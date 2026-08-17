@@ -25,6 +25,7 @@ import {
   SheetTitle,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import { Input as CopyableInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -76,24 +77,24 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
       : account?.status === 'READY'
         ? 'Connection is ready to accept'
         : account?.status === 'CREATING'
-          ? 'This account connection is being created'
+          ? 'This connection is being created'
           : account?.status === 'DELETING'
-            ? 'This account is being deleted'
+            ? 'This connection is being deleted'
             : account?.status === 'ASSOCIATION_REQUEST_EXPIRED'
-              ? 'Account acceptance request has expired'
+              ? 'This request has expired'
               : account?.status === 'CREATION_FAILED'
-                ? 'Failed to create account'
-                : 'This account needs to be accepted by the AWS account owner.'
+                ? "Couldn't create this connection"
+                : 'This connection needs to be accepted by the AWS account owner.'
 
   const description =
     account?.status === 'ASSOCIATION_ACCEPTED'
-      ? 'The resource share has been accepted by the AWS account owner and the connection is established.'
+      ? 'The AWS account owner has accepted the resource share.'
       : account?.status === 'READY'
-        ? 'It may be waiting acceptance from the AWS account owner. Association requests are automatically deleted if not accepted within 12 hours.'
+        ? 'It may be waiting acceptance from the AWS account owner. Requests expire after 12 hours.'
         : account?.status === 'ASSOCIATION_REQUEST_EXPIRED'
-          ? 'Reconnect this account to initiate a new connection request'
+          ? 'Add a new connection to try again.'
           : account?.status === 'CREATION_FAILED'
-            ? 'Reconnect this account to initiate a new connection request'
+            ? 'Add a new connection to try again.'
             : ''
 
   const onSubmit = (values: FormValues) => {
@@ -112,7 +113,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
         {
           onSuccess: () => {
             form.reset(defaultValues)
-            toast.success('Successfully added AWS account')
+            toast.success('Connection added')
             onOpenChange(false)
           },
         }
@@ -133,15 +134,17 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="flex flex-col gap-0">
         <SheetHeader>
-          <SheetTitle>{isNew ? 'Add AWS Account' : 'AWS Account Details'}</SheetTitle>
+          <SheetTitle>{isNew ? 'Add connection' : 'Connection details'}</SheetTitle>
           <SheetDescription>
-            Connect to your Supabase project from your AWS VPC using AWS PrivateLink.{' '}
+            {isNew
+              ? 'Enter an AWS account to connect. You’ll need to accept the share in AWS. '
+              : 'These values identify the resource share in AWS. '}
             <InlineLink href={`${DOCS_URL}/guides/platform/privatelink`}>Learn more</InlineLink>
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1">
-            <SheetSection className="space-y-4 flex-1">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 min-h-0">
+            <SheetSection className="space-y-4 flex-1 overflow-y-auto">
               {!isNew && account && (
                 <>
                   <Admonition
@@ -192,7 +195,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                             rel="noopener noreferrer"
                             href={`${DOCS_URL}/guides/platform/privatelink#step-2-accept-resource-share`}
                           >
-                            How to accept?
+                            How to accept
                           </Link>
                         </Button>
                       )
@@ -200,6 +203,28 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                   />
                 </>
               )}
+              <FormField
+                control={form.control}
+                name="accountName"
+                render={({ field }) => (
+                  <FormItemLayout
+                    label="Description"
+                    description="A description for this connection."
+                  >
+                    <FormControl>
+                      <Input
+                        {...field}
+                        readOnly={!isNew}
+                        onFocus={(e) => {
+                          if (!isNew) {
+                            e.target.blur()
+                          }
+                        }}
+                      />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
               {(showPrivateLinkReadReplica || !isNew) && (
                 <FormField
                   control={form.control}
@@ -207,7 +232,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                   render={({ field }) => (
                     <FormItemLayout
                       label="Database target"
-                      description="Associations are created per database target. The same AWS account can be associated with both primary and replica databases."
+                      description="Each database needs its own connection. The same AWS account can connect to both primary and replica databases."
                     >
                       <FormControl>
                         <Select
@@ -245,7 +270,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                 name="awsAccountId"
                 render={({ field }) => (
                   <FormItemLayout
-                    label="AWS Account ID"
+                    label="AWS account ID"
                     description="The ID of the AWS account you want to connect to."
                   >
                     <FormControl>
@@ -263,28 +288,38 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                   </FormItemLayout>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="accountName"
-                render={({ field }) => (
-                  <FormItemLayout
-                    label="Account Name"
-                    description="A name for this account connection."
-                  >
-                    <FormControl>
-                      <Input
-                        {...field}
-                        readOnly={!isNew}
-                        onFocus={(e) => {
-                          if (!isNew) {
-                            e.target.blur()
-                          }
-                        }}
-                      />
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
+              {!isNew && account?.resource_access_manager_resource_config_id && (
+                <FormItemLayout
+                  label="Resource Configuration ID"
+                  description="The AWS VPC Lattice resource configuration ID for this connection."
+                >
+                  <CopyableInput
+                    readOnly
+                    copy
+                    value={account.resource_access_manager_resource_config_id}
+                  />
+                </FormItemLayout>
+              )}
+              {!isNew && account?.resource_access_manager_resource_config_arn && (
+                <FormItemLayout
+                  label="Resource Configuration ARN"
+                  description="The ARN of the AWS VPC Lattice resource configuration."
+                >
+                  <CopyableInput
+                    readOnly
+                    copy
+                    value={account.resource_access_manager_resource_config_arn}
+                  />
+                </FormItemLayout>
+              )}
+              {!isNew && account?.resource_access_manager_share_arn && (
+                <FormItemLayout
+                  label="Resource Share ARN"
+                  description="The ARN of the AWS RAM resource share."
+                >
+                  <CopyableInput readOnly copy value={account.resource_access_manager_share_arn} />
+                </FormItemLayout>
+              )}
             </SheetSection>
 
             <SheetFooter>
@@ -293,7 +328,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
               </Button>
               {isNew && (
                 <Button type="submit" loading={isPending}>
-                  Add Account
+                  Add connection
                 </Button>
               )}
             </SheetFooter>
