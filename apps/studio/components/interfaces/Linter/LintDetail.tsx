@@ -1,6 +1,7 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { Markdown } from '../Markdown'
 import { asGraphqlExposureLint, GraphqlExposureCallout } from './GraphqlExposureLintCTA'
@@ -8,6 +9,7 @@ import { EntityTypeIcon, LintCTA, LintEntity } from './Linter.utils'
 import { createLintSummaryPrompt, lintInfoMap } from '@/components/interfaces/Linter/Linter.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { Lint } from '@/data/lint/lint-query'
 import { DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
@@ -31,6 +33,9 @@ export const LintDetail = ({
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
   const isGraphqlExposureLint = !!asGraphqlExposureLint(lint.name)
+  const isAuthDbConnectionsAbsoluteLint = (
+    ['auth_db_connections_absolute'] as readonly string[]
+  ).includes(lint.name)
 
   const handleAskAssistant = () => {
     track('advisor_assistant_button_clicked', {
@@ -72,6 +77,24 @@ export const LintDetail = ({
       {isGraphqlExposureLint && (
         <div className="mb-4">
           <GraphqlExposureCallout projectRef={projectRef} />
+        </div>
+      )}
+
+      {isAuthDbConnectionsAbsoluteLint && (
+        <div className="mb-4">
+          <Admonition
+            type="default"
+            title="Where to fix this"
+            description={
+              <p>
+                Switch to a percentage-based connection allocation strategy from the{' '}
+                <InlineLink href={`/project/${projectRef}/auth/performance`}>
+                  Auth performance settings
+                </InlineLink>
+                .
+              </p>
+            }
+          />
         </div>
       )}
 
