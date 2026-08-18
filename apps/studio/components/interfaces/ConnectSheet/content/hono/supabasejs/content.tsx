@@ -24,11 +24,9 @@ import { env } from 'hono/adapter'
 import { setCookie } from 'hono/cookie'
 import type { CookieOptions } from 'hono/utils/cookie'
 
-import type { Database } from '../database.types'
-
 declare module 'hono' {
   interface ContextVariableMap {
-    supabase: SupabaseClient<Database>
+    supabase: SupabaseClient
   }
 }
 
