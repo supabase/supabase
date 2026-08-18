@@ -60,6 +60,7 @@ describe('getConnectionsAttentionCopy', () => {
     const copy = getConnectionsAttentionCopy({ waitingCount: 1, expiredCount: 0 })
     expect(copy?.type).toBe('warning')
     expect(copy?.title).toBe('Waiting for the AWS account owner')
+    expect(copy?.description).toBe('Accept the resource share in AWS within 12 hours.')
     expect(copy?.shouldShowAcceptLink).toBe(true)
   })
 
@@ -67,7 +68,7 @@ describe('getConnectionsAttentionCopy', () => {
     const copy = getConnectionsAttentionCopy({ waitingCount: 0, expiredCount: 2 })
     expect(copy?.type).toBe('destructive')
     expect(copy?.title).toBe('Connection requests expired')
-    expect(copy?.description).toBe('AWS can no longer accept the expired shares below.')
+    expect(copy?.description).toBe('AWS can no longer accept these shares.')
     expect(copy?.shouldShowAcceptLink).toBe(false)
   })
 
