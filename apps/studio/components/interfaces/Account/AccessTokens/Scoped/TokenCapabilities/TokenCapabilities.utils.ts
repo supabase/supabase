@@ -1,7 +1,5 @@
 import {
   getCatalogEntry,
-  PERMISSION_CATALOG,
-  type PermissionCatalogEntry,
   type PermissionSelection,
   type ResourceAccessMode,
   type RiskLevel,
@@ -48,14 +46,6 @@ export const groupCapabilitiesByLevel = (capabilities: CapabilitySummaryEntry[])
   readwrite: capabilities.filter((capability) => capability.mode === 'readwrite'),
   read: capabilities.filter((capability) => capability.mode === 'read'),
 })
-
-/** Catalog entries the token doesn't grant at all — dense mode's "Not granted" group. */
-export const getNotGrantedCatalogEntries = (
-  capabilities: CapabilitySummaryEntry[]
-): PermissionCatalogEntry[] => {
-  const grantedKeys = new Set(capabilities.map((capability) => capability.entry.key))
-  return PERMISSION_CATALOG.filter((entry) => !grantedKeys.has(entry.key))
-}
 
 export type CapabilityLevelFilter = 'all' | 'read' | 'readwrite'
 

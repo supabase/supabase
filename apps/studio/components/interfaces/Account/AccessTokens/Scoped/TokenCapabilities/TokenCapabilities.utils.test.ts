@@ -5,7 +5,6 @@ import type { CapabilitySummaryEntry } from '../../hooks/useCapabilitySummary'
 import {
   computeRiskBanner,
   getCapabilityDensityTier,
-  getNotGrantedCatalogEntries,
   getSharedPathPrefix,
   groupCapabilitiesByLevel,
   splitEndpointPath,
@@ -93,17 +92,6 @@ describe('groupCapabilitiesByLevel', () => {
     const { readwrite, read } = groupCapabilitiesByLevel(capabilities)
     expect(readwrite.map((c) => c.entry.key)).toEqual(['project:database'])
     expect(read.map((c) => c.entry.key)).toEqual(['project:advisors'])
-  })
-})
-
-describe('getNotGrantedCatalogEntries', () => {
-  it('returns every catalog entry when nothing is granted', () => {
-    expect(getNotGrantedCatalogEntries([]).map((e) => e.key)).toContain('project:database')
-  })
-
-  it('excludes granted entries', () => {
-    const notGranted = getNotGrantedCatalogEntries([databaseCapability('read')])
-    expect(notGranted.map((e) => e.key)).not.toContain('project:database')
   })
 })
 

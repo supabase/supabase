@@ -1,14 +1,10 @@
 import { useState } from 'react'
-import { Accordion, Badge } from 'ui'
+import { Accordion } from 'ui'
 
 import type { EntryAccess } from '../../AccessToken.roles'
 import type { CapabilitySummaryEntry } from '../../hooks/useCapabilitySummary'
 import { CapabilityCard } from './CapabilityCard'
-import {
-  getNotGrantedCatalogEntries,
-  groupCapabilitiesByLevel,
-  type CapabilityLevelFilter,
-} from './TokenCapabilities.utils'
+import { groupCapabilitiesByLevel, type CapabilityLevelFilter } from './TokenCapabilities.utils'
 
 interface DenseCapabilitiesProps {
   capabilities: CapabilitySummaryEntry[]
@@ -26,7 +22,6 @@ export const DenseCapabilities = ({
   const [openKeys, setOpenKeys] = useState<string[]>([])
 
   const { readwrite, read } = groupCapabilitiesByLevel(capabilities)
-  const notGranted = getNotGrantedCatalogEntries(capabilities)
 
   const shown =
     levelFilter === 'readwrite'
@@ -52,21 +47,6 @@ export const DenseCapabilities = ({
           />
         ))}
       </Accordion>
-
-      {notGranted.length > 0 && (
-        <div className="flex flex-col gap-2">
-          <p className="text-[11px] font-mono uppercase tracking-wide text-foreground-lighter">
-            Not granted · {notGranted.length}
-          </p>
-          <div className="flex flex-wrap gap-1.5">
-            {notGranted.map((entry) => (
-              <Badge key={entry.key} variant="default">
-                {entry.name}
-              </Badge>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   )
 }

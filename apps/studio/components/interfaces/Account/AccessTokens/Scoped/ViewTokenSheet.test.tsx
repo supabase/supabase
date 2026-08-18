@@ -223,7 +223,6 @@ describe('ViewTokenSheet', () => {
     renderSheet()
 
     expect(await screen.findByText('Database')).toBeInTheDocument()
-    expect(screen.getByText(/Not granted · \d+/)).toBeInTheDocument()
     // All granted capabilities render immediately — no truncation.
     expect(screen.getByText('Storage')).toBeInTheDocument()
     expect(screen.getByText('Backups')).toBeInTheDocument()
