@@ -1,6 +1,6 @@
 import { Check, Copy } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { Badge, cn, copyToClipboard } from 'ui'
+import { cn, copyToClipboard } from 'ui'
 
 import { splitEndpointPath } from './TokenCapabilities.utils'
 
@@ -31,7 +31,6 @@ export const EndpointRow = ({
   methodColumnWidth,
 }: EndpointRowProps) => {
   const { prefix, distinguishing } = splitEndpointPath(path, sharedPrefix)
-  const isMutating = method !== 'GET'
 
   const pathContainerRef = useRef<HTMLSpanElement>(null)
   const [panDistance, setPanDistance] = useState(0)
@@ -69,8 +68,11 @@ export const EndpointRow = ({
       aria-label={`Copy ${method} ${path}`}
       className="group flex w-full items-center gap-2 py-1.5 text-left"
     >
-      <span className="shrink-0" style={{ width: methodColumnWidth }}>
-        <Badge variant={isMutating ? 'warning' : 'default'}>{method}</Badge>
+      <span
+        className="shrink-0 font-mono text-xs text-foreground-lighter"
+        style={{ width: methodColumnWidth }}
+      >
+        {method}
       </span>
       <span
         ref={pathContainerRef}
