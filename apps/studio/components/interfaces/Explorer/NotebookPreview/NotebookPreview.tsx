@@ -42,6 +42,7 @@ export const NotebookPreview = ({ entries, mode, title, className }: NotebookPre
   const isExpanded = (entry: NotebookCellDiffEntry) =>
     expandedOverrides[getEntryKey(entry)] ?? isEntryExpandedByDefault(entry)
 
+  const hasEntries = entries.length > 0
   const areAllExpanded = visibleEntries.every(isExpanded)
 
   const toggleAll = () =>
@@ -66,14 +67,16 @@ export const NotebookPreview = ({ entries, mode, title, className }: NotebookPre
         <span className="heading-meta shrink-0 text-foreground-light">
           {formatNotebookDiffSummary(summary)}
         </span>
-        <Button
-          variant="text"
-          size="tiny"
-          className="-mr-1.5 shrink-0 px-1.5 text-foreground-lighter hover:text-foreground"
-          onClick={toggleAll}
-        >
-          {areAllExpanded ? 'Collapse all' : 'Expand all'}
-        </Button>
+        {hasEntries && (
+          <Button
+            variant="text"
+            size="tiny"
+            className="-mr-1.5 shrink-0 px-1.5 text-foreground-lighter hover:text-foreground"
+            onClick={toggleAll}
+          >
+            {areAllExpanded ? 'Collapse all' : 'Expand all'}
+          </Button>
+        )}
       </div>
       <div className="divide-y divide-border">
         {visibleEntries.map((entry) => {
