@@ -199,7 +199,7 @@ The gateway applies a permissive CORS policy at the virtual-host level:
 
 This matches both the current Supabase platform behavior and the previous Kong-based gateway. The auth boundary for Supabase APIs is the `apikey` header rather than the request origin.
 
-The `/pg/` route (direct Postgres introspection via `meta`, gated by the service role key) is the exception: it carries its own stricter per-route CORS override, restricted to `SUPABASE_PUBLIC_URL` and `localhost`/`127.0.0.1` origins, since there's no legitimate reason for this route to be called from an arbitrary third-party origin.
+The `/pg/` route is the exception. This route runs direct Postgres introspection through `meta` and requires the service role key. It uses a stricter per-route CORS override that allows only `SUPABASE_PUBLIC_URL`, `localhost`, and `127.0.0.1` origins. No third-party origin needs to call it.
 
 <Admonition type="note">
 
