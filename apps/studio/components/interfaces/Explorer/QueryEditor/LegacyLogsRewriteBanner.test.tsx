@@ -7,9 +7,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { LegacyLogsRewriteBanner } from './LegacyLogsRewriteBanner'
 import { API_URL } from '@/lib/constants'
+import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer } from '@/tests/lib/msw'
-import { createMockOrganizationResponse } from '@/tests/helpers'
 
 type ProjectDetailResponse = platformComponents['schemas']['ProjectDetailResponse']
 
@@ -90,25 +90,19 @@ describe('LegacyLogsRewriteBanner', () => {
   it('stays hidden when the source is not logs', () => {
     renderBanner({ isLogsSource: false })
 
-    expect(
-      screen.queryByText('Logs now run on a ClickHouse-backed engine')
-    ).not.toBeInTheDocument()
+    expect(screen.queryByText('Logs now run on a ClickHouse-backed engine')).not.toBeInTheDocument()
   })
 
   it('stays hidden when the SQL does not look legacy', () => {
     renderBanner({ sql: 'select event_message from logs limit 10' })
 
-    expect(
-      screen.queryByText('Logs now run on a ClickHouse-backed engine')
-    ).not.toBeInTheDocument()
+    expect(screen.queryByText('Logs now run on a ClickHouse-backed engine')).not.toBeInTheDocument()
   })
 
   it('stays hidden when the ClickHouse logs flag is off', () => {
     renderBanner({ isOtelLogsEnabled: false })
 
-    expect(
-      screen.queryByText('Logs now run on a ClickHouse-backed engine')
-    ).not.toBeInTheDocument()
+    expect(screen.queryByText('Logs now run on a ClickHouse-backed engine')).not.toBeInTheDocument()
   })
 
   it('swaps the SQL in place when a rewrite is accepted', async () => {

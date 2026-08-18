@@ -60,5 +60,7 @@ export const LegacyLogsRewriteBanner = ({
   const hasUnacknowledgedOutcome = state.status === 'failed' || state.status === 'noRewriteNeeded'
   if (!(needsRewrite || hasUnacknowledgedOutcome)) return null
 
-  return <LegacyLogsRewriteAdmonition state={state} onRewrite={requestRewrite} onDismiss={dismiss} />
+  return (
+    <LegacyLogsRewriteAdmonition state={state} onRewrite={requestRewrite} onDismiss={dismiss} />
+  )
 }
