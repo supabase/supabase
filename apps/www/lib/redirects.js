@@ -138,7 +138,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/reports/:match*',
-    destination: '/docs/guides/observability/:match*',
+    destination: '/docs/guides/monitoring-and-debugging/:match*',
   },
   {
     permanent: true,
