@@ -276,6 +276,21 @@ to authenticated                          -- the Postgres Role (recommended)
 with check ( (select auth.uid()) = user_id );      -- the actual Policy
 ```
 
+<Admonition type="caution">
+
+When the Data API returns the inserted row (PostgREST `Prefer: return=representation`, or supabase-js `.insert(...).select()`), Postgres runs `insert ... returning *`. That also requires a corresponding [`SELECT` policy](#select-policies). An `INSERT` policy alone is enough for a plain SQL `insert` without `returning`, which is why the same statement can succeed in the SQL Editor under `set role anon` and still fail over the API.
+
+To insert without reading the new row back, omit `.select()` or use `Prefer: return=minimal`. Otherwise add a `SELECT` policy that covers the inserted rows, for example:
+
+```sql
+create policy "Users can view their own profile."
+on profiles for select
+to authenticated
+using ( (select auth.uid()) = user_id );
+```
+
+</Admonition>
+
 ### UPDATE policies
 
 You can specify update policies by combining both the `using` and `with check` expressions.
