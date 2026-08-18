@@ -171,6 +171,12 @@ export const useIsExplorerEnabled = () => {
   return isExplorerEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER]
 }
 
+export const useIsStorageVersioningEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const isStorageVersioningEnabled = useFlag('storageVersioningPrivateAlpha')
+  return isStorageVersioningEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING]
+}
+
 export const useFeaturePreviewModal = () => {
   const featurePreviews = useFeaturePreviews()
   const [featurePreviewModal, setFeaturePreviewModal] = useQueryState('featurePreviewModal')
