@@ -24,7 +24,7 @@ export const ResourceAccessPills = ({
   emptyText = '-',
 }: ResourceAccessPillsProps) => {
   if (items.length === 0) {
-    return <span className="text-sm text-foreground-lighter">{emptyText}</span>
+    return <span className="text-xs text-foreground-lighter">{emptyText}</span>
   }
 
   return (
@@ -33,7 +33,7 @@ export const ResourceAccessPills = ({
         <div
           key={item.key}
           className={cn(
-            'flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border bg-surface-75 text-foreground-light px-3 py-1 text-sm',
+            'flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border bg-surface-75 text-foreground-light px-3 py-1 text-xs',
             item.isInaccessible
               ? 'border-destructive-500 text-destructive'
               : 'border-strong text-foreground'
