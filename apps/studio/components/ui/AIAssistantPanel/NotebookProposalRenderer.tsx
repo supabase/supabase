@@ -197,7 +197,7 @@ function CreateNotebookProposal({ state, input, onApprove, onDeny }: NotebookPro
   )
 
   return (
-    <div className="w-auto overflow-x-hidden my-4 px-4 flex flex-col gap-2">
+    <div className="w-auto overflow-x-hidden my-4 flex flex-col gap-2">
       <NotebookPreview entries={entries} mode="create" title={parsedInput.data.name} />
       <NotebookConfirmFooter mode="create" state={state} onApprove={onApprove} onDeny={onDeny} />
     </div>
