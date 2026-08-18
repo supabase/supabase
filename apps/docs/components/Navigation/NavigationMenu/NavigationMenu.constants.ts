@@ -3365,7 +3365,7 @@ export const reference = {
         },
         {
           name: 'Management API',
-          url: '/reference/javascript',
+          url: '/reference/api/introduction',
           icon: '/img/icons/menu/reference-api' as `/${string}`,
         },
       ],
