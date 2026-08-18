@@ -32,7 +32,19 @@ vi.mock('@/components/ui/CodeEditor/CodeEditor', () => ({
   ),
 }))
 
-vi.mock('./ExplorerQuerySourceMenu', () => ({ ExplorerQuerySourceMenu: () => null }))
+vi.mock('./ExplorerQuerySourceMenu', () => ({
+  ExplorerQuerySourceMenu: ({
+    roleImpersonationState,
+  }: {
+    roleImpersonationState?: { role?: { type: string; role?: string } }
+  }) => (
+    <div data-testid="impersonated-role">
+      {roleImpersonationState?.role?.type === 'postgrest'
+        ? roleImpersonationState.role.role
+        : 'none'}
+    </div>
+  ),
+}))
 
 const renderQueryTab = () =>
   customRender(
@@ -167,5 +179,31 @@ describe('QueryTab execution', () => {
       new Date(bodies[0].iso_timestamp_end).getTime() -
         new Date(bodies[0].iso_timestamp_start).getTime()
     ).toBe(2 * 60 * 60 * 1000)
+  })
+
+  it('isolates the impersonated role selection per query tab', async () => {
+    createDraft({ _tag: 'database' })
+    explorerQueryState.removeDraft({ id: 'query-test-2', projectRef: 'default' })
+    explorerQueryState.createDraft({ id: 'query-test-2', projectRef: 'default', sql: 'select 2' })
+    explorerQueryState.setRole({
+      id: 'query-test',
+      role: { type: 'postgrest', role: 'service_role' },
+    })
+
+    const { rerender } = renderQueryTab()
+    expect(await screen.findByTestId('impersonated-role')).toHaveTextContent('service_role')
+
+    testContext.params = { ref: 'default', id: 'query-test-2' }
+    rerender(
+      <TabsStateContext.Provider value={createTabsState('default')}>
+        <QueryTab />
+      </TabsStateContext.Provider>
+    )
+
+    expect(await screen.findByTestId('impersonated-role')).toHaveTextContent('none')
+
+    await act(async () => {
+      explorerQueryState.removeDraft({ id: 'query-test-2', projectRef: 'default' })
+    })
   })
 })

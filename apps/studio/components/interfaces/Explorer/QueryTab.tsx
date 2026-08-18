@@ -1,14 +1,14 @@
 import { useParams } from 'common'
 import { Loader2, SquareCode } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { Button } from 'ui'
 
 import { QueryEditor, type ExplorerQueryModel } from './QueryEditor'
 import { type QueryResult } from './types'
 import { toQuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { explorerQueryState, useExplorerQueryStateSnapshot } from '@/state/explorer-query'
-import { useLocalRoleImpersonationState } from '@/state/role-impersonation-state'
+import { useControlledRoleImpersonationState } from '@/state/role-impersonation-state'
 import { createTabId, TabsStateContext } from '@/state/tabs'
 
 /** Query-tab lifecycle adapter around the shared QueryEditor. */
@@ -17,7 +17,6 @@ export const QueryTab = () => {
   const router = useRouter()
   const tabs = useContext(TabsStateContext)
   const querySnap = useExplorerQueryStateSnapshot()
-  const roleImpersonationState = useLocalRoleImpersonationState()
 
   const [restoredQueryKey, setRestoredQueryKey] = useState<string>()
 
@@ -25,6 +24,16 @@ export const QueryTab = () => {
   const draft = stateDraft?.projectRef === ref ? stateDraft : undefined
   const result = draft && id ? querySnap.results[id] : undefined
   const queryKey = id && ref ? `${ref}:${id}` : undefined
+
+  const roleImpersonationState = useControlledRoleImpersonationState(
+    draft?._tag === 'database' ? draft.role : undefined,
+    useCallback(
+      (role) => {
+        if (id) explorerQueryState.setRole({ id, role })
+      },
+      [id]
+    )
+  )
 
   useEffect(() => {
     if (!id || !ref) return
