@@ -26,6 +26,7 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 import {
   createMcpCopyHandler,
+  MCP_HOSTED_AUTH_NOTE,
   McpConfigPanel as McpConfigPanelBase,
   type McpClient,
 } from 'ui-patterns/McpUrlBuilder'
@@ -336,13 +337,8 @@ export function McpConfigPanel() {
         />
       </div>
       {isPlatform && (
-        <Admonition type="note" title="Authentication" className="mt-3">
-          <p>
-            Some MCP clients automatically prompt you to log in during setup. Others require manual
-            authentication steps. Either method opens a browser window where you log in to your
-            Supabase account and grant the MCP client access to your organization.
-          </p>
-          <p>You don't need a personal access token (PAT).</p>
+        <Admonition type="note" title={MCP_HOSTED_AUTH_NOTE.title} className="mt-3">
+          <p>{MCP_HOSTED_AUTH_NOTE.body}</p>
         </Admonition>
       )}
     </>

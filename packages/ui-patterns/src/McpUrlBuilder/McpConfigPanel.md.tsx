@@ -9,6 +9,7 @@ import {
   DEFAULT_MCP_URL_NON_PLATFORM as LOCAL_URL,
   MCP_CLIENT_DATA,
   MCP_CLIENT_GROUPS,
+  MCP_HOSTED_AUTH_NOTE,
 } from './clients.data'
 import type { McpClientData } from './clients.data'
 import {
@@ -144,14 +145,9 @@ export function McpConfigPanel() {
       ))}
 
       <paragraph>
-        <strong>Authentication</strong>
+        <strong>{MCP_HOSTED_AUTH_NOTE.title}</strong>
       </paragraph>
-      <paragraph>
-        Some MCP clients automatically prompt you to log in during setup. Others require manual
-        authentication steps. Either method opens a browser window where you log in to your Supabase
-        account and grant the MCP client access to your organization.
-      </paragraph>
-      <paragraph>You don't need a personal access token (PAT).</paragraph>
+      <paragraph>{MCP_HOSTED_AUTH_NOTE.body}</paragraph>
     </>
   )
 }
