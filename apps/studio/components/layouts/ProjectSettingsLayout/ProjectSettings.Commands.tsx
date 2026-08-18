@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { useRouter } from 'next/router'
 import type { CommandOptions, ICommand } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
@@ -14,6 +14,7 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
   const setIsOpen = useSetCommandMenuOpen()
   let { ref, slug } = useParams()
   const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
+  const showConfigDrift = useFlag('ConfigDrift')
   ref ||= '_'
   const hasOrgSlug = typeof slug === 'string' && slug.length > 0 && slug !== '_'
 
@@ -48,7 +49,7 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
         route: `/project/${ref}/settings/general`,
         defaultHidden: true,
       },
-      ...(IS_PLATFORM
+      ...(IS_PLATFORM && showConfigDrift
         ? [
             {
               id: 'nav-project-settings-configuration-drift',
@@ -202,6 +203,6 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
           ]
         : []),
     ],
-    { ...options, deps: [platformWebhooksEnabled, showLogDrains, ref, slug] }
+    { ...options, deps: [platformWebhooksEnabled, showLogDrains, showConfigDrift, ref, slug] }
   )
 }

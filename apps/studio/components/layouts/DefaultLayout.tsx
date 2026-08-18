@@ -1,4 +1,4 @@
-import { useBreakpoint, useParams } from 'common'
+import { useBreakpoint, useFlag, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { ResizablePanel, ResizablePanelGroup, SidebarProvider, usePanelRef } from 'ui'
@@ -55,6 +55,7 @@ export const DefaultLayout = ({
   const appSnap = useAppStateSnapshot()
   const { isMaximised, activeSidebar } = useSidebarManagerSnapshot()
   const { lastVisitedOrganization } = useLastVisitedOrganization()
+  const showConfigDrift = useFlag('ConfigDrift')
 
   const [isMounted, setIsMounted] = useState(false)
 
@@ -107,7 +108,7 @@ export const DefaultLayout = ({
                   />
                 )}
                 <LayoutHeader headerTitle={headerTitle} backToDashboardURL={backToDashboardURL} />
-                <GitHubConfigDriftBanner />
+                {showConfigDrift && <GitHubConfigDriftBanner />}
               </div>
               {/* Main Content Area */}
               <div className="flex flex-1 w-full overflow-y-hidden">
