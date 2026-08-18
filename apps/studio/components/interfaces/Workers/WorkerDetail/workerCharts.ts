@@ -2,13 +2,7 @@ import type { ChartConfig } from 'ui'
 
 import type { Worker } from '../Workers.types'
 
-/**
- * Deterministic mock time-series for the worker Overview tab.
- *
- * Mirrors the design-system "parent with mixed child widths" example, adapted
- * for workers. Timestamps are derived from a fixed base (not `new Date()`) so
- * the server and client renders match and React doesn't warn on hydration.
- */
+// Seeded time-series until the workers metrics endpoint ships.
 
 export const CHART_INTERVALS = [
   { key: '15min', label: '15 min', format: 'MMM D, h:mm:ssa', minutes: 15 },
@@ -59,7 +53,7 @@ const pseudoNoise = (seed: number, amplitude = 1) => {
 export const getIntervalMinutes = (intervalKey: string) =>
   CHART_INTERVALS.find((item) => item.key === intervalKey)?.minutes ?? 60
 
-/** States where the worker is not serving traffic — charts render empty. */
+// Not serving traffic, so the charts render empty rather than stale numbers.
 export const isIdleState = (worker: Pick<Worker, 'state'>) =>
   worker.state === 'suspended' ||
   worker.state === 'killed' ||
