@@ -69,7 +69,7 @@ reviews:
           for both runtimes until the final cleanup pass (tracked in FE-3106).
         Keep this a reminder to verify, not a hard blocker: if no mirror is required,
         say so briefly rather than forcing a change.
-    - path: '{apps,packages}/**/*.{tsx,jsx,css}'
+    - path: '{apps,packages}/**/*.{tsx,jsx,css,mdx}'
       instructions: |
         When reviewing UI changes, flag these accessibility gaps. Comments are
         advisory. One comment per gap. Skip test files (*.test.*, *.spec.*) and
@@ -88,6 +88,10 @@ reviews:
           motion-safe:, or matchMedia('(prefers-reduced-motion: reduce)').
           packages/config/css/utilities.css only zeroes out .shimmer under
           reduced motion, not all animation.
+        - Alt text: flag generic values such as Image, Icon, Photo, Picture, or
+          the filename. If adjacent visible text already names the image (blog
+          thumbnail next to its title, icon next to its label), flag it as
+          redundant and recommend alt="" plus aria-hidden on the image.
 
 # Applies our internal engineering skills (.claude/skills/) as CodeRabbit review
 # guidelines. The skills are the single source of truth — they are consumed
