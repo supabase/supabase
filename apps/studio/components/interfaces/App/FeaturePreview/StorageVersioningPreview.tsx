@@ -10,12 +10,13 @@ export const StorageVersioningPreview = () => {
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>Add object versioning and lifecycle policy settings to the bucket settings</li>
           <li>Show a version history for each file in the file preview panel</li>
+          <li>Allow soft-deleting and restoring files</li>
           <li>Break down retained version storage on the organization usage page</li>
         </ul>
       </div>
       <p className="text-sm text-foreground-light">
-        Object versioning is in private alpha. Versioning is off for every bucket until you turn it
-        on, and the backend is not yet available, so these surfaces have no data to show.
+        Versioning is in <em>Private Alpha</em> and is off for every bucket by default until you
+        turn it on.
       </p>
     </div>
   )

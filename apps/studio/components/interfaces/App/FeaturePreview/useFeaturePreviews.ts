@@ -154,11 +154,11 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       },
       {
         key: LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING,
-        name: 'Storage object versioning',
+        name: 'Storage versioning',
         discussionsUrl: undefined,
         isNew: true,
         isPlatformOnly: true,
-        isDefaultOptIn: false,
+        isDefaultOptIn: true,
         enabled: isStorageVersioningEnabled,
         getRoute: (ref?: string) => `/project/${ref}/storage/files`,
       },
