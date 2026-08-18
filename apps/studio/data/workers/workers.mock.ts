@@ -1,27 +1,11 @@
-import { proxy, useSnapshot } from 'valtio'
-
 import { WORKERS_REGION } from '@/components/interfaces/Workers/Workers.constants'
 import type { Worker } from '@/components/interfaces/Workers/Workers.types'
 
-// Seeded stand-in until the Management API worker routes are wired into the dashboard.
-
-// Fixed base timestamp so SSR and client render identically (no hydration mismatch).
+// Timestamps derive from a fixed base rather than Date.now() so SSR and client render identically.
 const SEED_BASE = new Date('2026-08-10T09:00:00.000Z').getTime()
 const seedTime = (minutesAgo: number) => new Date(SEED_BASE - minutesAgo * 60_000).toISOString()
 
-interface WorkersProjectState {
-  workers: Worker[]
-}
-
-interface WorkersState {
-  byProject: Record<string, WorkersProjectState>
-}
-
-const workersState = proxy<WorkersState>({
-  byProject: {},
-})
-
-function seedWorkers(): Worker[] {
+export function mockWorkers(): Worker[] {
   return [
     {
       id: 'wk-embed',
@@ -92,18 +76,4 @@ function seedWorkers(): Worker[] {
       ],
     },
   ]
-}
-
-// Mutates the valtio proxy, so callers must run it in an effect, not during render.
-export function ensureProjectSeeded(projectRef: string | undefined) {
-  if (!projectRef) return
-  if (!workersState.byProject[projectRef]) {
-    workersState.byProject[projectRef] = { workers: seedWorkers() }
-  }
-}
-
-export function useProjectWorkers(projectRef: string | undefined): Worker[] {
-  const snap = useSnapshot(workersState)
-  if (!projectRef) return []
-  return (snap.byProject[projectRef]?.workers ?? []) as Worker[]
 }

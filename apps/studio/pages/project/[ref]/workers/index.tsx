@@ -1,5 +1,5 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { useEffect } from 'react'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -9,24 +9,25 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { WorkersList } from '@/components/interfaces/Workers/WorkersList'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { WorkersLayout } from '@/components/layouts/WorkersLayout/WorkersLayout'
+import { AlertError } from '@/components/ui/AlertError'
+import { workersQueryOptions } from '@/data/workers/workers-query'
 import { PRODUCT_NAME } from '@/lib/constants/workers'
-import { ensureProjectSeeded, useProjectWorkers } from '@/state/workers-mock-state'
 import type { NextPageWithLayout } from '@/types'
 
 const WorkersPage: NextPageWithLayout = () => {
   const { ref } = useParams()
-
-  useEffect(() => {
-    ensureProjectSeeded(ref)
-  }, [ref])
-
-  const workers = useProjectWorkers(ref)
-
-  if (!ref) return null
+  const {
+    data: workers,
+    error,
+    isPending,
+    isError,
+    isSuccess,
+  } = useQuery(workersQueryOptions({ projectRef: ref }))
 
   return (
     <div className="w-full min-h-full flex flex-col items-stretch">
@@ -44,12 +45,16 @@ const WorkersPage: NextPageWithLayout = () => {
       <PageContainer size="large">
         <PageSection>
           <PageSectionContent>
-            {workers.length === 0 && (
+            {isPending && <GenericSkeletonLoader />}
+            {isError && <AlertError error={error} subject="Failed to retrieve workers" />}
+            {isSuccess && workers.length === 0 && (
               <p className="text-sm text-foreground-light">
                 No workers yet. Deploy your first worker with the Supabase CLI.
               </p>
             )}
-            {workers.length > 0 && <WorkersList projectRef={ref} workers={workers} />}
+            {isSuccess && workers.length > 0 && ref && (
+              <WorkersList projectRef={ref} workers={workers} />
+            )}
           </PageSectionContent>
         </PageSection>
       </PageContainer>
