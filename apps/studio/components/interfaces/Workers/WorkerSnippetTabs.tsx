@@ -21,10 +21,6 @@ interface WorkerSnippetTabsProps {
   className?: string
 }
 
-/**
- * Renders a subset of the deploy artifacts (AI prompt, config.toml, CLI, curl)
- * as a small tabbed code block that updates live from the create-worker form.
- */
 export const WorkerSnippetTabs = ({
   input,
   tabs = ['cli', 'curl'],
