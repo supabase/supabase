@@ -1,6 +1,6 @@
 import { WorkerDetail } from '@/components/interfaces/Workers/WorkerDetail/WorkerDetail'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
-import WorkersLayout from '@/components/layouts/WorkersLayout/WorkersLayout'
+import { WorkersLayout } from '@/components/layouts/WorkersLayout/WorkersLayout'
 import type { NextPageWithLayout } from '@/types'
 
 const WorkerDetailPage: NextPageWithLayout = () => <WorkerDetail />
