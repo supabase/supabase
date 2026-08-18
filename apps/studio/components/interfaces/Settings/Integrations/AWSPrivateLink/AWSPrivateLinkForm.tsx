@@ -206,11 +206,16 @@ export const AWSPrivateLinkForm = ({
                 control={form.control}
                 name="accountName"
                 render={({ field }) => (
-                  <FormItemLayout label="Description" labelOptional="Optional">
+                  <FormItemLayout
+                    label="Name"
+                    labelOptional="Optional"
+                    description="Shown on the connections list. Defaults to the AWS account ID if left blank."
+                  >
                     <FormControl>
                       <Input
                         {...field}
                         readOnly={!isNew}
+                        placeholder="Production VPC"
                         onFocus={(e) => {
                           if (!isNew) e.target.blur()
                         }}

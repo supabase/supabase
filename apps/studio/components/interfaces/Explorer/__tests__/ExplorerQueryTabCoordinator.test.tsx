@@ -1,7 +1,7 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { afterEach, describe, expect, it } from 'vitest'
 
-import { ExplorerQueryTabCoordinator } from './ExplorerQueryTabCoordinator'
+import { ExplorerQueryTabCoordinator } from '../ExplorerQueryTabCoordinator'
 import { explorerQueryState } from '@/state/explorer-query'
 import { createTabsState, TabsStateContext } from '@/state/tabs'
 import { customRender } from '@/tests/lib/custom-render'

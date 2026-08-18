@@ -1,31 +1,39 @@
 import { useParams } from 'common'
 import { Loader2, SquareCode } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { Button } from 'ui'
 
 import { QueryEditor, type ExplorerQueryModel } from './QueryEditor'
 import { type QueryResult } from './types'
 import { toQuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { explorerQueryState, useExplorerQueryStateSnapshot } from '@/state/explorer-query'
-import { useLocalRoleImpersonationState } from '@/state/role-impersonation-state'
+import { useControlledRoleImpersonationState } from '@/state/role-impersonation-state'
 import { createTabId, TabsStateContext } from '@/state/tabs'
 
 /** Query-tab lifecycle adapter around the shared QueryEditor. */
-export const QueryTab = () => {
+export const ExplorerQueryTab = () => {
   const { id, ref } = useParams()
   const router = useRouter()
   const tabs = useContext(TabsStateContext)
   const querySnap = useExplorerQueryStateSnapshot()
-  const roleImpersonationState = useLocalRoleImpersonationState()
 
-  const [rowLimit, setRowLimit] = useState<number>(100)
   const [restoredQueryKey, setRestoredQueryKey] = useState<string>()
 
   const stateDraft = id ? querySnap.drafts[id] : undefined
   const draft = stateDraft?.projectRef === ref ? stateDraft : undefined
   const result = draft && id ? querySnap.results[id] : undefined
   const queryKey = id && ref ? `${ref}:${id}` : undefined
+
+  const roleImpersonationState = useControlledRoleImpersonationState(
+    draft?._tag === 'database' ? draft.role : undefined,
+    useCallback(
+      (role) => {
+        if (id) explorerQueryState.setRole({ id, role })
+      },
+      [id]
+    )
+  )
 
   useEffect(() => {
     if (!id || !ref) return
@@ -84,7 +92,7 @@ export const QueryTab = () => {
       : {
           ...toQuerySourceBinding(draft),
           uncheckedSql: draft.uncheckedSql,
-          rowLimit,
+          rowLimit: draft.rowLimit,
         }
 
   return (
@@ -103,7 +111,7 @@ export const QueryTab = () => {
       onSqlChange={(sql) => explorerQueryState.updateDraft({ id, sql })}
       onSourceChange={(source) => explorerQueryState.updateDraft({ id, source })}
       onResultChange={handleResultChange}
-      onRowLimitChange={setRowLimit}
+      onRowLimitChange={(rowLimit) => explorerQueryState.updateDraft({ id, rowLimit })}
     />
   )
 }

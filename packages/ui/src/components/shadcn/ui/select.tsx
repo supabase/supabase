@@ -47,8 +47,8 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      'flex w-full items-center justify-between rounded-md border border-strong hover:border-stronger bg-background dark:bg-card hover:bg-popover text-xs data-[placeholder]:text-foreground-lighter ring-border-control focus-ring disabled:cursor-not-allowed disabled:opacity-50 transition-colors duration-200',
-      'data-[state=open]:bg-popover data-[state=open]:border-stronger',
+      'flex w-full items-center justify-between rounded-md border border-strong hover:border-control-hover bg-control-raised text-xs data-[placeholder]:text-foreground-lighter ring-border-control focus-ring disabled:cursor-not-allowed disabled:opacity-50 transition-colors duration-200',
+      'data-[state=open]:border-control-hover',
       'gap-2',
       '[&>span]:truncate text-left', // [kemal] This is to prevent double lines rendering when a string is particularly long.
       SelectTriggerVariants({ size }),

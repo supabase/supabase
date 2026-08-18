@@ -25,7 +25,7 @@ export function AWSPrivateLinkAttentionAdmonition({
       description={copy.description}
       className={className}
       actions={
-        copy.showAcceptLink && (
+        copy.shouldShowAcceptLink && (
           <Button variant="default" className="w-min" icon={<SquareArrowOutUpRight />} asChild>
             <Link
               target="_blank"

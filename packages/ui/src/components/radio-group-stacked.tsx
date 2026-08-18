@@ -49,14 +49,13 @@ const RadioGroupStackedItem = React.forwardRef<
         // Disabled state
         'disabled:opacity-50 disabled:cursor-not-allowed',
         // Enabled/hover states
-        'enabled:cursor-pointer enabled:hover:bg-surface-300 enabled:hover:border-foreground-muted',
+        'enabled:cursor-pointer enabled:hover:bg-surface-300 enabled:hover:border-control-hover',
         // Focus state
-        'focus-ring enabled:focus-visible:border-control',
+        'focus-ring enabled:focus-visible:border-control-hover',
         // Z-index for interactions
         'hover:z-1 focus-visible:z-1 data-[state=checked]:z-1',
         // Checked state
-        'data-[state=checked]:ring-1 data-[state=checked]:ring-border',
-        'data-[state=checked]:bg-surface-300 data-[state=checked]:border-foreground-muted',
+        'data-[state=checked]:bg-surface-300 data-[state=checked]:border-control-hover',
         // Colors only — avoid bare `transition` so the focus ring does not animate
         'transition-colors group',
         props.className
@@ -70,10 +69,10 @@ const RadioGroupStackedItem = React.forwardRef<
               'aspect-square h-4 w-4 min-w-4 min-h-4 rounded-full border relative',
               'flex items-center justify-center',
               // States
-              'group-data-[state=checked]:border-foreground-muted',
-              'group-focus-visible:border-foreground-muted',
+              'group-data-[state=checked]:border-control-hover',
+              'group-focus-visible:border-control-hover',
               'group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-background',
-              'group-hover:border-foreground-muted transition-colors'
+              'group-hover:border-control-hover transition-colors'
             )}
           >
             <RadioGroupPrimitive.Indicator className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
