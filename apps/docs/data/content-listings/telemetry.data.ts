@@ -22,7 +22,7 @@ export const telemetryAccessWhat: ContentListingGroup = {
     },
     {
       title: 'Database',
-      href: '/guides/database/inspect',
+      href: '/guides/monitoring-and-debugging/inspect',
       description:
         'Inspect live Postgres stats such as bloat, cache hit rate, locks, and slow queries.',
     },

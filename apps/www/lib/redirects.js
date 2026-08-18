@@ -2801,6 +2801,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/database/inspect',
+    destination: '/docs/guides/monitoring-and-debugging/inspect',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/database/database-linter',
     destination: '/docs/guides/monitoring-and-debugging/advisors',
   },

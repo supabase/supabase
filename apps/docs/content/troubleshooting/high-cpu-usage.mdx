@@ -25,7 +25,7 @@ Each Supabase project runs on dedicated compute. The available resources depend 
 1. Open the [Database Health report](/dashboard/project/_/observability/database), select the affected project, and identify when CPU usage increased.
 2. If you collect the project's [Metrics API](/docs/guides/monitoring-and-debugging/metrics), inspect CPU over the same time window. Confirm whether the increase is sustained or limited to a known operation.
 3. Open [Query Performance](/dashboard/project/_/advisors/query-performance?preset=slowest_execution). Look for queries whose execution time or call volume increased during the affected window.
-4. Use [database inspection tools](/docs/guides/database/inspect#query-performance) to check for long-running queries, outliers, sequential scans, and inefficient index usage when you need more detail.
+4. Use [database inspection tools](/docs/guides/monitoring-and-debugging/inspect#query-performance) to check for long-running queries, outliers, sequential scans, and inefficient index usage when you need more detail.
 5. Review the [Performance Advisor](/dashboard/project/_/advisors/performance) for missing indexes and other database findings related to the affected queries.
 6. Compare the evidence with these common causes:
    - **Slow or frequent queries:** Query execution time or call volume increased with CPU usage.

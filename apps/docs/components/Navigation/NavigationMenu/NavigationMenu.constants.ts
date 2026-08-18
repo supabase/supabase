@@ -1162,8 +1162,8 @@ export const database: NavMenuConstant = {
           url: '/guides/database/postgres/timeouts' as `/${string}`,
         },
         {
-          name: 'Debugging and monitoring',
-          url: '/guides/database/inspect' as `/${string}`,
+          name: 'Inspect the database',
+          url: '/guides/monitoring-and-debugging/inspect' as `/${string}`,
         },
         {
           name: 'Debugging performance issues',
@@ -3045,7 +3045,17 @@ export const telemetry: NavMenuConstant = {
             },
             {
               name: 'Database',
-              url: '/guides/database/inspect' as `/${string}`,
+              url: '/guides/monitoring-and-debugging/inspect' as `/${string}`,
+              items: [
+                {
+                  name: 'CLI commands',
+                  url: '/guides/monitoring-and-debugging/inspect#using-the-cli' as `/${string}`,
+                },
+                {
+                  name: 'SQL',
+                  url: '/guides/monitoring-and-debugging/inspect#using-sql' as `/${string}`,
+                },
+              ],
             },
             {
               name: 'Advisors',

@@ -1,27 +1,21 @@
 ---
-title: 'Database debugging and monitoring'
-description: 'Inspecting your Postgres database for common issues around disk, query performance, index, locks, and more using the terminal.'
+id: 'inspect'
+title: 'Inspect the database'
+description: 'Read live Postgres statistics such as bloat, cache hit rate, locks, and slow queries from the CLI, SQL Editor, or MCP.'
 ---
 
-This page is the catalog of live Postgres diagnostics. For project logs, the Metrics API, and Studio Logs or Reports, see [Observe the data](/docs/guides/monitoring-and-debugging/access-data).
+This guide explains how to inspect live Postgres statistics. The same checks run as `supabase inspect db` commands, as SQL in the [SQL Editor](/dashboard/project/_/sql), or as MCP `execute_sql`.
 
-Database performance is a large topic and many factors can contribute. Some of the most common causes of poor performance include:
+Use this page to:
 
-- An inefficiently designed schema
-- Inefficiently designed queries
-- A lack of indexes causing slower than required queries over large tables
-- Unused indexes causing slow `INSERT`, `UPDATE` and `DELETE` operations
-- Not enough compute resources, such as memory, causing your database to go to disk for results too often
-- Lock contention from multiple queries operating on heavily used tables
-- Large amount of bloat on your tables causing poor query planning
+- Run [CLI inspection commands](#using-the-cli)
+- Copy the matching [SQL](#using-sql)
 
-You can examine your database and queries for these issues using either the [Supabase CLI](/docs/guides/local-development/cli/getting-started) or SQL.
+If you are checking whether something is wrong, start with [Detecting](/docs/guides/monitoring-and-debugging/debugging). For project logs, metrics, and advisors, see [Observe the data](/docs/guides/monitoring-and-debugging/access-data).
 
 ## Using the CLI
 
-The Supabase CLI comes with a range of tools to help inspect your Postgres instances for potential issues. The CLI gets the information from <a href="https://www.postgresql.org/docs/current/internals.html" target="_blank">Postgres internals</a>. Therefore, most tools provided are compatible with any Postgres databases regardless if they are a Supabase project or not.
-
-You can find installation instructions for the Supabase CLI <a href="/docs/guides/local-development" target="_blank">here</a>.
+The [Supabase CLI](/docs/guides/local-development/cli/getting-started) reads live statistics from [Postgres internals](https://www.postgresql.org/docs/current/internals.html). Most commands work on any Postgres database, not only a Supabase project.
 
 ### The `inspect db` command
 
@@ -60,7 +54,7 @@ Working with Supabase, you can link the Supabase CLI with your project:
 supabase link --project-ref <project-id>
 ```
 
-Then the CLI will automatically connect to your Supabase project whenever you are in the project folder and you no longer need to provide `—db-url`.
+Then the CLI will automatically connect to your Supabase project whenever you are in the project folder and you no longer need to provide `--db-url`.
 
 ### Inspection commands
 
@@ -110,7 +104,7 @@ Following commands require `pg_stat_statements` to be enabled: calls, locks, cac
 
 When using `pg_stat_statements` also take note that it only stores the latest 5,000 statements. Moreover, consider resetting the analysis after optimizing any queries by running `select pg_stat_statements_reset();`
 
-Learn more about pg_stats [here](/docs/guides/database/extensions/pg_stat_statements).
+Learn more about [`pg_stat_statements`](/docs/guides/database/extensions/pg_stat_statements).
 
 ## Using SQL
 
@@ -126,7 +120,7 @@ $ grant pg_read_all_stats to postgres;
 
 ### Postgres cumulative statistics system
 
-Postgres collects data about its own operations using the [cumulative statistics system](https://www.postgresql.org/docs/current/monitoring-stats.html). In addition to this, every Supabase project has the [pg_stat_statements extension](/docs/guides/database/extensions/pg_stat_statements) enabled by default. This extension records query execution performance details and is the best way to find inefficient queries. This information can be combined with the Postgres query plan analyzer to develop more efficient queries.
+Postgres collects data about its own operations using the [cumulative statistics system](https://www.postgresql.org/docs/current/monitoring-stats.html). In addition to this, every Supabase project has the [pg_stat_statements extension](/docs/guides/database/extensions/pg_stat_statements) enabled by default. This extension records query execution performance details.
 
 Here are some example queries to get you started.
 
@@ -240,28 +234,8 @@ select
 from pg_statio_user_tables;
 ```
 
-This shows the ratio of data blocks fetched from the Postgres [shared_buffers](https://www.postgresql.org/docs/15/runtime-config-resource.html#RUNTIME-CONFIG-RESOURCE-MEMORY) cache against the data blocks that were read from disk/OS cache.
+This shows the ratio of data blocks fetched from the Postgres [shared_buffers](https://www.postgresql.org/docs/15/runtime-config-resource.html#RUNTIME-CONFIG-RESOURCE-MEMORY) cache against the data blocks that were read from disk or the OS cache.
 
-If either of your index or table hit rate are < 99% then this can indicate your compute plan is too small for your current workload and you would benefit from more memory. [Upgrading your compute](/docs/guides/platform/compute-and-disk#compute) can be done from your [project dashboard](/dashboard/project/_/settings/infrastructure).
+A ratio below 99% means Postgres is reading from disk more than from cache. Treat that as a [Performance](/docs/guides/monitoring-and-debugging/debugging#performance) signal, then search [Diagnosing](/docs/guides/troubleshooting).
 
-### Optimizing poor performing queries
-
-Postgres has built in tooling to help you optimize poorly performing queries. You can use the [query plan analyzer](https://www.postgresql.org/docs/current/sql-explain.html) on any expensive queries that you have identified:
-
-```sql
-explain analyze <query-statement-here>;
-```
-
-When you include `analyze` in the explain statement, the database attempts to execute the query and provides a detailed query plan along with actual execution times. So, be careful using `explain analyze` with `insert`/`update`/`delete` queries, because the query will run, and could have unintended side-effects.
-
-If you run `explain` without the `analyze` keyword, the database will only perform query planning without executing the query. This approach can be beneficial when you want to inspect the query plan without affecting the database or if you encounter timeouts in your queries.
-
-Using the query plan analyzer to optimize your queries is a large topic, with a number of online resources available:
-
-- [Official docs.](https://www.postgresql.org/docs/current/using-explain.html)
-  {/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
-- [The Art of PostgreSQL.](https://theartofpostgresql.com/explain-plan-visualizer/)
-- [Postgres Wiki.](https://wiki.postgresql.org/wiki/Using_EXPLAIN)
-- [Enterprise DB.](https://www.enterprisedb.com/blog/postgresql-query-optimization-performance-tuning-with-explain-analyze)
-
-You can pair the information available from `pg_stat_statements` with the detailed system metrics available [via the Metrics API](/docs/guides/monitoring-and-debugging/metrics) to better understand the behavior of your DB and the queries you're executing against it.
+When a check names a slow statement, get a query plan with [`explain`](/docs/guides/database/query-optimization#analyze-the-query-plan) in SQL, or [`explain()`](/docs/guides/database/debugging-performance) on the Data API. Pair `pg_stat_statements` with the [Metrics API](/docs/guides/monitoring-and-debugging/metrics) to read the same window from Postgres stats and host metrics.
