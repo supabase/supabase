@@ -1,6 +1,10 @@
 import { z } from 'zod'
 
 import {
+  bucketVersioningFormFields,
+  superRefineBucketVersioning,
+} from './BucketVersioningFields/BucketVersioningFields.schema'
+import {
   inverseValidBucketNameRegex,
   validBucketNameRegex,
 } from '@/components/interfaces/Storage/Storage.utils'
@@ -23,10 +27,13 @@ const BucketFormObjectSchema = z.object({
     .min(0, 'File size upload limit has to be at least 0')
     .optional(),
   allowed_mime_types: z.string().trim().default(''),
+  ...bucketVersioningFormFields,
 })
 
 export const EditBucketFormSchema = BucketFormObjectSchema.extend({
   name: z.string(),
+}).superRefine((data, ctx) => {
+  superRefineBucketVersioning(data, ctx)
 })
 
 export const BucketFormSchema = BucketFormObjectSchema.superRefine((data, ctx) => {
@@ -40,6 +47,8 @@ export const BucketFormSchema = BucketFormObjectSchema.superRefine((data, ctx) =
         : 'Bucket name contains an invalid special character',
     })
   }
+
+  superRefineBucketVersioning(data, ctx)
 })
 
 export type BucketFormValues = z.infer<typeof BucketFormSchema>
