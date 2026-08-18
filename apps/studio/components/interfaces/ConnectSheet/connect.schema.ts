@@ -49,6 +49,7 @@ export const EXTRA_PACKAGES: Record<string, Record<string, string[]>> = {
   supabasejs: {
     'nextjs/app': ['@supabase/ssr'],
     remix: ['@supabase/ssr'],
+    hono: ['@supabase/ssr'],
   },
 }
 
@@ -445,6 +446,7 @@ export const connectSchema: ConnectSchema = {
             },
           },
           remix: [frameworkInstallPackagesStep, frameworkConfigureStep, skillsInstallStep],
+          hono: [frameworkInstallPackagesStep, frameworkConfigureStep, skillsInstallStep],
           DEFAULT: [frameworkInstallStep, frameworkConfigureStep, skillsInstallStep],
         },
       },

@@ -268,6 +268,20 @@ export const FRAMEWORKS: ConnectionType[] = [
       },
     ],
   },
+  {
+    key: 'hono',
+    label: 'Hono',
+    icon: 'hono',
+    guideLink: `${DOCS_URL}/guides/getting-started/quickstarts/hono`,
+    children: [
+      {
+        key: 'supabasejs',
+        label: 'Supabase-js',
+        children: [],
+        icon: 'supabase',
+      },
+    ],
+  },
 ]
 
 export const MOBILES: ConnectionType[] = [

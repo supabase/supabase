@@ -1,3 +1,22 @@
+import { MultipleCodeBlock } from 'ui-patterns/MultipleCodeBlock'
+
+import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
+
+const ContentFile = ({ projectKeys }: StepContentProps) => {
+  const files = [
+    {
+      name: '.env',
+      language: 'bash',
+      code: [
+        `VITE_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}`,
+        `VITE_SUPABASE_PUBLISHABLE_KEY=${projectKeys.publishableKey ?? projectKeys.anonKey ?? 'your-anon-key'}`,
+        '',
+      ].join('\n'),
+    },
+    {
+      name: 'src/middleware/auth.middleware.ts',
+      language: 'ts',
+      code: `
 import { createServerClient, parseCookieHeader } from '@supabase/ssr'
 import { SupabaseClient } from '@supabase/supabase-js'
 import type { Context, MiddlewareHandler } from 'hono'
@@ -56,3 +75,38 @@ export const supabaseMiddleware = (): MiddlewareHandler => {
     await next()
   }
 }
+`,
+    },
+    {
+      name: 'src/index.ts',
+      language: 'ts',
+      code: `
+import { Hono } from 'hono'
+
+import { getSupabase, supabaseMiddleware } from './middleware/auth.middleware'
+
+const app = new Hono()
+
+app.use('*', supabaseMiddleware())
+
+app.get('/todos', async (c) => {
+  const supabase = getSupabase(c)
+  const { data, error } = await supabase.from('todos').select('*')
+
+  if (error) {
+    console.error(error)
+    return c.json({ error: error.message }, 500)
+  }
+
+  return c.json(data)
+})
+
+export default app
+`,
+    },
+  ]
+
+  return <MultipleCodeBlock files={files} />
+}
+
+export default ContentFile
