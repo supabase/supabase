@@ -26,6 +26,7 @@ import {
 import type { Worker } from '../Workers.types'
 import { buildWorkerCliCommands } from '../workerSnippets'
 import { WorkerSnippetTabs } from '../WorkerSnippetTabs'
+import CopyButton from '@/components/ui/CopyButton'
 import { WORKERS_DOCS_URL, WORKERS_SKILL_MARKDOWN } from '@/lib/constants/workers'
 import { deleteWorker } from '@/state/workers-mock-state'
 
@@ -53,31 +54,22 @@ const SettingsRow = ({
   </div>
 )
 
-const CommandLine = ({ comment, command }: { comment: string; command: string }) => {
-  const [isCopied, setIsCopied] = useState(false)
-  const handleCopy = () => {
-    setIsCopied(true)
-    copyToClipboard(command)
-    setTimeout(() => setIsCopied(false), 2000)
-  }
-  return (
-    <div className="space-y-1">
-      <p className="font-mono text-xs text-foreground-lighter">{`> ${comment}`}</p>
-      <div className="flex items-center gap-2 font-mono text-sm text-foreground">
-        <span className="text-foreground-lighter">$</span>
-        <span className="flex-1">{command}</span>
-        <button
-          type="button"
-          aria-label="Copy command"
-          onClick={handleCopy}
-          className="text-foreground-lighter transition-colors hover:text-foreground"
-        >
-          {isCopied ? <Check size={14} className="text-brand" /> : <Copy size={14} />}
-        </button>
-      </div>
+const CommandLine = ({ comment, command }: { comment: string; command: string }) => (
+  <div className="space-y-1">
+    <p className="font-mono text-xs text-foreground-lighter">{`> ${comment}`}</p>
+    <div className="flex items-center gap-2 font-mono text-sm text-foreground">
+      <span className="text-foreground-lighter">$</span>
+      <span className="flex-1">{command}</span>
+      <CopyButton
+        text={command}
+        iconOnly
+        variant="text"
+        aria-label="Copy command"
+        className="text-foreground-lighter hover:text-foreground"
+      />
     </div>
-  )
-}
+  </div>
+)
 
 export const WorkerSettingsTab = ({ projectRef, worker }: WorkerSettingsTabProps) => {
   const router = useRouter()

@@ -212,7 +212,7 @@ export const WorkerDetail = () => {
               </NavMenuItem>
             ) : (
               <NavMenuItem key={item} active={tab === item}>
-                <button type="button" onClick={() => setTab(item)}>
+                <button type="button" tabIndex={0} onClick={() => setTab(item)}>
                   {TAB_LABEL[item]}
                 </button>
               </NavMenuItem>

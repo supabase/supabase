@@ -1,8 +1,8 @@
-import { Check, Copy } from 'lucide-react'
 import { useState } from 'react'
-import { cn, copyToClipboard } from 'ui'
+import { cn } from 'ui'
 
 import { buildWorkerSnippets, type WorkerSnippetInput } from './workerSnippets'
+import CopyButton from '@/components/ui/CopyButton'
 
 export type WorkerSnippetTab = 'ai' | 'config' | 'cli' | 'curl' | 'js' | 'python'
 
@@ -31,7 +31,6 @@ export const WorkerSnippetTabs = ({
   className,
 }: WorkerSnippetTabsProps) => {
   const [active, setActive] = useState<WorkerSnippetTab>(tabs[0])
-  const [isCopied, setIsCopied] = useState(false)
 
   const snippets = buildWorkerSnippets(input)
   const snippetByTab: Record<WorkerSnippetTab, string> = {
@@ -45,12 +44,6 @@ export const WorkerSnippetTabs = ({
   const activeTab = tabs.includes(active) ? active : tabs[0]
   const value = snippetByTab[activeTab]
 
-  const handleCopy = () => {
-    setIsCopied(true)
-    copyToClipboard(value)
-    setTimeout(() => setIsCopied(false), 2000)
-  }
-
   return (
     <div className={cn('flex flex-col gap-y-2', className)}>
       <div className="flex items-center gap-x-4 border-b border-default">
@@ -58,6 +51,7 @@ export const WorkerSnippetTabs = ({
           <button
             key={tab}
             type="button"
+            tabIndex={0}
             onClick={() => setActive(tab)}
             className={cn(
               '-mb-px border-b px-0.5 py-1.5 text-sm transition-colors',
@@ -72,14 +66,13 @@ export const WorkerSnippetTabs = ({
       </div>
 
       <div className="relative rounded-md border border-default bg-surface-100">
-        <button
-          type="button"
-          onClick={handleCopy}
+        <CopyButton
+          text={value}
+          iconOnly
+          variant="text"
           aria-label="Copy snippet"
-          className="absolute right-2 top-2 rounded p-1 text-foreground-lighter transition-colors hover:bg-surface-200 hover:text-foreground"
-        >
-          {isCopied ? <Check size={14} className="text-brand" /> : <Copy size={14} />}
-        </button>
+          className="absolute right-2 top-2 text-foreground-lighter hover:text-foreground"
+        />
         <pre className="overflow-x-auto p-3 pr-10 font-mono text-xs leading-relaxed text-foreground-light">
           {value}
         </pre>
