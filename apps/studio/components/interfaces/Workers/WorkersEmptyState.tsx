@@ -1,13 +1,8 @@
-import { ArrowRight, Sparkles, Terminal } from 'lucide-react'
-import Link from 'next/link'
-import { Button, Card, cn } from 'ui'
+import { Sparkles, Terminal } from 'lucide-react'
+import { Button, Card } from 'ui'
 
 import CopyButton from '@/components/ui/CopyButton'
-import {
-  WORKERS_CLI_DEPLOY,
-  WORKERS_DOCS_URL,
-  WORKERS_SKILL_MARKDOWN,
-} from '@/lib/constants/workers'
+import { WORKERS_CLI_DEPLOY, WORKERS_SKILL_MARKDOWN } from '@/lib/constants/workers'
 
 interface WorkersEmptyStateProps {
   onDeploy: () => void
@@ -86,29 +81,8 @@ export const WorkersEmptyState = ({ onDeploy }: WorkersEmptyStateProps) => (
           <CopyButton text={WORKERS_SKILL_MARKDOWN} variant="default" size="tiny">
             Copy SKILL.md
           </CopyButton>
-          <Link
-            href={WORKERS_DOCS_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="text-sm text-foreground-light transition-colors hover:text-foreground"
-          >
-            View docs
-          </Link>
         </div>
       </div>
-
-      <Link
-        href={WORKERS_DOCS_URL}
-        target="_blank"
-        rel="noreferrer"
-        className={cn(
-          'flex items-center justify-between rounded-md border border-default px-4 py-3',
-          'text-sm text-foreground-light transition-colors hover:border-strong hover:text-foreground'
-        )}
-      >
-        Read the docs
-        <ArrowRight size={14} />
-      </Link>
     </div>
   </Card>
 )

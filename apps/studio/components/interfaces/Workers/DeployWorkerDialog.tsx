@@ -1,6 +1,4 @@
-import Link from 'next/link'
 import {
-  Button,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -13,7 +11,7 @@ import {
 import { EXAMPLE_WORKER } from './workerSnippets'
 import { WorkerSnippetTabs } from './WorkerSnippetTabs'
 import CopyButton from '@/components/ui/CopyButton'
-import { WORKERS_DOCS_URL, WORKERS_SKILL_MARKDOWN } from '@/lib/constants/workers'
+import { WORKERS_SKILL_MARKDOWN } from '@/lib/constants/workers'
 
 interface DeployWorkerDialogProps {
   open: boolean
@@ -72,11 +70,6 @@ export const DeployWorkerDialog = ({ open, onOpenChange }: DeployWorkerDialogPro
         <CopyButton text={WORKERS_SKILL_MARKDOWN} variant="default" copyLabel="Copy SKILL.md">
           Copy SKILL.md
         </CopyButton>
-        <Button asChild variant="primary">
-          <Link href={WORKERS_DOCS_URL} target="_blank" rel="noreferrer">
-            View docs
-          </Link>
-        </Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>
