@@ -1,10 +1,9 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { Clock, Container, Copy, Info, Pause, Play, Zap } from 'lucide-react'
+import { Clock, Container, Copy, Info } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect } from 'react'
-import { toast } from 'sonner'
 import {
   BreadcrumbItem,
   BreadcrumbLink,
@@ -22,7 +21,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { PageBreadcrumbs, PageBreadcrumbsActions } from 'ui-patterns/PageBreadcrumbs'
+import { PageBreadcrumbs } from 'ui-patterns/PageBreadcrumbs'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -42,13 +41,7 @@ import { WorkerLogsTab } from './WorkerLogsTab'
 import { WorkerOverviewTab } from './WorkerOverviewTab'
 import { WorkerSettingsTab } from './WorkerSettingsTab'
 import { PRODUCT_NAME } from '@/lib/constants/workers'
-import {
-  ensureProjectSeeded,
-  resumeWorker,
-  simulateTraffic,
-  suspendWorker,
-  useProjectWorkers,
-} from '@/state/workers-mock-state'
+import { ensureProjectSeeded, useProjectWorkers } from '@/state/workers-mock-state'
 
 type WorkerTab = 'overview' | 'logs' | 'settings'
 const WORKER_TABS: WorkerTab[] = ['overview', 'logs', 'settings']
@@ -94,52 +87,9 @@ export const WorkerDetail = () => {
     )
   }
 
-  const isActive = worker.state === 'active'
-  const isSuspended = worker.state === 'suspended'
-
-  const handleSimulateTraffic = () => {
-    const requests = simulateTraffic(projectRef, worker.id)
-    if (requests > 0) toast.success(`Simulated ${requests.toLocaleString()} requests`)
-    else toast.info('Traffic can only be simulated on an active worker')
-  }
-
   return (
     <div className="w-full min-h-full flex flex-col items-stretch">
-      <PageBreadcrumbs
-        actions={
-          <PageBreadcrumbsActions>
-            <Button
-              variant="default"
-              size="tiny"
-              icon={<Zap size={14} />}
-              disabled={!isActive}
-              onClick={handleSimulateTraffic}
-            >
-              Simulate traffic
-            </Button>
-            {isActive && (
-              <Button
-                variant="default"
-                size="tiny"
-                icon={<Pause size={14} />}
-                onClick={() => suspendWorker(projectRef, worker.id)}
-              >
-                Suspend
-              </Button>
-            )}
-            {isSuspended && (
-              <Button
-                variant="default"
-                size="tiny"
-                icon={<Play size={14} />}
-                onClick={() => resumeWorker(projectRef, worker.id)}
-              >
-                Resume
-              </Button>
-            )}
-          </PageBreadcrumbsActions>
-        }
-      >
+      <PageBreadcrumbs>
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
@@ -227,7 +177,7 @@ export const WorkerDetail = () => {
           <WorkerLogsTab projectRef={projectRef} workerName={worker.name} />
         </PageContainer>
       )}
-      {tab === 'settings' && <WorkerSettingsTab projectRef={projectRef} worker={worker} />}
+      {tab === 'settings' && <WorkerSettingsTab worker={worker} />}
     </div>
   )
 }

@@ -19,7 +19,7 @@ const useGenerateWorkersMenu = (): ProductMenuGroup[] => {
           {
             name: PRODUCT_NAME,
             key: 'main',
-            pages: ['', '[name]', '_states'],
+            pages: ['', '[name]'],
             url: `/project/${projectRef}/workers`,
             items: [],
           },

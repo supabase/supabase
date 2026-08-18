@@ -25,6 +25,15 @@ export interface WorkerSnippets {
   python: string
 }
 
+/** Placeholder worker used by the deploy instructions, which have no form to read from. */
+export const EXAMPLE_WORKER: WorkerSnippetInput = {
+  name: 'my-worker',
+  runtime: 'node',
+  size: '2x1',
+  access: 'public',
+  instances: 1,
+}
+
 const safeName = (name: string) => (name.trim().length > 0 ? name.trim() : 'my-worker')
 
 export function buildWorkerSnippets(input: WorkerSnippetInput): WorkerSnippets {

@@ -1,4 +1,4 @@
-import { BarChart2, Check, ExternalLink, RotateCw } from 'lucide-react'
+import { BarChart2, Check, ExternalLink } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -23,6 +23,7 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
+import { WorkerCommandLine } from '../WorkerCommandLine'
 import { WORKER_ERROR_REASON_LABEL } from '../Workers.constants'
 import type { Worker } from '../Workers.types'
 import {
@@ -37,7 +38,7 @@ import {
   RESPONSE_TIME_CHART_CONFIG,
   sumBy,
 } from './workerCharts'
-import { redeployWorker } from '@/state/workers-mock-state'
+import { CLI_NAME } from '@/lib/constants/workers'
 
 interface WorkerOverviewTabProps {
   projectRef: string
@@ -178,14 +179,10 @@ export const WorkerOverviewTab = ({ projectRef, worker }: WorkerOverviewTabProps
                         ? WORKER_ERROR_REASON_LABEL[worker.errorReason]
                         : 'The worker stopped unexpectedly.'}
                     </p>
-                    <Button
-                      variant="default"
-                      size="tiny"
-                      icon={<RotateCw size={14} />}
-                      onClick={() => redeployWorker(projectRef, worker.id)}
-                    >
-                      Redeploy
-                    </Button>
+                    <WorkerCommandLine
+                      comment="Redeploy after fixing the build"
+                      command={`supabase ${CLI_NAME} push ${worker.name}`}
+                    />
                   </div>
                 }
               />

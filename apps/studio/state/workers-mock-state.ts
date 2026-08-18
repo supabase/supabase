@@ -1,43 +1,13 @@
-import { proxy, snapshot, useSnapshot } from 'valtio'
+import { proxy, useSnapshot } from 'valtio'
 
-import {
-  WORKERS_INSTANCE_CAP,
-  WORKERS_REGION,
-} from '@/components/interfaces/Workers/Workers.constants'
-import type {
-  Worker,
-  WorkerAccess,
-  WorkerErrorReason,
-  WorkerLifecycleEvent,
-  WorkerRuntime,
-  WorkerSize,
-} from '@/components/interfaces/Workers/Workers.types'
+import { WORKERS_REGION } from '@/components/interfaces/Workers/Workers.constants'
+import type { Worker } from '@/components/interfaces/Workers/Workers.types'
 
-/**
- * Prototype-only in-memory store for the Workers dashboard.
- *
- * There is no Management API for workers yet — this valtio store simulates the
- * lifecycle (deploy → active, suspend/resume, crash, delete) with timers so the
- * dashboard can be demoed end to end. State is keyed by project ref and resets
- * on reload.
- */
+// Seeded stand-in until the Management API worker routes are wired into the dashboard.
 
-// Fixed base timestamp for seed data so SSR and client render identically (no
-// hydration mismatch). Runtime-created workers use Date.now() on the client.
+// Fixed base timestamp so SSR and client render identically (no hydration mismatch).
 const SEED_BASE = new Date('2026-08-10T09:00:00.000Z').getTime()
 const seedTime = (minutesAgo: number) => new Date(SEED_BASE - minutesAgo * 60_000).toISOString()
-
-// Timings for simulated lifecycle transitions (ms). Short enough to feel snappy
-// in a demo, long enough to read the intermediate state.
-const DEPLOY_MS = 2500
-const DRAIN_MS = 1800
-const RESUME_MS = 1600
-
-let idCounter = 0
-const nextId = (prefix: string) => `${prefix}-${(idCounter += 1)}`
-
-const isBrowser = typeof window !== 'undefined'
-const nowIso = () => (isBrowser ? new Date().toISOString() : seedTime(0))
 
 interface WorkersProjectState {
   workers: Worker[]
@@ -47,7 +17,7 @@ interface WorkersState {
   byProject: Record<string, WorkersProjectState>
 }
 
-export const workersState = proxy<WorkersState>({
+const workersState = proxy<WorkersState>({
   byProject: {},
 })
 
@@ -124,247 +94,16 @@ function seedWorkers(): Worker[] {
   ]
 }
 
-function getProjectState(projectRef: string): WorkersProjectState {
+// Mutates the valtio proxy, so callers must run it in an effect, not during render.
+export function ensureProjectSeeded(projectRef: string | undefined) {
+  if (!projectRef) return
   if (!workersState.byProject[projectRef]) {
     workersState.byProject[projectRef] = { workers: seedWorkers() }
   }
-  return workersState.byProject[projectRef]
 }
 
-function findWorker(projectRef: string, id: string): Worker | undefined {
-  return workersState.byProject[projectRef]?.workers.find((w) => w.id === id)
-}
-
-function appendEvent(worker: Worker, event: Omit<WorkerLifecycleEvent, 'id' | 'at'>) {
-  worker.events.push({ id: nextId('ev'), at: nowIso(), ...event })
-  worker.updatedAt = nowIso()
-}
-
-export interface DeployWorkerInput {
-  name: string
-  runtime: WorkerRuntime
-  size: WorkerSize
-  access: WorkerAccess
-  instances: number
-}
-
-export interface DeployRejection {
-  ok: false
-  reason: 'cap' | 'duplicate'
-  message: string
-}
-
-export interface DeploySuccess {
-  ok: true
-  worker: Worker
-}
-
-export type DeployResult = DeploySuccess | DeployRejection
-
-const totalInstances = (workers: Worker[]) =>
-  workers.filter((w) => w.state !== 'killed').reduce((sum, w) => sum + w.instances, 0)
-
-/**
- * Creates a worker in `deploying` and transitions it to `active` after a short
- * delay. Rejects (without creating) if the project's instance cap would be
- * exceeded or the name already exists.
- */
-export function deployWorker(projectRef: string, input: DeployWorkerInput): DeployResult {
-  const project = getProjectState(projectRef)
-
-  const duplicate = project.workers.some((w) => w.name === input.name && w.state !== 'killed')
-  if (duplicate) {
-    return {
-      ok: false,
-      reason: 'duplicate',
-      message: `A worker named "${input.name}" already exists`,
-    }
-  }
-
-  if (totalInstances(project.workers) + input.instances > WORKERS_INSTANCE_CAP) {
-    return {
-      ok: false,
-      reason: 'cap',
-      message: `This project is at the ${WORKERS_INSTANCE_CAP}-instance cap. Reduce instances or delete a worker.`,
-    }
-  }
-
-  const worker: Worker = {
-    id: nextId('wk'),
-    name: input.name,
-    runtime: input.runtime,
-    size: input.size,
-    access: input.access,
-    instances: input.instances,
-    region: WORKERS_REGION,
-    state: 'deploying',
-    createdAt: nowIso(),
-    updatedAt: nowIso(),
-    events: [{ id: nextId('ev'), at: nowIso(), level: 'info', message: 'Deploy started' }],
-  }
-  project.workers.unshift(worker)
-
-  if (isBrowser) {
-    window.setTimeout(() => {
-      const w = findWorker(projectRef, worker.id)
-      if (!w || w.state !== 'deploying') return
-      w.state = 'active'
-      appendEvent(w, {
-        level: 'info',
-        message: `Worker active on ${w.instances} instance${w.instances === 1 ? '' : 's'}`,
-      })
-    }, DEPLOY_MS)
-  }
-
-  return { ok: true, worker }
-}
-
-export function suspendWorker(projectRef: string, id: string) {
-  const worker = findWorker(projectRef, id)
-  if (!worker || worker.state !== 'active') return
-  worker.state = 'draining'
-  appendEvent(worker, { level: 'info', message: 'Draining connections before suspend' })
-  if (!isBrowser) return
-  window.setTimeout(() => {
-    const w = findWorker(projectRef, id)
-    if (!w || w.state !== 'draining') return
-    w.state = 'suspended'
-    appendEvent(w, { level: 'info', message: 'Suspended after drain' })
-  }, DRAIN_MS)
-}
-
-export function resumeWorker(projectRef: string, id: string) {
-  const worker = findWorker(projectRef, id)
-  if (!worker || (worker.state !== 'suspended' && worker.state !== 'errored')) return
-  worker.state = 'resuming'
-  worker.errorReason = undefined
-  appendEvent(worker, { level: 'info', message: 'Resuming worker' })
-  if (!isBrowser) return
-  window.setTimeout(() => {
-    const w = findWorker(projectRef, id)
-    if (!w || w.state !== 'resuming') return
-    w.state = 'active'
-    appendEvent(w, { level: 'info', message: `Worker active on ${w.instances} instances` })
-  }, RESUME_MS)
-}
-
-/** Redeploy from an errored state (Overview "Redeploy" button). */
-export function redeployWorker(projectRef: string, id: string) {
-  const worker = findWorker(projectRef, id)
-  if (!worker) return
-  worker.state = 'resuming'
-  worker.errorReason = undefined
-  appendEvent(worker, { level: 'info', message: 'Redeploy started' })
-  if (!isBrowser) return
-  window.setTimeout(() => {
-    const w = findWorker(projectRef, id)
-    if (!w || w.state !== 'resuming') return
-    w.state = 'active'
-    appendEvent(w, { level: 'info', message: `Worker active on ${w.instances} instances` })
-  }, DEPLOY_MS)
-}
-
-export function deleteWorker(projectRef: string, id: string) {
-  const project = workersState.byProject[projectRef]
-  if (!project) return
-  project.workers = project.workers.filter((w) => w.id !== id)
-}
-
-/** Unhappy path: transition an active worker to `errored` with a reason. */
-export function crashWorker(
-  projectRef: string,
-  id: string,
-  reason: Extract<WorkerErrorReason, 'crash' | 'unresponsive'> = 'crash'
-) {
-  const worker = findWorker(projectRef, id)
-  if (!worker) return
-  worker.state = 'errored'
-  worker.errorReason = reason
-  appendEvent(worker, {
-    level: 'error',
-    reason,
-    message:
-      reason === 'unresponsive'
-        ? 'Health check failed — worker did not respond on $PORT'
-        : 'Worker exited with a non-zero status',
-  })
-}
-
-/** Unhappy path: a deploy that fails during build instead of going active. */
-export function failDeploy(
-  projectRef: string,
-  id: string,
-  reason: Extract<WorkerErrorReason, 'build' | 'entrypoint' | 'dependency'> = 'build'
-) {
-  const worker = findWorker(projectRef, id)
-  if (!worker) return
-  worker.state = 'errored'
-  worker.errorReason = reason
-  appendEvent(worker, {
-    level: 'error',
-    reason,
-    message:
-      reason === 'dependency'
-        ? 'Dependency install failed during build'
-        : reason === 'entrypoint'
-          ? 'Entrypoint not found'
-          : 'Build failed',
-  })
-}
-
-/**
- * Appends a burst of simulated request events to an active worker (the detail
- * page "Simulate traffic" affordance). Returns the number of requests simulated.
- */
-export function simulateTraffic(projectRef: string, id: string): number {
-  const worker = findWorker(projectRef, id)
-  if (!worker || worker.state !== 'active') return 0
-  const requests = 1200 + worker.instances * 240
-  appendEvent(worker, {
-    level: 'info',
-    message: `Simulated ${requests.toLocaleString()} requests across ${worker.instances} instance${
-      worker.instances === 1 ? '' : 's'
-    }`,
-  })
-  return requests
-}
-
-/** Find a worker by name (detail pages resolve by name, not id). */
-export function findWorkerByName(projectRef: string, name: string): Worker | undefined {
-  return workersState.byProject[projectRef]?.workers.find((w) => w.name === name)
-}
-
-export const useWorkersSnapshot = (options?: Parameters<typeof useSnapshot>[1]) =>
-  useSnapshot(workersState, options)
-
-/**
- * Seeds a project's mock workers if not already present. Call from an effect —
- * never during render — since it mutates the valtio proxy.
- */
-export function ensureProjectSeeded(projectRef: string | undefined) {
-  if (!projectRef) return
-  if (!workersState.byProject[projectRef]) getProjectState(projectRef)
-}
-
-/**
- * Convenience hook: the worker list for a project. Read-only — pair with
- * `ensureProjectSeeded` in an effect to populate the initial mock data.
- *
- * valtio snapshots are deeply readonly at the type level; the cast keeps
- * consumer components on the plain `Worker` type (they only read, never mutate).
- */
 export function useProjectWorkers(projectRef: string | undefined): Worker[] {
   const snap = useSnapshot(workersState)
   if (!projectRef) return []
   return (snap.byProject[projectRef]?.workers ?? []) as Worker[]
-}
-
-export function getProjectWorkersSnapshot(projectRef: string): Worker[] {
-  getProjectState(projectRef)
-  return (snapshot(workersState).byProject[projectRef]?.workers ?? []) as Worker[]
-}
-
-export const currentInstancesUsed = (projectRef: string): number => {
-  const workers = workersState.byProject[projectRef]?.workers ?? []
-  return totalInstances(workers as Worker[])
 }

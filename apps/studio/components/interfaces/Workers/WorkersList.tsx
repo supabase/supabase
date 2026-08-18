@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, MoreVertical, Pause, Play, Plus, Trash2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Terminal } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
@@ -6,11 +6,6 @@ import {
   Button,
   Card,
   CardFooter,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
   Input,
   Select,
   SelectContent,
@@ -29,12 +24,11 @@ import { RuntimeBadge } from './RuntimeBadge'
 import { formatResources, WORKERS_REGION_SHORT } from './Workers.constants'
 import type { Worker, WorkerAccess, WorkerState } from './Workers.types'
 import { WorkerStatePill } from './WorkerStatePill'
-import { deleteWorker, resumeWorker, suspendWorker } from '@/state/workers-mock-state'
 
 interface WorkersListProps {
   projectRef: string
   workers: Worker[]
-  onCreate: () => void
+  onDeploy: () => void
 }
 
 const STATE_FILTERS: { value: WorkerState | 'all'; label: string }[] = [
@@ -53,7 +47,7 @@ const ACCESS_FILTERS: { value: WorkerAccess | 'all'; label: string }[] = [
 
 const PAGE_SIZE = 10
 
-export const WorkersList = ({ projectRef, workers, onCreate }: WorkersListProps) => {
+export const WorkersList = ({ projectRef, workers, onDeploy }: WorkersListProps) => {
   const router = useRouter()
   const [search, setSearch] = useState('')
   const [stateFilter, setStateFilter] = useState<WorkerState | 'all'>('all')
@@ -132,8 +126,8 @@ export const WorkersList = ({ projectRef, workers, onCreate }: WorkersListProps)
           <span className="text-sm text-foreground-lighter">
             {filtered.length} worker{filtered.length === 1 ? '' : 's'}
           </span>
-          <Button variant="primary" icon={<Plus />} onClick={onCreate}>
-            Create worker
+          <Button variant="primary" icon={<Terminal />} onClick={onDeploy}>
+            Deploy a worker
           </Button>
         </div>
       </div>
@@ -148,106 +142,44 @@ export const WorkersList = ({ projectRef, workers, onCreate }: WorkersListProps)
               <TableHead>Access</TableHead>
               <TableHead className="hidden xl:table-cell">Region</TableHead>
               <TableHead className="hidden lg:table-cell">Resources</TableHead>
-              <TableHead className="w-10" />
             </TableRow>
           </TableHeader>
           <TableBody>
             {filtered.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-foreground-lighter">
+                <TableCell colSpan={6} className="text-center text-foreground-lighter">
                   No workers match your filters
                 </TableCell>
               </TableRow>
             )}
-            {paged.map((worker) => {
-              const isActive = worker.state === 'active'
-              const isSuspended = worker.state === 'suspended'
-              return (
-                <TableRow
-                  key={worker.id}
-                  className="cursor-pointer"
-                  onClick={() => openWorker(worker.name)}
-                >
-                  <TableCell className="font-medium text-foreground">{worker.name}</TableCell>
-                  <TableCell>
-                    <WorkerStatePill state={worker.state} />
-                  </TableCell>
-                  <TableCell>
-                    <RuntimeBadge runtime={worker.runtime} />
-                  </TableCell>
-                  <TableCell>
-                    {worker.access === 'public' ? (
-                      <Badge variant="success">Public</Badge>
-                    ) : (
-                      <Badge>Private</Badge>
-                    )}
-                  </TableCell>
-                  <TableCell className="hidden text-foreground-light xl:table-cell">
-                    {WORKERS_REGION_SHORT}
-                  </TableCell>
-                  <TableCell className="hidden text-foreground-light lg:table-cell">
-                    {formatResources(worker.size, worker.instances)}
-                  </TableCell>
-                  <TableCell onClick={(e) => e.stopPropagation()}>
-                    <div className="flex items-center justify-end gap-1">
-                      {isActive && (
-                        <Button
-                          variant="text"
-                          size="tiny"
-                          icon={<Pause size={14} />}
-                          title="Suspend"
-                          className="px-1.5 text-foreground-lighter hover:text-foreground"
-                          onClick={() => suspendWorker(projectRef, worker.id)}
-                        />
-                      )}
-                      {isSuspended && (
-                        <Button
-                          variant="text"
-                          size="tiny"
-                          icon={<Play size={14} />}
-                          title="Resume"
-                          className="px-1.5 text-foreground-lighter hover:text-foreground"
-                          onClick={() => resumeWorker(projectRef, worker.id)}
-                        />
-                      )}
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="text"
-                            size="tiny"
-                            icon={<MoreVertical size={14} />}
-                            className="px-1.5 text-foreground-lighter hover:text-foreground"
-                          />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-40">
-                          <DropdownMenuItem onClick={() => openWorker(worker.name)}>
-                            View worker
-                          </DropdownMenuItem>
-                          {isActive && (
-                            <DropdownMenuItem onClick={() => suspendWorker(projectRef, worker.id)}>
-                              Suspend
-                            </DropdownMenuItem>
-                          )}
-                          {isSuspended && (
-                            <DropdownMenuItem onClick={() => resumeWorker(projectRef, worker.id)}>
-                              Resume
-                            </DropdownMenuItem>
-                          )}
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            className="flex items-center gap-2 text-destructive focus:text-destructive"
-                            onClick={() => deleteWorker(projectRef, worker.id)}
-                          >
-                            <Trash2 size={12} />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )
-            })}
+            {paged.map((worker) => (
+              <TableRow
+                key={worker.id}
+                className="cursor-pointer"
+                onClick={() => openWorker(worker.name)}
+              >
+                <TableCell className="font-medium text-foreground">{worker.name}</TableCell>
+                <TableCell>
+                  <WorkerStatePill state={worker.state} />
+                </TableCell>
+                <TableCell>
+                  <RuntimeBadge runtime={worker.runtime} />
+                </TableCell>
+                <TableCell>
+                  {worker.access === 'public' ? (
+                    <Badge variant="success">Public</Badge>
+                  ) : (
+                    <Badge>Private</Badge>
+                  )}
+                </TableCell>
+                <TableCell className="hidden text-foreground-light xl:table-cell">
+                  {WORKERS_REGION_SHORT}
+                </TableCell>
+                <TableCell className="hidden text-foreground-light lg:table-cell">
+                  {formatResources(worker.size, worker.instances)}
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
 

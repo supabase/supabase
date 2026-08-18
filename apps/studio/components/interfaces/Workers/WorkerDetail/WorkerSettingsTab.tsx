@@ -1,11 +1,7 @@
 import { Check, Copy, Sparkles } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { ReactNode, useState } from 'react'
-import { toast } from 'sonner'
 import { Badge, Button, Card, CardContent, copyToClipboard } from 'ui'
-import { Admonition } from 'ui-patterns/Admonition'
-import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageSection,
@@ -17,6 +13,7 @@ import {
 } from 'ui-patterns/PageSection'
 
 import { RuntimeBadge } from '../RuntimeBadge'
+import { WorkerCommandLine } from '../WorkerCommandLine'
 import {
   getRuntimeMeta,
   getSizeMeta,
@@ -26,12 +23,9 @@ import {
 import type { Worker } from '../Workers.types'
 import { buildWorkerCliCommands } from '../workerSnippets'
 import { WorkerSnippetTabs } from '../WorkerSnippetTabs'
-import CopyButton from '@/components/ui/CopyButton'
 import { WORKERS_DOCS_URL, WORKERS_SKILL_MARKDOWN } from '@/lib/constants/workers'
-import { deleteWorker } from '@/state/workers-mock-state'
 
 interface WorkerSettingsTabProps {
-  projectRef: string
   worker: Worker
 }
 
@@ -54,30 +48,11 @@ const SettingsRow = ({
   </div>
 )
 
-const CommandLine = ({ comment, command }: { comment: string; command: string }) => (
-  <div className="space-y-1">
-    <p className="font-mono text-xs text-foreground-lighter">{`> ${comment}`}</p>
-    <div className="flex items-center gap-2 font-mono text-sm text-foreground">
-      <span className="text-foreground-lighter">$</span>
-      <span className="flex-1">{command}</span>
-      <CopyButton
-        text={command}
-        iconOnly
-        variant="text"
-        aria-label="Copy command"
-        className="text-foreground-lighter hover:text-foreground"
-      />
-    </div>
-  </div>
-)
-
-export const WorkerSettingsTab = ({ projectRef, worker }: WorkerSettingsTabProps) => {
-  const router = useRouter()
+export const WorkerSettingsTab = ({ worker }: WorkerSettingsTabProps) => {
   const runtime = getRuntimeMeta(worker.runtime)
   const size = getSizeMeta(worker.size)
   const commands = buildWorkerCliCommands(worker.name)
 
-  const [showDelete, setShowDelete] = useState(false)
   const [isSkillCopied, setIsSkillCopied] = useState(false)
 
   const snippetInput = {
@@ -92,12 +67,6 @@ export const WorkerSettingsTab = ({ projectRef, worker }: WorkerSettingsTabProps
     setIsSkillCopied(true)
     copyToClipboard(WORKERS_SKILL_MARKDOWN)
     setTimeout(() => setIsSkillCopied(false), 2000)
-  }
-
-  const handleDelete = () => {
-    deleteWorker(projectRef, worker.id)
-    toast.success(`Worker "${worker.name}" deleted`)
-    router.push(`/project/${projectRef}/workers`)
   }
 
   return (
@@ -192,7 +161,7 @@ export const WorkerSettingsTab = ({ projectRef, worker }: WorkerSettingsTabProps
           <PageSectionContent>
             <div className="space-y-4 rounded-md border border-default bg-surface-100 p-4">
               {commands.map((command) => (
-                <CommandLine
+                <WorkerCommandLine
                   key={command.command}
                   comment={command.comment}
                   command={command.command}
@@ -243,43 +212,7 @@ export const WorkerSettingsTab = ({ projectRef, worker }: WorkerSettingsTabProps
             </Card>
           </PageSectionContent>
         </PageSection>
-
-        {/* Delete */}
-        <PageSection>
-          <PageSectionMeta>
-            <PageSectionSummary>
-              <PageSectionTitle>Delete worker</PageSectionTitle>
-            </PageSectionSummary>
-          </PageSectionMeta>
-          <PageSectionContent>
-            <Admonition
-              type="destructive"
-              title="Once your worker is deleted, it can no longer be restored"
-              description="Deleting drains in-flight requests, then permanently removes the worker and its instances."
-            >
-              <div className="mt-3">
-                <Button variant="danger" onClick={() => setShowDelete(true)}>
-                  Delete worker
-                </Button>
-              </div>
-            </Admonition>
-          </PageSectionContent>
-        </PageSection>
       </PageContainer>
-
-      <ConfirmationModal
-        visible={showDelete}
-        variant="destructive"
-        title={`Delete worker "${worker.name}"`}
-        confirmLabel="Delete worker"
-        confirmLabelLoading="Deleting"
-        onCancel={() => setShowDelete(false)}
-        onConfirm={handleDelete}
-        alert={{
-          title: 'This action cannot be undone',
-          description: 'The worker and all of its instances will be permanently removed.',
-        }}
-      />
     </>
   )
 }

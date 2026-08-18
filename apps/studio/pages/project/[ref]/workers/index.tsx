@@ -10,7 +10,7 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
-import { CreateWorkerDialog } from '@/components/interfaces/Workers/CreateWorkerDialog'
+import { DeployWorkerDialog } from '@/components/interfaces/Workers/DeployWorkerDialog'
 import { WorkersEmptyState } from '@/components/interfaces/Workers/WorkersEmptyState'
 import { WorkersList } from '@/components/interfaces/Workers/WorkersList'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
@@ -21,7 +21,7 @@ import type { NextPageWithLayout } from '@/types'
 
 const WorkersPage: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const [showCreate, setShowCreate] = useState(false)
+  const [showDeployInstructions, setShowDeployInstructions] = useState(false)
 
   useEffect(() => {
     ensureProjectSeeded(ref)
@@ -50,16 +50,16 @@ const WorkersPage: NextPageWithLayout = () => {
               <WorkersList
                 projectRef={ref as string}
                 workers={workers}
-                onCreate={() => setShowCreate(true)}
+                onDeploy={() => setShowDeployInstructions(true)}
               />
             ) : (
-              <WorkersEmptyState onCreate={() => setShowCreate(true)} />
+              <WorkersEmptyState onDeploy={() => setShowDeployInstructions(true)} />
             )}
           </PageSectionContent>
         </PageSection>
       </PageContainer>
 
-      <CreateWorkerDialog open={showCreate} onOpenChange={setShowCreate} />
+      <DeployWorkerDialog open={showDeployInstructions} onOpenChange={setShowDeployInstructions} />
     </div>
   )
 }
