@@ -186,11 +186,12 @@ export function useControlledRoleImpersonationState(
 ): RoleImpersonationController {
   const { data: project } = useSelectedProjectQuery()
   const customizeAccessToken = useCustomizeAccessToken(project?.ref, project?.connectionString)
+
+  const projectRef = project?.ref ?? ''
   const customizeAccessTokenRef = useLatest(customizeAccessToken)
   const customAccessTokenHookDetails = useCustomAccessTokenHookDetails(project?.ref)
   const customAccessTokenHookDetailsRef = useLatest(customAccessTokenHookDetails)
   const onRoleChangeRef = useLatest(onRoleChange)
-  const projectRef = project?.ref ?? ''
 
   const [claims, setClaims] = useState<PostgrestClaims | undefined>(undefined)
 
@@ -219,11 +220,8 @@ export function useControlledRoleImpersonationState(
     return () => {
       cancelled = true
     }
-    // Resolves only when the controlled role identity changes (e.g. switching tabs) — hook
-    // details and the customize-access-token callback are read from refs so they don't
-    // trigger a redundant resolution on their own.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectRef, role])
+    // Resolves only when the controlled role identity changes (e.g. switching tabs)
+  }, [customAccessTokenHookDetailsRef, customizeAccessTokenRef, projectRef, role])
 
   const setRole = useCallback(
     async (
