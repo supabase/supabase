@@ -106,7 +106,7 @@ export const gitHubConfigTomlSchema = z
     auth: z
       .object({
         enabled: z.boolean().optional(),
-        site_url: z.string().optional(),
+        site_url: z.string().nullable().optional(),
         additional_redirect_urls: z.array(z.string()).optional(),
         jwt_expiry: z.number().optional(),
         enable_refresh_token_rotation: z.boolean().optional(),
@@ -115,7 +115,7 @@ export const gitHubConfigTomlSchema = z
         enable_anonymous_sign_ins: z.boolean().optional(),
         enable_manual_linking: z.boolean().optional(),
         minimum_password_length: z.number().optional(),
-        password_requirements: z.string().optional(),
+        password_requirements: z.string().nullable().optional(),
         rate_limit: z
           .object({
             email_sent: z.number().optional(),
@@ -152,13 +152,14 @@ export const gitHubConfigTomlSchema = z
           .object({
             enable_signup: z.boolean().optional(),
             enable_confirmations: z.boolean().optional(),
-            template: z.string().optional(),
+            template: z.string().nullable().optional(),
             max_frequency: z.string().optional(),
+            provider: z.string().nullable().optional(),
             twilio: z
               .object({
                 enabled: z.boolean().optional(),
-                account_sid: z.string().optional(),
-                message_service_sid: z.string().optional(),
+                account_sid: z.string().nullable().optional(),
+                message_service_sid: z.string().nullable().optional(),
                 auth_token: z.string().optional(),
               })
               .passthrough()
@@ -195,10 +196,10 @@ export const gitHubConfigTomlSchema = z
             z
               .object({
                 enabled: z.boolean().optional(),
-                client_id: z.string().optional(),
-                secret: z.string().optional(),
-                redirect_uri: z.string().optional(),
-                url: z.string().optional(),
+                client_id: z.string().nullable().optional(),
+                secret: z.string().nullable().optional(),
+                redirect_uri: z.string().nullable().optional(),
+                url: z.string().nullable().optional(),
                 skip_nonce_check: z.boolean().optional(),
                 email_optional: z.boolean().optional(),
               })

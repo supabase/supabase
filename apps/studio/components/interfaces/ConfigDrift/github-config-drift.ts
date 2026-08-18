@@ -1,3 +1,4 @@
+import { gitHubConfigTomlSchema, type GitHubConfigToml } from './github-config.types'
 import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
 import { convertToBytes } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 
@@ -212,8 +213,8 @@ function getConfigFieldState({
 }: {
   section: ConfigSection
   fieldName: string
-  githubFormattedDashboardConfig: Record<string, unknown>
-  githubConfig?: Record<string, unknown>
+  githubFormattedDashboardConfig: GitHubConfigToml
+  githubConfig?: GitHubConfigToml
 }): GitHubConfigFieldState {
   if (SECRET_FIELD_PATTERN.test(fieldName)) return { status: 'unmanaged' }
 
@@ -253,12 +254,13 @@ export function getConfigDriftSummary({
   githubConfig,
 }: {
   dashboardConfig?: ConfigDriftDashboardConfig
-  githubConfig?: Record<string, unknown>
+  githubConfig?: GitHubConfigToml
 }): GitHubConfigDriftSummary {
   if (!dashboardConfig || !githubConfig) {
     return { managedCount: 0, driftedFields: [], unmanagedFields: [] }
   }
 
+  const cleanedGithubConfig = gitHubConfigTomlSchema.parse(githubConfig)
   const githubFormattedDashboardConfig = convertProjectConfigToGitHubConfig(dashboardConfig)
 
   let managedCount = 0
@@ -275,7 +277,7 @@ export function getConfigDriftSummary({
         section,
         fieldName,
         githubFormattedDashboardConfig,
-        githubConfig,
+        githubConfig: cleanedGithubConfig,
       })
 
       if (state.status === 'managed') {
@@ -333,9 +335,9 @@ function setConfigValue(config: Record<string, unknown>, configPath: string, val
  */
 export function convertProjectConfigToGitHubConfig(
   dashboardConfig?: ConfigDriftDashboardConfig
-): Record<string, unknown> {
+): GitHubConfigToml {
   const githubConfig: Record<string, unknown> = {}
-  if (!dashboardConfig) return githubConfig
+  if (!dashboardConfig) return gitHubConfigTomlSchema.parse(githubConfig)
 
   for (const section of CONFIG_SECTIONS) {
     const sectionConfig = dashboardConfig[section]
@@ -353,7 +355,7 @@ export function convertProjectConfigToGitHubConfig(
     }
   }
 
-  return githubConfig
+  return gitHubConfigTomlSchema.parse(githubConfig)
 }
 
 function valuesMatch(left: unknown, right: unknown): boolean {
