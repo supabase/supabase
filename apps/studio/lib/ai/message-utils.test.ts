@@ -1,7 +1,7 @@
 import type { DynamicToolUIPart, UIMessage } from 'ai'
 import { describe, expect, it } from 'vitest'
 
-import { getParallelApprovalIdsToReject, prepareMessagesForAPI } from './message-utils'
+import { getParallelApprovalIdsToReject, isManualApprovalRequested, prepareMessagesForAPI } from './message-utils'
 
 const makeApprovalPart = (id: string, isAutomatic = false): DynamicToolUIPart =>
   ({
@@ -20,6 +20,24 @@ const makeResultPart = (id: string): DynamicToolUIPart => ({
   state: 'output-available',
   input: {},
   output: {},
+})
+
+describe('isManualApprovalRequested', () => {
+  it('returns true for a human approval-requested tool part', () => {
+    expect(isManualApprovalRequested(makeApprovalPart('a1'))).toBe(true)
+  })
+
+  it('returns false for an automatic approval', () => {
+    expect(isManualApprovalRequested(makeApprovalPart('a1', true))).toBe(false)
+  })
+
+  it('returns false for a tool result part', () => {
+    expect(isManualApprovalRequested(makeResultPart('r1'))).toBe(false)
+  })
+
+  it('returns false for a content part with no state or approval', () => {
+    expect(isManualApprovalRequested({ type: 'text', text: 'hello' })).toBe(false)
+  })
 })
 
 describe('getParallelApprovalIdsToReject', () => {

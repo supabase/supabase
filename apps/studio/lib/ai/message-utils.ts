@@ -1,4 +1,12 @@
-import { isToolUIPart, type UIMessage } from 'ai'
+import {
+  isToolUIPart,
+  type UIDataTypes,
+  type UIMessage,
+  type UIMessagePart,
+  type UITools,
+} from 'ai'
+
+type UIPart = UIMessagePart<UIDataTypes, UITools>
 
 /**
  * Prepares messages for API transmission by cleaning and limiting history
@@ -24,16 +32,22 @@ export function prepareMessagesForAPI(messages: UIMessage[]): UIMessage[] {
   return cleanedMessages
 }
 
-function isAutomaticToolApproval(approval: { isAutomatic?: boolean } | undefined): boolean {
-  return approval?.isAutomatic === true
+/**
+ * Approval id when the part is waiting on a human Approve/Deny.
+ * Narrows with `isToolUIPart` first, matching the AI SDK `useChat` approval pattern:
+ * `state === 'approval-requested' && !approval.isAutomatic`.
+ *
+ * @see https://ai-sdk.dev/docs/agents/tool-approvals
+ */
+export function getManualApprovalId(part: UIPart): string | undefined {
+  if (!isToolUIPart(part) || part.state !== 'approval-requested') return undefined
+  if ('isAutomatic' in part.approval && part.approval.isAutomatic === true) return undefined
+  return part.approval.id
 }
 
 /** True when the part is waiting on a human Approve/Deny, not an automatic policy decision. */
-export function isManualApprovalRequested(part: {
-  state?: string
-  approval?: { id?: string; isAutomatic?: boolean }
-}): boolean {
-  return part.state === 'approval-requested' && !isAutomaticToolApproval(part.approval)
+export function isManualApprovalRequested(part: UIPart): boolean {
+  return getManualApprovalId(part) !== undefined
 }
 
 /**
@@ -46,14 +60,8 @@ export function getParallelApprovalIdsToReject(messages: UIMessage[]): string[] 
 
   const pendingIds: string[] = []
   for (const part of lastMessage.parts ?? []) {
-    if (
-      !isManualApprovalRequested(part) ||
-      !isToolUIPart(part) ||
-      part.state !== 'approval-requested'
-    ) {
-      continue
-    }
-    pendingIds.push(part.approval.id)
+    const id = getManualApprovalId(part)
+    if (id) pendingIds.push(id)
   }
   return pendingIds.slice(1)
 }
