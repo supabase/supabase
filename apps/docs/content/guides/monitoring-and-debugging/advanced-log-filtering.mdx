@@ -8,6 +8,7 @@ This guide explains how to query project logs and how to record extra events. Th
 Use this page to:
 
 - Query logs from [Studio](#studio), [MCP](#mcp), the [API](#api), or a [script](#cli)
+- Pick a [`source`](#logs-explorer) for the layer that reported the error
 - Record extra [API](#working-with-api-logs), [Postgres](#logging-postgres-queries), and [Realtime](#logging-realtime-connections) events
 - Write [ClickHouse SQL](#querying-with-the-logs-explorer)
 
@@ -38,6 +39,50 @@ Pass ClickHouse SQL in the `sql` parameter of the [Management API logs endpoint]
 ### CLI [#cli]
 
 The Supabase CLI does not query ClickHouse logs. Call the [Management API](/docs/reference/api/v1-get-project-logs) from a script, or use [`supabase inspect db`](/docs/guides/database/inspect) for database diagnostics. See [Observe the data](/docs/guides/monitoring-and-debugging/access-data#cli).
+
+## Sources [#logs-explorer]
+
+Filter by `source` to query one service. The Logs Explorer **Sources** drop-down lists these values.
+
+Pick the source for the layer that reported the error. A request hits the API gateway first, then one service, then the pooler and Postgres. The layer that _reports_ an error is often not the layer that _caused_ it. When two sources could fit, start closer to the database.
+
+```mermaid
+flowchart TD
+  Client --> Gateway["API gateway — edge_logs"]
+  Gateway --> PostgREST
+  Gateway --> Auth
+  Gateway --> Storage
+  Gateway --> Realtime
+  PostgREST --> Pooler["Pooler — supavisor_logs, pgbouncer_logs"]
+  Auth --> Pooler
+  Storage --> Pooler
+  Pooler --> Postgres["Postgres — postgres_logs"]
+```
+
+Edge Functions sit outside that path: `function_edge_logs` is the HTTP request to the function, and `function_logs` is `console` output from inside it.
+
+A permission error or an empty result at the API is often row-level security in `postgres_logs`.
+
+| `source`             | Events                                                                                                 |
+| -------------------- | ------------------------------------------------------------------------------------------------------ |
+| `edge_logs`          | HTTP requests through the API gateway, including REST and GraphQL                                      |
+| `postgres_logs`      | Database queries, SQLSTATE, RLS, and functions                                                         |
+| `postgrest_logs`     | PostgREST process logs. Low-signal; `PGRST*` evidence usually lives in `edge_logs` and `postgres_logs` |
+| `auth_logs`          | Auth server: login, JWT, OAuth, email                                                                  |
+| `auth_audit_logs`    | Auth audit events                                                                                      |
+| `storage_logs`       | Storage API: uploads and object access                                                                 |
+| `realtime_logs`      | Realtime server: channels, presence, broadcast                                                         |
+| `function_edge_logs` | HTTP request and response for an Edge Function invocation                                              |
+| `function_logs`      | `console` output from inside an Edge Function                                                          |
+| `supavisor_logs`     | Shared pooler: pooling and timeouts                                                                    |
+| `pgbouncer_logs`     | Dedicated pooler                                                                                       |
+| `pg_upgrade_logs`    | Database version upgrade                                                                               |
+
+For `postgres_logs`, statement text and error detail live in `event_message`. `parsed.query` and `parsed.detail` are usually empty.
+
+For API Load Balancer traffic, the upstream database is `log_attributes['load_balancer_redirect_identifier']`.
+
+See the [Logs field reference](/docs/guides/monitoring-and-debugging/log-field-reference) for the ClickHouse field names on each source.
 
 ## Working with API logs [#working-with-api-logs]
 
@@ -194,20 +239,6 @@ const options = {
 }
 const supabase = createClient('https://xyzcompany.supabase.co', 'sb_publishable_...', options)
 ```
-
-## Sources [#logs-explorer]
-
-Filter by these `source` values:
-
-- `auth_logs`: GoTrue server logs, containing authentication/authorization activity.
-- `edge_logs`: Edge network logs, containing request and response metadata retrieved from Cloudflare.
-- `function_edge_logs`: Edge network logs for only edge functions, containing network requests and response metadata for each execution.
-- `function_logs`: Function internal logs, containing any `console` logging from within the edge function.
-- `postgres_logs`: Postgres database logs, containing statements executed by connected applications.
-- `realtime_logs`: Realtime server logs, containing client connection information.
-- `storage_logs`: Storage server logs, containing object upload and retrieval information.
-
-The Logs Explorer lists these sources in the **Sources** drop-down.
 
 ## Querying logs [#querying-with-the-logs-explorer]
 

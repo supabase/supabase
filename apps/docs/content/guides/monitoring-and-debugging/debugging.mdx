@@ -4,16 +4,29 @@ title: 'Detecting'
 description: 'If you are observing, run a few checks to see whether something is wrong. If you already have a named error, diagnose it next.'
 ---
 
-This guide explains how to detect a signal from project data. Confirm one cause before you change anything. Then apply one fix and verify it.
+This guide explains how to detect a signal from project data. If you already have a named error, skip the checks and diagnose it.
 
 Use this page to:
 
-- Skip to [Diagnosing](/docs/guides/troubleshooting) if you already have a named error
+- Diagnose a named error: [Already have a symptom?](#open-the-directory)
 - Run a [Health](#health), [Security](#security), [Performance](#performance), or [Usage](#usage) check if you are observing
 
 ## Already have a symptom? [#open-the-directory]
 
-If you already have an error message, HTTP status, SQLSTATE, product error, or a clear advisor finding, skip the checks below. Search [Diagnosing](/docs/guides/troubleshooting). Each article confirms a cause, applies one fix, and verifies it.
+If you already have an error message, HTTP status, SQLSTATE, product error, or a clear advisor finding, skip the observing checks. Confirm one cause before you change anything.
+
+1. Capture the exact HTTP status, error code, and message. A `401` is not a `403`; `PGRST002` is not `PGRST106`. If you use `supabase-js`, errors are returned in `{ data, error }`, not thrown. Inspect `error`; ignoring it hides the failure.
+2. Query the log [source](/docs/guides/monitoring-and-debugging/advanced-log-filtering#logs-explorer) for that layer. When two layers could fit, start closer to the database.
+3. Search [Diagnosing](/docs/guides/troubleshooting) for that error. Each article confirms one cause, applies one fix, and tells you how to verify it.
+4. Re-run the failing operation. Keep the change only when the original symptom is gone. If verification fails, reverse the change and look again.
+
+For client-side or local debugging, see [Auth error codes](/docs/guides/auth/debugging/error-codes), [Storage logs](/docs/guides/storage/debugging/logs), and [Edge Functions debugging tools](/docs/guides/functions/debugging-tools).
+
+<Admonition type="danger">
+
+Deleting data, disabling row-level security, weakening a policy, or terminating a database process can cause data loss or a security incident. Do not let an automated routine perform these changes.
+
+</Admonition>
 
 ## Observing [#notice-a-signal]
 
@@ -24,7 +37,7 @@ If you are checking whether the project is healthy, run a few coarse checks agai
 - [Advisors](/docs/guides/monitoring-and-debugging/advisors) — Studio, MCP `get_advisors`, [`supabase db advisors`](/docs/reference/cli/usage#supabase-db-advisors), or the Management API
 - [Metrics](/docs/guides/monitoring-and-debugging/metrics) and [Reports](/docs/guides/monitoring-and-debugging/reports) — Studio charts, or the Metrics API for the same database series
 
-If a check turns up a spike, a named error, or an advisor finding, take that evidence to [Diagnosing](/docs/guides/troubleshooting). If the result is only a count, narrow the time window and pick one identifier (path, status, SQLSTATE, request ID) first.
+If a check turns up a spike, a named error, or an advisor finding, follow [Already have a symptom?](#open-the-directory). If the result is only a count, narrow the time window and pick one identifier (path, status, SQLSTATE, request ID) first.
 
 ### Health
 
@@ -113,13 +126,5 @@ limit 20;
 ```
 
 [Reports](/docs/guides/monitoring-and-debugging/reports) show total requests, disk usage, and database size without SQL. [`supabase inspect db table-sizes`](/docs/reference/cli/supabase-inspect-db-table-sizes) and [`bloat`](/docs/reference/cli/supabase-inspect-db-bloat) name the large relations. The [Management API usage endpoint](/docs/reference/api/v1-get-project-usage-api-count) returns request counts for a script.
-
-Keep the change only when the original symptom is gone. If verification fails, reverse the change and look again.
-
-<Admonition type="danger">
-
-Deleting data, disabling row-level security, weakening a policy, or terminating a database process can cause data loss or a security incident. Do not let an automated routine perform these changes.
-
-</Admonition>
 
 Escalate to [Support](/dashboard/support/new) when you cannot access the diagnostic source, the evidence points to a platform failure, or a safe fix needs a permission you do not have. Include the project reference, timestamp with time zone, error code, request ID, and sanitized evidence. Do not include passwords, API keys, or personal data.

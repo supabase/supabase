@@ -31,6 +31,7 @@ import {
   telemetryAccessWhat,
   telemetryAccessWhere,
   telemetryDetectResolve,
+  telemetryExport,
   telemetryHireAgent,
 } from './telemetry.data'
 
@@ -70,6 +71,7 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   telemetryAccessWhere,
   telemetryDetectResolve,
   telemetryHireAgent,
+  telemetryExport,
 ]
 
 export const CONTENT_LISTINGS: Readonly<Record<string, ContentListingGroup>> = Object.fromEntries(

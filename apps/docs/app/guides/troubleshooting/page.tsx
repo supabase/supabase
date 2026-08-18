@@ -16,6 +16,7 @@ import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 import { PROD_URL } from '~/lib/constants'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { type Metadata } from 'next'
+import Link from 'next/link'
 
 const { metadataTitle } = getCustomContent(['metadata:title'])
 
@@ -40,6 +41,23 @@ export default async function GlobalTroubleshootingPage({
         <p className="text-lg text-foreground-light">
           Search by symptom or error, then group results by product or by health, security,
           performance, or usage.
+        </p>
+        <p className="text-foreground-light mt-3">
+          If you don&apos;t have a named error yet, start with{' '}
+          <Link
+            href="/guides/monitoring-and-debugging/debugging"
+            className="text-foreground underline"
+          >
+            Detecting
+          </Link>
+          {'. To choose a log source, see '}
+          <Link
+            href="/guides/monitoring-and-debugging/advanced-log-filtering#logs-explorer"
+            className="text-foreground underline"
+          >
+            Query and filter logs
+          </Link>
+          {'.'}
         </p>
         <hr className="my-7" aria-hidden />
         <TroubleshootingFilter

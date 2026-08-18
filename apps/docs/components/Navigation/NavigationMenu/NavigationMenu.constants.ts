@@ -3008,6 +3008,10 @@ export const telemetry: NavMenuConstant = {
                   url: '/guides/monitoring-and-debugging/advanced-log-filtering' as `/${string}`,
                 },
                 {
+                  name: 'Sources',
+                  url: '/guides/monitoring-and-debugging/advanced-log-filtering#logs-explorer' as `/${string}`,
+                },
+                {
                   name: 'Logs field reference',
                   url: '/guides/monitoring-and-debugging/log-field-reference' as `/${string}`,
                 },

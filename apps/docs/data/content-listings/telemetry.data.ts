@@ -51,7 +51,7 @@ export const telemetryAccessWhere: ContentListingGroup = {
     {
       title: 'API',
       href: '/guides/monitoring-and-debugging/access-data#api',
-      description: 'Read logs, advisors, and usage counts from the Management API.',
+      description: 'Read logs, advisors, and usage counts, or scrape the Metrics API.',
     },
     {
       title: 'CLI',
@@ -62,7 +62,7 @@ export const telemetryAccessWhere: ContentListingGroup = {
     {
       title: 'Studio',
       href: '/guides/monitoring-and-debugging/access-data#studio',
-      description: 'Filter Logs and open Reports in the browser.',
+      description: 'Open Logs, Reports, and Advisors in the browser.',
     },
   ],
 }
@@ -75,7 +75,8 @@ export const telemetryDetectResolve: ContentListingGroup = {
     {
       title: 'Detecting',
       href: '/guides/monitoring-and-debugging/debugging',
-      description: 'If you are observing, run a few checks to see whether something is wrong.',
+      description:
+        'Run checks if you are observing, or pick a log source if you already have an error.',
     },
     {
       title: 'Diagnosing',
@@ -113,6 +114,29 @@ export const telemetryHireAgent: ContentListingGroup = {
       href: '/guides/monitoring-and-debugging/automate-with-agents/usage',
       subtitle: getScheduleLabel(monitoringAgents.usage),
       description: 'Track request growth, error rates, and approaching limits.',
+    },
+  ],
+}
+
+export const telemetryExport: ContentListingGroup = {
+  id: 'telemetry-export',
+  type: 'grid',
+  columns: 3,
+  items: [
+    {
+      title: 'Log drains',
+      href: '/guides/monitoring-and-debugging/log-drains',
+      description: 'Send project logs to your own destination.',
+    },
+    {
+      title: 'Client-side tracing',
+      href: '/guides/monitoring-and-debugging/client-side-tracing',
+      description: 'Propagate W3C trace context from the client through Supabase services.',
+    },
+    {
+      title: 'Sentry integration',
+      href: '/guides/monitoring-and-debugging/sentry-monitoring',
+      description: 'Capture supabase-js errors and spans in Sentry.',
     },
   ],
 }

@@ -58,6 +58,8 @@ Use the Management API when you want the same data from a script:
 - [Security advisors](/docs/reference/api/v1-get-security-advisors) and [performance advisors](/docs/reference/api/v1-get-performance-advisors)
 - [API usage counts](/docs/reference/api/v1-get-project-usage-api-count)
 
+Scrape the [Metrics API](/docs/guides/monitoring-and-debugging/metrics) for Prometheus-compatible database series. That endpoint is a project URL, not a Management API route.
+
 ### CLI [#cli]
 
 Use the [Supabase CLI](/docs/guides/local-development/cli/getting-started) against a linked project:
@@ -74,3 +76,5 @@ Use Studio when you want to inspect the project in the browser:
 - [Logs](/docs/guides/monitoring-and-debugging/logs) for the unified Logs view
 - [Reports](/docs/guides/monitoring-and-debugging/reports) for API, Auth, Storage, Realtime, and database dashboards
 - [Advisors](/docs/guides/monitoring-and-debugging/advisors) for deterministic security and performance findings
+
+To send logs or traces to your own stack, see [Log drains](/docs/guides/monitoring-and-debugging/log-drains), [Client-side tracing](/docs/guides/monitoring-and-debugging/client-side-tracing), and [Sentry integration](/docs/guides/monitoring-and-debugging/sentry-monitoring).
