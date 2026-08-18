@@ -258,7 +258,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
       }
     }, [values, badgeLimit])
 
-    const badgeClasses = 'rounded-sm shrink-0 px-1.5'
+    const badgeClasses = 'rounded-sm shrink-0 px-1.5 bg-surface-75 dark:bg-white/5'
 
     const handleTriggerClick: React.MouseEventHandler<HTMLButtonElement> = React.useCallback(
       (event) => {
@@ -294,12 +294,14 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           role="combobox"
           className={cn(
             'flex w-full min-w-[200px] min-h-[34px] items-center justify-between rounded-md border',
-            'border-strong bg-background dark:bg-card px-3 py-1.5 text-sm',
+            'border-strong px-3 py-1.5 text-sm',
+            // Empty: raised plate. Filled: sunk well for chips.
+            values.length > 0 ? 'bg-field' : 'bg-control-raised',
             'placeholder:text-muted-foreground',
             'ring-border-control focus-ring',
             'disabled:cursor-not-allowed disabled:opacity-50',
-            'hover:border-stronger hover:bg-popover transition-colors duration-200',
-            open && 'bg-popover border-stronger',
+            'hover:border-control-hover transition-colors duration-200',
+            open && 'border-control-hover',
             className
           )}
           {...props}
@@ -381,7 +383,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
 MultiSelectorTrigger.displayName = 'MultiSelectorTrigger'
 MultiSelector.Trigger = MultiSelectorTrigger
 
-const MultiSelectorInputVariants = cva('bg-control border', {
+const MultiSelectorInputVariants = cva('', {
   variants: {
     size: {
       ...SIZE_VARIANTS,
