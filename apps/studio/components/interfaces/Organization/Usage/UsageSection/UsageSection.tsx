@@ -3,6 +3,7 @@ import { CategoryMetaKey, USAGE_CATEGORIES } from '../Usage.constants'
 import AttributeUsage from './AttributeUsage'
 import DatabaseSizeUsage from './DatabaseSizeUsage'
 import { DiskUsage } from './DiskUsage'
+import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ScaffoldContainer } from '@/components/layouts/Scaffold'
 import { DataPoint } from '@/data/analytics/constants'
 import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
@@ -47,7 +48,9 @@ const UsageSection = ({
     end: !currentBillingCycleSelected && endDate ? new Date(endDate) : undefined,
   })
 
-  const categoryMeta = USAGE_CATEGORIES(subscription).find(
+  const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
+
+  const categoryMeta = USAGE_CATEGORIES(subscription, { isStorageVersioningEnabled }).find(
     (category) => category.key === categoryKey
   )
   if (!categoryMeta) return null
