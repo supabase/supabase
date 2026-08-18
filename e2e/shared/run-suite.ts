@@ -107,8 +107,11 @@ export async function runSuite(config: SuiteConfig): Promise<void> {
     process.exit(1)
   }
 
-  // First, so an explicit --project on the command line overrides it.
-  const projectArgs = config.project ? [`--project=${config.project}`] : []
+  // Playwright collects every --project, so skip the suite default when the CLI already named one.
+  const hasProjectArg = playwrightArgs.some(
+    (arg) => arg === '--project' || arg.startsWith('--project=')
+  )
+  const projectArgs = config.project && !hasProjectArg ? [`--project=${config.project}`] : []
   const env = { ...process.env }
   if (config.pagePathsEnv && pages) env[config.pagePathsEnv] = pages.join(',')
 

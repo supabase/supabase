@@ -1,6 +1,5 @@
-import { expect, test } from '@playwright/test'
-
 import { parsePagePaths } from '../../shared/paths.ts'
+import { expect, test } from '../../shared/test.ts'
 import {
   annotate,
   attachScanReport,

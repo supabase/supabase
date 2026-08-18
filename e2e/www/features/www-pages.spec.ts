@@ -1,7 +1,6 @@
-import { expect, test } from '@playwright/test'
-
 import { formatViolations, scan, violationIds } from '../../shared/axe.ts'
 import { parsePagePaths } from '../../shared/paths.ts'
+import { expect, test } from '../../shared/test.ts'
 
 const ENFORCED_RULES = ['page-has-heading-one']
 

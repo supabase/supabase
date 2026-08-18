@@ -74,20 +74,19 @@ export async function scanExcluding(
 
   const violations = await scan(page, { tags, excludeRules, exclude })
 
-  const elementCount = await page.evaluate(
-    (selectors) =>
-      document.body.querySelectorAll('*').length -
-      selectors.reduce(
-        (sum, selector) =>
-          sum +
-          [...document.querySelectorAll(selector)].reduce(
-            (nodes, root) => nodes + root.querySelectorAll('*').length + 1,
-            0
-          ),
-        0
-      ),
-    exclude
-  )
+  const elementCount = await page.evaluate((selectors) => {
+    const excluded = new Set<Element>()
+
+    for (const selector of selectors) {
+      for (const root of document.querySelectorAll(selector)) {
+        excluded.add(root)
+        root.querySelectorAll('*').forEach((element) => excluded.add(element))
+      }
+    }
+
+    return [...document.body.querySelectorAll('*')].filter((element) => !excluded.has(element))
+      .length
+  }, exclude)
 
   return {
     surface,
