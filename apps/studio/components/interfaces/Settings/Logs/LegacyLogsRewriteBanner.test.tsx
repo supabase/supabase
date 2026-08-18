@@ -42,14 +42,14 @@ const renderBanner = ({
   sql = LEGACY_SQL,
   isLogsSource = true,
   isOtelLogsEnabled = true,
-  onSqlChange = vi.fn(),
-  onSqlCommit = vi.fn(),
+  hidden = false,
+  onProposal = vi.fn(),
 }: {
   sql?: string
   isLogsSource?: boolean
   isOtelLogsEnabled?: boolean
-  onSqlChange?: (sql: string) => void
-  onSqlCommit?: (sql: string) => void
+  hidden?: boolean
+  onProposal?: (proposal: { original: string; modified: string }) => void
 } = {}) => {
   const utils = customRender(
     <FeatureFlagContext.Provider
@@ -59,12 +59,12 @@ const renderBanner = ({
         isLogsSource={isLogsSource}
         sql={sql}
         readSql={() => sql}
-        onSqlChange={onSqlChange}
-        onSqlCommit={onSqlCommit}
+        onProposal={onProposal}
+        hidden={hidden}
       />
     </FeatureFlagContext.Provider>
   )
-  return { ...utils, onSqlChange, onSqlCommit }
+  return { ...utils, onProposal }
 }
 
 describe('LegacyLogsRewriteBanner', () => {
@@ -105,18 +105,25 @@ describe('LegacyLogsRewriteBanner', () => {
     expect(screen.queryByText('Logs now run on a ClickHouse-backed engine')).not.toBeInTheDocument()
   })
 
-  it('swaps the SQL in place when a rewrite is accepted', async () => {
+  it('stays hidden when a caller suppresses it via `hidden`, even for legacy SQL', () => {
+    renderBanner({ hidden: true })
+
+    expect(screen.queryByText('Logs now run on a ClickHouse-backed engine')).not.toBeInTheDocument()
+  })
+
+  it('hands an accepted rewrite to the caller via onProposal', async () => {
     const rewritten = "select event_message from logs where source = 'edge_logs' limit 10"
     mswServer.use(
       http.post(`${API_URL}/ai/code/complete`, async () => HttpResponse.json(rewritten))
     )
 
-    const { onSqlChange, onSqlCommit } = renderBanner()
+    const { onProposal } = renderBanner()
 
     await userEvent.click(await screen.findByRole('button', { name: 'Rewrite with Assistant' }))
 
-    await waitFor(() => expect(onSqlChange).toHaveBeenCalledWith(rewritten))
-    expect(onSqlCommit).toHaveBeenCalledWith(rewritten)
+    await waitFor(() =>
+      expect(onProposal).toHaveBeenCalledWith({ original: LEGACY_SQL, modified: rewritten })
+    )
   })
 
   it('dismisses the offer', async () => {

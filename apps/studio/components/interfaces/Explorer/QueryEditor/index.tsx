@@ -21,9 +21,9 @@ import {
 } from '../ExplorerToolbar'
 import { type QueryDisplay, type QueryResult } from '../types'
 import { DisplaySettingsButton } from './DisplaySettingsButton'
-import { LegacyLogsRewriteBanner } from './LegacyLogsRewriteBanner'
 import { QueryResultRenderer } from './QueryResultRenderer'
 import { QuerySourceMenu } from './QuerySourceMenu'
+import { LegacyLogsRewriteBanner } from '@/components/interfaces/Settings/Logs/LegacyLogsRewriteBanner'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import {
   type DatabaseSourceParameters,
@@ -262,8 +262,10 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
             isLogsSource={query._tag === 'logs'}
             sql={sql}
             readSql={() => sqlRef.current}
-            onSqlChange={onSqlChange}
-            onSqlCommit={onSqlCommit}
+            onProposal={({ modified }) => {
+              onSqlChange(modified)
+              onSqlCommit?.(modified)
+            }}
           />
           <ExplorerQueryEditor
             className={cn('relative', variant === 'viewport' ? 'h-[45%] min-h-48' : undefined)}
