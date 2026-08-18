@@ -68,7 +68,7 @@ export const DatabaseDiffPanel = ({
       <CardHeader className="flex shrink-0 flex-row items-center justify-between space-y-0 py-3">
         <CardTitle>
           <Link
-            href={`/project/${currentBranchRef}/database/schema`}
+            href={`/project/${currentBranchRef}/database/schemas`}
             className="flex items-center gap-2"
           >
             <Database strokeWidth={1.5} size={16} className="text-foreground-muted" />
