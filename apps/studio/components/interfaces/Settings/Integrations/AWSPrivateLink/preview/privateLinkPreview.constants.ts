@@ -19,115 +19,108 @@ export type PrivateLinkPreviewScenario =
   | 'aws-direct-connected'
   | 'aws-direct-waiting'
   | 'aws-direct-expired'
-  | 'mixed-statuses'
   | 'vercel-initiated'
   | 'marketplace'
   | 'marketplace-plus-privatelink'
   | 'vercel-fallback'
   | 'mixed-rows'
-  | 'b6-private-hostname'
-  | 'b5-studio-copy'
+  | 'private-hostname'
 
-export type PrivateLinkPreviewSource = 'real-api' | 'mocked-platform'
+export type PrivateLinkPreviewGroup = 'reset' | 'aws' | 'vercel'
 
 export type PrivateLinkPreviewVercelCard =
   | 'live'
   | 'not-connected'
+  | 'install-from-vercel'
   | 'marketplace'
   | 'marketplace-plus'
-  | 'distinguish-billing'
 
 export type PrivateLinkPreviewScenarioConfig = {
   id: PrivateLinkPreviewScenario
   label: string
-  source: PrivateLinkPreviewSource
+  group: PrivateLinkPreviewGroup
   description: string
   vercelCard: PrivateLinkPreviewVercelCard
   showPrivateHostname: boolean
   showRestrictPublicAccess: boolean
   prefillAwsAccountId?: string
-  b5Note?: string
 }
+
+export const PRIVATE_LINK_PREVIEW_GROUPS: { id: PrivateLinkPreviewGroup; label: string }[] = [
+  { id: 'reset', label: 'Reset' },
+  { id: 'aws', label: 'AWS-direct' },
+  { id: 'vercel', label: 'Vercel' },
+]
 
 export const PRIVATE_LINK_PREVIEW_SCENARIOS: PrivateLinkPreviewScenarioConfig[] = [
   {
     id: 'empty',
-    label: 'Empty (reset)',
-    source: 'real-api',
-    description:
-      'Honest empty PrivateLink list. Vercel section is live. No mocked rows, hostname, or prefill.',
+    label: 'Empty',
+    group: 'reset',
+    description: 'Live Vercel section. Empty PrivateLink list.',
     vercelCard: 'live',
     showPrivateHostname: false,
     showRestrictPublicAccess: false,
   },
   {
     id: 'aws-direct-connected',
-    label: 'AWS-direct, connected',
-    source: 'real-api',
-    description: 'User-owned AWS account. No Vercel cue.',
+    label: 'Connected',
+    group: 'aws',
+    description: 'Plain Install on Vercel. User-owned PrivateLink row, no Vercel mark.',
     vercelCard: 'not-connected',
     showPrivateHostname: false,
     showRestrictPublicAccess: false,
   },
   {
     id: 'aws-direct-waiting',
-    label: 'AWS-direct, just added (Waiting)',
-    source: 'real-api',
-    description: 'Post-add accept moment. Toast, list warning, row second line.',
+    label: 'Waiting',
+    group: 'aws',
+    description: 'Accept-in-AWS list warning. Replay the add toast from this panel.',
     vercelCard: 'not-connected',
     showPrivateHostname: false,
     showRestrictPublicAccess: false,
   },
   {
     id: 'aws-direct-expired',
-    label: 'AWS-direct, Expired',
-    source: 'real-api',
-    description: '12-hour window missed.',
-    vercelCard: 'not-connected',
-    showPrivateHostname: false,
-    showRestrictPublicAccess: false,
-  },
-  {
-    id: 'mixed-statuses',
-    label: 'Mixed statuses',
-    source: 'real-api',
-    description: 'Waiting, connected, and expired in one list.',
+    label: 'Expired',
+    group: 'aws',
+    description: '12-hour window missed. Destructive list warning.',
     vercelCard: 'not-connected',
     showPrivateHostname: false,
     showRestrictPublicAccess: false,
   },
   {
     id: 'vercel-initiated',
-    label: 'Vercel-initiated, no Studio install',
-    source: 'mocked-platform',
-    description: 'Vercel-created PrivateLink row. Install remains available for env sync.',
-    vercelCard: 'not-connected',
+    label: 'From Vercel',
+    group: 'vercel',
+    description: 'Install still available. Vercel section points at PrivateLink below.',
+    vercelCard: 'install-from-vercel',
     showPrivateHostname: false,
     showRestrictPublicAccess: false,
   },
   {
     id: 'marketplace',
-    label: 'Marketplace / env sync, no PrivateLink',
-    source: 'mocked-platform',
-    description: 'Vercel card is billing and env sync. PrivateLink is empty.',
+    label: 'Marketplace',
+    group: 'vercel',
+    description: 'Env sync is done. No PrivateLink row.',
     vercelCard: 'marketplace',
     showPrivateHostname: false,
     showRestrictPublicAccess: false,
   },
   {
     id: 'marketplace-plus-privatelink',
-    label: 'Marketplace plus PrivateLink',
-    source: 'mocked-platform',
-    description: 'Two cards, two jobs. Partner cue on the PrivateLink row.',
+    label: 'Marketplace + PrivateLink',
+    group: 'vercel',
+    description: 'Env sync is done. Vercel section points at PrivateLink below.',
     vercelCard: 'marketplace-plus',
     showPrivateHostname: false,
     showRestrictPublicAccess: false,
   },
   {
     id: 'vercel-fallback',
-    label: 'Vercel fallback (paste account ID)',
-    source: 'mocked-platform',
-    description: 'Same add-connection sheet, including optional IAM role.',
+    label: 'Paste account ID',
+    group: 'vercel',
+    description: 'Plain Install. Add connection prefills Vercel’s AWS account ID.',
     vercelCard: 'not-connected',
     showPrivateHostname: false,
     showRestrictPublicAccess: false,
@@ -136,32 +129,20 @@ export const PRIVATE_LINK_PREVIEW_SCENARIOS: PrivateLinkPreviewScenarioConfig[] 
   {
     id: 'mixed-rows',
     label: 'Mixed rows',
-    source: 'mocked-platform',
-    description: 'Vercel cue and AWS-direct in one list. Install remains available. Not a split.',
-    vercelCard: 'not-connected',
+    group: 'vercel',
+    description: 'From-Vercel cue on Install, plus a user-owned AWS row in the same list.',
+    vercelCard: 'install-from-vercel',
     showPrivateHostname: false,
     showRestrictPublicAccess: false,
   },
   {
-    id: 'b6-private-hostname',
-    label: 'B6: private hostname and restrict public access',
-    source: 'mocked-platform',
-    description: 'Open Connect and Database Settings → Network restrictions.',
-    vercelCard: 'not-connected',
+    id: 'private-hostname',
+    label: 'Private hostname',
+    group: 'vercel',
+    description: 'Same as From Vercel. Open Connect and Database Settings → Network restrictions.',
+    vercelCard: 'install-from-vercel',
     showPrivateHostname: true,
     showRestrictPublicAccess: true,
-  },
-  {
-    id: 'b5-studio-copy',
-    label: 'B5: Studio copy only (not Vercel UI)',
-    source: 'mocked-platform',
-    description:
-      'If Vercel shows two Supabase rows, Studio copy distinguishes billing from the private path.',
-    vercelCard: 'distinguish-billing',
-    showPrivateHostname: false,
-    showRestrictPublicAccess: false,
-    b5Note:
-      'B5 is Vercel’s dashboard. We are not faking it. This scenario only tries Studio copy: Marketplace manages billing; PrivateLink below is the private database path.',
   },
 ]
 
@@ -177,11 +158,7 @@ export function getPrivateLinkPreviewScenarioConfig(
 }
 
 export function isVercelMarketplacePreviewCard(vercelCard: PrivateLinkPreviewVercelCard): boolean {
-  return (
-    vercelCard === 'marketplace' ||
-    vercelCard === 'marketplace-plus' ||
-    vercelCard === 'distinguish-billing'
-  )
+  return vercelCard === 'marketplace' || vercelCard === 'marketplace-plus'
 }
 
 export function getPreviewNavManagedBy(

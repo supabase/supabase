@@ -20,7 +20,7 @@ import {
 } from 'ui'
 
 import {
-  PRIVATE_LINK_PREVIEW_QUERY,
+  PRIVATE_LINK_PREVIEW_GROUPS,
   PRIVATE_LINK_PREVIEW_SCENARIOS,
   type PrivateLinkPreviewScenario,
 } from './privateLinkPreview.constants'
@@ -39,21 +39,11 @@ export const PrivateLinkPreviewPanel = () => {
 
   if (!preview.enabled) return null
 
-  const realApiScenarios = PRIVATE_LINK_PREVIEW_SCENARIOS.filter(
-    (scenario) => scenario.source === 'real-api'
-  )
-  const mockedScenarios = PRIVATE_LINK_PREVIEW_SCENARIOS.filter(
-    (scenario) => scenario.source === 'mocked-platform'
-  )
-
   return (
-    <div className="fixed bottom-4 right-4 z-50 w-[22rem] max-w-[calc(100vw-2rem)]">
+    <div className="fixed bottom-4 right-4 z-50 w-72 max-w-[calc(100vw-2rem)]">
       <Card className="border-warning-500 bg-surface-100 shadow-none">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm">PrivateLink preview</CardTitle>
-          <p className="text-xs text-foreground-lighter">
-            Prototype only. Off unless the URL has `{PRIVATE_LINK_PREVIEW_QUERY}=1`. Do not ship.
-          </p>
         </CardHeader>
         <CardContent className="space-y-3">
           <Select
@@ -66,35 +56,22 @@ export const PrivateLinkPreviewPanel = () => {
               <SelectValue placeholder="Choose a scenario" />
             </SelectTrigger>
             <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Real API states</SelectLabel>
-                {realApiScenarios.map((scenario) => (
-                  <SelectItem key={scenario.id} value={scenario.id}>
-                    {scenario.label}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-              <SelectGroup>
-                <SelectLabel>Mocked platform</SelectLabel>
-                {mockedScenarios.map((scenario) => (
-                  <SelectItem key={scenario.id} value={scenario.id}>
-                    {scenario.label}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
+              {PRIVATE_LINK_PREVIEW_GROUPS.map((group) => (
+                <SelectGroup key={group.id}>
+                  <SelectLabel>{group.label}</SelectLabel>
+                  {PRIVATE_LINK_PREVIEW_SCENARIOS.filter(
+                    (scenario) => scenario.group === group.id
+                  ).map((scenario) => (
+                    <SelectItem key={scenario.id} value={scenario.id}>
+                      {scenario.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              ))}
             </SelectContent>
           </Select>
 
           <p className="text-xs text-foreground-light">{preview.config.description}</p>
-          <p className="text-xs text-foreground-muted">
-            {preview.config.source === 'real-api' ? 'Real API' : 'Mocked platform'}
-          </p>
-
-          {preview.b5Note && (
-            <p className="text-xs text-foreground-light border-l-2 border-warning-500 pl-2">
-              {preview.b5Note}
-            </p>
-          )}
 
           {preview.scenario === 'aws-direct-waiting' && (
             <Button variant="default" size="tiny" onClick={replayPrivateLinkAddedToast}>
@@ -107,7 +84,7 @@ export const PrivateLinkPreviewPanel = () => {
             variant="outline"
             onClick={() => privateLinkPreviewState.setEnabled(false)}
           >
-            Dismiss preview
+            Dismiss
           </Button>
         </CardContent>
       </Card>

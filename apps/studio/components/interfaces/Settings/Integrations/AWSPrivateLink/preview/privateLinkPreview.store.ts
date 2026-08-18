@@ -100,7 +100,6 @@ export function usePrivateLinkPreview() {
     showRestrictPublicAccess: isActive && config.showRestrictPublicAccess,
     prefillAwsAccountId: isActive ? config.prefillAwsAccountId : undefined,
     skipUpgradeWall: isActive,
-    b5Note: isActive ? config.b5Note : undefined,
     showVercelMarketplaceNav: isActive && isVercelMarketplacePreviewCard(config.vercelCard),
   }
 }

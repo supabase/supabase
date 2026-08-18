@@ -3,7 +3,7 @@ import { Plus, SquareArrowOutUpRight } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
-import { Button, Card, CardContent, cn } from 'ui'
+import { Button, Card, CardContent, CardFooter, cn } from 'ui'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 import {
   PageSection,
@@ -144,13 +144,12 @@ export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean })
     'connection'
   )} `
   const vercelCard = preview.vercelCard
-  const showPreviewCard =
-    vercelCard === 'marketplace' ||
-    vercelCard === 'marketplace-plus' ||
-    vercelCard === 'distinguish-billing'
+  const showPreviewCard = vercelCard === 'marketplace' || vercelCard === 'marketplace-plus'
   const showLive = vercelCard === 'live'
+  const showInstallFromVercel = vercelCard === 'install-from-vercel'
   const showInstallEmpty =
     vercelCard === 'not-connected' ||
+    showInstallFromVercel ||
     (showLive && !isLoadingPermissions && canReadVercelConnection && !vercelIntegration)
 
   return (
@@ -168,7 +167,13 @@ export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean })
       </PageSectionMeta>
       <PageSectionContent>
         {showPreviewCard && <PrivateLinkPreviewVercelOverride />}
-        {showInstallEmpty && <VercelInstallEmptyState href={integrationUrl} disabled={isBranch} />}
+        {showInstallEmpty && (
+          <VercelInstallEmptyState
+            href={integrationUrl}
+            disabled={isBranch}
+            showPrivateLinkFromVercel={showInstallFromVercel}
+          />
+        )}
         {showLive && isLoadingPermissions && <GenericSkeletonLoader />}
         {showLive && !isLoadingPermissions && !canReadVercelConnection && (
           <NoPermission resourceText="view this organization's Vercel connections" />
@@ -240,7 +245,15 @@ export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean })
   )
 }
 
-function VercelInstallEmptyState({ href, disabled = false }: { href: string; disabled?: boolean }) {
+function VercelInstallEmptyState({
+  href,
+  disabled = false,
+  showPrivateLinkFromVercel = false,
+}: {
+  href: string
+  disabled?: boolean
+  showPrivateLinkFromVercel?: boolean
+}) {
   return (
     <Card>
       <CardContent>
@@ -273,6 +286,13 @@ function VercelInstallEmptyState({ href, disabled = false }: { href: string; dis
           )}
         </FormLayout>
       </CardContent>
+      {showPrivateLinkFromVercel && (
+        <CardFooter>
+          <p className="text-sm text-foreground-lighter">
+            Vercel’s private database path is in PrivateLink below.
+          </p>
+        </CardFooter>
+      )}
     </Card>
   )
 }

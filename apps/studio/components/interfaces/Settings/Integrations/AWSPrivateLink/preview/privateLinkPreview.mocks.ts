@@ -71,12 +71,9 @@ export function getPreviewAccounts(
       return [awsWaiting]
     case 'aws-direct-expired':
       return [awsExpired]
-    case 'mixed-statuses':
-      return [awsWaiting, awsConnected, awsExpired]
     case 'vercel-initiated':
     case 'marketplace-plus-privatelink':
-    case 'b6-private-hostname':
-    case 'b5-studio-copy':
+    case 'private-hostname':
       return [vercelConnected]
     case 'empty':
     case 'marketplace':

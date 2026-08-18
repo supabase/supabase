@@ -48,7 +48,7 @@ function MarketplacePlusVercelCard() {
       </CardContent>
       <CardFooter>
         <p className="text-sm text-foreground-lighter">
-          Private database path is in AWS PrivateLink below.
+          Vercel’s private database path is in PrivateLink below.
         </p>
       </CardFooter>
     </Card>
@@ -60,7 +60,7 @@ export const PrivateLinkPreviewVercelOverride = () => {
 
   if (vercelCard === 'marketplace') return <MarketplaceVercelCard />
 
-  if (vercelCard === 'marketplace-plus' || vercelCard === 'distinguish-billing') {
+  if (vercelCard === 'marketplace-plus') {
     return <MarketplacePlusVercelCard />
   }
 

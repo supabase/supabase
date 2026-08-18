@@ -13,11 +13,14 @@ describe('isPrivateLinkPreviewScenario', () => {
   it('accepts known scenarios', () => {
     expect(isPrivateLinkPreviewScenario('empty')).toBe(true)
     expect(isPrivateLinkPreviewScenario('vercel-initiated')).toBe(true)
-    expect(isPrivateLinkPreviewScenario('b5-studio-copy')).toBe(true)
+    expect(isPrivateLinkPreviewScenario('private-hostname')).toBe(true)
   })
 
-  it('rejects unknown values', () => {
+  it('rejects unknown and removed values', () => {
     expect(isPrivateLinkPreviewScenario('nope')).toBe(false)
+    expect(isPrivateLinkPreviewScenario('mixed-statuses')).toBe(false)
+    expect(isPrivateLinkPreviewScenario('b5-studio-copy')).toBe(false)
+    expect(isPrivateLinkPreviewScenario('b6-private-hostname')).toBe(false)
   })
 })
 
@@ -52,24 +55,31 @@ describe('getPrivateLinkPreviewScenarioConfig', () => {
     expect(config.showRestrictPublicAccess).toBe(false)
     expect(config.prefillAwsAccountId).toBeUndefined()
   })
+
+  it('keeps AWS-direct on plain Install', () => {
+    expect(getPrivateLinkPreviewScenarioConfig('aws-direct-connected').vercelCard).toBe(
+      'not-connected'
+    )
+  })
+
   it('marks marketplace plus PrivateLink as two jobs', () => {
     expect(getPrivateLinkPreviewScenarioConfig('marketplace-plus-privatelink').vercelCard).toBe(
       'marketplace-plus'
     )
   })
 
-  it('keeps mixed rows installable, not marketplace', () => {
-    expect(getPrivateLinkPreviewScenarioConfig('mixed-rows').vercelCard).toBe('not-connected')
+  it('puts an initiated-from-Vercel cue on Install for Vercel-initiated and mixed rows', () => {
+    expect(getPrivateLinkPreviewScenarioConfig('vercel-initiated').vercelCard).toBe(
+      'install-from-vercel'
+    )
+    expect(getPrivateLinkPreviewScenarioConfig('mixed-rows').vercelCard).toBe('install-from-vercel')
+    expect(getPrivateLinkPreviewScenarioConfig('private-hostname').vercelCard).toBe(
+      'install-from-vercel'
+    )
   })
 
-  it('keeps Vercel-initiated installable, with the Vercel cue on the PrivateLink row', () => {
-    expect(getPrivateLinkPreviewScenarioConfig('vercel-initiated').vercelCard).toBe('not-connected')
-  })
-
-  it('marks B5 as Studio copy only', () => {
-    const config = getPrivateLinkPreviewScenarioConfig('b5-studio-copy')
-    expect(config.vercelCard).toBe('distinguish-billing')
-    expect(config.b5Note).toMatch(/Vercel’s dashboard/)
+  it('keeps paste-account-ID on plain Install', () => {
+    expect(getPrivateLinkPreviewScenarioConfig('vercel-fallback').vercelCard).toBe('not-connected')
   })
 })
 
@@ -77,8 +87,8 @@ describe('isVercelMarketplacePreviewCard', () => {
   it('is true only for Marketplace card states', () => {
     expect(isVercelMarketplacePreviewCard('marketplace')).toBe(true)
     expect(isVercelMarketplacePreviewCard('marketplace-plus')).toBe(true)
-    expect(isVercelMarketplacePreviewCard('distinguish-billing')).toBe(true)
     expect(isVercelMarketplacePreviewCard('not-connected')).toBe(false)
+    expect(isVercelMarketplacePreviewCard('install-from-vercel')).toBe(false)
     expect(isVercelMarketplacePreviewCard('live')).toBe(false)
   })
 })

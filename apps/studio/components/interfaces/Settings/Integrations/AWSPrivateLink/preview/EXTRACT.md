@@ -19,28 +19,28 @@ Includes the floating presenter (`PrivateLinkPreviewPanel`), scenario mocks, Ver
 
 ## Production leaks (revert these)
 
-| File                                                                                               | What to remove                                                                                                                                           |
-| -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `apps/studio/components/layouts/DefaultLayout.tsx`                                                 | `PrivateLinkPreviewPanel` import and render                                                                                                              |
-| `apps/studio/components/layouts/AppLayout/OrganizationDropdown.tsx`                                | `usePreviewNavManagedBy`. Restore `<PartnerIcon organization={selectedOrganization} />`                                                                  |
-| `apps/studio/components/layouts/AppLayout/ProjectDropdown.tsx`                                     | `usePreviewNavManagedBy`. Restore the live `selectedProjectManagedBy` ternary                                                                            |
-| `apps/studio/components/layouts/AppLayout/OrganizationDropdown.test.tsx`                           | Preview hook mock                                                                                                                                        |
-| `apps/studio/components/layouts/AppLayout/ProjectDropdown.test.tsx`                                | Preview hook mock                                                                                                                                        |
-| `apps/studio/components/interfaces/Settings/Integrations/VercelIntegration/VercelSection.tsx`      | Preview import, `vercelCard` / `showPreviewCard` / `showInstallEmpty` overlay, `<PrivateLinkPreviewVercelOverride />`. Keep the real Install empty state |
-| `apps/studio/components/interfaces/Settings/Integrations/AWSPrivateLink/AWSPrivateLinkSection.tsx` | Preview import, mock `accounts`, `skipUpgradeWall`                                                                                                       |
-| `apps/studio/components/interfaces/Settings/Integrations/AWSPrivateLink/AWSPrivateLinkForm.tsx`    | Preview import, `prefillAwsAccountId`, preview-enabled submit that skips POST and replays the toast                                                      |
-| `apps/studio/components/interfaces/ConnectSheet/content/steps/direct-connection/content.tsx`       | `PRIVATE_LINK_PREVIEW_HOSTNAME` and `showPrivateHostname` block                                                                                          |
-| `apps/studio/components/interfaces/Settings/Database/NetworkRestrictions/NetworkRestrictions.tsx`  | `showRestrictPublicAccess` block                                                                                                                         |
+| File                                                                                               | What to remove                                                                                                                                      |
+| -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/studio/components/layouts/DefaultLayout.tsx`                                                 | `PrivateLinkPreviewPanel` import and render                                                                                                         |
+| `apps/studio/components/layouts/AppLayout/OrganizationDropdown.tsx`                                | `usePreviewNavManagedBy`. Restore `<PartnerIcon organization={selectedOrganization} />`                                                             |
+| `apps/studio/components/layouts/AppLayout/ProjectDropdown.tsx`                                     | `usePreviewNavManagedBy`. Restore the live `selectedProjectManagedBy` ternary                                                                       |
+| `apps/studio/components/layouts/AppLayout/OrganizationDropdown.test.tsx`                           | Preview hook mock                                                                                                                                   |
+| `apps/studio/components/layouts/AppLayout/ProjectDropdown.test.tsx`                                | Preview hook mock                                                                                                                                   |
+| `apps/studio/components/interfaces/Settings/Integrations/VercelIntegration/VercelSection.tsx`      | Preview import, `vercelCard` overlay, `showPrivateLinkFromVercel` footer, `<PrivateLinkPreviewVercelOverride />`. Keep the real Install empty state |
+| `apps/studio/components/interfaces/Settings/Integrations/AWSPrivateLink/AWSPrivateLinkSection.tsx` | Preview import, mock `accounts`, `skipUpgradeWall`                                                                                                  |
+| `apps/studio/components/interfaces/Settings/Integrations/AWSPrivateLink/AWSPrivateLinkForm.tsx`    | Preview import, `prefillAwsAccountId`, preview-enabled submit that skips POST and replays the toast                                                 |
+| `apps/studio/components/interfaces/ConnectSheet/content/steps/direct-connection/content.tsx`       | `PRIVATE_LINK_PREVIEW_HOSTNAME` and `showPrivateHostname` block                                                                                     |
+| `apps/studio/components/interfaces/Settings/Database/NetworkRestrictions/NetworkRestrictions.tsx`  | `showRestrictPublicAccess` block                                                                                                                    |
 
 ## What the mocks cover
 
-- Empty PrivateLink list, AWS-direct statuses, mixed statuses, mixed Vercel + AWS-direct rows
+- Empty PrivateLink list, AWS-direct connected / waiting / expired, mixed Vercel + AWS-direct rows
 - Vercel-initiated partner cue on a PrivateLink row (`partner: 'vercel'`)
+- Install empty with a PrivateLink pointer footer when the row was created from Vercel
 - Marketplace Vercel card (`acme-app`) with and without a PrivateLink pointer footer
 - Optional destination IAM role on the add sheet (UI only, not POSTed)
-- Nav `managed_by` fake for Marketplace, Marketplace plus PrivateLink, and B5 only (org + project switcher). Tooltip stays “Managed via Vercel Marketplace”. Not used for Vercel-initiated / mixed rows / Empty
-- B6 private hostname in Connect, restrict-public-access copy on Network Restrictions
-- B5 presenter note only. No fake Vercel dashboard
+- Nav `managed_by` fake for Marketplace and Marketplace plus PrivateLink only (org + project switcher)
+- Private hostname in Connect, restrict-public-access copy on Network Restrictions
 - Post-add toast: static “Connection added”. Accept copy lives on the list admonition
 
 ## Keep (not preview)
