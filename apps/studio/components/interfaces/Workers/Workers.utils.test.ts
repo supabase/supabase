@@ -9,6 +9,7 @@ import {
   getPage,
   isWorkersAccessDenied,
 } from './Workers.utils'
+import { ResponseError } from '@/types'
 
 const worker = (overrides: Partial<Worker> & Pick<Worker, 'name'>): Worker => ({
   buildState: 'active',
@@ -122,14 +123,17 @@ describe('formatResources', () => {
 })
 
 describe('isWorkersAccessDenied', () => {
+  const responseError = (code?: number) => new ResponseError('Denied', code)
+
   it('treats forbidden and not-found as the project missing from the alpha allowlist', () => {
-    expect(isWorkersAccessDenied({ code: 403 })).toBe(true)
-    expect(isWorkersAccessDenied({ code: 404 })).toBe(true)
+    expect(isWorkersAccessDenied(responseError(403))).toBe(true)
+    expect(isWorkersAccessDenied(responseError(404))).toBe(true)
   })
 
   it('leaves other failures to the generic error UI', () => {
-    expect(isWorkersAccessDenied({ code: 500 })).toBe(false)
-    expect(isWorkersAccessDenied({})).toBe(false)
+    expect(isWorkersAccessDenied(responseError(500))).toBe(false)
+    expect(isWorkersAccessDenied(responseError(undefined))).toBe(false)
+    expect(isWorkersAccessDenied(new Error('boom'))).toBe(false)
     expect(isWorkersAccessDenied(null)).toBe(false)
   })
 })

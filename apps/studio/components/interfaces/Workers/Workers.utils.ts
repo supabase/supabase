@@ -1,5 +1,6 @@
 import { RUNTIMES, type RuntimeMeta } from './Workers.constants'
 import type { Worker, WorkerAccess, WorkerBuildState } from './Workers.types'
+import { ResponseError } from '@/types'
 
 export interface WorkerFilters {
   search: string
@@ -55,5 +56,7 @@ export const formatResources = (worker: Worker): string =>
 
 // The Workers API is allowlisted per project (FUNC-795), so a project can hold the
 // dashboard flag and still be refused by the endpoint.
-export const isWorkersAccessDenied = (error: { code?: number } | null): boolean =>
-  error?.code === 403 || error?.code === 404
+export const isWorkersAccessDenied = (error: Error | null): boolean => {
+  if (!(error instanceof ResponseError)) return false
+  return error.code === 403 || error.code === 404
+}
