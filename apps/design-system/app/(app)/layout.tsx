@@ -1,6 +1,7 @@
 import { ScrollArea } from 'ui'
 import { SkipToContent } from 'ui-patterns/SkipToContent'
 
+import { ErrorBoundary } from '@/components/error-boundary'
 import { MobileSidebarSheet } from '@/components/mobile-sidebar-sheet'
 import { SideNavigation } from '@/components/side-navigation'
 import { SiteFooter } from '@/components/site-footer'
@@ -25,7 +26,7 @@ export default async function AppLayout({ children }: AppLayoutProps) {
           </aside>
           {/* Content-only landmark: sidebar must stay outside so skip/Tab don't land in the nav */}
           <main id="main" tabIndex={-1} className="outline-hidden scroll-mt-12 min-w-0">
-            {children}
+            <ErrorBoundary>{children}</ErrorBoundary>
           </main>
         </div>
       </div>
