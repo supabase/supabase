@@ -33,7 +33,7 @@ export const DatabaseConnections: NextPageWithLayout = () => {
   const { data: project } = useSelectedProjectQuery()
   const { openSidebar } = useSidebarManagerSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
-  const isDatabaseConnectionsEnabled = useIsDatabaseConnectionsEnabled()
+  const { enabled: isDatabaseConnectionsEnabled } = useIsDatabaseConnectionsEnabled()
   const { selectFeaturePreview } = useFeaturePreviewModal()
 
   const [live, setLive] = useState(true)

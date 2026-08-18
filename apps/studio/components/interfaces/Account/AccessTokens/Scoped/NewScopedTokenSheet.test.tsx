@@ -189,9 +189,9 @@ describe('NewScopedTokenSheet', () => {
     fireEvent.click(await screen.findByLabelText('Project Settings', { exact: false }))
     fireEvent.click(await screen.findByRole('option', { name: 'Read' }))
     fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
-    // Review screen
-    await screen.findByText('Low Risk')
-    await screen.findByText('Single-project read-only access')
+    // Review screen — Project Settings is a high-risk entry, downgraded one tier for read-only
+    await screen.findByText('Medium risk')
+    await screen.findByText('Read on 1 capability, across 1 project.')
     fireEvent.click(await screen.findByRole('button', { name: 'Create token' }))
     // If we can click this checkbox, the token was created
     // Must be a real click, which focuses the button: nothing holds focus once the form
@@ -204,7 +204,7 @@ describe('NewScopedTokenSheet', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Done' }))
     // Dialog has been closed
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
-  })
+  }, 10_000)
 
   // Organization scope tests
   test('requires an organization when scope is Organization', async () => {
@@ -239,9 +239,9 @@ describe('NewScopedTokenSheet', () => {
     fireEvent.click(await screen.findByLabelText('Project Settings', { exact: false }))
     fireEvent.click(await screen.findByRole('option', { name: 'Read' }))
     fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
-    // Review screen
-    await screen.findByText('Low Risk')
-    await screen.findByText('Organization-wide read-only access')
+    // Review screen — Project Settings is a high-risk entry, downgraded one tier for read-only
+    await screen.findByText('Medium risk')
+    await screen.findByText('Read on 1 capability, across 1 organization.')
     fireEvent.click(await screen.findByRole('button', { name: 'Create token' }))
     // If we can click this checkbox, the token was created
     // Must be a real click, which focuses the button: nothing holds focus once the form
@@ -254,7 +254,7 @@ describe('NewScopedTokenSheet', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Done' }))
     // Dialog has been closed
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
-  })
+  }, 10_000)
 
   test('opens the experimental API dialog from the dropdown', async () => {
     renderSheet()

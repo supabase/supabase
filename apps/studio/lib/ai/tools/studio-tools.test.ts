@@ -89,7 +89,7 @@ describe('ai/tools/studio-tools', () => {
       if (!renameTool.execute) throw new Error('execute is undefined')
       const result = await renameTool.execute(
         { newName: 'Test Chat' },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
       expect(result).toEqual({ status: 'Chat request sent to client' })
     })
@@ -154,7 +154,7 @@ describe('ai/tools/studio-tools', () => {
           chartConfig: { view: 'table' },
           isWriteQuery: false,
         },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
 
       expect(executeSql).toHaveBeenCalledWith(
@@ -191,7 +191,7 @@ describe('ai/tools/studio-tools', () => {
           chartConfig: { view: 'table' },
           isWriteQuery: false,
         },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
 
       expect(executeSql).toHaveBeenCalledWith(

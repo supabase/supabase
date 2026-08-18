@@ -10,20 +10,17 @@ import {
 import type { TokenAccessEvaluation } from '../../AccessToken.roles'
 import { PermissionRow } from './PermissionRow'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { PermissionScopeMap } from '@/data/scoped-access-tokens/permission-scope-map-query'
 import { DOCS_URL } from '@/lib/constants'
 
 interface PermissionsAccordionProps {
   selection: PermissionSelection
   onChange: (key: string, mode: PermissionMode) => void
-  permissionScopeMap: PermissionScopeMap | undefined
   access?: TokenAccessEvaluation
 }
 
 export const PermissionsAccordion = ({
   selection,
   onChange,
-  permissionScopeMap,
   access,
 }: PermissionsAccordionProps) => {
   const [openCategories, setOpenCategories] = useState<string[]>([])
@@ -81,7 +78,6 @@ export const PermissionsAccordion = ({
                         entry={entry}
                         mode={selection[entry.key] ?? 'none'}
                         onChange={(mode) => onChange(entry.key, mode)}
-                        permissionScopeMap={permissionScopeMap}
                         entryAccess={access?.entries[entry.key]}
                       />
                     </div>

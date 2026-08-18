@@ -1,12 +1,25 @@
 import { DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from 'ui'
 
-import { RoleImpersonationSelector } from '@/components/interfaces/RoleImpersonationSelector'
-import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
+import { RoleImpersonationSelectorInterface } from '@/components/interfaces/RoleImpersonationSelector'
+import {
+  useRoleImpersonationStateSnapshot,
+  type RoleImpersonationController,
+} from '@/state/role-impersonation-state'
 
 const SERVICE_ROLE_LABEL = 'postgres'
 
-export const RunAsSubMenu = () => {
-  const state = useRoleImpersonationStateSnapshot()
+type RunAsSubMenuProps =
+  | {
+      controlled?: false
+    }
+  | {
+      controlled: true
+      state: RoleImpersonationController
+    }
+
+export const RunAsSubMenu = (props: RunAsSubMenuProps) => {
+  const globalState = useRoleImpersonationStateSnapshot() as unknown as RoleImpersonationController
+  const state = props.controlled ? props.state : globalState
   const currentRole = state.role?.role ?? SERVICE_ROLE_LABEL
 
   return (
@@ -20,10 +33,11 @@ export const RunAsSubMenu = () => {
       {/* Stops propagation so the authenticated-user search input isn't swallowed by the
       dropdown's typeahead. */}
       <DropdownMenuSubContent className="w-80 p-0" onKeyDown={(e) => e.stopPropagation()}>
-        <RoleImpersonationSelector
+        <RoleImpersonationSelectorInterface
+          orientation="vertical"
           header="Run SQL query as a role"
           serviceRoleLabel={SERVICE_ROLE_LABEL}
-          orientation="vertical"
+          state={state}
         />
       </DropdownMenuSubContent>
     </DropdownMenuSub>

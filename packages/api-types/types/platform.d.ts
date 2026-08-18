@@ -5890,6 +5890,8 @@ export interface components {
         | 'vanity_subdomain_write'
         | 'platform_webhooks_projects_read'
         | 'platform_webhooks_projects_write'
+        | 'workers_read'
+        | 'workers_write'
       )[]
     }
     CreatePlatformAppResponse: {
@@ -5942,6 +5944,7 @@ export interface components {
             | 'm7g.medium'
             | 'm8g.medium'
             | 'm9g.medium'
+            | 'c6g.medium'
             | 'm6g.large'
             | 'm6a.large'
             | 'm6i.large'
@@ -7125,6 +7128,8 @@ export interface components {
         | 'vanity_subdomain_write'
         | 'platform_webhooks_projects_read'
         | 'platform_webhooks_projects_write'
+        | 'workers_read'
+        | 'workers_write'
       )[]
       project_refs?: string[]
     }
@@ -7756,6 +7761,12 @@ export interface components {
          * @enum {string}
          */
         database_type: 'PRIMARY' | 'READ_REPLICA'
+        /** @description ARN of the AWS VPC Lattice resource configuration backing this PrivateLink share. */
+        resource_access_manager_resource_config_arn?: string
+        /** @description ID of the AWS VPC Lattice resource configuration backing this PrivateLink share. */
+        resource_access_manager_resource_config_id?: string
+        /** @description ARN of the AWS Resource Access Manager resource share for this association. */
+        resource_access_manager_share_arn?: string
         /**
          * Format: date-time
          * @description The time and date at which the AWS Resource Share Association was requested from Supabase. `null` means that the association was not yet requested while the PrivateLink Association is pending.
@@ -12525,6 +12536,8 @@ export interface components {
         | 'vanity_subdomain_write'
         | 'platform_webhooks_projects_read'
         | 'platform_webhooks_projects_write'
+        | 'workers_read'
+        | 'workers_write'
       )[]
     }
     UpdatePlatformAppInstallationResponse: {

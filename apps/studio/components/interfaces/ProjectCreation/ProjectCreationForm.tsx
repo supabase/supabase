@@ -443,13 +443,9 @@ export const ProjectCreationForm = ({
       extractPostgresVersionDetails(postgresVersionSelection)
 
     const { smartGroup = [], specific = [] } = availableRegionsData?.all ?? {}
-    const selectedRegion =
-      highAvailability && highAvailabilityRegionCode !== undefined
-        ? specific.find((region) => region.code === highAvailabilityRegionCode)
-        : smartRegionEnabled
-          ? (smartGroup.find((x) => x.name === dbRegion) ??
-            specific.find((x) => x.name === dbRegion))
-          : undefined
+    const selectedRegion = smartRegionEnabled
+      ? (smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion))
+      : undefined
 
     if (highAvailability && highAvailabilityRegionCode !== undefined && !selectedRegion) {
       return toast.error(
@@ -680,8 +676,8 @@ export const ProjectCreationForm = ({
                           label="GitHub (optional)"
                           description={
                             <>
-                              Ideal for agent-first workflows: update your schema in code, push it
-                              to GitHub, and Supabase deploys the changes automatically.{' '}
+                              Ideal for agent-first workflows. Update your schema in code and push
+                              it to GitHub. Supabase deploys the changes.{' '}
                               <a
                                 href="https://supabase.com/docs/guides/deployment/branching/github-integration"
                                 target="_blank"
