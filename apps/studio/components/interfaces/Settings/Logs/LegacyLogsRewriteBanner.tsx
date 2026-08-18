@@ -52,7 +52,9 @@ export const LegacyLogsRewriteBanner = ({
   const { state, requestRewrite, dismiss } = useLegacyLogsRewrite({ readSql, onProposal })
 
   const hasUnacknowledgedOutcome = state.status === 'failed' || state.status === 'noRewriteNeeded'
-  if (hidden || !(needsRewrite || hasUnacknowledgedOutcome)) return null
+  const isEligibleSurface = isLogsSource && isOtelLogsEnabled
+
+  if (hidden || !isEligibleSurface || !(needsRewrite || hasUnacknowledgedOutcome)) return null
 
   return (
     <LegacyLogsRewriteAdmonition state={state} onRewrite={requestRewrite} onDismiss={dismiss} />
