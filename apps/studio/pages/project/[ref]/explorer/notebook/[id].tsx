@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { useEffect, useEffectEvent } from 'react'
 
-import { NotebookEditor } from '@/components/interfaces/Explorer/NotebookEditor'
+import { ExplorerNotebookTab } from '@/components/interfaces/Explorer/ExplorerNotebookTab'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { ExplorerLayout } from '@/components/layouts/ExplorerLayout/ExplorerLayout'
 import { useCurrentNotebook } from '@/state/notebooks/notebooks-state'
@@ -28,7 +28,7 @@ const NotebookPage: NextPageWithLayout = () => {
 
   useEffect(() => registerTab(), [id])
 
-  return <NotebookEditor />
+  return <ExplorerNotebookTab />
 }
 
 NotebookPage.getLayout = (page) => (

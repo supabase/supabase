@@ -1,6 +1,6 @@
+import { type QueryResult } from '../types'
 import { QueryResultChart } from './QueryResultChart'
 import { QueryResultError } from './QueryResultError'
-import { type QueryResult } from './types'
 import { DataGridResults } from '@/components/ui/DataGridResults'
 import { type ChartConfig } from '@/data/content/notebooks/notebook-schema'
 

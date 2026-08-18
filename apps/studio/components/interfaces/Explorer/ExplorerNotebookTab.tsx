@@ -31,7 +31,7 @@ import { isQueryCell } from '@/data/content/notebooks/notebook-schema'
 import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
-export const NotebookEditor = () => {
+export const ExplorerNotebookTab = () => {
   const { id } = useParams()
   const tabs = useTabsStateSnapshot()
   const snap = useNotebooksStateSnapshot()

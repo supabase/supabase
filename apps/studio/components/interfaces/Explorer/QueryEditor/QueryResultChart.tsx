@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { Chart, ChartBar, ChartCard, ChartContent, ChartLine } from 'ui-patterns/Chart'
 
-import { type QueryResult } from './types'
+import { type QueryResult } from '../types'
 import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
 import { formatLogTick, getCumulativeResults } from '@/components/ui/QueryBlock/QueryBlock.utils'
 import { type ChartConfig } from '@/data/content/notebooks/notebook-schema'

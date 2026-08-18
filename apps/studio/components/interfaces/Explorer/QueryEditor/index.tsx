@@ -4,25 +4,25 @@ import { CodeSquare, Eye, EyeOff, Play } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { cn } from 'ui'
 
-import { resolveLogTimeRange } from '../QuerySources/LogTimeRange.utils'
+import { resolveLogTimeRange } from '../../QuerySources/LogTimeRange.utils'
 import {
   ExplorerQuery,
   ExplorerQueryEditor,
   ExplorerQueryFooter,
   ExplorerQueryResults,
   ExplorerQueryViewport,
-} from './ExplorerQuery'
-import { ExplorerQuerySourceMenu } from './ExplorerQuerySourceMenu'
+} from '../ExplorerQuery'
 import {
   ExplorerToolbar,
   ExplorerToolbarAction,
   ExplorerToolbarActions,
   ExplorerToolbarIcon,
   ExplorerToolbarTitle,
-} from './ExplorerToolbar'
-import { DisplaySettingsButton } from './QueryCell/DisplaySettingsButton'
+} from '../ExplorerToolbar'
+import { type QueryDisplay, type QueryResult } from '../types'
+import { DisplaySettingsButton } from './DisplaySettingsButton'
 import { QueryResultRenderer } from './QueryResultRenderer'
-import { type QueryDisplay, type QueryResult } from './types'
+import { QuerySourceMenu } from './QuerySourceMenu'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import {
   type DatabaseSourceParameters,
@@ -212,7 +212,7 @@ export const QueryEditor = ({
         <ExplorerToolbarActions>
           {toolbarActions}
           {onSourceChange && (
-            <ExplorerQuerySourceMenu
+            <QuerySourceMenu
               source={toQuerySourceBinding(query)}
               onSourceChange={onSourceChange}
               rowLimit={rowLimit}

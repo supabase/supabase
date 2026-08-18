@@ -12,7 +12,7 @@ import { useControlledRoleImpersonationState } from '@/state/role-impersonation-
 import { createTabId, TabsStateContext } from '@/state/tabs'
 
 /** Query-tab lifecycle adapter around the shared QueryEditor. */
-export const QueryTab = () => {
+export const ExplorerQueryTab = () => {
   const { id, ref } = useParams()
   const router = useRouter()
   const tabs = useContext(TabsStateContext)
