@@ -43,7 +43,6 @@ export function CategoryAndSeverityInfo({
 }: CategoryAndSeverityInfoProps) {
   return (
     <div
-      data-support-field="category"
       className={cn(
         'grid sm:grid-rows-1 gap-4 grid-cols-1 grid-rows-2',
         showSeverity ? 'sm:grid-cols-2' : 'sm:grid-cols-1'
@@ -92,7 +91,11 @@ function CategorySelector({ form }: CategorySelectorProps) {
           <FormItemLayout hideMessage layout="vertical" label="What issue are you having?">
             <FormControl>
               <Select {...fieldWithoutRef} defaultValue={field.value} onValueChange={onValueChange}>
-                <SelectTrigger aria-label="Select an issue" className="w-full">
+                <SelectTrigger
+                  data-support-field="category"
+                  aria-label="Select an issue"
+                  className="w-full"
+                >
                   <SelectValue placeholder="Select an issue">
                     {field.value
                       ? CATEGORY_OPTIONS.find((o) => o.value === field.value)?.label
