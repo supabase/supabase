@@ -3,6 +3,8 @@ import type { McpClient } from 'ui-patterns/McpUrlBuilder'
 export interface PluginClient extends McpClient {
   repoUrl?: string
   docsUrl?: string
+  /** Overrides the default "View {label} extensions docs" link text. */
+  docsLinkText?: string
 }
 
 export const PLUGIN_CLIENTS: PluginClient[] = [
@@ -50,7 +52,8 @@ export const PLUGIN_CLIENTS: PluginClient[] = [
     icon: 'grok',
     hasDistinctDarkIcon: true,
     repoUrl: 'https://github.com/supabase-community/supabase-plugin',
-    docsUrl: 'https://docs.x.ai/build/features/skills-plugins-marketplaces',
+    docsUrl: 'https://docs.x.ai/build/features/skills-plugins-marketplaces#plugins',
+    docsLinkText: 'View Grok plugins docs',
   },
   {
     key: 'kimi',

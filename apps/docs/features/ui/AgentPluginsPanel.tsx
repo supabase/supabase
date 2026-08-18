@@ -163,9 +163,9 @@ function PluginInstructions({ client }: { client: PluginClient }) {
           className="block"
         />
         <p className="text-xs text-foreground-lighter">
-          Confirm the trust prompt to install (or pass <code>--trust</code> to skip it). You can also
-          browse and install plugins from within a Grok session by running <code>grok</code> and
-          opening the plugins modal with <code>/plugins</code>.
+          Confirm the trust prompt to install (or pass <code>--trust</code> to skip it). You can
+          also browse and install plugins from within a Grok session by running <code>grok</code>{' '}
+          and opening the plugins modal with <code>/plugins</code>.
         </p>
       </div>
     )
@@ -261,7 +261,7 @@ export function AgentPluginsPanel() {
               rel="noopener noreferrer"
               className="text-brand-link hover:underline inline-flex items-center"
             >
-              View {selectedClient.label} extensions docs
+              {selectedClient.docsLinkText ?? `View ${selectedClient.label} extensions docs`}
               <ExternalLink className="h-3 w-3 ml-1" />
             </a>
           </div>

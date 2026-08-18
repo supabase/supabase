@@ -99,8 +99,9 @@ export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
       <>
         <paragraph>
           The command writes the server to your user config (
-          <inlineCode value="~/.grok/config.toml" />), making it available across all your projects.
-          Start Grok and complete the Supabase OAuth flow when prompted on first use.
+          <inlineCode value="~/.grok/config.toml" />
+          ), making it available across all your projects. Start Grok and complete the Supabase
+          OAuth flow when prompted on first use.
         </paragraph>
         <paragraph>
           Verify the connection by running <inlineCode value="/mcps" /> inside a Grok session, or{' '}
