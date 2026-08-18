@@ -99,6 +99,9 @@ export const storageKeys = {
     ] as const,
   archivedObjects: (projectRef: string | undefined, bucketId: string | undefined) =>
     ['projects', projectRef, 'buckets', bucketId, 'archived-objects'] as const,
+  /** Org-scoped: storage retention is billed per organization, not per project. */
+  retentionUsage: (orgSlug: string | undefined) =>
+    ['organizations', orgSlug, 'storage-retention-usage'] as const,
   icebergNamespaces: ({ projectRef, warehouse }: { projectRef?: string; warehouse?: string }) =>
     [projectRef, 'warehouse', warehouse, 'namespaces'] as const,
   icebergNamespace: ({
