@@ -176,7 +176,7 @@ describe('NewScopedTokenSheet', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
     expect(await screen.findByText('No permissions selected', { selector: '[role="alert"] *' }))
   })
-  test('creates the token when scope is Project', { timeout: 20000 }, async () => {
+  test('creates the token when scope is Project', async () => {
     renderSheet()
     fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
     await screen.findByRole('dialog')
@@ -204,7 +204,7 @@ describe('NewScopedTokenSheet', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Done' }))
     // Dialog has been closed
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
-  })
+  }, 20_000)
 
   // Organization scope tests
   test('requires an organization when scope is Organization', async () => {
@@ -227,7 +227,7 @@ describe('NewScopedTokenSheet', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
     expect(await screen.findByText('No permissions selected', { selector: '[role="alert"] *' }))
   })
-  test('creates the token when scope is Organization', { timeout: 20000 }, async () => {
+  test('creates the token when scope is Organization', async () => {
     renderSheet()
     fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
     await screen.findByRole('dialog')
@@ -254,7 +254,7 @@ describe('NewScopedTokenSheet', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Done' }))
     // Dialog has been closed
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
-  })
+  }, 20_000)
 
   test('opens the experimental API dialog from the dropdown', async () => {
     renderSheet()
