@@ -83,7 +83,7 @@ function getCustomProviderName(provider: string): string | undefined {
     .replaceAll('_', ' ')
     .split(' ')
     .filter(Boolean)
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ')
 }
 

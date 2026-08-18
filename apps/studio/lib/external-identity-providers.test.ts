@@ -30,6 +30,7 @@ describe('external identity providers', () => {
     expect(getProviderDisplay('custom:acme').displayName).toBe('Acme')
     expect(getProviderDisplay('Custom:Acme').displayName).toBe('Acme')
     expect(getProviderDisplay('custom:my_provider').displayName).toBe('My Provider')
+    expect(getProviderDisplay('custom:MY_PROVIDER').displayName).toBe('My Provider')
     // registered custom providers keep their configured display name
     expect(getProviderDisplay('custom:openai').displayName).toBe('ChatGPT')
   })
