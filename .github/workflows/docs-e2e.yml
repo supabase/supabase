@@ -55,12 +55,8 @@ jobs:
               - 'apps/docs/content/guides/**/*.mdx'
               - 'apps/docs/content/troubleshooting/**/*.mdx'
               - 'apps/docs/content/_partials/**'
-              - 'e2e/docs/features/**'
-              - 'e2e/docs/utils/**'
-              - 'e2e/docs/scripts/**'
-              - 'e2e/docs/playwright.config.ts'
-              - 'e2e/docs/package.json'
-              - 'e2e/docs/tsconfig.json'
+              - 'e2e/docs/**'
+              - 'e2e/shared/**'
               - 'pnpm-lock.yaml'
               - '.github/workflows/docs-e2e.yml'
             docs_app:
@@ -75,6 +71,7 @@ jobs:
           fetch-depth: ${{ github.event_name == 'pull_request' && '0' || '1' }}
           sparse-checkout: |
             e2e/docs
+            e2e/shared
             scripts
             patches
             apps/docs/content/guides
@@ -138,17 +135,18 @@ jobs:
       # times out polling that API even though the preview builds fine.
       # Poll the "Vercel – docs" commit status instead — Vercel keeps posting
       # those — then resolve the deployment it points to via Vercel's own API
-      # to get the actual preview URL. See scripts/waitForVercelDocsPreview.js.
+      # to get the actual preview URL. See scripts/waitForVercelPreview.js.
       # A Vercel failure or timeout is not the author's problem, and the required
       # "Vercel – docs" check already reports it. Resolve no URL and skip below.
       - name: Wait for Vercel docs preview
         if: steps.scope.outputs.skip == 'false' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && steps.changes.outputs.docs_app == 'true'
         id: deployment
         continue-on-error: true
-        run: node scripts/waitForVercelDocsPreview.js
+        run: node scripts/waitForVercelPreview.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          VERCEL_STATUS_CONTEXT: 'Vercel – docs'
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
 

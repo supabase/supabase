@@ -27,6 +27,11 @@ export const telemetryDebugging: ContentListingGroup = {
       href: '/guides/troubleshooting',
       description: 'Searchable index of known error codes, symptoms, and fixes.',
     },
+    {
+      title: 'Diagnosing stuck and blocked queries',
+      href: '/guides/database/connection-management#diagnosing-stuck-and-blocked-queries',
+      description: 'Find sessions blocked by a lock, and cancel or terminate the one responsible.',
+    },
   ],
 }
 
@@ -55,6 +60,11 @@ export const telemetryMonitoring: ContentListingGroup = {
       title: 'Client-side tracing',
       href: '/guides/monitoring-and-debugging/client-side-tracing',
       description: 'Correlate browser requests end-to-end using W3C Trace Context.',
+    },
+    {
+      title: 'Query optimization',
+      href: '/guides/database/query-optimization',
+      description: 'Find and fix slow queries using indexes and query plan analysis.',
     },
     {
       title: 'Sentry integration',

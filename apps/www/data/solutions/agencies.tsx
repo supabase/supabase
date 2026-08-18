@@ -113,7 +113,7 @@ const data: {
         ),
       },
       {
-        icon: '/images/logos/publicity/sj-innovation.svg',
+        icon: '/images/logos/publicity/sjinnovation.svg',
         avatar: '/images/avatars/shahed-islam.jpeg',
         author: 'Shahed Islam',
         authorTitle: 'CEO, SJ Innovation LLC',

@@ -1,8 +1,8 @@
 import * as ai from 'ai'
 import {
   convertToModelMessages,
+  isStepCount,
   isToolUIPart,
-  stepCountIs,
   type LanguageModel,
   type ModelMessage,
   type SystemModelMessage,
@@ -16,7 +16,13 @@ import type { AssistantEvalInput } from '@/evals/scorer'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { buildAssistantContextMessages, NO_SCHEMA_ACCESS_MESSAGE } from '@/lib/ai/assistant-context'
 import { IS_TRACING_ENABLED } from '@/lib/ai/braintrust-logger'
-import { CHAT_PROMPT, GENERAL_PROMPT, LIMITATIONS_PROMPT, SECURITY_PROMPT } from '@/lib/ai/prompts'
+import {
+  CHAT_PROMPT,
+  GENERAL_PROMPT,
+  LIMITATIONS_PROMPT,
+  NOTEBOOKS_PROMPT,
+  SECURITY_PROMPT,
+} from '@/lib/ai/prompts'
 import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
 
 const { streamText: tracedStreamText } = wrapAISDK(ai)
@@ -36,6 +42,7 @@ export async function generateAssistantResponse({
   orgId,
   planId,
   includesLogsSnippets,
+  isExplorerEnabled,
   systemProviderOptions,
   providerOptions,
   requestedModel,
@@ -57,6 +64,7 @@ export async function generateAssistantResponse({
   planId?: string
   /** Whether any user message in the conversation attached a logs (ClickHouse) query. */
   includesLogsSnippets?: boolean
+  isExplorerEnabled?: boolean
   requestedModel?: string
   systemProviderOptions?: Record<string, any>
   providerOptions?: Record<string, any>
@@ -104,10 +112,13 @@ export async function generateAssistantResponse({
           : await getSchemas()
         : NO_SCHEMA_ACCESS_MESSAGE
 
-    // Important: do not use dynamic content in the system prompt or Bedrock will not cache it
+    // Important: do not use per-request dynamic content in the system prompt or Bedrock will
+    // not cache it. isExplorerEnabled is a per-user flag, not per-request, so it only produces
+    // two prompt variants (on/off) rather than defeating caching.
     const system = source`
       ${GENERAL_PROMPT}
       ${CHAT_PROMPT}
+      ${isExplorerEnabled ? NOTEBOOKS_PROMPT : ''}
       ${SECURITY_PROMPT}
       ${LIMITATIONS_PROMPT}
 
@@ -142,14 +153,14 @@ export async function generateAssistantResponse({
 
     return streamTextFn({
       model,
-      system: systemMessage,
-      stopWhen: stepCountIs(10),
+      instructions: systemMessage,
+      stopWhen: isStepCount(10),
       messages: coreMessages,
       ...(providerOptions && { providerOptions }),
       tools,
       ...(abortSignal && { abortSignal }),
       ...(span && {
-        onFinish: ({ steps, finishReason }) => {
+        onEnd: ({ steps, finishReason }) => {
           const metadata: Record<string, unknown> = {
             isFinalStep: finishReason === 'stop',
           }
@@ -169,7 +180,7 @@ export async function generateAssistantResponse({
   }
 
   if (shouldTrace) {
-    // startSpan instead of traced() so we control when the span closes via onFinish.
+    // startSpan instead of traced() so we control when the span closes via onEnd.
     // Scorers read from child spans (LLM + tool) in the trace rather than a root span output field.
     const span = startSpan({ name: 'generateAssistantResponse', type: 'function' })
     onSpanCreated?.(span.id)

@@ -1,9 +1,20 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form, ScrollArea, Separator, SheetClose, SheetFooter } from 'ui'
+import {
+  Button,
+  Form,
+  InfoIcon,
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+  ScrollArea,
+  Separator,
+  SheetClose,
+  SheetFooter,
+} from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { CLASSIC_TOKEN_WARNING } from '../../AccessToken.constants'
@@ -46,6 +57,8 @@ export const NewScopedTokenForm = ({
   })
   const [step, setStep] = useState<'form' | 'review'>('form')
   const [formValues, setFormValues] = useState<TokenFormValues>(DEFAULT_VALUES)
+  // Dismissal sticks for the sheet's lifetime, so bouncing between steps doesn't resurface it.
+  const [isCreateHintDismissed, setIsCreateHintDismissed] = useState(false)
   const [showMissingPermissionsWarning, setShowMissingPermissionsWarning] = useState(false)
   const resourceSectionRef = useRef<HTMLDivElement>(null)
   const resourceAccess = useWatch({ control: form.control, name: 'resourceAccess' })
@@ -111,7 +124,10 @@ export const NewScopedTokenForm = ({
 
   return (
     <>
-      <ScrollArea className="flex-1">
+      {/* Radix wraps viewport children in an inline-styled display:table div that grows to fit
+          the widest child, which would let one long endpoint path expand the sheet instead of
+          clipping — force it back to block so widths are bounded and rows can truncate. */}
+      <ScrollArea className="flex-1 [&>[data-radix-scroll-area-viewport]>div]:block!">
         {step === 'form' ? (
           <Form {...form}>
             <form id={FORM_ID} onSubmit={form.handleSubmit(handleReviewAccess)}>
@@ -154,7 +170,6 @@ export const NewScopedTokenForm = ({
                   <PermissionsAccordion
                     selection={selection}
                     onChange={handlePermissionChange}
-                    permissionScopeMap={permissionScopeMap}
                     access={access}
                   />
                   {showMissingPermissionsWarning && (
@@ -178,10 +193,6 @@ export const NewScopedTokenForm = ({
             values={formValues}
             access={access}
             permissionScopeMap={permissionScopeMap}
-            onSelectLegacyToken={() => {
-              handleSelectLegacyMode()
-              setStep('form')
-            }}
           />
         )}
       </ScrollArea>
@@ -191,16 +202,11 @@ export const NewScopedTokenForm = ({
         ) : (
           <StepIndicator step={step === 'form' ? 1 : 2} total={2} label="Configure" />
         )}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {step === 'review' && (
-            <>
-              <span className="text-xs text-foreground-lighter">
-                Access can't be changed after creation
-              </span>
-              <Button variant="default" disabled={isPending} onClick={() => setStep('form')}>
-                Back
-              </Button>
-            </>
+            <Button variant="default" disabled={isPending} onClick={() => setStep('form')}>
+              Back
+            </Button>
           )}
           <SheetClose asChild disabled={isPending}>
             <Button variant="default">Cancel</Button>
@@ -216,9 +222,35 @@ export const NewScopedTokenForm = ({
             </Button>
           )}
           {step === 'review' && (
-            <Button loading={isPending} onClick={() => onCreateToken(formValues)}>
-              Create token
-            </Button>
+            <Popover open={!isCreateHintDismissed}>
+              <PopoverAnchor asChild>
+                <Button loading={isPending} onClick={() => onCreateToken(formValues)}>
+                  Create token
+                </Button>
+              </PopoverAnchor>
+              <PopoverContent
+                side="top"
+                align="end"
+                sideOffset={8}
+                className="flex w-auto items-center gap-2 py-1.5 pl-3 pr-1.5"
+                onOpenAutoFocus={(event) => event.preventDefault()}
+                onInteractOutside={() => setIsCreateHintDismissed(true)}
+                onEscapeKeyDown={() => setIsCreateHintDismissed(true)}
+              >
+                <InfoIcon className="h-5 w-5 shrink-0" />
+                <p className="text-xs text-foreground-light">
+                  Access can't be changed after creation
+                </p>
+                <Button
+                  variant="text"
+                  size="tiny"
+                  icon={<X />}
+                  aria-label="Dismiss"
+                  className="px-1 text-foreground-lighter"
+                  onClick={() => setIsCreateHintDismissed(true)}
+                />
+              </PopoverContent>
+            </Popover>
           )}
         </div>
       </SheetFooter>

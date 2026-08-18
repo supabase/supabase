@@ -13,6 +13,7 @@ import {
   parseExecuteSqlChartResult,
 } from './Message.utils'
 import { MessageMarkdown } from './MessageMarkdown'
+import { NotebookProposalRenderer, type NotebookProposalMode } from './NotebookProposalRenderer'
 import { parseSupportRequestMessage, SupportRequestMessage } from './SupportRequestMessage'
 
 function MessagePartText({ textPart }: { textPart: TextUIPart }) {
@@ -232,6 +233,59 @@ function MessagePartDeployEdgeFunction({ toolPart }: { toolPart: ToolUIPart }) {
   )
 }
 
+const NOTEBOOK_DRAFTING_LABEL: Record<NotebookProposalMode, string> = {
+  create: 'Drafting notebook...',
+  update: 'Drafting notebook update...',
+}
+
+const NOTEBOOK_FAILED_LABEL: Record<NotebookProposalMode, string> = {
+  create: 'Failed to create notebook.',
+  update: 'Failed to update notebook.',
+}
+
+function MessagePartNotebookProposal({
+  toolPart,
+  mode,
+}: {
+  toolPart: ToolUIPart
+  mode: NotebookProposalMode
+}) {
+  const { state, input, output } = toolPart
+  const { addToolApprovalResponse } = useMessageActionsContext()
+
+  if (state === 'input-streaming') {
+    return (
+      <div className="my-4 mx-4 rounded-lg border bg-surface-75 heading-meta h-9 px-3 text-foreground-light flex items-center gap-2">
+        <Loader2 className="w-4 h-4 animate-spin" />
+        {NOTEBOOK_DRAFTING_LABEL[mode]}
+      </div>
+    )
+  }
+
+  if (state === 'output-error') {
+    return <p className="text-xs text-danger px-4">{NOTEBOOK_FAILED_LABEL[mode]}</p>
+  }
+
+  const approvalId = state === 'approval-requested' ? toolPart.approval?.id : undefined
+
+  return (
+    <NotebookProposalRenderer
+      mode={mode}
+      state={state}
+      input={input}
+      output={output}
+      onApprove={
+        approvalId ? () => addToolApprovalResponse?.({ id: approvalId, approved: true }) : undefined
+      }
+      onDeny={
+        approvalId
+          ? () => addToolApprovalResponse?.({ id: approvalId, approved: false })
+          : undefined
+      }
+    />
+  )
+}
+
 const MessagePart = {
   Text: MessagePartText,
   Dynamic: MessagePartDynamicTool,
@@ -239,6 +293,7 @@ const MessagePart = {
   Reasoning: MessagePartReasoning,
   ExecuteSql: MessagePartExecuteSql,
   DeployEdgeFunction: MessagePartDeployEdgeFunction,
+  NotebookProposal: MessagePartNotebookProposal,
 } as const
 
 export function MessagePartSwitcher({
@@ -268,6 +323,12 @@ export function MessagePartSwitcher({
     }
     case 'tool-deploy_edge_function': {
       return <MessagePart.DeployEdgeFunction toolPart={part} />
+    }
+    case 'tool-create_notebook': {
+      return <MessagePart.NotebookProposal toolPart={part} mode="create" />
+    }
+    case 'tool-update_notebook': {
+      return <MessagePart.NotebookProposal toolPart={part} mode="update" />
     }
 
     case 'source-url':
