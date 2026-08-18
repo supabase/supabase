@@ -163,9 +163,8 @@ function PluginInstructions({ client }: { client: PluginClient }) {
           className="block"
         />
         <p className="text-xs text-foreground-lighter">
-          Confirm the trust prompt to install (or pass <code>--trust</code> to skip it). You can
-          also browse and install plugins from within a Grok session by running <code>grok</code>{' '}
-          and opening the plugins modal with <code>/plugins</code>.
+          Browse and install plugins in a session: run <code>grok</code>, then <code>/plugins</code>{' '}
+          or <code>/marketplace</code>.
         </p>
       </div>
     )
