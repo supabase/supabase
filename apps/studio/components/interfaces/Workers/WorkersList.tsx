@@ -4,7 +4,6 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
   Badge,
-  Button,
   Card,
   CardFooter,
   Input,
@@ -26,6 +25,7 @@ import { formatResources, WORKERS_REGION_SHORT } from './Workers.constants'
 import type { Worker, WorkerAccess, WorkerState } from './Workers.types'
 import { filterWorkers, getPage } from './Workers.utils'
 import { WorkerStatePill } from './WorkerStatePill'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface WorkersListProps {
   projectRef: string
@@ -191,24 +191,36 @@ export const WorkersList = ({ projectRef, workers }: WorkersListProps) => {
               {filtered.length === 1 ? '' : 's'}
             </p>
             <div className="flex items-center gap-x-2" aria-label="Pagination">
-              <Button
+              <ButtonTooltip
                 icon={<ChevronLeft />}
                 aria-label="Previous page"
                 variant="default"
                 size="tiny"
                 disabled={currentPage === 1}
                 onClick={() => setPage(currentPage - 1)}
+                tooltip={{
+                  content: {
+                    side: 'top',
+                    text: currentPage === 1 ? 'Already on the first page' : undefined,
+                  },
+                }}
               />
               <span className="text-sm text-foreground-light tabular-nums">
                 Page {currentPage} of {totalPages}
               </span>
-              <Button
+              <ButtonTooltip
                 icon={<ChevronRight />}
                 aria-label="Next page"
                 variant="default"
                 size="tiny"
                 disabled={currentPage >= totalPages}
                 onClick={() => setPage(currentPage + 1)}
+                tooltip={{
+                  content: {
+                    side: 'top',
+                    text: currentPage >= totalPages ? 'Already on the last page' : undefined,
+                  },
+                }}
               />
             </div>
           </CardFooter>

@@ -41,7 +41,7 @@ interface WorkersLayoutProps {
   title?: string
 }
 
-const WorkersLayout = ({ children, title }: PropsWithChildren<WorkersLayoutProps>) => {
+const WorkersLayoutContent = ({ children, title }: PropsWithChildren<WorkersLayoutProps>) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { hasLoaded } = useContext(FeatureFlagContext)
@@ -68,4 +68,4 @@ const WorkersLayout = ({ children, title }: PropsWithChildren<WorkersLayoutProps
   )
 }
 
-export default withAuth(WorkersLayout)
+export const WorkersLayout = withAuth(WorkersLayoutContent)

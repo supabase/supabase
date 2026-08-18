@@ -12,7 +12,7 @@ import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 import { WorkersList } from '@/components/interfaces/Workers/WorkersList'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
-import WorkersLayout from '@/components/layouts/WorkersLayout/WorkersLayout'
+import { WorkersLayout } from '@/components/layouts/WorkersLayout/WorkersLayout'
 import { PRODUCT_NAME } from '@/lib/constants/workers'
 import { ensureProjectSeeded, useProjectWorkers } from '@/state/workers-mock-state'
 import type { NextPageWithLayout } from '@/types'
