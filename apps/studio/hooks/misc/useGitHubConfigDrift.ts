@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useCallback, useMemo } from 'react'
 
+import { getConfigDriftSummary } from '@/components/interfaces/ConfigDrift/github-config-drift'
 import type { Branch } from '@/data/branches/branches-query'
 import { useBranchesQuery } from '@/data/branches/branches-query'
 import { useGitHubConfigQuery } from '@/data/config/github-config-query'
@@ -9,7 +10,6 @@ import { projectConfigV2QueryOptions } from '@/data/config/project-config-query'
 import { useProjectGitHubConnectionQuery } from '@/data/integrations/github-connections-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
-import { getConfigDriftSummary } from '@/lib/github-config-drift'
 
 function getGitBranchName(branch?: Branch): string | undefined {
   return branch?.git_branch?.trim() || (branch?.is_default ? undefined : branch?.name?.trim())

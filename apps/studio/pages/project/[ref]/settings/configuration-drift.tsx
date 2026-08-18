@@ -8,7 +8,7 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
-import { ConfigurationDriftPage } from '@/components/interfaces/ConfigStorage/ConfigurationDriftPage'
+import { ConfigurationDriftPage } from '@/components/interfaces/ConfigDrift/ConfigurationDriftPage'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
 import type { NextPageWithLayout } from '@/types'

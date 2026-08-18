@@ -2,8 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 import type { components } from 'api-types'
 import { z } from 'zod'
 
+import type { gitHubConfigTomlSchema } from '@/components/interfaces/ConfigDrift/github-config.types'
 import { get, handleError } from '@/data/fetchers'
-import { gitHubConfigTomlSchema } from '@/lib/github-config.types'
 import type { UseCustomQueryOptions } from '@/types'
 
 export type GitHubConfigVariables = {
