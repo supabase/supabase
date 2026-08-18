@@ -147,13 +147,11 @@ export function McpConfigPanel() {
         <strong>Authentication</strong>
       </paragraph>
       <paragraph>
-        Some MCP clients automatically prompt you to log in during setup, while others require
-        manual authentication steps. Either way, a browser window opens where you log in to your
-        Supabase account and grant the MCP client access to your organization.
+        Some MCP clients automatically prompt you to log in during setup. Others require manual
+        authentication steps. Either method opens a browser window where you log in to your Supabase
+        account and grant the MCP client access to your organization.
       </paragraph>
-      <paragraph>
-        A personal access token (PAT) was previously required, but is no longer needed.
-      </paragraph>
+      <paragraph>You don't need a personal access token (PAT).</paragraph>
     </>
   )
 }
