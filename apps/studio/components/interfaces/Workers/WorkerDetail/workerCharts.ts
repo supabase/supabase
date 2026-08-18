@@ -22,14 +22,18 @@ export type ChartIntervalKey = (typeof CHART_INTERVALS)[number]['key']
 // Fixed base so SSR and client renders produce identical timestamps.
 const CHART_END_ISO = '2026-08-10T09:00:00.000Z'
 
-export interface WorkerInvocationDatum {
+export type WorkerInvocationDatum = {
   timestamp: string
   ok_count: number
   warning_count: number
   error_count: number
 }
 
-export interface WorkerMetricsDatum extends WorkerInvocationDatum {
+export type WorkerMetricsDatum = {
+  timestamp: string
+  ok_count: number
+  warning_count: number
+  error_count: number
   avg_response_time: number
   max_response_time: number
   avg_cpu_time_used: number
