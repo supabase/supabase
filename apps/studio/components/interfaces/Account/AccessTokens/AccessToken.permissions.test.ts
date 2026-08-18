@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  computeOverallRisk,
   countConfigured,
   getCatalogEntry,
   scopesToSelection,
@@ -12,6 +11,7 @@ import {
   getEnabledEndpoints,
   getEnabledEndpointsForCapability,
   getEnabledMcpTools,
+  getEnabledMcpToolsForCapability,
   normalizePermissionScopeMap,
   type PermissionScopeMap,
 } from '@/data/scoped-access-tokens/permission-scope-map-query'
@@ -142,37 +142,6 @@ describe('selectionToScopes', () => {
     const advisors = getCatalogEntry('project:advisors')
     expect(advisors?.writable).toBe(false)
     expect(selectionToScopes({ 'project:advisors': 'readwrite' })).toEqual(['advisors_read'])
-  })
-})
-
-describe('computeOverallRisk', () => {
-  it('is Minimal with no capabilities', () => {
-    expect(computeOverallRisk({}, 'project').level).toBe('Minimal')
-  })
-
-  it('account-level read-only is still Elevated', () => {
-    const risk = computeOverallRisk({ 'project:advisors': 'read' }, 'account')
-    expect(risk.level).toBe('Elevated')
-    expect(risk.tone).toBe('medium')
-  })
-
-  it('account-level with any write is High', () => {
-    const risk = computeOverallRisk({ 'project:realtime_config': 'readwrite' }, 'account')
-    expect(risk.level).toBe('High')
-  })
-
-  it('project high-risk write is High', () => {
-    expect(computeOverallRisk({ 'project:database': 'readwrite' }, 'project').level).toBe('High')
-  })
-
-  it('project medium write is Medium', () => {
-    expect(computeOverallRisk({ 'project:realtime_config': 'readwrite' }, 'project').level).toBe(
-      'Medium'
-    )
-  })
-
-  it('read-only project is Low', () => {
-    expect(computeOverallRisk({ 'project:database': 'read' }, 'project').level).toBe('Low')
   })
 })
 
@@ -339,5 +308,66 @@ describe('getEnabledEndpointsForCapability', () => {
         })
       )
     ).toEqual(['PUT /api/upgrade'])
+  })
+})
+
+describe('getEnabledMcpToolsForCapability', () => {
+  it('attributes a tool to each capability whose scope is in a fully-granted group', () => {
+    const permissionScopeMap = scopeMap({
+      mcp_tools: {
+        list_branches: [['branching_development_read'], ['branching_production_read']],
+      },
+    })
+    const allGrantedScopes = ['branching_development_read', 'branching_production_read']
+
+    expect(
+      getEnabledMcpToolsForCapability({
+        capabilityScopes: ['branching_development_read'],
+        allGrantedScopes,
+        permissionScopeMap,
+      })
+    ).toEqual(['list_branches'])
+    expect(
+      getEnabledMcpToolsForCapability({
+        capabilityScopes: ['branching_production_read'],
+        allGrantedScopes,
+        permissionScopeMap,
+      })
+    ).toEqual(['list_branches'])
+  })
+
+  it('does not attribute a tool to a capability whose own group is unsatisfied', () => {
+    const enabled = getEnabledMcpToolsForCapability({
+      capabilityScopes: ['branching_production_read'],
+      allGrantedScopes: ['branching_development_read'],
+      permissionScopeMap: scopeMap({
+        mcp_tools: {
+          list_branches: [['branching_development_read'], ['branching_production_read']],
+        },
+      }),
+    })
+
+    expect(enabled).toEqual([])
+  })
+
+  it('requires every scope of the capability group to be granted', () => {
+    const permissionScopeMap = scopeMap({
+      mcp_tools: { upgrade_project: [['project_admin_read', 'database_read']] },
+    })
+
+    expect(
+      getEnabledMcpToolsForCapability({
+        capabilityScopes: ['database_read'],
+        allGrantedScopes: ['database_read'],
+        permissionScopeMap,
+      })
+    ).toEqual([])
+    expect(
+      getEnabledMcpToolsForCapability({
+        capabilityScopes: ['database_read'],
+        allGrantedScopes: ['database_read', 'project_admin_read'],
+        permissionScopeMap,
+      })
+    ).toEqual(['upgrade_project'])
   })
 })

@@ -155,6 +155,34 @@ export const getEnabledEndpointsForCapability = ({
 }
 
 /**
+ * MCP-tool counterpart to getEnabledEndpointsForCapability: the MCP tools enabled by the complete
+ * granted-scope set that owe that to `capabilityScopes`, for grouping enabled tools under the
+ * capability that contributes them.
+ */
+export const getEnabledMcpToolsForCapability = ({
+  capabilityScopes,
+  allGrantedScopes,
+  permissionScopeMap,
+}: {
+  capabilityScopes: Iterable<string>
+  allGrantedScopes: Iterable<string>
+  permissionScopeMap: PermissionScopeMap | undefined
+}): string[] => {
+  if (permissionScopeMap == null) return []
+
+  const granted = new Set(allGrantedScopes)
+  const capability = new Set(capabilityScopes)
+  return Object.entries(permissionScopeMap.mcp_tools)
+    .filter(([, groups]) =>
+      groups.some(
+        (group) =>
+          group.some((scope) => capability.has(scope)) && group.every((scope) => granted.has(scope))
+      )
+    )
+    .map(([tool]) => tool)
+}
+
+/**
  * Informational lookup for the per-permission risk tooltip: the MCP tools associated with any of
  * the given scopes. Unlike getEnabledMcpTools this is not conjunctive — it surfaces every tool that
  * lists one of these scopes, so users can see what a capability relates to before granting it.
