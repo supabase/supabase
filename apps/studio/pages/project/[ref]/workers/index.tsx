@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
+import { Admonition } from 'ui-patterns/Admonition'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -11,6 +12,7 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { isWorkersAccessDenied } from '@/components/interfaces/Workers/Workers.utils'
 import { WorkersList } from '@/components/interfaces/Workers/WorkersList'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { WorkersLayout } from '@/components/layouts/WorkersLayout/WorkersLayout'
@@ -46,7 +48,16 @@ const WorkersPage: NextPageWithLayout = () => {
         <PageSection>
           <PageSectionContent>
             {isPending && <GenericSkeletonLoader />}
-            {isError && <AlertError error={error} subject="Failed to retrieve workers" />}
+            {isError && isWorkersAccessDenied(error) && (
+              <Admonition
+                type="default"
+                title="Compute is not enabled for this project"
+                description="Compute is in private alpha. Contact support to have this project added to the alpha."
+              />
+            )}
+            {isError && !isWorkersAccessDenied(error) && (
+              <AlertError error={error} subject="Failed to retrieve workers" />
+            )}
             {isSuccess && workers.length === 0 && (
               <p className="text-sm text-foreground-light">
                 No workers yet. Deploy your first worker with the Supabase CLI.

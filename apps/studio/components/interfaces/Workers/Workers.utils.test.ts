@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
 import type { Worker } from './Workers.types'
-import { filterWorkers, formatResources, formatRuntime, formatSize, getPage } from './Workers.utils'
+import {
+  filterWorkers,
+  formatResources,
+  formatRuntime,
+  formatSize,
+  getPage,
+  isWorkersAccessDenied,
+} from './Workers.utils'
 
 const worker = (overrides: Partial<Worker> & Pick<Worker, 'name'>): Worker => ({
   buildState: 'active',
@@ -111,5 +118,18 @@ describe('formatResources', () => {
     expect(formatResources(worker({ name: 'embed', declaredInstances: 3 }))).toBe(
       '2 GB · 1 vCPU · 3 inst'
     )
+  })
+})
+
+describe('isWorkersAccessDenied', () => {
+  it('treats forbidden and not-found as the project missing from the alpha allowlist', () => {
+    expect(isWorkersAccessDenied({ code: 403 })).toBe(true)
+    expect(isWorkersAccessDenied({ code: 404 })).toBe(true)
+  })
+
+  it('leaves other failures to the generic error UI', () => {
+    expect(isWorkersAccessDenied({ code: 500 })).toBe(false)
+    expect(isWorkersAccessDenied({})).toBe(false)
+    expect(isWorkersAccessDenied(null)).toBe(false)
   })
 })

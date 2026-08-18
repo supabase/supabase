@@ -52,3 +52,8 @@ export const formatSize = (size: string): string => {
 
 export const formatResources = (worker: Worker): string =>
   `${formatSize(worker.size)} · ${worker.declaredInstances} inst`
+
+// The Workers API is allowlisted per project (FUNC-795), so a project can hold the
+// dashboard flag and still be refused by the endpoint.
+export const isWorkersAccessDenied = (error: { code?: number } | null): boolean =>
+  error?.code === 403 || error?.code === 404
