@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import dayjs from 'dayjs'
-import { Clock, Container, Copy, Info } from 'lucide-react'
+import { Container, Copy, Info, Package } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import {
@@ -118,12 +117,14 @@ export const WorkerDetail = () => {
           <PageHeaderSummary>
             <PageHeaderTitle>{worker.name}</PageHeaderTitle>
             <PageHeaderDescription className="flex flex-row flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-              <WorkerStatePill state={worker.state} />
+              <WorkerStatePill worker={worker} />
               <RuntimeBadge runtime={worker.runtime} />
-              <span className="flex items-center gap-2 text-foreground-light">
-                <Clock size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                Last deployed {dayjs(worker.updatedAt).format('MMM D, YYYY HH:mm')}
-              </span>
+              {worker.imageVersion !== undefined && (
+                <span className="flex items-center gap-2 text-foreground-light">
+                  <Package size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                  Image {worker.imageVersion}
+                </span>
+              )}
             </PageHeaderDescription>
           </PageHeaderSummary>
           <PageHeaderAside>
@@ -140,7 +141,7 @@ export const WorkerDetail = () => {
                     runtime: worker.runtime,
                     size: worker.size,
                     access: worker.access,
-                    instances: worker.instances,
+                    instances: worker.declaredInstances,
                   }}
                   tabs={['curl', 'js', 'python']}
                 />
@@ -175,7 +176,7 @@ export const WorkerDetail = () => {
         </NavMenu>
       </PageNav>
 
-      {tab === 'overview' && <WorkerOverviewTab projectRef={projectRef} worker={worker} />}
+      {tab === 'overview' && <WorkerOverviewTab worker={worker} />}
       {tab === 'logs' && (
         <PageContainer size="full" className="px-0 xl:px-0">
           <WorkerLogsTab workerName={worker.name} />
