@@ -183,7 +183,7 @@ export const AssistantChat = ({
     state.ensureChatInstance(chatId)
   }, [chatId, state])
 
-  const chatInstance = snap.chatInstances[chatId]
+  const chatInstance = state.chatInstances[chatId]
 
   const {
     messages: chatMessages,
