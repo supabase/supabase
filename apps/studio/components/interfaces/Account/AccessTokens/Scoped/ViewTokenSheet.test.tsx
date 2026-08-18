@@ -140,7 +140,7 @@ describe('ViewTokenSheet', () => {
     expect(screen.queryByText('This token no longer has access')).toBeNull()
   })
 
-  test('renders capability cards with attributed endpoints, MCP tools, and a risk banner', async () => {
+  test('renders capability cards with endpoints, a token-wide MCP tools row, and a risk banner', async () => {
     mockPermissionsApi(ownerRows(MOCK_ORG.slug))
     mockToken({
       ...TOKEN_BASE,
@@ -168,12 +168,16 @@ describe('ViewTokenSheet', () => {
     })
     renderSheet()
 
-    // Capability cards are closed by default — expand both to see their endpoints and tools.
     expect(await screen.findByText('Advisors')).toBeInTheDocument()
     expect(screen.getByText('Database')).toBeInTheDocument()
     expect(screen.getByText('Read-write')).toBeInTheDocument()
     expect(screen.getByText('Read')).toBeInTheDocument()
 
+    // Enabled tools are token-wide summary rows, visible without expanding any capability card.
+    expect(screen.getByText('get_advisors')).toBeInTheDocument()
+    expect(screen.getByText('execute_sql')).toBeInTheDocument()
+
+    // Capability cards are closed by default — expand both to see their endpoints.
     fireEvent.click(screen.getByText('Advisors'))
     fireEvent.click(screen.getByText('Database'))
 
@@ -187,11 +191,7 @@ describe('ViewTokenSheet', () => {
     expect(
       screen.getByRole('button', { name: 'Copy POST /v1/projects/{ref}/database/query' })
     ).toBeInTheDocument()
-    // Every method renders as a badge; non-GET methods get the tinted warning variant.
     expect(screen.getByText('POST')).toBeInTheDocument()
-
-    expect(screen.getByText('get_advisors')).toBeInTheDocument()
-    expect(screen.getByText('execute_sql')).toBeInTheDocument()
 
     // project:database is catalog-high risk and granted read-write — max() over capabilities.
     // "High risk" appears twice: the risk banner title, and Database's own Risk Level badge.
@@ -223,7 +223,6 @@ describe('ViewTokenSheet', () => {
     renderSheet()
 
     expect(await screen.findByText('Database')).toBeInTheDocument()
-    expect(screen.getByText(/Not granted · \d+/)).toBeInTheDocument()
     // All granted capabilities render immediately — no truncation.
     expect(screen.getByText('Storage')).toBeInTheDocument()
     expect(screen.getByText('Backups')).toBeInTheDocument()

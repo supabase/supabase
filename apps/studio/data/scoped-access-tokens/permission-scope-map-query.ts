@@ -155,55 +155,6 @@ export const getEnabledEndpointsForCapability = ({
 }
 
 /**
- * MCP-tool counterpart to getEnabledEndpointsForCapability: the MCP tools enabled by the complete
- * granted-scope set that owe that to `capabilityScopes`, for grouping enabled tools under the
- * capability that contributes them.
- */
-export const getEnabledMcpToolsForCapability = ({
-  capabilityScopes,
-  allGrantedScopes,
-  permissionScopeMap,
-}: {
-  capabilityScopes: Iterable<string>
-  allGrantedScopes: Iterable<string>
-  permissionScopeMap: PermissionScopeMap | undefined
-}): string[] => {
-  if (permissionScopeMap == null) return []
-
-  const granted = new Set(allGrantedScopes)
-  const capability = new Set(capabilityScopes)
-  return Object.entries(permissionScopeMap.mcp_tools)
-    .filter(([, groups]) =>
-      groups.some(
-        (group) =>
-          group.some((scope) => capability.has(scope)) && group.every((scope) => granted.has(scope))
-      )
-    )
-    .map(([tool]) => tool)
-}
-
-/**
- * Informational lookup for the per-permission risk tooltip: the MCP tools associated with any of
- * the given scopes. Unlike getEnabledMcpTools this is not conjunctive — it surfaces every tool that
- * lists one of these scopes, so users can see what a capability relates to before granting it.
- */
-export const getMcpToolsForScopes = ({
-  scopeIds,
-  permissionScopeMap,
-}: {
-  scopeIds: Iterable<string>
-  permissionScopeMap: PermissionScopeMap | undefined
-}): string[] => {
-  if (permissionScopeMap == null) return []
-
-  const tools = new Set<string>()
-  for (const id of scopeIds) {
-    permissionScopeMap.scopes[id]?.mcp_tools.forEach((tool) => tools.add(tool))
-  }
-  return Array.from(tools)
-}
-
-/**
  * The endpoint's payload changed endpoint/tool requirements from a flat conjunctive scope list
  * (string[]) to alternative groups (string[][], ScopeGroupAlternatives) at the same URL, and the
  * response is CDN-cached (s-maxage + stale-while-revalidate). Right after a deploy a new client

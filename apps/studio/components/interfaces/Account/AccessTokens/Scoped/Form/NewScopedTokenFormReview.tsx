@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { useMemo, useState } from 'react'
-import { cn } from 'ui'
+import { Badge, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { PERMISSION_MODE_LABEL, selectionToScopes } from '../../AccessToken.permissions'
@@ -26,7 +26,10 @@ import {
   type CapabilityLevelFilter,
 } from '../TokenCapabilities/TokenCapabilities.utils'
 import { EXPIRY_OPTIONS, type TokenFormValues } from './NewScopedTokenForm.utils'
-import { PermissionScopeMap } from '@/data/scoped-access-tokens/permission-scope-map-query'
+import {
+  getEnabledMcpTools,
+  PermissionScopeMap,
+} from '@/data/scoped-access-tokens/permission-scope-map-query'
 
 interface ReviewStepProps {
   values: TokenFormValues
@@ -96,6 +99,11 @@ export const NewScopedTokenFormReview = ({
   })
   const capabilityTier = getCapabilityDensityTier(capabilities.length)
   const [levelFilter, setLevelFilter] = useState<CapabilityLevelFilter>('all')
+
+  const enabledMcpTools = useMemo(
+    () => getEnabledMcpTools({ grantedScopes, permissionScopeMap }).sort(),
+    [grantedScopes, permissionScopeMap]
+  )
 
   const { containerRef: pillsRef, isWrapped: isResourceAccessWrapped } = useResourceAccessWrap()
 
@@ -175,6 +183,25 @@ export const NewScopedTokenFormReview = ({
           accessEntries={access.entries}
           levelFilter={levelFilter}
         />
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <h3 className="text-sm">Available MCP tools</h3>
+        {enabledMcpTools.length === 0 ? (
+          <span className="text-sm text-foreground-lighter">No MCP tools enabled</span>
+        ) : (
+          <div className="flex flex-wrap gap-1.5">
+            {enabledMcpTools.map((tool) => (
+              <Badge
+                key={tool}
+                variant="default"
+                className="px-2.5 py-1 font-mono text-xs normal-case tracking-normal"
+              >
+                {tool}
+              </Badge>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

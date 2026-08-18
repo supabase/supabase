@@ -12,10 +12,9 @@ import type { EnabledEndpoint } from '@/data/scoped-access-tokens/permission-sco
 interface CapabilityCardBodyProps {
   entry: PermissionCatalogEntry
   endpoints: EnabledEndpoint[]
-  mcpTools: string[]
 }
 
-export const CapabilityCardBody = ({ entry, endpoints, mcpTools }: CapabilityCardBodyProps) => {
+export const CapabilityCardBody = ({ entry, endpoints }: CapabilityCardBodyProps) => {
   const sharedPrefix = getSharedPathPrefix(endpoints.map((endpoint) => endpoint.path))
   const methodColumnWidth = `${Math.max(0, ...endpoints.map((endpoint) => endpoint.method.length)) + 2}ch`
 
@@ -47,21 +46,9 @@ export const CapabilityCardBody = ({ entry, endpoints, mcpTools }: CapabilityCar
           </div>
         </div>
       )}
-      {mcpTools.length > 0 && (
-        <div className="flex flex-col gap-1.5">
-          <h3 className="text-xs tracking-wide text-foreground-lighter">MCP tools</h3>
-          <div className="flex flex-wrap gap-1.5">
-            {mcpTools.map((tool) => (
-              <Badge key={tool} variant="default">
-                {tool}
-              </Badge>
-            ))}
-          </div>
-        </div>
-      )}
-      {endpoints.length === 0 && mcpTools.length === 0 && (
+      {endpoints.length === 0 && (
         <p className="text-xs text-foreground-lighter">
-          No API endpoints or MCP tools are enabled by this capability yet.
+          No API endpoints are enabled by this capability yet.
         </p>
       )}
     </div>

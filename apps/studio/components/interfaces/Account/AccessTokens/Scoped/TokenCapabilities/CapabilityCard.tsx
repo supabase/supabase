@@ -5,7 +5,7 @@ import type { EntryAccess } from '../../AccessToken.roles'
 import type { CapabilitySummaryEntry } from '../../hooks/useCapabilitySummary'
 import { ExceedsRoleBadge } from '../ExceedsRoleBadge'
 import { CapabilityCardBody } from './CapabilityCardBody'
-import { formatCapabilityCounts } from './TokenCapabilities.utils'
+import { pluralize } from '@/lib/helpers'
 
 interface CapabilityCardProps {
   capability: CapabilitySummaryEntry
@@ -19,7 +19,7 @@ const CapabilityCardHeader = ({
   capability,
   accessEntries,
 }: Pick<CapabilityCardProps, 'capability' | 'accessEntries'>) => {
-  const { entry, mode, endpoints, mcpTools } = capability
+  const { entry, mode, endpoints } = capability
   const entryAccess = accessEntries[entry.key]
 
   return (
@@ -32,7 +32,7 @@ const CapabilityCardHeader = ({
           )}
         </span>
         <span className="text-xs text-foreground-lighter">
-          {formatCapabilityCounts(endpoints.length, mcpTools.length)}
+          {`${endpoints.length} ${pluralize(endpoints.length, 'endpoint')}`}
         </span>
       </div>
       <Badge variant={mode === 'readwrite' ? 'warning' : 'default'} className="shrink-0">
@@ -48,13 +48,7 @@ export const CapabilityCard = ({
   isFirst = true,
   isLast = true,
 }: CapabilityCardProps) => {
-  const body = (
-    <CapabilityCardBody
-      entry={capability.entry}
-      endpoints={capability.endpoints}
-      mcpTools={capability.mcpTools}
-    />
-  )
+  const body = <CapabilityCardBody entry={capability.entry} endpoints={capability.endpoints} />
   const positionClassName = cn(
     'border',
     !isLast && 'border-b-0',

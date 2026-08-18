@@ -9,7 +9,6 @@ import {
 } from '../AccessToken.permissions'
 import {
   getEnabledEndpointsForCapability,
-  getEnabledMcpToolsForCapability,
   type EnabledEndpoint,
   type PermissionScopeMap,
 } from '@/data/scoped-access-tokens/permission-scope-map-query'
@@ -24,12 +23,11 @@ export interface CapabilitySummaryEntry {
   entry: PermissionCatalogEntry
   mode: PermissionMode
   endpoints: EnabledEndpoint[]
-  mcpTools: string[]
 }
 
 /**
  * Selection-derived summary data for the token view sheet: every granted catalog entry paired with
- * the Management API endpoints and MCP tools it enables.
+ * the Management API endpoints it enables.
  */
 export const useCapabilitySummary = ({
   selection,
@@ -48,12 +46,7 @@ export const useCapabilitySummary = ({
         allGrantedScopes: grantedScopes,
         permissionScopeMap,
       })
-      const mcpTools = getEnabledMcpToolsForCapability({
-        capabilityScopes,
-        allGrantedScopes: grantedScopes,
-        permissionScopeMap,
-      })
-      result.push({ entry, mode, endpoints, mcpTools })
+      result.push({ entry, mode, endpoints })
     }
     return result
   }, [selection, grantedScopes, permissionScopeMap])
