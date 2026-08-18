@@ -13,6 +13,7 @@ import {
 } from '@dnd-kit/sortable'
 import { useParams } from 'common'
 import { FileText, Notebook, NotebookText, Play, Save, SquareCode } from 'lucide-react'
+import { useRef, useState } from 'react'
 import { AiIconAnimation, Button } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
@@ -25,6 +26,7 @@ import {
 } from './ExplorerToolbar'
 import { MarkdownCell } from './MarkdownCell'
 import { QueryCell } from './QueryCell'
+import { type QueryEditorHandle } from './QueryEditor'
 import { createMarkdownCellSkeleton, createQueryCellSkeleton } from './utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { isQueryCell } from '@/data/content/notebooks/notebook-schema'
@@ -39,6 +41,10 @@ export const ExplorerNotebookTab = () => {
   const currentNotebook = useCurrentNotebook()
   const { name, content } = currentNotebook?.notebook ?? {}
   const cells = content?.cells ?? []
+  const queryCellIds = cells.filter(isQueryCell).map((cell) => cell.id)
+
+  const [isRunningNotebook, setIsRunningNotebook] = useState(false)
+  const queryCellRefs = useRef(new Map<string, QueryEditorHandle>())
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -50,6 +56,17 @@ export const ExplorerNotebookTab = () => {
     if (id && trimmedName && trimmedName !== name) {
       snap.renameNotebook({ id, name: trimmedName })
       tabs.updateTab(createTabId('notebook', { id }), { label: trimmedName })
+    }
+  }
+
+  const handleRunNotebook = async () => {
+    setIsRunningNotebook(true)
+    try {
+      await Promise.allSettled(
+        queryCellIds.map((cellId) => queryCellRefs.current.get(cellId)?.run())
+      )
+    } finally {
+      setIsRunningNotebook(false)
     }
   }
 
@@ -81,7 +98,14 @@ export const ExplorerNotebookTab = () => {
           <ExplorerToolbarAction icon={<AiIconAnimation size={16} />}>
             Analyze
           </ExplorerToolbarAction>
-          <ExplorerToolbarAction icon={<Play />} tooltip="Run notebook" />
+          <ExplorerToolbarAction
+            aria-label="Run notebook"
+            icon={<Play />}
+            tooltip="Run notebook"
+            loading={isRunningNotebook}
+            disabled={isRunningNotebook || queryCellIds.length === 0}
+            onClick={handleRunNotebook}
+          />
           <ExplorerToolbarAction icon={<Save />} tooltip="Save changes" />
         </ExplorerToolbarActions>
       </ExplorerToolbar>
@@ -115,7 +139,14 @@ export const ExplorerNotebookTab = () => {
                   <div className="flex flex-col gap-y-4">
                     {cells.map((cell) =>
                       isQueryCell(cell) ? (
-                        <QueryCell key={cell.id} cell={cell} />
+                        <QueryCell
+                          key={cell.id}
+                          cell={cell}
+                          ref={(instance) => {
+                            if (instance) queryCellRefs.current.set(cell.id, instance)
+                            else queryCellRefs.current.delete(cell.id)
+                          }}
+                        />
                       ) : (
                         <MarkdownCell key={cell.id} cell={cell} />
                       )
