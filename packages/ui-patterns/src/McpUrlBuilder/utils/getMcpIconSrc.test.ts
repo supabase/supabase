@@ -21,12 +21,12 @@ describe('getMcpClientIconSrc', () => {
     const lightSrc = getMcpClientIconSrc({
       icon: 'cursor',
       useDarkVariant: false,
-      hasDistinctDarkIcon: true,
+      hasDarkIcon: true,
     })
     const darkSrc = getMcpClientIconSrc({
       icon: 'cursor',
       useDarkVariant: true,
-      hasDistinctDarkIcon: true,
+      hasDarkIcon: true,
     })
 
     expect(darkSrc).toBeTruthy()
@@ -37,12 +37,12 @@ describe('getMcpClientIconSrc', () => {
     const lightSrc = getMcpClientIconSrc({
       icon: 'perplexity',
       useDarkVariant: false,
-      hasDistinctDarkIcon: true,
+      hasDarkIcon: true,
     })
     const darkSrc = getMcpClientIconSrc({
       icon: 'perplexity',
       useDarkVariant: true,
-      hasDistinctDarkIcon: true,
+      hasDarkIcon: true,
     })
 
     expect(darkSrc).toBeTruthy()
@@ -53,12 +53,12 @@ describe('getMcpClientIconSrc', () => {
     const lightSrc = getMcpClientIconSrc({
       icon: 'factory',
       useDarkVariant: false,
-      hasDistinctDarkIcon: true,
+      hasDarkIcon: true,
     })
     const src = getMcpClientIconSrc({
       icon: 'factory',
       useDarkVariant: true,
-      hasDistinctDarkIcon: false,
+      hasDarkIcon: false,
     })
 
     expect(src).toBe(lightSrc)
@@ -68,7 +68,7 @@ describe('getMcpClientIconSrc', () => {
     const darkSrc = getMcpClientIconSrc({
       icon: 'unknown-client',
       useDarkVariant: true,
-      hasDistinctDarkIcon: true,
+      hasDarkIcon: true,
     })
 
     expect(darkSrc).toBe('')

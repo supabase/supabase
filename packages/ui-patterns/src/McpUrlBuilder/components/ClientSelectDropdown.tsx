@@ -57,11 +57,7 @@ export const ClientSelectDropdown = ({
         className="flex gap-2 items-center"
       >
         {client.icon ? (
-          <ConnectionIcon
-            connection={client.icon}
-            theme={theme}
-            hasDistinctDarkIcon={client.hasDistinctDarkIcon}
-          />
+          <ConnectionIcon connection={client.icon} theme={theme} hasDarkIcon={client.hasDarkIcon} />
         ) : (
           <Bot size={12} aria-hidden={true} />
         )}
@@ -98,7 +94,7 @@ export const ClientSelectDropdown = ({
                 <ConnectionIcon
                   connection={selectedClient.icon}
                   theme={theme}
-                  hasDistinctDarkIcon={selectedClient.hasDistinctDarkIcon}
+                  hasDarkIcon={selectedClient.hasDarkIcon}
                 />
               ) : (
                 <Bot size={12} aria-hidden={true} />
