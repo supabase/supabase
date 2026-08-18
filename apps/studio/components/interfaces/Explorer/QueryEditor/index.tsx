@@ -81,7 +81,7 @@ export type QueryEditorProps = {
   display?: QueryDisplay
   toolbarActions?: ReactNode
   className?: string
-  /** Disables the toolbar and editor run actions (e.g. while a confirm footer is shown). */
+  /** When true, toolbar and editor run actions are disabled. */
   isRunDisabled?: boolean
   onTitleChange: (title: string) => void
   onSqlChange: (sql: string) => void
