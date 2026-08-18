@@ -6,6 +6,7 @@ import type {
   FactoryMcpConfig,
   GeminiMcpConfig,
   GooseMcpConfig,
+  GrokMcpConfig,
   KimiMcpConfig,
   McpClientBaseConfig,
   McpClientConfig,
@@ -144,6 +145,23 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
     configFile: '~/.codex/config.toml',
     externalDocsUrl: 'https://developers.openai.com/codex/mcp/',
     transformConfig: (config): CodexMcpConfig => {
+      return {
+        mcp_servers: {
+          supabase: {
+            url: config.mcpServers.supabase.url,
+          },
+        },
+      }
+    },
+  },
+  {
+    key: 'grok',
+    label: 'Grok',
+    icon: 'grok',
+    hasDistinctDarkIcon: true,
+    configFile: '~/.grok/config.toml',
+    externalDocsUrl: 'https://docs.x.ai/build/features/mcp-servers',
+    transformConfig: (config): GrokMcpConfig => {
       return {
         mcp_servers: {
           supabase: {
@@ -375,6 +393,9 @@ export const MCP_CLI_COMMANDS: Record<string, McpCliCommands> = {
     install: (url) => `codex mcp add supabase --url "${url}"`,
     authenticate: 'codex mcp login supabase',
   },
+  grok: {
+    install: (url) => `grok mcp add supabase "${url}" --transport http`,
+  },
   'gemini-cli': {
     install: (url) => `gemini mcp add -t http supabase "${url}"`,
     authenticate: '/mcp auth supabase',
@@ -397,7 +418,7 @@ export const MCP_CLI_COMMANDS: Record<string, McpCliCommands> = {
 export const MCP_CLIENT_GROUPS = [
   {
     heading: 'AI Agent CLI',
-    keys: ['claude-code', 'codex', 'gemini-cli', 'copilot-cli', 'opencode', 'factory'],
+    keys: ['claude-code', 'codex', 'grok', 'gemini-cli', 'copilot-cli', 'opencode', 'factory'],
   },
   {
     heading: 'Web Clients',
