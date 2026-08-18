@@ -76,7 +76,7 @@ interface ConfigurationIssueRowMeta {
 export type ConfigurationDriftRow = Omit<GitHubConfigDriftField, 'settingHref'> &
   ConfigurationIssueRowMeta & { status: 'drifted' }
 
-export type ConfigurationDriftValueDiff =
+type ConfigurationDriftValueDiff =
   | {
       kind: 'list'
       onlyInDashboard: string[]
@@ -88,7 +88,7 @@ export type ConfigurationDriftValueDiff =
       configValue: string
     }
 
-export interface UnmanagedConfigRow {
+interface UnmanagedConfigRow {
   fieldName: string
   label: string
   value: string
@@ -135,7 +135,7 @@ export function groupUnmanagedConfigFields(
   }))
 }
 
-export function formatConfigFieldValue(fieldName: string, value: unknown): string {
+function formatConfigFieldValue(fieldName: string, value: unknown): string {
   const normalizedValue = fieldName === 'URI_ALLOW_LIST' ? normalizeRedirectUrls(value) : value
 
   if (normalizedValue === undefined || normalizedValue === null || normalizedValue === '') {

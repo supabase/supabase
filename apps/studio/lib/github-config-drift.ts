@@ -1,19 +1,12 @@
 import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
 import { convertToBytes } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 
-export type GitHubConfigFieldStatus = 'unmanaged' | 'managed' | 'drifted'
-export type ConfigSection = 'api' | 'auth' | 'database' | 'pooler' | 'realtime' | 'storage'
+type GitHubConfigFieldStatus = 'unmanaged' | 'managed' | 'drifted'
 
-export const CONFIG_SECTIONS: readonly ConfigSection[] = [
-  'api',
-  'auth',
-  'database',
-  'pooler',
-  'realtime',
-  'storage',
-]
+export const CONFIG_SECTIONS = ['api', 'auth', 'database', 'pooler', 'realtime', 'storage'] as const
+export type ConfigSection = (typeof CONFIG_SECTIONS)[number]
 
-export interface GitHubConfigFieldState {
+interface GitHubConfigFieldState {
   status: GitHubConfigFieldStatus
   configPath?: string
   settingHref?: (projectRef: string) => string
@@ -35,13 +28,13 @@ export interface UnmanagedConfigField {
   dashboardValue: unknown
 }
 
-export interface GitHubConfigDriftSummary {
+interface GitHubConfigDriftSummary {
   managedCount: number
   driftedFields: GitHubConfigDriftField[]
   unmanagedFields: UnmanagedConfigField[]
 }
 
-export type ConfigDriftDashboardConfig = Partial<Record<ConfigSection, Record<string, unknown>>>
+type ConfigDriftDashboardConfig = Partial<Record<ConfigSection, Record<string, unknown>>>
 
 interface ConfigFieldDefinition {
   configPath: string
@@ -211,15 +204,15 @@ function getFieldDefinition(
   return undefined
 }
 
-export function getConfigFieldState({
+function getConfigFieldState({
   section,
   fieldName,
-  dashboardValue,
+  githubFormattedDashboardConfig,
   githubConfig,
 }: {
   section: ConfigSection
   fieldName: string
-  dashboardValue: unknown
+  githubFormattedDashboardConfig: Record<string, unknown>
   githubConfig?: Record<string, unknown>
 }): GitHubConfigFieldState {
   if (SECRET_FIELD_PATTERN.test(fieldName)) return { status: 'unmanaged' }
@@ -227,13 +220,16 @@ export function getConfigFieldState({
   const definition = getFieldDefinition(section, fieldName)
   if (!definition || !githubConfig) return { status: 'unmanaged' }
 
+  const normalizedDashboardValue = getConfigValue(
+    githubFormattedDashboardConfig,
+    definition.configPath
+  )
+
   let githubValue = getConfigValue(githubConfig, definition.configPath)
   if (githubValue === undefined) {
     const isCodeOwned = getConfigValue(githubConfig, 'config_source') === 'code'
     if (!isCodeOwned || definition.hostedDefault === undefined) return { status: 'unmanaged' }
 
-    const normalizedDashboardValue =
-      definition.normalizeDashboardValue?.(dashboardValue) ?? dashboardValue
     const normalizedDefaultValue =
       definition.normalizeGithubValue?.(definition.hostedDefault) ?? definition.hostedDefault
     if (valuesMatch(normalizedDashboardValue, normalizedDefaultValue)) {
@@ -243,8 +239,6 @@ export function getConfigFieldState({
     githubValue = definition.hostedDefault
   }
 
-  const normalizedDashboardValue =
-    definition.normalizeDashboardValue?.(dashboardValue) ?? dashboardValue
   const normalizedGithubValue = definition.normalizeGithubValue?.(githubValue) ?? githubValue
   return {
     status: valuesMatch(normalizedDashboardValue, normalizedGithubValue) ? 'managed' : 'drifted',
@@ -265,6 +259,8 @@ export function getConfigDriftSummary({
     return { managedCount: 0, driftedFields: [], unmanagedFields: [] }
   }
 
+  const githubFormattedDashboardConfig = convertProjectConfigToGitHubConfig(dashboardConfig)
+
   let managedCount = 0
   const driftedFields: GitHubConfigDriftField[] = []
   const unmanagedFields: UnmanagedConfigField[] = []
@@ -278,7 +274,7 @@ export function getConfigDriftSummary({
       const state = getConfigFieldState({
         section,
         fieldName,
-        dashboardValue: rawValue,
+        githubFormattedDashboardConfig,
         githubConfig,
       })
 
@@ -305,7 +301,7 @@ export function getConfigDriftSummary({
   return { managedCount, driftedFields, unmanagedFields }
 }
 
-export function getConfigValue(config: Record<string, unknown>, configPath: string): unknown {
+function getConfigValue(config: Record<string, unknown>, configPath: string): unknown {
   let value: unknown = config
 
   for (const segment of configPath.split('.')) {
@@ -318,9 +314,46 @@ export function getConfigValue(config: Record<string, unknown>, configPath: stri
   return value
 }
 
-export function formatConfigValue(value: unknown): string {
-  if (typeof value === 'string') return value
-  return JSON.stringify(value)
+function setConfigValue(config: Record<string, unknown>, configPath: string, value: unknown): void {
+  const segments = configPath.split('.')
+  let target = config
+
+  for (const segment of segments.slice(0, -1)) {
+    if (!isRecord(target[segment])) target[segment] = {}
+    target = target[segment] as Record<string, unknown>
+  }
+
+  target[segments[segments.length - 1]] = value
+}
+
+/**
+ * Reshapes a project's dashboard config (sections keyed by section name, fields in their
+ * dashboard-native naming) into the nested, dotted-path shape of a parsed config.toml — using the
+ * same field registry `getConfigFieldState` compares against, so only trackable fields carry over.
+ */
+export function convertProjectConfigToGitHubConfig(
+  dashboardConfig?: ConfigDriftDashboardConfig
+): Record<string, unknown> {
+  const githubConfig: Record<string, unknown> = {}
+  if (!dashboardConfig) return githubConfig
+
+  for (const section of CONFIG_SECTIONS) {
+    const sectionConfig = dashboardConfig[section]
+    if (!sectionConfig) continue
+
+    for (const [rawFieldName, rawValue] of Object.entries(sectionConfig)) {
+      const fieldName = section === 'auth' ? rawFieldName.toUpperCase() : rawFieldName
+      if (SECRET_FIELD_PATTERN.test(fieldName)) continue
+
+      const definition = getFieldDefinition(section, fieldName)
+      if (!definition) continue
+
+      const value = definition.normalizeDashboardValue?.(rawValue) ?? rawValue
+      setConfigValue(githubConfig, definition.configPath, value)
+    }
+  }
+
+  return githubConfig
 }
 
 function valuesMatch(left: unknown, right: unknown): boolean {
