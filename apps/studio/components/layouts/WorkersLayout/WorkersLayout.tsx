@@ -1,6 +1,6 @@
-import { useParams } from 'common'
+import { FeatureFlagContext, useFlag, useParams } from 'common'
 import { useRouter } from 'next/router'
-import { useMemo, type PropsWithChildren } from 'react'
+import { useContext, useEffect, useMemo, type PropsWithChildren } from 'react'
 import { Badge } from 'ui'
 
 import { ProjectLayout } from '../ProjectLayout'
@@ -42,6 +42,19 @@ interface WorkersLayoutProps {
 }
 
 const WorkersLayout = ({ children, title }: PropsWithChildren<WorkersLayoutProps>) => {
+  const router = useRouter()
+  const { ref: projectRef } = useParams()
+  const { hasLoaded } = useContext(FeatureFlagContext)
+  const workersEnabled = useFlag('workers')
+
+  useEffect(() => {
+    if (hasLoaded && !workersEnabled) {
+      router.replace(`/project/${projectRef}`)
+    }
+  }, [router, hasLoaded, workersEnabled, projectRef])
+
+  if (!workersEnabled) return null
+
   return (
     <ProjectLayout
       product={PRODUCT_NAME}

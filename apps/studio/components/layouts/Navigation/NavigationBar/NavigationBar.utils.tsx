@@ -26,6 +26,7 @@ interface ProductFeatures {
   storage?: boolean
   realtime?: boolean
   authOverviewPage?: boolean
+  workers?: boolean
 }
 
 interface OtherFeatures {
@@ -80,6 +81,7 @@ export const generateProductRoutes = (
   const storageEnabled = features?.storage ?? true
   const realtimeEnabled = features?.realtime ?? true
   const authOverviewPageEnabled = features?.authOverviewPage ?? false
+  const workersEnabled = features?.workers ?? false
 
   return [
     {
@@ -138,13 +140,17 @@ export const generateProductRoutes = (
           },
         ]
       : []),
-    {
-      key: 'workers',
-      label: PRODUCT_NAME,
-      disabled: !isProjectActive,
-      icon: <Box size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/workers`),
-    },
+    ...(workersEnabled
+      ? [
+          {
+            key: 'workers',
+            label: PRODUCT_NAME,
+            disabled: !isProjectActive,
+            icon: <Box size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/workers`),
+          },
+        ]
+      : []),
     ...(realtimeEnabled
       ? [
           {
