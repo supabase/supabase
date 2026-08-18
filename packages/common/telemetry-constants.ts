@@ -1977,6 +1977,11 @@ export interface StorageBucketCreatedEvent {
      * The type of the bucket created. E.g. standard or analytics iceberg.
      */
     bucketType?: string
+    /**
+     * Whether object versioning was turned on for the bucket at creation time.
+     * Only set while the storage object versioning feature preview is enabled.
+     */
+    hasVersioningEnabled?: boolean
   }
   groups: TelemetryGroups
 }
