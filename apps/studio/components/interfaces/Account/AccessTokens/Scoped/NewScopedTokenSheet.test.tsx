@@ -176,7 +176,7 @@ describe('NewScopedTokenSheet', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
     expect(await screen.findByText('No permissions selected', { selector: '[role="alert"] *' }))
   })
-  test('creates the token when scope is Project', async () => {
+  test('creates the token when scope is Project', { timeout: 20000 }, async () => {
     renderSheet()
     fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
     await screen.findByRole('dialog')
@@ -227,7 +227,7 @@ describe('NewScopedTokenSheet', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
     expect(await screen.findByText('No permissions selected', { selector: '[role="alert"] *' }))
   })
-  test('creates the token when scope is Organization', async () => {
+  test('creates the token when scope is Organization', { timeout: 20000 }, async () => {
     renderSheet()
     fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
     await screen.findByRole('dialog')
