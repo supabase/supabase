@@ -681,7 +681,7 @@ export const createAiAssistantState = (): AiAssistantState => {
 export type AiAssistantState = AiAssistantData & {
   resetAiAssistantPanel: () => void
   activeChat: ChatSession | undefined
-  chatInstances: Record<string, Chat<MessageType>>
+  chatInstances: Record<string, ReturnType<typeof ref<Chat<MessageType>>>>
   pendingSpanIds: Record<string, string>
   messageSpanIds: Record<string, string>
   isInitialized: boolean
