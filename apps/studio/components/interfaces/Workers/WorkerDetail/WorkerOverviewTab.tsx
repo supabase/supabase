@@ -98,7 +98,6 @@ export const WorkerOverviewTab = ({ projectRef, worker }: WorkerOverviewTabProps
 
   return (
     <>
-      {/* Metrics breakdown band */}
       <PageSection className="border-b bg-surface-100/50 pb-8 pt-0">
         <PageContainer size="full">
           <div className="flex flex-col gap-5">
@@ -155,7 +154,6 @@ export const WorkerOverviewTab = ({ projectRef, worker }: WorkerOverviewTabProps
       </PageSection>
 
       <PageContainer size="full">
-        {/* Errors */}
         <PageSection>
           <PageSectionMeta>
             <PageSectionSummary>
@@ -203,7 +201,6 @@ export const WorkerOverviewTab = ({ projectRef, worker }: WorkerOverviewTabProps
           </PageSectionContent>
         </PageSection>
 
-        {/* Performance */}
         <PageSection>
           <PageSectionMeta>
             <PageSectionSummary>
@@ -261,7 +258,6 @@ export const WorkerOverviewTab = ({ projectRef, worker }: WorkerOverviewTabProps
           </PageSectionContent>
         </PageSection>
 
-        {/* Usage */}
         <PageSection>
           <PageSectionMeta>
             <PageSectionSummary>
