@@ -6,7 +6,6 @@ import {
   buildAPIPermissionScopeMap,
   getScopesAndEndpointsForAPI,
 } from './buildAPIPermissionScopeMap'
-import { expandOAuthScopeGroups, MCPToolScopeMappings } from './MCPToolScopeMappings'
 import { type ScopeMap } from '@/data/scoped-access-tokens/permission-scope-map-query'
 import { mswServer } from '@/tests/lib/msw'
 
@@ -135,118 +134,24 @@ describe('addMCPToolsToScopes', () => {
   })
 })
 
-describe('MCPToolScopeMappings', () => {
-  // Platform gates execute_sql on database:read OR database:write depending on the MCP session's
-  // read_only mode (mcp.controller.ts), so the derived requirement must be two alternatives — a
-  // single conjunctive group would hide the tool from read-only tokens the platform accepts.
-  test('execute_sql derives the database:read bundle OR the database:write bundle', () => {
-    expect(MCPToolScopeMappings.execute_sql).toHaveLength(2)
-    const [readGroup, writeGroup] = MCPToolScopeMappings.execute_sql
-    expect(readGroup).toContain('database_read')
-    expect(readGroup).not.toContain('database_write')
-    expect(writeGroup).toContain('database_write')
-  })
-
-  test('single-scope tools derive a single conjunctive group', () => {
-    expect(MCPToolScopeMappings.apply_migration).toHaveLength(1)
-    expect(MCPToolScopeMappings.apply_migration[0]).toContain('database_write')
-  })
-
-  test('tools without a platform scope gate stay ungated ([[]]), not disabled ([])', () => {
-    expect(MCPToolScopeMappings.confirm_cost).toEqual([[]])
-    expect(MCPToolScopeMappings.search_docs).toEqual([[]])
-  })
-
-  // A group is an AND: expanding only its mapped scopes would weaken the requirement (e.g.
-  // [organizations:read, projects:read] shrinking to projects_read alone) and report the tool
-  // enabled for an incomplete grant.
-  test('a group with any unmapped scope is dropped whole, not partially expanded', () => {
-    const map = { 'projects:read': ['projects_read'] }
-
-    expect(expandOAuthScopeGroups([['organizations:read', 'projects:read']], map)).toEqual([])
-    // Other alternatives and the ungated marker survive the drop untouched.
-    expect(expandOAuthScopeGroups([['organizations:read'], ['projects:read'], []], map)).toEqual([
-      ['projects_read'],
-      [],
-    ])
-  })
-
-  // Guards the OAuth-scope -> legacy-map join: a scope key drifting out of the legacy map must
-  // not inject undefined into the payload (flatMap doesn't flatten it) or silently disable a
-  // gated tool by dropping all its groups.
-  test('every derived group is non-empty strings, and only the ungated tools lack scopes', () => {
-    const ungated = ['confirm_cost', 'search_docs']
-    for (const [tool, groups] of Object.entries(MCPToolScopeMappings)) {
-      expect(groups.length, `${tool} lost all its alternatives`).toBeGreaterThan(0)
-      for (const group of groups) {
-        if (!ungated.includes(tool))
-          expect(group.length, `${tool} has an empty group`).toBeGreaterThan(0)
-        for (const scope of group)
-          expect(typeof scope, `${tool} leaked a non-string scope`).toBe('string')
-      }
-    }
-  })
-
-  test('get_cost requires both organization and project read bundles together', () => {
-    expect(MCPToolScopeMappings.get_cost).toHaveLength(1)
-    expect(MCPToolScopeMappings.get_cost[0]).toEqual(
-      expect.arrayContaining(['organizations_read', 'projects_read'])
-    )
-  })
-
-  // Drift guard: the exact tool registry of @supabase/mcp-server-supabase@0.8.1, the version the
-  // platform pins. When the platform bumps the MCP server, this list (and the mapping) must be
-  // re-derived from the controller's assertMcpOAuthScope calls.
-  test('covers exactly the tool registry of the deployed MCP server', () => {
-    expect(Object.keys(MCPToolScopeMappings).sort()).toEqual([
-      'apply_migration',
-      'confirm_cost',
-      'create_branch',
-      'create_project',
-      'delete_branch',
-      'deploy_edge_function',
-      'execute_sql',
-      'generate_typescript_types',
-      'get_advisors',
-      'get_cost',
-      'get_edge_function',
-      'get_logs',
-      'get_organization',
-      'get_project',
-      'get_project_url',
-      'get_publishable_keys',
-      'get_storage_config',
-      'list_branches',
-      'list_edge_functions',
-      'list_extensions',
-      'list_migrations',
-      'list_organizations',
-      'list_projects',
-      'list_storage_buckets',
-      'list_tables',
-      'merge_branch',
-      'pause_project',
-      'rebase_branch',
-      'reset_branch',
-      'restore_project',
-      'search_docs',
-      'update_storage_config',
-    ])
-  })
-})
-
 describe('buildAPIPermissionScopeMap', () => {
   // vitestSetup starts mswServer with `onUnhandledRequest: 'error'` and resets handlers between
-  // tests, so mocking here keeps that guard instead of replacing global fetch.
-  const stubSpecs = (v1: Record<string, unknown>, v2: Record<string, unknown>) => {
+  // tests, so mocking here keeps that guard instead of replacing global fetch. All three live
+  // sources (v1 spec, v2 spec, the MCP tool-permissions endpoint) are stubbed.
+  const stubSources = (
+    v1: Record<string, unknown>,
+    v2: Record<string, unknown>,
+    mcpTools: Record<string, string[][]> = { execute_sql: [['database_read']] }
+  ) => {
     mswServer.use(
       http.get('*/api/v1-json', () => HttpResponse.json(v1)),
-      http.get('*/api/v2-json', () => HttpResponse.json(v2))
+      http.get('*/api/v2-json', () => HttpResponse.json(v2)),
+      http.get('*/mcp-tools-permissions', () => HttpResponse.json(mcpTools))
     )
   }
 
   test('merges both specs, attaching each MCP tool to a shared scope exactly once', async () => {
-    stubSpecs(
+    stubSources(
       {
         paths: {
           '/v1/projects/{ref}/database/query': {
@@ -277,7 +182,7 @@ describe('buildAPIPermissionScopeMap', () => {
   // Path items may legally carry non-operation members; the specs are fetched live, so a benign
   // upstream swagger change must not start 500ing this route.
   test('tolerates path items with non-method OpenAPI members', async () => {
-    stubSpecs(
+    stubSources(
       {
         paths: {
           '/v1/projects/{ref}': {
@@ -296,15 +201,29 @@ describe('buildAPIPermissionScopeMap', () => {
     expect(Object.keys(map.endpoints)).toHaveLength(1)
   })
 
-  test('returns a copy of the tool mapping so callers cannot corrupt the module singleton', async () => {
-    stubSpecs({ paths: {} }, { paths: {} })
+  test('returns the MCP tool map fetched from the endpoint', async () => {
+    stubSources({ paths: {} }, { paths: {} }, {
+      apply_migration: [['database_migrations_write']],
+      search_docs: [[]],
+    })
 
     const map = await buildAPIPermissionScopeMap()
-    expect(map.mcp_tools).toEqual(MCPToolScopeMappings)
-    expect(map.mcp_tools).not.toBe(MCPToolScopeMappings)
 
-    const before = structuredClone(MCPToolScopeMappings.execute_sql)
-    map.mcp_tools.execute_sql.push(['tampered'])
-    expect(MCPToolScopeMappings.execute_sql).toEqual(before)
+    expect(map.mcp_tools).toEqual({
+      apply_migration: [['database_migrations_write']],
+      search_docs: [[]],
+    })
+    // The gated tool is indexed under its permission; the ungated one is not.
+    expect(map.scopes.database_migrations_write.mcp_tools).toEqual(['apply_migration'])
+  })
+
+  test('throws when the MCP tool-permissions endpoint is unavailable', async () => {
+    mswServer.use(
+      http.get('*/api/v1-json', () => HttpResponse.json({ paths: {} })),
+      http.get('*/api/v2-json', () => HttpResponse.json({ paths: {} })),
+      http.get('*/mcp-tools-permissions', () => new HttpResponse(null, { status: 503 }))
+    )
+
+    await expect(buildAPIPermissionScopeMap()).rejects.toThrow()
   })
 })
