@@ -37,6 +37,7 @@ export const EndpointRow = ({
   const [isRevealed, setIsRevealed] = useState(false)
   const [isCopied, setIsCopied] = useState(false)
   const copiedTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const [showCopiedIcon, setShowCopiedIcon] = useState(false)
 
   useEffect(() => () => clearTimeout(copiedTimerRef.current), [])
 
@@ -50,10 +51,12 @@ export const EndpointRow = ({
   const handleRevealEnd = () => setIsRevealed(false)
 
   const handleCopy = () => {
-    copyToClipboard(path)
-    setIsCopied(true)
-    clearTimeout(copiedTimerRef.current)
-    copiedTimerRef.current = setTimeout(() => setIsCopied(false), 2000)
+    copyToClipboard(path, () => {
+      setIsCopied(true)
+      setShowCopiedIcon(true)
+      clearTimeout(copiedTimerRef.current)
+      copiedTimerRef.current = setTimeout(() => setShowCopiedIcon(false), 2000)
+    })
   }
 
   return (
@@ -101,7 +104,7 @@ export const EndpointRow = ({
         </span>
       </span>
       <span className="shrink-0 pl-2">
-        {isCopied ? (
+        {showCopiedIcon ? (
           <Check size={14} className="text-brand" />
         ) : (
           <Copy
@@ -109,6 +112,9 @@ export const EndpointRow = ({
             className="text-foreground-lighter opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
           />
         )}
+      </span>
+      <span className="sr-only" aria-live="polite">
+        {isCopied ? 'URL copied' : null}
       </span>
     </button>
   )
