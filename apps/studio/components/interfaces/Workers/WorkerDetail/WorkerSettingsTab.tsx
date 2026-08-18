@@ -1,7 +1,6 @@
-import { Check, Copy, Sparkles } from 'lucide-react'
-import Link from 'next/link'
-import { ReactNode, useState } from 'react'
-import { Badge, Button, Card, CardContent, copyToClipboard } from 'ui'
+import { Sparkles } from 'lucide-react'
+import { ReactNode } from 'react'
+import { Badge, Card, CardContent } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageSection,
@@ -23,7 +22,8 @@ import {
 import type { Worker } from '../Workers.types'
 import { buildWorkerCliCommands } from '../workerSnippets'
 import { WorkerSnippetTabs } from '../WorkerSnippetTabs'
-import { WORKERS_DOCS_URL, WORKERS_SKILL_MARKDOWN } from '@/lib/constants/workers'
+import CopyButton from '@/components/ui/CopyButton'
+import { WORKERS_SKILL_MARKDOWN } from '@/lib/constants/workers'
 
 interface WorkerSettingsTabProps {
   worker: Worker
@@ -53,20 +53,12 @@ export const WorkerSettingsTab = ({ worker }: WorkerSettingsTabProps) => {
   const size = getSizeMeta(worker.size)
   const commands = buildWorkerCliCommands(worker.name)
 
-  const [isSkillCopied, setIsSkillCopied] = useState(false)
-
   const snippetInput = {
     name: worker.name,
     runtime: worker.runtime,
     size: worker.size,
     access: worker.access,
     instances: worker.instances,
-  }
-
-  const handleCopySkill = () => {
-    setIsSkillCopied(true)
-    copyToClipboard(WORKERS_SKILL_MARKDOWN)
-    setTimeout(() => setIsSkillCopied(false), 2000)
   }
 
   return (
@@ -194,19 +186,9 @@ export const WorkerSettingsTab = ({ worker }: WorkerSettingsTabProps) => {
                   from natural language.
                 </p>
                 <div className="flex items-center gap-3">
-                  <Button
-                    variant="default"
-                    size="tiny"
-                    icon={isSkillCopied ? <Check className="text-brand" /> : <Copy />}
-                    onClick={handleCopySkill}
-                  >
-                    {isSkillCopied ? 'Copied' : 'Copy SKILL.md'}
-                  </Button>
-                  <Button asChild variant="text" size="tiny">
-                    <Link href={WORKERS_DOCS_URL} target="_blank" rel="noreferrer">
-                      View docs
-                    </Link>
-                  </Button>
+                  <CopyButton text={WORKERS_SKILL_MARKDOWN} variant="default" size="tiny">
+                    Copy SKILL.md
+                  </CopyButton>
                 </div>
               </CardContent>
             </Card>
