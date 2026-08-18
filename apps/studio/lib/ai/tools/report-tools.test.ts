@@ -66,7 +66,7 @@ describe('ai/tools/report-tools', () => {
 
       const result = await tools.list_reports.execute(
         { limit: 20 },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
 
       expect(capturedRequest?.headers.get('authorization')).toBe('Bearer token')
@@ -169,7 +169,7 @@ describe('ai/tools/report-tools', () => {
 
       const result = (await tools.get_report.execute(
         { id: 'report-1' },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )) as { layout: Array<{ id: string; attribute: string; sql?: string }> }
 
       expect(result.layout).toEqual([
@@ -208,7 +208,10 @@ describe('ai/tools/report-tools', () => {
       if (!tools.get_report.execute) throw new Error('execute is undefined')
 
       await expect(
-        tools.get_report.execute({ id: 'snippet-1' }, { toolCallId: 'test', messages: [] })
+        tools.get_report.execute(
+          { id: 'snippet-1' },
+          { toolCallId: 'test', messages: [], context: {} }
+        )
       ).rejects.toThrow('is not a report')
     })
   })

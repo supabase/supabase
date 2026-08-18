@@ -1,76 +1,116 @@
-import { untrustedSql } from '@supabase/pg-meta'
-import { useState } from 'react'
+import { forwardRef, useState } from 'react'
 import { type Snapshot } from 'valtio'
 
-import { QueryEditor } from '../QueryEditor'
+import { AddCellDropdown } from '../AddCellDropdown'
+import { MoveCellDropdownContent } from '../MoveCellDropdownContent'
+import { QueryEditor, type QueryEditorHandle } from '../QueryEditor'
 import { type QueryDisplay, type QueryResult } from '../types'
+import {
+  changeCellSource,
+  cloneChartConfig,
+  cloneQueryCell,
+  getCellDisplay,
+  setCellRowLimit,
+  setCellSql,
+  toQueryModel,
+} from './QueryCell.utils'
 import { SortableSection } from '@/components/ui/SortableSection'
-import { type DatabaseCell as DatabaseCellSchema } from '@/data/content/notebooks/notebook-schema'
+import {
+  isQueryCell,
+  type QueryCell as QueryCellSchema,
+} from '@/data/content/notebooks/notebook-schema'
+import { type QuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
+import { useLocalRoleImpersonationState } from '@/state/role-impersonation-state'
 
 interface QueryCellProps {
-  cell: Snapshot<DatabaseCellSchema>
+  cell: Snapshot<QueryCellSchema>
 }
 
-type QueryCellUpdate = { sql: string } | { title: string } | { display: QueryDisplay }
-
 /** Notebook adapter around the shared QueryEditor. */
-export const QueryCell = ({ cell }: QueryCellProps) => {
+export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function QueryCell(
+  { cell },
+  ref
+) {
   const snap = useNotebooksStateSnapshot()
   const currentNotebook = useCurrentNotebook()
-  const cells = currentNotebook?.notebook.content?.cells ?? []
 
   const [sql, setSql] = useState<string>(cell.unchecked_sql)
   const [result, setResult] = useState<QueryResult>()
+  const roleImpersonationState = useLocalRoleImpersonationState()
 
-  const title = cell.title ?? 'Untitled snippet'
-  const display: QueryDisplay = {
-    view: cell.view ?? 'table',
-    chart: cell.chart ? { ...cell.chart, y_columns: [...cell.chart.y_columns] } : undefined,
-  }
+  const title = cell.title ?? 'Untitled query'
 
-  const handleUpdateCell = (payload: QueryCellUpdate) => {
+  /**
+   * Applies an update to this cell. The updater runs against the cell as the store holds
+   * it rather than the snapshot this component rendered with, so a concurrent edit isn't
+   * clobbered; `isQueryCell` keeps the per-backend helpers off a markdown cell that
+   * somehow shares the id.
+   */
+  const updateQueryCell = (updater: (candidate: Snapshot<QueryCellSchema>) => QueryCellSchema) => {
     const notebookId = currentNotebook?.notebook.id
     if (!notebookId) return
 
-    const nextCells = cells.map((candidate) => {
-      if (candidate.id !== cell.id || candidate._tag !== 'database_cell') return candidate
-
-      if ('sql' in payload) {
-        return { ...candidate, unchecked_sql: untrustedSql(payload.sql) }
-      }
-
-      if ('title' in payload) {
-        const nextTitle = payload.title.trim()
-        return nextTitle ? { ...candidate, title: nextTitle } : candidate
-      }
-
-      return {
-        ...candidate,
-        view: payload.display.view,
-        chart: payload.display.chart,
-      }
+    snap.updateCell({
+      id: notebookId,
+      cellId: cell.id,
+      updater: (candidate) => (isQueryCell(candidate) ? updater(candidate) : candidate),
     })
-
-    snap.updateCells({ id: notebookId, cells: nextCells })
   }
 
+  const handleSourceChange = (source: QuerySourceBinding) => {
+    // The query text carries over (see `changeCellSource`), so the editor's buffer stays
+    // valid — but a result the old backend produced does not, since another engine
+    // returns unrelated columns.
+    const isBackendChange = (source._tag === 'logs') !== (cell._tag === 'log_cell')
+    if (isBackendChange) setResult(undefined)
+
+    updateQueryCell((candidate) => changeCellSource(candidate, source))
+  }
+
+  const handleTitleChange = (value: string) => {
+    const nextTitle = value.trim()
+    if (!nextTitle) return
+    updateQueryCell((candidate) => ({ ...cloneQueryCell(candidate), title: nextTitle }))
+  }
+
+  const handleSqlCommit = (value: string) =>
+    updateQueryCell((candidate) => setCellSql(candidate, value))
+
+  const handleDisplayChange = (display: QueryDisplay) =>
+    updateQueryCell((candidate) => ({
+      ...cloneQueryCell(candidate),
+      view: display.view,
+      chart: cloneChartConfig(display.chart),
+    }))
+
+  const handleRowLimitChange = (rowLimit: number) =>
+    updateQueryCell((candidate) => setCellRowLimit(candidate, rowLimit))
+
   return (
-    <SortableSection gripClassName="mt-2.5" id={cell.id}>
+    <SortableSection
+      id={cell.id}
+      actions={<AddCellDropdown cellId={cell.id} />}
+      gripDropdownContent={<MoveCellDropdownContent cellId={cell.id} />}
+      gripClassName="mt-2 opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition"
+    >
       <QueryEditor
+        ref={ref}
         id={cell.id}
         variant="embedded"
         title={title}
-        sql={sql}
+        query={toQueryModel(cell, sql)}
         result={result}
-        rowLimit={cell.row_limit}
-        display={display}
-        onTitleChange={(title) => handleUpdateCell({ title })}
+        roleImpersonationState={roleImpersonationState}
+        display={getCellDisplay(cell)}
+        onTitleChange={handleTitleChange}
         onSqlChange={setSql}
-        onSqlCommit={(sql) => handleUpdateCell({ sql })}
+        onSqlCommit={handleSqlCommit}
+        onSourceChange={handleSourceChange}
         onResultChange={setResult}
-        onDisplayChange={(display) => handleUpdateCell({ display })}
+        onRowLimitChange={handleRowLimitChange}
+        onDisplayChange={handleDisplayChange}
       />
     </SortableSection>
   )
-}
+})

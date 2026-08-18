@@ -23,9 +23,9 @@ export function RoleImpersonationRadio<T extends string>({
   return (
     <label
       className={cn(
-        'border border-default rounded-md bg-surface-200 hover:bg-overlay-hover hover:border-control px-4 py-3 cursor-pointer transition-colors',
+        'border border-default rounded-md bg-surface-200 hover:bg-overlay-hover hover:border-control-hover px-4 py-3 cursor-pointer transition-colors',
         fullWidth ? 'w-full' : 'w-44',
-        isSelected && 'border-foreground-muted hover:border-foreground-muted bg-surface-300'
+        isSelected && 'border-control-hover hover:border-control-hover bg-surface-300'
       )}
       tabIndex={0}
       onKeyDown={(e) => {
