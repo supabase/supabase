@@ -190,6 +190,29 @@ export const notebookDomainSchema = z.object({
 
 export type NotebookContent = z.infer<typeof notebookDomainSchema>
 export type Cell = z.infer<typeof cellDomainSchema>
+
+// Reverse of cellDomainSchema's transform, for display-only conversions (e.g. deriving a
+// diff preview client-side). Never promoted or executed — writes still go through
+// acceptUntrustedSql/acceptUntrustedLogsSql at the point of user action.
+export function toWireCell(cell: Cell): CellWire {
+  switch (cell._tag) {
+    case 'markdown_cell':
+      return cell
+    case 'database_cell': {
+      const { unchecked_sql, ...rest } = cell
+      return { ...rest, sql: unchecked_sql }
+    }
+    case 'log_cell': {
+      const { unchecked_sql, ...rest } = cell
+      return { ...rest, sql: unchecked_sql }
+    }
+  }
+}
+
+export function toWireNotebook(content: NotebookContent): NotebookWire {
+  return { schema_version: content.schema_version, cells: content.cells.map(toWireCell) }
+}
+
 export type MarkdownCell = Extract<Cell, { _tag: 'markdown_cell' }>
 export type DatabaseCell = Extract<Cell, { _tag: 'database_cell' }>
 export type LogCell = Extract<Cell, { _tag: 'log_cell' }>
