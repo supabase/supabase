@@ -45,12 +45,12 @@ sequenceDiagram
 
 ## Unhappy paths
 
-| Class | Trigger | Transition | Where visible |
-| --- | --- | --- | --- |
-| Deploy build failure | invalid Dockerfile / missing entrypoint / deps fail | `deploying → errored` | CLI stream, Overview error alert |
-| Deploy cap hit | project at 100 instances | rejected before `deploying` | CLI error, create-dialog inline error |
-| Runtime crash | uncaught exception / non-zero exit | `active → errored (crash)` | state pill, Overview alert, log feed |
-| Unresponsive | health check / no `$PORT` answer | `active → errored (unresponsive)` | log event "did not respond on $PORT" |
-| Suspend during traffic | drain-idle while request in flight | `active → draining → suspended` | log stream shows drain → suspend |
-| Delete during in-flight | `workers delete` while live | `active → draining → killed` | deleted placeholder; last logs viewable |
-| Agent burst | 101st worker created | mgmt-api rejects | CLI error verbatim; dashboard toast |
+| Class                   | Trigger                                             | Transition                        | Where visible                           |
+| ----------------------- | --------------------------------------------------- | --------------------------------- | --------------------------------------- |
+| Deploy build failure    | invalid Dockerfile / missing entrypoint / deps fail | `deploying → errored`             | CLI stream, Overview error alert        |
+| Deploy cap hit          | project at 100 instances                            | rejected before `deploying`       | CLI error, create-dialog inline error   |
+| Runtime crash           | uncaught exception / non-zero exit                  | `active → errored (crash)`        | state pill, Overview alert, log feed    |
+| Unresponsive            | health check / no `$PORT` answer                    | `active → errored (unresponsive)` | log event "did not respond on $PORT"    |
+| Suspend during traffic  | drain-idle while request in flight                  | `active → draining → suspended`   | log stream shows drain → suspend        |
+| Delete during in-flight | `workers delete` while live                         | `active → draining → killed`      | deleted placeholder; last logs viewable |
+| Agent burst             | 101st worker created                                | mgmt-api rejects                  | CLI error verbatim; dashboard toast     |

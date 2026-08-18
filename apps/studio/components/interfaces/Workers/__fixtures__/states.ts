@@ -92,7 +92,12 @@ export const STATE_FIXTURES: Worker[] = [
     name: 'fx-suspended',
     state: 'suspended',
     events: [
-      { id: 'fx-suspended-1', at: AT_LATER, level: 'info', message: 'Suspended after idle timeout' },
+      {
+        id: 'fx-suspended-1',
+        at: AT_LATER,
+        level: 'info',
+        message: 'Suspended after idle timeout',
+      },
     ],
   },
   {
@@ -107,16 +112,16 @@ export const STATE_FIXTURES: Worker[] = [
     id: 'fx-draining',
     name: 'fx-draining',
     state: 'draining',
-    events: [
-      { id: 'fx-draining-1', at: AT_LATER, level: 'info', message: 'Draining connections' },
-    ],
+    events: [{ id: 'fx-draining-1', at: AT_LATER, level: 'info', message: 'Draining connections' }],
   },
   {
     ...base,
     id: 'fx-killed',
     name: 'fx-killed',
     state: 'killed',
-    events: [{ id: 'fx-killed-1', at: AT_LATER, level: 'info', message: 'Worker killed after delete' }],
+    events: [
+      { id: 'fx-killed-1', at: AT_LATER, level: 'info', message: 'Worker killed after delete' },
+    ],
   },
 ]
 

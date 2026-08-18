@@ -162,9 +162,7 @@ export interface DeploySuccess {
 export type DeployResult = DeploySuccess | DeployRejection
 
 const totalInstances = (workers: Worker[]) =>
-  workers
-    .filter((w) => w.state !== 'killed')
-    .reduce((sum, w) => sum + w.instances, 0)
+  workers.filter((w) => w.state !== 'killed').reduce((sum, w) => sum + w.instances, 0)
 
 /**
  * Creates a worker in `deploying` and transitions it to `active` after a short
@@ -174,9 +172,7 @@ const totalInstances = (workers: Worker[]) =>
 export function deployWorker(projectRef: string, input: DeployWorkerInput): DeployResult {
   const project = getProjectState(projectRef)
 
-  const duplicate = project.workers.some(
-    (w) => w.name === input.name && w.state !== 'killed'
-  )
+  const duplicate = project.workers.some((w) => w.name === input.name && w.state !== 'killed')
   if (duplicate) {
     return {
       ok: false,

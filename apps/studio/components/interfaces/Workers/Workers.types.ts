@@ -26,12 +26,7 @@ export type WorkerState =
   | 'killed'
 
 /** Why a worker ended up in `errored` (surfaced on Overview + in the log feed). */
-export type WorkerErrorReason =
-  | 'crash'
-  | 'unresponsive'
-  | 'build'
-  | 'entrypoint'
-  | 'dependency'
+export type WorkerErrorReason = 'crash' | 'unresponsive' | 'build' | 'entrypoint' | 'dependency'
 
 export type WorkerLifecycleLevel = 'info' | 'error'
 

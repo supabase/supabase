@@ -36,8 +36,8 @@ import {
   WORKER_MAX_INSTANCES,
   WORKER_MIN_INSTANCES,
 } from './Workers.constants'
-import { WorkerSnippetTabs } from './WorkerSnippetTabs'
 import { buildWorkerSnippets } from './workerSnippets'
+import { WorkerSnippetTabs } from './WorkerSnippetTabs'
 import { deployWorker } from '@/state/workers-mock-state'
 
 const FORM_ID = 'create-worker-form'
@@ -304,7 +304,11 @@ export const CreateWorkerDialog = ({ open, onOpenChange }: CreateWorkerDialogPro
               </div>
 
               {rejection && (
-                <Admonition type="warning" title="Can't deploy this worker" description={rejection} />
+                <Admonition
+                  type="warning"
+                  title="Can't deploy this worker"
+                  description={rejection}
+                />
               )}
             </DialogSection>
           </form>

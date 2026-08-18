@@ -3,7 +3,11 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Button, Card, cn, copyToClipboard } from 'ui'
 
-import { WORKERS_CLI_DEPLOY, WORKERS_DOCS_URL, WORKERS_SKILL_MARKDOWN } from '@/lib/constants/workers'
+import {
+  WORKERS_CLI_DEPLOY,
+  WORKERS_DOCS_URL,
+  WORKERS_SKILL_MARKDOWN,
+} from '@/lib/constants/workers'
 
 interface WorkersEmptyStateProps {
   onCreate: () => void

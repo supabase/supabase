@@ -1,6 +1,7 @@
 import { BarChart2, Check, ExternalLink, RotateCw } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import {
   Chart,
   ChartCard,
@@ -21,20 +22,19 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import { Admonition } from 'ui-patterns/Admonition'
 
 import { WORKER_ERROR_REASON_LABEL } from '../Workers.constants'
 import type { Worker } from '../Workers.types'
 import {
+  buildWorkerChartData,
   CHART_INTERVALS,
   CPU_TIME_CHART_CONFIG,
-  MEMORY_CHART_CONFIG,
-  RESPONSE_TIME_CHART_CONFIG,
-  buildWorkerChartData,
   formatMetric,
   formatRate,
   getSegmentedButtonClassName,
   meanBy,
+  MEMORY_CHART_CONFIG,
+  RESPONSE_TIME_CHART_CONFIG,
   sumBy,
 } from './workerCharts'
 import { redeployWorker } from '@/state/workers-mock-state'
@@ -75,7 +75,8 @@ export const WorkerOverviewTab = ({ projectRef, worker }: WorkerOverviewTabProps
   const { averageResponseTime, maxResponseTime } = useMemo(
     () => ({
       averageResponseTime: meanBy(metrics, (d) => d.avg_response_time),
-      maxResponseTime: metrics.length === 0 ? 0 : Math.max(...metrics.map((d) => d.max_response_time)),
+      maxResponseTime:
+        metrics.length === 0 ? 0 : Math.max(...metrics.map((d) => d.max_response_time)),
     }),
     [metrics]
   )
@@ -85,7 +86,8 @@ export const WorkerOverviewTab = ({ projectRef, worker }: WorkerOverviewTabProps
       averageCpuTime: meanBy(metrics, (d) => d.avg_cpu_time_used),
       maxCpuTime: metrics.length === 0 ? 0 : Math.max(...metrics.map((d) => d.max_cpu_time_used)),
       averageMemory: meanBy(metrics, (d) => d.avg_memory_used),
-      peakMemoryPercent: metrics.length === 0 ? 0 : Math.max(...metrics.map((d) => d.memory_percent)),
+      peakMemoryPercent:
+        metrics.length === 0 ? 0 : Math.max(...metrics.map((d) => d.memory_percent)),
     }),
     [metrics]
   )

@@ -6,9 +6,9 @@ import {
   LIFECYCLE_SWIMLANE_CHART,
   STATE_FIXTURES,
 } from '@/components/interfaces/Workers/__fixtures__/states'
-import { WORKER_STATE_META } from '@/components/interfaces/Workers/Workers.constants'
 import { WorkerOverviewTab } from '@/components/interfaces/Workers/WorkerDetail/WorkerOverviewTab'
 import { WorkerSettingsTab } from '@/components/interfaces/Workers/WorkerDetail/WorkerSettingsTab'
+import { WORKER_STATE_META } from '@/components/interfaces/Workers/Workers.constants'
 import { WorkerStatePill } from '@/components/interfaces/Workers/WorkerStatePill'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import WorkersLayout from '@/components/layouts/WorkersLayout/WorkersLayout'
@@ -38,8 +38,8 @@ const WorkerStatesShowcase: NextPageWithLayout = () => {
       <header className="space-y-1">
         <h1 className="text-xl text-foreground">Worker states — design showcase</h1>
         <p className="text-sm text-foreground-light">
-          Every lifecycle state and unhappy-path variant, rendered against fixture data. Never
-          ships — gated on <code>!IS_PLATFORM</code>.
+          Every lifecycle state and unhappy-path variant, rendered against fixture data. Never ships
+          — gated on <code>!IS_PLATFORM</code>.
         </p>
       </header>
 

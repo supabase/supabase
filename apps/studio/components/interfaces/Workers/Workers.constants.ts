@@ -1,9 +1,4 @@
-import type {
-  WorkerAccess,
-  WorkerRuntime,
-  WorkerSize,
-  WorkerState,
-} from './Workers.types'
+import type { WorkerAccess, WorkerRuntime, WorkerSize, WorkerState } from './Workers.types'
 
 /**
  * Region is locked to a single region at alpha — surfaced everywhere as

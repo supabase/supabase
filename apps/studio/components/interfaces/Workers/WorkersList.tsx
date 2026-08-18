@@ -25,9 +25,9 @@ import {
   TableRow,
 } from 'ui'
 
-import { WORKERS_REGION_SHORT, formatResources } from './Workers.constants'
-import type { Worker, WorkerAccess, WorkerState } from './Workers.types'
 import { RuntimeBadge } from './RuntimeBadge'
+import { formatResources, WORKERS_REGION_SHORT } from './Workers.constants'
+import type { Worker, WorkerAccess, WorkerState } from './Workers.types'
 import { WorkerStatePill } from './WorkerStatePill'
 import { deleteWorker, resumeWorker, suspendWorker } from '@/state/workers-mock-state'
 
