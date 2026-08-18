@@ -69,6 +69,24 @@ export function normalizeIconPath(iconPath: string): string {
   return `${BASE_PATH}/${iconPath}`
 }
 
+const CUSTOM_PROVIDER_PREFIX = 'custom:'
+
+/**
+ * Derives a human-readable name from a `custom:*` provider id, e.g. `custom:acme` -> "Acme" and
+ * `custom:my_provider` -> "My Provider". Returns undefined for non-custom providers.
+ */
+function getCustomProviderName(provider: string): string | undefined {
+  if (!provider.toLowerCase().startsWith(CUSTOM_PROVIDER_PREFIX)) return undefined
+
+  return provider
+    .slice(CUSTOM_PROVIDER_PREFIX.length)
+    .replaceAll('_', ' ')
+    .split(' ')
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
+
 export function getProviderDisplay(provider: string): IdentityProviderDisplay {
   const config = IDENTITY_PROVIDERS.find(
     ({ id, authProvider }) => provider === id || provider === authProvider
@@ -87,6 +105,17 @@ export function getProviderDisplay(provider: string): IdentityProviderDisplay {
     return {
       id: provider,
       displayName: 'SSO',
+      iconPath: `${BASE_PATH}/img/icons/saml-icon.svg`,
+    }
+  }
+
+  // Unregistered `custom:*` providers (e.g. white-label deployments' own OAuth providers) fall
+  // back to a title-cased name derived from the id: `custom:acme` -> "Acme".
+  const customProviderName = getCustomProviderName(provider)
+  if (customProviderName) {
+    return {
+      id: provider,
+      displayName: customProviderName,
       iconPath: `${BASE_PATH}/img/icons/saml-icon.svg`,
     }
   }
