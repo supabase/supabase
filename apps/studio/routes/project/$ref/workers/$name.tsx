@@ -10,5 +10,5 @@ export const Route = createFileRoute('/project/$ref/workers/$name')({
 })
 
 function WorkerDetailRoute() {
-  return <WorkerDetailPage />
+  return <WorkerDetailPage dehydratedState={undefined} />
 }
