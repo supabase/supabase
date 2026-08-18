@@ -3,7 +3,6 @@ import type { McpClient } from 'ui-patterns/McpUrlBuilder'
 export interface PluginClient extends McpClient {
   repoUrl?: string
   docsUrl?: string
-  /** Overrides the default "View {label} extensions docs" link text. */
   docsLinkText?: string
 }
 
