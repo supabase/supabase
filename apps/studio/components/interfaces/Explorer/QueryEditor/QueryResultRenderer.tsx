@@ -14,7 +14,7 @@ export const QueryResultRenderer = ({ result, view, chart }: QueryResultRenderer
   const { rows, error, autoLimit } = result ?? {}
 
   if (!result) {
-    return <p className="text-xs text-foreground-lighter">Run the query to see results</p>
+    return <p className="text-xs text-foreground-lighter py-8">Run the query to see results</p>
   }
 
   if (error) {
@@ -22,7 +22,7 @@ export const QueryResultRenderer = ({ result, view, chart }: QueryResultRenderer
   }
 
   if ((rows ?? []).length === 0) {
-    return <p className="text-xs text-foreground-lighter">Success. No rows returned</p>
+    return <p className="text-xs text-foreground-lighter py-8">Success. No rows returned</p>
   }
 
   if (rows && rows.length > 0) {
