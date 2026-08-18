@@ -21,6 +21,7 @@ import {
 } from '../ExplorerToolbar'
 import { type QueryDisplay, type QueryResult } from '../types'
 import { DisplaySettingsButton } from './DisplaySettingsButton'
+import { LegacyLogsRewriteBanner } from './LegacyLogsRewriteBanner'
 import { QueryResultRenderer } from './QueryResultRenderer'
 import { QuerySourceMenu } from './QuerySourceMenu'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
@@ -256,24 +257,33 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       </ExplorerToolbar>
 
       {showQuery && (
-        <ExplorerQueryEditor
-          className={cn('relative', variant === 'viewport' ? 'h-[45%] min-h-48' : undefined)}
-        >
-          <CodeEditor
-            id={`explorer-query-${id}`}
-            language="pgsql"
-            value={sql}
-            placeholder="select * from your_table limit 100;"
-            placeholderClassName="top-[13px]"
-            className={variant === 'embedded' ? 'h-32' : undefined}
-            actions={{ runQuery: { enabled: true, callback: handleRunQuery } }}
-            options={{ minimap: { enabled: false }, padding: { top: 8 } }}
-            onInputChange={(value) => onSqlChange(value ?? '')}
-            onMount={(editor) => {
-              editor.onDidBlurEditorWidget(() => onSqlCommitRef.current?.(sqlRef.current))
-            }}
+        <>
+          <LegacyLogsRewriteBanner
+            isLogsSource={query._tag === 'logs'}
+            sql={sql}
+            readSql={() => sqlRef.current}
+            onSqlChange={onSqlChange}
+            onSqlCommit={onSqlCommit}
           />
-        </ExplorerQueryEditor>
+          <ExplorerQueryEditor
+            className={cn('relative', variant === 'viewport' ? 'h-[45%] min-h-48' : undefined)}
+          >
+            <CodeEditor
+              id={`explorer-query-${id}`}
+              language="pgsql"
+              value={sql}
+              placeholder="select * from your_table limit 100;"
+              placeholderClassName="top-[13px]"
+              className={variant === 'embedded' ? 'h-44' : undefined}
+              actions={{ runQuery: { enabled: true, callback: handleRunQuery } }}
+              options={{ minimap: { enabled: false }, padding: { top: 8 } }}
+              onInputChange={(value) => onSqlChange(value ?? '')}
+              onMount={(editor) => {
+                editor.onDidBlurEditorWidget(() => onSqlCommitRef.current?.(sqlRef.current))
+              }}
+            />
+          </ExplorerQueryEditor>
+        </>
       )}
 
       <ExplorerQueryResults
