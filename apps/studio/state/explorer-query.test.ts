@@ -202,6 +202,97 @@ describe('explorer query drafts', () => {
     expect(persisted[`query-${MAX_PERSISTED_EXPLORER_QUERY_DRAFTS}`]).toBeDefined()
   })
 
+  it('persists and restores a per-draft row limit independently of other drafts', () => {
+    const storage = createMemoryStorage()
+    const state = createExplorerQueryState(storage)
+
+    state.createDraft({ id: 'query-1', projectRef: 'project-a' })
+    state.createDraft({ id: 'query-2', projectRef: 'project-a' })
+    state.updateDraft({ id: 'query-1', rowLimit: 500 })
+
+    expect(state.drafts['query-1']).toMatchObject({ rowLimit: 500 })
+    expect(state.drafts['query-2']).toMatchObject({ rowLimit: 100 })
+
+    const restored = createExplorerQueryState(storage)
+    expect(restored.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
+    expect(restored.restoreDraft({ id: 'query-2', projectRef: 'project-a' })).toBe(true)
+    expect(restored.drafts['query-1']).toMatchObject({ rowLimit: 500 })
+    expect(restored.drafts['query-2']).toMatchObject({ rowLimit: 100 })
+  })
+
+  it('defaults the row limit for drafts persisted before row limits existed', () => {
+    const storage = createMemoryStorage()
+    storage.setItem(
+      LOCAL_STORAGE_KEYS.EXPLORER_QUERY_DRAFTS('project-a'),
+      JSON.stringify({
+        'query-1': { name: 'Legacy query', sql: 'select 1', updatedAt: 1 },
+      })
+    )
+
+    const state = createExplorerQueryState(storage)
+    expect(state.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
+    expect(state.drafts['query-1']).toMatchObject({ rowLimit: 100 })
+  })
+
+  it('accepts every row limit the row limit menu can produce', () => {
+    const storage = createMemoryStorage()
+
+    for (const rowLimit of [-1, 100, 500, 1000]) {
+      storage.setItem(
+        LOCAL_STORAGE_KEYS.EXPLORER_QUERY_DRAFTS('project-a'),
+        JSON.stringify({
+          'query-1': { name: 'Query', sql: 'select 1', updatedAt: 1, rowLimit },
+        })
+      )
+
+      const state = createExplorerQueryState(storage)
+      expect(state.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
+      expect(state.drafts['query-1']).toMatchObject({ rowLimit })
+    }
+  })
+
+  it('normalizes a fractional persisted row limit to the default', () => {
+    const storage = createMemoryStorage()
+    storage.setItem(
+      LOCAL_STORAGE_KEYS.EXPLORER_QUERY_DRAFTS('project-a'),
+      JSON.stringify({
+        'query-1': { name: 'Query', sql: 'select 1', updatedAt: 1, rowLimit: 100.5 },
+      })
+    )
+
+    const state = createExplorerQueryState(storage)
+    expect(state.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
+    expect(state.drafts['query-1']).toMatchObject({ rowLimit: 100 })
+  })
+
+  it('normalizes an out-of-range persisted row limit to the default', () => {
+    const storage = createMemoryStorage()
+    storage.setItem(
+      LOCAL_STORAGE_KEYS.EXPLORER_QUERY_DRAFTS('project-a'),
+      JSON.stringify({
+        'query-1': { name: 'Query', sql: 'select 1', updatedAt: 1, rowLimit: 999999 },
+      })
+    )
+
+    const state = createExplorerQueryState(storage)
+    expect(state.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
+    expect(state.drafts['query-1']).toMatchObject({ rowLimit: 100 })
+  })
+
+  it('normalizes a non-numeric persisted row limit to the default without dropping the draft', () => {
+    const storage = createMemoryStorage()
+    storage.setItem(
+      LOCAL_STORAGE_KEYS.EXPLORER_QUERY_DRAFTS('project-a'),
+      JSON.stringify({
+        'query-1': { name: 'Query', sql: 'select 1', updatedAt: 1, rowLimit: 'unlimited' },
+      })
+    )
+
+    const state = createExplorerQueryState(storage)
+    expect(state.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
+    expect(state.drafts['query-1']).toMatchObject({ rowLimit: 100, uncheckedSql: 'select 1' })
+  })
+
   it('removes the persisted draft and its session result when its tab closes', () => {
     const storage = createMemoryStorage()
     const state = createExplorerQueryState(storage)

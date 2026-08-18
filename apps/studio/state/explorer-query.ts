@@ -3,7 +3,9 @@ import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { proxy, ref, snapshot, useSnapshot } from 'valtio'
 import { z } from 'zod'
 
+import { DEFAULT_CELL_ROW_LIMIT } from '@/components/interfaces/Explorer/QueryCell/QueryCell.utils'
 import { type QueryResult } from '@/components/interfaces/Explorer/types'
+import { ROWS_PER_PAGE_OPTIONS } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
 import {
   type DatabaseSourceParameters,
   type LogsSourceParameters,
@@ -33,6 +35,7 @@ export type DatabaseQueryDraft = ExplorerQueryDraftBase &
   DatabaseSourceParameters & {
     _tag: 'database'
     uncheckedSql: UntrustedSqlFragment
+    rowLimit: number
   }
 
 export type LogsQueryDraft = ExplorerQueryDraftBase &
@@ -57,6 +60,7 @@ type PersistedExplorerQueryDraft = {
   source: QuerySourceBinding
   sql: string
   updatedAt: number
+  rowLimit?: number
 }
 
 type PersistedExplorerQueryDrafts = Record<string, PersistedExplorerQueryDraft>
@@ -72,7 +76,22 @@ const persistedDraftSchema = z.object({
   sql: z.string(),
   updatedAt: z.number(),
   source: z.unknown().optional(),
+  rowLimit: z.unknown().optional(),
 })
+
+const VALID_ROW_LIMITS = ROWS_PER_PAGE_OPTIONS.map((option) => option.value)
+
+/**
+ * Falls back to the default whenever a persisted row limit isn't one of the values the row
+ * limit menu can actually produce — e.g. a fractional or out-of-range number from corrupted
+ * or hand-edited storage. `undefined` (never persisted) passes through unchanged; `toDraft`
+ * applies the default for that case.
+ */
+const rowLimitSchema = z
+  .number()
+  .refine((value) => VALID_ROW_LIMITS.includes(value))
+  .catch(DEFAULT_CELL_ROW_LIMIT)
+  .optional()
 
 /**
  * Rebuilds a draft from its persisted form, branding the SQL for the backend the binding
@@ -104,6 +123,7 @@ const toDraft = ({
     _tag: 'database',
     database_identifier: persisted.source.database_identifier,
     uncheckedSql: untrustedSql(persisted.sql),
+    rowLimit: persisted.rowLimit ?? DEFAULT_CELL_ROW_LIMIT,
   }
 }
 
@@ -125,6 +145,8 @@ const readPersistedDrafts = (storage: StorageLike, projectRef: string) => {
           ? parsedSource.data
           : createDefaultSourceBinding('database')
 
+        const rowLimit = rowLimitSchema.parse(draft.data.rowLimit)
+
         return [
           [
             id,
@@ -133,6 +155,7 @@ const readPersistedDrafts = (storage: StorageLike, projectRef: string) => {
               source,
               sql: draft.data.sql,
               updatedAt: draft.data.updatedAt,
+              rowLimit,
             },
           ],
         ]
@@ -172,6 +195,7 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
       source: toQuerySourceBinding(draft),
       sql: draft.uncheckedSql,
       updatedAt: draft.updatedAt,
+      rowLimit: draft._tag === 'database' ? draft.rowLimit : undefined,
     }
     writePersistedDrafts(storage, draft.projectRef, persisted)
   }
@@ -186,12 +210,14 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
       name = 'Untitled query',
       sql = '',
       source = createDefaultSourceBinding('database'),
+      rowLimit = DEFAULT_CELL_ROW_LIMIT,
     }: {
       id: string
       projectRef: string
       name?: string
       sql?: string
       source?: QuerySourceBinding
+      rowLimit?: number
     }) => {
       const draft = toDraft({
         id,
@@ -201,6 +227,7 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
           source: querySourceBindingSchema.parse(source),
           sql,
           updatedAt: Date.now(),
+          rowLimit,
         },
       })
 
@@ -237,17 +264,21 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
       name,
       source,
       sql,
+      rowLimit,
     }: {
       id: string
       name?: string
       source?: QuerySourceBinding
       sql?: string
+      rowLimit?: number
     }) => {
       const draft = state.drafts[id]
       if (!draft) return
 
       const nextSource = source === undefined ? undefined : querySourceBindingSchema.parse(source)
       if (nextSource !== undefined && nextSource._tag !== draft._tag) delete state.results[id]
+
+      const currentRowLimit = draft._tag === 'database' ? draft.rowLimit : undefined
 
       state.drafts[id] = toDraft({
         id,
@@ -257,6 +288,7 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
           source: nextSource ?? toQuerySourceBinding(draft),
           sql: sql ?? draft.uncheckedSql,
           updatedAt: Date.now(),
+          rowLimit: rowLimit ?? currentRowLimit,
         },
       })
 
@@ -273,7 +305,7 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
       const pending = pendingPersistence.get(id)
       if (pending) clearTimeout(pending.timeout)
 
-      if (name !== undefined || source !== undefined) persist()
+      if (name !== undefined || source !== undefined || rowLimit !== undefined) persist()
       else {
         const timeout = setTimeout(persist, EXPLORER_QUERY_PERSIST_DELAY)
         pendingPersistence.set(id, { timeout, persist })
