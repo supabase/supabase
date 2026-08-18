@@ -4,7 +4,7 @@ import { type ComponentType, type PropsWithChildren } from 'react'
 import { Button, cn } from 'ui'
 import { InnerSideBarFilters, InnerSideBarFilterSearchInput } from 'ui-patterns/InnerSideMenu'
 
-import { useCreateNotebook } from '@/components/interfaces/Explorer/hooks'
+import { useCreateChat, useCreateNotebook } from '@/components/interfaces/Explorer/hooks'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 export type ExplorerResourceType = 'notebook' | 'chat'
@@ -52,6 +52,7 @@ export const ExplorerNavResourceWrapper = ({
   onBack: () => void
 }>) => {
   const { createNotebook } = useCreateNotebook()
+  const { createChat } = useCreateChat()
   const searchPlaceholder = EXPLORER_SECTIONS.find((x) => x.type === type)?.searchPlaceholder
 
   return (
@@ -94,6 +95,7 @@ export const ExplorerNavResourceWrapper = ({
           tooltip={{ content: { side: 'bottom', text: `New ${type}` } }}
           onClick={() => {
             if (type === 'notebook') createNotebook()
+            if (type === 'chat') createChat()
           }}
         />
       </div>

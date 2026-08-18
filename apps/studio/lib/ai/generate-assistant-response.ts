@@ -1,8 +1,8 @@
 import * as ai from 'ai'
 import {
   convertToModelMessages,
+  isStepCount,
   isToolUIPart,
-  stepCountIs,
   type LanguageModel,
   type ModelMessage,
   type SystemModelMessage,
@@ -153,14 +153,14 @@ export async function generateAssistantResponse({
 
     return streamTextFn({
       model,
-      system: systemMessage,
-      stopWhen: stepCountIs(10),
+      instructions: systemMessage,
+      stopWhen: isStepCount(10),
       messages: coreMessages,
       ...(providerOptions && { providerOptions }),
       tools,
       ...(abortSignal && { abortSignal }),
       ...(span && {
-        onFinish: ({ steps, finishReason }) => {
+        onEnd: ({ steps, finishReason }) => {
           const metadata: Record<string, unknown> = {
             isFinalStep: finishReason === 'stop',
           }
@@ -180,7 +180,7 @@ export async function generateAssistantResponse({
   }
 
   if (shouldTrace) {
-    // startSpan instead of traced() so we control when the span closes via onFinish.
+    // startSpan instead of traced() so we control when the span closes via onEnd.
     // Scorers read from child spans (LLM + tool) in the trace rather than a root span output field.
     const span = startSpan({ name: 'generateAssistantResponse', type: 'function' })
     onSpanCreated?.(span.id)

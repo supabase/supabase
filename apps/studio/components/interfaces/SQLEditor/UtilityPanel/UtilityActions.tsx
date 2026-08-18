@@ -18,7 +18,6 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-import { type QuerySource } from '../querySource'
 import { ROWS_PER_PAGE_OPTIONS } from '../SQLEditor.constants'
 import { AutosaveStatus } from './AutosaveStatus'
 import { QuerySourceMenu } from './QuerySourceMenu/QuerySourceMenu'
@@ -30,6 +29,7 @@ import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonat
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { type QuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
@@ -39,7 +39,7 @@ import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state
 
 export type UtilityActionsProps = {
   id: string
-  runSource: QuerySource
+  runSource: QuerySourceBinding
   isExecuting?: boolean
   isDisabled?: boolean
   hasSelection?: boolean
@@ -66,7 +66,7 @@ export const UtilityActions = ({
   const isLogsSourceEnabled = useFlag('sqlEditorLogsSource')
   const isOtelLogsEnabled = useFlag('otelLegacyLogs')
 
-  const isLogs = runSource.type === 'logs'
+  const isLogs = runSource._tag === 'logs'
   const canCreateLogsSnippet = isLogsSourceEnabled && isOtelLogsEnabled
   const canShowSourceIndicator = isLogs || canCreateLogsSnippet
   const isLogsRunBlocked = isLogs && !isOtelLogsEnabled

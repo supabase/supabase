@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
-import { type QuerySource, type SqlSnippetSource } from '../../querySource'
+import { type SqlSnippetSource } from '../../querySource'
 import { resolveSourceSwitch } from './QuerySourceMenu.utils'
 import { RowLimitSubMenu } from './RowLimitSubMenu'
 import { RunAsSubMenu } from './RunAsSubMenu'
@@ -20,7 +20,11 @@ import { LogsTimeRangeSubMenu } from '@/components/interfaces/QuerySources/LogsT
 import { QuerySourceIcon } from '@/components/interfaces/QuerySources/QuerySourceIcon'
 import { useLogsCustomRange } from '@/components/interfaces/QuerySources/useLogsCustomRange'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
-import { QUERY_SOURCE_LABELS, QUERY_SOURCES } from '@/data/query-sources/query-source-registry'
+import {
+  QUERY_SOURCE_LABELS,
+  QUERY_SOURCES,
+  type QuerySourceBinding,
+} from '@/data/query-sources/query-source-registry'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
@@ -29,7 +33,7 @@ import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state
 
 type QuerySourceMenuProps = {
   id: string
-  runSource: QuerySource
+  runSource: QuerySourceBinding
   /** Whether creating a logs snippet is available (feature-flagged). */
   canCreateLogsSnippet: boolean
 }
@@ -70,7 +74,7 @@ export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySo
     handleApplyCustomRange,
   } = useLogsCustomRange({ onRangeChange: (range) => sessionSnap.setLogRange(id, range) })
 
-  const currentSource = runSource.type
+  const currentSource = runSource._tag
   const isLogs = currentSource === 'logs'
   // A snippet materializes in the store on its first keystroke; until then a
   // `/sql/new` tab is a blank scaffold with nothing to preserve.
@@ -81,7 +85,7 @@ export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySo
       : (databaseSelector.selectedDatabaseId ?? ref)
 
   const selectableSources = QUERY_SOURCES.filter(
-    (source) => source.type !== 'logs' || canCreateLogsSnippet || isLogs
+    (source) => source._tag !== 'logs' || canCreateLogsSnippet || isLogs
   )
 
   const switchSource = (target: SqlSnippetSource) => {
@@ -112,26 +116,26 @@ export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySo
         <DropdownMenuContent align="end" className="w-60">
           {selectableSources.map((source) => (
             <DropdownMenuItem
-              key={source.id}
+              key={source._tag}
               className="justify-between"
               onSelect={(e) => {
                 e.preventDefault()
-                switchSource(source.id)
+                switchSource(source._tag)
               }}
             >
               <span className="flex items-center gap-x-2">
-                <QuerySourceIcon source={source.id} className="text-foreground-light" />
-                {QUERY_SOURCE_LABELS[source.id]}
+                <QuerySourceIcon source={source._tag} className="text-foreground-light" />
+                {QUERY_SOURCE_LABELS[source._tag]}
               </span>
-              {currentSource === source.id && <Check size={14} />}
+              {currentSource === source._tag && <Check size={14} />}
             </DropdownMenuItem>
           ))}
 
           <DropdownMenuSeparator />
 
-          {runSource.type === 'logs' ? (
+          {runSource._tag === 'logs' ? (
             <LogsTimeRangeSubMenu
-              range={runSource.dateRange}
+              range={runSource.time_range}
               onRangeChange={(range) => sessionSnap.setLogRange(id, range)}
               onOpenCustomRange={() => setIsCustomRangeOpen(true)}
               onShowUpgrade={() => setShowUpgradePrompt(true)}
@@ -145,7 +149,10 @@ export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySo
                 />
               )}
               <RunAsSubMenu />
-              <RowLimitSubMenu />
+              <RowLimitSubMenu
+                value={sessionSnap.limit}
+                onValueChange={(val) => sessionSnap.setLimit(Number(val))}
+              />
             </>
           )}
         </DropdownMenuContent>

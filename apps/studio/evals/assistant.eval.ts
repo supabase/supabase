@@ -14,6 +14,7 @@ import {
   urlValidityScorer,
 } from './scorer'
 import { sqlIdentifierQuotingScorer, sqlSyntaxScorer } from './scorer-wasm'
+import { buildTranscript } from './transcript'
 import { generateAssistantResponse } from '@/lib/ai/generate-assistant-response'
 import { getModel } from '@/lib/ai/model'
 import { DEFAULT_ASSISTANT_BASE_MODEL_ID, getAssistantModelEntry } from '@/lib/ai/model.utils'
@@ -52,7 +53,8 @@ Eval('Assistant', {
       })
 
       const finishReason = await result.finishReason
-      return { finishReason }
+      const steps = await result.steps
+      return { finishReason, transcript: buildTranscript(input.prompt, steps) }
     } finally {
       toolsAbortController.abort()
     }

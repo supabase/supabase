@@ -69,6 +69,7 @@ export const ColumnManagement = ({
   const [open, setOpen] = useState(false)
   const [selectedColumn, setSelectedColumn] = useState<ColumnField>()
   const [selectedFk, setSelectedFk] = useState<ForeignKey>()
+  const [columnIdToFocus, setColumnIdToFocus] = useState<string | null>(null)
 
   const hasImportContent = !isEmpty(importContent)
   const [primaryKeyColumns, otherColumns] = partition(
@@ -109,6 +110,7 @@ export const ColumnManagement = ({
   const onAddColumn = () => {
     const defaultColumn = generateColumnField()
     const updatedColumns = columns.concat(defaultColumn)
+    setColumnIdToFocus(defaultColumn.id)
     onColumnsUpdated(updatedColumns)
   }
 
@@ -285,6 +287,7 @@ export const ColumnManagement = ({
                       hasForeignKeys={checkIfHaveForeignKeys(column)}
                       isNewRecord={isNewRecord}
                       hasImportContent={hasImportContent}
+                      shouldAutoFocusName={column.id === columnIdToFocus}
                       onUpdateColumn={(changes) => onUpdateColumn(column, changes)}
                       onRemoveColumn={() => onRemoveColumn(column)}
                       onEditForeignKey={(fk) => {
@@ -316,6 +319,7 @@ export const ColumnManagement = ({
                     isNewRecord={isNewRecord}
                     hasForeignKeys={checkIfHaveForeignKeys(column)}
                     hasImportContent={hasImportContent}
+                    shouldAutoFocusName={column.id === columnIdToFocus}
                     onUpdateColumn={(changes) => onUpdateColumn(column, changes)}
                     onRemoveColumn={() => onRemoveColumn(column)}
                     onEditForeignKey={(fk) => {
