@@ -8,7 +8,6 @@ interface RuntimeBadgeProps {
   className?: string
 }
 
-/** Small colored swatch + runtime label, e.g. "▪ Python 3.14". */
 export const RuntimeBadge = ({ runtime, className }: RuntimeBadgeProps) => {
   const meta = getRuntimeMeta(runtime)
   return (

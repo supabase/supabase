@@ -1,4 +1,5 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
@@ -23,6 +24,7 @@ import {
 import { RuntimeBadge } from './RuntimeBadge'
 import { formatResources, WORKERS_REGION_SHORT } from './Workers.constants'
 import type { Worker, WorkerAccess, WorkerState } from './Workers.types'
+import { filterWorkers, getPage } from './Workers.utils'
 import { WorkerStatePill } from './WorkerStatePill'
 
 interface WorkersListProps {
@@ -46,6 +48,12 @@ const ACCESS_FILTERS: { value: WorkerAccess | 'all'; label: string }[] = [
 
 const PAGE_SIZE = 10
 
+const parseStateFilter = (value: string): WorkerState | 'all' =>
+  STATE_FILTERS.find((option) => option.value === value)?.value ?? 'all'
+
+const parseAccessFilter = (value: string): WorkerAccess | 'all' =>
+  ACCESS_FILTERS.find((option) => option.value === value)?.value ?? 'all'
+
 export const WorkersList = ({ projectRef, workers }: WorkersListProps) => {
   const router = useRouter()
   const [search, setSearch] = useState('')
@@ -53,23 +61,16 @@ export const WorkersList = ({ projectRef, workers }: WorkersListProps) => {
   const [accessFilter, setAccessFilter] = useState<WorkerAccess | 'all'>('all')
   const [page, setPage] = useState(1)
 
-  const filtered = workers.filter((worker) => {
-    const matchesSearch = worker.name.toLowerCase().includes(search.trim().toLowerCase())
-    const matchesState = stateFilter === 'all' || worker.state === stateFilter
-    const matchesAccess = accessFilter === 'all' || worker.access === accessFilter
-    return matchesSearch && matchesState && matchesAccess
+  const filtered = filterWorkers(workers, {
+    search,
+    state: stateFilter,
+    access: accessFilter,
   })
+  const { items: paged, currentPage, totalPages, startIndex } = getPage(filtered, page, PAGE_SIZE)
 
-  // Derive the page window; clamp so deletions/filters never strand us on an empty page.
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
-  const currentPage = Math.min(page, totalPages)
-  const startIndex = (currentPage - 1) * PAGE_SIZE
-  const paged = filtered.slice(startIndex, startIndex + PAGE_SIZE)
-
-  // Reset to the first page whenever the filters change the result set.
   const resetToFirstPage = () => setPage(1)
 
-  const openWorker = (name: string) => router.push(`/project/${projectRef}/workers/${name}`)
+  const workerUrl = (name: string) => `/project/${projectRef}/workers/${name}`
 
   return (
     <div className="space-y-4">
@@ -87,7 +88,7 @@ export const WorkersList = ({ projectRef, workers }: WorkersListProps) => {
         <Select
           value={stateFilter}
           onValueChange={(value) => {
-            setStateFilter(value as WorkerState | 'all')
+            setStateFilter(parseStateFilter(value))
             resetToFirstPage()
           }}
         >
@@ -105,7 +106,7 @@ export const WorkersList = ({ projectRef, workers }: WorkersListProps) => {
         <Select
           value={accessFilter}
           onValueChange={(value) => {
-            setAccessFilter(value as WorkerAccess | 'all')
+            setAccessFilter(parseAccessFilter(value))
             resetToFirstPage()
           }}
         >
@@ -152,9 +153,13 @@ export const WorkersList = ({ projectRef, workers }: WorkersListProps) => {
               <TableRow
                 key={worker.id}
                 className="cursor-pointer"
-                onClick={() => openWorker(worker.name)}
+                onClick={() => router.push(workerUrl(worker.name))}
               >
-                <TableCell className="font-medium text-foreground">{worker.name}</TableCell>
+                <TableCell className="font-medium text-foreground">
+                  <Link href={workerUrl(worker.name)} onClick={(e) => e.stopPropagation()}>
+                    {worker.name}
+                  </Link>
+                </TableCell>
                 <TableCell>
                   <WorkerStatePill state={worker.state} />
                 </TableCell>

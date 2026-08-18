@@ -26,6 +26,8 @@ const WorkersPage: NextPageWithLayout = () => {
 
   const workers = useProjectWorkers(ref)
 
+  if (!ref) return null
+
   return (
     <div className="w-full min-h-full flex flex-col items-stretch">
       <PageHeader size="large">
@@ -47,7 +49,7 @@ const WorkersPage: NextPageWithLayout = () => {
                 No workers yet. Deploy your first worker with the Supabase CLI.
               </p>
             )}
-            {workers.length > 0 && <WorkersList projectRef={ref as string} workers={workers} />}
+            {workers.length > 0 && <WorkersList projectRef={ref} workers={workers} />}
           </PageSectionContent>
         </PageSection>
       </PageContainer>

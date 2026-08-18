@@ -8,7 +8,6 @@ interface WorkerStatePillProps {
   className?: string
 }
 
-/** Status dot + label, e.g. "● Active". */
 export const WorkerStatePill = ({ state, className }: WorkerStatePillProps) => {
   const meta = WORKER_STATE_META[state]
   const isPulsing = state === 'deploying' || state === 'draining' || state === 'resuming'
