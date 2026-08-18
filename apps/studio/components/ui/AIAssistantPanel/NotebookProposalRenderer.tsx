@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
@@ -118,6 +118,16 @@ interface NotebookConfirmFooterProps {
   onDeny?: () => void
 }
 
+/**
+ * `ConfirmFooter` is built to sit flush under the block it confirms (`border-t-0 rounded-b-lg`),
+ * so that block has to square off its own bottom corners and the two must not be gapped apart.
+ */
+const GLUED_TO_FOOTER = 'rounded-b-none'
+
+function hasConfirmFooter(state: NotebookProposalState) {
+  return state === 'approval-requested' || state === 'approval-responded'
+}
+
 /** The footer morphs (label + disabled) across approval-requested/approval-responded and is absent otherwise. */
 function NotebookConfirmFooter({
   mode,
@@ -129,7 +139,7 @@ function NotebookConfirmFooter({
   onApprove,
   onDeny,
 }: NotebookConfirmFooterProps) {
-  if (state !== 'approval-requested' && state !== 'approval-responded') return null
+  if (!hasConfirmFooter(state)) return null
 
   const copy = MODE_COPY[mode]
   const isApprovalRequested = state === 'approval-requested'
@@ -155,7 +165,7 @@ function NotebookParseFailure({
   onDeny,
 }: Pick<NotebookProposalRendererProps, 'mode' | 'state' | 'input' | 'onApprove' | 'onDeny'>) {
   return (
-    <div className="w-auto overflow-x-hidden my-4 px-4 flex flex-col gap-2">
+    <div className="w-auto overflow-x-hidden my-4 flex flex-col gap-2">
       <Admonition
         type="warning"
         title="Couldn't render a preview for this notebook"
@@ -197,8 +207,13 @@ function CreateNotebookProposal({ state, input, onApprove, onDeny }: NotebookPro
   )
 
   return (
-    <div className="w-auto overflow-x-hidden my-4 flex flex-col gap-2">
-      <NotebookPreview entries={entries} mode="create" title={parsedInput.data.name} />
+    <div className="w-auto overflow-x-hidden my-4 flex flex-col">
+      <NotebookPreview
+        entries={entries}
+        mode="create"
+        title={parsedInput.data.name}
+        className={cn(hasConfirmFooter(state) && GLUED_TO_FOOTER)}
+      />
       <NotebookConfirmFooter mode="create" state={state} onApprove={onApprove} onDeny={onDeny} />
     </div>
   )
@@ -243,7 +258,7 @@ function UpdateNotebookProposal({ state, input, onApprove, onDeny }: NotebookPro
 
   if (isError || !notebook) {
     return (
-      <div className="w-auto overflow-x-hidden my-4 px-4 flex flex-col gap-2">
+      <div className="w-auto overflow-x-hidden my-4 flex flex-col gap-2">
         <AlertError error={error} subject="Failed to load notebook" />
         {(state === 'approval-requested' || state === 'approval-responded') && (
           <Button
@@ -264,11 +279,12 @@ function UpdateNotebookProposal({ state, input, onApprove, onDeny }: NotebookPro
 
   if (isStale) {
     return (
-      <div className="w-auto overflow-x-hidden my-4 px-4 flex flex-col gap-2">
+      <div className="w-auto overflow-x-hidden my-4 flex flex-col">
         <Admonition
           type="warning"
           title="This notebook changed since the assistant planned this update"
           description={`"${notebook.name}" was updated after the assistant read it. Refresh to see the latest version before deciding.`}
+          className={cn(hasConfirmFooter(state) && GLUED_TO_FOOTER)}
         />
         <NotebookConfirmFooter
           mode="update"
@@ -286,14 +302,20 @@ function UpdateNotebookProposal({ state, input, onApprove, onDeny }: NotebookPro
   const diff = deriveNotebookDiff(toWireNotebook(notebook.content), parsedInput.data.operations)
 
   return (
-    <div className="w-auto overflow-x-hidden my-4 px-4 flex flex-col gap-2">
+    <div className="w-auto overflow-x-hidden my-4 flex flex-col">
       {diff.success ? (
-        <NotebookPreview entries={diff.entries} mode="update" title={notebook.name} />
+        <NotebookPreview
+          entries={diff.entries}
+          mode="update"
+          title={notebook.name}
+          className={cn(hasConfirmFooter(state) && GLUED_TO_FOOTER)}
+        />
       ) : (
         <Admonition
           type="warning"
           title="This update can't be applied as written"
           description={describeNotebookOperationError(diff.error)}
+          className={cn(hasConfirmFooter(state) && GLUED_TO_FOOTER)}
         />
       )}
       <NotebookConfirmFooter

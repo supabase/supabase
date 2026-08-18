@@ -1,6 +1,6 @@
 import { NotebookPen } from 'lucide-react'
 import { useState } from 'react'
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
 
 import {
   formatNotebookDiffSummary,
@@ -16,6 +16,7 @@ export interface NotebookPreviewProps {
   mode: 'create' | 'update'
   /** The notebook's name, shown in the card header. Falls back to a generic label. */
   title?: string
+  className?: string
 }
 
 const VISIBLE_ENTRY_LIMIT = 5
@@ -30,7 +31,7 @@ const FALLBACK_TITLE = {
  * Pure presentational component: no data fetching, no approval or notebook-editor state — see
  * `deriveNotebookDiff` for how `entries` is produced.
  */
-export const NotebookPreview = ({ entries, mode, title }: NotebookPreviewProps) => {
+export const NotebookPreview = ({ entries, mode, title, className }: NotebookPreviewProps) => {
   const [isShowingAllEntries, setIsShowingAllEntries] = useState(false)
   const [expandedOverrides, setExpandedOverrides] = useState<Record<string, boolean>>({})
 
@@ -49,7 +50,9 @@ export const NotebookPreview = ({ entries, mode, title }: NotebookPreviewProps) 
     )
 
   return (
-    <div className="overflow-hidden rounded-md border border-default bg-surface-100">
+    <div
+      className={cn('overflow-hidden rounded-lg border border-default bg-surface-100', className)}
+    >
       <div className="flex items-center gap-2 border-b border-default bg-surface-200 px-3 py-1.5">
         <NotebookPen
           aria-hidden={true}
