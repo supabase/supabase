@@ -198,7 +198,7 @@ function CreateNotebookProposal({ state, input, onApprove, onDeny }: NotebookPro
 
   return (
     <div className="w-auto overflow-x-hidden my-4 px-4 flex flex-col gap-2">
-      <NotebookPreview entries={entries} mode="create" />
+      <NotebookPreview entries={entries} mode="create" title={parsedInput.data.name} />
       <NotebookConfirmFooter mode="create" state={state} onApprove={onApprove} onDeny={onDeny} />
     </div>
   )
@@ -288,7 +288,7 @@ function UpdateNotebookProposal({ state, input, onApprove, onDeny }: NotebookPro
   return (
     <div className="w-auto overflow-x-hidden my-4 px-4 flex flex-col gap-2">
       {diff.success ? (
-        <NotebookPreview entries={diff.entries} mode="update" />
+        <NotebookPreview entries={diff.entries} mode="update" title={notebook.name} />
       ) : (
         <Admonition
           type="warning"
