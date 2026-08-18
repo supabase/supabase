@@ -86,7 +86,7 @@ export const hasPendingToolApproval = (messages: Pick<UIMessage, 'role' | 'parts
   return messages.some((message) => {
     if (message.role !== 'assistant') return false
 
-    return message.parts?.some(isManualApprovalRequested)
+    return message.parts?.some((part) => isManualApprovalRequested(part))
   })
 }
 

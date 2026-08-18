@@ -24,22 +24,16 @@ export function prepareMessagesForAPI(messages: UIMessage[]): UIMessage[] {
   return cleanedMessages
 }
 
-function isAutomaticToolApproval(approval: { isAutomatic?: boolean }): boolean {
-  return approval.isAutomatic === true
+function isAutomaticToolApproval(approval: { isAutomatic?: boolean } | undefined): boolean {
+  return approval?.isAutomatic === true
 }
 
 /** True when the part is waiting on a human Approve/Deny, not an automatic policy decision. */
-export function isManualApprovalRequested(
-  part: UIMessage['parts'][number]
-): part is UIMessage['parts'][number] & {
-  state: 'approval-requested'
-  approval: { id: string }
-} {
-  return (
-    isToolUIPart(part) &&
-    part.state === 'approval-requested' &&
-    !isAutomaticToolApproval(part.approval)
-  )
+export function isManualApprovalRequested(part: {
+  state?: string
+  approval?: { id?: string; isAutomatic?: boolean }
+}): boolean {
+  return part.state === 'approval-requested' && !isAutomaticToolApproval(part.approval)
 }
 
 /**
@@ -50,8 +44,16 @@ export function getParallelApprovalIdsToReject(messages: UIMessage[]): string[] 
   const lastMessage = messages.findLast((m) => m.role === 'assistant')
   if (!lastMessage) return []
 
-  const pendingIds = (lastMessage.parts ?? []).flatMap((part) =>
-    isManualApprovalRequested(part) ? [part.approval.id] : []
-  )
+  const pendingIds: string[] = []
+  for (const part of lastMessage.parts ?? []) {
+    if (
+      !isManualApprovalRequested(part) ||
+      !isToolUIPart(part) ||
+      part.state !== 'approval-requested'
+    ) {
+      continue
+    }
+    pendingIds.push(part.approval.id)
+  }
   return pendingIds.slice(1)
 }
