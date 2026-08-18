@@ -20,13 +20,13 @@ import {
 } from '@/lib/project-transition-state'
 import { getRestoreLongRunningThresholdMinutes } from '@/lib/restore-estimate'
 
-const POLL_INTERVAL_MS = 4000
+export const POLL_INTERVAL_MS = 4000
 
 export const RestoringState = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const [loading, setLoading] = useState(false)
+  const [isConfirming, setIsConfirming] = useState(false)
   const [hasLeftHealthyState, setHasLeftHealthyState] = useState(false)
   const restoreStateStartStorageKey = ref
     ? LOCAL_STORAGE_KEYS.PROJECT_RESTORING_STARTED_AT(ref)
@@ -58,6 +58,18 @@ export const RestoringState = () => {
   )
 
   const projectStatus = projectStatusData?.status
+
+  // Right after a restore is triggered the status endpoint can still report the stale
+  // pre-restore ACTIVE_HEALTHY, so completion is only trusted once the status has been
+  // observed leaving the healthy state.
+  if (
+    !hasLeftHealthyState &&
+    projectStatus !== undefined &&
+    projectStatus !== PROJECT_STATUS.ACTIVE_HEALTHY
+  ) {
+    setHasLeftHealthyState(true)
+  }
+
   const hasRestoreFailed = projectStatus === PROJECT_STATUS.RESTORE_FAILED
   const isCompleted = hasLeftHealthyState && projectStatus === PROJECT_STATUS.ACTIVE_HEALTHY
 
@@ -83,19 +95,13 @@ export const RestoringState = () => {
 
   const onConfirm = async () => {
     if (!ref) return console.error('Project ref is required')
-    setLoading(true)
+    setIsConfirming(true)
     try {
       await invalidateProjectDetailsQuery(ref)
     } finally {
-      setLoading(false)
+      setIsConfirming(false)
     }
   }
-
-  useEffect(() => {
-    if (projectStatus !== undefined && projectStatus !== PROJECT_STATUS.ACTIVE_HEALTHY) {
-      setHasLeftHealthyState(true)
-    }
-  }, [projectStatus])
 
   useEffect(() => {
     if (!isCompleted && !hasRestoreFailed) return
@@ -129,7 +135,7 @@ export const RestoringState = () => {
               </div>
             </div>
             <div className="border-t border-overlay flex items-center justify-end py-4 px-8">
-              <Button disabled={loading} loading={loading} onClick={onConfirm}>
+              <Button disabled={isConfirming} loading={isConfirming} onClick={onConfirm}>
                 Return to project
               </Button>
             </div>

@@ -1,10 +1,11 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test } from 'vitest'
 
-import { RestoringState } from './RestoringState'
+import { POLL_INTERVAL_MS, RestoringState } from './RestoringState'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -14,7 +15,6 @@ type DownloadableBackupsResponse = components['schemas']['DownloadableBackupsRes
 
 const PROJECT_REF = 'default'
 
-const POLL_INTERVAL_MS = 4000
 const SETTLE_MS = 2000
 
 const createProject = (status: ProjectStatus): ProjectDetailResponse => ({
@@ -140,6 +140,19 @@ describe('RestoringState', () => {
     },
     POLL_INTERVAL_MS * 3 + SETTLE_MS * 2
   )
+
+  test('clears the persisted restore start time when the restore fails', async () => {
+    const storageKey = LOCAL_STORAGE_KEYS.PROJECT_RESTORING_STARTED_AT(PROJECT_REF)
+    window.localStorage.setItem(storageKey, String(Date.now()))
+    mockProjectDetail(['RESTORING'])
+    mockProjectStatus(['RESTORE_FAILED'])
+
+    customRender(<RestoringState />)
+
+    await waitFor(() => {
+      expect(window.localStorage.getItem(storageKey)).toBeNull()
+    })
+  })
 
   test(
     'does not leave Return to project stuck loading when the details still report restoring',
