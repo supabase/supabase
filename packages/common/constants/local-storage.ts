@@ -52,6 +52,8 @@ export const LOCAL_STORAGE_KEYS = {
   SQL_EDITOR_SORT: (ref: string) => `sql-editor-sort-${ref}`,
   SQL_EDITOR_MANUAL_SAVE_NOTICE_DISMISSED: 'sql-editor-manual-save-notice-dismissed',
 
+  EXPLORER_QUERY_DRAFTS: (ref: string) => `explorer-query-drafts-${ref}`,
+
   LOG_EXPLORER_SPLIT_SIZE: 'supabase_log-explorer-split-size',
   GRAPHQL_INTROSPECTION_NOTICE_COLLAPSED: (ref: string) =>
     `graphql-introspection-notice-collapsed-${ref}`,
@@ -119,9 +121,9 @@ export const LOCAL_STORAGE_KEYS = {
     `project-upgrade-failed-banner-dismissed-at-${ref}`,
   UNIFIED_LOGS_BANNER_DISMISSED: 'unified-logs-banner-dismissed',
   UNIFIED_LOGS_SIDEBAR_BANNER_DISMISSED: 'unified-logs-sidebar-banner-dismissed',
+  SCOPED_TOKENS_MIGRATION_ADMONITION_DISMISSED: 'scoped-tokens-migration-admonition-dismissed',
   STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED: (ref: string, bucketId: string) =>
     `storage-public-bucket-select-policy-warning-dismissed-${ref}-${bucketId}`,
-
   /**
    * COMMON
    */

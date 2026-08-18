@@ -34,12 +34,12 @@ import { useCustomAccessTokenHookDetails } from '@/hooks/misc/useCustomAccessTok
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
-import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
+import { type RoleImpersonationController } from '@/state/role-impersonation-state'
 import type { ResponseError } from '@/types'
 
 type AuthenticatorAssuranceLevels = 'aal1' | 'aal2'
 
-export const UserImpersonationSelector = () => {
+export const UserImpersonationSelector = ({ state }: { state: RoleImpersonationController }) => {
   const [searchText, setSearchText] = useState('')
   const [aal, setAal] = useState<AuthenticatorAssuranceLevels>('aal1')
   const [externalUserId, setExternalUserId] = useState('')
@@ -53,7 +53,6 @@ export const UserImpersonationSelector = () => {
     []
   )
 
-  const state = useRoleImpersonationStateSnapshot()
   const debouncedSearchText = useDebounce(searchText, 300)
 
   const { data: project } = useSelectedProjectQuery()
@@ -179,7 +178,7 @@ export const UserImpersonationSelector = () => {
         impersonatingUser.email ?? impersonatingUser.phone ?? impersonatingUser.id ?? 'Unknown'
       )
     : isExternalAuthImpersonating
-      ? state.role.externalAuth.sub
+      ? isExternalAuthImpersonating.sub
       : undefined
 
   // Clear all search history
@@ -210,7 +209,7 @@ export const UserImpersonationSelector = () => {
         )}
         {isExternalAuthImpersonating && (
           <ExternalAuthImpersonatingRow
-            sub={state.role.externalAuth.sub}
+            sub={isExternalAuthImpersonating.sub}
             onClick={stopImpersonating}
             aal={aal}
             isLoading={isImpersonateLoading}
