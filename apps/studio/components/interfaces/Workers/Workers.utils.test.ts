@@ -1,19 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
 import type { Worker } from './Workers.types'
-import { filterWorkers, getPage } from './Workers.utils'
+import { filterWorkers, formatResources, formatRuntime, formatSize, getPage } from './Workers.utils'
 
 const worker = (overrides: Partial<Worker> & Pick<Worker, 'name'>): Worker => ({
-  id: overrides.name,
+  buildState: 'active',
+  isDeleting: false,
   runtime: 'node',
-  size: '2x1',
+  size: '2gb-1vcpu',
   access: 'public',
-  instances: 1,
-  region: 'us-west-1',
-  state: 'active',
-  createdAt: '2026-08-10T09:00:00.000Z',
-  updatedAt: '2026-08-10T09:00:00.000Z',
-  events: [],
+  declaredInstances: 1,
   ...overrides,
 })
 
@@ -21,9 +17,9 @@ const NO_FILTERS = { search: '', state: 'all', access: 'all' } as const
 
 describe('filterWorkers', () => {
   const workers = [
-    worker({ name: 'embed', state: 'active', access: 'public' }),
-    worker({ name: 'resize-images', state: 'suspended', access: 'private' }),
-    worker({ name: 'embed-batch', state: 'errored', access: 'public' }),
+    worker({ name: 'embed', buildState: 'active', access: 'public' }),
+    worker({ name: 'resize-images', buildState: 'building', access: 'private' }),
+    worker({ name: 'embed-batch', buildState: 'failed', access: 'public' }),
   ]
 
   it('returns every worker when no filters are set', () => {
@@ -39,8 +35,8 @@ describe('filterWorkers', () => {
     expect(filterWorkers(workers, { ...NO_FILTERS, search: '  resize  ' })).toHaveLength(1)
   })
 
-  it('filters by state and by access', () => {
-    expect(filterWorkers(workers, { ...NO_FILTERS, state: 'errored' }).map((w) => w.name)).toEqual([
+  it('filters by build state and by access', () => {
+    expect(filterWorkers(workers, { ...NO_FILTERS, state: 'failed' }).map((w) => w.name)).toEqual([
       'embed-batch',
     ])
     expect(filterWorkers(workers, { ...NO_FILTERS, access: 'private' }).map((w) => w.name)).toEqual(
@@ -81,5 +77,39 @@ describe('getPage', () => {
       totalPages: 1,
       startIndex: 0,
     })
+  })
+})
+
+describe('formatSize', () => {
+  it('splits the memory and vCPU parts the API reports', () => {
+    expect(formatSize('2gb-1vcpu')).toBe('2 GB · 1 vCPU')
+    expect(formatSize('4gb-2vcpu')).toBe('4 GB · 2 vCPU')
+  })
+
+  it('falls back to the raw value for a shape it does not recognize', () => {
+    expect(formatSize('8gb-4vcpu-gpu')).toBe('8gb-4vcpu-gpu')
+    expect(formatSize('')).toBe('')
+  })
+})
+
+describe('formatRuntime', () => {
+  it('labels a known runtime', () => {
+    expect(formatRuntime('python')).toBe('Python 3.14')
+  })
+
+  it('shows the raw value for a runtime it does not know', () => {
+    expect(formatRuntime('rust')).toBe('rust')
+  })
+
+  it('reports unknown when the API omits the runtime', () => {
+    expect(formatRuntime(undefined)).toBe('Unknown')
+  })
+})
+
+describe('formatResources', () => {
+  it('combines size and declared instance count', () => {
+    expect(formatResources(worker({ name: 'embed', declaredInstances: 3 }))).toBe(
+      '2 GB · 1 vCPU · 3 inst'
+    )
   })
 })

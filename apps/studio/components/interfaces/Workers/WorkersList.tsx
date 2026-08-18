@@ -21,9 +21,9 @@ import {
 } from 'ui'
 
 import { RuntimeBadge } from './RuntimeBadge'
-import { formatResources, WORKERS_REGION_SHORT } from './Workers.constants'
-import type { Worker, WorkerAccess, WorkerState } from './Workers.types'
-import { filterWorkers, getPage } from './Workers.utils'
+import { WORKERS_REGION_SHORT } from './Workers.constants'
+import type { Worker, WorkerAccess, WorkerBuildState } from './Workers.types'
+import { filterWorkers, formatResources, getPage } from './Workers.utils'
 import { WorkerStatePill } from './WorkerStatePill'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
@@ -32,12 +32,11 @@ interface WorkersListProps {
   workers: Worker[]
 }
 
-const STATE_FILTERS: { value: WorkerState | 'all'; label: string }[] = [
+const STATE_FILTERS: { value: WorkerBuildState | 'all'; label: string }[] = [
   { value: 'all', label: 'All states' },
   { value: 'active', label: 'Active' },
-  { value: 'deploying', label: 'Deploying' },
-  { value: 'suspended', label: 'Suspended' },
-  { value: 'errored', label: 'Errored' },
+  { value: 'building', label: 'Building' },
+  { value: 'failed', label: 'Failed' },
 ]
 
 const ACCESS_FILTERS: { value: WorkerAccess | 'all'; label: string }[] = [
@@ -48,7 +47,7 @@ const ACCESS_FILTERS: { value: WorkerAccess | 'all'; label: string }[] = [
 
 const PAGE_SIZE = 10
 
-const parseStateFilter = (value: string): WorkerState | 'all' =>
+const parseStateFilter = (value: string): WorkerBuildState | 'all' =>
   STATE_FILTERS.find((option) => option.value === value)?.value ?? 'all'
 
 const parseAccessFilter = (value: string): WorkerAccess | 'all' =>
@@ -57,7 +56,7 @@ const parseAccessFilter = (value: string): WorkerAccess | 'all' =>
 export const WorkersList = ({ projectRef, workers }: WorkersListProps) => {
   const router = useRouter()
   const [search, setSearch] = useState('')
-  const [stateFilter, setStateFilter] = useState<WorkerState | 'all'>('all')
+  const [stateFilter, setStateFilter] = useState<WorkerBuildState | 'all'>('all')
   const [accessFilter, setAccessFilter] = useState<WorkerAccess | 'all'>('all')
   const [page, setPage] = useState(1)
 
@@ -151,7 +150,7 @@ export const WorkersList = ({ projectRef, workers }: WorkersListProps) => {
             )}
             {paged.map((worker) => (
               <TableRow
-                key={worker.id}
+                key={worker.name}
                 className="cursor-pointer"
                 onClick={() => router.push(workerUrl(worker.name))}
               >
@@ -161,7 +160,7 @@ export const WorkersList = ({ projectRef, workers }: WorkersListProps) => {
                   </Link>
                 </TableCell>
                 <TableCell>
-                  <WorkerStatePill state={worker.state} />
+                  <WorkerStatePill worker={worker} />
                 </TableCell>
                 <TableCell>
                   <RuntimeBadge runtime={worker.runtime} />
@@ -177,7 +176,7 @@ export const WorkersList = ({ projectRef, workers }: WorkersListProps) => {
                   {WORKERS_REGION_SHORT}
                 </TableCell>
                 <TableCell className="hidden text-foreground-light lg:table-cell">
-                  {formatResources(worker.size, worker.instances)}
+                  {formatResources(worker)}
                 </TableCell>
               </TableRow>
             ))}

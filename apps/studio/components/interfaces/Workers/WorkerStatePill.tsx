@@ -1,16 +1,16 @@
 import { cn } from 'ui'
 
-import { WORKER_STATE_META } from './Workers.constants'
-import type { WorkerState } from './Workers.types'
+import { getWorkerStateMeta } from './Workers.constants'
+import type { Worker } from './Workers.types'
 
 interface WorkerStatePillProps {
-  state: WorkerState
+  worker: Worker
   className?: string
 }
 
-export const WorkerStatePill = ({ state, className }: WorkerStatePillProps) => {
-  const meta = WORKER_STATE_META[state]
-  const isPulsing = state === 'deploying' || state === 'draining' || state === 'resuming'
+export const WorkerStatePill = ({ worker, className }: WorkerStatePillProps) => {
+  const meta = getWorkerStateMeta(worker)
+  const isPulsing = worker.buildState === 'building' || worker.isDeleting
 
   return (
     <span className={cn('inline-flex items-center gap-2', className)}>

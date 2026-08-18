@@ -1,8 +1,9 @@
-import type { Worker, WorkerAccess, WorkerState } from './Workers.types'
+import { RUNTIMES, type RuntimeMeta } from './Workers.constants'
+import type { Worker, WorkerAccess, WorkerBuildState } from './Workers.types'
 
 export interface WorkerFilters {
   search: string
-  state: WorkerState | 'all'
+  state: WorkerBuildState | 'all'
   access: WorkerAccess | 'all'
 }
 
@@ -10,7 +11,7 @@ export const filterWorkers = (workers: Worker[], filters: WorkerFilters): Worker
   const search = filters.search.trim().toLowerCase()
   return workers.filter((worker) => {
     const matchesSearch = worker.name.toLowerCase().includes(search)
-    const matchesState = filters.state === 'all' || worker.state === filters.state
+    const matchesState = filters.state === 'all' || worker.buildState === filters.state
     const matchesAccess = filters.access === 'all' || worker.access === filters.access
     return matchesSearch && matchesState && matchesAccess
   })
@@ -35,3 +36,19 @@ export const getPage = <T>(items: T[], requestedPage: number, pageSize: number):
     startIndex,
   }
 }
+
+export const getRuntimeMeta = (runtime: string | undefined): RuntimeMeta | undefined =>
+  runtime === undefined ? undefined : RUNTIMES[runtime]
+
+export const formatRuntime = (runtime: string | undefined): string =>
+  getRuntimeMeta(runtime)?.label ?? runtime ?? 'Unknown'
+
+// The API reports size as e.g. "2gb-1vcpu"; render the parts when they parse, the raw value if not.
+export const formatSize = (size: string): string => {
+  const match = size.match(/^(\d+)gb-(\d+)vcpu$/)
+  if (!match) return size
+  return `${match[1]} GB · ${match[2]} vCPU`
+}
+
+export const formatResources = (worker: Worker): string =>
+  `${formatSize(worker.size)} · ${worker.declaredInstances} inst`
