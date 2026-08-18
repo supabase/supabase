@@ -64,7 +64,6 @@ export const WorkerSettingsTab = ({ worker }: WorkerSettingsTabProps) => {
   return (
     <>
       <PageContainer size="small">
-        {/* Container */}
         <PageSection>
           <PageSectionMeta>
             <PageSectionSummary>
@@ -96,7 +95,6 @@ export const WorkerSettingsTab = ({ worker }: WorkerSettingsTabProps) => {
           </PageSectionContent>
         </PageSection>
 
-        {/* Resources */}
         <PageSection>
           <PageSectionMeta>
             <PageSectionSummary>
@@ -125,7 +123,6 @@ export const WorkerSettingsTab = ({ worker }: WorkerSettingsTabProps) => {
           </PageSectionContent>
         </PageSection>
 
-        {/* Invoke worker */}
         <PageSection>
           <PageSectionMeta>
             <PageSectionSummary>
@@ -140,7 +137,6 @@ export const WorkerSettingsTab = ({ worker }: WorkerSettingsTabProps) => {
           </PageSectionContent>
         </PageSection>
 
-        {/* Develop locally */}
         <PageSection>
           <PageSectionMeta>
             <PageSectionSummary>
@@ -163,7 +159,6 @@ export const WorkerSettingsTab = ({ worker }: WorkerSettingsTabProps) => {
           </PageSectionContent>
         </PageSection>
 
-        {/* Agents & skills */}
         <PageSection>
           <PageSectionMeta>
             <PageSectionSummary>

@@ -1,9 +1,9 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { Clock, Container, Copy, Info } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
-import { useEffect } from 'react'
 import {
   BreadcrumbItem,
   BreadcrumbLink,
@@ -33,6 +33,7 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 import { PageNav } from 'ui-patterns/PageNav'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { RuntimeBadge } from '../RuntimeBadge'
 import { WorkerSnippetTabs } from '../WorkerSnippetTabs'
@@ -40,8 +41,9 @@ import { WorkerStatePill } from '../WorkerStatePill'
 import { WorkerLogsTab } from './WorkerLogsTab'
 import { WorkerOverviewTab } from './WorkerOverviewTab'
 import { WorkerSettingsTab } from './WorkerSettingsTab'
+import { AlertError } from '@/components/ui/AlertError'
+import { workerQueryOptions } from '@/data/workers/worker-query'
 import { PRODUCT_NAME } from '@/lib/constants/workers'
-import { ensureProjectSeeded, useProjectWorkers } from '@/state/workers-mock-state'
 
 type WorkerTab = 'overview' | 'logs' | 'settings'
 const WORKER_TABS: WorkerTab[] = ['overview', 'logs', 'settings']
@@ -64,14 +66,18 @@ export const WorkerDetail = () => {
       .withOptions({ history: 'push' })
   )
 
-  useEffect(() => {
-    ensureProjectSeeded(projectRef)
-  }, [projectRef])
-
-  const workers = useProjectWorkers(projectRef)
-  const worker = workers.find((w) => w.name === workerName)
+  const {
+    data: worker,
+    error,
+    isPending,
+    isError,
+  } = useQuery(workerQueryOptions({ projectRef, name: workerName }))
 
   if (!projectRef) return null
+
+  if (isPending) return <GenericSkeletonLoader className="p-6" />
+
+  if (isError) return <AlertError error={error} subject="Failed to retrieve worker" />
 
   if (!worker) {
     return (
@@ -102,7 +108,6 @@ export const WorkerDetail = () => {
         </BreadcrumbList>
       </PageBreadcrumbs>
 
-      {/* Worker title + summary, aligned with the breadcrumb/nav gutters */}
       <PageHeader className="py-4 [&>div]:px-4 [&>div]:xl:px-4">
         <PageHeaderMeta className="px-0 xl:px-0">
           <PageHeaderIcon>
