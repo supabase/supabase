@@ -27,7 +27,6 @@ const STEPS = [
 
 export const WorkersEmptyState = ({ onDeploy }: WorkersEmptyStateProps) => (
   <Card className="grid grid-cols-1 divide-y divide-default lg:grid-cols-[1.6fr_1fr] lg:divide-x lg:divide-y-0">
-    {/* Left: deploy hero + steps */}
     <div className="flex flex-col gap-6 p-8">
       <div className="space-y-2">
         <h3 className="text-lg text-foreground">Deploy a worker</h3>
@@ -58,7 +57,6 @@ export const WorkersEmptyState = ({ onDeploy }: WorkersEmptyStateProps) => (
       </ol>
     </div>
 
-    {/* Right rail: CLI + SKILL.md + docs */}
     <div className="flex flex-col gap-4 p-8">
       <p className="text-xs font-mono uppercase tracking-wider text-foreground-lighter">
         Prefer the CLI?
