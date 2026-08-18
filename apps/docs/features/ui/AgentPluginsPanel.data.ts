@@ -45,6 +45,14 @@ export const PLUGIN_CLIENTS: PluginClient[] = [
       'https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-finding-installing',
   },
   {
+    key: 'grok',
+    label: 'Grok',
+    icon: 'grok',
+    hasDistinctDarkIcon: true,
+    repoUrl: 'https://github.com/supabase-community/supabase-plugin',
+    docsUrl: 'https://docs.x.ai/build/features/skills-plugins-marketplaces',
+  },
+  {
     key: 'kimi',
     label: 'Kimi Code',
     icon: 'kimi',

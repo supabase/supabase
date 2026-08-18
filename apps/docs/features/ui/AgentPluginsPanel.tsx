@@ -150,6 +150,27 @@ function PluginInstructions({ client }: { client: PluginClient }) {
     )
   }
 
+  if (client.key === 'grok') {
+    return (
+      <div className="space-y-3">
+        <p className="text-sm text-foreground-light">
+          Install the Supabase plugin by running the following command in your terminal.
+        </p>
+        <CodeBlock
+          value="grok plugin install supabase-community/supabase-plugin"
+          language="bash"
+          focusable={false}
+          className="block"
+        />
+        <p className="text-xs text-foreground-lighter">
+          Confirm the trust prompt to install (or pass <code>--trust</code> to skip it). You can also
+          browse and install plugins from within a Grok session by running <code>grok</code> and
+          opening the plugins modal with <code>/plugins</code>.
+        </p>
+      </div>
+    )
+  }
+
   if (client.key === 'vscode') {
     return (
       <div className="space-y-3">
