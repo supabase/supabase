@@ -1,11 +1,12 @@
-import { getRuntimeMeta, getSizeMeta, workerGatewayUrl } from './Workers.constants'
-import type { WorkerAccess, WorkerRuntime, WorkerSize } from './Workers.types'
+import { workerGatewayUrl } from './Workers.constants'
+import type { WorkerAccess } from './Workers.types'
+import { formatRuntime, formatSize } from './Workers.utils'
 import { CLI_NAME, PRODUCT_NAME } from '@/lib/constants/workers'
 
 export interface WorkerSnippetInput {
   name: string
-  runtime: WorkerRuntime
-  size: WorkerSize
+  runtime: string | undefined
+  size: string
   access: WorkerAccess
   instances: number
 }
@@ -22,7 +23,7 @@ export interface WorkerSnippets {
 export const EXAMPLE_WORKER: WorkerSnippetInput = {
   name: 'my-worker',
   runtime: 'node',
-  size: '2x1',
+  size: '2gb-1vcpu',
   access: 'public',
   instances: 1,
 }
@@ -31,11 +32,10 @@ const safeName = (name: string) => (name.trim().length > 0 ? name.trim() : 'my-w
 
 export function buildWorkerSnippets(input: WorkerSnippetInput): WorkerSnippets {
   const name = safeName(input.name)
-  const runtime = getRuntimeMeta(input.runtime)
-  const size = getSizeMeta(input.size)
+  const runtime = input.runtime ?? 'node'
 
   const cli = [
-    `supabase ${CLI_NAME} new ${name} --runtime ${runtime.cli}`,
+    `supabase ${CLI_NAME} new ${name} --runtime ${runtime}`,
     `supabase ${CLI_NAME} push ${name}`,
   ].join('\n')
 
@@ -43,8 +43,8 @@ export function buildWorkerSnippets(input: WorkerSnippetInput): WorkerSnippets {
     `# supabase/config.toml`,
     ``,
     `[${CLI_NAME}.${name}]`,
-    `runtime   = "${runtime.cli}"`,
-    `size      = "${input.size}"        # ${size.memory} / ${size.vcpu}`,
+    `runtime   = "${runtime}"`,
+    `size      = "${input.size}"    # ${formatSize(input.size)}`,
     `access    = "${input.access}"`,
     `instances = ${input.instances}`,
     `# region is locked to us-west-1 at alpha`,
@@ -90,7 +90,7 @@ export function buildWorkerSnippets(input: WorkerSnippetInput): WorkerSnippets {
 
   const aiPrompt = [
     `Deploy a Supabase ${PRODUCT_NAME} worker named "${name}".`,
-    `Use the ${runtime.label} runtime on a ${input.size} instance (${size.memory} / ${size.vcpu}),`,
+    `Use the ${formatRuntime(input.runtime)} runtime on a ${formatSize(input.size)} instance,`,
     `${input.access} access, ${input.instances} instance${input.instances === 1 ? '' : 's'}.`,
     `Write the config to supabase/config.toml and run \`supabase ${CLI_NAME} push ${name}\`.`,
   ].join(' ')
