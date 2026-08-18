@@ -1,7 +1,7 @@
 'use client'
 
-import { RadioGroup as RadioGroupPrimitive } from 'radix-ui'
 import { Circle } from 'lucide-react'
+import { RadioGroup as RadioGroupPrimitive } from 'radix-ui'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
@@ -56,10 +56,8 @@ const RadioGroupLargeItem = React.forwardRef<
         'rounded-md border border-strong',
         'p-2',
         'shadow-xs',
-        'hover:border-stronger hover:bg-surface-300',
-        'data-[state=checked]:border-primary',
-        'data-[state=checked]:ring-1 data-[state=checked]:ring-border',
-        'data-[state=checked]:bg-selection data-[state=checked]:border-foreground',
+        'hover:border-control-hover focus-visible:border-control-hover hover:bg-surface-300',
+        'data-[state=checked]:bg-selection data-[state=checked]:border-control-hover',
         'transition-colors',
         'group',
         props.className
@@ -87,8 +85,9 @@ const RadioGroupLargeItem = React.forwardRef<
                 'w-3 h-3',
                 'border border-stronger',
                 'rounded-full',
-                'group-hover:border-foreground-light',
-                'group-data-[state=checked]:border-foreground',
+                'group-hover:border-control-hover',
+                'group-focus-visible:border-control-hover',
+                'group-data-[state=checked]:border-control-hover',
                 'transition-colors'
               )}
             ></div>

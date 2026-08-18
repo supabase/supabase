@@ -342,7 +342,7 @@ export const FormLayout = React.forwardRef<
         // Rendered as a div rather than a p as descriptions can be arbitrary JSX
         // which may contain block-level elements (invalid HTML inside a p)
         <div
-          className={cn(DescriptionVariants({ size, layout }), 'text-sm text-foreground-light')}
+          className={cn(DescriptionVariants({ size, layout }))}
           data-formlayout-id={'description'}
         >
           {description}

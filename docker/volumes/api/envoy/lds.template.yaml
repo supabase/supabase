@@ -523,6 +523,17 @@ resources:
                             '@type': >-
                               type.googleapis.com/envoy.config.route.v3.FilterConfig
                             disabled: true
+                          envoy.filters.http.cors:
+                            '@type': >-
+                              type.googleapis.com/envoy.extensions.filters.http.cors.v3.CorsPolicy
+                            allow_origin_string_match:
+                              - exact: '${SUPABASE_PUBLIC_URL}'
+                              - safe_regex:
+                                  regex: 'https?://(localhost|127\.0\.0\.1)(:[0-9]+)?'
+                            allow_methods: "GET,POST,PUT,PATCH,DELETE,OPTIONS,HEAD"
+                            allow_headers: "*"
+                            expose_headers: "*"
+                            max_age: "3600"
 
                       - match:
                           prefix: /api/mcp

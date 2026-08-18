@@ -49,7 +49,7 @@ export const useGenerateObservabilityMenu = () => {
   const { isSupamonitorEnabled } = useSupamonitorStatus()
 
   const showOverview = useFlag('observabilityOverview')
-  const isDatabaseConnectionsEnabled = useIsDatabaseConnectionsEnabled()
+  const { enabled: isDatabaseConnectionsEnabled } = useIsDatabaseConnectionsEnabled()
   const storageSupported = useIsFeatureEnabled('project_storage:all')
 
   const baseUrl = `/project/${ref}/observability`
