@@ -1,7 +1,11 @@
 import type { DynamicToolUIPart, UIMessage } from 'ai'
 import { describe, expect, it } from 'vitest'
 
-import { getParallelApprovalIdsToReject, isManualApprovalRequested, prepareMessagesForAPI } from './message-utils'
+import {
+  getParallelApprovalIdsToReject,
+  isManualApprovalRequested,
+  prepareMessagesForAPI,
+} from './message-utils'
 
 const makeApprovalPart = (id: string, isAutomatic = false): DynamicToolUIPart =>
   ({
