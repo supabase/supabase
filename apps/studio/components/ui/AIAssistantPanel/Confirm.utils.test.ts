@@ -5,6 +5,7 @@ import {
   getManualToolApprovalConfirmState,
   getManualToolApprovalHandlers,
   getManualToolApprovalId,
+  USER_SKIPPED_TOOL_REASON,
 } from './Confirm.utils'
 
 describe('getConfirmFooterBar', () => {
@@ -110,7 +111,11 @@ describe('getManualToolApprovalHandlers', () => {
     onApprove?.()
     onDeny?.()
     expect(addToolApprovalResponse).toHaveBeenCalledWith({ id: 'approval-1', approved: true })
-    expect(addToolApprovalResponse).toHaveBeenCalledWith({ id: 'approval-1', approved: false })
+    expect(addToolApprovalResponse).toHaveBeenCalledWith({
+      id: 'approval-1',
+      approved: false,
+      reason: USER_SKIPPED_TOOL_REASON,
+    })
   })
 
   it('does not call addToolApprovalResponse for automatic approvals', () => {

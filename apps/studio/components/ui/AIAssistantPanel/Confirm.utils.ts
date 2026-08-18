@@ -1,5 +1,8 @@
 export type ConfirmFooterApprovalState = 'approval-requested' | 'approval-responded'
 
+/** Sent with Skip so the model sees a user choice, not the SDK default "Tool execution denied." */
+export const USER_SKIPPED_TOOL_REASON = 'The user skipped this action.'
+
 export type ToolApprovalFields = {
   id?: string
   approved?: boolean
@@ -56,7 +59,11 @@ export function getManualToolApprovalHandlers({
 }: {
   state: string
   approval?: ToolApprovalFields
-  addToolApprovalResponse?: (args: { id: string; approved: boolean }) => void | PromiseLike<void>
+  addToolApprovalResponse?: (args: {
+    id: string
+    approved: boolean
+    reason?: string
+  }) => void | PromiseLike<void>
 }): {
   confirmState?: ConfirmFooterApprovalState
   onApprove?: () => void
@@ -69,6 +76,11 @@ export function getManualToolApprovalHandlers({
   return {
     confirmState,
     onApprove: () => addToolApprovalResponse?.({ id: approvalId, approved: true }),
-    onDeny: () => addToolApprovalResponse?.({ id: approvalId, approved: false }),
+    onDeny: () =>
+      addToolApprovalResponse?.({
+        id: approvalId,
+        approved: false,
+        reason: USER_SKIPPED_TOOL_REASON,
+      }),
   }
 }

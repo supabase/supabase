@@ -3,7 +3,7 @@ import { type DynamicToolUIPart, type ReasoningUIPart, type TextUIPart, type Too
 import { BrainIcon, CheckIcon, Loader2 } from 'lucide-react'
 import { cn } from 'ui'
 
-import { getManualToolApprovalHandlers } from './Confirm.utils'
+import { getManualToolApprovalHandlers, USER_SKIPPED_TOOL_REASON } from './Confirm.utils'
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 import { EdgeFunctionRenderer } from './EdgeFunctionRenderer'
 import { Tool } from './elements/Tool'
@@ -167,7 +167,12 @@ function MessagePartExecuteSql({
           }
           onDeny={
             approvalId
-              ? () => addToolApprovalResponse?.({ id: approvalId, approved: false })
+              ? () =>
+                  addToolApprovalResponse?.({
+                    id: approvalId,
+                    approved: false,
+                    reason: USER_SKIPPED_TOOL_REASON,
+                  })
               : undefined
           }
         />
