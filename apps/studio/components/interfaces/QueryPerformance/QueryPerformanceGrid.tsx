@@ -611,31 +611,31 @@ export const QueryPerformanceGrid = ({
           </SheetHeader>
 
           <div className="overflow-auto grow px-0">
-            <SheetSection className="pt-0">
-              <Tabs
-                value={view}
-                className="flex flex-col h-full"
-                onValueChange={(value) => setView(value as View)}
-              >
-                <div className="border-b">
-                  <TabsList className="px-0 flex gap-x-4 min-h-[46px] border-b-0 [&>button]:h-[47px]">
+            <Tabs
+              value={view}
+              className="flex flex-col h-full"
+              onValueChange={(value) => setView(value as View)}
+            >
+              <div className="border-b">
+                <TabsList className="px-5 flex gap-x-4 min-h-[46px] border-b-0 [&>button]:h-[47px]">
+                  <TabsTrigger
+                    value="details"
+                    className="px-0 pb-0 data-[state=active]:bg-transparent shadow-none!"
+                  >
+                    Query details
+                  </TabsTrigger>
+                  {selectedRow !== undefined && canShowIndexesTab && (
                     <TabsTrigger
-                      value="details"
+                      value="suggestion"
                       className="px-0 pb-0 data-[state=active]:bg-transparent shadow-none!"
                     >
-                      Query details
+                      Indexes
                     </TabsTrigger>
-                    {selectedRow !== undefined && canShowIndexesTab && (
-                      <TabsTrigger
-                        value="suggestion"
-                        className="px-0 pb-0 data-[state=active]:bg-transparent shadow-none!"
-                      >
-                        Indexes
-                      </TabsTrigger>
-                    )}
-                  </TabsList>
-                </div>
+                  )}
+                </TabsList>
+              </div>
 
+              <SheetSection className="pt-0">
                 <TabsContent value="details" className="mt-0 grow min-h-0 overflow-y-auto">
                   {selectedRow !== undefined && (
                     <QueryDetail
@@ -650,8 +650,8 @@ export const QueryPerformanceGrid = ({
                     <QueryIndexes selectedRow={reportData[selectedRow]} />
                   </TabsContent>
                 )}
-              </Tabs>
-            </SheetSection>
+              </SheetSection>
+            </Tabs>
           </div>
         </SheetContent>
       </Sheet>
