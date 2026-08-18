@@ -152,13 +152,13 @@ https://<project-ref>.supabase.co/auth/v1/oauth/authorize?
 
 #### Required parameters
 
-| Parameter               | Description                                  |
-| ----------------------- | -------------------------------------------- |
-| `response_type`         | Must be `code` for authorization code flow   |
-| `client_id`             | The client ID from registration              |
-| `redirect_uri`          | Must exactly match a registered redirect URI |
-| `code_challenge`        | The generated code challenge                 |
-| `code_challenge_method` | Must be `S256` (SHA-256)                     |
+| Parameter               | Description                                        |
+| ----------------------- | -------------------------------------------------- |
+| `response_type`         | Must be `code` for authorization code flow         |
+| `client_id`             | The client ID from registration                    |
+| `redirect_uri`          | Must exactly match a registered redirect URI       |
+| `code_challenge`        | The generated code challenge                       |
+| `code_challenge_method` | `S256` (SHA-256) or `plain`. `S256` is recommended |
 
 #### Optional parameters
 
