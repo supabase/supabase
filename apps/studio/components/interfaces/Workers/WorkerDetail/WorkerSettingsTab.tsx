@@ -13,13 +13,9 @@ import {
 
 import { RuntimeBadge } from '../RuntimeBadge'
 import { WorkerCommandLine } from '../WorkerCommandLine'
-import {
-  getRuntimeMeta,
-  getSizeMeta,
-  LISTENING_PORT,
-  WORKERS_REGION_LABEL,
-} from '../Workers.constants'
+import { LISTENING_PORT, WORKERS_REGION_LABEL } from '../Workers.constants'
 import type { Worker } from '../Workers.types'
+import { formatSize, getRuntimeMeta } from '../Workers.utils'
 import { buildWorkerCliCommands } from '../workerSnippets'
 import { WorkerSnippetTabs } from '../WorkerSnippetTabs'
 import CopyButton from '@/components/ui/CopyButton'
@@ -50,7 +46,6 @@ const SettingsRow = ({
 
 export const WorkerSettingsTab = ({ worker }: WorkerSettingsTabProps) => {
   const runtime = getRuntimeMeta(worker.runtime)
-  const size = getSizeMeta(worker.size)
   const commands = buildWorkerCliCommands(worker.name)
 
   const snippetInput = {
@@ -58,7 +53,7 @@ export const WorkerSettingsTab = ({ worker }: WorkerSettingsTabProps) => {
     runtime: worker.runtime,
     size: worker.size,
     access: worker.access,
-    instances: worker.instances,
+    instances: worker.declaredInstances,
   }
 
   return (
@@ -78,14 +73,27 @@ export const WorkerSettingsTab = ({ worker }: WorkerSettingsTabProps) => {
               <SettingsRow label="Runtime" isFirst>
                 <RuntimeBadge runtime={worker.runtime} />
               </SettingsRow>
-              <SettingsRow label="Base image">
-                <span className="font-mono text-xs text-foreground-light">{runtime.baseImage}</span>
-              </SettingsRow>
-              <SettingsRow label="Entrypoint">
-                <span className="font-mono text-xs text-foreground-light">
-                  {runtime.entrypoint}
-                </span>
-              </SettingsRow>
+              {worker.imageVersion !== undefined && (
+                <SettingsRow label="Image version">
+                  <span className="font-mono text-xs text-foreground-light">
+                    {worker.imageVersion}
+                  </span>
+                </SettingsRow>
+              )}
+              {runtime !== undefined && (
+                <SettingsRow label="Base image">
+                  <span className="font-mono text-xs text-foreground-light">
+                    {runtime.baseImage}
+                  </span>
+                </SettingsRow>
+              )}
+              {runtime !== undefined && (
+                <SettingsRow label="Entrypoint">
+                  <span className="font-mono text-xs text-foreground-light">
+                    {runtime.entrypoint}
+                  </span>
+                </SettingsRow>
+              )}
               <SettingsRow label="Listening port">
                 <span className="font-mono text-xs text-foreground-light">
                   $PORT → {LISTENING_PORT}
@@ -104,9 +112,9 @@ export const WorkerSettingsTab = ({ worker }: WorkerSettingsTabProps) => {
           <PageSectionContent>
             <div className="rounded-md border border-default bg-surface-100">
               <SettingsRow label="Size" isFirst>
-                {size.label}
+                {formatSize(worker.size)}
               </SettingsRow>
-              <SettingsRow label="Instances">{worker.instances}</SettingsRow>
+              <SettingsRow label="Instances">{worker.declaredInstances}</SettingsRow>
               <SettingsRow label="Access">
                 {worker.access === 'public' ? (
                   <Badge variant="success">Public</Badge>
