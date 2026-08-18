@@ -170,7 +170,6 @@ export const NewScopedTokenForm = ({
                   <PermissionsAccordion
                     selection={selection}
                     onChange={handlePermissionChange}
-                    permissionScopeMap={permissionScopeMap}
                     access={access}
                   />
                   {showMissingPermissionsWarning && (

@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { useMemo, useState } from 'react'
-import { cn, ScrollArea, Sheet, SheetContent, SheetHeader } from 'ui'
+import { Badge, cn, ScrollArea, Sheet, SheetContent, SheetHeader } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
@@ -23,7 +23,10 @@ import {
   type CapabilityLevelFilter,
 } from './TokenCapabilities/TokenCapabilities.utils'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { useGetEnabledEndpointsForCapability } from '@/data/scoped-access-tokens/permission-scope-map-query'
+import {
+  getEnabledMcpTools,
+  useGetEnabledEndpointsForCapability,
+} from '@/data/scoped-access-tokens/permission-scope-map-query'
 import { useScopedAccessTokenQuery } from '@/data/scoped-access-tokens/scoped-access-token-query'
 import { DOCS_URL } from '@/lib/constants'
 import { pluralize } from '@/lib/helpers'
@@ -155,6 +158,11 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
     access.inaccessibleProjectRefs,
     access.inaccessibleOrgSlugs,
   ])
+
+  const enabledMcpTools = useMemo(
+    () => getEnabledMcpTools({ grantedScopes, permissionScopeMap }).sort(),
+    [grantedScopes, permissionScopeMap]
+  )
 
   const { containerRef: pillsRef, isWrapped: isResourceAccessWrapped } = useResourceAccessWrap()
 
@@ -314,6 +322,25 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                     accessEntries={access.entries}
                     levelFilter={levelFilter}
                   />
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <h3 className="text-sm">Available MCP tools</h3>
+                  {enabledMcpTools.length === 0 ? (
+                    <span className="text-sm text-foreground-lighter">No MCP tools enabled</span>
+                  ) : (
+                    <div className="flex flex-wrap gap-1.5">
+                      {enabledMcpTools.map((tool) => (
+                        <Badge
+                          key={tool}
+                          variant="default"
+                          className="px-2.5 py-1 font-mono text-xs normal-case tracking-normal"
+                        >
+                          {tool}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </>
             )}

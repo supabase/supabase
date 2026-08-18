@@ -15,17 +15,6 @@ export type CapabilityDensityTier = 'accordion' | 'dense'
 export const getCapabilityDensityTier = (count: number): CapabilityDensityTier =>
   count <= CAPABILITY_DENSITY_ACCORDION_MAX ? 'accordion' : 'dense'
 
-/** Card subheading counts — omits whichever side is zero rather than saying "and 0 ...". */
-export const formatCapabilityCounts = (endpointCount: number, mcpToolCount: number): string => {
-  const endpointText = `${endpointCount} ${pluralize(endpointCount, 'endpoint')}`
-  const mcpToolText = `${mcpToolCount} MCP ${pluralize(mcpToolCount, 'tool')}`
-
-  if (endpointCount === 0 && mcpToolCount === 0) return endpointText
-  if (endpointCount === 0) return mcpToolText
-  if (mcpToolCount === 0) return endpointText
-  return `${endpointText} and ${mcpToolText}`
-}
-
 /**
  * Longest shared leading path segments across a group of endpoint paths, so the UI can mute the
  * boilerplate prefix and highlight only the segment that distinguishes each row. Matching is

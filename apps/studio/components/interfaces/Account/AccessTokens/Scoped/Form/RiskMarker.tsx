@@ -5,25 +5,15 @@ import {
   RISK_TONE_VARIANT,
   type PermissionCatalogEntry,
 } from '../../AccessToken.permissions'
-import {
-  getMcpToolsForScopes,
-  PermissionScopeMap,
-} from '@/data/scoped-access-tokens/permission-scope-map-query'
 
 interface RiskMarkerProps {
   entry: PermissionCatalogEntry
   /** When false, renders the dot + label without the explanatory tooltip (used in the review list). */
   withTooltip?: boolean
   className?: string
-  permissionScopeMap: PermissionScopeMap | undefined
 }
 
-export const RiskMarker = ({
-  entry,
-  withTooltip = true,
-  className,
-  permissionScopeMap,
-}: RiskMarkerProps) => {
+export const RiskMarker = ({ entry, withTooltip = true, className }: RiskMarkerProps) => {
   const marker = (
     <Badge
       variant={RISK_TONE_VARIANT[entry.risk]}
@@ -34,11 +24,6 @@ export const RiskMarker = ({
   )
 
   if (!withTooltip) return marker
-
-  const mcpTools = getMcpToolsForScopes({
-    scopeIds: [...entry.readScopes, ...entry.writeScopes],
-    permissionScopeMap,
-  })
 
   return (
     <Tooltip>
@@ -66,18 +51,6 @@ export const RiskMarker = ({
                 {entry.allowsWrite.join(', ')}
               </span>
             )}
-          </div>
-        )}
-        {mcpTools.length > 0 && (
-          <div className="space-y-1">
-            {/* getMcpToolsForScopes is associative, not conjunctive: these scopes contribute to
-                the listed tools, but a tool may need scopes from other capabilities too — the
-                review step's enabled-tools list is the authoritative view. Keep this heading
-                distinct from the review step's "MCP tools". */}
-            <p className="text-[11px] font-mono uppercase tracking-wide text-foreground-lighter">
-              Related MCP tools
-            </p>
-            <p className="font-mono text-xs text-foreground-light">{mcpTools.join(', ')}</p>
           </div>
         )}
       </TooltipContent>
