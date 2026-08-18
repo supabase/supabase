@@ -8,11 +8,11 @@ import { createMarkdownCellSkeleton, createQueryCellSkeleton } from '../utils'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import { notebooksState } from '@/state/notebooks/notebooks-state'
 import type { Notebook, StateNotebook } from '@/state/notebooks/types'
-import type { Notebooks } from '@/types'
 import { createTabsState, TabsStateContext } from '@/state/tabs'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { setupSqlEditorMocks } from '@/tests/lib/sql-editor-test-utils'
+import type { Notebooks } from '@/types'
 
 const testContext = vi.hoisted(() => ({
   flags: { otelLegacyLogs: true } as Record<string, boolean>,
