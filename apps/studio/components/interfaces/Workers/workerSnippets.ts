@@ -11,21 +11,14 @@ export interface WorkerSnippetInput {
 }
 
 export interface WorkerSnippets {
-  /** Natural-language prompt a user can paste into an agent. */
   aiPrompt: string
-  /** `supabase/config.toml` block the CLI reads. */
   configToml: string
-  /** `supabase workers deploy` invocation. */
   cli: string
-  /** `curl` invocation against the deployed worker. */
   curl: string
-  /** JavaScript (fetch) invocation. */
   javascript: string
-  /** Python (requests) invocation. */
   python: string
 }
 
-/** Placeholder worker used by the deploy instructions, which have no form to read from. */
 export const EXAMPLE_WORKER: WorkerSnippetInput = {
   name: 'my-worker',
   runtime: 'node',
@@ -110,7 +103,6 @@ export interface WorkerCliCommand {
   command: string
 }
 
-/** The "Develop locally" CLI commands for a worker (pull / push / logs / delete). */
 export function buildWorkerCliCommands(name: string): WorkerCliCommand[] {
   const slug = safeName(name)
   return [
