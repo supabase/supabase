@@ -73,16 +73,16 @@ reviews:
       instructions: |
         When reviewing UI changes, flag these accessibility gaps. Comments are
         advisory. One comment per gap. Skip test files (*.test.*, *.spec.*) and
-        generated files.
+        generated files. Skip Radix/shadcn primitives imported from ui for all
+        checks below.
         - State changes: if sighted users can see a status change (toast,
           loading/empty swap, copy confirmation, async result) and nothing
           announces it, suggest aria-live, role="status", or role="alert". Skip
           if a live region, Radix Toast, or Sonner is already there, or if the
           change is decoration only.
-        - Mouse interaction: flag onClick or onMouseEnter on a non-interactive
-          element (div, span) with no keyboard equivalent. Do not flag
-          Radix/shadcn primitives imported from ui. Those already handle
-          keyboard.
+        - Mouse interaction: flag pointer-only handlers (onClick, onMouseEnter,
+          onDoubleClick, onContextMenu) on a non-interactive element (div, span,
+          or similar) with no keyboard equivalent.
         - Animation: flag animate-*, keyframes, or JS motion with no
           reduced-motion treatment. Prefer Tailwind motion-reduce: /
           motion-safe:, or matchMedia('(prefers-reduced-motion: reduce)').
