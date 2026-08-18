@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { get, handleError } from '@/data/fetchers'
-import type { GitHubConfigResponse } from '@/lib/github-config.types'
+import { gitHubConfigTomlSchema, type GitHubConfigResponse } from '@/lib/github-config.types'
 import type { UseCustomQueryOptions } from '@/types'
 
 export type GitHubConfigVariables = {
@@ -20,7 +20,7 @@ export const githubConfigKeys = {
 const GitHubConnectionConfigResponseSchema = z.object({
   path: z.string(),
   ref: z.string().nullable(),
-  config: z.record(z.string(), z.unknown()),
+  config: gitHubConfigTomlSchema.catch({}),
 })
 
 export async function getGitHubConfig(
@@ -29,10 +29,8 @@ export async function getGitHubConfig(
 ): Promise<GitHubConfigResponse> {
   if (!connectionId) throw new Error('connectionId is required')
 
-  // [Alpha] Not yet in the generated api-types; drop the cast once `pnpm api:codegen` picks up
-  // GET /platform/integrations/github/connections/{connection_id}/config.
   const { data, error } = await get(
-    '/platform/integrations/github/connections/{connection_id}/config' as any,
+    '/platform/integrations/github/connections/{connection_id}/config',
     {
       params: {
         path: { connection_id: connectionId },

@@ -64,7 +64,7 @@ export function useSelectedGitHubConfigDrift() {
     staleTime: 30_000,
   })
   const {
-    data: effectiveConfigResult,
+    data: githubConfigData,
     isPending: isGithubConfigPending,
     isFetching: isGithubConfigFetching,
     isError: isGithubConfigError,
@@ -91,12 +91,12 @@ export function useSelectedGitHubConfigDrift() {
     () =>
       getConfigDriftSummary({
         dashboardConfig: projectConfig?.attributes,
-        githubConfig: effectiveConfigResult?.config,
+        githubConfig: githubConfigData?.config,
       }),
-    [projectConfig?.attributes, effectiveConfigResult?.config]
+    [projectConfig?.attributes, githubConfigData?.config]
   )
   const isReady = shouldLoad && hasConnection && isProjectConfigSuccess && isGithubConfigSuccess
-  const source = effectiveConfigResult?.source
+  const source = githubConfigData?.source
   const hasSourceBranchFallback =
     gitBranch !== undefined && source !== undefined && source.branch !== gitBranch
   const issueCount = summary.driftedFields.length
