@@ -1,25 +1,8 @@
-/**
- * Static copy + agent-facing SKILL markdown for the Workers prototype.
- * Single source of truth so the empty state, docs, and any future skill file
- * stay in sync.
- */
-
-/**
- * Product + CLI naming. Kept as single constants so the whole surface can be
- * re-labelled (e.g. "Workers" vs "Compute") in one place while the underlying
- * code identifiers stay stable.
- */
 export const PRODUCT_NAME = 'Compute'
 export const CLI_NAME = 'compute'
 
-export const WORKERS_DOCS_URL = 'https://supabase.com/docs/guides/workers'
-
 export const WORKERS_CLI_DEPLOY = `supabase ${CLI_NAME} push`
 
-/**
- * Markdown dropped into an agent so it can deploy and manage workers. Copied
- * verbatim by the "Copy SKILL.md" button on the empty state.
- */
 export const WORKERS_SKILL_MARKDOWN = `# Supabase ${PRODUCT_NAME} — agent skill
 
 Deploy and manage backend workers (microVMs) that run next to a Supabase project's Postgres.
