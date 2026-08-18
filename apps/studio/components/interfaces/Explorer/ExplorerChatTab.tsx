@@ -12,7 +12,7 @@ import { useAiAssistantState, useAiAssistantStateSnapshot } from '@/state/ai-ass
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
-export const ChatEditor = () => {
+export const ExplorerChatTab = () => {
   const { id, ref } = useParams()
   const router = useRouter()
   const tabs = useTabsStateSnapshot()

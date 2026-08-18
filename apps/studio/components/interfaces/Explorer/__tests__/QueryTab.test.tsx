@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { HttpResponse } from 'msw'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { QueryTab } from './QueryTab'
+import { ExplorerQueryTab } from '../ExplorerQueryTab'
 import type { ReadReplicasData } from '@/data/read-replicas/replicas-query'
 import { explorerQueryState } from '@/state/explorer-query'
 import { createTabsState, TabsStateContext } from '@/state/tabs'
@@ -32,8 +32,8 @@ vi.mock('@/components/ui/CodeEditor/CodeEditor', () => ({
   ),
 }))
 
-vi.mock('./ExplorerQuerySourceMenu', () => ({
-  ExplorerQuerySourceMenu: ({
+vi.mock('../QueryEditor/QuerySourceMenu', () => ({
+  QuerySourceMenu: ({
     roleImpersonationState,
   }: {
     roleImpersonationState?: { role?: { type: string; role?: string } }
@@ -49,7 +49,7 @@ vi.mock('./ExplorerQuerySourceMenu', () => ({
 const renderQueryTab = () =>
   customRender(
     <TabsStateContext.Provider value={createTabsState('default')}>
-      <QueryTab />
+      <ExplorerQueryTab />
     </TabsStateContext.Provider>
   )
 
@@ -196,7 +196,7 @@ describe('QueryTab execution', () => {
     testContext.params = { ref: 'default', id: 'query-test-2' }
     rerender(
       <TabsStateContext.Provider value={createTabsState('default')}>
-        <QueryTab />
+        <ExplorerQueryTab />
       </TabsStateContext.Provider>
     )
 

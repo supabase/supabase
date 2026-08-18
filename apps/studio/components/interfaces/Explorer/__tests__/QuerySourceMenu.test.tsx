@@ -4,7 +4,7 @@ import { FeatureFlagContext } from 'common'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { ExplorerQuerySourceMenu } from './ExplorerQuerySourceMenu'
+import { QuerySourceMenu } from '../QueryEditor/QuerySourceMenu'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -37,14 +37,14 @@ beforeEach(() => {
   })
 })
 
-describe('ExplorerQuerySourceMenu', () => {
+describe('QuerySourceMenu', () => {
   const renderWithFlags = (
-    source: Parameters<typeof ExplorerQuerySourceMenu>[0]['source'],
+    source: Parameters<typeof QuerySourceMenu>[0]['source'],
     flags: Record<string, boolean>
   ) =>
     customRender(
       <FeatureFlagContext.Provider value={{ configcat: flags, posthog: {}, hasLoaded: true }}>
-        <ExplorerQuerySourceMenu
+        <QuerySourceMenu
           rowLimit={100}
           onRowLimitChange={vi.fn()}
           source={source}
@@ -57,7 +57,7 @@ describe('ExplorerQuerySourceMenu', () => {
     const onSourceChange = vi.fn()
 
     customRender(
-      <ExplorerQuerySourceMenu
+      <QuerySourceMenu
         rowLimit={100}
         onRowLimitChange={vi.fn()}
         source={{
@@ -78,7 +78,7 @@ describe('ExplorerQuerySourceMenu', () => {
     const onSourceChange = vi.fn()
 
     customRender(
-      <ExplorerQuerySourceMenu
+      <QuerySourceMenu
         rowLimit={100}
         onRowLimitChange={vi.fn()}
         source={{

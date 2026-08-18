@@ -1,10 +1,10 @@
-import { QueryTab } from '@/components/interfaces/Explorer/QueryTab'
+import { ExplorerQueryTab } from '@/components/interfaces/Explorer/ExplorerQueryTab'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { ExplorerLayout } from '@/components/layouts/ExplorerLayout/ExplorerLayout'
 import type { NextPageWithLayout } from '@/types'
 
 const QueryPage: NextPageWithLayout = () => {
-  return <QueryTab />
+  return <ExplorerQueryTab />
 }
 
 QueryPage.getLayout = (page) => (
