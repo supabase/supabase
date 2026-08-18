@@ -32,8 +32,8 @@ vi.mock('@/components/ui/CodeEditor/CodeEditor', () => ({
   ),
 }))
 
-vi.mock('./ExplorerQuerySourceMenu', () => ({
-  ExplorerQuerySourceMenu: ({
+vi.mock('../QueryEditor/QuerySourceMenu', () => ({
+  QuerySourceMenu: ({
     roleImpersonationState,
   }: {
     roleImpersonationState?: { role?: { type: string; role?: string } }
