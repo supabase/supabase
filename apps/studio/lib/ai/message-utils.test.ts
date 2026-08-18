@@ -3,14 +3,15 @@ import { describe, expect, it } from 'vitest'
 
 import { getParallelApprovalIdsToReject, prepareMessagesForAPI } from './message-utils'
 
-const makeApprovalPart = (id: string): DynamicToolUIPart => ({
-  type: 'dynamic-tool',
-  toolName: 'test_tool',
-  toolCallId: id,
-  state: 'approval-requested',
-  input: {},
-  approval: { id },
-})
+const makeApprovalPart = (id: string, isAutomatic = false): DynamicToolUIPart =>
+  ({
+    type: 'dynamic-tool',
+    toolName: 'test_tool',
+    toolCallId: id,
+    state: 'approval-requested',
+    input: {},
+    approval: { id, ...(isAutomatic ? { isAutomatic: true } : {}) },
+  }) as DynamicToolUIPart
 
 const makeResultPart = (id: string): DynamicToolUIPart => ({
   type: 'dynamic-tool',
@@ -74,6 +75,21 @@ describe('getParallelApprovalIdsToReject', () => {
       },
     ]
     expect(getParallelApprovalIdsToReject(messages)).toEqual(['a2'])
+  })
+
+  it('ignores automatic approvals when picking extras to reject', () => {
+    const messages: UIMessage[] = [
+      {
+        id: '1',
+        role: 'assistant',
+        parts: [
+          makeApprovalPart('auto', true),
+          makeApprovalPart('manual-1'),
+          makeApprovalPart('manual-2'),
+        ],
+      },
+    ]
+    expect(getParallelApprovalIdsToReject(messages)).toEqual(['manual-2'])
   })
 })
 

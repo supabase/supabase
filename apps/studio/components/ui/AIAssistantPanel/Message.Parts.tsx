@@ -3,6 +3,7 @@ import { type DynamicToolUIPart, type ReasoningUIPart, type TextUIPart, type Too
 import { BrainIcon, CheckIcon, Loader2 } from 'lucide-react'
 import { cn } from 'ui'
 
+import { getManualToolApprovalHandlers } from './Confirm.utils'
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 import { EdgeFunctionRenderer } from './EdgeFunctionRenderer'
 import { Tool } from './elements/Tool'
@@ -211,24 +212,22 @@ function MessagePartDeployEdgeFunction({ toolPart }: { toolPart: ToolUIPart }) {
   const isInitiallyDeployed =
     state === 'output-available' && parsedOutput.success && parsedOutput.data.success === true
 
-  const approvalId = state === 'approval-requested' ? toolPart.approval?.id : undefined
+  const { confirmState, onApprove, onDeny } = getManualToolApprovalHandlers({
+    state,
+    approval: toolPart.approval,
+    addToolApprovalResponse,
+  })
 
   return (
     <EdgeFunctionRenderer
       label={parsedInput.data.label}
       code={parsedInput.data.code}
       functionName={parsedInput.data.functionName}
-      showConfirmFooter={state === 'approval-requested'}
-      isDeploying={state === 'approval-responded' && toolPart.approval?.approved !== false}
+      confirmState={confirmState}
+      isDeploying={confirmState === 'approval-responded'}
       initialIsDeployed={isInitiallyDeployed}
-      onApprove={
-        approvalId ? () => addToolApprovalResponse?.({ id: approvalId, approved: true }) : undefined
-      }
-      onDeny={
-        approvalId
-          ? () => addToolApprovalResponse?.({ id: approvalId, approved: false })
-          : undefined
-      }
+      onApprove={onApprove}
+      onDeny={onDeny}
     />
   )
 }

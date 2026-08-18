@@ -24,6 +24,24 @@ export function prepareMessagesForAPI(messages: UIMessage[]): UIMessage[] {
   return cleanedMessages
 }
 
+function isAutomaticToolApproval(approval: { isAutomatic?: boolean }): boolean {
+  return approval.isAutomatic === true
+}
+
+/** True when the part is waiting on a human Approve/Deny, not an automatic policy decision. */
+export function isManualApprovalRequested(
+  part: UIMessage['parts'][number]
+): part is UIMessage['parts'][number] & {
+  state: 'approval-requested'
+  approval: { id: string }
+} {
+  return (
+    isToolUIPart(part) &&
+    part.state === 'approval-requested' &&
+    !isAutomaticToolApproval(part.approval)
+  )
+}
+
 /**
  * Returns approval IDs to auto-deny when the model issues multiple approval-required
  * tool calls in the same turn — all but the first, so the model reissues them sequentially.
@@ -33,7 +51,7 @@ export function getParallelApprovalIdsToReject(messages: UIMessage[]): string[] 
   if (!lastMessage) return []
 
   const pendingIds = (lastMessage.parts ?? []).flatMap((part) =>
-    isToolUIPart(part) && part.state === 'approval-requested' ? [part.approval.id] : []
+    isManualApprovalRequested(part) ? [part.approval.id] : []
   )
   return pendingIds.slice(1)
 }
