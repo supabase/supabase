@@ -1,17 +1,7 @@
 import { useParams } from 'common'
-import {
-  ArrowRight,
-  CheckCircle2,
-  ExternalLink,
-  FileCode2,
-  FileWarning,
-  Github,
-  Minus,
-  Plus,
-  RefreshCw,
-} from 'lucide-react'
+import { ArrowRight, CheckCircle2, FileWarning, Github, Minus, Plus } from 'lucide-react'
 import Link from 'next/link'
-import { Button, Card, cn, Skeleton } from 'ui'
+import { Button, Card, Skeleton } from 'ui'
 import { CollapsibleCardSection } from 'ui-patterns/CollapsibleCardSection'
 
 import {
@@ -22,7 +12,6 @@ import {
 } from './ConfigurationDriftPage.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { useSelectedGitHubConfigDrift } from '@/hooks/misc/useGitHubConfigDrift'
-import type { GitHubConfigSource } from '@/lib/github-config.types'
 
 export function ConfigurationDriftPageSkeleton() {
   return (
@@ -104,108 +93,6 @@ export function ConfigurationDriftPageSkeleton() {
           <Skeleton className="h-[58px] flex-1 rounded-md" />
         </div>
       </Card>
-    </div>
-  )
-}
-
-function ConfigurationSourceToolbar({
-  source,
-  requestedGitBranch,
-  hasSourceBranchFallback,
-  isFetching,
-  onRefresh,
-}: {
-  source: GitHubConfigSource
-  requestedGitBranch?: string
-  hasSourceBranchFallback: boolean
-  isFetching: boolean
-  onRefresh: () => void
-}) {
-  const sourceFileName = source.path.split('/').at(-1) ?? source.path
-  const repositoryUrl = `https://github.com/${source.repository}`
-  const sourceBranchUrl = `${repositoryUrl}/tree/${source.branch
-    .split('/')
-    .map(encodeURIComponent)
-    .join('/')}`
-
-  return (
-    <div className="overflow-hidden rounded-lg border border-border bg-dash-sidebar">
-      <div className="flex flex-col gap-3 bg-surface-100 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 items-center gap-3">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-surface-200 text-foreground-muted">
-            <FileCode2 className="h-4 w-4" aria-hidden="true" />
-          </div>
-          <div className="min-w-0">
-            {source.htmlUrl ? (
-              <a
-                href={source.htmlUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${sourceFileName} on GitHub (opens in new tab)`}
-                title={source.path}
-                className="inline-flex max-w-full items-center gap-1 font-mono text-sm font-medium hover:underline"
-              >
-                <span className="truncate">{sourceFileName}</span>
-                <ExternalLink className="h-3 w-3 shrink-0" aria-hidden="true" />
-              </a>
-            ) : (
-              <p className="truncate font-mono text-sm font-medium" title={source.path}>
-                {sourceFileName}
-              </p>
-            )}
-            <div className="flex min-w-0 items-center gap-1 text-xs text-foreground-muted">
-              <a
-                href={repositoryUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${source.repository} repository (opens in new tab)`}
-                className="truncate hover:text-foreground hover:underline"
-              >
-                {source.repository}
-              </a>
-              <span aria-hidden="true">·</span>
-              <a
-                href={sourceBranchUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${source.branch} source branch (opens in new tab)`}
-                className="truncate font-mono hover:text-foreground hover:underline"
-              >
-                {source.branch}
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex w-full items-center gap-2 sm:w-auto">
-          <Button
-            variant="default"
-            size="tiny"
-            className="w-full sm:w-auto"
-            icon={<RefreshCw className={cn('h-3.5 w-3.5', isFetching && 'animate-spin')} />}
-            disabled={isFetching}
-            onClick={onRefresh}
-          >
-            Refresh
-          </Button>
-        </div>
-      </div>
-
-      {hasSourceBranchFallback && requestedGitBranch && (
-        <div className="border-t border-border px-4 py-3">
-          <div
-            role="status"
-            className="flex items-start gap-2 rounded-md border border-warning-400 bg-warning-200 px-3 py-2 text-sm text-foreground"
-          >
-            <FileWarning className="mt-0.5 h-4 w-4 shrink-0" />
-            <p>
-              <span className="font-medium">Requested branch config was not found.</span> Studio
-              requested <code>{requestedGitBranch}</code> and loaded <code>{source.branch}</code> ·{' '}
-              <code>{source.path}</code> as the fallback source.
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
@@ -379,19 +266,8 @@ function UnmanagedConfigSection({ groups }: { groups: UnmanagedConfigSectionGrou
 
 export function ConfigurationDriftPage() {
   const { ref: projectRef = '' } = useParams()
-  const {
-    requestedGitBranch,
-    source,
-    hasSourceBranchFallback = false,
-    summary,
-    unmanagedFields,
-    isReady,
-    isPending,
-    isFetching,
-    isError,
-    error,
-    refetch,
-  } = useSelectedGitHubConfigDrift()
+  const { summary, unmanagedFields, isReady, isPending, isFetching, isError, error, refetch } =
+    useSelectedGitHubConfigDrift()
   const driftRows = createConfigurationDriftRows(summary.driftedFields, projectRef)
   const comparableSettingCount = summary.managedCount + driftRows.length
   const unmanagedGroups = groupUnmanagedConfigFields(unmanagedFields)
@@ -453,16 +329,6 @@ export function ConfigurationDriftPage() {
       )}
 
       <UnmanagedConfigSection groups={unmanagedGroups} />
-
-      {source && (
-        <ConfigurationSourceToolbar
-          source={source}
-          requestedGitBranch={requestedGitBranch}
-          hasSourceBranchFallback={hasSourceBranchFallback}
-          isFetching={isFetching}
-          onRefresh={() => refetch()}
-        />
-      )}
     </div>
   )
 }

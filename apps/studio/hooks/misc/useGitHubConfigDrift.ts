@@ -72,7 +72,7 @@ export function useSelectedGitHubConfigDrift() {
     isSuccess: isGithubConfigSuccess,
     refetch: githubConfigRefetch,
   } = useGitHubConfigQuery(
-    { connectionId: connection?.id, repository: connection?.repository.name, branch: gitBranch },
+    { connectionId: connection?.id, branch: gitBranch },
     { enabled: queriesEnabled }
   )
 
@@ -96,15 +96,10 @@ export function useSelectedGitHubConfigDrift() {
     [projectConfig?.attributes, githubConfigData?.config]
   )
   const isReady = shouldLoad && hasConnection && isProjectConfigSuccess && isGithubConfigSuccess
-  const source = githubConfigData?.source
-  const hasSourceBranchFallback =
-    gitBranch !== undefined && source !== undefined && source.branch !== gitBranch
   const issueCount = summary.driftedFields.length
 
   return {
     requestedGitBranch: gitBranch,
-    source,
-    hasSourceBranchFallback,
     isReady,
     isPending:
       isProjectPending ||

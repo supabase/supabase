@@ -262,8 +262,3 @@ export const gitHubConfigTomlSchema = z
   .passthrough()
 
 export type GitHubConfigToml = z.infer<typeof gitHubConfigTomlSchema>
-
-export interface GitHubConfigResponse {
-  source: GitHubConfigSource
-  config: GitHubConfigToml
-}
