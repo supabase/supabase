@@ -27,6 +27,7 @@ export const PLUGIN_CLIENTS: PluginClient[] = [
     key: 'cursor',
     label: 'Cursor',
     icon: 'cursor',
+    hasDistinctDarkIcon: true,
     repoUrl: 'https://github.com/supabase-community/cursor-plugin',
     docsUrl: 'https://cursor.com/docs/plugins',
   },
