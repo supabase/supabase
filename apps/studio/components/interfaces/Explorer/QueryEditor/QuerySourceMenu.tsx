@@ -9,6 +9,8 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
+import { RowLimitSubMenu } from '../../SQLEditor/UtilityPanel/QuerySourceMenu/RowLimitSubMenu'
+import { RunAsSubMenu } from '../../SQLEditor/UtilityPanel/QuerySourceMenu/RunAsSubMenu'
 import { DatabaseParametersSubMenu } from '@/components/interfaces/QuerySources/DatabaseParametersSubMenu'
 import { LogsCustomRangeDialog } from '@/components/interfaces/QuerySources/LogsCustomRangeDialog'
 import { LogsTimeRangeSubMenu } from '@/components/interfaces/QuerySources/LogsTimeRangeSubMenu'
@@ -21,8 +23,12 @@ import {
   QUERY_SOURCES,
   type QuerySourceBinding,
 } from '@/data/query-sources/query-source-registry'
+import { type RoleImpersonationController } from '@/state/role-impersonation-state'
 
-export type ExplorerQuerySourceMenuProps = {
+export type QuerySourceMenuProps = {
+  rowLimit?: number
+  onRowLimitChange?: (val: number) => void
+  roleImpersonationState?: RoleImpersonationController
   source: QuerySourceBinding
   onSourceChange: (source: QuerySourceBinding) => void
 }
@@ -36,10 +42,13 @@ export type ExplorerQuerySourceMenuProps = {
  * what happens to the query body is the consumer's call, since a notebook cell
  * has SQL to preserve or discard and a fresh draft does not.
  */
-export const ExplorerQuerySourceMenu = ({
+export const QuerySourceMenu = ({
+  rowLimit = 100,
+  onRowLimitChange,
+  roleImpersonationState,
   source,
   onSourceChange,
-}: ExplorerQuerySourceMenuProps) => {
+}: QuerySourceMenuProps) => {
   const { ref } = useParams()
   const isLogsSourceEnabled = useFlag('sqlEditorLogsSource')
   const isOtelLogsEnabled = useFlag('otelLegacyLogs')
@@ -97,12 +106,23 @@ export const ExplorerQuerySourceMenu = ({
           <DropdownMenuSeparator />
 
           {source._tag === 'database' ? (
-            <DatabaseParametersSubMenu
-              identifier={source.database_identifier ?? ref}
-              onIdentifierChange={(database_identifier) =>
-                onSourceChange({ _tag: 'database', database_identifier })
-              }
-            />
+            <>
+              <DatabaseParametersSubMenu
+                identifier={source.database_identifier ?? ref}
+                onIdentifierChange={(database_identifier) =>
+                  onSourceChange({ _tag: 'database', database_identifier })
+                }
+              />
+              {roleImpersonationState !== undefined && (
+                <RunAsSubMenu controlled state={roleImpersonationState} />
+              )}
+              {onRowLimitChange !== undefined && (
+                <RowLimitSubMenu
+                  value={rowLimit}
+                  onValueChange={(val) => onRowLimitChange(Number(val))}
+                />
+              )}
+            </>
           ) : (
             <LogsTimeRangeSubMenu
               range={source.time_range}

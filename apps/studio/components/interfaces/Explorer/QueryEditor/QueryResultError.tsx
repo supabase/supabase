@@ -3,11 +3,10 @@ import { ExternalLink } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
-import { type QueryResult } from './types'
+import { subscriptionHasHipaaAddon } from '../../Billing/Subscription/Subscription.utils'
+import { type QueryResult } from '../types'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import CopyButton from '@/components/ui/CopyButton'
-import { DataGridResults } from '@/components/ui/DataGridResults'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { getSqlErrorLines } from '@/data/sql/utils'
@@ -15,37 +14,7 @@ import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-q
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
 
-interface QueryResultTableProps {
-  result?: QueryResult
-}
-
-// [Joshen] This is essentially a duplicate of UtilityTabResults from the SQL Editor
-// I'll eventually migrate the Results component over - just trying to avoid bloating
-// changes wherever possible
-
-// [Joshen] Should be shifted into QueryCell folder
-
-export const QueryResultTable = ({ result }: QueryResultTableProps) => {
-  const { rows, error, autoLimit } = result ?? {}
-
-  if (!result) {
-    return <p className="text-xs text-foreground-light">Run the query to see results</p>
-  }
-
-  if (error) {
-    return <QueryError error={error} autoLimit={autoLimit} />
-  }
-
-  if ((rows ?? []).length === 0) {
-    return <p className="text-xs text-foreground-light">Success. No rows returned</p>
-  }
-
-  if (rows && rows.length > 0) {
-    return <QueryResults rows={rows} />
-  }
-}
-
-const QueryError = ({
+export const QueryResultError = ({
   error,
   autoLimit,
 }: {
@@ -75,7 +44,7 @@ const QueryError = ({
   )
 
   return (
-    <div className="bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark overflow-y-auto">
+    <div className="w-full bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark overflow-y-auto">
       <div className="flex flex-row justify-between items-start py-4 px-6 gap-x-4">
         {isTimeout ? (
           <div className="flex flex-col gap-y-1">
@@ -182,9 +151,4 @@ const QueryError = ({
       </div>
     </div>
   )
-}
-
-// [Joshen] Eventually migrate the Results component here from SQL Editor
-const QueryResults = ({ rows }: { rows: NonNullable<QueryResult['rows']> }) => {
-  return <DataGridResults rows={rows} />
 }

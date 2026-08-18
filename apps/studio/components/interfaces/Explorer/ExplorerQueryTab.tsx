@@ -1,27 +1,39 @@
 import { useParams } from 'common'
 import { Loader2, SquareCode } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { Button } from 'ui'
 
-import { QueryEditor } from './QueryEditor'
+import { QueryEditor, type ExplorerQueryModel } from './QueryEditor'
 import { type QueryResult } from './types'
+import { toQuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { explorerQueryState, useExplorerQueryStateSnapshot } from '@/state/explorer-query'
+import { useControlledRoleImpersonationState } from '@/state/role-impersonation-state'
 import { createTabId, TabsStateContext } from '@/state/tabs'
 
-const QUERY_ROW_LIMIT = 100
-
 /** Query-tab lifecycle adapter around the shared QueryEditor. */
-export const QueryTab = () => {
+export const ExplorerQueryTab = () => {
   const { id, ref } = useParams()
   const router = useRouter()
   const tabs = useContext(TabsStateContext)
   const querySnap = useExplorerQueryStateSnapshot()
+
   const [restoredQueryKey, setRestoredQueryKey] = useState<string>()
+
   const stateDraft = id ? querySnap.drafts[id] : undefined
   const draft = stateDraft?.projectRef === ref ? stateDraft : undefined
   const result = draft && id ? querySnap.results[id] : undefined
   const queryKey = id && ref ? `${ref}:${id}` : undefined
+
+  const roleImpersonationState = useControlledRoleImpersonationState(
+    draft?._tag === 'database' ? draft.role : undefined,
+    useCallback(
+      (role) => {
+        if (id) explorerQueryState.setRole({ id, role })
+      },
+      [id]
+    )
+  )
 
   useEffect(() => {
     if (!id || !ref) return
@@ -74,15 +86,23 @@ export const QueryTab = () => {
     })
   }
 
+  const query: ExplorerQueryModel =
+    draft._tag === 'logs'
+      ? { ...toQuerySourceBinding(draft), uncheckedSql: draft.uncheckedSql }
+      : {
+          ...toQuerySourceBinding(draft),
+          uncheckedSql: draft.uncheckedSql,
+          rowLimit: draft.rowLimit,
+        }
+
   return (
     <QueryEditor
       id={id}
       variant="viewport"
       title={draft.name}
-      sql={draft.uncheckedSql}
-      source={draft.source}
+      query={query}
       result={result}
-      rowLimit={QUERY_ROW_LIMIT}
+      roleImpersonationState={roleImpersonationState}
       onTitleChange={(value) => {
         const name = value.trim() || 'Untitled query'
         explorerQueryState.updateDraft({ id, name })
@@ -91,6 +111,7 @@ export const QueryTab = () => {
       onSqlChange={(sql) => explorerQueryState.updateDraft({ id, sql })}
       onSourceChange={(source) => explorerQueryState.updateDraft({ id, source })}
       onResultChange={handleResultChange}
+      onRowLimitChange={(rowLimit) => explorerQueryState.updateDraft({ id, rowLimit })}
     />
   )
 }

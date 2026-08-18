@@ -1,7 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { ChatEditor } from '../ChatEditor'
+import { ExplorerChatTab } from '../ExplorerChatTab'
 import { customRender } from '@/tests/lib/custom-render'
 
 const mocks = vi.hoisted(() => ({
@@ -69,7 +69,7 @@ vi.mock('@/components/ui/AIAssistantPanel/AssistantChat', () => ({
   ),
 }))
 
-describe('ChatEditor', () => {
+describe('ExplorerChatTab', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mocks.useParams.mockReturnValue({ ref: 'default', id: 'chat-1' })
@@ -81,7 +81,7 @@ describe('ChatEditor', () => {
   })
 
   it('renders and registers the routed chat without changing sidebar selection', () => {
-    customRender(<ChatEditor />)
+    customRender(<ExplorerChatTab />)
 
     expect(mocks.ensureChatInstance).toHaveBeenCalledWith('chat-1')
     expect(screen.getByRole('button', { name: 'Assistant' })).toHaveAttribute(
@@ -98,7 +98,7 @@ describe('ChatEditor', () => {
   })
 
   it('routes shared chat navigation through Explorer', () => {
-    customRender(<ChatEditor />)
+    customRender(<ExplorerChatTab />)
 
     fireEvent.click(screen.getByRole('button', { name: 'Assistant' }))
 
@@ -112,7 +112,7 @@ describe('ChatEditor', () => {
       chatInstances: {},
     })
 
-    customRender(<ChatEditor />)
+    customRender(<ExplorerChatTab />)
 
     expect(screen.getByRole('heading', { name: 'Chat not found' })).toBeVisible()
     expect(mocks.handleTabClose).toHaveBeenCalledWith(

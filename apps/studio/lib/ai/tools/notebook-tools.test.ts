@@ -202,6 +202,7 @@ describe('ai/tools/notebook-tools', () => {
         name: 'Signup funnel',
         description: undefined,
         visibility: 'project',
+        updated_at: '2026-01-01T00:00:00.000Z',
         cells: [
           { _tag: 'markdown_cell', id: 'cell-1', text: '# Signup funnel' },
           {
@@ -399,6 +400,7 @@ describe('ai/tools/notebook-tools', () => {
       const result = await tools.update_notebook.execute(
         {
           id: 'notebook-1',
+          expected_updated_at: '2026-01-01T00:00:00.000Z',
           operations: [
             { _tag: 'delete_cell', cell_id: 'cell-3' },
             {
@@ -432,10 +434,32 @@ describe('ai/tools/notebook-tools', () => {
 
       await expect(
         tools.update_notebook.execute(
-          { id: 'notebook-1', operations: [{ _tag: 'delete_cell', cell_id: 'missing-cell' }] },
+          {
+            id: 'notebook-1',
+            expected_updated_at: '2026-01-01T00:00:00.000Z',
+            operations: [{ _tag: 'delete_cell', cell_id: 'missing-cell' }],
+          },
           { toolCallId: 'test', messages: [] }
         )
       ).rejects.toThrow('No cell with id "missing-cell"')
+    })
+
+    it('should throw instead of PUTting when the notebook changed since expected_updated_at', async () => {
+      mockGetNotebook()
+
+      const tools = getNotebookTools({ projectRef: 'test-project' })
+      if (!tools.update_notebook.execute) throw new Error('execute is undefined')
+
+      await expect(
+        tools.update_notebook.execute(
+          {
+            id: 'notebook-1',
+            expected_updated_at: '2025-12-31T00:00:00.000Z',
+            operations: [{ _tag: 'delete_cell', cell_id: 'cell-3' }],
+          },
+          { toolCallId: 'test', messages: [] }
+        )
+      ).rejects.toThrow(/changed since expected_updated_at/)
     })
   })
 })
