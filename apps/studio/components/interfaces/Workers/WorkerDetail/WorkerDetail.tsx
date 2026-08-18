@@ -46,7 +46,6 @@ import { ensureProjectSeeded, useProjectWorkers } from '@/state/workers-mock-sta
 type WorkerTab = 'overview' | 'logs' | 'settings'
 const WORKER_TABS: WorkerTab[] = ['overview', 'logs', 'settings']
 
-// Display order for the nav — Terminal is a disabled placeholder second to last.
 const TAB_ORDER: Array<WorkerTab | 'terminal'> = ['overview', 'logs', 'terminal', 'settings']
 
 const TAB_LABEL: Record<WorkerTab, string> = {
@@ -56,9 +55,7 @@ const TAB_LABEL: Record<WorkerTab, string> = {
 }
 
 export const WorkerDetail = () => {
-  const { ref, name } = useParams()
-  const projectRef = ref as string
-  const workerName = name as string
+  const { ref: projectRef, name: workerName } = useParams()
 
   const [tab, setTab] = useQueryState(
     'tab',
@@ -68,11 +65,13 @@ export const WorkerDetail = () => {
   )
 
   useEffect(() => {
-    ensureProjectSeeded(ref)
-  }, [ref])
+    ensureProjectSeeded(projectRef)
+  }, [projectRef])
 
-  const workers = useProjectWorkers(ref)
+  const workers = useProjectWorkers(projectRef)
   const worker = workers.find((w) => w.name === workerName)
+
+  if (!projectRef) return null
 
   if (!worker) {
     return (
@@ -174,7 +173,7 @@ export const WorkerDetail = () => {
       {tab === 'overview' && <WorkerOverviewTab projectRef={projectRef} worker={worker} />}
       {tab === 'logs' && (
         <PageContainer size="full" className="px-0 xl:px-0">
-          <WorkerLogsTab projectRef={projectRef} workerName={worker.name} />
+          <WorkerLogsTab workerName={worker.name} />
         </PageContainer>
       )}
       {tab === 'settings' && <WorkerSettingsTab worker={worker} />}
