@@ -15,7 +15,7 @@ const enableQueueOperations = async (page: Page) => {
 }
 
 const openQueueDropdownAndClick = async (page: Page, itemName: string) => {
-  await page.getByRole('button', { name: 'More options' }).click()
+  await page.getByRole('button', { name: 'More options', exact: true }).click()
   await page.getByRole('menuitem', { name: itemName }).click()
 }
 

@@ -36,7 +36,7 @@ const Partners = () => {
       />
       <DefaultLayout>
         <div className="relative bg-alternative overflow-hidden">
-          <SectionContainer className="overflow-hidden pt-8 pb-12 md:pt-12">
+          <SectionContainer className="overflow-hidden pt-8 pb-12">
             <ProductHeaderCentered {...pageData.heroSection} />
           </SectionContainer>
           <div className="relative z-20 w-full flex py-16 mb-16 -mt-10 md:mb-24 md:-mt-20 justify-center gap-2 overflow-hidden mx-auto max-w-4xl before:content[''] before:absolute before:inset-0 before:w-full before:bg-[linear-gradient(to_right,var(--background-alternative-default)_0%,transparent_10%,transparent_90%,var(--background-alternative-default)_100%)] before:z-10">
@@ -139,7 +139,7 @@ const Partners = () => {
                     Use your favorite tools with Supabase.
                   </p>
                 </div>
-                <Link href="/partners/integrations" className="absolute inset-0" />
+                <Link href="/partners/catalog" className="absolute inset-0" />
               </Panel>
             </div>
           </div>

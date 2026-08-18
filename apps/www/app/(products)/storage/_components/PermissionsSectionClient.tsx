@@ -107,6 +107,7 @@ export function PermissionsSectionClient({ examples }: { examples: PermissionExa
             const isActive = index === activeIdx
             return (
               <button
+                tabIndex={0}
                 key={example.title}
                 onClick={() => handleTabClick(index)}
                 className={cn(

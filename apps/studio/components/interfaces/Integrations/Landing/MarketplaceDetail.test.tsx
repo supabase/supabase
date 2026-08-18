@@ -48,6 +48,21 @@ const STABLE_INTEGRATIONS = [
     navigate: () => null,
     navigation: [{ route: 'overview', label: 'Overview' }],
   },
+  {
+    id: 'grafana-cloud',
+    name: 'Grafana',
+    type: 'oauth',
+    source: 'Partner',
+    description: 'Grafana',
+    content: 'Grafana overview content',
+    docsUrl: null,
+    siteUrl: null,
+    author: { name: 'Grafana Labs' },
+    oauthAppId: 'grafana-app',
+    icon: () => null,
+    navigate: () => null,
+    navigation: [{ route: 'overview', label: 'Overview' }],
+  },
 ]
 const STABLE_EMPTY_ARR = [] as unknown[]
 vi.mock('@/components/interfaces/Integrations/Landing/useAvailableIntegrations', () => ({

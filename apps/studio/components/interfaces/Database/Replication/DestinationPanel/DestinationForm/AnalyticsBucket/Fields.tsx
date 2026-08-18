@@ -1,8 +1,7 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { useState } from 'react'
-import type { UseFormReturn } from 'react-hook-form'
+import { useWatch, type UseFormReturn } from 'react-hook-form'
 import {
   Button,
   FormControl,
@@ -16,7 +15,7 @@ import {
   SelectTrigger,
   WarningIcon,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -27,11 +26,9 @@ import {
 } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useAnalyticsBucketsQuery } from '@/data/storage/analytics-buckets-query'
 import { useIcebergNamespacesQuery } from '@/data/storage/iceberg-namespaces-query'
 import { useStorageCredentialsQuery } from '@/data/storage/s3-access-key-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 /**
  * [Joshen] JFYI I'd foresee a possible UX friction point here regarding S3 access key IDs and secret access keys
@@ -64,19 +61,14 @@ export const AnalyticsBucketFields = ({
   editMode: boolean
   onSelectNewBucket: () => void
 }) => {
-  const { warehouseName, s3AccessKeyId, namespace } = form.watch()
+  const [warehouseName, s3AccessKeyId, namespace] = useWatch({
+    control: form.control,
+    name: ['warehouseName', 's3AccessKeyId', 'namespace'],
+  })
   const [showCatalogToken, setShowCatalogToken] = useState(false)
   const [showSecretAccessKey, setShowSecretAccessKey] = useState(false)
 
   const { ref: projectRef } = useParams()
-
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeysData } = useAPIKeys(
-    { projectRef, reveal: true },
-    { enabled: canReadAPIKeys }
-  )
-  const { serviceKey } = apiKeysData ?? {}
-  const serviceApiKey = serviceKey?.api_key ?? ''
 
   const {
     data: keysData,
@@ -96,7 +88,7 @@ export const AnalyticsBucketFields = ({
     isError: isErrorBuckets,
   } = useAnalyticsBucketsQuery({ projectRef })
 
-  const canSelectNamespace = !!warehouseName && !!serviceApiKey
+  const canSelectNamespace = !!warehouseName
 
   const {
     data: namespaces = [],
@@ -104,7 +96,7 @@ export const AnalyticsBucketFields = ({
     isError: isErrorNamespaces,
   } = useIcebergNamespacesQuery(
     { projectRef, warehouse: warehouseName },
-    { enabled: !!serviceApiKey }
+    { enabled: !!warehouseName }
   )
 
   return (
@@ -255,7 +247,7 @@ export const AnalyticsBucketFields = ({
             name="newNamespaceName"
             render={({ field }) => (
               <FormItemLayout
-                label="New Namespace Name"
+                label="New namespace name"
                 layout="horizontal"
                 description="A unique name for the new namespace"
               >
@@ -273,7 +265,7 @@ export const AnalyticsBucketFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="Catalog Token"
+              label="Catalog token"
               description={
                 editMode ? (
                   'Stored catalog token is hidden and kept automatically.'
@@ -293,7 +285,7 @@ export const AnalyticsBucketFields = ({
                 type={showCatalogToken ? 'text' : 'password'}
                 placeholder={editMode ? STORED_SECRET_PLACEHOLDER : 'Auto-populated'}
                 actions={
-                  serviceApiKey ? (
+                  field.value ? (
                     <div className="flex items-center justify-center">
                       <Button
                         variant="default"
@@ -315,7 +307,7 @@ export const AnalyticsBucketFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="S3 Access Key ID"
+              label="S3 access key ID"
               description={
                 <div className="flex flex-col gap-y-2">
                   <p>
@@ -403,7 +395,7 @@ export const AnalyticsBucketFields = ({
             render={({ field }) => (
               <FormItemLayout
                 layout="horizontal"
-                label="S3 Secret Access Key"
+                label="S3 secret access key"
                 className="relative"
                 description={
                   editMode

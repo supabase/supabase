@@ -43,6 +43,8 @@ fi
 # Read keys from .env
 ANON_KEY=$(grep '^ANON_KEY=' .env | cut -d= -f2-)
 SERVICE_ROLE_KEY=$(grep '^SERVICE_ROLE_KEY=' .env | cut -d= -f2-)
+SUPABASE_PUBLISHABLE_KEY=$(grep '^SUPABASE_PUBLISHABLE_KEY=' .env | cut -d= -f2-)
+SUPABASE_SECRET_KEY=$(grep '^SUPABASE_SECRET_KEY=' .env | cut -d= -f2-)
 DASHBOARD_USERNAME=$(grep '^DASHBOARD_USERNAME=' .env | cut -d= -f2-)
 DASHBOARD_PASSWORD=$(grep '^DASHBOARD_PASSWORD=' .env | cut -d= -f2-)
 
@@ -167,7 +169,7 @@ else
     check "Create user (admin)" "true" "false"
 fi
 
-# Public signup (optional — depends on email autoconfirm setting)
+# Public signup (optional - depends on email autoconfirm setting)
 signup_email="smoke-signup-$$@example.com"
 signup_resp=$(http_body "$BASE_URL/auth/v1/signup" \
     -H "apikey: $ANON_KEY" \
@@ -308,7 +310,7 @@ if [ "$create_bucket_status" = "200" ]; then
 
         if [ -n "$signed_path" ]; then
             check "Create signed URL" "true" "true"
-            # Fetch signed URL without any auth headers (goes through Kong)
+            # Fetch signed URL without any auth headers (goes through the API gateway)
             signed_content=$(curl -s "$BASE_URL/storage/v1$signed_path")
             check "Fetch signed URL (no auth)" "signed url test content" "$signed_content"
         else
@@ -440,10 +442,10 @@ echo ""
 echo "--- Edge Functions ---"
 fn_resp=$(http_body "$BASE_URL/functions/v1/hello" \
     -X POST \
-    -H "Authorization: Bearer $ANON_KEY" \
+    -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
     -H "Content-Type: application/json" \
     -d '{}')
-check "Call hello function" '"Hello from Edge Functions!"' "$fn_resp"
+check "Call hello function" '{"message":"Hello from Edge Functions!"}' "$fn_resp"
 
 # ---------------------------------------------
 # 8. pg-meta (Studio backend)

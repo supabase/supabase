@@ -130,13 +130,15 @@ module.exports = {
               paddingBottom: '2px',
               fontWeight: '400',
               opacity: 1,
-              color: 'var(--foreground-default)',
+              // Match Studio InlineLink: inherit body color, foreground on hover
+              color: 'inherit',
               textDecorationLine: 'underline',
-              textDecorationColor: 'var(--foreground-muted)',
+              textDecorationColor: 'inherit',
               textDecorationThickness: '1px',
               textUnderlineOffset: '2px',
             },
             'a:hover': {
+              color: 'var(--foreground-default)',
               textDecorationColor: 'var(--foreground-default)',
             },
             figcaption: {
@@ -199,7 +201,7 @@ module.exports = {
             '--tw-prose-body': 'var(--foreground-light)',
             '--tw-prose-headings': 'var(--foreground-default)',
             '--tw-prose-lead': 'var(--foreground-light)',
-            '--tw-prose-links': 'hsl(var(--brand-500))',
+            '--tw-prose-links': 'inherit',
             '--tw-prose-bold': 'var(--foreground-light)',
             '--tw-prose-counters': 'var(--foreground-light)',
             '--tw-prose-bullets': 'var(--foreground-muted)',

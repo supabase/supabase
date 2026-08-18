@@ -97,7 +97,7 @@ You can run any of the sites individually by using the scope name. For example:
 pnpm dev:www
 ```
 
-Note: Particularly for `www` make sure you have copied `apps/www/.env.local.example` to `apps/www/.env.local`
+Note: Particularly for `www` make sure you have copied `apps/www/.env.local.example` to `apps/www/.env.local`. For `docs`, see [`apps/docs/DEVELOPERS.md`](./apps/docs/DEVELOPERS.md).
 
 #### Shared components
 

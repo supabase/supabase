@@ -160,4 +160,17 @@ export function useApiKeysCommands() {
       sectionMeta: { priority: 3 },
     }
   )
+
+  useRegisterCommands(
+    COMMAND_MENU_SECTIONS.NAVIGATE,
+    [
+      {
+        id: 'nav-api-keys',
+        name: 'Go to API Keys',
+        route: `/project/${ref}/settings/api-keys`,
+        icon: () => <Key />,
+      },
+    ],
+    { enabled: !!project }
+  )
 }

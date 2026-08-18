@@ -1,3 +1,4 @@
+import { useBreakpoint } from 'common'
 import type { ReactNode } from 'react'
 import { CommandWrapper } from 'ui-patterns/CommandMenu'
 import { MobileSheetNav } from 'ui-patterns/MobileSheetNav'
@@ -37,7 +38,8 @@ function getSheetChildren(
   return null
 }
 
-const StudioMobileSheetNav = () => {
+export const StudioMobileSheetNav = () => {
+  const isMobile = useBreakpoint('md')
   const { content, setContent } = useMobileSheet()
   const { activeSidebar } = useSidebarManagerSnapshot()
   const sheetChildren = getSheetChildren(content, activeSidebar ?? null)
@@ -49,15 +51,24 @@ const StudioMobileSheetNav = () => {
     }
   }
 
+  if (!isMobile) return null
+
   return (
     <MobileSheetNav
       open={content !== null}
       onOpenChange={handleOpenChange}
       shouldCloseOnViewportResize={!activeSidebar}
+      onPointerDownOutside={(event) => {
+        // Buttons in the floating toolbar (#mobile-nav-actions) render outside this sheet, so
+        // Radix treats taps on them as an outside click and closes the sheet before the button's
+        // own onClick runs. Those buttons already manage the sheet themselves, so don't let
+        // Radix's outside-dismiss pre-empt them.
+        if ((event.target as HTMLElement | null)?.closest('#mobile-nav-actions')) {
+          event.preventDefault()
+        }
+      }}
     >
       {sheetChildren}
     </MobileSheetNav>
   )
 }
-
-export { StudioMobileSheetNav }

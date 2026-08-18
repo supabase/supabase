@@ -8,14 +8,14 @@ import { AWS_REGIONS } from 'shared-data'
 import { Badge, Button } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { ReadReplicaDetails } from '@/components/interfaces/Database/Replication/ReadReplicas/ReadReplicaDetails'
+import { DropReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/DropReplicaConfirmationModal'
+import { ReadReplicaDetails } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicaDetails'
+import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'
 import {
   getIsInTransition,
   getStatusLabel,
-} from '@/components/interfaces/Database/Replication/ReadReplicas/ReadReplicas.utils'
-import { DropReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/DropReplicaConfirmationModal'
-import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
-import { RestartReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/RestartReplicaConfirmationModal'
+} from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.utils'
+import { RestartReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/RestartReplicaConfirmationModal'
 import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'

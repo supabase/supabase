@@ -3,7 +3,7 @@ import { AlertCircle, RefreshCw } from 'lucide-react'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import { Alert, AlertDescription, AlertTitle, Button, WarningIcon } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { DNSRecord } from './DNSRecord'
 import { DNSTableHeaders } from './DNSTableHeaders'

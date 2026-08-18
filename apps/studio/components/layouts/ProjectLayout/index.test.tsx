@@ -138,7 +138,7 @@ vi.mock('./PausedState/ProjectPausedState', () => ({ ProjectPausedState: () => n
 vi.mock('./PauseFailedState', () => ({ PauseFailedState: () => null }))
 vi.mock('./PausingState', () => ({ PausingState: () => null }))
 vi.mock('./ProductMenuBar', () => ({
-  default: ({ children }: { children: ReactNode }) => <>{children}</>,
+  ProductMenuBar: ({ children }: { children: ReactNode }) => <>{children}</>,
 }))
 vi.mock('./ResizingState', () => ({ ResizingState: () => null }))
 vi.mock('./RestartingState', () => ({ default: () => null }))
@@ -156,7 +156,11 @@ vi.mock('@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarni
   ResourceExhaustionWarningBanner: () => null,
 }))
 vi.mock('@/components/ui/ButtonTooltip', () => ({
-  ButtonTooltip: ({ children, ...props }: any) => <button {...props}>{children}</button>,
+  ButtonTooltip: ({ children, ...props }: any) => (
+    <button tabIndex={0} {...props}>
+      {children}
+    </button>
+  ),
 }))
 vi.mock('@/components/ui/PartnerIcon', () => ({
   default: () => <div data-testid="partner-icon" />,

@@ -27,7 +27,14 @@ vi.mock('ui', () => ({
     children: ReactNode
     asChild?: boolean
     type?: string
-  }) => (asChild ? <>{children}</> : <button {...props}>{children}</button>),
+  }) =>
+    asChild ? (
+      <>{children}</>
+    ) : (
+      <button tabIndex={0} {...props}>
+        {children}
+      </button>
+    ),
   Card: ({ children }: { children: ReactNode }) => <div>{children}</div>,
   CardContent: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }))

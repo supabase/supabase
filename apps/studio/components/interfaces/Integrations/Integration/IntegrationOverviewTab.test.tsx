@@ -77,7 +77,7 @@ describe('IntegrationOverviewTab', () => {
     customRender(
       <IntegrationOverviewTab
         hideRequiredExtensionsSection
-        actions={<button>Enable webhooks</button>}
+        actions={<button tabIndex={0}>Enable webhooks</button>}
       />
     )
 
@@ -87,7 +87,9 @@ describe('IntegrationOverviewTab', () => {
   })
 
   it('disables actions when extensions are uninstalled and hideRequiredExtensionsSection is false', () => {
-    customRender(<IntegrationOverviewTab actions={<button>Enable integration</button>} />)
+    customRender(
+      <IntegrationOverviewTab actions={<button tabIndex={0}>Enable integration</button>} />
+    )
 
     const actionsArea = screen.getByText('Enable integration').closest('[aria-disabled]')
     expect(actionsArea).toHaveAttribute('aria-disabled', 'true')

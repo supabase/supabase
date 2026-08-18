@@ -56,6 +56,7 @@ import {
 import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
+import { buildUnifiedLogsUrl } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FilterPopover } from '@/components/ui/FilterPopover'
@@ -157,7 +158,6 @@ export const UsersV2 = () => {
     'show',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
-
   const [improvedSearchDismissed, setImprovedSearchDismissed] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.AUTH_USERS_IMPROVED_SEARCH_DISMISSED(projectRef ?? ''),
     false
@@ -373,6 +373,12 @@ export const UsersV2 = () => {
     }
   }
 
+  const onSelectViewLogs = (user: User) => {
+    const identifier = user.id || user.email
+    if (!projectRef || !identifier) return
+    router.push(buildUnifiedLogsUrl({ projectRef, user: identifier }))
+  }
+
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     const isScrollingHorizontally = xScroll.current !== event.currentTarget.scrollLeft
     xScroll.current = event.currentTarget.scrollLeft
@@ -482,6 +488,7 @@ export const UsersV2 = () => {
         setSortByValue: updateSortByValue,
         onSelectDeleteUser: setSelectedUserToDelete,
         onSelectImpersonateUser,
+        onSelectViewLogs,
       })
       setColumns(columns)
       if (columns.length < userTableColumns.length) {
@@ -716,6 +723,7 @@ export const UsersV2 = () => {
                       setSortByValue: updateSortByValue,
                       onSelectDeleteUser: setSelectedUserToDelete,
                       onSelectImpersonateUser,
+                      onSelectViewLogs,
                     })
 
                     setSelectedColumns(value)

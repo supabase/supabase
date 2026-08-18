@@ -1,6 +1,6 @@
 import { Check, Database, Eye, EyeOff, Loader2, Plus, SlidersHorizontal } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import type { UseFormReturn } from 'react-hook-form'
+import { useWatch, type UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   WarningIcon,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -76,15 +76,14 @@ const DuckLakeModeSelector = ({
           <button
             key={option.value}
             type="button"
+            tabIndex={0}
             role="radio"
             aria-checked={selected}
             onClick={() => onChange(option.value)}
             className={cn(
               'relative flex flex-col gap-y-3 rounded-md border p-4 text-left transition',
-              'hover:border-foreground-muted',
-              selected
-                ? 'border-foreground-muted bg-surface-300 ring-1 ring-border'
-                : 'border-default bg-surface-100'
+              'hover:border-control-hover',
+              selected ? 'border-control-hover bg-surface-300' : 'border-default bg-surface-100'
             )}
           >
             <div className="flex items-start justify-between">
@@ -107,7 +106,10 @@ const DuckLakeModeSelector = ({
 }
 
 const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => {
-  const { ducklakeStorageProjectRef } = form.watch()
+  const ducklakeStorageProjectRef = useWatch({
+    control: form.control,
+    name: 'ducklakeStorageProjectRef',
+  })
 
   const [showNewBucketDialog, setShowNewBucketDialog] = useState(false)
   const [newBucketName, setNewBucketName] = useState('')
@@ -476,7 +478,7 @@ const DuckLakeCustomFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="S3 Access Key ID"
+              label="S3 access key ID"
               description={
                 editMode
                   ? 'Stored access key ID is hidden. Enter a new key ID to replace it.'
@@ -500,7 +502,7 @@ const DuckLakeCustomFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="S3 Secret Access Key"
+              label="S3 secret access key"
               description={
                 editMode
                   ? 'Stored secret access key is hidden. Enter a new secret to replace it.'
@@ -532,7 +534,7 @@ const DuckLakeCustomFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="S3 Region"
+              label="S3 region"
               description="Required region for the object storage provider"
             >
               <FormControl>
@@ -548,7 +550,7 @@ const DuckLakeCustomFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="S3 Endpoint"
+              label="S3 endpoint"
               description="Required endpoint without the protocol scheme, for example `127.0.0.1:5000/s3`"
             >
               <FormControl>
@@ -641,7 +643,8 @@ export const DuckLakeFields = ({
   form: UseFormReturn<DestinationPanelSchemaType>
   editMode: boolean
 }) => {
-  const ducklakeMode = (form.watch('ducklakeMode') ?? DUCKLAKE_MODE_SUPABASE) as DucklakeMode
+  const ducklakeMode = (useWatch({ control: form.control, name: 'ducklakeMode' }) ??
+    DUCKLAKE_MODE_SUPABASE) as DucklakeMode
   // The platform API resolves "Use Supabase" config into a flat catalog URL + provisioned S3
   // credentials before persisting, so an existing destination can only be edited as custom
   // parameters — the original project selections aren't recoverable.
@@ -775,7 +778,10 @@ const BucketSelection = ({
   value: string | undefined
   onChange: (value: string) => void
 }) => {
-  const { ducklakeStorageProjectRef } = form.watch()
+  const ducklakeStorageProjectRef = useWatch({
+    control: form.control,
+    name: 'ducklakeStorageProjectRef',
+  })
 
   const {
     data: bucketsData,

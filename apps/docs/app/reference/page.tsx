@@ -1,7 +1,5 @@
-import Link from 'next/link'
-
-import { REFERENCES, clientSdkIds } from '~/content/navigation.references'
-import { IconPanelWithIconPicker } from '~/features/ui/IconPanelWithIconPicker'
+import { clientSdkIds, REFERENCES } from '~/content/navigation.references'
+import { IconLinkList, IconLinkMenuIcon } from '~/features/ui/IconLink'
 import { LayoutMainContent } from '~/layouts/DefaultLayout'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 
@@ -20,41 +18,37 @@ export default function ReferenceIndexPage() {
             Supabase also has a Management API to help with managing your Supabase Platform, and a
             CLI for local development and CI workflows.
           </p>
-          <h2 className="mb-8">Client Libraries</h2>
-          <div className="grid col-span-8 grid-cols-12 gap-6 not-prose">
-            {clientSdkIds.map((sdkId) => {
-              return (
-                <Link
-                  key={REFERENCES[sdkId].name}
-                  href={`/reference/${REFERENCES[sdkId].libPath}`}
-                  passHref
-                  className="col-span-6 md:col-span-4"
-                >
-                  <IconPanelWithIconPicker
-                    title={REFERENCES[sdkId].name}
-                    icon={REFERENCES[sdkId].icon}
-                  />
-                </Link>
-              )
-            })}
-          </div>
-          <h2 className="mb-8">Management API and CLI</h2>
-          <div className="grid col-span-8 grid-cols-12 gap-6 not-prose">
-            <Link
-              href={`/reference/api/introduction`}
-              passHref
-              className="col-span-6 md:col-span-4"
-            >
-              <IconPanelWithIconPicker title="Management API" icon={REFERENCES['api'].icon} />
-            </Link>
-            <Link
-              href={`/reference/cli/introduction`}
-              passHref
-              className="col-span-6 md:col-span-4"
-            >
-              <IconPanelWithIconPicker title="CLI" icon={REFERENCES['cli'].icon} />
-            </Link>
-          </div>
+          <h2 id="client-libraries" className="mb-8">
+            Client Libraries
+          </h2>
+          <IconLinkList
+            labelledBy="client-libraries"
+            className="not-prose"
+            items={clientSdkIds.map((sdkId) => ({
+              title: REFERENCES[sdkId].name,
+              href: `/reference/${REFERENCES[sdkId].libPath}`,
+              icon: <IconLinkMenuIcon icon={REFERENCES[sdkId].icon} />,
+            }))}
+          />
+          <h2 id="management-api-and-cli" className="mb-8">
+            Management API and CLI
+          </h2>
+          <IconLinkList
+            labelledBy="management-api-and-cli"
+            className="not-prose"
+            items={[
+              {
+                title: 'Management API',
+                href: '/reference/api/introduction',
+                icon: <IconLinkMenuIcon icon={REFERENCES['api'].icon} />,
+              },
+              {
+                title: 'CLI',
+                href: '/reference/cli/introduction',
+                icon: <IconLinkMenuIcon icon={REFERENCES['cli'].icon} />,
+              },
+            ]}
+          />
         </article>
       </LayoutMainContent>
     </SidebarSkeleton>

@@ -51,7 +51,7 @@ const Error404 = () => {
             </p>
           </div>
           <div className="flex items-center space-x-4">
-            <Button asChild size="small" className="text-white">
+            <Button asChild size="small">
               <Link href="/">Head back</Link>
             </Button>
           </div>
