@@ -1,5 +1,5 @@
 import assert from 'node:assert'
-import { tool, type ToolCallOptions, type ToolSet } from 'ai'
+import { tool, type ToolExecutionOptions, type ToolSet } from 'ai'
 import { z } from 'zod'
 
 import { getStudioTools } from '../tools/studio-tools'
@@ -423,7 +423,7 @@ function createMockNotebookTools(store: MockNotebookStore) {
       ...list_notebooks,
       execute: async (
         { limit = 20 }: { cursor?: string; limit?: number },
-        _options: ToolCallOptions
+        _options: ToolExecutionOptions<unknown>
       ) => ({
         notebooks: store
           .list()
@@ -442,7 +442,7 @@ function createMockNotebookTools(store: MockNotebookStore) {
     },
     get_notebook: {
       ...get_notebook,
-      execute: async ({ id }: { id: string }, _options: ToolCallOptions) => {
+      execute: async ({ id }: { id: string }, _options: ToolExecutionOptions<unknown>) => {
         const notebook = store.get(id)
         if (!notebook) throw new Error(`Notebook ${id} not found.`)
 
@@ -475,7 +475,7 @@ function createMockNotebookTools(store: MockNotebookStore) {
           description?: string
           content: AgentNotebook
         },
-        _options: ToolCallOptions
+        _options: ToolExecutionOptions<unknown>
       ) => {
         const created = store.create({ name, description, content })
         return { id: created.id, name: created.name }
@@ -493,7 +493,7 @@ function createMockNotebookTools(store: MockNotebookStore) {
           id,
           operations,
         }: { id: string; expected_updated_at: string; operations: NotebookOperation[] },
-        _options: ToolCallOptions
+        _options: ToolExecutionOptions<unknown>
       ) => {
         const notebook = store.get(id)
         if (!notebook) throw new Error(`Notebook ${id} not found.`)
