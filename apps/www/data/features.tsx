@@ -2353,7 +2353,7 @@ Trace propagation also works inbound. supabase-js, Swift, Flutter, and Python ca
 5. Scalability: Handle large volumes of log data with a robust infrastructure designed for high availability and performance.
 6. OpenTelemetry Support: Export telemetry data to vendor-agnostic monitoring platforms for unified observability.
 7. Metrics API: Stream Postgres performance metrics for CPU, IO, WAL, connections, and query statistics.
-8. Client-Side Trace Propagation: correlate a browser request with the matching API Gateway and Edge Function log under one shared trace_id.
+8. Client-Side Trace Propagation: correlate a trace from your client app — web, mobile, or server-side — with the matching API Gateway and Edge Function log under one shared 'trace_id'.
 
 This feature is particularly valuable for teams looking to enhance their application's reliability and performance by gaining deeper insights into usage patterns and potential issues.
 `,
