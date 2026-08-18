@@ -74,6 +74,9 @@ export const storageKeys = {
       objectName,
       ...(lifecyclePolicy ? [lifecyclePolicy] : []),
     ] as const,
+  /** Org-scoped: storage retention is billed per organization, not per project. */
+  retentionUsage: (orgSlug: string | undefined) =>
+    ['organizations', orgSlug, 'storage-retention-usage'] as const,
   icebergNamespaces: ({ projectRef, warehouse }: { projectRef?: string; warehouse?: string }) =>
     [projectRef, 'warehouse', warehouse, 'namespaces'] as const,
   icebergNamespace: ({
