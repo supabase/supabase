@@ -18,7 +18,7 @@ async function getWorker({ projectRef, name }: WorkerVariables, signal?: AbortSi
     signal,
   })
 
-  if (error) handleError(error)
+  if (error) return handleError(error)
   return parseWorker(data.data)
 }
 

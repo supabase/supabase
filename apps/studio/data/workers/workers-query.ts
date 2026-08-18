@@ -17,7 +17,7 @@ async function getWorkers({ projectRef }: WorkersVariables, signal?: AbortSignal
     signal,
   })
 
-  if (error) handleError(error)
+  if (error) return handleError(error)
   return data.data.map(parseWorker)
 }
 
