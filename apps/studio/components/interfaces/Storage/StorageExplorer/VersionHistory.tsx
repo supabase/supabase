@@ -34,10 +34,6 @@ import { formatBytes } from '@/lib/helpers'
 /** Version IDs are long opaque strings; show enough to tell two rows apart. */
 export const shortVersion = (versionId: string) => `${versionId.slice(0, 6)}…${versionId.slice(-2)}`
 
-/**
- * A row's removal outlook. `retained` renders nothing — saying "Retained" on
- * every unflagged row repeats what the absence of a warning already says.
- */
 const VersionFateLabel = ({ fate }: { fate: VersionFate }) => {
   switch (fate.type) {
     case 'retained':
@@ -132,17 +128,13 @@ interface VersionHistoryProps {
   projectRef?: string
   bucketId?: string
   objectName: string
-  /** The bucket's versioning state, for the suspended notice. */
   versioningState: BucketVersioningState
-  /** The bucket's lifecycle policy, which drives the per-row expiry outlook. */
   lifecyclePolicy: LifecyclePolicy
   expirationMode: ExpirationMode
-  /** Drives the row thumbnail glyph — falls back to a generic file icon. */
   mimeType?: string
   previewedVersionId?: string
   onPreview?: (version: ObjectVersion) => void
   clearPreview: () => void
-  /** Opens the bucket settings, where the lifecycle policy is configured. */
   onEditBucket: () => void
 }
 
@@ -275,12 +267,7 @@ export const VersionHistory = ({
                   !isComparing && !isDeleteMarker && 'hover:bg-surface-200'
                 )}
               >
-                {/*
-                 * A marker has no content to preview, so it renders as plain
-                 * content rather than a control that does nothing when pressed.
-                 * A real button elsewhere, so Enter/Space and screen readers
-                 * work for free.
-                 */}
+                {/* A marker has no content to preview */}
                 {isDeleteMarker ? (
                   <span className="flex min-w-0 flex-1 items-center gap-x-2.5">{rowContent}</span>
                 ) : (
