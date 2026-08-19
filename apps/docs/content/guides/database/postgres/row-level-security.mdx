@@ -498,6 +498,20 @@ as select <QUERY>
 
 In older versions of Postgres, protect your views by revoking access from the `anon` and `authenticated` roles, or by putting them in an unexposed schema.
 
+A materialized view has none of these options. It stores its own copy of the rows, so it doesn't consult the policies on the tables it was built from, and Postgres rejects both `security_invoker` and `enable row level security` on one. Granting `select` on a materialized view hands the client every row it holds:
+
+```sql
+-- Reject: the client reads rows the base table's policies withhold.
+create materialized view reports_summary as select * from public.reports;
+grant select on reports_summary to authenticated;
+```
+
+Keep materialized views out of exposed schemas, or grant no client role access to them:
+
+```sql
+revoke all on reports_summary from anon, authenticated;
+```
+
 ## RLS reference
 
 These are the functions and patterns available inside a policy expression.
@@ -611,13 +625,80 @@ using ( (select private.has_good_role()) );
 
 Add member and non-member cases to that table's file under `supabase/tests/`. A member who is not the owner must be allowed; a non-member must not.
 
-Set `search_path = ''` on every `security definer` function and schema-qualify the names inside it. Without a pinned `search_path`, a caller can point an unqualified name at their own object and run it with the function owner's privileges. Check `(select auth.uid())` inside the function body. Revoke `execute` from `public`, then grant `usage` on the schema and `execute` on the function to the role the policy uses. Policy expressions run as the caller, so that role needs both. Keep the function in an unexposed schema so it is not an RPC. New functions grant `execute` to `public` by default.
+Pin `search_path` on every `security definer` function to a schema its callers can't write to, and schema-qualify the names inside it. `search_path = ''` is the usual choice, and it still resolves `pg_catalog`, which Postgres always searches. Without a pinned `search_path`, a caller can point an unqualified name at their own object and run it with the function owner's privileges. Check `(select auth.uid())` inside the function body. Revoke `execute` from `public`, then grant `usage` on the schema and `execute` on the function to the role the policy uses. Policy expressions run as the caller, so that role needs both. Keep the function in an unexposed schema so it is not an RPC. New functions grant `execute` to `public` by default.
 
 <Admonition type="caution">
 
 A `security definer` function in an exposed schema is callable over the Data API with the creator's privileges. Never create one in a schema listed under "Exposed schemas" in your [API settings](/dashboard/project/_/settings/api).
 
 </Admonition>
+
+### Avoid recursive policies
+
+Two tables whose policies read each other deadlock. Postgres raises `42P17`, `infinite recursion detected in policy for relation`, and the query fails for every role the policies apply to.
+
+Sharing features produce this shape. A policy on `lists` checks `list_members` to find who the list is shared with, and a policy on `list_members` checks `lists` to find who owns it:
+
+```sql
+-- Reject: each policy reads the table the other one protects.
+create policy "members read lists" on lists for select
+to authenticated
+using (
+  exists (
+    select 1 from list_members m
+    where m.list_id = lists.id and m.user_id = (select auth.uid())
+  )
+);
+
+create policy "members read membership" on list_members for select
+to authenticated
+using (
+  exists (
+    select 1 from lists l
+    where l.id = list_members.list_id and l.owner_id = (select auth.uid())
+  )
+);
+```
+
+Break the cycle with a [security definer function](#use-security-definer-functions). It reads the membership table as its owner, so the second policy never runs and there's nothing to recurse into:
+
+```sql
+create function private.user_list_ids()
+returns setof uuid
+language sql
+security definer
+set search_path = ''
+stable
+as $$
+  select list_id from public.list_members
+  where user_id = (select auth.uid())
+$$;
+
+revoke execute on function private.user_list_ids() from public;
+grant usage on schema private to authenticated;
+grant execute on function private.user_list_ids() to authenticated;
+
+create policy "members read lists" on lists for select
+to authenticated
+using ( id in (select private.user_list_ids()) );
+
+create policy "members read membership" on list_members for select
+to authenticated
+using ( list_id in (select private.user_list_ids()) );
+```
+
+The function filters on `(select auth.uid())`, so it returns only the caller's lists. A member who doesn't own the list still reads it, and a non-member reads nothing.
+
+### Debug a policy
+
+A policy that denies too much returns no rows and raises no error, so start by establishing which of the two layers stopped the request.
+
+1. Confirm which role ran the query. `select current_user, (select auth.uid());` inside the same session as the failing statement. The Dashboard SQL Editor runs as `postgres`, which has `bypassrls`, so it can't reproduce a client's result. Switch role first, the way the test files do.
+2. Read the policies on the table. `select * from pg_policies where tablename = 'reports';` shows the command, the roles, the mode, and both expressions for each policy.
+3. Compare a privileged read against the client's read. If a [secret key](/docs/guides/getting-started/api-keys) returns the row and `authenticated` doesn't, the row exists and a policy is hiding it. If neither returns it, the row isn't there and the policy is not your problem.
+4. Check the grants before rewriting anything. A missing grant raises `42501` before any policy runs. See [Grants and policies](#grants-and-policies).
+
+An empty array from the Data API is not proof that no matching row exists. See [Why is my select returning an empty data array?](/docs/guides/troubleshooting/why-is-my-select-returning-an-empty-data-array-and-i-have-data-in-the-table-xvOPgx) for the same problem from the client side.
 
 ### Bypassing Row Level Security
 
@@ -646,4 +727,7 @@ This can be useful for system-level access. **Never** share login credentials fo
 - [Testing your database](/docs/guides/database/testing): the CLI test workflow that `supabase test db` runs.
 - [Securing your API](/docs/guides/api/securing-your-api): grants, dedicated schemas, and pre-request checks around the Data API.
 - [Column Level Security](/docs/guides/database/postgres/column-level-security): restrict access to individual columns.
+- [Custom claims and RBAC](/docs/guides/api/custom-claims-and-role-based-access-control-rbac): model roles and permissions in tables when ownership isn't enough.
+- [Storage access control](/docs/guides/storage/security/access-control): RLS on `storage.objects`, where the policy targets a bucket and a path.
+- [Realtime authorization](/docs/guides/realtime/authorization): RLS on channels, which reads claims differently from a table policy.
 - [`supabase-test-helpers`](https://github.com/usebasejump/supabase-test-helpers/tree/main): a community extension that adds user creation and role impersonation helpers to pgTAP.
