@@ -18,6 +18,9 @@ const worker = (name: string, overrides: Partial<Worker> = {}): Worker => ({
   ...overrides,
 })
 
+const renderList = (workers: Worker[]) =>
+  customRender(<WorkersList projectRef="default" workers={workers} />)
+
 const rowNames = () =>
   screen
     .getAllByRole('row')
@@ -30,12 +33,7 @@ describe('WorkersList', () => {
   })
 
   it('renders a row per worker, linking to its detail page', () => {
-    customRender(
-      <WorkersList
-        projectRef="default"
-        workers={[worker('embed'), worker('resize', { buildState: 'building' })]}
-      />
-    )
+    renderList([worker('embed'), worker('resize', { buildState: 'building' })])
 
     expect(rowNames()).toEqual(['embed', 'resize'])
     expect(screen.getByRole('link', { name: 'embed' })).toHaveAttribute(
@@ -46,9 +44,7 @@ describe('WorkersList', () => {
   })
 
   it('narrows the rows as you search, and says so when nothing matches', async () => {
-    customRender(
-      <WorkersList projectRef="default" workers={[worker('embed'), worker('resize-images')]} />
-    )
+    renderList([worker('embed'), worker('resize-images')])
 
     await userEvent.type(screen.getByPlaceholderText('Search by name'), 'resize')
     expect(rowNames()).toEqual(['resize-images'])
@@ -60,7 +56,7 @@ describe('WorkersList', () => {
 
   it('pages through the workers ten at a time', async () => {
     const workers = Array.from({ length: 12 }, (_, index) => worker(`worker-${index}`))
-    customRender(<WorkersList projectRef="default" workers={workers} />)
+    renderList(workers)
 
     expect(rowNames()).toHaveLength(10)
     expect(screen.getByText('Page 1 of 2')).toBeVisible()
@@ -74,7 +70,7 @@ describe('WorkersList', () => {
 
   it('returns to the first page when a search shrinks the results', async () => {
     const workers = Array.from({ length: 12 }, (_, index) => worker(`worker-${index}`))
-    customRender(<WorkersList projectRef="default" workers={workers} />)
+    renderList(workers)
 
     await userEvent.click(screen.getByRole('button', { name: 'Next page' }))
     expect(screen.getByText('Page 2 of 2')).toBeVisible()
