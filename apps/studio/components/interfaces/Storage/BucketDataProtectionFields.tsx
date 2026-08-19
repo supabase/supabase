@@ -229,9 +229,7 @@ const LifecyclePolicySection = ({
     <div className="flex flex-col gap-y-2">
       <div className="flex flex-col gap-y-0.5">
         <p className="text-sm font-medium text-foreground">Lifecycle policy</p>
-        <p className="text-sm text-foreground-lighter">
-          Automatically expire noncurrent versions and archived files past a certain age.
-        </p>
+        <p className="text-sm text-foreground-lighter">Automatically expire noncurrent versions</p>
       </div>
 
       <FormField
@@ -278,6 +276,10 @@ const LifecyclePolicySection = ({
               !hasDays ? 'Requires an expiration age to be set.' : undefined
             }
             layout="flex-row-reverse"
+            // Dim the whole row (label + description + input) so the
+            // dependency reads at a glance rather than the disabled input
+            // sitting under a still-full-strength label.
+            className={!hasDays ? 'opacity-60' : undefined}
           >
             <FormControl>
               <InputGroup>
