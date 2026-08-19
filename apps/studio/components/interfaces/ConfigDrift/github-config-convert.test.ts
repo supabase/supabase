@@ -37,7 +37,7 @@ describe('convertProjectConfigToGitHubConfig', () => {
     expect(result).toEqual({ auth: { enable_signup: false } })
   })
 
-  it('omits secret-looking fields and fields without a registry entry', () => {
+  it('omits fields it has no conversion mapping for, secret-named or not', () => {
     const result = convertProjectConfigToGitHubConfig({
       auth: {
         sms_twilio_auth_token: 'super-secret',
@@ -84,5 +84,94 @@ describe('convertProjectConfigToGitHubConfig', () => {
     })
 
     expect(result).toEqual({ api: { extra_search_path: ['public', 'extensions', 'auth'] } })
+  })
+
+  describe('db.network_restrictions', () => {
+    it('derives enabled from status and splits allowed CIDRs by type', () => {
+      const result = convertProjectConfigToGitHubConfig({
+        database: {
+          network_restrictions: {
+            status: 'applied',
+            allowed_cidrs: [
+              { type: 'v4', address: '10.0.0.0/24' },
+              { type: 'v6', address: '::1/128' },
+            ],
+          },
+        },
+      })
+
+      expect(result).toEqual({
+        db: {
+          network_restrictions: {
+            enabled: true,
+            allowed_cidrs: ['10.0.0.0/24'],
+            allowed_cidrs_v6: ['::1/128'],
+          },
+        },
+      })
+    })
+  })
+
+  describe('db.pooler', () => {
+    it('maps the top-level dashboard pooler section under db.pooler', () => {
+      const result = convertProjectConfigToGitHubConfig({
+        pooler: { pool_mode: 'transaction', default_pool_size: 20, max_client_conn: 100 },
+      })
+
+      expect(result).toEqual({
+        db: { pooler: { pool_mode: 'transaction', default_pool_size: 20, max_client_conn: 100 } },
+      })
+    })
+  })
+
+  describe('storage', () => {
+    it('maps file_size_limit and renames feature flags onto their config.toml fields', () => {
+      const result = convertProjectConfigToGitHubConfig({
+        storage: {
+          file_size_limit: 52428800,
+          features: {
+            s3_protocol: { enabled: true },
+            iceberg_catalog: {
+              enabled: true,
+              max_namespaces: 10,
+              max_tables: 100,
+              max_catalogs: 5,
+            },
+            vector_buckets: { enabled: false, max_buckets: 2, max_indexes: 4 },
+          },
+        },
+      })
+
+      expect(result).toEqual({
+        storage: {
+          file_size_limit: 52428800,
+          s3_protocol: { enabled: true },
+          analytics: { enabled: true, max_namespaces: 10, max_tables: 100, max_catalogs: 5 },
+          vector: { enabled: false, max_buckets: 2, max_indexes: 4 },
+        },
+      })
+    })
+  })
+
+  describe('auth.password_requirements', () => {
+    it('maps NO_REQUIRED_CHARS and null to an empty string', () => {
+      expect(
+        convertProjectConfigToGitHubConfig({
+          auth: { password_required_characters: 'NO_REQUIRED_CHARS' },
+        })
+      ).toEqual({ auth: { password_requirements: '' } })
+
+      expect(
+        convertProjectConfigToGitHubConfig({ auth: { password_required_characters: null } })
+      ).toEqual({ auth: { password_requirements: '' } })
+    })
+
+    it('passes through any other value unchanged', () => {
+      const result = convertProjectConfigToGitHubConfig({
+        auth: { password_required_characters: 'abcdefgABCDEFG01234' },
+      })
+
+      expect(result).toEqual({ auth: { password_requirements: 'abcdefgABCDEFG01234' } })
+    })
   })
 })

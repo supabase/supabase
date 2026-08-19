@@ -18,7 +18,7 @@ type GithubConfigQueryResponse = components['schemas']['GetGitHubConnectionConfi
 export const githubConfigKeys = {
   all: ['github-config'] as const,
   connection: (connectionId?: number, branch?: string) =>
-    [...githubConfigKeys.all, connectionId, branch ?? 'default-branch'] as const,
+    [...githubConfigKeys.all, connectionId, branch] as const,
 }
 
 export async function getGitHubConfig(

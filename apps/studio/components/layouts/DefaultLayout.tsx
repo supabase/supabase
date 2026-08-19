@@ -108,7 +108,7 @@ export const DefaultLayout = ({
                   />
                 )}
                 <LayoutHeader headerTitle={headerTitle} backToDashboardURL={backToDashboardURL} />
-                {showConfigDrift && <GitHubConfigDriftBanner />}
+                {showConfigDrift && ref && <GitHubConfigDriftBanner />}
               </div>
               {/* Main Content Area */}
               <div className="flex flex-1 w-full overflow-y-hidden">

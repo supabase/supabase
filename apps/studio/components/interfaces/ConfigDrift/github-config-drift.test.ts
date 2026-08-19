@@ -30,6 +30,15 @@ describe('getConfigDriftSummary', () => {
     ])
   })
 
+  it('excludes a secret field even when dashboard and config.toml values match', () => {
+    const summary = getConfigDriftSummary({
+      dashboardConfig: { auth: { jwt_secret: 'shh' } },
+      githubConfig: { auth: { jwt_secret: 'shh' } },
+    })
+
+    expect(summary).toEqual({ managedCount: 0, driftedFields: [], unmanagedFields: [] })
+  })
+
   it('reports a field absent from config.toml as unmanaged', () => {
     const summary = getConfigDriftSummary({
       dashboardConfig: { auth: { site_url: 'https://example.com' } },

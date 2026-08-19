@@ -108,7 +108,7 @@ export function getConfigDriftSummary({
 
       const state = getConfigFieldState({
         configPath,
-        dashboardConfig,
+        dashboardConfig: cleanedDashboardConfig,
         githubConfig: cleanedGithubConfig,
       })
 

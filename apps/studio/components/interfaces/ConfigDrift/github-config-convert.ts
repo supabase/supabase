@@ -1,4 +1,6 @@
 import {
+  EXTERNAL_AUTH_PROVIDERS,
+  EXTERNAL_AUTH_PROVIDERS_WITH_URL,
   normalizeRedirectUrls,
   type ConfigDriftDashboardConfig,
 } from './github-config-field-registry'
@@ -166,9 +168,9 @@ function convertAuthRateLimit(
     anonymous_users: asNumber(auth.rate_limit_anonymous_users),
     token_refresh: asNumber(auth.rate_limit_token_refresh),
     web3: asNumber(auth.rate_limit_web3),
-    // rate_limit_verify -> token_verifications and rate_limit_otp -> sign_in_sign_ups are best
-    // guesses from naming — the dashboard field names don't obviously correspond 1:1 to these,
-    // worth confirming against the Auth service source before trusting them.
+    // Confirmed against the Auth service source (supabase/auth#2090): the dashboard's
+    // RATE_LIMIT_VERIFY backs "rate limit for token verifications" and RATE_LIMIT_OTP backs
+    // "rate limit for sign ups and sign ins", despite the naming mismatch.
     token_verifications: asNumber(auth.rate_limit_verify),
     sign_in_sign_ups: asNumber(auth.rate_limit_otp),
   }
@@ -242,35 +244,6 @@ function convertAuthMfa(
     // passkey_enabled, webauthn_rp_*: no config.toml field.
   }
 }
-
-// external_<provider>_enabled/client_id/email_optional/skip_nonce_check is the dashboard's flat
-// naming for every OAuth provider; a handful of self-hosted providers also expose `_url`.
-// external_<provider>_secret is always a secret and is never read here.
-const EXTERNAL_AUTH_PROVIDERS = [
-  'apple',
-  'azure',
-  'bitbucket',
-  'discord',
-  'facebook',
-  'figma',
-  'github',
-  'gitlab',
-  'google',
-  'kakao',
-  'keycloak',
-  'linkedin_oidc',
-  'notion',
-  'slack',
-  'slack_oidc',
-  'spotify',
-  'twitch',
-  'twitter',
-  'x',
-  'workos',
-  'zoom',
-] as const
-
-const EXTERNAL_AUTH_PROVIDERS_WITH_URL = new Set(['azure', 'gitlab', 'keycloak', 'workos'])
 
 function convertAuthExternalProviders(
   auth: Record<string, unknown>

@@ -44,6 +44,35 @@ interface ConfigFieldDefinition {
 
 export type ResolvedConfigFieldDefinition = ConfigFieldDefinition & { configPath: string }
 
+// external_<provider>_enabled/client_id/email_optional/skip_nonce_check is the dashboard's flat
+// naming for every OAuth provider; a handful of self-hosted providers also expose `_url`.
+// external_<provider>_secret is always a secret and is never read here.
+export const EXTERNAL_AUTH_PROVIDERS = [
+  'apple',
+  'azure',
+  'bitbucket',
+  'discord',
+  'facebook',
+  'figma',
+  'github',
+  'gitlab',
+  'google',
+  'kakao',
+  'keycloak',
+  'linkedin_oidc',
+  'notion',
+  'slack',
+  'slack_oidc',
+  'spotify',
+  'twitch',
+  'twitter',
+  'x',
+  'workos',
+  'zoom',
+] as const
+
+export const EXTERNAL_AUTH_PROVIDERS_WITH_URL = new Set(['azure', 'gitlab', 'keycloak', 'workos'])
+
 const toAuthUrlConfigHref = (projectRef: string) => `/project/${projectRef}/auth/url-configuration`
 const toAuthProvidersHref = (projectRef: string) => `/project/${projectRef}/auth/providers`
 const toApiSettingsHref = (projectRef: string) => `/project/${projectRef}/settings/api`
@@ -368,6 +397,18 @@ const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
     settingHref: toProjectHref,
   },
 }
+
+for (const provider of EXTERNAL_AUTH_PROVIDERS) {
+  for (const field of ['enabled', 'client_id', 'email_optional', 'skip_nonce_check']) {
+    CONFIG_FIELD_REGISTRY[`auth.external.${provider}.${field}`] = {
+      settingHref: toAuthProvidersHref,
+    }
+  }
+  if (EXTERNAL_AUTH_PROVIDERS_WITH_URL.has(provider)) {
+    CONFIG_FIELD_REGISTRY[`auth.external.${provider}.url`] = { settingHref: toAuthProvidersHref }
+  }
+}
+
 /**
  * config.toml paths whose values are secrets — never tracked, compared, or displayed.
  * A `*` segment matches any key at that position (e.g. every vault entry, every OAuth provider).
@@ -394,6 +435,8 @@ const SECRET_CONFIG_FIELDS = [
   'auth.sms.vonage.api_secret',
   'auth.external.*.secret',
   'edge_runtime.secrets.*',
+  'experimental.s3_access_key',
+  'experimental.s3_secret_key',
 ] as const
 
 export function isSecretConfigField(configPath: string): boolean {
@@ -457,22 +500,6 @@ export function getConfigValue(config: Record<string, unknown>, configPath: stri
   }
 
   return value
-}
-
-export function setConfigValue(
-  config: Record<string, unknown>,
-  configPath: string,
-  value: unknown
-): void {
-  const segments = configPath.split('.')
-  let target = config
-
-  for (const segment of segments.slice(0, -1)) {
-    if (!isRecord(target[segment])) target[segment] = {}
-    target = target[segment] as Record<string, unknown>
-  }
-
-  target[segments[segments.length - 1]] = value
 }
 
 /**
