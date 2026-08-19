@@ -12,6 +12,9 @@ export interface GitHubConfigSource {
 // objects allow unknown keys since users can add custom sections/providers.
 export const gitHubConfigTomlSchema = z.object({
   project_id: z.string().optional(),
+  // `code` when the config is owned by the repository, which is what lets drift detection fall back
+  // to a field's hosted default when config.toml is silent on it.
+  config_source: z.string().optional(),
   api: z
     .object({
       enabled: z.boolean().optional(),

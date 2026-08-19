@@ -14,7 +14,7 @@ describe('getConfigDriftSummary', () => {
 
   it('reports a differing field as drifted, keeping raw (non-normalized) display values', () => {
     const summary = getConfigDriftSummary({
-      dashboardConfig: { auth: { disable_signup: true } },
+      dashboardConfig: { auth: { enable_signup: false } },
       githubConfig: { auth: { enable_signup: true } },
     })
 
@@ -22,10 +22,9 @@ describe('getConfigDriftSummary', () => {
     expect(summary.driftedFields).toEqual([
       {
         section: 'auth',
-        fieldName: 'DISABLE_SIGNUP',
         configPath: 'auth.enable_signup',
         settingHref: expect.any(Function),
-        dashboardValue: true,
+        dashboardValue: false,
         githubValue: true,
       },
     ])
@@ -41,7 +40,7 @@ describe('getConfigDriftSummary', () => {
       managedCount: 0,
       driftedFields: [],
       unmanagedFields: [
-        { section: 'auth', fieldName: 'SITE_URL', dashboardValue: 'https://example.com' },
+        { section: 'auth', configPath: 'auth.site_url', dashboardValue: 'https://example.com' },
       ],
     })
   })
@@ -49,19 +48,19 @@ describe('getConfigDriftSummary', () => {
   it('falls back to the hosted default when config.toml is code-owned and silent on the field', () => {
     const atDefault = getConfigDriftSummary({
       dashboardConfig: { auth: { site_url: 'http://localhost:3000' } },
-      githubConfig: { auth: {} },
+      githubConfig: { auth: {}, config_source: 'code' },
     })
     expect(atDefault).toEqual({
       managedCount: 0,
       driftedFields: [],
       unmanagedFields: [
-        { section: 'auth', fieldName: 'SITE_URL', dashboardValue: 'http://localhost:3000' },
+        { section: 'auth', configPath: 'auth.site_url', dashboardValue: 'http://localhost:3000' },
       ],
     })
 
     const drifted = getConfigDriftSummary({
       dashboardConfig: { auth: { site_url: 'https://example.com' } },
-      githubConfig: { auth: {} },
+      githubConfig: { auth: {}, config_source: 'code' },
     })
     expect(drifted.driftedFields).toHaveLength(1)
     expect(drifted.driftedFields[0].githubValue).toBe('http://localhost:3000')

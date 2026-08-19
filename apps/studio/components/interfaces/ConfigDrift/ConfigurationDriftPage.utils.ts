@@ -7,28 +7,32 @@ import {
   type ConfigSection,
 } from '@/components/interfaces/ConfigDrift/github-config-field-registry'
 
+/** Keyed by config.toml path — the single identifier a drifted or unmanaged field carries. */
 const FIELD_LABELS: Record<string, string> = {
-  DISABLE_SIGNUP: 'New user signups',
-  EXTERNAL_ANONYMOUS_USERS_ENABLED: 'Anonymous sign-ins',
-  SECURITY_MANUAL_LINKING_ENABLED: 'Manual account linking',
-  SITE_URL: 'Site URL',
-  URI_ALLOW_LIST: 'Redirect URLs',
-  EXTERNAL_EMAIL_ENABLED: 'Email signups',
-  EXTERNAL_PHONE_ENABLED: 'Phone signups',
-  MAILER_AUTOCONFIRM: 'Email confirmations',
-  MAILER_SECURE_EMAIL_CHANGE_ENABLED: 'Secure email change',
-  MAILER_OTP_LENGTH: 'Email OTP length',
-  MAILER_OTP_EXP: 'Email OTP expiry',
-  PASSWORD_MIN_LENGTH: 'Minimum password length',
-  PASSWORD_REQUIRED_CHARACTERS: 'Password requirements',
-  SMS_PROVIDER: 'SMS provider',
-  SMS_AUTOCONFIRM: 'SMS confirmations',
-  SMS_OTP_EXP: 'SMS OTP expiry',
-  SMS_OTP_LENGTH: 'SMS OTP length',
-  SMS_TEMPLATE: 'SMS template',
-  max_rows: 'Max rows',
-  file_size_limit: 'File size limit',
+  'auth.enable_signup': 'New user signups',
+  'auth.enable_anonymous_sign_ins': 'Anonymous sign-ins',
+  'auth.enable_manual_linking': 'Manual account linking',
+  'auth.site_url': 'Site URL',
+  'auth.additional_redirect_urls': 'Redirect URLs',
+  'auth.email.enable_signup': 'Email signups',
+  'auth.sms.enable_signup': 'Phone signups',
+  'auth.email.enable_confirmations': 'Email confirmations',
+  'auth.email.double_confirm_changes': 'Secure email change',
+  'auth.email.otp_length': 'Email OTP length',
+  'auth.email.otp_expiry': 'Email OTP expiry',
+  'auth.minimum_password_length': 'Minimum password length',
+  'auth.password_requirements': 'Password requirements',
+  'auth.sms.provider': 'SMS provider',
+  'auth.sms.enable_confirmations': 'SMS confirmations',
+  'auth.sms.otp_expiry': 'SMS OTP expiry',
+  'auth.sms.otp_length': 'SMS OTP length',
+  'auth.sms.template': 'SMS template',
+  'api.max_rows': 'Max rows',
+  'storage.file_size_limit': 'File size limit',
 }
+
+/** config.toml path of the redirect URL list, which renders as an added/removed diff, not a scalar. */
+const REDIRECT_URLS_CONFIG_PATH = 'auth.additional_redirect_urls'
 
 const CONFIG_KEY_LABELS: Record<string, string> = {
   client_id: 'Client ID',
@@ -97,7 +101,7 @@ type ConfigurationDriftValueDiff =
     }
 
 interface UnmanagedConfigRow {
-  fieldName: string
+  configPath: string
   label: string
   value: string
 }
@@ -115,7 +119,7 @@ export function createConfigurationDriftRows(
   return fields.map((field) => ({
     ...field,
     status: 'drifted' as const,
-    settingLabel: getSettingLabel(field),
+    settingLabel: getConfigFieldLabel(field.configPath),
     settingHref: field.settingHref(projectRef),
     valueDiff: createConfigurationDriftValueDiff(field),
   }))
@@ -129,9 +133,9 @@ export function groupUnmanagedConfigFields(
   for (const field of fields) {
     const rows = bySection.get(field.section) ?? []
     rows.push({
-      fieldName: field.fieldName,
-      label: titleCase(field.fieldName),
-      value: formatConfigFieldValue(field.fieldName, field.dashboardValue),
+      configPath: field.configPath,
+      label: getConfigFieldLabel(field.configPath),
+      value: formatConfigFieldValue(field.configPath, field.dashboardValue),
     })
     bySection.set(field.section, rows)
   }
@@ -143,8 +147,9 @@ export function groupUnmanagedConfigFields(
   }))
 }
 
-function formatConfigFieldValue(fieldName: string, value: unknown): string {
-  const normalizedValue = fieldName === 'URI_ALLOW_LIST' ? normalizeRedirectUrls(value) : value
+function formatConfigFieldValue(configPath: string, value: unknown): string {
+  const normalizedValue =
+    configPath === REDIRECT_URLS_CONFIG_PATH ? normalizeRedirectUrls(value) : value
 
   if (normalizedValue === undefined || normalizedValue === null || normalizedValue === '') {
     return 'Not set'
@@ -161,7 +166,7 @@ function formatConfigFieldValue(fieldName: string, value: unknown): string {
 function createConfigurationDriftValueDiff(
   field: GitHubConfigDriftField
 ): ConfigurationDriftValueDiff {
-  if (field.fieldName === 'URI_ALLOW_LIST') {
+  if (field.configPath === REDIRECT_URLS_CONFIG_PATH) {
     const dashboardUrls = normalizeRedirectUrls(field.dashboardValue)
     const configUrls = normalizeRedirectUrls(field.githubValue)
     const dashboardUrlSet = new Set(dashboardUrls)
@@ -176,21 +181,25 @@ function createConfigurationDriftValueDiff(
 
   return {
     kind: 'scalar',
-    dashboardValue: formatConfigFieldValue(field.fieldName, field.dashboardValue),
-    configValue: formatConfigFieldValue(field.fieldName, field.githubValue),
+    dashboardValue: formatConfigFieldValue(field.configPath, field.dashboardValue),
+    configValue: formatConfigFieldValue(field.configPath, field.githubValue),
   }
 }
 
-function getSettingLabel(field: Pick<GitHubConfigDriftField, 'fieldName' | 'configPath'>): string {
-  const staticLabel = FIELD_LABELS[field.fieldName]
+/**
+ * Prefers a hand-written label, then the `auth.external.<provider>.<key>` shape, and otherwise
+ * title-cases the last path segment — never the whole path, which would leave the dots in.
+ */
+function getConfigFieldLabel(configPath: string): string {
+  const staticLabel = FIELD_LABELS[configPath]
   if (staticLabel) return staticLabel
 
-  const [, section, provider, configKey] = field.configPath.split('.')
+  const [, section, provider, configKey] = configPath.split('.')
   if (section === 'external' && provider && configKey) {
     return `${formatProviderLabel(provider)} · ${CONFIG_KEY_LABELS[configKey] ?? titleCase(configKey)}`
   }
 
-  return titleCase(field.configPath.split('.').at(-1) ?? field.fieldName)
+  return titleCase(configPath.split('.').at(-1) ?? configPath)
 }
 
 function normalizeRedirectUrls(value: unknown): string[] {

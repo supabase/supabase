@@ -19,7 +19,6 @@ interface GitHubConfigFieldState {
 
 export interface GitHubConfigDriftField {
   section: ConfigSection
-  fieldName: string
   configPath: string
   settingHref: (projectRef: string) => string
   dashboardValue: unknown
@@ -28,7 +27,7 @@ export interface GitHubConfigDriftField {
 
 export interface UnmanagedConfigField {
   section: ConfigSection
-  fieldName: string
+  configPath: string
   dashboardValue: unknown
 }
 
@@ -39,15 +38,15 @@ interface GitHubConfigDriftSummary {
 }
 
 function getConfigFieldState({
-  fieldName,
+  configPath,
   dashboardConfig,
   githubConfig,
 }: {
-  fieldName: string
+  configPath: string
   dashboardConfig: GitHubConfigToml
   githubConfig?: GitHubConfigToml
 }): GitHubConfigFieldState {
-  const definition = getFieldDefinition(fieldName)
+  const definition = getFieldDefinition(configPath)
   if (!definition || !githubConfig || isSecretConfigField(definition.configPath)) {
     return { status: 'unmanaged' }
   }
@@ -99,9 +98,9 @@ export function getConfigDriftSummary({
     const sectionConfig = cleanedDashboardConfig[section]
     if (!sectionConfig) continue
 
-    for (const { fieldName, rawValue } of getSectionFieldEntries(sectionConfig)) {
+    for (const { configPath, rawValue } of getSectionFieldEntries(section, sectionConfig)) {
       const state = getConfigFieldState({
-        fieldName,
+        configPath,
         dashboardConfig,
         githubConfig: cleanedGithubConfig,
       })
@@ -111,13 +110,12 @@ export function getConfigDriftSummary({
         continue
       }
       if (state.status === 'unmanaged' || !state.configPath || !state.settingHref) {
-        unmanagedFields.push({ section, fieldName, dashboardValue: rawValue })
+        unmanagedFields.push({ section, configPath, dashboardValue: rawValue })
         continue
       }
 
       driftedFields.push({
         section,
-        fieldName,
         configPath: state.configPath,
         settingHref: state.settingHref,
         dashboardValue: rawValue,

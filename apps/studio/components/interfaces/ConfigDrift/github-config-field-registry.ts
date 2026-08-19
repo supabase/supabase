@@ -54,9 +54,9 @@ const toStorageSettingsHref = (projectRef: string) =>
 const invertBoolean = (value: unknown) => (typeof value === 'boolean' ? !value : value)
 
 /**
- * Every trackable field across every section, keyed by its config.toml dotted path — the same
- * shape `getConfigValue`/`setConfigValue` address. `section` + `dashboardFieldName` record how that
- * path shows up on the dashboard side, so `getFieldDefinition` can resolve either direction.
+ * Every trackable field across every section, keyed by its config.toml dotted path — the same shape
+ * `getConfigValue`/`setConfigValue` address, and the single identifier a field is known by once the
+ * dashboard config has been run through `convertProjectConfigToGitHubConfig`.
  */
 const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
   'auth.enable_signup': {
@@ -191,19 +191,21 @@ export function isSecretConfigField(configPath: string): boolean {
   })
 }
 
-export function getFieldDefinition(fieldName: string): ResolvedConfigFieldDefinition | undefined {
-  return { ...CONFIG_FIELD_REGISTRY[fieldName], configPath: fieldName }
+export function getFieldDefinition(configPath: string): ResolvedConfigFieldDefinition | undefined {
+  return { ...CONFIG_FIELD_REGISTRY[configPath], configPath }
 }
 
 /**
- * A dashboard config section can nest fields arbitrarily deep (e.g. `storage.features.iceberg_catalog.enabled`),
+ * A config section can nest fields arbitrarily deep (e.g. `storage.analytics.max_namespaces`),
  * mirroring how deep `gitHubConfigTomlSchema` itself nests. Recurse through plain objects — but not
- * arrays, which are leaf values — to produce one dot-joined field name per leaf.
+ * arrays, which are leaf values — to produce one section-prefixed dotted path per leaf, matching how
+ * `CONFIG_FIELD_REGISTRY` is keyed.
  */
 export function getSectionFieldEntries(
+  section: ConfigSection,
   sectionConfig: Record<string, unknown>
-): Array<{ fieldName: string; rawValue: unknown }> {
-  const entries: Array<{ fieldName: string; rawValue: unknown }> = []
+): Array<{ configPath: string; rawValue: unknown }> {
+  const entries: Array<{ configPath: string; rawValue: unknown }> = []
 
   function walk(value: unknown, path: string[]) {
     if (isRecord(value)) {
@@ -211,14 +213,13 @@ export function getSectionFieldEntries(
       return
     }
 
-    const joinedPath = path.join('.')
     entries.push({
-      fieldName: joinedPath,
+      configPath: path.join('.'),
       rawValue: value,
     })
   }
 
-  for (const [key, value] of Object.entries(sectionConfig)) walk(value, [key])
+  for (const [key, value] of Object.entries(sectionConfig)) walk(value, [section, key])
 
   return entries
 }

@@ -17,7 +17,7 @@ export function convertProjectConfigToGitHubConfig(
 
   const database = dashboardConfig.database
 
-  return {
+  const config: GitHubConfigToml = {
     db: {
       network_restrictions: convertNetworkRestrictions(database?.network_restrictions),
       pooler: convertPooler(dashboardConfig.pooler),
@@ -32,6 +32,27 @@ export function convertProjectConfigToGitHubConfig(
   // database.ssl_enforced: dashboard-only security toggle, not managed via config.toml
   // database.postgres_settings: user-set Postgres GUC overrides, applied directly to the database
   // rather than declared in config.toml
+
+  return pruneUndefined(config) ?? {}
+}
+
+/**
+ * Every convertX helper always returns every field it knows about, most of them `undefined` when
+ * the source dashboard config didn't have that value. Recursively drop `undefined` leaves and the
+ * empty objects left behind, so callers only see the fields that actually had a value.
+ */
+function pruneUndefined<T>(value: T): T | undefined {
+  if (value === undefined || Array.isArray(value) || typeof value !== 'object' || value === null) {
+    return value === undefined ? undefined : value
+  }
+
+  const result: Record<string, unknown> = {}
+  for (const [key, nestedValue] of Object.entries(value)) {
+    const pruned = pruneUndefined(nestedValue)
+    if (pruned !== undefined) result[key] = pruned
+  }
+
+  return Object.keys(result).length > 0 ? (result as T) : undefined
 }
 
 function convertNetworkRestrictions(

@@ -217,7 +217,7 @@ export function ConfigurationDriftResults({ rows }: { rows: ConfigurationDriftRo
 
       <div>
         {rows.map((row) => (
-          <ConfigurationDriftItem key={row.fieldName} row={row} />
+          <ConfigurationDriftItem key={row.configPath} row={row} />
         ))}
       </div>
     </Card>
@@ -243,7 +243,7 @@ function UnmanagedConfigSection({ groups }: { groups: UnmanagedConfigSectionGrou
               <ul className="divide-y divide-border rounded-md border border-border">
                 {group.rows.map((row) => (
                   <li
-                    key={row.fieldName}
+                    key={row.configPath}
                     className="flex items-center justify-between gap-4 px-3 py-2 text-sm"
                   >
                     <span className="text-foreground-light">{row.label}</span>
