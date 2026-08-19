@@ -18,6 +18,12 @@ const testContext = vi.hoisted(() => ({
   flags: { otelLegacyLogs: true } as Record<string, boolean>,
 }))
 
+// getNotebook simulates network latency via `timeout` — mock it away so this test is fast.
+vi.mock('@/lib/helpers', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/helpers')>()
+  return { ...actual, timeout: () => Promise.resolve() }
+})
+
 vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()
   return {
@@ -129,5 +135,16 @@ describe('ExplorerNotebookTab', () => {
 
     const runNotebookButton = await screen.findByRole('button', { name: 'Run notebook' })
     expect(runNotebookButton).toBeDisabled()
+  })
+
+  it('shows a not-found empty state when the notebook fetch 404s', async () => {
+    // NOTEBOOK_ID isn't one of the stub notebooks, so getNotebook throws a 404 on its own —
+    // no network mock needed since the notebook stub never hits the network.
+    delete notebooksState.notebooks[NOTEBOOK_ID]
+
+    renderNotebookTab()
+
+    await screen.findByText('Notebook not found')
+    expect(screen.queryByRole('button', { name: 'Run notebook' })).not.toBeInTheDocument()
   })
 })

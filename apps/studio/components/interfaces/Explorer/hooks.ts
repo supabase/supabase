@@ -1,6 +1,8 @@
 import { useRouter } from 'next/router'
+import { useEffect, useEffectEvent } from 'react'
 
 import { createMarkdownCellSkeleton, createQueryCellSkeleton } from './utils'
+import { useNotebookQuery } from '@/data/content/notebooks/notebook-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { generateUuid } from '@/lib/api/snippets.browser'
@@ -11,6 +13,37 @@ import { useExplorerQueryStateSnapshot } from '@/state/explorer-query'
 import { useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { type Notebook } from '@/state/notebooks/types'
 import { Notebooks } from '@/types'
+
+/**
+ * Fetches a notebook's content by id and merges it into the valtio store, so landing on
+ * a notebook any way other than creating it in this session (direct link, hard refresh,
+ * clicking it from the nav list) still hydrates `notebooksState`.
+ */
+export const useLoadNotebook = ({ id, projectRef }: { id?: string; projectRef?: string }) => {
+  const notebooksSnap = useNotebooksStateSnapshot()
+  const currentNotebook = id ? notebooksSnap.notebooks[id] : undefined
+
+  const { data, error, isError } = useNotebookQuery(
+    { projectRef, id },
+    {
+      retry: false,
+      // Skip fetching for a not-yet-persisted local notebook (would 404) or one whose
+      // content is already loaded (avoids refetching on every render/navigation).
+      enabled: currentNotebook?.status !== 'new' && !currentNotebook?.notebook.content,
+    }
+  )
+
+  const mergeNotebook = useEffectEvent(() => {
+    // @ts-ignore [Joshen TODO] We'll fix the type validations once API is properly hooked up
+    if (projectRef && data) notebooksSnap.setNotebook({ projectRef, notebook: data })
+  })
+
+  useEffect(() => {
+    mergeNotebook()
+  }, [projectRef, data])
+
+  return { isNotFound: isError && error.code === 404 }
+}
 
 export const useCreateNotebook = () => {
   const router = useRouter()

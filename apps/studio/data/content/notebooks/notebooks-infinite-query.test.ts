@@ -1,50 +1,32 @@
 import { waitFor } from '@testing-library/react'
-import { HttpResponse } from 'msw'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
-import { useNotebooksInfiniteQuery } from './notebooks-infinite-query'
-import type { components } from '@/data/api'
+import { STUB_NOTEBOOKS, useNotebooksInfiniteQuery } from './notebooks-infinite-query'
 import { customRenderHook } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
 
-const NOTEBOOK_ROW = {
-  id: 'd3aadd77-7c3c-4de7-aa5c-5aa8ac270b44',
-  type: 'notebook',
-  name: 'Signup funnel',
-  description: '',
-  favorite: false,
-  folder_id: null,
-  inserted_at: '2024-01-01T00:00:00.000Z',
-  updated_at: '2024-01-01T00:00:00.000Z',
-  visibility: 'project',
-  owner_id: 1,
-  project_id: 1,
-  owner: { id: 1, username: 'test' },
-  updated_by: { id: 1, username: 'test' },
-  content: {
-    schema_version: 1,
-    cells: [],
-  },
-}
+// The stub simulates network latency via `timeout` — mock it away so these tests are fast
+// and don't race against @testing-library's default 1000ms `waitFor` window.
+vi.mock('@/lib/helpers', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/helpers')>()
+  return { ...actual, timeout: () => Promise.resolve() }
+})
 
 describe('useNotebooksInfiniteQuery', () => {
-  it('narrows the page content to notebook rows', async () => {
-    addAPIMock({
-      method: 'get',
-      path: '/platform/projects/:ref/content',
-      response: () =>
-        HttpResponse.json<components['schemas']['GetUserContentResponse']>({
-          cursor: undefined,
-          data: [NOTEBOOK_ROW],
-        } as unknown as components['schemas']['GetUserContentResponse']),
-    })
-
+  it('returns stub notebooks without hitting the network', async () => {
     const { result } = customRenderHook(() => useNotebooksInfiniteQuery({ projectRef: 'default' }))
 
     await waitFor(() => expect(result.current.data).toBeDefined())
 
-    expect(result.current.data?.pages[0].content).toEqual([
-      { ...NOTEBOOK_ROW, content: { schema_version: 1, cells: [] } },
-    ])
+    expect(result.current.data?.pages[0].content).toEqual(STUB_NOTEBOOKS)
+  })
+
+  it('respects the limit', async () => {
+    const { result } = customRenderHook(() =>
+      useNotebooksInfiniteQuery({ projectRef: 'default', limit: 1 })
+    )
+
+    await waitFor(() => expect(result.current.data).toBeDefined())
+
+    expect(result.current.data?.pages[0].content).toHaveLength(1)
   })
 })

@@ -12,7 +12,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { useParams } from 'common'
-import { FileText, Notebook, NotebookText, Play, Save, SquareCode } from 'lucide-react'
+import { FileText, Loader2, Notebook, NotebookText, Play, Save, SquareCode } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { AiIconAnimation, Button } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
@@ -24,6 +24,7 @@ import {
   ExplorerToolbarIcon,
   ExplorerToolbarTitle,
 } from './ExplorerToolbar'
+import { useLoadNotebook } from './hooks'
 import { MarkdownCell } from './MarkdownCell'
 import { QueryCell } from './QueryCell'
 import { type QueryEditorHandle } from './QueryEditor'
@@ -34,12 +35,13 @@ import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export const ExplorerNotebookTab = () => {
-  const { id } = useParams()
+  const { id, ref } = useParams()
   const tabs = useTabsStateSnapshot()
   const snap = useNotebooksStateSnapshot()
 
   const currentNotebook = useCurrentNotebook()
   const { name, content } = currentNotebook?.notebook ?? {}
+  const { isNotFound } = useLoadNotebook({ id, projectRef: ref })
   const cells = content?.cells ?? []
   const queryCellIds = cells.filter(isQueryCell).map((cell) => cell.id)
 
@@ -85,6 +87,27 @@ export const ExplorerNotebookTab = () => {
     const lastCellId = cells[cells.length - 1]?.id
 
     snap.insertCellAfter({ id: notebookId, cellId: lastCellId, cell })
+  }
+
+  if (isNotFound) {
+    return (
+      <div className="px-20 flex flex-col h-full items-center justify-center bg-surface-100">
+        <EmptyStatePresentational
+          icon={<Notebook className="text-foreground-lighter" />}
+          title="Notebook not found"
+          description="This notebook may have been deleted or does not exist."
+          contentClassName="[&>h3]:text-sm [&>p]:text-xs"
+        />
+      </div>
+    )
+  }
+
+  if (!content) {
+    return (
+      <div className="flex flex-col h-full items-center justify-center bg-surface-100">
+        <Loader2 className="animate-spin text-foreground-muted" />
+      </div>
+    )
   }
 
   return (
