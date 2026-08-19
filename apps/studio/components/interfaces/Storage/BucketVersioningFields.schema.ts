@@ -3,16 +3,12 @@ import { z } from 'zod'
 import type { ExpirationMode } from './StorageVersioning.constants'
 
 /**
- * `''` is the in-form empty sentinel for both number fields, so they stay
- * controlled and deletable. Empty means the condition isn't part of the policy,
- * which is distinct from zero.
+ * Empty means the condition isn't part of the policy, which is distinct from zero.
  */
 const versioningNumberField = z.union([z.literal(''), z.coerce.number().int()])
 
-/** S3 lifecycle policies support at most 100 noncurrent versions per rule. */
 export const S3_MAX_NONCURRENT_VERSIONS = 100
 
-/** Spread into the create/edit bucket form schemas so both share one definition. */
 export const bucketVersioningFormFields = {
   enable_versioning: z.boolean().default(false),
   version_expiry_days: versioningNumberField.default(''),
@@ -28,9 +24,7 @@ export interface BucketVersioningFormValues {
 }
 
 /**
- * Call from the parent modal's `.superRefine` so errors surface through the
- * usual `FormItemLayout`/`FormMessage` rendering. Both number fields are
- * optional — an empty value drops that condition from the policy.
+ * Both number fields are optional — an empty value drops that condition from the policy.
  */
 export const superRefineBucketVersioning = (
   data: BucketVersioningFormValues,
@@ -50,8 +44,7 @@ export const superRefineBucketVersioning = (
 
   if (versions === '') return
 
-  // S3 only accepts a noncurrent-count condition alongside a noncurrent-days
-  // one. The form disables the cap while no age is set, so this is a backstop.
+  // S3 only accepts a noncurrent-count condition alongside a noncurrent-days one
   if (days === '') {
     ctx.addIssue({
       path: ['max_noncurrent_versions'],

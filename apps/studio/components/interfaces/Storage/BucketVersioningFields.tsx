@@ -15,21 +15,12 @@ import type { BucketVersioningState, ExpirationMode } from './StorageVersioning.
 import { FormSectionCollapse } from '@/components/ui/FormSectionCollapse'
 
 interface BucketVersioningFieldsProps {
-  /** The bucket's versioning state when the modal opened. Always `disabled` when creating. */
   initialVersioningState?: BucketVersioningState
-  /** The bucket's retention window when the modal opened, for tightening detection. */
   initialRetentionDays?: number | null
-  /** The bucket's version cap when the modal opened, for tightening detection. */
   initialMaxVersions?: number | null
-  /** Public buckets serve every version by default, which is worth calling out. */
   isPublicBucket?: boolean
 }
 
-/**
- * Object versioning and lifecycle policy controls for the create/edit bucket
- * modals. Expects to render inside the parent modal's `<Form>` provider, whose
- * schema spreads `bucketVersioningFormFields`.
- */
 export const BucketVersioningFields = ({
   initialVersioningState = 'disabled',
   initialRetentionDays,
@@ -43,8 +34,8 @@ export const BucketVersioningFields = ({
   const maxVersions = useWatch({ control, name: 'max_noncurrent_versions' })
   const expirationMode = useWatch({ control, name: 'expiration_mode' })
 
-  // Turning the switch off suspends rather than disables, so this is a heads-up
-  // rather than a destructive confirmation.
+  // Turning the switch off suspends rather than disables,
+  // so this is a heads-up rather than a destructive confirmation.
   const isSuspending = !isVersioningEnabled && initialVersioningState !== 'disabled'
 
   const tightening = getRetentionTightening({
