@@ -91,7 +91,6 @@ export function useSelectedGitHubConfigDrift() {
   const summary = useMemo(() => {
     const dashboardConfig = convertProjectConfigToGitHubConfig(projectConfig?.attributes)
 
-    console.log(dashboardConfig)
     return getConfigDriftSummary({
       dashboardConfig: dashboardConfig,
       githubConfig: githubConfigData?.config,

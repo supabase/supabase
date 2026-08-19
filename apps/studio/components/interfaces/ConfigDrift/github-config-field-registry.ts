@@ -49,6 +49,7 @@ const toAuthProvidersHref = (projectRef: string) => `/project/${projectRef}/auth
 const toApiSettingsHref = (projectRef: string) => `/project/${projectRef}/settings/api`
 const toStorageSettingsHref = (projectRef: string) =>
   `/project/${projectRef}/storage/files/settings`
+const toProjectHref = (projectRef: string) => `/project/${projectRef}`
 
 /**
  * Every trackable field across every section, keyed by its config.toml dotted path — the same shape
@@ -143,6 +144,228 @@ const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
   'storage.file_size_limit': {
     settingHref: toStorageSettingsHref,
     normalizeGithubValue: parseFileSizeToBytes,
+  },
+  'api.enabled': {
+    settingHref: toProjectHref,
+  },
+  'api.port': {
+    settingHref: toProjectHref,
+  },
+  'api.schemas': {
+    settingHref: toProjectHref,
+  },
+  'api.extra_search_path': {
+    settingHref: toProjectHref,
+  },
+  'api.tls.enabled': {
+    settingHref: toProjectHref,
+  },
+  'db.port': {
+    settingHref: toProjectHref,
+  },
+  'db.shadow_port': {
+    settingHref: toProjectHref,
+  },
+  'db.major_version': {
+    settingHref: toProjectHref,
+  },
+  'db.pooler.enabled': {
+    settingHref: toProjectHref,
+  },
+  'db.pooler.port': {
+    settingHref: toProjectHref,
+  },
+  'db.pooler.pool_mode': {
+    settingHref: toProjectHref,
+  },
+  'db.pooler.default_pool_size': {
+    settingHref: toProjectHref,
+  },
+  'db.pooler.max_client_conn': {
+    settingHref: toProjectHref,
+  },
+  'db.migrations.enabled': {
+    settingHref: toProjectHref,
+  },
+  'db.migrations.schema_paths': {
+    settingHref: toProjectHref,
+  },
+  'db.seed.enabled': {
+    settingHref: toProjectHref,
+  },
+  'db.seed.sql_paths': {
+    settingHref: toProjectHref,
+  },
+  'db.network_restrictions.enabled': {
+    settingHref: toProjectHref,
+  },
+  'db.network_restrictions.allowed_cidrs': {
+    settingHref: toProjectHref,
+  },
+  'db.network_restrictions.allowed_cidrs_v6': {
+    settingHref: toProjectHref,
+  },
+  'realtime.enabled': {
+    settingHref: toProjectHref,
+  },
+  'studio.enabled': {
+    settingHref: toProjectHref,
+  },
+  'studio.port': {
+    settingHref: toProjectHref,
+  },
+  'studio.api_url': {
+    settingHref: toProjectHref,
+  },
+  'inbucket.enabled': {
+    settingHref: toProjectHref,
+  },
+  'inbucket.port': {
+    settingHref: toProjectHref,
+  },
+  'storage.enabled': {
+    settingHref: toProjectHref,
+  },
+  'storage.s3_protocol.enabled': {
+    settingHref: toProjectHref,
+  },
+  'storage.analytics.enabled': {
+    settingHref: toProjectHref,
+  },
+  'storage.analytics.max_namespaces': {
+    settingHref: toProjectHref,
+  },
+  'storage.analytics.max_tables': {
+    settingHref: toProjectHref,
+  },
+  'storage.analytics.max_catalogs': {
+    settingHref: toProjectHref,
+  },
+  'storage.vector.enabled': {
+    settingHref: toProjectHref,
+  },
+  'storage.vector.max_buckets': {
+    settingHref: toProjectHref,
+  },
+  'storage.vector.max_indexes': {
+    settingHref: toProjectHref,
+  },
+  'auth.enabled': {
+    settingHref: toProjectHref,
+  },
+  'auth.jwt_expiry': {
+    settingHref: toProjectHref,
+  },
+  'auth.enable_refresh_token_rotation': {
+    settingHref: toProjectHref,
+  },
+  'auth.refresh_token_reuse_interval': {
+    settingHref: toProjectHref,
+  },
+  'auth.rate_limit.email_sent': {
+    settingHref: toProjectHref,
+  },
+  'auth.rate_limit.sms_sent': {
+    settingHref: toProjectHref,
+  },
+  'auth.rate_limit.anonymous_users': {
+    settingHref: toProjectHref,
+  },
+  'auth.rate_limit.token_refresh': {
+    settingHref: toProjectHref,
+  },
+  'auth.rate_limit.sign_in_sign_ups': {
+    settingHref: toProjectHref,
+  },
+  'auth.rate_limit.token_verifications': {
+    settingHref: toProjectHref,
+  },
+  'auth.rate_limit.web3': {
+    settingHref: toProjectHref,
+  },
+  'auth.email.secure_password_change': {
+    settingHref: toProjectHref,
+  },
+  'auth.email.max_frequency': {
+    settingHref: toProjectHref,
+  },
+  'auth.sms.max_frequency': {
+    settingHref: toProjectHref,
+  },
+  'auth.sms.twilio.enabled': {
+    settingHref: toProjectHref,
+  },
+  'auth.mfa.max_enrolled_factors': {
+    settingHref: toProjectHref,
+  },
+  'auth.mfa.totp.enroll_enabled': {
+    settingHref: toProjectHref,
+  },
+  'auth.mfa.totp.verify_enabled': {
+    settingHref: toProjectHref,
+  },
+  'auth.mfa.phone.enroll_enabled': {
+    settingHref: toProjectHref,
+  },
+  'auth.mfa.phone.verify_enabled': {
+    settingHref: toProjectHref,
+  },
+  'auth.mfa.phone.otp_length': {
+    settingHref: toProjectHref,
+  },
+  'auth.mfa.phone.template': {
+    settingHref: toProjectHref,
+  },
+  'auth.mfa.phone.max_frequency': {
+    settingHref: toProjectHref,
+  },
+  'auth.web3.solana.enabled': {
+    settingHref: toProjectHref,
+  },
+  'auth.oauth_server.enabled': {
+    settingHref: toProjectHref,
+  },
+  'auth.oauth_server.authorization_url_path': {
+    settingHref: toProjectHref,
+  },
+  'auth.oauth_server.allow_dynamic_registration': {
+    settingHref: toProjectHref,
+  },
+  'edge_runtime.enabled': {
+    settingHref: toProjectHref,
+  },
+  'edge_runtime.policy': {
+    settingHref: toProjectHref,
+  },
+  'edge_runtime.inspector_port': {
+    settingHref: toProjectHref,
+  },
+  'edge_runtime.deno_version': {
+    settingHref: toProjectHref,
+  },
+  'analytics.enabled': {
+    settingHref: toProjectHref,
+  },
+  'analytics.port': {
+    settingHref: toProjectHref,
+  },
+  'analytics.backend': {
+    settingHref: toProjectHref,
+  },
+  'experimental.orioledb_version': {
+    settingHref: toProjectHref,
+  },
+  'experimental.s3_host': {
+    settingHref: toProjectHref,
+  },
+  'experimental.s3_region': {
+    settingHref: toProjectHref,
+  },
+  'experimental.s3_access_key': {
+    settingHref: toProjectHref,
+  },
+  'experimental.s3_secret_key': {
+    settingHref: toProjectHref,
   },
 }
 /**
