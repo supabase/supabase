@@ -47,6 +47,8 @@ where auth.uid() = todos.user_id;
 
 You write RLS rules in SQL, so a rule can express whatever access logic your app needs. Because RLS is a Postgres primitive, it also protects your data when it is reached through third-party tooling, which is what makes it "[defense in depth](<https://en.wikipedia.org/wiki/Defense_in_depth_(computing)>)". Combine RLS with [Supabase Auth](/docs/guides/auth) for end-to-end user security from the browser to the database.
 
+Multiple policies for the same role and operation are permissive by default: if any one of them passes, the row is allowed. A second policy widens access; it never narrows it. To require two checks at once, mark one `as restrictive`. See [MFA](#mfa).
+
 ### Grants and policies
 
 Postgres runs two checks before a client touches a table. Grants decide whether a role can run an operation on the table at all. Policies decide which rows that operation applies to. Set both for every table you expose.
@@ -64,6 +66,8 @@ Adding policies doesn't take those grants back. A table protected only by polici
 Not every project grants these automatically. See [Default privileges](/docs/guides/api/securing-your-api#default-privileges). Grant each role only the operations it needs.
 
 A missing grant raises a `42501` error before any policy runs. When a request fails that your policy should allow, check the grants before you change the policy. To set them, see [Lock down the table](#lock-down-the-table).
+
+Table owners, superusers, and roles with `bypassrls` skip RLS unless you force it. The Dashboard SQL Editor typically runs as `postgres`, the table owner, which is why [Test your policies](#test-your-policies) switches role. Add `alter table ... force row level security` only when the owning role must also obey policies. Don't force it on a lookup table that a `security definer` helper reads as the owner.
 
 ### Authenticated and unauthenticated roles
 
@@ -144,7 +148,7 @@ Write the tests for this table in the same change. See [Test your policies](#tes
 
 ### Write a policy for each operation
 
-Write a separate policy for `select`, `insert`, `update`, and `delete`. Postgres does not accept multiple operations in one `for` clause, and a `for all` policy hides which operation each rule was meant to cover.
+Write a separate policy for `select`, `insert`, `update`, and `delete`. Postgres does not accept multiple operations in one `for` clause, and a `for all` policy hides which operation each rule was meant to cover. To deny an operation, grant nothing and write no policy for it.
 
 These examples use a `profiles` table where each user manages only their own row:
 
@@ -201,7 +205,7 @@ If no `with check` expression is defined, the `using` expression decides both wh
 
 <Admonition type="caution">
 
-To perform an `UPDATE` operation, a corresponding [`SELECT` policy](#select-policies) is required. Without a `SELECT` policy, the `UPDATE` operation will not work as expected.
+Postgres can update a row with only an `update` policy. The Data API also needs a matching [`select` policy](#select-policies) to return the updated row. Without one, the write can succeed and the client still receives no representation.
 
 </Admonition>
 
@@ -413,29 +417,11 @@ Supabase provides some helper functions that make it easier to write policies.
 
 Returns the ID of the user making the request.
 
-<Admonition type="caution" title="`auth.uid()` Returns `null` When Unauthenticated">
+<Admonition type="caution" title="`auth.uid()` returns `null` when unauthenticated">
 
-When a request is made without an authenticated user (e.g., no access token is provided or the session has expired), `auth.uid()` returns `null`.
+When a request has no signed-in user, `auth.uid()` returns `null`. `null = user_id` is unknown in SQL, so a policy like `using (auth.uid() = user_id)` filters the row out instead of raising an error.
 
-This means that a policy like:
-
-```sql
-USING (auth.uid() = user_id)
-```
-
-will silently fail for unauthenticated users, because:
-
-```sql
-null = user_id
-```
-
-is always false in SQL.
-
-To avoid confusion and make your intention clear, we recommend explicitly checking for authentication:
-
-```sql
-USING (auth.uid() IS NOT NULL AND auth.uid() = user_id)
-```
+Scope the policy with `to authenticated` so the expression does not run for `anon`. That is both the correct intention and the cheaper plan. See [Specify roles in your policies](#specify-roles-in-your-policies).
 
 </Admonition>
 
@@ -449,16 +435,18 @@ Not all information present in the JWT should be used in RLS policies. For insta
 
 Returns the JWT of the user making the request. Anything that you store in the user's `raw_app_meta_data` column or the `raw_user_meta_data` column will be accessible using this function. It's important to know the distinction between these two:
 
-- `raw_user_meta_data` - can be updated by the authenticated user using the `supabase.auth.update()` function. It is not a good place to store authorization data.
+- `raw_user_meta_data` - can be updated by the authenticated user using [`updateUser()`](/docs/reference/javascript/auth-updateuser). It is not a good place to store authorization data.
 - `raw_app_meta_data` - cannot be updated by the user, so it's a good place to store authorization data.
 
-The `auth.jwt()` function is extremely versatile. For example, if you store some team data inside `app_metadata`, you can use it to determine whether a particular user belongs to a team. For example, if this was an array of IDs:
+The `auth.jwt()` function is extremely versatile. For example, if you store some team data inside `app_metadata`, you can use it to determine whether a particular user belongs to a team. If `teams` is a JSON array of IDs:
 
 ```sql
 create policy "User is in team"
 on my_table
 to authenticated
-using ( team_id in (select auth.jwt() -> 'app_metadata' -> 'teams'));
+using (
+  ((select auth.jwt()) -> 'app_metadata' -> 'teams') ? team_id::text
+);
 ```
 
 <Admonition type="caution">
@@ -515,6 +503,8 @@ begin
 end;
 $$;
 
+revoke execute on function private.has_good_role() from public, anon, authenticated, service_role;
+
 -- Update our policy to use this function:
 create policy "rls_test_select"
 on test_table
@@ -522,7 +512,7 @@ to authenticated
 using ( (select private.has_good_role()) );
 ```
 
-Set `search_path = ''` on every `security definer` function and schema-qualify the names inside it. Without a pinned `search_path`, a caller can point an unqualified name at their own object and run it with the function owner's privileges.
+Set `search_path = ''` on every `security definer` function and schema-qualify the names inside it. Without a pinned `search_path`, a caller can point an unqualified name at their own object and run it with the function owner's privileges. Check `(select auth.uid())` inside the function body, and revoke `execute` from `public` and the client roles. New functions grant `execute` to `public` by default.
 
 <Admonition type="caution">
 
