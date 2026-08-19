@@ -149,11 +149,12 @@ export const ActivityRow = ({
         activity.state === 'idle in transaction (aborted)') &&
         durationSeconds >= WARN_DURATION_IDLE_TXN))
 
-  const onCancelQuery = async () => {
+  const onCancelQuery = async (origin: 'dropdown_menu' | 'terminate_dialog') => {
     const isBlocking = (data ?? []).some((x) => x.blocked_by.includes(activity.pid))
     track('query_cancel_button_clicked', {
       activityState: activity.state,
       isBlocking,
+      origin,
     })
 
     const toastId = toast.loading(`Cancelling query (ID: ${activity.pid})`)
@@ -445,7 +446,7 @@ export const ActivityRow = ({
                 disabled={
                   activity.state !== 'active' || superuserRoles?.includes(activity.role_name)
                 }
-                onClick={onCancelQuery}
+                onClick={() => onCancelQuery('dropdown_menu')}
                 tooltip={{
                   content: {
                     side: 'left',
@@ -503,7 +504,10 @@ export const ActivityRow = ({
             <AlertDialogCancel>Back</AlertDialogCancel>
             <div className="flex items-center gap-x-2">
               {activity.state === 'active' && (
-                <AlertDialogAction variant="default" onClick={onCancelQuery}>
+                <AlertDialogAction
+                  variant="default"
+                  onClick={() => onCancelQuery('terminate_dialog')}
+                >
                   Cancel query
                 </AlertDialogAction>
               )}

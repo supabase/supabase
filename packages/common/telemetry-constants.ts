@@ -1605,7 +1605,8 @@ export interface SessionTerminateSubmittedEvent {
 }
 
 /**
- * User clicked the Cancel query menu item for a database session in the Database Connections activity table.
+ * User clicked Cancel query for a database session in the Database Connections activity table,
+ * either from the row's dropdown menu or from the terminate session confirmation dialog.
  *
  * @group Events
  * @source studio
@@ -1619,6 +1620,10 @@ export interface QueryCancelButtonClickedEvent {
      * Whether the session whose query is being cancelled was itself blocking one or more other sessions.
      */
     isBlocking: boolean
+    /**
+     * Which surface the cancel was triggered from.
+     */
+    origin: 'dropdown_menu' | 'terminate_dialog'
   }
   groups: TelemetryGroups
 }
