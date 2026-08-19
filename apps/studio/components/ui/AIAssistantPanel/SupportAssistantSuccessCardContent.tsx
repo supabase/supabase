@@ -19,6 +19,7 @@ import { buildSupportAssistantPrompt } from '@/components/interfaces/Support/Sup
 import type { SubmittedSupportRequest } from '@/components/interfaces/Support/SupportForm.state'
 import { NO_PROJECT_MARKER } from '@/components/interfaces/Support/SupportForm.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useTrack } from '@/lib/telemetry/track'
 import {
   useAiAssistantState,
@@ -60,9 +61,24 @@ export function SupportAssistantSuccessCardContent({
 
   const assistantPrompt = useMemo(() => buildSupportAssistantPrompt(request), [request])
 
+  // The org-view support form resolves projectRef itself (defaulting to the
+  // first project in the org) rather than reading it from the URL, so the
+  // assistant's context needs the connection string fetched explicitly too.
+  const { data: projectDetail } = useProjectDetailQuery(
+    { ref: request.projectRef },
+    { enabled: hasAssistantContext }
+  )
+
   useEffect(() => {
     if (!hasAssistantContext) return
+    if (!projectDetail?.connectionString) return
     if (createdChatIdRef.current) return
+
+    aiAssistantState.setContext({
+      projectRef: request.projectRef,
+      orgSlug: request.organizationSlug,
+      connectionString: projectDetail.connectionString,
+    })
 
     const newChatId = aiAssistant.newChat({
       name: 'Support request',
@@ -71,7 +87,9 @@ export function SupportAssistantSuccessCardContent({
 
     createdChatIdRef.current = newChatId
     setChatId(newChatId)
-  }, [aiAssistant, assistantPrompt, hasAssistantContext])
+    // aiAssistantState is a stable context value (same identity across renders)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [aiAssistant, assistantPrompt, hasAssistantContext, projectDetail?.connectionString, request])
 
   const handleOpenAssistant = () => {
     track(

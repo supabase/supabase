@@ -168,14 +168,19 @@ export const AssistantChat = ({
   const currentTable = tables?.find((t) => t.id.toString() === entityId)
   const currentSchema = searchParams?.get('schema') ?? 'public'
 
-  // Update context in state
+  // Update context in state. Skip when there's no project in the URL (e.g. org-level
+  // pages) and the open chat is a support chat that already set its own project
+  // context (see SupportAssistantSuccessCardContent) — otherwise this would clobber
+  // that context back to undefined as soon as the panel mounts.
   useEffect(() => {
+    if (!project?.ref && currentChat?.supportMetadata?.projectRef) return
+
     state.setContext({
       projectRef: project?.ref,
       orgSlug: selectedOrganization?.slug,
       connectionString: project?.connectionString ?? '',
     })
-  }, [project?.ref, project?.connectionString, selectedOrganization?.slug, state])
+  }, [project?.ref, project?.connectionString, selectedOrganization?.slug, state, currentChat])
 
   const track = useTrack()
 
