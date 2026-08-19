@@ -18,7 +18,7 @@ async function getWorkers({ projectRef }: WorkersVariables, signal?: AbortSignal
   })
 
   if (error) return handleError(error)
-  return data.data.map(parseWorker)
+  return data.data.map((worker) => parseWorker(worker))
 }
 
 export type WorkersData = Awaited<ReturnType<typeof getWorkers>>
