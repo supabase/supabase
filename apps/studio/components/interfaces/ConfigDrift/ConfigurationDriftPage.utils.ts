@@ -1,9 +1,11 @@
 import {
-  CONFIG_SECTIONS,
-  type ConfigSection,
   type GitHubConfigDriftField,
   type UnmanagedConfigField,
 } from '@/components/interfaces/ConfigDrift/github-config-drift'
+import {
+  CONFIG_SECTIONS,
+  type ConfigSection,
+} from '@/components/interfaces/ConfigDrift/github-config-field-registry'
 
 const FIELD_LABELS: Record<string, string> = {
   DISABLE_SIGNUP: 'New user signups',

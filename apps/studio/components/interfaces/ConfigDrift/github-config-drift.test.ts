@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { convertProjectConfigToGitHubConfig, getConfigDriftSummary } from './github-config-drift'
+import { convertProjectConfigToGitHubConfig } from './github-config-convert'
+import { getConfigDriftSummary } from './github-config-drift'
 
 describe('convertProjectConfigToGitHubConfig', () => {
   it('returns an empty object when no dashboard config is provided', () => {

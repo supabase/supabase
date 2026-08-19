@@ -157,7 +157,6 @@ import { Route as ProjectRefDatabaseFunctionsRouteImport } from './routes/projec
 import { Route as ProjectRefDatabaseExtensionsRouteImport } from './routes/project/$ref/database/extensions'
 import { Route as ProjectRefDatabaseColumnPrivilegesRouteImport } from './routes/project/$ref/database/column-privileges'
 import { Route as ProjectRefBranchesMergeRequestsRouteImport } from './routes/project/$ref/branches/merge-requests'
-import { Route as ProjectRefBranchesConfigurationDriftRouteImport } from './routes/project/$ref/branches/configuration-drift'
 import { Route as ProjectRefAuthUsersRouteImport } from './routes/project/$ref/auth/users'
 import { Route as ProjectRefAuthUrlConfigurationRouteImport } from './routes/project/$ref/auth/url-configuration'
 import { Route as ProjectRefAuthThirdPartyRouteImport } from './routes/project/$ref/auth/third-party'
@@ -1121,12 +1120,6 @@ const ProjectRefBranchesMergeRequestsRoute =
   ProjectRefBranchesMergeRequestsRouteImport.update({
     id: '/merge-requests',
     path: '/merge-requests',
-    getParentRoute: () => ProjectRefBranchesRoute,
-  } as any)
-const ProjectRefBranchesConfigurationDriftRoute =
-  ProjectRefBranchesConfigurationDriftRouteImport.update({
-    id: '/configuration-drift',
-    path: '/configuration-drift',
     getParentRoute: () => ProjectRefBranchesRoute,
   } as any)
 const ProjectRefAuthUsersRoute = ProjectRefAuthUsersRouteImport.update({
@@ -2220,7 +2213,6 @@ export interface FileRoutesByFullPath {
   '/project/$ref/auth/third-party': typeof ProjectRefAuthThirdPartyRoute
   '/project/$ref/auth/url-configuration': typeof ProjectRefAuthUrlConfigurationRoute
   '/project/$ref/auth/users': typeof ProjectRefAuthUsersRoute
-  '/project/$ref/branches/configuration-drift': typeof ProjectRefBranchesConfigurationDriftRoute
   '/project/$ref/branches/merge-requests': typeof ProjectRefBranchesMergeRequestsRoute
   '/project/$ref/database/column-privileges': typeof ProjectRefDatabaseColumnPrivilegesRoute
   '/project/$ref/database/extensions': typeof ProjectRefDatabaseExtensionsRoute
@@ -2526,7 +2518,6 @@ export interface FileRoutesByTo {
   '/project/$ref/auth/third-party': typeof ProjectRefAuthThirdPartyRoute
   '/project/$ref/auth/url-configuration': typeof ProjectRefAuthUrlConfigurationRoute
   '/project/$ref/auth/users': typeof ProjectRefAuthUsersRoute
-  '/project/$ref/branches/configuration-drift': typeof ProjectRefBranchesConfigurationDriftRoute
   '/project/$ref/branches/merge-requests': typeof ProjectRefBranchesMergeRequestsRoute
   '/project/$ref/database/column-privileges': typeof ProjectRefDatabaseColumnPrivilegesRoute
   '/project/$ref/database/extensions': typeof ProjectRefDatabaseExtensionsRoute
@@ -2843,7 +2834,6 @@ export interface FileRoutesById {
   '/project/$ref/auth/third-party': typeof ProjectRefAuthThirdPartyRoute
   '/project/$ref/auth/url-configuration': typeof ProjectRefAuthUrlConfigurationRoute
   '/project/$ref/auth/users': typeof ProjectRefAuthUsersRoute
-  '/project/$ref/branches/configuration-drift': typeof ProjectRefBranchesConfigurationDriftRoute
   '/project/$ref/branches/merge-requests': typeof ProjectRefBranchesMergeRequestsRoute
   '/project/$ref/database/column-privileges': typeof ProjectRefDatabaseColumnPrivilegesRoute
   '/project/$ref/database/extensions': typeof ProjectRefDatabaseExtensionsRoute
@@ -3162,7 +3152,6 @@ export interface FileRouteTypes {
     | '/project/$ref/auth/third-party'
     | '/project/$ref/auth/url-configuration'
     | '/project/$ref/auth/users'
-    | '/project/$ref/branches/configuration-drift'
     | '/project/$ref/branches/merge-requests'
     | '/project/$ref/database/column-privileges'
     | '/project/$ref/database/extensions'
@@ -3468,7 +3457,6 @@ export interface FileRouteTypes {
     | '/project/$ref/auth/third-party'
     | '/project/$ref/auth/url-configuration'
     | '/project/$ref/auth/users'
-    | '/project/$ref/branches/configuration-drift'
     | '/project/$ref/branches/merge-requests'
     | '/project/$ref/database/column-privileges'
     | '/project/$ref/database/extensions'
@@ -3784,7 +3772,6 @@ export interface FileRouteTypes {
     | '/project/$ref/auth/third-party'
     | '/project/$ref/auth/url-configuration'
     | '/project/$ref/auth/users'
-    | '/project/$ref/branches/configuration-drift'
     | '/project/$ref/branches/merge-requests'
     | '/project/$ref/database/column-privileges'
     | '/project/$ref/database/extensions'
@@ -5142,13 +5129,6 @@ declare module '@tanstack/react-router' {
       path: '/merge-requests'
       fullPath: '/project/$ref/branches/merge-requests'
       preLoaderRoute: typeof ProjectRefBranchesMergeRequestsRouteImport
-      parentRoute: typeof ProjectRefBranchesRoute
-    }
-    '/project/$ref/branches/configuration-drift': {
-      id: '/project/$ref/branches/configuration-drift'
-      path: '/configuration-drift'
-      fullPath: '/project/$ref/branches/configuration-drift'
-      preLoaderRoute: typeof ProjectRefBranchesConfigurationDriftRouteImport
       parentRoute: typeof ProjectRefBranchesRoute
     }
     '/project/$ref/auth/users': {
@@ -6547,14 +6527,11 @@ const ProjectRefAuthRouteWithChildren = ProjectRefAuthRoute._addFileChildren(
 )
 
 interface ProjectRefBranchesRouteChildren {
-  ProjectRefBranchesConfigurationDriftRoute: typeof ProjectRefBranchesConfigurationDriftRoute
   ProjectRefBranchesMergeRequestsRoute: typeof ProjectRefBranchesMergeRequestsRoute
   ProjectRefBranchesIndexRoute: typeof ProjectRefBranchesIndexRoute
 }
 
 const ProjectRefBranchesRouteChildren: ProjectRefBranchesRouteChildren = {
-  ProjectRefBranchesConfigurationDriftRoute:
-    ProjectRefBranchesConfigurationDriftRoute,
   ProjectRefBranchesMergeRequestsRoute: ProjectRefBranchesMergeRequestsRoute,
   ProjectRefBranchesIndexRoute: ProjectRefBranchesIndexRoute,
 }
