@@ -35,7 +35,7 @@ const buildHeader = (name: string, size: number): Uint8Array => {
 
 const padToBlock = (length: number) => (BLOCK_SIZE - (length % BLOCK_SIZE)) % BLOCK_SIZE
 
-export const createTar = (files: TarFile[]): Uint8Array => {
+export const createTar = (files: TarFile[]): Uint8Array<ArrayBuffer> => {
   const encoder = new TextEncoder()
   const parts: Uint8Array[] = []
 
@@ -50,7 +50,7 @@ export const createTar = (files: TarFile[]): Uint8Array => {
   parts.push(new Uint8Array(BLOCK_SIZE * 2))
 
   const total = parts.reduce((size, part) => size + part.length, 0)
-  const tar = new Uint8Array(total)
+  const tar = new Uint8Array(new ArrayBuffer(total))
   let offset = 0
   for (const part of parts) {
     tar.set(part, offset)
