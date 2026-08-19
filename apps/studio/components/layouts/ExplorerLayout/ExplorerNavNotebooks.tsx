@@ -17,6 +17,7 @@ export const ExplorerNavNotebooks = ({ onBack }: { onBack: () => void }) => {
   const { data: notebooksData, isPending } = useNotebooksInfiniteQuery({
     projectRef: ref,
     limit: 100,
+    name: search,
   })
   const notebooks = useMemo(() => {
     const items = notebooksData?.pages.flatMap((page) => page.content) ?? []
