@@ -1,4 +1,3 @@
-import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { NotebookText } from 'lucide-react'
 import Link from 'next/link'
@@ -15,10 +14,10 @@ export const ExplorerNavNotebooks = ({ onBack }: { onBack: () => void }) => {
   const { ref, id } = useParams()
   const [search, setSearch] = useState('')
 
-  const { data: notebooksData, isPending } = useNotebooksInfiniteQuery(
-    { projectRef: ref, limit: 100 },
-    { placeholderData: keepPreviousData }
-  )
+  const { data: notebooksData, isPending } = useNotebooksInfiniteQuery({
+    projectRef: ref,
+    limit: 100,
+  })
   const notebooks = useMemo(() => {
     const items = notebooksData?.pages.flatMap((page) => page.content) ?? []
     return items

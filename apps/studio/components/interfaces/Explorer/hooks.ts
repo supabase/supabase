@@ -23,13 +23,16 @@ export const useLoadNotebook = ({ id, projectRef }: { id?: string; projectRef?: 
   const notebooksSnap = useNotebooksStateSnapshot()
   const currentNotebook = id ? notebooksSnap.notebooks[id] : undefined
 
+  const isCurrentProjectNotebook = currentNotebook?.projectRef === projectRef
+  const isNewLocalNotebook = isCurrentProjectNotebook && currentNotebook?.status === 'new'
+  const hasLoadedNotebook =
+    isCurrentProjectNotebook && currentNotebook?.notebook.content !== undefined
+
   const { data, error, isError } = useNotebookQuery(
     { projectRef, id },
     {
       retry: false,
-      // Skip fetching for a not-yet-persisted local notebook (would 404) or one whose
-      // content is already loaded (avoids refetching on every render/navigation).
-      enabled: currentNotebook?.status !== 'new' && !currentNotebook?.notebook.content,
+      enabled: !isNewLocalNotebook && !hasLoadedNotebook,
     }
   )
 

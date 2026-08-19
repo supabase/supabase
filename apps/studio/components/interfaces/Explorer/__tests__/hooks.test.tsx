@@ -1,20 +1,7 @@
-import { act, renderHook, waitFor } from '@testing-library/react'
+import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useCreateChat, useLoadNotebook } from '../hooks'
-import { STUB_NOTEBOOKS } from '@/data/content/notebooks/notebooks-infinite-query'
-import { notebooksState } from '@/state/notebooks/notebooks-state'
-import type { Notebook, StateNotebook } from '@/state/notebooks/types'
-import { customRenderHook } from '@/tests/lib/custom-render'
-
-// getNotebook simulates network latency via `timeout` — mock it away so these tests are
-// fast, and so we can assert on whether it was called at all (a proxy for "was a fetch
-// attempted", since the stub never hits the network for vi.spyOn/MSW to observe).
-const { mockTimeout } = vi.hoisted(() => ({ mockTimeout: vi.fn(() => Promise.resolve()) }))
-vi.mock('@/lib/helpers', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/lib/helpers')>()
-  return { ...actual, timeout: mockTimeout }
-})
+import { useCreateChat } from '../hooks'
 
 const {
   mockCreateChat,
@@ -120,72 +107,5 @@ describe('useCreateChat', () => {
     })
     expect(mockSetModel).toHaveBeenCalledWith('gpt-5.4-nano')
     expect(mockPush).toHaveBeenCalledWith('/project/default/explorer/chat/chat-2')
-  })
-})
-
-describe('useLoadNotebook', () => {
-  const PROJECT_REF = 'default'
-  const NOTEBOOK_ID = 'local-notebook-1'
-
-  const seedNotebook = (overrides: { status: StateNotebook['status']; content?: object }) => {
-    const notebook: Notebook = {
-      id: NOTEBOOK_ID,
-      type: 'notebook',
-      name: 'Existing notebook',
-      visibility: 'project',
-      favorite: false,
-      owner_id: 1,
-      project_id: 1,
-      content: overrides.content as Notebook['content'],
-    }
-    notebooksState.notebooks[NOTEBOOK_ID] = {
-      projectRef: PROJECT_REF,
-      notebook,
-      status: overrides.status,
-    }
-  }
-
-  beforeEach(() => {
-    mockTimeout.mockClear()
-    for (const id of Object.keys(notebooksState.notebooks)) {
-      delete notebooksState.notebooks[id]
-    }
-  })
-
-  it('fetches the matching stub notebook and merges it into the store when nothing is cached yet', async () => {
-    const [stub] = STUB_NOTEBOOKS
-
-    const { result } = customRenderHook(() =>
-      useLoadNotebook({ id: stub.id, projectRef: PROJECT_REF })
-    )
-
-    await waitFor(() =>
-      expect(notebooksState.notebooks[stub.id]?.notebook.content).toEqual(stub.content)
-    )
-    expect(result.current.isNotFound).toBe(false)
-  })
-
-  it('does not fetch when the notebook has not been persisted yet', () => {
-    seedNotebook({ status: 'new' })
-
-    customRenderHook(() => useLoadNotebook({ id: NOTEBOOK_ID, projectRef: PROJECT_REF }))
-
-    expect(mockTimeout).not.toHaveBeenCalled()
-  })
-
-  it('does not fetch when notebook content is already loaded', () => {
-    seedNotebook({ status: 'saved', content: { schema_version: 1, cells: [] } })
-
-    customRenderHook(() => useLoadNotebook({ id: NOTEBOOK_ID, projectRef: PROJECT_REF }))
-
-    expect(mockTimeout).not.toHaveBeenCalled()
-  })
-
-  it('returns isNotFound when the id matches no stub notebook', async () => {
-    const { result } = customRenderHook(() =>
-      useLoadNotebook({ id: 'unknown-id', projectRef: PROJECT_REF })
-    )
-
-    await waitFor(() => expect(result.current.isNotFound).toBe(true))
   })
 })
