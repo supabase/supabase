@@ -8,7 +8,7 @@ import { z } from 'zod'
 
 import { RealtimeSettings } from './RealtimeSettings'
 import type { Entitlement, FeatureKey } from '@/data/entitlements/entitlements-query'
-import type { RealtimeConfiguration } from '@/data/realtime/realtime-config-query'
+import type { RealtimeConfigurationData } from '@/data/realtime/realtime-config-query'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -53,7 +53,7 @@ vi.mock('@/lib/constants', async (importOriginal) => {
   return { ...actual, IS_PLATFORM: true }
 })
 
-const REALTIME_CONFIG: RealtimeConfiguration = {
+const REALTIME_CONFIG = {
   connection_pool: 2,
   postgres_changes_pool: 2,
   max_bytes_per_second: 100000,
@@ -66,7 +66,7 @@ const REALTIME_CONFIG: RealtimeConfiguration = {
   presence_enabled: true,
   private_only: false,
   suspend: false,
-}
+} as const satisfies RealtimeConfigurationData
 
 const REALTIME_ENTITLEMENTS: Entitlement[] = (
   [
@@ -100,7 +100,7 @@ describe('RealtimeSettings', () => {
     addAPIMock({
       method: 'get',
       path: '/platform/projects/:ref/config/realtime',
-      response: () => HttpResponse.json<RealtimeConfiguration>(REALTIME_CONFIG),
+      response: () => HttpResponse.json<RealtimeConfigurationData>(REALTIME_CONFIG),
     })
 
     addAPIMock({
