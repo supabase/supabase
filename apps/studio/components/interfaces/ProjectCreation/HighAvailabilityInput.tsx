@@ -4,6 +4,7 @@ import { type CloudProvider } from 'shared-data'
 import { Badge, FormControl, FormField, Switch, useWatch } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import { HIGH_AVAILABILITY_INSTANCE_SIZE } from './ProjectCreation.constants'
 import { CreateProjectForm } from './ProjectCreation.schema'
 import Panel from '@/components/ui/Panel'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
@@ -28,10 +29,12 @@ export const HighAvailabilityInput = ({
     cloudProvider: CloudProvider | undefined
     postgresVersionSelection: string | undefined
     dbRegion: string | null
+    instanceSize: string | null
   }>({
     cloudProvider: undefined,
     postgresVersionSelection: undefined,
     dbRegion: null,
+    instanceSize: null,
   })
 
   const handleHighAvailabilityChange = (checked: boolean) => {
@@ -75,6 +78,23 @@ export const HighAvailabilityInput = ({
       }
     }
   }
+
+  // instanceSize can't be set in the toggle handler like the fields above: the compute size
+  // Select's options swap in the same render, and Radix clears a value assigned in the same
+  // tick its option mounts (the hidden native select's options update one render later).
+  // Setting it from an effect runs after the option list has rendered.
+  useEffect(() => {
+    if (highAvailability) {
+      const currentInstanceSize = getValues('instanceSize')
+      if (currentInstanceSize !== HIGH_AVAILABILITY_INSTANCE_SIZE) {
+        beforeHighAvailability.current.instanceSize = currentInstanceSize ?? null
+        setValue('instanceSize', HIGH_AVAILABILITY_INSTANCE_SIZE)
+      }
+    } else if (beforeHighAvailability.current.instanceSize !== null) {
+      setValue('instanceSize', beforeHighAvailability.current.instanceSize)
+      beforeHighAvailability.current.instanceSize = null
+    }
+  }, [highAvailability, getValues, setValue])
 
   // Catches the case where highAvailabilityRegionName wasn't loaded yet at the moment the
   // toggle fired above (the org's available-regions query for AWS_K8S may still be in
