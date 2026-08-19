@@ -1,13 +1,13 @@
-export type WorkerBuildState = 'building' | 'active' | 'failed'
+import type { components } from 'api-types'
 
+type WorkerAttributes = components['schemas']['V2WorkerResponse']['data']['attributes']
+
+export type WorkerBuildState = WorkerAttributes['build_state']
+
+export type WorkerInstanceTally = NonNullable<WorkerAttributes['instances']>
+
+// The API types `spec.exposure` as a free-form string; the UI only handles these two values.
 export type WorkerAccess = 'public' | 'private'
-
-export interface WorkerInstanceTally {
-  declared: number
-  live: number
-  ready: number
-  stale: number
-}
 
 export interface Worker {
   name: string
