@@ -23,6 +23,7 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { AlertError } from '@/components/ui/AlertError'
@@ -64,7 +65,7 @@ export const RealtimeSettings = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data, error, isError } = useRealtimeConfigurationQuery({
+  const { data, error, isError, isPending } = useRealtimeConfigurationQuery({
     projectRef,
   })
 
@@ -93,6 +94,8 @@ export const RealtimeSettings = () => {
     isSuccessMaxEventsPerSecond &&
     isSuccessMaxPresenceEventsPerSecond &&
     isSuccessMaxPayloadSizeInKb
+
+  const isLoading = isPending || !isRealtimeEntitlementsLoaded
 
   const maxConcurrentUsersLimit = Math.min(
     getMaxConcurrentUsers() ?? Infinity,
@@ -220,16 +223,32 @@ export const RealtimeSettings = () => {
     }),
   ])
 
+  const configValues = data ?? REALTIME_DEFAULT_CONFIG
+  const sharedFormValues = {
+    connection_pool: configValues.connection_pool ?? REALTIME_DEFAULT_CONFIG.connection_pool,
+    max_concurrent_users:
+      configValues.max_concurrent_users ?? REALTIME_DEFAULT_CONFIG.max_concurrent_users,
+    max_events_per_second:
+      configValues.max_events_per_second ?? REALTIME_DEFAULT_CONFIG.max_events_per_second,
+    max_presence_events_per_second:
+      configValues.max_presence_events_per_second ??
+      REALTIME_DEFAULT_CONFIG.max_presence_events_per_second,
+    max_payload_size_in_kb:
+      configValues.max_payload_size_in_kb ?? REALTIME_DEFAULT_CONFIG.max_payload_size_in_kb,
+    allow_public: !(configValues.private_only ?? REALTIME_DEFAULT_CONFIG.private_only),
+  }
+  const formValues: z.infer<typeof FormSchema> = {
+    suspend: configValues.suspend ?? REALTIME_DEFAULT_CONFIG.suspend,
+    ...sharedFormValues,
+  }
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       ...REALTIME_DEFAULT_CONFIG,
       allow_public: !REALTIME_DEFAULT_CONFIG.private_only,
     },
-    values: {
-      ...(data ?? REALTIME_DEFAULT_CONFIG),
-      allow_public: !(data?.private_only ?? REALTIME_DEFAULT_CONFIG.private_only),
-    } as any,
+    values: formValues,
   })
 
   const [allow_public, suspend] = useWatch({
@@ -283,6 +302,16 @@ export const RealtimeSettings = () => {
     })
   }
 
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent>
+          <GenericSkeletonLoader />
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <>
       <Form {...form}>
@@ -306,6 +335,7 @@ export const RealtimeSettings = () => {
                         <FormControl>
                           <Switch
                             id="suspend"
+                            aria-label="Toggle enabling of realtime service"
                             checked={!field.value}
                             onCheckedChange={(checked) => field.onChange(!checked)}
                             disabled={!canUpdateConfig}
@@ -320,30 +350,25 @@ export const RealtimeSettings = () => {
                   <Admonition
                     showIcon={false}
                     type={isDisablingRealtime || isEnablingRealtime ? 'warning' : 'default'}
-                  >
-                    <div className="flex items-center gap-x-2">
-                      <div>
-                        <h5 className="text-foreground mb-1">
-                          {isDisablingRealtime
-                            ? 'Realtime service will be disabled'
-                            : isEnablingRealtime
-                              ? 'Realtime service will be re-enabled'
-                              : isRealtimeDisabled
-                                ? 'Realtime service is disabled'
-                                : null}
-                        </h5>
-                        <p className="text-foreground-light">
-                          {isDisablingRealtime
-                            ? 'Clients will no longer be able to connect to your project’s realtime service once saved'
-                            : isEnablingRealtime
-                              ? "Clients will be able to connect to your project's realtime service again once saved"
-                              : isRealtimeDisabled
-                                ? 'You will need to enable it to continue using Realtime'
-                                : null}
-                        </p>
-                      </div>
-                    </div>
-                  </Admonition>
+                    title={
+                      isDisablingRealtime
+                        ? 'Realtime service will be disabled'
+                        : isEnablingRealtime
+                          ? 'Realtime service will be re-enabled'
+                          : isRealtimeDisabled
+                            ? 'Realtime service is disabled'
+                            : ''
+                    }
+                    description={
+                      isDisablingRealtime
+                        ? 'Clients will no longer be able to connect to your project’s realtime service once saved'
+                        : isEnablingRealtime
+                          ? "Clients will be able to connect to your project's realtime service again once saved"
+                          : isRealtimeDisabled
+                            ? 'You will need to enable it to continue using Realtime'
+                            : null
+                    }
+                  />
                 )}
               </CardContent>
 
@@ -364,6 +389,7 @@ export const RealtimeSettings = () => {
                             <FormControl>
                               <Switch
                                 id="allow_public"
+                                aria-label="Toggle allow public access"
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
                                 disabled={!canUpdateConfig}
@@ -377,25 +403,23 @@ export const RealtimeSettings = () => {
                             !isRealtimeDisabled && (
                               <Admonition
                                 showIcon={false}
+                                className="mt-2"
                                 type="warning"
                                 title="No Realtime RLS policies found"
                                 description={
-                                  <>
-                                    <p className="prose max-w-full text-sm">
-                                      Private mode is {isSettingToPrivate ? 'being ' : ''}
-                                      enabled, but no RLS policies exists on the{' '}
-                                      <code className="text-code-inline">
-                                        realtime.messages
-                                      </code>{' '}
-                                      table. No messages will be received by users.
-                                    </p>
-
-                                    <Button asChild variant="default" className="mt-2">
-                                      <Link href={`/project/${projectRef}/realtime/policies`}>
-                                        Create policy
-                                      </Link>
-                                    </Button>
-                                  </>
+                                  <p className="prose max-w-full text-sm">
+                                    Private mode is {isSettingToPrivate ? 'being ' : ''}
+                                    enabled, but no RLS policies exists on the{' '}
+                                    <code className="text-code-inline">realtime.messages</code>{' '}
+                                    table. No messages will be received by users.
+                                  </p>
+                                }
+                                actions={
+                                  <Button asChild variant="default">
+                                    <Link href={`/project/${projectRef}/realtime/policies`}>
+                                      Create policy
+                                    </Link>
+                                  </Button>
                                 }
                               />
                             )}
@@ -654,7 +678,7 @@ export const RealtimeSettings = () => {
                 </div>
                 <div className="flex items-center gap-x-2">
                   {form.formState.isDirty && (
-                    <Button variant="default" onClick={() => form.reset(data as any)}>
+                    <Button variant="default" onClick={() => form.reset(formValues)}>
                       Cancel
                     </Button>
                   )}
