@@ -8,6 +8,8 @@ import {
 } from './github-config-field-registry'
 import { gitHubConfigTomlSchema, type GitHubConfigToml } from './github-config.types'
 
+// This file should be temporary and will be removed once we publish a "@supabase/config" package.
+
 type GitHubConfigFieldStatus = 'unmanaged' | 'managed' | 'drifted'
 
 interface GitHubConfigFieldState {

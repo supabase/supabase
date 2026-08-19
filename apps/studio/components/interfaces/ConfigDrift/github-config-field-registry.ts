@@ -2,6 +2,8 @@ import { type GitHubConfigToml } from './github-config.types'
 import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
 import { convertToBytes } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 
+// This file should be temporary and will be removed once we publish a "@supabase/config" package.
+
 // Every top-level config.toml section, excluding `project_id` which is a scalar, not a section.
 export const CONFIG_SECTIONS = [
   'api',

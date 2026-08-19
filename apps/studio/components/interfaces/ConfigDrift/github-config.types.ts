@@ -1,11 +1,6 @@
 import { z } from 'zod'
 
-export interface GitHubConfigSource {
-  repository: string
-  branch: string
-  path: string
-  htmlUrl: string | null
-}
+// This file should be temporary and will be removed once we publish a "@supabase/config" package.
 
 // Mirrors the shape produced by parsing a project's `supabase/config.toml`.
 // Every field is optional since config.toml sections are all opt-in, and
