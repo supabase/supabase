@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { KeyRound, MoreVertical, Plus, Trash2 } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -20,20 +20,26 @@ import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AddSecretDialog } from './AddSecretDialog'
+// Reuse the Edge Functions defaults — SUPABASE_URL / SUPABASE_DB_URL / etc. are
+// project-level env vars, so Workers get the exact same set. Extract to a
+// shared module once a third consumer needs them.
+import { DefaultEdgeFunctionSecrets } from '@/components/interfaces/Functions/EdgeFunctionSecrets/DefaultEdgeFunctionSecrets'
+import {
+  getVisibleDefaultEdgeFunctionSecrets,
+  isInternalEdgeFunctionSecret,
+} from '@/components/interfaces/Functions/EdgeFunctionSecrets/DefaultEdgeFunctionSecrets.utils'
 import { AlertError } from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { useSecretsCreateMutation } from '@/data/secrets/secrets-create-mutation'
 import { useSecretsDeleteMutation } from '@/data/secrets/secrets-delete-mutation'
 import { useSecretsQuery } from '@/data/secrets/secrets-query'
+import { DOCS_URL } from '@/lib/constants'
 
 interface ProjectSecretsSectionProps {
   projectRef: string
 }
 
 const MASKED = '••••••••'
-
-// Filter out the platform-injected secrets (SUPABASE_URL, etc.) — Edge Functions
-// keeps those on a separate "default secrets" list.
-const isCustomSecret = (name: string) => !name.startsWith('SUPABASE_')
 
 export const ProjectSecretsSection = ({ projectRef }: ProjectSecretsSectionProps) => {
   const [isAddOpen, setIsAddOpen] = useState(false)
@@ -47,7 +53,20 @@ export const ProjectSecretsSection = ({ projectRef }: ProjectSecretsSectionProps
     isSuccess,
   } = useSecretsQuery({ projectRef })
 
-  const customSecrets = data.filter((secret) => isCustomSecret(secret.name))
+  // Custom = user-managed secrets (SUPABASE_* / defaults live in their own
+  // section below).
+  const customSecrets = useMemo(
+    () => data.filter((secret) => !isInternalEdgeFunctionSecret(secret.name)),
+    [data]
+  )
+
+  // Match Edge Functions' logic: prefer the SUPABASE_* defaults actually
+  // returned by the API, fall back to the full hardcoded list for empty
+  // projects. Runtime defaults (SB_REGION etc.) are appended.
+  const visibleDefaultSecrets = useMemo(
+    () => getVisibleDefaultEdgeFunctionSecrets(new Set(data.map((secret) => secret.name))),
+    [data]
+  )
 
   const { mutate: createSecrets, isPending: isCreating } = useSecretsCreateMutation({
     onSuccess: (_, variables) => {
@@ -157,6 +176,21 @@ export const ProjectSecretsSection = ({ projectRef }: ProjectSecretsSectionProps
               </TableBody>
             </Table>
           </Card>
+        )}
+
+        {isSuccess && (
+          <section className="space-y-3 pt-6">
+            <div className="flex flex-col justify-between gap-2 md:flex-row md:items-center">
+              <div className="space-y-1">
+                <h3 className="text-base text-foreground">Default secrets</h3>
+                <p className="text-sm text-foreground-light">
+                  Reserved secrets available in every worker
+                </p>
+              </div>
+              <DocsButton href={`${DOCS_URL}/guides/functions/secrets#default-secrets`} />
+            </div>
+            <DefaultEdgeFunctionSecrets secrets={visibleDefaultSecrets} />
+          </section>
         )}
       </div>
 
