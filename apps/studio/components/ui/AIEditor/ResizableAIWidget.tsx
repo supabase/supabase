@@ -2,7 +2,7 @@ import type { editor as monacoEditor } from 'monaco-editor'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { AskAIWidget } from './AskAIWidget'
-import InlineWidget from './InlineWidget'
+import { InlineWidget } from './InlineWidget'
 
 interface ResizableAIWidgetProps {
   editor: monacoEditor.IStandaloneCodeEditor | monacoEditor.IStandaloneDiffEditor
