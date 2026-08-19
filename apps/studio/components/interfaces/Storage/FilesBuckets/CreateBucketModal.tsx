@@ -50,7 +50,6 @@ const DEFAULT_VALUES: BucketFormValues = {
   has_file_size_limit: false,
   formatted_size_limit: undefined,
   allowed_mime_types: '',
-  // Prefilled so enabling versioning starts from a sensible policy.
   enable_versioning: false,
   version_expiry_days: PROJECT_VERSIONING_DEFAULTS.versionExpiryDays,
   max_noncurrent_versions: PROJECT_VERSIONING_DEFAULTS.maxNoncurrentVersions,
@@ -82,7 +81,7 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
   const form = useForm<BucketFormValues>({
     resolver: zodResolver(BucketFormSchema),
     defaultValues: DEFAULT_VALUES,
-    // Surface the numeric versioning bounds as the user types, not only on submit.
+    // Show numeric versioning bounds as the user types, not only on submit
     mode: 'onChange',
   })
   const { formatted_size_limit: formattedSizeLimitError } = form.formState.errors
@@ -112,8 +111,8 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
       }
 
       // TODO(storage-versioning): pass `enable_versioning`, `version_expiry_days`,
-      // `max_noncurrent_versions` and `expiration_mode` through once the Storage
-      // API accepts them. Until then the versioning section is form state only.
+      // `max_noncurrent_versions` and `expiration_mode` through once the API accepts them.
+      // Until then the versioning section is form state only.
       await createBucket({
         projectRef: ref,
         id: values.name,

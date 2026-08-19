@@ -69,8 +69,6 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
 
   const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
 
-  // TODO(storage-versioning): read the stored lifecycle policy off the bucket
-  // once the Storage API returns it. Reports `disabled` today.
   const versioningSettings: BucketVersioningSettings = {
     versioning: getBucketVersioningState(bucket),
     versionExpiryDays: null,
@@ -130,7 +128,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     resolver: zodResolver(EditBucketFormSchema),
     defaultValues,
     values: defaultValues,
-    // Surface the numeric versioning bounds as the user types, not only on submit.
+    // Show numeric versioning bounds as the user types, not only on submit.
     mode: 'onChange',
   })
   const { formatted_size_limit: formattedSizeLimitError } = form.formState.errors
@@ -155,7 +153,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     if (ref === undefined) return console.error('Project ref is required')
 
     // TODO(storage-versioning): pass the versioning fields through once the
-    // Storage API accepts them. Until then the section is form state only.
+    // API accepts them. Until then the section is form state only.
     updateBucket({
       projectRef: ref,
       id: bucket.id,
