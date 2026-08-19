@@ -104,7 +104,7 @@ export const useUnifiedLogsPreview = () => {
   const isEnabled = IS_PLATFORM && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const hasToggledPreview = !!safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS)
-  const isDefaultOptIn = IS_PLATFORM && isInitialized && !hasToggledPreview
+  const isDefaultOptIn = IS_PLATFORM && !hasToggledPreview
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
