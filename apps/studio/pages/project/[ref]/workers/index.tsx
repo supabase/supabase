@@ -12,11 +12,15 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { isWorkersAccessDenied } from '@/components/interfaces/Workers/Workers.utils'
+import {
+  isWorkersForbidden,
+  isWorkersUnavailable,
+} from '@/components/interfaces/Workers/Workers.utils'
 import { WorkersList } from '@/components/interfaces/Workers/WorkersList'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { WorkersLayout } from '@/components/layouts/WorkersLayout/WorkersLayout'
 import { AlertError } from '@/components/ui/AlertError'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { workersQueryOptions } from '@/data/workers/workers-query'
 import { PRODUCT_NAME } from '@/lib/constants/workers'
 import type { NextPageWithLayout } from '@/types'
@@ -48,14 +52,17 @@ const WorkersPage: NextPageWithLayout = () => {
         <PageSection>
           <PageSectionContent>
             {isPending && <GenericSkeletonLoader />}
-            {isError && isWorkersAccessDenied(error) && (
+            {isError && isWorkersUnavailable(error) && (
               <Admonition
                 type="default"
                 title="Compute is not enabled for this project"
                 description="Compute is in private alpha. Contact support to have this project added to the alpha."
               />
             )}
-            {isError && !isWorkersAccessDenied(error) && (
+            {isError && isWorkersForbidden(error) && (
+              <NoPermission resourceText="view this project's Compute workers" />
+            )}
+            {isError && !isWorkersUnavailable(error) && !isWorkersForbidden(error) && (
               <AlertError error={error} subject="Failed to retrieve workers" />
             )}
             {isSuccess && workers.length === 0 && (

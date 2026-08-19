@@ -54,9 +54,12 @@ export const formatSize = (size: string): string => {
 export const formatResources = (worker: Worker): string =>
   `${formatSize(worker.size)} · ${worker.declaredInstances} inst`
 
-// The Workers API is allowlisted per project (FUNC-795), so a project can hold the
-// dashboard flag and still be refused by the endpoint.
-export const isWorkersAccessDenied = (error: Error | null): boolean => {
-  if (!(error instanceof ResponseError)) return false
-  return error.code === 403 || error.code === 404
-}
+// A project outside the alpha allow-list gets a 404 rather than a 403, so the routes stay
+// invisible to anyone not enrolled.
+export const isWorkersUnavailable = (error: Error | null): boolean =>
+  error instanceof ResponseError && error.code === 404
+
+// The routes require the FGA workers_read/workers_write permissions, which a caller can hold
+// independently of being enrolled.
+export const isWorkersForbidden = (error: Error | null): boolean =>
+  error instanceof ResponseError && error.code === 403

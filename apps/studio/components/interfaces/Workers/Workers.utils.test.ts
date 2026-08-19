@@ -8,7 +8,8 @@ import {
   formatRuntime,
   formatSize,
   getPage,
-  isWorkersAccessDenied,
+  isWorkersForbidden,
+  isWorkersUnavailable,
 } from './Workers.utils'
 import { ResponseError } from '@/types'
 
@@ -123,19 +124,24 @@ describe('formatResources', () => {
   })
 })
 
-describe('isWorkersAccessDenied', () => {
+describe('workers error classification', () => {
   const responseError = (code?: number) => new ResponseError('Denied', code)
 
-  it('treats forbidden and not-found as the project missing from the alpha allowlist', () => {
-    expect(isWorkersAccessDenied(responseError(403))).toBe(true)
-    expect(isWorkersAccessDenied(responseError(404))).toBe(true)
+  it('reads a 404 as the project being outside the alpha allow-list', () => {
+    expect(isWorkersUnavailable(responseError(404))).toBe(true)
+    expect(isWorkersForbidden(responseError(404))).toBe(false)
+  })
+
+  it('reads a 403 as a missing workers permission, not a missing enrollment', () => {
+    expect(isWorkersForbidden(responseError(403))).toBe(true)
+    expect(isWorkersUnavailable(responseError(403))).toBe(false)
   })
 
   it('leaves other failures to the generic error UI', () => {
-    expect(isWorkersAccessDenied(responseError(500))).toBe(false)
-    expect(isWorkersAccessDenied(responseError(undefined))).toBe(false)
-    expect(isWorkersAccessDenied(new Error('boom'))).toBe(false)
-    expect(isWorkersAccessDenied(null)).toBe(false)
+    for (const error of [responseError(500), responseError(undefined), new Error('boom'), null]) {
+      expect(isWorkersUnavailable(error)).toBe(false)
+      expect(isWorkersForbidden(error)).toBe(false)
+    }
   })
 })
 
