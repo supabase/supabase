@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router'
 import { useEffect, useEffectEvent } from 'react'
 
-import { createMarkdownCellSkeleton, createQueryCellSkeleton } from './utils'
 import { useNotebookStubQuery } from '@/data/content/notebooks/notebook-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -62,30 +61,6 @@ export const useCreateNotebook = () => {
     if (!profile) return console.error('Profile is required')
     if (!project) return console.error('Project is required')
 
-    const sampleMdCell1 = createMarkdownCellSkeleton({
-      content: `
-# Title
-A brief description on what this notebook is about
-`.trim(),
-    })
-    const sampleMdCell2 = createMarkdownCellSkeleton({
-      content: `
-## Section
-This is a sample paragraph to demonstrate the Markdown cells
-1. List item 1
-2. List item 2
-3. List item 3
-`.trim(),
-    })
-    const sampleQueryCell = createQueryCellSkeleton({ sql: 'select * from colors;' })
-
-    // [Joshen] Just adding sample data to play around with, keep for now - clean up at the end
-    const DEFAULT_CELLS = [
-      sampleMdCell1,
-      sampleMdCell2,
-      sampleQueryCell,
-    ] as Notebooks.Content['cells']
-
     const id = idOverride ?? generateUuid()
 
     const notebook: Notebook = {
@@ -97,7 +72,7 @@ This is a sample paragraph to demonstrate the Markdown cells
       favorite: false,
       content: {
         schema_version: 1,
-        cells: cells ?? DEFAULT_CELLS,
+        cells: cells ?? [],
       },
       owner_id: profile.id,
       project_id: project.id,

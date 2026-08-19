@@ -3,6 +3,7 @@ import { useInfiniteQuery, type InfiniteData } from '@tanstack/react-query'
 import type { ContentOfType } from '../content-query'
 import { contentKeys } from '../keys'
 import {
+  createLogCellSkeleton,
   createMarkdownCellSkeleton,
   createQueryCellSkeleton,
 } from '@/components/interfaces/Explorer/utils'
@@ -52,8 +53,19 @@ export const STUB_NOTEBOOKS: NotebookRow[] = [
         createMarkdownCellSkeleton({
           content: '# Signup funnel\nTrack how many users complete each step of sign up.',
         }),
+        createMarkdownCellSkeleton({
+          content: `
+## Funnel details
+Track where users drop off between signing up and becoming active:
+1. Account created — captured by the query below
+2. Email verified
+3. Onboarding completed
+4. First project created
+`.trim(),
+        }),
         createQueryCellSkeleton({
-          sql: 'select * from auth.users order by created_at desc limit 20;',
+          title: 'Retrieve the latest 20 users that signed up',
+          sql: 'select id, email, created_at, updated_at from auth.users order by created_at desc limit 20;',
         }),
       ],
     },
@@ -78,7 +90,27 @@ export const STUB_NOTEBOOKS: NotebookRow[] = [
         createMarkdownCellSkeleton({
           content: '# Error rate investigation\nNotes on the recent spike in 5xx responses.',
         }),
-        createQueryCellSkeleton({ sql: 'select count(*) from pg_stat_activity;' }),
+        createQueryCellSkeleton({
+          title: 'Check database processes via pg_stat_activity',
+          sql: 'select count(*) from pg_stat_activity;',
+        }),
+        createMarkdownCellSkeleton({
+          content: "## Check against Postgres logs\nSee if there's anything weird going on.",
+        }),
+        createLogCellSkeleton({
+          title: 'Check Postgres logs',
+          sql: `
+select
+  id,
+  timestamp,
+  event_message,
+  severity_text,
+  source,
+  log_attributes
+from logs
+where source = 'postgres_logs'
+`.trim(),
+        }),
       ],
     },
   },
