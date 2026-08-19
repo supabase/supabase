@@ -35,11 +35,19 @@ import {
   REALTIME_DEFAULT_CONFIG,
   useRealtimeConfigurationQuery,
 } from '@/data/realtime/realtime-config-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const formId = 'realtime-configuration-form'
+
+const REALTIME_SOFT_LIMITS = {
+  max_concurrent_users: 50_000,
+  max_events_per_second: 50_000,
+  max_presence_events_per_second: 5_000,
+  max_payload_size_in_kb: 3_000,
+}
 
 export const RealtimeSettings = () => {
   const { ref: projectRef } = useParams()
@@ -65,6 +73,43 @@ export const RealtimeSettings = () => {
     connectionString: project?.connectionString,
     schemas: ['realtime'],
   })
+
+  // Per-plan realtime ceilings come from the org's entitlements (plan + any overrides).
+  // The effective limit is the lower of the entitlement and the soft cap, so an unlimited
+  // plan is still bounded and self-hosted / loading falls back to the soft cap.
+  const { getEntitlementMax: getMaxConcurrentUsers, isSuccess: isSuccessMaxConcurrentUsers } =
+    useCheckEntitlements('realtime.max_concurrent_users')
+  const { getEntitlementMax: getMaxEventsPerSecond, isSuccess: isSuccessMaxEventsPerSecond } =
+    useCheckEntitlements('realtime.max_events_per_second')
+  const {
+    getEntitlementMax: getMaxPresenceEventsPerSecond,
+    isSuccess: isSuccessMaxPresenceEventsPerSecond,
+  } = useCheckEntitlements('realtime.max_presence_events_per_second')
+  const { getEntitlementMax: getMaxPayloadSizeInKb, isSuccess: isSuccessMaxPayloadSizeInKb } =
+    useCheckEntitlements('realtime.max_payload_size_in_kb')
+
+  const isRealtimeEntitlementsLoaded =
+    isSuccessMaxConcurrentUsers &&
+    isSuccessMaxEventsPerSecond &&
+    isSuccessMaxPresenceEventsPerSecond &&
+    isSuccessMaxPayloadSizeInKb
+
+  const maxConcurrentUsersLimit = Math.min(
+    getMaxConcurrentUsers() ?? Infinity,
+    REALTIME_SOFT_LIMITS.max_concurrent_users
+  )
+  const maxEventsPerSecondLimit = Math.min(
+    getMaxEventsPerSecond() ?? Infinity,
+    REALTIME_SOFT_LIMITS.max_events_per_second
+  )
+  const maxPresenceEventsPerSecondLimit = Math.min(
+    getMaxPresenceEventsPerSecond() ?? Infinity,
+    REALTIME_SOFT_LIMITS.max_presence_events_per_second
+  )
+  const maxPayloadSizeInKbLimit = Math.min(
+    getMaxPayloadSizeInKb() ?? Infinity,
+    REALTIME_SOFT_LIMITS.max_payload_size_in_kb
+  )
 
   const isFreePlan = organization?.plan.id === 'free'
   const isUsageBillingEnabled = organization?.usage_billing_enabled
@@ -93,10 +138,38 @@ export const RealtimeSettings = () => {
         .min(1)
         .max(maxConn?.maxConnections ?? 100)
         .optional(),
-      max_concurrent_users: z.coerce.number().min(1).max(50000).optional(),
-      max_events_per_second: z.coerce.number().min(1).max(50000).optional(),
-      max_presence_events_per_second: z.coerce.number().min(1).max(5000).optional(),
-      max_payload_size_in_kb: z.coerce.number().min(1).max(10000).optional(),
+      max_concurrent_users: z.coerce
+        .number()
+        .min(1)
+        .max(
+          maxConcurrentUsersLimit,
+          `Cannot exceed ${maxConcurrentUsersLimit.toLocaleString()} concurrent clients`
+        )
+        .optional(),
+      max_events_per_second: z.coerce
+        .number()
+        .min(1)
+        .max(
+          maxEventsPerSecondLimit,
+          `Cannot exceed ${maxEventsPerSecondLimit.toLocaleString()} events per second`
+        )
+        .optional(),
+      max_presence_events_per_second: z.coerce
+        .number()
+        .min(1)
+        .max(
+          maxPresenceEventsPerSecondLimit,
+          `Cannot exceed ${maxPresenceEventsPerSecondLimit.toLocaleString()} presence events per second`
+        )
+        .optional(),
+      max_payload_size_in_kb: z.coerce
+        .number()
+        .min(1)
+        .max(
+          maxPayloadSizeInKbLimit,
+          `Cannot exceed ${maxPayloadSizeInKbLimit.toLocaleString()} KB`
+        )
+        .optional(),
       // [Joshen] These fields are temporarily hidden from the UI
       // max_bytes_per_second: z.coerce.number().min(1).max(10000000).optional(),
       // max_channels_per_client: z.coerce.number().min(1).max(10000).optional(),
@@ -110,10 +183,34 @@ export const RealtimeSettings = () => {
         .number()
         .min(1)
         .max(maxConn?.maxConnections ?? 100),
-      max_concurrent_users: z.coerce.number().min(1).max(50000),
-      max_events_per_second: z.coerce.number().min(1).max(50000),
-      max_presence_events_per_second: z.coerce.number().min(1).max(5000),
-      max_payload_size_in_kb: z.coerce.number().min(1).max(10000),
+      max_concurrent_users: z.coerce
+        .number()
+        .min(1)
+        .max(
+          maxConcurrentUsersLimit,
+          `Cannot exceed ${maxConcurrentUsersLimit.toLocaleString()} concurrent clients`
+        ),
+      max_events_per_second: z.coerce
+        .number()
+        .min(1)
+        .max(
+          maxEventsPerSecondLimit,
+          `Cannot exceed ${maxEventsPerSecondLimit.toLocaleString()} events per second`
+        ),
+      max_presence_events_per_second: z.coerce
+        .number()
+        .min(1)
+        .max(
+          maxPresenceEventsPerSecondLimit,
+          `Cannot exceed ${maxPresenceEventsPerSecondLimit.toLocaleString()} presence events per second`
+        ),
+      max_payload_size_in_kb: z.coerce
+        .number()
+        .min(1)
+        .max(
+          maxPayloadSizeInKbLimit,
+          `Cannot exceed ${maxPayloadSizeInKbLimit.toLocaleString()} KB`
+        ),
       // [Joshen] These fields are temporarily hidden from the UI
       // max_bytes_per_second: z.coerce.number().min(1).max(10000000),
       // max_channels_per_client: z.coerce.number().min(1).max(10000),
@@ -145,11 +242,13 @@ export const RealtimeSettings = () => {
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = (_data) => {
     if (!projectRef) return console.error('Project ref is required')
+    if (!isRealtimeEntitlementsLoaded) return
     setIsConfirmNextModalOpen(true)
   }
 
   const onConfirmSave = () => {
     if (!projectRef) return console.error('Project ref is required')
+    if (!isRealtimeEntitlementsLoaded) return
     const values = form.getValues()
 
     // [Joshen] Casting to `Number` here as the values are being set as string when edited in the form
@@ -563,7 +662,12 @@ export const RealtimeSettings = () => {
                     variant="primary"
                     type="submit"
                     form={formId}
-                    disabled={!canUpdateConfig || isUpdatingConfig || !form.formState.isDirty}
+                    disabled={
+                      !canUpdateConfig ||
+                      isUpdatingConfig ||
+                      !form.formState.isDirty ||
+                      !isRealtimeEntitlementsLoaded
+                    }
                     loading={isUpdatingConfig}
                   >
                     Save changes
