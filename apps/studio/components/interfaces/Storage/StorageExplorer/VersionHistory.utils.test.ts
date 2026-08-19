@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { computeVersionFate } from './VersionHistory.utils'
 
 describe('computeVersionFate', () => {
-  it('returns kept when no policy is configured', () => {
+  it('returns retained when no policy is configured', () => {
     expect(
       computeVersionFate({
         daysOld: 90,
@@ -13,7 +13,7 @@ describe('computeVersionFate', () => {
         cap: null,
         mode: 'and',
       })
-    ).toEqual({ type: 'kept' })
+    ).toEqual({ type: 'retained' })
   })
 
   it('treats a zero bound as "condition not set" rather than "expire immediately"', () => {
@@ -28,7 +28,7 @@ describe('computeVersionFate', () => {
         cap: 0,
         mode: 'or',
       })
-    ).toEqual({ type: 'kept' })
+    ).toEqual({ type: 'retained' })
   })
 
   describe('age only', () => {
@@ -53,13 +53,13 @@ describe('computeVersionFate', () => {
   describe('cap only', () => {
     const base = { expiryDays: null, cap: 3, mode: 'and' as const }
 
-    it('keeps everything except the one at the cap boundary', () => {
+    it('retains everything except the one at the cap boundary', () => {
       expect(
         computeVersionFate({ ...base, daysOld: 3, chronoIndex: 2, noncurrentCount: 3 })
-      ).toEqual({ type: 'kept' })
+      ).toEqual({ type: 'retained' })
       expect(
         computeVersionFate({ ...base, daysOld: 163, chronoIndex: 1, noncurrentCount: 3 })
-      ).toEqual({ type: 'kept' })
+      ).toEqual({ type: 'retained' })
       expect(
         computeVersionFate({ ...base, daysOld: 216, chronoIndex: 0, noncurrentCount: 3 })
       ).toEqual({ type: 'expires-on-next-upload' })
@@ -69,13 +69,13 @@ describe('computeVersionFate', () => {
   describe('both — AND', () => {
     const base = { expiryDays: 30, cap: 3, mode: 'and' as const }
 
-    it('keeps every version under the cap regardless of age', () => {
+    it('retains every version under the cap regardless of age', () => {
       expect(
         computeVersionFate({ ...base, daysOld: 45, chronoIndex: 1, noncurrentCount: 2 })
-      ).toEqual({ type: 'kept' })
+      ).toEqual({ type: 'retained' })
       expect(
         computeVersionFate({ ...base, daysOld: 70, chronoIndex: 0, noncurrentCount: 2 })
-      ).toEqual({ type: 'kept' })
+      ).toEqual({ type: 'retained' })
     })
 
     it('gives a countdown only once the cap is exceeded, since age is then the sole gate', () => {
@@ -88,10 +88,10 @@ describe('computeVersionFate', () => {
       expect(
         computeVersionFate({ ...base, daysOld: 34, chronoIndex: 0, noncurrentCount: 4 })
       ).toEqual({ type: 'expiring-now' })
-      // Still within the cap: kept even though very old — AND needs both.
+      // Still within the cap: retained even though very old — AND needs both.
       expect(
         computeVersionFate({ ...base, daysOld: 28, chronoIndex: 1, noncurrentCount: 4 })
-      ).toEqual({ type: 'kept' })
+      ).toEqual({ type: 'retained' })
     })
   })
 

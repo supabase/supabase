@@ -1,7 +1,7 @@
 import type { ExpirationMode } from '../StorageVersioning.constants'
 
 export type VersionFate =
-  | { type: 'kept' }
+  | { type: 'retained' }
   | { type: 'expires-in'; days: number }
   /**
    * The cap forces this one out, so the date depends on the next upload.
@@ -46,11 +46,11 @@ export const computeVersionFate = ({
   const activeCap = toActiveBound(cap)
 
   if (activeExpiryDays === null) {
-    if (activeCap === null) return { type: 'kept' }
+    if (activeCap === null) return { type: 'retained' }
 
     // Cap only: the oldest version still inside the cap is next to be evicted.
     const isAtCapBoundary = chronoIndex === noncurrentCount - activeCap
-    return isAtCapBoundary ? { type: 'expires-on-next-upload' } : { type: 'kept' }
+    return isAtCapBoundary ? { type: 'expires-on-next-upload' } : { type: 'retained' }
   }
 
   const isAgeExceeded = daysOld >= activeExpiryDays
@@ -65,7 +65,7 @@ export const computeVersionFate = ({
   const isAtCapBoundary = chronoIndex === noncurrentCount - activeCap
 
   if (mode === 'and') {
-    if (!isCapExceeded) return { type: 'kept' }
+    if (!isCapExceeded) return { type: 'retained' }
     return isAgeExceeded ? { type: 'expiring-now' } : { type: 'expires-in', days: daysRemaining }
   }
 
