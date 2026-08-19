@@ -1,4 +1,4 @@
-import { Sparkles, Terminal } from 'lucide-react'
+import { Plus, Sparkles, Terminal } from 'lucide-react'
 import { Button, Card } from 'ui'
 
 import CopyButton from '@/components/ui/CopyButton'
@@ -6,6 +6,7 @@ import { WORKERS_CLI_DEPLOY, WORKERS_SKILL_MARKDOWN } from '@/lib/constants/work
 
 interface WorkersEmptyStateProps {
   onDeploy: () => void
+  onCreate: () => void
 }
 
 const STEPS = [
@@ -25,20 +26,23 @@ const STEPS = [
   },
 ]
 
-export const WorkersEmptyState = ({ onDeploy }: WorkersEmptyStateProps) => (
+export const WorkersEmptyState = ({ onDeploy, onCreate }: WorkersEmptyStateProps) => (
   <Card className="grid grid-cols-1 divide-y divide-default lg:grid-cols-[1.6fr_1fr] lg:divide-x lg:divide-y-0">
     <div className="flex flex-col gap-6 p-8">
       <div className="space-y-2">
         <h3 className="text-lg text-foreground">Deploy a worker</h3>
         <p className="max-w-md text-sm text-foreground-light">
-          No workers yet. Run managed compute in microVMs next to your database. Deploy your first
-          worker with the Supabase CLI.
+          No workers yet. Run managed compute in microVMs next to your database. Deploy from the
+          dashboard, or push your own code with the Supabase CLI.
         </p>
       </div>
 
-      <div>
-        <Button variant="primary" icon={<Terminal />} onClick={onDeploy}>
-          Deploy a worker
+      <div className="flex items-center gap-2">
+        <Button variant="primary" icon={<Plus />} onClick={onCreate}>
+          New worker
+        </Button>
+        <Button variant="default" icon={<Terminal />} onClick={onDeploy}>
+          Deploy with CLI
         </Button>
       </div>
 

@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Terminal } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Plus, Terminal } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -32,6 +32,7 @@ interface WorkersListProps {
   projectRef: string
   workers: Worker[]
   onDeploy: () => void
+  onCreate: () => void
 }
 
 const STATE_FILTERS: { value: WorkerBuildState | 'all'; label: string }[] = [
@@ -55,7 +56,7 @@ const parseStateFilter = (value: string): WorkerBuildState | 'all' =>
 const parseAccessFilter = (value: string): WorkerAccess | 'all' =>
   ACCESS_FILTERS.find((option) => option.value === value)?.value ?? 'all'
 
-export const WorkersList = ({ projectRef, workers, onDeploy }: WorkersListProps) => {
+export const WorkersList = ({ projectRef, workers, onDeploy, onCreate }: WorkersListProps) => {
   const router = useRouter()
   const [search, setSearch] = useState('')
   const [stateFilter, setStateFilter] = useState<WorkerBuildState | 'all'>('all')
@@ -127,8 +128,11 @@ export const WorkersList = ({ projectRef, workers, onDeploy }: WorkersListProps)
           <span className="text-sm text-foreground-lighter">
             {filtered.length} worker{filtered.length === 1 ? '' : 's'}
           </span>
-          <Button variant="primary" icon={<Terminal />} onClick={onDeploy}>
-            Deploy a worker
+          <Button variant="default" icon={<Terminal />} onClick={onDeploy}>
+            Deploy with CLI
+          </Button>
+          <Button variant="primary" icon={<Plus />} onClick={onCreate}>
+            New worker
           </Button>
         </div>
       </div>
