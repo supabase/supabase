@@ -55,7 +55,7 @@ export const DefaultLayout = ({
   const appSnap = useAppStateSnapshot()
   const { isMaximised, activeSidebar } = useSidebarManagerSnapshot()
   const { lastVisitedOrganization } = useLastVisitedOrganization()
-  const showConfigDrift = useFlag('ConfigDrift')
+  const showConfigDrift = useFlag('ConfigDrift') && IS_PLATFORM
 
   const [isMounted, setIsMounted] = useState(false)
 

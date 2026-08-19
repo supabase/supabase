@@ -401,13 +401,20 @@ export function isSecretConfigField(configPath: string): boolean {
 
   return SECRET_CONFIG_FIELDS.some((secretPath) => {
     const secretSegments = secretPath.split('.')
-    if (secretSegments.length !== pathSegments.length) return false
+    const isPrefixPattern = secretSegments[secretSegments.length - 1] === '*'
+    if (isPrefixPattern) {
+      if (pathSegments.length < secretSegments.length) return false
+    } else if (secretSegments.length !== pathSegments.length) {
+      return false
+    }
     return secretSegments.every((segment, i) => segment === '*' || segment === pathSegments[i])
   })
 }
 
 export function getFieldDefinition(configPath: string): ResolvedConfigFieldDefinition | undefined {
-  return { ...CONFIG_FIELD_REGISTRY[configPath], configPath }
+  const definition = CONFIG_FIELD_REGISTRY[configPath]
+  if (!definition) return undefined
+  return { ...definition, configPath }
 }
 
 /**
