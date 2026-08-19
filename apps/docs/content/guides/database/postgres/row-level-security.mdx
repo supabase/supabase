@@ -9,7 +9,7 @@ Postgres [Row Level Security (RLS)](https://www.postgresql.org/docs/current/ddl-
 
 <Admonition type="danger">
 
-A table in an exposed schema without RLS is readable and writable by anyone with your publishable key. Enable RLS on every table in an exposed schema, and revoke the default grants that let `anon` and `authenticated` write to it. Adding policies doesn't remove those grants.
+A table in an exposed schema without RLS is readable and writable by any role with a grant on it. Enable RLS on every table in an exposed schema. On projects that still grant `anon` and `authenticated` by default, revoke those grants. Adding policies doesn't remove them.
 
 </Admonition>
 
@@ -61,6 +61,8 @@ On existing projects, a new table in `public` starts with every privilege alread
 
 Adding policies doesn't take those grants back. A table protected only by policies still hands `anon` an insert path if you never revoke the grant.
 
+Not every project grants these automatically. See [Default privileges](/docs/guides/api/securing-your-api#default-privileges). Grant each role only the operations it needs.
+
 A missing grant raises a `42501` error before any policy runs. When a request fails that your policy should allow, check the grants before you change the policy. To set them, see [Lock down the table](#lock-down-the-table).
 
 ### Authenticated and unauthenticated roles
@@ -92,7 +94,7 @@ Using the `anon` Postgres role is different from an [anonymous user](/docs/guide
 
 </Admonition>
 
-A policy that reads `to anon using ( true )` grants every unauthenticated visitor read access to every row. Use it only for data that is meant to be public.
+A policy that reads `to anon using ( true )` grants every unauthenticated visitor read access to every row the role can already reach through grants. Use it only for data that is meant to be public.
 
 ### Views and RLS
 
@@ -116,7 +118,7 @@ Enable RLS, then set the grants to match what each role does in your app:
 
    Once RLS is enabled, no data is accessible through the [API](/docs/guides/api) when using a publishable key, until you create policies.
 
-2. Revoke the automatic grants from both client roles.
+2. Revoke any existing grants from both client roles.
 
    ```sql
    revoke all on table public.reports from anon, authenticated;
@@ -136,7 +138,7 @@ revoke all on table public.weather_readings from anon, authenticated;
 grant select on table public.weather_readings to anon, authenticated;
 ```
 
-To stop new tables from receiving the automatic grants in the first place, see [Revoke default privileges](/docs/guides/api/securing-your-api#revoke-default-privileges). To enable RLS automatically on every new table, see [Event triggers](/docs/guides/database/postgres/event-triggers).
+If new tables still receive automatic grants, see [Revoke default privileges](/docs/guides/api/securing-your-api#revoke-default-privileges). To enable RLS automatically on every new table, see [Event triggers](/docs/guides/database/postgres/event-triggers).
 
 Write the tests for this table in the same change. See [Test your policies](#test-your-policies).
 

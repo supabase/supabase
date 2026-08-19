@@ -91,7 +91,7 @@ Policies are implicit `where` clauses, so it's common to run `select` statements
 
 {/* prettier-ignore */}
 ```js
-const { data } = supabase
+const { data } = await supabase
   .from('table')
   .select()
 ```
@@ -100,7 +100,7 @@ Always add a filter:
 
 {/* prettier-ignore */}
 ```js
-const { data } = supabase
+const { data } = await supabase
   .from('table')
   .select()
   .eq('user_id', userId)
@@ -121,7 +121,7 @@ using (
   (select auth.uid()) in (
     select user_id
     from team_user
-    where team_user.team_id = team_id -- joins to the source "test_table.team_id"
+    where team_user.team_id = test_table.team_id -- joins to the source table
   )
 );
 ```
@@ -162,7 +162,7 @@ These numbers come from a series of [tests](https://github.com/GaryAustin1/RLS-P
 | [test2e-wrappedSQL-sd-fun-array](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test2e-wrappedSQL-sd-fun-array)   | 173,000     | 16         | 99.991%       | `team_id = any(user_teams())`, then `team_id = any(array(select user_teams()))`     |
 | [test3-addfilter](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test3-addfilter)                                 | 171         | 9          | 94.74%        | No client filter, then `.eq` or `where` on `user_id`                                |
 | [test5-fixed-join](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test5-fixed-join)                               | 9,000       | 20         | 99.78%        | `auth.uid()` in a table join on a column, then the column in a join on `auth.uid()` |
-| [test6-To-role](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test6-To-role)                                     | 170         | < 0.1      | 99.78%        | No `to` clause, then `to authenticated` with `anon` accessing                       |
+| [test6-To-role](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test6-To-role)                                     | 170         | < 0.1      | 99.94%        | No `to` clause, then `to authenticated` with `anon` accessing                       |
 
 ## More resources
 

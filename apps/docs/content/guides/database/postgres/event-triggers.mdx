@@ -80,6 +80,7 @@ BEGIN
       EXCEPTION
         WHEN OTHERS THEN
           RAISE LOG 'rls_auto_enable: failed to enable RLS on %', cmd.object_identity;
+          RAISE;
       END;
      ELSE
         RAISE LOG 'rls_auto_enable: skip % (either system schema or not in enforced list: %.)', cmd.object_identity, cmd.schema_name;
