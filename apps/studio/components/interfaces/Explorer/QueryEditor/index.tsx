@@ -323,7 +323,6 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
                     language="pgsql"
                     original={rewriteProposal.original}
                     modified={rewriteProposal.modified}
-                    options={{ renderSideBySide: true, renderGutterMenu: false }}
                   />
                 </div>
               </div>
