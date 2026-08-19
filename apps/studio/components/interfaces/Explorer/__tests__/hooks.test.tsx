@@ -180,4 +180,12 @@ describe('useLoadNotebook', () => {
 
     expect(mockTimeout).not.toHaveBeenCalled()
   })
+
+  it('returns isNotFound when the id matches no stub notebook', async () => {
+    const { result } = customRenderHook(() =>
+      useLoadNotebook({ id: 'unknown-id', projectRef: PROJECT_REF })
+    )
+
+    await waitFor(() => expect(result.current.isNotFound).toBe(true))
+  })
 })
