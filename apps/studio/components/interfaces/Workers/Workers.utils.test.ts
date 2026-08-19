@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { workerUrl } from './Workers.constants'
+import { getWorkerStateMeta, workerUrl } from './Workers.constants'
 import type { Worker } from './Workers.types'
 import {
   filterWorkers,
@@ -152,7 +152,7 @@ describe('workerUrl', () => {
     )
   })
 
-  it('honours a non-https protocol', () => {
+  it('honors a non-https protocol', () => {
     expect(workerUrl({ endpoint: 'localhost:8000', protocol: 'http', name: 'embed' })).toBe(
       'http://localhost:8000/workers/v1/embed'
     )
@@ -160,5 +160,19 @@ describe('workerUrl', () => {
 
   it('has no url until the project settings resolve', () => {
     expect(workerUrl({ endpoint: undefined, name: 'embed' })).toBeUndefined()
+  })
+})
+
+describe('getWorkerStateMeta', () => {
+  it('labels every build state', () => {
+    expect(getWorkerStateMeta(worker({ name: 'a', buildState: 'building' })).label).toBe('Building')
+    expect(getWorkerStateMeta(worker({ name: 'a', buildState: 'active' })).label).toBe('Active')
+    expect(getWorkerStateMeta(worker({ name: 'a', buildState: 'failed' })).label).toBe('Failed')
+  })
+
+  it('reports deleting over the build state', () => {
+    expect(
+      getWorkerStateMeta(worker({ name: 'a', buildState: 'active', isDeleting: true })).label
+    ).toBe('Deleting')
   })
 })
