@@ -35,12 +35,12 @@ import { formatBytes } from '@/lib/helpers'
 export const shortVersion = (versionId: string) => `${versionId.slice(0, 6)}…${versionId.slice(-2)}`
 
 /**
- * A row's removal outlook. `kept` renders nothing — saying "Kept" on every
- * unflagged row repeats what the absence of a warning already says.
+ * A row's removal outlook. `retained` renders nothing — saying "Retained" on
+ * every unflagged row repeats what the absence of a warning already says.
  */
 const VersionFateLabel = ({ fate }: { fate: VersionFate }) => {
   switch (fate.type) {
-    case 'kept':
+    case 'retained':
       return null
     case 'expires-in':
       return (

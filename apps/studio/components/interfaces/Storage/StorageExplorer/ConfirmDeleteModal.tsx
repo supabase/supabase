@@ -45,7 +45,7 @@ export const ConfirmDeleteModal = () => {
   const alert = isVersionedBucket
     ? {
         base: { variant: 'warning' as const },
-        title: 'Versions are kept',
+        title: 'Versions are retained',
         description: `Archiving ${getSubject()} hides it from the bucket. Its noncurrent versions stay retained until you delete them individually or a lifecycle policy expires them.`,
       }
     : {

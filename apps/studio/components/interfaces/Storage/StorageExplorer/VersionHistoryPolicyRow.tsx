@@ -60,7 +60,8 @@ const PolicyFullRule = ({ cap, expiryDays, mode }: PolicyRuleProps) => {
 
   return (
     <>
-      Only the {cap} newest noncurrent versions are kept. Older ones are deleted on the next upload.
+      Only the {cap} newest noncurrent versions are retained. Older ones are deleted on the next
+      upload.
     </>
   )
 }
