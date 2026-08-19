@@ -17,16 +17,10 @@ const MimeTypeIcon = ({ mimeType, size }: { mimeType?: string; size: number }) =
 interface VersionThumbnailProps {
   mimeType?: string
   isCurrent: boolean
-  /** An empty placeholder standing in for a soft delete in the object's history. */
   isDeleteMarker?: boolean
   size?: number
 }
 
-/**
- * Type glyph for a version row. Noncurrent versions have no thumbnail of their
- * own so they share one; the current version gets a restore glyph, and a delete
- * marker a dashed outline so it reads as "nothing here".
- */
 export const VersionThumbnail = ({
   mimeType,
   isCurrent,
