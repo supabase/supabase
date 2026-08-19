@@ -11,61 +11,38 @@ const steps = [
 ]
 
 describe('SteppedFlow', () => {
-  test('calls onCancel from the back link and Cancel', () => {
-    const onCancel = vi.fn()
-
-    customRender(
-      <SteppedFlow
-        title="Create a pipeline"
-        backLabel="Replication"
-        backHref="/project/abc/database/replication"
-        steps={steps}
-        currentStep="destination"
-        onStepChange={vi.fn()}
-        onCancel={onCancel}
-      >
-        Step body
-      </SteppedFlow>
-    )
-
-    fireEvent.click(screen.getByRole('link', { name: 'Replication' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
-
-    expect(onCancel).toHaveBeenCalledTimes(2)
-  })
-
   test('does not let the user jump ahead of the current step', () => {
     const onStepChange = vi.fn()
 
     customRender(
-      <SteppedFlow
-        title="Create a pipeline"
-        backLabel="Replication"
-        steps={steps}
-        currentStep="destination"
-        onStepChange={onStepChange}
-        onCancel={vi.fn()}
-      >
+      <SteppedFlow steps={steps} currentStep="destination" onStepChange={onStepChange}>
         Step body
       </SteppedFlow>
     )
 
     fireEvent.click(screen.getByRole('button', { name: 'Connection, not yet available' }))
     expect(onStepChange).not.toHaveBeenCalled()
+    expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument()
+  })
+
+  test('shows Back after the first step', () => {
+    const onStepChange = vi.fn()
+
+    customRender(
+      <SteppedFlow steps={steps} currentStep="connection" onStepChange={onStepChange}>
+        Step body
+      </SteppedFlow>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Back' }))
+    expect(onStepChange).toHaveBeenCalledWith('destination')
   })
 
   test('lets the user return to a completed step', () => {
     const onStepChange = vi.fn()
 
     customRender(
-      <SteppedFlow
-        title="Create a pipeline"
-        backLabel="Replication"
-        steps={steps}
-        currentStep="connection"
-        onStepChange={onStepChange}
-        onCancel={vi.fn()}
-      >
+      <SteppedFlow steps={steps} currentStep="connection" onStepChange={onStepChange}>
         Step body
       </SteppedFlow>
     )
@@ -79,12 +56,9 @@ describe('SteppedFlow', () => {
 
     customRender(
       <SteppedFlow
-        title="Create a pipeline"
-        backLabel="Replication"
         steps={steps}
         currentStep="review"
         onStepChange={vi.fn()}
-        onCancel={vi.fn()}
         onNext={vi.fn()}
         finalAction={{ label: 'Create and start pipeline', onClick: onFinal }}
       >

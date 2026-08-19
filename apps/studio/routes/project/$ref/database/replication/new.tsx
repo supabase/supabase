@@ -14,7 +14,7 @@ function DatabaseReplicationNewRoute() {
   return (
     <ProjectLayoutWithAuth
       product="Database"
-      browserTitle={{ section: 'Create pipeline' }}
+      browserTitle={{ section: 'New pipeline' }}
       isBlocking={false}
     >
       <DatabaseReplicationNewPage dehydratedState={undefined} />

@@ -15,10 +15,12 @@ function DatabaseShell() {
   // like ReactFlow stable, otherwise their internal compose-refs chain runs
   // setRef → setState every render and trips React's max-update-depth.
   //
-  // `replication/new` is a full-canvas stepped page: project chrome stays, the
-  // Database product menu does not. That leaf sets `skipDatabaseLayout: true`
-  // and wraps itself in ProjectLayoutWithAuth. Scan the whole match chain
-  // (same pattern as advisors/functions) so a parent declaration also works.
+  // `replication/new` is an isolated stepped page: it sets
+  // `skipDatabaseLayout: true` and wraps itself in ProjectLayoutWithAuth so
+  // the Database product menu does not eat width. The primary sidebar is
+  // hidden and LayoutHeader shows logo, org, project, and title with a close
+  // control on the right. Scan the whole match chain (same pattern as
+  // advisors/functions) so a parent declaration also works.
   const skipDatabaseLayout = useMatches({
     select: (matches) =>
       matches.some(

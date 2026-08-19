@@ -1,4 +1,3 @@
-import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { type ReactNode } from 'react'
 import { Button, cn } from 'ui'
 
@@ -18,14 +17,9 @@ export type SteppedFlowFinalAction = {
 }
 
 export interface SteppedFlowProps {
-  title: string
-  description?: string
-  backLabel: string
-  backHref?: string
   steps: SteppedFlowStep[]
   currentStep: string
   onStepChange: (stepId: string) => void
-  onCancel: () => void
   nextDisabled?: boolean
   nextLabel?: string
   onNext?: () => void
@@ -35,14 +29,9 @@ export interface SteppedFlowProps {
 }
 
 export const SteppedFlow = ({
-  title,
-  description,
-  backLabel,
-  backHref,
   steps,
   currentStep,
   onStepChange,
-  onCancel,
   nextDisabled = false,
   nextLabel = 'Continue',
   onNext,
@@ -59,40 +48,6 @@ export const SteppedFlow = ({
 
   return (
     <div className="flex min-h-full flex-col">
-      <header className="flex flex-col gap-4 border-b px-6 py-6 sm:flex-row sm:items-start sm:justify-between">
-        <div className="min-w-0 space-y-1">
-          {backHref ? (
-            <a
-              href={backHref}
-              tabIndex={0}
-              className="mb-2 flex items-center gap-1.5 text-sm text-foreground-light hover:text-foreground"
-              onClick={(event) => {
-                event.preventDefault()
-                onCancel()
-              }}
-            >
-              <ArrowLeft size={14} />
-              {backLabel}
-            </a>
-          ) : (
-            <button
-              type="button"
-              tabIndex={0}
-              className="mb-2 flex items-center gap-1.5 text-sm text-foreground-light hover:text-foreground"
-              onClick={onCancel}
-            >
-              <ArrowLeft size={14} />
-              {backLabel}
-            </button>
-          )}
-          <h1 className="text-xl text-foreground">{title}</h1>
-          {description && <p className="max-w-xl text-sm text-foreground-light">{description}</p>}
-        </div>
-        <Button type="button" onClick={onCancel}>
-          Cancel
-        </Button>
-      </header>
-
       <div className="mx-auto grid w-full max-w-[924px] flex-1 grid-cols-1 gap-6 px-6 pt-8 pb-10 lg:grid-cols-[minmax(0,760px)_140px]">
         <div className="min-w-0">
           <p className="mb-4 text-xs text-foreground-lighter lg:hidden">
@@ -100,18 +55,21 @@ export const SteppedFlow = ({
             {currentStepLabel ? ` · ${currentStepLabel}` : ''}
           </p>
           <main className="min-w-0">{children}</main>
-          <footer className="mt-6 flex items-center justify-between border-t pt-4">
-            <Button
-              type="button"
-              icon={<ArrowLeft size={14} />}
-              disabled={currentIndex === 0}
-              onClick={() => {
-                if (currentIndex === 0) return
-                onStepChange(steps[currentIndex - 1].id)
-              }}
-            >
-              Back
-            </Button>
+          <footer
+            className={cn(
+              'mt-6 flex items-center border-t pt-4',
+              currentIndex > 0 ? 'justify-between' : 'justify-end'
+            )}
+          >
+            {currentIndex > 0 && (
+              <Button
+                type="button"
+                variant="default"
+                onClick={() => onStepChange(steps[currentIndex - 1].id)}
+              >
+                Back
+              </Button>
+            )}
             {isLastStep && finalAction ? (
               <Button
                 type={finalAction.type ?? (finalAction.form ? 'submit' : 'button')}
@@ -132,7 +90,6 @@ export const SteppedFlow = ({
                 onClick={onNext}
               >
                 {nextLabel}
-                <ArrowRight size={14} />
               </Button>
             )}
           </footer>

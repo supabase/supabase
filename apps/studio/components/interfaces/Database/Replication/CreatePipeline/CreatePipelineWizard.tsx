@@ -9,7 +9,6 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, cn, Form } from 'ui'
-import { Admonition } from 'ui-patterns/Admonition'
 import * as z from 'zod'
 
 import { AdvancedSettings } from '../DestinationPanel/DestinationForm/AdvancedSettings'
@@ -42,6 +41,7 @@ import { ValidationWarningsDialog } from '../DestinationPanel/DestinationForm/Va
 import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
 import { DestinationTypeSelection } from '../DestinationPanel/DestinationTypeSelection'
 import { EnablePipelinesCallout } from '../EnablePipelinesCallout'
+import { LocalReplicationUnavailableAdmonition } from '../LocalReplicationUnavailableAdmonition'
 import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLClickHousePrivateAlpha,
@@ -60,18 +60,17 @@ import {
 } from './CreatePipelineWizard.utils'
 import { PipelineRegionField } from './PipelineRegionField'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
+import { useRegisterIsolatedStudioFlowClose } from '@/components/layouts/Navigation/LayoutHeader/IsolatedStudioFlowClose'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { SteppedFlow } from '@/components/ui/SteppedFlow/SteppedFlow'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
 import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
 import {
   useReplicationSourceId,
   useReplicationSourcesQuery,
 } from '@/data/replication/sources-query'
-import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { DOCS_URL } from '@/lib/constants'
@@ -117,9 +116,6 @@ export const CreatePipelineWizard = () => {
   const selectedType = isPipelineDestinationType(urlDestinationType) ? urlDestinationType : null
 
   const listHref = `/project/${projectRef}/database/replication`
-
-  const { error: destinationsError } = useReplicationDestinationsQuery({ projectRef })
-  const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
 
   const { data: sourcesData, isSuccess: isSourcesSuccess } = useReplicationSourcesQuery({
     projectRef,
@@ -278,6 +274,7 @@ export const CreatePipelineWizard = () => {
     checkIsDirty: () => isDirty || step !== 'destination',
     onClose: goToList,
   })
+  useRegisterIsolatedStudioFlowClose(confirmOnClose)
 
   const canContinueFromDestination = selectedType !== null
   const canContinueFromConnection =
@@ -412,7 +409,6 @@ export const CreatePipelineWizard = () => {
       <CreatePipelineGate
         title="Request Pipelines access"
         description="Pipelines is in public alpha and being rolled out gradually. Request access to join the waitlist."
-        onCancel={goToList}
       >
         <div className={cn('flex max-w-xl flex-col gap-y-4 rounded-md border p-6')}>
           <div className="flex flex-col gap-y-1">
@@ -444,7 +440,6 @@ export const CreatePipelineWizard = () => {
       <CreatePipelineGate
         title="Enable Pipelines"
         description="Turn on Pipelines for this project before creating a destination."
-        onCancel={goToList}
       >
         <EnablePipelinesCallout className="p-6!" type={selectedType} />
       </CreatePipelineGate>
@@ -456,7 +451,6 @@ export const CreatePipelineWizard = () => {
       <CreatePipelineGate
         title="Create a pipeline"
         description="Connect this Postgres database to an analytical destination."
-        onCancel={goToList}
       >
         <NoDestinationsAvailable />
       </CreatePipelineGate>
@@ -468,14 +462,9 @@ export const CreatePipelineWizard = () => {
       <Form {...form}>
         <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
           <SteppedFlow
-            title="Create a pipeline"
-            description="Connect this Postgres database to an analytical destination."
-            backLabel="Replication"
-            backHref={listHref}
             steps={[...PIPELINE_CREATE_STEPS]}
             currentStep={step}
             onStepChange={(nextStep) => setStep(nextStep as PipelineCreateStepId)}
-            onCancel={confirmOnClose}
             nextDisabled={nextDisabled}
             onNext={handleNext}
             finalAction={{
@@ -485,21 +474,13 @@ export const CreatePipelineWizard = () => {
               disabled: isSubmitDisabled,
             }}
           >
-            {isLocalETLNotSetUp && (
-              <Admonition
-                type="warning"
-                className="mb-6"
-                title="Replication unavailable locally"
-                description="Configure the replication API to manage Pipelines destinations in local development."
-              />
-            )}
-
             {step === 'destination' && (
               <section className="space-y-2">
                 <h2 className="text-lg text-foreground">Choose a destination</h2>
                 <p className="text-sm text-foreground-light">
                   Where should this database be replicated?
                 </p>
+                <LocalReplicationUnavailableAdmonition className="mt-4" />
                 <DestinationTypeSelection hideReadReplica className="p-0 pt-4" />
               </section>
             )}

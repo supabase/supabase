@@ -15,9 +15,9 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns/Admonition'
 
 import { EnablePipelinesCallout } from '../EnablePipelinesCallout'
+import { LocalReplicationUnavailableAdmonition } from '../LocalReplicationUnavailableAdmonition'
 import { PipelineStatusName } from '../Replication.constants'
 import { useDestinationInformation } from '../useDestinationInformation'
 import { useIsETLPrivateAlpha } from '../useIsETLPrivateAlpha'
@@ -27,8 +27,6 @@ import { DestinationTypeSelection } from './DestinationTypeSelection'
 import { ReadReplicaForm } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicaForm'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
-import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -39,8 +37,6 @@ interface DestinationPanelProps {
 export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPanelProps) => {
   const { ref: projectRef } = useParams()
   const enablePgReplicate = useIsETLPrivateAlpha()
-  const { error: destinationsError } = useReplicationDestinationsQuery({ projectRef })
-  const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
 
   const [urlDestinationType, setDestinationType] = useQueryState(
     'destinationType',
@@ -125,15 +121,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
   const pipelinesTypeSelection = (
     <>
       {typeSelection}
-      {destinationType != null && isLocalETLNotSetUp && (
-        <SheetSection className="pb-0!">
-          <Admonition
-            type="warning"
-            title="Replication unavailable locally"
-            description="Configure the replication API to manage Pipelines destinations in local development."
-          />
-        </SheetSection>
-      )}
+      {destinationType != null && <LocalReplicationUnavailableAdmonition className="mx-5 mt-4" />}
     </>
   )
 
