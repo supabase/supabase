@@ -1,6 +1,6 @@
 ---
-title: 'Build a User Management App with Nuxt 4'
-description: 'Learn how to use Supabase in your Nuxt 4 app.'
+title: 'Build a User Management App with Nuxt'
+description: 'Learn how to use Supabase in your Nuxt app.'
 ---
 
 <$Partial path="uiLibCta.mdx" />
@@ -18,9 +18,9 @@ If you get stuck while working through this guide, you can find the [full exampl
 
 ## Building the app
 
-Build the Nuxt 4 and TypeScript.
+Build the Nuxt app and TypeScript.
 
-### Initialize a Nuxt 4 app
+### Initialize a Nuxt app
 
 Use [`npm create nuxt`](https://nuxt.com/docs/4.x/getting-started/installation) to create an app called `nuxt-user-management`:
 
@@ -97,7 +97,7 @@ async function handleLogin() {
 
 <template>
   <form class="form-widget" @submit.prevent="handleLogin">
-    <h1 class="header">Supabase + Nuxt 4</h1>
+    <h1 class="header">Supabase + Nuxt</h1>
     <p class="description">Sign in with a magic link sent to your email.</p>
     <input v-model="email" class="inputField" type="email" placeholder="Your email" required />
     <input
@@ -396,7 +396,7 @@ npm run dev
 
 Open [localhost:3000](http://localhost:3000) in your browser to see the completed app.
 
-![Supabase Nuxt 4](/docs/img/supabase-vue-3-demo.png)
+![Supabase Nuxt](/docs/img/supabase-vue-3-demo.png)
 
 At this stage you have a fully functional application.
 
