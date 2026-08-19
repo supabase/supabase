@@ -19,7 +19,9 @@ const worker = (name: string, overrides: Partial<Worker> = {}): Worker => ({
 })
 
 const renderList = (workers: Worker[]) =>
-  customRender(<WorkersList projectRef="default" workers={workers} onDeploy={vi.fn()} />)
+  customRender(
+    <WorkersList projectRef="default" workers={workers} onDeploy={vi.fn()} onCreate={vi.fn()} />
+  )
 
 const rowNames = () =>
   screen
