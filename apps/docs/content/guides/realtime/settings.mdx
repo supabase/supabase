@@ -49,7 +49,7 @@ See [Database connections](/docs/guides/realtime/concepts#database-connections) 
 
 ### Postgres Changes connection pool size
 
-Determines the number of connections used to create [Postgres Changes](/docs/guides/realtime/postgres-changes) subscriptions when clients subscribe. It's only used while subscriptions are created; streaming the changes uses a separate connection.
+Determines the number of connections used to create [Postgres Changes](/docs/guides/realtime/postgres-changes) subscriptions when clients subscribe. It's only used while subscriptions are created; streaming the changes uses a separate connection. The default is 2 connections.
 
 - **Too low**: subscription creation times out during bursts. Clients receive a `postgres_changes` system error with `Too many database timeouts` and retry after 5 to 10 seconds.
 - **Too high**: it counts toward the same connection budget as every other Realtime pool. The maximum is 20.

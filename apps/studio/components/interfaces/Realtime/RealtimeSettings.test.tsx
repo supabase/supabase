@@ -115,6 +115,20 @@ describe('RealtimeSettings', () => {
     expect(await screen.findByLabelText('Postgres Changes connection pool size')).toHaveValue(2)
   })
 
+  test('falls back to the default postgres changes pool value when omitted', async () => {
+    const { postgres_changes_pool, ...configWithoutPool } = REALTIME_CONFIG
+
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref/config/realtime',
+      response: () => HttpResponse.json(configWithoutPool),
+    })
+
+    customRender(<RealtimeSettings />)
+
+    expect(await screen.findByLabelText('Postgres Changes connection pool size')).toHaveValue(2)
+  })
+
   test('submits the postgres changes pool value when saving', async () => {
     const updateBodySchema = z.object({ postgres_changes_pool: z.number() })
 
@@ -143,5 +157,44 @@ describe('RealtimeSettings', () => {
 
     await waitFor(() => expect(requests).toHaveLength(1))
     expect(requests[0]).toMatchObject({ postgres_changes_pool: 5 })
+  })
+
+  test.each([
+    { value: '1', accepted: true },
+    { value: '20', accepted: true },
+    { value: '0', accepted: false },
+    { value: '21', accepted: false },
+  ])('$accepted for postgres changes pool value of $value', async ({ value, accepted }) => {
+    const requests: unknown[] = []
+    addAPIMock({
+      method: 'patch',
+      path: '/platform/projects/:ref/config/realtime',
+      response: async ({ request }) => {
+        requests.push(await request.json())
+        return new HttpResponse(null, { status: 204 })
+      },
+    })
+
+    customRender(<RealtimeSettings />)
+
+    const postgresChangesPoolInput = await screen.findByLabelText(
+      'Postgres Changes connection pool size'
+    )
+    await userEvent.clear(postgresChangesPoolInput)
+    await userEvent.type(postgresChangesPoolInput, value)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save changes' }))
+
+    if (accepted) {
+      const dialog = await screen.findByRole('dialog')
+      fireEvent.click(within(dialog).getByRole('button', { name: 'Save changes' }))
+
+      await waitFor(() => expect(requests).toHaveLength(1))
+      expect(requests[0]).toMatchObject({ postgres_changes_pool: Number(value) })
+    } else {
+      await waitFor(() => expect(postgresChangesPoolInput).toHaveAttribute('aria-invalid', 'true'))
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+      expect(requests).toHaveLength(0)
+    }
   })
 })
