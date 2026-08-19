@@ -8,9 +8,7 @@ interface GetRetentionTighteningParams {
   isVersioningEnabled: boolean
   initialRetentionDays: number | null | undefined
   initialMaxVersions: number | null | undefined
-  /** `null` for the empty sentinel. */
   nextRetentionDays: number | null
-  /** `null` for the empty sentinel. */
   nextMaxVersions: number | null
 }
 
@@ -59,6 +57,6 @@ export const RETENTION_TIGHTENING_DESCRIPTION: Record<
   versions: 'Saving permanently deletes noncurrent versions beyond the lower per-object cap.',
 }
 
-/** Converts the form's `'' | number` sentinel into a plain nullable number. */
+/** Converts the form's `'' | number` into a plain nullable number. */
 export const toNullableNumber = (value: '' | number): number | null =>
   typeof value === 'number' ? value : null
