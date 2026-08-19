@@ -9,6 +9,7 @@ import {
 
 import { EXAMPLE_WORKER } from './workerSnippets'
 import { WorkerSnippetTabs } from './WorkerSnippetTabs'
+import { CLI_NAME } from '@/lib/constants/workers'
 
 interface DeployWorkerDialogProps {
   open: boolean
@@ -18,7 +19,7 @@ interface DeployWorkerDialogProps {
 const STEPS = [
   {
     title: 'Scaffold the worker',
-    description: 'Creates supabase/workers/<name>/ with an entrypoint for the runtime you pick.',
+    description: `Creates supabase/${CLI_NAME}/<name>/ with an entrypoint for the runtime you pick.`,
   },
   {
     title: 'Configure it',
@@ -34,13 +35,12 @@ export const DeployWorkerDialog = ({ open, onOpenChange }: DeployWorkerDialogPro
   <Dialog open={open} onOpenChange={onOpenChange}>
     <DialogContent size="large">
       <DialogHeader>
-        <DialogTitle>Deploy a worker</DialogTitle>
+        <DialogTitle>Deploy with the CLI</DialogTitle>
       </DialogHeader>
 
       <DialogSection className="space-y-4">
         <p className="text-sm text-foreground-light">
-          Workers are deployed with the Supabase CLI. This dashboard is read-only during the private
-          alpha.
+          The dashboard deploys a starter worker. Push your own code with the Supabase CLI.
         </p>
         <ol className="space-y-4">
           {STEPS.map((step, index) => (
