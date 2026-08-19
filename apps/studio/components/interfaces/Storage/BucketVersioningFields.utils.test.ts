@@ -48,9 +48,6 @@ describe('getRetentionTightening', () => {
   })
 
   it('does not warn when a bound is newly added where none existed', () => {
-    // Going from "no age condition" to 7 days does tighten the policy, but the
-    // helper only compares against a previous bound; a brand new condition is
-    // covered by the generic lifecycle-policy copy instead.
     expect(
       getRetentionTightening(params({ initialRetentionDays: null, nextRetentionDays: 7 }))
     ).toBe('none')
