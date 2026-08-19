@@ -67,7 +67,7 @@ export const BucketVersioningFields = ({
               hideMessage
               name="enable_versioning"
               label="Object versioning"
-              description="Keeps previous versions of an object when it is overwritten or deleted"
+              description="Retains previous versions of an object when it is overwritten or deleted"
               layout="flex"
             >
               <FormControl>
