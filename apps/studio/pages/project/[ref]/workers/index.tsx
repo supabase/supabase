@@ -35,6 +35,10 @@ const WorkersPage: NextPageWithLayout = () => {
     isSuccess,
   } = useQuery(workersQueryOptions({ projectRef: ref }))
 
+  const isNotEnrolled = isError && isWorkersUnavailable(error)
+  const isMissingPermission = isError && isWorkersForbidden(error)
+  const isUnexpectedError = isError && !isNotEnrolled && !isMissingPermission
+
   return (
     <div className="w-full min-h-full flex flex-col items-stretch">
       <PageHeader size="large">
@@ -52,19 +56,17 @@ const WorkersPage: NextPageWithLayout = () => {
         <PageSection>
           <PageSectionContent>
             {isPending && <GenericSkeletonLoader />}
-            {isError && isWorkersUnavailable(error) && (
+            {isNotEnrolled && (
               <Admonition
                 type="default"
-                title="Compute is not enabled for this project"
-                description="Compute is in private alpha. Contact support to have this project added to the alpha."
+                title={`${PRODUCT_NAME} is not enabled for this project`}
+                description={`${PRODUCT_NAME} is in private alpha. Contact support to have this project added to the alpha.`}
               />
             )}
-            {isError && isWorkersForbidden(error) && (
-              <NoPermission resourceText="view this project's Compute workers" />
+            {isMissingPermission && (
+              <NoPermission resourceText={`view this project's ${PRODUCT_NAME} workers`} />
             )}
-            {isError && !isWorkersUnavailable(error) && !isWorkersForbidden(error) && (
-              <AlertError error={error} subject="Failed to retrieve workers" />
-            )}
+            {isUnexpectedError && <AlertError error={error} subject="Failed to retrieve workers" />}
             {isSuccess && workers.length === 0 && (
               <p className="text-sm text-foreground-light">
                 No workers yet. Deploy your first worker with the Supabase CLI.
