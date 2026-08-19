@@ -51,10 +51,8 @@ describe('computeVersionFate', () => {
   })
 
   it('ignores a cap that has no expiration age alongside it', () => {
-    // Not a reachable policy: S3 requires NoncurrentDays on any
-    // NoncurrentVersionExpiration rule, so the bucket form disables the cap until
-    // an age is set. Pinned here so a cap arriving alone can never be read as an
-    // active rule and start labelling versions for removal.
+    // Not a reachable policy: S3 requires NoncurrentDays
+    // on any NoncurrentVersionExpiration rule
     const base = { expiryDays: null, cap: 3, mode: 'and' as const }
 
     expect(computeVersionFate({ ...base, daysOld: 3, chronoIndex: 2, noncurrentCount: 3 })).toEqual(
@@ -62,7 +60,7 @@ describe('computeVersionFate', () => {
         type: 'retained',
       }
     )
-    // Would have been the cap boundary — still nothing to promise.
+
     expect(
       computeVersionFate({ ...base, daysOld: 216, chronoIndex: 0, noncurrentCount: 3 })
     ).toEqual({ type: 'retained' })
