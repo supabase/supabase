@@ -1,12 +1,21 @@
 import type { Worker, WorkerBuildState } from './Workers.types'
 
 // Locked to one region at alpha, so nothing in the UI lets you change it.
-export const WORKERS_REGION = 'us-west-1'
+export const WORKERS_REGION = 'us-west-2'
 export const WORKERS_REGION_LABEL = 'US West (Oregon)'
 export const WORKERS_REGION_SHORT = 'US West'
 
-// Private workers share this URL shape; access is enforced by the gateway, not the path.
-export const workerGatewayUrl = (name: string) => `https://workers.supabase.co/v1/${name}`
+// Workers answer on the project's own domain, alongside /functions/v1, and the api-gateway keeps
+// the route dark for projects outside the alpha allow-list.
+export const workerUrl = ({
+  endpoint,
+  protocol = 'https',
+  name,
+}: {
+  endpoint: string | undefined
+  protocol?: string
+  name: string
+}) => (endpoint ? `${protocol}://${endpoint}/workers/v1/${name}` : undefined)
 
 export const LISTENING_PORT = 8080
 

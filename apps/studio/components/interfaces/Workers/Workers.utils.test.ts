@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { workerUrl } from './Workers.constants'
 import type { Worker } from './Workers.types'
 import {
   filterWorkers,
@@ -135,5 +136,23 @@ describe('isWorkersAccessDenied', () => {
     expect(isWorkersAccessDenied(responseError(undefined))).toBe(false)
     expect(isWorkersAccessDenied(new Error('boom'))).toBe(false)
     expect(isWorkersAccessDenied(null)).toBe(false)
+  })
+})
+
+describe('workerUrl', () => {
+  it('answers on the project domain alongside /functions/v1', () => {
+    expect(workerUrl({ endpoint: 'abcdefgh.supabase.co', name: 'embed' })).toBe(
+      'https://abcdefgh.supabase.co/workers/v1/embed'
+    )
+  })
+
+  it('honours a non-https protocol', () => {
+    expect(workerUrl({ endpoint: 'localhost:8000', protocol: 'http', name: 'embed' })).toBe(
+      'http://localhost:8000/workers/v1/embed'
+    )
+  })
+
+  it('has no url until the project settings resolve', () => {
+    expect(workerUrl({ endpoint: undefined, name: 'embed' })).toBeUndefined()
   })
 })
