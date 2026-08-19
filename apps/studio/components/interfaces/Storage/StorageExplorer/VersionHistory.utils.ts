@@ -4,10 +4,11 @@ export type VersionFate =
   | { type: 'retained' }
   | { type: 'expires-in'; days: number }
   /**
-   * The cap forces this one out, so the date depends on the next upload.
-   * `daysRemaining` is set when an age rule is also configured.
+   * The cap forces this one out before its age would, so the exact date depends
+   * on when the next upload happens. `daysRemaining` is the date it would have
+   * hit anyway had the cap not got there first.
    */
-  | { type: 'expires-on-next-upload'; daysRemaining?: number }
+  | { type: 'expires-on-next-upload'; daysRemaining: number }
   | { type: 'expiring-now' }
 
 export interface ComputeVersionFateOptions {
@@ -28,9 +29,8 @@ const toActiveBound = (value: number | null) => (value !== null && value > 0 ? v
 /**
  * The removal-outlook label a version row shows. Governing rule: never show a
  * countdown unless removal is actually guaranteed under the current policy — a
- * row only gets a day count once every other condition is already satisfied.
- * So a cap-only policy shows no dates except at the boundary, and an `and`
- * policy shows one only once the cap is already exceeded.
+ * row only gets a day count once every other condition is already satisfied. So
+ * an `and` policy shows one only once the cap is already exceeded.
  *
  * Each branch has a worked reference case in `VersionHistory.utils.test.ts`.
  */
@@ -45,13 +45,10 @@ export const computeVersionFate = ({
   const activeExpiryDays = toActiveBound(expiryDays)
   const activeCap = toActiveBound(cap)
 
-  if (activeExpiryDays === null) {
-    if (activeCap === null) return { type: 'retained' }
-
-    // Cap only: the oldest version still inside the cap is next to be evicted.
-    const isAtCapBoundary = chronoIndex === noncurrentCount - activeCap
-    return isAtCapBoundary ? { type: 'expires-on-next-upload' } : { type: 'retained' }
-  }
+  // A cap with no age isn't expressible in S3 — NoncurrentDays is required on any
+  // NoncurrentVersionExpiration rule, which is why the bucket form disables the
+  // cap until an age is set. So no age means no policy, whatever the cap says.
+  if (activeExpiryDays === null) return { type: 'retained' }
 
   const isAgeExceeded = daysOld >= activeExpiryDays
   const daysRemaining = activeExpiryDays - daysOld
