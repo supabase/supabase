@@ -52,9 +52,7 @@ const VersionFateLabel = ({ fate }: { fate: VersionFate }) => {
       return (
         <div className="flex flex-col items-end">
           <span className="shrink-0 text-xs text-warning-600">Expires on next upload</span>
-          {fate.daysRemaining !== undefined && (
-            <span className="shrink-0 text-xs text-warning-600">or in {fate.daysRemaining}d</span>
-          )}
+          <span className="shrink-0 text-xs text-warning-600">or in {fate.daysRemaining}d</span>
         </div>
       )
     case 'expiring-now':
@@ -288,6 +286,7 @@ export const VersionHistory = ({
                 ) : (
                   <button
                     type="button"
+                    tabIndex={0}
                     className="flex min-w-0 flex-1 items-center gap-x-2.5 text-left"
                     onClick={() => (version.isCurrent ? clearPreview() : onPreview?.(version))}
                   >

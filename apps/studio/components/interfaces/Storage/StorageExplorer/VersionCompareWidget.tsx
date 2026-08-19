@@ -35,6 +35,7 @@ export const VersionCompareWidget = ({
       </p>
       <button
         type="button"
+        tabIndex={0}
         className="ml-auto shrink-0 text-foreground-lighter transition-colors hover:text-foreground"
         onClick={onDismiss}
         aria-label="Cancel comparison"
