@@ -31,10 +31,22 @@ export async function getNotebook(
 
 export type NotebookData = Awaited<ReturnType<typeof getNotebook>>
 
+export const useNotebookQuery = <TData = NotebookData>(
+  { projectRef, id }: NotebookVariables,
+  { enabled = true, ...options }: UseCustomQueryOptions<NotebookData, NotebookError, TData> = {}
+) =>
+  useQuery<NotebookData, NotebookError, TData>({
+    queryKey: contentKeys.resource(projectRef, id),
+    queryFn: ({ signal }) => getNotebook({ projectRef, id }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined',
+    ...options,
+  })
+
 /**
- * [Joshen] Temporary stub for the Explorer notebook page only, until API support for the
- * 'notebook' content type ships. Deliberately NOT used by `getNotebook` above — that's also
- * called directly by lib/ai/tools/notebook-tools.ts, which needs the real endpoint.
+ * [Joshen] Temporary stub for the Explorer notebook page only (via useLoadNotebook in
+ * Explorer/hooks.ts), until API support for the 'notebook' content type ships. Deliberately
+ * separate from useNotebookQuery above — that's also used by NotebookProposalRenderer (the AI
+ * assistant's notebook diff preview), which needs the real endpoint.
  */
 async function getNotebookStub({ id }: NotebookVariables): Promise<NotebookData> {
   await timeout(1000)
@@ -45,13 +57,12 @@ async function getNotebookStub({ id }: NotebookVariables): Promise<NotebookData>
   return notebookStub
 }
 
-export const useNotebookQuery = <TData = NotebookData>(
+export const useNotebookStubQuery = <TData = NotebookData>(
   { projectRef, id }: NotebookVariables,
   { enabled = true, ...options }: UseCustomQueryOptions<NotebookData, NotebookError, TData> = {}
 ) =>
   useQuery<NotebookData, NotebookError, TData>({
     queryKey: contentKeys.resource(projectRef, id),
-    // [Joshen] Replace with getNotebook once API support is ready
     queryFn: () => getNotebookStub({ projectRef, id }),
     enabled: enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined',
     ...options,
