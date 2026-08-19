@@ -41,7 +41,7 @@ interface DisplaySettingsButtonProps {
 
 const getLogScaleDisabledReason = (y_columns: string[]) => {
   if (y_columns.length === 0) return 'Select a column for the Y axis first'
-  if (y_columns.length > 1) return 'Logarithmic scale is not supported with multiple Y axis columns'
+  if (y_columns.length > 1) return 'Only available with a single Y axis column'
   return 'Data contains zero or negative values'
 }
 
