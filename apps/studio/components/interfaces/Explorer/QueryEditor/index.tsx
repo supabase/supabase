@@ -2,7 +2,7 @@ import { acceptUntrustedSql, untrustedSql, type UntrustedSqlFragment } from '@su
 import { useFlag } from 'common'
 import { CodeSquare, Eye, EyeOff, Play } from 'lucide-react'
 import { forwardRef, useImperativeHandle, useState, type ReactNode } from 'react'
-import { cn } from 'ui'
+import { Button, cn } from 'ui'
 
 import { resolveLogTimeRange } from '../../QuerySources/LogTimeRange.utils'
 import {
@@ -25,6 +25,7 @@ import { QueryResultRenderer } from './QueryResultRenderer'
 import { QuerySourceMenu } from './QuerySourceMenu'
 import { LegacyLogsRewriteBanner } from '@/components/interfaces/Settings/Logs/LegacyLogsRewriteBanner'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+import { DiffEditor } from '@/components/ui/DiffEditor'
 import {
   type DatabaseSourceParameters,
   type LogsSourceParameters,
@@ -44,6 +45,7 @@ import {
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { applyAutoLimit } from '@/data/sql/utils'
+import { type LegacyLogsRewriteProposal } from '@/hooks/analytics/useLegacyLogsRewrite'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
@@ -129,6 +131,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   const databaseIdentifier = query._tag === 'database' ? query.database_identifier : undefined
 
   const [showQuery, setShowQuery] = useState(true)
+  const [rewriteProposal, setRewriteProposal] = useState<LegacyLogsRewriteProposal | null>(null)
 
   const { data: databases, isPending: isLoadingDatabases } = useReadReplicasQuery(
     { projectRef: project?.ref },
@@ -208,6 +211,15 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     }).catch(() => {})
   }
 
+  const acceptRewrite = () => {
+    if (!rewriteProposal) return
+    onSqlChange(rewriteProposal.modified)
+    onSqlCommit?.(rewriteProposal.modified)
+    setRewriteProposal(null)
+  }
+
+  const discardRewrite = () => setRewriteProposal(null)
+
   useImperativeHandle(ref, () => ({ run: () => handleRunQuery() }))
 
   const Shell = variant === 'viewport' ? ExplorerQueryViewport : ExplorerQuery
@@ -262,10 +274,8 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
             isLogsSource={query._tag === 'logs'}
             sql={sql}
             readSql={() => sqlRef.current}
-            onProposal={({ modified }) => {
-              onSqlChange(modified)
-              onSqlCommit?.(modified)
-            }}
+            onProposal={setRewriteProposal}
+            hidden={rewriteProposal !== null}
           />
           <ExplorerQueryEditor
             className={cn('relative', variant === 'viewport' ? 'h-[45%] min-h-48' : undefined)}
@@ -284,6 +294,31 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
                 editor.onDidBlurEditorWidget(() => onSqlCommitRef.current?.(sqlRef.current))
               }}
             />
+            {rewriteProposal && (
+              <div className="absolute inset-0 z-10 flex flex-col bg-studio">
+                <div className="flex items-center justify-between gap-2 border-b bg-surface-100 px-3 py-2">
+                  <span className="text-xs text-foreground-light">
+                    Review the ClickHouse SQL rewrite before accepting it
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <Button variant="default" size="tiny" onClick={discardRewrite}>
+                      Discard
+                    </Button>
+                    <Button variant="primary" size="tiny" onClick={acceptRewrite}>
+                      Accept
+                    </Button>
+                  </div>
+                </div>
+                <div className="min-h-0 flex-1">
+                  <DiffEditor
+                    language="pgsql"
+                    original={rewriteProposal.original}
+                    modified={rewriteProposal.modified}
+                    options={{ renderSideBySide: true, renderGutterMenu: false }}
+                  />
+                </div>
+              </div>
+            )}
           </ExplorerQueryEditor>
         </>
       )}
