@@ -3,6 +3,7 @@ import { useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import {
   Button,
+  cn,
   FormControl,
   FormField,
   Input,
@@ -20,14 +21,16 @@ import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
 export const ClickHouseFields = ({
   form,
   editMode,
+  className,
 }: {
   form: UseFormReturn<DestinationPanelSchemaType>
   editMode: boolean
+  className?: string
 }) => {
   const [showPassword, setShowPassword] = useState(false)
 
   return (
-    <div className="flex flex-col gap-y-6 p-5">
+    <div className={cn('flex flex-col gap-y-6 p-5', className)}>
       <p className="text-sm font-medium text-foreground">ClickHouse settings</p>
 
       <div className="flex flex-col gap-y-4">

@@ -1,7 +1,7 @@
 import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
-import { Button, FormControl, FormField, Input, TextArea } from 'ui'
+import { Button, cn, FormControl, FormField, Input, TextArea } from 'ui'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -11,14 +11,16 @@ import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
 export const SnowflakeFields = ({
   form,
   editMode,
+  className,
 }: {
   form: UseFormReturn<DestinationPanelSchemaType>
   editMode: boolean
+  className?: string
 }) => {
   const [showPrivateKeyPassphrase, setShowPrivateKeyPassphrase] = useState(false)
 
   return (
-    <div className="flex flex-col gap-y-6 p-5">
+    <div className={cn('flex flex-col gap-y-6 p-5', className)}>
       <p className="text-sm font-medium text-foreground">Snowflake settings</p>
 
       <div className="flex flex-col gap-y-1">

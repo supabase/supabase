@@ -119,6 +119,24 @@ describe('DestinationTypeSelection', () => {
     expect(screen.queryByText('Pipelines')).not.toBeInTheDocument()
   })
 
+  test('hides Read Replica when hideReadReplica is set', async () => {
+    mockBigQueryEnabled.mockReturnValue(true)
+    mockIcebergEnabled.mockReturnValue(false)
+    mockDucklakeEnabled.mockReturnValue(false)
+    mockSnowflakeEnabled.mockReturnValue(false)
+    mockClickHouseEnabled.mockReturnValue(false)
+    addBackgroundMocks()
+
+    customRender(<DestinationTypeSelection hideReadReplica />)
+
+    fireEvent.click(await screen.findByRole('combobox'))
+
+    expect(await screen.findByText('Pipelines')).toBeInTheDocument()
+    expect(screen.getByText('BigQuery')).toBeInTheDocument()
+    expect(screen.queryByText('Other')).not.toBeInTheDocument()
+    expect(screen.queryByText('Read Replica')).not.toBeInTheDocument()
+  })
+
   test('shows the public alpha warning for a Pipelines destination', async () => {
     mockBigQueryEnabled.mockReturnValue(true)
     mockIcebergEnabled.mockReturnValue(false)

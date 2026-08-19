@@ -1,6 +1,7 @@
 import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
 import {
   Badge,
+  cn,
   Select,
   SelectContent,
   SelectGroup,
@@ -37,7 +38,15 @@ interface DestinationTypeGroup {
   options: DestinationTypeOption[]
 }
 
-export const DestinationTypeSelection = () => {
+interface DestinationTypeSelectionProps {
+  hideReadReplica?: boolean
+  className?: string
+}
+
+export const DestinationTypeSelection = ({
+  hideReadReplica = false,
+  className,
+}: DestinationTypeSelectionProps) => {
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
@@ -84,7 +93,7 @@ export const DestinationTypeSelection = () => {
           description:
             'Deploy a read-only database in another region for lower latency and workload isolation',
           stage: null,
-          enabled: isOptionVisible('Read Replica', infrastructureReadReplicas),
+          enabled: !hideReadReplica && isOptionVisible('Read Replica', infrastructureReadReplicas),
         },
       ],
     },
@@ -171,7 +180,7 @@ export const DestinationTypeSelection = () => {
     <FormItemLayout
       isReactForm={false}
       layout="horizontal"
-      className="p-5 [&>div]:gap-y-1 [&>div>span]:text-foreground-lighter"
+      className={cn('p-5 [&>div]:gap-y-1 [&>div>span]:text-foreground-lighter', className)}
       label="Type"
       description={typeDescription}
     >

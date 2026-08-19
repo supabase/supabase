@@ -1,5 +1,5 @@
 import type { UseFormReturn } from 'react-hook-form'
-import { FormControl, FormField, Input, TextArea } from 'ui'
+import { cn, FormControl, FormField, Input, TextArea } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
@@ -8,12 +8,14 @@ import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
 export const BigQueryFields = ({
   form,
   editMode,
+  className,
 }: {
   form: UseFormReturn<DestinationPanelSchemaType>
   editMode: boolean
+  className?: string
 }) => {
   return (
-    <div className="flex flex-col gap-y-6 p-5">
+    <div className={cn('flex flex-col gap-y-6 p-5', className)}>
       <p className="text-sm font-medium text-foreground">BigQuery settings</p>
       <div className="flex flex-col gap-y-4">
         <FormField

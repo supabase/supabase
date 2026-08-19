@@ -65,7 +65,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
     })
   )
 
-  const visible = urlDestinationType !== null || edit !== null
+  const visible = edit !== null || urlDestinationType === 'Read Replica'
   const editMode = edit !== null
 
   const {

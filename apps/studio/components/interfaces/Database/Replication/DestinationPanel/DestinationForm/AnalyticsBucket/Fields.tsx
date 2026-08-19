@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 import {
   Button,
+  cn,
   FormControl,
   FormField,
   Input,
@@ -56,10 +57,12 @@ export const AnalyticsBucketFields = ({
   form,
   editMode,
   onSelectNewBucket,
+  className,
 }: {
   form: UseFormReturn<DestinationPanelSchemaType>
   editMode: boolean
   onSelectNewBucket: () => void
+  className?: string
 }) => {
   const [warehouseName, s3AccessKeyId, namespace] = useWatch({
     control: form.control,
@@ -100,7 +103,7 @@ export const AnalyticsBucketFields = ({
   )
 
   return (
-    <div className="flex flex-col gap-y-6 p-5">
+    <div className={cn('flex flex-col gap-y-6 p-5', className)}>
       <p className="text-sm font-medium text-foreground">Analytics Bucket settings</p>
 
       <div className="flex flex-col gap-y-4">
