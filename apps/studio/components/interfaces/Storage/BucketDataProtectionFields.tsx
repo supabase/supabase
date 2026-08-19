@@ -369,7 +369,7 @@ const LifecyclePolicySection = ({
               type="warning"
               className="mt-2"
               title="No lifecycle policy"
-              description="All noncurrent versions count toward storage usage and incur ongoing costs. Consider setting a lifecycle policy to automatically expire outdated versions."
+              description="Without one, every noncurrent version is retained indefinitely and keeps counting toward storage costs."
             />
           </Collapse>
         )}
