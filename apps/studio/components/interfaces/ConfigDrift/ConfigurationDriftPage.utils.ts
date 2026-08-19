@@ -63,10 +63,16 @@ const PROVIDER_LABELS: Record<string, string> = {
 const CONFIG_SECTION_LABELS: Record<ConfigSection, string> = {
   api: 'API',
   auth: 'Auth',
-  database: 'Database',
-  pooler: 'Pooler',
-  realtime: 'Realtime',
+  db: 'Database',
   storage: 'Storage',
+  realtime: 'Realtime',
+  studio: 'Studio',
+  inbucket: 'Inbucket',
+  functions: 'Edge Functions',
+  edge_runtime: 'Edge Runtime',
+  analytics: 'Analytics',
+  remotes: 'Remotes',
+  experimental: 'Experimental',
 }
 
 interface ConfigurationIssueRowMeta {

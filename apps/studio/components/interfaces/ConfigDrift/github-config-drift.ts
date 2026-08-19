@@ -1,11 +1,9 @@
-import { convertProjectConfigToGitHubConfig } from './github-config-convert'
 import {
   CONFIG_SECTIONS,
   getConfigValue,
   getFieldDefinition,
   getSectionFieldEntries,
   isSecretConfigField,
-  type ConfigDriftDashboardConfig,
   type ConfigSection,
 } from './github-config-field-registry'
 import { gitHubConfigTomlSchema, type GitHubConfigToml } from './github-config.types'
@@ -41,25 +39,20 @@ interface GitHubConfigDriftSummary {
 }
 
 function getConfigFieldState({
-  section,
   fieldName,
-  githubFormattedDashboardConfig,
+  dashboardConfig,
   githubConfig,
 }: {
-  section: ConfigSection
   fieldName: string
-  githubFormattedDashboardConfig: GitHubConfigToml
+  dashboardConfig: GitHubConfigToml
   githubConfig?: GitHubConfigToml
 }): GitHubConfigFieldState {
-  const definition = getFieldDefinition(section, fieldName)
+  const definition = getFieldDefinition(fieldName)
   if (!definition || !githubConfig || isSecretConfigField(definition.configPath)) {
     return { status: 'unmanaged' }
   }
 
-  const normalizedDashboardValue = getConfigValue(
-    githubFormattedDashboardConfig,
-    definition.configPath
-  )
+  const normalizedDashboardValue = getConfigValue(dashboardConfig, definition.configPath)
 
   let githubValue = getConfigValue(githubConfig, definition.configPath)
   if (githubValue === undefined) {
@@ -88,7 +81,7 @@ export function getConfigDriftSummary({
   dashboardConfig,
   githubConfig,
 }: {
-  dashboardConfig?: ConfigDriftDashboardConfig
+  dashboardConfig?: GitHubConfigToml
   githubConfig?: GitHubConfigToml
 }): GitHubConfigDriftSummary {
   if (!dashboardConfig || !githubConfig) {
@@ -96,21 +89,20 @@ export function getConfigDriftSummary({
   }
 
   const cleanedGithubConfig = gitHubConfigTomlSchema.parse(githubConfig)
-  const githubFormattedDashboardConfig = convertProjectConfigToGitHubConfig(dashboardConfig)
+  const cleanedDashboardConfig = gitHubConfigTomlSchema.parse(dashboardConfig)
 
   let managedCount = 0
   const driftedFields: GitHubConfigDriftField[] = []
   const unmanagedFields: UnmanagedConfigField[] = []
 
   for (const section of CONFIG_SECTIONS) {
-    const sectionConfig = dashboardConfig[section]
+    const sectionConfig = cleanedDashboardConfig[section]
     if (!sectionConfig) continue
 
-    for (const { fieldName, rawValue } of getSectionFieldEntries(section, sectionConfig)) {
+    for (const { fieldName, rawValue } of getSectionFieldEntries(sectionConfig)) {
       const state = getConfigFieldState({
-        section,
         fieldName,
-        githubFormattedDashboardConfig,
+        dashboardConfig,
         githubConfig: cleanedGithubConfig,
       })
 

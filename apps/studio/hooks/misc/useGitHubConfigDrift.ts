@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useCallback, useMemo } from 'react'
 
+import { convertProjectConfigToGitHubConfig } from '@/components/interfaces/ConfigDrift/github-config-convert'
 import { getConfigDriftSummary } from '@/components/interfaces/ConfigDrift/github-config-drift'
 import type { Branch } from '@/data/branches/branches-query'
 import { useBranchesQuery } from '@/data/branches/branches-query'
@@ -87,14 +88,15 @@ export function useSelectedGitHubConfigDrift() {
     [branchesRefetch, connectionRefetch, projectConfigRefetch, githubConfigRefetch]
   )
 
-  const summary = useMemo(
-    () =>
-      getConfigDriftSummary({
-        dashboardConfig: projectConfig?.attributes,
-        githubConfig: githubConfigData?.config,
-      }),
-    [projectConfig?.attributes, githubConfigData?.config]
-  )
+  const summary = useMemo(() => {
+    const dashboardConfig = convertProjectConfigToGitHubConfig(projectConfig?.attributes)
+
+    console.log(dashboardConfig)
+    return getConfigDriftSummary({
+      dashboardConfig: dashboardConfig,
+      githubConfig: githubConfigData?.config,
+    })
+  }, [projectConfig?.attributes, githubConfigData?.config])
   const isReady = shouldLoad && hasConnection && isProjectConfigSuccess && isGithubConfigSuccess
   const issueCount = summary.driftedFields.length
 
