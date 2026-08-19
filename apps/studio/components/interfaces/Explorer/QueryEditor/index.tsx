@@ -2,7 +2,15 @@ import { acceptUntrustedSql, untrustedSql, type UntrustedSqlFragment } from '@su
 import { useFlag } from 'common'
 import { CodeSquare, Eye, EyeOff, Play } from 'lucide-react'
 import type { editor as monacoEditor } from 'monaco-editor'
-import { forwardRef, useImperativeHandle, useRef, useState, type ReactNode } from 'react'
+import {
+  forwardRef,
+  useEffect,
+  useEffectEvent,
+  useImperativeHandle,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react'
 import { Button, cn } from 'ui'
 
 import { resolveLogTimeRange } from '../../QuerySources/LogTimeRange.utils'
@@ -251,6 +259,12 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     setPromptInput('')
   }
 
+  const handleEscapeKey = useEffectEvent((e: KeyboardEvent) => {
+    if (e.key !== 'Escape') return
+    closePrompt()
+    editorInstanceRef.current?.focus()
+  })
+
   const handleGenerateSql = async (prompt: string) => {
     if (!promptState) return
     try {
@@ -266,9 +280,17 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     }
   }
 
+  const Shell = variant === 'viewport' ? ExplorerQueryViewport : ExplorerQuery
+
   useImperativeHandle(ref, () => ({ run: () => handleRunQuery() }))
 
-  const Shell = variant === 'viewport' ? ExplorerQueryViewport : ExplorerQuery
+  useEffect(() => {
+    if (!promptState?.isOpen) return
+    const node = editorInstanceRef.current?.getDomNode()
+    if (!node) return
+    node.addEventListener('keydown', handleEscapeKey)
+    return () => node.removeEventListener('keydown', handleEscapeKey)
+  }, [promptState?.isOpen])
 
   return (
     <Shell className={variant === 'embedded' ? 'mx-auto max-w-4xl' : undefined}>
