@@ -33,14 +33,28 @@ import {
  * siblings slide in place rather than snapping. Wrap the parent with
  * `<AnimatePresence initial={false}>` so a section that's already open on
  * mount doesn't animate in on first paint.
+ *
+ * `overflow` is kept hidden only while the height is actually animating —
+ * otherwise focus rings and outlines on nested inputs would be clipped by
+ * the wrapper. `transitionEnd` on the "open" state flips overflow back to
+ * visible once the enter animation settles; the "collapsed" state clips
+ * again so the shrink is clean.
  */
 const Collapse = ({ children }: { children: ReactNode }) => (
   <motion.div
-    initial={{ opacity: 0, height: 0 }}
-    animate={{ opacity: 1, height: 'auto' }}
-    exit={{ opacity: 0, height: 0 }}
+    initial="collapsed"
+    animate="open"
+    exit="collapsed"
+    variants={{
+      collapsed: { opacity: 0, height: 0, overflow: 'hidden' },
+      open: {
+        opacity: 1,
+        height: 'auto',
+        overflow: 'hidden',
+        transitionEnd: { overflow: 'visible' },
+      },
+    }}
     transition={{ duration: 0.18, ease: [0.4, 0, 0.2, 1] }}
-    className="overflow-hidden"
   >
     {children}
   </motion.div>
