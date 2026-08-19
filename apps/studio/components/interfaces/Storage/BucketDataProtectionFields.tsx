@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import {
   DialogSection,
@@ -206,13 +207,32 @@ const LifecyclePolicySection = ({
   mode,
   onModeChange,
 }: LifecyclePolicySectionProps) => {
-  const { trigger } = useFormContext<BucketProtectionFormValues>()
+  const { trigger, setValue } = useFormContext<BucketProtectionFormValues>()
   const hasNoPolicy = !hasDays && !hasVersions
   const hasBothConditions = hasDays && hasVersions
 
+  // The retained-versions cap is only meaningful alongside an expiration age
+  // (S3 requires the noncurrent-days condition on any noncurrent-count rule),
+  // so clear any orphaned cap value the moment the age field transitions from
+  // set to unset. Only fire on the actual flip — not on mount — so a bucket
+  // opened with a stale `{ days: null, versions: N }` state doesn't silently
+  // lose N (the input is also disabled while `!hasDays`, keeping the
+  // orphaned value visible so the user can decide to keep or clear it).
+  const prevHasDaysRef = useRef(hasDays)
+  useEffect(() => {
+    const prevHasDays = prevHasDaysRef.current
+    prevHasDaysRef.current = hasDays
+    if (prevHasDays && !hasDays) setValue('max_noncurrent_versions', '', { shouldDirty: true })
+  }, [hasDays, setValue])
+
   return (
     <div className="flex flex-col gap-y-2">
-      <p className="text-sm font-medium text-foreground">Lifecycle policy</p>
+      <div className="flex flex-col gap-y-0.5">
+        <p className="text-sm font-medium text-foreground">Lifecycle policy</p>
+        <p className="text-sm text-foreground-lighter">
+          Automatically expire noncurrent versions and archived files past a certain age.
+        </p>
+      </div>
 
       <FormField
         name="version_expiry_days"
@@ -254,6 +274,9 @@ const LifecyclePolicySection = ({
           <FormItemLayout
             name="max_noncurrent_versions"
             label="Retained noncurrent versions"
+            description={
+              !hasDays ? 'Requires an expiration age to be set.' : undefined
+            }
             layout="flex-row-reverse"
           >
             <FormControl>
@@ -264,6 +287,7 @@ const LifecyclePolicySection = ({
                   type="number"
                   inputMode="numeric"
                   placeholder="—"
+                  disabled={!hasDays}
                   value={field.value === '' ? '' : field.value}
                   onChange={(e) => {
                     const raw = e.target.value.replace(/[^0-9]/g, '')

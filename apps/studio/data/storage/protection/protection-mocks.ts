@@ -13,7 +13,7 @@
  * refreshed.
  */
 
-export type ObjectVersionAction = 'initial upload' | 'overwrite' | 'restore'
+export type ObjectVersionAction = 'initial upload' | 'overwrite' | 'restore' | 'delete marker'
 
 export interface ObjectVersion {
   versionId: string
@@ -91,6 +91,14 @@ export interface MockObjectVersionsOptions {
  * common retention windows so at least one shows a near-expiry countdown under
  * typical (30d) settings, while tighter policies still leave the freshest
  * couple retained.
+ *
+ * Includes a `delete marker` row — the empty placeholder S3 writes to the
+ * top of the version stack when an object is soft-deleted, and leaves
+ * behind in the history once the object is restored or re-uploaded. Studio
+ * abstracts markers away in the archived-files view, but a stale one still
+ * showing up in a live file's version history is real (e.g. delete →
+ * upload → delete → restore leaves the middle marker sitting in history),
+ * so we surface it here with "Permanently delete" as its only action.
  */
 const NONCURRENT_VERSION_TEMPLATES: Array<{
   versionId: string
@@ -100,6 +108,7 @@ const NONCURRENT_VERSION_TEMPLATES: Array<{
 }> = [
   { versionId: '2b7d9153aa9e', size: 790 * KB, daysAgo: 1, action: 'overwrite' },
   { versionId: 'a19c04f7de40', size: 760 * KB, daysAgo: 3, action: 'overwrite' },
+  { versionId: 'dm7b4c1e29f3', size: 0, daysAgo: 6, action: 'delete marker' },
   { versionId: '5c0278b3ac7a', size: 744 * KB, daysAgo: 8, action: 'overwrite' },
   { versionId: '9f4e1a2b8c3d', size: 720 * KB, daysAgo: 20, action: 'overwrite' },
   { versionId: '6a1b8d2f5c47', size: 705 * KB, daysAgo: 27, action: 'overwrite' },

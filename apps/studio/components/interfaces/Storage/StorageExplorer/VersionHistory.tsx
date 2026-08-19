@@ -6,6 +6,7 @@ import {
   Film,
   Image as ImageIcon,
   Info,
+  MinusCircle,
   MoreVertical,
   Music,
   RotateCcw,
@@ -142,35 +143,53 @@ export const VersionHistory = ({
           {versions.map((version) => {
             const isSelected = previewedVersionId === version.versionId
             const fate = version.isCurrent ? undefined : fateByVersionId.get(version.versionId)
+            const isDeleteMarker = version.action === 'delete marker'
+            // Delete markers are empty placeholders — nothing to preview,
+            // restore, or download, so the row isn't clickable and only
+            // gets a "Permanently delete" action.
+            const isRowClickable = !isDeleteMarker
 
             return (
               <li
                 key={version.versionId}
-                role="button"
-                tabIndex={0}
+                role={isRowClickable ? 'button' : undefined}
+                tabIndex={isRowClickable ? 0 : -1}
                 className={cn(
-                  'group -mx-2 flex items-center gap-x-2.5 rounded-md px-2 py-1.5 border border-transparent cursor-pointer',
-                  isSelected ? 'bg-brand-200 border-brand-500' : 'hover:bg-surface-200'
+                  'group -mx-2 flex items-center gap-x-2.5 rounded-md px-2 py-1.5 border border-transparent',
+                  isRowClickable && 'cursor-pointer',
+                  isSelected
+                    ? 'bg-brand-200 border-brand-500'
+                    : isRowClickable
+                      ? 'hover:bg-surface-200'
+                      : 'opacity-70'
                 )}
-                onClick={() => (version.isCurrent ? clearPreview() : onPreview?.(version))}
+                onClick={() => {
+                  if (!isRowClickable) return
+                  version.isCurrent ? clearPreview() : onPreview?.(version)
+                }}
                 onKeyDown={(e) => {
+                  if (!isRowClickable) return
                   if (e.key === 'Enter' || e.key === ' ')
                     version.isCurrent ? clearPreview : onPreview?.(version)
                 }}
               >
-                <VersionThumbnail mimeType={mimeType} isCurrent={version.isCurrent} />
+                <VersionThumbnail
+                  mimeType={mimeType}
+                  isCurrent={version.isCurrent}
+                  isDeleteMarker={isDeleteMarker}
+                />
 
                 <div className="min-w-0 flex-1">
                   <p
                     className={cn(
                       'truncate text-sm text-foreground',
-                      onPreview && 'group-hover:underline'
+                      isRowClickable && onPreview && 'group-hover:underline'
                     )}
                   >
                     {dayjs(version.createdAt).format('MMM D, HH:mm')}
                   </p>
                   <p className="truncate font-mono text-xs text-foreground-lighter">
-                    {formatBytes(version.size)}
+                    {isDeleteMarker ? 'Delete marker' : formatBytes(version.size)}
                   </p>
                 </div>
 
@@ -197,7 +216,11 @@ export const VersionHistory = ({
       <ConfirmationModal
         variant="destructive"
         visible={versionToDelete !== undefined}
-        title="Permanently delete version"
+        title={
+          versionToDelete?.action === 'delete marker'
+            ? 'Permanently delete marker'
+            : 'Permanently delete version'
+        }
         confirmLabel="Delete permanently"
         confirmLabelLoading="Deleting..."
         loading={isDeleting}
@@ -213,12 +236,21 @@ export const VersionHistory = ({
         }}
       >
         <p className="text-sm text-foreground-light">
-          Version{' '}
-          <span className="font-mono text-foreground">
-            {versionToDelete ? shortVersion(versionToDelete.versionId) : ''}
-          </span>{' '}
-          of {objectName} will be permanently deleted. The current version is not affected. This
-          action cannot be undone.
+          {versionToDelete?.action === 'delete marker' ? (
+            <>
+              The delete marker in {objectName}'s history will be permanently removed. Other
+              versions of this file are not affected. This action cannot be undone.
+            </>
+          ) : (
+            <>
+              Version{' '}
+              <span className="font-mono text-foreground">
+                {versionToDelete ? shortVersion(versionToDelete.versionId) : ''}
+              </span>{' '}
+              of {objectName} will be permanently deleted. The current version is not affected.
+              This action cannot be undone.
+            </>
+          )}
         </p>
       </ConfirmationModal>
     </div>
@@ -230,6 +262,8 @@ export const VersionHistory = ({
 interface VersionThumbnailProps {
   mimeType?: string
   isCurrent: boolean
+  /** Empty-placeholder row for a soft-deleted moment in the object's history. */
+  isDeleteMarker?: boolean
   size?: number
 }
 
@@ -238,20 +272,31 @@ interface VersionThumbnailProps {
  * of every row and in the compare widget. Versions don't have their own
  * historical thumbnail in this prototype, so every noncurrent row shares the
  * same type-based glyph — the current version gets a distinct restore glyph
- * in brand color instead, matching the design handoff's convention.
+ * in brand color instead, matching the design handoff's convention. Delete
+ * markers get their own struck-through glyph so they read as
+ * "nothing there" at a glance.
  */
-export const VersionThumbnail = ({ mimeType, isCurrent, size = 14 }: VersionThumbnailProps) => (
+export const VersionThumbnail = ({
+  mimeType,
+  isCurrent,
+  isDeleteMarker = false,
+  size = 14,
+}: VersionThumbnailProps) => (
   <span
     className={cn(
       'flex h-7 w-7 shrink-0 items-center justify-center rounded-md border',
-      isCurrent ? 'border-brand-400 bg-surface-200' : 'border-overlay bg-surface-100'
+      isCurrent
+        ? 'border-brand-400 bg-surface-200'
+        : isDeleteMarker
+          ? 'border-dashed border-strong bg-surface-100'
+          : 'border-overlay bg-surface-100'
     )}
   >
-    {isCurrent ? (
-      <RotateCcw size={size} className="text-brand" />
-    ) : (
-      <MimeTypeIcon mimeType={mimeType} size={size} />
+    {isCurrent && <RotateCcw size={size} className="text-brand" />}
+    {!isCurrent && isDeleteMarker && (
+      <MinusCircle size={size} className="text-foreground-muted" />
     )}
+    {!isCurrent && !isDeleteMarker && <MimeTypeIcon mimeType={mimeType} size={size} />}
   </span>
 )
 
@@ -284,6 +329,7 @@ const VersionActionsMenu = ({
   onDelete,
 }: VersionActionsMenuProps) => {
   const label = shortVersion(version.versionId)
+  const isDeleteMarker = version.action === 'delete marker'
   return (
     <div onClick={(e) => e.stopPropagation()}>
       <DropdownMenu>
@@ -297,35 +343,42 @@ const VersionActionsMenu = ({
           />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem
-            className="gap-x-2"
-            onClick={() => toast.success(`Downloading ${label}`)}
-          >
-            <Download size={14} />
-            Download version
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            className="gap-x-2"
-            onClick={() => toast.success(`Copied URL for ${label}`)}
-          >
-            <Copy size={14} />
-            Get version URL
-          </DropdownMenuItem>
-          {!version.isCurrent && (
+          {/* Delete markers are empty placeholders — download / get URL /
+              restore don't apply, so the only action is permanently
+              removing the marker itself. */}
+          {!isDeleteMarker && (
             <>
-              <DropdownMenuItem className="gap-x-2" disabled={isRestoring} onClick={onRestore}>
-                <RotateCcw size={14} />
-                Restore as current
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
               <DropdownMenuItem
-                onClick={onDelete}
-                className="gap-x-2 text-destructive focus:text-destructive"
+                className="gap-x-2"
+                onClick={() => toast.success(`Downloading ${label}`)}
               >
-                <Trash2 size={14} />
-                Delete permanently
+                <Download size={14} />
+                Download version
               </DropdownMenuItem>
+              <DropdownMenuItem
+                className="gap-x-2"
+                onClick={() => toast.success(`Copied URL for ${label}`)}
+              >
+                <Copy size={14} />
+                Get version URL
+              </DropdownMenuItem>
+              {!version.isCurrent && (
+                <DropdownMenuItem className="gap-x-2" disabled={isRestoring} onClick={onRestore}>
+                  <RotateCcw size={14} />
+                  Restore as current
+                </DropdownMenuItem>
+              )}
+              {!version.isCurrent && <DropdownMenuSeparator />}
             </>
+          )}
+          {!version.isCurrent && (
+            <DropdownMenuItem
+              onClick={onDelete}
+              className="gap-x-2 text-destructive focus:text-destructive"
+            >
+              <Trash2 size={14} />
+              {isDeleteMarker ? 'Delete marker permanently' : 'Delete permanently'}
+            </DropdownMenuItem>
           )}
         </DropdownMenuContent>
       </DropdownMenu>
