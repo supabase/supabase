@@ -4,6 +4,7 @@ import {
 } from '@/components/interfaces/ConfigDrift/github-config-drift'
 import {
   CONFIG_SECTIONS,
+  normalizeRedirectUrls,
   type ConfigSection,
 } from '@/components/interfaces/ConfigDrift/github-config-field-registry'
 
@@ -200,16 +201,6 @@ function getConfigFieldLabel(configPath: string): string {
   }
 
   return titleCase(configPath.split('.').at(-1) ?? configPath)
-}
-
-function normalizeRedirectUrls(value: unknown): string[] {
-  const urls = Array.isArray(value) ? value : typeof value === 'string' ? value.split(',') : []
-
-  return Array.from(
-    new Set(urls.filter((url): url is string => typeof url === 'string').map((url) => url.trim()))
-  )
-    .filter(Boolean)
-    .sort()
 }
 
 function formatScalarValue(value: unknown): string {

@@ -29,7 +29,7 @@ describe('convertProjectConfigToGitHubConfig', () => {
     })
   })
 
-  it('applies the normalizeDashboardValue transform for inverted booleans', () => {
+  it('inverts booleans that config.toml expresses the opposite way', () => {
     const result = convertProjectConfigToGitHubConfig({
       auth: { disable_signup: true },
     })
@@ -51,5 +51,38 @@ describe('convertProjectConfigToGitHubConfig', () => {
   it('skips sections that are absent from the dashboard config', () => {
     const result = convertProjectConfigToGitHubConfig({ database: { some_field: 'x' } })
     expect(result).toEqual({})
+  })
+
+  describe('auth.additional_redirect_urls', () => {
+    it('splits the comma-separated list, then dedupes, trims and sorts it', () => {
+      const result = convertProjectConfigToGitHubConfig({
+        auth: { uri_allow_list: 'https://b.com, https://a.com ,https://b.com' },
+      })
+
+      expect(result).toEqual({
+        auth: { additional_redirect_urls: ['https://a.com', 'https://b.com'] },
+      })
+    })
+
+    it('maps an empty list to an empty array, not to an absent field', () => {
+      const result = convertProjectConfigToGitHubConfig({ auth: { uri_allow_list: '' } })
+
+      expect(result).toEqual({ auth: { additional_redirect_urls: [] } })
+    })
+
+    it('omits the field when the dashboard has no list at all', () => {
+      const result = convertProjectConfigToGitHubConfig({ auth: { site_url: 'https://a.com' } })
+
+      expect(result).toEqual({ auth: { site_url: 'https://a.com' } })
+    })
+  })
+
+  it('leaves order-sensitive comma lists in their original order', () => {
+    // Only the redirect allow-list is a set — `extra_search_path` order is meaningful to Postgres.
+    const result = convertProjectConfigToGitHubConfig({
+      api: { db_extra_search_path: 'public, extensions, auth' },
+    })
+
+    expect(result).toEqual({ api: { extra_search_path: ['public', 'extensions', 'auth'] } })
   })
 })

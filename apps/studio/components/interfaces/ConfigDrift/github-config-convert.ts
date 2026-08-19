@@ -1,4 +1,7 @@
-import type { ConfigDriftDashboardConfig } from './github-config-field-registry'
+import {
+  normalizeRedirectUrls,
+  type ConfigDriftDashboardConfig,
+} from './github-config-field-registry'
 import { type GitHubConfigToml } from './github-config.types'
 
 /**
@@ -113,7 +116,7 @@ function convertAuth(value: unknown): GitHubConfigToml['auth'] {
   return {
     site_url: asString(auth.site_url),
     // uri_allow_list is a comma-separated string on the dashboard; config.toml wants a string[]
-    additional_redirect_urls: splitCommaList(auth.uri_allow_list),
+    additional_redirect_urls: convertRedirectUrls(auth.uri_allow_list),
     jwt_expiry: asNumber(auth.jwt_exp),
     // disable_signup -> enable_signup (inverted boolean)
     enable_signup: invertBoolean(auth.disable_signup),
@@ -348,6 +351,19 @@ function asBoolean(value: unknown): boolean | undefined {
 function invertBoolean(value: unknown): boolean | undefined {
   const bool = asBoolean(value)
   return bool === undefined ? undefined : !bool
+}
+
+/**
+ * Unlike the other comma-separated lists (`api.schemas`, `api.extra_search_path`) whose order is
+ * meaningful, a redirect allow-list is a set. Dedupe and sort it here so a list that differs from
+ * config.toml only in ordering isn't reported as drift — `getConfigFieldState` compares with
+ * `JSON.stringify`, which is order-sensitive.
+ */
+function convertRedirectUrls(value: unknown): string[] | undefined {
+  const urls = splitCommaList(value)
+  if (urls === undefined) return undefined
+
+  return normalizeRedirectUrls(urls)
 }
 
 function splitCommaList(value: unknown): string[] | undefined {

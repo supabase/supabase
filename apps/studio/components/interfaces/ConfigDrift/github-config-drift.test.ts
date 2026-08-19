@@ -65,4 +65,71 @@ describe('getConfigDriftSummary', () => {
     expect(drifted.driftedFields).toHaveLength(1)
     expect(drifted.driftedFields[0].githubValue).toBe('http://localhost:3000')
   })
+
+  describe('auth.additional_redirect_urls', () => {
+    it('counts an identical list as managed', () => {
+      const summary = getConfigDriftSummary({
+        dashboardConfig: { auth: { additional_redirect_urls: ['https://a.com', 'https://b.com'] } },
+        githubConfig: { auth: { additional_redirect_urls: ['https://a.com', 'https://b.com'] } },
+      })
+
+      expect(summary).toEqual({ managedCount: 1, driftedFields: [], unmanagedFields: [] })
+    })
+
+    it('counts a list that differs only in order as managed', () => {
+      const summary = getConfigDriftSummary({
+        // `convertProjectConfigToGitHubConfig` sorts the dashboard list and `normalizeGithubValue`
+        // sorts the config.toml one, so ordering can never register as drift.
+        dashboardConfig: { auth: { additional_redirect_urls: ['https://a.com', 'https://b.com'] } },
+        githubConfig: { auth: { additional_redirect_urls: ['https://b.com', 'https://a.com'] } },
+      })
+
+      expect(summary).toEqual({ managedCount: 1, driftedFields: [], unmanagedFields: [] })
+    })
+
+    it('ignores duplicate and untrimmed entries in config.toml', () => {
+      const summary = getConfigDriftSummary({
+        dashboardConfig: { auth: { additional_redirect_urls: ['https://a.com'] } },
+        githubConfig: {
+          auth: { additional_redirect_urls: ['  https://a.com  ', 'https://a.com', ''] },
+        },
+      })
+
+      expect(summary.managedCount).toBe(1)
+      expect(summary.driftedFields).toEqual([])
+    })
+
+    it('reports a list the dashboard adds to as drifted, keeping the raw dashboard list', () => {
+      const summary = getConfigDriftSummary({
+        dashboardConfig: { auth: { additional_redirect_urls: ['https://a.com', 'https://b.com'] } },
+        githubConfig: { auth: { additional_redirect_urls: ['https://a.com'] } },
+      })
+
+      expect(summary.driftedFields).toEqual([
+        {
+          section: 'auth',
+          configPath: 'auth.additional_redirect_urls',
+          settingHref: expect.any(Function),
+          dashboardValue: ['https://a.com', 'https://b.com'],
+          githubValue: ['https://a.com'],
+        },
+      ])
+    })
+
+    it('compares against the empty hosted default when code-owned config.toml is silent', () => {
+      const atDefault = getConfigDriftSummary({
+        dashboardConfig: { auth: { additional_redirect_urls: [] } },
+        githubConfig: { auth: {}, config_source: 'code' },
+      })
+      expect(atDefault.managedCount).toBe(0)
+      expect(atDefault.driftedFields).toEqual([])
+
+      const drifted = getConfigDriftSummary({
+        dashboardConfig: { auth: { additional_redirect_urls: ['https://a.com'] } },
+        githubConfig: { auth: {}, config_source: 'code' },
+      })
+      expect(drifted.driftedFields).toHaveLength(1)
+      expect(drifted.driftedFields[0].githubValue).toEqual([])
+    })
+  })
 })

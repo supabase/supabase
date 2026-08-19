@@ -39,7 +39,6 @@ interface ConfigFieldDefinition {
   settingHref: (projectRef: string) => string
   /** Value to compare against when the field is absent from a code-owned config.toml. */
   hostedDefault?: unknown
-  normalizeDashboardValue?: (value: unknown) => unknown
   normalizeGithubValue?: (value: unknown) => unknown
 }
 
@@ -51,8 +50,6 @@ const toApiSettingsHref = (projectRef: string) => `/project/${projectRef}/settin
 const toStorageSettingsHref = (projectRef: string) =>
   `/project/${projectRef}/storage/files/settings`
 
-const invertBoolean = (value: unknown) => (typeof value === 'boolean' ? !value : value)
-
 /**
  * Every trackable field across every section, keyed by its config.toml dotted path — the same shape
  * `getConfigValue`/`setConfigValue` address, and the single identifier a field is known by once the
@@ -61,7 +58,6 @@ const invertBoolean = (value: unknown) => (typeof value === 'boolean' ? !value :
 const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
   'auth.enable_signup': {
     settingHref: toAuthProvidersHref,
-    normalizeDashboardValue: invertBoolean,
   },
   'auth.enable_anonymous_sign_ins': {
     settingHref: toAuthProvidersHref,
@@ -76,7 +72,6 @@ const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
   'auth.additional_redirect_urls': {
     settingHref: toAuthUrlConfigHref,
     hostedDefault: [],
-    normalizeDashboardValue: normalizeRedirectUrls,
     normalizeGithubValue: normalizeRedirectUrls,
   },
   'auth.email.enable_signup': {
@@ -87,7 +82,6 @@ const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
   },
   'auth.email.enable_confirmations': {
     settingHref: toAuthProvidersHref,
-    normalizeDashboardValue: invertBoolean,
   },
   'auth.email.double_confirm_changes': {
     settingHref: toAuthProvidersHref,
@@ -103,14 +97,12 @@ const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
   },
   'auth.password_requirements': {
     settingHref: toAuthProvidersHref,
-    normalizeDashboardValue: (value) => (value === 'NO_REQUIRED_CHARS' ? '' : value),
   },
   'auth.sms.provider': {
     settingHref: toAuthProvidersHref,
   },
   'auth.sms.enable_confirmations': {
     settingHref: toAuthProvidersHref,
-    normalizeDashboardValue: invertBoolean,
   },
   'auth.sms.otp_expiry': {
     settingHref: toAuthProvidersHref,
@@ -253,7 +245,12 @@ export function setConfigValue(
   target[segments[segments.length - 1]] = value
 }
 
-function normalizeRedirectUrls(value: unknown): string[] {
+/**
+ * A redirect allow-list is a set, not a sequence: accepts either a comma-separated string or an
+ * array, and returns trimmed, deduped, sorted entries so two lists holding the same URLs compare
+ * equal regardless of how they were written.
+ */
+export function normalizeRedirectUrls(value: unknown): string[] {
   const urls = Array.isArray(value) ? value : typeof value === 'string' ? value.split(',') : []
 
   return Array.from(
