@@ -12,7 +12,6 @@ export const CreateWorkerSchema = z.object({
     .min(1, 'Provide a name for your worker')
     .max(48, 'Use 48 characters or fewer')
     .regex(WORKER_NAME_PATTERN, 'Lowercase letters, numbers, and hyphens only'),
-  runtime: z.string().min(1, 'Pick a runtime'),
   size: z.string().min(1, 'Pick a size'),
   access: z.enum(['public', 'private']),
   instances: z.coerce

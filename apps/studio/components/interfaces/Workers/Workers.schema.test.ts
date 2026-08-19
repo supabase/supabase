@@ -4,7 +4,6 @@ import { CreateWorkerSchema } from './Workers.schema'
 
 const valid = {
   name: 'embed',
-  runtime: 'node',
   size: '2gb-1vcpu',
   access: 'private' as const,
   instances: 1,

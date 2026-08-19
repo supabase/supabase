@@ -1,7 +1,9 @@
 import { useMutation, useQueryClient, type UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { createTarGz } from './createTarGz'
 import { workersKeys } from './keys'
+import { STARTER_RUNTIME, starterFiles } from './workers.templates'
 import { parseWorker } from './workers.utils'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError } from '@/types'
@@ -9,35 +11,42 @@ import type { ResponseError } from '@/types'
 export type WorkerDeployVariables = {
   projectRef: string
   name: string
-  runtime: string
   size: string
   access: 'public' | 'private'
   instances: number
 }
 
-// The deploy endpoint accepts a spec without a build context as long as `runtime` is set,
-// which is how the dashboard deploys without uploading a tarball the way the CLI does.
-async function deployWorker({
-  projectRef,
-  name,
-  runtime,
-  size,
-  access,
-  instances,
-}: WorkerDeployVariables) {
+async function deployWorker({ projectRef, name, size, access, instances }: WorkerDeployVariables) {
+  const { data: slot, error: slotError } = await post('/v2/projects/{ref}/workers/{name}/uploads', {
+    params: { path: { ref: projectRef, name } },
+  })
+  if (slotError) return handleError(slotError)
+
+  // The presigned URL carries its own authorization, so this one call bypasses the API client
+  // on purpose — sending our bearer token to storage would be rejected.
+  const upload = await fetch(slot.data.attributes.url, {
+    method: 'PUT',
+    body: await createTarGz(starterFiles()),
+    headers: { 'content-type': 'application/gzip' },
+  })
+  if (!upload.ok) {
+    throw new Error(`Failed to upload the build context (${upload.status})`)
+  }
+
   const { data, error } = await post('/v2/projects/{ref}/workers/{name}/deploy', {
     params: { path: { ref: projectRef, name } },
     body: {
       data: {
         type: 'project_worker',
         attributes: {
-          spec: { runtime, size, exposure: access, instances },
+          context_upload_id: slot.data.id,
+          spec: { runtime: STARTER_RUNTIME, size, exposure: access, instances },
         },
       },
     },
   })
-
   if (error) return handleError(error)
+
   return parseWorker(data.data)
 }
 
