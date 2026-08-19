@@ -16,6 +16,8 @@ extra_search_path = ["public", "extensions"]
 # The maximum number of rows returned from a view, table, or function. Limits payload size
 # for accidental or malicious requests.
 max_rows = 1000
+# backward-compatible, to automatically expose newly created tables to PostgREST
+auto_expose_new_tables = true
 
 [api.tls]
 # Enable HTTPS endpoints locally using a self-signed certificate.
