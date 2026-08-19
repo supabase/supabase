@@ -48,10 +48,6 @@ export interface CategoryMeta {
 }
 
 export interface UsageCategoryOptions {
-  /**
-   * On, Storage Size splits into current / noncurrent segments and gains a
-   * retention breakdown. Off, it stays the single real series.
-   */
   isStorageVersioningEnabled?: boolean
 }
 
