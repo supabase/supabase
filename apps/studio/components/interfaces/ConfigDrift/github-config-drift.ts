@@ -104,6 +104,8 @@ export function getConfigDriftSummary({
     if (!sectionConfig) continue
 
     for (const { configPath, rawValue } of getSectionFieldEntries(section, sectionConfig)) {
+      if (isSecretConfigField(configPath)) continue
+
       const state = getConfigFieldState({
         configPath,
         dashboardConfig,

@@ -64,10 +64,10 @@ function convertNetworkRestrictions(
   const restrictions = asRecord(value)
   if (!restrictions) return undefined
 
-  const cidrs = Array.isArray(restrictions.allowed_cidrs) ? restrictions.allowed_cidrs : []
+  const cidrs = Array.isArray(restrictions.allowed_cidrs) ? restrictions.allowed_cidrs : undefined
   const addressesOfType = (type: string) =>
     cidrs
-      .map((cidr) => asRecord(cidr))
+      ?.map((cidr) => asRecord(cidr))
       .filter((cidr): cidr is Record<string, unknown> => cidr?.type === type)
       .map((cidr) => asString(cidr.address))
       .filter((address): address is string => address !== undefined)
@@ -75,7 +75,7 @@ function convertNetworkRestrictions(
   return {
     // dashboard has no single boolean — derived from `status === 'applied'`. `entitlement` (plan
     // gating) and `status` (rollout state) have no config.toml equivalent.
-    enabled: restrictions.status === 'applied',
+    enabled: restrictions.status === undefined ? undefined : restrictions.status === 'applied',
     allowed_cidrs: addressesOfType('v4'),
     allowed_cidrs_v6: addressesOfType('v6'),
   }
