@@ -3,6 +3,7 @@ import { groupBy } from 'lodash'
 
 import { DataPoint } from '@/data/analytics/constants'
 import type { OrgDailyUsageResponse, PricingMetric } from '@/data/analytics/org-daily-stats-query'
+import type { Branch } from '@/data/branches/branches-query'
 import type { OrgSubscription } from '@/data/subscriptions/types'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
@@ -16,6 +17,18 @@ export const generateUsageData = (attribute: string, days: number): DataPoint[] 
       [attribute]: Math.floor(Math.random() * 100).toString(),
     }
   })
+}
+
+// Usage is recorded against each branch's own project ref, so a branch is only visible when selected
+export function getUsageBranchOptions(branches: Branch[] | undefined) {
+  if (!branches || branches.length < 2) return []
+
+  const mainBranch = branches.find((branch) => branch.is_default)
+  const previewBranches = branches
+    .filter((branch) => !branch.is_default)
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+
+  return mainBranch ? [mainBranch, ...previewBranches] : previewBranches
 }
 
 export function useGetUpgradeUrl(slug: string, subscription?: OrgSubscription, source?: string) {
