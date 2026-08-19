@@ -1,3 +1,4 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronLeft, ChevronRight, Plus, Terminal } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -27,6 +28,7 @@ import type { Worker, WorkerAccess, WorkerBuildState } from './Workers.types'
 import { filterWorkers, formatResources, getPage } from './Workers.utils'
 import { WorkerStatePill } from './WorkerStatePill'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 interface WorkersListProps {
   projectRef: string
@@ -58,6 +60,7 @@ const parseAccessFilter = (value: string): WorkerAccess | 'all' =>
 
 export const WorkersList = ({ projectRef, workers, onDeploy, onCreate }: WorkersListProps) => {
   const router = useRouter()
+  const { can: canDeployWorkers } = useAsyncCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
   const [search, setSearch] = useState('')
   const [stateFilter, setStateFilter] = useState<WorkerBuildState | 'all'>('all')
   const [accessFilter, setAccessFilter] = useState<WorkerAccess | 'all'>('all')
@@ -131,9 +134,22 @@ export const WorkersList = ({ projectRef, workers, onDeploy, onCreate }: Workers
           <Button variant="default" icon={<Terminal />} onClick={onDeploy}>
             Deploy with CLI
           </Button>
-          <Button variant="primary" icon={<Plus />} onClick={onCreate}>
+          <ButtonTooltip
+            variant="primary"
+            icon={<Plus />}
+            disabled={!canDeployWorkers}
+            onClick={onCreate}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: canDeployWorkers
+                  ? undefined
+                  : 'You need additional permissions to deploy workers',
+              },
+            }}
+          >
             New worker
-          </Button>
+          </ButtonTooltip>
         </div>
       </div>
 
