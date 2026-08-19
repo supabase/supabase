@@ -27,7 +27,7 @@ Read the first section when you're deciding how to model access. Go directly to 
 
 [Policies](https://www.postgresql.org/docs/current/sql-createpolicy.html) are Postgres's rule engine. Each policy is attached to a table, and the policy is executed every time a table is accessed.
 
-Think of a policy as adding a `WHERE` clause to every query. A policy like this ...
+Think of a policy as adding a `WHERE` clause to every query. A policy like this:
 
 ```sql
 create policy "Individuals can view their own todos."
@@ -36,7 +36,7 @@ to authenticated
 using ( (select auth.uid()) = user_id );
 ```
 
-.. translates to this whenever a user selects from the todos table:
+That policy translates to this whenever a user selects from the todos table:
 
 ```sql
 select *
@@ -461,7 +461,7 @@ using ( team_id in (select auth.jwt() -> 'app_metadata' -> 'teams'));
 
 <Admonition type="caution">
 
-Keep in mind that a JWT is not always "fresh". In the example above, even if you remove a user from a team and update the `app_metadata` field, that will not be reflected using `auth.jwt()` until the user's JWT is refreshed.
+Keep in mind that a JWT is not always up-to-date. In the team policy example, even if you remove a user from a team and update the `app_metadata` field, that will not be reflected using `auth.jwt()` until the user's JWT is refreshed.
 
 Also, if you are using Cookies for Auth, then you must be mindful of the JWT size. Some browsers are limited to 4096 bytes for each cookie, and so the total size of your JWT should be small enough to fit inside this limitation.
 
@@ -530,11 +530,13 @@ A `security definer` function in an exposed schema is callable over the Data API
 
 ### Bypassing Row Level Security
 
-Supabase provides special "Service" keys, which can be used to bypass RLS. These should never be used in the browser or exposed to customers, but they are useful for administrative tasks.
+Use a [secret key](/docs/guides/getting-started/api-keys) for administrative tasks that need to bypass RLS. A secret key authorizes access through the `service_role` Postgres role, which has the `bypassrls` attribute. Never use a secret key in the browser or expose it to customers.
+
+The JWT-based `service_role` key is a legacy alternative. Prefer a secret key where possible.
 
 <Admonition type="note">
 
-A Service Key bypasses RLS only when the request carries no user access token. If the request carries one, it runs under the RLS policies of that signed-in user, even when the client library was initialized with a Service Key.
+A secret key bypasses RLS only when the request carries no user access token. If the request carries one, it runs under the RLS policies of that signed-in user, even when the client library was initialized with a secret key.
 
 </Admonition>
 
