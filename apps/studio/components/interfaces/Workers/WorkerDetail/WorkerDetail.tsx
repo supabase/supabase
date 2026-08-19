@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { Container, Copy, Info, Package } from 'lucide-react'
+import { Container, Copy, Package } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import {
@@ -16,12 +16,8 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import { PageBreadcrumbs } from 'ui-patterns/PageBreadcrumbs'
-import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
   PageHeaderAside,
@@ -37,21 +33,17 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { RuntimeBadge } from '../RuntimeBadge'
 import { WorkerSnippetTabs } from '../WorkerSnippetTabs'
 import { WorkerStatePill } from '../WorkerStatePill'
-import { WorkerLogsTab } from './WorkerLogsTab'
 import { WorkerOverviewTab } from './WorkerOverviewTab'
 import { WorkerSettingsTab } from './WorkerSettingsTab'
 import { AlertError } from '@/components/ui/AlertError'
 import { workerQueryOptions } from '@/data/workers/worker-query'
 import { PRODUCT_NAME } from '@/lib/constants/workers'
 
-type WorkerTab = 'overview' | 'logs' | 'settings'
-const WORKER_TABS: WorkerTab[] = ['overview', 'logs', 'settings']
-
-const TAB_ORDER: Array<WorkerTab | 'terminal'> = ['overview', 'logs', 'terminal', 'settings']
+type WorkerTab = 'overview' | 'settings'
+const WORKER_TABS: WorkerTab[] = ['overview', 'settings']
 
 const TAB_LABEL: Record<WorkerTab, string> = {
   overview: 'Overview',
-  logs: 'Logs',
   settings: 'Settings',
 }
 
@@ -152,36 +144,17 @@ export const WorkerDetail = () => {
       </PageHeader>
       <PageNav>
         <NavMenu>
-          {TAB_ORDER.map((item) =>
-            item === 'terminal' ? (
-              <NavMenuItem key="terminal" active={false}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className="flex h-full items-center gap-1 text-foreground-muted/70">
-                      Terminal
-                      <Info size={12} />
-                    </span>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">Coming soon</TooltipContent>
-                </Tooltip>
-              </NavMenuItem>
-            ) : (
-              <NavMenuItem key={item} active={tab === item}>
-                <button type="button" tabIndex={0} onClick={() => setTab(item)}>
-                  {TAB_LABEL[item]}
-                </button>
-              </NavMenuItem>
-            )
-          )}
+          {WORKER_TABS.map((item) => (
+            <NavMenuItem key={item} active={tab === item}>
+              <button type="button" tabIndex={0} onClick={() => setTab(item)}>
+                {TAB_LABEL[item]}
+              </button>
+            </NavMenuItem>
+          ))}
         </NavMenu>
       </PageNav>
 
       {tab === 'overview' && <WorkerOverviewTab worker={worker} />}
-      {tab === 'logs' && (
-        <PageContainer size="full" className="px-0 xl:px-0">
-          <WorkerLogsTab workerName={worker.name} />
-        </PageContainer>
-      )}
       {tab === 'settings' && <WorkerSettingsTab worker={worker} />}
     </div>
   )
