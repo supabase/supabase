@@ -28,4 +28,7 @@ export const workersQueryOptions = ({ projectRef }: WorkersVariables) =>
     queryKey: workersKeys.list(projectRef),
     queryFn: ({ signal }) => getWorkers({ projectRef }, signal),
     enabled: IS_PLATFORM && typeof projectRef !== 'undefined',
+    // Builds finish asynchronously, so keep polling until nothing is mid-build.
+    refetchInterval: (query) =>
+      query.state.data?.some((worker) => worker.buildState === 'building') ? 5_000 : false,
   })
