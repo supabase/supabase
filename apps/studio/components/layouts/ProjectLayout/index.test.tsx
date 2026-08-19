@@ -79,7 +79,6 @@ vi.mock('common', () => ({
       `free-micro-upgrade-banner-dismissed-${ref}`,
     PROJECT_INTEGRATION_BANNER_DISMISSED: (ref: string, integrationSource: string) =>
       `project-integration-banner-dismissed-${ref}-${integrationSource}`,
-    UNIFIED_LOGS_BANNER_DISMISSED: 'unified-logs-banner-dismissed',
   },
   isFeatureEnabled: () => false,
 }))
@@ -177,7 +176,6 @@ vi.mock('@/hooks/misc/useLocalStorage', () => ({
 vi.mock('@/components/ui/BannerStack/BannerStackProvider', () => ({
   BANNER_ID: {
     FREE_MICRO_UPGRADE: 'free-micro-upgrade-banner',
-    UNIFIED_LOGS: 'unified-logs-banner',
   },
   useBannerStack: () => ({
     addBanner: mockAddBanner,
@@ -188,19 +186,6 @@ vi.mock('@/components/ui/BannerStack/BannerStackProvider', () => ({
 
 vi.mock('@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade', () => ({
   BannerFreeMicroUpgrade: () => null,
-}))
-
-vi.mock('@/components/ui/BannerStack/Banners/BannerUnifiedLogs', () => ({
-  BannerUnifiedLogs: () => null,
-}))
-
-vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
-  useUnifiedLogsPreview: () => ({
-    isEnabled: false,
-    isLoading: false,
-    enable: () => {},
-    disable: () => {},
-  }),
 }))
 
 vi.mock('@/data/usage/resource-warnings-query', () => ({
