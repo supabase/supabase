@@ -5,8 +5,7 @@ export const WORKERS_REGION = 'us-west-2'
 export const WORKERS_REGION_LABEL = 'US West (Oregon)'
 export const WORKERS_REGION_SHORT = 'US West'
 
-// Workers answer on the project's own domain, alongside /functions/v1, and the api-gateway keeps
-// the route dark for projects outside the alpha allow-list.
+// Workers answer on the project's own domain, alongside /functions/v1.
 export const workerUrl = ({
   endpoint,
   protocol = 'https',
@@ -60,7 +59,7 @@ export const RUNTIMES: Record<string, RuntimeMeta> = {
   },
 }
 
-export interface WorkerStateMeta {
+interface WorkerStateMeta {
   label: string
   dotClassName: string
   textClassName: string

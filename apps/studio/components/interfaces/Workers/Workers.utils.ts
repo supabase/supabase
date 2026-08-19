@@ -54,12 +54,10 @@ export const formatSize = (size: string): string => {
 export const formatResources = (worker: Worker): string =>
   `${formatSize(worker.size)} · ${worker.declaredInstances} inst`
 
-// A project outside the alpha allow-list gets a 404 rather than a 403, so the routes stay
-// invisible to anyone not enrolled.
+// A project outside the alpha allow-list gets a 404, not a 403.
 export const isWorkersUnavailable = (error: Error | null): boolean =>
   error instanceof ResponseError && error.code === 404
 
-// The routes require the FGA workers_read/workers_write permissions, which a caller can hold
-// independently of being enrolled.
+// An enrolled project still answers 403 when the caller lacks the workers permission.
 export const isWorkersForbidden = (error: Error | null): boolean =>
   error instanceof ResponseError && error.code === 403
