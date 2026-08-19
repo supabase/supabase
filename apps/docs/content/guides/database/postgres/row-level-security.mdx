@@ -41,11 +41,13 @@ That policy translates to this whenever a user selects from the todos table:
 ```sql
 select *
 from todos
-where auth.uid() = todos.user_id;
+where (select auth.uid()) = todos.user_id;
 -- Policy is implicitly added.
 ```
 
 You write RLS rules in SQL, so a rule can express whatever access logic your app needs. Because RLS is a Postgres primitive, it also protects your data when it is reached through third-party tooling, which is what makes it "[defense in depth](<https://en.wikipedia.org/wiki/Defense_in_depth_(computing)>)". Combine RLS with [Supabase Auth](/docs/guides/auth) for end-to-end user security from the browser to the database.
+
+Multiple policies for the same role and operation are permissive by default: if any one of them passes, the row is allowed. A second permissive policy widens access; it does not narrow it. To require two checks at once, mark one `as restrictive`. See [MFA](#mfa). Restrictive policies only reduce access after at least one permissive policy has granted it.
 
 ### Grants and policies
 
@@ -64,6 +66,8 @@ Adding policies doesn't take those grants back. A table protected only by polici
 Not every project grants these automatically. See [Default privileges](/docs/guides/api/securing-your-api#default-privileges). Grant each role only the operations it needs.
 
 A missing grant raises a `42501` error before any policy runs. When a request fails that your policy should allow, check the grants before you change the policy. To set them, see [Lock down the table](#lock-down-the-table).
+
+Table owners skip RLS unless you force it. Superusers and roles with `bypassrls` always skip RLS; `force row level security` does not apply to them. On Supabase, `postgres` is not a superuser, but it has `bypassrls`, so the Dashboard SQL Editor skips policies even after you force them. That is why [Test your policies](#test-your-policies) switches role. Add `alter table ... force row level security` only when a table owner without `bypassrls` must also obey policies.
 
 ### Authenticated and unauthenticated roles
 
@@ -98,7 +102,7 @@ A policy that reads `to anon using ( true )` grants every unauthenticated visito
 
 ### Views and RLS
 
-Views bypass RLS by default because they are usually created with the `postgres` user. This is a feature of Postgres, which automatically creates views with `security definer`. A view over a protected table hands out every row its policies were meant to withhold, so a view needs the same attention as a table. To create one safely, see [Expose a view safely](#expose-a-view-safely).
+Views bypass RLS by default because they are usually created with the `postgres` user. Postgres creates views with the owner's rights (`security_invoker` defaults to false), so a view over a protected table hands out every row its policies were meant to withhold. A view needs the same attention as a table. To create one safely, see [Expose a view safely](#expose-a-view-safely).
 
 ## Secure a table with RLS
 
@@ -144,7 +148,7 @@ Write the tests for this table in the same change. See [Test your policies](#tes
 
 ### Write a policy for each operation
 
-Write a separate policy for `select`, `insert`, `update`, and `delete`. Postgres does not accept multiple operations in one `for` clause, and a `for all` policy hides which operation each rule was meant to cover.
+Write a separate policy for `select`, `insert`, `update`, and `delete`. Postgres does not accept multiple operations in one `for` clause, and a `for all` policy hides which operation each rule was meant to cover. To deny an operation, grant nothing and write no policy for it.
 
 These examples use a `profiles` table where each user manages only their own row:
 
@@ -201,7 +205,7 @@ If no `with check` expression is defined, the `using` expression decides both wh
 
 <Admonition type="caution">
 
-To perform an `UPDATE` operation, a corresponding [`SELECT` policy](#select-policies) is required. Without a `SELECT` policy, the `UPDATE` operation will not work as expected.
+An `update` that reads the row also needs a matching [`select` policy](#select-policies). That includes a `where` clause, a `returning` clause, and Data API updates, which filter by column and return the updated row. Without a `select` policy, the update matches zero rows rather than raising an error. A SQL `update` that assigns constants and has no `where` or `returning` clause can succeed with only an `update` policy.
 
 </Admonition>
 
@@ -255,7 +259,7 @@ on test_table
 using btree (user_id);
 ```
 
-A column counts as indexed only when it comes first in a `btree` index. Postgres can't use a multi-column index to filter on a column that isn't the leading one, so a composite primary key indexes its first column and no others. A membership table keyed on `(team_id, user_id)` has no index on `user_id`:
+A policy filter uses a `btree` index most efficiently when the filter column leads the index. A composite primary key on `(team_id, user_id)` leads with `team_id`, so a policy that filters on `user_id` still needs its own index:
 
 ```sql
 create table team_members (
@@ -298,7 +302,7 @@ You can only use this technique if the results of the query or function do not c
 
 ### Expose a view safely
 
-In Postgres 15 and above, make a view obey the RLS policies of its underlying tables when invoked by `anon` and `authenticated` by setting `security_invoker = true`.
+In Postgres 15 or later, make a view obey the RLS policies of its underlying tables when invoked by `anon` and `authenticated` by setting `security_invoker = true`.
 
 ```sql
 create view <VIEW_NAME>
@@ -335,7 +339,7 @@ Each case sets an identity, runs one statement as that identity, and asserts the
 1. Create a test file:
 
    ```bash
-   supabase test new profiles_rls
+   supabase test new profiles_rls.test
    ```
 
 2. Write the tests. Cover `select`, `insert`, `update`, and `delete` twice each, once for a request the policy allows and once for a request it denies, for `anon` as well as `authenticated`.
@@ -413,29 +417,11 @@ Supabase provides some helper functions that make it easier to write policies.
 
 Returns the ID of the user making the request.
 
-<Admonition type="caution" title="`auth.uid()` Returns `null` When Unauthenticated">
+<Admonition type="caution" title="`auth.uid()` returns `null` when unauthenticated">
 
-When a request is made without an authenticated user (e.g., no access token is provided or the session has expired), `auth.uid()` returns `null`.
+When a request has no signed-in user, `auth.uid()` returns `null`. `null = user_id` is unknown in SQL, so a policy like `using (auth.uid() = user_id)` filters the row out instead of raising an error.
 
-This means that a policy like:
-
-```sql
-USING (auth.uid() = user_id)
-```
-
-will silently fail for unauthenticated users, because:
-
-```sql
-null = user_id
-```
-
-is always false in SQL.
-
-To avoid confusion and make your intention clear, we recommend explicitly checking for authentication:
-
-```sql
-USING (auth.uid() IS NOT NULL AND auth.uid() = user_id)
-```
+Scope the policy with `to authenticated` so the expression does not run for `anon`. That is both the correct intention and the cheaper plan. See [Specify roles in your policies](#specify-roles-in-your-policies).
 
 </Admonition>
 
@@ -447,18 +433,20 @@ Not all information present in the JWT should be used in RLS policies. For insta
 
 </Admonition>
 
-Returns the JWT of the user making the request. Anything that you store in the user's `raw_app_meta_data` column or the `raw_user_meta_data` column will be accessible using this function. It's important to know the distinction between these two:
+Returns the JWT claims of the user making the request as `jsonb`. Anything that you store in the user's `raw_app_meta_data` column or the `raw_user_meta_data` column is copied into those claims. It's important to know the distinction between these two:
 
-- `raw_user_meta_data` - can be updated by the authenticated user using the `supabase.auth.update()` function. It is not a good place to store authorization data.
+- `raw_user_meta_data` - can be updated by the authenticated user using [`updateUser()`](/docs/reference/javascript/auth-updateuser). It is not a good place to store authorization data.
 - `raw_app_meta_data` - cannot be updated by the user, so it's a good place to store authorization data.
 
-The `auth.jwt()` function is extremely versatile. For example, if you store some team data inside `app_metadata`, you can use it to determine whether a particular user belongs to a team. For example, if this was an array of IDs:
+The `auth.jwt()` function is extremely versatile. For example, if you store some team data inside `app_metadata`, you can use it to determine whether a particular user belongs to a team. If `teams` is a JSON array of IDs:
 
 ```sql
 create policy "User is in team"
 on my_table
 to authenticated
-using ( team_id in (select auth.jwt() -> 'app_metadata' -> 'teams'));
+using (
+  ((select auth.jwt()) -> 'app_metadata' -> 'teams') ? team_id::text
+);
 ```
 
 <Admonition type="caution">
@@ -483,9 +471,11 @@ to authenticated using (
 );
 ```
 
+This restrictive check only applies after a permissive update policy has allowed the row. A table with only restrictive policies denies every row.
+
 ### Use security definer functions
 
-A "security definer" function runs using the same role that _created_ the function. This means that if you create a role with a superuser (like `postgres`), then that function will have `bypassrls` privileges. For example, if you had a policy like this:
+A `security definer` function runs as the role that owns it, not the caller. Functions you create as `postgres` skip RLS because `postgres` has `bypassrls`. That is useful for looking up roles without paying RLS on the lookup table, and dangerous if the function is callable without checking `(select auth.uid())`. For example, if you had a policy like this:
 
 ```sql
 create policy "rls_test_select" on test_table
@@ -498,13 +488,13 @@ using (
 );
 ```
 
-We can instead create a `security definer` function which can scan `roles_table` without any RLS penalties:
+You can instead create a `security definer` function which can scan `roles_table` without any RLS penalties:
 
 ```sql
 create function private.has_good_role()
 returns boolean
 language plpgsql
-security definer -- will run as the creator
+security definer -- runs as the owner
 set search_path = '' -- every name inside must be schema-qualified
 as $$
 begin
@@ -515,6 +505,10 @@ begin
 end;
 $$;
 
+revoke execute on function private.has_good_role() from public;
+grant usage on schema private to authenticated;
+grant execute on function private.has_good_role() to authenticated;
+
 -- Update our policy to use this function:
 create policy "rls_test_select"
 on test_table
@@ -522,7 +516,7 @@ to authenticated
 using ( (select private.has_good_role()) );
 ```
 
-Set `search_path = ''` on every `security definer` function and schema-qualify the names inside it. Without a pinned `search_path`, a caller can point an unqualified name at their own object and run it with the function owner's privileges.
+Set `search_path = ''` on every `security definer` function and schema-qualify the names inside it. Without a pinned `search_path`, a caller can point an unqualified name at their own object and run it with the function owner's privileges. Check `(select auth.uid())` inside the function body. Revoke `execute` from `public`, then grant `usage` on the schema and `execute` on the function to the role the policy uses. Policy expressions run as the caller, so that role needs both. Keep the function in an unexposed schema so it is not an RPC. New functions grant `execute` to `public` by default.
 
 <Admonition type="caution">
 
