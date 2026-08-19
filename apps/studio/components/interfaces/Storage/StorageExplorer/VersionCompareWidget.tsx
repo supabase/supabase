@@ -15,10 +15,6 @@ interface VersionCompareWidgetProps {
   onDismiss: () => void
 }
 
-/**
- * Takes over the top of the preview panel when a noncurrent version is selected:
- * comparison and restore confirmation in one, so there is no modal.
- */
 export const VersionCompareWidget = ({
   mimeType,
   selectedVersion,
