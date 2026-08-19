@@ -42,10 +42,7 @@ async function getNotebookStub({ id }: NotebookVariables): Promise<NotebookData>
   const notebookStub = STUB_NOTEBOOKS.find((x) => x.id === id)
   if (!notebookStub) throw new ResponseError(`Content ${id} not found`, 404)
 
-  return notebookStub as Omit<typeof notebookStub, 'type' | 'content'> & {
-    type: 'notebook'
-    content: Notebooks.Content
-  }
+  return notebookStub
 }
 
 export const useNotebookQuery = <TData = NotebookData>(

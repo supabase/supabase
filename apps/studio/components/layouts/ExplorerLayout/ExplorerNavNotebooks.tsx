@@ -39,7 +39,7 @@ export const ExplorerNavNotebooks = ({ onBack }: { onBack: () => void }) => {
           </p>
         ) : (
           notebooks.map((notebook) => {
-            const isActive = router.pathname.includes('/explorer/chat/') && id === notebook.id
+            const isActive = router.pathname.includes('/explorer/notebook/') && id === notebook.id
 
             return (
               <Link
