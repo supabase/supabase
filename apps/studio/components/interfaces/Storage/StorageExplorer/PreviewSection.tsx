@@ -9,7 +9,6 @@ interface PreviewSectionProps {
   children: ReactNode
 }
 
-/** A collapsible section in the file preview panel. */
 export const PreviewSection = ({
   title,
   count,
