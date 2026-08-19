@@ -87,8 +87,13 @@ export function getConfigDriftSummary({
     return { managedCount: 0, driftedFields: [], unmanagedFields: [] }
   }
 
-  const cleanedGithubConfig = gitHubConfigTomlSchema.parse(githubConfig)
-  const cleanedDashboardConfig = gitHubConfigTomlSchema.parse(dashboardConfig)
+  const githubConfigResult = gitHubConfigTomlSchema.safeParse(githubConfig)
+  const dashboardConfigResult = gitHubConfigTomlSchema.safeParse(dashboardConfig)
+  if (!githubConfigResult.success || !dashboardConfigResult.success) {
+    return { managedCount: 0, driftedFields: [], unmanagedFields: [] }
+  }
+  const cleanedGithubConfig = githubConfigResult.data
+  const cleanedDashboardConfig = dashboardConfigResult.data
 
   let managedCount = 0
   const driftedFields: GitHubConfigDriftField[] = []
