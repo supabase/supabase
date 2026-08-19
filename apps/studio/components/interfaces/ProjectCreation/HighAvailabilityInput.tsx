@@ -58,6 +58,12 @@ export const HighAvailabilityInput = ({
         beforeHighAvailability.current.dbRegion = currentRegion ?? null
         setValue('dbRegion', highAvailabilityRegionName)
       }
+
+      const currentInstanceSize = getValues('instanceSize')
+      if (currentInstanceSize !== HIGH_AVAILABILITY_INSTANCE_SIZE) {
+        beforeHighAvailability.current.instanceSize = currentInstanceSize ?? null
+        setValue('instanceSize', HIGH_AVAILABILITY_INSTANCE_SIZE)
+      }
     } else {
       if (beforeHighAvailability.current.cloudProvider !== undefined) {
         setValue('cloudProvider', beforeHighAvailability.current.cloudProvider)
@@ -76,25 +82,13 @@ export const HighAvailabilityInput = ({
         setValue('dbRegion', beforeHighAvailability.current.dbRegion)
         beforeHighAvailability.current.dbRegion = null
       }
+
+      if (beforeHighAvailability.current.instanceSize !== null) {
+        setValue('instanceSize', beforeHighAvailability.current.instanceSize)
+        beforeHighAvailability.current.instanceSize = null
+      }
     }
   }
-
-  // instanceSize can't be set in the toggle handler like the fields above: the compute size
-  // Select's options swap in the same render, and Radix clears a value assigned in the same
-  // tick its option mounts (the hidden native select's options update one render later).
-  // Setting it from an effect runs after the option list has rendered.
-  useEffect(() => {
-    if (highAvailability) {
-      const currentInstanceSize = getValues('instanceSize')
-      if (currentInstanceSize !== HIGH_AVAILABILITY_INSTANCE_SIZE) {
-        beforeHighAvailability.current.instanceSize = currentInstanceSize ?? null
-        setValue('instanceSize', HIGH_AVAILABILITY_INSTANCE_SIZE)
-      }
-    } else if (beforeHighAvailability.current.instanceSize !== null) {
-      setValue('instanceSize', beforeHighAvailability.current.instanceSize)
-      beforeHighAvailability.current.instanceSize = null
-    }
-  }, [highAvailability, getValues, setValue])
 
   // Catches the case where highAvailabilityRegionName wasn't loaded yet at the moment the
   // toggle fired above (the org's available-regions query for AWS_K8S may still be in

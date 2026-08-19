@@ -231,7 +231,14 @@ export const RegionSelector = ({
                 }
               >
                 <FormControl>
-                  <Select value={dbRegion} onValueChange={field.onChange} disabled={isLoading}>
+                  {/* Radix fires onValueChange('') when the value and the option list change
+                      in the same tick (its hidden native select briefly holds stale options).
+                      No item here has an empty value, so an empty change is always spurious. */}
+                  <Select
+                    value={dbRegion}
+                    onValueChange={(value) => value !== '' && field.onChange(value)}
+                    disabled={isLoading}
+                  >
                     <SelectTrigger
                       id="region"
                       className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start"

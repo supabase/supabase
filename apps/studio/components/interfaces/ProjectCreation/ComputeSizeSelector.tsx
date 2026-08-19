@@ -63,7 +63,13 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
               </p>
             }
           >
-            <Select value={field.value} onValueChange={(value) => field.onChange(value)}>
+            {/* Radix fires onValueChange('') when the value and the option list change in
+                the same tick (its hidden native select briefly holds stale options). No
+                item here has an empty value, so an empty change is always spurious. */}
+            <Select
+              value={field.value}
+              onValueChange={(value) => value !== '' && field.onChange(value)}
+            >
               <SelectTrigger
                 id="instanceSize"
                 className="[&>span>div>div>[data-field=instance-details]]:hidden"
