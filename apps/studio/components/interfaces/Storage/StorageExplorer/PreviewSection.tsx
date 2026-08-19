@@ -23,6 +23,7 @@ export const PreviewSection = ({
       <CollapsibleTrigger asChild>
         <button
           type="button"
+          tabIndex={0}
           className="flex w-full items-center justify-between py-3 text-left text-sm font-medium text-foreground transition-colors hover:text-foreground-light"
         >
           <span className="flex items-center gap-x-2">
