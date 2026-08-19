@@ -27,8 +27,7 @@ describe('getVersioningFormDefaults', () => {
   })
 
   it('ignores any stray stored policy on a never-versioned bucket', () => {
-    // Defense in depth: a bucket reporting `disabled` should not surface policy
-    // numbers the user never set, whatever the API happens to return alongside.
+    // A `disabled` bucket should not surface policy numbers the user never set, even if the API returns them.
     const defaults = getVersioningFormDefaults(
       settings({ versionExpiryDays: 1, maxNoncurrentVersions: 1 })
     )
@@ -82,7 +81,6 @@ describe('getNextVersioningState', () => {
   })
 
   it('suspends rather than disables a bucket that has been versioned', () => {
-    // S3 has no path back to `disabled` — retained versions outlive the toggle.
     expect(getNextVersioningState('enabled', false)).toBe('suspended')
   })
 
