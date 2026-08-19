@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { BoxPlus } from 'icons'
-import { Plus } from 'lucide-react'
+import { Plus, Terminal } from 'lucide-react'
+import { Button } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -8,9 +9,10 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 interface WorkersEmptyStateProps {
   onDeploy: () => void
+  onCreate: () => void
 }
 
-export const WorkersEmptyState = ({ onDeploy }: WorkersEmptyStateProps) => {
+export const WorkersEmptyState = ({ onDeploy, onCreate }: WorkersEmptyStateProps) => {
   const { can: canDeployWorkers } = useAsyncCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
 
   return (
@@ -24,7 +26,7 @@ export const WorkersEmptyState = ({ onDeploy }: WorkersEmptyStateProps) => {
         size="tiny"
         icon={<Plus size={14} />}
         disabled={!canDeployWorkers}
-        onClick={onDeploy}
+        onClick={onCreate}
         tooltip={{
           content: {
             side: 'bottom',
@@ -34,8 +36,11 @@ export const WorkersEmptyState = ({ onDeploy }: WorkersEmptyStateProps) => {
           },
         }}
       >
-        Deploy a worker
+        New worker
       </ButtonTooltip>
+      <Button variant="default" size="tiny" icon={<Terminal size={14} />} onClick={onDeploy}>
+        Deploy with CLI
+      </Button>
     </EmptyStatePresentational>
   )
 }

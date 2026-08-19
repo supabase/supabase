@@ -13,6 +13,7 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { CreateWorkerDialog } from '@/components/interfaces/Workers/CreateWorkerDialog'
 import { DeployWorkerDialog } from '@/components/interfaces/Workers/DeployWorkerDialog'
 import {
   isWorkersForbidden,
@@ -32,6 +33,7 @@ import type { NextPageWithLayout } from '@/types'
 const WorkersPage: NextPageWithLayout = () => {
   const { ref } = useParams()
   const [isDeployInstructionsOpen, setIsDeployInstructionsOpen] = useState(false)
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
   const {
     data: workers,
     error,
@@ -76,13 +78,17 @@ const WorkersPage: NextPageWithLayout = () => {
             {isMissingPermission && <NoPermission resourceText="view this project's workers" />}
             {isUnexpectedError && <AlertError error={error} subject="Failed to retrieve workers" />}
             {isSuccess && workers.length === 0 && (
-              <WorkersEmptyState onDeploy={() => setIsDeployInstructionsOpen(true)} />
+              <WorkersEmptyState
+                onDeploy={() => setIsDeployInstructionsOpen(true)}
+                onCreate={() => setIsCreateOpen(true)}
+              />
             )}
             {isSuccess && workers.length > 0 && ref && (
               <WorkersList
                 projectRef={ref}
                 workers={workers}
                 onDeploy={() => setIsDeployInstructionsOpen(true)}
+                onCreate={() => setIsCreateOpen(true)}
               />
             )}
           </PageSectionContent>
@@ -93,6 +99,9 @@ const WorkersPage: NextPageWithLayout = () => {
         open={isDeployInstructionsOpen}
         onOpenChange={setIsDeployInstructionsOpen}
       />
+      {ref && (
+        <CreateWorkerDialog projectRef={ref} open={isCreateOpen} onOpenChange={setIsCreateOpen} />
+      )}
     </div>
   )
 }
