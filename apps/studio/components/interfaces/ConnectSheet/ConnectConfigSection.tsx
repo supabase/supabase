@@ -1,3 +1,4 @@
+import { Fragment, type ReactNode } from 'react'
 import {
   cn,
   RadioGroupStacked,
@@ -31,6 +32,13 @@ interface ConnectConfigSectionProps {
   state: Record<string, string | boolean | string[]>
   onFieldChange: (fieldId: string, value: string | boolean | string[]) => void
   getFieldOptions: (fieldId: string) => FieldOption[]
+  /** Rendered after this field when it is visible, otherwise at the top of the stack. */
+  insertAfter?: { fieldId: string; node: ReactNode }
+}
+
+function shouldShowConnectField(field: ResolvedField, options: FieldOption[]) {
+  if (field.type === 'switch' || field.type === 'multi-select') return true
+  return options.length > 1
 }
 
 export function ConnectConfigSection({
@@ -38,191 +46,202 @@ export function ConnectConfigSection({
   state,
   onFieldChange,
   getFieldOptions,
+  insertAfter,
 }: ConnectConfigSectionProps) {
   if (activeFields.length === 0) return null
 
+  const visibleFields = activeFields.filter((field) =>
+    shouldShowConnectField(field, getFieldOptions(field.id))
+  )
+  const insertAfterVisible = Boolean(
+    insertAfter?.node && visibleFields.some((field) => field.id === insertAfter.fieldId)
+  )
+
   return (
     <div className="flex flex-col gap-y-4">
-      {activeFields.map((field) => {
+      {!insertAfterVisible && insertAfter?.node}
+      {visibleFields.map((field) => {
         const options = getFieldOptions(field.id)
         const value = state[field.id]
 
-        // Skip fields with no options (or single option that's auto-selected)
-        // Exception: switch and multi-select fields don't require options
-        if (field.type !== 'switch' && field.type !== 'multi-select') {
-          if (options.length === 0) return null
-          if (options.length === 1) return null
-        }
-
-        switch (field.type) {
-          case 'radio-grid':
-            return (
-              <FormItemLayout
-                key={field.id}
-                isReactForm={false}
-                layout="horizontal"
-                label={field.label}
-              >
-                <RadioGroupStacked
-                  value={String(value ?? '')}
-                  onValueChange={(v) => onFieldChange(field.id, v)}
-                  className="flex-row gap-3 space-y-0"
+        const control = (() => {
+          switch (field.type) {
+            case 'radio-grid':
+              return (
+                <FormItemLayout
+                  key={field.id}
+                  isReactForm={false}
+                  layout="horizontal"
+                  label={field.label}
                 >
-                  {options.map((option) => (
-                    <RadioGroupStackedItem
-                      key={option.value}
-                      id={`connect-${field.id}-${option.value}`}
-                      value={option.value}
-                      label=""
-                      className="flex-1 rounded-lg text-left"
-                    >
-                      <div className="flex items-center gap-2">
-                        {option.icon && <ConnectionIcon supportsDarkMode icon={option.icon} />}
-                        <span className="text-sm">{option.label}</span>
-                      </div>
-                    </RadioGroupStackedItem>
-                  ))}
-                </RadioGroupStacked>
-              </FormItemLayout>
-            )
-
-          case 'radio-list':
-            return (
-              <FormItemLayout
-                key={field.id}
-                isReactForm={false}
-                layout="horizontal"
-                label={field.label}
-              >
-                <RadioGroupStacked
-                  value={String(value ?? '')}
-                  onValueChange={(v) => onFieldChange(field.id, v)}
-                  className="min-w-0 w-full"
-                >
-                  {options.map((option) => (
-                    <RadioGroupStackedItem
-                      key={option.value}
-                      id={`connect-${field.id}-${option.value}`}
-                      value={option.value}
-                      className="min-w-0 w-full text-left"
-                      label={
-                        <span className="flex min-w-0 items-center gap-2">
-                          {option.icon && <ConnectionIcon icon={option.icon} />}
-                          <span className="truncate">{option.label}</span>
-                        </span>
-                      }
-                      description={option.description}
-                    />
-                  ))}
-                </RadioGroupStacked>
-              </FormItemLayout>
-            )
-
-          case 'select':
-            return (
-              <FormItemLayout
-                key={field.id}
-                isReactForm={false}
-                layout="horizontal"
-                label={field.label}
-                description={field.description}
-              >
-                <Select
-                  value={String(value ?? '')}
-                  onValueChange={(v) => onFieldChange(field.id, v)}
-                >
-                  <SelectTrigger
-                    size="small"
-                    className="[&>span:first-child]:flex [&>span:first-child]:items-center [&>span:first-child]:gap-x-2"
+                  <RadioGroupStacked
+                    value={String(value ?? '')}
+                    onValueChange={(v) => onFieldChange(field.id, v)}
+                    className="flex-row gap-3 space-y-0"
                   >
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
                     {options.map((option) => (
-                      <SelectItem
+                      <RadioGroupStackedItem
                         key={option.value}
+                        id={`connect-${field.id}-${option.value}`}
                         value={option.value}
-                        className="[&>span:last-child]:flex [&>span:last-child]:items-center [&>span:last-child]:gap-x-2"
+                        label=""
+                        className="flex-1 rounded-lg text-left"
                       >
-                        {/*
+                        <div className="flex items-center gap-2">
+                          {option.icon && <ConnectionIcon supportsDarkMode icon={option.icon} />}
+                          <span className="text-sm">{option.label}</span>
+                        </div>
+                      </RadioGroupStackedItem>
+                    ))}
+                  </RadioGroupStacked>
+                </FormItemLayout>
+              )
+
+            case 'radio-list':
+              return (
+                <FormItemLayout
+                  key={field.id}
+                  isReactForm={false}
+                  layout="horizontal"
+                  label={field.label}
+                >
+                  <RadioGroupStacked
+                    value={String(value ?? '')}
+                    onValueChange={(v) => onFieldChange(field.id, v)}
+                    className="min-w-0 w-full"
+                  >
+                    {options.map((option) => (
+                      <RadioGroupStackedItem
+                        key={option.value}
+                        id={`connect-${field.id}-${option.value}`}
+                        value={option.value}
+                        className="min-w-0 w-full text-left"
+                        label={
+                          <span className="flex min-w-0 items-center gap-2">
+                            {option.icon && <ConnectionIcon icon={option.icon} />}
+                            <span className="truncate">{option.label}</span>
+                          </span>
+                        }
+                        description={option.description}
+                      />
+                    ))}
+                  </RadioGroupStacked>
+                </FormItemLayout>
+              )
+
+            case 'select':
+              return (
+                <FormItemLayout
+                  key={field.id}
+                  isReactForm={false}
+                  layout="horizontal"
+                  label={field.label}
+                  description={field.description}
+                >
+                  <Select
+                    value={String(value ?? '')}
+                    onValueChange={(v) => onFieldChange(field.id, v)}
+                  >
+                    <SelectTrigger
+                      size="small"
+                      className="[&>span:first-child]:flex [&>span:first-child]:items-center [&>span:first-child]:gap-x-2"
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {options.map((option) => (
+                        <SelectItem
+                          key={option.value}
+                          value={option.value}
+                          className="[&>span:last-child]:flex [&>span:last-child]:items-center [&>span:last-child]:gap-x-2"
+                        >
+                          {/*
                           [Joshen] Omitting MCP icons for now as the images are not optimized (large)
                           and is causing noticeably latency issues on the browser (even with the existing Connect UI)
                          */}
-                        {field.id === 'framework' && option.icon && (
-                          <ConnectionIcon icon={option.icon} />
-                        )}
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormItemLayout>
-            )
-
-          case 'switch':
-            return (
-              <FormItemLayout
-                key={field.id}
-                isReactForm={false}
-                layout="horizontal"
-                label={field.label}
-                description={field.description}
-                className="[&>div>label>span]:break-keep! [&>div>label>span]:text-balance"
-              >
-                <Switch
-                  id={field.id}
-                  checked={Boolean(value)}
-                  onCheckedChange={(v) => onFieldChange(field.id, v)}
-                />
-              </FormItemLayout>
-            )
-
-          case 'multi-select':
-            return (
-              <FormItemLayout
-                key={field.id}
-                isReactForm={false}
-                layout="horizontal"
-                label={field.label}
-                description={field.description}
-              >
-                <MultiSelector
-                  values={Array.isArray(value) ? value : []}
-                  onValuesChange={(v) => onFieldChange(field.id, v)}
-                >
-                  <MultiSelectorTrigger
-                    className="w-full"
-                    label="Select features"
-                    badgeLimit="wrap"
-                    showIcon={true}
-                  />
-                  <MultiSelectorContent>
-                    <MultiSelectorList>
-                      {options.map((option) => (
-                        <MultiSelectorItem
-                          key={option.value}
-                          value={option.value}
-                          className="items-start"
-                        >
-                          <div className="flex flex-col ml-2 gap-y-0.5">
-                            <span className="font-medium">{option.label}</span>
-                            {option.description && (
-                              <span className="text-xs text-foreground-light">
-                                {option.description}
-                              </span>
-                            )}
-                          </div>
-                        </MultiSelectorItem>
+                          {field.id === 'framework' && option.icon && (
+                            <ConnectionIcon icon={option.icon} />
+                          )}
+                          {option.label}
+                        </SelectItem>
                       ))}
-                    </MultiSelectorList>
-                  </MultiSelectorContent>
-                </MultiSelector>
-              </FormItemLayout>
-            )
+                    </SelectContent>
+                  </Select>
+                </FormItemLayout>
+              )
 
-          default:
-            return null
-        }
+            case 'switch':
+              return (
+                <FormItemLayout
+                  key={field.id}
+                  isReactForm={false}
+                  layout="horizontal"
+                  label={field.label}
+                  description={field.description}
+                  className="[&>div>label>span]:break-keep! [&>div>label>span]:text-balance"
+                >
+                  <Switch
+                    id={field.id}
+                    checked={Boolean(value)}
+                    onCheckedChange={(v) => onFieldChange(field.id, v)}
+                  />
+                </FormItemLayout>
+              )
+
+            case 'multi-select':
+              return (
+                <FormItemLayout
+                  key={field.id}
+                  isReactForm={false}
+                  layout="horizontal"
+                  label={field.label}
+                  description={field.description}
+                >
+                  <MultiSelector
+                    values={Array.isArray(value) ? value : []}
+                    onValuesChange={(v) => onFieldChange(field.id, v)}
+                  >
+                    <MultiSelectorTrigger
+                      className="w-full"
+                      label="Select features"
+                      badgeLimit="wrap"
+                      showIcon={true}
+                    />
+                    <MultiSelectorContent>
+                      <MultiSelectorList>
+                        {options.map((option) => (
+                          <MultiSelectorItem
+                            key={option.value}
+                            value={option.value}
+                            className="items-start"
+                          >
+                            <div className="flex flex-col ml-2 gap-y-0.5">
+                              <span className="font-medium">{option.label}</span>
+                              {option.description && (
+                                <span className="text-xs text-foreground-light">
+                                  {option.description}
+                                </span>
+                              )}
+                            </div>
+                          </MultiSelectorItem>
+                        ))}
+                      </MultiSelectorList>
+                    </MultiSelectorContent>
+                  </MultiSelector>
+                </FormItemLayout>
+              )
+
+            default:
+              return null
+          }
+        })()
+
+        return (
+          <Fragment key={field.id}>
+            {control}
+            {insertAfterVisible && insertAfter?.fieldId === field.id ? insertAfter.node : null}
+          </Fragment>
+        )
       })}
     </div>
   )

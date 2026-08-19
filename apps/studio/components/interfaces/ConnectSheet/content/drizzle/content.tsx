@@ -6,6 +6,7 @@ import type {
   StepContentProps,
 } from '@/components/interfaces/ConnectSheet/Connect.types'
 import { resolveOrmConnectionScenario } from '@/components/interfaces/ConnectSheet/OrmConnection.utils'
+import { TemporaryAccessPasswordNote } from '@/components/interfaces/ConnectSheet/TemporaryAccessRoleField'
 import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 
 function getEnvCode({
@@ -102,7 +103,12 @@ const allUsers = await db.select().from(users);
     },
   ]
 
-  return <MultipleCodeBlock files={files} />
+  return (
+    <div className="flex flex-col gap-3">
+      <MultipleCodeBlock files={files} />
+      <TemporaryAccessPasswordNote tokenHref="/account/tokens" />
+    </div>
+  )
 }
 
 export default ContentFile

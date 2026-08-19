@@ -12,10 +12,11 @@ import {
   buildConnectionParameters,
   buildSafeConnectionString,
   parseConnectionParams,
-  PASSWORD_PLACEHOLDER,
   resolveConnectionString,
 } from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
 import { PasswordEncodingNote } from '@/components/interfaces/ConnectSheet/PasswordEncodingNote'
+import { useTemporaryAccessConnection } from '@/components/interfaces/ConnectSheet/TemporaryAccessConnectionProvider'
+import { TemporaryAccessPasswordNote } from '@/components/interfaces/ConnectSheet/TemporaryAccessRoleField'
 
 type DirectFilesConfig = {
   files: {
@@ -32,6 +33,9 @@ function DirectFilesContent({ state, connectionStringPooler }: StepContentProps)
   const connectionType = (state.connectionType as DatabaseConnectionType) ?? 'uri'
   const connectionMethod = (state.connectionMethod as ConnectionStringMethod) ?? 'direct'
   const useSharedPooler = Boolean(state.useSharedPooler)
+  const {
+    meta: { isGrantMode, passwordPlaceholder },
+  } = useTemporaryAccessConnection()
 
   const resolvedConnectionString = useMemo(
     () =>
@@ -49,8 +53,9 @@ function DirectFilesContent({ state, connectionStringPooler }: StepContentProps)
   )
 
   const safeConnectionString = useMemo(
-    () => buildSafeConnectionString(resolvedConnectionString, connectionParams),
-    [resolvedConnectionString, connectionParams]
+    () =>
+      buildSafeConnectionString(resolvedConnectionString, connectionParams, passwordPlaceholder),
+    [resolvedConnectionString, connectionParams, passwordPlaceholder]
   )
 
   const config: DirectFilesConfig | null = useMemo(() => {
@@ -125,7 +130,7 @@ func main() {
               language: 'json',
               code: `{
   "ConnectionStrings": {
-    "DefaultConnection": "Host=${connectionParams.host};Database=${connectionParams.database};Username=${connectionParams.user};Password=${PASSWORD_PLACEHOLDER};SSL Mode=Require;Trust Server Certificate=true"
+                "DefaultConnection": "Host=${connectionParams.host};Database=${connectionParams.database};Username=${connectionParams.user};Password=${passwordPlaceholder};SSL Mode=Require;Trust Server Certificate=true"
   }
 }`,
             },
@@ -200,7 +205,7 @@ except Exception as e:
               language: 'bash',
               code: [
                 `user=${connectionParams.user}`,
-                `password=${PASSWORD_PLACEHOLDER}`,
+                `password=${passwordPlaceholder}`,
                 `host=${connectionParams.host}`,
                 `port=${connectionParams.port}`,
                 `dbname=${connectionParams.database}`,
@@ -214,7 +219,7 @@ except Exception as e:
       default:
         return null
     }
-  }, [connectionType, safeConnectionString, connectionParams])
+  }, [connectionType, safeConnectionString, connectionParams, passwordPlaceholder])
 
   const defaultFile = config?.files[0]?.name ?? ''
   const [activeFile, setActiveFile] = useState(defaultFile)
@@ -238,7 +243,8 @@ except Exception as e:
   return (
     <div className="flex flex-col gap-3">
       <MultipleCodeBlock files={config.files} value={activeFile} onValueChange={setActiveFile} />
-      {config.passwordInUrl && <PasswordEncodingNote />}
+      {config.passwordInUrl && !isGrantMode && <PasswordEncodingNote />}
+      <TemporaryAccessPasswordNote tokenHref="/account/tokens" />
       <ConnectionParameters parameters={buildConnectionParameters(connectionParams)} />
     </div>
   )
