@@ -1,12 +1,12 @@
 import dayjs from 'dayjs'
 import {
+  Archive,
   Copy,
   Download,
   File,
   Film,
   Image as ImageIcon,
   Info,
-  MinusCircle,
   MoreVertical,
   Music,
   RotateCcw,
@@ -294,7 +294,7 @@ export const VersionThumbnail = ({
   >
     {isCurrent && <RotateCcw size={size} className="text-brand" />}
     {!isCurrent && isDeleteMarker && (
-      <MinusCircle size={size} className="text-foreground-muted" />
+      <Archive size={size} className="text-foreground-muted" />
     )}
     {!isCurrent && !isDeleteMarker && <MimeTypeIcon mimeType={mimeType} size={size} />}
   </span>
