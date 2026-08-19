@@ -39,42 +39,36 @@ Go to: [Your function returned a 401](#your-function-returned-a-401)
 
 ### Case 3: Not sure
 
-Run this query in [Log Explorer](/dashboard/project/_/logs/explorer?q=SELECT%0A++++cast%28timestamp+AS+datetime%29++AS+timestamp%2C%0A++++req.pathname+++++++++++++++++AS+function_name%2C%0A%0A++++CASE%0A++++++++WHEN+metadata.execution_id+IS+NOT+NULL%0A++++++++++++THEN+%27your_code_returned_401%27%0A++++++++WHEN+metadata.execution_id+IS+NULL%0A+++++++++AND+%28new_auth.prefix+IS+NOT+NULL+OR+legacy_payload.algorithm+<>+%27HS256%27%29%0A++++++++++++THEN+%27incompatible_keys%27%0A++++++++WHEN+metadata.execution_id+IS+NULL%0A++++++++AND+%0A++++++++++++%28%0A++++++++++++++++%28legacy_auth_data.invalid+IS+NOT+NULL+OR+new_auth.error+IS+NOT+NULL%29%0A++++++++++++++++++++OR%0A++++++++++++++++legacy_payload.algorithm+%3D+%27HS256%27%0A++++++++++++%29%0A++++++++++++THEN+%27invalid_key%27%0A++++++++WHEN+metadata.execution_id+IS+NULL%0A+++++++++AND+legacy_auth_data+++++++IS+NULL%0A+++++++++AND+new_auth.prefix+IS+NULL%0A++++++++++++THEN+%27missing_auth_header%27%0A++++END+AS+cause%0A%0AFROM+function_edge_logs%0A%0A++++--+unnesting+metadata%0A++++CROSS+JOIN+UNNEST%28metadata%29++++++++++AS+metadata%0A++++CROSS+JOIN+UNNEST%28metadata.request%29++AS+req%0A++++CROSS+JOIN+UNNEST%28metadata.response%29+AS+res%0A++++--+unnesting+auth+details%0A++++LEFT+JOIN+UNNEST%28req.sb%29++++++++++++++++++++AS+sb%0A++++LEFT+JOIN+UNNEST%28sb.apikey%29+++++++++++++++++AS+apikey%0A++++LEFT+JOIN+UNNEST%28apikey.authorization%29++++++AS+new_auth%0A++++LEFT+JOIN+UNNEST%28sb.jwt%29++++++++++++++++++++AS+legacy_jwt%0A++++LEFT+JOIN+UNNEST%28legacy_jwt.authorization%29++AS+legacy_auth_data%0A++++LEFT+JOIN+UNNEST%28legacy_auth_data.payload%29++AS+legacy_payload%0A%0AWHERE+res.status_code+%3D+401%0AORDER+BY+timestamp+DESC%0ALIMIT+200) to classify recent 401s:
+Run this query in the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs&content=select%0A%20%20timestamp%2C%0A%20%20log_attributes%5B%27request.pathname%27%5D%20as%20function_name%2C%0A%20%20case%0A%20%20%20%20when%20log_attributes%5B%27execution_id%27%5D%20%21%3D%20%27%27%20then%20%27your_code_returned_401%27%0A%20%20%20%20when%20log_attributes%5B%27execution_id%27%5D%20%3D%20%27%27%0A%20%20%20%20and%20%28%0A%20%20%20%20%20%20log_attributes%5B%27request.sb.apikey.authorization.prefix%27%5D%20%21%3D%20%27%27%0A%20%20%20%20%20%20or%20%28%0A%20%20%20%20%20%20%20%20log_attributes%5B%27request.sb.jwt.authorization.payload.algorithm%27%5D%20%21%3D%20%27%27%0A%20%20%20%20%20%20%20%20and%20log_attributes%5B%27request.sb.jwt.authorization.payload.algorithm%27%5D%20%21%3D%20%27HS256%27%0A%20%20%20%20%20%20%29%0A%20%20%20%20%29%20then%20%27incompatible_keys%27%0A%20%20%20%20when%20log_attributes%5B%27execution_id%27%5D%20%3D%20%27%27%0A%20%20%20%20and%20%28%0A%20%20%20%20%20%20log_attributes%5B%27request.sb.jwt.authorization.invalid%27%5D%20%21%3D%20%27%27%0A%20%20%20%20%20%20or%20log_attributes%5B%27request.sb.apikey.authorization.error%27%5D%20%21%3D%20%27%27%0A%20%20%20%20%20%20or%20log_attributes%5B%27request.sb.jwt.authorization.payload.algorithm%27%5D%20%3D%20%27HS256%27%0A%20%20%20%20%29%20then%20%27invalid_key%27%0A%20%20%20%20when%20log_attributes%5B%27execution_id%27%5D%20%3D%20%27%27%0A%20%20%20%20and%20log_attributes%5B%27request.sb.jwt.authorization.payload.algorithm%27%5D%20%3D%20%27%27%0A%20%20%20%20and%20log_attributes%5B%27request.sb.apikey.authorization.prefix%27%5D%20%3D%20%27%27%20then%20%27missing_auth_header%27%0A%20%20end%20as%20cause%0Afrom%20logs%0Awhere%0A%20%20source%20%3D%20%27function_edge_logs%27%0A%20%20and%20toInt32OrZero%28log_attributes%5B%27response.status_code%27%5D%29%20%3D%20401%0Aorder%20by%20timestamp%20desc%0Alimit%2050%3B) to classify recent 401s:
 
 ```sql
 select
-  cast(timestamp as datetime) as timestamp,
-  req.pathname as function_name,
+  timestamp,
+  log_attributes['request.pathname'] as function_name,
   case
-    when metadata.execution_id is not null then 'your_code_returned_401'
-    when metadata.execution_id is null
+    when log_attributes['execution_id'] != '' then 'your_code_returned_401'
+    when log_attributes['execution_id'] = ''
     and (
-      new_auth.prefix is not null
-      or legacy_payload.algorithm != 'HS256'
+      log_attributes['request.sb.apikey.authorization.prefix'] != ''
+      or (
+        log_attributes['request.sb.jwt.authorization.payload.algorithm'] != ''
+        and log_attributes['request.sb.jwt.authorization.payload.algorithm'] != 'HS256'
+      )
     ) then 'incompatible_keys'
-    when metadata.execution_id is null
+    when log_attributes['execution_id'] = ''
     and (
-      (legacy_auth_data.invalid is not null or new_auth.error is not null)
-      or legacy_payload.algorithm = 'HS256'
+      log_attributes['request.sb.jwt.authorization.invalid'] != ''
+      or log_attributes['request.sb.apikey.authorization.error'] != ''
+      or log_attributes['request.sb.jwt.authorization.payload.algorithm'] = 'HS256'
     ) then 'invalid_key'
-    when metadata.execution_id is null
-    and legacy_auth_data is null
-    and new_auth.prefix is null then 'missing_auth_header'
+    when log_attributes['execution_id'] = ''
+    and log_attributes['request.sb.jwt.authorization.payload.algorithm'] = ''
+    and log_attributes['request.sb.apikey.authorization.prefix'] = '' then 'missing_auth_header'
   end as cause
-from
-  function_edge_logs
-  -- unnesting metadata
-  cross join UNNEST(metadata) as metadata
-  cross join UNNEST(metadata.request) as req
-  cross join UNNEST(metadata.response) as res
-  -- unnesting auth details
-  left join UNNEST(req.sb) as sb
-  left join UNNEST(sb.apikey) as apikey
-  left join UNNEST(apikey.authorization) as new_auth
-  left join UNNEST(sb.jwt) as legacy_jwt
-  left join UNNEST(legacy_jwt.authorization) as legacy_auth_data
-  left join UNNEST(legacy_auth_data.payload) as legacy_payload
-where res.status_code = 401
+from logs
+where
+  source = 'function_edge_logs'
+  and toInt32OrZero(log_attributes['response.status_code']) = 401
 order by timestamp desc
 limit 50;
 ```
