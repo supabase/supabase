@@ -41,6 +41,11 @@ export const selfHostingCommunity: ContentListingGroup = {
       hasLightIcon: false,
       description: 'A self-hosted Supabase setup with Traefik as a reverse proxy.',
     },
+    {
+      title: 'Sealos',
+      href: 'https://sealos.io/products/app-store/supabase',
+      description: 'Deploy Supabase on Sealos with PostgreSQL and local or S3-compatible Storage.',
+    },
   ],
 }
 
