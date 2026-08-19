@@ -1,8 +1,10 @@
+import { useParams } from 'common'
 import { useState } from 'react'
 import { cn } from 'ui'
 
 import { buildWorkerSnippets, type WorkerSnippetInput } from './workerSnippets'
 import CopyButton from '@/components/ui/CopyButton'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 
 export type WorkerSnippetTab = 'ai' | 'config' | 'cli' | 'curl' | 'js' | 'python'
 
@@ -16,7 +18,7 @@ const TAB_LABEL: Record<WorkerSnippetTab, string> = {
 }
 
 interface WorkerSnippetTabsProps {
-  input: WorkerSnippetInput
+  input: Omit<WorkerSnippetInput, 'endpoint' | 'protocol'>
   tabs?: WorkerSnippetTab[]
   className?: string
 }
@@ -26,9 +28,15 @@ export const WorkerSnippetTabs = ({
   tabs = ['cli', 'curl'],
   className,
 }: WorkerSnippetTabsProps) => {
+  const { ref } = useParams()
   const [active, setActive] = useState<WorkerSnippetTab>(tabs[0])
 
-  const snippets = buildWorkerSnippets(input)
+  const { data: settings } = useProjectSettingsV2Query({ projectRef: ref }, { enabled: !!ref })
+  const snippets = buildWorkerSnippets({
+    ...input,
+    endpoint: settings?.app_config?.endpoint,
+    protocol: settings?.app_config?.protocol,
+  })
   const snippetByTab: Record<WorkerSnippetTab, string> = {
     ai: snippets.aiPrompt,
     config: snippets.configToml,

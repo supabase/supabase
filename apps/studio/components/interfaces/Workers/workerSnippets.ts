@@ -1,10 +1,12 @@
-import { workerGatewayUrl } from './Workers.constants'
+import { workerUrl } from './Workers.constants'
 import type { WorkerAccess } from './Workers.types'
 import { formatRuntime, formatSize } from './Workers.utils'
 import { CLI_NAME, PRODUCT_NAME } from '@/lib/constants/workers'
 
 export interface WorkerSnippetInput {
   name: string
+  endpoint: string | undefined
+  protocol?: string
   runtime: string | undefined
   size: string
   access: WorkerAccess
@@ -20,7 +22,7 @@ export interface WorkerSnippets {
   python: string
 }
 
-export const EXAMPLE_WORKER: WorkerSnippetInput = {
+export const EXAMPLE_WORKER: Omit<WorkerSnippetInput, 'endpoint' | 'protocol'> = {
   name: 'my-worker',
   runtime: 'node',
   size: '2gb-1vcpu',
@@ -33,6 +35,9 @@ const safeName = (name: string) => (name.trim().length > 0 ? name.trim() : 'my-w
 export function buildWorkerSnippets(input: WorkerSnippetInput): WorkerSnippets {
   const name = safeName(input.name)
   const runtime = input.runtime ?? 'node'
+
+  const url =
+    workerUrl({ endpoint: input.endpoint, protocol: input.protocol, name }) ?? '[YOUR WORKER URL]'
 
   const cli = [
     `supabase ${CLI_NAME} new ${name} --runtime ${runtime}`,
@@ -56,14 +61,13 @@ export function buildWorkerSnippets(input: WorkerSnippetInput): WorkerSnippets {
       : `  -H 'Authorization: Bearer [YOUR SERVICE ROLE KEY]' \\`
 
   const curl = [
-    `curl -L -X POST '${workerGatewayUrl(name)}' \\`,
+    `curl -L -X POST '${url}' \\`,
     authHeader,
     `  -H 'Content-Type: application/json' \\`,
     `  --data '{"name":"world"}'`,
   ].join('\n')
 
   const keyPlaceholder = input.access === 'public' ? '[YOUR ANON KEY]' : '[YOUR SERVICE ROLE KEY]'
-  const url = workerGatewayUrl(name)
 
   const javascript = [
     `const res = await fetch('${url}', {`,
