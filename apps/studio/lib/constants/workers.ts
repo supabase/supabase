@@ -14,7 +14,7 @@ Add a block to \`supabase/config.toml\`:
 \`\`\`toml
 [${CLI_NAME}.embed]
 runtime   = "python"   # node | deno | bun | python | dockerfile
-size      = "2x1"      # 2x1 (2GB/1vCPU) | 4x2 (4GB/2vCPU) — fixed at deploy
+size      = "2gb-1vcpu"   # 2gb-1vcpu | 4gb-2vcpu — fixed at deploy
 access    = "public"   # public | private
 instances = 1          # 1..10 per deploy; 100 cap per project
 secrets   = ["OPENAI_API_KEY"]   # names only — values live in the Secrets API
@@ -33,7 +33,7 @@ Config precedence: \`--flag\` > \`config.toml\` > interactive prompt > default.
 
 - Workers under \`supabase/${CLI_NAME}/<name>/\` are auto-discovered; the folder name is the slug.
 - \`entrypoint\` is inferred from the runtime (node index.js, deno run main.ts, python main.py, Dockerfile CMD).
-- \`region\` is locked to us-west-1 at alpha — do not set it.
+- \`region\` is locked to us-west-2 at alpha — do not set it.
 - Sizes are fixed at deploy time. To change size, delete the worker and redeploy.
 
 ## Manage
