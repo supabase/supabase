@@ -101,6 +101,7 @@ export const AssistantChat = ({
   const snap = useAiAssistantStateSnapshot()
   const state = useAiAssistantState()
   const currentChat = snap.chats[chatId]
+  const supportMetadata = currentChat?.supportMetadata
 
   useShortcut(SHORTCUT_IDS.AI_ASSISTANT_CANCEL_EDIT, () => cancelEdit(), {
     enabled: shortcutsEnabled,
@@ -168,19 +169,26 @@ export const AssistantChat = ({
   const currentTable = tables?.find((t) => t.id.toString() === entityId)
   const currentSchema = searchParams?.get('schema') ?? 'public'
 
-  // Update context in state. Skip when there's no project in the URL (e.g. org-level
-  // pages) and the open chat is a support chat that already set its own project
-  // context (see SupportAssistantSuccessCardContent) — otherwise this would clobber
-  // that context back to undefined as soon as the panel mounts.
+  // Update context in state. On org-level pages there's no project in the URL, so
+  // fall back to the open chat's own support metadata (see
+  // SupportAssistantSuccessCardContent) rather than clobbering it back to undefined —
+  // this also restores the right context after switching between support chats.
   useEffect(() => {
-    if (!project?.ref && currentChat?.supportMetadata?.projectRef) return
+    if (!project?.ref && supportMetadata?.projectRef) {
+      state.setContext({
+        projectRef: supportMetadata.projectRef,
+        orgSlug: supportMetadata.organizationSlug,
+        connectionString: supportMetadata.connectionString ?? '',
+      })
+      return
+    }
 
     state.setContext({
       projectRef: project?.ref,
       orgSlug: selectedOrganization?.slug,
       connectionString: project?.connectionString ?? '',
     })
-  }, [project?.ref, project?.connectionString, selectedOrganization?.slug, state, currentChat])
+  }, [project?.ref, project?.connectionString, selectedOrganization?.slug, state, supportMetadata])
 
   const track = useTrack()
 
@@ -208,7 +216,6 @@ export const AssistantChat = ({
 
   const isChatLoading = chatStatus === 'submitted' || chatStatus === 'streaming'
   const hasPendingApproval = hasPendingToolApproval(chatMessages)
-  const supportMetadata = currentChat?.supportMetadata
   const isSupportChat = !!supportMetadata?.isSupportChat
   const isSupportChatClosed = isSupportChat && supportMetadata.lifecycleStatus !== 'bot_active'
   const supportConversationId = supportMetadata?.frontConversationId

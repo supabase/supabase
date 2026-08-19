@@ -2,10 +2,11 @@ import type { UIMessage as MessageType } from '@ai-sdk/react'
 import { ArrowUpRight } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
-import type { JSX } from 'react'
+import type { JSX, MouseEvent } from 'react'
 import type { StreamdownProps } from 'streamdown'
 import {
   AiIconAnimation,
+  Button,
   Card,
   CardContent,
   CardDescription,
@@ -19,6 +20,7 @@ import { buildSupportAssistantPrompt } from '@/components/interfaces/Support/Sup
 import type { SubmittedSupportRequest } from '@/components/interfaces/Support/SupportForm.state'
 import { NO_PROJECT_MARKER } from '@/components/interfaces/Support/SupportForm.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { isValidConnString } from '@/data/fetchers'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useTrack } from '@/lib/telemetry/track'
 import {
@@ -64,20 +66,31 @@ export function SupportAssistantSuccessCardContent({
   // The org-view support form resolves projectRef itself (defaulting to the
   // first project in the org) rather than reading it from the URL, so the
   // assistant's context needs the connection string fetched explicitly too.
-  const { data: projectDetail } = useProjectDetailQuery(
-    { ref: request.projectRef },
-    { enabled: hasAssistantContext }
-  )
+  const {
+    data: projectDetail,
+    isError: isProjectDetailError,
+    refetch: refetchProjectDetail,
+  } = useProjectDetailQuery({ ref: request.projectRef }, { enabled: hasAssistantContext })
+
+  // Mirrors the readiness check useProjectDetailQuery itself polls on: a project
+  // still coming up, or one without a usable connection string yet, isn't ready
+  // to receive requests, even though the query already returned some data.
+  const isProjectReady =
+    !!projectDetail &&
+    projectDetail.status !== 'COMING_UP' &&
+    projectDetail.status !== 'UNKNOWN' &&
+    isValidConnString(projectDetail.connectionString)
+  const connectionString = projectDetail?.connectionString ?? undefined
 
   useEffect(() => {
     if (!hasAssistantContext) return
-    if (!projectDetail?.connectionString) return
+    if (!isProjectReady) return
     if (createdChatIdRef.current) return
 
     aiAssistantState.setContext({
       projectRef: request.projectRef,
       orgSlug: request.organizationSlug,
-      connectionString: projectDetail.connectionString,
+      connectionString,
     })
 
     const newChatId = aiAssistant.newChat({
@@ -89,7 +102,7 @@ export function SupportAssistantSuccessCardContent({
     setChatId(newChatId)
     // aiAssistantState is a stable context value (same identity across renders)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [aiAssistant, assistantPrompt, hasAssistantContext, projectDetail?.connectionString, request])
+  }, [aiAssistant, assistantPrompt, connectionString, hasAssistantContext, isProjectReady, request])
 
   const handleOpenAssistant = () => {
     track(
@@ -113,6 +126,7 @@ export function SupportAssistantSuccessCardContent({
           severity: request.severity,
           organizationSlug: request.organizationSlug,
           projectRef: request.projectRef,
+          connectionString,
           library: request.library,
           affectedServices: request.affectedServices,
           allowSupportAccess: request.allowSupportAccess,
@@ -176,6 +190,13 @@ export function SupportAssistantSuccessCardContent({
       </CardHeader>
       {chat ? (
         <SupportAssistantResponsePreview chat={chat as SupportAssistantPreviewChat} />
+      ) : isProjectDetailError ? (
+        <SupportAssistantResponseErrorState
+          onRetry={(event) => {
+            event.stopPropagation()
+            refetchProjectDetail()
+          }}
+        />
       ) : (
         <CardContent>
           <SupportAssistantResponseLoadingSkeleton />
@@ -257,5 +278,20 @@ function SupportAssistantResponseLoadingSkeleton() {
       <Skeleton className="h-4 w-[92%]" />
       <Skeleton className="h-4 w-[68%]" />
     </div>
+  )
+}
+
+function SupportAssistantResponseErrorState({
+  onRetry,
+}: {
+  onRetry: (event: MouseEvent<HTMLButtonElement>) => void
+}) {
+  return (
+    <CardContent className="flex items-center justify-between gap-4">
+      <span className="text-sm text-foreground-light">Couldn't load the assistant response.</span>
+      <Button variant="default" size="tiny" onClick={onRetry}>
+        Try again
+      </Button>
+    </CardContent>
   )
 }
