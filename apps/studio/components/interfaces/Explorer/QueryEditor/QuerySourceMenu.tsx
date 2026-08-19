@@ -9,8 +9,8 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
-import { RowLimitSubMenu } from '../SQLEditor/UtilityPanel/QuerySourceMenu/RowLimitSubMenu'
-import { RunAsSubMenu } from '../SQLEditor/UtilityPanel/QuerySourceMenu/RunAsSubMenu'
+import { RowLimitSubMenu } from '../../SQLEditor/UtilityPanel/QuerySourceMenu/RowLimitSubMenu'
+import { RunAsSubMenu } from '../../SQLEditor/UtilityPanel/QuerySourceMenu/RunAsSubMenu'
 import { DatabaseParametersSubMenu } from '@/components/interfaces/QuerySources/DatabaseParametersSubMenu'
 import { LogsCustomRangeDialog } from '@/components/interfaces/QuerySources/LogsCustomRangeDialog'
 import { LogsTimeRangeSubMenu } from '@/components/interfaces/QuerySources/LogsTimeRangeSubMenu'
@@ -25,7 +25,8 @@ import {
 } from '@/data/query-sources/query-source-registry'
 import { type RoleImpersonationController } from '@/state/role-impersonation-state'
 
-export type ExplorerQuerySourceMenuProps = {
+export type QuerySourceMenuProps = {
+  disabled?: boolean
   rowLimit?: number
   onRowLimitChange?: (val: number) => void
   roleImpersonationState?: RoleImpersonationController
@@ -42,13 +43,14 @@ export type ExplorerQuerySourceMenuProps = {
  * what happens to the query body is the consumer's call, since a notebook cell
  * has SQL to preserve or discard and a fresh draft does not.
  */
-export const ExplorerQuerySourceMenu = ({
+export const QuerySourceMenu = ({
+  disabled = false,
   rowLimit = 100,
   onRowLimitChange,
   roleImpersonationState,
   source,
   onSourceChange,
-}: ExplorerQuerySourceMenuProps) => {
+}: QuerySourceMenuProps) => {
   const { ref } = useParams()
   const isLogsSourceEnabled = useFlag('sqlEditorLogsSource')
   const isOtelLogsEnabled = useFlag('otelLegacyLogs')
@@ -74,6 +76,7 @@ export const ExplorerQuerySourceMenu = ({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
+            disabled={disabled}
             variant="text"
             size="tiny"
             aria-label={`Query source: ${QUERY_SOURCE_LABELS[source._tag]}`}

@@ -1,29 +1,31 @@
 import { acceptUntrustedSql, untrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { useFlag } from 'common'
 import { CodeSquare, Eye, EyeOff, Play } from 'lucide-react'
-import { useState, type ReactNode } from 'react'
-import { cn } from 'ui'
+import { forwardRef, useImperativeHandle, useState, type ReactNode } from 'react'
+import { Button, cn } from 'ui'
 
-import { resolveLogTimeRange } from '../QuerySources/LogTimeRange.utils'
+import { resolveLogTimeRange } from '../../QuerySources/LogTimeRange.utils'
 import {
   ExplorerQuery,
   ExplorerQueryEditor,
   ExplorerQueryFooter,
   ExplorerQueryResults,
   ExplorerQueryViewport,
-} from './ExplorerQuery'
-import { ExplorerQuerySourceMenu } from './ExplorerQuerySourceMenu'
+} from '../ExplorerQuery'
 import {
   ExplorerToolbar,
   ExplorerToolbarAction,
   ExplorerToolbarActions,
   ExplorerToolbarIcon,
   ExplorerToolbarTitle,
-} from './ExplorerToolbar'
-import { DisplaySettingsButton } from './QueryCell/DisplaySettingsButton'
+} from '../ExplorerToolbar'
+import { type QueryDisplay, type QueryResult } from '../types'
+import { DisplaySettingsButton } from './DisplaySettingsButton'
 import { QueryResultRenderer } from './QueryResultRenderer'
-import { type QueryDisplay, type QueryResult } from './types'
+import { QuerySourceMenu } from './QuerySourceMenu'
+import { LegacyLogsRewriteBanner } from '@/components/interfaces/Settings/Logs/LegacyLogsRewriteBanner'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+import { DiffEditor } from '@/components/ui/DiffEditor'
 import {
   type DatabaseSourceParameters,
   type LogsSourceParameters,
@@ -43,6 +45,7 @@ import {
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { applyAutoLimit } from '@/data/sql/utils'
+import { type LegacyLogsRewriteProposal } from '@/hooks/analytics/useLegacyLogsRewrite'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
@@ -86,28 +89,35 @@ export type QueryEditorProps = {
   onDisplayChange?: (display: QueryDisplay) => void
 }
 
+export type QueryEditorHandle = {
+  run: () => Promise<void>
+}
+
 /**
  * Shared query editor used by query tabs, notebook cells, and other Explorer surfaces.
  * The consuming surface owns persistence and surrounding chrome; this component owns
  * query-level UI and execution behavior.
  */
-export const QueryEditor = ({
-  id,
-  variant,
-  title,
-  query,
-  result,
-  roleImpersonationState,
-  display,
-  toolbarActions,
-  onTitleChange,
-  onSqlChange,
-  onSqlCommit,
-  onSourceChange,
-  onResultChange,
-  onRowLimitChange,
-  onDisplayChange,
-}: QueryEditorProps) => {
+export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(function QueryEditor(
+  {
+    id,
+    variant,
+    title,
+    query,
+    result,
+    roleImpersonationState,
+    display,
+    toolbarActions,
+    onTitleChange,
+    onSqlChange,
+    onSqlCommit,
+    onSourceChange,
+    onResultChange,
+    onRowLimitChange,
+    onDisplayChange,
+  }: QueryEditorProps,
+  ref
+) {
   const sql = query.uncheckedSql
   const sqlRef = useLatest<string>(sql)
   const onSqlCommitRef = useLatest(onSqlCommit)
@@ -121,6 +131,7 @@ export const QueryEditor = ({
   const databaseIdentifier = query._tag === 'database' ? query.database_identifier : undefined
 
   const [showQuery, setShowQuery] = useState(true)
+  const [rewriteProposal, setRewriteProposal] = useState<LegacyLogsRewriteProposal | null>(null)
 
   const { data: databases, isPending: isLoadingDatabases } = useReadReplicasQuery(
     { projectRef: project?.ref },
@@ -132,12 +143,12 @@ export const QueryEditor = ({
     }
   )
 
-  const { mutate: executeSql, isPending: isExecutingSql } = useExecuteSqlMutation({
+  const { mutateAsync: executeSql, isPending: isExecutingSql } = useExecuteSqlMutation({
     onSuccess: (data) => onResultChange({ rows: data.result }),
     onError: (error) => onResultChange({ error }),
   })
 
-  const { mutate: executeLogsSql, isPending: isExecutingLogs } = useExecuteLogsSqlMutation({
+  const { mutateAsync: executeLogsSql, isPending: isExecutingLogs } = useExecuteLogsSqlMutation({
     onSuccess: (data) => onResultChange({ rows: data.rows as readonly Record<string, unknown>[] }),
     onError: (error) => onResultChange({ error }),
   })
@@ -154,8 +165,8 @@ export const QueryEditor = ({
    * decided by `query._tag`, the same discriminant that picks the execution endpoint, so
    * Postgres SQL cannot reach the analytics wire or vice versa.
    */
-  const handleRunQuery = (rawSql: string = sql) => {
-    if (!project || isBusy || rawSql.trim().length === 0) return
+  const handleRunQuery = async (rawSql: string = sql) => {
+    if (!project || isBusy || rewriteProposal || rawSql.trim().length === 0) return
 
     onSqlCommit?.(rawSql)
 
@@ -167,12 +178,12 @@ export const QueryEditor = ({
         return
       }
 
-      executeLogsSql({
+      await executeLogsSql({
         projectRef: project.ref,
         sql: acceptUntrustedLogsSql(untrustedLogSql(rawSql)),
         range: resolveLogTimeRange(query.time_range),
         endpoint: QUERY_SOURCE_REGISTRY.logs.endpoint,
-      })
+      }).catch(() => {})
       return
     }
 
@@ -189,7 +200,7 @@ export const QueryEditor = ({
       return
     }
 
-    executeSql({
+    await executeSql({
       projectRef: project.ref,
       connectionString,
       sql: wrapWithRoleImpersonation(limitedSql.sql, roleImpersonationState),
@@ -197,8 +208,21 @@ export const QueryEditor = ({
       contextualInvalidation: true,
       isStatementTimeoutDisabled: true,
       isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
-    })
+    }).catch(() => {})
   }
+
+  const acceptRewrite = () => {
+    if (!rewriteProposal) return
+    if (sql === rewriteProposal.original) {
+      onSqlChange(rewriteProposal.modified)
+      onSqlCommit?.(rewriteProposal.modified)
+    }
+    setRewriteProposal(null)
+  }
+
+  const discardRewrite = () => setRewriteProposal(null)
+
+  useImperativeHandle(ref, () => ({ run: () => handleRunQuery() }))
 
   const Shell = variant === 'viewport' ? ExplorerQueryViewport : ExplorerQuery
 
@@ -212,9 +236,13 @@ export const QueryEditor = ({
         <ExplorerToolbarActions>
           {toolbarActions}
           {onSourceChange && (
-            <ExplorerQuerySourceMenu
+            <QuerySourceMenu
+              disabled={rewriteProposal !== null}
               source={toQuerySourceBinding(query)}
-              onSourceChange={onSourceChange}
+              onSourceChange={(source) => {
+                setRewriteProposal(null)
+                onSourceChange(source)
+              }}
               rowLimit={rowLimit}
               onRowLimitChange={onRowLimitChange}
               roleImpersonationState={roleImpersonationState}
@@ -231,6 +259,7 @@ export const QueryEditor = ({
           )}
           <ExplorerToolbarAction
             icon={showQuery ? <EyeOff /> : <Eye />}
+            disabled={rewriteProposal !== null}
             tooltip={showQuery ? 'Hide query' : 'Show query'}
             onClick={() => setShowQuery((value) => !value)}
           />
@@ -238,7 +267,9 @@ export const QueryEditor = ({
             loading={isExecuting || isLoadingProject}
             icon={<Play />}
             tooltip="Run query"
-            disabled={isLoadingProject || isExecuting || sql.trim().length === 0}
+            disabled={
+              isLoadingProject || isExecuting || rewriteProposal !== null || sql.trim().length === 0
+            }
             onClick={() => handleRunQuery()}
           >
             Run
@@ -247,24 +278,57 @@ export const QueryEditor = ({
       </ExplorerToolbar>
 
       {showQuery && (
-        <ExplorerQueryEditor
-          className={cn('relative', variant === 'viewport' ? 'h-[45%] min-h-48' : undefined)}
-        >
-          <CodeEditor
-            id={`explorer-query-${id}`}
-            language="pgsql"
-            value={sql}
-            placeholder="select * from your_table limit 100;"
-            placeholderClassName="top-[13px]"
-            className={variant === 'embedded' ? 'h-32' : undefined}
-            actions={{ runQuery: { enabled: true, callback: handleRunQuery } }}
-            options={{ minimap: { enabled: false }, padding: { top: 8 } }}
-            onInputChange={(value) => onSqlChange(value ?? '')}
-            onMount={(editor) => {
-              editor.onDidBlurEditorWidget(() => onSqlCommitRef.current?.(sqlRef.current))
-            }}
+        <>
+          <LegacyLogsRewriteBanner
+            isLogsSource={query._tag === 'logs'}
+            sql={sql}
+            readSql={() => sqlRef.current}
+            onProposal={setRewriteProposal}
+            hidden={rewriteProposal !== null}
           />
-        </ExplorerQueryEditor>
+          <ExplorerQueryEditor
+            className={cn('relative', variant === 'viewport' ? 'h-[45%] min-h-48' : undefined)}
+          >
+            <CodeEditor
+              id={`explorer-query-${id}`}
+              language="pgsql"
+              value={sql}
+              placeholder="select * from your_table limit 100;"
+              placeholderClassName="top-[13px]"
+              className={variant === 'embedded' ? 'h-44' : undefined}
+              actions={{ runQuery: { enabled: true, callback: handleRunQuery } }}
+              options={{ minimap: { enabled: false }, padding: { top: 8 } }}
+              onInputChange={(value) => onSqlChange(value ?? '')}
+              onMount={(editor) => {
+                editor.onDidBlurEditorWidget(() => onSqlCommitRef.current?.(sqlRef.current))
+              }}
+            />
+            {rewriteProposal && (
+              <div className="absolute inset-0 z-10 flex flex-col bg-studio">
+                <div className="flex items-center justify-between gap-2 border-b bg-surface-100 px-3 py-2">
+                  <span className="text-xs text-foreground-light">
+                    Review the ClickHouse SQL rewrite before accepting it
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <Button variant="default" size="tiny" onClick={discardRewrite}>
+                      Discard
+                    </Button>
+                    <Button variant="primary" size="tiny" onClick={acceptRewrite}>
+                      Accept
+                    </Button>
+                  </div>
+                </div>
+                <div className="min-h-0 flex-1">
+                  <DiffEditor
+                    language="pgsql"
+                    original={rewriteProposal.original}
+                    modified={rewriteProposal.modified}
+                  />
+                </div>
+              </div>
+            )}
+          </ExplorerQueryEditor>
+        </>
       )}
 
       <ExplorerQueryResults
@@ -286,4 +350,4 @@ export const QueryEditor = ({
       </ExplorerQueryFooter>
     </Shell>
   )
-}
+})

@@ -6,7 +6,7 @@ import { ActionCard } from '@/components/layouts/Tabs/ActionCard'
 import { AssistantChatForm } from '@/components/ui/AIAssistantPanel/AssistantChatForm'
 import type { AssistantModel } from '@/state/ai-assistant-state'
 
-export const ExplorerHome = () => {
+export const ExplorerHomeTab = () => {
   const { createNotebook } = useCreateNotebook()
   const { createQuery } = useCreateQuery()
   const { createChat } = useCreateChat()

@@ -1,6 +1,6 @@
 import pgMeta from '@supabase/pg-meta'
 import type { JwtPayload } from '@supabase/supabase-js'
-import { safeValidateUIMessages } from 'ai'
+import { pipeUIMessageStreamToResponse, safeValidateUIMessages, toUIMessageStream } from 'ai'
 import { IS_PLATFORM } from 'common'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
@@ -244,9 +244,9 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       },
     })
 
-    result.pipeUIMessageStreamToResponse(res, {
+    const stream = toUIMessageStream({
+      stream: result.stream,
       sendReasoning: true,
-      headers: { 'Content-Encoding': 'none' },
       onError: (error) => {
         console.error('Assistant stream error:', error)
 
@@ -264,6 +264,12 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
         return JSON.stringify(error)
       },
+    })
+
+    pipeUIMessageStreamToResponse({
+      response: res,
+      stream,
+      headers: { 'Content-Encoding': 'none' },
     })
   } catch (error) {
     console.error('Error in handlePost:', error)

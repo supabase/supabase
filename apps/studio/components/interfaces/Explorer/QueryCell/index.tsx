@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { forwardRef, useState } from 'react'
 import { type Snapshot } from 'valtio'
 
 import { AddCellDropdown } from '../AddCellDropdown'
 import { MoveCellDropdownContent } from '../MoveCellDropdownContent'
-import { QueryEditor } from '../QueryEditor'
+import { QueryEditor, type QueryEditorHandle } from '../QueryEditor'
 import { type QueryDisplay, type QueryResult } from '../types'
 import {
   changeCellSource,
@@ -28,7 +28,10 @@ interface QueryCellProps {
 }
 
 /** Notebook adapter around the shared QueryEditor. */
-export const QueryCell = ({ cell }: QueryCellProps) => {
+export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function QueryCell(
+  { cell },
+  ref
+) {
   const snap = useNotebooksStateSnapshot()
   const currentNotebook = useCurrentNotebook()
 
@@ -92,6 +95,7 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
       gripClassName="mt-2 opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition"
     >
       <QueryEditor
+        ref={ref}
         id={cell.id}
         variant="embedded"
         title={title}
@@ -109,4 +113,4 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
       />
     </SortableSection>
   )
-}
+})
