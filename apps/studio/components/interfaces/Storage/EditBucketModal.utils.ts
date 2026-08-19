@@ -55,3 +55,13 @@ export const isSuspendingVersioning = (
   currentState: BucketVersioningState,
   isVersioningEnabled: boolean
 ) => currentState === 'enabled' && !isVersioningEnabled
+
+/**
+ * True when saving would turn versioning on for a bucket that has never had it.
+ * Re-enabling a suspended bucket doesn't count — the user already opted in once,
+ * and its retained versions never went away.
+ */
+export const isEnablingVersioning = (
+  currentState: BucketVersioningState,
+  isVersioningEnabled: boolean
+) => currentState === 'disabled' && isVersioningEnabled
