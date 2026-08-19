@@ -1,4 +1,4 @@
-import { untrustedSql } from '@supabase/pg-meta'
+import { safeSql, untrustedSql } from '@supabase/pg-meta'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -11,7 +11,7 @@ import {
   toWireWritableNotebook,
   writableNotebookSchema,
 } from './notebook-schema'
-import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
+import { safeSql as safeLogSql, untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 
 const FULL_NOTEBOOK = {
   schema_version: 1 as const,
@@ -410,5 +410,34 @@ describe('toWireWritableNotebook', () => {
     })
 
     expect(wire.cells[0]).not.toHaveProperty('_id')
+  })
+
+  it('carries a query cell (database_cell, log_cell) sql through as plain text, never unchecked_sql', () => {
+    const wire = toWireWritableNotebook({
+      schema_version: 1,
+      cells: [
+        {
+          _tag: 'database_cell',
+          _id: 'b1ffcd88-8d1a-4de7-aa5c-5aa8ac270b22',
+          sql: safeSql`select 1`,
+          row_limit: 100,
+        },
+        {
+          _tag: 'log_cell',
+          sql: safeLogSql`select 1`,
+          time_range: { _tag: 'relative_time_range', unit: 'hour', amount: 1 },
+        },
+      ],
+    })
+
+    const [databaseCell, logCell] = wire.cells
+    expect(databaseCell).toMatchObject({
+      _id: 'b1ffcd88-8d1a-4de7-aa5c-5aa8ac270b22',
+      sql: 'select 1',
+    })
+    expect(databaseCell).not.toHaveProperty('unchecked_sql')
+    expect(logCell).toMatchObject({ sql: 'select 1' })
+    expect(logCell).not.toHaveProperty('_id')
+    expect(logCell).not.toHaveProperty('unchecked_sql')
   })
 })
