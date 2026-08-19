@@ -2,14 +2,8 @@ import { motion } from 'framer-motion'
 import type { ReactNode } from 'react'
 
 /**
- * Enter/exit for a form section that appears in response to a toggle further up
- * the form. Animates height and opacity so pushed siblings slide rather than
- * snap. Wrap the parent in `<AnimatePresence initial={false}>` so a section
- * already open on mount doesn't animate in on first paint, and give each child
- * a stable `key`.
- *
- * `overflow` is hidden only while the height is animating — otherwise focus
- * rings on nested inputs get clipped by the wrapper.
+ * Provides enter/exit animation for a form section that appears in response to a toggle in the form.
+ * Wrap the parent in `<AnimatePresence initial={false}>` to avoid animation on first paint.
  */
 export const FormSectionCollapse = ({ children }: { children: ReactNode }) => (
   <motion.div

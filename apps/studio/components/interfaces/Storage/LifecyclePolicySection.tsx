@@ -17,7 +17,6 @@ import { ExpirationModeToggle } from './ExpirationModeToggle'
 import type { ExpirationMode } from './StorageVersioning.constants'
 import { FormSectionCollapse } from '@/components/ui/FormSectionCollapse'
 
-/** Digits only, so a partially typed value never lands in form state as `NaN`. */
 const toFieldValue = (rawInput: string): '' | number => {
   const digits = rawInput.replace(/[^0-9]/g, '')
   return digits === '' ? '' : Number(digits)
@@ -25,9 +24,7 @@ const toFieldValue = (rawInput: string): '' | number => {
 
 interface LifecyclePolicySectionProps {
   control: Control<BucketVersioningFormValues>
-  /** The age condition is part of the policy. */
   hasDays: boolean
-  /** The count condition is part of the policy. */
   hasVersions: boolean
   mode: ExpirationMode
   onModeChange: (mode: ExpirationMode) => void
@@ -103,8 +100,6 @@ export const LifecyclePolicySection = ({
             label="Retained noncurrent versions"
             description={hasDays ? undefined : 'Requires an expiration age to be set.'}
             layout="flex-row-reverse"
-            // Dim label and description too, so the dependency reads at a glance
-            // rather than a disabled input sitting under a full-strength label.
             className={hasDays ? undefined : 'opacity-60'}
           >
             <FormControl>
