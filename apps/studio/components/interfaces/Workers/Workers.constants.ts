@@ -18,6 +18,11 @@ export const workerUrl = ({
 
 export const LISTENING_PORT = 8080
 
+export const WORKER_SIZES = ['2gb-1vcpu', '4gb-2vcpu'] as const
+
+export const WORKER_MIN_INSTANCES = 1
+export const WORKER_MAX_INSTANCES = 10
+
 export interface RuntimeMeta {
   label: string
   baseImage: string
