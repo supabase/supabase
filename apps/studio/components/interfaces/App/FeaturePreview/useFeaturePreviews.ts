@@ -36,7 +36,6 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
   const isDatabaseConnectionsEnabled = useFlag('topForPostgres')
 
-  const unifiedLogsDefaultOptIn = useFlag('unifiedLogsDefaultOptIn')
   const isSqlEditorManualSaveForced = useFlag('sqlEditorManualSaveForced')
 
   return useMemo(() => {
@@ -49,7 +48,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
         enabled: true,
         isNew: true,
         isPlatformOnly: true,
-        isDefaultOptIn: unifiedLogsDefaultOptIn,
+        isDefaultOptIn: true,
         getRoute: (ref?: string) => `/project/${ref}/logs`,
       },
       {
@@ -142,7 +141,6 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
 
     return previews.sort((a, b) => Number(b.isNew) - Number(a.isNew))
   }, [
-    unifiedLogsDefaultOptIn,
     isSqlEditorManualSaveForced,
     isPlatformWebhooksEnabled,
     jitDbAccessEnabled,
