@@ -300,9 +300,9 @@ Schema change support depends on the destination. BigQuery is the only managed d
 
 Pipelines can add, remove, or rename supported columns, drop `NOT NULL`, update supported defaults, and change the published column list for a table already in the pipeline.
 
-New scalar columns are nullable, and Pipelines doesn't fill their values in existing BigQuery rows. Data type changes aren't applied to BigQuery and require a table resynchronization.
+New scalar columns are nullable, and Pipelines doesn't fill their values in existing BigQuery rows. Data type changes aren't applied to BigQuery and require a table resynchronization; Supabase is exploring how to support data type changes without a full resync, but this isn't implemented yet.
 
-See [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support) for supported changes and limitations.
+When Pipelines detects a schema change it can't apply safely, it stops replicating the affected table instead of risking an inconsistent copy, and requires you to resynchronize that table. Other tables in the pipeline keep replicating. See [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support) for supported changes and limitations.
 
 ### How it works
 
@@ -336,6 +336,7 @@ Pipelines has the following limitations:
 - **Schema changes**: In beta and limited to BigQuery. Data type changes and interrupted schema changes require a table resynchronization.
 - **No user-defined transformations**: Pipelines performs destination-compatible type and name mapping, but doesn't run custom transformations
 - **At-least-once processing**: Failed destination write attempts that Pipelines retries are not counted. In rare cases, Pipelines can count an acknowledged batch but crash or be interrupted before its replication checkpoint is persisted. Recovery can then process and count that batch again. BigQuery uses primary-key-based CDC to converge on the current table state. See [Can data be processed more than once?](/docs/guides/database/replication/pipelines-faq#can-data-be-processed-more-than-once) for details.
+- **Automatic stop on repeated failure**: Transient errors retry automatically for a limited time. If a pipeline keeps failing and restarting despite those retries, Supabase automatically stops it to avoid consuming resources indefinitely, and you must fix the underlying issue and restart it manually. See [Why was the pipeline stopped?](/docs/guides/database/replication/pipelines-faq#why-was-the-pipeline-stopped).
 
 Destination-specific limitations, such as BigQuery's row size limits, are documented in each destination guide.
 
