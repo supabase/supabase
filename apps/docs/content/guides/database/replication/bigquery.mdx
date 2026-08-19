@@ -150,30 +150,43 @@ alter table public.your_table replica identity full;
 
 ## Schema change support
 
-Schema change support for BigQuery is currently in beta. Pipelines supports a limited set of schema changes for BigQuery while the feature is developed further.
+Schema change support for BigQuery is in beta. Pipelines detects supported changes in Postgres and updates the BigQuery table before replicating rows that use the new schema.
 
-Supported schema changes:
+### Supported changes
 
-- Adding a scalar, top-level column (created as `NULLABLE` in BigQuery)
-- Removing a column
-- Renaming a column
-- Dropping a `NOT NULL` constraint
-- Setting or dropping supported column default metadata
+| Postgres change                   | BigQuery behavior                                                             |
+| --------------------------------- | ----------------------------------------------------------------------------- |
+| Add a scalar column               | Adds the column as `NULLABLE`.                                                |
+| Remove or rename a column         | Applies the change unless the column is part of the destination primary key.  |
+| Drop `NOT NULL`                   | Changes a `REQUIRED` column to `NULLABLE`.                                    |
+| Add, replace, or remove a default | Applies supported literal defaults for future writes.                         |
+| Change the published column list  | Adds or removes columns for a table that the running pipeline already tracks. |
 
-Unsupported or limited schema changes:
+When a scalar column is added, Pipelines doesn't fill its value in existing BigQuery rows. Those rows remain `NULL`. New changes from Postgres contain the column's value and replicate normally.
 
-- Changing a column's data type
-- Adding `NOT NULL` with `SET NOT NULL`
-- Filling existing rows for `ADD COLUMN ... DEFAULT`
-- Unsupported default expressions
+The same rule applies when you add an existing scalar column to a publication's column list. Pipelines doesn't have the values that were hidden before the change, so existing BigQuery rows remain `NULL`.
 
-When the initial sync creates a BigQuery table, Pipelines preserves whether each scalar, non-array source column allows `NULL`: Postgres `NOT NULL` columns become `REQUIRED`, and nullable columns become `NULLABLE`. BigQuery represents Postgres arrays as `REPEATED` fields instead of using `REQUIRED` or `NULLABLE` mode.
+Removing a column from the publication also removes the BigQuery column and its stored values. Adding it again doesn't restore those values.
 
-After the table exists, BigQuery requires every newly added scalar, top-level column to be `NULLABLE`. If Postgres adds a `NOT NULL` column, Pipelines adds it as `NULLABLE` in BigQuery and logs a warning. Postgres remains the source of truth and rejects new `NULL` values before they reach the destination.
+### Changes that require extra action
 
-For Postgres `DROP NOT NULL`, Pipelines relaxes an existing BigQuery column from `REQUIRED` to `NULLABLE`. For Postgres `SET NOT NULL`, BigQuery cannot change an existing `NULLABLE` column to `REQUIRED`, so Pipelines leaves the destination column nullable and logs a warning.
+- **Data type changes:** Pipelines detects the change but doesn't update the BigQuery data type. Resynchronize the table after changing a replicated column's data type.
+- **Adding `NOT NULL`:** BigQuery keeps the existing column nullable. Postgres still prevents new `NULL` values.
+- **Primary-key changes:** Changing primary-key columns, names, or order isn't supported.
+- **Publishing an existing array column:** BigQuery can't preserve the unknown historical values. Resynchronize the table to include the array.
+- **Interrupted schema changes:** Pipelines stops instead of guessing which changes completed. Resynchronize the affected table.
 
-Column defaults are handled independently from whether the column allows `NULL`. BigQuery does not support `ADD COLUMN ... DEFAULT` on an existing table, so Pipelines first adds the nullable column and then applies supported default metadata with a separate statement. This is destination metadata for future BigQuery writes that omit the column; pipeline writes already contain the value evaluated by Postgres, and the metadata doesn't populate existing destination rows. Unsupported defaults, including defaults on destination primary-key columns, are skipped with a warning instead of failing replication.
+A resynchronization repeats the initial sync and processes billable data again.
+
+### Column defaults
+
+Pipelines supports literal defaults such as strings, numbers, dates, timestamps, JSON values, and UUIDs. It skips defaults that depend on when or where they run, including `now()`, sequences, `random()`, and generated UUID functions.
+
+Skipping a BigQuery default doesn't lose values from Postgres. Postgres evaluates the default, and Pipelines replicates the resulting value with future row changes. Defaults don't fill existing BigQuery rows.
+
+### Publication changes
+
+Changing the column list for a table already in the pipeline is supported while the pipeline is running. For other publication changes, including adding or removing tables, changing row filters, or changing `publish_via_partition_root`, stop and restart the pipeline. Some changes may also require a table resynchronization or a new pipeline. See [Adding or removing tables](/docs/guides/database/replication/pipelines#adding-or-removing-tables).
 
 ## Limitations
 
@@ -185,7 +198,7 @@ Column defaults are handled independently from whether the column allows `NULL`.
 - **Arrays and numeric values**: Arrays can't contain `NULL` elements. Numeric values with more than 38 fractional digits and exact JSON integer values outside BigQuery's supported range can't be replicated.
 - **BigQuery CDC tables**: While CDC is active, BigQuery doesn't support mutating DML (`UPDATE`, `DELETE`, or `MERGE`), wildcard table queries, or search indexes on the destination table. See [BigQuery CDC limitations](https://cloud.google.com/bigquery/docs/change-data-capture#limitations) for the complete list.
 - **Managed destination objects**: Don't delete or modify tables or views created by Pipelines. Doing so can stop replication and may require a new, billable initial sync.
-- **Schema changes**: Limited to the supported schema changes listed above
+- **Schema changes**: Limited to the changes listed in [Schema change support](#schema-change-support). Data type changes and interrupted schema changes require a table resynchronization.
 
 ## Additional resources
 

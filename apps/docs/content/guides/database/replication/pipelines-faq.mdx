@@ -50,17 +50,13 @@ The replication state tables are not updated very often, especially after the in
 
 ## What schema changes are supported?
 
-Schema change support is currently in beta and limited to the BigQuery destination.
+Schema change support is in beta and limited to the BigQuery destination.
 
-Supported schema changes:
+Pipelines supports adding, removing, and renaming non-primary-key columns; dropping `NOT NULL`; updating supported defaults; and changing the published column list for a table already in the pipeline.
 
-- Adding a scalar, top-level column (created as `NULLABLE` in BigQuery)
-- Removing a column
-- Renaming a column
-- Dropping a `NOT NULL` constraint
-- Setting or dropping supported column default metadata
+New scalar columns are nullable. Existing BigQuery rows remain `NULL`, and future changes contain the value from Postgres. Removing a published column also removes its stored BigQuery values.
 
-Initial BigQuery table creation preserves whether each scalar, non-array Postgres column allows `NULL`. Arrays use BigQuery's `REPEATED` mode. For later changes, `DROP NOT NULL` relaxes a BigQuery `REQUIRED` column to `NULLABLE`, while `SET NOT NULL` leaves an existing BigQuery column nullable and logs a warning. Newly added scalar, top-level columns are always nullable in BigQuery. Supported defaults are applied separately as destination metadata and do not populate existing destination rows. Pipelines does not currently support changing column data types. See [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support) for details.
+Data type changes aren't applied to BigQuery and require a table resynchronization. See [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support) for the full behavior and limitations.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
