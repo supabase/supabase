@@ -34,34 +34,27 @@ interface PolicyRuleProps {
 
 /** The policy spelled out in plain language, for the hover card. */
 const PolicyFullRule = ({ cap, expiryDays, mode }: PolicyRuleProps) => {
+  // A cap always arrives with an age, so there are only three shapes to describe:
+  // age alone, or age combined with the cap under either operator.
   const hasCap = cap !== null && cap > 0
-  const hasExpiryDays = expiryDays !== null && expiryDays > 0
 
-  if (hasCap && hasExpiryDays) {
-    if (mode === 'and') {
-      return (
-        <>
-          A noncurrent version is permanently deleted only once it is <em>both</em> older than{' '}
-          {expiryDays} days and beyond the {cap} newest noncurrent versions.
-        </>
-      )
-    }
+  if (!hasCap) {
+    return <>A noncurrent version is permanently deleted once it is older than {expiryDays} days.</>
+  }
+
+  if (mode === 'and') {
     return (
       <>
-        A noncurrent version is permanently deleted as soon as it is <em>either</em> older than{' '}
-        {expiryDays} days <em>or</em> beyond the {cap} newest noncurrent versions.
+        A noncurrent version is permanently deleted only once it is <em>both</em> older than{' '}
+        {expiryDays} days and beyond the {cap} newest noncurrent versions.
       </>
     )
   }
 
-  if (hasExpiryDays) {
-    return <>A noncurrent version is permanently deleted once it is older than {expiryDays} days.</>
-  }
-
   return (
     <>
-      Only the {cap} newest noncurrent versions are retained. Older ones are deleted on the next
-      upload.
+      A noncurrent version is permanently deleted as soon as it is <em>either</em> older than{' '}
+      {expiryDays} days <em>or</em> beyond the {cap} newest noncurrent versions.
     </>
   )
 }
@@ -91,6 +84,7 @@ export const VersionHistoryPolicyRow = ({
       <HoverCardTrigger asChild>
         <button
           type="button"
+          tabIndex={0}
           onClick={onEditBucket}
           className="flex items-center gap-x-2 text-left"
           aria-label="Lifecycle policy details"
@@ -105,9 +99,6 @@ export const VersionHistoryPolicyRow = ({
             <span className="font-mono text-[11px] text-foreground-lighter">
               — no retention cap
             </span>
-          )}
-          {hasCap && !hasExpiryDays && (
-            <span className="font-mono text-[11px] text-foreground-lighter">— no age limit</span>
           )}
           <Info size={13} className="text-foreground-lighter" />
         </button>
