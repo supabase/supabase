@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Form, FormControl, FormField } from '@ui/components/shadcn/ui/form'
 import { useParams } from 'common'
-import { useEffect } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
@@ -29,7 +28,6 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizations/organization-customer-profile-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 const FORM_ID = 'org-billing-email'
 const formSchema = z.object({
@@ -39,9 +37,6 @@ const formSchema = z.object({
 
 const BillingEmail = () => {
   const { slug } = useParams()
-  const { data: selectedOrganization } = useSelectedOrganizationQuery()
-
-  const { name } = selectedOrganization ?? {}
 
   const { can: canReadBillingEmail, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
@@ -64,12 +59,19 @@ const BillingEmail = () => {
       }
     )
 
+  const formValues = {
+    billingEmail: customerProfile?.email ?? '',
+    additionalBillingEmails: customerProfile?.additional_emails ?? [],
+  }
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      billingEmail: customerProfile?.email ?? '',
-      additionalBillingEmails: customerProfile?.additional_emails ?? [],
+      billingEmail: '',
+      additionalBillingEmails: [],
     },
+    values: formValues,
+    resetOptions: { keepDirtyValues: true },
   })
   const additionalBillingEmails = useWatch({
     control: form.control,
@@ -86,7 +88,6 @@ const BillingEmail = () => {
       return toast.error('You do not have the required permissions to update this organization')
     }
     if (!slug) return console.error('Slug is required')
-    if (!name) return console.error('Organization name is required')
 
     updateCustomerProfile(
       {
@@ -102,15 +103,6 @@ const BillingEmail = () => {
       }
     )
   }
-
-  useEffect(() => {
-    if (customerProfile) {
-      form.reset({
-        billingEmail: customerProfile.email ?? '',
-        additionalBillingEmails: customerProfile.additional_emails ?? [],
-      })
-    }
-  }, [customerProfile])
 
   return (
     <ScaffoldSection ref={ref}>
