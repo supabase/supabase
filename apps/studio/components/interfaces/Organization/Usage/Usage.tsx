@@ -59,7 +59,7 @@ export const Usage = () => {
 
   const { data: branches } = useBranchesQuery({ projectRef: selectedProjectRef ?? undefined })
   const branchOptions = useMemo(() => getUsageBranchOptions(branches), [branches])
-  const usageProjectRef = selectedBranchRef ?? selectedProjectRef
+  const usageProjectRef = selectedProjectRef ? (selectedBranchRef ?? selectedProjectRef) : null
   const selectedBranch = branchOptions.find((branch) => branch.project_ref === selectedBranchRef)
 
   const { data: selectedProject, isPending: isLoadingSelectedProject } = useProjectDetailQuery({
