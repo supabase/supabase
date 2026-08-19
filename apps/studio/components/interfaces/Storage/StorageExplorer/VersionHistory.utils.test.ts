@@ -2,10 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import { computeVersionFate } from './VersionHistory.utils'
 
-// Each case below mirrors a worked example from the design handoff's
-// operator-notation reference matrix (one noncurrent version list per policy
-// shape), oldest version at chronoIndex 0.
-
 describe('computeVersionFate', () => {
   it('returns kept when no policy is configured', () => {
     expect(
