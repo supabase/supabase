@@ -236,7 +236,7 @@ export const gettingStartedWebAppDemos: ContentListingGroup = {
     },
     {
       title: 'Nuxt 3',
-      href: '/guides/getting-started/tutorials/with-nuxt-3',
+      href: '/guides/getting-started/tutorials/with-nuxt',
       icon: '/docs/img/icons/nuxt-icon',
       hasLightIcon: false,
       description:
