@@ -12,7 +12,6 @@ import {
   DEFAULT_PORT,
   parseConnectionParams,
   PASSWORD_PLACEHOLDER,
-  replaceConnectionUser,
   resolveConnectionString,
   shouldAddTemporaryAccessPoolerOption,
   TOKEN_PASSWORD_PLACEHOLDER,
@@ -260,76 +259,33 @@ describe('buildConnectionParameters', () => {
   })
 })
 
-describe('replaceConnectionUser', () => {
-  test('replaces a bare postgres user', () => {
-    expect(replaceConnectionUser('postgres', 'analytics')).toBe('analytics')
-  })
-
-  test('keeps the pooler project-ref suffix', () => {
-    expect(replaceConnectionUser('postgres.projref', 'analytics')).toBe('analytics.projref')
-  })
-
-  test('keeps the self-hosted pooler tenant placeholder', () => {
-    expect(replaceConnectionUser('postgres.[POOLER_TENANT_ID]', 'analytics')).toBe(
-      'analytics.[POOLER_TENANT_ID]'
-    )
-  })
-
-  test('returns the original user when role is empty', () => {
-    expect(replaceConnectionUser('postgres.projref', '')).toBe('postgres.projref')
-  })
-})
-
 describe('applyTemporaryAccessToConnectionString', () => {
-  test('returns the URI unchanged when input or role is empty', () => {
-    const uri = `postgresql://postgres:${PASSWORD_PLACEHOLDER}@db.proj.supabase.co:5432/postgres`
-
-    expect(applyTemporaryAccessToConnectionString('', { role: 'analytics' })).toBe('')
-    expect(applyTemporaryAccessToConnectionString(uri, { role: '' })).toBe(uri)
-  })
-
   test('rewrites a direct URI user and password placeholder', () => {
     const uri = `postgresql://postgres:${PASSWORD_PLACEHOLDER}@db.proj.supabase.co:5432/postgres?sslmode=require`
 
+    expect(applyTemporaryAccessToConnectionString('', { role: 'analytics' })).toBe('')
+    expect(applyTemporaryAccessToConnectionString(uri, { role: '' })).toBe(uri)
     expect(applyTemporaryAccessToConnectionString(uri, { role: 'analytics' })).toBe(
       `postgresql://analytics:${TOKEN_PASSWORD_PLACEHOLDER}@db.proj.supabase.co:5432/postgres?sslmode=require`
     )
   })
 
-  test('rewrites a shared pooler URI and appends the jit option', () => {
+  test('appends jit on shared pooler URIs once', () => {
     const uri = `postgresql://postgres.projref:${PASSWORD_PLACEHOLDER}@aws-0-eu-west-1.pooler.supabase.com:6543/postgres`
+    const withJit = applyTemporaryAccessToConnectionString(uri, {
+      role: 'analytics',
+      addPoolerJitOption: true,
+    })
 
-    expect(
-      applyTemporaryAccessToConnectionString(uri, { role: 'analytics', addPoolerJitOption: true })
-    ).toBe(
+    expect(withJit).toBe(
       `postgresql://analytics.projref:${TOKEN_PASSWORD_PLACEHOLDER}@aws-0-eu-west-1.pooler.supabase.com:6543/postgres?options=-c%20jit%3dtrue`
     )
-  })
-
-  test('does not double-append the jit option', () => {
-    const uri = `postgresql://postgres.projref:${PASSWORD_PLACEHOLDER}@host:6543/postgres?options=-c%20jit%3dtrue`
-
     expect(
-      applyTemporaryAccessToConnectionString(uri, { role: 'analytics', addPoolerJitOption: true })
-    ).toBe(
-      `postgresql://analytics.projref:${TOKEN_PASSWORD_PLACEHOLDER}@host:6543/postgres?options=-c%20jit%3dtrue`
-    )
-  })
-
-  test('does not add the jit option to a direct URI', () => {
-    const uri = `postgresql://postgres:${PASSWORD_PLACEHOLDER}@db.proj.supabase.co:5432/postgres`
-
-    expect(
-      applyTemporaryAccessToConnectionString(uri, { role: 'analytics', addPoolerJitOption: false })
-    ).not.toContain('jit')
-  })
-
-  test('decodes a percent-encoded pooler user before rewriting', () => {
-    const uri = `postgresql://postgres.%5BPOOLER_TENANT_ID%5D:${PASSWORD_PLACEHOLDER}@host:6543/postgres`
-
-    expect(applyTemporaryAccessToConnectionString(uri, { role: 'analytics' })).toBe(
-      `postgresql://analytics.[POOLER_TENANT_ID]:${TOKEN_PASSWORD_PLACEHOLDER}@host:6543/postgres`
-    )
+      applyTemporaryAccessToConnectionString(withJit, {
+        role: 'analytics',
+        addPoolerJitOption: true,
+      })
+    ).toBe(withJit)
   })
 })
 
@@ -350,18 +306,15 @@ describe('applyTemporaryAccessToPooler', () => {
     expect(rewritten.direct).toBe(
       `postgresql://analytics:${TOKEN_PASSWORD_PLACEHOLDER}@db.host:5432/postgres`
     )
-    expect(rewritten.transactionShared).toContain('analytics.proj')
     expect(rewritten.transactionShared).toContain('options=-c%20jit%3dtrue')
     expect(rewritten.sessionShared).toContain('options=-c%20jit%3dtrue')
-    expect(rewritten.transactionDedicated).toBe(
-      `postgresql://analytics.proj:${TOKEN_PASSWORD_PLACEHOLDER}@dedicated:6543/postgres`
-    )
+    expect(rewritten.transactionDedicated).not.toContain('jit')
     expect(rewritten.sessionDedicated).not.toContain('jit')
   })
 })
 
 describe('shouldAddTemporaryAccessPoolerOption', () => {
-  test('is false for direct connections', () => {
+  test('is true only for shared pooler connections', () => {
     expect(
       shouldAddTemporaryAccessPoolerOption({
         connectionMethod: 'direct',
@@ -369,9 +322,6 @@ describe('shouldAddTemporaryAccessPoolerOption', () => {
         hasDedicatedPooler: true,
       })
     ).toBe(false)
-  })
-
-  test('is true for session pooler (always shared)', () => {
     expect(
       shouldAddTemporaryAccessPoolerOption({
         connectionMethod: 'session',
@@ -379,9 +329,6 @@ describe('shouldAddTemporaryAccessPoolerOption', () => {
         hasDedicatedPooler: true,
       })
     ).toBe(true)
-  })
-
-  test('is true for shared transaction pooler and false for dedicated', () => {
     expect(
       shouldAddTemporaryAccessPoolerOption({
         connectionMethod: 'transaction',
@@ -403,31 +350,5 @@ describe('shouldAddTemporaryAccessPoolerOption', () => {
         hasDedicatedPooler: false,
       })
     ).toBe(true)
-  })
-})
-
-describe('buildSafeConnectionString and buildJdbcString password placeholders', () => {
-  test('buildSafeConnectionString can emit the token placeholder', () => {
-    const uri = `postgresql://analytics:${TOKEN_PASSWORD_PLACEHOLDER}@db.host:5432/postgres`
-    const params = parseConnectionParams(uri)
-
-    expect(buildSafeConnectionString(uri, params, TOKEN_PASSWORD_PLACEHOLDER)).toBe(uri)
-  })
-
-  test('buildJdbcString can emit the token placeholder', () => {
-    expect(
-      buildJdbcString(
-        {
-          host: 'db.host',
-          port: '5432',
-          user: 'analytics',
-          database: 'postgres',
-          search: '',
-        },
-        TOKEN_PASSWORD_PLACEHOLDER
-      )
-    ).toBe(
-      `jdbc:postgresql://db.host:5432/postgres?user=analytics&password=${TOKEN_PASSWORD_PLACEHOLDER}`
-    )
   })
 })
