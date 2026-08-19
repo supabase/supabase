@@ -7,7 +7,6 @@ export const BANNER_ID = {
   RLS_EVENT_TRIGGER: 'rls-event-trigger-banner',
   FREE_MICRO_UPGRADE: 'free-micro-upgrade-banner',
   TOS_UPDATE: 'tos-update-banner',
-  UNIFIED_LOGS: 'unified-logs-banner',
   LOGS_ALL_DEPRECATION: 'logs-all-deprecation-banner',
 } as const
 

@@ -40,6 +40,7 @@ export const DatabaseConnections: NextPageWithLayout = () => {
   const [now, setNow] = useState(() => dayjs.utc())
 
   useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_LIVE, handleToggleLive, {
+    enabled: isDatabaseConnectionsEnabled,
     registerInCommandMenu: false,
   })
 

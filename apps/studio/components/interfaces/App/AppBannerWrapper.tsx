@@ -42,7 +42,7 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
         id: 'tos-update-banner',
         isDismissed: false,
         content: <BannerTOSUpdate />,
-        priority: 2,
+        priority: 0,
       })
     } else {
       dismissBanner('tos-update-banner')

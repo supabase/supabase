@@ -37,9 +37,12 @@ export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayout
 
 export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayoutProps) => {
   const [section, setSection] = useState<ExplorerResourceType>()
+  const tabs = useTabsStateSnapshot()
 
-  // [Joshen] Temporary, to hook up with tabs store
-  const activeTabLabel = 'Active Tab Label'
+  const activeTab = tabs.activeTab ? tabs.tabsMap[tabs.activeTab] : undefined
+  const isActiveExplorerTab =
+    activeTab !== undefined && editorEntityTypes.explorer.includes(activeTab.type)
+  const activeTabLabel = isActiveExplorerTab ? activeTab.label || 'Untitled' : 'Explorer'
 
   const mergedBrowserTitle = {
     ...browserTitle,
