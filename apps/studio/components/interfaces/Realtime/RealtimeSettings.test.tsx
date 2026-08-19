@@ -1,5 +1,6 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
@@ -121,7 +122,10 @@ describe('RealtimeSettings', () => {
     addAPIMock({
       method: 'get',
       path: '/platform/projects/:ref/config/realtime',
-      response: () => HttpResponse.json(configWithoutPool),
+      response: () =>
+        HttpResponse.json<components['schemas']['RealtimeConfigResponse']>(
+          configWithoutPool as any
+        ),
     })
 
     customRender(<RealtimeSettings />)

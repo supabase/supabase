@@ -31,7 +31,7 @@ export const REALTIME_DEFAULT_CONFIG = {
 export async function getRealtimeConfiguration(
   { projectRef }: RealtimeConfigurationVariables,
   signal?: AbortSignal
-): Promise<RealtimeConfiguration | typeof REALTIME_DEFAULT_CONFIG | undefined> {
+) {
   if (!projectRef) throw new Error('Project ref is required')
 
   const { data, error } = await get(`/platform/projects/{ref}/config/realtime`, {
