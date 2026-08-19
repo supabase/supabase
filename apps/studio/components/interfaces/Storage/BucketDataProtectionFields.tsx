@@ -17,15 +17,14 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-
 import { type BucketProtectionFormValues } from './BucketDataProtectionFields.schema'
 import {
   getVersioningPlanLimits,
   type BucketVersioningState,
   type ExpirationMode,
 } from './StorageProtection.constants'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 /**
  * Shared enter/exit for any form section that appears or disappears in
@@ -318,9 +317,7 @@ const LifecyclePolicySection = ({
           <FormItemLayout
             name="max_noncurrent_versions"
             label="Retained noncurrent versions"
-            description={
-              !hasDays ? 'Requires an expiration age to be set.' : undefined
-            }
+            description={!hasDays ? 'Requires an expiration age to be set.' : undefined}
             layout="flex-row-reverse"
             // Dim the whole row (label + description + input) so the
             // dependency reads at a glance rather than the disabled input
@@ -369,7 +366,7 @@ const LifecyclePolicySection = ({
               type="warning"
               className="mt-2"
               title="No lifecycle policy"
-              description="Without one, every noncurrent version is retained indefinitely and keeps counting toward storage costs."
+              description="Lifecycle policies are recommended to manage and reduce storage costs for noncurrent versions."
             />
           </Collapse>
         )}
