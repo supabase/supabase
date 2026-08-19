@@ -2,6 +2,45 @@ _format_version: '2.1'
 _transform: true
 
 ###
+### Global plugins
+###
+plugins:
+  ## Trace ID propagation: sets a W3C `traceparent` header on every request
+  ## before it is routed to an upstream service. If the incoming request
+  ## already carries a `traceparent` header, it is passed through unchanged
+  ## (propagated). Otherwise a new one is generated here at the edge.
+  - name: pre-function
+    config:
+      access:
+        - |
+          local traceparent = kong.request.get_header("traceparent")
+          if not traceparent then
+            math.randomseed(ngx.now() * 1000 + ngx.worker.pid())
+            local hex_chars = "0123456789abcdef"
+            local function random_hex(len)
+              local out = {}
+              for i = 1, len do
+                local idx = math.random(1, #hex_chars)
+                out[i] = hex_chars:sub(idx, idx)
+              end
+              return table.concat(out)
+            end
+            local trace_id = random_hex(32)
+            local parent_id = random_hex(16)
+            traceparent = "00-" .. trace_id .. "-" .. parent_id .. "-01"
+            kong.service.request.set_header("traceparent", traceparent)
+          else
+            kong.service.request.set_header("traceparent", traceparent)
+          end
+          kong.ctx.shared.trace_id = traceparent
+      header_filter:
+        - |
+          local traceparent = kong.ctx.shared.trace_id
+          if traceparent then
+            kong.response.set_header("traceparent", traceparent)
+          end
+
+###
 ### Consumers / Users
 ###
 consumers:
