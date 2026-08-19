@@ -13,6 +13,7 @@ import {
 
 import { RuntimeBadge } from '../RuntimeBadge'
 import { WorkerCommandLine } from '../WorkerCommandLine'
+import { WorkerSecretsSection } from '../Secrets/WorkerSecretsSection'
 import { LISTENING_PORT, WORKERS_REGION_LABEL } from '../Workers.constants'
 import type { Worker } from '../Workers.types'
 import { formatSize, getRuntimeMeta } from '../Workers.utils'
@@ -128,6 +129,21 @@ export const WorkerSettingsTab = ({ worker }: WorkerSettingsTabProps) => {
                 </span>
               </SettingsRow>
             </div>
+          </PageSectionContent>
+        </PageSection>
+
+        <PageSection>
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>Secrets</PageSectionTitle>
+              <PageSectionDescription>
+                Loaded as environment variables when the worker starts. Inherits project secrets
+                by default — override per worker, or add worker-only values here.
+              </PageSectionDescription>
+            </PageSectionSummary>
+          </PageSectionMeta>
+          <PageSectionContent>
+            <WorkerSecretsSection worker={worker} />
           </PageSectionContent>
         </PageSection>
 
