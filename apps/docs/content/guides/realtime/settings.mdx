@@ -27,18 +27,25 @@ You can set the following settings using the Realtime Settings screen in your Da
 
 ### Enable Realtime service
 
+**Type:** Toggle · **Options:** Enabled, Disabled · **Default:** Enabled
+
 Determines if the Realtime service is enabled or disabled for your project.
 
-**If you disable it**, connected clients are disconnected, new connections are rejected with `403` and `Realtime was disabled for this tenant`, joins receive `RealtimeDisabledForTenant`, and Broadcast REST requests are rejected with `403`. Realtime also releases the database connections and Postgres Changes replication slot it holds for your project, and reopens them on the first connection after you enable it again.
+- **Enabled**: normal operation.
+- **Disabled**: connected clients are disconnected, new connections are rejected with `403` and `Realtime was disabled for this tenant`, joins receive `RealtimeDisabledForTenant`, and Broadcast REST requests are rejected with `403`. Realtime also releases the database connections and Postgres Changes replication slot it holds for your project, and reopens them on the first connection after you enable it again.
 
 ### Allow public access to channels
 
-You can toggle this setting to set Realtime to allow public channels or set it to use only private channels with [Realtime Authorization](/docs/guides/realtime/authorization).
+**Type:** Toggle · **Options:** Enabled, Disabled · **Default:** Enabled
 
-- **Private only**: every join is checked against the Row Level Security policies on `realtime.messages`, so each join costs one authorization query. Clients that don't set `config.private` to `true` are rejected with `PrivateOnly`. With no policies, clients connect but receive no messages.
-- **Public allowed**: no policy check runs, but anyone holding your project's anon key can subscribe to and broadcast on any public channel.
+Determines whether Realtime allows public channels, or restricts your project to private channels with [Realtime Authorization](/docs/guides/realtime/authorization).
+
+- **Enabled**: no policy check runs, but anyone holding your project's anon key can subscribe to and broadcast on any public channel.
+- **Disabled**: every join is checked against the Row Level Security policies on `realtime.messages`, so each join costs one authorization query. Clients that don't set `config.private` to `true` are rejected with `PrivateOnly`. With no policies, clients connect but receive no messages.
 
 ### Database connection pool size
+
+**Type:** Number of connections · **Range:** 1 to your database's `max_connections` · **Default:** varies by compute size
 
 Determines the number of connections used for Realtime Authorization RLS checking. Results are cached per client, so the pool is used on each private channel join, each `access_token` refresh, and each private Broadcast REST request.
 
@@ -49,16 +56,20 @@ See [Database connections](/docs/guides/realtime/concepts#database-connections) 
 
 ### Postgres Changes connection pool size
 
-Determines the number of connections used to create [Postgres Changes](/docs/guides/realtime/postgres-changes) subscriptions when clients subscribe. It's only used while subscriptions are created; streaming the changes uses a separate connection. The default is 2 connections.
+**Type:** Number of connections · **Range:** 1 to 20 · **Default:** 2
+
+Determines the number of connections used to create [Postgres Changes](/docs/guides/realtime/postgres-changes) subscriptions when clients subscribe. It's only used while subscriptions are created; streaming the changes uses a separate connection.
 
 - **Too low**: subscription creation times out during bursts. Clients receive a `postgres_changes` system error with `Too many database timeouts` and retry after 5 to 10 seconds.
-- **Too high**: it counts toward the same connection budget as every other Realtime pool. The maximum is 20.
+- **Too high**: it counts toward the same connection budget as every other Realtime pool.
 
 Raise this value if many clients subscribe at the same time, such as after a deploy or a mass reconnect.
 
 {/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 
 ### Max concurrent clients
+
+**Type:** Number of clients · **Range:** 1 to your plan's [concurrent connections](/docs/guides/realtime/limits#limits-by-plan) limit · **Default:** your plan's limit
 
 Determines the maximum number of clients that can be connected. A client is one WebSocket connection, no matter how many channels it joins.
 
@@ -67,12 +78,16 @@ Determines the maximum number of clients that can be connected. A client is one 
 
 ### Max events per second
 
+**Type:** Number of events per second · **Range:** 1 to your plan's [messages per second](/docs/guides/realtime/limits#limits-by-plan) limit · **Default:** your plan's limit
+
 Determines the maximum number of events per second that can be sent, measured as a rolling average over the previous minute. An event is a message sent by a client or delivered to one, so one broadcast to 100 subscribers counts as 100 events.
 
 - **Too low**: channels that exceed the average are closed with `Too many messages per second`, which `supabase-js` recovers from by rejoining. Broadcast REST requests are rejected with `429`; those responses carry `x-rate-limit` and `x-rate-limit-remaining` headers you can use to slow down first.
 - **Too high**: Realtime stops throttling broadcast fan-out, which removes the protection against a runaway loop or a mass reconnect, and raises the ceiling on your Realtime spend.
 
 ### Max presence events per second
+
+**Type:** Number of events per second · **Range:** 1 to your plan's [presence messages per second](/docs/guides/realtime/limits#limits-by-plan) limit · **Default:** your plan's limit
 
 Determines the maximum number of presence events per second that can be sent, using the same rolling average as [Max events per second](#max-events-per-second) but checked before the event is sent rather than after delivery.
 
@@ -86,6 +101,8 @@ A separate per-client limit also applies to presence, independent of this projec
 </Admonition>
 
 ### Max payload size in KB
+
+**Type:** Size in KB · **Range:** 1 to your plan's [broadcast payload size](/docs/guides/realtime/limits#limits-by-plan) limit · **Default:** your plan's limit
 
 Determines the maximum payload size in KB that can be sent.
 
