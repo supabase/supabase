@@ -36,6 +36,7 @@ import {
 } from './BucketVersioningFields.schema'
 import {
   getVersioningFormDefaults,
+  isEnablingVersioning,
   isSuspendingVersioning,
   type BucketVersioningSettings,
 } from './EditBucketModal.utils'
@@ -51,6 +52,7 @@ import { useProjectStorageConfigQuery } from '@/data/config/project-storage-conf
 import { useBucketUpdateMutation } from '@/data/storage/bucket-update-mutation'
 import { Bucket } from '@/data/storage/buckets-query'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 export interface EditBucketModalProps {
   visible: boolean
@@ -99,8 +101,17 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
   // Held while the suspend confirmation is open, so confirming completes the save.
   const [pendingSuspendValues, setPendingSuspendValues] = useState<BucketFormValues | null>(null)
 
+  const track = useTrack()
+  // The versioning fields aren't part of the update payload yet, so the intent is
+  // stashed here and only reported once the save actually succeeds.
+  const enabledVersioningRef = useRef<{ hasLifecyclePolicy: boolean } | null>(null)
+
   const { mutate: updateBucket, isPending: isUpdating } = useBucketUpdateMutation({
     onSuccess: () => {
+      if (enabledVersioningRef.current !== null) {
+        track('storage_bucket_versioning_enabled', enabledVersioningRef.current)
+        enabledVersioningRef.current = null
+      }
       toast.success(`Successfully updated bucket "${bucket?.name}"`)
       onClose()
     },
@@ -171,6 +182,15 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
   const persistChanges = (values: BucketFormValues) => {
     if (bucket === undefined) return console.error('Bucket is required')
     if (ref === undefined) return console.error('Project ref is required')
+
+    enabledVersioningRef.current =
+      isStorageVersioningEnabled &&
+      isEnablingVersioning(versioningSettings.versioning, values.enable_versioning)
+        ? {
+            hasLifecyclePolicy:
+              values.version_expiry_days !== '' || values.max_noncurrent_versions !== '',
+          }
+        : null
 
     // TODO(storage-versioning): pass the versioning fields through once the
     // API accepts them. Until then the section is form state only.

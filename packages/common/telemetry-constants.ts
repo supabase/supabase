@@ -1979,9 +1979,29 @@ export interface StorageBucketCreatedEvent {
     bucketType?: string
     /**
      * Whether object versioning was turned on for the bucket at creation time.
-     * Only set while the storage object versioning feature preview is enabled.
      */
     hasVersioningEnabled?: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when object versioning is turned on for a storage bucket that has
+ * never had it. Re-enabling a suspended bucket is not reported — the user
+ * already opted in once.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/storage/files/buckets/{bucketId}
+ */
+export interface StorageBucketVersioningEnabledEvent {
+  action: 'storage_bucket_versioning_enabled'
+  properties: {
+    /**
+     * Whether a lifecycle policy was configured at the same time, rather than
+     * leaving noncurrent versions to accumulate indefinitely.
+     */
+    hasLifecyclePolicy?: boolean
   }
   groups: TelemetryGroups
 }
@@ -3861,6 +3881,7 @@ export type TelemetryEvent =
   | OrganizationMfaEnforcementUpdatedEvent
   | ForeignDataWrapperCreatedEvent
   | StorageBucketCreatedEvent
+  | StorageBucketVersioningEnabledEvent
   | BranchCreateButtonClickedEvent
   | BranchDeleteButtonClickedEvent
   | BranchCreateMergeRequestButtonClickedEvent

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   getNextVersioningState,
   getVersioningFormDefaults,
+  isEnablingVersioning,
   isSuspendingVersioning,
   type BucketVersioningSettings,
 } from './EditBucketModal.utils'
@@ -108,5 +109,27 @@ describe('isSuspendingVersioning', () => {
 
   it('is false for a bucket that was never versioned', () => {
     expect(isSuspendingVersioning('disabled', false)).toBe(false)
+  })
+})
+
+describe('isEnablingVersioning', () => {
+  it('is true only when a never-versioned bucket is being turned on', () => {
+    expect(isEnablingVersioning('disabled', true)).toBe(true)
+  })
+
+  it('is false when re-enabling a suspended bucket', () => {
+    // The user already opted in once and its versions never went away, so this
+    // is not a first-time enablement.
+    expect(isEnablingVersioning('suspended', true)).toBe(false)
+  })
+
+  it('is false when versioning is already on', () => {
+    expect(isEnablingVersioning('enabled', true)).toBe(false)
+  })
+
+  it('is false whenever the switch is off', () => {
+    for (const state of ['disabled', 'suspended', 'enabled'] as const) {
+      expect(isEnablingVersioning(state, false), state).toBe(false)
+    }
   })
 })
