@@ -5,12 +5,9 @@ import {
   type ExpirationMode,
 } from './StorageVersioning.constants'
 
-/** A bucket's persisted object versioning settings, as the edit form reads them. */
 export interface BucketVersioningSettings {
   versioning: BucketVersioningState
-  /** `null` when no age condition is part of the lifecycle policy. */
   versionExpiryDays: number | null
-  /** `null` when no version cap is part of the lifecycle policy. */
   maxNoncurrentVersions: number | null
   expirationMode: ExpirationMode
 }
@@ -44,9 +41,7 @@ export const getVersioningFormDefaults = (
 }
 
 /**
- * Turning versioning off suspends rather than disables: S3 has no path back to
- * `disabled` once a bucket has been versioned. A never-versioned bucket stays
- * `disabled`.
+ * Turning versioning off suspends rather than disables.
  */
 export const getNextVersioningState = (
   currentState: BucketVersioningState,
@@ -56,7 +51,6 @@ export const getNextVersioningState = (
   return currentState === 'disabled' ? 'disabled' : 'suspended'
 }
 
-/** True when saving would stop an actively versioning bucket — worth confirming. */
 export const isSuspendingVersioning = (
   currentState: BucketVersioningState,
   isVersioningEnabled: boolean
