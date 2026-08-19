@@ -14,8 +14,6 @@ const isoDateTimeSchema = z.string().transform((raw, ctx) => {
   return parsed
 })
 
-// Chart rendering only has a fixed palette for this many series (see
-// Y_COLUMN_COLORS in QueryResultChart.tsx).
 export const MAX_CHART_Y_COLUMNS = 3
 
 const chartConfigSchema = z.object({
