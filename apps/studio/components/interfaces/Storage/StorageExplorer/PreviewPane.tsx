@@ -199,11 +199,6 @@ const CurrentFilePreview = ({
 }: CurrentFilePreviewProps) => (
   <div className="border-b border-overlay p-3">
     <div
-      /*
-       * ~144px of chrome sits above, so the preview takes 40% of what's left of
-       * the viewport. The floor keeps the sections below scrollable; the cap
-       * stops the preview dominating tall viewports.
-       */
       className="flex items-center justify-center overflow-hidden rounded-md border border-overlay"
       style={{ height: 'clamp(120px, calc((100vh - 144px) * 0.4), 180px)' }}
     >
@@ -281,8 +276,7 @@ const CurrentFilePreview = ({
           </DropdownMenu>
         )}
 
-        {/* A delete here is a soft delete, so the button says so and the real
-            destructive action moves behind the split menu. */}
+        {/* A delete in a versioned bucket is a soft delete/archive, unless specified explicitly */}
         {canUpdateFiles && isVersionedBucket && (
           <div className="flex">
             <Button
@@ -353,8 +347,6 @@ export const PreviewPane = () => {
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
   const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
 
-  // The bucket page owns `?edit=true` and mounts the modal on it, so routing
-  // through the URL avoids threading a callback down the explorer tree.
   const [, setShowEditBucketModal] = useQueryState(
     'edit',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })

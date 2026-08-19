@@ -17,9 +17,6 @@ export const ConfirmDeleteModal = () => {
   } = useStorageExplorerStateSnapshot()
 
   const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
-  // On a versioned bucket a delete is a soft delete: the object is hidden but
-  // every version stays recoverable, so the usual "cannot be undone" warning
-  // would be wrong.
   const isVersionedBucket =
     isStorageVersioningEnabled && getBucketVersioningState(selectedBucket) !== 'disabled'
 

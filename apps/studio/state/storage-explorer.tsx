@@ -1899,13 +1899,8 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
     bucket,
   ])
 
-  // The effect above only seeds `selectedBucket` once, when the explorer state is
-  // (re)created for a project — after that it never re-syncs. Editing the bucket
-  // afterwards (toggling public/private in bucket settings, say) then leaves every
-  // consumer of `selectedBucket` reading stale metadata, which is how the preview
-  // panel's Copy URL action ends up signing a URL for the wrong visibility.
-  // Re-sync whenever the query refetches, as long as it still describes the bucket
-  // the store already has selected.
+  // Re-sync selectedBucket also when the bucket changes,
+  // to ensure the state is always up-to-date with the latest bucket data
   useEffect(() => {
     if (bucket && state.selectedBucket?.id === bucket.id && state.selectedBucket !== bucket) {
       state.selectedBucket = bucket

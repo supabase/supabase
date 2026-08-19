@@ -5,7 +5,6 @@ import { Button, cn, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 import { BroomSparklesIcon } from '../BroomSparklesIcon'
 import type { ExpirationMode } from '../StorageVersioning.constants'
 
-/** Shared chip styling so the tokens and the operator badge read as one family. */
 const POLICY_CHIP_CLASSNAME = 'rounded-sm border px-1.5 py-0.5 font-mono text-[10.5px]'
 
 const PolicyChip = ({ children }: { children: ReactNode }) => (
@@ -32,10 +31,7 @@ interface PolicyRuleProps {
   mode: ExpirationMode
 }
 
-/** The policy spelled out in plain language, for the hover card. */
 const PolicyFullRule = ({ cap, expiryDays, mode }: PolicyRuleProps) => {
-  // A cap always arrives with an age, so there are only three shapes to describe:
-  // age alone, or age combined with the cap under either operator.
   const hasCap = cap !== null && cap > 0
 
   if (!hasCap) {
@@ -60,15 +56,9 @@ const PolicyFullRule = ({ cap, expiryDays, mode }: PolicyRuleProps) => {
 }
 
 interface VersionHistoryPolicyRowProps extends PolicyRuleProps {
-  /** Opens the bucket settings, where the policy is configured. */
   onEditBucket: () => void
 }
 
-/**
- * The bucket's lifecycle policy as one inline row. A hover card rather than a
- * tooltip because the content holds a button — tooltip content is not reachable
- * by pointer or keyboard.
- */
 export const VersionHistoryPolicyRow = ({
   cap,
   expiryDays,
