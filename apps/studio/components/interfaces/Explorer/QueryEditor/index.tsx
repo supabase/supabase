@@ -73,6 +73,7 @@ type PendingProposal = {
   original: string
   modified: string
   label: string
+  prompt?: string
 }
 
 /**
@@ -273,6 +274,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
         original,
         modified,
         label: 'Review the suggested SQL edit before accepting it',
+        prompt,
       })
       closePrompt()
     } catch {
@@ -406,7 +408,14 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
             {pendingProposal && (
               <div className="absolute inset-0 z-10 flex flex-col bg-studio">
                 <div className="flex items-center justify-between gap-2 border-b bg-surface-100 px-3 py-2">
-                  <span className="text-xs text-foreground-light">{pendingProposal.label}</span>
+                  <div>
+                    <p className="text-xs text-foreground-light">{pendingProposal.label}</p>
+                    {pendingProposal.prompt && (
+                      <p className="text-xs text-foreground-lighter">
+                        Prompt: {pendingProposal.prompt}
+                      </p>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2">
                     <Button variant="default" size="tiny" onClick={discardSqlProposal}>
                       Discard
