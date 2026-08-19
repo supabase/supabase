@@ -116,7 +116,11 @@ To test every guide and troubleshooting entry instead of a changed-files scope
 PLAYWRIGHT_BASE_URL=https://supabase.com pnpm e2e:docs:all
 ```
 
-This ignores `DOCS_E2E_PAGE_PATHS` and the 20-page cap described in
+This is the whole-site audit: it selects both the `pages` and `global-elements`
+projects, so one run covers every article plus everything outside it, in a single
+`playwright-report/`. The per-project commands scope a run to one of them.
+
+It ignores `DOCS_E2E_PAGE_PATHS` and the 20-page cap described in
 [Limits](#limits), and tests every page listed by
 `pnpm -C e2e/docs resolve-docs-scope` across the whole `guides` and
 `troubleshooting` trees — several hundred pages as of this writing. `--all`
@@ -214,7 +218,8 @@ PLAYWRIGHT_BASE_URL=https://supabase.com pnpm e2e:docs:global-elements
   element is scanned once instead of once per changed page.
 
 The two suites are separate Playwright projects, so a content pull request never runs
-this one. Its report lands in `playwright-report-global-elements/`.
+this one. On its own its report lands in `playwright-report-global-elements/`. Under
+`pnpm e2e:docs:all` both projects run together and share `playwright-report/`.
 
 Rules that pass today are enforced, so they catch a newly introduced violation without
 failing on existing debt. Everything else annotates. `GLOBAL_ELEMENTS_ENFORCED_RULES` in

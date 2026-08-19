@@ -10,6 +10,8 @@ type SuiteBase = {
   devCommand: string
   defaultBaseUrl: string
   project?: string
+  // Projects an `--all` run selects instead of `project`, for a whole-suite report.
+  allProjects?: string[]
 }
 
 type ScopedSuite = {
@@ -108,7 +110,8 @@ export async function runSuite(config: SuiteConfig): Promise<void> {
   }
 
   // First, so an explicit --project on the command line overrides it.
-  const projectArgs = config.project ? [`--project=${config.project}`] : []
+  const selected = (runAll && config.allProjects) || (config.project ? [config.project] : [])
+  const projectArgs = selected.map((project) => `--project=${project}`)
   const env = { ...process.env }
   if (config.pagePathsEnv && pages) env[config.pagePathsEnv] = pages.join(',')
 

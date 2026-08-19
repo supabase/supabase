@@ -13,6 +13,7 @@ runSuite({
   baseRefEnv: 'DOCS_E2E_BASE_REF',
   defaultBaseUrl: 'http://localhost:3001',
   project: 'pages',
+  allProjects: ['pages', 'global-elements'],
   resolveScope: resolveDocsScope,
   resolveAllPages: resolveAllDocsPages,
 }).catch((error) => {
