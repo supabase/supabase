@@ -13,7 +13,7 @@ normalize_origin() {
   [ -z "$url" ] && return
   scheme="${url%%://*}"
   rest="${url#*://}"
-  authority="${rest%%/*}"
+  authority="${rest%%[/?#]*}"
   origin="${scheme}://${authority}"
   case "$origin" in
     http://*:80) origin="${origin%:80}" ;;
