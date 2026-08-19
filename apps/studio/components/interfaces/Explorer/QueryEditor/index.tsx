@@ -166,7 +166,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
    * Postgres SQL cannot reach the analytics wire or vice versa.
    */
   const handleRunQuery = async (rawSql: string = sql) => {
-    if (!project || isBusy || rawSql.trim().length === 0) return
+    if (!project || isBusy || rewriteProposal || rawSql.trim().length === 0) return
 
     onSqlCommit?.(rawSql)
 
@@ -213,8 +213,10 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
 
   const acceptRewrite = () => {
     if (!rewriteProposal) return
-    onSqlChange(rewriteProposal.modified)
-    onSqlCommit?.(rewriteProposal.modified)
+    if (sql === rewriteProposal.original) {
+      onSqlChange(rewriteProposal.modified)
+      onSqlCommit?.(rewriteProposal.modified)
+    }
     setRewriteProposal(null)
   }
 
@@ -235,8 +237,12 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
           {toolbarActions}
           {onSourceChange && (
             <QuerySourceMenu
+              disabled={rewriteProposal !== null}
               source={toQuerySourceBinding(query)}
-              onSourceChange={onSourceChange}
+              onSourceChange={(source) => {
+                setRewriteProposal(null)
+                onSourceChange(source)
+              }}
               rowLimit={rowLimit}
               onRowLimitChange={onRowLimitChange}
               roleImpersonationState={roleImpersonationState}
@@ -253,6 +259,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
           )}
           <ExplorerToolbarAction
             icon={showQuery ? <EyeOff /> : <Eye />}
+            disabled={rewriteProposal !== null}
             tooltip={showQuery ? 'Hide query' : 'Show query'}
             onClick={() => setShowQuery((value) => !value)}
           />
@@ -260,7 +267,9 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
             loading={isExecuting || isLoadingProject}
             icon={<Play />}
             tooltip="Run query"
-            disabled={isLoadingProject || isExecuting || sql.trim().length === 0}
+            disabled={
+              isLoadingProject || isExecuting || rewriteProposal !== null || sql.trim().length === 0
+            }
             onClick={() => handleRunQuery()}
           >
             Run
