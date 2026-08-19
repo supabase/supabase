@@ -5,15 +5,14 @@ import type { RetentionDayPoint } from '@/data/storage/protection/protection-moc
 
 /**
  * Converts the mock retention daily series into `DataPoint[]` matching the
- * three stacked attribute keys declared for Storage Size in `Usage.constants`
- * (`live`, `noncurrent_versions`, `soft_deleted`). Keeps chart bars and the
- * inline breakdown in sync — both read the same mock source.
+ * two stacked attribute keys declared for Storage Size in `Usage.constants`
+ * (`current`, `noncurrent`). Keeps chart bars and the inline breakdown in
+ * sync — both read the same mock source.
  */
 export const toStorageSizeChartData = (daily: RetentionDayPoint[]): DataPoint[] =>
   daily.map((day) => ({
     period_start: day.date,
     periodStartFormatted: dayjs(day.date).format('DD MMM'),
-    live: day.live,
-    noncurrent_versions: day.noncurrentVersions,
-    soft_deleted: day.softDeleted,
+    current: day.current,
+    noncurrent: day.noncurrent,
   }))

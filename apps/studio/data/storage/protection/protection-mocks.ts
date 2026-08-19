@@ -492,21 +492,26 @@ export const restoreNoncurrentVersion = (objectId: string, _versionId: string): 
 
 export interface BucketRetentionSummary {
   bucket: string
-  live: number
-  noncurrentVersions: number
-  softDeleted: number
+  current: number
+  /**
+   * Everything the bucket is still paying for that isn't the live object —
+   * noncurrent versions plus the empty delete-marker placeholders behind
+   * archived files. Studio doesn't split these out in usage: the platform
+   * can't reliably distinguish the two after the fact, and either way the
+   * user's lever for shrinking it (a lifecycle policy) is the same.
+   */
+  noncurrent: number
   isVersioned: boolean
 }
 
 export interface RetentionDayPoint {
   date: string
-  live: number
-  noncurrentVersions: number
-  softDeleted: number
+  current: number
+  noncurrent: number
 }
 
 export interface StorageRetentionUsage {
-  totals: { live: number; noncurrentVersions: number; softDeleted: number }
+  totals: { current: number; noncurrent: number }
   daily: RetentionDayPoint[]
   byBucket: BucketRetentionSummary[]
 }
@@ -515,63 +520,39 @@ const GB = 1024 * MB
 
 /**
  * Day-over-day growth for the Storage Size usage chart, oldest first, ending
- * "today". `noncurrentVersions` and `softDeleted` are both the "retained
- * recovery data" driven by versioning — kept separate so the breakdown can
- * show which one is dominating.
+ * "today". `noncurrent` rolls up what used to be split as
+ * `noncurrentVersions` + `softDeleted` — the platform doesn't reliably
+ * distinguish them in usage, and the user's shrink lever (a lifecycle
+ * policy) is the same either way.
  */
 const RETENTION_DAILY_GROWTH = [
-  { daysAgo: 6, live: 4.1 * GB, noncurrentVersions: 0.9 * GB, softDeleted: 0.5 * GB },
-  { daysAgo: 5, live: 4.3 * GB, noncurrentVersions: 1.0 * GB, softDeleted: 0.5 * GB },
-  { daysAgo: 4, live: 4.4 * GB, noncurrentVersions: 1.05 * GB, softDeleted: 0.55 * GB },
-  { daysAgo: 3, live: 4.6 * GB, noncurrentVersions: 1.1 * GB, softDeleted: 0.6 * GB },
-  { daysAgo: 2, live: 4.7 * GB, noncurrentVersions: 1.15 * GB, softDeleted: 0.65 * GB },
-  { daysAgo: 1, live: 5.4 * GB, noncurrentVersions: 1.35 * GB, softDeleted: 0.75 * GB },
-  { daysAgo: 0, live: 6.1 * GB, noncurrentVersions: 1.55 * GB, softDeleted: 0.85 * GB },
+  { daysAgo: 6, current: 4.1 * GB, noncurrent: 1.4 * GB },
+  { daysAgo: 5, current: 4.3 * GB, noncurrent: 1.5 * GB },
+  { daysAgo: 4, current: 4.4 * GB, noncurrent: 1.6 * GB },
+  { daysAgo: 3, current: 4.6 * GB, noncurrent: 1.7 * GB },
+  { daysAgo: 2, current: 4.7 * GB, noncurrent: 1.8 * GB },
+  { daysAgo: 1, current: 5.4 * GB, noncurrent: 2.1 * GB },
+  { daysAgo: 0, current: 6.1 * GB, noncurrent: 2.4 * GB },
 ]
 
 export const getMockRetentionUsage = (): StorageRetentionUsage => {
-  const daily = RETENTION_DAILY_GROWTH.map(
-    ({ daysAgo: offset, live, noncurrentVersions, softDeleted }) => ({
-      date: daysAgoFromNow(offset),
-      live,
-      noncurrentVersions,
-      softDeleted,
-    })
-  )
+  const daily = RETENTION_DAILY_GROWTH.map(({ daysAgo: offset, current, noncurrent }) => ({
+    date: daysAgoFromNow(offset),
+    current,
+    noncurrent,
+  }))
 
   // Derive totals from today's entry (the last day) so the breakdown and the
   // chart's most recent bar can never drift out of sync with each other.
   const today = daily[daily.length - 1]
 
   return {
-    totals: {
-      live: today.live,
-      noncurrentVersions: today.noncurrentVersions,
-      softDeleted: today.softDeleted,
-    },
+    totals: { current: today.current, noncurrent: today.noncurrent },
     daily,
     byBucket: [
-      {
-        bucket: 'match-media',
-        live: 4.1 * GB,
-        noncurrentVersions: 1.2 * GB,
-        softDeleted: 0.7 * GB,
-        isVersioned: true,
-      },
-      {
-        bucket: 'avatars',
-        live: 1.4 * GB,
-        noncurrentVersions: 0.35 * GB,
-        softDeleted: 0.15 * GB,
-        isVersioned: true,
-      },
-      {
-        bucket: 'exports',
-        live: 0.6 * GB,
-        noncurrentVersions: 0,
-        softDeleted: 0,
-        isVersioned: false,
-      },
+      { bucket: 'match-media', current: 4.1 * GB, noncurrent: 1.9 * GB, isVersioned: true },
+      { bucket: 'avatars', current: 1.4 * GB, noncurrent: 0.5 * GB, isVersioned: true },
+      { bucket: 'exports', current: 0.6 * GB, noncurrent: 0, isVersioned: false },
     ],
   }
 }

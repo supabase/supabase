@@ -36,8 +36,8 @@ const SizeAndCounts = ({
     [PricingMetric.STORAGE_SIZE]: {
       isLoading: isLoadingRetention,
       margin: 14,
-      // Reads entirely off the mock retention series (live / noncurrent versions
-      // / soft-deleted) rather than the real daily-stats endpoint — see
+      // Reads entirely off the mock retention series (current / noncurrent)
+      // rather than the real daily-stats endpoint — see
       // StorageRetention.utils.ts.
       data: retention ? toStorageSizeChartData(retention.daily) : [],
     },

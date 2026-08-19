@@ -218,15 +218,14 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
     anchor: 'storageSize',
     key: PricingMetric.STORAGE_SIZE,
     attributes: [
-      { key: 'live', name: 'Live objects', color: 'white' },
-      { key: 'noncurrent_versions', name: 'Noncurrent versions', color: 'yellow' },
-      { key: 'soft_deleted', name: 'Soft-deleted files', color: 'orange' },
+      { key: 'current', name: 'Current objects', color: 'white' },
+      { key: 'noncurrent', name: 'Noncurrent objects', color: 'yellow' },
     ],
     name: 'Storage Size',
     chartPrefix: 'Average',
     unit: 'bytes',
     description:
-      'Sum of all objects in your storage buckets, including noncurrent versions and soft-deleted files retained by object versioning.\nBilling is prorated down to the hour and will be displayed GB-Hrs.',
+      'Sum of all objects in your storage buckets, including noncurrent objects retained by object versioning.\nBilling is prorated down to the hour and will be displayed GB-Hrs.',
     chartDescription: 'The data refreshes every hour.',
     additionalInfo: () => <StorageRetentionBreakdown />,
     links: [
