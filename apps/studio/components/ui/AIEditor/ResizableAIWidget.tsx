@@ -1,8 +1,8 @@
 import type { editor as monacoEditor } from 'monaco-editor'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { AskAIWidget } from '@/components/interfaces/SQLEditor/AskAIWidget'
-import InlineWidget from '@/components/interfaces/SQLEditor/InlineWidget'
+import { AskAIWidget } from './AskAIWidget'
+import InlineWidget from './InlineWidget'
 
 interface ResizableAIWidgetProps {
   editor: monacoEditor.IStandaloneCodeEditor | monacoEditor.IStandaloneDiffEditor
@@ -22,7 +22,7 @@ interface ResizableAIWidgetProps {
 const LINE_HEIGHT = 20 // height of each line in pixels
 const MIN_LINES = 3 // minimum number of lines to show
 
-const ResizableAIWidget = ({
+export const ResizableAIWidget = ({
   editor,
   id,
   value,
@@ -85,5 +85,3 @@ const ResizableAIWidget = ({
     </InlineWidget>
   )
 }
-
-export default ResizableAIWidget
