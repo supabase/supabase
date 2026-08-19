@@ -22,23 +22,15 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import {
-  RUNTIMES,
-  WORKER_MAX_INSTANCES,
-  WORKER_MIN_INSTANCES,
-  WORKER_SIZES,
-} from './Workers.constants'
+import { WORKER_MAX_INSTANCES, WORKER_MIN_INSTANCES, WORKER_SIZES } from './Workers.constants'
 import { CreateWorkerSchema, type CreateWorkerForm } from './Workers.schema'
 import { formatSize } from './Workers.utils'
 import { useWorkerDeployMutation } from '@/data/workers/worker-deploy-mutation'
 
 const FORM_ID = 'create-worker-form'
 
-const RUNTIME_VALUES = Object.keys(RUNTIMES).filter((runtime) => runtime !== 'dockerfile')
-
 const defaultValues: CreateWorkerForm = {
   name: '',
-  runtime: 'node',
   size: WORKER_SIZES[0],
   access: 'private',
   instances: WORKER_MIN_INSTANCES,
@@ -78,8 +70,8 @@ export const CreateWorkerDialog = ({ projectRef, open, onOpenChange }: CreateWor
             <DialogSection className="space-y-4">
               <Admonition
                 type="default"
-                title="This deploys an empty worker"
-                description="A worker deployed from the dashboard runs the runtime's default entrypoint. Push your own code with the Supabase CLI."
+                title="Deploys a Deno starter worker"
+                description="The dashboard deploys a hello-world worker you can then edit and redeploy with the Supabase CLI."
               />
 
               <FormField
@@ -93,29 +85,6 @@ export const CreateWorkerDialog = ({ projectRef, open, onOpenChange }: CreateWor
                     <FormControl>
                       <Input {...field} placeholder="embed" autoComplete="off" />
                     </FormControl>
-                  </FormItemLayout>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="runtime"
-                render={({ field }) => (
-                  <FormItemLayout label="Runtime">
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {RUNTIME_VALUES.map((runtime) => (
-                          <SelectItem key={runtime} value={runtime}>
-                            {RUNTIMES[runtime].label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
                   </FormItemLayout>
                 )}
               />
