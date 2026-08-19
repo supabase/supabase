@@ -142,44 +142,53 @@ Enable RLS, then set the grants to match what each role does in your app:
    grant select, insert, update, delete on table public.reports to authenticated;
    ```
 
+4. Write the test file for the table, and run the suite.
+
+   ```bash
+   supabase test new reports_rls.test
+   supabase test db
+   ```
+
+   Every table you secure gets one, and the change isn't done until the suite passes. The examples below show what goes in the file.
+
 Data that clients read but never write, such as a feed a backend job populates, gets select only. The policy and the test file are part of the same change:
 
 ```sql
-alter table public.weather_readings enable row level security;
-revoke all on table public.weather_readings from anon, authenticated;
-grant select on table public.weather_readings to anon, authenticated;
+alter table public.announcements enable row level security;
+revoke all on table public.announcements from anon, authenticated;
+grant select on table public.announcements to anon, authenticated;
 
-create policy "Anyone can read weather readings"
-on public.weather_readings for select
+create policy "Anyone can read announcements"
+on public.announcements for select
 to anon, authenticated
 using ( true );
 ```
 
-```sql supabase/tests/weather_readings_rls.test.sql
--- File: supabase/tests/weather_readings_rls.test.sql
+```sql supabase/tests/announcements_rls.test.sql
+-- File: supabase/tests/announcements_rls.test.sql
 -- Repeat for every public-read table you secured. Do not add a table only the tests use.
 begin;
 select plan(8);
 
 set local role anon;
 select lives_ok(
-  $$select * from weather_readings$$,
+  $$select * from announcements$$,
   'anon can read the feed'
 );
 select throws_ok(
-  $$insert into weather_readings select * from weather_readings$$,
+  $$insert into announcements select * from announcements$$,
   '42501',
   null,
   'anon cannot insert into the feed'
 );
 select throws_ok(
-  $$update weather_readings set id = id$$,
+  $$update announcements set id = id$$,
   '42501',
   null,
   'anon cannot update the feed'
 );
 select throws_ok(
-  $$delete from weather_readings$$,
+  $$delete from announcements$$,
   '42501',
   null,
   'anon cannot delete from the feed'
@@ -187,23 +196,23 @@ select throws_ok(
 
 set local role authenticated;
 select lives_ok(
-  $$select * from weather_readings$$,
+  $$select * from announcements$$,
   'authenticated can read the feed'
 );
 select throws_ok(
-  $$insert into weather_readings select * from weather_readings$$,
+  $$insert into announcements select * from announcements$$,
   '42501',
   null,
   'authenticated cannot insert into the feed'
 );
 select throws_ok(
-  $$update weather_readings set id = id$$,
+  $$update announcements set id = id$$,
   '42501',
   null,
   'authenticated cannot update the feed'
 );
 select throws_ok(
-  $$delete from weather_readings$$,
+  $$delete from announcements$$,
   '42501',
   null,
   'authenticated cannot delete from the feed'
