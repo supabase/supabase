@@ -5,17 +5,7 @@ import { ChartArea, Check, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
-import {
-  Button,
-  cn,
-  CommandGroup,
-  CommandItem,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from 'ui'
+import { Button, cn, CommandGroup, CommandItem } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -29,6 +19,7 @@ import { Pipelines } from './Pipelines'
 import SizeAndCounts from './SizeAndCounts'
 import { TotalUsage } from './TotalUsage'
 import { getUsageBranchOptions } from './Usage.utils'
+import { UsageBranchFilter } from './UsageBranchFilter'
 import {
   ScaffoldContainer,
   ScaffoldHeader,
@@ -251,28 +242,13 @@ export const Usage = () => {
                     )}
                   />
 
-                  {branchOptions.length > 0 && (
-                    <Select
-                      value={usageProjectRef ?? undefined}
-                      onValueChange={(value) =>
-                        setSelectedBranchRef(value === selectedProjectRef ? null : value)
-                      }
-                    >
-                      <SelectTrigger
-                        size="tiny"
-                        className="w-[180px]"
-                        aria-label="Filter by branch"
-                      >
-                        <SelectValue placeholder="Select branch" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {branchOptions.map((branch) => (
-                          <SelectItem key={branch.project_ref} value={branch.project_ref}>
-                            {branch.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  {!!selectedProjectRef && (
+                    <UsageBranchFilter
+                      branchOptions={branchOptions}
+                      projectRef={selectedProjectRef}
+                      branchRef={selectedBranchRef}
+                      onSelectBranch={setSelectedBranchRef}
+                    />
                   )}
                 </div>
 
