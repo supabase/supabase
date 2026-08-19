@@ -106,7 +106,6 @@ export interface ProjectLayoutProps {
   isLoading?: boolean
   isBlocking?: boolean
   product?: string
-  /** Optional node rendered next to the product title in the menu bar header. */
   productMenuBadge?: ReactNode
   productMenu?: ReactNode
   browserTitle?: {

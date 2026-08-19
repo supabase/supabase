@@ -5,7 +5,6 @@ import { Button, cn } from 'ui'
 
 interface ProductMenuBarProps {
   title: string
-  /** Optional node rendered next to the title, e.g. a status badge. */
   titleBadge?: ReactNode
   className?: string
 }

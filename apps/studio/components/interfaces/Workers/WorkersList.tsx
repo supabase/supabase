@@ -69,7 +69,7 @@ export const WorkersList = ({ projectRef, workers }: WorkersListProps) => {
 
   const resetToFirstPage = () => setPage(1)
 
-  const workerUrl = (name: string) => `/project/${projectRef}/workers/${name}`
+  const workerPagePath = (name: string) => `/project/${projectRef}/workers/${name}`
 
   return (
     <div className="space-y-4">
@@ -152,10 +152,10 @@ export const WorkersList = ({ projectRef, workers }: WorkersListProps) => {
               <TableRow
                 key={worker.name}
                 className="cursor-pointer"
-                onClick={() => router.push(workerUrl(worker.name))}
+                onClick={() => router.push(workerPagePath(worker.name))}
               >
                 <TableCell className="font-medium text-foreground">
-                  <Link href={workerUrl(worker.name)} onClick={(e) => e.stopPropagation()}>
+                  <Link href={workerPagePath(worker.name)} onClick={(e) => e.stopPropagation()}>
                     {worker.name}
                   </Link>
                 </TableCell>
