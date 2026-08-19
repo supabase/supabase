@@ -67,7 +67,7 @@ Not every project grants these automatically. See [Default privileges](/docs/gui
 
 A missing grant raises a `42501` error before any policy runs. When a request fails that your policy should allow, check the grants before you change the policy. To set them, see [Lock down the table](#lock-down-the-table).
 
-Table owners skip RLS unless you force it. Superusers and roles with `bypassrls` always skip RLS; `force row level security` does not apply to them. On Supabase, `postgres` is not a superuser, but it has `bypassrls`, so the Dashboard SQL Editor skips policies even after you force them. That is why [Test your policies](#test-your-policies) switches role. Add `alter table ... force row level security` only when a table owner without `bypassrls` must also obey policies.
+Table owners skip RLS unless you force it. Superusers and roles with `bypassrls` always skip RLS; `force row level security` does not apply to them. On Supabase, `postgres` is not a superuser, but it has `bypassrls`, so the Dashboard SQL Editor skips policies even after you force them. That is why the test files switch role. Add `alter table ... force row level security` only when a table owner without `bypassrls` must also obey policies.
 
 ### Authenticated and unauthenticated roles
 
@@ -142,23 +142,78 @@ Enable RLS, then set the grants to match what each role does in your app:
    grant select, insert, update, delete on table public.reports to authenticated;
    ```
 
-Data that clients read but never write, such as a feed a backend job populates, gets no write grant at all:
+Data that clients read but never write, such as a feed a backend job populates, gets select only. The policy and the test file are part of the same change:
 
 ```sql
+alter table public.weather_readings enable row level security;
 revoke all on table public.weather_readings from anon, authenticated;
 grant select on table public.weather_readings to anon, authenticated;
+
+create policy "Anyone can read weather readings"
+on public.weather_readings for select
+to anon, authenticated
+using ( true );
+```
+
+```sql supabase/tests/weather_readings_rls.test.sql
+-- File: supabase/tests/weather_readings_rls.test.sql
+-- Repeat for every public-read table you secured. Do not add a table only the tests use.
+begin;
+select plan(8);
+
+set local role anon;
+select lives_ok(
+  $$select * from weather_readings$$,
+  'anon can read the feed'
+);
+select throws_ok(
+  $$insert into weather_readings select * from weather_readings$$,
+  '42501',
+  null,
+  'anon cannot insert into the feed'
+);
+select throws_ok(
+  $$update weather_readings set id = id$$,
+  '42501',
+  null,
+  'anon cannot update the feed'
+);
+select throws_ok(
+  $$delete from weather_readings$$,
+  '42501',
+  null,
+  'anon cannot delete from the feed'
+);
+
+set local role authenticated;
+select lives_ok(
+  $$select * from weather_readings$$,
+  'authenticated can read the feed'
+);
+select throws_ok(
+  $$insert into weather_readings select * from weather_readings$$,
+  '42501',
+  null,
+  'authenticated cannot insert into the feed'
+);
+select throws_ok(
+  $$update weather_readings set id = id$$,
+  '42501',
+  null,
+  'authenticated cannot update the feed'
+);
+select throws_ok(
+  $$delete from weather_readings$$,
+  '42501',
+  null,
+  'authenticated cannot delete from the feed'
+);
+
+select * from finish();
+rollback;
 ```
 
 If new tables still receive automatic grants, see [Revoke default privileges](/docs/guides/api/securing-your-api#revoke-default-privileges). To enable RLS automatically on every new table, see [Event triggers](/docs/guides/database/postgres/event-triggers).
-
-After the policies, create a test file for the table and run the suite in the same change:
-
-```bash
-supabase test new reports_rls.test
-supabase test db
-```
-
-Cover allow and deny for `select`, `insert`, `update`, and `delete`, for `anon` as well as `authenticated`. See [Test your policies](#test-your-policies).
 
 ### Write a policy for each operation
 
@@ -234,69 +289,12 @@ to authenticated
 using ( (select auth.uid()) = user_id );
 ```
 
-These four policies are not done until tests prove them. Put a `.sql` file under `supabase/tests/` and run `supabase test db`. See [Test your policies](#test-your-policies).
-
-### Specify roles in your policies
-
-Always name the role a policy applies to, using the `to` clause. Instead of this:
-
-```sql
-create policy "rls_test_select" on rls_test
-using ( auth.uid() = user_id );
-```
-
-Use:
-
-```sql
-create policy "rls_test_select" on rls_test
-to authenticated
-using ( (select auth.uid()) = user_id );
-```
-
-This prevents the policy `( (select auth.uid()) = user_id )` from running for any `anon` users, since the execution stops at the `to authenticated` step.
-
-### Test your policies
-
-Create a `.sql` file under `supabase/tests/` for every table you enabled RLS on. Run `supabase test db` in the same change. Do not ship grants and policies without a passing suite.
-
-```bash
-supabase test new profiles_rls.test
-supabase test db
-```
-
-Supabase runs those files with [pgTAP](/docs/guides/database/extensions/pgtap) through the CLI.
-
-A wrong policy fails quietly. Too permissive, and a query returns rows it shouldn't. Too strict, and it returns nothing and raises no error. Neither case surfaces as an error, so tests are how you find out.
-
-Assert against the tables whose grants and policies you set. Do not introduce a scratch table only the tests use.
-
-Write allow and deny cases for `select`, `insert`, `update`, and `delete`, for `anon` as well as `authenticated`. Switch role and identity between cases. Repeat that suite for every table you enabled RLS on.
-
-For a public-read table, assert that `anon` and `authenticated` can select and that every write is denied. For a table users share, assert that a member who is not the owner can read and write, and that a non-member cannot.
-
-[`supabase-test-helpers`](https://github.com/usebasejump/supabase-test-helpers/tree/main) removes most of the setup below. It adds `tests.create_supabase_user()`, `tests.authenticate_as()`, and `tests.rls_enabled()`, so you don't hand-roll user seeding or role switching. See [Advanced pgTAP testing](/docs/guides/local-development/testing/pgtap-extended) for schema-wide assertions and a worked multi-tenant example.
-
-Stop only when `supabase test db` reports a passing result.
-
-#### Anatomy of a policy test
-
-Each case sets an identity, runs one statement as that identity, and asserts the outcome. Three things decide whether the assertion means anything.
-
-**Identity.** Switch role and identity between cases with `set local role` and `set local request.jwt.claim.sub`, so each assertion runs as the user it describes. Without the switch, every case runs as the same role and proves nothing about access.
-
-**Denials.** A denied request doesn't always raise an error, so match the assertion to the way the denial happens:
-
-- A missing grant raises `42501`. Assert it with `throws_ok`.
-- A `with check` violation raises `42501`. Assert it with `throws_ok`.
-- A `using` clause that filters the target row out raises nothing. The update or delete matches zero rows instead. Assert that no row changed.
-
-**Allowed writes.** The absence of an error doesn't prove that anything changed. Add `returning` to the statement so one assertion covers both directions. An allowed write returns the changed row, and a write the policy filters out returns nothing.
-
-#### Example
-
-This example covers all four operations against a `profiles` table where `authenticated` holds every privilege, `anon` holds none, and each user reads and writes only their own row. Copy the pattern onto each table you secured:
+When you adapt those four policies to a table, add this file for that table. The path is `supabase/tests/<table>_rls.test.sql`. For a table users share, also assert that a member who is not the owner can read and write, and that a non-member cannot.
 
 ```sql supabase/tests/profiles_rls.test.sql
+-- File: supabase/tests/profiles_rls.test.sql
+-- One file per table you enabled RLS on. Name that table in the assertions.
+-- Do not create a table only the tests use.
 begin;
 select plan(12);
 
@@ -400,7 +398,32 @@ select * from finish();
 rollback;
 ```
 
-For CLI setup and more pgTAP helpers, see [Testing your database](/docs/guides/database/testing).
+A missing grant or a `with check` violation raises `42501`; assert it with `throws_ok`. A `using` clause that filters the row out raises nothing, so assert that the update or delete changed no rows. An allowed write needs `returning`. Switch role and identity with `set local role` and `set local request.jwt.claim.sub`.
+
+### Specify roles in your policies
+
+Always name the role a policy applies to, using the `to` clause. Instead of this:
+
+```sql
+create policy "rls_test_select" on rls_test
+using ( auth.uid() = user_id );
+```
+
+Use:
+
+```sql
+create policy "rls_test_select" on rls_test
+to authenticated
+using ( (select auth.uid()) = user_id );
+```
+
+This prevents the policy `( (select auth.uid()) = user_id )` from running for any `anon` users, since the execution stops at the `to authenticated` step.
+
+### Test your policies
+
+The files above live under `supabase/tests/` and run through [pgTAP](/docs/guides/database/extensions/pgtap). Create them with `supabase test new <table>_rls.test`. Run the suite with `supabase test db`. Stop only when it reports a passing result.
+
+[`supabase-test-helpers`](https://github.com/usebasejump/supabase-test-helpers/tree/main) adds `tests.create_supabase_user()`, `tests.authenticate_as()`, and `tests.rls_enabled()`. See [Advanced pgTAP testing](/docs/guides/local-development/testing/pgtap-extended) and [Testing your database](/docs/guides/database/testing).
 
 Index the filter columns and wrap helper calls so policies stay fast as a table grows. For the measured impact and for tuning beyond them, see [Row Level Security performance](/docs/guides/database/postgres/row-level-security-performance).
 
@@ -585,6 +608,8 @@ on test_table
 to authenticated
 using ( (select private.has_good_role()) );
 ```
+
+Add member and non-member cases to that table's file under `supabase/tests/`. A member who is not the owner must be allowed; a non-member must not.
 
 Set `search_path = ''` on every `security definer` function and schema-qualify the names inside it. Without a pinned `search_path`, a caller can point an unqualified name at their own object and run it with the function owner's privileges. Check `(select auth.uid())` inside the function body. Revoke `execute` from `public`, then grant `usage` on the schema and `execute` on the function to the role the policy uses. Policy expressions run as the caller, so that role needs both. Keep the function in an unexposed schema so it is not an RPC. New functions grant `execute` to `public` by default.
 
