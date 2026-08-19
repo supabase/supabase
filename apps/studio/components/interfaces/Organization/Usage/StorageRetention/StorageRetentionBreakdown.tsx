@@ -10,9 +10,8 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { formatBytes } from '@/lib/helpers'
 
 /**
- * What is driving Storage Size — current objects versus the noncurrent data
- * versioning retains — attributed to the buckets responsible. Rendered via
- * `additionalInfo` so the noncurrent cost sits with the metric it inflates.
+ * What is driving Storage Size -
+ * current objects versus data retained by noncurrent versions
  */
 export const StorageRetentionBreakdown = () => {
   const { data: organization } = useSelectedOrganizationQuery()
