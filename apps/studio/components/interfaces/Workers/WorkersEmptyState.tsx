@@ -1,6 +1,7 @@
 import { Sparkles, Terminal } from 'lucide-react'
 import { Button, Card } from 'ui'
 
+import { WorkerCommandLine } from './WorkerCommandLine'
 import CopyButton from '@/components/ui/CopyButton'
 import { WORKERS_CLI_DEPLOY, WORKERS_SKILL_MARKDOWN } from '@/lib/constants/workers'
 
@@ -20,8 +21,8 @@ const STEPS = [
       'Your worker is built and scheduled onto a microVM in US West, right next to your database.',
   },
   {
-    title: 'Streams back here',
-    description: 'Lifecycle events and logs stream to Logflare and show up on this page.',
+    title: 'Shows up here',
+    description: 'The worker and its state appear on this page once the build finishes.',
   },
 ]
 
@@ -59,10 +60,10 @@ export const WorkersEmptyState = ({ onDeploy }: WorkersEmptyStateProps) => (
 
     <div className="flex flex-col gap-4 p-8">
       <p className="text-xs font-mono uppercase tracking-wider text-foreground-lighter">
-        Prefer the CLI?
+        Deploy from the terminal
       </p>
-      <div className="rounded-md border border-default bg-surface-100 px-3 py-2 font-mono text-sm text-foreground-light">
-        {WORKERS_CLI_DEPLOY}
+      <div className="rounded-md border border-default bg-surface-100 px-3 py-2">
+        <WorkerCommandLine command={WORKERS_CLI_DEPLOY} />
       </div>
 
       <div className="space-y-2 rounded-md border border-default p-4">
