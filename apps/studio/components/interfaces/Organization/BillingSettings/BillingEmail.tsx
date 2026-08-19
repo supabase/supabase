@@ -41,11 +41,11 @@ const BillingEmail = () => {
   const { slug } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
-  const { name, billing_email } = selectedOrganization ?? {}
+  const { name } = selectedOrganization ?? {}
 
   const { can: canReadBillingEmail, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
+    'stripe.customer'
   )
   const { can: canUpdateBillingData } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
@@ -54,17 +54,21 @@ const BillingEmail = () => {
 
   const { ref, inView } = useInView({ triggerOnce: true })
 
-  const { data: additionalBillingEmailsData, isPending: loadingBillingCustomer } =
+  const { data: customerProfile, isPending: loadingBillingCustomer } =
     useOrganizationCustomerProfileQuery(
       { slug },
-      { enabled: canReadBillingEmail && inView, select: (data) => data?.additional_emails }
+      {
+        enabled: canReadBillingEmail && inView,
+        select: (data) =>
+          data ? { email: data.email, additional_emails: data.additional_emails } : data,
+      }
     )
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      billingEmail: billing_email ?? '',
-      additionalBillingEmails: additionalBillingEmailsData ?? [],
+      billingEmail: customerProfile?.email ?? '',
+      additionalBillingEmails: customerProfile?.additional_emails ?? [],
     },
   })
   const additionalBillingEmails = useWatch({
@@ -100,13 +104,13 @@ const BillingEmail = () => {
   }
 
   useEffect(() => {
-    if (additionalBillingEmailsData !== undefined) {
+    if (customerProfile) {
       form.reset({
-        billingEmail: billing_email ?? '',
-        additionalBillingEmails: additionalBillingEmailsData ?? [],
+        billingEmail: customerProfile.email ?? '',
+        additionalBillingEmails: customerProfile.additional_emails ?? [],
       })
     }
-  }, [additionalBillingEmailsData])
+  }, [customerProfile])
 
   return (
     <ScaffoldSection ref={ref}>
@@ -180,7 +184,11 @@ const BillingEmail = () => {
                           }
                         >
                           <FormControl>
-                            <MultiSelector values={field.value} onValuesChange={field.onChange}>
+                            <MultiSelector
+                              values={field.value}
+                              onValuesChange={field.onChange}
+                              disabled={!canUpdateBillingData}
+                            >
                               <MultiSelectorTrigger
                                 deletableBadge
                                 showIcon={false}
