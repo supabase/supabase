@@ -1,4 +1,5 @@
-import { useEffect, useRef } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import {
   DialogSection,
@@ -25,6 +26,25 @@ import {
   type BucketVersioningState,
   type ExpirationMode,
 } from './StorageProtection.constants'
+
+/**
+ * Shared enter/exit for any form section that appears or disappears in
+ * response to a toggle further up the form. Height + opacity so pushed
+ * siblings slide in place rather than snapping. Wrap the parent with
+ * `<AnimatePresence initial={false}>` so a section that's already open on
+ * mount doesn't animate in on first paint.
+ */
+const Collapse = ({ children }: { children: ReactNode }) => (
+  <motion.div
+    initial={{ opacity: 0, height: 0 }}
+    animate={{ opacity: 1, height: 'auto' }}
+    exit={{ opacity: 0, height: 0 }}
+    transition={{ duration: 0.18, ease: [0.4, 0, 0.2, 1] }}
+    className="overflow-hidden"
+  >
+    {children}
+  </motion.div>
+)
 
 interface BucketDataProtectionFieldsProps {
   /** The bucket's versioning state when the modal opened (unset when creating a new bucket, which is always `disabled`). */
@@ -131,60 +151,72 @@ export const BucketDataProtectionFields = ({
           )}
         />
 
-        {!isVersioningEnabled && wasEverVersioned && (
-          // Full-detail explanation moved to the AlertDialog that confirms
-          // the save; the inline note is just a heads-up that the switch
-          // did something non-obvious.
-          <Admonition
-            type="default"
-            title={
-              initialVersioningEnabled
-                ? 'Versioning will be suspended once saved'
-                : 'Versioning is suspended on this bucket'
-            }
-            description="Existing versions and archived files stay put. Re-enable versioning any time."
-          />
-        )}
+        <AnimatePresence initial={false}>
+          {!isVersioningEnabled && wasEverVersioned && (
+            // Full-detail explanation moved to the AlertDialog that
+            // confirms the save; the inline note is just a heads-up that
+            // the switch did something non-obvious.
+            <Collapse key="suspension-notice">
+              <Admonition
+                type="default"
+                title={
+                  initialVersioningEnabled
+                    ? 'Versioning will be suspended once saved'
+                    : 'Versioning is suspended on this bucket'
+                }
+                description="Existing versions and archived files stay put. Re-enable versioning any time."
+              />
+            </Collapse>
+          )}
 
-        {showUpgradePrompt && (
-          <UpgradeToPro
-            primaryText="Object versioning requires the Pro plan or higher"
-            secondaryText="The Free plan doesn't support object versioning or lifecycle policy management. Upgrade to keep previous versions of objects and automatically manage their retention."
-            source="storage-object-versioning"
-          />
-        )}
+          {showUpgradePrompt && (
+            <Collapse key="upgrade-prompt">
+              <UpgradeToPro
+                primaryText="Object versioning requires the Pro plan or higher"
+                secondaryText="The Free plan doesn't support object versioning or lifecycle policy management. Upgrade to keep previous versions of objects and automatically manage their retention."
+                source="storage-object-versioning"
+              />
+            </Collapse>
+          )}
 
-        {!!planLimits && isVersioningEnabled && isPublicBucket && (
-          <Admonition
-            type="warning"
-            title="Public bucket exposes every version"
-            description="Anyone with a version ID can fetch a noncurrent version of a public object. To hide noncurrent versions, add an RLS policy on storage.objects that filters where metadata->>'isCurrent' = 'true'."
-          />
-        )}
+          {!!planLimits && isVersioningEnabled && isPublicBucket && (
+            <Collapse key="public-bucket-warning">
+              <Admonition
+                type="warning"
+                title="Public bucket exposes every version"
+                description="Anyone with a version ID can fetch a noncurrent version of a public object. To hide noncurrent versions, add an RLS policy on storage.objects that filters where metadata->>'isCurrent' = 'true'."
+              />
+            </Collapse>
+          )}
 
-        {!!planLimits && isVersioningEnabled && isTightening && (
-          <Admonition
-            type="warning"
-            title="Tightening retention will expire some data"
-            description={
-              isTighteningRetention && isTighteningMaxVersions
-                ? 'Noncurrent versions past the shorter retention window, and any beyond the lower per-object cap, will be permanently deleted once saved.'
-                : isTighteningRetention
-                  ? 'Noncurrent versions past the shorter retention window will be permanently deleted once saved.'
-                  : 'Noncurrent versions beyond the lower per-object cap will be permanently deleted once saved.'
-            }
-          />
-        )}
+          {!!planLimits && isVersioningEnabled && isTightening && (
+            <Collapse key="tightening-warning">
+              <Admonition
+                type="warning"
+                title="Tightening retention will expire some data"
+                description={
+                  isTighteningRetention && isTighteningMaxVersions
+                    ? 'Noncurrent versions past the shorter retention window, and any beyond the lower per-object cap, will be permanently deleted once saved.'
+                    : isTighteningRetention
+                      ? 'Noncurrent versions past the shorter retention window will be permanently deleted once saved.'
+                      : 'Noncurrent versions beyond the lower per-object cap will be permanently deleted once saved.'
+                }
+              />
+            </Collapse>
+          )}
 
-        {!!planLimits && isVersioningEnabled && (
-          <LifecyclePolicySection
-            control={control}
-            hasDays={hasDays}
-            hasVersions={hasVersions}
-            mode={expirationMode}
-            onModeChange={handleModeChange}
-          />
-        )}
+          {!!planLimits && isVersioningEnabled && (
+            <Collapse key="lifecycle-policy">
+              <LifecyclePolicySection
+                control={control}
+                hasDays={hasDays}
+                hasVersions={hasVersions}
+                mode={expirationMode}
+                onModeChange={handleModeChange}
+              />
+            </Collapse>
+          )}
+        </AnimatePresence>
       </DialogSection>
     </>
   )
@@ -310,16 +342,24 @@ const LifecyclePolicySection = ({
           with a single condition there's nothing to combine. Vertical layout
           lets the two-line option descriptions span the full section width
           rather than getting squeezed into the number-input column. */}
-      {hasBothConditions && <ExpirationModeToggle mode={mode} onModeChange={onModeChange} />}
+      <AnimatePresence initial={false}>
+        {hasBothConditions && (
+          <Collapse key="mode">
+            <ExpirationModeToggle mode={mode} onModeChange={onModeChange} />
+          </Collapse>
+        )}
 
-      {hasNoPolicy && (
-        <Admonition
-          type="warning"
-          className="mt-2"
-          title="No lifecycle policy"
-          description="All noncurrent versions count toward storage usage and incur ongoing costs. Consider setting a lifecycle policy to automatically expire outdated versions."
-        />
-      )}
+        {hasNoPolicy && (
+          <Collapse key="no-policy">
+            <Admonition
+              type="warning"
+              className="mt-2"
+              title="No lifecycle policy"
+              description="All noncurrent versions count toward storage usage and incur ongoing costs. Consider setting a lifecycle policy to automatically expire outdated versions."
+            />
+          </Collapse>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
