@@ -1,3 +1,4 @@
+import { Check } from 'lucide-react'
 import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
 import {
   Badge,
@@ -38,12 +39,27 @@ interface DestinationTypeGroup {
   options: DestinationTypeOption[]
 }
 
+function StageBadge({ stage }: { stage: DestinationTypeOption['stage'] }) {
+  if (!stage) return null
+  return (
+    <Badge
+      variant={
+        stage === 'Early Access' ? 'warning' : stage === 'Deprecated' ? 'destructive' : 'default'
+      }
+    >
+      {stage}
+    </Badge>
+  )
+}
+
 interface DestinationTypeSelectionProps {
+  variant?: 'select' | 'radio'
   hideReadReplica?: boolean
   className?: string
 }
 
 export const DestinationTypeSelection = ({
+  variant = 'select',
   hideReadReplica = false,
   className,
 }: DestinationTypeSelectionProps) => {
@@ -144,9 +160,9 @@ export const DestinationTypeSelection = ({
     .map((group) => ({ ...group, options: group.options.filter((option) => option.enabled) }))
     .filter((group) => group.options.length > 0)
 
-  const selectedOption = visibleGroups
-    .flatMap((group) => group.options)
-    .find((option) => option.value === destinationType)
+  const allVisibleOptions = visibleGroups.flatMap((group) => group.options)
+
+  const selectedOption = allVisibleOptions.find((option) => option.value === destinationType)
 
   const stageDescription =
     selectedOption?.stage === 'Public Alpha' ? (
@@ -166,6 +182,53 @@ export const DestinationTypeSelection = ({
     ) : selectedOption?.stage === 'Deprecated' ? (
       'This destination type is deprecated.'
     ) : null
+
+  if (variant === 'radio') {
+    return (
+      <div className={className}>
+        <div role="radiogroup" aria-label="Destination type" className="flex flex-col gap-3">
+          {allVisibleOptions.map((option) => {
+            const selected = destinationType === option.value
+            return (
+              <button
+                key={option.value}
+                type="button"
+                role="radio"
+                aria-checked={selected}
+                onClick={() => setDestinationType(option.value)}
+                className={cn(
+                  'relative flex items-start gap-x-4 rounded-md border p-4 text-left transition',
+                  'hover:border-control-hover',
+                  selected ? 'border-control-hover bg-surface-300' : 'border-default bg-surface-100'
+                )}
+              >
+                <DestinationIcon
+                  type={option.value}
+                  size={20}
+                  className="mt-0.5 shrink-0 text-foreground-light"
+                />
+                <div className="flex min-w-0 flex-1 flex-col gap-y-0.5">
+                  <div className="flex items-center gap-x-2">
+                    <span className="text-sm text-foreground">{option.label}</span>
+                    <StageBadge stage={option.stage} />
+                  </div>
+                  <span className="text-xs text-foreground-lighter">{option.description}</span>
+                </div>
+                {selected ? (
+                  <Check size={16} className="mt-0.5 shrink-0 text-brand" />
+                ) : (
+                  <span className="mt-0.5 h-4 w-4 shrink-0 rounded-full border border-strong" />
+                )}
+              </button>
+            )
+          })}
+        </div>
+        {stageDescription && (
+          <p className="mt-3 text-xs text-foreground-lighter">{stageDescription}</p>
+        )}
+      </div>
+    )
+  }
 
   const typeDescription =
     !editMode || stageDescription ? (
@@ -199,19 +262,7 @@ export const DestinationTypeSelection = ({
               />
               <div className="flex items-center gap-x-2">
                 <span className="text-sm text-foreground">{selectedOption.label}</span>
-                {selectedOption.stage && (
-                  <Badge
-                    variant={
-                      selectedOption.stage === 'Early Access'
-                        ? 'warning'
-                        : selectedOption.stage === 'Deprecated'
-                          ? 'destructive'
-                          : 'default'
-                    }
-                  >
-                    {selectedOption.stage}
-                  </Badge>
-                )}
+                <StageBadge stage={selectedOption.stage} />
               </div>
             </div>
           ) : (
@@ -234,19 +285,7 @@ export const DestinationTypeSelection = ({
                     <div className="flex flex-col gap-y-0.5">
                       <div className="flex items-center gap-x-2">
                         <span className="text-foreground">{option.label}</span>
-                        {option.stage && (
-                          <Badge
-                            variant={
-                              option.stage === 'Early Access'
-                                ? 'warning'
-                                : option.stage === 'Deprecated'
-                                  ? 'destructive'
-                                  : 'default'
-                            }
-                          >
-                            {option.stage}
-                          </Badge>
-                        )}
+                        <StageBadge stage={option.stage} />
                       </div>
                       <span className="text-xs text-foreground-lighter">{option.description}</span>
                     </div>

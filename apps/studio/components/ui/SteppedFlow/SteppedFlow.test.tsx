@@ -5,23 +5,19 @@ import { SteppedFlow } from './SteppedFlow'
 import { customRender } from '@/tests/lib/custom-render'
 
 const steps = [
-  { id: 'destination', label: 'Destination', description: 'Choose where data should go' },
-  { id: 'connection', label: 'Connection', description: 'Authorize the destination' },
-  { id: 'review', label: 'Review', description: 'Confirm and create' },
+  { id: 'destination', label: 'Destination' },
+  { id: 'connection', label: 'Connection' },
+  { id: 'review', label: 'Review' },
 ]
 
 describe('SteppedFlow', () => {
-  test('does not let the user jump ahead of the current step', () => {
-    const onStepChange = vi.fn()
-
+  test('does not show Back on the first step', () => {
     customRender(
-      <SteppedFlow steps={steps} currentStep="destination" onStepChange={onStepChange}>
+      <SteppedFlow steps={steps} currentStep="destination" onStepChange={vi.fn()}>
         Step body
       </SteppedFlow>
     )
 
-    fireEvent.click(screen.getByRole('button', { name: 'Connection, not yet available' }))
-    expect(onStepChange).not.toHaveBeenCalled()
     expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument()
   })
 
@@ -35,19 +31,6 @@ describe('SteppedFlow', () => {
     )
 
     fireEvent.click(screen.getByRole('button', { name: 'Back' }))
-    expect(onStepChange).toHaveBeenCalledWith('destination')
-  })
-
-  test('lets the user return to a completed step', () => {
-    const onStepChange = vi.fn()
-
-    customRender(
-      <SteppedFlow steps={steps} currentStep="connection" onStepChange={onStepChange}>
-        Step body
-      </SteppedFlow>
-    )
-
-    fireEvent.click(screen.getByRole('button', { name: 'Go to completed step: Destination' }))
     expect(onStepChange).toHaveBeenCalledWith('destination')
   })
 

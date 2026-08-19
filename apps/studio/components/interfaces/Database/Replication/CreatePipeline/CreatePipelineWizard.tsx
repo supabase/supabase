@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { useFeatureFlags, useParams } from 'common'
 import { ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -8,7 +8,21 @@ import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, cn, Form } from 'ui'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  Button,
+  CardContent,
+  cn,
+  Form,
+} from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { AdvancedSettings } from '../DestinationPanel/DestinationForm/AdvancedSettings'
@@ -40,7 +54,6 @@ import { ValidationFailuresSection } from '../DestinationPanel/DestinationForm/V
 import { ValidationWarningsDialog } from '../DestinationPanel/DestinationForm/ValidationWarningsDialog'
 import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
 import { DestinationTypeSelection } from '../DestinationPanel/DestinationTypeSelection'
-import { EnablePipelinesCallout } from '../EnablePipelinesCallout'
 import { LocalReplicationUnavailableAdmonition } from '../LocalReplicationUnavailableAdmonition'
 import {
   useIsETLBigQueryPrivateAlpha,
@@ -66,12 +79,14 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { SteppedFlow } from '@/components/ui/SteppedFlow/SteppedFlow'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useCreateTenantSourceMutation } from '@/data/replication/create-tenant-source-mutation'
 import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
 import {
   useReplicationSourceId,
   useReplicationSourcesQuery,
 } from '@/data/replication/sources-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -80,6 +95,9 @@ const formId = 'create-pipeline'
 export const CreatePipelineWizard = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
+  const { isLoading: isOrgLoading } = useSelectedOrganizationQuery()
+  const { configcat: flagStore } = useFeatureFlags()
+  const isFlagStoreLoaded = Object.keys(flagStore).length > 0
   const enablePgReplicate = useIsETLPrivateAlpha()
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
@@ -124,6 +142,12 @@ export const CreatePipelineWizard = () => {
     (source) => source.name === projectRef
   )
   const replicationNotEnabled = isSourcesSuccess && !externalReplicationSource
+
+  const { mutate: createTenantSource, isPending: isEnablingPipelines } =
+    useCreateTenantSourceMutation({
+      onSuccess: () => toast.success('Pipelines enabled'),
+      onError: (error) => toast.error(`Failed to enable Pipelines: ${error.message}`),
+    })
 
   const availableDestinations = useMemo(() => {
     const destinations: DestinationType[] = []
@@ -276,6 +300,16 @@ export const CreatePipelineWizard = () => {
   })
   useRegisterIsolatedStudioFlowClose(confirmOnClose)
 
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty || step !== 'destination') {
+        e.preventDefault()
+      }
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [isDirty, step])
+
   const canContinueFromDestination = selectedType !== null
   const canContinueFromConnection =
     selectedType !== null && hasValidConnection({ type: selectedType, data: formValues })
@@ -404,6 +438,14 @@ export const CreatePipelineWizard = () => {
       ? `${DOCS_URL}/guides/database/replication/bigquery#configure-bigquery-as-a-destination`
       : `${DOCS_URL}/guides/database/replication/pipelines#step-3-configure-a-destination`
 
+  if (isOrgLoading || !isFlagStoreLoaded) {
+    return (
+      <div className="mx-auto w-full max-w-[760px] px-6 py-8">
+        <GenericSkeletonLoader />
+      </div>
+    )
+  }
+
   if (!enablePgReplicate) {
     return (
       <CreatePipelineGate
@@ -437,12 +479,13 @@ export const CreatePipelineWizard = () => {
 
   if (replicationNotEnabled) {
     return (
-      <CreatePipelineGate
-        title="Enable Pipelines"
-        description="Turn on Pipelines for this project before creating a destination."
-      >
-        <EnablePipelinesCallout className="p-6!" type={selectedType} />
-      </CreatePipelineGate>
+      <EnablePipelinesAlertDialog
+        onEnable={() => {
+          if (projectRef) createTenantSource({ projectRef })
+        }}
+        isEnabling={isEnablingPipelines}
+        onCancel={goToList}
+      />
     )
   }
 
@@ -475,92 +518,110 @@ export const CreatePipelineWizard = () => {
             }}
           >
             {step === 'destination' && (
-              <section className="space-y-2">
-                <h2 className="text-lg text-foreground">Choose a destination</h2>
-                <p className="text-sm text-foreground-light">
-                  Where should this database be replicated?
-                </p>
-                <LocalReplicationUnavailableAdmonition className="mt-4" />
-                <DestinationTypeSelection hideReadReplica className="p-0 pt-4" />
-              </section>
+              <>
+                <CardContent className="space-y-1">
+                  <h2 className="text-lg text-foreground">Choose a destination</h2>
+                  <p className="text-sm text-foreground-light">
+                    Where should this database be replicated?
+                  </p>
+                  <LocalReplicationUnavailableAdmonition className="pt-2" />
+                </CardContent>
+                <CardContent>
+                  <DestinationTypeSelection variant="radio" hideReadReplica />
+                </CardContent>
+              </>
             )}
 
             {step === 'connection' && selectedType && (
-              <section className="space-y-6">
-                <div className="space-y-1">
+              <>
+                <CardContent className="space-y-1">
                   <h2 className="text-lg text-foreground">Authorize the destination</h2>
                   <p className="text-sm text-foreground-light">
                     Name this pipeline and enter credentials for {selectedType}.
                   </p>
-                </div>
-                <DestinationNameInput form={form} />
-                <PipelineRegionField />
-                {selectedType === 'BigQuery' && etlEnableBigQuery && (
-                  <BigQueryFields form={form} editMode={false} className="p-0" />
-                )}
-                {selectedType === 'Analytics Bucket' && etlEnableIceberg && (
-                  <AnalyticsBucketFields
-                    form={form}
-                    editMode={false}
-                    className="p-0"
-                    onSelectNewBucket={() => setNewBucketSheetVisible(true)}
-                  />
-                )}
-                {selectedType === 'DuckLake' && etlEnableDucklake && (
-                  <DuckLakeFields form={form} editMode={false} className="p-0" />
-                )}
-                {selectedType === 'Snowflake' && etlEnableSnowflake && (
-                  <SnowflakeFields form={form} editMode={false} className="p-0" />
-                )}
-                {selectedType === 'ClickHouse' && etlEnableClickHouse && (
-                  <ClickHouseFields form={form} editMode={false} className="p-0" />
-                )}
-              </section>
+                </CardContent>
+                <CardContent className="space-y-6">
+                  <DestinationNameInput form={form} />
+                  <PipelineRegionField />
+                </CardContent>
+                <CardContent>
+                  {selectedType === 'BigQuery' && etlEnableBigQuery && (
+                    <BigQueryFields form={form} editMode={false} className="p-0" />
+                  )}
+                  {selectedType === 'Analytics Bucket' && etlEnableIceberg && (
+                    <AnalyticsBucketFields
+                      form={form}
+                      editMode={false}
+                      className="p-0"
+                      onSelectNewBucket={() => setNewBucketSheetVisible(true)}
+                    />
+                  )}
+                  {selectedType === 'DuckLake' && etlEnableDucklake && (
+                    <DuckLakeFields form={form} editMode={false} className="p-0" />
+                  )}
+                  {selectedType === 'Snowflake' && etlEnableSnowflake && (
+                    <SnowflakeFields form={form} editMode={false} className="p-0" />
+                  )}
+                  {selectedType === 'ClickHouse' && etlEnableClickHouse && (
+                    <ClickHouseFields form={form} editMode={false} className="p-0" />
+                  )}
+                </CardContent>
+              </>
             )}
 
             {step === 'data' && (
-              <section className="space-y-6">
-                <div className="space-y-1">
+              <>
+                <CardContent className="space-y-1">
                   <h2 className="text-lg text-foreground">Choose what to replicate</h2>
                   <p className="text-sm text-foreground-light">
                     Select a publication and which existing rows to copy during initial sync.
                   </p>
-                </div>
-                <PublicationSelection
-                  form={form}
-                  onSelectNewPublication={() => setPublicationPanelVisible(true)}
-                />
-                <TableCopySelection form={form} editMode={false} />
-              </section>
+                </CardContent>
+                <CardContent>
+                  <PublicationSelection
+                    form={form}
+                    onSelectNewPublication={() => setPublicationPanelVisible(true)}
+                  />
+                </CardContent>
+                <CardContent>
+                  <TableCopySelection form={form} editMode={false} />
+                </CardContent>
+              </>
             )}
 
             {step === 'review' && selectedType && (
-              <section className="space-y-6">
-                <div className="space-y-1">
+              <>
+                <CardContent className="space-y-1">
                   <h2 className="text-lg text-foreground">Review and create</h2>
                   <p className="text-sm text-foreground-light">
                     Confirm optional settings, then create and start the pipeline.
                   </p>
-                </div>
-                <p className="text-sm text-foreground-light">
-                  <span className="text-foreground">{name || 'Untitled pipeline'}</span>
-                  {' · '}
-                  {selectedType}
-                  {publicationName ? ` · ${publicationName}` : ''}
-                </p>
-                <div className="-mx-5">
+                </CardContent>
+                <CardContent>
+                  <p className="text-sm text-foreground-light">
+                    <span className="text-foreground">{name || 'Untitled pipeline'}</span>
+                    {' · '}
+                    {selectedType}
+                    {publicationName ? ` · ${publicationName}` : ''}
+                  </p>
+                </CardContent>
+                <CardContent>
                   <AdvancedSettings type={selectedType} form={form} />
-                </div>
+                </CardContent>
                 {hasRunValidation && !isValidating && (
-                  <div ref={validationSectionRef}>
-                    <ValidationFailuresSection
-                      destinationFailures={destinationValidationFailures}
-                      pipelineFailures={pipelineValidationFailures}
-                    />
-                  </div>
+                  <CardContent>
+                    <div ref={validationSectionRef}>
+                      <ValidationFailuresSection
+                        destinationFailures={destinationValidationFailures}
+                        pipelineFailures={pipelineValidationFailures}
+                      />
+                    </div>
+                  </CardContent>
                 )}
-                <DocsButton href={docsUrl} topic={`${selectedType} pipeline settings`} />
-              </section>
+                <CardContent>
+                  <DocsButton href={docsUrl} topic={`${selectedType} pipeline settings`} />
+                </CardContent>
+              </>
             )}
           </SteppedFlow>
         </form>
@@ -608,5 +669,37 @@ export const CreatePipelineWizard = () => {
 
       <DiscardChangesConfirmationDialog {...modalProps} />
     </>
+  )
+}
+
+function EnablePipelinesAlertDialog({
+  onEnable,
+  isEnabling,
+  onCancel,
+}: {
+  onEnable: () => void
+  isEnabling: boolean
+  onCancel: () => void
+}) {
+  return (
+    <AlertDialog open>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Enable Pipelines</AlertDialogTitle>
+          <AlertDialogDescription>
+            Pipelines replicates your database to external destinations. It is billed for configured
+            pipeline hours and data processed.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isEnabling} onClick={onCancel}>
+            Cancel
+          </AlertDialogCancel>
+          <AlertDialogAction onClick={onEnable} disabled={isEnabling}>
+            Enable
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }

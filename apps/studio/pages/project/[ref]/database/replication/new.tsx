@@ -57,7 +57,7 @@ DatabaseReplicationNewPage.getLayout = (page) => (
   <DefaultLayout hideMobileMenu headerTitle="New pipeline">
     <ProjectLayoutWithAuth
       product="Database"
-      browserTitle={{ section: 'New pipeline' }}
+      browserTitle={{ section: 'New Pipeline' }}
       isBlocking={false}
     >
       {page}
