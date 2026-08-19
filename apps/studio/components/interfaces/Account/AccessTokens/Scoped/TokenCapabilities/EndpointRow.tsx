@@ -75,7 +75,7 @@ export const EndpointRow = ({
             'font-mono text-xs',
             // This is necessary for the reveal on hover animation
             'block inline-[max-content] whitespace-nowrap text-nowrap',
-            'transition-transform ease-linear motion-reduce:transition-none duration-500 delay-400',
+            'transition-transform ease-linear motion-reduce:transition-none duration-1000 delay-400',
             // This ensure no GPU jump when non-scrolling items are hovered
             'translate-0',
             // If the content (102% to have a small right margin) exceeds the container size (100cqi), the calc result will be a negative number
