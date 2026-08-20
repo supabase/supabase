@@ -12,6 +12,7 @@ export const dataset: AssistantEvalCase[] = [
     },
     expected: {
       requiredTools: ['get_advisors', 'query_logs'],
+      requiredKnowledge: ['logs'],
     },
     metadata: { category: ['debugging', 'rls_policies'] },
   },

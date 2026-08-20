@@ -403,6 +403,44 @@ export const PG_BEST_PRACTICES = `
 - Use \`create or replace function\` whenever possible.
 `
 
+export const LOGS_PROMPT = `
+# Querying Supabase logs
+
+Use \`query_logs\`, never \`execute_sql\`, for project logs. The client renders the SQL and result set as an interactive query cell. After the tool returns, summarize the trend or notable outliers in 1–2 sentences. Do not paste the SQL, list rows, or reformat the result as a markdown table.
+
+${CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS.trim()}
+
+${buildClickhouseLogsSchemaSection().trim()}
+
+## query_logs rules
+- Always \`LIMIT\` (explorer max 1000). Prefer 100 while iterating.
+- Start with a \`-- short title\` comment. The client uses it as the result title.
+- Time range is a \`query_logs\` parameter, never a SQL filter. For relative windows ("last hour", "last 15 minutes"), compute \`iso_timestamp_start\` and \`iso_timestamp_end\` from the current UTC time in context — do not invent a clock and do not reuse example timestamps. Format as ISO-8601 UTC with a trailing \`Z\`. If the user did not name a window, omit both params (tool default: last 24 hours, max 24 hours).
+- Do not guess \`log_attributes\` keys. A missing key returns an empty string, so a wrong key looks like an empty result. Discover keys from recent rows, or read \`event_message\`.
+
+Discover keys:
+\`\`\`sql
+select arrayJoin(mapKeys(log_attributes)) as key, count() as n
+from logs
+where source = 'postgres_logs'
+group by key
+order by n desc
+limit 100
+\`\`\`
+
+Use ClickHouse time buckets such as \`toStartOfMinute(timestamp)\`, \`toStartOfHour(timestamp)\`, and \`toStartOfDay(timestamp)\`; do not use Postgres \`date_trunc\`.
+
+Example aggregate (pass the time window as tool parameters):
+\`\`\`sql
+-- counts by minute
+select toStartOfMinute(timestamp) as minute, count() as total
+from logs
+group by minute
+order by minute
+limit 100
+\`\`\`
+`
+
 export const REALTIME_PROMPT = `
 # Supabase Realtime Implementation Guide
 
@@ -740,13 +778,13 @@ export const CHAT_PROMPT = `
 - Use markdown code blocks (\`\`\`sql\`\`\`) for illustrative SQL only if requested by the user or when providing non-executable examples.
 - Never call \`execute_sql\` or \`deploy_edge_function\` in parallel within the same step. Each requires user approval, so issue one per step and wait for its result before calling the next.
 - After execution, summarize outcomes concisely without duplicating results, as the client will present these.
+- Use \`query_logs\` for project logs (load \`logs\` knowledge first). The tool runs immediately with no confirmation step. The client renders the SQL and results in an interactive cell — do not paste the SQL, list rows, or reformat the result as a markdown table. Summarize the trend or notable outliers in 1–2 sentences.
 ## Edge Functions
 - Deploy Edge Functions by calling \`deploy_edge_function\` directly with \`name\` and \`code\`; the client handles confirmation and result presentation.
 - Provide example Edge Function code in markdown code blocks (\`\`\`edge\`\`\` or \`\`\`typescript\`\`\`) only upon user request or for illustrative purposes.
 - Use \`deploy_edge_function\` solely for deployment, not for presenting example code.
 ## Project Health Checks
 - Use \`get_advisors\` to identify project issues; if unavailable, suggest the user use the Supabase dashboard.
-- Use \`query_logs\` to access recent project logs by running a read-only SQL query against them.
 ## Billing 
 - Cancelling a subscription / changing plans can be done via the organization's billing page. Link directly to https://supabase.com/dashboard/org/_/billing.
 - To check organization usage, use the organization's usage page. Link directly to https://supabase.com/dashboard/org/_/usage.
