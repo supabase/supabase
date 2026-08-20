@@ -107,9 +107,9 @@ Follow these steps for every table in an exposed schema:
 1. [Enable RLS and set the grants](#enable-rls-and-set-the-grants) to match the app.
 2. [Write a policy per operation](#write-a-policy-for-each-operation).
 3. [Create a `.sql` file under `supabase/tests/`](#test-your-policies) that asserts allow and deny for `select`, `insert`, `update`, and `delete`, for `anon` and `authenticated`.
-4. Run `supabase test db` and stop only when it passes.
+4. Run `supabase test db` and fix what it reports.
 
-A table is not secured until that suite passes.
+Until the suite passes, you don't know whether the policies do what you intended.
 
 ### Enable RLS and set the grants
 
@@ -145,7 +145,7 @@ Enable RLS, then set the grants to match what each role does in your app:
    supabase test db
    ```
 
-   Every table you secure gets one, and the change isn't done until the suite passes. The examples below show what goes in the file.
+   Give every table you secure one. The examples below show what goes in the file.
 
 Data that clients read but never write, such as a feed a backend job populates, gets select only. The policy and the test file are part of the same change:
 
@@ -164,7 +164,7 @@ using ( true );
 -- File: supabase/tests/announcements_rls.test.sql
 -- Create: supabase test new announcements_rls.test
 -- Run:    supabase test db
--- Repeat for every public-read table you secured. Do not add a table only the tests use.
+-- Repeat for every public-read table you secured.
 begin;
 select plan(8);
 
@@ -442,7 +442,7 @@ This prevents the policy `( (select auth.uid()) = user_id )` from running for an
 
 ### Test your policies
 
-The files above live under `supabase/tests/` and run through [pgTAP](/docs/guides/database/extensions/pgtap). Create them with `supabase test new <table>_rls.test`. Run the suite with `supabase test db`. Stop only when it reports a passing result.
+The files above live under `supabase/tests/` and run through [pgTAP](/docs/guides/database/extensions/pgtap). Create them with `supabase test new <table>_rls.test`, and run them with `supabase test db`.
 
 [`supabase-test-helpers`](https://github.com/usebasejump/supabase-test-helpers/tree/main) adds `tests.create_supabase_user()`, `tests.authenticate_as()`, and `tests.rls_enabled()`. See [Advanced pgTAP testing](/docs/guides/local-development/testing/pgtap-extended) and [Testing your database](/docs/guides/database/testing).
 
