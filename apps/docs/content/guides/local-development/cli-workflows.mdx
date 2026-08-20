@@ -121,8 +121,6 @@ The generated file can include statements you didn't expect. The diff engine exc
 
 The `auth` and `storage` schemas are managed by Supabase, so the diff engine excludes their platform objects. Your own triggers on managed tables (such as a trigger on `auth.users` calling a function in `public`) are captured automatically. Other customizations inside these schemas, for example RLS policies on `storage.objects`, are not diffed: manage them with [hand-written migrations](/docs/guides/deployment/database-migrations).
 
-On the legacy `migra` engine, pull these schemas separately instead: `supabase db pull --schema auth -f pull-auth-schema`.
-
 </Admonition>
 
 ### Step 5: Create seed data
