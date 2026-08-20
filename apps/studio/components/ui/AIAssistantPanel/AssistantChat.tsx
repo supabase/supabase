@@ -194,7 +194,7 @@ export const AssistantChat = ({
     addToolApprovalResponse,
     stop,
     regenerate,
-  } = useChat({
+  } = useChat<MessageType>({
     id: chatId,
     ...(chatInstance ? { chat: chatInstance } : {}),
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,

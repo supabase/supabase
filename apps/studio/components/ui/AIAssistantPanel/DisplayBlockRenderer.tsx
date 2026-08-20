@@ -8,7 +8,7 @@ import { useRef, useState, type DragEvent, type PropsWithChildren } from 'react'
 
 import { DEFAULT_CHART_CONFIG, QueryBlock } from '../QueryBlock/QueryBlock'
 import { identifyQueryType } from './AIAssistant.utils'
-import { ConfirmFooter } from './ConfirmFooter'
+import { ConfirmFooter } from './Confirm'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { entityTypeKeys } from '@/data/entity-types/keys'
 import { lintKeys } from '@/data/lint/keys'
