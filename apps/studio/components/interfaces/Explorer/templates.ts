@@ -1,9 +1,29 @@
-import {
-  createLogCellSkeleton,
-  createMarkdownCellSkeleton,
-  createQueryCellSkeleton,
-} from './utils'
+import { createLogCellSkeleton, createMarkdownCellSkeleton, createQueryCellSkeleton } from './utils'
 import type { Notebooks } from '@/types'
+
+export type ChatTemplate = {
+  title: string
+  description: string
+  initialMessage: string
+}
+
+export const CHAT_TEMPLATES: ChatTemplate[] = [
+  {
+    title: 'Generate sample data',
+    description: 'Chat template',
+    initialMessage: 'Generate sample data for a blog with users, posts, and comments tables.',
+  },
+  {
+    title: 'Set up RLS policies',
+    description: 'Chat template',
+    initialMessage: 'Create RLS policies to ensure users can only access their own data.',
+  },
+  {
+    title: 'Build a notebook',
+    description: 'Chat template',
+    initialMessage: 'Build me a notebook that tracks weekly signups and active users.',
+  },
+]
 
 export type NotebookTemplate = {
   title: string
@@ -20,7 +40,7 @@ export const NOTEBOOK_TEMPLATES: NotebookTemplate[] = [
         content: [
           '# Database health check',
           '',
-          "A quick look at table sizes, index usage, and dead tuples — good to run before a scaling decision or when queries feel slower than usual.",
+          'A quick look at table sizes, index usage, and dead tuples — good to run before a scaling decision or when queries feel slower than usual.',
         ].join('\n'),
       }),
       createMarkdownCellSkeleton({
@@ -98,8 +118,8 @@ export const NOTEBOOK_TEMPLATES: NotebookTemplate[] = [
       createLogCellSkeleton({
         title: 'Recent database errors and warnings',
         sql: [
-          "-- recent database errors and warnings",
-          'select timestamp, event_message, log_attributes[\'parsed.error_severity\'] as severity',
+          '-- recent database errors and warnings',
+          "select timestamp, event_message, log_attributes['parsed.error_severity'] as severity",
           'from logs',
           "where source = 'postgres_logs'",
           "  and log_attributes['parsed.error_severity'] in ('ERROR', 'FATAL', 'PANIC', 'WARNING')",
@@ -183,7 +203,7 @@ export const NOTEBOOK_TEMPLATES: NotebookTemplate[] = [
         title: 'Retention cohorts (weekly)',
         sql: [
           'with cohorts as (',
-          '  select id as user_id, date_trunc(\'week\', created_at) as signup_week',
+          "  select id as user_id, date_trunc('week', created_at) as signup_week",
           '  from auth.users',
           '),',
           'cohort_sizes as (',
@@ -192,7 +212,7 @@ export const NOTEBOOK_TEMPLATES: NotebookTemplate[] = [
           '  group by signup_week',
           '),',
           'activity as (',
-          '  select user_id, date_trunc(\'week\', created_at) as active_week',
+          "  select user_id, date_trunc('week', created_at) as active_week",
           '  from auth.sessions',
           '),',
           'retention as (',
