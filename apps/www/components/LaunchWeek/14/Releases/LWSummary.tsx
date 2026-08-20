@@ -14,7 +14,7 @@ const LW14Summary = () => {
     >
       <div className="w-full p-4 flex justify-between items-center">
         <Link
-          href="/launch-week/14"
+          href="/launch-week"
           className="flex items-center text-foreground font-medium gap-1.5 leading-none uppercase text-xs opacity-80 transition-opacity hover:opacity-100"
         >
           Launch Week 14
