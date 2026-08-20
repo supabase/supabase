@@ -1,0 +1,187 @@
+---
+id: 'clickhouse-destination'
+title: 'ClickHouse destination'
+description: 'Configure ClickHouse as a Supabase Pipelines destination.'
+subtitle: 'Replicate Supabase Postgres changes to ClickHouse.'
+sidebar_label: 'ClickHouse'
+---
+
+<$Partial path="pipelines-public-alpha.mdx" />
+
+{/* supa-mdx-lint-disable Rule003Spelling */}
+
+<Admonition type="note" label="Early Access">
+
+The ClickHouse destination is in Early Access and available only to approved organizations. [Request access](/go/supabase-pipelines-new-destinations) before following this guide.
+
+</Admonition>
+
+[ClickHouse](https://clickhouse.com/) is a column-oriented database for analytics. Supabase Pipelines can maintain current-state tables in ClickHouse or write an append-only change history, depending on the selected table engine.
+
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
+## Prepare ClickHouse resources
+
+Before creating the destination:
+
+1. Create or choose a ClickHouse database for the replicated tables.
+2. Create a dedicated ClickHouse user for Pipelines.
+3. Grant the user access to the target database. Pipelines must be able to:
+   - Query `system.databases`, `system.tables`, and `system.columns`
+   - Create, alter, truncate, and drop tables
+   - Create and drop views when using `ReplacingMergeTree`
+   - Insert rows into managed tables
+4. Copy the database's HTTPS endpoint, including its port when required. Pipelines rejects HTTP endpoints and private or internal hostnames.
+
+Keep the database otherwise empty. Pipelines manages the replicated tables and current-state views. Don't pre-create or manually alter those objects.
+
+The default `ReplacingMergeTree` engine requires ClickHouse **23.5 or newer**. The `MergeTree` event-log engine does not have this minimum-version requirement.
+
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
+## Configure ClickHouse as a destination
+
+1. Open [**Database > Replication**](/dashboard/project/_/database/replication)
+2. Click **Add destination**
+3. Select **ClickHouse**. If it isn't available, [request Early Access](/go/supabase-pipelines-new-destinations).
+4. Select a Postgres publication and enter a destination name
+5. Enter the ClickHouse settings:
+   - **URL**: The HTTPS endpoint, including its port when required
+   - **User**: The dedicated ClickHouse user
+   - **Password**: The user's password, if authentication requires one
+   - **Database**: The existing target database
+   - **Table engine**: Choose **ReplacingMergeTree** for current-state tables or **MergeTree** for an append-only event log
+6. Click **Create and start pipeline**
+
+Managed Pipelines run in **AWS `eu-central-1` (Frankfurt)**. When possible, place the ClickHouse service close to Frankfurt to reduce network latency and replication lag.
+
+## How table names are mapped
+
+Pipelines maps each Postgres schema and table pair to one ClickHouse table. Existing underscores are doubled, and the schema and table names are joined with one underscore:
+
+| Postgres table   | ClickHouse table  |
+| ---------------- | ----------------- |
+| `public.orders`  | `public_orders`   |
+| `my_schema.logs` | `my__schema_logs` |
+
+Postgres schema and table names cannot start or end with `_` or contain `"` or `;` when replicating to ClickHouse.
+
+## Choose a table engine
+
+The table engine controls how ClickHouse represents changes. It is selected for the entire destination.
+
+| Engine                         | Data model                    | Source primary key                                      | Query pattern                               |
+| ------------------------------ | ----------------------------- | ------------------------------------------------------- | ------------------------------------------- |
+| `ReplacingMergeTree` (default) | Current-state tables          | Required                                                | Query the generated `<table>__current` view |
+| `MergeTree`                    | Append-only CDC event history | Optional for insert-only tables; see requirements below | Query the base table                        |
+
+### ReplacingMergeTree
+
+`ReplacingMergeTree` is the default and is intended for current-state analytics. Pipelines:
+
+- Uses the source primary key as ClickHouse's sorting and deduplication key
+- Adds an `_etl_version UInt128` ordering column
+- Adds an `_etl_deleted UInt8` tombstone column
+- Creates a `<table>__current` view that runs the base table with `FINAL` and removes deleted rows
+
+Query the generated view for the current state:
+
+```sql
+select *
+from "public_orders__current";
+```
+
+ClickHouse background merges combine older row versions over time. Until they do, querying the base table without `FINAL` can return multiple versions of the same source row. Use the generated `__current` view for normal current-state queries.
+
+Pipelines does not run `OPTIMIZE ... FINAL CLEANUP`. ClickHouse operators remain responsible for any physical tombstone cleanup required by their storage-retention policy.
+
+### MergeTree
+
+`MergeTree` stores every replicated change as an append-only event. Pipelines adds:
+
+- `cdc_operation`, containing `INSERT`, `UPDATE`, or `DELETE`
+- `cdc_lsn`, containing the Postgres commit LSN for the change
+
+Read the base table to analyze the event history. Multiple changes committed in one Postgres transaction can share the same `cdc_lsn`, so it is not a unique event ID or a total ordering for reconstructing current state.
+
+A source `TRUNCATE` truncates the ClickHouse table for either engine. Resetting a table also drops and recreates its table and, for `ReplacingMergeTree`, its generated view. These operations erase the destination data accumulated for that table before a new initial sync begins.
+
+## Source table requirements
+
+ClickHouse requirements depend on the engine and the operations published for a table.
+
+| Source table and publication                                        | Support | Guidance                                                                                                                  |
+| ------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `ReplacingMergeTree` table without a primary key                    | No      | Add a source primary key, include all primary-key columns in the publication, or use `MergeTree` for an event-log layout. |
+| Insert-only `MergeTree` table without a primary key                 | Yes     | No row identity is required for inserts.                                                                                  |
+| Table with a primary key                                            | Yes     | Include every primary-key column in the publication.                                                                      |
+| Updates or deletes with primary-key replica identity                | Yes     | The publication must include every primary-key column.                                                                    |
+| Updates or deletes with `REPLICA IDENTITY FULL`                     | Yes     | Use this when the source table doesn't use primary-key identity.                                                          |
+| Updates or deletes with `REPLICA IDENTITY USING INDEX` or `NOTHING` | No      | ClickHouse currently accepts primary-key identity or full identity for row-level changes.                                 |
+
+Top-level Postgres array columns can contain arrays with nullable elements, but the array column itself must not contain `NULL`. ClickHouse's RowBinary format cannot encode a top-level `NULL` array. Replace existing `NULL` values and make the source array column `NOT NULL`, or ensure producers always write an array value. Empty arrays remain supported.
+
+## Type mapping
+
+Pipelines creates ClickHouse columns with these mappings:
+
+| Postgres type                 | ClickHouse type              |
+| ----------------------------- | ---------------------------- |
+| `boolean`                     | `Boolean`                    |
+| `smallint`                    | `Int16`                      |
+| `integer`                     | `Int32`                      |
+| `bigint`                      | `Int64`                      |
+| `real`                        | `Float32`                    |
+| `double precision`            | `Float64`                    |
+| `date`                        | `Date32`                     |
+| `timestamp without time zone` | `DateTime64(6)`              |
+| `timestamp with time zone`    | `DateTime64(6, 'UTC')`       |
+| `uuid`                        | `UUID`                       |
+| `oid`                         | `UInt32`                     |
+| Other scalar and custom types | `String`                     |
+| Arrays                        | `Array(Nullable(<element>))` |
+
+Nullable scalar columns are wrapped in `Nullable(...)`. Character, text, `numeric`, `money`, JSON, `time`, `interval`, binary, bit-string, enum, and unsupported custom values are serialized into `String` columns rather than stored as native ClickHouse types.
+
+## Schema change support
+
+ClickHouse schema change support is limited during Early Access.
+
+Supported changes include:
+
+- Adding columns
+- Renaming columns, except moving a nested subcolumn to a different parent
+- Dropping columns
+- Dropping `NOT NULL` from an existing scalar column
+- Adding, changing, or removing supported column defaults
+
+The following changes are not applied automatically:
+
+- Changing a column's data type
+- Adding `NOT NULL` to an existing nullable column
+- Changing, dropping, or renaming a source primary-key column when using `ReplacingMergeTree`
+- Renaming a source table or schema
+
+New scalar columns are made nullable when ClickHouse needs a value for historical rows and the source default cannot be represented safely. Some Postgres defaults cannot be translated to ClickHouse and are skipped with a warning.
+
+ClickHouse DDL is not transactional. An interrupted multi-column schema change can leave a partially applied destination schema. Don't repair managed tables or views manually. If the pipeline remains failed after a restart, [contact support](/dashboard/support/new).
+
+## Troubleshooting
+
+| Issue                                              | Resolution                                                                                                                                                                                              |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ClickHouse isn't available in the destination list | The destination is organization-gated during Early Access. [Request access](/go/supabase-pipelines-new-destinations).                                                                                   |
+| URL validation fails                               | Use the public ClickHouse HTTPS endpoint, including its port when required. HTTP, localhost, and private or internal endpoints are not supported.                                                       |
+| Connection fails                                   | Confirm the endpoint is reachable from the internet and that the username and password are correct.                                                                                                     |
+| Database validation fails                          | Create the configured database and grant the user permission to read `system.databases`.                                                                                                                |
+| Validation succeeds but table setup or writes fail | Grant the user the target-database permissions listed above. Check for a pre-existing table or view with the generated name, and don't manually modify managed objects.                                 |
+| `ReplacingMergeTree` initialization fails          | Confirm the server is ClickHouse 23.5 or newer and every source table has a published primary key.                                                                                                      |
+| Updates or deletes fail                            | Use primary-key replica identity or `REPLICA IDENTITY FULL`, and include all identity columns in the publication.                                                                                       |
+| A nullable array fails to replicate                | Replace top-level `NULL` array values and make the source column `NOT NULL`, or ensure producers always write an array. Empty arrays are supported.                                                     |
+| A schema change fails                              | Check the supported changes above. ClickHouse DDL can be partially applied, so don't repair managed objects manually. [Contact support](/dashboard/support/new) with the pipeline ID and error details. |
+
+## Additional resources
+
+- [ClickHouse documentation](https://clickhouse.com/docs)
+- [ReplacingMergeTree](https://clickhouse.com/docs/engines/table-engines/mergetree-family/replacingmergetree)
+- [Monitor pipeline status](/docs/guides/database/replication/pipelines-monitoring)

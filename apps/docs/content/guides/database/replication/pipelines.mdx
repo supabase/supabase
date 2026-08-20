@@ -163,7 +163,7 @@ Before creating a managed replication pipeline, enable Pipelines for your projec
 
 1. Navigate to the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard
 2. Click **Add destination** to show the replication side panel
-3. Select a Pipelines destination, such as **BigQuery** or **Snowflake** if your organization has Early Access
+3. Select a Pipelines destination, such as **BigQuery**, or **ClickHouse** or **Snowflake** if your organization has Early Access
 4. Click **Enable Pipelines**
 
 ### Step 3: Configure a destination
@@ -173,7 +173,7 @@ Once Pipelines is enabled and you have a Postgres publication, configure a desti
 #### Choose and configure your destination
 
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
-Follow these steps to configure your destination. Each destination has its own setup requirements and data model. **BigQuery** is currently available. **Snowflake** is in Early Access. [Request access](/go/supabase-pipelines-new-destinations) to Snowflake, ClickHouse, or DuckLake.
+Follow these steps to configure your destination. Each destination has its own setup requirements and data model. **BigQuery** is currently available. **ClickHouse** and **Snowflake** are in Early Access. [Request access](/go/supabase-pipelines-new-destinations) to ClickHouse, Snowflake, or DuckLake.
 
 1. Navigate to the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard
 2. Click **Add destination** if the destination side panel isn't already open
@@ -187,6 +187,7 @@ Follow these steps to configure your destination. Each destination has its own s
 
 5. Configure the destination-specific settings. See the destination guide for required credentials, permissions, and limitations:
    - [BigQuery](/docs/guides/database/replication/bigquery)
+   - [ClickHouse (Early Access)](/docs/guides/database/replication/clickhouse)
    - [Snowflake (Early Access)](/docs/guides/database/replication/snowflake)
 
 6. Optionally expand **Advanced settings** to tune pipeline behavior:
@@ -297,7 +298,7 @@ Don't delete or modify a table managed by Pipelines while it remains in the publ
 
 ### Schema change support
 
-Schema change support is destination-specific and limited. See [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support) or [Snowflake schema change support](/docs/guides/database/replication/snowflake#schema-change-support) for the exact behavior.
+Schema change support is destination-specific and limited. See the [BigQuery](/docs/guides/database/replication/bigquery#schema-change-support), [ClickHouse](/docs/guides/database/replication/clickhouse#schema-change-support), or [Snowflake](/docs/guides/database/replication/snowflake#schema-change-support) guide for the exact behavior.
 
 ### How it works
 
@@ -314,7 +315,7 @@ Pipelines automatically optimizes how changes are delivered to the destination. 
 If you encounter issues during setup:
 
 - **Publication not appearing**: Ensure you created the Postgres publication via SQL and refresh the dashboard
-- **Tables not showing in publication**: Verify your tables meet the requirements of the selected destination. BigQuery requires a source primary key. Snowflake requires `REPLICA IDENTITY FULL` when updates are published.
+- **Tables not showing in publication**: Verify your tables meet the requirements of the selected destination. BigQuery and ClickHouse `ReplacingMergeTree` require a source primary key. ClickHouse updates and deletes require primary-key or full replica identity. Snowflake requires `REPLICA IDENTITY FULL` when updates are published.
 - **Pipeline failed to start**: Check the error message in the status view for specific details
 - **No data being replicated**: Verify your Postgres publication includes the correct tables and event types
 
@@ -324,19 +325,20 @@ For more troubleshooting help, see the [Pipelines FAQ](/docs/guides/database/rep
 
 Pipelines has the following limitations:
 
-- **Row identity**: Requirements are destination-specific. BigQuery always requires a source primary key and its published columns. Snowflake insert-only tables don't require a key. Snowflake deletes require a published primary-key or replica-identity index unless full identity is used. Snowflake updates require `REPLICA IDENTITY FULL`.
+- **Row identity**: Requirements are destination-specific. BigQuery and ClickHouse `ReplacingMergeTree` require a source primary key and its published columns. ClickHouse updates and deletes require primary-key or full identity. Snowflake insert-only tables don't require a key. Snowflake deletes require a published primary-key or replica-identity index unless full identity is used. Snowflake updates require `REPLICA IDENTITY FULL`.
 - **Custom data types**: Custom values replicate as strings. Check that your destination can interpret those string values correctly.
 - **Generated columns**: Generated columns are skipped. Use triggers to store derived values in regular columns if you need them in the destination.
-- **Replica identity**: Updates and deletes need the mode required by the destination. See the [BigQuery](/docs/guides/database/replication/bigquery#source-table-requirements) and [Snowflake](/docs/guides/database/replication/snowflake#source-table-requirements) requirements.
+- **Replica identity**: Updates and deletes need the mode required by the destination. See the [BigQuery](/docs/guides/database/replication/bigquery#source-table-requirements), [ClickHouse](/docs/guides/database/replication/clickhouse#source-table-requirements), and [Snowflake](/docs/guides/database/replication/snowflake#source-table-requirements) requirements.
 - **Schema changes**: Support is destination-specific and limited.
 - **No user-defined transformations**: Pipelines performs destination-compatible type and name mapping, but doesn't run custom transformations
-- **At-least-once processing**: In rare recovery cases, an acknowledged batch can be processed and counted again. BigQuery uses primary-key-based CDC to converge on current state. Snowflake uses committed channel offsets to suppress ordinary replay. Because its tables are append-only, consumers must still tolerate repeated events. See [Can data be processed more than once?](/docs/guides/database/replication/pipelines-faq#can-data-be-processed-more-than-once) for details.
+- **At-least-once processing**: In rare recovery cases, an acknowledged batch can be processed and counted again. BigQuery and the default ClickHouse `ReplacingMergeTree` layout use primary-key-based CDC to converge on current state. ClickHouse `MergeTree` and Snowflake store append-only histories, so consumers must tolerate repeated events. See [Can data be processed more than once?](/docs/guides/database/replication/pipelines-faq#can-data-be-processed-more-than-once) for details.
 
 Destination-specific limitations, such as row size and type mappings, are documented in each destination guide.
 
 ### Next steps
 
 - [Set up BigQuery](/docs/guides/database/replication/bigquery)
+- [Set up ClickHouse](/docs/guides/database/replication/clickhouse)
 - [Set up Snowflake](/docs/guides/database/replication/snowflake)
 - [Monitor pipeline status](/docs/guides/database/replication/pipelines-monitoring)
 - [View the Pipelines FAQ](/docs/guides/database/replication/pipelines-faq)
