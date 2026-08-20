@@ -226,18 +226,13 @@ limit 100;
 select
   toStartOfHour(timestamp) as hour,
   count() as error_count,
-  log_attributes['request.path'] as path,
-  if(
-    log_attributes['response.headers.proxy_status'] = '',
-    'not_recorded',
-    log_attributes['response.headers.proxy_status']
-  ) as error_codes
+  log_attributes['request.path'] as path
 from logs
 where
   source = 'edge_logs'
   and toInt32OrZero(log_attributes['response.status_code']) >= 300
   and match(log_attributes['request.path'], '^/rest/v1/')
-group by hour, error_codes, path
+group by hour, path
 order by hour desc
 limit 100;
 ```
@@ -257,7 +252,6 @@ select
   log_attributes['request.headers.user_agent'] as user_agent,
   log_attributes['request.cf.city'] as city,
   log_attributes['request.cf.country'] as country,
-  log_attributes['request.cf.continent'] as continent,
   log_attributes['request.cf.postalCode'] as postalCode
 from logs
 where
