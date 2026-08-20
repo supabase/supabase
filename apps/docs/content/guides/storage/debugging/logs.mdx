@@ -25,7 +25,8 @@ select
   timestamp,
   event_message,
   toInt32OrZero(log_attributes['res.statusCode']) as statusCode,
-  log_attributes['rawError'] as rawError
+  log_attributes['error.message'] as errorMessage,
+  log_attributes['error.raw'] as rawError
 from logs
 where source = 'storage_logs'
   and toInt32OrZero(log_attributes['res.statusCode']) >= 500
@@ -41,7 +42,8 @@ select
   timestamp,
   event_message,
   toInt32OrZero(log_attributes['res.statusCode']) as statusCode,
-  log_attributes['rawError'] as rawError
+  log_attributes['error.message'] as errorMessage,
+  log_attributes['error.raw'] as rawError
 from logs
 where source = 'storage_logs'
   and toInt32OrZero(log_attributes['res.statusCode']) between 400 and 499
