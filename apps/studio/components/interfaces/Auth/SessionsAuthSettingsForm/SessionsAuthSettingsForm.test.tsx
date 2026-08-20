@@ -138,7 +138,7 @@ describe('SessionsAuthSettingsForm — User Sessions', () => {
 
   test('accepts a timebox at the maximum', async () => {
     mockAuthConfig({ SESSIONS_TIMEBOX: 0 })
-    let patchBody: any
+    let patchBody: unknown
     mockUpdateAuthConfig((body) => {
       patchBody = body
     })
@@ -149,12 +149,14 @@ describe('SessionsAuthSettingsForm — User Sessions', () => {
     fireEvent.change(input, { target: { value: String(MAX_SESSIONS_TIMEBOX_HOURS) } })
     await saveForm(input)
 
-    await waitFor(() => expect(patchBody?.SESSIONS_TIMEBOX).toBe(MAX_SESSIONS_TIMEBOX_HOURS))
+    await waitFor(() =>
+      expect(patchBody).toMatchObject({ SESSIONS_TIMEBOX: MAX_SESSIONS_TIMEBOX_HOURS })
+    )
   })
 
   test('saves an over-limit timebox that is already stored', async () => {
     mockAuthConfig({ SESSIONS_TIMEBOX: 20000 })
-    let patchBody: any
+    let patchBody: unknown
     mockUpdateAuthConfig((body) => {
       patchBody = body
     })
@@ -166,8 +168,9 @@ describe('SessionsAuthSettingsForm — User Sessions', () => {
     fireEvent.click(singleSessionSwitch)
     await saveForm(singleSessionSwitch)
 
-    await waitFor(() => expect(patchBody?.SESSIONS_TIMEBOX).toBe(20000))
-    expect(patchBody?.SESSIONS_SINGLE_PER_USER).toBe(true)
+    await waitFor(() =>
+      expect(patchBody).toMatchObject({ SESSIONS_TIMEBOX: 20000, SESSIONS_SINGLE_PER_USER: true })
+    )
   })
 
   test('blocks a reduction that is still above the maximum', async () => {
@@ -189,7 +192,7 @@ describe('SessionsAuthSettingsForm — User Sessions', () => {
 
   test('saves a reduction into the allowed range', async () => {
     mockAuthConfig({ SESSIONS_TIMEBOX: 20000 })
-    let patchBody: any
+    let patchBody: unknown
     mockUpdateAuthConfig((body) => {
       patchBody = body
     })
@@ -200,7 +203,7 @@ describe('SessionsAuthSettingsForm — User Sessions', () => {
     fireEvent.change(input, { target: { value: '5000' } })
     await saveForm(input)
 
-    await waitFor(() => expect(patchBody?.SESSIONS_TIMEBOX).toBe(5000))
+    await waitFor(() => expect(patchBody).toMatchObject({ SESSIONS_TIMEBOX: 5000 }))
   })
 
   test('blocks submit when the inactivity timeout exceeds the maximum', async () => {
@@ -241,7 +244,7 @@ describe('SessionsAuthSettingsForm — Refresh Tokens', () => {
 
   test('saves an over-limit reuse interval that is already stored', async () => {
     mockAuthConfig({ SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: 600 })
-    let patchBody: any
+    let patchBody: unknown
     mockUpdateAuthConfig((body) => {
       patchBody = body
     })
@@ -254,12 +257,14 @@ describe('SessionsAuthSettingsForm — Refresh Tokens', () => {
     fireEvent.click(rotationSwitch)
     await saveForm(rotationSwitch)
 
-    await waitFor(() => expect(patchBody?.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL).toBe(600))
+    await waitFor(() =>
+      expect(patchBody).toMatchObject({ SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: 600 })
+    )
   })
 
   test('saves a reduction into the allowed range', async () => {
     mockAuthConfig({ SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: 600 })
-    let patchBody: any
+    let patchBody: unknown
     mockUpdateAuthConfig((body) => {
       patchBody = body
     })
@@ -270,6 +275,8 @@ describe('SessionsAuthSettingsForm — Refresh Tokens', () => {
     fireEvent.change(input, { target: { value: '10' } })
     await saveForm(input)
 
-    await waitFor(() => expect(patchBody?.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL).toBe(10))
+    await waitFor(() =>
+      expect(patchBody).toMatchObject({ SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: 10 })
+    )
   })
 })

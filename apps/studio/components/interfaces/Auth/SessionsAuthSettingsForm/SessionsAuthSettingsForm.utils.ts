@@ -57,7 +57,7 @@ export const createUserSessionsSchema = ({
   z.object({
     SESSIONS_TIMEBOX: z.coerce
       .number()
-      .min(0, 'Must be a positive number')
+      .min(0, 'Must be 0 or greater')
       .refine(
         isWithinMaxOrUnchanged(MAX_SESSIONS_TIMEBOX_HOURS, savedTimebox),
         MAX_SESSIONS_TIMEBOX_MESSAGE
@@ -65,7 +65,7 @@ export const createUserSessionsSchema = ({
     SESSIONS_INACTIVITY_TIMEOUT: z.coerce
       .number()
       .multipleOf(0.1, 'Must be a multiple of 0.1')
-      .min(0, 'Must be a positive number')
+      .min(0, 'Must be 0 or greater')
       .refine(
         isWithinMaxOrUnchanged(MAX_SESSIONS_INACTIVITY_TIMEOUT_HOURS, savedInactivityTimeout),
         MAX_SESSIONS_INACTIVITY_TIMEOUT_MESSAGE

@@ -92,7 +92,7 @@ describe('createUserSessionsSchema — SESSIONS_TIMEBOX', () => {
     const result = parseUserSessions({ SESSIONS_TIMEBOX: -1 })
 
     expect(result.success).toBe(false)
-    expect(errorFor(result, 'SESSIONS_TIMEBOX')).toBe('Must be a positive number')
+    expect(errorFor(result, 'SESSIONS_TIMEBOX')).toBe('Must be 0 or greater')
   })
 })
 
