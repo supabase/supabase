@@ -98,15 +98,13 @@ export const useIsColumnLevelPrivilegesEnabled = () => {
 }
 
 export const useUnifiedLogsPreview = () => {
-  const unifiedLogsDefaultOptIn = useFlag('unifiedLogsDefaultOptIn')
   const { flags, isInitialized, onUpdateFlag } = useFeaturePreviewContext()
 
   const isLoading = !isInitialized
   const isEnabled = IS_PLATFORM && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const hasToggledPreview = !!safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS)
-  const isDefaultOptIn =
-    IS_PLATFORM && isInitialized && unifiedLogsDefaultOptIn && !hasToggledPreview
+  const isDefaultOptIn = IS_PLATFORM && !hasToggledPreview
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)

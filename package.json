@@ -61,7 +61,7 @@
     "prettier": "^3.8.0",
     "prettier-plugin-sql-cst": "^0.18.0",
     "rimraf": "^6.0.0",
-    "supabase": "^2.76.10",
+    "supabase": "^2.114.0",
     "supports-color": "^8.0.0",
     "tailwindcss": "catalog:",
     "tsx": "catalog:",

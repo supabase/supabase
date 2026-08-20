@@ -6,6 +6,7 @@ import type {
   FactoryMcpConfig,
   GeminiMcpConfig,
   GooseMcpConfig,
+  GrokMcpConfig,
   KimiMcpConfig,
   McpClientBaseConfig,
   McpClientConfig,
@@ -144,6 +145,23 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
     configFile: '~/.codex/config.toml',
     externalDocsUrl: 'https://developers.openai.com/codex/mcp/',
     transformConfig: (config): CodexMcpConfig => {
+      return {
+        mcp_servers: {
+          supabase: {
+            url: config.mcpServers.supabase.url,
+          },
+        },
+      }
+    },
+  },
+  {
+    key: 'grok',
+    label: 'Grok',
+    icon: 'grok',
+    hasDistinctDarkIcon: true,
+    configFile: '~/.grok/config.toml',
+    externalDocsUrl: 'https://docs.x.ai/build/features/mcp-servers',
+    transformConfig: (config): GrokMcpConfig => {
       return {
         mcp_servers: {
           supabase: {
@@ -375,6 +393,9 @@ export const MCP_CLI_COMMANDS: Record<string, McpCliCommands> = {
     install: (url) => `codex mcp add supabase --url "${url}"`,
     authenticate: 'codex mcp login supabase',
   },
+  grok: {
+    install: (url) => `grok mcp add supabase "${url}" --transport http`,
+  },
   'gemini-cli': {
     install: (url) => `gemini mcp add -t http supabase "${url}"`,
     authenticate: '/mcp auth supabase',
@@ -397,7 +418,7 @@ export const MCP_CLI_COMMANDS: Record<string, McpCliCommands> = {
 export const MCP_CLIENT_GROUPS = [
   {
     heading: 'AI Agent CLI',
-    keys: ['claude-code', 'codex', 'gemini-cli', 'copilot-cli', 'opencode', 'factory'],
+    keys: ['claude-code', 'codex', 'grok', 'gemini-cli', 'copilot-cli', 'opencode', 'factory'],
   },
   {
     heading: 'Web Clients',
@@ -418,3 +439,12 @@ export const DEFAULT_MCP_URL_NON_PLATFORM = 'http://localhost:54321/mcp'
  * docs document (and what to fall back to in production).
  */
 export const HOSTED_MCP_URL = 'https://mcp.supabase.com/mcp'
+
+/**
+ * Hosted MCP authentication note. Shared by the docs HTML callout and the
+ * markdown export so the two pipelines cannot drift.
+ */
+export const MCP_HOSTED_AUTH_NOTE = {
+  title: 'Authentication',
+  body: "Some MCP clients automatically prompt you to log in during setup. Others require manual authentication steps. Either method opens a browser window where you log in to your Supabase account and grant the MCP client access to your organization. You don't need a personal access token (PAT).",
+} as const
