@@ -166,13 +166,26 @@ using ( true );
 -- Run:    supabase test db
 -- Repeat for every public-read table you secured.
 begin;
-select plan(8);
+select plan(10);
+
+insert into announcements (id, body)
+values ('33333333-3333-3333-3333-333333333333', 'published');
+
+-- A read has to return the row. lives_ok passes on an empty result.
+select ok(
+  not has_table_privilege('anon', 'public.announcements', 'insert,update,delete'),
+  'anon holds no write grant on the feed'
+);
+select ok(
+  not has_table_privilege('authenticated', 'public.announcements', 'insert,update,delete'),
+  'authenticated holds no write grant on the feed'
+);
 
 set local role anon;
--- lives_ok is fine for a read. For an allowed write, assert the returned row instead.
-select lives_ok(
-  $$select * from announcements$$,
-  'anon can read the feed'
+select results_eq(
+  $$select body from announcements where id = '33333333-3333-3333-3333-333333333333'$$,
+  array['published'],
+  'anon reads the feed'
 );
 select throws_ok(
   $$insert into announcements select * from announcements$$,
@@ -194,9 +207,10 @@ select throws_ok(
 );
 
 set local role authenticated;
-select lives_ok(
-  $$select * from announcements$$,
-  'authenticated can read the feed'
+select results_eq(
+  $$select body from announcements where id = '33333333-3333-3333-3333-333333333333'$$,
+  array['published'],
+  'authenticated reads the feed'
 );
 select throws_ok(
   $$insert into announcements select * from announcements$$,
@@ -367,7 +381,9 @@ select results_eq(
   'the owner reads their own profile'
 );
 select results_eq(
-  $$update profiles set avatar_url = 'updated.png' returning avatar_url$$,
+  $$update profiles set avatar_url = 'updated.png'
+    where user_id = '11111111-1111-1111-1111-111111111111'
+    returning avatar_url$$,
   array['updated.png'],
   'the owner updates their own profile'
 );
@@ -420,7 +436,8 @@ select results_eq(
 -- Owner delete last so earlier cases still have a row to assert against.
 set local request.jwt.claim.sub = '11111111-1111-1111-1111-111111111111';
 select results_eq(
-  $$delete from profiles returning avatar_url$$,
+  $$delete from profiles where user_id = '11111111-1111-1111-1111-111111111111'
+    returning avatar_url$$,
   array['updated.png'],
   'the owner deletes their own profile'
 );
@@ -700,6 +717,8 @@ using (
 Break the cycle with a [security definer function](#use-security-definer-functions). It reads the membership table as its owner, so the second policy never runs and the cycle is broken:
 
 ```sql
+create schema if not exists private;
+
 create function private.user_list_ids()
 returns setof uuid
 language sql
