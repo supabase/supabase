@@ -164,6 +164,8 @@ export function DevToolbarTrigger() {
   if (!IS_TOOLBAR_ENABLED || !isEnabled) return null
 
   const eventCount = events.length
+  const eventCountLabel = eventCount > 99 ? '99+' : eventCount
+  const isLargeEventCount = eventCount > 99
   const isDragging = dragPos !== null
   const snapCoords = getSnapCoords(snapPosition, viewport.w, viewport.h)
   const FULL_TRANSITION = `${SNAP_TRANSITION}, opacity 200ms ease`
@@ -243,13 +245,13 @@ export function DevToolbarTrigger() {
           <span
             className={cn(
               'absolute -top-1 -right-1',
-              'h-3.5 min-w-3.5 px-px',
               'inline-flex items-center justify-center',
               'rounded-full bg-brand text-white dark:text-black',
-              'text-[9px] font-medium leading-none tracking-tight tabular-nums'
+              'text-[9px] font-medium leading-none tracking-tight tabular-nums',
+              isLargeEventCount ? 'h-3.5 min-w-3.5 px-1' : eventCount < 10 ? 'size-3.5' : 'size-4'
             )}
           >
-            {eventCount > 99 ? '99+' : eventCount}
+            {eventCountLabel}
           </span>
         )}
       </Button>
