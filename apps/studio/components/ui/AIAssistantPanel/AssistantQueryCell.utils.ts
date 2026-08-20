@@ -25,7 +25,7 @@ export function getAssistantQueryDisplay({
       ? {
           type: 'bar',
           x_column: xAxis ?? '',
-          y_columns: yAxis ? [yAxis] : [],
+          y_series: yAxis ? [yAxis] : [],
           cumulative: false,
           scale: 'linear',
           show_labels: false,
