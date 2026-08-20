@@ -4,6 +4,8 @@ import { clients } from './clients'
 import currentUserAvatar from './default/blocks/current-user-avatar/registry-item.json' with { type: 'json' }
 import dropzone from './default/blocks/dropzone/registry-item.json' with { type: 'json' }
 import infiniteQueryHook from './default/blocks/infinite-query-hook/registry-item.json' with { type: 'json' }
+import magicLinkAuthNextjs from './default/blocks/magic-link-auth-nextjs/registry-item.json' with { type: 'json' }
+import magicLinkAuthReact from './default/blocks/magic-link-auth-react/registry-item.json' with { type: 'json' }
 import passwordBasedAuthNextjs from './default/blocks/password-based-auth-nextjs/registry-item.json' with { type: 'json' }
 import passwordBasedAuthReactRouter from './default/blocks/password-based-auth-react-router/registry-item.json' with { type: 'json' }
 import passwordBasedAuthReact from './default/blocks/password-based-auth-react/registry-item.json' with { type: 'json' }
@@ -42,6 +44,9 @@ export const blocks = [
   registryItemAppend(passwordBasedAuthReact as RegistryItem, [reactClient!]),
   registryItemAppend(passwordBasedAuthReactRouter as RegistryItem, [reactRouterClient!]),
   registryItemAppend(passwordBasedAuthTanstack as RegistryItem, [tanstackClient!]),
+
+  registryItemAppend(magicLinkAuthNextjs as RegistryItem, [nextjsClient!]),
+  registryItemAppend(magicLinkAuthReact as RegistryItem, [reactClient!]),
 
   registryItemAppend(socialAuthNextjs as RegistryItem, [nextjsClient!]),
   registryItemAppend(socialAuthReact as RegistryItem, [reactClient!]),

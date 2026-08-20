@@ -1,0 +1,79 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "magic-link-auth-nextjs",
+  "type": "registry:block",
+  "title": "Magic Link Auth flow for Nextjs and Supabase",
+  "description": "Magic Link Auth flow for Nextjs and Supabase",
+  "dependencies": [
+    "@supabase/ssr@latest",
+    "@supabase/supabase-js@latest"
+  ],
+  "registryDependencies": [
+    "button",
+    "card",
+    "input",
+    "label"
+  ],
+  "files": [
+    {
+      "path": "registry/default/blocks/magic-link-auth-nextjs/app/auth/login/page.tsx",
+      "content": "import { MagicLinkForm } from '@/registry/default/blocks/magic-link-auth-nextjs/components/magic-link-form'\n\nexport default function Page() {\n  return (\n    <div className=\"flex min-h-svh w-full items-center justify-center p-6 md:p-10\">\n      <div className=\"w-full max-w-sm\">\n        <MagicLinkForm />\n      </div>\n    </div>\n  )\n}\n",
+      "type": "registry:page",
+      "target": "app/auth/login/page.tsx"
+    },
+    {
+      "path": "registry/default/blocks/magic-link-auth-nextjs/app/auth/error/page.tsx",
+      "content": "import { Card, CardContent, CardHeader, CardTitle } from '@/registry/default/components/ui/card'\n\nexport default async function Page({ searchParams }: { searchParams: Promise<{ error: string }> }) {\n  const params = await searchParams\n\n  return (\n    <div className=\"flex min-h-svh w-full items-center justify-center p-6 md:p-10\">\n      <div className=\"w-full max-w-sm\">\n        <div className=\"flex flex-col gap-6\">\n          <Card>\n            <CardHeader>\n              <CardTitle className=\"text-2xl\">Sorry, something went wrong.</CardTitle>\n            </CardHeader>\n            <CardContent>\n              {params?.error ? (\n                <p className=\"text-sm text-muted-foreground\">Code error: {params.error}</p>\n              ) : (\n                <p className=\"text-sm text-muted-foreground\">An unspecified error occurred.</p>\n              )}\n            </CardContent>\n          </Card>\n        </div>\n      </div>\n    </div>\n  )\n}\n",
+      "type": "registry:page",
+      "target": "app/auth/error/page.tsx"
+    },
+    {
+      "path": "registry/default/blocks/magic-link-auth-nextjs/app/protected/page.tsx",
+      "content": "import { redirect } from 'next/navigation'\n\nimport { LogoutButton } from '@/registry/default/blocks/magic-link-auth-nextjs/components/logout-button'\nimport { createClient } from '@/registry/default/clients/nextjs/lib/supabase/server'\n\nexport default async function ProtectedPage() {\n  const supabase = await createClient()\n\n  const { data, error } = await supabase.auth.getClaims()\n  if (error || !data?.claims) {\n    redirect('/auth/login')\n  }\n\n  return (\n    <div className=\"flex h-svh w-full items-center justify-center gap-2\">\n      <p>\n        Hello <span>{data.claims.email}</span>\n      </p>\n      <LogoutButton />\n    </div>\n  )\n}\n",
+      "type": "registry:page",
+      "target": "app/protected/page.tsx"
+    },
+    {
+      "path": "registry/default/blocks/magic-link-auth-nextjs/app/auth/confirm/route.ts",
+      "content": "import { type EmailOtpType } from '@supabase/supabase-js'\nimport { redirect } from 'next/navigation'\nimport { type NextRequest } from 'next/server'\n\nimport { createClient } from '@/registry/default/clients/nextjs/lib/supabase/server'\n\nexport async function GET(request: NextRequest) {\n  const { searchParams, origin } = new URL(request.url)\n  const token_hash = searchParams.get('token_hash')\n  const type = searchParams.get('type') as EmailOtpType | null\n  const _next = searchParams.get('next')\n  // only follow relative paths or same-origin URLs to prevent open redirects\n  let next = '/'\n  if (_next) {\n    if (_next.startsWith('/') && !_next.startsWith('//') && !_next.startsWith('/\\\\')) {\n      next = _next\n    } else {\n      try {\n        const nextUrl = new URL(_next)\n        if (nextUrl.origin === origin) {\n          next = nextUrl.pathname + nextUrl.search + nextUrl.hash\n        }\n      } catch {\n        // not a valid URL, keep the default\n      }\n    }\n  }\n\n  if (token_hash && type) {\n    const supabase = await createClient()\n\n    const { error } = await supabase.auth.verifyOtp({\n      type,\n      token_hash,\n    })\n    if (!error) {\n      // redirect user to specified redirect URL or root of app\n      redirect(next)\n    } else {\n      // redirect the user to an error page with some instructions\n      redirect(`/auth/error?error=${encodeURIComponent(error.message)}`)\n    }\n  }\n\n  // redirect the user to an error page with some instructions\n  redirect(`/auth/error?error=${encodeURIComponent('No token hash or type')}`)\n}\n",
+      "type": "registry:page",
+      "target": "app/auth/confirm/route.ts"
+    },
+    {
+      "path": "registry/default/blocks/magic-link-auth-nextjs/components/magic-link-form.tsx",
+      "content": "'use client'\n\nimport { useState } from 'react'\n\nimport { cn } from '@/lib/utils'\nimport { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'\nimport { Button } from '@/registry/default/components/ui/button'\nimport {\n  Card,\n  CardContent,\n  CardDescription,\n  CardHeader,\n  CardTitle,\n} from '@/registry/default/components/ui/card'\nimport { Input } from '@/registry/default/components/ui/input'\nimport { Label } from '@/registry/default/components/ui/label'\n\nexport function MagicLinkForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {\n  const [email, setEmail] = useState('')\n  const [error, setError] = useState<string | null>(null)\n  const [success, setSuccess] = useState(false)\n  const [isLoading, setIsLoading] = useState(false)\n\n  const handleMagicLink = async (e: React.FormEvent) => {\n    e.preventDefault()\n    const supabase = createClient()\n    setIsLoading(true)\n    setError(null)\n\n    try {\n      // The url which will be included in the email. This URL needs to be configured in your redirect URLs in the Supabase dashboard at https://supabase.com/dashboard/project/_/auth/url-configuration\n      const { error } = await supabase.auth.signInWithOtp({\n        email,\n        options: {\n          emailRedirectTo: `${window.location.origin}/protected`,\n        },\n      })\n      if (error) throw error\n      setSuccess(true)\n    } catch (error: unknown) {\n      setError(error instanceof Error ? error.message : 'An error occurred')\n    } finally {\n      setIsLoading(false)\n    }\n  }\n\n  return (\n    <div className={cn('flex flex-col gap-6', className)} {...props}>\n      {success ? (\n        <Card>\n          <CardHeader>\n            <CardTitle className=\"text-2xl\">Check your email</CardTitle>\n            <CardDescription>Magic link sent</CardDescription>\n          </CardHeader>\n          <CardContent>\n            <p className=\"text-sm text-muted-foreground\" role=\"status\" aria-live=\"polite\">\n              We&apos;ve sent a magic link to <span className=\"font-medium\">{email}</span>. Follow\n              the link in the email to log in.\n            </p>\n          </CardContent>\n        </Card>\n      ) : (\n        <Card>\n          <CardHeader>\n            <CardTitle className=\"text-2xl\">Login</CardTitle>\n            <CardDescription>\n              Enter your email and we&apos;ll send you a magic link to log in\n            </CardDescription>\n          </CardHeader>\n          <CardContent>\n            <form onSubmit={handleMagicLink}>\n              <div className=\"flex flex-col gap-6\">\n                <div className=\"grid gap-2\">\n                  <Label htmlFor=\"email\">Email</Label>\n                  <Input\n                    id=\"email\"\n                    type=\"email\"\n                    placeholder=\"m@example.com\"\n                    autoComplete=\"email\"\n                    required\n                    value={email}\n                    onChange={(e) => setEmail(e.target.value)}\n                  />\n                </div>\n                {error && (\n                  <p className=\"text-sm text-destructive-500\" role=\"alert\" aria-live=\"assertive\">\n                    {error}\n                  </p>\n                )}\n                <Button type=\"submit\" className=\"w-full\" disabled={isLoading}>\n                  {isLoading ? 'Sending magic link...' : 'Send magic link'}\n                </Button>\n              </div>\n            </form>\n          </CardContent>\n        </Card>\n      )}\n    </div>\n  )\n}\n",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/magic-link-auth-nextjs/middleware.ts",
+      "content": "import { type NextRequest } from 'next/server'\n\nimport { updateSession } from '@/registry/default/clients/nextjs/lib/supabase/middleware'\n\nexport async function middleware(request: NextRequest) {\n  return await updateSession(request)\n}\n\nexport const config = {\n  matcher: [\n    /*\n     * Match all request paths except for the ones starting with:\n     * - _next/static (static files)\n     * - _next/image (image optimization files)\n     * - favicon.ico (favicon file)\n     * Feel free to modify this pattern to include more paths.\n     */\n    '/((?!_next/static|_next/image|favicon.ico|.*\\\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',\n  ],\n}\n",
+      "type": "registry:file",
+      "target": "middleware.ts"
+    },
+    {
+      "path": "registry/default/blocks/magic-link-auth-nextjs/components/logout-button.tsx",
+      "content": "'use client'\n\nimport { useRouter } from 'next/navigation'\n\nimport { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'\nimport { Button } from '@/registry/default/components/ui/button'\n\nexport function LogoutButton() {\n  const router = useRouter()\n\n  const logout = async () => {\n    const supabase = createClient()\n    await supabase.auth.signOut()\n    router.push('/auth/login')\n  }\n\n  return <Button onClick={logout}>Logout</Button>\n}\n",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+      "content": "import { createBrowserClient } from '@supabase/ssr'\n\nexport function createClient() {\n  return createBrowserClient(\n    process.env.NEXT_PUBLIC_SUPABASE_URL!,\n    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!\n  )\n}\n",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+      "content": "import { createServerClient } from '@supabase/ssr'\nimport { NextResponse, type NextRequest } from 'next/server'\n\nexport async function updateSession(request: NextRequest) {\n  let supabaseResponse = NextResponse.next({\n    request,\n  })\n\n  // With Fluid compute, don't put this client in a global environment\n  // variable. Always create a new one on each request.\n  const supabase = createServerClient(\n    process.env.NEXT_PUBLIC_SUPABASE_URL!,\n    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,\n    {\n      cookies: {\n        getAll() {\n          return request.cookies.getAll()\n        },\n        setAll(cookiesToSet) {\n          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))\n          supabaseResponse = NextResponse.next({\n            request,\n          })\n          cookiesToSet.forEach(({ name, value, options }) =>\n            supabaseResponse.cookies.set(name, value, options)\n          )\n        },\n      },\n    }\n  )\n\n  // Do not run code between createServerClient and\n  // supabase.auth.getClaims(). A simple mistake could make it very hard to debug\n  // issues with users being randomly logged out.\n\n  // IMPORTANT: If you remove getClaims() and you use server-side rendering\n  // with the Supabase client, your users may be randomly logged out.\n  const { data } = await supabase.auth.getClaims()\n  const user = data?.claims\n\n  if (\n    !user &&\n    !request.nextUrl.pathname.startsWith('/login') &&\n    !request.nextUrl.pathname.startsWith('/auth')\n  ) {\n    // no user, potentially respond by redirecting the user to the login page\n    const url = request.nextUrl.clone()\n    url.pathname = '/auth/login'\n    return NextResponse.redirect(url)\n  }\n\n  // IMPORTANT: You *must* return the supabaseResponse object as it is.\n  // If you're creating a new response object with NextResponse.next() make sure to:\n  // 1. Pass the request in it, like so:\n  //    const myNewResponse = NextResponse.next({ request })\n  // 2. Copy over the cookies, like so:\n  //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())\n  // 3. Change the myNewResponse object to fit your needs, but avoid changing\n  //    the cookies!\n  // 4. Finally:\n  //    return myNewResponse\n  // If this is not done, you may be causing the browser and server to go out\n  // of sync and terminate the user's session prematurely!\n\n  return supabaseResponse\n}\n",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+      "content": "import { createServerClient } from '@supabase/ssr'\nimport { cookies } from 'next/headers'\n\n/**\n * If using Fluid compute: Don't put this client in a global variable. Always create a new client within each\n * function when using it.\n */\nexport async function createClient() {\n  const cookieStore = await cookies()\n\n  return createServerClient(\n    process.env.NEXT_PUBLIC_SUPABASE_URL!,\n    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,\n    {\n      cookies: {\n        getAll() {\n          return cookieStore.getAll()\n        },\n        setAll(cookiesToSet) {\n          try {\n            cookiesToSet.forEach(({ name, value, options }) =>\n              cookieStore.set(name, value, options)\n            )\n          } catch {\n            // The `setAll` method was called from a Server Component.\n            // This can be ignored if you have middleware refreshing\n            // user sessions.\n          }\n        },\n      },\n    }\n  )\n}\n",
+      "type": "registry:lib"
+    }
+  ],
+  "envVars": {
+    "NEXT_PUBLIC_SUPABASE_URL": "",
+    "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": ""
+  },
+  "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`."
+}
