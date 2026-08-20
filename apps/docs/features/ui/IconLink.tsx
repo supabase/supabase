@@ -1,6 +1,6 @@
 import MenuIconPicker from '~/components/Navigation/NavigationMenu/MenuIconPicker'
 import Link from 'next/link'
-import { type ReactNode } from 'react'
+import { type ButtonHTMLAttributes, type ReactNode } from 'react'
 import { cn } from 'ui'
 
 const sizeStyles = {
@@ -23,6 +23,33 @@ export type IconLinkItem = {
   className?: string
 }
 
+const iconLinkClassName =
+  'group relative -m-3 flex items-center gap-3 rounded-xl p-3 no-underline transition-colors hover:bg-accent focus-ring focus-visible:bg-accent'
+
+function IconLinkContent({
+  title,
+  icon,
+  size = 'sm',
+}: {
+  title: string
+  icon: ReactNode
+  size?: IconLinkSize
+}) {
+  return (
+    <>
+      <div
+        className={cn(
+          'flex shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-surface-100 transition-colors group-hover:border-strong group-focus-visible:border-strong',
+          sizeStyles[size].tile
+        )}
+      >
+        {icon}
+      </div>
+      <span className="text-base text-foreground">{title}</span>
+    </>
+  )
+}
+
 export function IconLink({
   href,
   title,
@@ -37,41 +64,62 @@ export function IconLink({
   className?: string
 }) {
   return (
-    <Link
-      href={href}
-      className={cn(
-        'group relative -m-3 flex items-center gap-3 rounded-xl p-3 no-underline transition-colors hover:bg-accent',
-        className
-      )}
-    >
-      <div
-        className={cn(
-          'flex shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-surface-100 transition-colors group-hover:border-strong',
-          sizeStyles[size].tile
-        )}
-      >
-        {icon}
-      </div>
-      <span className="text-base text-foreground">{title}</span>
+    <Link href={href} className={cn(iconLinkClassName, className)}>
+      <IconLinkContent title={title} icon={icon} size={size} />
     </Link>
+  )
+}
+
+export function IconLinkButton({
+  title,
+  icon,
+  size = 'sm',
+  className,
+  disabled,
+  tabIndex,
+  ...props
+}: {
+  title: string
+  icon: ReactNode
+  size?: IconLinkSize
+  className?: string
+} & ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      tabIndex={tabIndex ?? (disabled ? -1 : 0)}
+      className={cn(iconLinkClassName, 'w-full text-left', className)}
+      {...props}
+    >
+      <IconLinkContent title={title} icon={icon} size={size} />
+    </button>
   )
 }
 
 export function IconLinkList({
   items,
   labelledBy,
+  label,
   className,
   itemClassName = 'col-span-6 md:col-span-4',
   size = 'sm',
 }: {
   items: IconLinkItem[]
+  /** Prefer when a visible heading is the list’s name. */
   labelledBy?: string
+  /** Prefer when the nearby heading is section/setup copy, not a list title. */
+  label?: string
   className?: string
   itemClassName?: string
   size?: IconLinkSize
 }) {
   return (
-    <ul className={cn('grid grid-cols-12 gap-6', className)} aria-labelledby={labelledBy}>
+    <ul
+      className={cn('grid grid-cols-12 gap-6', className)}
+      aria-labelledby={labelledBy}
+      aria-label={label}
+    >
       {items.map((item) => (
         <li key={item.href} className={cn(itemClassName, item.className)}>
           <IconLink href={item.href} title={item.title} icon={item.icon} size={size} />

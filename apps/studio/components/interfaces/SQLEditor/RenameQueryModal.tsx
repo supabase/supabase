@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -146,6 +145,7 @@ export const RenameQueryModal = ({
       }
 
       toast.success('Successfully renamed snippet!')
+      reset({ name, description }, { keepDirtyValues: false })
       if (onComplete) onComplete()
     } catch (error: any) {
       // [Joshen] We probably need some rollback cause all the saving is async
@@ -156,18 +156,15 @@ export const RenameQueryModal = ({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { name: name ?? '', description: description ?? '' },
+    values: { name: name ?? '', description: description ?? '' },
+    resetOptions: { keepDirtyValues: true },
   })
   const { reset, formState } = form
   const { isDirty, isSubmitting } = formState
 
-  useEffect(() => {
-    if (isDirty) return
-    reset({ name: name ?? '', description: description ?? '' })
-  }, [id, name, description, reset, isDirty])
-
   const handleCancel = () => {
     onCancel()
-    reset()
+    reset(undefined, { keepDirtyValues: false })
   }
 
   return (

@@ -40,7 +40,7 @@ export function ChangelogLlmMarkdownButton({ className, markdownPath = '/changel
     <div className={cn('flex items-center', className)}>
       <Button
         variant="default"
-        className="rounded-r-none border-r-0"
+        className="rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
         icon={
           copied ? (
             <Check className="h-4 w-4" strokeWidth={2} aria-hidden />
@@ -57,7 +57,7 @@ export function ChangelogLlmMarkdownButton({ className, markdownPath = '/changel
         <DropdownMenuTrigger asChild>
           <Button
             variant="default"
-            className="rounded-l-none px-1"
+            className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
             icon={<ChevronDown className="h-4 w-4" strokeWidth={2} aria-hidden />}
             aria-label="Open LLM options for this changelog page"
           />

@@ -42,7 +42,7 @@ const DROPDOWN_MAX_HEIGHT = 300
 const DROPDOWN_GAP = 8
 
 const commandItemClass = cn(
-  'relative text-foreground-lighter text-left px-2 py-1.5 rounded-sm',
+  'relative text-foreground-light text-left px-2 py-1.5 rounded-xs',
   'hover:text-foreground hover:!bg-overlay-hover w-full flex items-center space-x-2',
   'peer-data-[value=true]:bg-overlay-hover'
 )
@@ -258,7 +258,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
       }
     }, [values, badgeLimit])
 
-    const badgeClasses = 'rounded-sm shrink-0 px-1.5'
+    const badgeClasses = 'rounded-sm shrink-0 px-1.5 bg-surface-75 dark:bg-white/5'
 
     const handleTriggerClick: React.MouseEventHandler<HTMLButtonElement> = React.useCallback(
       (event) => {
@@ -293,12 +293,15 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           type="button"
           role="combobox"
           className={cn(
-            'flex w-full min-w-[200px] min-h-[40px] items-center justify-between rounded-md border',
-            'border-alternative bg-control px-3 py-2 text-sm',
+            'flex w-full min-w-[200px] min-h-[34px] items-center justify-between rounded-md border',
+            'border-strong px-3 py-1.5 text-sm',
+            // Empty: raised plate. Filled: sunk well for chips.
+            values.length > 0 ? 'bg-field' : 'bg-control-raised',
             'placeholder:text-muted-foreground',
-            'focus-ring',
+            'ring-border-control focus-ring',
             'disabled:cursor-not-allowed disabled:opacity-50',
-            'hover:border-primary transition-colors duration-200',
+            'hover:border-control-hover transition-colors duration-200',
+            open && 'border-control-hover',
             className
           )}
           {...props}
@@ -367,7 +370,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           {showIcon && (
             <ChevronsUpDown
               size={16}
-              strokeWidth={2}
+              strokeWidth={1.5}
               className="text-foreground-lighter shrink-0 ml-1.5"
             />
           )}
@@ -380,7 +383,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
 MultiSelectorTrigger.displayName = 'MultiSelectorTrigger'
 MultiSelector.Trigger = MultiSelectorTrigger
 
-const MultiSelectorInputVariants = cva('bg-control border', {
+const MultiSelectorInputVariants = cva('', {
   variants: {
     size: {
       ...SIZE_VARIANTS,
@@ -478,7 +481,7 @@ const MultiSelectorContent = React.forwardRef<HTMLDivElement, PopoverContentProp
         align="start"
         ref={ref}
         className={cn(
-          'bg-overlay shadow-md z-50 border border-overlay rounded-md p-0',
+          'bg-overlay shadow-md z-50 border rounded-md p-0',
           'w-(--radix-popper-anchor-width)',
           className
         )}
@@ -526,7 +529,7 @@ const MultiSelectorList = React.forwardRef<
     <CommandList
       ref={ref}
       className={cn(
-        'p-2 flex flex-col gap-2 scrollbar-thin scrollbar-track-transparent transition-colors',
+        'p-1 flex flex-col scrollbar-thin scrollbar-track-transparent transition-colors',
         'scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted',
         'scrollbar-thumb-rounded-lg w-full overflow-y-auto',
         className
@@ -588,13 +591,13 @@ const MultiSelectorItem = React.forwardRef<
           'transition-colors duration-150 ease-in-out',
           'hover:border-strong',
           'focus-ring',
-          'disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-foreground data-[state=checked]:text-background',
-          isSelected ? 'bg-foreground text-background' : '[&_svg]:invisible'
+          'disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-foreground data-[state=checked]:text-background-overlay',
+          isSelected ? 'bg-foreground text-background-overlay' : '[&_svg]:invisible'
         )}
       >
         <Check className="h-3 w-3" strokeWidth={4} />
       </div>
-      <div className="text-xs grow leading-none pointer-events-none cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:pointer-events-none peer-disabled:opacity-50">
+      <div className="text-sm grow leading-none pointer-events-none cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:pointer-events-none peer-disabled:opacity-50">
         {children}
       </div>
     </CommandItem>

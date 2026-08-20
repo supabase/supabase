@@ -5,6 +5,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
 import { Button, Card, CardFooter, Form } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -47,19 +48,24 @@ export const BillingCustomerData = () => {
     'stripe.customer'
   )
 
+  const { ref, inView } = useInView({ triggerOnce: true })
+
   const {
     data: customerProfile,
     error,
     isPending: isLoading,
     isSuccess,
-  } = useOrganizationCustomerProfileQuery({ slug }, { enabled: canReadBillingCustomerData })
+  } = useOrganizationCustomerProfileQuery(
+    { slug },
+    { enabled: canReadBillingCustomerData && inView }
+  )
 
   const {
     data: taxId,
     error: errorLoadingTaxId,
     isPending: isLoadingTaxId,
     isSuccess: loadedTaxId,
-  } = useOrganizationTaxIdQuery({ slug })
+  } = useOrganizationTaxIdQuery({ slug }, { enabled: inView })
 
   const { mutateAsync: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation({
     onError: () => {},
@@ -165,7 +171,7 @@ export const BillingCustomerData = () => {
   )
 
   return (
-    <ScaffoldSection>
+    <ScaffoldSection ref={ref}>
       <ScaffoldSectionDetail>
         <div className="sticky space-y-2 top-12 pr-3">
           <p className="text-foreground text-base m-0">Billing Address &amp; Tax ID</p>

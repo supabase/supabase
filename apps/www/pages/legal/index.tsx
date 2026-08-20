@@ -21,6 +21,11 @@ const sections = [
         type: 'document' as const,
       },
       {
+        label: 'Subprocessor List',
+        href: '/legal/customer-resources/subprocessor-list',
+        type: 'document' as const,
+      },
+      {
         label: 'Support Policy',
         href: '/support-policy',
         type: 'document' as const,
