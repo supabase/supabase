@@ -212,11 +212,10 @@ export function DevToolbarTrigger() {
   return (
     <div style={containerStyle}>
       <Button
-        variant="text"
+        variant="default"
+        rounded
         className={cn(
-          'relative rounded-full h-10 w-10 p-0',
-          'bg-surface-100 border border-overlay shadow-md',
-          'text-foreground-light hover:text-foreground hover:bg-surface-200',
+          'relative h-10 w-10 p-0 shadow-md',
           'focus-visible:outline-0 focus-visible:outline-transparent focus-visible:outline-offset-0',
           'select-none touch-none',
           isDragging ? 'cursor-grabbing' : 'cursor-pointer'
