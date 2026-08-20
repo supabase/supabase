@@ -45,7 +45,7 @@ export function withAuth<T>(
       error: errorAAL,
     } = useAuthenticatorAssuranceLevelQuery()
 
-    const isAtHighestAAL = aalData?.currentLevel === aalData?.nextLevel
+    const isAtHighestAAL = !!aalData && aalData.currentLevel === aalData.nextLevel
 
     useEffect(() => {
       if (isErrorAAL) {
