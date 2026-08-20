@@ -1,5 +1,4 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { ExternalLink } from 'lucide-react'
 import { Badge, Button } from 'ui'
 
 import { BannerCard } from '../BannerCard'
@@ -39,15 +38,9 @@ export const BannerLogsAllDeprecation = () => {
             Management API endpoint need to migrate. Dashboard logs are unchanged.
           </p>
         </div>
-        <Button
-          variant="default"
-          size="tiny"
-          className="w-min"
-          asChild
-          iconRight={<ExternalLink size={14} />}
-        >
+        <Button variant="default" size="tiny" className="w-min" asChild>
           <a href={MIGRATION_GUIDE_URL} target="_blank" rel="noreferrer noopener">
-            View changelog
+            Learn more
           </a>
         </Button>
       </div>
