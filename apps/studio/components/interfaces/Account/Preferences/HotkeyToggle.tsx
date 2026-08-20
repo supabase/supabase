@@ -19,7 +19,9 @@ export function HotkeyToggle({ definition, isLast }: HotkeyToggleProps) {
   return (
     <CardContent className={isLast ? undefined : 'border-b'}>
       <div className="flex items-center justify-between gap-x-3">
-        <label htmlFor={`id-${definition.id}`} className="text-sm text-foreground">{definition.label}</label>
+        <label htmlFor={`id-${definition.id}`} className="text-sm text-foreground">
+          {definition.label}
+        </label>
         <div className="flex items-center gap-x-3">
           <div className="flex items-center gap-1">
             {definition.sequence.map((step, i) => (
