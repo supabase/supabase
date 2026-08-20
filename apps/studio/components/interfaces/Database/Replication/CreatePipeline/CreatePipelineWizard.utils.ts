@@ -7,15 +7,16 @@ import { getDucklakeValidationIssues } from '../DestinationPanel/DestinationForm
 import { getSnowflakeValidationIssues } from '../DestinationPanel/DestinationForm/Snowflake/Snowflake.utils'
 import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
 import type { ReplicationPublication } from '@/data/replication/publications-query'
+import { DOCS_URL } from '@/lib/constants'
 
-export const PIPELINE_CREATE_STEPS = [
-  { id: 'destination', label: 'Destination', description: 'Choose where data should go' },
-  { id: 'connection', label: 'Connection', description: 'Authorize the destination' },
-  { id: 'data', label: 'Data', description: 'Choose a publication and initial sync' },
-  { id: 'review', label: 'Review', description: 'Confirm and create the pipeline' },
-] as const
+export const PIPELINE_CREATE_DOCS_URL = `${DOCS_URL}/guides/database/replication#pipelines`
 
-export type PipelineCreateStepId = (typeof PIPELINE_CREATE_STEPS)[number]['id']
+export const PIPELINE_PUBLICATION_DOCS_URL = `${DOCS_URL}/guides/database/replication/pipelines#step-1-create-a-postgres-publication`
+
+export const getDestinationSetupDocsUrl = (destinationType: DestinationType) =>
+  destinationType === 'BigQuery'
+    ? `${DOCS_URL}/guides/database/replication/bigquery#configure-bigquery-as-a-destination`
+    : `${DOCS_URL}/guides/database/replication/pipelines#step-3-configure-a-destination`
 
 export type PipelineDestinationType = Exclude<DestinationType, 'Read Replica'>
 
@@ -26,6 +27,64 @@ export const PIPELINE_DESTINATION_TYPES: PipelineDestinationType[] = [
   'Snowflake',
   'ClickHouse',
 ]
+
+export const PIPELINE_CREATE_STEPS = [
+  {
+    id: 'destination',
+    label: 'Destination',
+    title: 'Choose a destination',
+    description: 'Where should this database be replicated?',
+  },
+  {
+    id: 'connection',
+    label: 'Connection',
+    title: 'Authorize the destination',
+    description: 'Name this pipeline and enter credentials for {destination}.',
+  },
+  {
+    id: 'data',
+    label: 'Data',
+    title: 'Choose what to replicate',
+    description: 'Select a publication and which existing rows to copy during initial sync.',
+  },
+  {
+    id: 'review',
+    label: 'Review',
+    title: 'Review and create',
+    description: 'Check these details, then create and start the pipeline.',
+  },
+] as const
+
+export type PipelineCreateStepId = (typeof PIPELINE_CREATE_STEPS)[number]['id']
+
+export const getPipelineCreateStepDocsUrl = (
+  step: PipelineCreateStepId,
+  destinationType?: PipelineDestinationType
+): string | null => {
+  if (step === 'connection' && destinationType) {
+    return getDestinationSetupDocsUrl(destinationType)
+  }
+
+  if (step === 'data') {
+    return PIPELINE_PUBLICATION_DOCS_URL
+  }
+
+  return null
+}
+
+export const getPipelineCreateStepHeader = (
+  id: PipelineCreateStepId,
+  vars?: { destinationType?: PipelineDestinationType }
+) => {
+  const step = PIPELINE_CREATE_STEPS.find((item) => item.id === id)!
+  return {
+    title: step.title,
+    description: step.description.replace(
+      '{destination}',
+      vars?.destinationType ?? 'the destination'
+    ),
+  }
+}
 
 export const isPipelineDestinationType = (
   value: string | null | undefined
@@ -95,4 +154,77 @@ export const hasValidDataStep = ({
   }
 
   return true
+}
+
+const PIPELINE_CREATE_CONNECTION_STEP_FIELDS: Record<
+  PipelineDestinationType,
+  (keyof DestinationPanelSchemaType)[]
+> = {
+  BigQuery: ['name', 'projectId', 'datasetId', 'serviceAccountKey'],
+  'Analytics Bucket': [
+    'name',
+    'warehouseName',
+    'namespace',
+    'newNamespaceName',
+    's3Region',
+    's3AccessKeyId',
+    's3SecretAccessKey',
+  ],
+  DuckLake: [
+    'name',
+    'ducklakeMode',
+    'ducklakeCatalogUrl',
+    'ducklakeDataPath',
+    'ducklakeS3AccessKeyId',
+    'ducklakeS3SecretAccessKey',
+    'ducklakeS3Region',
+    'ducklakeS3Endpoint',
+    'ducklakeMetadataSchema',
+    'ducklakeCatalogProjectRef',
+    'ducklakeStorageProjectRef',
+    'ducklakeStorageBucket',
+  ],
+  Snowflake: [
+    'name',
+    'snowflakeAccountId',
+    'snowflakeUser',
+    'snowflakePrivateKey',
+    'snowflakeDatabase',
+    'snowflakeSchema',
+  ],
+  ClickHouse: ['name', 'clickhouseUrl', 'clickhouseUser', 'clickhouseDatabase'],
+}
+
+export const getPipelineCreateConnectionStepFieldNames = (type: PipelineDestinationType) =>
+  PIPELINE_CREATE_CONNECTION_STEP_FIELDS[type]
+
+export const PIPELINE_CREATE_DATA_STEP_FIELD_NAMES = [
+  'publicationName',
+  'tableSyncCopyTableIds',
+] as const satisfies readonly (keyof DestinationPanelSchemaType)[]
+
+const PIPELINE_CREATE_SHARED_FIELD_NAMES = [
+  'name',
+  'publicationName',
+  'tableSyncCopyMode',
+  'tableSyncCopyTableIds',
+  'maxFillMs',
+  'maxTableSyncWorkers',
+  'maxCopyConnectionsPerTable',
+  'invalidatedSlotBehavior',
+] as const satisfies readonly (keyof DestinationPanelSchemaType)[]
+
+/** Keeps pipeline-wide fields when the destination type changes; resets type-specific credentials. */
+export const mergeFormValuesForDestinationTypeChange = (
+  current: DestinationPanelSchemaType,
+  defaults: DestinationPanelSchemaType
+): DestinationPanelSchemaType => {
+  const shared = Object.fromEntries(
+    PIPELINE_CREATE_SHARED_FIELD_NAMES.map((key) => [key, current[key]])
+  ) as Pick<DestinationPanelSchemaType, (typeof PIPELINE_CREATE_SHARED_FIELD_NAMES)[number]>
+
+  return {
+    ...defaults,
+    ...shared,
+  }
 }

@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react'
-import { Button, Card, cn } from 'ui'
+import { Button, Card, CardFooter, CardHeader, cn } from 'ui'
 
 export type SteppedFlowStep = {
   id: string
@@ -15,6 +15,33 @@ export type SteppedFlowFinalAction = {
   type?: 'button' | 'submit'
 }
 
+export const SteppedFlowHeader = ({
+  title,
+  description,
+  actions,
+  children,
+}: {
+  title: string
+  description?: ReactNode
+  actions?: ReactNode
+  children?: ReactNode
+}) => {
+  return (
+    <CardHeader>
+      <header className="flex flex-col space-y-1">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0 flex-1 space-y-1">
+            <h2 className="text-lg text-foreground">{title}</h2>
+            {description ? <p className="text-sm text-foreground-light">{description}</p> : null}
+          </div>
+          {actions ? <div className="shrink-0">{actions}</div> : null}
+        </div>
+        {children}
+      </header>
+    </CardHeader>
+  )
+}
+
 export interface SteppedFlowProps {
   steps: SteppedFlowStep[]
   currentStep: string
@@ -23,6 +50,7 @@ export interface SteppedFlowProps {
   nextLabel?: string
   onNext?: () => void
   nextLoading?: boolean
+  navigationDisabled?: boolean
   finalAction?: SteppedFlowFinalAction
   children: ReactNode
 }
@@ -32,9 +60,10 @@ export const SteppedFlow = ({
   currentStep,
   onStepChange,
   nextDisabled = false,
-  nextLabel = 'Continue',
+  nextLabel = 'Next',
   onNext,
   nextLoading = false,
+  navigationDisabled = false,
   finalAction,
   children,
 }: SteppedFlowProps) => {
@@ -54,45 +83,43 @@ export const SteppedFlow = ({
         </p>
         <Card key={currentStep} className="animate-in fade-in-0 duration-200">
           {children}
+          <CardFooter className={cn(currentIndex > 0 ? 'justify-between' : 'justify-end')}>
+            {currentIndex > 0 && (
+              <Button
+                type="button"
+                variant="default"
+                disabled={navigationDisabled}
+                onClick={() => onStepChange(steps[currentIndex - 1].id)}
+              >
+                Back
+              </Button>
+            )}
+            <div className="flex items-center gap-2">
+              {isLastStep && finalAction ? (
+                <Button
+                  type={finalAction.type ?? (finalAction.form ? 'submit' : 'button')}
+                  form={finalAction.form}
+                  variant="primary"
+                  loading={finalAction.loading}
+                  disabled={finalAction.disabled}
+                  onClick={finalAction.onClick}
+                >
+                  {finalAction.label}
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  variant="primary"
+                  disabled={nextDisabled}
+                  loading={nextLoading}
+                  onClick={onNext}
+                >
+                  {nextLabel}
+                </Button>
+              )}
+            </div>
+          </CardFooter>
         </Card>
-        <footer
-          className={cn(
-            'mt-6 flex items-center',
-            currentIndex > 0 ? 'justify-between' : 'justify-end'
-          )}
-        >
-          {currentIndex > 0 && (
-            <Button
-              type="button"
-              variant="default"
-              onClick={() => onStepChange(steps[currentIndex - 1].id)}
-            >
-              Back
-            </Button>
-          )}
-          {isLastStep && finalAction ? (
-            <Button
-              type={finalAction.type ?? (finalAction.form ? 'submit' : 'button')}
-              form={finalAction.form}
-              variant="primary"
-              loading={finalAction.loading}
-              disabled={finalAction.disabled}
-              onClick={finalAction.onClick}
-            >
-              {finalAction.label}
-            </Button>
-          ) : (
-            <Button
-              type="button"
-              variant="primary"
-              disabled={nextDisabled}
-              loading={nextLoading}
-              onClick={onNext}
-            >
-              {nextLabel}
-            </Button>
-          )}
-        </footer>
       </div>
     </div>
   )

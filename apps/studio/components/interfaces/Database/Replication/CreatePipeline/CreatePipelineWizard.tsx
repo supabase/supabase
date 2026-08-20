@@ -50,7 +50,6 @@ import { SnowflakeFields } from '../DestinationPanel/DestinationForm/Snowflake/F
 import { getSnowflakeValidationIssues } from '../DestinationPanel/DestinationForm/Snowflake/Snowflake.utils'
 import { TableCopySelection } from '../DestinationPanel/DestinationForm/TableCopySelection'
 import { useDestinationForm } from '../DestinationPanel/DestinationForm/useDestinationForm'
-import { ValidationFailuresSection } from '../DestinationPanel/DestinationForm/ValidationFailuresSection'
 import { ValidationWarningsDialog } from '../DestinationPanel/DestinationForm/ValidationWarningsDialog'
 import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
 import { DestinationTypeSelection } from '../DestinationPanel/DestinationTypeSelection'
@@ -65,18 +64,25 @@ import {
 } from '../useIsETLPrivateAlpha'
 import { CreatePipelineGate } from './CreatePipelineGate'
 import {
-  hasValidConnection,
-  hasValidDataStep,
+  getPipelineCreateConnectionStepFieldNames,
+  getPipelineCreateStepDocsUrl,
+  getPipelineCreateStepHeader,
   isPipelineDestinationType,
+  mergeFormValuesForDestinationTypeChange,
+  PIPELINE_CREATE_DATA_STEP_FIELD_NAMES,
   PIPELINE_CREATE_STEPS,
   type PipelineCreateStepId,
+  type PipelineDestinationType,
 } from './CreatePipelineWizard.utils'
+import { PipelineCreateStepDescription } from './PipelineCreateStepDescription'
 import { PipelineRegionField } from './PipelineRegionField'
+import { PipelineReviewSummary } from './PipelineReviewSummary'
+import { PipelineValidationAdmonition } from './PipelineValidationAdmonition'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
 import { useRegisterIsolatedStudioFlowClose } from '@/components/layouts/Navigation/LayoutHeader/IsolatedStudioFlowClose'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { SteppedFlow } from '@/components/ui/SteppedFlow/SteppedFlow'
+import { SteppedFlow, SteppedFlowHeader } from '@/components/ui/SteppedFlow/SteppedFlow'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useCreateTenantSourceMutation } from '@/data/replication/create-tenant-source-mutation'
@@ -114,7 +120,7 @@ export const CreatePipelineWizard = () => {
   const [pendingFormValues, setPendingFormValues] = useState<z.infer<typeof FormSchema> | null>(
     null
   )
-  const validationSectionRef = useRef<HTMLDivElement>(null)
+  const validationSectionRef = useRef<React.ComponentRef<typeof PipelineValidationAdmonition>>(null)
 
   const [urlDestinationType] = useQueryState(
     'destinationType',
@@ -132,6 +138,7 @@ export const CreatePipelineWizard = () => {
   )
 
   const selectedType = isPipelineDestinationType(urlDestinationType) ? urlDestinationType : null
+  const previousSelectedTypeRef = useRef<PipelineDestinationType | null>(null)
 
   const listHref = `/project/${projectRef}/database/replication`
 
@@ -204,8 +211,6 @@ export const CreatePipelineWizard = () => {
   )
 
   const form = useForm<z.infer<typeof FormSchema>>({
-    mode: 'onChange',
-    reValidateMode: 'onChange',
     resolver: zodResolver(
       FormSchema.superRefine((data, ctx) => {
         const addRequiredFieldError = (path: string, message: string) => {
@@ -262,7 +267,7 @@ export const CreatePipelineWizard = () => {
 
   const { isDirty } = form.formState
   const formValues = useWatch({ control: form.control }) ?? defaultValues
-  const { name, publicationName, tableSyncCopyMode, tableSyncCopyTableIds } = formValues
+  const { publicationName, tableSyncCopyMode, tableSyncCopyTableIds } = formValues
 
   const publicationNames = useMemo(() => publications.map((pub) => pub.name), [publications])
   const isSelectedPublicationMissing =
@@ -311,16 +316,6 @@ export const CreatePipelineWizard = () => {
   }, [isDirty, step])
 
   const canContinueFromDestination = selectedType !== null
-  const canContinueFromConnection =
-    selectedType !== null && hasValidConnection({ type: selectedType, data: formValues })
-  const canContinueFromData =
-    isSuccessPublications &&
-    hasValidDataStep({
-      publicationName,
-      tableSyncCopyMode,
-      tableSyncCopyTableIds,
-      publications,
-    })
 
   const isSubmitDisabled =
     isSaving || !isSuccessPublications || isSelectedPublicationMissing || hasNoAvailableDestinations
@@ -405,16 +400,40 @@ export const CreatePipelineWizard = () => {
     })
   }
 
-  const handleNext = () => {
-    if (step === 'destination' && canContinueFromDestination) setStep('connection')
-    if (step === 'connection' && canContinueFromConnection) setStep('data')
-    if (step === 'data' && canContinueFromData) setStep('review')
+  const handleNext = async () => {
+    if (step === 'destination') {
+      if (canContinueFromDestination) setStep('connection')
+      return
+    }
+
+    if (step === 'connection' && selectedType) {
+      const valid = await form.trigger(getPipelineCreateConnectionStepFieldNames(selectedType))
+      if (valid) setStep('data')
+      return
+    }
+
+    if (step === 'data') {
+      const valid = await form.trigger([...PIPELINE_CREATE_DATA_STEP_FIELD_NAMES])
+      if (valid) setStep('review')
+    }
   }
 
-  const nextDisabled =
-    (step === 'destination' && !canContinueFromDestination) ||
-    (step === 'connection' && !canContinueFromConnection) ||
-    (step === 'data' && !canContinueFromData)
+  const nextDisabled = step === 'destination' && !canContinueFromDestination
+
+  useEffect(() => {
+    if (!selectedType) {
+      previousSelectedTypeRef.current = null
+      return
+    }
+
+    const previousType = previousSelectedTypeRef.current
+    previousSelectedTypeRef.current = selectedType
+
+    if (previousType === null || previousType === selectedType) return
+
+    form.reset(mergeFormValuesForDestinationTypeChange(form.getValues(), defaultValues))
+    resetValidation()
+  }, [defaultValues, form, resetValidation, selectedType])
 
   useEffect(() => {
     if (urlDestinationType === 'Read Replica' && projectRef) {
@@ -432,11 +451,6 @@ export const CreatePipelineWizard = () => {
   useEffect(() => {
     if (projectRef && sourceId) refetchPublications()
   }, [projectRef, refetchPublications, sourceId])
-
-  const docsUrl =
-    selectedType === 'BigQuery'
-      ? `${DOCS_URL}/guides/database/replication/bigquery#configure-bigquery-as-a-destination`
-      : `${DOCS_URL}/guides/database/replication/pipelines#step-3-configure-a-destination`
 
   if (isOrgLoading || !isFlagStoreLoaded) {
     return (
@@ -500,6 +514,12 @@ export const CreatePipelineWizard = () => {
     )
   }
 
+  const stepHeader = getPipelineCreateStepHeader(step, {
+    destinationType: selectedType ?? undefined,
+  })
+  const stepDocsUrl = getPipelineCreateStepDocsUrl(step, selectedType ?? undefined)
+  const pipelineCreateDocsButton = stepDocsUrl ? <DocsButton href={stepDocsUrl} /> : undefined
+
   return (
     <>
       <Form {...form}>
@@ -510,6 +530,7 @@ export const CreatePipelineWizard = () => {
             onStepChange={(nextStep) => setStep(nextStep as PipelineCreateStepId)}
             nextDisabled={nextDisabled}
             onNext={handleNext}
+            navigationDisabled={isSaving || isValidating}
             finalAction={{
               label: getSubmitButtonText(),
               form: formId,
@@ -519,13 +540,12 @@ export const CreatePipelineWizard = () => {
           >
             {step === 'destination' && (
               <>
-                <CardContent className="space-y-1">
-                  <h2 className="text-lg text-foreground">Choose a destination</h2>
-                  <p className="text-sm text-foreground-light">
-                    Where should this database be replicated?
-                  </p>
+                <SteppedFlowHeader
+                  title={stepHeader.title}
+                  description={<PipelineCreateStepDescription step={step} />}
+                >
                   <LocalReplicationUnavailableAdmonition className="pt-2" />
-                </CardContent>
+                </SteppedFlowHeader>
                 <CardContent>
                   <DestinationTypeSelection variant="radio" hideReadReplica />
                 </CardContent>
@@ -534,12 +554,13 @@ export const CreatePipelineWizard = () => {
 
             {step === 'connection' && selectedType && (
               <>
-                <CardContent className="space-y-1">
-                  <h2 className="text-lg text-foreground">Authorize the destination</h2>
-                  <p className="text-sm text-foreground-light">
-                    Name this pipeline and enter credentials for {selectedType}.
-                  </p>
-                </CardContent>
+                <SteppedFlowHeader
+                  title={stepHeader.title}
+                  description={
+                    <PipelineCreateStepDescription step={step} destinationType={selectedType} />
+                  }
+                  actions={pipelineCreateDocsButton}
+                />
                 <CardContent className="space-y-6">
                   <DestinationNameInput form={form} />
                   <PipelineRegionField />
@@ -566,17 +587,27 @@ export const CreatePipelineWizard = () => {
                     <ClickHouseFields form={form} editMode={false} className="p-0" />
                   )}
                 </CardContent>
+                <CardContent>
+                  <AdvancedSettings
+                    type={selectedType}
+                    form={form}
+                    group="connection"
+                    className="px-0"
+                  />
+                </CardContent>
+                {hasRunValidation && !isValidating && (
+                  <PipelineValidationAdmonition failures={destinationValidationFailures} />
+                )}
               </>
             )}
 
-            {step === 'data' && (
+            {step === 'data' && selectedType && (
               <>
-                <CardContent className="space-y-1">
-                  <h2 className="text-lg text-foreground">Choose what to replicate</h2>
-                  <p className="text-sm text-foreground-light">
-                    Select a publication and which existing rows to copy during initial sync.
-                  </p>
-                </CardContent>
+                <SteppedFlowHeader
+                  title={stepHeader.title}
+                  description={<PipelineCreateStepDescription step={step} />}
+                  actions={pipelineCreateDocsButton}
+                />
                 <CardContent>
                   <PublicationSelection
                     form={form}
@@ -586,41 +617,31 @@ export const CreatePipelineWizard = () => {
                 <CardContent>
                   <TableCopySelection form={form} editMode={false} />
                 </CardContent>
+                <CardContent>
+                  <AdvancedSettings type={selectedType} form={form} group="data" className="px-0" />
+                </CardContent>
+                {hasRunValidation && !isValidating && (
+                  <PipelineValidationAdmonition failures={pipelineValidationFailures} />
+                )}
               </>
             )}
 
             {step === 'review' && selectedType && (
               <>
-                <CardContent className="space-y-1">
-                  <h2 className="text-lg text-foreground">Review and create</h2>
-                  <p className="text-sm text-foreground-light">
-                    Confirm optional settings, then create and start the pipeline.
-                  </p>
-                </CardContent>
-                <CardContent>
-                  <p className="text-sm text-foreground-light">
-                    <span className="text-foreground">{name || 'Untitled pipeline'}</span>
-                    {' · '}
-                    {selectedType}
-                    {publicationName ? ` · ${publicationName}` : ''}
-                  </p>
-                </CardContent>
-                <CardContent>
-                  <AdvancedSettings type={selectedType} form={form} />
-                </CardContent>
-                {hasRunValidation && !isValidating && (
-                  <CardContent>
-                    <div ref={validationSectionRef}>
-                      <ValidationFailuresSection
-                        destinationFailures={destinationValidationFailures}
-                        pipelineFailures={pipelineValidationFailures}
-                      />
-                    </div>
-                  </CardContent>
-                )}
-                <CardContent>
-                  <DocsButton href={docsUrl} topic={`${selectedType} pipeline settings`} />
-                </CardContent>
+                <SteppedFlowHeader
+                  title={stepHeader.title}
+                  description={<PipelineCreateStepDescription step={step} />}
+                />
+                <PipelineReviewSummary
+                  type={selectedType}
+                  values={{ ...defaultValues, ...formValues }}
+                  publications={publications}
+                  connectionFailures={destinationValidationFailures}
+                  dataFailures={pipelineValidationFailures}
+                  editDisabled={isSaving || isValidating}
+                  validationScrollRef={validationSectionRef}
+                  onGoToStep={setStep}
+                />
               </>
             )}
           </SteppedFlow>

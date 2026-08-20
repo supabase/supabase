@@ -9,5 +9,7 @@ export enum PipelineStatusName {
   UNKNOWN = 'unknown',
 }
 
+export const PIPELINES_FEEDBACK_URL = 'https://github.com/orgs/supabase/discussions/39416'
+
 /** @deprecated Import from Settings/Infrastructure/ReadReplicas/ReadReplicas.constants */
 export { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'

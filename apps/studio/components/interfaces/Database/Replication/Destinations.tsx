@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Database } from 'icons'
-import { MoreVertical, Plus, Search, X } from 'lucide-react'
+import { MessageSquare, MoreVertical, Plus, Search, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
@@ -36,7 +36,7 @@ import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
 import { DisablePipelinesDialog } from './DisablePipelinesDialog'
 import { EnablePipelinesModal } from './EnablePipelinesCallout'
-import { REPLICA_STATUS } from './Replication.constants'
+import { PIPELINES_FEEDBACK_URL, REPLICA_STATUS } from './Replication.constants'
 import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLClickHousePrivateAlpha,
@@ -315,6 +315,11 @@ export const Destinations = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
+          <Button asChild variant="default" icon={<MessageSquare />}>
+            <a href={PIPELINES_FEEDBACK_URL} target="_blank" rel="noreferrer noopener">
+              Leave feedback
+            </a>
+          </Button>
           <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
 
           <Shortcut

@@ -769,6 +769,45 @@ describe('DestinationForm.utils BigQuery', () => {
     expect(issues).toEqual([])
   })
 
+  it('rejects invalid JSON in the service account key', () => {
+    const issues = getBigQueryValidationIssues({
+      projectId: 'my-project',
+      datasetId: 'my_dataset',
+      serviceAccountKey: '{ "type": "service_account" ',
+    })
+
+    expect(issues).toEqual([
+      { path: 'serviceAccountKey', message: 'Service account key must be valid JSON' },
+    ])
+  })
+
+  it('rejects non-JSON text in the service account key', () => {
+    const issues = getBigQueryValidationIssues({
+      projectId: 'my-project',
+      datasetId: 'my_dataset',
+      serviceAccountKey: 'not-json',
+    })
+
+    expect(issues).toEqual([
+      { path: 'serviceAccountKey', message: 'Service account key must be valid JSON' },
+    ])
+  })
+
+  it('validates JSON when replacing credentials in edit mode', () => {
+    const issues = getBigQueryValidationIssues(
+      {
+        projectId: 'my-project',
+        datasetId: 'my_dataset',
+        serviceAccountKey: '{ invalid',
+      },
+      { secretsOptional: true }
+    )
+
+    expect(issues).toEqual([
+      { path: 'serviceAccountKey', message: 'Service account key must be valid JSON' },
+    ])
+  })
+
   it('allows an omitted BigQuery service account key in edit mode', () => {
     const issues = getBigQueryValidationIssues(
       {

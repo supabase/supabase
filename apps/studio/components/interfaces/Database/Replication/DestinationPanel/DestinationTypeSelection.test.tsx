@@ -83,7 +83,7 @@ describe('DestinationTypeSelection', () => {
     expect(screen.getByText('Read Replica')).toBeInTheDocument()
   })
 
-  test('renders the Pipelines group with BigQuery when the flag is enabled', async () => {
+  test('renders BigQuery when the flag is enabled', async () => {
     mockBigQueryEnabled.mockReturnValue(true)
     mockIcebergEnabled.mockReturnValue(false)
     mockDucklakeEnabled.mockReturnValue(false)
@@ -95,8 +95,8 @@ describe('DestinationTypeSelection', () => {
 
     fireEvent.click(await screen.findByRole('combobox'))
 
-    expect(await screen.findByText('Pipelines')).toBeInTheDocument()
-    expect(screen.getByText('BigQuery')).toBeInTheDocument()
+    expect(await screen.findByText('BigQuery')).toBeInTheDocument()
+    expect(screen.queryByText('Pipelines')).not.toBeInTheDocument()
   })
 
   test('hides destinations behind disabled feature flags', async () => {
@@ -131,8 +131,7 @@ describe('DestinationTypeSelection', () => {
 
     fireEvent.click(await screen.findByRole('combobox'))
 
-    expect(await screen.findByText('Pipelines')).toBeInTheDocument()
-    expect(screen.getByText('BigQuery')).toBeInTheDocument()
+    expect(await screen.findByText('BigQuery')).toBeInTheDocument()
     expect(screen.queryByText('Other')).not.toBeInTheDocument()
     expect(screen.queryByText('Read Replica')).not.toBeInTheDocument()
   })
@@ -183,5 +182,26 @@ describe('DestinationTypeSelection', () => {
     customRender(<DestinationTypeSelection />, { nuqs: { searchParams: { edit: '1' } } })
 
     expect(await screen.findByRole('combobox')).toBeDisabled()
+  })
+
+  test('radio variant uses the shared radio group and clusters early access destinations', async () => {
+    mockBigQueryEnabled.mockReturnValue(true)
+    mockIcebergEnabled.mockReturnValue(true)
+    mockDucklakeEnabled.mockReturnValue(true)
+    mockSnowflakeEnabled.mockReturnValue(false)
+    mockClickHouseEnabled.mockReturnValue(false)
+    addBackgroundMocks()
+
+    customRender(<DestinationTypeSelection variant="radio" hideReadReplica />)
+
+    expect(await screen.findByRole('group', { name: 'Destination type' })).toBeInTheDocument()
+    expect(screen.getByText('Public Alpha')).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /BigQuery/ })).toBeInTheDocument()
+    expect(screen.getByText('Early Access')).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /DuckLake/ })).toBeInTheDocument()
+    expect(screen.getByText('Deprecated')).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /Analytics Bucket/ })).toBeInTheDocument()
+    expect(screen.queryByText('Cannot be changed after creation.')).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Leave feedback' })).not.toBeInTheDocument()
   })
 })

@@ -14,7 +14,9 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { BASE_PATH, IS_STAGING_OR_LOCAL } from '@/lib/constants'
 
-const PIPELINE_REGION = IS_STAGING_OR_LOCAL ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.CENTRAL_EU
+export const PIPELINE_REGION = IS_STAGING_OR_LOCAL
+  ? AWS_REGIONS.SOUTHEAST_ASIA
+  : AWS_REGIONS.CENTRAL_EU
 
 export const PipelineRegionField = () => {
   return (
