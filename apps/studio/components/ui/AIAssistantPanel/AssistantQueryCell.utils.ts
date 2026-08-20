@@ -1,11 +1,15 @@
 import { untrustedSql } from '@supabase/pg-meta'
 import dayjs from 'dayjs'
+import isEqual from 'lodash/isEqual'
 
 import { DEFAULT_CELL_ROW_LIMIT } from '@/components/interfaces/Explorer/QueryCell/QueryCell.utils'
 import { type ExplorerQueryModel } from '@/components/interfaces/Explorer/QueryEditor'
 import { type QueryDisplay, type QueryResult } from '@/components/interfaces/Explorer/types'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
-import { type QuerySourceBinding } from '@/data/query-sources/query-source-registry'
+import {
+  toQuerySourceBinding,
+  type QuerySourceBinding,
+} from '@/data/query-sources/query-source-registry'
 
 export const DEFAULT_ASSISTANT_QUERY_TITLE = 'SQL query'
 export const DEFAULT_ASSISTANT_LOGS_QUERY_TITLE = 'Logs query'
@@ -143,6 +147,13 @@ export function changeAssistantQuerySource(
     uncheckedSql: untrustedSql(query.uncheckedSql),
     rowLimit: query._tag === 'database' ? query.rowLimit : DEFAULT_CELL_ROW_LIMIT,
   }
+}
+
+export function shouldClearAssistantQueryResult(
+  query: ExplorerQueryModel,
+  nextSource: QuerySourceBinding
+): boolean {
+  return !isEqual(toQuerySourceBinding(query), toQuerySourceBinding(nextSource))
 }
 
 function isNumericValue(value: unknown): boolean {

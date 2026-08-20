@@ -77,20 +77,29 @@ function parseQueryResult(output: unknown, depth = 0): QueryResult | undefined {
 
   if ('result' in record) {
     const result = parseQueryResult(record.result, depth + 1)
-    if (error) return { ...(result ?? { rows: [] }), error }
-    if (result) return result
+    const mergedResult = mergeParentError(result, error)
+    if (mergedResult) return mergedResult
   }
 
   if (record.structuredContent != null) {
     const result = parseQueryResult(record.structuredContent, depth + 1)
-    if (result) return result
+    const mergedResult = mergeParentError(result, error)
+    if (mergedResult) return mergedResult
   }
 
   if (Array.isArray(record.content)) {
-    return parseQueryResult(textFromMcpContent(record.content), depth + 1)
+    const result = parseQueryResult(textFromMcpContent(record.content), depth + 1)
+    return mergeParentError(result, error)
   }
 
   return error ? { rows: [], error } : undefined
+}
+
+function mergeParentError(
+  result: QueryResult | undefined,
+  error: QueryResult['error']
+): QueryResult | undefined {
+  return error ? { ...(result ?? { rows: [] }), error } : result
 }
 
 function toRowResult(rows: unknown[]): QueryResult {

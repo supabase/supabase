@@ -8,6 +8,7 @@ import {
   DEFAULT_ASSISTANT_QUERY_TITLE,
   getAssistantQueryDisplay,
   setAssistantQuerySql,
+  shouldClearAssistantQueryResult,
 } from './AssistantQueryCell.utils'
 import { Confirm } from './Confirm'
 import { type ConfirmFooterApprovalState } from './Confirm.utils'
@@ -97,10 +98,8 @@ export const AssistantQueryCell = ({
 
   const handleSourceChange = (nextSource: QuerySourceBinding) => {
     const isBackendChange = nextSource._tag !== query._tag
-    if (isBackendChange) {
-      setResultOverride(null)
-      if (!hasExplicitAxes) setLocalDisplay(undefined)
-    }
+    if (shouldClearAssistantQueryResult(query, nextSource)) setResultOverride(null)
+    if (isBackendChange && !hasExplicitAxes) setLocalDisplay(undefined)
     setQuery((current) => changeAssistantQuerySource(current, nextSource))
   }
 
