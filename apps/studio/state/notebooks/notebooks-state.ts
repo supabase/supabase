@@ -9,8 +9,6 @@ import type { Notebook, StateNotebook } from './types'
 import type { SnippetStatus } from '@/data/content/snippet-status'
 import type { Notebooks } from '@/types'
 
-// [Joshen] Deliberately copied from sql-editor-lifecycle cause we might deprecate
-// that in favor of notebooks in the long run
 function statusOnEdit(status: SnippetStatus): SnippetStatus {
   return status === 'saved' ? 'unsaved' : status
 }
@@ -67,8 +65,6 @@ export const notebooksState = proxy({
     const { [id]: notebook, ...otherNotebooks } = notebooksState.notebooks
     notebooksState.notebooks = otherNotebooks
     if (!skipSave) notebooksState.needsSaving.delete(id)
-
-    // TODO: clear notebookSessionState once it exists
   },
 
   /**

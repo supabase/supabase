@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { getContentById } from '../content-id-query'
 import { contentKeys } from '../keys'
-import type { Notebooks, ResponseError, UseCustomQueryOptions } from '@/types'
+import type { Notebooks, UseCustomQueryOptions } from '@/types'
+import { ResponseError } from '@/types'
 
 export type NotebookVariables = { projectRef?: string; id?: string }
 export type NotebookError = ResponseError
@@ -18,7 +19,9 @@ export async function getNotebook(
     throw new Error(`Content ${id} is not a notebook (got type: ${data.type})`)
   }
 
-  return data as Omit<typeof data, 'content'> & {
+  return data as Omit<typeof data, 'content' | 'type' | 'visibility'> & {
+    type: 'notebook'
+    visibility: 'project'
     content: Notebooks.Content
   }
 }

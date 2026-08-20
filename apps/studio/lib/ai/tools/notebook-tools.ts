@@ -15,7 +15,7 @@ import {
   type WritableCell,
   type WritableNotebook,
 } from '@/data/content/notebooks/notebook-schema'
-import { createNotebook, updateNotebook } from '@/data/content/notebooks/notebook-upsert-mutation'
+import { createNotebook, upsertNotebook } from '@/data/content/notebooks/notebook-upsert-mutation'
 import { acceptUntrustedLogsSql, untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import type { Notebooks } from '@/types'
 
@@ -181,7 +181,7 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
           }
         })
 
-        await updateNotebook(
+        await upsertNotebook(
           {
             projectRef: projectRef ?? '',
             id,

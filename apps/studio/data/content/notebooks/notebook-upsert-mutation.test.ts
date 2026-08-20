@@ -3,7 +3,7 @@ import { HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
 
 import type { WritableNotebook } from './notebook-schema'
-import { createNotebook, updateNotebook } from './notebook-upsert-mutation'
+import { createNotebook, upsertNotebook } from './notebook-upsert-mutation'
 import { safeSql as safeLogSql } from '@/data/logs/safe-analytics-sql'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -100,7 +100,7 @@ describe('createNotebook', () => {
   })
 })
 
-describe('updateNotebook', () => {
+describe('upsertNotebook', () => {
   const NOTEBOOK_ID = 'd3aadd77-7c3c-4de7-aa5c-5aa8ac270b44'
 
   it('PUTs with the given id, keeping the existing cell id and leaving the new cell without one', async () => {
@@ -114,7 +114,7 @@ describe('updateNotebook', () => {
       },
     })
 
-    await updateNotebook({
+    await upsertNotebook({
       projectRef: 'default',
       id: NOTEBOOK_ID,
       name: 'Signup funnel',
@@ -136,7 +136,7 @@ describe('updateNotebook', () => {
 
   it('rejects malformed content without making a network request', async () => {
     await expect(
-      updateNotebook({
+      upsertNotebook({
         projectRef: 'default',
         id: NOTEBOOK_ID,
         name: 'Bad notebook',
