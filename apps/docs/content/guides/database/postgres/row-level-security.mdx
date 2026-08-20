@@ -106,8 +106,8 @@ Follow these steps for every table in an exposed schema:
 
 1. [Enable RLS and set the grants](#enable-rls-and-set-the-grants) to match the app.
 2. [Write a policy per operation](#write-a-policy-for-each-operation).
-3. [Create a `.sql` file under `supabase/tests/`](#test-your-policies) that asserts allow and deny for `select`, `insert`, `update`, and `delete`, for `anon` and `authenticated`.
-4. Run `supabase test db` and fix what it reports.
+3. [Create a `.sql` file under `supabase/tests/`](#policy-tests) that asserts allow and deny for `select`, `insert`, `update`, and `delete`, for `anon` and `authenticated`.
+4. [Run `supabase test db`](#run-the-test-suite) and fix what it reports.
 
 Until the suite passes, you don't know whether the policies do what you intended.
 
@@ -169,6 +169,7 @@ begin;
 select plan(8);
 
 set local role anon;
+-- lives_ok is fine for a read. For an allowed write, assert the returned row instead.
 select lives_ok(
   $$select * from announcements$$,
   'anon can read the feed'
@@ -296,7 +297,7 @@ to authenticated
 using ( (select auth.uid()) = user_id );
 ```
 
-#### Test the policies
+#### Policy tests
 
 When you adapt those four policies to a table, add this file for that table. The path is `supabase/tests/<table>_rls.test.sql`. For a table users share, also assert that a member who is not the owner can read and write, and that a non-member cannot.
 
@@ -307,7 +308,7 @@ When you adapt those four policies to a table, add this file for that table. The
 -- One file per table you enabled RLS on. Name that table in the assertions.
 -- Do not create a table only the tests use.
 begin;
-select plan(12);
+select plan(14);
 
 insert into auth.users (id, email)
 values
@@ -361,7 +362,7 @@ select results_eq(
   'the owner creates their own profile'
 );
 select results_eq(
-  $$select avatar_url from profiles$$,
+  $$select avatar_url from profiles where user_id = '11111111-1111-1111-1111-111111111111'$$,
   array['owner.png'],
   'the owner reads their own profile'
 );
@@ -392,9 +393,28 @@ select is_empty(
   $$update profiles set avatar_url = 'stolen.png' returning avatar_url$$,
   'another user updates no profiles'
 );
+
+-- Matching no rows is not proof on its own. Pair every denied write with a
+-- check that the row it targeted is intact. Scope it to that row: a suite
+-- that asserts on everything a role can see breaks once the table holds more.
+set local request.jwt.claim.sub = '11111111-1111-1111-1111-111111111111';
+select results_eq(
+  $$select avatar_url from profiles where user_id = '11111111-1111-1111-1111-111111111111'$$,
+  array['updated.png'],
+  'the denied update left the owner row intact'
+);
+
+set local request.jwt.claim.sub = '22222222-2222-2222-2222-222222222222';
 select is_empty(
   $$delete from profiles returning avatar_url$$,
   'another user deletes no profiles'
+);
+
+set local request.jwt.claim.sub = '11111111-1111-1111-1111-111111111111';
+select results_eq(
+  $$select avatar_url from profiles where user_id = '11111111-1111-1111-1111-111111111111'$$,
+  array['updated.png'],
+  'the denied delete left the owner row intact'
 );
 
 -- Owner delete last so earlier cases still have a row to assert against.
@@ -411,11 +431,11 @@ rollback;
 
 Match the assertion to how the request is denied. Only two of the three raise an error:
 
-| Denied by                              | Postgres                          | Assert with                                    |
-| -------------------------------------- | --------------------------------- | ---------------------------------------------- |
-| A missing grant                        | raises `42501`                    | `throws_ok`                                    |
-| A `with check` violation               | raises `42501`                    | `throws_ok`                                    |
-| A `using` clause filtering the row out | raises nothing, matches zero rows | `is_empty` over the statement with `returning` |
+| Denied by                              | Postgres                          | Assert with                                                                                  |
+| -------------------------------------- | --------------------------------- | -------------------------------------------------------------------------------------------- |
+| A missing grant                        | raises `42501`                    | `throws_ok`                                                                                  |
+| A `with check` violation               | raises `42501`                    | `throws_ok`                                                                                  |
+| A `using` clause filtering the row out | raises nothing, matches zero rows | `is_empty` over the statement with `returning`, then a read proving the target row is intact |
 
 Never prove an allowed write with `lives_ok`. It passes when the write matched zero rows. Add `returning` and assert the returned value.
 
@@ -440,13 +460,11 @@ using ( (select auth.uid()) = user_id );
 
 This prevents the policy `( (select auth.uid()) = user_id )` from running for any `anon` users, since the execution stops at the `to authenticated` step.
 
-### Test your policies
+### Run the test suite
 
 The files above live under `supabase/tests/` and run through [pgTAP](/docs/guides/database/extensions/pgtap). Create them with `supabase test new <table>_rls.test`, and run them with `supabase test db`.
 
 [`supabase-test-helpers`](https://github.com/usebasejump/supabase-test-helpers/tree/main) adds `tests.create_supabase_user()`, `tests.authenticate_as()`, and `tests.rls_enabled()`. See [Advanced pgTAP testing](/docs/guides/local-development/testing/pgtap-extended) and [Testing your database](/docs/guides/database/testing).
-
-Index the filter columns and wrap helper calls so policies stay fast as a table grows. For the measured impact and for tuning beyond them, see [Row Level Security performance](/docs/guides/database/postgres/row-level-security-performance).
 
 ### Add indexes
 
@@ -506,6 +524,8 @@ This method works well for JWT functions like `auth.uid()` and `auth.jwt()` as w
 You can only use this technique if the results of the query or function do not change based on the row data.
 
 </Admonition>
+
+Indexing the filter columns and wrapping helper calls keeps policies fast as a table grows. For the measured impact, and for tuning beyond these two rules, see [Row Level Security performance](/docs/guides/database/postgres/row-level-security-performance).
 
 ### Expose a view safely
 
@@ -652,7 +672,7 @@ A `security definer` function in an exposed schema is callable over the Data API
 
 ### Avoid recursive policies
 
-Two tables whose policies read each other deadlock. Postgres raises `42P17`, `infinite recursion detected in policy for relation`, and the query fails for every role the policies apply to.
+Two tables whose policies read each other never resolve. Postgres raises `42P17`, `infinite recursion detected in policy for relation`, and the query fails for every role the policies apply to.
 
 Sharing features produce this shape. A policy on `lists` checks `list_members` to find who the list is shared with, and a policy on `list_members` checks `lists` to find who owns it:
 
@@ -677,7 +697,7 @@ using (
 );
 ```
 
-Break the cycle with a [security definer function](#use-security-definer-functions). It reads the membership table as its owner, so the second policy never runs and there's nothing to recurse into:
+Break the cycle with a [security definer function](#use-security-definer-functions). It reads the membership table as its owner, so the second policy never runs and the cycle is broken:
 
 ```sql
 create function private.user_list_ids()
@@ -705,6 +725,8 @@ using ( list_id in (select private.user_list_ids()) );
 ```
 
 The function filters on `(select auth.uid())`, so it returns only the caller's lists. A member who doesn't own the list still reads it, and a non-member reads nothing.
+
+This works because the function runs as its owner, and a `security definer` function only skips RLS when its owner can. On Supabase the owner is `postgres`, which has `bypassrls`. A function owned by a role without `bypassrls`, or reading a table set to `force row level security`, evaluates the membership policy again and stays recursive.
 
 ### Bypassing Row Level Security
 
