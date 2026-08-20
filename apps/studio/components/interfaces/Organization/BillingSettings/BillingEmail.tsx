@@ -45,7 +45,7 @@ const BillingEmail = () => {
   )
   const { can: canUpdateBillingData } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
-    'organizations'
+    'stripe.customer'
   )
 
   const { ref, inView } = useInView({ triggerOnce: true })
