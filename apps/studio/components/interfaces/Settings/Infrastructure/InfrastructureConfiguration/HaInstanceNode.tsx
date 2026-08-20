@@ -87,8 +87,8 @@ export const HaPrimaryNode = ({ data }: NodeProps<Node<HaPoolerNodeData>>) => {
         style={{ background: 'transparent' }}
       />
       {/* dark-mode brand-600 is the brightest step of the scale — use the
-          standard brand green there so the ring matches the replication edges */}
-      <div className="flex flex-col rounded-sm bg-surface-100 border border-brand-600 dark:border-brand">
+          deep brand-500 there so the ring marks the primary without glowing */}
+      <div className="flex flex-col rounded-sm bg-surface-100 border border-brand-600 dark:border-brand-500">
         <div className="flex items-start justify-between p-3" style={{ width: NODE_CARD_WIDTH }}>
           <div className="flex gap-x-3">
             <div className="w-8 h-8 bg-brand-500 border border-brand-600 rounded-md flex items-center justify-center">
