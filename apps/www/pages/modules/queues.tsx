@@ -1,6 +1,5 @@
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { MarkdownActions } from '~/components/MarkdownActions'
 import ModulesNav from '~/components/Modules/ModulesNav'
 import ProductModulesHeader from '~/components/Sections/ProductModulesHeader'
 import QueuesPageData from '~/data/products/modules/queues'
@@ -46,17 +45,7 @@ function CronPage() {
       </Head>
       <DefaultLayout className="bg-alternative!" stickyNavbar={false}>
         <ModulesNav activePage={PRODUCT_MODULES_NAMES.QUEUES} docsUrl={pageData.docsUrl} />
-        <ProductModulesHeader
-          {...pageData.heroSection}
-          footer={
-            <MarkdownActions
-              orientation="horizontal"
-              className="justify-center"
-              pagePath="/modules/queues"
-              pageType="modules"
-            />
-          }
-        />
+        <ProductModulesHeader {...pageData.heroSection} />
         <SectionContainer>{pageData.videoSection.video}</SectionContainer>
         <HighlightCards {...pageData.highlightsSection} />
         <QueuesSQLSection {...pageData.section1} />

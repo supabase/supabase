@@ -1,6 +1,5 @@
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { MarkdownActions } from '~/components/MarkdownActions'
 import ModulesNav from '~/components/Modules/ModulesNav'
 import ProductModulesHeader from '~/components/Sections/ProductModulesHeader'
 import CronPageData from '~/data/products/modules/cron'
@@ -45,17 +44,7 @@ function CronPage() {
       </Head>
       <DefaultLayout className="bg-alternative!" stickyNavbar={false}>
         <ModulesNav activePage={PRODUCT_MODULES_NAMES.CRON} docsUrl={pageData.docsUrl} />
-        <ProductModulesHeader
-          {...pageData.heroSection}
-          footer={
-            <MarkdownActions
-              orientation="horizontal"
-              className="justify-center"
-              pagePath="/modules/cron"
-              pageType="modules"
-            />
-          }
-        />
+        <ProductModulesHeader {...pageData.heroSection} />
         <SectionContainer>{pageData.videoSection.video}</SectionContainer>
         <HighlightCards {...(pageData.highlightsSection as any)} />
         <CronSQLSection {...pageData.section1} />
