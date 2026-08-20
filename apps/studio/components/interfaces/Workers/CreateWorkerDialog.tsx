@@ -93,7 +93,7 @@ export const CreateWorkerDialog = ({ projectRef, open, onOpenChange }: CreateWor
                 control={form.control}
                 name="size"
                 render={({ field }) => (
-                  <FormItemLayout label="Size" description="Fixed at deploy time">
+                  <FormItemLayout label="Size">
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
@@ -116,10 +116,7 @@ export const CreateWorkerDialog = ({ projectRef, open, onOpenChange }: CreateWor
                 control={form.control}
                 name="access"
                 render={({ field }) => (
-                  <FormItemLayout
-                    label="Access"
-                    description="Public workers accept requests with an anon key"
-                  >
+                  <FormItemLayout label="Access">
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
