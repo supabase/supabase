@@ -44,6 +44,10 @@ export type EdgeData = {
 export const NODE_WIDTH = 660
 export const NODE_SEP = 20
 
+// Rendered width of the node cards; dagre lays out with NODE_WIDTH / 2 so
+// cards get a little breathing room between columns.
+export const NODE_CARD_WIDTH = NODE_WIDTH / 2 - 10
+
 // The region wrapper is a static, non-measured sibling node with a fixed size.
 export const REGION_NODE_HEIGHT = 162
 

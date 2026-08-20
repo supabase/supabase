@@ -3,11 +3,11 @@ import { groupBy } from 'lodash'
 
 import { getPoolerKey, HaTopology } from './HaTopology.utils'
 import {
-  NODE_HEIGHT_FALLBACKS,
-  NODE_WIDTH,
+  NODE_CARD_WIDTH,
   SHARD_HEADER_HEIGHT,
   SHARD_NODE_PADDING,
 } from './InstanceConfiguration.constants'
+import { getDagreNodeHeight } from './InstanceConfiguration.utils'
 
 export type MultigatewayNodeData = {
   numGateways: number
@@ -25,8 +25,6 @@ export type HaPoolerNodeData = {
 export type HaShardNodeData = {
   name: string
   numNodes: number
-  width: number
-  height: number
 }
 
 export type HaReplicationEdgeData = {
@@ -52,10 +50,10 @@ export const generateHaNodesAndEdges = (topology: HaTopology): { nodes: Node[]; 
   }
 
   topology.shards.forEach((shard) => {
-    const primaryId =
-      shard.primary !== undefined ? `pooler-${getPoolerKey(shard.primary)}` : undefined
+    let primaryId: string | undefined
 
-    if (shard.primary !== undefined && primaryId !== undefined) {
+    if (shard.primary !== undefined) {
+      primaryId = `pooler-${getPoolerKey(shard.primary)}`
       nodes.push({
         position,
         id: primaryId,
@@ -113,10 +111,7 @@ export const generateHaNodesAndEdges = (topology: HaTopology): { nodes: Node[]; 
   return { nodes, edges }
 }
 
-const getNodeWidth = (node: Node) => node.measured?.width ?? NODE_WIDTH / 2 - 10
-
-const getNodeHeight = (node: Node) =>
-  node.measured?.height ?? NODE_HEIGHT_FALLBACKS[node.type ?? ''] ?? 100
+const getNodeWidth = (node: Node) => node.measured?.width ?? NODE_CARD_WIDTH
 
 /**
  * Prepends a background group node per shard wrapping its primary + replicas,
@@ -134,10 +129,7 @@ export const addShardNodes = (nodes: Node[], edges: Edge[]) => {
     const minX = Math.min(...children.map((node) => node.position.x))
     const maxX = Math.max(...children.map((node) => node.position.x + getNodeWidth(node)))
     const minY = Math.min(...children.map((node) => node.position.y))
-    const maxY = Math.max(...children.map((node) => node.position.y + getNodeHeight(node)))
-
-    const width = maxX - minX + SHARD_NODE_PADDING * 2
-    const height = maxY - minY + SHARD_HEADER_HEIGHT + SHARD_NODE_PADDING * 2
+    const maxY = Math.max(...children.map((node) => node.position.y + getDagreNodeHeight(node)))
 
     shardNodes.push({
       id: `shard-${shardId}`,
@@ -148,8 +140,8 @@ export const addShardNodes = (nodes: Node[], edges: Edge[]) => {
       // Explicit dimensions so React Flow renders the node immediately —
       // without them a node stays `visibility: hidden` until a measurement
       // pass that this post-layout background node never gets.
-      width,
-      height,
+      width: maxX - minX + SHARD_NODE_PADDING * 2,
+      height: maxY - minY + SHARD_HEADER_HEIGHT + SHARD_NODE_PADDING * 2,
       // The box covers most of the canvas; making it non-interactive lets
       // React Flow drop its pointer events so drag-to-pan passes through to
       // the pane. The header pill re-enables pointer events for its tooltip.
@@ -159,8 +151,6 @@ export const addShardNodes = (nodes: Node[], edges: Edge[]) => {
       data: {
         name: children[0].data.shardName,
         numNodes: children.length,
-        width,
-        height,
       } satisfies HaShardNodeData,
     })
   })

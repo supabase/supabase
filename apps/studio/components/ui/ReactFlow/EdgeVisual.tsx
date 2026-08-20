@@ -1,4 +1,5 @@
 import { ArrowRight, Loader2, Square, X, type LucideIcon } from 'lucide-react'
+import { cn } from 'ui'
 
 export interface ReplicationState {
   isComingUp: boolean
@@ -68,4 +69,26 @@ export const getEdgeVisual = ({
     shouldAnimate: false,
     isFilled: true,
   }
+}
+
+/**
+ * The icon half of an edge visual, for the small chip rendered mid-edge.
+ * Pass `rotation` (degrees) to orient directional icons in layouts that
+ * aren't left-to-right.
+ */
+export const EdgeVisualIcon = ({ visual, rotation }: { visual: EdgeVisual; rotation?: number }) => {
+  const { Icon, color, shouldSpin, isFilled, strokeWidth, isDirectional } = visual
+
+  return (
+    <Icon
+      size={12}
+      strokeWidth={strokeWidth ?? 2}
+      fill={isFilled ? 'currentColor' : 'none'}
+      className={cn(shouldSpin && 'animate-spin')}
+      style={{
+        color,
+        transform: isDirectional && rotation !== undefined ? `rotate(${rotation}deg)` : undefined,
+      }}
+    />
+  )
 }

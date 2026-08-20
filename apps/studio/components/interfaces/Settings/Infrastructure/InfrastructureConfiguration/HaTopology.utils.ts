@@ -1,8 +1,8 @@
 import { groupBy, partition, uniqBy } from 'lodash'
 
-import type { ReplicationState } from '@/components/ui/ReactFlow/getEdgeVisual'
+import type { ReplicationState } from '@/components/ui/ReactFlow/EdgeVisual'
 import type { Multigateway } from '@/data/ha-admin/ha-cluster-gateways-query'
-import type { Multipooler } from '@/data/ha-admin/ha-cluster-poolers-query'
+import type { HaClusterPoolersData, Multipooler } from '@/data/ha-admin/ha-cluster-poolers-query'
 
 /**
  * Pure helpers mapping the multiadmin cluster state (gateways + poolers) onto
@@ -124,3 +124,27 @@ export const buildHaTopology = ({
 
   return { gateways: uniqueGateways, shards }
 }
+
+/**
+ * Query `select` projecting poolers down to the fields the topology depends on
+ * (identity, shard, routing role) — live status is self-fetched by the
+ * individual nodes and edges. React Query's structural sharing then keeps the
+ * result referentially stable across polls, so refetches only re-run
+ * layout/fitView when the topology actually changes (volatile fields like
+ * lifecycle timestamps would otherwise churn the data identity on every poll).
+ */
+export const selectTopologyPoolers = (data: HaClusterPoolersData): Multipooler[] =>
+  (data.poolers ?? []).map((pooler) => ({
+    id: pooler.id === undefined ? undefined : { cell: pooler.id.cell, name: pooler.id.name },
+    shardKey:
+      pooler.shardKey === undefined
+        ? undefined
+        : {
+            database: pooler.shardKey.database,
+            tableGroup: pooler.shardKey.tableGroup,
+            shard: pooler.shardKey.shard,
+          },
+    routingState:
+      pooler.routingState === undefined ? undefined : { role: pooler.routingState.role },
+    type: pooler.type,
+  }))

@@ -6,6 +6,7 @@ import {
   getPoolerEdgeState,
   getPoolerStatus,
   isPrimaryPooler,
+  selectTopologyPoolers,
 } from './HaTopology.utils'
 import type { Multipooler } from '@/data/ha-admin/ha-cluster-poolers-query'
 
@@ -114,6 +115,42 @@ describe('formatCellAsAvailabilityZone', () => {
   it('returns undefined for an omitted cell', () => {
     expect(formatCellAsAvailabilityZone(undefined)).toBeUndefined()
     expect(formatCellAsAvailabilityZone('')).toBeUndefined()
+  })
+})
+
+describe('selectTopologyPoolers', () => {
+  it('projects poolers down to identity, shard, and routing role', () => {
+    const projected = selectTopologyPoolers({
+      poolers: [
+        {
+          id: { cell: 'cell-1', name: 'p-1' },
+          shardKey: { database: 'postgres', tableGroup: 'default', shard: '0-inf' },
+          type: 'PRIMARY',
+          hostname: 'some-host',
+          servingStatus: 'DRAINING',
+          lifecycleStatus: { status: 'LIFECYCLE_ACTIVE' },
+          routingState: { role: 'ROUTING_ROLE_PRIMARY' },
+        },
+      ],
+    })
+
+    // Volatile fields (lifecycle, serving status, hostname) are dropped so the
+    // projection stays deep-equal across polls when the topology is unchanged.
+    expect(projected).toEqual([
+      {
+        id: { cell: 'cell-1', name: 'p-1' },
+        shardKey: { database: 'postgres', tableGroup: 'default', shard: '0-inf' },
+        routingState: { role: 'ROUTING_ROLE_PRIMARY' },
+        type: 'PRIMARY',
+      },
+    ])
+  })
+
+  it('preserves omitted fields as undefined and handles an empty response', () => {
+    expect(selectTopologyPoolers({})).toEqual([])
+    expect(selectTopologyPoolers({ poolers: [{}] })).toEqual([
+      { id: undefined, shardKey: undefined, routingState: undefined, type: undefined },
+    ])
   })
 })
 

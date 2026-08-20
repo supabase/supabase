@@ -1,11 +1,14 @@
 import { BaseEdge, EdgeLabelRenderer, getSmoothStepPath, type EdgeProps } from '@xyflow/react'
 import { useParams } from 'common'
 import { useMemo } from 'react'
-import { cn } from 'ui'
 
 import { getStatusName } from '../Pipeline.utils'
 import { REPLICA_STATUS, STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
-import { getEdgeVisual, type ReplicationState } from '@/components/ui/ReactFlow/getEdgeVisual'
+import {
+  EdgeVisualIcon,
+  getEdgeVisual,
+  type ReplicationState,
+} from '@/components/ui/ReactFlow/EdgeVisual'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
@@ -93,8 +96,7 @@ export const SmoothstepEdge = ({
     targetPosition,
   })
 
-  const { Icon, color, opacity, dashArray, shouldAnimate, shouldSpin, isFilled, strokeWidth } =
-    getEdgeVisual(replicationState)
+  const visual = getEdgeVisual(replicationState)
 
   return (
     <>
@@ -103,10 +105,10 @@ export const SmoothstepEdge = ({
         markerEnd={markerEnd}
         style={{
           ...style,
-          stroke: color,
-          opacity,
-          strokeDasharray: dashArray,
-          animation: shouldAnimate ? 'dashdraw 0.5s linear infinite' : undefined,
+          stroke: visual.color,
+          opacity: visual.opacity,
+          strokeDasharray: visual.dashArray,
+          animation: visual.shouldAnimate ? 'dashdraw 0.5s linear infinite' : undefined,
         }}
       />
 
@@ -117,13 +119,7 @@ export const SmoothstepEdge = ({
             transform: `translate(-50%, -50%) translate(${shiftEdgeEnd ? targetX - 30 : labelX}px,${shiftEdgeEnd ? targetY : labelY}px)`,
           }}
         >
-          <Icon
-            size={12}
-            strokeWidth={strokeWidth ?? 2}
-            fill={isFilled ? 'currentColor' : 'none'}
-            className={cn(shouldSpin && 'animate-spin')}
-            style={{ color }}
-          />
+          <EdgeVisualIcon visual={visual} />
         </div>
       </EdgeLabelRenderer>
     </>

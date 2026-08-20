@@ -114,7 +114,7 @@ export const generateNodes = ({
   ]
 }
 
-const getDagreNodeHeight = (node: Node) => {
+export const getDagreNodeHeight = (node: Node) => {
   if (node.measured?.height) return node.measured.height
   return NODE_HEIGHT_FALLBACKS[node.type ?? ''] ?? 100
 }
