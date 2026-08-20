@@ -1,11 +1,17 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { act, render, screen, waitFor } from '@testing-library/react'
+import { act, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { SubmittedSupportRequest } from './SupportForm.state'
 import { NO_PROJECT_MARKER } from './SupportForm.utils'
 import { SupportAssistantSuccessCardContent as SupportAssistantSuccessCard } from '@/components/ui/AIAssistantPanel/SupportAssistantSuccessCardContent'
+import type { components } from '@/data/api'
+import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+
+type ProjectDetailResponse = components['schemas']['ProjectDetailResponse']
 
 const {
   chatInstances,
@@ -13,6 +19,7 @@ const {
   mockNewChat,
   mockOpenSidebar,
   mockSelectChat,
+  mockSetContext,
   mockSyncSupportChatToFront,
   mockTrack,
 } = vi.hoisted(() => ({
@@ -21,6 +28,7 @@ const {
   mockNewChat: vi.fn(),
   mockOpenSidebar: vi.fn(),
   mockSelectChat: vi.fn(),
+  mockSetContext: vi.fn(),
   mockSyncSupportChatToFront: vi.fn(),
   mockTrack: vi.fn(),
 }))
@@ -51,6 +59,7 @@ vi.mock('@/state/ai-assistant-state', () => ({
   useAiAssistantState: () => ({
     chats,
     selectChat: mockSelectChat,
+    setContext: mockSetContext,
   }),
 }))
 
@@ -83,6 +92,45 @@ const supportRequest: SubmittedSupportRequest = {
   frontConversationId: 'front-conversation-1',
 }
 
+// A minimal but contract-accurate ProjectDetailResponse, so a mock drifting
+// from the OpenAPI shape (missing fields, stale enum values) fails to compile.
+const readyProjectDetail: ProjectDetailResponse = {
+  id: 1,
+  ref: 'project-1',
+  name: 'Project 1',
+  organization_id: 1,
+  cloud_provider: 'AWS',
+  connectionString: 'postgresql://postgres:postgres@db.project-1.example.com:5432/postgres',
+  db_host: 'db.project-1.example.com',
+  high_availability: false,
+  inserted_at: new Date(0).toISOString(),
+  integration_source: null,
+  is_branch_enabled: false,
+  is_physical_backups_enabled: false,
+  region: 'us-east-1',
+  restUrl: 'https://project-1.example.com/rest',
+  status: 'ACTIVE_HEALTHY',
+  subscription_id: 'subscription-1',
+  updated_at: new Date(0).toISOString(),
+}
+
+function mockProjectDetail(response: ProjectDetailResponse) {
+  addAPIMock({
+    method: 'get',
+    path: '/platform/projects/:ref',
+    response: () => HttpResponse.json<ProjectDetailResponse>(response),
+  })
+}
+
+function mockProjectDetailError() {
+  addAPIMock({
+    method: 'get',
+    path: '/platform/projects/:ref',
+    response: () =>
+      HttpResponse.json<APIErrorBody>({ message: 'Failed to load project' }, { status: 500 }),
+  })
+}
+
 describe('SupportAssistantSuccessCard', () => {
   let nextChatMessages: MockChat['messages']
   let emitChatMessagesChange: (() => void) | undefined
@@ -103,6 +151,7 @@ describe('SupportAssistantSuccessCard', () => {
     mockNewChat.mockReset()
     mockOpenSidebar.mockReset()
     mockSelectChat.mockReset()
+    mockSetContext.mockReset()
     mockSyncSupportChatToFront.mockReset()
     mockTrack.mockReset()
     nextChatMessages = []
@@ -113,15 +162,22 @@ describe('SupportAssistantSuccessCard', () => {
       chats['chat-1'] = { messages: nextChatMessages }
       return 'chat-1'
     })
+
+    mockProjectDetail(readyProjectDetail)
   })
 
   it('creates an assistant chat with the submitted support request', async () => {
-    render(<SupportAssistantSuccessCard request={supportRequest} />)
+    customRender(<SupportAssistantSuccessCard request={supportRequest} />)
 
     await waitFor(() => {
       expect(mockNewChat).toHaveBeenCalledTimes(1)
     })
 
+    expect(mockSetContext).toHaveBeenCalledWith({
+      projectRef: 'project-1',
+      orgSlug: 'org-1',
+      connectionString: readyProjectDetail.connectionString,
+    })
     expect(mockNewChat).toHaveBeenCalledWith(
       expect.objectContaining({
         name: 'Support request',
@@ -133,11 +189,44 @@ describe('SupportAssistantSuccessCard', () => {
     )
   })
 
+  it('does not create a chat while the project is still coming up', async () => {
+    mockProjectDetail({ ...readyProjectDetail, status: 'COMING_UP', connectionString: null })
+
+    customRender(<SupportAssistantSuccessCard request={supportRequest} />)
+
+    await screen.findByRole('heading', { name: 'While you wait' })
+    expect(mockNewChat).not.toHaveBeenCalled()
+    // Not interactive yet either - no chat has been created for the card to open
+    expect(
+      screen.queryByRole('button', { name: /open assistant response/i })
+    ).not.toBeInTheDocument()
+  })
+
+  it('shows a retry state when the project details request fails, and recovers on retry', async () => {
+    mockProjectDetailError()
+
+    const user = userEvent.setup()
+    customRender(<SupportAssistantSuccessCard request={supportRequest} />)
+
+    const retryButton = await screen.findByRole('button', { name: 'Try again' })
+    expect(mockNewChat).not.toHaveBeenCalled()
+    // The card itself has no chat yet, so it must not be interactive
+    expect(
+      screen.queryByRole('button', { name: /open assistant response/i })
+    ).not.toBeInTheDocument()
+
+    mockProjectDetail(readyProjectDetail)
+    await user.click(retryButton)
+
+    await waitFor(() => {
+      expect(mockNewChat).toHaveBeenCalledTimes(1)
+    })
+  })
+
   it('shows a loading preview before the assistant responds', async () => {
-    const { container } = render(<SupportAssistantSuccessCard request={supportRequest} />)
+    const { container } = customRender(<SupportAssistantSuccessCard request={supportRequest} />)
 
     expect(await screen.findByRole('heading', { name: 'While you wait' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /open assistant response/i })).toBeInTheDocument()
     expect(container.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0)
   })
 
@@ -151,7 +240,7 @@ describe('SupportAssistantSuccessCard', () => {
       },
     ]
 
-    render(<SupportAssistantSuccessCard request={supportRequest} />)
+    customRender(<SupportAssistantSuccessCard request={supportRequest} />)
 
     const preview = await screen.findByTestId('assistant-preview-message')
     expect(preview).toHaveTextContent(longResponse)
@@ -159,7 +248,7 @@ describe('SupportAssistantSuccessCard', () => {
   })
 
   it('updates the preview when the shared chat receives an assistant message', async () => {
-    render(<SupportAssistantSuccessCard request={supportRequest} />)
+    customRender(<SupportAssistantSuccessCard request={supportRequest} />)
 
     await waitFor(() => {
       expect(chatInstances['chat-1']?.['~registerMessagesCallback']).toHaveBeenCalled()
@@ -183,7 +272,7 @@ describe('SupportAssistantSuccessCard', () => {
 
   it('opens the generated assistant chat when the action is clicked', async () => {
     const user = userEvent.setup()
-    render(<SupportAssistantSuccessCard request={supportRequest} />)
+    customRender(<SupportAssistantSuccessCard request={supportRequest} />)
 
     const button = await screen.findByRole('button', { name: /open assistant response/i })
     await user.click(button)
@@ -202,7 +291,7 @@ describe('SupportAssistantSuccessCard', () => {
 
   it('tags the chat as a support chat and syncs it to Front on first open', async () => {
     const user = userEvent.setup()
-    render(<SupportAssistantSuccessCard request={supportRequest} />)
+    customRender(<SupportAssistantSuccessCard request={supportRequest} />)
 
     const button = await screen.findByRole('button', { name: /open assistant response/i })
     await user.click(button)
@@ -222,6 +311,8 @@ describe('SupportAssistantSuccessCard', () => {
       isSyncing: false,
       isLifecycleSyncing: false,
     })
+    // A database credential must never be persisted onto the chat's stored metadata
+    expect(chats['chat-1'].supportMetadata).not.toHaveProperty('connectionString')
 
     // The initial flush is behind a dynamic import, so it lands asynchronously
     await waitFor(() => {
@@ -244,7 +335,7 @@ describe('SupportAssistantSuccessCard', () => {
 
   it('opens the generated assistant chat with keyboard activation', async () => {
     const user = userEvent.setup()
-    render(<SupportAssistantSuccessCard request={supportRequest} />)
+    customRender(<SupportAssistantSuccessCard request={supportRequest} />)
 
     const button = await screen.findByRole('button', { name: /open assistant response/i })
     button.focus()
@@ -255,7 +346,7 @@ describe('SupportAssistantSuccessCard', () => {
   })
 
   it('does not render or create a chat when no project is selected', () => {
-    render(
+    customRender(
       <SupportAssistantSuccessCard
         request={{ ...supportRequest, projectRef: NO_PROJECT_MARKER, organizationSlug: 'org-1' }}
       />
