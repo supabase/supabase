@@ -1,4 +1,5 @@
 import { acceptUntrustedSql, untrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
+import { useMonaco } from '@monaco-editor/react'
 import { useFlag } from 'common'
 import { CodeSquare, Eye, EyeOff, Play } from 'lucide-react'
 import type { editor as monacoEditor } from 'monaco-editor'
@@ -34,6 +35,7 @@ import { QueryResultRenderer } from './QueryResultRenderer'
 import { QuerySourceMenu } from './QuerySourceMenu'
 import { useQueryEditorAi } from './useQueryEditorAi'
 import { LegacyLogsRewriteBanner } from '@/components/interfaces/Settings/Logs/LegacyLogsRewriteBanner'
+import { useAddDefinitions } from '@/components/interfaces/SQLEditor/useAddDefinitions'
 import { ResizableAIWidget } from '@/components/ui/AIEditor/ResizableAIWidget'
 import { getEditorSelectionParts, type EditorSelection } from '@/components/ui/AIEditor/utils'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
@@ -172,6 +174,9 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
 
   const dialect = query._tag === 'logs' ? 'clickhouse' : 'postgres'
   const { requestCompletion, isCompletionLoading } = useQueryEditorAi({ dialect })
+
+  const monaco = useMonaco()
+  useAddDefinitions('', monaco, { enabled: dialect === 'postgres' })
 
   const { data: databases, isPending: isLoadingDatabases } = useReadReplicasQuery(
     { projectRef: project?.ref },

@@ -12,9 +12,11 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { acceptUntrustedSql } from '@supabase/pg-meta'
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
+  Check,
   FileText,
+  Keyboard,
   Loader2,
   MoreVertical,
   Notebook,
@@ -33,6 +35,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -59,6 +62,7 @@ import {
 } from '@/data/content/notebooks/notebook-schema'
 import { useUpsertNotebookMutation } from '@/data/content/notebooks/notebook-upsert-mutation'
 import { acceptUntrustedLogsSql } from '@/data/logs/safe-analytics-sql'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
@@ -67,6 +71,11 @@ export const ExplorerNotebookTab = () => {
   const { id, ref } = useParams()
   const tabs = useTabsStateSnapshot()
   const snap = useNotebooksStateSnapshot()
+
+  const [intellisenseEnabled, setIntellisenseEnabled] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
+    true
+  )
 
   const currentNotebook = useCurrentNotebook()
   const { name, content } = currentNotebook?.notebook ?? {}
@@ -98,6 +107,13 @@ export const ExplorerNotebookTab = () => {
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
+
+  const toggleIntellisense = () => {
+    setIntellisenseEnabled(!intellisenseEnabled)
+    toast.success(
+      `Successfully ${intellisenseEnabled ? 'disabled' : 'enabled'} intellisense. ${intellisenseEnabled ? 'Please refresh your browser for changes to take place.' : ''}`
+    )
+  }
 
   const handleSaveTitle = (titleValue: string) => {
     const trimmedName = titleValue.trim()
@@ -231,7 +247,15 @@ export const ExplorerNotebookTab = () => {
               <DropdownMenuTrigger asChild>
                 <ExplorerToolbarAction aria-label="More options" icon={<MoreVertical />} />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-44">
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem className="justify-between" onClick={() => toggleIntellisense()}>
+                  <div className="flex items-center gap-x-2">
+                    <Keyboard size={14} />
+                    <span>Intellisense enabled</span>
+                  </div>
+                  {intellisenseEnabled && <Check className="text-brand" size={16} />}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem className="gap-x-2" onClick={() => setIsDeleteModalOpen(true)}>
                   <Trash size={14} />
                   <span>Delete notebook</span>
