@@ -193,7 +193,7 @@ export const PricingTableRowDesktop = (props: any) => {
               >
                 <span className="mr-1">{feat.title}</span>
                 {tooltips?.main && (
-                  <InfoTooltip side="top" className="max-w-[250px]">
+                  <InfoTooltip side="top" className="max-w-[250px]" label={`About ${feat.title}`}>
                     {tooltips.main}
                   </InfoTooltip>
                 )}
@@ -221,7 +221,11 @@ export const PricingTableRowDesktop = (props: any) => {
                       <div className="text-foreground text-xs flex flex-col justify-center">
                         <span className="flex items-center gap-2">
                           {tooltips?.[planName] && (
-                            <InfoTooltip side="top" className="max-w-[250px]">
+                            <InfoTooltip
+                              side="top"
+                              className="max-w-[250px]"
+                              label={`About ${feat.title} on the ${planName} plan`}
+                            >
                               {tooltips[planName]}
                             </InfoTooltip>
                           )}
