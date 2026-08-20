@@ -43,7 +43,7 @@ const NOTEBOOK_ID = 'notebook-test'
 const databaseCell = createQueryCellSkeleton({ sql: 'select 1' })
 const logCell = {
   _tag: 'log_cell' as const,
-  id: 'log-cell-1',
+  _id: 'log-cell-1',
   view: 'table' as const,
   chart: undefined,
   unchecked_sql: untrustedLogSql('select * from edge_logs limit 1'),

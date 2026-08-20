@@ -14,14 +14,11 @@ export async function getNotebook(
 ) {
   const data = await getContentById({ projectRef, id }, signal, headers)
 
-  // api-types doesn't have 'notebook' in GetUserContentByIdResponse['type'] yet — same gap
-  // tracked by the ContentBase TODO in content-query.ts — so this narrowing can't be static.
-  if ((data.type as string) !== 'notebook') {
+  if (data.type !== 'notebook') {
     throw new Error(`Content ${id} is not a notebook (got type: ${data.type})`)
   }
 
-  return data as unknown as Omit<typeof data, 'type' | 'content'> & {
-    type: 'notebook'
+  return data as Omit<typeof data, 'content'> & {
     content: Notebooks.Content
   }
 }
