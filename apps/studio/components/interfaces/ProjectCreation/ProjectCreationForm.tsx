@@ -371,7 +371,14 @@ export const ProjectCreationForm = ({
       values.instanceSize &&
       !sizesWithNoCostConfirmationRequired.includes(values.instanceSize as DesiredInstanceSize)
 
-    if (additionalMonthlySpend > 0 && (hasOAuthApps || launchingLargerInstance)) {
+    // High availability projects are free during Alpha, so the forced large compute
+    // doesn't incur the usual compute costs.
+    const requiresCostConfirmation =
+      !values.highAvailability &&
+      additionalMonthlySpend > 0 &&
+      (hasOAuthApps || launchingLargerInstance)
+
+    if (requiresCostConfirmation) {
       track('project_creation_simple_version_confirm_modal_opened', {
         instanceSize: values.instanceSize,
       })

@@ -1428,6 +1428,32 @@ export interface UnifiedLogsBannerDismissButtonClickedEvent {
 }
 
 /**
+ * The logs.all deprecation banner was rendered, fired once per mount. Acts as the
+ * denominator for the dismiss rate. Migration outcome itself is measured via decay in
+ * `/v1/projects/:ref/analytics/endpoints/logs.all` traffic in the warehouse, not from this event.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs/*, /project/[ref]/observability/*
+ */
+export interface LogsAllDeprecationBannerExposedEvent {
+  action: 'logs_all_deprecation_banner_exposed'
+  groups: TelemetryGroups
+}
+
+/**
+ * User dismissed the logs.all deprecation banner.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs/*, /project/[ref]/observability/*
+ */
+export interface LogsAllDeprecationBannerDismissButtonClickedEvent {
+  action: 'logs_all_deprecation_banner_dismiss_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the enable button for Index Advisor, either from the banner or the confirmation dialog.
  *
  * @group Events
@@ -1605,7 +1631,8 @@ export interface SessionTerminateSubmittedEvent {
 }
 
 /**
- * User clicked the Cancel query menu item for a database session in the Database Connections activity table.
+ * User clicked Cancel query for a database session in the Database Connections activity table,
+ * either from the row's dropdown menu or from the terminate session confirmation dialog.
  *
  * @group Events
  * @source studio
@@ -1619,6 +1646,10 @@ export interface QueryCancelButtonClickedEvent {
      * Whether the session whose query is being cancelled was itself blocking one or more other sessions.
      */
     isBlocking: boolean
+    /**
+     * Which surface the cancel was triggered from.
+     */
+    origin: 'dropdown_menu' | 'terminate_dialog'
   }
   groups: TelemetryGroups
 }
@@ -3778,6 +3809,8 @@ export type TelemetryEvent =
   | ReportsDatabaseGrafanaBannerClickedEvent
   | UnifiedLogsBannerCtaButtonClickedEvent
   | UnifiedLogsBannerDismissButtonClickedEvent
+  | LogsAllDeprecationBannerExposedEvent
+  | LogsAllDeprecationBannerDismissButtonClickedEvent
   | IndexAdvisorEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
   | IndexAdvisorTabClickedEvent

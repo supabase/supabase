@@ -3,7 +3,7 @@ import { HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
 
 import type { WritableNotebook } from './notebook-schema'
-import { createNotebook, updateNotebook } from './notebook-upsert-mutation'
+import { createNotebook, upsertNotebook } from './notebook-upsert-mutation'
 import { safeSql as safeLogSql } from '@/data/logs/safe-analytics-sql'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -12,7 +12,7 @@ const LOG_SQL = "select timestamp, event_message from edge_logs where source = '
 
 const EXISTING_CELL_ID = 'b1ffcd88-8d1a-4de7-aa5c-5aa8ac270b22'
 
-// Create-shaped: no cell carries an `id` — the notebook is brand new, so no cell has a
+// Create-shaped: no cell carries an `_id` — the notebook is brand new, so no cell has a
 // prior version for the backend to diff against; ids are backend-generated on write.
 const VALID_CONTENT: WritableNotebook = {
   schema_version: 1,
@@ -27,7 +27,7 @@ const VALID_CONTENT: WritableNotebook = {
   ],
 }
 
-// Update-shaped: mixes an existing cell (kept, carries its real backend-assigned id so the
+// Update-shaped: mixes an existing cell (kept, carries its real backend-assigned _id so the
 // backend can diff it against the previous version) with a newly inserted cell (no id —
 // same as create, the backend assigns one on write).
 const UPDATE_CONTENT: WritableNotebook = {
@@ -35,7 +35,7 @@ const UPDATE_CONTENT: WritableNotebook = {
   cells: [
     {
       _tag: 'database_cell',
-      id: EXISTING_CELL_ID,
+      _id: EXISTING_CELL_ID,
       sql: DATABASE_SQL,
       row_limit: 100,
     },
@@ -85,6 +85,7 @@ describe('createNotebook', () => {
     const content = sentBody?.content as WritableNotebook
     for (const cell of content.cells) {
       expect(cell).not.toHaveProperty('id')
+      expect(cell).not.toHaveProperty('_id')
     }
 
     const [, databaseCell, logCell] = content.cells as Array<Record<string, unknown>>
@@ -99,7 +100,7 @@ describe('createNotebook', () => {
   })
 })
 
-describe('updateNotebook', () => {
+describe('upsertNotebook', () => {
   const NOTEBOOK_ID = 'd3aadd77-7c3c-4de7-aa5c-5aa8ac270b44'
 
   it('PUTs with the given id, keeping the existing cell id and leaving the new cell without one', async () => {
@@ -113,7 +114,7 @@ describe('updateNotebook', () => {
       },
     })
 
-    await updateNotebook({
+    await upsertNotebook({
       projectRef: 'default',
       id: NOTEBOOK_ID,
       name: 'Signup funnel',
@@ -125,15 +126,17 @@ describe('updateNotebook', () => {
 
     const content = sentBody?.content as WritableNotebook
     const [databaseCell, logCell] = content.cells as Array<Record<string, unknown>>
-    expect(databaseCell.id).toBe(EXISTING_CELL_ID)
+    expect(databaseCell._id).toBe(EXISTING_CELL_ID)
+    expect(databaseCell).not.toHaveProperty('id')
     expect(databaseCell.sql).toBe(DATABASE_SQL)
     expect(logCell).not.toHaveProperty('id')
+    expect(logCell).not.toHaveProperty('_id')
     expect(logCell.sql).toBe(LOG_SQL)
   })
 
   it('rejects malformed content without making a network request', async () => {
     await expect(
-      updateNotebook({
+      upsertNotebook({
         projectRef: 'default',
         id: NOTEBOOK_ID,
         name: 'Bad notebook',

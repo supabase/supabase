@@ -149,7 +149,7 @@ describe('ai/tools/mock-tools getMockTools', () => {
         { toolCallId: 'test', messages: [], context: {} }
       )
       expect(fetched.cells).toHaveLength(2)
-      expect(fetched.cells.every((cell) => typeof cell.id === 'string')).toBe(true)
+      expect(fetched.cells.every((cell) => typeof cell._id === 'string')).toBe(true)
 
       const listed = await mockTools.list_notebooks.execute(
         { limit: 20 },
@@ -186,10 +186,10 @@ describe('ai/tools/mock-tools getMockTools', () => {
           operations: [
             {
               _tag: 'insert_cell',
-              after_cell_id: markdownCell.id,
+              after_cell_id: markdownCell._id,
               cell: { _tag: 'database_cell', sql: 'select 1', row_limit: 10 },
             },
-            { _tag: 'delete_cell', cell_id: logCell.id },
+            { _tag: 'delete_cell', cell_id: logCell._id },
           ],
         },
         { toolCallId: 'test', messages: [], context: {} }

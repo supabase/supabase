@@ -267,6 +267,7 @@ const ProjectLinks = () => {
   ])
 
   const authOverviewPageEnabled = useFlag('authOverviewPage')
+  const workersEnabled = useFlag('workers')
 
   const toolRoutes = generateToolRoutes(ref, project)
   const productRoutes = generateProductRoutes(ref, project, {
@@ -275,6 +276,7 @@ const ProjectLinks = () => {
     storage: storageEnabled,
     realtime: realtimeEnabled,
     authOverviewPage: authOverviewPageEnabled,
+    workers: workersEnabled,
   })
   const otherRoutes = useGenerateOtherRoutes()
   const settingsRoutes = generateSettingsRoutes(ref)

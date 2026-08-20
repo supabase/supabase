@@ -3,7 +3,8 @@ import { type DynamicToolUIPart, type ReasoningUIPart, type TextUIPart, type Too
 import { BrainIcon, CheckIcon, Loader2 } from 'lucide-react'
 import { cn } from 'ui'
 
-import { DisplayBlockRenderer } from './DisplayBlockRenderer'
+import { AssistantQueryCell } from './AssistantQueryCell'
+import { getManualToolApprovalHandlers } from './Confirm.utils'
 import { EdgeFunctionRenderer } from './EdgeFunctionRenderer'
 import { Tool } from './elements/Tool'
 import { useMessageActionsContext, useMessageInfoContext } from './Message.Context'
@@ -110,14 +111,8 @@ function ToolDisplayExecuteSqlFailure() {
   return <div className="text-xs text-danger">Failed to execute SQL.</div>
 }
 
-function MessagePartExecuteSql({
-  toolPart,
-  isLastPart,
-}: {
-  toolPart: ToolUIPart
-  isLastPart?: boolean
-}) {
-  const { id, isLastMessage } = useMessageInfoContext()
+function MessagePartExecuteSql({ toolPart }: { toolPart: ToolUIPart }) {
+  const { id } = useMessageInfoContext()
   const { addToolApprovalResponse } = useMessageActionsContext()
 
   const { toolCallId, state, input, output } = toolPart
@@ -140,35 +135,25 @@ function MessagePartExecuteSql({
     state === 'output-denied' ||
     state === 'output-available'
   ) {
-    const approvalId = state === 'approval-requested' ? toolPart.approval?.id : undefined
+    const { confirmState, onApprove, onDeny } = getManualToolApprovalHandlers({
+      state,
+      approval: toolPart.approval,
+      addToolApprovalResponse,
+    })
+
     return (
       <div className="w-auto overflow-x-hidden my-4 space-y-2">
-        <DisplayBlockRenderer
-          messageId={id}
-          toolCallId={toolCallId}
-          initialArgs={{
-            sql: chart.sql,
-            label: chart.label,
-            isWriteQuery: chart.isWriteQuery,
-            view: chart.view,
-            xAxis: chart.xAxis,
-            yAxis: chart.yAxis,
-          }}
-          initialResults={output}
-          toolState={state}
-          toolApprovalRespondedApproved={toolPart.approval?.approved}
-          isLastPart={isLastPart}
-          isLastMessage={isLastMessage}
-          onApprove={
-            approvalId
-              ? () => addToolApprovalResponse?.({ id: approvalId, approved: true })
-              : undefined
-          }
-          onDeny={
-            approvalId
-              ? () => addToolApprovalResponse?.({ id: approvalId, approved: false })
-              : undefined
-          }
+        <AssistantQueryCell
+          id={`${id}-${toolCallId}`}
+          sql={chart.sql}
+          title={chart.label}
+          initialRows={output}
+          view={chart.view}
+          xAxis={chart.xAxis}
+          yAxis={chart.yAxis}
+          confirmState={confirmState}
+          onApprove={onApprove}
+          onDeny={onDeny}
         />
       </div>
     )
@@ -211,24 +196,22 @@ function MessagePartDeployEdgeFunction({ toolPart }: { toolPart: ToolUIPart }) {
   const isInitiallyDeployed =
     state === 'output-available' && parsedOutput.success && parsedOutput.data.success === true
 
-  const approvalId = state === 'approval-requested' ? toolPart.approval?.id : undefined
+  const { confirmState, onApprove, onDeny } = getManualToolApprovalHandlers({
+    state,
+    approval: toolPart.approval,
+    addToolApprovalResponse,
+  })
 
   return (
     <EdgeFunctionRenderer
       label={parsedInput.data.label}
       code={parsedInput.data.code}
       functionName={parsedInput.data.functionName}
-      showConfirmFooter={state === 'approval-requested'}
-      isDeploying={state === 'approval-responded' && toolPart.approval?.approved !== false}
+      confirmState={confirmState}
+      isDeploying={confirmState === 'approval-responded'}
       initialIsDeployed={isInitiallyDeployed}
-      onApprove={
-        approvalId ? () => addToolApprovalResponse?.({ id: approvalId, approved: true }) : undefined
-      }
-      onDeny={
-        approvalId
-          ? () => addToolApprovalResponse?.({ id: approvalId, approved: false })
-          : undefined
-      }
+      onApprove={onApprove}
+      onDeny={onDeny}
     />
   )
 }
@@ -266,7 +249,11 @@ function MessagePartNotebookProposal({
     return <p className="text-xs text-danger px-4">{NOTEBOOK_FAILED_LABEL[mode]}</p>
   }
 
-  const approvalId = state === 'approval-requested' ? toolPart.approval?.id : undefined
+  const { confirmState, onApprove, onDeny } = getManualToolApprovalHandlers({
+    state,
+    approval: toolPart.approval,
+    addToolApprovalResponse,
+  })
 
   return (
     <NotebookProposalRenderer
@@ -274,14 +261,9 @@ function MessagePartNotebookProposal({
       state={state}
       input={input}
       output={output}
-      onApprove={
-        approvalId ? () => addToolApprovalResponse?.({ id: approvalId, approved: true }) : undefined
-      }
-      onDeny={
-        approvalId
-          ? () => addToolApprovalResponse?.({ id: approvalId, approved: false })
-          : undefined
-      }
+      confirmState={confirmState}
+      onApprove={onApprove}
+      onDeny={onDeny}
     />
   )
 }
@@ -298,10 +280,8 @@ const MessagePart = {
 
 export function MessagePartSwitcher({
   part,
-  isLastPart,
 }: {
   part: NonNullable<VercelMessage['parts']>[number]
-  isLastPart?: boolean
 }) {
   switch (part.type) {
     case 'dynamic-tool': {
@@ -319,7 +299,7 @@ export function MessagePartSwitcher({
       return <MessagePart.Text textPart={part} />
 
     case 'tool-execute_sql': {
-      return <MessagePart.ExecuteSql toolPart={part} isLastPart={isLastPart} />
+      return <MessagePart.ExecuteSql toolPart={part} />
     }
     case 'tool-deploy_edge_function': {
       return <MessagePart.DeployEdgeFunction toolPart={part} />

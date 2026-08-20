@@ -2939,6 +2939,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/launch-week/6',
+    destination: '/blog/launch-week-6-wrap-up',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/platform/enterprise-billing',
     destination: '/docs/guides/platform/org-based-billing',
   },

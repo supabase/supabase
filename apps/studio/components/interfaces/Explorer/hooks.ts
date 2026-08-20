@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router'
+import { useEffect, useEffectEvent } from 'react'
 
-import { createMarkdownCellSkeleton, createQueryCellSkeleton } from './utils'
+import { useNotebookQuery } from '@/data/content/notebooks/notebook-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { generateUuid } from '@/lib/api/snippets.browser'
@@ -11,6 +12,39 @@ import { useExplorerQueryStateSnapshot } from '@/state/explorer-query'
 import { useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { type Notebook } from '@/state/notebooks/types'
 import { Notebooks } from '@/types'
+
+/**
+ * Fetches a notebook's content by id and merges it into the valtio store, so landing on
+ * a notebook any way other than creating it in this session (direct link, hard refresh,
+ * clicking it from the nav list) still hydrates `notebooksState`.
+ */
+export const useLoadNotebook = ({ id, projectRef }: { id?: string; projectRef?: string }) => {
+  const notebooksSnap = useNotebooksStateSnapshot()
+  const currentNotebook = id ? notebooksSnap.notebooks[id] : undefined
+
+  const isCurrentProjectNotebook = currentNotebook?.projectRef === projectRef
+  const isNewLocalNotebook = isCurrentProjectNotebook && currentNotebook?.status === 'new'
+  const hasLoadedNotebook =
+    isCurrentProjectNotebook && currentNotebook?.notebook.content !== undefined
+
+  const { data, error, isError } = useNotebookQuery(
+    { projectRef, id },
+    {
+      retry: false,
+      enabled: !isNewLocalNotebook && !hasLoadedNotebook,
+    }
+  )
+
+  const mergeNotebook = useEffectEvent(() => {
+    if (projectRef && data) notebooksSnap.setNotebook({ projectRef, notebook: data })
+  })
+
+  useEffect(() => {
+    mergeNotebook()
+  }, [projectRef, data])
+
+  return { isNotFound: isError && error.code === 404 }
+}
 
 export const useCreateNotebook = () => {
   const router = useRouter()
@@ -26,30 +60,6 @@ export const useCreateNotebook = () => {
     if (!profile) return console.error('Profile is required')
     if (!project) return console.error('Project is required')
 
-    const sampleMdCell1 = createMarkdownCellSkeleton({
-      content: `
-# Title
-A brief description on what this notebook is about
-`.trim(),
-    })
-    const sampleMdCell2 = createMarkdownCellSkeleton({
-      content: `
-## Section
-This is a sample paragraph to demonstrate the Markdown cells
-1. List item 1
-2. List item 2
-3. List item 3
-`.trim(),
-    })
-    const sampleQueryCell = createQueryCellSkeleton({ sql: 'select * from colors;' })
-
-    // [Joshen] Just adding sample data to play around with, keep for now - clean up at the end
-    const DEFAULT_CELLS = [
-      sampleMdCell1,
-      sampleMdCell2,
-      sampleQueryCell,
-    ] as Notebooks.Content['cells']
-
     const id = idOverride ?? generateUuid()
 
     const notebook: Notebook = {
@@ -61,7 +71,7 @@ This is a sample paragraph to demonstrate the Markdown cells
       favorite: false,
       content: {
         schema_version: 1,
-        cells: cells ?? DEFAULT_CELLS,
+        cells: cells ?? [],
       },
       owner_id: profile.id,
       project_id: project.id,

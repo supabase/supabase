@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -27,8 +27,16 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import * as z from 'zod'
 
+import {
+  AccessTokenSchema,
+  createRefreshTokenSchema,
+  createUserSessionsSchema,
+  MAX_REFRESH_TOKEN_REUSE_INTERVAL_SECONDS,
+  MAX_SESSIONS_INACTIVITY_TIMEOUT_HOURS,
+  MAX_SESSIONS_TIMEBOX_HOURS,
+  type AccessTokenFormValues,
+} from './SessionsAuthSettingsForm.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
@@ -47,30 +55,6 @@ function HoursOrNeverText({ value }: { value: number }) {
     return 'hours'
   }
 }
-
-const MAX_JWT_EXP = 604800
-
-const AccessTokenSchema = z.object({
-  JWT_EXP: z.coerce
-    .number()
-    .int('Must be a whole number')
-    .positive('Must be greater than 0')
-    .max(MAX_JWT_EXP, `Must be less than ${MAX_JWT_EXP}`),
-})
-
-const RefreshTokenSchema = z.object({
-  REFRESH_TOKEN_ROTATION_ENABLED: z.boolean(),
-  SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: z.coerce.number().min(0, 'Must be a value more than 0'),
-})
-
-const UserSessionsSchema = z.object({
-  SESSIONS_TIMEBOX: z.coerce.number().min(0, 'Must be a positive number'),
-  SESSIONS_INACTIVITY_TIMEOUT: z.coerce
-    .number()
-    .multipleOf(0.1)
-    .min(0, 'Must be a positive number'),
-  SESSIONS_SINGLE_PER_USER: z.boolean(),
-})
 
 export const SessionsAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
@@ -100,15 +84,40 @@ export const SessionsAuthSettingsForm = () => {
     useCheckEntitlements('auth.user_sessions')
   const promptProPlanUpgrade = IS_PLATFORM && !hasUserSessionsEntitlement
 
-  const accessTokenForm = useForm<z.infer<typeof AccessTokenSchema>>({
+  // NOTE(fm): The maximums below were introduced after these settings were unbounded,
+  // so they are validated against the currently saved value: a project already above a
+  // maximum can still save the section, but can only move the value into range.
+  // Normalized exactly as the reset() calls below, so an untouched field compares equal.
+  const savedRefreshTokenReuseInterval = authConfig?.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL ?? 0
+  const savedSessionsTimebox = authConfig?.SESSIONS_TIMEBOX || 0
+  const savedSessionsInactivityTimeout = authConfig?.SESSIONS_INACTIVITY_TIMEOUT || 0
+
+  const refreshTokenResolver = useMemo(
+    () =>
+      zodResolver(createRefreshTokenSchema({ savedReuseInterval: savedRefreshTokenReuseInterval })),
+    [savedRefreshTokenReuseInterval]
+  )
+
+  const userSessionsResolver = useMemo(
+    () =>
+      zodResolver(
+        createUserSessionsSchema({
+          savedTimebox: savedSessionsTimebox,
+          savedInactivityTimeout: savedSessionsInactivityTimeout,
+        })
+      ),
+    [savedSessionsTimebox, savedSessionsInactivityTimeout]
+  )
+
+  const accessTokenForm = useForm<AccessTokenFormValues>({
     resolver: zodResolver(AccessTokenSchema),
     defaultValues: {
       JWT_EXP: 3600,
     },
   })
 
-  const refreshTokenForm = useForm<z.infer<typeof RefreshTokenSchema>>({
-    resolver: zodResolver(RefreshTokenSchema),
+  const refreshTokenForm = useForm({
+    resolver: refreshTokenResolver,
     defaultValues: {
       REFRESH_TOKEN_ROTATION_ENABLED: false,
       SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: 0,
@@ -116,7 +125,7 @@ export const SessionsAuthSettingsForm = () => {
   })
 
   const userSessionsForm = useForm({
-    resolver: zodResolver(UserSessionsSchema),
+    resolver: userSessionsResolver,
     defaultValues: {
       SESSIONS_TIMEBOX: 0,
       SESSIONS_INACTIVITY_TIMEOUT: 0,
@@ -136,21 +145,29 @@ export const SessionsAuthSettingsForm = () => {
       if (!isUpdatingRefreshTokens) {
         refreshTokenForm.reset({
           REFRESH_TOKEN_ROTATION_ENABLED: authConfig.REFRESH_TOKEN_ROTATION_ENABLED || false,
-          SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: authConfig.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL,
+          SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: savedRefreshTokenReuseInterval,
         })
       }
 
       if (!isUpdatingUserSessions) {
         userSessionsForm.reset({
-          SESSIONS_TIMEBOX: authConfig.SESSIONS_TIMEBOX || 0,
-          SESSIONS_INACTIVITY_TIMEOUT: authConfig.SESSIONS_INACTIVITY_TIMEOUT || 0,
+          SESSIONS_TIMEBOX: savedSessionsTimebox,
+          SESSIONS_INACTIVITY_TIMEOUT: savedSessionsInactivityTimeout,
           SESSIONS_SINGLE_PER_USER: authConfig.SESSIONS_SINGLE_PER_USER || false,
         })
       }
     }
-  }, [authConfig, isUpdatingAccessToken, isUpdatingRefreshTokens, isUpdatingUserSessions])
+  }, [
+    authConfig,
+    isUpdatingAccessToken,
+    isUpdatingRefreshTokens,
+    isUpdatingUserSessions,
+    savedRefreshTokenReuseInterval,
+    savedSessionsTimebox,
+    savedSessionsInactivityTimeout,
+  ])
 
-  const onSubmitAccessToken = (values: z.infer<typeof AccessTokenSchema>) => {
+  const onSubmitAccessToken = (values: AccessTokenFormValues) => {
     const payload = { ...values }
     setIsUpdatingAccessToken(true)
 
@@ -259,11 +276,13 @@ export const SessionsAuthSettingsForm = () => {
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
+                        name="SESSIONS_SINGLE_PER_USER"
                         label="Enforce single session per user"
                         description="If enabled, all but a user's most recently active session will be terminated."
                       >
                         <FormControl>
                           <Switch
+                            id="SESSIONS_SINGLE_PER_USER"
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             disabled={!canUpdateConfig || !hasUserSessionsEntitlement}
@@ -281,12 +300,14 @@ export const SessionsAuthSettingsForm = () => {
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
+                        name="SESSIONS_TIMEBOX"
                         label="Time-box user sessions"
-                        description="The amount of time before a user is forced to sign in again. Use 0 for never."
+                        description={`The amount of time before a user is forced to sign in again. Use 0 for never. Maximum ${MAX_SESSIONS_TIMEBOX_HOURS} hours (1 year).`}
                       >
                         <FormControl className="w-full">
                           <InputGroup>
                             <FormInputGroupInput
+                              id="SESSIONS_TIMEBOX"
                               type="number"
                               min={0}
                               {...field}
@@ -311,13 +332,16 @@ export const SessionsAuthSettingsForm = () => {
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
+                        name="SESSIONS_INACTIVITY_TIMEOUT"
                         label="Inactivity timeout"
-                        description="The amount of time a user needs to be inactive to be forced to sign in again. Use 0 for never."
+                        description={`The amount of time a user needs to be inactive to be forced to sign in again. Use 0 for never. Maximum ${MAX_SESSIONS_INACTIVITY_TIMEOUT_HOURS} hours (1 year).`}
                       >
                         <FormControl className="w-full">
                           <InputGroup>
                             <FormInputGroupInput
+                              id="SESSIONS_INACTIVITY_TIMEOUT"
                               type="number"
+                              min={0}
                               {...field}
                               className="flex-1"
                               disabled={!canUpdateConfig || !hasUserSessionsEntitlement}
@@ -389,12 +413,14 @@ export const SessionsAuthSettingsForm = () => {
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
+                        name="JWT_EXP"
                         label="Access token expiry time"
                         description="How long access tokens are valid for before they must be refreshed. Recommendation: 3600 seconds."
                       >
                         <FormControl className="w-full">
                           <InputGroup>
                             <FormInputGroupInput
+                              id="JWT_EXP"
                               type="number"
                               min={1}
                               {...field}
@@ -454,11 +480,13 @@ export const SessionsAuthSettingsForm = () => {
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
+                        name="REFRESH_TOKEN_ROTATION_ENABLED"
                         label="Detect and revoke potentially compromised refresh tokens"
                         description="Prevent replay attacks from potentially compromised refresh tokens."
                       >
                         <FormControl>
                           <Switch
+                            id="REFRESH_TOKEN_ROTATION_ENABLED"
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             disabled={!canUpdateConfig}
@@ -475,12 +503,14 @@ export const SessionsAuthSettingsForm = () => {
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
+                        name="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
                         label="Refresh token reuse interval"
-                        description="Time interval where the same refresh token can be used multiple times to request for an access token. Recommendation: 10 seconds."
+                        description={`Time interval where the same refresh token can be used multiple times to request for an access token. Recommendation: 10 seconds. Maximum ${MAX_REFRESH_TOKEN_REUSE_INTERVAL_SECONDS} seconds (5 minutes).`}
                       >
                         <FormControl className="w-full">
                           <InputGroup>
                             <FormInputGroupInput
+                              id="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
                               type="number"
                               min={0}
                               {...field}
