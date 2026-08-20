@@ -1,5 +1,6 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { HttpResponse } from 'msw'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -87,7 +88,10 @@ beforeEach(() => {
   seedNotebook([databaseCell, logCell, markdownCell])
 })
 
-afterEach(() => notebooksState.needsSaving.clear())
+afterEach(() => {
+  notebooksState.needsSaving.clear()
+  safeLocalStorage.removeItem(LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE)
+})
 
 describe('ExplorerNotebookTab', () => {
   it('runs every database and log cell, and skips markdown cells, on "Run notebook"', async () => {
@@ -135,5 +139,23 @@ describe('ExplorerNotebookTab', () => {
 
     const runNotebookButton = await screen.findByRole('button', { name: 'Run notebook' })
     expect(runNotebookButton).toBeDisabled()
+  })
+
+  it('toggles and persists the Intellisense enabled preference from "More options"', async () => {
+    const readPersistedValue = () => {
+      const item = safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE)
+      return item === null ? true : (JSON.parse(item) as boolean)
+    }
+    const initialValue = readPersistedValue()
+
+    renderNotebookTab()
+
+    const moreOptionsButton = await screen.findByRole('button', { name: 'More options' })
+    await userEvent.click(moreOptionsButton)
+
+    const intellisenseItem = await screen.findByRole('menuitem', { name: 'Intellisense enabled' })
+    await userEvent.click(intellisenseItem)
+
+    await waitFor(() => expect(readPersistedValue()).toBe(!initialValue))
   })
 })

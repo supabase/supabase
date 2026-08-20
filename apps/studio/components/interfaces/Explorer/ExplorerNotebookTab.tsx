@@ -73,7 +73,7 @@ export const ExplorerNotebookTab = () => {
   const tabs = useTabsStateSnapshot()
   const snap = useNotebooksStateSnapshot()
 
-  const [intellisenseEnabled, setIntellisenseEnabled] = useLocalStorageQuery(
+  const [isIntellisenseEnabled, setIsIntellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
     true
   )
@@ -244,13 +244,13 @@ export const ExplorerNotebookTab = () => {
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem
                   className="justify-between"
-                  onClick={() => setIntellisenseEnabled(!intellisenseEnabled)}
+                  onClick={() => setIsIntellisenseEnabled(!isIntellisenseEnabled)}
                 >
                   <div className="flex items-center gap-x-2">
                     <Keyboard size={14} />
                     <span>Intellisense enabled</span>
                   </div>
-                  {intellisenseEnabled && <Check className="text-brand" size={16} />}
+                  {isIntellisenseEnabled && <Check className="text-brand" size={16} />}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="gap-x-2" onClick={() => setIsDeleteModalOpen(true)}>
