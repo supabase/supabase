@@ -52,7 +52,7 @@ export function buildWorkerSnippets(input: WorkerSnippetInput): WorkerSnippets {
     `size      = "${input.size}"    # ${formatSize(input.size)}`,
     `access    = "${input.access}"`,
     `instances = ${input.instances}`,
-    `# region is locked to us-west-1 at alpha`,
+    `# region is locked to us-west-2 at alpha`,
   ].join('\n')
 
   const authHeader =
