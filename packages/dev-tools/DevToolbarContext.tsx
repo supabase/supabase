@@ -60,9 +60,11 @@ export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps
     setIsEnabled(true)
   }, [])
 
+  // Persist 'false' rather than clearing the key, so an explicit opt-out survives
+  // a reload and takes precedence over the devToolbarDefaultOn flag.
   const dismissToolbar = useCallback(() => {
     try {
-      localStorage.removeItem(STORAGE_KEY)
+      localStorage.setItem(STORAGE_KEY, 'false')
     } catch {}
     setIsEnabled(false)
     setIsOpen(false)
@@ -75,7 +77,7 @@ export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps
     try {
       stored = localStorage.getItem(STORAGE_KEY)
     } catch {}
-    if (stored === 'true' || isDefaultOn) {
+    if (stored === 'true' || (stored !== 'false' && isDefaultOn)) {
       setIsEnabled(true)
     }
 

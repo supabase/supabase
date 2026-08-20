@@ -315,6 +315,73 @@ describe('DevToolbar', () => {
     })
   })
 
+  describe('dismissToolbar', () => {
+    beforeEach(() => {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
+    })
+
+    async function renderDismissHarness() {
+      const { DevToolbarProvider, useDevToolbar } = await import('./DevToolbarContext')
+      const { DevToolbarTrigger } = await import('./DevToolbarTrigger')
+      const { TooltipProvider } = await import('ui')
+
+      function ToolbarDismisser() {
+        const { dismissToolbar } = useDevToolbar()
+        return (
+          <button type="button" onClick={dismissToolbar}>
+            Dismiss toolbar
+          </button>
+        )
+      }
+
+      return render(
+        <TooltipProvider>
+          <DevToolbarProvider apiUrl="http://localhost:3000">
+            <ToolbarDismisser />
+            <DevToolbarTrigger />
+          </DevToolbarProvider>
+        </TooltipProvider>
+      )
+    }
+
+    it('persists the opt-out so it survives a remount', async () => {
+      localStorage.setItem('dev-telemetry-toolbar-enabled', 'true')
+
+      vi.resetModules()
+      const { unmount } = await renderDismissHarness()
+
+      expect(screen.getByRole('button', { name: 'Open dev toolbar' })).toBeInTheDocument()
+
+      await userEvent.setup().click(screen.getByRole('button', { name: 'Dismiss toolbar' }))
+
+      expect(localStorage.getItem('dev-telemetry-toolbar-enabled')).toBe('false')
+      expect(screen.queryByRole('button', { name: 'Open dev toolbar' })).not.toBeInTheDocument()
+
+      unmount()
+      await renderDismissHarness()
+
+      expect(screen.queryByRole('button', { name: 'Open dev toolbar' })).not.toBeInTheDocument()
+    })
+
+    it('takes precedence over the devToolbarDefaultOn flag', async () => {
+      flags.devToolbarDefaultOn = true
+
+      vi.resetModules()
+      const { unmount } = await renderDismissHarness()
+
+      expect(screen.getByRole('button', { name: 'Open dev toolbar' })).toBeInTheDocument()
+
+      await userEvent.setup().click(screen.getByRole('button', { name: 'Dismiss toolbar' }))
+
+      expect(screen.queryByRole('button', { name: 'Open dev toolbar' })).not.toBeInTheDocument()
+
+      unmount()
+      await renderDismissHarness()
+
+      expect(screen.queryByRole('button', { name: 'Open dev toolbar' })).not.toBeInTheDocument()
+    })
+  })
+
   describe('window.devToolbar function', () => {
     beforeEach(() => {
       process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
