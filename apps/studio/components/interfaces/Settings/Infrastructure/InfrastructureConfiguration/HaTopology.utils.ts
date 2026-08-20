@@ -1,4 +1,4 @@
-import { groupBy, partition } from 'lodash'
+import { groupBy, partition, uniqBy } from 'lodash'
 
 import type { ReplicationState } from '@/components/ui/ReactFlow/getEdgeVisual'
 import type { Multigateway } from '@/data/ha-admin/ha-cluster-gateways-query'
@@ -25,7 +25,7 @@ export interface HaTopology {
   shards: HaShard[]
 }
 
-export const getPoolerKey = (pooler: Multipooler) =>
+export const getPoolerKey = (pooler: Pick<Multipooler, 'id'>) =>
   `${pooler.id?.cell ?? 'unknown'}-${pooler.id?.name ?? 'unknown'}`
 
 /**
@@ -91,7 +91,16 @@ export const buildHaTopology = ({
   gateways: Multigateway[]
   poolers: Multipooler[]
 }): HaTopology => {
-  const sortedPoolers = [...poolers].sort((a, b) => getPoolerKey(a).localeCompare(getPoolerKey(b)))
+  // The /ha-admin passthrough can return the same record multiple times (one
+  // copy per cell it fans out to), so both lists must be deduped by id —
+  // duplicate poolers would otherwise produce duplicate React Flow node ids,
+  // and extra copies of the primary would render as replicas.
+  const uniqueGateways = uniqBy(gateways, getPoolerKey)
+  const uniquePoolers = uniqBy(poolers, getPoolerKey)
+
+  const sortedPoolers = [...uniquePoolers].sort((a, b) =>
+    getPoolerKey(a).localeCompare(getPoolerKey(b))
+  )
   const poolersByShard = groupBy(
     sortedPoolers,
     (pooler) =>
@@ -113,5 +122,5 @@ export const buildHaTopology = ({
       }
     })
 
-  return { gateways, shards }
+  return { gateways: uniqueGateways, shards }
 }

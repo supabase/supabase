@@ -181,6 +181,26 @@ describe('buildHaTopology', () => {
     expect(topology.shards[0].replicas).toHaveLength(1)
   })
 
+  it('dedupes repeated records by id (the passthrough returns one copy per cell)', () => {
+    const gateway = { id: { cell: 'cell-1', name: 'gw-1' } }
+    const primary = primaryPooler({
+      id: { cell: 'cell-1', name: 'p-1' },
+      lifecycleStatus: { status: 'LIFECYCLE_ACTIVE' },
+    })
+    const replica = replicaPooler({ id: { cell: 'cell-2', name: 'p-2' } })
+
+    const topology = buildHaTopology({
+      gateways: [gateway, gateway, gateway],
+      poolers: [primary, replica, primary, replica, primary, replica],
+    })
+
+    expect(topology.gateways).toEqual([gateway])
+    expect(topology.shards).toHaveLength(1)
+    // Duplicate copies of the primary must not be demoted to replicas.
+    expect(topology.shards[0].primary).toEqual(primary)
+    expect(topology.shards[0].replicas).toEqual([replica])
+  })
+
   it('returns an empty topology for empty responses', () => {
     const topology = buildHaTopology({ gateways: [], poolers: [] })
 
