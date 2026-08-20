@@ -307,8 +307,14 @@ function PromptPanel({ children, className }: PromptPanelProps) {
       className={cn('w-full overflow-hidden rounded-lg border bg-background shadow-sm', className)}
     >
       {header}
-      {/* Stack panes in one grid cell so the panel keeps the tallest tab's height. */}
-      <div className="grid">
+      {/*
+        Stack panes in one grid cell so the panel keeps the tallest tab's
+        height. `grid-cols-1` pins the single track to `minmax(0, 1fr)` — without
+        it the track sizes to the widest pane (e.g. a long cURL line), pushing
+        the whole panel past its column. `min-w-0` on each pane then lets its
+        content wrap (text) or scroll (code) instead of overflowing.
+      */}
+      <div className="grid grid-cols-1">
         {prompts.map((prompt) => {
           const isActive = prompt.value === activeTab
 
@@ -319,7 +325,7 @@ function PromptPanel({ children, className }: PromptPanelProps) {
               forceMount
               inert={!isActive}
               aria-hidden={!isActive}
-              className="col-start-1 row-start-1 m-0 data-[state=inactive]:invisible data-[state=inactive]:pointer-events-none"
+              className="col-start-1 row-start-1 m-0 min-w-0 data-[state=inactive]:invisible data-[state=inactive]:pointer-events-none"
             >
               <PromptBody prompt={prompt} shimmerEnabled={shimmerEnabled} />
             </TabsContent>

@@ -24,8 +24,7 @@ const WorkersSecretsPage: NextPageWithLayout = () => {
           <PageHeaderSummary>
             <PageHeaderTitle>Secrets</PageHeaderTitle>
             <PageHeaderDescription>
-              Environment variables loaded into every worker at start-up. Restrict per worker from
-              its Settings tab.
+              Environment variables loaded into every worker at start-up
             </PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>

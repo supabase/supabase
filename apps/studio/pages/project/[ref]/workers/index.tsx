@@ -48,7 +48,7 @@ const WorkersPage: NextPageWithLayout = () => {
           <PageHeaderSummary>
             <PageHeaderTitle>{PRODUCT_NAME}</PageHeaderTitle>
             <PageHeaderDescription>
-              Run backend workers in microVMs next to your database
+              Fully managed compute that runs any runtime next to your database
             </PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>

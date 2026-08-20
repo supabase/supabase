@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { KeyRound, MoreVertical, Plus, Trash2 } from 'lucide-react'
+import { KeyRound, MoreVertical, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -19,7 +19,9 @@ import {
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { AddSecretDialog } from './AddSecretDialog'
+// Reuse the exact Edge Functions add-secret form so the two products stay in
+// lockstep — same validation, paste-parsing, and bulk-add behaviour.
+import { AddNewSecretForm } from '@/components/interfaces/Functions/EdgeFunctionSecrets/AddNewSecretForm'
 // Reuse the Edge Functions defaults — SUPABASE_URL / SUPABASE_DB_URL / etc. are
 // project-level env vars, so Workers get the exact same set. Extract to a
 // shared module once a third consumer needs them.
@@ -30,7 +32,6 @@ import {
 } from '@/components/interfaces/Functions/EdgeFunctionSecrets/DefaultEdgeFunctionSecrets.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { useSecretsCreateMutation } from '@/data/secrets/secrets-create-mutation'
 import { useSecretsDeleteMutation } from '@/data/secrets/secrets-delete-mutation'
 import { useSecretsQuery } from '@/data/secrets/secrets-query'
 import { DOCS_URL } from '@/lib/constants'
@@ -42,7 +43,6 @@ interface ProjectSecretsSectionProps {
 const MASKED = '••••••••'
 
 export const ProjectSecretsSection = ({ projectRef }: ProjectSecretsSectionProps) => {
-  const [isAddOpen, setIsAddOpen] = useState(false)
   const [pendingDelete, setPendingDelete] = useState<string | null>(null)
 
   const {
@@ -68,23 +68,12 @@ export const ProjectSecretsSection = ({ projectRef }: ProjectSecretsSectionProps
     [data]
   )
 
-  const { mutate: createSecrets, isPending: isCreating } = useSecretsCreateMutation({
-    onSuccess: (_, variables) => {
-      toast.success(`Added secret ${variables.secrets[0]?.name ?? ''}`)
-      setIsAddOpen(false)
-    },
-  })
-
   const { mutate: deleteSecrets, isPending: isDeleting } = useSecretsDeleteMutation({
     onSuccess: (_, variables) => {
       toast.success(`Deleted secret ${variables.secrets[0] ?? ''}`)
       setPendingDelete(null)
     },
   })
-
-  const handleAdd = ({ name, value }: { name: string; value: string }) => {
-    createSecrets({ projectRef, secrets: [{ name, value }] })
-  }
 
   const handleConfirmDelete = () => {
     if (!pendingDelete) return
@@ -93,93 +82,87 @@ export const ProjectSecretsSection = ({ projectRef }: ProjectSecretsSectionProps
 
   return (
     <>
-      <div className="space-y-4">
-        <div className="flex items-center justify-between gap-3">
+      <div className="space-y-10">
+        <AddNewSecretForm />
+
+        <section className="space-y-4">
           <p className="text-sm text-foreground-light">
             {isLoading
               ? 'Loading secrets…'
-              : `${customSecrets.length} secret${customSecrets.length === 1 ? '' : 's'} in this project — shared with every worker by default. Restrict access per worker from that worker's Settings tab.`}
+              : `${customSecrets.length} secret${customSecrets.length === 1 ? '' : 's'} in this project — shared with every worker by default.`}
           </p>
-          <Button
-            variant="primary"
-            size="tiny"
-            icon={<Plus />}
-            onClick={() => setIsAddOpen(true)}
-          >
-            Add secret
-          </Button>
-        </div>
 
-        {isLoading && <GenericSkeletonLoader />}
-        {isError && <AlertError error={error} subject="Failed to load secrets" />}
-        {isSuccess && (
-          <Card>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Value</TableHead>
-                  <TableHead className="hidden md:table-cell">Updated</TableHead>
-                  <TableHead className="w-10" />
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {customSecrets.length === 0 && (
+          {isLoading && <GenericSkeletonLoader />}
+          {isError && <AlertError error={error} subject="Failed to load secrets" />}
+          {isSuccess && (
+            <Card>
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell
-                      colSpan={4}
-                      className="py-10 text-center text-sm text-foreground-lighter"
-                    >
-                      <KeyRound size={16} className="mx-auto mb-2 text-foreground-lighter" />
-                      No secrets yet. Add one to expose it to your workers.
-                    </TableCell>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Value</TableHead>
+                    <TableHead className="hidden md:table-cell">Updated</TableHead>
+                    <TableHead className="w-10" />
                   </TableRow>
-                )}
-                {customSecrets.map((secret) => (
-                  <TableRow key={secret.name}>
-                    <TableCell>
-                      <code className="text-code-inline">{secret.name}</code>
-                    </TableCell>
-                    <TableCell>
-                      <code className="text-code-inline text-foreground-light!">{MASKED}</code>
-                    </TableCell>
-                    <TableCell className="hidden text-foreground-light md:table-cell">
-                      {secret.updated_at
-                        ? dayjs(secret.updated_at).format('MMM D, YYYY HH:mm')
-                        : '—'}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center justify-end">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              aria-label="Secret options"
-                              variant="text"
-                              size="tiny"
-                              icon={<MoreVertical size={14} />}
-                              className="px-1.5 text-foreground-lighter hover:text-foreground"
-                            />
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-40">
-                            <DropdownMenuItem
-                              className="flex items-center gap-2 text-destructive focus:text-destructive"
-                              onClick={() => setPendingDelete(secret.name)}
-                            >
-                              <Trash2 size={12} /> Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Card>
-        )}
+                </TableHeader>
+                <TableBody>
+                  {customSecrets.length === 0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={4}
+                        className="py-10 text-center text-sm text-foreground-lighter"
+                      >
+                        <KeyRound size={16} className="mx-auto mb-2 text-foreground-lighter" />
+                        No secrets yet. Add one to expose it to your workers.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  {customSecrets.map((secret) => (
+                    <TableRow key={secret.name}>
+                      <TableCell>
+                        <code className="text-code-inline">{secret.name}</code>
+                      </TableCell>
+                      <TableCell>
+                        <code className="text-code-inline text-foreground-light!">{MASKED}</code>
+                      </TableCell>
+                      <TableCell className="hidden text-foreground-light md:table-cell">
+                        {secret.updated_at
+                          ? dayjs(secret.updated_at).format('MMM D, YYYY HH:mm')
+                          : '—'}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center justify-end">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                aria-label="Secret options"
+                                variant="text"
+                                size="tiny"
+                                icon={<MoreVertical size={14} />}
+                                className="px-1.5 text-foreground-lighter hover:text-foreground"
+                              />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-40">
+                              <DropdownMenuItem
+                                className="flex items-center gap-2 text-destructive focus:text-destructive"
+                                onClick={() => setPendingDelete(secret.name)}
+                              >
+                                <Trash2 size={12} /> Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Card>
+          )}
+        </section>
 
         {isSuccess && (
-          <section className="space-y-3 pt-6">
+          <section className="space-y-3">
             <div className="flex flex-col justify-between gap-2 md:flex-row md:items-center">
               <div className="space-y-1">
                 <h3 className="text-base text-foreground">Default secrets</h3>
@@ -193,17 +176,6 @@ export const ProjectSecretsSection = ({ projectRef }: ProjectSecretsSectionProps
           </section>
         )}
       </div>
-
-      <AddSecretDialog
-        open={isAddOpen}
-        onOpenChange={setIsAddOpen}
-        onSubmit={handleAdd}
-        existingNames={data.map((s) => s.name)}
-        title="Add project secret"
-        description="Secrets are shared with every worker by default. You can restrict access per worker later."
-        submitLabel="Add secret"
-        isLoading={isCreating}
-      />
 
       <ConfirmationModal
         visible={pendingDelete !== null}
