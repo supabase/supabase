@@ -19,7 +19,9 @@ export async function getNotebook(
     throw new Error(`Content ${id} is not a notebook (got type: ${data.type})`)
   }
 
-  return data as Omit<typeof data, 'content'> & {
+  return data as Omit<typeof data, 'content' | 'type' | 'visibility'> & {
+    type: 'notebook'
+    visibility: 'project'
     content: Notebooks.Content
   }
 }

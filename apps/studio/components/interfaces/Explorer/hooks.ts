@@ -36,7 +36,6 @@ export const useLoadNotebook = ({ id, projectRef }: { id?: string; projectRef?: 
   )
 
   const mergeNotebook = useEffectEvent(() => {
-    // @ts-ignore [Joshen TODO] We'll fix the type validations once API is properly hooked up
     if (projectRef && data) notebooksSnap.setNotebook({ projectRef, notebook: data })
   })
 

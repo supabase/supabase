@@ -29,6 +29,28 @@ function buildNotebookUpsertPayload({
   }
 }
 
+export type CreateNotebookVariables = {
+  projectRef: string
+  name: string
+  description?: string
+  content: WritableNotebook
+}
+
+export async function createNotebook(
+  { projectRef, name, description, content }: CreateNotebookVariables,
+  signal?: AbortSignal,
+  headersInit?: HeadersInit
+) {
+  const id = crypto.randomUUID()
+  const payload = buildNotebookUpsertPayload({ id, name, description, content })
+
+  await upsertContent({ projectRef, payload }, signal, headersInit)
+
+  return { id }
+}
+
+export type CreateNotebookData = Awaited<ReturnType<typeof createNotebook>>
+
 export type UpsertNotebookVariables = {
   id: string
   projectRef: string
