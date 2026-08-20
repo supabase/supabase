@@ -52,6 +52,9 @@ export function ChangelogLlmMarkdownButton({ className, markdownPath = '/changel
       >
         {copied ? 'Copied!' : 'Copy as Markdown'}
       </Button>
+      <span className="sr-only" role="status">
+        {copied ? 'Copied to clipboard' : ''}
+      </span>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -75,7 +78,7 @@ export function ChangelogLlmMarkdownButton({ className, markdownPath = '/changel
                 })
               }
             >
-              <Chatgpt className="h-4 w-4 shrink-0" />
+              <Chatgpt className="h-4 w-4 shrink-0" aria-hidden />
               Ask ChatGPT
             </a>
           </DropdownMenuItem>
@@ -91,7 +94,7 @@ export function ChangelogLlmMarkdownButton({ className, markdownPath = '/changel
                 })
               }
             >
-              <Claude className="h-4 w-4 shrink-0" />
+              <Claude className="h-4 w-4 shrink-0" aria-hidden />
               Ask Claude
             </a>
           </DropdownMenuItem>

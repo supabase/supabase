@@ -31,7 +31,7 @@ function AiTools({ className }: { className?: string }) {
   }
 
   async function handleCopy() {
-    const ok = await copyMarkdown(`/docs/${path}.md`, {
+    const ok = await copyMarkdown(`/docs${path}.md`, {
       fallbackHtml: () => document.getElementById('sb-docs-guide-main-article')?.innerHTML ?? '',
     })
     if (ok) {
@@ -62,12 +62,15 @@ function AiTools({ className }: { className?: string }) {
           className="flex cursor-pointer items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground text-left transition-colors"
         >
           {copied ? (
-            <Check size={14} strokeWidth={1.5} className="text-brand" />
+            <Check size={14} strokeWidth={1.5} className="text-brand" aria-hidden />
           ) : (
-            <Copy size={14} strokeWidth={1.5} />
+            <Copy size={14} strokeWidth={1.5} aria-hidden />
           )}
           {copied ? 'Copied!' : 'Copy as Markdown'}
         </button>
+        <span className="sr-only" role="status">
+          {copied ? 'Copied to clipboard' : ''}
+        </span>
         <a
           href={urls.chatgpt}
           target="_blank"
@@ -80,7 +83,7 @@ function AiTools({ className }: { className?: string }) {
           rel="noreferrer noopener"
           className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
         >
-          <Chatgpt size={14} />
+          <Chatgpt size={14} aria-hidden />
           Ask ChatGPT
         </a>
         <a
@@ -95,7 +98,7 @@ function AiTools({ className }: { className?: string }) {
           rel="noreferrer noopener"
           className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
         >
-          <Claude size={14} />
+          <Claude size={14} aria-hidden />
           Ask Claude
         </a>
       </div>

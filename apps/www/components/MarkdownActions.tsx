@@ -52,12 +52,15 @@ export function MarkdownActions({
         className={cn(itemClass, 'cursor-pointer text-left')}
       >
         {copied ? (
-          <Check size={14} strokeWidth={1.5} className="text-brand" />
+          <Check size={14} strokeWidth={1.5} className="text-brand" aria-hidden />
         ) : (
-          <Copy size={14} strokeWidth={1.5} />
+          <Copy size={14} strokeWidth={1.5} aria-hidden />
         )}
         {copied ? 'Copied!' : 'Copy as Markdown'}
       </button>
+      <span className="sr-only" role="status">
+        {copied ? 'Copied to clipboard' : ''}
+      </span>
       <a
         href={urls.chatgpt}
         target="_blank"
@@ -70,7 +73,7 @@ export function MarkdownActions({
         }
         className={itemClass}
       >
-        <Chatgpt size={14} />
+        <Chatgpt size={14} aria-hidden />
         Ask ChatGPT
       </a>
       <a
@@ -85,7 +88,7 @@ export function MarkdownActions({
         }
         className={itemClass}
       >
-        <Claude size={14} />
+        <Claude size={14} aria-hidden />
         Ask Claude
       </a>
     </div>
