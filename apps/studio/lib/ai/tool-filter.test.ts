@@ -42,7 +42,8 @@ describe('tool allowance by opt-in level', () => {
 
     Object.entries(filtered).forEach(([toolName, tool]) => {
       // Check if tool is actually allowed (not stubbed)
-      const isStubbed = tool.description?.includes('Requires opting in')
+      const isStubbed =
+        typeof tool.description === 'string' && tool.description.includes('Requires opting in')
       if (!isStubbed) {
         allowedTools.push(toolName)
       }

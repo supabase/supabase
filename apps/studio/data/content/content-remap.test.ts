@@ -118,6 +118,7 @@ describe('remapSqlContentField', () => {
       _tag: 'database_cell',
       id: DATABASE_CELL.id,
       row_limit: 100,
+      view: 'table',
       unchecked_sql: untrustedSql(DATABASE_CELL.sql),
     })
     expect(databaseCell).not.toHaveProperty('sql')
@@ -125,6 +126,7 @@ describe('remapSqlContentField', () => {
       _tag: 'log_cell',
       id: LOG_CELL.id,
       time_range: LOG_CELL.time_range,
+      view: 'table',
       unchecked_sql: untrustedLogSql(LOG_CELL.sql),
     })
     expect(logCell).not.toHaveProperty('sql')

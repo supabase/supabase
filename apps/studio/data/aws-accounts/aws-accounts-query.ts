@@ -11,11 +11,14 @@ type AWSAccountsVariables = {
   projectRef?: string
 }
 
-// [Joshen] API types should be updated with these 2 parameters, so remove once verified
+// [Joshen] API types should be updated with these parameters, so remove once verified
 export type AWSAccount =
   components['schemas']['GetPrivateLinkResponse']['private_link_associations'][number] & {
     database_type?: 'PRIMARY' | 'READ_REPLICA'
     database_identifier?: string
+    resource_access_manager_resource_config_id?: string
+    resource_access_manager_resource_config_arn?: string
+    resource_access_manager_share_arn?: string
   }
 
 async function getAWSAccounts({ projectRef }: AWSAccountsVariables, signal?: AbortSignal) {

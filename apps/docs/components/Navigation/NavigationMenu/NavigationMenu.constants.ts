@@ -2772,6 +2772,10 @@ export const platform: NavMenuConstant = {
               name: 'Testing and Best Practices',
               url: '/guides/platform/sso/testing-best-practices' as `/${string}`,
             },
+            {
+              name: 'Enterprise-Managed Authentication for MCP',
+              url: '/guides/platform/sso/enterprise-mcp-authentication' as `/${string}`,
+            },
           ],
         },
       ],
@@ -3361,7 +3365,7 @@ export const reference = {
         },
         {
           name: 'Management API',
-          url: '/reference/javascript',
+          url: '/reference/api/introduction',
           icon: '/img/icons/menu/reference-api' as `/${string}`,
         },
       ],
