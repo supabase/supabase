@@ -184,7 +184,7 @@ export const getSnippetContent = (snippet: SqlSnippet): string =>
  * against the `logs` table — a single message can carry both dialects.
  *
  * It also keeps the two apart in the rendered message: MessageMarkdown treats a `sql`
- * fence as runnable Postgres (`DisplayBlockRenderer`, branded with `untrustedSql`),
+ * fence as runnable Postgres (`AssistantQueryCell`, branded with `untrustedSql`),
  * which a ClickHouse query must never be offered as.
  */
 function getSnippetFenceLanguage(snippet: SqlSnippet): 'sql' | 'clickhouse' {
