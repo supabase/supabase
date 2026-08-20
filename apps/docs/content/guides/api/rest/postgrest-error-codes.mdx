@@ -193,29 +193,26 @@ limit 100;
 
 <Admonition type="note">
 
-PostgREST error codes are only captured in the logs for projects running V14+. You can check your PostgREST version and upgrade your project in the [General Settings](/dashboard/project/_/settings/general)
+The codes in the table above are returned in the response body, not recorded in the logs. Use the queries below to find the failing requests, then read the `code` from the response your client received.
 
 </Admonition>
 
-### Find specific API error
+### Find API errors at the gateway
+
+`sb_error_code` is the error code the API gateway recorded for a request, such as `UNAUTHORIZED_MISSING_API_KEY`. It is empty when the request reached PostgREST and failed there.
 
 ```sql
 select
   timestamp,
   log_attributes['response.status_code'] as status_code,
-  event_message,
-  if(
-    log_attributes['response.headers.proxy_status'] = '',
-    'not_recorded',
-    log_attributes['response.headers.proxy_status']
-  ) as error_codes,
-  log_attributes['request.path'] as path
+  log_attributes['response.headers.sb_error_code'] as gateway_error_code,
+  log_attributes['request.path'] as path,
+  event_message
 from logs
 where
   source = 'edge_logs'
   and toInt32OrZero(log_attributes['response.status_code']) >= 300
   and match(log_attributes['request.path'], '^/rest/v1/')
-  and match(log_attributes['response.headers.proxy_status'], '(?i)THE_RELEVANT_STATUS_CODE')
 order by timestamp desc
 limit 100;
 ```
