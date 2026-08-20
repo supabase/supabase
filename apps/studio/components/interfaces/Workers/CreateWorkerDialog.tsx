@@ -67,10 +67,6 @@ const CreateWorkerSnippets = ({ control }: { control: Control<CreateWorkerForm> 
   )
 }
 
-// Match CreateAnalyticsBucketForm: FormItemLayout draws its own padding so the
-// wrapping DialogSection can drop to `p-0!` and let the fields sit flush.
-const fieldClassName = 'p-5'
-
 interface CreateWorkerDialogProps {
   projectRef: string
   open: boolean
@@ -102,22 +98,14 @@ export const CreateWorkerDialog = ({ projectRef, open, onOpenChange }: CreateWor
 
         <DialogSectionSeparator />
 
-        <Admonition
-          type="default"
-          title="Deploys a Deno starter worker"
-          description="The dashboard deploys a hello-world worker you can then edit and redeploy with the Supabase CLI."
-          className={cn('rounded-none border-x-0 border-t-0')}
-        />
-
         <Form {...form}>
           <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
-            <DialogSection className="p-0!">
+            <DialogSection className="space-y-4">
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItemLayout
-                    className={fieldClassName}
                     label="Name"
                     description="Lowercase letters, numbers, and hyphens only"
                   >
@@ -132,11 +120,7 @@ export const CreateWorkerDialog = ({ projectRef, open, onOpenChange }: CreateWor
                 control={form.control}
                 name="size"
                 render={({ field }) => (
-                  <FormItemLayout
-                    className={fieldClassName}
-                    label="Size"
-                    description="Fixed at deploy time"
-                  >
+                  <FormItemLayout label="Size" description="Fixed at deploy time">
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
@@ -160,7 +144,6 @@ export const CreateWorkerDialog = ({ projectRef, open, onOpenChange }: CreateWor
                 name="access"
                 render={({ field }) => (
                   <FormItemLayout
-                    className={fieldClassName}
                     label="Access"
                     description="Public workers accept requests with an anon key"
                   >
@@ -184,7 +167,6 @@ export const CreateWorkerDialog = ({ projectRef, open, onOpenChange }: CreateWor
                 name="instances"
                 render={({ field }) => (
                   <FormItemLayout
-                    className={fieldClassName}
                     label="Instances"
                     description={`${WORKER_MIN_INSTANCES} to ${WORKER_MAX_INSTANCES}`}
                   >
@@ -200,6 +182,15 @@ export const CreateWorkerDialog = ({ projectRef, open, onOpenChange }: CreateWor
                 )}
               />
             </DialogSection>
+
+            {/* Bottom-of-form notice, flush with the dialog edges. Own border-top acts
+                as the divider from the fields; border-bottom flows into the separator below. */}
+            <Admonition
+              type="default"
+              title="Deploys a Deno starter worker"
+              description="The dashboard deploys a hello-world worker you can then edit and redeploy with the Supabase CLI."
+              className={cn('mb-0 rounded-none border-x-0 border-b-0')}
+            />
           </form>
         </Form>
 
