@@ -22,8 +22,23 @@ export const HaReplicationEdge = ({
 
   // Until the pooler's state is known, render the edge as coming up.
   const status = pooler !== undefined ? getPoolerStatus(pooler) : 'coming_up'
-  const { Icon, color, opacity, dashArray, shouldAnimate, shouldSpin, isFilled, strokeWidth } =
-    getEdgeVisual(getPoolerEdgeState(status))
+  const {
+    Icon,
+    color,
+    opacity,
+    dashArray,
+    shouldAnimate,
+    shouldSpin,
+    isFilled,
+    strokeWidth,
+    isDirectional,
+  } = getEdgeVisual(getPoolerEdgeState(status))
+
+  // The icon chip sits on the horizontal run of this top-to-bottom smoothstep
+  // edge, so point directional icons along the actual flow: toward the
+  // target's side, or straight down when the replica sits directly below.
+  const dx = targetX - sourceX
+  const rotation = Math.abs(dx) < 8 ? 90 : dx > 0 ? 0 : 180
 
   const [edgePath, labelX, labelY] = getSmoothStepPath({
     sourceX,
@@ -58,7 +73,7 @@ export const HaReplicationEdge = ({
             strokeWidth={strokeWidth ?? 2}
             fill={isFilled ? 'currentColor' : 'none'}
             className={cn(shouldSpin && 'animate-spin')}
-            style={{ color }}
+            style={{ color, transform: isDirectional ? `rotate(${rotation}deg)` : undefined }}
           />
         </div>
       </EdgeLabelRenderer>

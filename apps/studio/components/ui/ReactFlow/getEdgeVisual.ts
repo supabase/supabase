@@ -16,6 +16,10 @@ export interface EdgeVisual {
   shouldSpin?: boolean
   isFilled?: boolean
   strokeWidth?: number
+  // The icon depicts the flow direction (it points right, matching a
+  // left-to-right layout) — edges in other layouts must rotate it to match
+  // their actual direction.
+  isDirectional?: boolean
 }
 
 // Picks the icon + line appearance for a replication state. Both the icon and the line are derived
@@ -53,6 +57,7 @@ export const getEdgeVisual = ({
       opacity: 1,
       dashArray: '5',
       shouldAnimate: true,
+      isDirectional: true,
     }
   }
   return {
