@@ -105,20 +105,26 @@ export const useAddDefinitions = (
     isKeywordsSuccess &&
     isFunctionsSuccess
 
-  if (isPgInfoReady) {
-    if (sharedPgInfoRef.current === null) {
-      sharedPgInfoRef.current = {}
+  // Keeps `sharedPgInfoRef` current for the registered pgsql completion/signature-help
+  // providers. Runs in an effect — not render — so only committed tree state writes the
+  // shared, module-level ref; mutating it directly during render risked a discarded or
+  // interrupted render pass leaking a write that no committed render ever produced.
+  useEffect(() => {
+    if (isPgInfoReady) {
+      if (sharedPgInfoRef.current === null) {
+        sharedPgInfoRef.current = {}
+      }
+      sharedPgInfoRef.current.tableColumns = tableColumns
+      sharedPgInfoRef.current.schemas = filteredSchemas
+      sharedPgInfoRef.current.keywords = keywords
+      sharedPgInfoRef.current.functions = functions
+    } else if (!intellisenseEnabled) {
+      // Release this instance's hold on the (potentially huge, for large databases)
+      // tableColumns/functions arrays so they're actually eligible for GC — see the
+      // cache-eviction effect below for why `enabled: false` alone isn't enough.
+      sharedPgInfoRef.current = null
     }
-    sharedPgInfoRef.current.tableColumns = tableColumns
-    sharedPgInfoRef.current.schemas = filteredSchemas
-    sharedPgInfoRef.current.keywords = keywords
-    sharedPgInfoRef.current.functions = functions
-  } else if (!intellisenseEnabled) {
-    // Release this instance's hold on the (potentially huge, for large databases)
-    // tableColumns/functions arrays so they're actually eligible for GC — see the
-    // cache-eviction effect below for why `enabled: false` alone isn't enough.
-    sharedPgInfoRef.current = null
-  }
+  }, [isPgInfoReady, intellisenseEnabled, tableColumns, filteredSchemas, keywords, functions])
 
   // Actively evict the cached tableColumns/functions data when intellisense is turned off
   useEffect(() => {
