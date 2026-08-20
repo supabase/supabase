@@ -3,7 +3,7 @@ import type { ColumnDef, Row, Table as TTable, VisibilityState } from '@tanstack
 import { flexRender } from '@tanstack/react-table'
 import { LoaderCircle } from 'lucide-react'
 import { useQueryState } from 'nuqs'
-import { Fragment, UIEvent, useCallback, useRef } from 'react'
+import { Fragment, ReactNode, UIEvent, useCallback, useRef } from 'react'
 import { Button, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -27,6 +27,8 @@ export interface DataTableInfiniteProps<TData, TValue, _TMeta> {
   fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<unknown>
   setColumnOrder: (columnOrder: string[]) => void
   setColumnVisibility: (columnVisibility: VisibilityState) => void
+  /** Overrides the "No results found" copy shown when the current filters can't match any row. */
+  emptyStateMessage?: string | ReactNode
 
   // [Joshen] See if we can type this properly
   searchParamsParser: any
@@ -43,6 +45,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   totalRowsFetched = 0,
   setColumnOrder,
   setColumnVisibility,
+  emptyStateMessage = 'No results found',
   searchParamsParser,
 }: DataTableInfiniteProps<TData, TValue, TMeta>) {
   const tableRef = useRef<HTMLTableElement>(null)
@@ -193,7 +196,11 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                   className={cn(TableCellClassName, 'text-center')}
                 >
                   <div className="flex flex-col items-center justify-center h-full gap-3">
-                    <p className="text-foreground-light text-sm">No results found</p>
+                    {typeof emptyStateMessage === 'string' ? (
+                      <p className="text-foreground-light text-sm">{emptyStateMessage}</p>
+                    ) : (
+                      emptyStateMessage
+                    )}
                   </div>
                 </TableCell>
               </TableRow>

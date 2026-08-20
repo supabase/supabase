@@ -34,8 +34,8 @@ It eliminates the need for servers to continuously poll for database changes and
 
 ```sql
 -- Example: enable the "pg_net" extension.
-create extension pg_net;
--- Note: The extension creates its own schema/namespace named "net" to avoid naming conflicts.
+create extension pg_net with schema "extensions";
+-- Note: The extension creates its own schema/namespace named "net" to avoid naming conflicts. Registering it in the extensions schema avoids exposing it in public and satisfies the Security Advisor check.
 
 -- Example: disable the "pg_net" extension
 drop extension if exists pg_net;
@@ -311,7 +311,7 @@ order by "created" desc;
 
 <Admonition type="note" title="Must be on pg_net v0.12.0 or above to reconfigure ">
 
-Supabase supports reconfiguring pg*net starting from v0.12.0+. For the latest release, initiate a Postgres upgrade in the [Infrastructure Settings](/dashboard/project/*/settings/infrastructure).
+Supabase supports reconfiguring `pg_net` starting from v0.12.0+. For the latest release, initiate a Postgres upgrade in the [General Settings](/dashboard/project/_/settings/general).
 
 </Admonition>
 
@@ -363,7 +363,7 @@ select
     ) as request_id;
 ```
 
-### Call an endpoint every minute with [pg_cron](/docs/guides/database/extensions/pgcron)
+### Call an endpoint every minute with [pg_cron](/docs/guides/database/extensions/pg_cron)
 
 The pg_cron extension enables Postgres to become its own cron server. With it you can schedule regular calls with up to a minute precision to endpoints.
 

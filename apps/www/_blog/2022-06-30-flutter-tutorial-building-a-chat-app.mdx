@@ -544,9 +544,7 @@ create trigger on_auth_user_created
 Also, Supabase has email confirmation turned on by default, meaning that every time someone signs up, they have to click the confirmation link they receive in their email.
 This is ideal for a production app, but for our sample app, we can turn it off since we want to get up and running with building a functioning chat app.
 We will cover secure authentications using Supabase in later articles.
-Go to authentication → settings and turn off the switch of `Enable email confirmations`.
-
-![turn off email confirmation](/images/blog/flutter-chat/turn-off-email-confirmation.png)
+Go to [Authentication → Sign In / Providers](https://supabase.com/dashboard/project/_/auth/providers) and turn off the **Confirm email** toggle under **User Signups**.
 
 ### Step 6: Create login page
 

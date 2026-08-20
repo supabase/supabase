@@ -1839,16 +1839,16 @@ function createStorageExplorerState({
 
 export type StorageExplorerState = ReturnType<typeof createStorageExplorerState>
 
-const DEFAULT_STATE_CONFIG = {
+const createDefaultStateConfig = () => ({
   projectRef: '',
   connectionString: '',
   resumableUploadUrl: '',
   clientEndpoint: '',
   bucket: {} as Bucket,
-}
+})
 
 const StorageExplorerStateContext = createContext<StorageExplorerState>(
-  createStorageExplorerState(DEFAULT_STATE_CONFIG)
+  createStorageExplorerState(createDefaultStateConfig())
 )
 
 export const StorageExplorerStateContextProvider = ({ children }: PropsWithChildren) => {
@@ -1856,7 +1856,7 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   const { data: bucket } = useSelectedBucket()
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
 
-  const [state, setState] = useState(() => createStorageExplorerState(DEFAULT_STATE_CONFIG))
+  const [state, setState] = useState(() => createStorageExplorerState(createDefaultStateConfig()))
   const stateRef = useLatest(state)
 
   const {

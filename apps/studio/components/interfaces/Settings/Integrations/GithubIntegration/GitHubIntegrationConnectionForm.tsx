@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -17,7 +17,7 @@ import {
   Input,
   Switch,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
@@ -176,9 +176,18 @@ export const GitHubIntegrationConnectionForm = ({
     },
   })
 
-  const enableProductionSync = githubSettingsForm.watch('enableProductionSync')
-  const newBranchPerPr = githubSettingsForm.watch('new_branch_per_pr')
-  const currentRepositoryId = githubSettingsForm.watch('repositoryId')
+  const enableProductionSync = useWatch({
+    control: githubSettingsForm.control,
+    name: 'enableProductionSync',
+  })
+  const newBranchPerPr = useWatch({
+    control: githubSettingsForm.control,
+    name: 'new_branch_per_pr',
+  })
+  const currentRepositoryId = useWatch({
+    control: githubSettingsForm.control,
+    name: 'repositoryId',
+  })
 
   const handleCreateOrUpdateConnection = async (data: z.infer<typeof GitHubSettingsSchema>) => {
     if (!selectedProject?.ref || !selectedOrganization?.id) return
@@ -385,6 +394,13 @@ export const GitHubIntegrationConnectionForm = ({
     isDeletingConnection ||
     isLoadingRepositoryOptions
 
+  let repositoryDescription = 'Select the repository to connect to your project'
+  if (connection) {
+    repositoryDescription = 'Change the connected repository'
+  } else if (gitHubAuthorization === null) {
+    repositoryDescription = 'Connect GitHub to link a repository to this project'
+  }
+
   return (
     <>
       <Form {...githubSettingsForm}>
@@ -399,11 +415,7 @@ export const GitHubIntegrationConnectionForm = ({
                 name="repositoryId"
                 label="GitHub repository"
                 layout="flex-row-reverse"
-                description={
-                  connection
-                    ? 'Change the connected repository'
-                    : 'Select the repository to connect to your project'
-                }
+                description={repositoryDescription}
                 disabled={
                   (!connection && !canCreateGitHubConnection) ||
                   (connection && !canUpdateGitHubConnection)

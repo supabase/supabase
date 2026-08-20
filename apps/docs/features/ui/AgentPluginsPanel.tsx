@@ -4,53 +4,9 @@ import { ExternalLink } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useState } from 'react'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
-import { ClientSelectDropdown, type McpClient } from 'ui-patterns/McpUrlBuilder'
+import { ClientSelectDropdown } from 'ui-patterns/McpUrlBuilder'
 
-interface PluginClient extends McpClient {
-  repoUrl?: string
-  docsUrl?: string
-}
-
-const PLUGIN_CLIENTS: PluginClient[] = [
-  {
-    key: 'claude-code',
-    label: 'Claude Code',
-    icon: 'claude',
-    repoUrl: 'https://github.com/supabase-community/supabase-plugin',
-    docsUrl: 'https://code.claude.com/docs/en/discover-plugins',
-  },
-  {
-    key: 'codex',
-    label: 'Codex',
-    icon: 'openai',
-    hasDistinctDarkIcon: true,
-    repoUrl: 'https://github.com/supabase-community/codex-plugin',
-    docsUrl: 'https://developers.openai.com/codex/plugins',
-  },
-  {
-    key: 'cursor',
-    label: 'Cursor',
-    icon: 'cursor',
-    repoUrl: 'https://github.com/supabase-community/cursor-plugin',
-    docsUrl: 'https://cursor.com/docs/plugins',
-  },
-  {
-    key: 'gemini-cli',
-    label: 'Gemini CLI',
-    icon: 'gemini-cli',
-    repoUrl: 'https://github.com/supabase-community/supabase-plugin',
-    docsUrl: 'https://geminicli.com/docs/extensions/',
-  },
-  {
-    key: 'github-copilot',
-    label: 'GitHub Copilot',
-    icon: 'copilot',
-    hasDistinctDarkIcon: true,
-    repoUrl: 'https://github.com/supabase-community/supabase-plugin',
-    docsUrl:
-      'https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-finding-installing',
-  },
-]
+import { PLUGIN_CLIENTS, type PluginClient } from './AgentPluginsPanel.data'
 
 function PluginInstructions({ client }: { client: PluginClient }) {
   if (client.key === 'claude-code') {
@@ -172,6 +128,78 @@ function PluginInstructions({ client }: { client: PluginClient }) {
     )
   }
 
+  if (client.key === 'kimi') {
+    return (
+      <div className="space-y-3">
+        <p className="text-sm text-foreground-light">Open Kimi Code by running</p>
+        <CodeBlock value="kimi" language="bash" focusable={false} className="block" />
+        <p className="text-sm text-foreground-light">
+          Then install the Supabase plugin from within the session:
+        </p>
+        <CodeBlock
+          value="/plugins install https://github.com/supabase-community/supabase-plugin"
+          language="bash"
+          focusable={false}
+          className="block"
+        />
+        <p className="text-xs text-foreground-lighter">
+          Confirm the trust prompt to install. Kimi adds the plugin to its native plugin store. Run{' '}
+          <code>/plugins</code> at any time to view or reload installed plugins.
+        </p>
+      </div>
+    )
+  }
+
+  if (client.key === 'grok') {
+    return (
+      <div className="space-y-3">
+        <p className="text-sm text-foreground-light">
+          Install the Supabase plugin by running the following command in your terminal.
+        </p>
+        <CodeBlock
+          value="grok plugin install supabase-community/supabase-plugin"
+          language="bash"
+          focusable={false}
+          className="block"
+        />
+        <p className="text-xs text-foreground-lighter">
+          Browse and install plugins in a session: run <code>grok</code>, then <code>/plugins</code>{' '}
+          or <code>/marketplace</code>.
+        </p>
+      </div>
+    )
+  }
+
+  if (client.key === 'vscode') {
+    return (
+      <div className="space-y-3">
+        <p className="text-sm text-foreground-light">
+          Open the Command Palette (<code>Cmd/Ctrl+Shift+P</code>) and run{' '}
+          <strong>Chat: Install Plugin From Source</strong>, then paste the Supabase plugin
+          repository URL:
+        </p>
+        <CodeBlock
+          value="https://github.com/supabase-community/supabase-plugin"
+          language="bash"
+          focusable={false}
+          className="block"
+        />
+        <p className="text-xs text-foreground-lighter">
+          VS Code auto-detects the vendor-neutral{' '}
+          <a
+            href="https://github.com/vercel-labs/open-plugin-spec"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-brand-link hover:underline"
+          >
+            Open Plugin
+          </a>{' '}
+          manifest in the repo. Review the trust prompt to finish installing.
+        </p>
+      </div>
+    )
+  }
+
   if (client.key === 'github-copilot') {
     return (
       <div className="space-y-4">
@@ -232,7 +260,7 @@ export function AgentPluginsPanel() {
               rel="noopener noreferrer"
               className="text-brand-link hover:underline inline-flex items-center"
             >
-              View {selectedClient.label} extensions docs
+              {selectedClient.docsLinkText ?? `View ${selectedClient.label} extensions docs`}
               <ExternalLink className="h-3 w-3 ml-1" />
             </a>
           </div>

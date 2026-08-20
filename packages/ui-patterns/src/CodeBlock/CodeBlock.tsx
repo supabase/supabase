@@ -16,6 +16,7 @@ import ini from 'react-syntax-highlighter/dist/cjs/languages/hljs/ini'
 import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
 import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
 import kotlin from 'react-syntax-highlighter/dist/cjs/languages/hljs/kotlin'
+import markdown from 'react-syntax-highlighter/dist/cjs/languages/hljs/markdown'
 import pgsql from 'react-syntax-highlighter/dist/cjs/languages/hljs/pgsql'
 import php from 'react-syntax-highlighter/dist/cjs/languages/hljs/php'
 import {
@@ -52,6 +53,7 @@ const codeBlockLangs = [
   'yaml',
   'toml',
   'html',
+  'markdown',
 ] as const
 
 export type CodeBlockLang = (typeof codeBlockLangs)[number]
@@ -78,6 +80,7 @@ export interface CodeBlockProps {
   theme?: any
   children?: string
   wrapLines?: boolean
+  wrapLongLines?: boolean
   focusable?: boolean
   renderer?: SyntaxHighlighterProps['renderer']
   handleCopy?: (value?: string) => void
@@ -98,6 +101,7 @@ export interface CodeBlockProps {
  * @param {string} [props.children] - The code content as children.
  * @param {boolean} [props.hideCopy=false] - Whether to hide the copy button.
  * @param {boolean} [props.hideLineNumbers=false] - Whether to hide line numbers.
+ * @param {boolean} [props.wrapLongLines=false] - Whether long lines soft-wrap instead of scrolling horizontally.
  * @param {SyntaxHighlighterProps['renderer']} [props.renderer] - Custom renderer for syntax highlighting.
  * @param {boolean} [props.focusable=true] - Whether the code block is focusable. When true, users can focus the code block to select text or use ⌘A (Cmd+A) to select all. This is so we don't need to load Monaco Editor.
  * @param {function} [props.handleCopy] - Optional override behaviour for copying value. For e.g if the code block contains obfuscated values, but the copy behaviour should reveal those values instead.
@@ -116,6 +120,7 @@ export const CodeBlock = ({
   hideCopy = false,
   hideLineNumbers = false,
   wrapLines = true,
+  wrapLongLines = false,
   renderer,
   focusable = true,
   onCopyCallback = noop,
@@ -175,6 +180,7 @@ export const CodeBlock = ({
   SyntaxHighlighter.registerLanguage('html', xml)
   SyntaxHighlighter.registerLanguage('toml', ini)
   SyntaxHighlighter.registerLanguage('yaml', yaml)
+  SyntaxHighlighter.registerLanguage('markdown', markdown)
 
   const large = false
   // don't show line numbers if bash == lang
@@ -200,6 +206,7 @@ export const CodeBlock = ({
             suppressContentEditableWarning
             language={lang}
             wrapLines={wrapLines}
+            wrapLongLines={wrapLongLines}
             style={monokaiTheme}
             className={cn(
               'code-block border border-surface p-4 w-full my-0! !bg-surface-100 outline-hidden focus:border-foreground-lighter/50',
@@ -268,7 +275,7 @@ export const CodeBlock = ({
             >
               <Button
                 variant="default"
-                className="px-1.5"
+                className="px-1.5 dark:bg-200! dark:hover:bg-button! hover:bg-alternative!"
                 icon={copied ? <Check /> : <Copy />}
                 onClick={() => onSelectCopy(value || children)}
               >

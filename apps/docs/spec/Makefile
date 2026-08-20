@@ -61,18 +61,22 @@ download.analytics.v0:
 # at build time, so no separate `dereference` / `combine` step is needed.
 transform: dereference.api.v1 dereference.auth.v1 dereference.storage.v0
 
+# NOTE: no --dereferenced here — api_v2_openapi.json has a circular ref
+# (APIErrorObject.issues -> APIErrorObject) that Redocly can't flatten to
+# JSON. v1 uses the same approach for consistency.
+# $refs are resolved manually in writeApiReferenceSections
 dereference.api.v1:
-	pnpm exec redocly bundle --dereferenced -o $(REPO_DIR)/transforms/api_v1_openapi_deparsed.json $(REPO_DIR)/api_v1_openapi.json
-	pnpm exec redocly bundle --dereferenced -o $(REPO_DIR)/transforms/api_v2_openapi_deparsed.json $(REPO_DIR)/api_v2_openapi.json
+	npx --package=@redocly/cli redocly bundle -o $(REPO_DIR)/transforms/api_v1_openapi_deparsed.json $(REPO_DIR)/api_v1_openapi.json
+	npx --package=@redocly/cli redocly bundle -o $(REPO_DIR)/transforms/api_v2_openapi_deparsed.json $(REPO_DIR)/api_v2_openapi.json
 
 dereference.auth.v1:
-	pnpm exec redocly bundle --dereferenced -o $(REPO_DIR)/transforms/auth_v1_openapi_deparsed.json $(REPO_DIR)/auth_v1_openapi.json
+	npx --package=@redocly/cli redocly bundle --dereferenced -o $(REPO_DIR)/transforms/auth_v1_openapi_deparsed.json $(REPO_DIR)/auth_v1_openapi.json
 
 dereference.storage.v0:
-	pnpm exec redocly bundle --dereferenced -o $(REPO_DIR)/transforms/storage_v0_openapi_deparsed.json $(REPO_DIR)/storage_v0_openapi.json
+	npx --package=@redocly/cli redocly bundle --dereferenced -o $(REPO_DIR)/transforms/storage_v0_openapi_deparsed.json $(REPO_DIR)/storage_v0_openapi.json
 
 dereference.analytics.v0:
-	pnpm exec redocly bundle --dereferenced -o $(REPO_DIR)/transforms/analytics_v0_openapi_deparsed.json $(REPO_DIR)/analytics_v0_openapi.json
+	npx --package=@redocly/cli redocly bundle --dereferenced -o $(REPO_DIR)/transforms/analytics_v0_openapi_deparsed.json $(REPO_DIR)/analytics_v0_openapi.json
 
 ###############################################################################
 # Generate sections from OpenAPI 3.0
@@ -90,7 +94,7 @@ generate.sections.api.v1:
 ###############################################################################
 
 validate.analytics.v0:
-	pnpm exec redocly lint --extends=minimal $(REPO_DIR)/analytics_v0_openapi.json
+	npx --package=@redocly/cli redocly lint --extends=minimal $(REPO_DIR)/analytics_v0_openapi.json
 
 ###############################################################################
 # Format everything - easier for git to track changes.

@@ -118,6 +118,7 @@ export function IntegratesSectionClient({ useCases }: { useCases: UseCase[] }) {
             const Icon = ICONS[useCase.icon]
             return (
               <button
+                tabIndex={0}
                 key={useCase.label}
                 role="tab"
                 aria-selected={isActive}

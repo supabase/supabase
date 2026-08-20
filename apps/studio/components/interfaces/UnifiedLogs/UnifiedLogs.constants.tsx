@@ -33,6 +33,23 @@ type LogType = keyof typeof LOG_TYPES_LABELS
 export const LOG_TYPES = Object.keys(LOG_TYPES_LABELS) as [LogType, ...LogType[]]
 export const DEFAULT_LOG_TYPES = ['postgres', 'edge'] as const
 
+// ClickHouse `source` value for each unified log type. Single source of truth
+// consumed by both the unified logs list query (LOG_TYPE_CONDITION in
+// UnifiedLogs.queries.ts) and the single-log inspection point lookup
+// (unified-log-inspection-query.ts).
+export const LOG_TYPE_TO_SOURCE: Record<LogType, string> = {
+  edge: 'edge_logs',
+  postgrest: 'postgrest_logs',
+  storage: 'storage_logs',
+  postgres: 'postgres_logs',
+  'edge function': 'function_edge_logs',
+  auth: 'auth_logs',
+  realtime: 'realtime_logs',
+  supavisor: 'supavisor_logs',
+  pgbouncer: 'pgbouncer_logs',
+  multigres: 'multigres_logs',
+}
+
 const parseAsSort = createParser({
   parse(queryValue: string) {
     const [id, desc] = queryValue.split(SORT_DELIMITER)
@@ -77,6 +94,10 @@ export const SEARCH_PARAMS_PARSER = {
   edge_auth: parseAsBoolean.withDefault(true),
   edge_storage: parseAsBoolean.withDefault(true),
   edge_postgrest: parseAsBoolean.withDefault(true),
+
+  // Support searching for user against user ID
+  // See userAttributionCondition in UnifiedLogs.queries.ts.
+  user: parseAsString,
 }
 
 const POSTGRES_STATUS_CODE_LABELS = {

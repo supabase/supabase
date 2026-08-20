@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
 import { processIncidentData } from '@/data/platform/incident-status-utils'

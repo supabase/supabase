@@ -73,7 +73,10 @@ describe('ai/tools/incident-tools', () => {
 
         const tools = getIncidentTools({ baseUrl: 'https://example.com/dashboard' })
         if (!tools.get_active_incidents.execute) throw new Error('execute is undefined')
-        await tools.get_active_incidents.execute({}, { toolCallId: 'test', messages: [] })
+        await tools.get_active_incidents.execute(
+          {},
+          { toolCallId: 'test', messages: [], context: {} }
+        )
 
         expect(mockFetch).toHaveBeenCalledWith(
           'https://example.com/dashboard/api/incident-status',
@@ -210,7 +213,10 @@ describe('ai/tools/incident-tools', () => {
 
         const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
         if (!tools.get_active_incidents.execute) throw new Error('execute is undefined')
-        await tools.get_active_incidents.execute({}, { toolCallId: 'test', messages: [] })
+        await tools.get_active_incidents.execute(
+          {},
+          { toolCallId: 'test', messages: [], context: {} }
+        )
 
         const callArgs = mockFetch.mock.calls[0]
         expect(callArgs[1].signal).toBeInstanceOf(AbortSignal)

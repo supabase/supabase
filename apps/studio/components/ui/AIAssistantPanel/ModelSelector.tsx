@@ -82,9 +82,7 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <div>
-                          <Badge role="button" variant="warning">
-                            Upgrade
-                          </Badge>
+                          <Badge variant="warning">Upgrade</Badge>
                         </div>
                       </TooltipTrigger>
                       <TooltipContent side="right">

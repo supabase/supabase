@@ -2,7 +2,6 @@
 
 import 'react-data-grid/lib/styles.css'
 import '@/styles/code.css'
-import '@/styles/focus.css'
 // Vite-only: defines @font-face for the custom fonts. The Next pipeline
 // (pages/_app.tsx) loads these via next/font instead, so this import has no
 // counterpart there — but dropping it under Vite makes the browser fall back
@@ -25,11 +24,13 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 import type { QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import {
+  ClientOnly,
   createRootRouteWithContext,
   HeadContent,
   Outlet,
   redirect,
   Scripts,
+  type AnyRouter,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import {
@@ -57,6 +58,7 @@ import {
 } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { TooltipProvider } from 'ui'
+import { TimestampInfoProvider } from 'ui-patterns/TimestampInfo'
 
 import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
@@ -64,14 +66,18 @@ import { FeaturePreviewContextProvider } from '@/components/interfaces/App/Featu
 import { FeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProvider'
 import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
+import { ShellFallback } from '@/components/interfaces/App/ShellFallback'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
+import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { AuthProvider } from '@/lib/auth'
 import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
+import { TimezoneProvider, useTimezone } from '@/lib/datetime'
+import { splitInternalUrl } from '@/lib/internal-url'
 // Custom adapter instead of `nuqs/adapters/tanstack-router` — the stock one
 // injects a trailing slash before the query on every nuqs write (see module).
 import { NuqsAdapter } from '@/lib/nuqs-tanstack-adapter'
@@ -99,12 +105,34 @@ const FeatureFlagProviderWithOrgContext = ({
   ...props
 }: ComponentProps<typeof FeatureFlagProvider>) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
+  const cloudProvider = useDefaultProvider()
+
+  const getConfigCatFlags = useCallback(
+    (userEmail?: string) => {
+      const customAttributes: Record<string, string> = {}
+      if (cloudProvider) customAttributes.cloud_provider = cloudProvider
+      if (selectedOrganization?.plan?.id) customAttributes.plan = selectedOrganization.plan.id
+      return getFlags(userEmail, customAttributes)
+    },
+    [cloudProvider, selectedOrganization?.plan?.id]
+  )
 
   return (
-    <FeatureFlagProvider {...props} organizationSlug={selectedOrganization?.slug ?? undefined}>
+    <FeatureFlagProvider
+      {...props}
+      getConfigCatFlags={getConfigCatFlags}
+      organizationSlug={selectedOrganization?.slug ?? undefined}
+    >
       {children}
     </FeatureFlagProvider>
   )
+}
+
+// Bridges the user's stored timezone preference into TimestampInfoProvider so
+// dayjs.tz.setDefault runs app-wide (see @/lib/datetime).
+const TimestampInfoTimezoneBridge = ({ children }: { children: ReactNode }) => {
+  const { timezone } = useTimezone()
+  return <TimestampInfoProvider timezone={timezone}>{children}</TimestampInfoProvider>
 }
 
 const IS_NON_PROD_ENV =
@@ -190,7 +218,7 @@ function buildRootHead() {
   const meta: Array<Record<string, string>> = [
     { charSet: 'utf-8' },
     { name: 'viewport', content: 'initial-scale=1.0, width=device-width' },
-    { property: 'og:image', content: `${BASE_PATH}/img/supabase-logo.png` },
+    { property: 'og:image', content: `${BASE_PATH}/img/supabase-og.png` },
     { name: 'googlebot', content: 'notranslate' },
     { name: 'application-name', content: APPLICATION_NAME },
     { name: 'msapplication-TileColor', content: `#${THEME_COLOR}` },
@@ -304,8 +332,21 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       hash: location.hash,
     })
     if (!match) return
-    const href = BASE_PATH ? `${BASE_PATH}${match.destination}` : match.destination
-    throw redirect({ href, statusCode: match.permanent ? 308 : 307 })
+    // `to`/`search`/`hash`, never `href`: the router treats `href` as an
+    // opaque (external) target, and preloading a Link whose beforeLoad
+    // throws `redirect({ href })` recurses forever — the preload retry
+    // rebuilds the origin location and re-runs this beforeLoad
+    // (https://github.com/TanStack/router/issues/7141). `to` is also
+    // basepath-relative, so no manual BASE_PATH prefix. The explicit
+    // `search`/`hash` fallbacks clear the incoming values rather than
+    // inherit them — `preserveQueryAndHash` already merged what carries over.
+    const { to, search, hash } = splitInternalUrl(match.destination)
+    throw redirect<AnyRouter, string>({
+      to,
+      search: search ?? {},
+      hash: hash ?? '',
+      statusCode: match.permanent ? 308 : 307,
+    })
   },
   component: RootComponent,
   shellComponent: RootDocument,
@@ -316,59 +357,52 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 function RootComponent() {
   useThemeSandbox()
 
-  const cloudProvider = useDefaultProvider()
-
-  const getConfigCatFlags = useCallback(
-    (userEmail?: string) => {
-      const customAttributes = cloudProvider ? { cloud_provider: cloudProvider } : undefined
-      return getFlags(userEmail, customAttributes)
-    },
-    [cloudProvider]
-  )
-
   return (
     <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
       <NuqsAdapter>
         <AuthProvider>
-          <FeatureFlagProviderWithOrgContext
-            API_URL={API_URL}
-            enabled={IS_PLATFORM}
-            getConfigCatFlags={getConfigCatFlags}
-          >
+          <FeatureFlagProviderWithOrgContext API_URL={API_URL} enabled={IS_PLATFORM}>
             <ProfileProvider>
-              <DynamicTitle />
-              <TooltipProvider delayDuration={0}>
-                <RouteValidationWrapper>
-                  <ThemeProvider
-                    defaultTheme="system"
-                    themes={['dark', 'light', 'classic-dark']}
-                    enableSystem
-                    disableTransitionOnChange
-                  >
-                    <DevToolbarProvider apiUrl={API_URL}>
-                      <AiAssistantStateContextProvider>
-                        <CommandProvider>
-                          <BannerStackProvider>
-                            <FeaturePreviewContextProvider>
-                              <MainScrollContainerProvider>
-                                <Outlet />
-                              </MainScrollContainerProvider>
-                              <StudioCommandMenu />
-                              <FeaturePreviewModal />
-                            </FeaturePreviewContextProvider>
-                          </BannerStackProvider>
-                          <Toaster />
-                          <ToastErrorTracker />
-                          <MonacoThemeProvider />
-                        </CommandProvider>
-                      </AiAssistantStateContextProvider>
-                      <DevToolbar extraTabs={devToolbarExtraTabs} />
-                      <DevToolbarTrigger />
-                    </DevToolbarProvider>
-                  </ThemeProvider>
-                </RouteValidationWrapper>
-              </TooltipProvider>
-              <Telemetry />
+              <TimezoneProvider>
+                <TimestampInfoTimezoneBridge>
+                  <DynamicTitle />
+                  <TooltipProvider>
+                    <RouteValidationWrapper>
+                      <ThemeProvider
+                        defaultTheme="system"
+                        themes={['dark', 'light', 'classic-dark']}
+                        enableSystem
+                        disableTransitionOnChange
+                      >
+                        <DevToolbarProvider apiUrl={API_URL}>
+                          <AiAssistantStateContextProvider>
+                            <CommandProvider>
+                              <BannerStackProvider>
+                                <FeaturePreviewContextProvider>
+                                  <MainScrollContainerProvider>
+                                    <ClientOnly fallback={<ShellFallback />}>
+                                      <Outlet />
+                                    </ClientOnly>
+                                  </MainScrollContainerProvider>
+                                  <GlobalShortcuts />
+                                  <StudioCommandMenu />
+                                  <FeaturePreviewModal />
+                                </FeaturePreviewContextProvider>
+                              </BannerStackProvider>
+                              <Toaster />
+                              <ToastErrorTracker />
+                              <MonacoThemeProvider />
+                            </CommandProvider>
+                          </AiAssistantStateContextProvider>
+                          <DevToolbar extraTabs={devToolbarExtraTabs} />
+                          <DevToolbarTrigger />
+                        </DevToolbarProvider>
+                      </ThemeProvider>
+                    </RouteValidationWrapper>
+                  </TooltipProvider>
+                  <Telemetry />
+                </TimestampInfoTimezoneBridge>
+              </TimezoneProvider>
             </ProfileProvider>
           </FeatureFlagProviderWithOrgContext>
         </AuthProvider>

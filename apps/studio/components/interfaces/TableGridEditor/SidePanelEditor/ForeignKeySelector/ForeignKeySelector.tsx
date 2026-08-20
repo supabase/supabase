@@ -2,7 +2,7 @@ import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
 import type { PGTable } from '@supabase/pg-meta'
 import { sortBy } from 'lodash'
 import { ArrowRight, HelpCircle, Loader2, X } from 'lucide-react'
-import { Fragment, useEffect, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import {
   Alert,
   AlertDescription,
@@ -34,6 +34,7 @@ import InformationBox from '@/components/ui/InformationBox'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useTableQuery } from '@/data/tables/table-retrieve-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
+import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
@@ -89,7 +90,11 @@ export const ForeignKeySelector = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const sortedSchemas = [...schemas].sort((a, b) => a.name.localeCompare(b.name))
+  const visibleSchemas = useSchemasFilteredForHighAvailability(schemas)
+  const sortedSchemas = useMemo(
+    () => [...visibleSchemas].sort((a, b) => a.name.localeCompare(b.name)),
+    [visibleSchemas]
+  )
 
   const { data: tables } = useTablesQuery({
     projectRef: project?.ref,

@@ -3,10 +3,18 @@ import { DefaultChatTransport, lastAssistantMessageIsCompleteWithApprovalRespons
 import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { DBSchema, IDBPDatabase, openDB } from 'idb'
 import { debounce } from 'lodash'
-import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import {
+  createContext,
+  PropsWithChildren,
+  useContext,
+  useEffect,
+  useReducer,
+  useState,
+} from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 
+import type { SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
 import type { AiSupportStatus } from '@/data/feedback/ai-chat-front-sync'
 import { constructHeaders } from '@/data/fetchers'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -22,7 +30,12 @@ type SuggestionsType = {
 
 export type AssistantMessageType = MessageType
 
-export type SqlSnippet = string | { label: string; content: string }
+/**
+ * A query attached to the composer (the "Current Query" chip). `source` records which
+ * backend the attached query runs against, so the dialect travels with the query it
+ * describes.
+ */
+export type SqlSnippet = string | { label: string; content: string; source?: SqlSnippetSource }
 
 export type AssistantModel = AssistantModelId
 
@@ -54,13 +67,14 @@ export type SupportChatMetadata = {
   isLifecycleSyncing: boolean
 }
 
-type ChatSession = {
+export type ChatSession = {
   id: string
   name: string
   messages: AssistantMessageType[]
   createdAt: Date
   updatedAt: Date
   supportMetadata?: SupportChatMetadata
+  branchedFrom?: { chatId: string; messageId: string }
 }
 
 export type AiAssistantContext = {
@@ -80,6 +94,10 @@ type AiAssistantData = {
   context: AiAssistantContext
 }
 
+type CreateChatOptions = { name?: string; initialMessage?: string }
+type NewChatOptions = CreateChatOptions &
+  Partial<Pick<AiAssistantData, 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>>
+
 // Data structure stored in IndexedDB
 type StoredAiAssistantState = {
   projectRef: string
@@ -88,7 +106,7 @@ type StoredAiAssistantState = {
   model?: AssistantModel
 }
 
-const INITIAL_AI_ASSISTANT: AiAssistantData = {
+const createInitialAiAssistantData = (): AiAssistantData => ({
   initialInput: '',
   sqlSnippets: undefined,
   suggestions: undefined,
@@ -97,7 +115,7 @@ const INITIAL_AI_ASSISTANT: AiAssistantData = {
   activeChatId: undefined,
   model: undefined,
   context: {},
-}
+})
 
 const DB_NAME = 'ai-assistant-db'
 const DB_VERSION = 1
@@ -152,7 +170,7 @@ async function clearStorage(): Promise<void> {
 
 // Helper function to sanitize objects to ensure they're cloneable
 // Issue due to addToolResult
-function sanitizeForCloning(obj: any): any {
+export function sanitizeForCloning(obj: any): any {
   if (obj === null || obj === undefined) return obj
   if (typeof obj !== 'object') return obj
   return JSON.parse(JSON.stringify(obj))
@@ -210,7 +228,7 @@ async function tryMigrateFromLocalStorage(
         projectRef: projectRef,
         activeChatId: parsedFromLocalStorage.activeChatId,
         chats: parsedFromLocalStorage.chats,
-        model: parsedFromLocalStorage.model ?? INITIAL_AI_ASSISTANT.model,
+        model: parsedFromLocalStorage.model ?? createInitialAiAssistantData().model,
       }
     } else {
       console.warn('Data in localStorage is not in the expected format, ignoring.')
@@ -329,7 +347,8 @@ function createChatInstance(
         const messages = chatInstance.messages
         const chat = state.chats[options.id]
         if (chat) {
-          chat.messages = messages
+          // Clone first — valtio's proxy() mutates nested properties in place and would corrupt the SDK's live array
+          chat.messages = messages.map((message) => sanitizeForCloning(message))
           chat.updatedAt = new Date()
         }
 
@@ -356,20 +375,22 @@ function createChatInstance(
 
 export const createAiAssistantState = (): AiAssistantState => {
   // Initialize with defaults, loading happens asynchronously in the provider
-  const initialState = { ...INITIAL_AI_ASSISTANT }
+  const initialState = createInitialAiAssistantData()
 
   const state: AiAssistantState = proxy({
     ...initialState, // Spread initial values directly
     chatInstances: {},
     pendingSpanIds: {},
     messageSpanIds: {},
+    isInitialized: false,
 
     setContext: (context: Partial<AiAssistantContext>) => {
       state.context = { ...state.context, ...context }
     },
 
     resetAiAssistantPanel: () => {
-      Object.assign(state, INITIAL_AI_ASSISTANT)
+      Object.assign(state, createInitialAiAssistantData())
+      state.isInitialized = false
     },
 
     setModel: (model: AssistantModel) => {
@@ -381,11 +402,7 @@ export const createAiAssistantState = (): AiAssistantState => {
       return state.activeChatId ? state.chats[state.activeChatId] : undefined
     },
 
-    newChat: (
-      options?: { name?: string; initialMessage?: string } & Partial<
-        Pick<AiAssistantData, 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
-      >
-    ) => {
+    createChat: (options?: CreateChatOptions) => {
       const chatId = uuidv4()
       const newChat: ChatSession = {
         id: chatId,
@@ -399,25 +416,78 @@ export const createAiAssistantState = (): AiAssistantState => {
         ...state.chats,
         [chatId]: newChat,
       }
-      state.activeChatId = chatId
 
-      // Create new chat instance
       const chatInstance = createChatInstance(state, { id: chatId, initialMessages: [] })
-
       state.chatInstances[chatId] = ref(chatInstance)
 
-      // If initialMessage is provided, append it to the chat instance
       if (options?.initialMessage) {
         chatInstance.sendMessage({
           text: options.initialMessage,
         })
       }
 
-      // Update non-chat related state based on options, falling back to current state, then initial
-      state.initialInput = options?.initialInput ?? INITIAL_AI_ASSISTANT.initialInput
-      state.sqlSnippets = options?.sqlSnippets ?? INITIAL_AI_ASSISTANT.sqlSnippets
-      state.suggestions = options?.suggestions ?? INITIAL_AI_ASSISTANT.suggestions
-      state.tables = options?.tables ?? INITIAL_AI_ASSISTANT.tables
+      return chatId
+    },
+
+    newChat: (options?: NewChatOptions) => {
+      const chatId = state.createChat(options)
+      state.selectChat(chatId)
+
+      const initialAiAssistantData = createInitialAiAssistantData()
+      state.initialInput = options?.initialInput ?? initialAiAssistantData.initialInput
+      state.sqlSnippets = options?.sqlSnippets ?? initialAiAssistantData.sqlSnippets
+      state.suggestions = options?.suggestions ?? initialAiAssistantData.suggestions
+      state.tables = options?.tables ?? initialAiAssistantData.tables
+
+      return chatId
+    },
+
+    createBranch: (sourceChatId: string, messageId: string) => {
+      const sourceChat = state.chats[sourceChatId]
+      if (!sourceChat) return
+
+      const messageIndex = sourceChat.messages.findIndex((msg) => msg.id === messageId)
+      if (messageIndex === -1) return
+
+      const branchedMessages = sourceChat.messages
+        .slice(0, messageIndex + 1)
+        .map((message) => sanitizeForCloning(message))
+
+      const chatId = uuidv4()
+      const newChat: ChatSession = {
+        id: chatId,
+        name: `Branch - ${sourceChat.name}`,
+        messages: branchedMessages,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        branchedFrom: { chatId: sourceChat.id, messageId },
+      }
+
+      state.chats = {
+        ...state.chats,
+        [chatId]: newChat,
+      }
+
+      state.chatInstances[chatId] = ref(
+        createChatInstance(state, { id: chatId, initialMessages: branchedMessages })
+      )
+
+      return chatId
+    },
+
+    branchChat: (messageId: string) => {
+      if (!state.activeChatId) return
+
+      const chatId = state.createBranch(state.activeChatId, messageId)
+      if (!chatId) return
+
+      state.selectChat(chatId)
+
+      const initialAiAssistantData = createInitialAiAssistantData()
+      state.initialInput = initialAiAssistantData.initialInput
+      state.sqlSnippets = initialAiAssistantData.sqlSnippets
+      state.suggestions = initialAiAssistantData.suggestions
+      state.tables = initialAiAssistantData.tables
 
       return chatId
     },
@@ -444,35 +514,33 @@ export const createAiAssistantState = (): AiAssistantState => {
       })
     },
 
-    selectChat: (id: string) => {
-      if (id !== state.activeChatId) {
-        state.activeChatId = id
-        const chat = state.chats[id]
-        if (chat) {
-          if (!state.chatInstances[id]) {
-            state.chatInstances[id] = ref(
-              createChatInstance(state, { id, initialMessages: chat.messages })
-            )
-          }
-        }
+    ensureChatInstance: (id: string) => {
+      const chat = state.chats[id]
+      if (chat && !state.chatInstances[id]) {
+        state.chatInstances[id] = ref(
+          createChatInstance(state, { id, initialMessages: chat.messages })
+        )
       }
+    },
+
+    selectChat: (id: string) => {
+      if (!state.chats[id]) return
+
+      state.activeChatId = id
+      state.ensureChatInstance(id)
     },
 
     deleteChat: (id: string) => {
       const { [id]: _, ...remainingChats } = state.chats
       state.chats = remainingChats
+      delete state.chatInstances[id]
 
       if (id === state.activeChatId) {
         const remainingChatIds = Object.keys(remainingChats)
         state.activeChatId = remainingChatIds.length > 0 ? remainingChatIds[0] : undefined
 
         if (state.activeChatId) {
-          const chat = state.chats[state.activeChatId]
-          if (!state.chatInstances[state.activeChatId]) {
-            state.chatInstances[state.activeChatId] = ref(
-              createChatInstance(state, { id: state.activeChatId, initialMessages: chat.messages })
-            )
-          }
+          state.ensureChatInstance(state.activeChatId)
         }
       }
     },
@@ -485,19 +553,27 @@ export const createAiAssistantState = (): AiAssistantState => {
       }
     },
 
-    clearMessages: () => {
-      const chat = state.activeChat
+    clearMessages: (chatId = state.activeChatId) => {
+      if (!chatId) return
+
+      const chat = state.chats[chatId]
       if (chat) {
         chat.messages = []
+        const chatInstance = state.chatInstances[chatId]
+        if (chatInstance) chatInstance.messages = []
         chat.updatedAt = new Date()
-        state.suggestions = undefined
-        state.sqlSnippets = []
-        state.initialInput = ''
+        if (chatId === state.activeChatId) {
+          state.suggestions = undefined
+          state.sqlSnippets = []
+          state.initialInput = ''
+        }
       }
     },
 
-    deleteMessagesAfter: (id: string, { includeSelf = true } = {}) => {
-      const chat = state.activeChat
+    deleteMessagesAfter: (id: string, { includeSelf = true, chatId = state.activeChatId } = {}) => {
+      if (!chatId) return
+
+      const chat = state.chats[chatId]
       if (!chat) return
 
       const messageIndex = chat.messages.findIndex((msg) => msg.id === id)
@@ -506,40 +582,37 @@ export const createAiAssistantState = (): AiAssistantState => {
       // Delete all messages from the target message (optionally including) to the end
       const startIndex = includeSelf ? messageIndex : messageIndex + 1
       chat.messages.splice(startIndex)
+      const chatInstance = state.chatInstances[chatId]
+      const instanceMessageIndex = chatInstance?.messages.findIndex((message) => message.id === id)
+      if (chatInstance && instanceMessageIndex !== undefined && instanceMessageIndex !== -1) {
+        chatInstance.messages = chatInstance.messages.slice(
+          0,
+          includeSelf ? instanceMessageIndex : instanceMessageIndex + 1
+        )
+      }
       chat.updatedAt = new Date()
     },
 
-    saveMessage: (message: MessageType | MessageType[]) => {
-      const chat = state.activeChat
-      if (!chat) return
+    updateMessage: (updatedMessage: MessageType, chatId = state.activeChatId) => {
+      if (!chatId) return
 
-      const incomingMessages = Array.isArray(message) ? message : [message]
-
-      const messagesToAdd: AssistantMessageType[] = []
-
-      incomingMessages.forEach((msg) => {
-        const index = chat.messages.findIndex((existing) => existing.id === msg.id)
-
-        if (index !== -1) {
-          state.updateMessage(msg)
-        } else {
-          messagesToAdd.push(msg)
-        }
-      })
-
-      if (messagesToAdd.length > 0) {
-        chat.messages.push(...messagesToAdd)
-        chat.updatedAt = new Date()
-      }
-    },
-
-    updateMessage: (updatedMessage: MessageType) => {
-      const chat = state.activeChat
+      const chat = state.chats[chatId]
       if (!chat) return
 
       const messageIndex = chat.messages.findIndex((msg) => msg.id === updatedMessage.id)
       if (messageIndex !== -1) {
-        chat.messages[messageIndex] = updatedMessage
+        // Clone first — valtio's proxy() mutates nested properties in place and would corrupt the SDK's live array
+        const clonedMessage = sanitizeForCloning(updatedMessage)
+        chat.messages[messageIndex] = clonedMessage
+        const chatInstance = state.chatInstances[chatId]
+        const instanceMessageIndex = chatInstance?.messages.findIndex(
+          (message) => message.id === updatedMessage.id
+        )
+        if (chatInstance && instanceMessageIndex !== undefined && instanceMessageIndex !== -1) {
+          chatInstance.messages = chatInstance.messages.map((message, index) =>
+            index === instanceMessageIndex ? sanitizeForCloning(updatedMessage) : message
+          )
+        }
         chat.updatedAt = new Date()
       }
     },
@@ -561,7 +634,7 @@ export const createAiAssistantState = (): AiAssistantState => {
       state.model =
         storedModel && isKnownAssistantModelId(storedModel)
           ? storedModel
-          : INITIAL_AI_ASSISTANT.model
+          : createInitialAiAssistantData().model
 
       // Reset sync guards on any support chats (can't be mid-sync after reload)
       Object.values(state.chats).forEach((chat) => {
@@ -594,18 +667,7 @@ export const createAiAssistantState = (): AiAssistantState => {
       }
 
       // Initialize chat instance for the active chat
-      if (
-        state.activeChatId &&
-        state.chats[state.activeChatId] &&
-        !state.chatInstances[state.activeChatId]
-      ) {
-        state.chatInstances[state.activeChatId] = ref(
-          createChatInstance(state, {
-            id: state.activeChatId,
-            initialMessages: state.chats[state.activeChatId].messages,
-          })
-        )
-      }
+      if (state.activeChatId) state.ensureChatInstance(state.activeChatId)
     },
 
     clearStorage: async () => {
@@ -619,24 +681,24 @@ export const createAiAssistantState = (): AiAssistantState => {
 export type AiAssistantState = AiAssistantData & {
   resetAiAssistantPanel: () => void
   activeChat: ChatSession | undefined
-  chatInstances: Record<string, Chat<MessageType>>
+  chatInstances: Record<string, ReturnType<typeof ref<Chat<MessageType>>>>
   pendingSpanIds: Record<string, string>
   messageSpanIds: Record<string, string>
+  isInitialized: boolean
   setContext: (context: Partial<AiAssistantContext>) => void
   setModel: (model: AssistantModel) => void
-  newChat: (
-    options?: { name?: string; initialMessage?: string } & Partial<
-      Pick<AiAssistantData, 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
-    >
-  ) => string
+  createChat: (options?: CreateChatOptions) => string
+  newChat: (options?: NewChatOptions) => string
+  createBranch: (sourceChatId: string, messageId: string) => string | undefined
+  branchChat: (messageId: string) => string | undefined
   setSupportLifecycleStatus: (chatId: string, status: AiSupportStatus) => void
+  ensureChatInstance: (id: string) => void
   selectChat: (id: string) => void
   deleteChat: (id: string) => void
   renameChat: (id: string, name: string) => void
-  clearMessages: () => void
-  deleteMessagesAfter: (id: string, options?: { includeSelf?: boolean }) => void
-  saveMessage: (message: MessageType | MessageType[]) => void
-  updateMessage: (message: MessageType) => void
+  clearMessages: (chatId?: string) => void
+  deleteMessagesAfter: (id: string, options?: { includeSelf?: boolean; chatId?: string }) => void
+  updateMessage: (message: MessageType, chatId?: string) => void
   setSqlSnippets: (snippets: SqlSnippet[]) => void
   clearSqlSnippets: () => void
   loadPersistedState: (persistedState: StoredAiAssistantState) => void
@@ -653,6 +715,7 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
   // Effect to load state from IndexedDB on mount or projectRef change
   useEffect(() => {
     let isMounted = true
+    state.isInitialized = false
 
     async function loadAndInitializeState() {
       if (!project?.ref || typeof window === 'undefined') {
@@ -681,6 +744,7 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
 
       // 4. Ensure an active chat exists and handle URL overrides
       ensureActiveChatOrInitialize(state)
+      state.isInitialized = true
     }
 
     loadAndInitializeState()
@@ -698,22 +762,25 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
 
       const unsubscribe = subscribe(state, () => {
         const snap = snapshot(state)
+
         // Prepare state for IndexedDB
         const stateToSave: StoredAiAssistantState = {
           projectRef: project?.ref,
           activeChatId: snap.activeChatId,
           model: snap.model,
           chats: snap.chats
-            ? Object.entries(snap.chats).reduce((acc, [chatId, chat]) => {
-                // Limit messages before saving
-                return {
-                  ...acc,
-                  [chatId]: {
-                    ...chat,
-                    messages: chat.messages?.slice(-20) || [],
-                  },
-                }
-              }, {})
+            ? (Object.entries(snap.chats) as Array<[string, ChatSession]>).reduce(
+                (acc, [chatId, chat]) => {
+                  return {
+                    ...acc,
+                    [chatId]: {
+                      ...chat,
+                      messages: chat.messages?.slice(-20) || [],
+                    },
+                  }
+                },
+                {} as Record<string, ChatSession>
+              )
             : {},
         }
         debouncedSaveAiState(stateToSave)
@@ -735,6 +802,33 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
 export const useAiAssistantStateSnapshot = (options?: Parameters<typeof useSnapshot>[1]) => {
   const state = useContext(AiAssistantStateContext)
   return useSnapshot(state, options)
+}
+
+export const useAiAssistantChatList = (): ChatSession[] => {
+  const state = useContext(AiAssistantStateContext)
+  const [, rerender] = useReducer((count) => count + 1, 0)
+  // Subscribe to the parent, not `state.chats` — createChat, createBranch, deleteChat and
+  // loadPersistedState all replace `state.chats` wholesale, which would leave a subscription
+  // to the old object silently stale.
+  useEffect(() => subscribe(state, rerender), [state])
+  return Object.values(state.chats)
+}
+
+/**
+ * Resolves once the assistant state has hydrated from storage. `loadPersistedState` replaces
+ * `state.chats` wholesale, so anything that adds a chat has to wait for hydration or the new
+ * chat is dropped the moment the persisted state lands.
+ */
+export const whenAiAssistantInitialized = (state: AiAssistantState): Promise<void> => {
+  if (state.isInitialized) return Promise.resolve()
+
+  return new Promise((resolve) => {
+    const unsubscribe = subscribe(state, () => {
+      if (!state.isInitialized) return
+      unsubscribe()
+      resolve()
+    })
+  })
 }
 
 export const useAiAssistantState = () => {

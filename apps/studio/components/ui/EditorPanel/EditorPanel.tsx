@@ -34,23 +34,20 @@ import {
   PopoverTrigger,
   SQL_ICON,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/AIAssistant.utils'
 import { AIEditor } from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
+import { DataGridResults } from '../DataGridResults'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
 import { formatSqlError } from './EditorPanel.utils'
 import { SaveSnippetDialog } from './SaveSnippetDialog'
 import { isExplainQuery } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
 import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
-import {
-  createSqlSnippetSkeletonV2,
-  suffixWithLimit,
-} from '@/components/interfaces/SQLEditor/SQLEditor.utils'
+import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
 import { useAddDefinitions } from '@/components/interfaces/SQLEditor/useAddDefinitions'
-import { Results } from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
 import { SqlRunButton } from '@/components/interfaces/SQLEditor/UtilityPanel/RunButton'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useContentIdQuery } from '@/data/content/content-id-query'
@@ -58,6 +55,7 @@ import { useContentQuery, type Content } from '@/data/content/content-query'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 import { contentKeys } from '@/data/content/keys'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
+import { applyAutoLimit } from '@/data/sql/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'
@@ -231,7 +229,7 @@ export const EditorPanel = () => {
     }
 
     executeSql({
-      sql: suffixWithLimit(acceptUntrustedSql(currentValue), 100),
+      sql: applyAutoLimit(acceptUntrustedSql(currentValue), 100).sql,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       isStatementTimeoutDisabled: true,
@@ -565,7 +563,7 @@ export const EditorPanel = () => {
           >
             {showResults && (
               <div className="border-t flex-1 overflow-hidden">
-                <Results rows={results} />
+                <DataGridResults rows={results} />
               </div>
             )}
             <div className="text-xs text-foreground-light border-t py-2 px-5 flex items-center justify-between">
@@ -640,7 +638,7 @@ export const EditorPanel = () => {
                     owner_id: profile.id,
                     content: {
                       ...activeSnippet.content,
-                      sql: currentValue,
+                      unchecked_sql: untrustedSql(currentValue),
                     },
                   },
                 })

@@ -12,26 +12,33 @@ import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { useEffect, useMemo, useState } from 'react'
 import { Badge, Button, cn, IconYCombinator, Input } from 'ui'
 
+import { ChangelogInlineMarkdown } from '@/components/Changelog/ChangelogInlineMarkdown'
 import { ChangelogLlmMarkdownButton } from '@/components/Changelog/ChangelogLlmMarkdownButton'
-import { ChangelogTimelineList } from '@/components/Changelog/ChangelogTimelineList'
+import {
+  ChangelogTimelineList,
+  ChangeTypeBadge,
+} from '@/components/Changelog/ChangelogTimelineList'
 import CTABanner from '@/components/CTABanner'
 import DefaultLayout from '@/components/Layouts/Default'
-import changelogProductTags from '@/data/changelog-product-tags.json'
+import { getChangelogEntries, type ChangeType } from '@/lib/changelog-repo'
 import {
-  createChangelogOctokit,
-  fetchChangelogDiscussionByNumber,
-  getChangelogTimelineSortedIndex,
-  type ChangelogLabel,
-  type ChangelogTimelineIndexItem,
-} from '@/lib/changelog-github'
-import {
+  CHANGE_TYPE_DISPLAY,
+  CHANGE_TYPES,
+  CHANGELOG_PRODUCT_STAGES,
   CHANGELOG_PRODUCT_TAGS,
-  changelogLabelDisplayName,
+  CHANGELOG_SELF_HOSTED_OPTIONS,
   changelogTagFilterUrl,
-  discussionDisplayDate,
+  isChangelogChangeType,
   isChangelogProductSlug,
+  isChangelogProductStageSlug,
+  isChangelogSelfHostedSlug,
   itemMatchesChangelogSearch,
+  itemMatchesChangelogSelectedSelfHosted,
+  itemMatchesChangelogSelectedStages,
   itemMatchesChangelogSelectedTags,
+  itemMatchesChangelogSelectedTypes,
+  toChangelogTimelineIndexItem,
+  type ChangelogTimelineIndexItem,
 } from '@/lib/changelog.utils'
 import mdxComponents from '@/lib/mdx/mdxComponents'
 import { mdxSerialize } from '@/lib/mdx/mdxSerialize'
@@ -39,13 +46,12 @@ import { mdxSerialize } from '@/lib/mdx/mdxSerialize'
 const FEATURED_COUNT = 3
 
 type FeaturedEntry = {
-  number: number
   slug: string
   title: string
-  url: string
   created_at: string
   source: MDXRemoteSerializeResult
-  labels: ChangelogLabel[]
+  changeType: ChangelogTimelineIndexItem['changeType']
+  affectedProducts: string[]
 }
 
 type PageProps = {
@@ -55,61 +61,38 @@ type PageProps = {
 }
 
 export const getServerSideProps: GetServerSideProps<PageProps> = async ({ res }) => {
-  try {
-    const changelogIndex = await getChangelogTimelineSortedIndex()
-    const visible = changelogIndex.filter((item) => !item.title.includes('[d]'))
-    const allIndex = visible
-    const firstMeta = visible.slice(0, FEATURED_COUNT)
-    const restIndex = visible.slice(FEATURED_COUNT)
+  const entries = await getChangelogEntries()
+  const allIndex = entries.map(toChangelogTimelineIndexItem)
+  const firstEntries = entries.slice(0, FEATURED_COUNT)
 
-    const octokit = createChangelogOctokit()
-    const featuredResults = await Promise.all(
-      firstMeta.map(
-        async (meta): Promise<FeaturedEntry | { failedMeta: ChangelogTimelineIndexItem }> => {
-          try {
-            const discussion = await fetchChangelogDiscussionByNumber(
-              octokit,
-              'supabase',
-              'supabase',
-              meta.number
-            )
-            if (!discussion) return { failedMeta: meta }
-            const source = await mdxSerialize(discussion.body)
-            const created_at =
-              discussionDisplayDate({
-                title: discussion.title,
-                createdAt: discussion.createdAt,
-              }) ?? discussion.createdAt
-            return {
-              number: meta.number,
-              slug: meta.slug,
-              title: discussion.title,
-              url: discussion.url ?? '',
-              created_at,
-              source,
-              labels: meta.labels,
-            }
-          } catch (e) {
-            console.error(e)
-            return { failedMeta: meta }
-          }
-        }
-      )
+  // Serialized independently so one entry's MDX failure doesn't drop the others.
+  const featuredResults = await Promise.allSettled(
+    firstEntries.map(
+      async (entry): Promise<FeaturedEntry> => ({
+        slug: entry.slug,
+        title: entry.frontmatter.title,
+        created_at: entry.sortDate,
+        source: await mdxSerialize(entry.bodySection),
+        changeType: entry.frontmatter.change_type,
+        affectedProducts: entry.frontmatter.affected_products ?? [],
+      })
     )
+  )
+  const featured = featuredResults.flatMap((result) => {
+    if (result.status === 'rejected') {
+      console.error(result.reason)
+      return []
+    }
+    return [result.value]
+  })
 
-    const featured = featuredResults.filter((e): e is FeaturedEntry => !('failedMeta' in e))
-    const fallbackItems = featuredResults
-      .filter((e): e is { failedMeta: ChangelogTimelineIndexItem } => 'failedMeta' in e)
-      .map((e) => e.failedMeta)
-    const restIndexWithFallbacks = fallbackItems.concat(restIndex)
+  // Anything not successfully featured falls back to the timeline, so a featured
+  // entry whose MDX failed to serialize doesn't vanish from the page.
+  const featuredSlugs = new Set(featured.map((entry) => entry.slug))
+  const restIndex = allIndex.filter((item) => !featuredSlugs.has(item.slug))
 
-    res.setHeader('Cache-Control', 'public, max-age=900, stale-while-revalidate=900')
-    return { props: { featured, restIndex: restIndexWithFallbacks, allIndex } }
-  } catch (e) {
-    console.error(e)
-    res.setHeader('Cache-Control', 'private, no-store, max-age=0, must-revalidate')
-    return { props: { featured: [], restIndex: [], allIndex: [] } }
-  }
+  res.setHeader('Cache-Control', 'public, max-age=900, stale-while-revalidate=900')
+  return { props: { featured, restIndex, allIndex } }
 }
 
 export default function ChangelogPage(props: PageProps) {
@@ -131,6 +114,18 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
     'tags',
     parseAsArrayOf(parseAsString).withOptions(nuqsUrlOptions)
   )
+  const [queryTypes, setQueryTypes] = useQueryState(
+    'types',
+    parseAsArrayOf(parseAsString).withOptions(nuqsUrlOptions)
+  )
+  const [queryStages, setQueryStages] = useQueryState(
+    'stages',
+    parseAsArrayOf(parseAsString).withOptions(nuqsUrlOptions)
+  )
+  const [querySelfHosted, setQuerySelfHosted] = useQueryState(
+    'selfHosted',
+    parseAsArrayOf(parseAsString).withOptions(nuqsUrlOptions)
+  )
 
   const isMobile = useBreakpoint('lg')
   const [filterPanelOpen, setFilterPanelOpen] = useState(false)
@@ -143,10 +138,36 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
     }
     return next
   }, [queryTags])
+  const selectedTypes = useMemo(() => {
+    const next = new Set<ChangeType>()
+    for (const raw of queryTypes ?? []) {
+      if (isChangelogChangeType(raw)) next.add(raw)
+    }
+    return next
+  }, [queryTypes])
+  const selectedStages = useMemo(() => {
+    const next = new Set<string>()
+    for (const raw of queryStages ?? []) {
+      if (isChangelogProductStageSlug(raw)) next.add(raw)
+    }
+    return next
+  }, [queryStages])
+  const selectedSelfHosted = useMemo(() => {
+    const next = new Set<string>()
+    for (const raw of querySelfHosted ?? []) {
+      if (isChangelogSelfHostedSlug(raw)) next.add(raw)
+    }
+    return next
+  }, [querySelfHosted])
 
   const hasNuqsFilters = useMemo(
-    () => filterSearch.trim().length > 0 || selectedTags.size > 0,
-    [filterSearch, selectedTags]
+    () =>
+      filterSearch.trim().length > 0 ||
+      selectedTags.size > 0 ||
+      selectedTypes.size > 0 ||
+      selectedStages.size > 0 ||
+      selectedSelfHosted.size > 0,
+    [filterSearch, selectedTags, selectedTypes, selectedStages, selectedSelfHosted]
   )
 
   useEffect(() => {
@@ -157,15 +178,21 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
     const q = filterSearch
     const hasSearch = q.trim().length > 0
     const hasTags = selectedTags.size > 0
-    if (!hasSearch && !hasTags) return null
+    const hasTypes = selectedTypes.size > 0
+    const hasStages = selectedStages.size > 0
+    const hasSelfHosted = selectedSelfHosted.size > 0
+    if (!hasSearch && !hasTags && !hasTypes && !hasStages && !hasSelfHosted) return null
     return allIndex
       .filter(
         (item) =>
           itemMatchesChangelogSearch(item, q) &&
-          itemMatchesChangelogSelectedTags(item, selectedTags)
+          itemMatchesChangelogSelectedTags(item, selectedTags) &&
+          itemMatchesChangelogSelectedTypes(item, selectedTypes) &&
+          itemMatchesChangelogSelectedStages(item, selectedStages) &&
+          itemMatchesChangelogSelectedSelfHosted(item, selectedSelfHosted)
       )
       .sort((a, b) => dayjs(b.sortDate).diff(dayjs(a.sortDate)))
-  }, [allIndex, filterSearch, selectedTags])
+  }, [allIndex, filterSearch, selectedTags, selectedTypes, selectedStages, selectedSelfHosted])
 
   const toggleProductTag = (slug: string) => {
     const current = (queryTags ?? []).filter(isChangelogProductSlug)
@@ -174,12 +201,36 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
     void setQueryTags(next.length > 0 ? next : null)
   }
 
+  const toggleChangeType = (type: ChangeType) => {
+    const current = (queryTypes ?? []).filter(isChangelogChangeType)
+    const has = current.includes(type)
+    const next = has ? current.filter((t) => t !== type) : [...current, type]
+    void setQueryTypes(next.length > 0 ? next : null)
+  }
+
+  const toggleProductStage = (slug: string) => {
+    const current = (queryStages ?? []).filter(isChangelogProductStageSlug)
+    const has = current.includes(slug)
+    const next = has ? current.filter((s) => s !== slug) : [...current, slug]
+    void setQueryStages(next.length > 0 ? next : null)
+  }
+
+  const toggleSelfHosted = (slug: string) => {
+    const current = (querySelfHosted ?? []).filter(isChangelogSelfHostedSlug)
+    const has = current.includes(slug)
+    const next = has ? current.filter((s) => s !== slug) : [...current, slug]
+    void setQuerySelfHosted(next.length > 0 ? next : null)
+  }
+
   const clearFilters = () => {
     void setQuerySearch(null)
     void setQueryTags(null)
+    void setQueryTypes(null)
+    void setQueryStages(null)
+    void setQuerySelfHosted(null)
   }
 
-  const isSingleQueryTag = queryTags?.length === 1
+  const singleSelectedTag = selectedTags.size === 1 ? [...selectedTags][0] : null
 
   const TITLE = 'Changelog'
   const DESCRIPTION = 'New updates and improvements to Supabase'
@@ -239,13 +290,13 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                 >
                   <Link
                     href={
-                      isSingleQueryTag
-                        ? `/changelog-rss/${queryTags?.[0]}.xml`
+                      singleSelectedTag
+                        ? `/changelog-rss/${singleSelectedTag}.xml`
                         : '/changelog-rss.xml'
                     }
                   >
-                    {isSingleQueryTag &&
-                      changelogProductTags.find((tag) => tag.slug === queryTags?.[0])?.label +
+                    {singleSelectedTag &&
+                      CHANGELOG_PRODUCT_TAGS.find((tag) => tag.slug === singleSelectedTag)?.label +
                         ' '}{' '}
                     RSS
                   </Link>
@@ -272,7 +323,11 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                       void setQuerySearch(v.length === 0 ? null : v)
                     }}
                   />
-                  {(filterSearch.trim().length > 0 || selectedTags.size > 0) && (
+                  {(filterSearch.trim().length > 0 ||
+                    selectedTags.size > 0 ||
+                    selectedTypes.size > 0 ||
+                    selectedStages.size > 0 ||
+                    selectedSelfHosted.size > 0) && (
                     <Button
                       variant="outline"
                       size="tiny"
@@ -285,13 +340,103 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                   )}
                 </div>
               </div>
-              <div>
-                <p className="sr-only">Filter by tags</p>
+              <div className="py-1">
+                <p className="text-foreground-lighter text-xs font-mono uppercase tracking-wide">
+                  Change types
+                </p>
                 <div className="flex flex-wrap gap-1.5">
+                  {CHANGE_TYPES.map((type) => {
+                    const { label } = CHANGE_TYPE_DISPLAY[type]
+                    const on = selectedTypes.has(type)
+                    return (
+                      <button
+                        tabIndex={0}
+                        key={type}
+                        type="button"
+                        aria-pressed={on}
+                        onClick={() => toggleChangeType(type)}
+                      >
+                        <Badge
+                          variant={on ? 'success' : 'default'}
+                          className={cn(!on && 'hover:text-foreground')}
+                        >
+                          {label}
+                        </Badge>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+              <div className="border-default border-t" role="presentation" />
+              <div className="py-1">
+                <p className="text-foreground-lighter text-xs font-mono uppercase tracking-wide">
+                  Products
+                </p>
+                <div className="flex flex-wrap gap-x-1.5 gap-y-1">
                   {CHANGELOG_PRODUCT_TAGS.map(({ slug, label }) => {
                     const on = selectedTags.has(slug)
                     return (
-                      <button key={slug} type="button" onClick={() => toggleProductTag(slug)}>
+                      <button
+                        key={slug}
+                        tabIndex={0}
+                        type="button"
+                        aria-pressed={on}
+                        onClick={() => toggleProductTag(slug)}
+                      >
+                        <Badge
+                          variant={on ? 'success' : 'default'}
+                          className={cn(!on && 'hover:text-foreground')}
+                        >
+                          {label}
+                        </Badge>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+              <div className="border-default border-t" role="presentation" />
+              <div className="py-1">
+                <p className="text-foreground-lighter text-xs font-mono uppercase tracking-wide">
+                  Product stage
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {CHANGELOG_PRODUCT_STAGES.map(({ slug, label }) => {
+                    const on = selectedStages.has(slug)
+                    return (
+                      <button
+                        tabIndex={0}
+                        key={slug}
+                        type="button"
+                        aria-pressed={on}
+                        onClick={() => toggleProductStage(slug)}
+                      >
+                        <Badge
+                          variant={on ? 'success' : 'default'}
+                          className={cn(!on && 'hover:text-foreground')}
+                        >
+                          {label}
+                        </Badge>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+              <div className="border-default border-t" role="presentation" />
+              <div className="py-1">
+                <p className="text-foreground-lighter text-xs font-mono uppercase tracking-wide">
+                  Self-hosted
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {CHANGELOG_SELF_HOSTED_OPTIONS.map(({ slug, label }) => {
+                    const on = selectedSelfHosted.has(slug)
+                    return (
+                      <button
+                        tabIndex={0}
+                        key={slug}
+                        type="button"
+                        aria-pressed={on}
+                        onClick={() => toggleSelfHosted(slug)}
+                      >
                         <Badge
                           variant={on ? 'success' : 'default'}
                           className={cn(!on && 'hover:text-foreground')}
@@ -353,8 +498,8 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
               <div className="grid">
                 {featured.map((entry) => (
                   <div
-                    key={entry.number}
-                    id={entry.number.toString()}
+                    key={entry.slug}
+                    id={entry.slug}
                     className="grid pb-12 lg:grid-cols-12 lg:gap-8 lg:pb-36 scroll-mt-32"
                   >
                     <div className="col-span-12 lg:ml-[-31px] mb-8 lg:mb-0 self-start z-10 sticky top-[65px] lg:top-32 lg:col-span-4">
@@ -365,29 +510,17 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                         <div className="flex w-full flex-col gap-1">
                           {entry.title && (
                             <Link href={`/changelog/${entry.slug}`}>
-                              <h3 className="text-foreground text-lg hover:underline">
-                                {entry.title}
+                              <h3 className="text-foreground text-lg hover:underline [&_code]:align-middle">
+                                <ChangelogInlineMarkdown>{entry.title}</ChangelogInlineMarkdown>
                               </h3>
                             </Link>
                           )}
-                          <p className="text-foreground-lighter font-mono text-xs">
-                            {dayjs(entry.created_at).format('MMM D, YYYY')}
-                          </p>
-                          {entry.labels && entry.labels.length > 0 && (
-                            <div className="flex flex-wrap gap-1.5 pt-1.5">
-                              {entry.labels.map((label) => (
-                                <a
-                                  key={`${entry.number}-${label.name}`}
-                                  href={changelogTagFilterUrl(label.name)}
-                                  className="group inline-flex no-underline focus-visible:ring-brand-default rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden"
-                                >
-                                  <Badge className="group-hover:text-foreground-light text-foreground-lighter group-hover:border-foreground-muted px-1.5 py-px text-[11px] tracking-normal lowercase">
-                                    {changelogLabelDisplayName(label.name)}
-                                  </Badge>
-                                </a>
-                              ))}
-                            </div>
-                          )}
+                          <div className="flex items-center gap-2 mb-2">
+                            <p className="text-foreground-lighter font-mono text-xs">
+                              {dayjs(entry.created_at).format('MMM D, YYYY')}
+                            </p>
+                          </div>
+                          <ChangeTypeBadge type={entry.changeType} />
                         </div>
                       </div>
                     </div>
@@ -399,6 +532,21 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                           <MDXClient {...entry.source} components={mdxComponents('blog')} />
                         )}
                       </article>
+                      {entry.affectedProducts.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 pt-2">
+                          {entry.affectedProducts.map((product) => (
+                            <a
+                              key={`${entry.slug}-${product}`}
+                              href={changelogTagFilterUrl(product)}
+                              className="group inline-flex no-underline focus-visible:ring-brand-default rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden"
+                            >
+                              <Badge className="group-hover:text-foreground-light text-foreground-lighter group-hover:border-foreground-muted px-1.5 py-px text-[11px] tracking-normal lowercase">
+                                {product}
+                              </Badge>
+                            </a>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -411,7 +559,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
               )}
               <div className="hidden lg:grid">
                 <div className="col-span-12 -ml-8 mb-8 lg:mb-0 self-start lg:sticky lg:top-0 lg:col-span-4 lg:-mt-20 lg:pt-20">
-                  <div className="flex w-full items-baseline border-b pb-4 lg:gap-4 lg:border-none lg:pb-0">
+                  <div className="flex w-full items-baseline border-b pb-4 lg:gap-8 lg:border-none lg:pb-0">
                     <Link
                       href="https://www.ycombinator.com/companies/supabase"
                       target="_blank"

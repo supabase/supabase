@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 import { Button, StatusIcon } from 'ui'
 
 import { useDeploymentCommitQuery } from '@/data/utils/deployment-commit-query'
-import { BASE_PATH } from '@/lib/constants'
 
 const DeployCheckToast = ({ id }: { id: string | number }) => {
   const router = useRouter()
@@ -27,9 +26,9 @@ const DeployCheckToast = ({ id }: { id: string | number }) => {
         </Button>
         <Button
           onClick={() => {
-            // Clear the deployment pin so the reload lands on the latest
-            // version. No-op on Next (the cookie isn't set there).
-            document.cookie = `__vdpl=; Path=${BASE_PATH || '/'}; Max-Age=0`
+            // Document requests carry no skew-protection pin (only built
+            // asset URLs do — see skewProtectionDpl in vite.config.ts), so a
+            // plain reload lands on the latest deployment.
             router.reload()
           }}
         >

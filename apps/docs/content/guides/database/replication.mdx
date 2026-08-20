@@ -6,7 +6,7 @@ subtitle: 'An introduction to database replication and change data capture.'
 sidebar_label: 'Overview'
 ---
 
-Replication is the process of copying changes from your database to another location. It's also referred to as change data capture (CDC): capturing all the changes that occur to your data.
+Replication keeps data synchronized with another location. Logical replication products such as Supabase Pipelines use change data capture (CDC) to read database changes and apply them to a destination.
 
 ## Use cases
 
@@ -14,7 +14,7 @@ You might use database replication for:
 
 - **Analytics and data warehousing**: Replicate your operational database to analytics platforms for complex analysis without impacting your application's performance.
 - **Data integration**: Keep your data synchronized across different systems and services in your tech stack.
-- **Backup and disaster recovery**: Maintain up-to-date copies of your data in different locations.
+- **Operational reporting**: Maintain a copy of selected application data that you can query in another system.
 
 ## Replication methods
 
@@ -30,23 +30,22 @@ Read replicas are additional Supabase Postgres databases kept in sync with your 
 
 ### Pipelines
 
-<Admonition type="caution" title="Private Alpha">
+<$Partial path="pipelines-public-alpha.mdx" />
 
-Supabase Pipelines is currently in private alpha. Private alpha features can be unstable and may introduce breaking changes while we evaluate the product direction, refine the feature set, and incorporate customer feedback.
-
-</Admonition>
-
-Pipelines is a managed CDC feature for creating replication pipelines from Supabase Postgres to destination systems. It uses Postgres logical replication under the hood with the open-source [Supabase ETL engine](https://github.com/supabase/etl). A destination is where your replicated data is stored; the pipeline is the managed process that continuously streams database changes to that destination.
+Supabase Pipelines is a managed CDC product for moving data from Supabase Postgres to supported destination systems. It uses Postgres logical replication with the open-source [Supabase ETL engine](https://github.com/supabase/etl). A destination is where your replicated data is stored; a pipeline first performs an initial sync of existing rows, then uses ongoing replication (CDC) to send subsequent database changes to that destination.
 
 - [Set up Pipelines](/docs/guides/database/replication/pipelines)
 
 #### Supported destinations
 
-Pipelines currently supports BigQuery as the managed destination. We are working on new destinations, and this table will be updated as support expands.
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
+Pipelines currently supports BigQuery as the managed destination. You can [request early access to ClickHouse, Snowflake, and DuckLake](/go/supabase-pipelines-new-destinations) while we expand destination support.
 
-| Destination                                            | Insert       | Update       | Delete       | Truncate     | Schema change | Description                                                         |
-| ------------------------------------------------------ | ------------ | ------------ | ------------ | ------------ | ------------- | ------------------------------------------------------------------- |
-| [BigQuery](/docs/guides/database/replication/bigquery) | ✅ Supported | ✅ Supported | ✅ Supported | ✅ Supported | ✅ Supported  | Managed replication to Google BigQuery for analytics and reporting. |
+Managed Pipelines run in **AWS `eu-central-1` (Frankfurt)**. Choose destination resources as close as possible to Frankfurt to reduce network latency and replication lag.
+
+| Destination                                            | Insert       | Update       | Delete       | Truncate     | Schema change  | Description                                                         |
+| ------------------------------------------------------ | ------------ | ------------ | ------------ | ------------ | -------------- | ------------------------------------------------------------------- |
+| [BigQuery](/docs/guides/database/replication/bigquery) | ✅ Supported | ✅ Supported | ✅ Supported | ✅ Supported | Beta (limited) | Managed replication to Google BigQuery for analytics and reporting. |
 
 ### Manual replication
 

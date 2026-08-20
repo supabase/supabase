@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { acceptUntrustedSql, joinSqlFragments, untrustedSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFeatureFlags, useFlag, useParams } from 'common'
 import Link from 'next/link'
@@ -7,22 +8,29 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm, useFormState } from 'react-hook-form'
 import { type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
-import { Button, Form, useWatch } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Button, cn, Form, useWatch } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { z } from 'zod'
 
 import { AdvancedConfiguration } from './AdvancedConfiguration'
 import { ComputeSizeSelector } from './ComputeSizeSelector'
 import { DatabasePasswordInput } from './DatabasePasswordInput'
+import { DataSeeding } from './DataSeeding'
 import { DisabledWarningDueToIncident } from './DisabledWarningDueToIncident'
 import { FreeProjectLimitWarning } from './FreeProjectLimitWarning'
+import { HighAvailabilityInput } from './HighAvailabilityInput'
 import { InternalOnlyConfiguration } from './InternalOnlyConfiguration'
 import { OrganizationSelector } from './OrganizationSelector'
 import { extractPostgresVersionDetails } from './PostgresVersionSelector'
-import { sizes } from './ProjectCreation.constants'
+import {
+  HIGH_AVAILABILITY_POSTGRES_ENGINE,
+  HIGH_AVAILABILITY_RELEASE_CHANNEL,
+  sizes,
+} from './ProjectCreation.constants'
 import { FormSchema } from './ProjectCreation.schema'
 import {
+  getHighAvailabilityRegionCode,
   instanceLabel,
   monthlyInstancePrice,
   smartRegionToExactRegion,
@@ -64,20 +72,49 @@ import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganizat
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { usePHFlag } from '@/hooks/ui/useFlag'
 import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from '@/lib/constants'
+import { getInitialMigrationSQLFromGitHubRepo } from '@/lib/integration-utils'
 import { useProfile } from '@/lib/profile'
+import { trimSafeSqlFragment } from '@/lib/sql'
 import { classifyApiError, classifyValidationError } from '@/lib/telemetry/funnel-errors'
 import { useTrack } from '@/lib/telemetry/track'
 import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 
 const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'small']
 
-export const ProjectCreationForm = () => {
+interface ProjectCreationFormProps {
+  isVercelIntegrationFlow?: boolean
+  onCreateSuccess?: (ref: string) => void
+}
+
+/**
+ * [Joshen] JFYI am only adding the `isVercelIntegrationFlow` flag to keep the existing
+ * behaviour for project creation via Vercel integration as similar to keep current state
+ * for now, what it controls if `true`:
+ * - Disables organization selection
+ * - Hides the following:
+ *  - "Internal configuration" section
+ *  - "GitHub repository" field
+ *  - "Free project info" at the bottom
+ * - Cancel closes the popup window instead of navigating into Studio
+ * - Shows the following:
+ *  - "Data seeding" section
+ * - When embedded in the Vercel interstitial, flattens Panel chrome so the shared
+ *   form fields sit inside InterstitialLayout without a nested card
+ * Eventually we could looking into reducing the differences more, e.g having data seeding
+ * for both ways, and showing GitHub repository field for Vercel integration
+ */
+export const ProjectCreationForm = ({
+  isVercelIntegrationFlow = false,
+  onCreateSuccess,
+}: ProjectCreationFormProps) => {
   const track = useTrack()
-  const trackFunnelError = useTrackFunnelError()
   const router = useRouter()
-  const { slug, projectName } = useParams()
-  const defaultProvider = useDefaultProvider()
   const { profile } = useProfile()
+  const { slug, projectName, externalId } = useParams()
+  const trackFunnelError = useTrackFunnelError()
+  const defaultProvider = useDefaultProvider()
+
+  const surface = isVercelIntegrationFlow ? 'vercel' : 'main'
 
   const { data: currentOrg } = useSelectedOrganizationQuery()
   const isFreePlan = currentOrg?.plan?.id === 'free'
@@ -96,7 +133,8 @@ export const ProjectCreationForm = () => {
 
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
-  const showInternalOnlyConfiguration = useFlag('newProjectInternalOnlyConfiguration')
+  const showInternalOnlyConfiguration =
+    useFlag('newProjectInternalOnlyConfiguration') && !isVercelIntegrationFlow
 
   // Read the raw flag for telemetry — coerce-undefined-to-false would record false for
   // users whose flags haven't loaded yet. The raw value preserves undefined (omitted from
@@ -112,6 +150,7 @@ export const ProjectCreationForm = () => {
   const [allProjects, setAllProjects] = useState<OrgProject[] | undefined>(undefined)
   const [isComputeCostsConfirmationModalVisible, setIsComputeCostsConfirmationModalVisible] =
     useState(false)
+  const [projectCreationError, setProjectCreationError] = useState<string>()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -136,6 +175,7 @@ export const ProjectCreationForm = () => {
       enableRlsEventTrigger: false,
       postgresVersionSelection: '',
       useOrioleDb: false,
+      shouldRunMigrations: true,
     },
   })
   const { getFieldState, resetField, setValue } = form
@@ -151,6 +191,7 @@ export const ProjectCreationForm = () => {
   const { dirtyFields } = useFormState(form)
   const isDbRegionDirty = dirtyFields.dbRegion
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
+  const highAvailabilityRegionCode = getHighAvailabilityRegionCode()
 
   // Read dirty state during render rather than depending on form.formState in the
   // effect — form.formState is a Proxy that gets a new reference every render, which
@@ -231,15 +272,24 @@ export const ProjectCreationForm = () => {
       }
     )
 
+  const highAvailabilityRegion =
+    highAvailability && highAvailabilityRegionCode !== undefined
+      ? availableRegionsData?.all.specific.find(
+          (region) => region.code === highAvailabilityRegionCode
+        )
+      : undefined
   const recommendedSmartRegion = smartRegionEnabled
     ? availableRegionsData?.recommendations.smartGroup.name
     : ''
 
   const fixedDefaultRegion = PROVIDERS[selectedCloudProvider].default_region.displayName
   const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
-  const defaultRegion = smartRegionEnabled
-    ? availableRegionsData?.recommendations.smartGroup.name
-    : (autoDefaultRegion ?? fixedDefaultRegion)
+  const defaultRegion =
+    highAvailability && highAvailabilityRegionCode !== undefined
+      ? highAvailabilityRegion?.name
+      : smartRegionEnabled
+        ? recommendedSmartRegion
+        : (autoDefaultRegion ?? fixedDefaultRegion)
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !hasOutstandingInvoices
   const canConfigureGitHubOnCreate =
@@ -262,7 +312,8 @@ export const ProjectCreationForm = () => {
         (member) => member.primary_email?.toLowerCase() === userPrimaryEmail
       )
     : false
-  const shouldShowFreeProjectInfo = !!currentOrg && !isFreePlan && !isUserAtFreeProjectLimit
+  const shouldShowFreeProjectInfo =
+    !!currentOrg && !isFreePlan && !isUserAtFreeProjectLimit && !isVercelIntegrationFlow
   const {
     gitHubAuthorization,
     githubRepos,
@@ -277,10 +328,11 @@ export const ProjectCreationForm = () => {
     isSuccess: isSuccessNewProject,
   } = useProjectCreateMutation({
     onSuccess: (res) => {
+      setProjectCreationError(undefined)
       track(
         'project_creation_simple_version_submitted',
         {
-          surface: 'main',
+          surface,
           instanceSize: form.getValues('instanceSize'),
           enableRlsEventTrigger: form.getValues('enableRlsEventTrigger'),
           dataApiEnabled: form.getValues('dataApi'),
@@ -295,9 +347,15 @@ export const ProjectCreationForm = () => {
           organization: res.organization_slug,
         }
       )
-      router.push(`/project/${res.ref}`)
+      onCreateSuccess?.(res.ref)
+      if (surface === 'main') router.push(`/project/${res.ref}`)
     },
     onError: (error) => {
+      if (isVercelIntegrationFlow) {
+        setProjectCreationError(`Failed to create new project: ${error.message}`)
+        trackFunnelError('project_creation', classifyApiError('project_creation', error), 'form')
+        return
+      }
       const toastId = toast.error(`Failed to create new project: ${error.message}`)
       trackFunnelError(
         'project_creation',
@@ -313,7 +371,14 @@ export const ProjectCreationForm = () => {
       values.instanceSize &&
       !sizesWithNoCostConfirmationRequired.includes(values.instanceSize as DesiredInstanceSize)
 
-    if (additionalMonthlySpend > 0 && (hasOAuthApps || launchingLargerInstance)) {
+    // High availability projects are free during Alpha, so the forced large compute
+    // doesn't incur the usual compute costs.
+    const requiresCostConfirmation =
+      !values.highAvailability &&
+      additionalMonthlySpend > 0 &&
+      (hasOAuthApps || launchingLargerInstance)
+
+    if (requiresCostConfirmation) {
       track('project_creation_simple_version_confirm_modal_opened', {
         instanceSize: values.instanceSize,
       })
@@ -325,6 +390,7 @@ export const ProjectCreationForm = () => {
 
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
     if (!currentOrg) return console.error('Unable to retrieve current organization')
+    setProjectCreationError(undefined)
 
     const {
       cloudProvider,
@@ -342,10 +408,35 @@ export const ProjectCreationForm = () => {
       useOrioleDb,
       githubInstallationId,
       githubRepositoryId,
+      shouldRunMigrations,
     } = values
 
+    // HA projects never take a custom version — the API resolves the image from
+    // postgresEngine + releaseChannel.
+    const customPostgresVersion = highAvailability ? undefined : postgresVersion
+
+    if (customPostgresVersion && !customPostgresVersion.match(/1[2-9]\..*/)) {
+      const message =
+        'Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3'
+      if (isVercelIntegrationFlow) {
+        setProjectCreationError(message)
+        return
+      }
+      return toast.error(message)
+    }
+
     if (useOrioleDb && !availableOrioleVersion) {
-      const toastId = toast.error('No available OrioleDB image found, only Postgres is available')
+      const message = 'No available OrioleDB image found, only Postgres is available'
+      if (isVercelIntegrationFlow) {
+        setProjectCreationError(message)
+        trackFunnelError(
+          'project_creation',
+          { errorCategory: 'validation', errorReason: 'oriole_unavailable' },
+          'form'
+        )
+        return
+      }
+      const toastId = toast.error(message)
       trackFunnelError(
         'project_creation',
         { errorCategory: 'validation', errorReason: 'oriole_unavailable' },
@@ -362,12 +453,44 @@ export const ProjectCreationForm = () => {
     const selectedRegion = smartRegionEnabled
       ? (smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion))
       : undefined
+
+    if (highAvailability && highAvailabilityRegionCode !== undefined && !selectedRegion) {
+      return toast.error(
+        `High Availability projects are not available in the required region (${highAvailabilityRegionCode})`
+      )
+    }
     const parsedGitHubRepositoryId =
       githubRepositoryId.length > 0 ? Number(githubRepositoryId) : undefined
     const shouldIncludeGitHubFields =
       githubInstallationId !== undefined && Number.isFinite(parsedGitHubRepositoryId)
 
+    let dbSql = enableRlsEventTrigger ? AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL : undefined
+    if (isVercelIntegrationFlow && shouldRunMigrations && !!externalId) {
+      const id = toast.loading(`Fetching initial migrations from GitHub repository...`)
+
+      try {
+        const migrationSql = await getInitialMigrationSQLFromGitHubRepo(externalId)
+        if (migrationSql) {
+          const safeMigrationSql = trimSafeSqlFragment(
+            acceptUntrustedSql(untrustedSql(migrationSql))
+          )
+          dbSql = dbSql
+            ? joinSqlFragments([trimSafeSqlFragment(dbSql), safeMigrationSql], ';\n')
+            : safeMigrationSql
+          toast.loading(`Migrations fetched! Creating project...`, { id })
+        } else {
+          toast.loading('No migrations found, creating project...')
+        }
+      } catch (error) {
+        toast.loading(
+          `Failed to fetch migrations: ${error instanceof Error ? error.message : ''}. Proceeding to create project...`,
+          { id }
+        )
+      }
+    }
+
     const data: ProjectCreateVariables = {
+      dbSql,
       dbPass,
       cloudProvider,
       organizationSlug: currentOrg.slug,
@@ -380,10 +503,17 @@ export const ProjectCreationForm = () => {
       dataApiExposedSchemas: !dataApi ? [] : undefined,
       dataApiUseApiSchema: false,
       dataApiRevokeDefaultPrivileges: dataApi && !dataApiDefaultPrivileges,
-      postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
-      releaseChannel: useOrioleDb ? availableOrioleVersion?.release_channel : releaseChannel,
+      postgresEngine: highAvailability
+        ? HIGH_AVAILABILITY_POSTGRES_ENGINE
+        : useOrioleDb
+          ? availableOrioleVersion?.postgres_engine
+          : postgresEngine,
+      releaseChannel: highAvailability
+        ? HIGH_AVAILABILITY_RELEASE_CHANNEL
+        : useOrioleDb
+          ? availableOrioleVersion?.release_channel
+          : releaseChannel,
       ...(smartRegionEnabled ? { regionSelection: selectedRegion } : { dbRegion }),
-      dbSql: enableRlsEventTrigger ? AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL : undefined,
       ...(shouldIncludeGitHubFields
         ? {
             githubInstallationId,
@@ -392,17 +522,11 @@ export const ProjectCreationForm = () => {
         : {}),
     }
 
-    if (postgresVersion && !postgresVersion.match(/1[2-9]\..*/)) {
-      return toast.error(
-        `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`
-      )
-    }
-
-    if (postgresVersion || instanceType) {
+    if (customPostgresVersion || instanceType) {
       data['customSupabaseRequest'] = {
         ami: {
-          ...(postgresVersion && {
-            search_tags: { 'tag:postgresVersion': postgresVersion },
+          ...(customPostgresVersion && {
+            search_tags: { 'tag:postgresVersion': customPostgresVersion },
           }),
           ...(instanceType && { instance_type: instanceType }),
         },
@@ -413,12 +537,13 @@ export const ProjectCreationForm = () => {
   }
 
   const hasTrackedFormExposed = useRef(false)
+
   useEffect(() => {
     if (hasTrackedFormExposed.current) return
     if (!isOrganizationsSuccess || !canCreateProject || !currentOrg) return
     hasTrackedFormExposed.current = true
-    track('project_creation_form_exposed', { surface: 'main' })
-  }, [isOrganizationsSuccess, canCreateProject, currentOrg, track])
+    track('project_creation_form_exposed', { surface })
+  }, [isOrganizationsSuccess, canCreateProject, currentOrg, track, surface])
 
   useEffect(() => {
     // Only set once to ensure compute credits dont change while project is being created
@@ -429,10 +554,10 @@ export const ProjectCreationForm = () => {
 
   useEffect(() => {
     // Handle no org: redirect to new org route
-    if (isEmptyOrganizations) {
+    if (isEmptyOrganizations && !isVercelIntegrationFlow) {
       router.push(`/new`)
     }
-  }, [isEmptyOrganizations, router])
+  }, [isEmptyOrganizations, isVercelIntegrationFlow, router])
 
   useEffect(() => {
     // [Joshen] Cause slug depends on router which doesnt load immediately on render
@@ -448,22 +573,10 @@ export const ProjectCreationForm = () => {
   }, [defaultRegion, isDbRegionDirty, setValue])
 
   useEffect(() => {
-    if (!isDbRegionDirty && recommendedSmartRegion) {
-      setValue('dbRegion', recommendedSmartRegion)
-    }
-  }, [recommendedSmartRegion, isDbRegionDirty, setValue])
-
-  useEffect(() => {
     if (regionError && fixedDefaultRegion) {
       resetField('dbRegion', { defaultValue: fixedDefaultRegion })
     }
   }, [regionError, resetField, fixedDefaultRegion])
-
-  useEffect(() => {
-    if (highAvailability && cloudProvider !== 'AWS_K8S') {
-      setValue('cloudProvider', 'AWS_K8S')
-    }
-  }, [highAvailability, cloudProvider, setValue])
 
   useEffect(() => {
     if (watchedInstanceSize !== instanceSize) {
@@ -521,14 +634,20 @@ export const ProjectCreationForm = () => {
       >
         <Panel
           loading={!isOrganizationsSuccess}
+          noMargin={isVercelIntegrationFlow}
+          className={cn(
+            isVercelIntegrationFlow && 'border-0 shadow-none rounded-none bg-transparent'
+          )}
           title={
-            <div key="panel-title">
-              <h3>Create a new project</h3>
-              <p className="text-sm text-foreground-lighter text-balance">
-                Your project will have its own dedicated instance and full Postgres database. An API
-                will be set up so you can easily interact with your new database.
-              </p>
-            </div>
+            !isVercelIntegrationFlow && (
+              <div key="panel-title">
+                <h3>Create a new project</h3>
+                <p className="text-sm text-foreground-lighter text-balance">
+                  Your project will have its own dedicated instance and full Postgres database. An
+                  API will be set up so you can easily interact with your new database.
+                </p>
+              </div>
+            )
           }
           footer={
             <ProjectCreationFooter
@@ -538,6 +657,7 @@ export const ProjectCreationForm = () => {
               organizationProjects={organizationProjects}
               isCreatingNewProject={isCreatingNewProject}
               isSuccessNewProject={isSuccessNewProject}
+              cancelAction={isVercelIntegrationFlow ? 'close' : 'studio'}
             />
           }
         >
@@ -546,11 +666,14 @@ export const ProjectCreationForm = () => {
               <DisabledWarningDueToIncident title="Project creation is currently disabled" />
             ) : (
               <div className="divide-y divide-border-border">
-                <OrganizationSelector form={form} />
+                <OrganizationSelector
+                  form={form}
+                  disableOrganizationSelection={isVercelIntegrationFlow}
+                />
 
                 {canCreateProject && (
                   <>
-                    {canConfigureGitHubOnCreate && (
+                    {!isVercelIntegrationFlow && canConfigureGitHubOnCreate && (
                       <Panel.Content>
                         <GitHubRepositoryField
                           form={form}
@@ -560,8 +683,8 @@ export const ProjectCreationForm = () => {
                           label="GitHub (optional)"
                           description={
                             <>
-                              Ideal for agent-first workflows: update your schema in code, push it
-                              to GitHub, and Supabase deploys the changes automatically.{' '}
+                              Ideal for agent-first workflows. Update your schema in code and push
+                              it to GitHub. Supabase deploys the changes.{' '}
                               <a
                                 href="https://supabase.com/docs/guides/deployment/branching/github-integration"
                                 target="_blank"
@@ -584,6 +707,11 @@ export const ProjectCreationForm = () => {
                     )}
                     <ProjectNameInput form={form} />
 
+                    <HighAvailabilityInput
+                      form={form}
+                      highAvailabilityRegionName={highAvailabilityRegion?.name}
+                    />
+
                     {canChooseInstanceSize && <ComputeSizeSelector form={form} />}
 
                     <DatabasePasswordInput form={form} />
@@ -593,13 +721,15 @@ export const ProjectCreationForm = () => {
                       instanceSize={instanceSize as DesiredInstanceSize}
                     />
 
-                    <SecurityOptions form={form} />
+                    {isVercelIntegrationFlow && !!externalId && <DataSeeding form={form} />}
+
+                    <SecurityOptions form={form} surface={surface} />
 
                     {showInternalOnlyConfiguration && <InternalOnlyConfiguration form={form} />}
 
-                    {showAdvancedConfig && !!availableOrioleVersion && (
-                      <AdvancedConfiguration form={form} />
-                    )}
+                    {showAdvancedConfig &&
+                      !!availableOrioleVersion &&
+                      highAvailability !== true && <AdvancedConfiguration form={form} />}
 
                     {shouldShowFreeProjectInfo ? (
                       <Admonition
@@ -648,6 +778,13 @@ export const ProjectCreationForm = () => {
                   </Panel.Content>
                 ) : null}
               </div>
+            )}
+            {projectCreationError && (
+              <Panel.Content>
+                <p role="alert" className="text-sm text-destructive">
+                  {projectCreationError}
+                </p>
+              </Panel.Content>
             )}
           </>
         </Panel>

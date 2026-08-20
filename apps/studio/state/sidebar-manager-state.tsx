@@ -36,16 +36,16 @@ type SidebarManagerState = SidebarManagerData & {
   toggleMaximise: () => void
 }
 
-const INITIAL_SIDEBAR_MANAGER_DATA: SidebarManagerData = {
+const createInitialSidebarManagerData = (): SidebarManagerData => ({
   sidebars: {},
   activeSidebar: undefined,
   pendingSidebarOpen: undefined,
   isMaximised: false,
-}
+})
 
 const createSidebarManagerState = () => {
   const state: SidebarManagerState = proxy({
-    ...INITIAL_SIDEBAR_MANAGER_DATA,
+    ...createInitialSidebarManagerData(),
 
     registerSidebar(
       id: string,

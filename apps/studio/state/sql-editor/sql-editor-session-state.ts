@@ -1,10 +1,12 @@
 import { proxy, ref, snapshot, useSnapshot } from 'valtio'
 
+import type { TimeRange } from '@/data/content/notebooks/notebook-schema'
+
 /**
- * Ephemeral, per-session SQL editor state that is NOT persisted: query results
- * and the row limit. Kept separate from the snippet/folder store (which deals
- * with persistence) because none of this is saved — it lives only for the
- * current editing session.
+ * Ephemeral, per-session SQL editor state that is NOT persisted: query results,
+ * the row limit, and the per-snippet logs time range. Kept separate from the
+ * snippet/folder store (which deals with persistence) because none of this is
+ * saved — it lives only for the current editing session.
  */
 export const sqlEditorSessionState = proxy({
   /**
@@ -23,11 +25,23 @@ export const sqlEditorSessionState = proxy({
   /**
    * UI-imposed limit for the number of rows a query can return (a safeguard
    * against accidentally taking down the database with a huge SELECT). Related
-   * to `autoLimit` in `results`; see `checkIfAppendLimitRequired`/`suffixWithLimit`.
+   * to `autoLimit` in `results`; see `applyAutoLimit`.
    */
   limit: 100,
 
   setLimit: (value: number) => (sqlEditorSessionState.limit = value),
+
+  /**
+   * The logs time range for a logs snippet, keyed by snippet id. Session state —
+   * never written to snippet content — so it works on read-only shared snippets
+   * and resets on reload. An unset snippet has no entry; read sites fall back to
+   * `DEFAULT_LOG_TIME_RANGE`.
+   */
+  logRange: {} as { [snippetId: string]: TimeRange },
+
+  setLogRange: (id: string, range: TimeRange) => {
+    sqlEditorSessionState.logRange[id] = range
+  },
 
   addResult: (id: string, results: any[], autoLimit?: number) => {
     // Use ref() to prevent Valtio from creating proxies for each row object.
@@ -49,6 +63,7 @@ export const sqlEditorSessionState = proxy({
   /** Drop all session state for a snippet (called when the snippet is removed). */
   clearForSnippet: (id: string) => {
     delete sqlEditorSessionState.results[id]
+    delete sqlEditorSessionState.logRange[id]
   },
 })
 

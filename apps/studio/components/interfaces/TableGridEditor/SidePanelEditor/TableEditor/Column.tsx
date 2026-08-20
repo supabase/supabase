@@ -59,6 +59,7 @@ interface ColumnProps {
   isNewRecord: boolean
   hasForeignKeys: boolean
   hasImportContent: boolean
+  shouldAutoFocusName?: boolean
   onUpdateColumn: (changes: Partial<ColumnField>) => void
   onRemoveColumn: () => void
   onEditForeignKey: (relation?: ForeignKey) => void
@@ -71,6 +72,7 @@ export const Column = ({
   isNewRecord = false,
   hasForeignKeys = false,
   hasImportContent = false,
+  shouldAutoFocusName = false,
   onUpdateColumn,
   onRemoveColumn,
   onEditForeignKey,
@@ -126,6 +128,7 @@ export const Column = ({
           ref={setActivatorNodeRef}
           {...attributes}
           {...listeners}
+          tabIndex={0}
           className="opacity-50 hover:opacity-100 disabled:hover:opacity-50 transition cursor-grab text-foreground"
           type="button"
         >
@@ -136,6 +139,7 @@ export const Column = ({
         <div className="flex w-[95%] items-center justify-between">
           <div className="h-4 w-px bg-border" />
           <Input
+            autoFocus={shouldAutoFocusName}
             aria-label="Column name"
             size="small"
             value={column.name}
@@ -163,6 +167,7 @@ export const Column = ({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
+                    tabIndex={0}
                     onClick={() => {
                       const SENSITIVE_DATA_MARKER = '[SENSITIVE]'
 
@@ -448,7 +453,13 @@ export const Column = ({
       </div>
       {!hasImportContent && (
         <div className="flex w-[5%] justify-end">
-          <button className="cursor-pointer" onClick={() => onRemoveColumn()}>
+          <button
+            type="button"
+            tabIndex={0}
+            aria-label="Remove column"
+            className="cursor-pointer"
+            onClick={() => onRemoveColumn()}
+          >
             <X size={16} strokeWidth={1} />
           </button>
         </div>
