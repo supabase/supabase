@@ -1,32 +1,30 @@
 import { useDevToolbar } from 'dev-tools'
-import { Activity } from 'lucide-react'
-import {
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-} from 'ui'
+import { DropdownMenuCheckboxItem, DropdownMenuGroup, DropdownMenuLabel } from 'ui'
 
 export function DevToolbarMenuGroup() {
-  const { isAvailable, enableToolbar, setIsOpen } = useDevToolbar()
+  const { isAvailable, isEnabled, enableToolbar, dismissToolbar } = useDevToolbar()
 
   if (!isAvailable) return null
 
-  const handleOpenDevToolbar = () => {
-    enableToolbar()
-    setIsOpen(true)
+  const handleToggleDevToolbar = (checked: boolean) => {
+    if (checked) {
+      enableToolbar()
+      return
+    }
+
+    dismissToolbar()
   }
 
   return (
-    <>
-      <DropdownMenuSeparator />
-      <DropdownMenuGroup>
-        <DropdownMenuLabel>Local tools</DropdownMenuLabel>
-        <DropdownMenuItem className="flex gap-2 cursor-pointer" onSelect={handleOpenDevToolbar}>
-          <Activity size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-          Dev toolbar
-        </DropdownMenuItem>
-      </DropdownMenuGroup>
-    </>
+    <DropdownMenuGroup>
+      <DropdownMenuLabel>Local tools</DropdownMenuLabel>
+      <DropdownMenuCheckboxItem
+        checked={isEnabled}
+        onCheckedChange={handleToggleDevToolbar}
+        className="cursor-pointer"
+      >
+        Dev toolbar
+      </DropdownMenuCheckboxItem>
+    </DropdownMenuGroup>
   )
 }

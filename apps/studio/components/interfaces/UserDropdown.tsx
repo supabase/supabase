@@ -18,8 +18,8 @@ import {
 } from 'ui'
 
 import { ButtonTooltip } from '../ui/ButtonTooltip'
-import { DevToolbarMenuGroup } from './DevToolbarMenuGroup'
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
+import { DevToolbarMenuGroup } from './DevToolbarMenuGroup'
 import { TimezoneDropdown } from './UserDropdown/TimezoneDropdown'
 import { ProfileImage } from '@/components/ui/ProfileImage'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
@@ -137,10 +137,11 @@ export function UserDropdown({
                   Changelog
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
             </DropdownMenuGroup>
           </>
         )}
+
+        <DropdownMenuSeparator />
 
         <DevToolbarMenuGroup />
 
