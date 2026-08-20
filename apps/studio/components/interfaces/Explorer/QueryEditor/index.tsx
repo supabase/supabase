@@ -344,15 +344,11 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
             onClick={() => setShowQuery((value) => !value)}
           />
           <ExplorerToolbarAction
-            loading={isExecuting || isLoadingProject}
+            loading={isExecuting}
             icon={<Play />}
             tooltip="Run query"
             disabled={
-              isLoadingProject ||
-              isExecuting ||
-              pendingProposal !== null ||
-              isRunDisabled ||
-              sql.trim().length === 0
+              isBusy || pendingProposal !== null || isRunDisabled || sql.trim().length === 0
             }
             onClick={() => handleRunQuery()}
           >

@@ -130,12 +130,18 @@ describe('QueryTab execution', () => {
         return HttpResponse.json<ReadReplicasData>([])
       },
     })
+    // `useAddDefinitions` fires its own background keywords/functions/schemas/table-columns
+    // fetches against this same generic pg-meta query endpoint (differentiated by the `key`
+    // search param) as soon as the editor mounts — those are expected and unrelated to the
+    // actual run. Only a request with no recognized intellisense `key` counts as an execution.
+    const INTELLISENSE_KEYS = ['keywords', 'database-functions', 'schemas', 'table-columns']
     const requests: Request[] = []
     addAPIMock({
       method: 'post',
       path: '/platform/pg-meta/:ref/query',
       response: ({ request }) => {
-        requests.push(request)
+        const key = new URL(request.url).searchParams.get('key')
+        if (!key || !INTELLISENSE_KEYS.includes(key)) requests.push(request)
         return HttpResponse.json([])
       },
     })
