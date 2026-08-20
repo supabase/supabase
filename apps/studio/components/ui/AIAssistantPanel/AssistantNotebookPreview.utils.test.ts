@@ -16,7 +16,7 @@ import { isoDateTimeString } from '@/lib/iso-datetime'
 
 const wireMarkdownCell = (id: string, text = 'hello'): CellWire => ({
   _tag: 'markdown_cell',
-  id,
+  _id: id,
   text,
 })
 
@@ -24,7 +24,7 @@ const agentMarkdownCell = (text = 'hello'): AgentCell => ({ _tag: 'markdown_cell
 
 const wireDatabaseCell = (id: string, title?: string, database_identifier?: string): CellWire => ({
   _tag: 'database_cell',
-  id,
+  _id: id,
   title,
   sql: 'select 1',
   row_limit: 100,
@@ -33,7 +33,7 @@ const wireDatabaseCell = (id: string, title?: string, database_identifier?: stri
 
 const wireLogCell = (id: string): CellWire => ({
   _tag: 'log_cell',
-  id,
+  _id: id,
   sql: 'select 1',
   time_range: { _tag: 'relative_time_range', unit: 'day', amount: 7 },
 })

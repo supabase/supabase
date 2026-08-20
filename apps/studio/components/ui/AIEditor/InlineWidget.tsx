@@ -35,7 +35,7 @@ export interface InlineWidgetProps {
  * widgets (such as "Go to References"), but built for React.
  * Uses a combination of a view zone and overlay widget.
  */
-const InlineWidget = ({
+export const InlineWidget = ({
   children,
   editor,
   id,
@@ -125,5 +125,3 @@ const InlineWidget = ({
 
   return createPortal(children, containerElement, key)
 }
-
-export default InlineWidget

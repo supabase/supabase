@@ -22,7 +22,7 @@ describe('getAssistantQueryDisplay', () => {
       chart: {
         type: 'bar',
         x_column: 'day',
-        y_columns: ['signups'],
+        y_series: ['signups'],
         cumulative: false,
         scale: 'linear',
         show_labels: false,
@@ -31,7 +31,7 @@ describe('getAssistantQueryDisplay', () => {
   })
 
   it('keeps an empty y-axis list when only the x-axis is provided', () => {
-    expect(getAssistantQueryDisplay({ xAxis: 'day' }).chart?.y_columns).toEqual([])
+    expect(getAssistantQueryDisplay({ xAxis: 'day' }).chart?.y_series).toEqual([])
   })
 })
 
