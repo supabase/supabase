@@ -243,10 +243,10 @@ export function DevToolbarTrigger() {
           <span
             className={cn(
               'absolute -top-1 -right-1',
-              'h-4 min-w-4 px-0.5',
+              'h-3.5 min-w-3.5 px-px',
               'inline-flex items-center justify-center',
               'rounded-full bg-brand text-white dark:text-black',
-              'text-[10px] font-medium leading-none'
+              'text-[9px] font-medium leading-none tracking-tight tabular-nums'
             )}
           >
             {eventCount > 99 ? '99+' : eventCount}
