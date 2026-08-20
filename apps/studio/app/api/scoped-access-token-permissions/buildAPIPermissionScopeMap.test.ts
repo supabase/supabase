@@ -202,10 +202,14 @@ describe('buildAPIPermissionScopeMap', () => {
   })
 
   test('returns the MCP tool map fetched from the endpoint', async () => {
-    stubSources({ paths: {} }, { paths: {} }, {
-      apply_migration: [['database_migrations_write']],
-      search_docs: [[]],
-    })
+    stubSources(
+      { paths: {} },
+      { paths: {} },
+      {
+        apply_migration: [['database_migrations_write']],
+        search_docs: [[]],
+      }
+    )
 
     const map = await buildAPIPermissionScopeMap()
 
