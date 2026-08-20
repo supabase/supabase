@@ -29,16 +29,16 @@ type GetUserContentResponse = components['schemas']['GetUserContentResponse']
 const NOTEBOOK_CONTENT = {
   schema_version: 1,
   cells: [
-    { _tag: 'markdown_cell', id: 'cell-1', text: '# Signup funnel' },
+    { _tag: 'markdown_cell', _id: 'cell-1', text: '# Signup funnel' },
     {
       _tag: 'database_cell',
-      id: 'cell-2',
+      _id: 'cell-2',
       sql: 'select * from auth.users limit 100',
       row_limit: 100,
     },
     {
       _tag: 'log_cell',
-      id: 'cell-3',
+      _id: 'cell-3',
       sql: 'select timestamp, event_message from edge_logs limit 10',
       time_range: { _tag: 'relative_time_range', unit: 'hour', amount: 1 },
     },
@@ -204,17 +204,17 @@ describe('ai/tools/notebook-tools', () => {
         visibility: 'project',
         updated_at: '2026-01-01T00:00:00.000Z',
         cells: [
-          { _tag: 'markdown_cell', id: 'cell-1', text: '# Signup funnel' },
+          { _tag: 'markdown_cell', _id: 'cell-1', text: '# Signup funnel' },
           {
             _tag: 'database_cell',
-            id: 'cell-2',
+            _id: 'cell-2',
             row_limit: 100,
             view: 'table',
             sql: 'select * from auth.users limit 100',
           },
           {
             _tag: 'log_cell',
-            id: 'cell-3',
+            _id: 'cell-3',
             time_range: { _tag: 'relative_time_range', unit: 'hour', amount: 1 },
             view: 'table',
             sql: 'select timestamp, event_message from edge_logs limit 10',
@@ -423,7 +423,7 @@ describe('ai/tools/notebook-tools', () => {
       expect(sentBody?.type).toBe('notebook')
 
       const content = sentBody?.content as { cells: Array<Record<string, unknown>> }
-      expect(content.cells.map((cell) => cell.id ?? cell.text)).toEqual([
+      expect(content.cells.map((cell) => cell._id ?? cell.text)).toEqual([
         'cell-1',
         '# New section',
         'cell-2',

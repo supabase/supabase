@@ -53,7 +53,7 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
 
     snap.updateCell({
       id: notebookId,
-      cellId: cell.id,
+      cellId: cell._id,
       updater: (candidate) => (isQueryCell(candidate) ? updater(candidate) : candidate),
     })
   }
@@ -89,14 +89,14 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
 
   return (
     <SortableSection
-      id={cell.id}
-      actions={<AddCellDropdown cellId={cell.id} />}
-      gripDropdownContent={<MoveCellDropdownContent cellId={cell.id} />}
+      id={cell._id}
+      actions={<AddCellDropdown cellId={cell._id} />}
+      gripDropdownContent={<MoveCellDropdownContent cellId={cell._id} />}
       gripClassName="mt-2 opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition"
     >
       <QueryEditor
         ref={ref}
-        id={cell.id}
+        id={cell._id}
         variant="embedded"
         title={title}
         query={toQueryModel(cell, sql)}

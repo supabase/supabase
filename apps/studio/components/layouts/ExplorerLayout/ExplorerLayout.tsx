@@ -36,8 +36,9 @@ export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayout
 }
 
 export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayoutProps) => {
-  const [section, setSection] = useState<ExplorerResourceType>()
   const tabs = useTabsStateSnapshot()
+
+  const [section, setSection] = useState<ExplorerResourceType>()
 
   const activeTab = tabs.activeTab ? tabs.tabsMap[tabs.activeTab] : undefined
   const isActiveExplorerTab =

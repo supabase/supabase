@@ -41,7 +41,7 @@ export const ExplorerNotebookTab = () => {
   const currentNotebook = useCurrentNotebook()
   const { name, content } = currentNotebook?.notebook ?? {}
   const cells = content?.cells ?? []
-  const queryCellIds = cells.filter(isQueryCell).map((cell) => cell.id)
+  const queryCellIds = cells.filter(isQueryCell).map((cell) => cell._id)
 
   const [isRunningNotebook, setIsRunningNotebook] = useState(false)
   const queryCellRefs = useRef(new Map<string, QueryEditorHandle>())
@@ -82,7 +82,7 @@ export const ExplorerNotebookTab = () => {
     if (!notebookId) return
 
     const cell = type === 'markdown' ? createMarkdownCellSkeleton() : createQueryCellSkeleton()
-    const lastCellId = cells[cells.length - 1]?.id
+    const lastCellId = cells[cells.length - 1]?._id
 
     snap.insertCellAfter({ id: notebookId, cellId: lastCellId, cell })
   }
@@ -133,22 +133,22 @@ export const ExplorerNotebookTab = () => {
             <>
               <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
                 <SortableContext
-                  items={cells.map((cell) => cell.id)}
+                  items={cells.map((cell) => cell._id)}
                   strategy={verticalListSortingStrategy}
                 >
                   <div className="flex flex-col gap-y-4">
                     {cells.map((cell) =>
                       isQueryCell(cell) ? (
                         <QueryCell
-                          key={cell.id}
+                          key={cell._id}
                           cell={cell}
                           ref={(instance) => {
-                            if (instance) queryCellRefs.current.set(cell.id, instance)
-                            else queryCellRefs.current.delete(cell.id)
+                            if (instance) queryCellRefs.current.set(cell._id, instance)
+                            else queryCellRefs.current.delete(cell._id)
                           }}
                         />
                       ) : (
-                        <MarkdownCell key={cell.id} cell={cell} />
+                        <MarkdownCell key={cell._id} cell={cell} />
                       )
                     )}
                   </div>
