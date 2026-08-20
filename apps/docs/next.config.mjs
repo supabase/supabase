@@ -122,23 +122,14 @@ const nextConfig = {
   },
 
   /**
-   * Cross-app doc rewrites and redirects are
+   * Doc rewrites and redirects are
    * handled by the `www` nextjs config:
    *
    * ./apps/www/lib/redirects.js
    *
-   * This config only takes dev/preview specific
-   * redirects and internal static-asset rewrites.
+   * Only add dev/preview specific redirects
+   * in this config.
    */
-  async rewrites() {
-    return [
-      {
-        source: '/index.md',
-        destination: '/markdown/guides/index.md',
-      },
-    ]
-  },
-
   async redirects() {
     return [
       // Redirect root to docs base path in dev/preview envs

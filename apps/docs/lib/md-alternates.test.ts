@@ -10,7 +10,6 @@ vi.mock('~/public/markdown/manifest.json', () => ({
     'getting-started/quickstarts/react',
     'troubleshooting/all-about-supabase-egress-a_Sg_e',
     'troubleshooting',
-    'index',
   ],
 }))
 
@@ -33,12 +32,6 @@ describe('mdAlternate', () => {
     })
   })
 
-  it('maps the index slug to the root sibling, not a guides URL', () => {
-    expect(mdAlternate('index')).toEqual({
-      'text/markdown': `${PROD_URL}/index.md`,
-    })
-  })
-
   it('returns undefined for slugs without generated markdown', () => {
     expect(mdAlternate('database/extensions/wrappers/s3')).toBeUndefined()
     expect(mdAlternate('local-development/cli/config')).toBeUndefined()
@@ -50,7 +43,6 @@ const WIRING: [string, string][] = [
   ['app/guides/troubleshooting/[slug]/page.tsx', 'mdAlternate(`troubleshooting/${slug}`)'],
   ['app/guides/troubleshooting/page.tsx', "mdAlternate('troubleshooting')"],
   ['features/docs/TroubleshootingSection.page.tsx', 'mdAlternate(`${topic}/troubleshooting`)'],
-  ['app/page.tsx', "mdAlternate('index')"],
 ]
 
 describe('markdown alternate wiring', () => {
@@ -61,19 +53,12 @@ describe('markdown alternate wiring', () => {
     }
   })
 
-  it('the generator registers the docs index in the manifest', async () => {
+  it('the generator registers the troubleshooting index in the manifest', async () => {
     const source = await fs.readFile(
       path.join(process.cwd(), 'internals/generate-guides-markdown.ts'),
       'utf-8'
     )
-    expect(source.includes("renderManifest(sources, ['troubleshooting', 'index'])")).toBe(true)
-    expect(source.includes('renderDocsIndex(guides)')).toBe(true)
-  })
-
-  it('next.config rewrites /index.md to the generated file', async () => {
-    const source = await fs.readFile(path.join(process.cwd(), 'next.config.mjs'), 'utf-8')
-    expect(source.includes("source: '/index.md'")).toBe(true)
-    expect(source.includes("destination: '/markdown/guides/index.md'")).toBe(true)
+    expect(source.includes("renderManifest(sources, ['troubleshooting'])")).toBe(true)
   })
 })
 

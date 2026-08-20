@@ -5,6 +5,5 @@ const SLUGS = new Set<string>(MARKDOWN_SLUGS)
 
 export function mdAlternate(slug: string): { 'text/markdown': string } | undefined {
   if (!SLUGS.has(slug)) return undefined
-  const href = slug === 'index' ? `${PROD_URL}/index.md` : `${PROD_URL}/guides/${slug}.md`
-  return { 'text/markdown': href }
+  return { 'text/markdown': `${PROD_URL}/guides/${slug}.md` }
 }
