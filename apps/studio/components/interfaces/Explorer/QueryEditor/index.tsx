@@ -1,3 +1,4 @@
+import { useMonaco } from '@monaco-editor/react'
 import { acceptUntrustedSql, untrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { useFlag } from 'common'
 import { CodeSquare, Eye, EyeOff, Play } from 'lucide-react'
@@ -34,6 +35,7 @@ import { QueryResultRenderer } from './QueryResultRenderer'
 import { QuerySourceMenu } from './QuerySourceMenu'
 import { useQueryEditorAi } from './useQueryEditorAi'
 import { LegacyLogsRewriteBanner } from '@/components/interfaces/Settings/Logs/LegacyLogsRewriteBanner'
+import { useAddDefinitions } from '@/components/interfaces/SQLEditor/useAddDefinitions'
 import { ResizableAIWidget } from '@/components/ui/AIEditor/ResizableAIWidget'
 import { getEditorSelectionParts, type EditorSelection } from '@/components/ui/AIEditor/utils'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
@@ -172,6 +174,9 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
 
   const dialect = query._tag === 'logs' ? 'clickhouse' : 'postgres'
   const { requestCompletion, isCompletionLoading } = useQueryEditorAi({ dialect })
+
+  const monaco = useMonaco()
+  useAddDefinitions('', monaco, { enabled: dialect === 'postgres' })
 
   const { data: databases, isPending: isLoadingDatabases } = useReadReplicasQuery(
     { projectRef: project?.ref },
@@ -339,15 +344,11 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
             onClick={() => setShowQuery((value) => !value)}
           />
           <ExplorerToolbarAction
-            loading={isExecuting || isLoadingProject}
+            loading={isExecuting}
             icon={<Play />}
             tooltip="Run query"
             disabled={
-              isLoadingProject ||
-              isExecuting ||
-              pendingProposal !== null ||
-              isRunDisabled ||
-              sql.trim().length === 0
+              isBusy || pendingProposal !== null || isRunDisabled || sql.trim().length === 0
             }
             onClick={() => handleRunQuery()}
           >
@@ -381,8 +382,13 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
               placeholder={!promptState?.isOpen ? generatePlaceholder(os) : ''}
               placeholderClassName="top-[13px]"
               className={variant === 'embedded' ? 'h-44' : undefined}
-              actions={{ runQuery: { enabled: !isRunDisabled, callback: handleRunQuery } }}
-              options={{ minimap: { enabled: false }, padding: { top: 8 } }}
+              actions={{
+                runQuery: { enabled: !isRunDisabled, callback: handleRunQuery },
+              }}
+              options={{
+                minimap: { enabled: false },
+                padding: { top: 8 },
+              }}
               onInputChange={(value) => onSqlChange(value ?? '')}
               onMount={(editor, monaco) => {
                 editor.onDidBlurEditorWidget(() => onSqlCommitRef.current?.(sqlRef.current))

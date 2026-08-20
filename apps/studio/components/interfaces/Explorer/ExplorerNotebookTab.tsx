@@ -12,15 +12,18 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { acceptUntrustedSql } from '@supabase/pg-meta'
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
+  Check,
   FileText,
+  Keyboard,
   Loader2,
   MoreVertical,
   Notebook,
   NotebookText,
   Play,
   Save,
+  SearchX,
   SquareCode,
   Trash,
 } from 'lucide-react'
@@ -33,6 +36,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -59,6 +63,7 @@ import {
 } from '@/data/content/notebooks/notebook-schema'
 import { useUpsertNotebookMutation } from '@/data/content/notebooks/notebook-upsert-mutation'
 import { acceptUntrustedLogsSql } from '@/data/logs/safe-analytics-sql'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
@@ -67,6 +72,11 @@ export const ExplorerNotebookTab = () => {
   const { id, ref } = useParams()
   const tabs = useTabsStateSnapshot()
   const snap = useNotebooksStateSnapshot()
+
+  const [isIntellisenseEnabled, setIsIntellisenseEnabled] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
+    true
+  )
 
   const currentNotebook = useCurrentNotebook()
   const { name, content } = currentNotebook?.notebook ?? {}
@@ -181,9 +191,9 @@ export const ExplorerNotebookTab = () => {
 
   if (isNotFound) {
     return (
-      <div className="px-20 flex flex-col h-full items-center justify-center bg-surface-100">
+      <div className="p-4 h-full bg-surface-100">
         <EmptyStatePresentational
-          icon={<Notebook className="text-foreground-lighter" />}
+          icon={<SearchX className="text-foreground-lighter" />}
           title="Notebook not found"
           description="This notebook may have been deleted or does not exist."
           contentClassName="[&>h3]:text-sm [&>p]:text-xs"
@@ -231,7 +241,18 @@ export const ExplorerNotebookTab = () => {
               <DropdownMenuTrigger asChild>
                 <ExplorerToolbarAction aria-label="More options" icon={<MoreVertical />} />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-44">
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem
+                  className="justify-between"
+                  onClick={() => setIsIntellisenseEnabled(!isIntellisenseEnabled)}
+                >
+                  <div className="flex items-center gap-x-2">
+                    <Keyboard size={14} />
+                    <span>Intellisense enabled</span>
+                  </div>
+                  {isIntellisenseEnabled && <Check className="text-brand" size={16} />}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem className="gap-x-2" onClick={() => setIsDeleteModalOpen(true)}>
                   <Trash size={14} />
                   <span>Delete notebook</span>
