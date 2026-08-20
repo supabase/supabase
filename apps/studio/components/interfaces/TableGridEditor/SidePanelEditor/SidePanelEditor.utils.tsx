@@ -396,18 +396,25 @@ export const duplicateTable = async (
     // Insert into does not copy over auto increment sequences, so we manually do it next if any
     const columns = duplicateTable.columns ?? []
     const identityColumns = columns.filter((column) => column.identity_generation !== null)
-    identityColumns.map(async (column) => {
+    if (identityColumns.length > 0) {
+      const updateSequenceSQL = joinSqlFragments(
+        identityColumns.map((column) =>
+          getDuplicateIdentitySequenceSQL({
+            sourceTableName,
+            sourceTableSchema,
+            duplicatedTableName,
+            columnName: column.name,
+          })
+        ),
+        ';\n'
+      )
       await executeSql({
         projectRef,
         connectionString,
-        sql: getDuplicateIdentitySequenceSQL({
-          sourceTableName,
-          sourceTableSchema,
-          duplicatedTableName,
-          columnName: column.name,
-        }),
+        sql: updateSequenceSQL,
+        queryKey: ['sequences', 'duplicate-batch'],
       })
-    })
+    }
   }
 
   const tables = await queryClient.fetchQuery({
