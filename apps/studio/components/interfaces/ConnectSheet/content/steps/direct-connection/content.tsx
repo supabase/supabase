@@ -71,6 +71,9 @@ const useConnectionStringDatabases = (deploymentMode: DeploymentMode) => {
   // render and ripple through the resolveConnectionString useMemo below.
   return useMemo(() => {
     const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
+    // Only self-hosted advertises a separate direct-connection host; keep the
+    // platform connectionInfo shape untouched.
+    if (deploymentMode.isSelfHosted) DB_FIELDS.push('db_host_direct')
     const emptyState = { db_user: '', db_host: '', db_port: '', db_name: '' }
 
     return Object.fromEntries(

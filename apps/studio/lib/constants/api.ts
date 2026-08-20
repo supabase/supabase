@@ -10,6 +10,22 @@ export const PROJECT_ENDPOINT = PUBLIC_URL.host
 export const PROJECT_ENDPOINT_PROTOCOL = PUBLIC_URL.protocol.replace(':', '')
 export const PROJECT_DB_HOST = PUBLIC_URL.hostname
 
+/**
+ * Host advertised in the self-hosted direct connection string. `POSTGRES_HOST`
+ * points at Postgres itself (which the operator can run outside the compose
+ * network); its default `db` is the internal service name, unreachable by
+ * external clients, so fall back to the public gateway host in that case.
+ */
+export const resolveDirectDbHost = (
+  postgresHost: string | undefined,
+  gatewayHost: string
+): string => (postgresHost && postgresHost !== 'db' ? postgresHost : gatewayHost)
+
+export const PROJECT_DB_HOST_DIRECT = resolveDirectDbHost(
+  process.env.POSTGRES_HOST,
+  PROJECT_DB_HOST
+)
+
 export const DEFAULT_PROJECT = {
   id: 1,
   ref: 'default',

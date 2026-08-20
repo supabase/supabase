@@ -61,6 +61,58 @@ describe('constants/api', () => {
     })
   })
 
+  describe('resolveDirectDbHost', () => {
+    it('passes a real POSTGRES_HOST through', async () => {
+      const { resolveDirectDbHost } = await import('./api')
+      expect(resolveDirectDbHost('mydb.example.com', 'gateway.example.com')).toBe(
+        'mydb.example.com'
+      )
+    })
+
+    it('passes an IP address through', async () => {
+      const { resolveDirectDbHost } = await import('./api')
+      expect(resolveDirectDbHost('10.0.0.5', 'gateway.example.com')).toBe('10.0.0.5')
+    })
+
+    it('falls back to the gateway host for the compose-internal default `db`', async () => {
+      const { resolveDirectDbHost } = await import('./api')
+      expect(resolveDirectDbHost('db', 'gateway.example.com')).toBe('gateway.example.com')
+    })
+
+    it('falls back to the gateway host when POSTGRES_HOST is undefined', async () => {
+      const { resolveDirectDbHost } = await import('./api')
+      expect(resolveDirectDbHost(undefined, 'gateway.example.com')).toBe('gateway.example.com')
+    })
+
+    it('falls back to the gateway host when POSTGRES_HOST is empty', async () => {
+      const { resolveDirectDbHost } = await import('./api')
+      expect(resolveDirectDbHost('', 'gateway.example.com')).toBe('gateway.example.com')
+    })
+  })
+
+  describe('PROJECT_DB_HOST_DIRECT', () => {
+    it('advertises POSTGRES_HOST when set to a real host', async () => {
+      vi.stubEnv('SUPABASE_PUBLIC_URL', 'https://gateway.example.com')
+      vi.stubEnv('POSTGRES_HOST', 'mydb.example.com')
+      const { PROJECT_DB_HOST_DIRECT } = await import('./api')
+      expect(PROJECT_DB_HOST_DIRECT).toBe('mydb.example.com')
+    })
+
+    it('falls back to the public URL host when POSTGRES_HOST is the default `db`', async () => {
+      vi.stubEnv('SUPABASE_PUBLIC_URL', 'https://gateway.example.com')
+      vi.stubEnv('POSTGRES_HOST', 'db')
+      const { PROJECT_DB_HOST_DIRECT } = await import('./api')
+      expect(PROJECT_DB_HOST_DIRECT).toBe('gateway.example.com')
+    })
+
+    it('falls back to the public URL host when POSTGRES_HOST is unset', async () => {
+      vi.stubEnv('SUPABASE_PUBLIC_URL', 'https://gateway.example.com')
+      vi.stubEnv('POSTGRES_HOST', '')
+      const { PROJECT_DB_HOST_DIRECT } = await import('./api')
+      expect(PROJECT_DB_HOST_DIRECT).toBe('gateway.example.com')
+    })
+  })
+
   describe('DEFAULT_PROJECT', () => {
     it('should have correct default values', async () => {
       vi.stubEnv('DEFAULT_PROJECT_NAME', '')

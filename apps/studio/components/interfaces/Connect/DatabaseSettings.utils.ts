@@ -20,6 +20,9 @@ export const getConnectionStrings = ({
     db_port: number
     db_host: string
     db_name: string
+    // Self-hosted only: direct-connection host, distinct from db_host (the
+    // gateway host used for the pooler). Falls back to db_host when unset.
+    db_host_direct?: string
   }
   poolingInfo?: {
     connectionString: string
@@ -43,7 +46,7 @@ export const getConnectionStrings = ({
   // Direct connection variables
   const directUser = connectionInfo.db_user
   const directPort = connectionInfo.db_port
-  const directHost = connectionInfo.db_host
+  const directHost = connectionInfo.db_host_direct || connectionInfo.db_host
   const directName = connectionInfo.db_name
 
   // Pooler connection variables

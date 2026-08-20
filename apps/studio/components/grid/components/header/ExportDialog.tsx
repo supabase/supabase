@@ -22,6 +22,7 @@ import { Filter, Sort, SupaTable } from '@/components/grid/types'
 import { getConnectionStrings } from '@/components/interfaces/Connect/DatabaseSettings.utils'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { getAllTableRowsSql } from '@/data/table-rows/table-rows-query'
+import { IS_PLATFORM } from '@/lib/constants'
 import { pluckObjectFields } from '@/lib/helpers'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
@@ -52,10 +53,16 @@ export const ExportDialog = ({
   const { data: databases } = useReadReplicasQuery({ projectRef })
   const primaryDatabase = (databases ?? []).find((db) => db.identifier === projectRef)
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
+  // Self-hosted advertises a separate direct-connection host (POSTGRES_HOST);
+  // keep the platform connectionInfo shape untouched.
+  if (!IS_PLATFORM) DB_FIELDS.push('db_host_direct')
   const emptyState = { db_user: '', db_host: '', db_port: '', db_name: '' }
 
   const connectionInfo = pluckObjectFields(primaryDatabase || emptyState, DB_FIELDS)
   const { db_host, db_port, db_user, db_name } = connectionInfo
+  // pg_dump connects directly to Postgres, which the operator can host
+  // elsewhere on self-hosted; db_host stays the gateway host.
+  const directHost = connectionInfo.db_host_direct || db_host
 
   const connectionStrings = getConnectionStrings({
     connectionInfo,
@@ -81,7 +88,7 @@ export const ExportDialog = ({
 ${connectionStrings.direct.psql} -c "COPY (${query}) TO STDOUT WITH CSV HEADER DELIMITER ',';" > ${outputName}.csv`.trim()
 
   const sqlExportCommand = `
-pg_dump -h ${db_host} -p ${db_port} -d ${db_name} -U ${db_user} --table="${table?.schema}.${table?.name}" --data-only --column-inserts > ${outputName}.sql
+pg_dump -h ${directHost} -p ${db_port} -d ${db_name} -U ${db_user} --table="${table?.schema}.${table?.name}" --data-only --column-inserts > ${outputName}.sql
   `.trim()
 
   return (
