@@ -2,7 +2,9 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { GripVertical, Trash } from 'lucide-react'
 import type { Control, FieldPath, FieldValues } from 'react-hook-form'
-import { Button, FormControl, FormField, FormItem, FormLabel, FormMessage, Input } from 'ui'
+import { Button, FormControl, FormField, FormItem, FormLabel, FormMessage, Input, Tooltip,
+  TooltipContent,
+  TooltipTrigger, } from 'ui'
 
 interface EnumeratedTypeValueRowProps<
   TFieldValues extends FieldValues = FieldValues,
@@ -58,15 +60,20 @@ const EnumeratedTypeValueRow = <TFieldValues extends FieldValues>({
                 <GripVertical size={16} strokeWidth={1.5} />
               </button>
               <Input {...inputField} className="w-full" />
-              <Button
-                variant="default"
-                size="small"
-                disabled={isDisabled}
-                icon={<Trash strokeWidth={1.5} size={16} />}
-                className="px-2"
-                onClick={() => onRemoveValue()}
-                aria-label="Remove value"
-              />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="default"
+                    size="small"
+                    disabled={isDisabled}
+                    icon={<Trash strokeWidth={1.5} size={16} />}
+                    className="px-2"
+                    onClick={() => onRemoveValue()}
+                    aria-label="Remove value"
+                  />
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Remove value</TooltipContent>
+              </Tooltip>
             </div>
           </FormControl>
           <FormMessage className="ml-6" />
