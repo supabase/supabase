@@ -1,24 +1,36 @@
 import dayjs from 'dayjs'
 import type { CodeBlockLang } from 'ui-patterns/CodeBlock'
 
-import type { NotebookCellDiffEntry } from '@/data/content/notebooks/notebook-operations'
-import type { AgentCell, CellWire, TimeRange } from '@/data/content/notebooks/notebook-schema'
+import type {
+  NotebookCellDiffEntry,
+  OperationResultCell,
+} from '@/data/content/notebooks/notebook-operations'
+import type { TimeRange } from '@/data/content/notebooks/notebook-schema'
 
-/** React key for a diff entry. Added/replaced cells have no `id`, so they key off the operation. */
+/** React key for a diff entry. Added/replaced cells have no `_id`, so they key off the operation. */
 export function getEntryKey(entry: NotebookCellDiffEntry): string {
   switch (entry._tag) {
     case 'unchanged':
     case 'removed':
     case 'moved':
-      return entry.cell.id
+      return entry.cell._id
     case 'added':
     case 'replaced':
       return `op-${entry.operationIndex}`
   }
 }
 
+/**
+ * Whether a diff entry starts expanded. Only the entries the user has to actually read to
+ * decide — the ones whose content the assistant is proposing — open on their own; unchanged,
+ * moved, and removed cells stay as single rows until asked for.
+ */
+export function isEntryExpandedByDefault(entry: NotebookCellDiffEntry): boolean {
+  return entry._tag === 'added' || entry._tag === 'replaced'
+}
+
 /** Human label for a collapsed/badge row. */
-export function getCellLabel(cell: CellWire | AgentCell): string {
+export function getCellLabel(cell: OperationResultCell): string {
   switch (cell._tag) {
     case 'markdown_cell':
       return 'Markdown cell'
@@ -29,7 +41,7 @@ export function getCellLabel(cell: CellWire | AgentCell): string {
 }
 
 /** The cell's underlying source text, regardless of backend. */
-export function getCellSourceText(cell: CellWire | AgentCell): string {
+export function getCellSourceText(cell: OperationResultCell): string {
   switch (cell._tag) {
     case 'markdown_cell':
       return cell.text
@@ -40,7 +52,7 @@ export function getCellSourceText(cell: CellWire | AgentCell): string {
 }
 
 /** Language for rendering the cell's source via `CodeBlock`. */
-export function getCellCodeBlockLanguage(cell: CellWire | AgentCell): CodeBlockLang {
+export function getCellCodeBlockLanguage(cell: OperationResultCell): CodeBlockLang {
   switch (cell._tag) {
     case 'markdown_cell':
       return 'markdown'
@@ -51,7 +63,7 @@ export function getCellCodeBlockLanguage(cell: CellWire | AgentCell): CodeBlockL
 }
 
 /** Monaco language id for rendering the cell's source via `DiffEditor`. */
-export function getCellMonacoLanguage(cell: CellWire | AgentCell): string {
+export function getCellMonacoLanguage(cell: OperationResultCell): string {
   switch (cell._tag) {
     case 'markdown_cell':
       return 'markdown'
@@ -76,7 +88,7 @@ export function formatTimeRange(range: TimeRange): string {
  * when the cell has none. A `replace_cell` can change only this and leave `sql` identical,
  * so it's compared independently of the source text rather than folded into it.
  */
-export function getCellMetadataLine(cell: CellWire | AgentCell): string | null {
+export function getCellMetadataLine(cell: OperationResultCell): string | null {
   switch (cell._tag) {
     case 'markdown_cell':
       return null

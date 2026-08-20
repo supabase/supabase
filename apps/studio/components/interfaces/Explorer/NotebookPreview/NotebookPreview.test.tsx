@@ -8,7 +8,7 @@ import { customRender as render } from '@/tests/lib/custom-render'
 
 const wireMarkdownCell = (id: string, text: string): CellWire => ({
   _tag: 'markdown_cell',
-  id,
+  _id: id,
   text,
 })
 
@@ -16,7 +16,7 @@ const agentMarkdownCell = (text: string): AgentCell => ({ _tag: 'markdown_cell',
 
 const wireDatabaseCell = (id: string, database_identifier?: string): CellWire => ({
   _tag: 'database_cell',
-  id,
+  _id: id,
   sql: 'select 1',
   row_limit: 100,
   database_identifier,

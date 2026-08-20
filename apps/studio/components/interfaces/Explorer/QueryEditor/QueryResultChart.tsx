@@ -12,7 +12,7 @@ interface QueryResultChartProps {
   result?: QueryResult
 }
 
-const Y_COLUMN_COLORS = [
+const Y_SERIES_COLORS = [
   'hsl(var(--brand-default))',
   'hsl(var(--chart-blue))',
   'hsl(var(--chart-3))',
@@ -25,36 +25,36 @@ const toChartValue = (value: unknown): string | number => {
 }
 
 export const QueryResultChart = ({ chart, result }: QueryResultChartProps) => {
-  const { type, x_column, y_columns = [], cumulative, show_labels, scale } = chart ?? {}
+  const { type, x_column, y_series = [], cumulative, show_labels, scale } = chart ?? {}
 
-  const hasConfig = !!x_column && y_columns.length > 0
+  const hasConfig = !!x_column && y_series.length > 0
   // Logarithmic scale only makes sense for a single series — DisplaySettingsButton
   // resets `scale` to linear once a second Y column is added
-  const effectiveScale = y_columns.length > 1 ? 'linear' : scale
+  const effectiveScale = y_series.length > 1 ? 'linear' : scale
 
   const chartConfig: ChartSeriesConfig = useMemo(
     () =>
-      y_columns.reduce((acc, key, index) => {
-        acc[key] = { label: key, color: Y_COLUMN_COLORS[index] }
+      y_series.reduce((acc, key, index) => {
+        acc[key] = { label: key, color: Y_SERIES_COLORS[index] }
         return acc
       }, {} as ChartSeriesConfig),
-    [y_columns]
+    [y_series]
   )
 
   const chartRows = useMemo(() => {
     const xKey = x_column ?? ''
     return (result?.rows ?? []).map((row) => {
       const chartRow: Record<string, string | number> = { [xKey]: toChartValue(row[xKey]) }
-      y_columns.forEach((yKey) => {
+      y_series.forEach((yKey) => {
         chartRow[yKey] = toChartValue(row[yKey])
       })
       return chartRow
     })
-  }, [result, x_column, y_columns])
+  }, [result, x_column, y_series])
 
   const cumulativeResults = useMemo(
-    () => getCumulativeResults({ rows: chartRows }, { yKey: y_columns }),
-    [chartRows, y_columns]
+    () => getCumulativeResults({ rows: chartRows }, { yKey: y_series }),
+    [chartRows, y_series]
   )
   const resultToRender = cumulative ? cumulativeResults : chartRows
 
@@ -89,8 +89,8 @@ export const QueryResultChart = ({ chart, result }: QueryResultChartProps) => {
               <ChartBar
                 isFullHeight
                 xKey={x_column}
-                dataKey={y_columns[0]}
-                dataKeys={y_columns}
+                dataKey={y_series[0]}
+                dataKeys={y_series}
                 config={chartConfig}
                 showXAxis={show_labels}
                 showYAxis={show_labels}
@@ -106,8 +106,8 @@ export const QueryResultChart = ({ chart, result }: QueryResultChartProps) => {
               <ChartLine
                 isFullHeight
                 xKey={x_column}
-                dataKey={y_columns[0]}
-                dataKeys={y_columns}
+                dataKey={y_series[0]}
+                dataKeys={y_series}
                 config={chartConfig}
                 showXAxis={show_labels}
                 showYAxis={show_labels}

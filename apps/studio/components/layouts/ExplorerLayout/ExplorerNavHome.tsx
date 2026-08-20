@@ -46,7 +46,7 @@ export const ExplorerNavHome = ({
 
       <section className="flex flex-col gap-px">
         <h3 className="mb-2 px-3 font-mono text-sm font-normal uppercase text-foreground-lighter">
-          Recent
+          Recently updated
         </h3>
         <p className="px-3 text-xs text-foreground-lighter">Nothing edited yet</p>
       </section>

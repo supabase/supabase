@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router'
 import { useEffect, useEffectEvent } from 'react'
 
-import { useNotebookStubQuery } from '@/data/content/notebooks/notebook-query'
+import { useNotebookQuery } from '@/data/content/notebooks/notebook-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { generateUuid } from '@/lib/api/snippets.browser'
@@ -27,7 +27,7 @@ export const useLoadNotebook = ({ id, projectRef }: { id?: string; projectRef?: 
   const hasLoadedNotebook =
     isCurrentProjectNotebook && currentNotebook?.notebook.content !== undefined
 
-  const { data, error, isError } = useNotebookStubQuery(
+  const { data, error, isError } = useNotebookQuery(
     { projectRef, id },
     {
       retry: false,

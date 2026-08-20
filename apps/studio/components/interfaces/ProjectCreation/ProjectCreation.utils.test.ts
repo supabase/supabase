@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  HIGH_AVAILABILITY_INSTANCE_SIZE,
   HIGH_AVAILABILITY_POSTGRES_ENGINE,
   HIGH_AVAILABILITY_RELEASE_CHANNEL,
 } from './ProjectCreation.constants'
@@ -10,9 +11,10 @@ import {
 } from './ProjectCreation.utils'
 
 describe('High Availability project creation constraints', () => {
-  it('pins the Alpha Postgres engine and release channel', () => {
+  it('pins the Alpha Postgres engine, release channel, and compute size', () => {
     expect(HIGH_AVAILABILITY_POSTGRES_ENGINE).toBe('17')
     expect(HIGH_AVAILABILITY_RELEASE_CHANNEL).toBe('ga')
+    expect(HIGH_AVAILABILITY_INSTANCE_SIZE).toBe('large')
   })
 
   it.each([

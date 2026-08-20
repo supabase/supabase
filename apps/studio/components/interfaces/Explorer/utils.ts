@@ -1,6 +1,7 @@
 import { untrustedSql } from '@supabase/pg-meta'
 
 import { DEFAULT_CELL_ROW_LIMIT } from './QueryCell/QueryCell.utils'
+import { generateDraftId } from '@/data/content/notebooks/notebook-schema'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import { generateUuid } from '@/lib/api/snippets.browser'
 import type { Notebooks } from '@/types'
@@ -9,7 +10,7 @@ export const createQueryCellSkeleton = ({ title, sql }: { title?: string; sql?: 
   return {
     title,
     _tag: 'database_cell' as const,
-    id: generateUuid(),
+    _id: generateDraftId(),
     view: 'table' as const,
     chart: undefined,
     unchecked_sql: untrustedSql(sql ?? ''),
@@ -51,7 +52,7 @@ export const createMarkdownCellSkeleton = ({
 } = {}) => {
   return {
     _tag: 'markdown_cell' as const,
-    id: generateUuid(),
+    _id: generateDraftId(),
     text: content,
   }
 }
