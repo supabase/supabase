@@ -24,7 +24,7 @@ import z from 'zod'
 import PasswordConditionsHelper from './PasswordConditionsHelper'
 import { useSignUpMutation } from '@/data/misc/signup-mutation'
 import { BASE_PATH } from '@/lib/constants'
-import { buildPathWithParams } from '@/lib/gotrue'
+import { buildPathWithParams, getSignUpRedirectPath } from '@/lib/gotrue'
 import { classifyApiError, classifyValidationError } from '@/lib/telemetry/funnel-errors'
 import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 
@@ -112,7 +112,7 @@ export const SignUpForm = () => {
     } else {
       // Use getRedirectToPath to handle redirect_to parameter and other query params
       const { returnTo } = router.query
-      const basePath = returnTo || '/new'
+      const basePath = getSignUpRedirectPath(returnTo)
       const fullPath = buildPathWithParams(basePath as string)
       const fullRedirectUrl = `${redirectUrlBase}${fullPath}`
       redirectTo = fullRedirectUrl

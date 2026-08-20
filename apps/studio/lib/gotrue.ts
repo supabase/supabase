@@ -5,6 +5,12 @@ import { gotrueClient } from 'common/gotrue'
 export const auth = gotrueClient
 
 export const DEFAULT_FALLBACK_PATH = '/organizations'
+export const DEFAULT_SIGNUP_RETURN_PATH = '/new'
+
+export function getSignUpRedirectPath(returnTo: string | string[] | undefined): string {
+  const value = Array.isArray(returnTo) ? returnTo[0] : returnTo
+  return value || DEFAULT_SIGNUP_RETURN_PATH
+}
 
 export const validateReturnTo = (
   returnTo: string,
