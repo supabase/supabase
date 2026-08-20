@@ -245,7 +245,7 @@ export function DevToolbarTrigger() {
               'absolute -top-1 -right-1',
               'h-4 min-w-4 px-0.5',
               'inline-flex items-center justify-center',
-              'rounded-full bg-destructive text-foreground',
+              'rounded-full bg-brand text-white dark:text-black',
               'text-[10px] font-medium leading-none'
             )}
           >
