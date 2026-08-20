@@ -5,6 +5,7 @@ import {
   cn,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSection,
@@ -89,6 +90,9 @@ pg_dump -h ${db_host} -p ${db_port} -d ${db_name} -U ${db_user} --table="${table
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Export table data via CLI</DialogTitle>
+          <DialogDescription>
+            Copy a ready-to-run terminal command to export this table as CSV or SQL.
+          </DialogDescription>
         </DialogHeader>
 
         <DialogSectionSeparator />
