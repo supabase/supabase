@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useFlag, useParams } from 'common'
-import { Check, DatabaseZap, DollarSign, Github, GitMerge, Loader2 } from 'lucide-react'
+import { Check, DatabaseZap, DollarSign, GitMerge, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -25,7 +25,6 @@ import {
   FormControl,
   FormField,
   Input,
-  Label,
   Switch,
   Tooltip,
   TooltipContent,
@@ -40,6 +39,7 @@ import {
   estimateDiskCost,
   estimateRestoreTime,
 } from './BranchManagement.utils'
+import { ConnectToGitHub } from './ConnectToGitHub'
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { BranchingPITRNotice } from '@/components/layouts/AppLayout/EnableBranchingButton/BranchingPITRNotice'
@@ -50,6 +50,7 @@ import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useBranchCreateMutation } from '@/data/branches/branch-create-mutation'
 import { useBranchesQuery } from '@/data/branches/branches-query'
 import { DiskAttributesData, useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
+import { useGitHubAuthorizationQuery } from '@/data/integrations/github-authorization-query'
 import { useCheckGithubBranchValidity } from '@/data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
 import { projectKeys } from '@/data/projects/keys'
@@ -119,6 +120,14 @@ export const CreateBranchModal = () => {
   const debouncedGitBranchName = useDebounce(gitBranchName, 500)
 
   const {
+    data: githubAuthorization,
+    error: authorizationError,
+    isPending: isLoadingAuthorization,
+    isSuccess: isSuccessAuthorization,
+    isError: isErrorAuthorization,
+  } = useGitHubAuthorizationQuery()
+
+  const {
     data: connections,
     error: connectionsError,
     isPending: isLoadingConnections,
@@ -128,6 +137,11 @@ export const CreateBranchModal = () => {
     { organizationId: selectedOrg?.id },
     { enabled: showCreateBranchModal }
   )
+
+  const isLoading = isLoadingAuthorization || isLoadingConnections
+  const isSuccess = isSuccessAuthorization && isSuccessConnections
+  const isError = isErrorAuthorization || isErrorConnections
+  const error = authorizationError || connectionsError
 
   const { data: branches } = useBranchesQuery({ projectRef })
   const { data: addons, isSuccess: isSuccessAddons } = useProjectAddonsQuery(
@@ -260,11 +274,6 @@ export const CreateBranchModal = () => {
     })
   }
 
-  const handleGitHubClick = () => {
-    setShowCreateBranchModal(false)
-    router.push(`/project/${projectRef}/settings/integrations`)
-  }
-
   useEffect(() => {
     if (showCreateBranchModal) form.reset()
   }, [form, showCreateBranchModal])
@@ -323,22 +332,24 @@ export const CreateBranchModal = () => {
                 )}
               />
 
-              {isLoadingConnections && (
+              {isLoading && (
                 <div className="flex flex-col gap-y-2">
                   <ShimmeringLoader />
                   <ShimmeringLoader className="w-1/2" />
                 </div>
               )}
 
-              {isErrorConnections && (
+              {isError && (
                 <AlertError
-                  error={connectionsError}
+                  error={error}
                   subject="Failed to retrieve GitHub connection information"
                 />
               )}
 
-              {isSuccessConnections &&
-                (githubConnection ? (
+              {isSuccess &&
+                (!githubAuthorization || !githubConnection ? (
+                  <ConnectToGitHub />
+                ) : (
                   <FormField
                     control={form.control}
                     name="gitBranchName"
@@ -367,7 +378,11 @@ export const CreateBranchModal = () => {
                           </div>
                         }
                         labelOptional="Optional"
-                        description="Automatically deploy changes on every commit"
+                        description={
+                          githubAuthorization
+                            ? 'Automatically deploy changes on every commit'
+                            : undefined
+                        }
                       >
                         <div className="relative w-full">
                           <FormControl>
@@ -394,18 +409,6 @@ export const CreateBranchModal = () => {
                       </FormItemLayout>
                     )}
                   />
-                ) : (
-                  <div className="flex items-center gap-2 justify-between">
-                    <div className="flex flex-col gap-1">
-                      <Label>Sync with a GitHub branch</Label>
-                      <p className="text-sm text-foreground-lighter">
-                        Keep this preview branch in sync with a chosen GitHub branch
-                      </p>
-                    </div>
-                    <Button variant="default" icon={<Github />} onClick={handleGitHubClick}>
-                      Configure
-                    </Button>
-                  </div>
                 ))}
 
               {allowDataBranching && (
@@ -416,7 +419,7 @@ export const CreateBranchModal = () => {
                     <FormItemLayout
                       label={
                         <>
-                          <Label className="mr-2">Include data</Label>
+                          <span className="mr-2">Include data</span>
                           {!hasPitrEnabled && <Badge variant="warning">Requires PITR</Badge>}
                         </>
                       }
@@ -426,6 +429,7 @@ export const CreateBranchModal = () => {
                     >
                       <FormControl>
                         <Switch
+                          aria-label="Include data"
                           disabled={!hasPitrEnabled}
                           checked={field.value}
                           onCheckedChange={field.onChange}

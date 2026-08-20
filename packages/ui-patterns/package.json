@@ -394,10 +394,6 @@
       "import": "./src/GlassPanel/index.tsx",
       "types": "./src/GlassPanel/index.tsx"
     },
-    "./IconPanel": {
-      "import": "./src/IconPanel/index.tsx",
-      "types": "./src/IconPanel/index.tsx"
-    },
     "./Image/Image": {
       "import": "./src/Image/Image.tsx",
       "types": "./src/Image/Image.tsx"
@@ -815,13 +811,13 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@types/react-syntax-highlighter": "^15.5.13",
+    "@typescript/native": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "api-types": "workspace:*",
     "config": "workspace:*",
     "next-router-mock": "^0.9.13",
     "tailwindcss": "^4.2.4",
     "tsx": "catalog:",
-    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "unified": "^11.0.5",
     "vfile": "^6.0.3",

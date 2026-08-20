@@ -7517,14 +7517,36 @@ functions:
           ```
       - id: listening-to-row-level-changes
         name: Listen to row level changes
-        description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
+        description: You can listen to individual rows using the format `{table}:{col}=op.{val}` - where `{col}` is the column name, `{op}` is the filter operator, and `{val}` is the value to match.
         notes: |
-          - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
+          - Supported operators: ``eq``, ``neq``, ``lt``, ``lte``, ``gt``, ``gte``, ``in`` (e.g. ``"status=in.(active,pending)"``), ``like``, ``ilike``, ``is`` (e.g. ``"deleted_at=is.null"``), ``match``, ``imatch`` (POSIX regex), ``isdistinct`` (NULL-safe inequality). Prefix any operator with ``not.`` to negate it (e.g. ``"status=not.in.(draft,archived)"``). Combine multiple conditions with commas for an implicit ``AND`` (e.g. ``"amount=gt.100,status=in.(open,pending)"``).
         code: |
           ```python
           response = (
               await supabase.channel("room1")
               .on_postgres_changes("UPDATE", schema="public", table="countries", filter="id=eq.200", callback=handle_record_updated)
+              .subscribe()
+          )
+          ```
+      - id: listening-to-selected-columns
+        name: Listen to selected columns only
+        description: |
+          Use the `select` parameter to receive only specific columns instead of the full row.
+          This reduces payload size, which is especially useful for tables with large `bytea` or `jsonb` columns.
+        code: |
+          ```python
+          def handle_record_updated(payload):
+              print("Updated country:", payload)
+
+          response = (
+              await supabase.channel("room1")
+              .on_postgres_changes(
+                  "UPDATE",
+                  schema="public",
+                  table="countries",
+                  select=["id", "name"],
+                  callback=handle_record_updated,
+              )
               .subscribe()
           )
           ```

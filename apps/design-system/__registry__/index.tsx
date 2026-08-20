@@ -2623,6 +2623,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "connect-interstitial-action-error": {
+      name: "connect-interstitial-action-error",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/connect-interstitial-action-error")),
+      source: "",
+      files: ["registry/default/example/connect-interstitial-action-error.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "connect-interstitial-logo-pair": {
       name: "connect-interstitial-logo-pair",
       type: "components:example",

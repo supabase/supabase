@@ -94,11 +94,16 @@ export function getContractIneligibilityDescription(
 ) {
   switch (reason) {
     case 'AWS_ACTIVATE_CREDITS_DEAL':
-      return 'No further action is required for this AWS Activate credits offer'
+      return 'This private offer grants you credits on the Supabase platform'
     case 'AGREEMENT_BASED_OFFER':
       return 'This private offer updated an existing AWS Marketplace subscription'
-    case 'NO_ACTIVE_CONTRACT_FOUND':
+    case 'NO_CONTRACT_FOUND':
+    case 'CONTRACT_IN_SETTLING_WINDOW':
       return 'AWS is still syncing this Marketplace subscription'
+    case 'CONTRACT_INACTIVE':
+      return ''
+    case 'CONTRACT_TERMINATED_EARLY':
+      return 'Subscription was terminated'
     default:
       return 'This AWS Marketplace subscription cannot be linked right now'
   }
@@ -114,7 +119,7 @@ export function ContractIneligibilityNotice({
       return (
         <Admonition
           type="success"
-          title="Credits accepted"
+          title="No action required"
           description="Your Supabase organization credit balance will be updated after AWS finishes processing the offer. This can take 1 or 2 days."
         />
       )
@@ -126,12 +131,29 @@ export function ContractIneligibilityNotice({
           description="Your existing Supabase organization remains linked to AWS Marketplace and your projects will continue to run as usual."
         />
       )
-    case 'NO_ACTIVE_CONTRACT_FOUND':
+    case 'NO_CONTRACT_FOUND':
+    case 'CONTRACT_IN_SETTLING_WINDOW':
       return (
         <Admonition
           type="warning"
           title="Still syncing"
           description="Thanks for purchasing Supabase through AWS Marketplace. It can take a few minutes before the subscription is ready to link. Try again shortly."
+        />
+      )
+    case 'CONTRACT_INACTIVE':
+      return (
+        <Admonition
+          type="warning"
+          title="No active subscription"
+          description="There is currently no active subscription to the Supabase product associated with your AWS account."
+        />
+      )
+    case 'CONTRACT_TERMINATED_EARLY':
+      return (
+        <Admonition
+          type="warning"
+          title="Action required"
+          description="Your subscription was terminated by AWS. Please review your payment method and billing settings in AWS."
         />
       )
     default:

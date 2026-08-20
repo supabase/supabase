@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import {
   Background,
   ColorMode,
@@ -9,74 +8,42 @@ import {
   useReactFlow,
 } from '@xyflow/react'
 import { partition } from 'lodash'
-import { ChevronDown, Globe2, Loader2, Network } from 'lucide-react'
+import { Globe2, Loader2, Network } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import Link from 'next/link'
 import { useEffect, useEffectEvent, useMemo, useState } from 'react'
 
 import '@xyflow/react/dist/style.css'
 
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
-import {
-  Button,
-  cn,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from 'ui'
+import { Button, cn } from 'ui'
 
-import DropAllReplicasConfirmationModal from './DropAllReplicasConfirmationModal'
-import { DropReplicaConfirmationModal } from './DropReplicaConfirmationModal'
 import { SmoothstepEdge } from './Edge'
-import { REPLICA_STATUS } from './InstanceConfiguration.constants'
 import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceConfiguration.utils'
 import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
-import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
-import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
+import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'
 import { AlertError } from '@/components/ui/AlertError'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
-import { Database, useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import {
   ReplicaInitializationStatus,
   useReadReplicasStatusesQuery,
 } from '@/data/read-replicas/replicas-status-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import {
-  useIsAwsCloudProvider,
-  useIsOrioleDb,
-  useSelectedProjectQuery,
-} from '@/hooks/misc/useSelectedProject'
+import { useIsAwsCloudProvider, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { timeout } from '@/lib/helpers'
 
-interface InstanceConfigurationUIProps {
-  diagramOnly?: boolean
-}
-
-const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationUIProps) => {
-  const router = useRouter()
+const InstanceConfigurationUI = () => {
   const reactFlow = useReactFlow()
-  const isOrioleDb = useIsOrioleDb()
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const { isPending: isLoadingProject } = useSelectedProjectQuery()
 
   const isAws = useIsAwsCloudProvider()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
-  const newReplicaURL = `/project/${projectRef}/database/replication?destinationType=Read+Replica`
 
   const [view, setView] = useState<'flow' | 'map'>('flow')
-  const [showDeleteAllModal, setShowDeleteAllModal] = useState(false)
   const [refetchInterval, setRefetchInterval] = useState<number | false>(10000)
-  const [selectedReplicaToDrop, setSelectedReplicaToDrop] = useState<Database>()
-  const [selectedReplicaToRestart, setSelectedReplicaToRestart] = useState<Database>()
-
-  const { can: canManageReplicas } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
 
   const {
     data: loadBalancers,
@@ -152,8 +119,6 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
             primary,
             replicas,
             loadBalancers: loadBalancers ?? [],
-            onSelectRestartReplica: setSelectedReplicaToRestart,
-            onSelectDropReplica: setSelectedReplicaToDrop,
           })
         : [],
     [isSuccessReplicas, isSuccessLoadBalancers, primary, replicas, loadBalancers]
@@ -254,13 +219,12 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
   })
   useEffect(() => {
     runMeasuredLayout()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
   }, [nodesInitialized])
 
   return (
-    <div className={cn('nowheel', diagramOnly ? 'h-full' : 'border-y')}>
+    <div className={cn('nowheel h-full')}>
       <div
-        className={`${diagramOnly ? 'h-full' : 'h-[500px]'} w-full relative ${
+        className={`h-full w-full relative ${
           isSuccessReplicas && !isLoadingProject ? '' : 'flex items-center justify-center px-28'
         }`}
       >
@@ -270,48 +234,8 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
         {isError && <AlertError error={error} subject="Failed to retrieve replicas" />}
         {isSuccessReplicas && !isLoadingProject && (
           <>
-            {!diagramOnly && infrastructureReadReplicas && (
+            {infrastructureReadReplicas && (
               <div className="z-10 absolute top-4 right-4 flex items-center justify-center gap-x-2">
-                <div className="flex items-center justify-center">
-                  <ButtonTooltip
-                    asChild
-                    variant="default"
-                    disabled={!canManageReplicas || isOrioleDb}
-                    className={cn(replicas.length > 0 ? 'rounded-r-none' : '')}
-                    tooltip={{
-                      content: {
-                        side: 'bottom',
-                        text: !canManageReplicas
-                          ? 'You need additional permissions to deploy replicas'
-                          : isOrioleDb
-                            ? 'Read replicas are not supported with OrioleDB'
-                            : undefined,
-                      },
-                    }}
-                  >
-                    <Link href={newReplicaURL}>Deploy a new replica</Link>
-                  </ButtonTooltip>
-                  {replicas.length > 0 && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="default"
-                          icon={<ChevronDown size={16} />}
-                          className="px-1 rounded-l-none border-l-0"
-                        />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-52 *:space-x-2">
-                        <DropdownMenuItem asChild>
-                          <Link href={getInfrastructurePath(projectRef)}>Resize databases</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => setShowDeleteAllModal(true)}>
-                          <div>Remove all replicas</div>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
-                </div>
                 {isAws && (
                   <div className="flex items-center justify-center">
                     <Button
@@ -362,49 +286,19 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
                 <Background color={backgroundPatternColor} />
               </ReactFlow>
             ) : (
-              <MapView
-                onSelectDeployNewReplica={() => router.push(newReplicaURL)}
-                onSelectRestartReplica={setSelectedReplicaToRestart}
-                onSelectDropReplica={setSelectedReplicaToDrop}
-              />
+              <MapView />
             )}
           </>
         )}
       </div>
-
-      {!diagramOnly && (
-        <>
-          <DropReplicaConfirmationModal
-            selectedReplica={selectedReplicaToDrop}
-            onSuccess={() => setRefetchInterval(5000)}
-            onCancel={() => setSelectedReplicaToDrop(undefined)}
-          />
-
-          <DropAllReplicasConfirmationModal
-            visible={showDeleteAllModal}
-            onSuccess={() => setRefetchInterval(5000)}
-            onCancel={() => setShowDeleteAllModal(false)}
-          />
-
-          <RestartReplicaConfirmationModal
-            selectedReplica={selectedReplicaToRestart}
-            onSuccess={() => setRefetchInterval(5000)}
-            onCancel={() => setSelectedReplicaToRestart(undefined)}
-          />
-        </>
-      )}
     </div>
   )
 }
 
-interface InstanceConfigurationProps {
-  diagramOnly?: boolean
-}
-
-export const InstanceConfiguration = ({ diagramOnly = false }: InstanceConfigurationProps) => {
+export const InstanceConfiguration = () => {
   return (
     <ReactFlowProvider>
-      <InstanceConfigurationUI diagramOnly={diagramOnly} />
+      <InstanceConfigurationUI />
     </ReactFlowProvider>
   )
 }

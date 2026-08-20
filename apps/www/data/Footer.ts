@@ -105,10 +105,6 @@ const footerData = [
         url: '/security',
       },
       {
-        text: 'DPA',
-        url: '/legal/dpa',
-      },
-      {
         text: 'SOC2',
         url: '/security',
       },
@@ -126,8 +122,8 @@ const footerData = [
         url: '/docs',
       },
       {
-        text: 'Supabase UI',
-        url: 'https://supabase.com/ui',
+        text: 'Supabase Library',
+        url: 'https://supabase.com/library',
       },
       {
         text: 'Changelog',
