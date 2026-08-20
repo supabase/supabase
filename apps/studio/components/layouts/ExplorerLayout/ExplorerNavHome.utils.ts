@@ -46,7 +46,12 @@ export function getRecentlyUpdatedItems({
 }
 
 /** Compact relative time (`12m`, `21h`, `2d`) for the narrow recent-items row. */
-export function formatRelativeTimeShort(timestamp: number, now: number = Date.now()): string {
+export function formatRelativeTimeShort(
+  timestamp: number,
+  now: number = Date.now()
+): string | undefined {
+  if (timestamp === 0) return undefined
+
   const diffMinutes = dayjs(now).diff(timestamp, 'minute')
   if (diffMinutes < 1) return 'just now'
   if (diffMinutes < 60) return `${diffMinutes}m ago`

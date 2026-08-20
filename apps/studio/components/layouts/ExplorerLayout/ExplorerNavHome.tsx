@@ -68,38 +68,35 @@ export const ExplorerNavHome = ({
         ) : (
           recentItems.map((item) => {
             const Icon = EXPLORER_SECTIONS.find((section) => section.type === item.type)?.icon
+            const content = (
+              <>
+                {Icon && <Icon size={14} className="shrink-0" />}
+                <span className="flex-1 truncate text-left">{item.label}</span>
+                <span className="shrink-0 text-xs text-foreground-lighter">
+                  {formatRelativeTimeShort(item.updatedAt)}
+                </span>
+              </>
+            )
 
-            if (item.type === 'chat') {
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  tabIndex={0}
-                  className={rowClassName(false)}
-                  onClick={() => openChat(item.id)}
-                >
-                  {Icon && <Icon size={14} className="shrink-0" />}
-                  <span className="flex-1 truncate text-left">{item.label}</span>
-                  <span className="shrink-0 text-xs text-foreground-lighter">
-                    {formatRelativeTimeShort(item.updatedAt)}
-                  </span>
-                </button>
-              )
-            } else {
-              return (
-                <Link
-                  key={item.id}
-                  href={`/project/${ref}/explorer/notebook/${item.id}`}
-                  className={rowClassName(false)}
-                >
-                  {Icon && <Icon size={14} className="shrink-0" />}
-                  <span className="flex-1 truncate text-left">{item.label}</span>
-                  <span className="shrink-0 text-xs text-foreground-lighter">
-                    {formatRelativeTimeShort(item.updatedAt)}
-                  </span>
-                </Link>
-              )
-            }
+            return item.type === 'chat' ? (
+              <button
+                key={item.id}
+                type="button"
+                tabIndex={0}
+                className={rowClassName(false)}
+                onClick={() => openChat(item.id)}
+              >
+                {content}
+              </button>
+            ) : (
+              <Link
+                key={item.id}
+                href={`/project/${ref}/explorer/notebook/${item.id}`}
+                className={rowClassName(false)}
+              >
+                {content}
+              </Link>
+            )
           })
         )}
       </section>
