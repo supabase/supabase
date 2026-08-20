@@ -63,11 +63,6 @@ const renderModal = (overrides: { branch?: Branch; onClose?: () => void } = {}) 
 }
 
 describe('SwitchToPreviewModal', () => {
-  /**
-   * The modal is opened from the branching overview, where the selected project is
-   * the parent project and has no `parent_project_ref`. Both refs therefore have to
-   * come from the branch itself — neither matches the ref in the URL.
-   */
   test('switches the branch to preview using the refs on the branch', async () => {
     const requests = mockBranchUpdate()
 
