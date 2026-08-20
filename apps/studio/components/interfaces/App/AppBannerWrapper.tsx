@@ -3,6 +3,7 @@ import { usePathname } from 'next/navigation'
 import { PropsWithChildren, useEffect, useRef } from 'react'
 
 import { OrganizationResourceBanner } from '../Organization/HeaderBanner'
+import { isLogsOrObservabilityPath } from './AppBannerWrapper.utils'
 import { ClockSkewBanner } from '@/components/layouts/AppLayout/ClockSkewBanner'
 import { NoticeBanner } from '@/components/layouts/AppLayout/NoticeBanner'
 import { StatusPageBanner } from '@/components/layouts/AppLayout/StatusPageBanner'
@@ -17,9 +18,6 @@ const TOSUpdateExpiry = new Date('2026-08-29T00:00:00Z')
 // Update this whenever the banner content changes so old client bundles stop
 // displaying the notice after the removal date passes.
 const LogsAllDeprecationExpiry = new Date('2026-09-24T00:00:00Z')
-// Anchored to the section root so per-resource log pages (e.g. a single edge
-// function's logs) don't pull the banner outside Logs/Observability.
-const LOGS_SECTION_PATH = /^\/project\/[^/]+\/(logs|observability)(\/|$)/
 
 export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const showNoticeBanner = useFlag('showNoticeBanner')
@@ -52,17 +50,17 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const [isLogsAllDeprecationDismissed, , { isSuccess: isLogsAllDeprecationLoaded }] =
     useLocalStorageQuery(LOCAL_STORAGE_KEYS.LOGS_ALL_DEPRECATION_2026_09_23, false)
 
-  const shouldShowLogsAllDeprecation =
-    IS_PLATFORM &&
-    Date.now() < LogsAllDeprecationExpiry.getTime() &&
-    !!pathname &&
-    LOGS_SECTION_PATH.test(pathname) &&
-    isLogsAllDeprecationLoaded &&
-    !isLogsAllDeprecationDismissed
-
   const hasTrackedLogsAllExposure = useRef(false)
   useEffect(() => {
-    if (!shouldShowLogsAllDeprecation) {
+    if (!isLogsAllDeprecationLoaded || pathname == null) return
+
+    const shouldShow =
+      IS_PLATFORM &&
+      Date.now() < LogsAllDeprecationExpiry.getTime() &&
+      isLogsOrObservabilityPath(pathname) &&
+      !isLogsAllDeprecationDismissed
+
+    if (!shouldShow) {
       dismissBanner(BANNER_ID.LOGS_ALL_DEPRECATION)
       return
     }
@@ -78,7 +76,14 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
       hasTrackedLogsAllExposure.current = true
       track('logs_all_deprecation_banner_exposed')
     }
-  }, [shouldShowLogsAllDeprecation, addBanner, dismissBanner, track])
+  }, [
+    pathname,
+    isLogsAllDeprecationLoaded,
+    isLogsAllDeprecationDismissed,
+    addBanner,
+    dismissBanner,
+    track,
+  ])
 
   return (
     <div className="flex flex-col">

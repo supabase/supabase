@@ -1,5 +1,6 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { Button } from 'ui'
+import { ExternalLink } from 'lucide-react'
+import { Badge, Button } from 'ui'
 
 import { BannerCard } from '../BannerCard'
 import { BANNER_ID, useBannerStack } from '../BannerStackProvider'
@@ -26,22 +27,29 @@ export const BannerLogsAllDeprecation = () => {
         track('logs_all_deprecation_banner_dismissed')
       }}
     >
-      <div className="flex flex-col gap-y-4">
+      <div className="flex flex-col gap-y-2">
+        <Badge variant="default" className="w-min -ml-0.5 uppercase inline-flex items-center mb-2">
+          Notice
+        </Badge>
+
         <div className="flex flex-col gap-y-1 mb-2">
-          <p className="text-sm font-medium">logs.all endpoint is removed on September 23</p>
+          <p className="text-sm font-medium">Logs endpoint retires September 23</p>
           <p className="text-xs text-foreground-lighter text-balance">
-            If you query project logs through the <code>analytics/endpoints/logs.all</code>{' '}
-            Management API endpoint, migrate to <code>analytics/endpoints/logs</code> before then.
-            The new endpoint uses ClickHouse SQL, so queries need rewriting.
+            Scripts that call the <code className="text-code-inline break-keep!">logs.all</code>{' '}
+            Management API endpoint need to migrate. Dashboard logs are unchanged.
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="default" size="tiny" asChild>
-            <a href={MIGRATION_GUIDE_URL} target="_blank" rel="noreferrer noopener">
-              View migration guide
-            </a>
-          </Button>
-        </div>
+        <Button
+          variant="default"
+          size="tiny"
+          className="w-min"
+          asChild
+          iconRight={<ExternalLink size={14} />}
+        >
+          <a href={MIGRATION_GUIDE_URL} target="_blank" rel="noreferrer noopener">
+            View changelog
+          </a>
+        </Button>
       </div>
     </BannerCard>
   )
