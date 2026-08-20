@@ -4,8 +4,8 @@ import { HttpResponse } from 'msw'
 import { describe, expect, it, vi } from 'vitest'
 
 import { acquireSharedRegistration, useAddDefinitions } from './useAddDefinitions'
-import { addAPIMock } from '@/tests/lib/msw'
 import { customRenderHook } from '@/tests/lib/custom-render'
+import { addAPIMock } from '@/tests/lib/msw'
 import { setupSqlEditorMocks } from '@/tests/lib/sql-editor-test-utils'
 
 vi.mock('@/components/ui/CodeEditor/Providers/PgSQLCompletionProvider', () => ({
@@ -115,8 +115,14 @@ describe('useAddDefinitions', () => {
     const renderOptions = { queryClient }
 
     // Two sibling notebook cells' editors, both mounted at once, sharing the same cache.
-    const editor1 = customRenderHook(() => useAddDefinitions('', monaco, { enabled: true }), renderOptions)
-    const editor2 = customRenderHook(() => useAddDefinitions('', monaco, { enabled: true }), renderOptions)
+    const editor1 = customRenderHook(
+      () => useAddDefinitions('', monaco, { enabled: true }),
+      renderOptions
+    )
+    const editor2 = customRenderHook(
+      () => useAddDefinitions('', monaco, { enabled: true }),
+      renderOptions
+    )
 
     await waitFor(() =>
       expect(monaco.languages.registerCompletionItemProvider).toHaveBeenCalledTimes(1)
@@ -124,7 +130,9 @@ describe('useAddDefinitions', () => {
 
     // The first (and only, thanks to ref-counted registration) call registered the provider —
     // capture the `pgInfoRef` it reads from.
-    const pgInfoRef = getPgsqlCompletionProvider.mock.calls[0][1] as { current: { keywords: string[] } }
+    const pgInfoRef = getPgsqlCompletionProvider.mock.calls[0][1] as {
+      current: { keywords: string[] }
+    }
     await waitFor(() => expect(pgInfoRef.current.keywords).toEqual(['select']))
 
     // Editor 1 — the one whose render happened to trigger the registration — closes. Editor 2
