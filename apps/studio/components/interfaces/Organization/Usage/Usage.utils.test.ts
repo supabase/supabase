@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { dailyUsageToDataPoints, getUsageBranchOptions } from './Usage.utils'
+import {
+  dailyUsageToDataPoints,
+  getUsageBranchOptions,
+  resolveUsageProjectRef,
+} from './Usage.utils'
 import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import type { OrgDailyUsageResponse } from '@/data/analytics/org-daily-stats-query'
 import { createTestBranch } from '@/tests/lib/branch-test-utils'
@@ -291,5 +295,36 @@ describe('getUsageBranchOptions', () => {
     ]
 
     expect(getUsageBranchOptions(branches).map((branch) => branch.name)).toEqual(['one', 'two'])
+  })
+
+  it('returns a lone branch that is not the main branch', () => {
+    const branches = [createTestBranch({ name: 'only', project_ref: 'only-ref' })]
+
+    expect(getUsageBranchOptions(branches).map((branch) => branch.name)).toEqual(['only'])
+  })
+})
+
+describe('resolveUsageProjectRef', () => {
+  const branchOptions = [
+    createTestBranch({ name: 'main', project_ref: 'parent-ref', is_default: true }),
+    createTestBranch({ name: 'preview', project_ref: 'branch-ref' }),
+  ]
+
+  it('returns null when no project is selected', () => {
+    expect(resolveUsageProjectRef(null, [], 'branch-ref')).toBe(null)
+  })
+
+  it('returns the selected branch ref', () => {
+    expect(resolveUsageProjectRef('parent-ref', branchOptions, 'branch-ref')).toBe('branch-ref')
+  })
+
+  it('falls back to the project when the branch ref is not one of its branches', () => {
+    expect(resolveUsageProjectRef('parent-ref', branchOptions, 'other-org-branch-ref')).toBe(
+      'parent-ref'
+    )
+  })
+
+  it('falls back to the project while its branches are still unknown', () => {
+    expect(resolveUsageProjectRef('parent-ref', [], 'branch-ref')).toBe('parent-ref')
   })
 })

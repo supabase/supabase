@@ -22,7 +22,11 @@ export const UsageBranchFilter = ({
       value={branchRef ?? projectRef}
       onValueChange={(value) => onSelectBranch(value === projectRef ? null : value)}
     >
-      <SelectTrigger size="tiny" className="w-[180px]" aria-label="Filter by branch">
+      <SelectTrigger
+        size="tiny"
+        className="w-auto min-w-[140px] max-w-[280px]"
+        aria-label="Filter by branch"
+      >
         <SelectValue placeholder="Select branch" />
       </SelectTrigger>
       <SelectContent>
