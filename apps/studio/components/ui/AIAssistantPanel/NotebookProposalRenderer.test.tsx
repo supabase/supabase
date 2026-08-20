@@ -127,6 +127,7 @@ describe('NotebookProposalRenderer', () => {
 
   it('falls back to a raw-input admonition without dropping the confirm footer on a parse failure', async () => {
     const user = userEvent.setup()
+    const onApprove = vi.fn()
     const onDeny = vi.fn()
 
     render(
@@ -136,14 +137,45 @@ describe('NotebookProposalRenderer', () => {
         confirmState="approval-requested"
         input={{ nonsense: true }}
         output={undefined}
-        onApprove={vi.fn()}
+        onApprove={onApprove}
         onDeny={onDeny}
       />
     )
 
     expect(screen.getByText("Couldn't render a preview for this notebook")).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Create' })).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Skip' }))
     expect(onDeny).toHaveBeenCalledTimes(1)
+    expect(onApprove).not.toHaveBeenCalled()
+  })
+
+  it('withholds Apply changes when the update cannot be applied as written', async () => {
+    const user = userEvent.setup()
+    const onApprove = vi.fn()
+    const onDeny = vi.fn()
+    mockContentItem(mockNotebookRow())
+
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="approval-requested"
+        confirmState="approval-requested"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'missing' }],
+        }}
+        output={undefined}
+        onApprove={onApprove}
+        onDeny={onDeny}
+      />
+    )
+
+    expect(await screen.findByText("This update can't be applied as written")).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Apply changes' })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Skip' }))
+    expect(onDeny).toHaveBeenCalledTimes(1)
+    expect(onApprove).not.toHaveBeenCalled()
   })
 
   it('renders an Open notebook link once output is available', () => {

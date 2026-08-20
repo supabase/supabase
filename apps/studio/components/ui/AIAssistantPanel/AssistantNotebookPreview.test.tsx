@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 
 import { AssistantNotebookPreview } from './AssistantNotebookPreview'
@@ -33,7 +34,8 @@ describe('AssistantNotebookPreview', () => {
   // The whole safety argument for this feature reduces to this: agent-authored markdown text
   // is rendered as literal source (via CodeBlock), never interpreted into real DOM nodes. A
   // future refactor that swaps in <Markdown> would break this silently.
-  it('never renders agent-authored cell content as real img/link/src DOM nodes', () => {
+  it('never renders agent-authored cell content as real img/link/src DOM nodes', async () => {
+    const user = userEvent.setup()
     const adversarialText =
       '![x](https://evil.example/) [y](https://evil.example/) <img src=x onerror=1>'
     const entries: NotebookCellDiffEntry[] = [
@@ -41,6 +43,7 @@ describe('AssistantNotebookPreview', () => {
     ]
 
     const { container } = render(<AssistantNotebookPreview entries={entries} mode="update" />)
+    await user.click(screen.getByRole('button', { name: 'Added Markdown cell' }))
 
     expect(container.querySelectorAll('img')).toHaveLength(0)
     expect(container.querySelectorAll('[href]')).toHaveLength(0)

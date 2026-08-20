@@ -121,6 +121,7 @@ interface NotebookConfirmProps {
   confirmLabel?: string
   confirmLabelLoading?: string
   extraLoading?: boolean
+  denyOnly?: boolean
   onApprove?: () => void
   onDeny?: () => void
 }
@@ -133,6 +134,7 @@ function NotebookConfirm({
   confirmLabel,
   confirmLabelLoading,
   extraLoading,
+  denyOnly,
   onApprove,
   onDeny,
   children,
@@ -148,8 +150,9 @@ function NotebookConfirm({
       confirmLabel={confirmLabel ?? copy.confirmLabel}
       confirmLabelLoading={confirmLabelLoading ?? copy.confirmLabelLoading}
       extraLoading={extraLoading}
+      denyOnly={denyOnly}
       onCancel={onDeny}
-      onConfirm={onApprove}
+      onConfirm={denyOnly ? undefined : onApprove}
     >
       {children}
     </Confirm>
@@ -160,14 +163,10 @@ function NotebookParseFailure({
   mode,
   confirmState,
   input,
-  onApprove,
   onDeny,
-}: Pick<
-  NotebookProposalRendererProps,
-  'mode' | 'confirmState' | 'input' | 'onApprove' | 'onDeny'
->) {
+}: Pick<NotebookProposalRendererProps, 'mode' | 'confirmState' | 'input' | 'onDeny'>) {
   return (
-    <NotebookConfirm mode={mode} confirmState={confirmState} onApprove={onApprove} onDeny={onDeny}>
+    <NotebookConfirm mode={mode} confirmState={confirmState} denyOnly onDeny={onDeny}>
       <div className="flex flex-col gap-2 p-3">
         <Admonition
           type="warning"
@@ -200,7 +199,6 @@ function CreateNotebookProposal({
         mode="create"
         confirmState={confirmState}
         input={input}
-        onApprove={onApprove}
         onDeny={onDeny}
       />
     )
@@ -253,7 +251,6 @@ function UpdateNotebookProposal({
         mode="update"
         confirmState={confirmState}
         input={input}
-        onApprove={onApprove}
         onDeny={onDeny}
       />
     )
@@ -313,6 +310,26 @@ function UpdateNotebookProposal({
 
   const diff = deriveNotebookDiff(toWireNotebook(notebook.content), parsedInput.data.operations)
 
+  if (!diff.success) {
+    return (
+      <NotebookConfirm
+        mode="update"
+        confirmState={confirmState}
+        message={`Assistant wants to update "${notebook.name}"`}
+        denyOnly
+        onDeny={onDeny}
+      >
+        <div className="p-3">
+          <Admonition
+            type="warning"
+            title="This update can't be applied as written"
+            description={describeNotebookOperationError(diff.error)}
+          />
+        </div>
+      </NotebookConfirm>
+    )
+  }
+
   return (
     <NotebookConfirm
       mode="update"
@@ -321,17 +338,7 @@ function UpdateNotebookProposal({
       onApprove={onApprove}
       onDeny={onDeny}
     >
-      {diff.success ? (
-        <AssistantNotebookPreview entries={diff.entries} mode="update" title={notebook.name} />
-      ) : (
-        <div className="p-3">
-          <Admonition
-            type="warning"
-            title="This update can't be applied as written"
-            description={describeNotebookOperationError(diff.error)}
-          />
-        </div>
-      )}
+      <AssistantNotebookPreview entries={diff.entries} mode="update" title={notebook.name} />
     </NotebookConfirm>
   )
 }

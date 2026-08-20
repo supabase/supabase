@@ -5,7 +5,6 @@ import { Button, cn } from 'ui'
 import {
   formatNotebookDiffSummary,
   getEntryKey,
-  isEntryExpandedByDefault,
   summarizeNotebookDiff,
 } from './AssistantNotebookPreview.utils'
 import { AssistantNotebookPreviewCell } from './AssistantNotebookPreviewCell'
@@ -52,7 +51,7 @@ export const AssistantNotebookPreview = ({
   const hiddenCount = entries.length - visibleEntries.length
 
   const isExpanded = (entry: NotebookCellDiffEntry) =>
-    expandedOverrides[getEntryKey(entry)] ?? isEntryExpandedByDefault(entry)
+    expandedOverrides[getEntryKey(entry)] === true
 
   return (
     <div className={cn('flex min-w-0 flex-col', className)}>

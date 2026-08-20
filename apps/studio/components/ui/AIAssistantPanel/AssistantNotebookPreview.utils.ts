@@ -17,15 +17,6 @@ export function getEntryKey(entry: NotebookCellDiffEntry): string {
   }
 }
 
-/**
- * Whether a diff entry starts expanded. Only the entries the user has to actually read to
- * decide — the ones whose content the assistant is proposing — open on their own; unchanged,
- * moved, and removed cells stay as single rows until asked for.
- */
-export function isEntryExpandedByDefault(entry: NotebookCellDiffEntry): boolean {
-  return entry._tag === 'added' || entry._tag === 'replaced'
-}
-
 /** Human label for a collapsed/badge row. */
 export function getCellLabel(cell: CellWire | AgentCell): string {
   switch (cell._tag) {

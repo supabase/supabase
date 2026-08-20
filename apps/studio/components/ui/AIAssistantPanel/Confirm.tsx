@@ -10,6 +10,8 @@ interface ConfirmFooterProps {
   confirmLabelLoading?: string
   isLoading?: boolean
   isDisabled?: boolean
+  /** Omit the confirm button so only Skip remains (unparseable / unapplyable previews). */
+  denyOnly?: boolean
   /** Escape hatch for consumers that attach the bar directly under their own frame. */
   className?: string
   onCancel?: () => void | Promise<void>
@@ -24,6 +26,7 @@ export const ConfirmFooter = ({
   confirmLabelLoading = 'Working...',
   isLoading = false,
   isDisabled = false,
+  denyOnly = false,
   className,
   onCancel,
   onConfirm,
@@ -43,9 +46,11 @@ export const ConfirmFooter = ({
         <Button size="tiny" variant="outline" onClick={onCancel} disabled={isInactive}>
           {cancelLabel}
         </Button>
-        <Button size="tiny" variant="primary" onClick={onConfirm} disabled={isInactive}>
-          {isLoading ? confirmLabelLoading : confirmLabel}
-        </Button>
+        {!denyOnly && (
+          <Button size="tiny" variant="primary" onClick={onConfirm} disabled={isInactive}>
+            {isLoading ? confirmLabelLoading : confirmLabel}
+          </Button>
+        )}
       </div>
     </div>
   )
@@ -69,6 +74,8 @@ interface ConfirmProps {
    */
   fill?: boolean
   className?: string
+  /** Omit the confirm button so only Skip remains. */
+  denyOnly?: boolean
   onCancel?: () => void | Promise<void>
   onConfirm?: () => void | Promise<void>
 }
@@ -90,6 +97,7 @@ export const Confirm = ({
   isLoading = false,
   fill = false,
   className,
+  denyOnly = false,
   onCancel,
   onConfirm,
 }: PropsWithChildren<ConfirmProps>) => {
@@ -118,6 +126,7 @@ export const Confirm = ({
           confirmLabelLoading={confirmLabelLoading}
           isLoading={showLoading}
           isDisabled={!isApprovalRequested}
+          denyOnly={denyOnly}
           onCancel={onCancel}
           onConfirm={onConfirm}
         />
