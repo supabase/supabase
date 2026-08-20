@@ -49,11 +49,11 @@ export function getRecentlyUpdatedItems({
 export function formatRelativeTimeShort(timestamp: number, now: number = Date.now()): string {
   const diffMinutes = dayjs(now).diff(timestamp, 'minute')
   if (diffMinutes < 1) return 'just now'
-  if (diffMinutes < 60) return `${diffMinutes}m`
+  if (diffMinutes < 60) return `${diffMinutes}m ago`
 
   const diffHours = dayjs(now).diff(timestamp, 'hour')
-  if (diffHours < 24) return `${diffHours}h`
+  if (diffHours < 24) return `${diffHours}h ago`
 
   const diffDays = dayjs(now).diff(timestamp, 'day')
-  return `${diffDays}d`
+  return `${diffDays}d ago`
 }
