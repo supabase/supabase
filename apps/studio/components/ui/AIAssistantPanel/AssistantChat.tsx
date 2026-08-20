@@ -31,6 +31,7 @@ import { Message } from './Message'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
 import { useRateMessageMutation } from '@/data/ai/rate-message-mutation'
+import { isValidConnString } from '@/data/fetchers'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
@@ -177,8 +178,14 @@ export const AssistantChat = ({
     { ref: supportMetadata?.projectRef },
     { enabled: isOrgViewSupportChat }
   )
-  const isResolvingSupportChatConnectionString =
-    isOrgViewSupportChat && !supportChatProjectDetail?.connectionString
+  // Mirrors the readiness check in SupportAssistantSuccessCardContent — a project still
+  // coming up, or with a connection string that isn't valid yet, isn't ready to send to.
+  const isSupportChatProjectReady =
+    !!supportChatProjectDetail &&
+    supportChatProjectDetail.status !== 'COMING_UP' &&
+    supportChatProjectDetail.status !== 'UNKNOWN' &&
+    isValidConnString(supportChatProjectDetail.connectionString)
+  const isResolvingSupportChatConnectionString = isOrgViewSupportChat && !isSupportChatProjectReady
 
   // Update context in state. On org-level pages there's no project in the URL, so
   // fall back to the open chat's own support metadata (see
@@ -186,13 +193,13 @@ export const AssistantChat = ({
   // this also restores the right context after switching between support chats.
   useEffect(() => {
     if (isOrgViewSupportChat && supportMetadata) {
-      // Wait for the connection string fetch rather than setting an empty one
-      if (!supportChatProjectDetail?.connectionString) return
+      // Wait for a ready project rather than setting an empty/unready connection string
+      if (!isSupportChatProjectReady) return
 
       state.setContext({
         projectRef: supportMetadata.projectRef,
         orgSlug: supportMetadata.organizationSlug,
-        connectionString: supportChatProjectDetail.connectionString,
+        connectionString: supportChatProjectDetail.connectionString ?? undefined,
       })
       return
     }
@@ -208,6 +215,7 @@ export const AssistantChat = ({
     selectedOrganization?.slug,
     state,
     isOrgViewSupportChat,
+    isSupportChatProjectReady,
     supportMetadata,
     supportChatProjectDetail?.connectionString,
   ])

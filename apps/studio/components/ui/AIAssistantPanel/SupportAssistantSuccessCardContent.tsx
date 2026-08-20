@@ -153,9 +153,10 @@ export function SupportAssistantSuccessCardContent({
 
   if (!hasAssistantContext) return null
 
-  // While the project details request failed, the card has no chat to open — disable
-  // its click/keyboard handlers so only the "Try again" button inside is interactive.
-  const isInteractive = !isProjectDetailError
+  // Before the chat exists (still loading, or failed) there's nothing for the card to
+  // open — disable its click/keyboard handlers so only "Try again" (while erroring) is
+  // interactive, and clicking mid-load can't open the sidebar with no chat prepared.
+  const isInteractive = !!chat
 
   return (
     <Card
