@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 
 import {
-  formatPartner,
+  formatPartnerIfExists,
   formatSelectedDateRange,
 } from '@/components/interfaces/Organization/AuditLogs/AuditLogs.utils'
 
@@ -85,16 +85,24 @@ describe('formatSelectedDateRange', () => {
   })
 })
 
-describe('formatPartner', () => {
+describe('formatPartnerIfExists', () => {
   test('capitalizes the partner name', () => {
-    expect(formatPartner('github', undefined)).toBe('Github')
+    expect(formatPartnerIfExists('github', undefined)).toBe('Github')
   })
 
   test('prefixes with the partner email when provided', () => {
-    expect(formatPartner('github', 'a@b.com')).toBe('a@b.com (Github)')
+    expect(formatPartnerIfExists('github', 'a@b.com')).toBe('a@b.com (Github)')
   })
 
   test('normalizes casing regardless of input case', () => {
-    expect(formatPartner('GITHUB', undefined)).toBe('Github')
+    expect(formatPartnerIfExists('GITHUB', undefined)).toBe('Github')
+  })
+
+  test('returns undefined when partner is undefined', () => {
+    expect(formatPartnerIfExists(undefined, 'a@b.com')).toBeUndefined()
+  })
+
+  test('returns undefined when partner is an empty string', () => {
+    expect(formatPartnerIfExists('', 'a@b.com')).toBeUndefined()
   })
 })
