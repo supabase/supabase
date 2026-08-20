@@ -39,6 +39,13 @@ type PromptProps = {
 type PromptPanelProps = {
   children: ReactNode
   className?: string
+  /**
+   * When true, the panel resizes to fit the active tab's content — inactive
+   * panes are unmounted. Default false: all panes stay mounted stacked in one
+   * grid cell so the panel keeps the tallest tab's height (used by the docs
+   * homepage, where a stable frame across tabs matters more than tight fit).
+   */
+  adaptiveHeight?: boolean
 }
 
 type CollectedPrompt = {
@@ -221,6 +228,10 @@ const tabTriggerClassName = 'h-full px-0 py-0 text-xs shadow-none data-[state=ac
  * prompts render as tabs. A single prompt still shows the header + copy
  * button, with the title styled like an inactive tab (no underline).
  *
+ * The compound children (`Prompt`, `PromptTitle`, `PromptCopy`,
+ * `PromptContent`) must be composed inside a client module — detection is
+ * by `displayName`, which does not survive the RSC boundary.
+ *
  * @example
  * ```tsx
  * <PromptPanel>
@@ -232,7 +243,7 @@ const tabTriggerClassName = 'h-full px-0 py-0 text-xs shadow-none data-[state=ac
  * </PromptPanel>
  * ```
  */
-function PromptPanel({ children, className }: PromptPanelProps) {
+function PromptPanel({ children, className, adaptiveHeight = false }: PromptPanelProps) {
   const fallbackId = useId()
   const titleId = useId()
   const prompts = collectPrompts(children)
@@ -303,25 +314,44 @@ function PromptPanel({ children, className }: PromptPanelProps) {
       className={cn('w-full overflow-hidden rounded-lg border bg-background shadow-sm', className)}
     >
       {header}
-      {/* Stack panes in one grid cell so the panel keeps the tallest tab's height. */}
-      <div className="grid">
-        {prompts.map((prompt) => {
-          const isActive = prompt.value === activeTab
-
-          return (
-            <TabsContent
-              key={prompt.value}
-              value={prompt.value}
-              forceMount
-              inert={!isActive}
-              aria-hidden={!isActive}
-              className="col-start-1 row-start-1 m-0 data-[state=inactive]:invisible data-[state=inactive]:pointer-events-none"
-            >
+      {adaptiveHeight ? (
+        // Only the active pane renders, so the panel height tracks its content.
+        // `min-w-0` on the grid track keeps long code lines from pushing the
+        // whole panel past its column (they wrap or scroll inside instead).
+        <div className="grid grid-cols-1">
+          {prompts.map((prompt) => (
+            <TabsContent key={prompt.value} value={prompt.value} className="m-0 min-w-0">
               <PromptBody prompt={prompt} shimmerEnabled={shimmerEnabled} />
             </TabsContent>
-          )
-        })}
-      </div>
+          ))}
+        </div>
+      ) : (
+        /*
+          Stack panes in one grid cell so the panel keeps the tallest tab's
+          height. `grid-cols-1` pins the single track to `minmax(0, 1fr)` — without
+          it the track sizes to the widest pane (e.g. a long cURL line), pushing
+          the whole panel past its column. `min-w-0` on each pane then lets its
+          content wrap (text) or scroll (code) instead of overflowing.
+        */
+        <div className="grid grid-cols-1">
+          {prompts.map((prompt) => {
+            const isActive = prompt.value === activeTab
+
+            return (
+              <TabsContent
+                key={prompt.value}
+                value={prompt.value}
+                forceMount
+                inert={!isActive}
+                aria-hidden={!isActive}
+                className="col-start-1 row-start-1 m-0 min-w-0 data-[state=inactive]:invisible data-[state=inactive]:pointer-events-none"
+              >
+                <PromptBody prompt={prompt} shimmerEnabled={shimmerEnabled} />
+              </TabsContent>
+            )
+          })}
+        </div>
+      )}
     </Tabs>
   )
 }

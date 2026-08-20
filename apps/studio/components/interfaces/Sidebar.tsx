@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
 import {
+  Badge,
   Button,
   cn,
   DropdownMenu,
@@ -195,6 +196,18 @@ export function SideBarNavLink({
     <>
       {route.icon}
       <span>{route.label}</span>
+      {/*
+        `overflow-hidden` on SidebarMenuButton clips the badge when the
+        sidebar collapses to icon width, so no extra hide class is needed.
+      */}
+      {route.isNew && (
+        <Badge
+          variant="success"
+          className="ml-auto shrink-0 px-1.5 py-0.5 text-[9px] uppercase tracking-wider"
+        >
+          New
+        </Badge>
+      )}
     </>
   )
 
@@ -267,6 +280,7 @@ const ProjectLinks = () => {
   ])
 
   const authOverviewPageEnabled = useFlag('authOverviewPage')
+  const workersEnabled = useFlag('workers')
 
   const toolRoutes = generateToolRoutes(ref, project)
   const productRoutes = generateProductRoutes(ref, project, {
@@ -275,6 +289,7 @@ const ProjectLinks = () => {
     storage: storageEnabled,
     realtime: realtimeEnabled,
     authOverviewPage: authOverviewPageEnabled,
+    workers: workersEnabled,
   })
   const otherRoutes = useGenerateOtherRoutes()
   const settingsRoutes = generateSettingsRoutes(ref)

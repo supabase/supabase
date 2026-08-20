@@ -1,15 +1,15 @@
 'use client'
 
+import { isFeatureEnabled } from 'common'
+import { Sparkles, Terminal } from 'lucide-react'
+import { type ReactNode } from 'react'
 import {
   Prompt,
   PromptContent,
   PromptCopy,
   PromptPanel,
   PromptTitle,
-} from '~/features/ui/PromptPanel'
-import { isFeatureEnabled } from 'common'
-import { Sparkles, Terminal } from 'lucide-react'
-import { type ReactNode } from 'react'
+} from 'ui-patterns/PromptPanel'
 
 import { getCustomContent } from '../lib/custom-content/getCustomContent'
 import DocsCoverLogo from './DocsCoverLogo'

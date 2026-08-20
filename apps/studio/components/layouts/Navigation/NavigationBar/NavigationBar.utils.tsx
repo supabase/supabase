@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { Auth, Database, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
-import { Blocks, Lightbulb, List, Settings, Telescope } from 'lucide-react'
+import { Blocks, Box, Lightbulb, List, Settings, Telescope } from 'lucide-react'
 
 import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from '@/components/interfaces/Sidebar'
@@ -10,6 +10,7 @@ import type { Project } from '@/data/projects/project-detail-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
+import { PRODUCT_NAME } from '@/lib/constants/workers'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface RouteContext {
@@ -25,6 +26,7 @@ interface ProductFeatures {
   storage?: boolean
   realtime?: boolean
   authOverviewPage?: boolean
+  workers?: boolean
 }
 
 interface OtherFeatures {
@@ -79,6 +81,7 @@ export const generateProductRoutes = (
   const storageEnabled = features?.storage ?? true
   const realtimeEnabled = features?.realtime ?? true
   const authOverviewPageEnabled = features?.authOverviewPage ?? false
+  const workersEnabled = features?.workers ?? false
 
   return [
     {
@@ -134,6 +137,18 @@ export const generateProductRoutes = (
             icon: <EdgeFunctions size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && `/project/${ref}/functions`,
             shortcutId: SHORTCUT_IDS.NAV_FUNCTIONS,
+          },
+        ]
+      : []),
+    ...(workersEnabled
+      ? [
+          {
+            key: 'workers',
+            label: PRODUCT_NAME,
+            disabled: !isProjectActive,
+            icon: <Box size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/workers`),
+            isNew: true,
           },
         ]
       : []),
