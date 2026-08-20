@@ -71,7 +71,7 @@ const BillingEmail = () => {
     control: form.control,
     name: 'additionalBillingEmails',
   })
-  const { errors } = form.formState
+  const { errors, isDirty } = form.formState
   const additionalEmailsError = errors.additionalBillingEmails ?? []
 
   const { mutate: updateCustomerProfile, isPending: isUpdating } =
@@ -99,13 +99,13 @@ const BillingEmail = () => {
   }
 
   useEffect(() => {
-    if (customerProfile) {
+    if (customerProfile && !isDirty) {
       form.reset({
         billingEmail: customerProfile.email ?? '',
         additionalBillingEmails: customerProfile.additional_emails ?? [],
       })
     }
-  }, [form, customerProfile])
+  }, [form, customerProfile, isDirty])
 
   return (
     <ScaffoldSection ref={ref}>
@@ -129,7 +129,7 @@ const BillingEmail = () => {
                     <FormActions
                       form={FORM_ID}
                       isSubmitting={isUpdating}
-                      hasChanges={form.formState.isDirty}
+                      hasChanges={isDirty}
                       handleReset={form.reset}
                       disabled={!canUpdateBillingData}
                       helper={
