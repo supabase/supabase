@@ -87,7 +87,7 @@ export function useQueryEditorAi({ dialect }: { dialect: SqlDialect }) {
       return { original, modified: isClickhouse ? modified : formatSql(modified) }
     } catch (error) {
       toast.error(`Failed to generate SQL: ${getErrorMessage(error, 'Unknown error')}`)
-      throw error
+      return { original: undefined, modified: undefined }
     } finally {
       setIsCompletionLoading(false)
     }

@@ -276,8 +276,9 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
 
   const handleGenerateSql = async (prompt: string) => {
     if (!promptState) return
-    try {
-      const { original, modified } = await requestCompletion(prompt, promptState)
+
+    const { original, modified } = await requestCompletion(prompt, promptState)
+    if (original && modified) {
       setPendingProposal({
         original,
         modified,
@@ -285,8 +286,6 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
         prompt,
       })
       closePrompt()
-    } catch {
-      // requestCompletion already surfaced a toast — leave the widget open to retry
     }
   }
 
