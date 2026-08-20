@@ -2,6 +2,7 @@ import { MessageCirclePlus, NotebookText, SquareCode } from 'lucide-react'
 import { useState } from 'react'
 
 import { useCreateChat, useCreateNotebook, useCreateQuery } from './hooks'
+import { NOTEBOOK_TEMPLATES } from './notebook-templates'
 import { ActionCard } from '@/components/layouts/Tabs/ActionCard'
 import { AssistantChatForm } from '@/components/ui/AIAssistantPanel/AssistantChatForm'
 import type { AssistantModel } from '@/state/ai-assistant-state'
@@ -14,7 +15,6 @@ export const ExplorerHomeTab = () => {
   const [value, setValue] = useState<string>('')
   const [selectedModel, setSelectedModal] = useState<AssistantModel>('gpt-5.4-nano')
 
-  const onCreateNotebook = () => {}
   const onCreateChat = () => {}
 
   return (
@@ -61,27 +61,18 @@ export const ExplorerHomeTab = () => {
           <h2 className="text-sm font-medium text-foreground">Start with a template</h2>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <ActionCard
-              icon={<NotebookText className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
-              title="Authentication health"
-              description="Notebook template"
-              bgColor="bg-blue-500"
-              onClick={onCreateNotebook}
-            />
-            <ActionCard
-              icon={<NotebookText className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
-              title="Signup funnel"
-              description="Notebook template"
-              bgColor="bg-blue-500"
-              onClick={onCreateNotebook}
-            />
-            <ActionCard
-              icon={<NotebookText className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
-              title="Incident review"
-              description="Notebook template"
-              bgColor="bg-blue-500"
-              onClick={onCreateNotebook}
-            />
+            {NOTEBOOK_TEMPLATES.map((template) => (
+              <ActionCard
+                key={template.title}
+                icon={<NotebookText className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
+                title={template.title}
+                description={template.description}
+                bgColor="bg-blue-500"
+                onClick={() =>
+                  createNotebook({ name: template.title, cells: template.buildCells() })
+                }
+              />
+            ))}
             <ActionCard
               icon={<MessageCirclePlus className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
               title="Investigate errors"
