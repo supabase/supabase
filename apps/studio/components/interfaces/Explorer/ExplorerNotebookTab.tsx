@@ -232,10 +232,7 @@ export const ExplorerNotebookTab = () => {
                 <ExplorerToolbarAction aria-label="More options" icon={<MoreVertical />} />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-44">
-                <DropdownMenuItem
-                  className="gap-x-2"
-                  onClick={() => setIsDeleteModalOpen(true)}
-                >
+                <DropdownMenuItem className="gap-x-2" onClick={() => setIsDeleteModalOpen(true)}>
                   <Trash size={14} />
                   <span>Delete notebook</span>
                 </DropdownMenuItem>
