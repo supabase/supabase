@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 
+import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
+
 const TERMINAL_LINES = [
   { text: '$ supabase functions new hello-world', delay: 0 },
   { text: 'Created function: supabase/functions/hello-world/index.ts', delay: 0.3, dim: true },
@@ -81,7 +83,7 @@ export function CTASection() {
 
         <div className="flex items-center gap-2">
           <Button asChild size="medium">
-            <Link href="https://supabase.com/dashboard">Start your project</Link>
+            <Link href={DASHBOARD_SIGN_UP_URL}>Start your project</Link>
           </Button>
           <Button asChild size="medium" variant="default">
             <Link href="/docs/guides/functions/quickstart">Quickstart guide</Link>

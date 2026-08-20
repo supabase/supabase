@@ -2,6 +2,8 @@ import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 import Link from 'next/link'
 import { Button } from 'ui'
 
+import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
+
 export function Hero() {
   return (
     <SectionContainerWithCn>
@@ -18,7 +20,7 @@ export function Hero() {
         </div>
         <div className="flex items-center gap-2">
           <Button asChild size="medium">
-            <Link href="https://supabase.com/dashboard">Start your project</Link>
+            <Link href={DASHBOARD_SIGN_UP_URL}>Start your project</Link>
           </Button>
           <Button asChild size="medium" variant="default">
             <Link href="/docs/guides/auth">Documentation</Link>

@@ -1,8 +1,10 @@
 'use client'
 
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 import Link from 'next/link'
 import { Button, cn } from 'ui'
-import { useSendTelemetryEvent } from '~/lib/telemetry'
+
+import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
 
 interface Props {
   className?: string
@@ -28,7 +30,7 @@ const CTABanner = ({ darkerBg, className }: Props) => {
       <div className="flex items-center justify-center gap-2 col-span-12 mt-4">
         <Button asChild size="medium">
           <Link
-            href="https://supabase.com/dashboard"
+            href={DASHBOARD_SIGN_UP_URL}
             onClick={() =>
               sendTelemetryEvent({
                 action: 'start_project_button_clicked',

@@ -4,6 +4,8 @@ import { useSendTelemetryEvent } from '~/lib/telemetry'
 import Link from 'next/link'
 import { Button } from 'ui'
 
+import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
+
 export function CTASection() {
   const sendTelemetryEvent = useSendTelemetryEvent()
 
@@ -17,7 +19,7 @@ export function CTASection() {
         <div className="flex items-center gap-2">
           <Button asChild size="medium">
             <Link
-              href="https://supabase.com/dashboard"
+              href={DASHBOARD_SIGN_UP_URL}
               onClick={() =>
                 sendTelemetryEvent({
                   action: 'start_project_button_clicked',

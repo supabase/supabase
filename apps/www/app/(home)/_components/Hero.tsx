@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Button } from 'ui'
 
 import SectionContainer from '@/components/Layouts/SectionContainer'
+import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
 
 export function Hero() {
   const sendTelemetryEvent = useSendTelemetryEvent()
@@ -25,7 +26,7 @@ export function Hero() {
         <div className="flex items-center gap-2">
           <Button asChild size="medium">
             <Link
-              href="https://supabase.com/dashboard"
+              href={DASHBOARD_SIGN_UP_URL}
               onClick={() =>
                 sendTelemetryEvent({
                   action: 'start_project_button_clicked',
