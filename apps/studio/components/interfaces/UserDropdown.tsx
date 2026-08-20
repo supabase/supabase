@@ -47,7 +47,7 @@ export function UserDropdown({
   const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
   const track = useTrack()
   const { isAvailable: isDevToolbarAvailable } = useDevToolbar()
-  const showSectionSeparator = IS_PLATFORM || isDevToolbarAvailable
+  const shouldShowSectionSeparator = IS_PLATFORM || isDevToolbarAvailable
 
   // The upgrade CTA is org-scoped, so only enable it on routes where an org is in scope.
   // Excludes /account/*, /organizations, /new, marketing routes, etc. Gating the hook here
@@ -144,7 +144,7 @@ export function UserDropdown({
           </>
         )}
 
-        {showSectionSeparator && <DropdownMenuSeparator />}
+        {shouldShowSectionSeparator && <DropdownMenuSeparator />}
 
         <DevToolbarMenuGroup />
 
