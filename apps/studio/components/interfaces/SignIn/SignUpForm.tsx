@@ -110,7 +110,7 @@ export const SignUpForm = () => {
       }
       redirectTo = `${redirectUrlBase}/authorize?${authorizeParams.toString()}`
     } else {
-      // Use getRedirectToPath to handle redirect_to parameter and other query params
+      // Build the post-verification return path from returnTo and other query params.
       const { returnTo } = router.query
       const fullPath = buildSignUpReturnPath(returnTo)
       const fullRedirectUrl = `${redirectUrlBase}${fullPath}`
