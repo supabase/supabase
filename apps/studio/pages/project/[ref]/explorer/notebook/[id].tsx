@@ -33,7 +33,7 @@ const NotebookPage: NextPageWithLayout = () => {
     tabs.updateTab(createTabId('notebook', { id }), { label: name })
   })
 
-  useEffect(() => registerTab(), [id, isNotFound])
+  useEffect(() => registerTab(), [id])
 
   useEffect(() => backfillTabLabel(), [id, name])
 
