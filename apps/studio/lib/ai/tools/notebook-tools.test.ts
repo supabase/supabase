@@ -52,10 +52,11 @@ const NOTEBOOK_CONTENT = {
 
 describe('ai/tools/notebook-tools', () => {
   describe('getNotebookTools', () => {
-    it('should return list_notebooks, get_notebook, create_notebook, and update_notebook tools', () => {
+    it('should return list_databases, list_notebooks, get_notebook, create_notebook, and update_notebook tools', () => {
       const tools = getNotebookTools()
 
       expect(Object.keys(tools)).toEqual([
+        'list_databases',
         'list_notebooks',
         'get_notebook',
         'create_notebook',
@@ -75,6 +76,69 @@ describe('ai/tools/notebook-tools', () => {
 
       expect(tools.create_notebook.needsApproval).toBe(true)
       expect(tools.update_notebook.needsApproval).toBe(true)
+    })
+  })
+
+  describe('list_databases', () => {
+    it('should list databases with a computed is_primary flag', async () => {
+      addAPIMock({
+        method: 'get',
+        path: '/platform/projects/:ref/databases',
+        response: () =>
+          HttpResponse.json<components['schemas']['DatabaseDetailResponse'][]>([
+            {
+              identifier: 'test-project',
+              region: 'us-east-1',
+              status: 'ACTIVE_HEALTHY',
+              cloud_provider: 'AWS',
+              db_host: 'db.test-project.supabase.co',
+              db_name: 'postgres',
+              db_port: 5432,
+              db_user: 'postgres',
+              inserted_at: '2026-01-01T00:00:00.000Z',
+              restUrl: 'https://test-project.supabase.co/rest/v1',
+              size: 't4g.micro',
+            },
+            {
+              identifier: 'test-project-replica-1',
+              region: 'us-west-1',
+              status: 'COMING_UP',
+              cloud_provider: 'AWS',
+              db_host: 'db.test-project-replica-1.supabase.co',
+              db_name: 'postgres',
+              db_port: 5432,
+              db_user: 'postgres',
+              inserted_at: '2026-01-01T00:00:00.000Z',
+              restUrl: 'https://test-project-replica-1.supabase.co/rest/v1',
+              size: 't4g.micro',
+            },
+          ]),
+      })
+
+      const tools = getNotebookTools({ projectRef: 'test-project' })
+      if (!tools.list_databases.execute) throw new Error('execute is undefined')
+
+      const result = await tools.list_databases.execute(
+        {},
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+
+      expect(result).toEqual({
+        databases: [
+          {
+            identifier: 'test-project',
+            is_primary: true,
+            region: 'us-east-1',
+            status: 'ACTIVE_HEALTHY',
+          },
+          {
+            identifier: 'test-project-replica-1',
+            is_primary: false,
+            region: 'us-west-1',
+            status: 'COMING_UP',
+          },
+        ],
+      })
     })
   })
 
