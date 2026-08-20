@@ -52,7 +52,7 @@ export const DiagramFlow = ({
   const backgroundPatternColor =
     resolvedTheme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.4)'
 
-  const setReactFlow = useEffectEvent(async ({ measured }: { measured: boolean }) => {
+  const setReactFlow = useEffectEvent(async ({ isMeasuredPass }: { isMeasuredPass: boolean }) => {
     // Merge in React Flow's measured dimensions (if any) so dagre can use real
     // heights instead of the first-paint fallbacks.
     const measuredNodes = nodes.map((node) => {
@@ -77,7 +77,7 @@ export const DiagramFlow = ({
     // [Joshen] Odd fix to ensure that react flow snaps back to center when adding nodes
     await timeout(1)
     reactFlow.fitView({ maxZoom: 0.9, minZoom: 0.9 })
-    if (measured) setHasMeasuredLayout(true)
+    if (isMeasuredPass) setHasMeasuredLayout(true)
   })
 
   // First pass: lay out using fallback heights for any not-yet-measured nodes.
@@ -85,7 +85,7 @@ export const DiagramFlow = ({
   // user never sees the fallback positions.
   useEffect(() => {
     if (nodes.length > 0) {
-      setReactFlow({ measured: false })
+      setReactFlow({ isMeasuredPass: false })
     }
   }, [nodes, edges])
 
@@ -94,7 +94,7 @@ export const DiagramFlow = ({
   // this — the first-pass effect above handles node changes.
   const runMeasuredLayout = useEffectEvent(() => {
     if (nodesInitialized && nodes.length > 0) {
-      setReactFlow({ measured: true })
+      setReactFlow({ isMeasuredPass: true })
     }
   })
   useEffect(() => {
