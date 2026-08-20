@@ -1,9 +1,8 @@
-import { Sparkles, Terminal } from 'lucide-react'
+import { Terminal } from 'lucide-react'
 import { Button, Card } from 'ui'
 
 import { WorkerCommandLine } from './WorkerCommandLine'
-import CopyButton from '@/components/ui/CopyButton'
-import { WORKERS_CLI_DEPLOY, WORKERS_SKILL_MARKDOWN } from '@/lib/constants/workers'
+import { WORKERS_CLI_DEPLOY } from '@/lib/constants/workers'
 
 interface WorkersEmptyStateProps {
   onDeploy: () => void
@@ -64,23 +63,6 @@ export const WorkersEmptyState = ({ onDeploy }: WorkersEmptyStateProps) => (
       </p>
       <div className="rounded-md border border-default bg-surface-100 px-3 py-2">
         <WorkerCommandLine command={WORKERS_CLI_DEPLOY} />
-      </div>
-
-      <div className="space-y-2 rounded-md border border-default p-4">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-foreground">SKILL.md</span>
-          <span className="inline-flex items-center gap-1 rounded-full border border-strong px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-foreground-lighter">
-            <Sparkles size={10} /> For agents
-          </span>
-        </div>
-        <p className="text-sm text-foreground-lighter">
-          Drop a skill file into your agent so it can deploy and manage workers for you.
-        </p>
-        <div className="flex items-center gap-3 pt-1">
-          <CopyButton text={WORKERS_SKILL_MARKDOWN} variant="default" size="tiny">
-            Copy SKILL.md
-          </CopyButton>
-        </div>
       </div>
     </div>
   </Card>

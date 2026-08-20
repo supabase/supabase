@@ -1,7 +1,6 @@
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogSection,
   DialogSectionSeparator,
@@ -10,8 +9,6 @@ import {
 
 import { EXAMPLE_WORKER } from './workerSnippets'
 import { WorkerSnippetTabs } from './WorkerSnippetTabs'
-import CopyButton from '@/components/ui/CopyButton'
-import { WORKERS_SKILL_MARKDOWN } from '@/lib/constants/workers'
 
 interface DeployWorkerDialogProps {
   open: boolean
@@ -63,14 +60,8 @@ export const DeployWorkerDialog = ({ open, onOpenChange }: DeployWorkerDialogPro
       <DialogSectionSeparator />
 
       <DialogSection>
-        <WorkerSnippetTabs input={EXAMPLE_WORKER} tabs={['cli', 'config', 'ai']} />
+        <WorkerSnippetTabs input={EXAMPLE_WORKER} tabs={['cli', 'config']} />
       </DialogSection>
-
-      <DialogFooter>
-        <CopyButton text={WORKERS_SKILL_MARKDOWN} variant="default" copyLabel="Copy SKILL.md">
-          Copy SKILL.md
-        </CopyButton>
-      </DialogFooter>
     </DialogContent>
   </Dialog>
 )

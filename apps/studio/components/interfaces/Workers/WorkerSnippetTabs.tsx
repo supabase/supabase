@@ -6,10 +6,9 @@ import { buildWorkerSnippets, type WorkerSnippetInput } from './workerSnippets'
 import CopyButton from '@/components/ui/CopyButton'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 
-export type WorkerSnippetTab = 'ai' | 'config' | 'cli' | 'curl' | 'js' | 'python'
+export type WorkerSnippetTab = 'config' | 'cli' | 'curl' | 'js' | 'python'
 
 const TAB_LABEL: Record<WorkerSnippetTab, string> = {
-  ai: 'AI',
   config: 'config.toml',
   cli: 'CLI',
   curl: 'cURL',
@@ -38,7 +37,6 @@ export const WorkerSnippetTabs = ({
     protocol: settings?.app_config?.protocol,
   })
   const snippetByTab: Record<WorkerSnippetTab, string> = {
-    ai: snippets.aiPrompt,
     config: snippets.configToml,
     cli: snippets.cli,
     curl: snippets.curl,
