@@ -40,8 +40,9 @@ export const createLogCellSkeleton = ({
 }
 
 const DEFAULT_MARKDOWN_CONTENT = `
-  # New section
-  Add notes about your queries and results
+# New section
+
+Add notes about your queries and results
 `.trim()
 
 export const createMarkdownCellSkeleton = ({

@@ -52,7 +52,9 @@ export const ExplorerNavHome = ({
             >
               <Icon size={14} className="shrink-0" />
               <span className="flex-1 text-left">{label}</span>
-              <span className="text-xs text-foreground-lighter">{/* Length will be here */}</span>
+              <span className="text-xs text-foreground-lighter">
+                {type === 'notebook' ? notebooks.length : chats.length}
+              </span>
               <ChevronRight size={14} className="shrink-0 text-foreground-muted" />
             </button>
           )
