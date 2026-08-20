@@ -260,6 +260,26 @@ describe('agentNotebookSchema', () => {
 
     expect(result.success).toBe(false)
   })
+
+  it('rejects a database_cell that carries a database_identifier', () => {
+    // Agents have no way to discover a project's real read-replica identifiers, so an
+    // invented one silently breaks the cell (its connection string never resolves) — the
+    // field is stripped from the agent-facing schema entirely rather than left for a model
+    // to guess at.
+    const result = agentNotebookSchema.safeParse({
+      schema_version: 1,
+      cells: [
+        {
+          _tag: 'database_cell',
+          sql: 'select 1',
+          row_limit: 100,
+          database_identifier: 'replica-1',
+        },
+      ],
+    })
+
+    expect(result.success).toBe(false)
+  })
 })
 
 describe('writableNotebookSchema', () => {
