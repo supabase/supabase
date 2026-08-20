@@ -98,33 +98,6 @@ describe('NotebookProposalRenderer', () => {
     expect(onApprove).toHaveBeenCalledTimes(1)
   })
 
-  it('warns and withholds the diff when the notebook changed since expected_updated_at', async () => {
-    const onApprove = vi.fn()
-    mockContentItem(mockNotebookRow({ updated_at: '2024-06-01T00:00:00.000Z' }))
-
-    render(
-      <NotebookProposalRenderer
-        mode="update"
-        state="approval-requested"
-        confirmState="approval-requested"
-        input={{
-          id: NOTEBOOK_ID,
-          expected_updated_at: '2024-01-01T00:00:00.000Z',
-          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
-        }}
-        output={undefined}
-        onApprove={onApprove}
-        onDeny={vi.fn()}
-      />
-    )
-
-    expect(
-      await screen.findByText('This notebook changed since the assistant planned this update')
-    ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Refresh' })).toBeInTheDocument()
-    expect(onApprove).not.toHaveBeenCalled()
-  })
-
   it('falls back to a raw-input admonition without dropping the confirm footer on a parse failure', async () => {
     const user = userEvent.setup()
     const onApprove = vi.fn()

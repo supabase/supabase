@@ -238,8 +238,6 @@ function UpdateNotebookProposal({
     isLoading,
     isError,
     error,
-    refetch,
-    isFetching,
   } = useNotebookQuery(
     { projectRef: ref, id: parsedInput.success ? parsedInput.data.id : undefined },
     { enabled: parsedInput.success }
@@ -281,30 +279,6 @@ function UpdateNotebookProposal({
           </Button>
         )}
       </div>
-    )
-  }
-
-  const isStale = notebook.updated_at !== parsedInput.data.expected_updated_at
-
-  if (isStale) {
-    return (
-      <NotebookConfirm
-        mode="update"
-        confirmState={confirmState}
-        confirmLabel="Refresh"
-        confirmLabelLoading="Refreshing..."
-        extraLoading={isFetching}
-        onDeny={onDeny}
-        onApprove={() => refetch()}
-      >
-        <div className="p-3">
-          <Admonition
-            type="warning"
-            title="This notebook changed since the assistant planned this update"
-            description={`"${notebook.name}" was updated after the assistant read it. Refresh to see the latest version before deciding.`}
-          />
-        </div>
-      </NotebookConfirm>
     )
   }
 

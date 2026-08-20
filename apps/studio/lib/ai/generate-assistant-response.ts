@@ -2,7 +2,6 @@ import * as ai from 'ai'
 import {
   convertToModelMessages,
   isStepCount,
-  isToolUIPart,
   type LanguageModel,
   type ModelMessage,
   type SystemModelMessage,
@@ -16,6 +15,7 @@ import type { AssistantEvalInput } from '@/evals/scorer'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { buildAssistantContextMessages, NO_SCHEMA_ACCESS_MESSAGE } from '@/lib/ai/assistant-context'
 import { IS_TRACING_ENABLED } from '@/lib/ai/braintrust-logger'
+import { prepareMessagesForModel } from '@/lib/ai/generate-assistant-response.utils'
 import {
   CHAT_PROMPT,
   GENERAL_PROMPT,
@@ -23,7 +23,6 @@ import {
   NOTEBOOKS_PROMPT,
   SECURITY_PROMPT,
 } from '@/lib/ai/prompts'
-import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
 
 const { streamText: tracedStreamText } = wrapAISDK(ai)
 
@@ -74,36 +73,7 @@ export async function generateAssistantResponse({
   const shouldTrace = allowTracing ?? IS_TRACING_ENABLED
 
   const run = async (span?: Span) => {
-    // Only returns last 7 messages
-    // Filters out tools with invalid states
-    // Filters out tool outputs based on opt-in level
-    const messages = (rawMessages || []).slice(-7).map((msg) => {
-      if (msg && msg.role === 'assistant' && 'results' in msg) {
-        const cleanedMsg = { ...msg }
-        delete cleanedMsg.results
-        return cleanedMsg
-      }
-      if (msg && msg.role === 'assistant' && msg.parts) {
-        const cleanedParts = msg.parts
-          .filter((part) => {
-            if (isToolUIPart(part)) {
-              const invalidStates = [
-                'input-streaming',
-                'input-available',
-                'approval-requested',
-                'output-error',
-              ]
-              return !invalidStates.includes(part.state)
-            }
-            return true
-          })
-          .map((part) => {
-            return sanitizeMessagePart(part, aiOptInLevel)
-          })
-        return { ...msg, parts: cleanedParts }
-      }
-      return msg
-    })
+    const messages = prepareMessagesForModel(rawMessages, aiOptInLevel)
 
     const schemasString =
       aiOptInLevel !== 'disabled' && getSchemas
