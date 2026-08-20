@@ -84,7 +84,7 @@ export const EdgeVisualIcon = ({ visual, rotation }: { visual: EdgeVisual; rotat
       size={12}
       strokeWidth={strokeWidth ?? 2}
       fill={isFilled ? 'currentColor' : 'none'}
-      className={cn(shouldSpin && 'animate-spin')}
+      className={cn(shouldSpin && 'motion-safe:animate-spin')}
       style={{
         color,
         transform: isDirectional && rotation !== undefined ? `rotate(${rotation}deg)` : undefined,

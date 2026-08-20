@@ -35,12 +35,17 @@ const POOLER_STATUS_REFRESH_MS = 30_000
 export const HaInstanceConfiguration = () => {
   const { ref: projectRef } = useParams()
 
+  // Gateways poll on the same interval as poolers so the gateway count and
+  // gateway→primary edge track cluster changes while the page stays open.
   const {
     data: gatewaysData,
     error: gatewaysError,
     isPending: isPendingGateways,
     isError: isErrorGateways,
-  } = useQuery(haClusterGatewaysQueryOptions({ projectRef }))
+  } = useQuery({
+    ...haClusterGatewaysQueryOptions({ projectRef }),
+    refetchInterval: POOLER_STATUS_REFRESH_MS,
+  })
 
   const {
     data: poolers,

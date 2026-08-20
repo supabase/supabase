@@ -129,18 +129,25 @@ describe('selectTopologyPoolers', () => {
           hostname: 'some-host',
           servingStatus: 'DRAINING',
           lifecycleStatus: { status: 'LIFECYCLE_ACTIVE' },
-          routingState: { role: 'ROUTING_ROLE_PRIMARY' },
+          routingState: {
+            role: 'ROUTING_ROLE_PRIMARY',
+            rule: { coordinatorTerm: '2', leaderSubterm: '1' },
+          },
         },
       ],
     })
 
     // Volatile fields (lifecycle, serving status, hostname) are dropped so the
     // projection stays deep-equal across polls when the topology is unchanged.
+    // The routing rule is kept — it decides the primary during failover.
     expect(projected).toEqual([
       {
         id: { cell: 'cell-1', name: 'p-1' },
         shardKey: { database: 'postgres', tableGroup: 'default', shard: '0-inf' },
-        routingState: { role: 'ROUTING_ROLE_PRIMARY' },
+        routingState: {
+          role: 'ROUTING_ROLE_PRIMARY',
+          rule: { coordinatorTerm: '2', leaderSubterm: '1' },
+        },
         type: 'PRIMARY',
       },
     ])
@@ -201,7 +208,7 @@ describe('buildHaTopology', () => {
     expect(topology.shards[0].replicas).toHaveLength(1)
   })
 
-  it('keeps extra primaries as replicas instead of dropping them', () => {
+  it('keeps extra primaries as replicas instead of dropping them (tie keeps sort order)', () => {
     const first = primaryPooler()
     const second = primaryPooler({ id: { cell: 'eu-central-1b', name: 'pooler-2' } })
 
@@ -209,6 +216,55 @@ describe('buildHaTopology', () => {
 
     expect(topology.shards[0].primary).toEqual(first)
     expect(topology.shards[0].replicas).toEqual([second])
+  })
+
+  it('elects the primary claimant with the highest coordinator term during failover', () => {
+    // '9' vs '10' also guards against lexicographic string comparison.
+    const outgoing = primaryPooler({
+      routingState: { role: 'ROUTING_ROLE_PRIMARY', rule: { coordinatorTerm: '9' } },
+    })
+    const incoming = primaryPooler({
+      id: { cell: 'eu-central-1b', name: 'pooler-2' },
+      routingState: { role: 'ROUTING_ROLE_PRIMARY', rule: { coordinatorTerm: '10' } },
+    })
+
+    const topology = buildHaTopology({ gateways: [], poolers: [outgoing, incoming] })
+
+    expect(topology.shards[0].primary).toEqual(incoming)
+    expect(topology.shards[0].replicas).toEqual([outgoing])
+  })
+
+  it('breaks coordinator-term ties on leader subterm', () => {
+    const lower = primaryPooler({
+      routingState: {
+        role: 'ROUTING_ROLE_PRIMARY',
+        rule: { coordinatorTerm: '2', leaderSubterm: '1' },
+      },
+    })
+    const higher = primaryPooler({
+      id: { cell: 'eu-central-1b', name: 'pooler-2' },
+      routingState: {
+        role: 'ROUTING_ROLE_PRIMARY',
+        rule: { coordinatorTerm: '2', leaderSubterm: '2' },
+      },
+    })
+
+    const topology = buildHaTopology({ gateways: [], poolers: [lower, higher] })
+
+    expect(topology.shards[0].primary).toEqual(higher)
+  })
+
+  it('prefers a claimant with a routing rule over one without (omitted terms are zero)', () => {
+    const withoutRule = primaryPooler()
+    const withRule = primaryPooler({
+      id: { cell: 'eu-central-1b', name: 'pooler-2' },
+      routingState: { role: 'ROUTING_ROLE_PRIMARY', rule: { coordinatorTerm: '1' } },
+    })
+
+    const topology = buildHaTopology({ gateways: [], poolers: [withoutRule, withRule] })
+
+    expect(topology.shards[0].primary).toEqual(withRule)
+    expect(topology.shards[0].replicas).toEqual([withoutRule])
   })
 
   it('handles a shard with no primary', () => {

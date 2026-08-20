@@ -1,5 +1,5 @@
 import { BaseEdge, EdgeLabelRenderer, getSmoothStepPath, type EdgeProps } from '@xyflow/react'
-import { useParams } from 'common'
+import { useParams, useReducedMotion } from 'common'
 import { useMemo } from 'react'
 
 import { getStatusName } from '../Pipeline.utils'
@@ -35,6 +35,7 @@ export const SmoothstepEdge = ({
   data,
 }: EdgeProps) => {
   const { ref: projectRef = 'default' } = useParams()
+  const prefersReducedMotion = useReducedMotion()
   const { type, identifier, shiftEdgeEnd } = (data || {}) as EdgeData
   const isReplica = type === 'replica'
 
@@ -108,7 +109,10 @@ export const SmoothstepEdge = ({
           stroke: visual.color,
           opacity: visual.opacity,
           strokeDasharray: visual.dashArray,
-          animation: visual.shouldAnimate ? 'dashdraw 0.5s linear infinite' : undefined,
+          animation:
+            visual.shouldAnimate && !prefersReducedMotion
+              ? 'dashdraw 0.5s linear infinite'
+              : undefined,
         }}
       />
 

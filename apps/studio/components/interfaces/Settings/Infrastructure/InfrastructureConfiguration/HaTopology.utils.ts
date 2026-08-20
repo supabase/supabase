@@ -40,6 +40,14 @@ export const isPrimaryPooler = (pooler: Multipooler) => {
   return pooler.type === 'PRIMARY'
 }
 
+/**
+ * Health as reported by the pooler's topology record — not a live probe: a
+ * pooler that crashes without publishing STOPPING/SHUTDOWN can leave an
+ * ACTIVE/SERVING record behind until the topology evicts it, and "healthy"
+ * says nothing about replication progress. Live signals (WAL receiver state,
+ * replay position) exist on `GET /poolers/{cell}/{name}/status` but require a
+ * per-pooler fanout.
+ */
 export const getPoolerStatus = (pooler: Multipooler): HaPoolerStatus => {
   // Lifecycle values may arrive with or without the proto enum prefix.
   const lifecycle = (pooler.lifecycleStatus?.status ?? '').replace(/^LIFECYCLE_/, '')
@@ -84,6 +92,24 @@ export const formatCellAsAvailabilityZone = (cell: string | undefined) => {
   return AWS_AZ_REGEX.exec(cell)?.[0] ?? cell
 }
 
+// Routing-rule terms are proto int64s, serialized as strings in JSON and
+// omitted when zero. Failover counts stay far below Number's safe range.
+const parseTerm = (value: string | undefined) => {
+  const parsed = Number(value ?? 0)
+  return Number.isFinite(parsed) ? parsed : 0
+}
+
+// Orders two primary claimants by routing rule: (coordinator term, leader
+// subterm), greatest wins.
+const compareRoutingRules = (a: Multipooler, b: Multipooler) => {
+  const ruleA = a.routingState?.rule
+  const ruleB = b.routingState?.rule
+  return (
+    parseTerm(ruleA?.coordinatorTerm) - parseTerm(ruleB?.coordinatorTerm) ||
+    parseTerm(ruleA?.leaderSubterm) - parseTerm(ruleB?.leaderSubterm)
+  )
+}
+
 export const buildHaTopology = ({
   gateways,
   poolers,
@@ -110,15 +136,22 @@ export const buildHaTopology = ({
   const shards = Object.entries(poolersByShard)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([id, shardPoolers], index) => {
-      // A shard should only ever have one primary; if the data disagrees, the
-      // first one renders as the primary and the rest as replicas rather than
-      // dropping nodes.
       const [primaries, replicas] = partition(shardPoolers, isPrimaryPooler)
+      // During a failover the outgoing and incoming primary can briefly both
+      // claim ROUTING_ROLE_PRIMARY — the highest routing rule wins, matching
+      // the multigateway's election. Losing claimants render as replicas
+      // rather than being dropped; ties keep the first in sorted order so the
+      // result stays deterministic.
+      const primary = primaries.reduce<Multipooler | undefined>(
+        (best, candidate) =>
+          best === undefined || compareRoutingRules(candidate, best) > 0 ? candidate : best,
+        undefined
+      )
       return {
         id,
         name: `Shard ${index + 1}`,
-        primary: primaries[0],
-        replicas: [...primaries.slice(1), ...replicas],
+        primary,
+        replicas: [...primaries.filter((pooler) => pooler !== primary), ...replicas],
       }
     })
 
@@ -145,6 +178,17 @@ export const selectTopologyPoolers = (data: HaClusterPoolersData): Multipooler[]
             shard: pooler.shardKey.shard,
           },
     routingState:
-      pooler.routingState === undefined ? undefined : { role: pooler.routingState.role },
+      pooler.routingState === undefined
+        ? undefined
+        : {
+            role: pooler.routingState.role,
+            rule:
+              pooler.routingState.rule === undefined
+                ? undefined
+                : {
+                    coordinatorTerm: pooler.routingState.rule.coordinatorTerm,
+                    leaderSubterm: pooler.routingState.rule.leaderSubterm,
+                  },
+          },
     type: pooler.type,
   }))

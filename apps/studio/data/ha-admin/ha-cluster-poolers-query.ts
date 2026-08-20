@@ -16,7 +16,11 @@ export type Multipooler = {
   servingStatus?: 'SERVING' | 'DISABLED' | 'DRAINING'
   hostname?: string
   lifecycleStatus?: { status?: string }
-  routingState?: { role?: string }
+  routingState?: {
+    role?: string
+    // proto int64s, serialized as strings in JSON
+    rule?: { coordinatorTerm?: string; leaderSubterm?: string }
+  }
 }
 
 async function getHaClusterPoolers(

@@ -95,7 +95,10 @@ export const HaPrimaryNode = ({ data }: NodeProps<Node<HaPoolerNodeData>>) => {
             <div className="flex flex-col gap-y-0.5">
               <div className="flex items-center gap-x-2">
                 <p className="text-sm">Primary Database</p>
-                {status !== undefined && <PoolerStatusBadge status={status} />}
+                {/* Stable live region so polled status changes are announced */}
+                <span role="status">
+                  {status !== undefined && <PoolerStatusBadge status={status} />}
+                </span>
               </div>
               {primaryRegion !== undefined && (
                 <p className="text-sm text-foreground-light">{primaryRegion.name}</p>
@@ -104,8 +107,10 @@ export const HaPrimaryNode = ({ data }: NodeProps<Node<HaPoolerNodeData>>) => {
             </div>
           </div>
           {primaryRegion !== undefined && (
+            // Decorative — the visible text next to it already names the region
             <img
-              alt="region icon"
+              alt=""
+              aria-hidden="true"
               className="w-8 rounded-xs mt-0.5"
               src={`${BASE_PATH}/img/regions/${primaryRegion.region}.svg`}
             />
@@ -141,7 +146,7 @@ export const HaReplicaNode = ({ data }: NodeProps<Node<HaPoolerNodeData>>) => {
             )}
           >
             {status === 'coming_up' ? (
-              <Loader2 className="animate-spin" size={16} />
+              <Loader2 className="motion-safe:animate-spin" size={16} />
             ) : (
               <DatabaseBackup size={16} />
             )}
@@ -149,7 +154,10 @@ export const HaReplicaNode = ({ data }: NodeProps<Node<HaPoolerNodeData>>) => {
           <div className="flex flex-col gap-y-0.5">
             <div className="flex items-center gap-x-2">
               <p className="text-sm">Read Replica</p>
-              {status !== undefined && <PoolerStatusBadge status={status} />}
+              {/* Stable live region so polled status changes are announced */}
+              <span role="status">
+                {status !== undefined && <PoolerStatusBadge status={status} />}
+              </span>
             </div>
             <PoolerCardSubtitle availabilityZone={availabilityZone} computeSize={computeSize} />
           </div>
@@ -169,11 +177,10 @@ export const HaShardNode = ({ data }: NodeProps<Node<HaShardNodeData>>) => {
         <p className="text-sm">{name}</p>
         <Badge>{numNodes}</Badge>
         <Tooltip>
-          <TooltipTrigger asChild>
-            <span className="flex items-center gap-x-1 text-sm text-foreground-light">
-              Automatic failover
-              <HelpCircle size={14} />
-            </span>
+          {/* Renders a button so the explanation is keyboard reachable */}
+          <TooltipTrigger className="flex items-center gap-x-1 text-sm text-foreground-light">
+            Automatic failover
+            <HelpCircle size={14} />
           </TooltipTrigger>
           <TooltipContent side="bottom" className="max-w-72 text-center">
             If the primary database fails, a replica in this shard is automatically promoted to take

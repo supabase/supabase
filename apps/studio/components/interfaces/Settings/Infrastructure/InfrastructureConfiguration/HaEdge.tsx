@@ -1,4 +1,5 @@
 import { BaseEdge, Edge, EdgeLabelRenderer, getSmoothStepPath, type EdgeProps } from '@xyflow/react'
+import { useReducedMotion } from 'common'
 
 import { HaReplicationEdgeData } from './HaInstanceConfiguration.utils'
 import { getPoolerEdgeState, getPoolerStatus } from './HaTopology.utils'
@@ -18,6 +19,7 @@ export const HaReplicationEdge = ({
 }: EdgeProps<Edge<HaReplicationEdgeData>>) => {
   const { cell, name } = data ?? {}
   const { data: pooler } = useHaPooler({ cell, name })
+  const prefersReducedMotion = useReducedMotion()
 
   // Until the pooler's state is known, render the edge as coming up.
   const status = pooler !== undefined ? getPoolerStatus(pooler) : 'coming_up'
@@ -48,7 +50,10 @@ export const HaReplicationEdge = ({
           stroke: visual.color,
           opacity: visual.opacity,
           strokeDasharray: visual.dashArray,
-          animation: visual.shouldAnimate ? 'dashdraw 0.5s linear infinite' : undefined,
+          animation:
+            visual.shouldAnimate && !prefersReducedMotion
+              ? 'dashdraw 0.5s linear infinite'
+              : undefined,
         }}
       />
 
