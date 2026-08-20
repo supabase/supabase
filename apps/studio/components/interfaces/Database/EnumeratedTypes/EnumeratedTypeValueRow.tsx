@@ -65,6 +65,7 @@ const EnumeratedTypeValueRow = <TFieldValues extends FieldValues>({
                 icon={<Trash strokeWidth={1.5} size={16} />}
                 className="px-2"
                 onClick={() => onRemoveValue()}
+                aria-label="Remove value"
               />
             </div>
           </FormControl>
