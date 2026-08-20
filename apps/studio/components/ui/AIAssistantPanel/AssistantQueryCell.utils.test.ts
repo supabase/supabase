@@ -31,7 +31,7 @@ describe('getAssistantQueryDisplay', () => {
   })
 
   it('keeps an empty y-axis list when only the x-axis is provided', () => {
-    expect(getAssistantQueryDisplay({ xAxis: 'day' }).chart?.y_columns).toEqual([])
+    expect(getAssistantQueryDisplay({ xAxis: 'day' }).chart?.y_series).toEqual([])
   })
 })
 
