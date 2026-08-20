@@ -105,9 +105,7 @@ describe('/project/[ref]/workers', () => {
     await renderWorkersPage()
 
     expect(
-      screen.getByText(
-        `You need additional permissions to view this project's ${PRODUCT_NAME} workers`
-      )
+      screen.getByText("You need additional permissions to view this project's workers")
     ).toBeVisible()
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
   })

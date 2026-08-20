@@ -63,9 +63,7 @@ const WorkersPage: NextPageWithLayout = () => {
                 description={`${PRODUCT_NAME} is in private alpha. Contact support to have this project added to the alpha.`}
               />
             )}
-            {isMissingPermission && (
-              <NoPermission resourceText={`view this project's ${PRODUCT_NAME} workers`} />
-            )}
+            {isMissingPermission && <NoPermission resourceText="view this project's workers" />}
             {isUnexpectedError && <AlertError error={error} subject="Failed to retrieve workers" />}
             {isSuccess && workers.length === 0 && (
               <p className="text-sm text-foreground-light">
