@@ -20,15 +20,6 @@ export function getEntryKey(entry: NotebookCellDiffEntry): string {
   }
 }
 
-/**
- * Whether a diff entry starts expanded. Only the entries the user has to actually read to
- * decide — the ones whose content the assistant is proposing — open on their own; unchanged,
- * moved, and removed cells stay as single rows until asked for.
- */
-export function isEntryExpandedByDefault(entry: NotebookCellDiffEntry): boolean {
-  return entry._tag === 'added' || entry._tag === 'replaced'
-}
-
 /** Human label for a collapsed/badge row. */
 export function getCellLabel(cell: OperationResultCell): string {
   switch (cell._tag) {
@@ -97,6 +88,18 @@ export function getCellMetadataLine(cell: OperationResultCell): string | null {
     case 'log_cell':
       return `Time range: ${formatTimeRange(cell.time_range)}`
   }
+}
+
+/** Header metadata for a diff row, including a before → after pair on replacements. */
+export function getEntryMetadataLine(entry: NotebookCellDiffEntry): string | null {
+  if (entry._tag !== 'replaced') {
+    return getCellMetadataLine(entry.cell)
+  }
+
+  const beforeMetadata = getCellMetadataLine(entry.before)
+  const afterMetadata = getCellMetadataLine(entry.after)
+  if (beforeMetadata === afterMetadata) return afterMetadata
+  return `${beforeMetadata ?? 'No metadata'} → ${afterMetadata ?? 'No metadata'}`
 }
 
 export type NotebookDiffSummary =

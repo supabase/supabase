@@ -10,6 +10,8 @@ interface ConfirmFooterProps {
   confirmLabelLoading?: string
   isLoading?: boolean
   isDisabled?: boolean
+  /** Omit the confirm button so only Skip remains (unparseable / unapplyable previews). */
+  denyOnly?: boolean
   /** Escape hatch for consumers that attach the bar directly under their own frame. */
   className?: string
   onCancel?: () => void | Promise<void>
@@ -24,6 +26,7 @@ export const ConfirmFooter = ({
   confirmLabelLoading = 'Working...',
   isLoading = false,
   isDisabled = false,
+  denyOnly = false,
   className,
   onCancel,
   onConfirm,
@@ -33,20 +36,21 @@ export const ConfirmFooter = ({
   return (
     <div
       className={cn(
-        'flex items-center justify-between py-2 pr-2 pl-4 text-xs text-foreground gap-3 shrink-0',
-        'relative overflow-hidden border-t bg-border shadow-inset',
-        'bg-linear-to-r from-background-surface-75 to-background-surface-200',
+        'mx-3 flex shrink-0 items-center justify-between gap-3 rounded-b-md py-2 pr-2 pl-3',
+        'border-x border-b bg-surface-200 text-xs text-foreground-light',
         className
       )}
     >
-      <div className="flex-1 relative z-10">{message}</div>
-      <div className="flex items-center gap-2 relative z-10">
+      <div className="min-w-0 flex-1">{message}</div>
+      <div className="flex shrink-0 items-center gap-2">
         <Button size="tiny" variant="outline" onClick={onCancel} disabled={isInactive}>
           {cancelLabel}
         </Button>
-        <Button size="tiny" variant="primary" onClick={onConfirm} disabled={isInactive}>
-          {isLoading ? confirmLabelLoading : confirmLabel}
-        </Button>
+        {!denyOnly && (
+          <Button size="tiny" variant="primary" onClick={onConfirm} disabled={isInactive}>
+            {isLoading ? confirmLabelLoading : confirmLabel}
+          </Button>
+        )}
       </div>
     </div>
   )
@@ -66,18 +70,21 @@ interface ConfirmProps {
   isLoading?: boolean
   /**
    * Children fill the remaining height of the card (e.g. `QueryEditor` in viewport
-   * mode). Omit for content-sized bodies like notebook previews.
+   * mode). Omit for content-sized bodies like notebook previews and Edge Function blocks.
    */
   fill?: boolean
   className?: string
+  /** Omit the confirm button so only Skip remains. */
+  denyOnly?: boolean
   onCancel?: () => void | Promise<void>
   onConfirm?: () => void | Promise<void>
 }
 
 /**
  * Card that wraps an assistant tool preview and optionally attaches a confirm footer
- * below it. The card owns the frame; nested surfaces (QueryEditor viewport, unframed
- * edge-function blocks) fill the body.
+ * below it. The card owns the frame; the footer hangs inset from the sides so it reads
+ * as tucked under the card. Nested surfaces (QueryEditor viewport, unframed notebook
+ * previews, Edge Function blocks) fill the body.
  */
 export const Confirm = ({
   children,
@@ -90,6 +97,7 @@ export const Confirm = ({
   isLoading = false,
   fill = false,
   className,
+  denyOnly = false,
   onCancel,
   onConfirm,
 }: PropsWithChildren<ConfirmProps>) => {
@@ -100,13 +108,14 @@ export const Confirm = ({
   return (
     <div
       data-slot="assistant-confirm"
-      className={cn(
-        'flex flex-col overflow-hidden rounded-md border shadow-xs bg-muted',
-        fill && 'min-h-64',
-        className
-      )}
+      className={cn('flex flex-col', fill && 'min-h-64', className)}
     >
-      <div className={cn('min-w-0', fill && 'flex min-h-0 flex-1 flex-col overflow-hidden')}>
+      <div
+        className={cn(
+          'min-w-0 overflow-hidden rounded-md border shadow-xs bg-muted',
+          fill && 'flex min-h-0 flex-1 flex-col overflow-hidden'
+        )}
+      >
         {children}
       </div>
       {bar.show && (
@@ -117,6 +126,7 @@ export const Confirm = ({
           confirmLabelLoading={confirmLabelLoading}
           isLoading={showLoading}
           isDisabled={!isApprovalRequested}
+          denyOnly={denyOnly}
           onCancel={onCancel}
           onConfirm={onConfirm}
         />

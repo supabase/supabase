@@ -7,8 +7,9 @@ import {
   getCellLabel,
   getCellMetadataLine,
   getEntryKey,
+  getEntryMetadataLine,
   summarizeNotebookDiff,
-} from './NotebookPreview.utils'
+} from './AssistantNotebookPreview.utils'
 import type { NotebookCellDiffEntry } from '@/data/content/notebooks/notebook-operations'
 import type { AgentCell, CellWire } from '@/data/content/notebooks/notebook-schema'
 import { isoDateTimeString } from '@/lib/iso-datetime'
@@ -35,6 +36,13 @@ const wireLogCell = (id: string): CellWire => ({
   _id: id,
   sql: 'select 1',
   time_range: { _tag: 'relative_time_range', unit: 'day', amount: 7 },
+})
+
+const agentDatabaseCell = (database_identifier?: string): AgentCell => ({
+  _tag: 'database_cell',
+  sql: 'select 1',
+  row_limit: 100,
+  database_identifier,
 })
 
 describe('getEntryKey', () => {
@@ -125,6 +133,39 @@ describe('getCellMetadataLine', () => {
 
   it('labels a log cell with its formatted time range', () => {
     expect(getCellMetadataLine(wireLogCell('cell-1'))).toBe('Time range: Last 7 days')
+  })
+})
+
+describe('getEntryMetadataLine', () => {
+  it('uses the cell metadata for non-replaced entries', () => {
+    expect(
+      getEntryMetadataLine({
+        _tag: 'unchanged',
+        cell: wireDatabaseCell('cell-1', 'Signups', 'replica-3'),
+      })
+    ).toBe('Database: replica-3')
+  })
+
+  it('returns a before → after pair when a replacement changes only metadata', () => {
+    expect(
+      getEntryMetadataLine({
+        _tag: 'replaced',
+        before: wireDatabaseCell('cell-1', 'Signups', 'primary'),
+        after: agentDatabaseCell('replica-3'),
+        operationIndex: 0,
+      })
+    ).toBe('Database: primary → Database: replica-3')
+  })
+
+  it('returns a single line when replacement metadata is unchanged', () => {
+    expect(
+      getEntryMetadataLine({
+        _tag: 'replaced',
+        before: wireDatabaseCell('cell-1', 'Signups', 'primary'),
+        after: agentDatabaseCell('primary'),
+        operationIndex: 0,
+      })
+    ).toBe('Database: primary')
   })
 })
 
