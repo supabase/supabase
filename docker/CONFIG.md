@@ -660,10 +660,10 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
 | `GOTRUE_SESSIONS_ALLOW_LOW_AAL` | string (duration) |  | Time during which a low-AAL session is still accepted. |  |
-| `GOTRUE_SESSIONS_INACTIVITY_TIMEOUT` | string (duration) |  | Session inactivity timeout. |  |
+| `GOTRUE_SESSIONS_INACTIVITY_TIMEOUT` | string (duration) |  | Session inactivity timeout (time since last successful token refresh). | Go duration, e.g. `4h`, `50m`. Dashboard / Management API use hours (e.g. `4`), which map to this duration. |
 | `GOTRUE_SESSIONS_SINGLE_PER_USER` | boolean |  | Allow only one active session per user. |  |
 | `GOTRUE_SESSIONS_TAGS` | string (CSV) |  | Tags attached to created sessions. |  |
-| `GOTRUE_SESSIONS_TIMEBOX` | string (duration) |  | Absolute session lifetime. |  |
+| `GOTRUE_SESSIONS_TIMEBOX` | string (duration) |  | Absolute session lifetime from creation. | Go duration, e.g. `24h`. Dashboard / Management API use hours (e.g. `24`), which map to this duration. |
 
 ### Web3
 

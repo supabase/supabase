@@ -218,7 +218,7 @@ export default function PageLayoutSettings() {
                         <FormItemLayout
                           layout="flex-row-reverse"
                           label="Time-box user sessions"
-                          description="The amount of time before a user is forced to sign in again. Use 0 for never."
+                          description="Hours before a user must sign in again. Checked on the next token refresh. Use 0 for never."
                         >
                           <div className="flex items-center">
                             <FormControl>
@@ -245,7 +245,7 @@ export default function PageLayoutSettings() {
                         <FormItemLayout
                           layout="flex-row-reverse"
                           label="Inactivity timeout"
-                          description="The amount of time a user needs to be inactive to be forced to sign in again. Use 0 for never."
+                          description="Hours without a session refresh before the user must sign in again. Checked on the next token refresh. Use 0 for never."
                         >
                           <div className="flex items-center">
                             <FormControl>

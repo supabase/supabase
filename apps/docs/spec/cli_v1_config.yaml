@@ -1489,7 +1489,8 @@ parameters:
     required: false
     default: ''
     description: |
-      Force log out after the specified duration. Sample values include: '50m', '20h'.
+      Force log out after the specified duration from session creation. Sample values include: '50m', '20h'.
+      On hosted projects, the Dashboard and Management API configure this in hours (for example, 4 means 4 hours).
     links:
       - name: 'Auth Sessions'
         link: 'https://supabase.com/docs/guides/auth/sessions'
@@ -1500,7 +1501,8 @@ parameters:
     required: false
     default: ''
     description: |
-      Force log out if the user has been inactive longer than the specified duration. Sample values include: '50m', '20h'.
+      Force log out if the session has not been refreshed within the specified duration. Sample values include: '50m', '20h'.
+      Activity means a successful token refresh, not other API calls. On hosted projects, the Dashboard and Management API configure this in hours (for example, 4 means 4 hours).
     links:
       - name: 'Auth Sessions'
         link: 'https://supabase.com/docs/guides/auth/sessions'
