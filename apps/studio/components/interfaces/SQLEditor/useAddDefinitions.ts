@@ -1,4 +1,5 @@
 import { Monaco } from '@monaco-editor/react'
+import { useQueryClient } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import type { IDisposable } from 'monaco-editor'
 import { useEffect, useRef } from 'react'
@@ -6,6 +7,7 @@ import { useEffect, useRef } from 'react'
 import getPgsqlCompletionProvider from '@/components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
 import getPgsqlSignatureHelpProvider from '@/components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
 import { useDatabaseFunctionsQuery } from '@/data/database-functions/database-functions-query'
+import { databaseKeys } from '@/data/database/keys'
 import { useKeywordsQuery } from '@/data/database/keywords-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useTableColumnsQuery } from '@/data/database/table-columns-query'
@@ -47,6 +49,7 @@ export const useAddDefinitions = (
 ) => {
   const { data: project } = useSelectedProjectQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const queryClient = useQueryClient()
 
   const [intellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
@@ -102,7 +105,26 @@ export const useAddDefinitions = (
     pgInfoRef.current.schemas = filteredSchemas
     pgInfoRef.current.keywords = keywords
     pgInfoRef.current.functions = functions
+  } else if (!intellisenseEnabled) {
+    // Release this instance's hold on the (potentially huge, for large databases)
+    // tableColumns/functions arrays so they're actually eligible for GC — see the
+    // cache-eviction effect below for why `enabled: false` alone isn't enough.
+    pgInfoRef.current = null
   }
+
+  // Actively evict the cached tableColumns/functions data when intellisense is turned off
+  useEffect(() => {
+    if (intellisenseEnabled) return
+
+    queryClient.removeQueries({
+      queryKey: databaseKeys.tableColumns(project?.ref, undefined, undefined),
+      exact: true,
+    })
+    queryClient.removeQueries({
+      queryKey: databaseKeys.databaseFunctions(project?.ref),
+      exact: true,
+    })
+  }, [intellisenseEnabled, project?.ref, queryClient])
 
   //  Enable pgsql format
   useEffect(() => {
