@@ -3,6 +3,7 @@ import { useParams } from 'common'
 import { Database, DatabaseBackup, HelpCircle, Layers, Loader2, Network } from 'lucide-react'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
+import { ComputeMetricsFooter } from './ComputeMetricsFooter'
 import {
   HaPoolerNodeData,
   HaShardNodeData,
@@ -124,6 +125,9 @@ export const HaPrimaryNode = ({ data }: NodeProps<Node<HaPoolerNodeData>>) => {
             />
           )}
         </div>
+        {/* Whether connection metrics are meaningful through the multigateway
+            is unconfirmed, so they're left off for HA projects. */}
+        <ComputeMetricsFooter showConnections={false} />
       </div>
       <Handle type="source" position={Position.Bottom} style={{ background: 'transparent' }} />
     </>

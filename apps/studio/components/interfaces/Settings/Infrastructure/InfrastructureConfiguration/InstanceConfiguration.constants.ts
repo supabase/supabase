@@ -64,7 +64,7 @@ export const NODE_HEIGHT_FALLBACKS: Record<string, number> = {
   READ_REPLICA: 140,
   REGION: REGION_NODE_HEIGHT,
   HA_GATEWAY: 64,
-  HA_PRIMARY: 120,
+  HA_PRIMARY: 150,
   HA_REPLICA: 90,
 }
 
