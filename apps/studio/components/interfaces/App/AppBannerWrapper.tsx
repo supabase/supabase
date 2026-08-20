@@ -1,6 +1,7 @@
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag } from 'common'
+import dayjs from 'dayjs'
 import { usePathname } from 'next/navigation'
-import { PropsWithChildren, useEffect, useRef } from 'react'
+import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 
 import { OrganizationResourceBanner } from '../Organization/HeaderBanner'
 import { isLogsOrObservabilityPath } from './AppBannerWrapper.utils'
@@ -17,7 +18,10 @@ const TOSUpdateExpiry = new Date('2026-08-29T00:00:00Z')
 
 // Update this whenever the banner content changes so old client bundles stop
 // displaying the notice after the removal date passes.
-const LogsAllDeprecationExpiry = new Date('2026-09-24T00:00:00Z')
+const LogsAllDeprecationExpiry = dayjs('2026-09-24T00:00:00Z')
+
+// setTimeout overflows above ~24.8 days; re-arm until the real expiry.
+const MAX_TIMEOUT_MS = 2_147_483_647
 
 export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const showNoticeBanner = useFlag('showNoticeBanner')
@@ -50,13 +54,35 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const [isLogsAllDeprecationDismissed, , { isSuccess: isLogsAllDeprecationLoaded }] =
     useLocalStorageQuery(LOCAL_STORAGE_KEYS.LOGS_ALL_DEPRECATION_2026_09_23, false)
 
+  const [isLogsAllDeprecationExpired, setIsLogsAllDeprecationExpired] = useState(
+    () => !dayjs().isBefore(LogsAllDeprecationExpiry)
+  )
+
+  useEffect(() => {
+    if (isLogsAllDeprecationExpired) return
+
+    let timeoutId: ReturnType<typeof setTimeout> | undefined
+
+    const armExpiryTimer = () => {
+      const msUntilExpiry = LogsAllDeprecationExpiry.diff(dayjs())
+      if (msUntilExpiry <= 0) {
+        setIsLogsAllDeprecationExpired(true)
+        return
+      }
+      timeoutId = setTimeout(armExpiryTimer, Math.min(msUntilExpiry, MAX_TIMEOUT_MS))
+    }
+
+    armExpiryTimer()
+    return () => clearTimeout(timeoutId)
+  }, [isLogsAllDeprecationExpired])
+
   const hasTrackedLogsAllExposure = useRef(false)
   useEffect(() => {
     if (!isLogsAllDeprecationLoaded || pathname == null) return
 
     const shouldShow =
       IS_PLATFORM &&
-      Date.now() < LogsAllDeprecationExpiry.getTime() &&
+      !isLogsAllDeprecationExpired &&
       isLogsOrObservabilityPath(pathname) &&
       !isLogsAllDeprecationDismissed
 
@@ -80,6 +106,7 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
     pathname,
     isLogsAllDeprecationLoaded,
     isLogsAllDeprecationDismissed,
+    isLogsAllDeprecationExpired,
     addBanner,
     dismissBanner,
     track,

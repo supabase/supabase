@@ -23,7 +23,7 @@ export const BannerLogsAllDeprecation = () => {
       onDismiss={() => {
         setIsDismissed(true)
         dismissBanner(BANNER_ID.LOGS_ALL_DEPRECATION)
-        track('logs_all_deprecation_banner_dismissed')
+        track('logs_all_deprecation_banner_dismiss_button_clicked')
       }}
     >
       <div className="flex flex-col gap-y-2">

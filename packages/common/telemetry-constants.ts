@@ -1448,8 +1448,8 @@ export interface LogsAllDeprecationBannerExposedEvent {
  * @source studio
  * @page /project/[ref]/logs/*, /project/[ref]/observability/*
  */
-export interface LogsAllDeprecationBannerDismissedEvent {
-  action: 'logs_all_deprecation_banner_dismissed'
+export interface LogsAllDeprecationBannerDismissButtonClickedEvent {
+  action: 'logs_all_deprecation_banner_dismiss_button_clicked'
   groups: TelemetryGroups
 }
 
@@ -3810,7 +3810,7 @@ export type TelemetryEvent =
   | UnifiedLogsBannerCtaButtonClickedEvent
   | UnifiedLogsBannerDismissButtonClickedEvent
   | LogsAllDeprecationBannerExposedEvent
-  | LogsAllDeprecationBannerDismissedEvent
+  | LogsAllDeprecationBannerDismissButtonClickedEvent
   | IndexAdvisorEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
   | IndexAdvisorTabClickedEvent

@@ -21,6 +21,14 @@ describe('BannerStackProvider', () => {
     const { result } = renderHook(() => useBannerStack(), { wrapper })
 
     act(() => {
+      result.current.addBanner({
+        id: BANNER_ID.LOGS_ALL_DEPRECATION,
+        isDismissed: false,
+        content: null,
+      })
+    })
+
+    act(() => {
       result.current.dismissBanner(BANNER_ID.LOGS_ALL_DEPRECATION)
     })
 
