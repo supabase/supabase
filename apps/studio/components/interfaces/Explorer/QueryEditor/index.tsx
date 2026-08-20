@@ -1,5 +1,5 @@
-import { acceptUntrustedSql, untrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { useMonaco } from '@monaco-editor/react'
+import { acceptUntrustedSql, untrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { useFlag } from 'common'
 import { CodeSquare, Eye, EyeOff, Play } from 'lucide-react'
 import type { editor as monacoEditor } from 'monaco-editor'

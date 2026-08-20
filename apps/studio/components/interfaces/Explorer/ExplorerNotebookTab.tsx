@@ -108,13 +108,6 @@ export const ExplorerNotebookTab = () => {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
 
-  const toggleIntellisense = () => {
-    setIntellisenseEnabled(!intellisenseEnabled)
-    toast.success(
-      `Successfully ${intellisenseEnabled ? 'disabled' : 'enabled'} intellisense. ${intellisenseEnabled ? 'Please refresh your browser for changes to take place.' : ''}`
-    )
-  }
-
   const handleSaveTitle = (titleValue: string) => {
     const trimmedName = titleValue.trim()
     if (id && trimmedName && trimmedName !== name) {
@@ -248,7 +241,10 @@ export const ExplorerNotebookTab = () => {
                 <ExplorerToolbarAction aria-label="More options" icon={<MoreVertical />} />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem className="justify-between" onClick={() => toggleIntellisense()}>
+                <DropdownMenuItem
+                  className="justify-between"
+                  onClick={() => setIntellisenseEnabled(!intellisenseEnabled)}
+                >
                   <div className="flex items-center gap-x-2">
                     <Keyboard size={14} />
                     <span>Intellisense enabled</span>
