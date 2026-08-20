@@ -4,6 +4,7 @@ import { BrainIcon, CheckIcon, Loader2 } from 'lucide-react'
 import { cn } from 'ui'
 
 import { AssistantQueryCell } from './AssistantQueryCell'
+import { toAssistantQueryResult } from './AssistantQueryCell.utils'
 import { getManualToolApprovalHandlers } from './Confirm.utils'
 import { EdgeFunctionRenderer } from './EdgeFunctionRenderer'
 import { Tool } from './elements/Tool'
@@ -14,6 +15,7 @@ import {
   parseExecuteSqlChartResult,
 } from './Message.utils'
 import { MessageMarkdown } from './MessageMarkdown'
+import { MessagePartQueryLogs } from './MessagePartQueryLogs'
 import { NotebookProposalRenderer, type NotebookProposalMode } from './NotebookProposalRenderer'
 import { parseSupportRequestMessage, SupportRequestMessage } from './SupportRequestMessage'
 
@@ -147,7 +149,7 @@ function MessagePartExecuteSql({ toolPart }: { toolPart: ToolUIPart }) {
           id={`${id}-${toolCallId}`}
           sql={chart.sql}
           title={chart.label}
-          initialRows={output}
+          initialResult={toAssistantQueryResult(output)}
           view={chart.view}
           xAxis={chart.xAxis}
           yAxis={chart.yAxis}
@@ -274,6 +276,7 @@ const MessagePart = {
   Tool: MessagePartTool,
   Reasoning: MessagePartReasoning,
   ExecuteSql: MessagePartExecuteSql,
+  QueryLogs: MessagePartQueryLogs,
   DeployEdgeFunction: MessagePartDeployEdgeFunction,
   NotebookProposal: MessagePartNotebookProposal,
 } as const
@@ -285,6 +288,9 @@ export function MessagePartSwitcher({
 }) {
   switch (part.type) {
     case 'dynamic-tool': {
+      if (part.toolName === 'query_logs') {
+        return <MessagePart.QueryLogs toolPart={part} />
+      }
       return <MessagePart.Dynamic toolPart={part} />
     }
     case 'tool-list_policies':
@@ -300,6 +306,9 @@ export function MessagePartSwitcher({
 
     case 'tool-execute_sql': {
       return <MessagePart.ExecuteSql toolPart={part} />
+    }
+    case 'tool-query_logs': {
+      return <MessagePart.QueryLogs toolPart={part} />
     }
     case 'tool-deploy_edge_function': {
       return <MessagePart.DeployEdgeFunction toolPart={part} />

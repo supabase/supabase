@@ -4,10 +4,11 @@ import { identifyQueryType } from './AIAssistant.utils'
 import {
   changeAssistantQuerySource,
   createAssistantQueryModel,
+  DEFAULT_ASSISTANT_LOGS_QUERY_TITLE,
   DEFAULT_ASSISTANT_QUERY_TITLE,
   getAssistantQueryDisplay,
   setAssistantQuerySql,
-  toAssistantQueryResult,
+  shouldClearAssistantQueryResult,
 } from './AssistantQueryCell.utils'
 import { Confirm } from './Confirm'
 import { type ConfirmFooterApprovalState } from './Confirm.utils'
@@ -21,7 +22,8 @@ interface AssistantQueryCellProps {
   id: string
   sql: string
   title?: string
-  initialRows?: unknown
+  initialResult?: QueryResult
+  source?: QuerySourceBinding
   view?: 'table' | 'chart'
   xAxis?: string
   yAxis?: string
@@ -32,12 +34,15 @@ interface AssistantQueryCellProps {
   onDeny?: () => void
 }
 
+const DEFAULT_SOURCE: QuerySourceBinding = { _tag: 'database' }
+
 /** Assistant adapter around the shared QueryEditor. Local state only — nothing is persisted. */
 export const AssistantQueryCell = ({
   id,
   sql: initialSql,
   title: initialTitle,
-  initialRows,
+  initialResult,
+  source = DEFAULT_SOURCE,
   view,
   xAxis,
   yAxis,
@@ -49,40 +54,41 @@ export const AssistantQueryCell = ({
   const track = useTrack()
   const roleImpersonationState = useLocalRoleImpersonationState()
 
-  const [title, setTitle] = useState(initialTitle?.trim() || DEFAULT_ASSISTANT_QUERY_TITLE)
-  const [query, setQuery] = useState(() => createAssistantQueryModel(initialSql))
-  const [result, setResult] = useState<QueryResult | undefined>(() =>
-    toAssistantQueryResult(initialRows)
-  )
-  const [display, setDisplay] = useState<QueryDisplay>(() =>
-    getAssistantQueryDisplay({ view, xAxis, yAxis })
-  )
+  const fallbackTitle =
+    initialTitle?.trim() ||
+    (source._tag === 'logs' ? DEFAULT_ASSISTANT_LOGS_QUERY_TITLE : DEFAULT_ASSISTANT_QUERY_TITLE)
 
-  const prevId = useRef(id)
-  const prevSql = useRef(initialSql)
-  const prevRows = useRef(initialRows)
+  const hasExplicitAxes = Boolean(xAxis || yAxis)
 
-  if (prevId.current !== id) {
-    prevId.current = id
-    prevSql.current = initialSql
-    prevRows.current = initialRows
-    setTitle(initialTitle?.trim() || DEFAULT_ASSISTANT_QUERY_TITLE)
-    setQuery(createAssistantQueryModel(initialSql))
-    setResult(toAssistantQueryResult(initialRows))
-    setDisplay(getAssistantQueryDisplay({ view, xAxis, yAxis }))
+  const [title, setTitle] = useState(fallbackTitle)
+  const [query, setQuery] = useState(() => createAssistantQueryModel(initialSql, source))
+  // undefined uses the tool output; null intentionally clears it after changing source.
+  const [resultOverride, setResultOverride] = useState<QueryResult | null>()
+  const [localDisplay, setLocalDisplay] = useState<QueryDisplay | undefined>(undefined)
+  const previousId = useRef(id)
+
+  if (previousId.current !== id) {
+    previousId.current = id
+    setTitle(fallbackTitle)
+    setQuery(createAssistantQueryModel(initialSql, source))
+    setResultOverride(undefined)
+    setLocalDisplay(undefined)
   }
 
-  if (prevSql.current !== initialSql) {
-    prevSql.current = initialSql
-    if (isStreaming) {
-      setQuery((current) => setAssistantQuerySql(current, initialSql))
-    }
+  if (isStreaming && query.uncheckedSql !== initialSql) {
+    setQuery((current) => setAssistantQuerySql(current, initialSql))
   }
 
-  if (prevRows.current !== initialRows) {
-    prevRows.current = initialRows
-    setResult(toAssistantQueryResult(initialRows))
-  }
+  const result = resultOverride === undefined ? initialResult : (resultOverride ?? undefined)
+  const display =
+    localDisplay ??
+    getAssistantQueryDisplay({
+      view,
+      xAxis,
+      yAxis,
+      sql: query.uncheckedSql,
+      rows: result?.rows,
+    })
 
   const handleTitleChange = (value: string) => {
     const nextTitle = value.trim()
@@ -90,10 +96,19 @@ export const AssistantQueryCell = ({
     setTitle(nextTitle)
   }
 
-  const handleSourceChange = (source: QuerySourceBinding) => {
-    const isBackendChange = source._tag !== query._tag
-    if (isBackendChange) setResult(undefined)
-    setQuery((current) => changeAssistantQuerySource(current, source))
+  const handleSourceChange = (nextSource: QuerySourceBinding) => {
+    const isBackendChange = nextSource._tag !== query._tag
+    if (shouldClearAssistantQueryResult(query, nextSource)) setResultOverride(null)
+    if (isBackendChange && !hasExplicitAxes) setLocalDisplay(undefined)
+    setQuery((current) => changeAssistantQuerySource(current, nextSource))
+  }
+
+  const handleDisplayChange = (nextDisplay: QueryDisplay) => {
+    setLocalDisplay(nextDisplay)
+  }
+
+  const handleResultChange = (nextResult: QueryResult) => {
+    setResultOverride(nextResult)
   }
 
   const handleRun = () => {
@@ -131,11 +146,11 @@ export const AssistantQueryCell = ({
         onTitleChange={handleTitleChange}
         onSqlChange={(sql) => setQuery((current) => setAssistantQuerySql(current, sql))}
         onSourceChange={handleSourceChange}
-        onResultChange={setResult}
+        onResultChange={handleResultChange}
         onRowLimitChange={(rowLimit) =>
           setQuery((current) => (current._tag === 'database' ? { ...current, rowLimit } : current))
         }
-        onDisplayChange={setDisplay}
+        onDisplayChange={handleDisplayChange}
         onRun={handleRun}
       />
     </Confirm>
