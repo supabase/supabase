@@ -1213,6 +1213,10 @@ export const database: NavMenuConstant = {
               url: '/guides/database/replication/clickhouse' as `/${string}`,
             },
             {
+              name: 'DuckLake',
+              url: '/guides/database/replication/ducklake' as `/${string}`,
+            },
+            {
               name: 'Snowflake',
               url: '/guides/database/replication/snowflake' as `/${string}`,
             },
