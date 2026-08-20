@@ -1428,6 +1428,32 @@ export interface UnifiedLogsBannerDismissButtonClickedEvent {
 }
 
 /**
+ * The logs.all deprecation banner was rendered, fired once per mount. Acts as the
+ * denominator for the dismiss rate. Migration outcome itself is measured via decay in
+ * `/v1/projects/:ref/analytics/endpoints/logs.all` traffic in the warehouse, not from this event.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs/*, /project/[ref]/observability/*
+ */
+export interface LogsAllDeprecationBannerExposedEvent {
+  action: 'logs_all_deprecation_banner_exposed'
+  groups: TelemetryGroups
+}
+
+/**
+ * User dismissed the logs.all deprecation banner.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs/*, /project/[ref]/observability/*
+ */
+export interface LogsAllDeprecationBannerDismissButtonClickedEvent {
+  action: 'logs_all_deprecation_banner_dismiss_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the enable button for Index Advisor, either from the banner or the confirmation dialog.
  *
  * @group Events
@@ -3783,6 +3809,8 @@ export type TelemetryEvent =
   | ReportsDatabaseGrafanaBannerClickedEvent
   | UnifiedLogsBannerCtaButtonClickedEvent
   | UnifiedLogsBannerDismissButtonClickedEvent
+  | LogsAllDeprecationBannerExposedEvent
+  | LogsAllDeprecationBannerDismissButtonClickedEvent
   | IndexAdvisorEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
   | IndexAdvisorTabClickedEvent
