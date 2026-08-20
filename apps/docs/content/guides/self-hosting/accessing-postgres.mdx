@@ -40,13 +40,14 @@ Configure Supavisor settings through your `.env` file, then recreate the stack f
 
 | Variable                        | Default          | Description                                                                                                                                    |
 | ------------------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POSTGRES_PORT`                 | `5432`           | Host port for session-mode connections.                                                                                                        |
 | `POOLER_PROXY_PORT_TRANSACTION` | `6543`           | Host port for transaction-mode connections.                                                                                                    |
 | `POOLER_DEFAULT_POOL_SIZE`      | `20`             | Postgres connections the pooler opens per pool. Keep this below your Postgres `max_connections` minus connections reserved for other services. |
 | `POOLER_MAX_CLIENT_CONN`        | `100`            | Client connections the pooler accepts.                                                                                                         |
 | `POOLER_TENANT_ID`              | `your-tenant-id` | Supavisor tenant identifier, used in the username.                                                                                             |
 | `POOLER_DB_POOL_SIZE`           | `5`              | Internal metadata pool used by Supavisor itself.                                                                                               |
 
-To check your current Postgres `max_connections` setting (default `100`):
+To check your current Postgres `max_connections` setting:
 
 ```sh
 docker compose exec db psql -U postgres -c "SHOW max_connections;"
