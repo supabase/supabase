@@ -150,6 +150,11 @@ export const addShardNodes = (nodes: Node[], edges: Edge[]) => {
       // pass that this post-layout background node never gets.
       width,
       height,
+      // The box covers most of the canvas; making it non-interactive lets
+      // React Flow drop its pointer events so drag-to-pan passes through to
+      // the pane. The header pill re-enables pointer events for its tooltip.
+      selectable: false,
+      focusable: false,
       type: 'HA_SHARD',
       data: {
         name: children[0].data.shardName,

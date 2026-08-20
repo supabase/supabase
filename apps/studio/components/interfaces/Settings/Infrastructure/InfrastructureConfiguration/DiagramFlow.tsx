@@ -60,7 +60,17 @@ export const DiagramFlow = ({
       return existing?.measured ? { ...node, measured: existing.measured } : node
     })
     const graph = getDagreGraphLayout(measuredNodes, edges, { ranksep })
-    const { nodes: updatedNodes } = addGroupNodes(graph.nodes, graph.edges)
+    const { nodes: groupedNodes } = addGroupNodes(graph.nodes, graph.edges)
+    // Re-attach known measurements to the freshly created group nodes too —
+    // handing setNodes an unmeasured node resets the store's nodesInitialized
+    // flag, which would re-trigger the measured pass below on every re-measure
+    // and loop forever (each iteration re-running fitView, so the diagram
+    // snaps back to center and can't be panned).
+    const updatedNodes = groupedNodes.map((node) => {
+      if (node.measured !== undefined) return node
+      const existing = reactFlow.getNode(node.id)
+      return existing?.measured ? { ...node, measured: existing.measured } : node
+    })
     reactFlow.setNodes(updatedNodes)
     reactFlow.setEdges(graph.edges)
 

@@ -194,7 +194,7 @@ export const HaShardNode = ({ data }: NodeProps<Node<HaShardNodeData>>) => {
       className="relative rounded-md border border-default bg-surface-100/25"
       style={{ width, height }}
     >
-      <div className="absolute top-3 left-3 flex items-center gap-x-2 rounded-full border border-default bg-surface-100 pl-3 pr-2 py-1">
+      <div className="pointer-events-auto absolute top-3 left-3 flex items-center gap-x-2 rounded-full border border-default bg-surface-100 pl-3 pr-2 py-1">
         <Layers size={14} className="text-foreground-light" />
         <p className="text-sm">{name}</p>
         <Badge>{numNodes}</Badge>
