@@ -22,7 +22,7 @@ describe('getAssistantQueryDisplay', () => {
       chart: {
         type: 'bar',
         x_column: 'day',
-        y_columns: ['signups'],
+        y_series: ['signups'],
         cumulative: false,
         scale: 'linear',
         show_labels: false,
