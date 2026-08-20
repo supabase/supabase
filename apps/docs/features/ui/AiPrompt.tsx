@@ -3,7 +3,7 @@
 import { aiPrompts, type AiPromptId } from '~/data/ai-prompts.data'
 import { Sparkles } from 'lucide-react'
 
-import { Prompt, PromptContent, PromptCopy, PromptPanel, PromptTitle } from './PromptPanel'
+import { Prompt, PromptContent, PromptCopy, PromptPanel, PromptTitle } from 'ui-patterns/PromptPanel'
 
 type AiPromptProps = {
   /** Looks up prompt text from `aiPrompts`. */

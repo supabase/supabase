@@ -221,6 +221,10 @@ const tabTriggerClassName = 'h-full px-0 py-0 text-xs shadow-none data-[state=ac
  * prompts render as tabs. A single prompt still shows the header + copy
  * button, with the title styled like an inactive tab (no underline).
  *
+ * The compound children (`Prompt`, `PromptTitle`, `PromptCopy`,
+ * `PromptContent`) must be composed inside a client module — detection is
+ * by `displayName`, which does not survive the RSC boundary.
+ *
  * @example
  * ```tsx
  * <PromptPanel>

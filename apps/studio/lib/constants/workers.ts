@@ -1,5 +1,5 @@
-export const PRODUCT_NAME = 'Compute'
-export const CLI_NAME = 'compute'
+export const PRODUCT_NAME = 'Workers'
+export const CLI_NAME = 'workers'
 
 export const WORKERS_CLI_DEPLOY = `supabase ${CLI_NAME} push`
 
@@ -33,7 +33,7 @@ Config precedence: \`--flag\` > \`config.toml\` > interactive prompt > default.
 
 - Workers under \`supabase/${CLI_NAME}/<name>/\` are auto-discovered; the folder name is the slug.
 - \`entrypoint\` is inferred from the runtime (node index.js, deno run main.ts, python main.py, Dockerfile CMD).
-- \`region\` is locked to us-west-1 at alpha — do not set it.
+- \`region\` is locked to us-west-2 at alpha — do not set it.
 - Sizes are fixed at deploy time. To change size, delete the worker and redeploy.
 
 ## Manage

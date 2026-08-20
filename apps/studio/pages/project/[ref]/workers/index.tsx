@@ -61,12 +61,12 @@ const WorkersPage: NextPageWithLayout = () => {
             {isError && isWorkersUnavailable(error) && (
               <Admonition
                 type="default"
-                title="Compute is not enabled for this project"
-                description="Compute is in private alpha. Contact support to have this project added to the alpha."
+                title="Workers are not enabled for this project"
+                description="Workers are in private alpha. Contact support to have this project added to the alpha."
               />
             )}
             {isError && isWorkersForbidden(error) && (
-              <NoPermission resourceText="view this project's Compute workers" />
+              <NoPermission resourceText="view this project's workers" />
             )}
             {isError && !isWorkersUnavailable(error) && !isWorkersForbidden(error) && (
               <AlertError error={error} subject="Failed to retrieve workers" />

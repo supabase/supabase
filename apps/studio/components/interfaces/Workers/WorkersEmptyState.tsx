@@ -4,7 +4,7 @@ import { Plus } from 'lucide-react'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { EXAMPLE_WORKER } from './workerSnippets'
-import { WorkerSnippetTabs } from './WorkerSnippetTabs'
+import { WorkerPromptPanel } from './WorkerPromptPanel'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
@@ -16,8 +16,8 @@ export const WorkersEmptyState = ({ onCreate }: WorkersEmptyStateProps) => {
   const { can: canDeployWorkers } = useAsyncCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
 
   return (
-    <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-3">
-      <div className="lg:col-span-2">
+    <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-5">
+      <div className="lg:col-span-3">
         <EmptyStatePresentational
           icon={BoxPlus}
           title="Deploy your first worker"
@@ -44,14 +44,7 @@ export const WorkersEmptyState = ({ onCreate }: WorkersEmptyStateProps) => {
         </EmptyStatePresentational>
       </div>
 
-      <WorkerSnippetTabs
-        editor
-        fillHeight
-        wrap
-        input={EXAMPLE_WORKER}
-        tabs={['ai', 'cli', 'config', 'curl']}
-        className="lg:col-span-1"
-      />
+      <WorkerPromptPanel input={EXAMPLE_WORKER} className="h-full lg:col-span-2" />
     </div>
   )
 }
