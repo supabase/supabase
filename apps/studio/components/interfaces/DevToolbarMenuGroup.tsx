@@ -6,8 +6,8 @@ export function DevToolbarMenuGroup() {
 
   if (!isAvailable) return null
 
-  const handleToggleDevToolbar = (checked: boolean) => {
-    if (checked) {
+  const handleToggleDevToolbar = (isChecked: boolean) => {
+    if (isChecked) {
       enableToolbar()
       return
     }

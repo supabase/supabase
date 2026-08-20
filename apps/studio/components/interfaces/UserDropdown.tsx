@@ -1,3 +1,4 @@
+import { useDevToolbar } from 'dev-tools'
 import { FlaskConical, Loader2, ScrollText, User2 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
@@ -45,6 +46,8 @@ export function UserDropdown({
 
   const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
   const track = useTrack()
+  const { isAvailable: isDevToolbarAvailable } = useDevToolbar()
+  const showSectionSeparator = IS_PLATFORM || isDevToolbarAvailable
 
   // The upgrade CTA is org-scoped, so only enable it on routes where an org is in scope.
   // Excludes /account/*, /organizations, /new, marketing routes, etc. Gating the hook here
@@ -141,7 +144,7 @@ export function UserDropdown({
           </>
         )}
 
-        <DropdownMenuSeparator />
+        {showSectionSeparator && <DropdownMenuSeparator />}
 
         <DevToolbarMenuGroup />
 
