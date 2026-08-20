@@ -1,11 +1,11 @@
 import { BaseEdge, EdgeLabelRenderer, getSmoothStepPath, type EdgeProps } from '@xyflow/react'
 import { useParams } from 'common'
-import { ArrowRight, Loader2, Square, X, type LucideIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { cn } from 'ui'
 
 import { getStatusName } from '../Pipeline.utils'
 import { REPLICA_STATUS, STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
+import { getEdgeVisual, type ReplicationState } from '@/components/ui/ReactFlow/getEdgeVisual'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
@@ -18,67 +18,6 @@ type EdgeData = {
   type: string
   identifier: string
   shiftEdgeEnd: boolean
-}
-
-interface ReplicationState {
-  isComingUp: boolean
-  isReplicating: boolean
-  isFailed: boolean
-}
-
-interface EdgeVisual {
-  Icon: LucideIcon
-  // CSS color shared by the icon and the connecting line so they always match.
-  color: string
-  opacity: number
-  dashArray: string
-  shouldAnimate: boolean
-  shouldSpin?: boolean
-  isFilled?: boolean
-  strokeWidth?: number
-}
-
-// Picks the icon + line appearance for a replication state. Both the icon and the line are derived
-// here from the same state so they always stay in sync. We deliberately don't surface lag: the line
-// just communicates whether data is moving, stopped, starting, or broken.
-const getEdgeVisual = ({ isComingUp, isReplicating, isFailed }: ReplicationState): EdgeVisual => {
-  if (isFailed) {
-    return {
-      Icon: X,
-      color: 'hsl(var(--destructive-default))',
-      opacity: 1,
-      dashArray: '5 5',
-      shouldAnimate: false,
-      strokeWidth: 4,
-    }
-  }
-  if (isComingUp) {
-    return {
-      Icon: Loader2,
-      color: 'var(--foreground-light)',
-      opacity: 1,
-      dashArray: '5',
-      shouldAnimate: true,
-      shouldSpin: true,
-    }
-  }
-  if (isReplicating) {
-    return {
-      Icon: ArrowRight,
-      color: 'hsl(var(--brand-default))',
-      opacity: 1,
-      dashArray: '5',
-      shouldAnimate: true,
-    }
-  }
-  return {
-    Icon: Square,
-    color: 'var(--foreground-lighter)',
-    opacity: 0.5,
-    dashArray: '5 5',
-    shouldAnimate: false,
-    isFilled: true,
-  }
 }
 
 export const SmoothstepEdge = ({
