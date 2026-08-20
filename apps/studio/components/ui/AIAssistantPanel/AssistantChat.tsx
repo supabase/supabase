@@ -31,6 +31,7 @@ import { Message } from './Message'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
 import { useRateMessageMutation } from '@/data/ai/rate-message-mutation'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
@@ -169,16 +170,29 @@ export const AssistantChat = ({
   const currentTable = tables?.find((t) => t.id.toString() === entityId)
   const currentSchema = searchParams?.get('schema') ?? 'public'
 
+  // on org-level pages, where there's no project in the URL,
+  // resolve it fresh from the chat's own projectRef instead.
+  const isOrgViewSupportChat = !project?.ref && !!supportMetadata?.projectRef
+  const { data: supportChatProjectDetail } = useProjectDetailQuery(
+    { ref: supportMetadata?.projectRef },
+    { enabled: isOrgViewSupportChat }
+  )
+  const isResolvingSupportChatConnectionString =
+    isOrgViewSupportChat && !supportChatProjectDetail?.connectionString
+
   // Update context in state. On org-level pages there's no project in the URL, so
   // fall back to the open chat's own support metadata (see
   // SupportAssistantSuccessCardContent) rather than clobbering it back to undefined —
   // this also restores the right context after switching between support chats.
   useEffect(() => {
-    if (!project?.ref && supportMetadata?.projectRef) {
+    if (isOrgViewSupportChat && supportMetadata) {
+      // Wait for the connection string fetch rather than setting an empty one
+      if (!supportChatProjectDetail?.connectionString) return
+
       state.setContext({
         projectRef: supportMetadata.projectRef,
         orgSlug: supportMetadata.organizationSlug,
-        connectionString: supportMetadata.connectionString ?? '',
+        connectionString: supportChatProjectDetail.connectionString,
       })
       return
     }
@@ -188,7 +202,15 @@ export const AssistantChat = ({
       orgSlug: selectedOrganization?.slug,
       connectionString: project?.connectionString ?? '',
     })
-  }, [project?.ref, project?.connectionString, selectedOrganization?.slug, state, supportMetadata])
+  }, [
+    project?.ref,
+    project?.connectionString,
+    selectedOrganization?.slug,
+    state,
+    isOrgViewSupportChat,
+    supportMetadata,
+    supportChatProjectDetail?.connectionString,
+  ])
 
   const track = useTrack()
 
@@ -220,7 +242,11 @@ export const AssistantChat = ({
   const isSupportChatClosed = isSupportChat && supportMetadata.lifecycleStatus !== 'bot_active'
   const supportConversationId = supportMetadata?.frontConversationId
   const isChatInputDisabled =
-    !isApiKeySet || disablePrompts || isLoadingOrganization || isSupportChatClosed
+    !isApiKeySet ||
+    disablePrompts ||
+    isLoadingOrganization ||
+    isSupportChatClosed ||
+    isResolvingSupportChatConnectionString
 
   const branchedFrom = currentChat?.branchedFrom
   const branchedConversation = branchedFrom ? snap.chats[branchedFrom.chatId] : undefined

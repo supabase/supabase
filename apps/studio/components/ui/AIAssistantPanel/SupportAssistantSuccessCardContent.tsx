@@ -126,7 +126,6 @@ export function SupportAssistantSuccessCardContent({
           severity: request.severity,
           organizationSlug: request.organizationSlug,
           projectRef: request.projectRef,
-          connectionString,
           library: request.library,
           affectedServices: request.affectedServices,
           allowSupportAccess: request.allowSupportAccess,
@@ -154,20 +153,29 @@ export function SupportAssistantSuccessCardContent({
 
   if (!hasAssistantContext) return null
 
+  // While the project details request failed, the card has no chat to open — disable
+  // its click/keyboard handlers so only the "Try again" button inside is interactive.
+  const isInteractive = !isProjectDetailError
+
   return (
     <Card
-      role="button"
-      tabIndex={0}
-      aria-label="Open assistant response"
-      onClick={handleOpenAssistant}
-      onKeyDown={(event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault()
-          handleOpenAssistant()
-        }
-      }}
+      role={isInteractive ? 'button' : undefined}
+      tabIndex={isInteractive ? 0 : undefined}
+      aria-label={isInteractive ? 'Open assistant response' : undefined}
+      onClick={isInteractive ? handleOpenAssistant : undefined}
+      onKeyDown={
+        isInteractive
+          ? (event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                handleOpenAssistant()
+              }
+            }
+          : undefined
+      }
       className={cn(
-        'group cursor-pointer bg-muted/50 transition-colors hover:bg-muted/50 focus-ring',
+        'group bg-muted/50 transition-colors',
+        isInteractive && 'cursor-pointer hover:bg-muted/50 focus-ring',
         className
       )}
     >

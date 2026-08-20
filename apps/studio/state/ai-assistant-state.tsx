@@ -45,10 +45,6 @@ export type SupportChatMetadata = {
   severity: string
   organizationSlug?: string
   projectRef?: string
-  // Captured alongside projectRef so this chat's assistant context can be
-  // restored (e.g. after switching chats or reopening the panel) without
-  // depending on a project being resolvable from the current URL.
-  connectionString?: string
   library?: string
   affectedServices?: string
   allowSupportAccess: boolean
