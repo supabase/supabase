@@ -178,25 +178,20 @@ limit 100;
     You can check to see how frequent 546 errors are per hour with the below query:
 
     ```sql
-
-select
-formatDateTime(toStartOfHour(timestamp), '%Y-%m-%d %H:00', 'UTC') as hour,
-count() as total_responses,
-
-countIf(toInt32OrZero(log_attributes['response.status_code']) = 546) as total_546,
-
-countIf(toInt32OrZero(log_attributes['response.status_code']) = 546) / count() \* 100
-as pct_546
-
-from logs
-where
-source = 'function_edge_logs'
-and log_attributes['request.pathname'] = '/functions/v1/FUNCTION_NAME'--<--OPTIONAL FILTER: add specific function name to target query
-group by hour
-order by hour desc
-limit 24;
-
-````
+    select
+      formatDateTime(toStartOfHour(timestamp), '%Y-%m-%d %H:00', 'UTC') as hour,
+      count() as total_responses,
+      countIf(toInt32OrZero(log_attributes['response.status_code']) = 546) as total_546,
+      countIf(toInt32OrZero(log_attributes['response.status_code']) = 546) / count() * 100 as pct_546
+    from logs
+    where
+      source = 'function_edge_logs'
+      -- <--OPTIONAL FILTER: add specific function name to target query
+      and log_attributes['request.pathname'] = '/functions/v1/FUNCTION_NAME'
+    group by hour
+    order by hour desc
+    limit 24;
+    ```
 
     The output may look like:
     ![image](/docs/img/troubleshooting/546_errors_by_hour.png)
@@ -214,30 +209,30 @@ limit 24;
     If your isolates are serving more than 2 requests before retiring, it suggests variability in how much processing each request needs. In that case, you may want to cross compare your successful requests with your failed ones. Maybe there's a query parameter or specific content-length header that makes failures more likely.
 
     ```sql
-
-select
-count() as requests_served,
-fl.execution_id as isolate_id
-from
-(
-select log_attributes['execution_id'] as execution_id
-from logs
-where source = 'function_logs'
-and log_attributes['reason'] in ('Memory', 'CPUTime')
-) as fl
-inner join (
-select
-log_attributes['execution_id'] as execution_id,
-log_attributes['request.pathname'] as pathname,
-log_attributes['request.method'] as method
-from logs
-where source = 'function_edge_logs'
-and log_attributes['request.method'] != 'OPTIONS' --ignore OPTION requests
-and log_attributes['request.pathname'] = '/functions/v1/FUNCTION_NAME' --<-- add your function name to inspect specific endpoints
-) as fel on fl.execution_id = fel.execution_id
-group by isolate_id
-limit 100;
-````
+    select
+      count() as requests_served,
+      fl.execution_id as isolate_id
+    from
+      (
+        select log_attributes['execution_id'] as execution_id
+        from logs
+        where source = 'function_logs'
+          and log_attributes['reason'] in ('Memory', 'CPUTime')
+      ) as fl
+      inner join (
+        select
+          log_attributes['execution_id'] as execution_id,
+          log_attributes['request.pathname'] as pathname,
+          log_attributes['request.method'] as method
+        from logs
+        where source = 'function_edge_logs'
+          and log_attributes['request.method'] != 'OPTIONS' --ignore OPTION requests
+          -- <-- add your function name to inspect specific endpoints
+          and log_attributes['request.pathname'] = '/functions/v1/FUNCTION_NAME'
+      ) as fel on fl.execution_id = fel.execution_id
+    group by isolate_id
+    limit 100;
+    ```
 
     </AccordionItem>
 
