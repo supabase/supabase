@@ -39,7 +39,7 @@ Go to: [Your function returned a 401](#your-function-returned-a-401)
 
 ### Case 3: Not sure
 
-Run this query in the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs&content=select%0A%20%20timestamp%2C%0A%20%20log_attributes%5B%27request.pathname%27%5D%20as%20function_name%2C%0A%20%20case%0A%20%20%20%20when%20log_attributes%5B%27execution_id%27%5D%20%21%3D%20%27%27%20then%20%27your_code_returned_401%27%0A%20%20%20%20when%20log_attributes%5B%27execution_id%27%5D%20%3D%20%27%27%0A%20%20%20%20and%20%28%0A%20%20%20%20%20%20log_attributes%5B%27request.sb.apikey.authorization.prefix%27%5D%20%21%3D%20%27%27%0A%20%20%20%20%20%20or%20%28%0A%20%20%20%20%20%20%20%20log_attributes%5B%27request.sb.jwt.authorization.payload.algorithm%27%5D%20%21%3D%20%27%27%0A%20%20%20%20%20%20%20%20and%20log_attributes%5B%27request.sb.jwt.authorization.payload.algorithm%27%5D%20%21%3D%20%27HS256%27%0A%20%20%20%20%20%20%29%0A%20%20%20%20%29%20then%20%27incompatible_keys%27%0A%20%20%20%20when%20log_attributes%5B%27execution_id%27%5D%20%3D%20%27%27%0A%20%20%20%20and%20%28%0A%20%20%20%20%20%20log_attributes%5B%27request.sb.jwt.authorization.invalid%27%5D%20%21%3D%20%27%27%0A%20%20%20%20%20%20or%20log_attributes%5B%27request.sb.apikey.authorization.error%27%5D%20%21%3D%20%27%27%0A%20%20%20%20%20%20or%20log_attributes%5B%27request.sb.jwt.authorization.payload.algorithm%27%5D%20%3D%20%27HS256%27%0A%20%20%20%20%29%20then%20%27invalid_key%27%0A%20%20%20%20when%20log_attributes%5B%27execution_id%27%5D%20%3D%20%27%27%0A%20%20%20%20and%20log_attributes%5B%27request.sb.jwt.authorization.payload.algorithm%27%5D%20%3D%20%27%27%0A%20%20%20%20and%20log_attributes%5B%27request.sb.apikey.authorization.prefix%27%5D%20%3D%20%27%27%20then%20%27missing_auth_header%27%0A%20%20end%20as%20cause%0Afrom%20logs%0Awhere%0A%20%20source%20%3D%20%27function_edge_logs%27%0A%20%20and%20toInt32OrZero%28log_attributes%5B%27response.status_code%27%5D%29%20%3D%20401%0Aorder%20by%20timestamp%20desc%0Alimit%2050%3B) to classify recent 401s:
+Run this query in the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs&content=select%0A%20%20timestamp%2C%0A%20%20log_attributes%5B%27request.pathname%27%5D%20as%20function_name%2C%0A%20%20case%0A%20%20%20%20when%20log_attributes%5B%27execution_id%27%5D%20%21%3D%20%27%27%20then%20%27your_code_returned_401%27%0A%20%20%20%20when%20log_attributes%5B%27execution_id%27%5D%20%3D%20%27%27%0A%20%20%20%20and%20%28%0A%20%20%20%20%20%20log_attributes%5B%27request.sb.apikey.apikey.prefix%27%5D%20%21%3D%20%27%27%0A%20%20%20%20%20%20or%20%28%0A%20%20%20%20%20%20%20%20log_attributes%5B%27request.sb.jwt.authorization.payload.algorithm%27%5D%20%21%3D%20%27%27%0A%20%20%20%20%20%20%20%20and%20log_attributes%5B%27request.sb.jwt.authorization.payload.algorithm%27%5D%20%21%3D%20%27HS256%27%0A%20%20%20%20%20%20%29%0A%20%20%20%20%29%20then%20%27incompatible_keys%27%0A%20%20%20%20when%20log_attributes%5B%27execution_id%27%5D%20%3D%20%27%27%0A%20%20%20%20and%20%28%0A%20%20%20%20%20%20log_attributes%5B%27request.sb.jwt.authorization.invalid%27%5D%20%21%3D%20%27%27%0A%20%20%20%20%20%20or%20log_attributes%5B%27request.sb.apikey.apikey.error%27%5D%20%21%3D%20%27%27%0A%20%20%20%20%20%20or%20log_attributes%5B%27request.sb.jwt.authorization.payload.algorithm%27%5D%20%3D%20%27HS256%27%0A%20%20%20%20%29%20then%20%27invalid_key%27%0A%20%20%20%20when%20log_attributes%5B%27execution_id%27%5D%20%3D%20%27%27%0A%20%20%20%20and%20log_attributes%5B%27request.sb.jwt.authorization.payload.algorithm%27%5D%20%3D%20%27%27%0A%20%20%20%20and%20log_attributes%5B%27request.sb.apikey.apikey.prefix%27%5D%20%3D%20%27%27%20then%20%27missing_auth_header%27%0A%20%20end%20as%20cause%0Afrom%20logs%0Awhere%0A%20%20source%20%3D%20%27function_edge_logs%27%0A%20%20and%20toInt32OrZero%28log_attributes%5B%27response.status_code%27%5D%29%20%3D%20401%0Aorder%20by%20timestamp%20desc%0Alimit%2050%3B) to classify recent 401s:
 
 ```sql
 select
@@ -49,7 +49,7 @@ select
     when log_attributes['execution_id'] != '' then 'your_code_returned_401'
     when log_attributes['execution_id'] = ''
     and (
-      log_attributes['request.sb.apikey.authorization.prefix'] != ''
+      log_attributes['request.sb.apikey.apikey.prefix'] != ''
       or (
         log_attributes['request.sb.jwt.authorization.payload.algorithm'] != ''
         and log_attributes['request.sb.jwt.authorization.payload.algorithm'] != 'HS256'
@@ -58,12 +58,12 @@ select
     when log_attributes['execution_id'] = ''
     and (
       log_attributes['request.sb.jwt.authorization.invalid'] != ''
-      or log_attributes['request.sb.apikey.authorization.error'] != ''
+      or log_attributes['request.sb.apikey.apikey.error'] != ''
       or log_attributes['request.sb.jwt.authorization.payload.algorithm'] = 'HS256'
     ) then 'invalid_key'
     when log_attributes['execution_id'] = ''
     and log_attributes['request.sb.jwt.authorization.payload.algorithm'] = ''
-    and log_attributes['request.sb.apikey.authorization.prefix'] = '' then 'missing_auth_header'
+    and log_attributes['request.sb.apikey.apikey.prefix'] = '' then 'missing_auth_header'
   end as cause
 from logs
 where
