@@ -10,9 +10,9 @@ import type { NotebookWire } from './notebook-schema'
 const NOTEBOOK: NotebookWire = {
   schema_version: 1,
   cells: [
-    { _tag: 'markdown_cell', id: 'cell-1', text: '# Intro' },
-    { _tag: 'database_cell', id: 'cell-2', sql: 'select 1', row_limit: 100 },
-    { _tag: 'markdown_cell', id: 'cell-3', text: '# Outro' },
+    { _tag: 'markdown_cell', _id: 'cell-1', text: '# Intro' },
+    { _tag: 'database_cell', _id: 'cell-2', sql: 'select 1', row_limit: 100 },
+    { _tag: 'markdown_cell', _id: 'cell-3', text: '# Outro' },
   ],
 }
 
@@ -29,7 +29,7 @@ describe('applyNotebookOperations', () => {
     expect(result.success).toBe(true)
     if (!result.success) return
     expect(
-      result.notebook.cells.map((cell) => ('id' in cell ? cell.id : 'text' in cell && cell.text))
+      result.notebook.cells.map((cell) => ('_id' in cell ? cell._id : 'text' in cell && cell.text))
     ).toEqual(['cell-1', '# New', 'cell-2', 'cell-3'])
   })
 
@@ -98,7 +98,7 @@ describe('applyNotebookOperations', () => {
 
     expect(result.success).toBe(true)
     if (!result.success) return
-    expect(result.notebook.cells.map((cell) => ('id' in cell ? cell.id : undefined))).toEqual([
+    expect(result.notebook.cells.map((cell) => ('_id' in cell ? cell._id : undefined))).toEqual([
       'cell-2',
       'cell-3',
       'cell-1',
@@ -114,7 +114,7 @@ describe('applyNotebookOperations', () => {
 
     expect(result.success).toBe(true)
     if (!result.success) return
-    expect(result.notebook.cells.map((cell) => ('id' in cell ? cell.id : undefined))).toEqual([
+    expect(result.notebook.cells.map((cell) => ('_id' in cell ? cell._id : undefined))).toEqual([
       'cell-3',
       'cell-1',
       'cell-2',
@@ -133,7 +133,7 @@ describe('applyNotebookOperations', () => {
 
     expect(result.success).toBe(true)
     if (!result.success) return
-    expect(result.notebook.cells.map((cell) => ('id' in cell ? cell.id : undefined))).toEqual([
+    expect(result.notebook.cells.map((cell) => ('_id' in cell ? cell._id : undefined))).toEqual([
       'cell-3',
       'cell-1',
       'cell-2',
@@ -152,7 +152,7 @@ describe('applyNotebookOperations', () => {
 
     expect(result.success).toBe(true)
     if (!result.success) return
-    expect(result.notebook.cells.map((cell) => ('id' in cell ? cell.id : undefined))).toEqual([
+    expect(result.notebook.cells.map((cell) => ('_id' in cell ? cell._id : undefined))).toEqual([
       'cell-2',
       'cell-3',
       'cell-1',
@@ -169,7 +169,7 @@ describe('applyNotebookOperations', () => {
 
     expect(result.success).toBe(true)
     if (!result.success) return
-    expect(result.notebook.cells.map((cell) => ('id' in cell ? cell.id : undefined))).toEqual([
+    expect(result.notebook.cells.map((cell) => ('_id' in cell ? cell._id : undefined))).toEqual([
       'cell-1',
       'cell-2',
       'cell-3',

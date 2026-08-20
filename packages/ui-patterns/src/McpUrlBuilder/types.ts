@@ -136,6 +136,19 @@ export interface CodexMcpConfig {
 }
 
 /**
+ * Configuration format for Grok CLI MCP client.
+ * Grok reads a TOML config (`~/.grok/config.toml`) and, like Codex, keys
+ * servers under a `mcp_servers` table. HTTP transport is inferred from the URL.
+ */
+export interface GrokMcpConfig {
+  mcp_servers: {
+    supabase: {
+      url: string
+    }
+  }
+}
+
+/**
  * Configuration format for Gemini CLI MCP client.
  * Uses httpUrl instead of url to match Gemini CLI's expected format.
  */
@@ -199,6 +212,7 @@ export type McpClientConfig =
   | FactoryMcpConfig
   | GeminiMcpConfig
   | GooseMcpConfig
+  | GrokMcpConfig
   | KimiMcpConfig
   | McpClientBaseConfig
   | OpenCodeMcpConfig

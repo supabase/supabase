@@ -29,7 +29,7 @@ import {
 import { ExplorerToolbarAction } from '../ExplorerToolbar'
 import { type QueryDisplay, type QueryResult } from '../types'
 import { checkHasNonPositiveValues } from '@/components/ui/QueryBlock/QueryBlock.utils'
-import { MAX_CHART_Y_COLUMNS, type ChartConfig } from '@/data/content/notebooks/notebook-schema'
+import { MAX_CHART_Y_SERIES, type ChartConfig } from '@/data/content/notebooks/notebook-schema'
 
 interface DisplaySettingsButtonProps {
   display: QueryDisplay
@@ -39,9 +39,9 @@ interface DisplaySettingsButtonProps {
   onChange: (display: QueryDisplay) => void
 }
 
-const getLogScaleDisabledReason = (y_columns: string[]) => {
-  if (y_columns.length === 0) return 'Select a column for the Y axis first'
-  if (y_columns.length > 1) return 'Only available with a single Y axis column'
+const getLogScaleDisabledReason = (y_series: string[]) => {
+  if (y_series.length === 0) return 'Select a column for the Y axis first'
+  if (y_series.length > 1) return 'Only available with a single Y axis column'
   return 'Data contains zero or negative values'
 }
 
@@ -56,22 +56,22 @@ export const DisplaySettingsButton = ({
   const {
     type = 'bar',
     x_column,
-    y_columns = [],
+    y_series = [],
     cumulative = false,
     show_labels = false,
     scale = 'linear',
   } = chart ?? {}
 
   const hasNonPositiveValues = useMemo(
-    () => checkHasNonPositiveValues(result?.rows ?? [], y_columns[0]),
-    [result, y_columns]
+    () => checkHasNonPositiveValues(result?.rows ?? [], y_series[0]),
+    [result, y_series]
   )
 
   // Logarithmic scale only applies to a single series.
   const canToggleLogScale = useMemo(() => {
-    if (y_columns.length !== 1 || !result || (result.rows ?? []).length === 0) return false
+    if (y_series.length !== 1 || !result || (result.rows ?? []).length === 0) return false
     return !hasNonPositiveValues
-  }, [hasNonPositiveValues, result, y_columns.length])
+  }, [hasNonPositiveValues, result, y_series.length])
 
   const onChangeView = (view: 'table' | 'chart') => {
     onChange({ ...display, view })
@@ -83,7 +83,7 @@ export const DisplaySettingsButton = ({
       chart: {
         type: chart?.type ?? 'bar',
         x_column: chart?.x_column ?? '',
-        y_columns: chart?.y_columns ?? [],
+        y_series: chart?.y_series ?? [],
         cumulative: chart?.cumulative ?? false,
         scale: chart?.scale ?? 'linear',
         show_labels: chart?.show_labels ?? false,
@@ -97,10 +97,10 @@ export const DisplaySettingsButton = ({
   })
 
   useEffect(() => {
-    if (scale === 'log' && (hasNonPositiveValues || y_columns.length > 1)) {
+    if (scale === 'log' && (hasNonPositiveValues || y_series.length > 1)) {
       resetToLinearScale()
     }
-  }, [hasNonPositiveValues, scale, y_columns.length])
+  }, [hasNonPositiveValues, scale, y_series.length])
 
   return (
     <Popover>
@@ -187,16 +187,16 @@ export const DisplaySettingsButton = ({
                 className="[&>div:first-child]:xl:w-3/5"
               >
                 <MultiSelector
-                  values={y_columns}
+                  values={y_series}
                   onValuesChange={(values) => {
-                    if (values.length > MAX_CHART_Y_COLUMNS) return
-                    onUpdateChartConfig({ y_columns: values })
+                    if (values.length > MAX_CHART_Y_SERIES) return
+                    onUpdateChartConfig({ y_series: values })
                   }}
                   className="w-full"
                 >
                   <MultiSelectorTrigger
                     mode="inline-combobox"
-                    label={`Select up to ${MAX_CHART_Y_COLUMNS} columns`}
+                    label={`Select up to ${MAX_CHART_Y_SERIES} columns`}
                     deletableBadge
                     badgeLimit="wrap"
                     showIcon={false}
@@ -208,9 +208,7 @@ export const DisplaySettingsButton = ({
                         <MultiSelectorItem
                           key={x}
                           value={x}
-                          disabled={
-                            y_columns.length >= MAX_CHART_Y_COLUMNS && !y_columns.includes(x)
-                          }
+                          disabled={y_series.length >= MAX_CHART_Y_SERIES && !y_series.includes(x)}
                         >
                           {x}
                         </MultiSelectorItem>
@@ -249,7 +247,7 @@ export const DisplaySettingsButton = ({
                       </TooltipTrigger>
                       {!canToggleLogScale && (
                         <TooltipContent side="left">
-                          {getLogScaleDisabledReason(y_columns)}
+                          {getLogScaleDisabledReason(y_series)}
                         </TooltipContent>
                       )}
                     </Tooltip>

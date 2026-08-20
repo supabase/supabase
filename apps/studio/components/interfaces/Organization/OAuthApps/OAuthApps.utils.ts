@@ -86,7 +86,11 @@ export function findTrustedPartnerByRedirectUri(
   )
 }
 
-export function findTrustedPartnerByName(name: string): TrustedOAuthPartner | null {
+export function findTrustedPartnerByName(
+  name: string | null | undefined
+): TrustedOAuthPartner | null {
+  if (!name) return null
+
   const searchable = name.toLowerCase()
   return (
     TRUSTED_OAUTH_PARTNERS.find((partner) =>
@@ -154,7 +158,7 @@ export function getOAuthImpersonationWarning({
   name,
   redirectUri,
 }: {
-  name: string
+  name: string | null | undefined
   redirectUri: string | null | undefined
 }): OAuthImpersonationWarning | null {
   const namedPartner = findTrustedPartnerByName(name)

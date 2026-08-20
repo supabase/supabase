@@ -25,8 +25,8 @@ const mockNotebookRow = (overrides: Partial<Record<string, unknown>> = {}) => ({
   content: {
     schema_version: 1,
     cells: [
-      { _tag: 'markdown_cell', id: 'cell-1', text: 'hello' },
-      { _tag: 'markdown_cell', id: 'cell-2', text: 'world' },
+      { _tag: 'markdown_cell', _id: 'cell-1', text: 'hello' },
+      { _tag: 'markdown_cell', _id: 'cell-2', text: 'world' },
     ],
   },
   ...overrides,
