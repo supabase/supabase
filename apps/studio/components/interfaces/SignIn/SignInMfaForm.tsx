@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { SupportCategories } from '@supabase/shared-types/out/constants'
 import type { Factor } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
 import { useAuthError } from 'common'
@@ -13,7 +12,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
 
-import { SupportLink } from '../Support/SupportLink'
 import { AlertError } from '@/components/ui/AlertError'
 import { useMfaChallengeAndVerifyMutation } from '@/data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
@@ -129,7 +127,9 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
     <>
       {isLoadingFactors && <GenericSkeletonLoader />}
 
-      {isErrorFactors && <AlertError error={factorsError} subject="Failed to retrieve factors" />}
+      {isErrorFactors && (
+        <AlertError error={factorsError} subject="Failed to retrieve factors" hideContactSupport />
+      )}
 
       {isSuccessFactors && (
         <Form {...form}>
@@ -234,17 +234,6 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
             >
               Force sign out and clear cookies
             </Link>
-          </li>
-          <li>
-            <SupportLink
-              className="text-sm transition text-foreground-light hover:text-foreground"
-              queryParams={{
-                subject: 'Unable to sign in via MFA',
-                category: SupportCategories.LOGIN_ISSUES,
-              }}
-            >
-              Reach out to us via support
-            </SupportLink>
           </li>
         </ul>
       </div>
