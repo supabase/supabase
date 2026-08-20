@@ -81,7 +81,7 @@ describe('formatRelativeTimeShort', () => {
 
   it('shows minutes under an hour', () => {
     const timestamp = now - 12 * 60 * 1000
-    expect(formatRelativeTimeShort(timestamp, now)).toBe('12m')
+    expect(formatRelativeTimeShort(timestamp, now)).toBe('12m ago')
   })
 
   it('shows "just now" for under a minute', () => {
@@ -91,11 +91,11 @@ describe('formatRelativeTimeShort', () => {
 
   it('shows hours under a day', () => {
     const timestamp = now - 21 * 60 * 60 * 1000
-    expect(formatRelativeTimeShort(timestamp, now)).toBe('21h')
+    expect(formatRelativeTimeShort(timestamp, now)).toBe('21h ago')
   })
 
   it('shows days beyond a day', () => {
     const timestamp = now - 2 * 24 * 60 * 60 * 1000
-    expect(formatRelativeTimeShort(timestamp, now)).toBe('2d')
+    expect(formatRelativeTimeShort(timestamp, now)).toBe('2d ago')
   })
 })
