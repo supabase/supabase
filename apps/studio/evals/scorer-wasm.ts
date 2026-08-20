@@ -1,18 +1,11 @@
 import { Trace } from 'braintrust'
 import { parse } from 'libpg-query'
-import { z } from 'zod'
 
 import { AssistantEvalScorer } from './scorer'
 import { getParsedToolSpans } from './trace-utils'
-import { agentNotebookSchema } from '@/data/content/notebooks/notebook-schema'
+import { createNotebookInputSchema } from '@/components/ui/AIAssistantPanel/Message.utils'
 import { executeSqlInputSchema } from '@/lib/ai/tools/studio-tools'
 import { extractIdentifiers, isQuotedInSql, needsQuoting } from '@/lib/sql-identifier-quoting'
-
-const createNotebookInputSchema = z.object({
-  name: z.string(),
-  description: z.string().optional(),
-  content: agentNotebookSchema,
-})
 
 /**
  * Extracts SQL strings from `execute_sql` tool spans and from every database cell inside
