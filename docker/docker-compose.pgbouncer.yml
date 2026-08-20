@@ -5,7 +5,7 @@
 # Usage:
 #   docker compose -f docker-compose.yml -f docker-compose.pgbouncer.yml up -d
 #
-#   Or persist it in .env's COMPOSE_FILE and bring the stack up with run.sh:
+#   Or use run.sh to add PgBouncer to the stack:
 #     sh run.sh config add pgbouncer
 #     sh run.sh start
 #
