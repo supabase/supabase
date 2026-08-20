@@ -105,7 +105,7 @@ const BillingEmail = () => {
         additionalBillingEmails: customerProfile.additional_emails ?? [],
       })
     }
-  }, [customerProfile])
+  }, [form, customerProfile])
 
   return (
     <ScaffoldSection ref={ref}>
