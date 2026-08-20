@@ -12,6 +12,7 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
   const dateUpdated = entry.data.database_id.startsWith('pseudo-')
     ? new Date()
     : (await getTroubleshootingUpdatedDates()).get(entry.data.database_id)
+  const errorCodes = entry.data.errors?.map(formatError).filter(Boolean) ?? []
 
   return (
     <SidebarSkeleton
@@ -62,17 +63,17 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
                   <hr className="my-6" aria-hidden />
                 </>
               )}
-              {entry.data.errors?.length && entry.data.errors.length > 0 && (
+              {errorCodes.length > 0 && (
                 <>
                   <h3 className="text-sm text-foreground-lighter mb-3">Related error codes</h3>
                   <div className="flex flex-wrap gap-0.5">
-                    {entry.data.errors.map((error, index) => (
+                    {errorCodes.map((errorCode, index) => (
                       <Link
                         key={index}
-                        href={`/guides/troubleshooting${serializeTroubleshootingSearchParams({ errorCodes: [formatError(error)] })}`}
+                        href={`/guides/troubleshooting${serializeTroubleshootingSearchParams({ errorCodes: [errorCode] })}`}
                       >
                         <PillTag className="hover:bg-200 focus-visible:bg-foreground-muted hover:border-control focus-visible:border-control transition-colors">
-                          {formatError(error)}
+                          {errorCode}
                         </PillTag>
                       </Link>
                     ))}
@@ -80,7 +81,7 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
                   <hr className="my-6" aria-hidden />
                 </>
               )}
-              {entry.data.keywords?.length && entry.data.keywords.length > 0 && (
+              {!!entry.data.keywords?.length && (
                 <>
                   <h3 className="text-sm text-foreground-lighter mb-3">Keywords</h3>
                   <div className="flex flex-wrap gap-0.5">
