@@ -47,6 +47,15 @@ export const NODE_SEP = 20
 // The region wrapper is a static, non-measured sibling node with a fixed size.
 export const REGION_NODE_HEIGHT = 162
 
+// The shard wrapper is a static, non-measured background node sized around its
+// children, with room reserved above them for the group header pill.
+export const SHARD_NODE_PADDING = 16
+export const SHARD_HEADER_HEIGHT = 42
+
+// dagre rank separation for the High Availability layout — leaves room for the
+// shard group header between the gateway row and the primary row.
+export const HA_RANKSEP = 96
+
 // First-paint fallback heights for the dagre layout, only used before React
 // Flow has measured the real nodes. Subsequent layouts use node.measured.height.
 export const NODE_HEIGHT_FALLBACKS: Record<string, number> = {
@@ -54,6 +63,9 @@ export const NODE_HEIGHT_FALLBACKS: Record<string, number> = {
   PRIMARY: 140,
   READ_REPLICA: 140,
   REGION: REGION_NODE_HEIGHT,
+  HA_GATEWAY: 64,
+  HA_PRIMARY: 120,
+  HA_REPLICA: 90,
 }
 
 // [Joshen] Coordinates from https://github.com/tobilg/aws-edge-locations/blob/main/data/aws-edge-locations.json

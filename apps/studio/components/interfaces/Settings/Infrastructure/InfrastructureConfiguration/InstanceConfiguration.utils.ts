@@ -119,10 +119,14 @@ const getDagreNodeHeight = (node: Node) => {
   return NODE_HEIGHT_FALLBACKS[node.type ?? ''] ?? 100
 }
 
-export const getDagreGraphLayout = (nodes: Node[], edges: Edge[]) => {
+export const getDagreGraphLayout = (
+  nodes: Node[],
+  edges: Edge[],
+  { ranksep = 60 }: { ranksep?: number } = {}
+) => {
   const dagreGraph = new dagre.graphlib.Graph()
   dagreGraph.setDefaultEdgeLabel(() => ({}))
-  dagreGraph.setGraph({ rankdir: 'TB', ranksep: 60, nodesep: NODE_SEP })
+  dagreGraph.setGraph({ rankdir: 'TB', ranksep, nodesep: NODE_SEP })
 
   nodes.forEach((node) => {
     dagreGraph.setNode(node.id, {
