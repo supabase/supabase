@@ -319,27 +319,7 @@ You will be prompted for a username and password. See the [Studio authentication
 
 ## Accessing Postgres
 
-The self-hosted Supabase stack provides the [Supavisor](https://supabase.github.io/supavisor/development/docs/) connection pooler for accessing Postgres and managing database connections.
-
-You can connect to the Postgres database via Supavisor using the methods described below. Use your domain name, your server IP, or `localhost` depending on whether you are running self-hosted Supabase on a VPS, or locally.
-
-The default `POOLER_TENANT_ID` is `your-tenant-id` (can be later changed in `.env`), and the password is the value of `POSTGRES_PASSWORD` from the `.env` file.
-
-For session-mode connections (equivalent to a direct Postgres connection):
-
-```sh
-psql 'postgres://postgres.[POOLER_TENANT_ID]:[POSTGRES_PASSWORD]@[your-domain]:5432/postgres'
-```
-
-For transaction-mode connections:
-
-```sh
-psql 'postgres://postgres.[POOLER_TENANT_ID]:[POSTGRES_PASSWORD]@[your-domain]:6543/postgres'
-```
-
-When using `psql` with command-line parameters instead of a connection string to connect to Supavisor, the `-U` parameter should also be `postgres.[POOLER_TENANT_ID]`.
-
-If you need to configure Postgres to be directly accessible from the Internet, read [Exposing your Postgres database](#exposing-your-postgres-database).
+Self-hosted Supabase pools Postgres connections through Supavisor by default, with an optional PgBouncer pooler and a direct-connection option. For connection strings, pooler configuration, switching poolers, and exposing Postgres directly, see [Configure connection pooling](/docs/guides/self-hosting/connection-pooling).
 
 To change the database password, read [Changing database password](#changing-database-password).
 
@@ -589,43 +569,6 @@ By default, the Storage backend uses local files via a bind mount. On macOS, Doc
 ### Configuring Supabase AI Assistant
 
 Configuring the Supabase AI Assistant is optional. By adding **your own** `OPENAI_API_KEY` to `.env` you can enable AI services, which help with writing SQL queries, statements, and policies.
-
-### Accessing Postgres through Supavisor
-
-By default, Postgres connections go through the Supavisor connection pooler for efficient connection management. Two ports are available:
-
-- `POSTGRES_PORT` (default: 5432) - Session mode, behaves like a direct Postgres connection
-- `POOLER_PROXY_PORT_TRANSACTION` (default: 6543) - Transaction mode, uses connection pooling
-
-For more information on configuring and using Supavisor, see the [Supavisor documentation](https://supabase.github.io/supavisor/).
-
-### Exposing your Postgres database
-
-By default, Postgres is only accessible through Supavisor. If you need direct access to the database (bypassing the connection pooler), you need to disable Supavisor and expose the Postgres port.
-
-<Admonition type="danger">
-
-  Exposing Postgres directly bypasses connection pooling and exposes your database to the network. Configure firewall rules or network policies to restrict access to trusted IPs only.
-
-</Admonition>
-
-Edit `docker-compose.yml`:
-
-1. **Disable Supavisor** - Comment out or remove the entire `supavisor` service section
-2. **Expose Postgres port** - Add the port mapping to the `db` service, it should look like the example below:
-
-```yaml name=docker-compose.yml
-db:
-  ports:
-    - ${POSTGRES_PORT}:${POSTGRES_PORT}
-  container_name: supabase-db
-```
-
-After restarting, you can connect to the database directly using a standard Postgres connection string:
-
-```sh
-postgres://postgres:[POSTGRES_PASSWORD]@[your-server-ip]:5432/[POSTGRES_DB]
-```
 
 ### Setting log_min_messages in Postgres
 

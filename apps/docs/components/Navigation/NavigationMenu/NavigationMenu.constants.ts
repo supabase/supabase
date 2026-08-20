@@ -3102,6 +3102,7 @@ export const self_hosting: NavMenuConstant = {
     {
       name: 'How-to Guides',
       items: [
+        { name: 'Configure connection pooling', url: '/guides/self-hosting/connection-pooling' },
         { name: 'Upgrade to Postgres 17', url: '/guides/self-hosting/postgres-upgrade-17' },
         { name: 'Remove superuser access', url: '/guides/self-hosting/remove-superuser-access' },
         { name: 'Run Self-Hosted Functions', url: '/guides/self-hosting/self-hosted-functions' },

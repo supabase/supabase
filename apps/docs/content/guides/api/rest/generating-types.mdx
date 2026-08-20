@@ -46,7 +46,7 @@ or in case of local development:
 npx supabase gen types typescript --local > database.types.ts
 ```
 
-or in case of a self-hosted instance (see [Accessing Postgres](/docs/guides/self-hosting/docker#accessing-postgres) for more information):
+or in case of a self-hosted instance (see [Accessing Postgres](/docs/guides/self-hosting/connection-pooling#connect-through-supavisor) for more information):
 
 ```bash
 npx supabase gen types typescript --db-url postgres://postgres.[POOLER_TENANT_ID]:[POSTGRES_PASSWORD]@[your-domain-or-ip]:5432/postgres --schema public > database.types.ts

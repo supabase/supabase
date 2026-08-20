@@ -1,0 +1,110 @@
+---
+title: 'Configure Connection Pooling'
+description: 'Configure the default Supavisor pooler, or switch to the optional PgBouncer pooler, for self-hosted Supabase.'
+subtitle: 'Configure the default Supavisor pooler, or switch to the optional PgBouncer pooler, for self-hosted Supabase.'
+---
+
+This guide explains how Postgres connections are pooled in self-hosted Supabase, and how to configure the default Supavisor pooler or switch to the optional PgBouncer pooler.
+
+Self-hosted Supabase uses [Supavisor](https://github.com/supabase/supavisor) as its default connection pooler. A pooler sits in front of Postgres and shares a small set of database connections across many clients, which avoids exhausting Postgres connection limits. For a deeper explanation of poolers and connection modes, see [Connecting to Postgres](/docs/guides/database/connecting-to-postgres).
+
+## Choose a connection mode
+
+Self-hosted Supabase offers three ways to reach Postgres:
+
+- **Session mode** - Supavisor on port `5432`. Best for persistent clients, because each client holds a dedicated Postgres connection for the life of the session, so it behaves like a direct connection. Available by default.
+- **Transaction mode** - Supavisor or PgBouncer on port `6543`. Best for serverless or edge functions that open many short-lived connections. Connections return to the pool after each transaction, so [prepared statements](https://www.postgresql.org/docs/current/sql-prepare.html) are not supported. Available by default.
+- **Direct connection** - Postgres on port `5432`, bypassing the pooler. Best for migrations, `pg_dump`, and long-lived backends. Requires [exposing Postgres](#expose-postgres-for-direct-connections).
+
+## Connect through Supavisor [#connect-through-supavisor]
+
+By default, Supavisor is exposed on `POSTGRES_PORT` for session mode and `POOLER_PROXY_PORT_TRANSACTION` for transaction mode. Connect with the tenant `POOLER_TENANT_ID` and the password `POSTGRES_PASSWORD` from your `.env` file.
+
+For session-mode connections:
+
+```sh
+psql 'postgres://postgres.[POOLER_TENANT_ID]:[POSTGRES_PASSWORD]@[your-domain]:5432/postgres'
+```
+
+For transaction-mode connections:
+
+```sh
+psql 'postgres://postgres.[POOLER_TENANT_ID]:[POSTGRES_PASSWORD]@[your-domain]:6543/postgres'
+```
+
+Use your domain name, your server IP, or `localhost`, depending on where the stack runs. When using `psql` with command-line parameters instead of a connection string, the `-U` parameter must also be `postgres.[POOLER_TENANT_ID]`.
+
+## Customize the pooler
+
+Configure the pooler through your `.env` file, then recreate the stack for changes to take effect:
+
+| Variable                        | Default          | Description                                        |
+| ------------------------------- | ---------------- | -------------------------------------------------- |
+| `POOLER_PROXY_PORT_TRANSACTION` | `6543`           | Host port for transaction-mode connections.        |
+| `POOLER_DEFAULT_POOL_SIZE`      | `20`             | Postgres connections the pooler opens per pool.    |
+| `POOLER_MAX_CLIENT_CONN`        | `100`            | Client connections the pooler accepts.             |
+| `POOLER_TENANT_ID`              | `your-tenant-id` | Supavisor tenant identifier, used in the username. |
+| `POOLER_DB_POOL_SIZE`           | `5`              | Internal metadata pool used by Supavisor itself.   |
+
+## Use PgBouncer instead of Supavisor
+
+Self-hosted Supabase includes an optional [PgBouncer](https://www.pgbouncer.org/) override. It disables Supavisor and runs PgBouncer in transaction mode on `POOLER_PROXY_PORT_TRANSACTION`.
+
+Enable it with Docker Compose:
+
+```sh
+docker compose -f docker-compose.yml -f docker-compose.pgbouncer.yml up -d
+```
+
+Or add it to your stack with `run.sh`:
+
+```sh
+sh run.sh config add pgbouncer
+sh run.sh start
+```
+
+PgBouncer authenticates every Postgres role, so connect as `postgres` without a tenant suffix:
+
+```sh
+psql 'postgres://postgres:[POSTGRES_PASSWORD]@[your-domain]:6543/postgres'
+```
+
+PgBouncer runs in transaction mode only. For session-mode connections, or for features that transaction mode does not support, use a [direct connection](#expose-postgres-for-direct-connections). PgBouncer reuses the `POOLER_DEFAULT_POOL_SIZE` and `POOLER_MAX_CLIENT_CONN` values from your `.env` file.
+
+## Expose Postgres for direct connections
+
+By default, Postgres is only reachable through the pooler. To bypass the pooler for migrations, `pg_dump`, or other direct-connection needs, expose the Postgres port.
+
+<Admonition type="danger">
+
+Exposing Postgres directly bypasses connection pooling and opens your database to the network. Configure firewall rules or network policies to restrict access to trusted IPs only.
+
+</Admonition>
+
+If you use the default Supavisor stack, edit `docker-compose.yml`:
+
+1. Disable Supavisor by commenting out or removing the entire `supavisor` service section.
+2. Expose the Postgres port by adding the port mapping to the `db` service:
+
+```yaml name=docker-compose.yml
+db:
+  ports:
+    - ${POSTGRES_PORT}:${POSTGRES_PORT}
+  container_name: supabase-db
+```
+
+If you use the PgBouncer override, Supavisor is already disabled. Uncomment the `db` block in `docker-compose.pgbouncer.yml` instead:
+
+```yaml name=docker-compose.pgbouncer.yml
+db:
+  ports:
+    - ${POSTGRES_PORT}:${POSTGRES_PORT}
+```
+
+After restarting, connect directly with a standard Postgres connection string:
+
+```sh
+postgres://postgres:[POSTGRES_PASSWORD]@[your-server-ip]:5432/[POSTGRES_DB]
+```
+
+{/* TODO: ## Configure SSL - document TLS termination for both Supavisor and PgBouncer here, with subsections for Supavisor and PgBouncer. */}
