@@ -166,6 +166,16 @@ export const buildHaTopology = ({
  * layout/fitView when the topology actually changes (volatile fields like
  * lifecycle timestamps would otherwise churn the data identity on every poll).
  */
+const projectRoutingRule = (rule: NonNullable<Multipooler['routingState']>['rule']) =>
+  rule === undefined
+    ? undefined
+    : { coordinatorTerm: rule.coordinatorTerm, leaderSubterm: rule.leaderSubterm }
+
+const projectRoutingState = (routingState: Multipooler['routingState']) =>
+  routingState === undefined
+    ? undefined
+    : { role: routingState.role, rule: projectRoutingRule(routingState.rule) }
+
 export const selectTopologyPoolers = (data: HaClusterPoolersData): Multipooler[] =>
   (data.poolers ?? []).map((pooler) => ({
     id: pooler.id === undefined ? undefined : { cell: pooler.id.cell, name: pooler.id.name },
@@ -177,18 +187,6 @@ export const selectTopologyPoolers = (data: HaClusterPoolersData): Multipooler[]
             tableGroup: pooler.shardKey.tableGroup,
             shard: pooler.shardKey.shard,
           },
-    routingState:
-      pooler.routingState === undefined
-        ? undefined
-        : {
-            role: pooler.routingState.role,
-            rule:
-              pooler.routingState.rule === undefined
-                ? undefined
-                : {
-                    coordinatorTerm: pooler.routingState.rule.coordinatorTerm,
-                    leaderSubterm: pooler.routingState.rule.leaderSubterm,
-                  },
-          },
+    routingState: projectRoutingState(pooler.routingState),
     type: pooler.type,
   }))

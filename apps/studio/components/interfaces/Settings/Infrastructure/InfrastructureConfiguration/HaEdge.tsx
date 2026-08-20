@@ -6,6 +6,14 @@ import { getPoolerEdgeState, getPoolerStatus } from './HaTopology.utils'
 import { useHaPooler } from './useHaPooler'
 import { EdgeVisualIcon, getEdgeVisual } from '@/components/ui/ReactFlow/EdgeVisual'
 
+// The icon chip sits on the horizontal run of this top-to-bottom smoothstep
+// edge, so directional icons point along the actual flow: toward the target's
+// side, or straight down when the replica sits directly below the primary.
+const getIconRotation = (dx: number) => {
+  if (Math.abs(dx) < 8) return 90
+  return dx > 0 ? 0 : 180
+}
+
 export const HaReplicationEdge = ({
   sourceX,
   sourceY,
@@ -25,11 +33,7 @@ export const HaReplicationEdge = ({
   const status = pooler !== undefined ? getPoolerStatus(pooler) : 'coming_up'
   const visual = getEdgeVisual(getPoolerEdgeState(status))
 
-  // The icon chip sits on the horizontal run of this top-to-bottom smoothstep
-  // edge, so point directional icons along the actual flow: toward the
-  // target's side, or straight down when the replica sits directly below.
-  const dx = targetX - sourceX
-  const rotation = Math.abs(dx) < 8 ? 90 : dx > 0 ? 0 : 180
+  const rotation = getIconRotation(targetX - sourceX)
 
   const [edgePath, labelX, labelY] = getSmoothStepPath({
     sourceX,
