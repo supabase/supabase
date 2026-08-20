@@ -9,54 +9,26 @@ Route: `/project/<ref>/database/replication/new`
 
 **Layout primitive:** `SteppedFlow.tsx` in this directory
 
-**Design discussion:** [#team-design thread, Aug 2025](https://supabase.slack.com/archives/C0429V78ACX/p1786412987260359) (summarised in **Design rationale** below)
-
 ---
 
-## Design rationale
+## When to use
 
-Source: [Slack thread in #team-design](https://supabase.slack.com/archives/C0429V78ACX/p1786412987260359) (Aug 2025). Team alignment before building the pipeline wizard.
+| Surface             | Prefer when                                | Example in Studio                       |
+| ------------------- | ------------------------------------------ | --------------------------------------- |
+| **Full-page route** | 3+ steps, dense controls, user needs focus | Create pipeline (`/replication/new`)    |
+| **Sheet**           | 2–3 lighter steps, stay in context         | Scoped access token create              |
+| **Modal / dialog**  | Confirm branches on top of a picker        | Plan change (side panel + dialog today) |
 
-### Why this pattern exists
+`SteppedFlow` provides footer, step counter, and card body only. Wrap it in a page, sheet, or dialog; keep step state, validation, and submit in the consumer.
 
-- **Pipeline create is too complex for a sheet.** Distinct steps plus dense controls per step (e.g. table/column selection) need room.
-- **Stepped sheets work for short flows.** PAT / scoped token generation is a reasonable sheet wizard, but gets mentally taxing after **3+ steps** and does not solve UI density.
-- **Goal:** a **generic stepping system** reusable across surfaces so future flows (sharding, billing, infra) feel cohesive.
-
-### Full-page vs sheet vs modal
-
-| Surface                  | Prefer when                                             | Examples                               |
-| ------------------------ | ------------------------------------------------------- | -------------------------------------- |
-| **Full-page route**      | 3+ steps, dense controls, long forms, user needs focus  | Create pipeline (`/replication/new`)   |
-| **Sheet**                | 2–3 lighter steps, user stays in context                | Scoped access token create             |
-| **Modal / dialog chain** | Confirm branches, payment, surveys bolted onto a picker | Plan change today (candidate to unify) |
-
-`SteppedFlow` is the shared **footer + step counter + card body**. Wrap it in a page, sheet, or dialog; keep wizard state and validation in the consumer (composition over rewrite).
-
-### Flows named in design discussion (not exhaustive)
-
-| Flow                      | Mentioned by                  | Notes                                                                                                                           |
-| ------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| **Create pipeline**       | Danny                         | First implementation; prototype [live demo](https://pipelines-select.vercel.app/?page=pipelines&scenario=healthy&view=overview) |
-| **Plan downgrade**        | Danny                         | Many steps; see `CancellationFlow`                                                                                              |
-| **Plan upgrade / change** | Danny (implicit), this branch | Side panel + dialog today                                                                                                       |
-| **Postgres upgrade**      | Danny                         | Disables much of Studio UI during operation; good stepped candidate                                                             |
-| **Multigres sharding**    | Saxon                         | Future; similar complexity to pipelines                                                                                         |
-| **Scoped access token**   | Danny, Kemal                  | Sheet stepped flow; good second adopter                                                                                         |
-
-### Cross-surface composition (team intent)
-
-From Saxon and Jonny: stepping logic should compose so the **same step content** can render on a route, sheet, or other surface without a large rewrite. Keep `SteppedFlow` surface-agnostic; put routing, sheet chrome, and org context in the parent.
-
-Prior art cited in thread: Cloudflare Workers/Pages stepped create flows.
+Sheets work for short flows. After **3+ steps** or heavy controls per step, prefer a full-page route.
 
 ---
 
 ## How to use this file
 
 1. Read **Navigation rules** and **Foot guns** before changing an existing wizard or shipping a new one.
-2. Copy relevant sections into PR descriptions when introducing a new stepped flow.
-3. Append a changelog row when we learn something new from a wizard in production or review.
+2. Append a changelog row when behaviour or guidance changes.
 
 ---
 
@@ -85,7 +57,7 @@ Split responsibilities deliberately:
 
 There is **no skip-to-step shortcut** in the footer. We tried a return-to-review button and removed it (see below).
 
-To return to review after editing connection or data: use **Edit** on the review step, fix the step, then **Continue** forward through each intermediate step again. More clicks, fewer impossible states.
+To return to review after editing connection or data: use **Edit** on the review step, fix the step, then **Next** forward through each intermediate step again.
 
 ### Do not add
 
@@ -247,9 +219,9 @@ Use this list when picking the next migration or when a flow starts growing its 
 | 1        | New scoped access token       | Smallest; already form → review with Back/Next                 |
 | 2        | Storage policy editor modal   | Branching views + review-before-save, same lessons as pipeline |
 | 3        | Claim project                 | Clean linear 3-step page flow                                  |
-| 4        | Subscription plan change      | Named in design thread; side panel + dialog unification        |
-| 5        | Plan downgrade / cancellation | Named in design thread; many steps, modal chain today          |
-| 6        | Postgres upgrade              | Named in design thread; heavy UI lockout during upgrade        |
+| 4        | Subscription plan change      | Side panel + dialog unification                                |
+| 5        | Plan downgrade / cancellation | Many steps, modal chain today                                  |
+| 6        | Postgres upgrade              | Blocking state during upgrade                                  |
 | 7        | Restore backup to new project | Dialog chain maps cleanly to steps                             |
 
 ---
@@ -318,10 +290,10 @@ Subscription.tsx
 
 ### Infrastructure (future)
 
-| Flow                         | Files                                                                                                                                          | Surface                    | Fit                                                                      | Complexity |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------ | ---------- |
-| **Postgres upgrade**         | `components/interfaces/Settings/General/Infrastructure/ProjectUpgradeAlert.tsx`<br>`components/layouts/ProjectLayout/UpgradingState/index.tsx` | Full page / blocking state | Named in design thread; upgrade disables much of Studio during operation | Med–High   |
-| **Multigres sharding setup** | TBD                                                                                                                                            | TBD                        | Named in design thread; pipeline-like complexity expected                | TBD        |
+| Flow                         | Files                                                                                                                                          | Surface                    | Fit                                              | Complexity |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------ | ---------- |
+| **Postgres upgrade**         | `components/interfaces/Settings/General/Infrastructure/ProjectUpgradeAlert.tsx`<br>`components/layouts/ProjectLayout/UpgradingState/index.tsx` | Full page / blocking state | Upgrade disables much of Studio during operation | Med–High   |
+| **Multigres sharding setup** | TBD                                                                                                                                            | TBD                        | Pipeline-like complexity expected                | TBD        |
 
 ---
 
@@ -369,4 +341,4 @@ Subscription.tsx
 | 2026-08-20 | Documented return-to-review removal and destination type change lessons |
 | 2026-08-20 | Added migration candidates list (incl. subscription plan change)        |
 | 2026-08-20 | Footer label: Continue → Next; restored Edit destination on review      |
-| 2026-08-20 | Added design rationale from #team-design Slack thread                   |
+| 2026-08-20 | Trimmed internal process from migration and when-to-use guidance        |
