@@ -11,6 +11,11 @@ export interface Route {
   linkElement?: ReactNode
   items?: any | Route[]
   /**
+   * Renders a small "New" badge next to the label to flag recently released
+   * products. Hidden when the sidebar is icon-collapsed.
+   */
+  isNew?: boolean
+  /**
    * Binds a registered keyboard shortcut to this route when set. The sidebar
    * entry shows the keybind on hover and jumps to `link` when the shortcut
    * fires. Ignored if `link` is not set.
