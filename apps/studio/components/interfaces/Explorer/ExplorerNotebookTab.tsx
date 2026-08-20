@@ -11,10 +11,31 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
+import { acceptUntrustedSql } from '@supabase/pg-meta'
 import { useParams } from 'common'
-import { FileText, Loader2, Notebook, NotebookText, Play, Save, SquareCode } from 'lucide-react'
+import {
+  FileText,
+  Loader2,
+  MoreVertical,
+  Notebook,
+  NotebookText,
+  Play,
+  Save,
+  SquareCode,
+  Trash,
+} from 'lucide-react'
+import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
-import { AiIconAnimation, Button } from 'ui'
+import { toast } from 'sonner'
+import {
+  AiIconAnimation,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import {
@@ -30,11 +51,19 @@ import { QueryCell } from './QueryCell'
 import { type QueryEditorHandle } from './QueryEditor'
 import { createMarkdownCellSkeleton, createQueryCellSkeleton } from './utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { isQueryCell } from '@/data/content/notebooks/notebook-schema'
+import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
+import {
+  isQueryCell,
+  WritableCell,
+  WritableNotebook,
+} from '@/data/content/notebooks/notebook-schema'
+import { useUpsertNotebookMutation } from '@/data/content/notebooks/notebook-upsert-mutation'
+import { acceptUntrustedLogsSql } from '@/data/logs/safe-analytics-sql'
 import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export const ExplorerNotebookTab = () => {
+  const router = useRouter()
   const { id, ref } = useParams()
   const tabs = useTabsStateSnapshot()
   const snap = useNotebooksStateSnapshot()
@@ -46,7 +75,24 @@ export const ExplorerNotebookTab = () => {
   const queryCellIds = cells.filter(isQueryCell).map((cell) => cell._id)
 
   const [isRunningNotebook, setIsRunningNotebook] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const queryCellRefs = useRef(new Map<string, QueryEditorHandle>())
+
+  const { mutate: updateNotebook, isPending: isUpdating } = useUpsertNotebookMutation({
+    onSuccess: () => toast.success('Successfully saved notebook!'),
+  })
+  const { mutate: deleteNotebook, isPending: isDeleting } = useContentDeleteMutation({
+    onSuccess: () => {
+      toast.success('Successfully deleted notebook')
+      if (id) {
+        tabs.removeTab(createTabId('notebook', { id }))
+        snap.removeNotebook({ id })
+      }
+      setIsDeleteModalOpen(false)
+      router.push(`/project/${ref}/explorer`)
+    },
+    onError: (error) => toast.error(`Failed to delete notebook: ${error.message}`),
+  })
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -70,6 +116,50 @@ export const ExplorerNotebookTab = () => {
     } finally {
       setIsRunningNotebook(false)
     }
+  }
+
+  const handleSaveNotebook = () => {
+    const notebookId = currentNotebook?.notebook.id
+    if (!ref || !notebookId || !name || !content) return
+
+    const writableContent: WritableNotebook = {
+      schema_version: content.schema_version,
+      cells: content.cells.map((cell): WritableCell => {
+        switch (cell._tag) {
+          case 'markdown_cell':
+            return cell
+          case 'database_cell': {
+            const { unchecked_sql, chart, ...rest } = cell
+            return {
+              ...rest,
+              chart: chart ? { ...chart, y_series: [...chart.y_series] } : undefined,
+              sql: acceptUntrustedSql(unchecked_sql),
+            }
+          }
+          case 'log_cell': {
+            const { unchecked_sql, chart, ...rest } = cell
+            return {
+              ...rest,
+              chart: chart ? { ...chart, y_series: [...chart.y_series] } : undefined,
+              sql: acceptUntrustedLogsSql(unchecked_sql),
+            }
+          }
+        }
+      }),
+    }
+
+    updateNotebook({
+      projectRef: ref,
+      id: notebookId,
+      name,
+      description: currentNotebook?.notebook.description,
+      content: writableContent,
+    })
+  }
+
+  const handleConfirmDeleteNotebook = () => {
+    if (!ref || !id) return
+    deleteNotebook({ projectRef: ref, ids: [id] })
   }
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -126,10 +216,32 @@ export const ExplorerNotebookTab = () => {
             icon={<Play />}
             tooltip="Run notebook"
             loading={isRunningNotebook}
-            disabled={isRunningNotebook || queryCellIds.length === 0}
+            disabled={queryCellIds.length === 0}
             onClick={handleRunNotebook}
           />
-          <ExplorerToolbarAction icon={<Save />} tooltip="Save changes" />
+          <ExplorerToolbarAction
+            aria-label="Save changes"
+            icon={<Save />}
+            tooltip="Save changes"
+            loading={isUpdating}
+            onClick={handleSaveNotebook}
+          />
+          <ExplorerToolbarActions>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <ExplorerToolbarAction aria-label="More options" icon={<MoreVertical />} />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-44">
+                <DropdownMenuItem
+                  className="gap-x-2"
+                  onClick={() => setIsDeleteModalOpen(true)}
+                >
+                  <Trash size={14} />
+                  <span>Delete notebook</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </ExplorerToolbarActions>
         </ExplorerToolbarActions>
       </ExplorerToolbar>
 
@@ -198,6 +310,22 @@ export const ExplorerNotebookTab = () => {
           )}
         </div>
       </div>
+
+      <ConfirmationModal
+        size="small"
+        visible={isDeleteModalOpen}
+        title={`Confirm to delete notebook '${name ?? ''}'`}
+        confirmLabel="Delete notebook"
+        confirmLabelLoading="Deleting notebook"
+        variant="destructive"
+        loading={isDeleting}
+        onCancel={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDeleteNotebook}
+      >
+        <p className="text-sm">
+          This action cannot be undone. Are you sure you want to delete '{name}'?
+        </p>
+      </ConfirmationModal>
     </div>
   )
 }
