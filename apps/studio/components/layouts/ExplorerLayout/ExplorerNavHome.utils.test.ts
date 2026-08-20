@@ -35,7 +35,10 @@ describe('getRecentlyUpdatedItems', () => {
 
   it('filters out support chats', () => {
     const chats = [
-      chat({ id: 'support', supportMetadata: { isSupportChat: true } as ChatSession['supportMetadata'] }),
+      chat({
+        id: 'support',
+        supportMetadata: { isSupportChat: true } as ChatSession['supportMetadata'],
+      }),
     ]
 
     expect(getRecentlyUpdatedItems({ notebooks: [], chats })).toEqual([])

@@ -42,9 +42,7 @@ export function getRecentlyUpdatedItems({
       updatedAt: chat.updatedAt?.getTime() ?? 0,
     }))
 
-  return [...notebookItems, ...chatItems]
-    .sort((a, b) => b.updatedAt - a.updatedAt)
-    .slice(0, limit)
+  return [...notebookItems, ...chatItems].sort((a, b) => b.updatedAt - a.updatedAt).slice(0, limit)
 }
 
 /** Compact relative time (`12m`, `21h`, `2d`) for the narrow recent-items row. */
