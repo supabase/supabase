@@ -5,7 +5,7 @@ import { Button, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
-import { ConfirmFooter } from './ConfirmFooter'
+import { ConfirmFooter } from './Confirm'
 import {
   createNotebookInputSchema,
   notebookToolOutputSchema,
@@ -119,10 +119,12 @@ interface NotebookConfirmFooterProps {
 }
 
 /**
- * `ConfirmFooter` is built to sit flush under the block it confirms (`border-t-0 rounded-b-lg`),
- * so that block has to square off its own bottom corners and the two must not be gapped apart.
+ * `ConfirmFooter` now ships bare so the `Confirm` card can own the frame, so this renderer
+ * supplies its own flush-under-block border. The block above still has to square off its
+ * bottom corners and the two must not be gapped apart.
  */
 const GLUED_TO_FOOTER = 'rounded-b-none'
+const FLUSH_UNDER_BLOCK = 'border border-t-0 rounded-b-lg'
 
 function hasConfirmFooter(state: NotebookProposalState) {
   return state === 'approval-requested' || state === 'approval-responded'
@@ -146,6 +148,7 @@ function NotebookConfirmFooter({
 
   return (
     <ConfirmFooter
+      className={FLUSH_UNDER_BLOCK}
       message={message ?? copy.confirmMessage}
       cancelLabel="Skip"
       confirmLabel={confirmLabel ?? copy.confirmLabel}
