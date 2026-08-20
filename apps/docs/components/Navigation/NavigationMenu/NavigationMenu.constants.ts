@@ -3092,6 +3092,7 @@ export const self_hosting: NavMenuConstant = {
   items: [
     { name: 'Overview', url: '/guides/self-hosting' },
     { name: 'Deploy with Docker', url: '/guides/self-hosting/docker' },
+    { name: 'Accessing Postgres', url: '/guides/self-hosting/accessing-postgres' },
     { name: 'Configure new API keys', url: '/guides/self-hosting/self-hosted-auth-keys' },
     { name: 'Learn about API Gateway', url: '/guides/self-hosting/self-hosted-envoy' },
     {
@@ -3102,7 +3103,6 @@ export const self_hosting: NavMenuConstant = {
     {
       name: 'How-to Guides',
       items: [
-        { name: 'Configure connection pooling', url: '/guides/self-hosting/connection-pooling' },
         { name: 'Upgrade to Postgres 17', url: '/guides/self-hosting/postgres-upgrade-17' },
         { name: 'Remove superuser access', url: '/guides/self-hosting/remove-superuser-access' },
         { name: 'Run Self-Hosted Functions', url: '/guides/self-hosting/self-hosted-functions' },
