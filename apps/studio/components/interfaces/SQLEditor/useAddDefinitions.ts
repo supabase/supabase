@@ -3,8 +3,9 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import type { IDisposable } from 'monaco-editor'
 import { useEffect, useRef } from 'react'
 
-import getPgsqlCompletionProvider from '@/components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
-import getPgsqlSignatureHelpProvider from '@/components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
+import { getPgsqlCompletionProvider } from '@/components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
+import { getPgsqlSignatureHelpProvider } from '@/components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
+import type { PgInfo } from '@/components/ui/CodeEditor/Providers/Providers.types'
 import { useDatabaseFunctionsQuery } from '@/data/database-functions/database-functions-query'
 import { useKeywordsQuery } from '@/data/database/keywords-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
@@ -57,7 +58,7 @@ export const useAddDefinitions = (
     { enabled: enabled && intellisenseEnabled }
   )
 
-  const pgInfoRef = useRef<any>(null)
+  const pgInfoRef = useRef<PgInfo | null>(null)
 
   const filteredSchemas = useSchemasFilteredForHighAvailability(schemas)
 
@@ -69,14 +70,13 @@ export const useAddDefinitions = (
     isKeywordsSuccess &&
     isFunctionsSuccess
 
-  if (isPgInfoReady) {
-    if (pgInfoRef.current === null) {
-      pgInfoRef.current = {}
+  if (isPgInfoReady && tableColumns && keywords && functions) {
+    pgInfoRef.current = {
+      tableColumns,
+      schemas: filteredSchemas,
+      keywords,
+      functions,
     }
-    pgInfoRef.current.tableColumns = tableColumns
-    pgInfoRef.current.schemas = filteredSchemas
-    pgInfoRef.current.keywords = keywords
-    pgInfoRef.current.functions = functions
   }
 
   //  Enable pgsql format
