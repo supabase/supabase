@@ -106,6 +106,9 @@ type QueryEditorProps = {
   roleImpersonationState?: RoleImpersonationController
   display?: QueryDisplay
   toolbarActions?: ReactNode
+  className?: string
+  /** When true, toolbar and editor run actions are disabled. */
+  isRunDisabled?: boolean
   onTitleChange: (title: string) => void
   onSqlChange: (sql: string) => void
   onSqlCommit?: (sql: string) => void
@@ -113,6 +116,7 @@ type QueryEditorProps = {
   onResultChange: (result: QueryResult) => void
   onRowLimitChange?: (val: number) => void
   onDisplayChange?: (display: QueryDisplay) => void
+  onRun?: () => void
 }
 
 /**
@@ -130,6 +134,8 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     roleImpersonationState,
     display,
     toolbarActions,
+    className,
+    isRunDisabled = false,
     onTitleChange,
     onSqlChange,
     onSqlCommit,
@@ -137,6 +143,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     onResultChange,
     onRowLimitChange,
     onDisplayChange,
+    onRun,
   }: QueryEditorProps,
   ref
 ) {
@@ -199,8 +206,9 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
    * Postgres SQL cannot reach the analytics wire or vice versa.
    */
   const handleRunQuery = async (rawSql: string = sql) => {
-    if (!project || isBusy || pendingProposal || rawSql.trim().length === 0) return
+    if (!project || isBusy || pendingProposal || isRunDisabled || rawSql.trim().length === 0) return
 
+    onRun?.()
     onSqlCommit?.(rawSql)
 
     if (query._tag === 'logs') {
@@ -295,7 +303,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   }, [promptState?.isOpen])
 
   return (
-    <Shell className={variant === 'embedded' ? 'mx-auto max-w-4xl' : undefined}>
+    <Shell className={cn(variant === 'embedded' && 'mx-auto max-w-4xl', className)}>
       <ExplorerToolbar>
         <ExplorerToolbarIcon>
           <CodeSquare size={14} />
@@ -336,7 +344,11 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
             icon={<Play />}
             tooltip="Run query"
             disabled={
-              isLoadingProject || isExecuting || pendingProposal !== null || sql.trim().length === 0
+              isLoadingProject ||
+              isExecuting ||
+              pendingProposal !== null ||
+              isRunDisabled ||
+              sql.trim().length === 0
             }
             onClick={() => handleRunQuery()}
           >
@@ -370,7 +382,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
               placeholder={!promptState?.isOpen ? generatePlaceholder(os) : ''}
               placeholderClassName="top-[13px]"
               className={variant === 'embedded' ? 'h-44' : undefined}
-              actions={{ runQuery: { enabled: true, callback: handleRunQuery } }}
+              actions={{ runQuery: { enabled: !isRunDisabled, callback: handleRunQuery } }}
               options={{ minimap: { enabled: false }, padding: { top: 8 } }}
               onInputChange={(value) => onSqlChange(value ?? '')}
               onMount={(editor, monaco) => {

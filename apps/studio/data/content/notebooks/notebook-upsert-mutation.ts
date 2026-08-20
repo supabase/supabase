@@ -6,15 +6,6 @@ import { contentKeys } from '../keys'
 import { writableNotebookSchema, type WritableNotebook } from './notebook-schema'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
-// TODO — Charis 2026-08-06
-// UpsertContentPayload['type'] (generated from api-types) doesn't have 'notebook' yet — same
-// gap tracked by the ContentBase TODO in content-query.ts. Widen locally and cast at the
-// upsertContent call site until the generated type picks it up.
-type NotebookUpsertPayload = Omit<UpsertContentPayload, 'type' | 'content'> & {
-  type: 'notebook'
-  content: WritableNotebook
-}
-
 function buildNotebookUpsertPayload({
   id,
   name,
@@ -25,7 +16,7 @@ function buildNotebookUpsertPayload({
   name: string
   description?: string
   content: WritableNotebook
-}): NotebookUpsertPayload {
+}): UpsertContentPayload {
   writableNotebookSchema.parse(content)
 
   return {
@@ -53,11 +44,7 @@ export async function createNotebook(
   const id = crypto.randomUUID()
   const payload = buildNotebookUpsertPayload({ id, name, description, content })
 
-  await upsertContent(
-    { projectRef, payload: payload as unknown as UpsertContentPayload },
-    signal,
-    headersInit
-  )
+  await upsertContent({ projectRef, payload }, signal, headersInit)
 
   return { id }
 }
@@ -73,11 +60,7 @@ export async function updateNotebook(
 ) {
   const payload = buildNotebookUpsertPayload({ id, name, description, content })
 
-  return upsertContent(
-    { projectRef, payload: payload as unknown as UpsertContentPayload },
-    signal,
-    headersInit
-  )
+  return upsertContent({ projectRef, payload }, signal, headersInit)
 }
 
 export type UpdateNotebookData = Awaited<ReturnType<typeof updateNotebook>>
