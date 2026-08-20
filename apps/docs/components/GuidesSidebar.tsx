@@ -32,7 +32,7 @@ function AiTools({ className }: { className?: string }) {
 
   async function handleCopy() {
     const ok = await copyMarkdown(`/docs${path}.md`, {
-      fallbackHtml: () => document.getElementById('sb-docs-guide-main-article')?.innerHTML ?? '',
+      fallback: () => document.getElementById('sb-docs-guide-main-article')?.innerHTML ?? '',
     })
     if (ok) {
       sendTelemetryEvent({ action: 'copy_as_markdown_clicked', properties: { pageType: 'guide' } })
