@@ -23,11 +23,10 @@ const wireDatabaseCell = (id: string, database_identifier?: string): CellWire =>
   database_identifier,
 })
 
-const agentDatabaseCell = (database_identifier?: string): AgentCell => ({
+const agentDatabaseCell = (): AgentCell => ({
   _tag: 'database_cell',
   sql: 'select 1',
   row_limit: 100,
-  database_identifier,
 })
 
 describe('AssistantNotebookPreview', () => {
@@ -68,17 +67,17 @@ describe('AssistantNotebookPreview', () => {
       {
         _tag: 'replaced',
         before: wireDatabaseCell('cell-1', 'primary'),
-        after: agentDatabaseCell('replica-3'),
+        after: agentDatabaseCell(),
         operationIndex: 0,
       },
     ]
 
     render(<AssistantNotebookPreview entries={entries} mode="update" />)
 
-    expect(screen.getByText('Database: primary → Database: replica-3')).toBeInTheDocument()
+    expect(screen.getByText('Database: primary → No metadata')).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: 'Replaced Query: Untitled query' })
-    ).toHaveTextContent('Database: primary → Database: replica-3')
+    ).toHaveTextContent('Database: primary → No metadata')
   })
 
   it('hides entries past the limit behind a "Show N more" button', async () => {
