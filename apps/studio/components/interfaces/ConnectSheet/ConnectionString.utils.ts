@@ -4,11 +4,17 @@ import type { ConnectionStringPooler } from './Connect.types'
 export const DEFAULT_PORT = '5432'
 export const PASSWORD_PLACEHOLDER = '[YOUR-PASSWORD]'
 
+/** Appends query params to a connection string, joining with `?` or `&` as needed */
+export const appendConnectionStringParams = (uri: string, params: string) =>
+  !uri || !params ? uri : `${uri}${uri.includes('?') ? '&' : '?'}${params}`
+
 export type ConnectionParams = {
   host: string
   port: string
   user: string
   database: string
+  /** Raw query string including the leading `?`, or '' when the URI has none */
+  search: string
 }
 
 export const resolveConnectionString = ({
@@ -44,6 +50,7 @@ export const parseConnectionParams = (connectionString: string): ConnectionParam
       port: DEFAULT_PORT,
       user: 'hidden',
       database: 'hidden',
+      search: '',
     }
   }
 
@@ -64,6 +71,7 @@ export const parseConnectionParams = (connectionString: string): ConnectionParam
       port: parsed.port || DEFAULT_PORT,
       user: parsed.username ? decode(parsed.username) : 'hidden',
       database: parsed.pathname?.replace(/^\//, '') || 'hidden',
+      search: parsed.search,
     }
   } catch (error) {
     return {
@@ -71,6 +79,7 @@ export const parseConnectionParams = (connectionString: string): ConnectionParam
       port: DEFAULT_PORT,
       user: 'hidden',
       database: 'hidden',
+      search: '',
     }
   }
 }
@@ -81,15 +90,22 @@ export const buildSafeConnectionString = (
 ): string => {
   if (!connectionString) return ''
 
-  const search = (() => {
-    try {
-      return new URL(connectionString).search
-    } catch (error) {
-      return ''
-    }
-  })()
+  return `postgresql://${params.user}:${PASSWORD_PLACEHOLDER}@${params.host}:${params.port}/${params.database}${params.search}`
+}
 
-  return `postgresql://${params.user}:${PASSWORD_PLACEHOLDER}@${params.host}:${params.port}/${params.database}${search}`
+export const buildPsqlCommand = (params: ConnectionParams) =>
+  params.search
+    ? // Query params (e.g. sslmode) can't be expressed as psql flags, so fall
+      // back to the URI form — psql prompts for the password.
+      `psql "postgresql://${params.user}@${params.host}:${params.port}/${params.database}${params.search}"`
+    : `psql -h ${params.host} -p ${params.port} -d ${params.database} -U ${params.user}`
+
+export const buildJdbcString = (params: ConnectionParams) => {
+  // pgJDBC (42.7.4+) spells libpq's `sslnegotiation` as `sslNegotiation`
+  const extraParams = params.search
+    ? `&${params.search.slice(1).replace('sslnegotiation=', 'sslNegotiation=')}`
+    : ''
+  return `jdbc:postgresql://${params.host}:${params.port}/${params.database}?user=${params.user}&password=${PASSWORD_PLACEHOLDER}${extraParams}`
 }
 
 export const buildConnectionStringWithPassword = (

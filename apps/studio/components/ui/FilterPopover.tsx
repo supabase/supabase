@@ -121,7 +121,8 @@ export const FilterPopover = <T extends Record<string, any>>({
         <div className="flex-1">{label}</div>
         {showOnlyButton && (
           <button
-            className="text-xs text-foreground-lighter hover:text-foreground-muted opacity-0 group-hover:opacity-100 transition-opacity"
+            tabIndex={0}
+            className="text-xs text-foreground-lighter hover:text-foreground-muted opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
             onClick={(e) => {
               e.preventDefault()
               setSelectedOptions([value])

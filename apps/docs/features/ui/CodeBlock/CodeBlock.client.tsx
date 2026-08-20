@@ -46,6 +46,7 @@ export function AnnotatedSpan({
     <Tooltip open={open} onOpenChange={onOpenChange}>
       <TooltipTrigger asChild onClick={handleClick}>
         <button
+          tabIndex={0}
           style={token.htmlStyle}
           className={cn(
             isTouchDevice &&
@@ -108,10 +109,11 @@ export function CodeCopyButton({ className, content }: { className?: string; con
       <Tooltip>
         <TooltipTrigger asChild>
           <button
+            tabIndex={0}
             onClick={handleCopy}
             onBlur={resetStatus}
             className={cn(
-              'border rounded-md p-1',
+              'cursor-pointer border rounded-md p-1',
               copied && 'bg-selection',
               'hover:bg-selection transition',
               className
@@ -159,8 +161,9 @@ export function CodeBlockControls({ content }: { content: string }) {
       <Tooltip>
         <TooltipTrigger asChild>
           <button
+            tabIndex={0}
             onClick={toggleWrap}
-            className={cn('border rounded-md p-1', 'hover:bg-selection transition')}
+            className={cn('cursor-pointer border rounded-md p-1', 'hover:bg-selection transition')}
             aria-label={isWrapped ? 'Disable word wrap' : 'Enable word wrap'}
           >
             {isWrapped ? (

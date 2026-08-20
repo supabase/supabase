@@ -4,18 +4,25 @@ import { useCallback, useEffect, useEffectEvent, useMemo, useState } from 'react
 import { toast } from 'sonner'
 
 import type { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
-import { sqlAiDisclaimerComment } from './SQLEditor.constants'
+import type { SqlSnippetSource } from './querySource'
 import { DiffType, type IStandaloneDiffEditor } from './SQLEditor.types'
 import {
   assembleCompletionDiff,
+  buildCompletionRequestBody,
+  buildDebugChatArgs,
   buildDebugPromptText,
   createSqlSnippetSkeletonV2,
+  extractDebugContext,
+  planDiffRequestApplication,
+  sqlSourceToDialect,
 } from './SQLEditor.utils'
 import { useSQLEditorContext } from './SQLEditorContext'
 import { useSnippetTitleGenerator } from './useSnippetTitleGenerator'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { constructHeaders } from '@/data/fetchers'
+import { stripSqlCodeFences } from '@/data/logs/logs-sql-rewrite'
 import { isError } from '@/data/utils/error-check'
+import { useLogsAttributeKeys } from '@/hooks/analytics/useLogsAttributeKeys'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'
@@ -34,6 +41,11 @@ type UseSqlEditorAiArgs = {
   editorMountCount: number
   diff: ReturnType<typeof useSqlEditorDiff>
   prompt: ReturnType<typeof useSqlEditorPrompt>
+  /**
+   * Where the snippet runs. Selects the dialect the AI writes in — logs snippets
+   * get ClickHouse SQL for the `logs` table, database snippets get Postgres.
+   */
+  sqlSource: SqlSnippetSource
 }
 
 /**
@@ -42,7 +54,13 @@ type UseSqlEditorAiArgs = {
  * lifecycle effects (one-shot diff-request drain, diff-editor value sync, and the
  * ask-AI widget visibility).
  */
-export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEditorAiArgs) {
+export function useSqlEditorAi({
+  id,
+  editorMountCount,
+  diff,
+  prompt,
+  sqlSource,
+}: UseSqlEditorAiArgs) {
   const {
     sourceSqlDiff,
     setSourceSqlDiff,
@@ -55,7 +73,7 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
   } = diff
   const { promptState, setPromptState, resetPrompt } = prompt
 
-  const { editorRef, diffEditorRef, refocusEditor } = useSQLEditorContext()
+  const { editor, diff: diffController, refocusEditor } = useSQLEditorContext()
 
   const router = useRouter()
   const { ref } = useParams()
@@ -73,6 +91,14 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
   const [isCompletionLoading, setIsCompletionLoading] = useState<boolean>(false)
   const [isDiffEditorMounted, setIsDiffEditorMounted] = useState(false)
   const [showWidget, setShowWidget] = useState(false)
+
+  const dialect = sqlSourceToDialect(sqlSource)
+  const isClickhouse = dialect === 'clickhouse'
+
+  // Grounds ClickHouse edits in the source's real log_attributes keys, the same way
+  // the whole-query rewrite does — otherwise inline edits invent dotted paths.
+  // Looked up when the user submits, not while they type.
+  const { fetchAttributeKeys } = useLogsAttributeKeys()
 
   const handleNewQuery = useCallback(
     async (sql: string, name: string) => {
@@ -100,26 +126,17 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
   const buildDebugPrompt = useCallback(() => {
     const snippet = snapV2.snippets[id]
     const result = sessionSnap.results[id]?.[0]
-    const sql = (snippet?.snippet.content?.unchecked_sql ?? '')
-      .replace(sqlAiDisclaimerComment, '')
-      .trim()
-    const errorMessage = result?.error?.message ?? 'Unknown error'
+    const { sql, errorMessage } = extractDebugContext(snippet, result)
 
-    return buildDebugPromptText(sql, errorMessage)
-  }, [id, sessionSnap.results, snapV2.snippets])
+    return buildDebugPromptText(sql, errorMessage, sqlSource)
+  }, [id, sessionSnap.results, snapV2.snippets, sqlSource])
 
   const onDebug = useCallback(async () => {
     try {
       const snippet = snapV2.snippets[id]
       const result = sessionSnap.results[id]?.[0]
       openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-      aiSnap.newChat({
-        name: 'Debug SQL snippet',
-        sqlSnippets: [
-          (snippet.snippet.content?.unchecked_sql ?? '').replace(sqlAiDisclaimerComment, '').trim(),
-        ],
-        initialInput: `Help me to debug the attached sql snippet which gives the following error: \n\n${result.error.message}`,
-      })
+      aiSnap.newChat(buildDebugChatArgs(snippet, result, sqlSource))
     } catch (error: unknown) {
       // [Joshen] There's a tendency for the SQL debug to chuck a lengthy error message
       // that's not relevant for the user - so we prettify it here by avoiding to return the
@@ -130,32 +147,23 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
         )
       }
     }
-  }, [id, sessionSnap.results, snapV2.snippets, aiSnap, openSidebar])
+  }, [id, sessionSnap.results, snapV2.snippets, aiSnap, openSidebar, sqlSource])
 
   const acceptAiHandler = useCallback(async () => {
     try {
       setIsAcceptDiffLoading(true)
 
       // TODO: show error if undefined
-      if (!sourceSqlDiff || !editorRef.current || !diffEditorRef.current) return
+      if (!sourceSqlDiff || !editor.isReady() || !diffController.isMounted()) return
 
-      const editorModel = editorRef.current.getModel()
-      const diffModel = diffEditorRef.current.getModel()
-
-      if (!editorModel || !diffModel) return
-
-      const sql = diffModel.modified.getValue()
+      const sql = diffController.getModifiedValue()
+      if (sql === undefined) return
 
       if (selectedDiffType === DiffType.NewSnippet) {
         const { title } = await generateSqlTitle({ sql })
         await handleNewQuery(sql, title)
       } else {
-        editorRef.current.executeEdits('apply-ai-edit', [
-          {
-            text: sql,
-            range: editorModel.getFullModelRange(),
-          },
-        ])
+        editor.replaceAll(sql, 'apply-ai-edit')
       }
 
       track('assistant_sql_diff_handler_evaluated', { handlerAccepted: true })
@@ -168,8 +176,8 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
       setIsAcceptDiffLoading(false)
     }
   }, [
-    editorRef,
-    diffEditorRef,
+    editor,
+    diffController,
     sourceSqlDiff,
     selectedDiffType,
     generateSqlTitle,
@@ -206,13 +214,15 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
             'Content-Type': 'application/json',
             ...(options?.headers ?? {}),
           },
-          body: JSON.stringify({
-            projectRef: project?.ref,
-            connectionString: project?.connectionString,
-            language: 'sql',
-            orgSlug: org?.slug,
-            ...(options?.body ?? {}),
-          }),
+          body: JSON.stringify(
+            buildCompletionRequestBody({
+              projectRef: project?.ref,
+              connectionString: project?.connectionString,
+              orgSlug: org?.slug,
+              dialect,
+              options: options?.body,
+            })
+          ),
         })
 
         if (!response.ok) {
@@ -224,9 +234,16 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
         const text: string = await response.json()
 
         const meta = options?.body?.completionMetadata ?? {}
-        const { original, modified } = assembleCompletionDiff(meta, text)
+        // The clickhouse system prompt forbids fences, but strip them defensively
+        // so a chatty model can't leak backticks into the snippet.
+        const { original, modified } = assembleCompletionDiff(
+          meta,
+          isClickhouse ? stripSqlCodeFences(text) : text
+        )
 
-        const formattedModified = formatSql(modified)
+        // sql-formatter is Postgres-only — it mangles ClickHouse backticks and
+        // map lookups — so ClickHouse output goes into the diff unformatted.
+        const formattedModified = isClickhouse ? modified : formatSql(modified)
         setSourceSqlDiff({ original, modified: formattedModified })
         setSelectedDiffType(DiffType.Modification)
         setPromptState((prev) => ({ ...prev, isLoading: false }))
@@ -238,6 +255,8 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
       }
     },
     [
+      dialect,
+      isClickhouse,
       org?.slug,
       project?.connectionString,
       project?.ref,
@@ -263,10 +282,23 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
           beforeSelection: context.beforeSelection,
           afterSelection: context.afterSelection,
         }))
-        const headerData = await constructHeaders()
+        // ClickHouse only: there's no server-side schema to fetch for the logs
+        // table, so the real log_attributes keys travel with the request. Detected
+        // from the whole document, which is what the three context fields spell.
+        const [headerData, availableKeys] = await Promise.all([
+          constructHeaders(),
+          isClickhouse
+            ? fetchAttributeKeys(
+                context.beforeSelection + context.selection + context.afterSelection
+              )
+            : undefined,
+        ])
 
         const authorizationHeader = headerData.get('Authorization')
 
+        // The instruction goes over as-is for both dialects — the route assembles
+        // the schema section and the cursor context around it, so there's exactly
+        // one place that knows how a completion prompt is built.
         await complete(prompt, {
           ...(authorizationHeader
             ? { headers: { Authorization: authorizationHeader } }
@@ -278,6 +310,7 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
               language: 'pgsql',
               prompt,
               selection: context.selection,
+              ...(availableKeys ? { availableKeys } : {}),
             },
           },
         })
@@ -285,15 +318,15 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
         setPromptState((prev) => ({ ...prev, isLoading: false }))
       }
     },
-    [complete, setPromptState]
+    [complete, fetchAttributeKeys, isClickhouse, setPromptState]
   )
 
   const handleDiffEditorMount = useCallback(
-    (editor: IStandaloneDiffEditor) => {
-      diffEditorRef.current = editor
+    (mountedDiffEditor: IStandaloneDiffEditor) => {
+      diffController.attach(mountedDiffEditor)
       setIsDiffEditorMounted(true)
     },
-    [diffEditorRef]
+    [diffController]
   )
 
   const resetDiff = useEffectEvent(() => {
@@ -304,50 +337,33 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
   })
   useEffect(() => {
     resetDiff()
-    // Temporary until we update eslint to ignore useEffectEvent
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
-  useEffect(() => {
+  const syncDiffEditor = useEffectEvent(() => {
     if (isDiffOpen) {
-      const diffEditor = diffEditorRef.current
-      const model = diffEditor?.getModel()
-      if (model && model.original && model.modified) {
-        model.original.setValue(defaultSqlDiff.original)
-        model.modified.setValue(defaultSqlDiff.modified)
-        // scroll to the start line of the modification
-        const modifiedEditor = diffEditor!.getModifiedEditor()
-        const startLine = promptState.startLineNumber
-        modifiedEditor.revealLineInCenter(startLine)
-      }
+      diffController.setDiff(defaultSqlDiff, promptState.startLineNumber)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  })
+  useEffect(() => {
+    syncDiffEditor()
   }, [selectedDiffType, sourceSqlDiff])
 
   const drainDiffRequest = useEffectEvent(() => {
     const request = diffRequest.pending
     if (request === undefined) return
 
-    const editorModel = editorRef.current?.getModel()
     // Editor isn't ready yet; leave the request pending. editorMountCount bumps
     // on mount and re-runs this effect, so the request applies once mounted.
-    if (!editorModel) return
+    if (!editor.isReady()) return
 
-    const { diffType, sql } = request
-    const existingValue = editorRef.current?.getValue() ?? ''
-    if (existingValue.length === 0) {
+    const existingValue = editor.getValue() ?? ''
+    const plan = planDiffRequestApplication({ existingValue, request })
+    if (plan.kind === 'replace') {
       // if the editor is empty, just copy over the code
-      editorRef.current?.executeEdits('apply-ai-message', [
-        {
-          text: `${sql}`,
-          range: editorModel.getFullModelRange(),
-        },
-      ])
+      editor.replaceAll(plan.text, 'apply-ai-message')
     } else {
-      const currentSql = editorRef.current?.getValue()
-      const diff = { original: currentSql || '', modified: sql }
-      setSourceSqlDiff(diff)
-      setSelectedDiffType(diffType)
+      setSourceSqlDiff(plan.diff)
+      setSelectedDiffType(plan.diffType)
     }
 
     // One-shot: drain the request so it can't re-apply to a later editor or session.
@@ -355,8 +371,6 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
   })
   useEffect(() => {
     drainDiffRequest()
-    // until we can upgrade eslint to ignore useEffectEvent
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [diffRequest.pending, editorMountCount])
 
   // We want to check if the diff editor is mounted and if it is, we want to show the widget
@@ -365,11 +379,11 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
     if (!isDiffOpen) {
       setIsDiffEditorMounted(false)
       setShowWidget(false)
-    } else if (diffEditorRef.current && isDiffEditorMounted) {
+    } else if (diffController.isMounted() && isDiffEditorMounted) {
       setShowWidget(true)
       return () => setShowWidget(false)
     }
-  }, [diffEditorRef, isDiffOpen, isDiffEditorMounted])
+  }, [diffController, isDiffOpen, isDiffEditorMounted])
 
   return useMemo(
     () => ({

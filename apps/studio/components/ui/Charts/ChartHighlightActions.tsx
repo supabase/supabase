@@ -134,6 +134,7 @@ export const ChartHighlightActions = ({
             <DropdownMenuItem asChild key={action.id} disabled={disabled} className={cn('group')}>
               <button
                 disabled={disabled}
+                tabIndex={-1}
                 onClick={() => ctx && action.onSelect({ ...ctx })}
                 className="w-full flex items-center gap-1.5"
               >

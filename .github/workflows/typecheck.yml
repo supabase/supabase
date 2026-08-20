@@ -37,6 +37,12 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
 
+      # Needs no dependencies, so it runs before install and fails fast. Catches a
+      # class of bug that only breaks on case-insensitive filesystems (macOS and
+      # Windows dev machines) and is therefore invisible to typecheck/lint on CI.
+      - name: Check for case-sensitivity hazards
+        run: node scripts/check-case-hazards.mjs
+
       - name: Install deps
         run: pnpm install --frozen-lockfile
 

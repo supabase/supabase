@@ -24,6 +24,9 @@ import { joinSqlFragments, literal, safeSql, type SafeSqlFragment } from '../../
  * The two branches are kept as complete, standalone templates (no interpolated
  * conditional fragments) so each rendered statement is easy to read and diff.
  */
+// FROZEN legacy path: served while the pgMetaScopedIntrospection flag is off.
+// Do not edit -- it must keep matching production behavior until the flag
+// cleanup deletes it. SCOPED_PG_GET_TABLEDEF_SQL is the replacement.
 const LEGACY_PG_GET_TABLEDEF_SQL: SafeSqlFragment = safeSql`
   DROP TYPE IF EXISTS pg_temp.tabledefs CASCADE;
   CREATE TYPE pg_temp.tabledefs AS ENUM ('PKEY_INTERNAL','PKEY_EXTERNAL','FKEYS_INTERNAL', 'FKEYS_EXTERNAL', 'COMMENTS', 'FKEYS_NONE', 'INCLUDE_TRIGGERS', 'NO_TRIGGERS');

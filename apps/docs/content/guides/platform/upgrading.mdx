@@ -18,7 +18,7 @@ Free projects will move to the latest minor version when their paused project is
 
 The upgrade process is as follows:
 
-1. Use the "Upgrade project" button on the [Infrastructure](/dashboard/project/_/settings/infrastructure) section of your dashboard.
+1. Use the "Upgrade project" button on the [General settings](/dashboard/project/_/settings/general) page of your dashboard.
 2. An estimate of the time to upgrade is shown and anything that needs to be addressed before you are eligible to upgrade is shown as a warning. Ensure you have reviewed the [caveats](#caveats) section of this document before executing the upgrade.
 3. Your project is taken offline and the Dashboard shows the upgrade status.
 4. Behind the scenes, a new instance is created running the latest version of Supabase.
@@ -39,7 +39,7 @@ When upgrading, a notification will inform you about what is blocking the upgrad
 3. Logical replication slots must be dropped.
 4. Deprecated/unsupported extensions must be dropped. Extensions can have dependencies, make sure you backup that data to restore it after the upgrade, with the updated extension version.
 
-Newer versions of services can break functionality or change the performance characteristics you rely on. If your project is eligible for an upgrade, you will be able to find your current service versions from within [the Supabase dashboard](/dashboard/project/_/settings/infrastructure).
+Newer versions of services can break functionality or change the performance characteristics you rely on. If your project is eligible for an upgrade, you will be able to find your current service versions from within [the Supabase dashboard](/dashboard/project/_/settings/general).
 
 Breaking changes are generally only present in major version upgrades of Postgres and PostgREST. You can find their respective release notes at:
 
@@ -94,11 +94,11 @@ When upgrading, the Supabase platform will "right-size" your disk based on the c
 
 ### Time limits
 
-Starting from 2024-06-24, when a project is paused, users then have a 90-day window to restore the project on the platform from within Supabase Studio.
+When a project is paused, users have a 1-year window to restore the project on the platform from within Supabase Studio.
 
-The 90-day window allows Supabase to introduce platform changes that may not be backwards compatible with older backups. Unlike active projects, static backups can't be updated to accommodate such changes.
+The restore window exists because backups are only retained for a limited period, and platform changes may not be backwards compatible with older backups. Unlike active projects, static backups can't be updated to accommodate such changes.
 
-During the 90-day restore window a paused project can be restored to the platform with a single button click from [Studio's dashboard page](/dashboard/projects).
+During the restore window a paused project can be restored to the platform with a single button click from [Studio's dashboard page](/dashboard/projects).
 
 <Image
   alt="Project Paused: 90 Days Remaining"
@@ -107,7 +107,7 @@ During the 90-day restore window a paused project can be restored to the platfor
   src="/docs/img/guides/platform/paused-90-day.png"
 />
 
-After the 90-day restore window, you can download your project's backup file, and Storage objects from the project dashboard. You can restore the data in the following ways:
+After the restore window, you can download your project's backup file, and Storage objects from the project dashboard. You can restore the data in the following ways:
 
 - [Restore a backup to a new Supabase project](/docs/guides/platform/migrating-within-supabase/dashboard-restore)
 - [Restore a backup locally](/docs/guides/local-development/restoring-downloaded-backup)
@@ -119,7 +119,7 @@ After the 90-day restore window, you can download your project's backup file, an
   height={306}
 />
 
-If you upgrade to a paid plan while your project is paused within the 90-day restore window, any expired one-click restore options are reenabled. Since the backup was taken outside the backwards compatibility window, it may fail to restore. If you have a problem restoring your backup after upgrading, contact [Support](/support).
+If you upgrade to a paid plan while your project is paused, any expired one-click restore options are reenabled. Since the backup was taken outside the backwards compatibility window, it may fail to restore. If you have a problem restoring your backup after upgrading, contact [Support](/support).
 
 <Image
   alt="Project Paused: Paid Tier Restore"
@@ -142,7 +142,7 @@ In projects using Postgres 17, the following extensions are deprecated:
 
 Projects planning to upgrade from Postgres 15 to Postgres 17 need to first disable these extensions in the [Supabase Dashboard](/dashboard/project/_/database/extensions).
 
-<Admonition type="tip">
+<Admonition type="note">
 
 `pgjwt` was enabled by default on every Supabase project up until Postgres 17. If you weren't explicitly using `pgjwt` in your project, it's most likely safe to disable.
 

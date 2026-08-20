@@ -1,24 +1,40 @@
-import { EvalScorer, Trace } from 'braintrust'
+import { Trace } from 'braintrust'
 import { parse } from 'libpg-query'
+import { z } from 'zod'
 
-import { AssistantEvalInput, AssistantEvalOutput, Expected } from './scorer'
+import { AssistantEvalScorer } from './scorer'
 import { getParsedToolSpans } from './trace-utils'
+import { agentNotebookSchema } from '@/data/content/notebooks/notebook-schema'
 import { executeSqlInputSchema } from '@/lib/ai/tools/studio-tools'
 import { extractIdentifiers, isQuotedInSql, needsQuoting } from '@/lib/sql-identifier-quoting'
 
-/** Extracts SQL strings from all `execute_sql` tool spans in the trace. */
+const createNotebookInputSchema = z.object({
+  name: z.string(),
+  description: z.string().optional(),
+  content: agentNotebookSchema,
+})
+
+/**
+ * Extracts SQL strings from `execute_sql` tool spans and from every database cell inside
+ * `create_notebook` tool spans. Log cells are excluded — their SQL targets ClickHouse, and
+ * libpg-query only understands Postgres syntax.
+ */
 async function getSqlQueries(trace: Trace): Promise<string[]> {
-  const spans = await getParsedToolSpans(trace, 'execute_sql', {
+  const executeSqlSpans = await getParsedToolSpans(trace, 'execute_sql', {
     inputSchema: executeSqlInputSchema,
   })
-  return spans.map((s) => s.input.sql)
+  const createNotebookSpans = await getParsedToolSpans(trace, 'create_notebook', {
+    inputSchema: createNotebookInputSchema,
+  })
+
+  const notebookCellSql = createNotebookSpans.flatMap((s) =>
+    s.input.content.cells.filter((cell) => cell._tag === 'database_cell').map((cell) => cell.sql)
+  )
+
+  return [...executeSqlSpans.map((s) => s.input.sql), ...notebookCellSql]
 }
 
-export const sqlSyntaxScorer: EvalScorer<
-  AssistantEvalInput,
-  AssistantEvalOutput,
-  Expected
-> = async ({ trace }) => {
+export const sqlSyntaxScorer: AssistantEvalScorer = async ({ trace }) => {
   if (!trace) return null
 
   const sqlQueries = await getSqlQueries(trace)
@@ -44,11 +60,7 @@ export const sqlSyntaxScorer: EvalScorer<
   }
 }
 
-export const sqlIdentifierQuotingScorer: EvalScorer<
-  AssistantEvalInput,
-  AssistantEvalOutput,
-  Expected
-> = async ({ trace }) => {
+export const sqlIdentifierQuotingScorer: AssistantEvalScorer = async ({ trace }) => {
   if (!trace) return null
 
   const sqlQueries = await getSqlQueries(trace)

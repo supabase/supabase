@@ -75,7 +75,7 @@ export const ProjectTableRow = ({
   return (
     <>
       <TableRow
-        className="cursor-pointer hover:bg-surface-200 inset-focus"
+        className="cursor-pointer hover:bg-surface-200 focus-inset"
         onClick={handleNavigation}
         onAuxClick={handleNavigation}
         onKeyDown={handleNavigation}

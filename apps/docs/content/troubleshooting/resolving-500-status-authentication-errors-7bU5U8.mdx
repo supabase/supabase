@@ -14,15 +14,15 @@ http_status_code = 500
 
 A 500 error in Auth typically indicates an issue with an external dependency, such as your database or SMTP provider, rather than with Auth itself. This guide will help you explore the Auth logs to identify the underlying cause.
 
-#### Prerequisites
+### Prerequisites
 
-##### Open the log explorer
+#### Open the SQL Editor
 
-Ensure you have access to the [Dashboard's Log Explorer](/dashboard/project/_/logs/explorer) and set the time range appropriately:
+Ensure you have access to the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs), set the query source to **Logs**, and set the time range appropriately:
 
 ![image](/docs/img/troubleshooting/152d65ad-f0ed-47cf-8dcb-1e31c6221e71.png)
 
-##### Improving log readability
+#### Improving log readability
 
 Logs are displayed in a table format, which can be challenging to read. Double-clicking on a row will expand it for easier viewing:
 
@@ -40,22 +40,20 @@ Use the following SQL query to check for any recent errors the Auth server encou
 
 ```sql
 select
-  cast(postgres_logs.timestamp as datetime) as timestamp,
+  timestamp,
   event_message,
-  parsed.error_severity,
-  parsed.user_name,
-  parsed.query,
-  parsed.detail,
-  parsed.hint,
-  parsed.sql_state_code,
-  parsed.backend_type
-from
-  postgres_logs
-  cross join unnest(metadata) as metadata
-  cross join unnest(metadata.parsed) as parsed
+  log_attributes['parsed.error_severity'] as error_severity,
+  log_attributes['parsed.user_name'] as user_name,
+  log_attributes['parsed.query'] as query,
+  log_attributes['parsed.detail'] as detail,
+  log_attributes['parsed.hint'] as hint,
+  log_attributes['parsed.sql_state_code'] as sql_state_code,
+  log_attributes['parsed.backend_type'] as backend_type
+from logs
 where
-  regexp_contains(parsed.error_severity, 'ERROR|FATAL|PANIC')
-  and regexp_contains(parsed.user_name, 'supabase_auth_admin')
+  source = 'postgres_logs'
+  and log_attributes['parsed.error_severity'] in ('ERROR', 'FATAL', 'PANIC')
+  and log_attributes['parsed.user_name'] = 'supabase_auth_admin'
 order by timestamp desc
 limit 100;
 ```
@@ -147,24 +145,26 @@ If you made any customizations to the auth schema, such as adding RLS, modifying
 
 #### Query for Auth errors
 
-Run this SQL query in the Log Explorer to find Auth-related errors:
+Run this SQL query in the SQL Editor to find Auth-related errors:
 
 ```sql
 select
-  cast(metadata.timestamp as datetime) as timestamp,
-  msg,
+  timestamp,
+  log_attributes['msg'] as msg,
   event_message,
-  status,
-  path,
-  level
-from auth_logs
-cross join unnest(metadata) as metadata
+  log_attributes['status'] as status,
+  log_attributes['path'] as path,
+  log_attributes['level'] as level
+from logs
 where
-   -- find all errors
-   status::INT = 500
-    OR
-  regexp_contains(level, 'error|fatal')
+  source = 'auth_logs'
+  -- find all errors
+  and (
+    toInt32OrZero(log_attributes['status']) = 500
+    or log_attributes['level'] in ('error', 'fatal')
+  )
 order by timestamp
+limit 100;
 ```
 
 #### Database migration errors

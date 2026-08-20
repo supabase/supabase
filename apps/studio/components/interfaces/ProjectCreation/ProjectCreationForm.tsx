@@ -8,8 +8,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm, useFormState } from 'react-hook-form'
 import { type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
-import { Button, Form, useWatch } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Button, cn, Form, useWatch } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { z } from 'zod'
 
@@ -19,12 +19,18 @@ import { DatabasePasswordInput } from './DatabasePasswordInput'
 import { DataSeeding } from './DataSeeding'
 import { DisabledWarningDueToIncident } from './DisabledWarningDueToIncident'
 import { FreeProjectLimitWarning } from './FreeProjectLimitWarning'
+import { HighAvailabilityInput } from './HighAvailabilityInput'
 import { InternalOnlyConfiguration } from './InternalOnlyConfiguration'
 import { OrganizationSelector } from './OrganizationSelector'
 import { extractPostgresVersionDetails } from './PostgresVersionSelector'
-import { sizes } from './ProjectCreation.constants'
+import {
+  HIGH_AVAILABILITY_POSTGRES_ENGINE,
+  HIGH_AVAILABILITY_RELEASE_CHANNEL,
+  sizes,
+} from './ProjectCreation.constants'
 import { FormSchema } from './ProjectCreation.schema'
 import {
+  getHighAvailabilityRegionCode,
   instanceLabel,
   monthlyInstancePrice,
   smartRegionToExactRegion,
@@ -89,9 +95,11 @@ interface ProjectCreationFormProps {
  *  - "Internal configuration" section
  *  - "GitHub repository" field
  *  - "Free project info" at the bottom
- *  - "Cancel" button
+ * - Cancel closes the popup window instead of navigating into Studio
  * - Shows the following:
  *  - "Data seeding" section
+ * - When embedded in the Vercel interstitial, flattens Panel chrome so the shared
+ *   form fields sit inside InterstitialLayout without a nested card
  * Eventually we could looking into reducing the differences more, e.g having data seeding
  * for both ways, and showing GitHub repository field for Vercel integration
  */
@@ -142,6 +150,7 @@ export const ProjectCreationForm = ({
   const [allProjects, setAllProjects] = useState<OrgProject[] | undefined>(undefined)
   const [isComputeCostsConfirmationModalVisible, setIsComputeCostsConfirmationModalVisible] =
     useState(false)
+  const [projectCreationError, setProjectCreationError] = useState<string>()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -182,6 +191,7 @@ export const ProjectCreationForm = ({
   const { dirtyFields } = useFormState(form)
   const isDbRegionDirty = dirtyFields.dbRegion
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
+  const highAvailabilityRegionCode = getHighAvailabilityRegionCode()
 
   // Read dirty state during render rather than depending on form.formState in the
   // effect — form.formState is a Proxy that gets a new reference every render, which
@@ -262,15 +272,24 @@ export const ProjectCreationForm = ({
       }
     )
 
+  const highAvailabilityRegion =
+    highAvailability && highAvailabilityRegionCode !== undefined
+      ? availableRegionsData?.all.specific.find(
+          (region) => region.code === highAvailabilityRegionCode
+        )
+      : undefined
   const recommendedSmartRegion = smartRegionEnabled
     ? availableRegionsData?.recommendations.smartGroup.name
     : ''
 
   const fixedDefaultRegion = PROVIDERS[selectedCloudProvider].default_region.displayName
   const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
-  const defaultRegion = smartRegionEnabled
-    ? availableRegionsData?.recommendations.smartGroup.name
-    : (autoDefaultRegion ?? fixedDefaultRegion)
+  const defaultRegion =
+    highAvailability && highAvailabilityRegionCode !== undefined
+      ? highAvailabilityRegion?.name
+      : smartRegionEnabled
+        ? recommendedSmartRegion
+        : (autoDefaultRegion ?? fixedDefaultRegion)
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !hasOutstandingInvoices
   const canConfigureGitHubOnCreate =
@@ -309,6 +328,7 @@ export const ProjectCreationForm = ({
     isSuccess: isSuccessNewProject,
   } = useProjectCreateMutation({
     onSuccess: (res) => {
+      setProjectCreationError(undefined)
       track(
         'project_creation_simple_version_submitted',
         {
@@ -331,6 +351,11 @@ export const ProjectCreationForm = ({
       if (surface === 'main') router.push(`/project/${res.ref}`)
     },
     onError: (error) => {
+      if (isVercelIntegrationFlow) {
+        setProjectCreationError(`Failed to create new project: ${error.message}`)
+        trackFunnelError('project_creation', classifyApiError('project_creation', error), 'form')
+        return
+      }
       const toastId = toast.error(`Failed to create new project: ${error.message}`)
       trackFunnelError(
         'project_creation',
@@ -346,7 +371,14 @@ export const ProjectCreationForm = ({
       values.instanceSize &&
       !sizesWithNoCostConfirmationRequired.includes(values.instanceSize as DesiredInstanceSize)
 
-    if (additionalMonthlySpend > 0 && (hasOAuthApps || launchingLargerInstance)) {
+    // High availability projects are free during Alpha, so the forced large compute
+    // doesn't incur the usual compute costs.
+    const requiresCostConfirmation =
+      !values.highAvailability &&
+      additionalMonthlySpend > 0 &&
+      (hasOAuthApps || launchingLargerInstance)
+
+    if (requiresCostConfirmation) {
       track('project_creation_simple_version_confirm_modal_opened', {
         instanceSize: values.instanceSize,
       })
@@ -358,6 +390,7 @@ export const ProjectCreationForm = ({
 
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
     if (!currentOrg) return console.error('Unable to retrieve current organization')
+    setProjectCreationError(undefined)
 
     const {
       cloudProvider,
@@ -378,14 +411,32 @@ export const ProjectCreationForm = ({
       shouldRunMigrations,
     } = values
 
-    if (postgresVersion && !postgresVersion.match(/1[2-9]\..*/)) {
-      return toast.error(
-        `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`
-      )
+    // HA projects never take a custom version — the API resolves the image from
+    // postgresEngine + releaseChannel.
+    const customPostgresVersion = highAvailability ? undefined : postgresVersion
+
+    if (customPostgresVersion && !customPostgresVersion.match(/1[2-9]\..*/)) {
+      const message =
+        'Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3'
+      if (isVercelIntegrationFlow) {
+        setProjectCreationError(message)
+        return
+      }
+      return toast.error(message)
     }
 
     if (useOrioleDb && !availableOrioleVersion) {
-      const toastId = toast.error('No available OrioleDB image found, only Postgres is available')
+      const message = 'No available OrioleDB image found, only Postgres is available'
+      if (isVercelIntegrationFlow) {
+        setProjectCreationError(message)
+        trackFunnelError(
+          'project_creation',
+          { errorCategory: 'validation', errorReason: 'oriole_unavailable' },
+          'form'
+        )
+        return
+      }
+      const toastId = toast.error(message)
       trackFunnelError(
         'project_creation',
         { errorCategory: 'validation', errorReason: 'oriole_unavailable' },
@@ -402,6 +453,12 @@ export const ProjectCreationForm = ({
     const selectedRegion = smartRegionEnabled
       ? (smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion))
       : undefined
+
+    if (highAvailability && highAvailabilityRegionCode !== undefined && !selectedRegion) {
+      return toast.error(
+        `High Availability projects are not available in the required region (${highAvailabilityRegionCode})`
+      )
+    }
     const parsedGitHubRepositoryId =
       githubRepositoryId.length > 0 ? Number(githubRepositoryId) : undefined
     const shouldIncludeGitHubFields =
@@ -446,8 +503,16 @@ export const ProjectCreationForm = ({
       dataApiExposedSchemas: !dataApi ? [] : undefined,
       dataApiUseApiSchema: false,
       dataApiRevokeDefaultPrivileges: dataApi && !dataApiDefaultPrivileges,
-      postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
-      releaseChannel: useOrioleDb ? availableOrioleVersion?.release_channel : releaseChannel,
+      postgresEngine: highAvailability
+        ? HIGH_AVAILABILITY_POSTGRES_ENGINE
+        : useOrioleDb
+          ? availableOrioleVersion?.postgres_engine
+          : postgresEngine,
+      releaseChannel: highAvailability
+        ? HIGH_AVAILABILITY_RELEASE_CHANNEL
+        : useOrioleDb
+          ? availableOrioleVersion?.release_channel
+          : releaseChannel,
       ...(smartRegionEnabled ? { regionSelection: selectedRegion } : { dbRegion }),
       ...(shouldIncludeGitHubFields
         ? {
@@ -457,11 +522,11 @@ export const ProjectCreationForm = ({
         : {}),
     }
 
-    if (postgresVersion || instanceType) {
+    if (customPostgresVersion || instanceType) {
       data['customSupabaseRequest'] = {
         ami: {
-          ...(postgresVersion && {
-            search_tags: { 'tag:postgresVersion': postgresVersion },
+          ...(customPostgresVersion && {
+            search_tags: { 'tag:postgresVersion': customPostgresVersion },
           }),
           ...(instanceType && { instance_type: instanceType }),
         },
@@ -508,22 +573,10 @@ export const ProjectCreationForm = ({
   }, [defaultRegion, isDbRegionDirty, setValue])
 
   useEffect(() => {
-    if (!isDbRegionDirty && recommendedSmartRegion) {
-      setValue('dbRegion', recommendedSmartRegion)
-    }
-  }, [recommendedSmartRegion, isDbRegionDirty, setValue])
-
-  useEffect(() => {
     if (regionError && fixedDefaultRegion) {
       resetField('dbRegion', { defaultValue: fixedDefaultRegion })
     }
   }, [regionError, resetField, fixedDefaultRegion])
-
-  useEffect(() => {
-    if (highAvailability && cloudProvider !== 'AWS_K8S') {
-      setValue('cloudProvider', 'AWS_K8S')
-    }
-  }, [highAvailability, cloudProvider, setValue])
 
   useEffect(() => {
     if (watchedInstanceSize !== instanceSize) {
@@ -581,14 +634,20 @@ export const ProjectCreationForm = ({
       >
         <Panel
           loading={!isOrganizationsSuccess}
+          noMargin={isVercelIntegrationFlow}
+          className={cn(
+            isVercelIntegrationFlow && 'border-0 shadow-none rounded-none bg-transparent'
+          )}
           title={
-            <div key="panel-title">
-              <h3>Create a new project</h3>
-              <p className="text-sm text-foreground-lighter text-balance">
-                Your project will have its own dedicated instance and full Postgres database. An API
-                will be set up so you can easily interact with your new database.
-              </p>
-            </div>
+            !isVercelIntegrationFlow && (
+              <div key="panel-title">
+                <h3>Create a new project</h3>
+                <p className="text-sm text-foreground-lighter text-balance">
+                  Your project will have its own dedicated instance and full Postgres database. An
+                  API will be set up so you can easily interact with your new database.
+                </p>
+              </div>
+            )
           }
           footer={
             <ProjectCreationFooter
@@ -598,7 +657,7 @@ export const ProjectCreationForm = ({
               organizationProjects={organizationProjects}
               isCreatingNewProject={isCreatingNewProject}
               isSuccessNewProject={isSuccessNewProject}
-              hideCancelButton={isVercelIntegrationFlow}
+              cancelAction={isVercelIntegrationFlow ? 'close' : 'studio'}
             />
           }
         >
@@ -624,8 +683,8 @@ export const ProjectCreationForm = ({
                           label="GitHub (optional)"
                           description={
                             <>
-                              Ideal for agent-first workflows: update your schema in code, push it
-                              to GitHub, and Supabase deploys the changes automatically.{' '}
+                              Ideal for agent-first workflows. Update your schema in code and push
+                              it to GitHub. Supabase deploys the changes.{' '}
                               <a
                                 href="https://supabase.com/docs/guides/deployment/branching/github-integration"
                                 target="_blank"
@@ -648,6 +707,11 @@ export const ProjectCreationForm = ({
                     )}
                     <ProjectNameInput form={form} />
 
+                    <HighAvailabilityInput
+                      form={form}
+                      highAvailabilityRegionName={highAvailabilityRegion?.name}
+                    />
+
                     {canChooseInstanceSize && <ComputeSizeSelector form={form} />}
 
                     <DatabasePasswordInput form={form} />
@@ -663,9 +727,9 @@ export const ProjectCreationForm = ({
 
                     {showInternalOnlyConfiguration && <InternalOnlyConfiguration form={form} />}
 
-                    {showAdvancedConfig && !!availableOrioleVersion && (
-                      <AdvancedConfiguration form={form} />
-                    )}
+                    {showAdvancedConfig &&
+                      !!availableOrioleVersion &&
+                      highAvailability !== true && <AdvancedConfiguration form={form} />}
 
                     {shouldShowFreeProjectInfo ? (
                       <Admonition
@@ -714,6 +778,13 @@ export const ProjectCreationForm = ({
                   </Panel.Content>
                 ) : null}
               </div>
+            )}
+            {projectCreationError && (
+              <Panel.Content>
+                <p role="alert" className="text-sm text-destructive">
+                  {projectCreationError}
+                </p>
+              </Panel.Content>
             )}
           </>
         </Panel>

@@ -118,6 +118,7 @@ export const CreateOrganizationCard = ({
     return (
       <button
         type="button"
+        tabIndex={disabled ? -1 : 0}
         disabled={disabled}
         onClick={onClick}
         className={cn(

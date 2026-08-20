@@ -1,3 +1,8 @@
+import {
+  buildClickhouseLogsSchemaSection,
+  CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS,
+} from '@/lib/ai/clickhouse-logs'
+
 export const RLS_PROMPT = `
 # PostgreSQL RLS in Supabase: Condensed Guide
 
@@ -731,7 +736,7 @@ export const CHAT_PROMPT = `
 - Do not show the SQL query before execution; the client will display it to the user.
 - Set chartConfig \`view\` to \`chart\` and xAxis/yAxis if the results would be best displayed as a chart e.g. count of items by date
 - On execution error, explain succinctly and attempt to correct if possible, validating each outcome briefly (1–2 lines) after execution.
-- If a user skips execution, acknowledge and suggest alternatives.
+- If a user skips execution, acknowledge and suggest alternatives. A skip is a user choice, not a permission or environment error.
 - Use markdown code blocks (\`\`\`sql\`\`\`) for illustrative SQL only if requested by the user or when providing non-executable examples.
 - Never call \`execute_sql\` or \`deploy_edge_function\` in parallel within the same step. Each requires user approval, so issue one per step and wait for its result before calling the next.
 - After execution, summarize outcomes concisely without duplicating results, as the client will present these.
@@ -741,7 +746,7 @@ export const CHAT_PROMPT = `
 - Use \`deploy_edge_function\` solely for deployment, not for presenting example code.
 ## Project Health Checks
 - Use \`get_advisors\` to identify project issues; if unavailable, suggest the user use the Supabase dashboard.
-- Use \`get_logs\` to access recent project logs.
+- Use \`query_logs\` to access recent project logs by running a read-only SQL query against them.
 ## Billing 
 - Cancelling a subscription / changing plans can be done via the organization's billing page. Link directly to https://supabase.com/dashboard/org/_/billing.
 - To check organization usage, use the organization's usage page. Link directly to https://supabase.com/dashboard/org/_/usage.
@@ -755,6 +760,23 @@ When asked about restoring/recovering deleted data:
 1. Search docs for how deletion works for that data type (e.g., "delete storage objects", "delete database rows") to understand if recovery is possible
 2. If recovery is possible (or inconclusive), search docs for restore/backup options
 DO NOT start searching for recovery docs before checking deletion docs
+`
+
+// Notebooks haven't shipped yet — gated behind the Explorer feature flag, same as the
+// notebook AI tools (see lib/ai/is-explorer-enabled.ts). Only spliced into the system
+// prompt when that flag resolves true for the requesting user.
+export const NOTEBOOKS_PROMPT = `
+## Notebooks
+- Use \`create_notebook\` for a saved, shareable, multi-step investigation or dashboard the user will revisit — e.g. "build me a signup funnel notebook" or "create a notebook to track auth errors".
+- Use \`update_notebook\` to edit an existing notebook — insert, replace, delete, or move cells — instead of recreating it from scratch.
+- Use \`execute_sql\` for a single ad-hoc question with no need to persist it.
+- When the request clearly calls for a notebook, call \`create_notebook\` or \`update_notebook\` directly; both tools handle user approval.
+- \`update_notebook\` requires \`expected_updated_at\`, the \`updated_at\` you got from \`get_notebook\`. If the notebook changed since, the call is rejected — call \`get_notebook\` again and reissue \`update_notebook\` against the current content.
+- When describing an existing notebook, report each query cell's configuration that changes what it returns — a log cell's time range, a database cell's row limit — and don't count markdown cells as queries.
+- Before writing a \`database_cell\`'s SQL, call \`list_tables\` to confirm the referenced tables and columns actually exist. Never assume a table or column exists from the user's wording alone — if it isn't in the schema you fetched, say so instead of fabricating a query against it.
+- A cell that queries logs (edge_logs, postgres_logs, auth_logs, function_edge_logs, function_logs, storage_logs, realtime_logs, postgrest_logs, supavisor_logs, or pgbouncer_logs) must be a \`log_cell\`, never a \`database_cell\` — these are not Postgres tables, and a \`log_cell\`'s SQL runs on ClickHouse, not Postgres.
+${CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS}
+${buildClickhouseLogsSchemaSection()}
 `
 
 export const OUTPUT_ONLY_PROMPT = `
@@ -784,15 +806,6 @@ When no code context is provided: return a complete, valid implementation.
 export const SQL_COMPLETION_INSTRUCTIONS = `
 # SQL identifier quoting
 Do not quote identifiers unless they actually require it (uppercase letters, reserved words, or special characters). Plain lowercase identifiers should not be quoted.
-`
-
-export const CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS = `
-# Supabase logs SQL (ClickHouse)
-You are writing SQL for Supabase logs, which run on a ClickHouse-backed engine. This is NOT Postgres and NOT BigQuery. Output valid ClickHouse SQL only.
-- All logs are in a single table named \`logs\`, keyed by a \`source\` column. There are no per-service tables (no \`edge_logs\`, \`postgres_logs\`, and so on) and no \`unnest\` joins.
-- Per-source fields live in the \`log_attributes\` Map(String, String), read as \`log_attributes['key']\`. Map values are strings, so wrap numeric ones in \`toInt32OrZero(...)\`.
-- Use ClickHouse functions, not Postgres or BigQuery ones. Use \`match(col, 'regex')\` or \`col ILIKE '%text%'\` instead of \`regexp_contains\`, \`count()\` instead of \`count(*)\`, and select the \`timestamp\` column directly instead of \`cast(timestamp as datetime)\`.
-- Do not quote identifiers with double quotes and do not append a trailing semicolon.
 `
 
 export const LIMITATIONS_PROMPT = `

@@ -86,12 +86,20 @@ export const DATADOG_REGIONS = [
     value: 'EU',
   },
   {
+    label: 'UK1',
+    value: 'UK1',
+  },
+  {
     label: 'US1',
     value: 'US1',
   },
   {
     label: 'US1-FED',
     value: 'US1-FED',
+  },
+  {
+    label: 'US2-FED',
+    value: 'US2-FED',
   },
   {
     label: 'US3',

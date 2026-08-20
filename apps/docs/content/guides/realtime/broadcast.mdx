@@ -122,6 +122,19 @@ Get the Project URL and key from [the project's **Connect** dialog](/dashboard/p
 
   </TabPanel>
   </$Show>
+  <$Show if="sdk:csharp">
+  <TabPanel id="csharp" label="C#">
+
+    ```c#
+    var supabase = new Supabase.Client(
+        "https://<project>.supabase.co",
+        "<sb_publishable_... key>"
+    );
+    await supabase.InitializeAsync();
+    ```
+
+  </TabPanel>
+  </$Show>
 </Tabs>
 
 ### Receive Broadcast messages
@@ -249,6 +262,32 @@ Binary payloads (`ArrayBuffer` / `ArrayBufferView`) are received automatically f
     await my_channel
       .on_broadcast('shout', message_received) # Listen for "shout". Can be "*" to listen to all events
       .subscribe()
+    ```
+
+  </TabPanel>
+  </$Show>
+  <$Show if="sdk:csharp">
+  <TabPanel id="csharp" label="C#">
+
+    ```c#
+    class ShoutBroadcast : BaseBroadcast
+    {
+        [JsonProperty("message")]
+        public string Message { get; set; }
+    }
+
+    // Join a room/topic. Can be anything except for 'realtime'.
+    var myChannel = supabase.Realtime.Channel("test-channel");
+
+    // Register a typed broadcast and log any messages we receive
+    var broadcast = myChannel.Register<ShoutBroadcast>();
+    broadcast.AddBroadcastEventHandler((sender, _) =>
+    {
+        Console.WriteLine(broadcast.Current());
+    });
+
+    // Subscribe to the channel
+    await myChannel.Subscribe();
     ```
 
   </TabPanel>
@@ -432,6 +471,21 @@ Broadcast payloads can be binary (`ArrayBuffer` or `ArrayBufferView`, e.g. `Uint
       ))
 
     await my_channel.subscribe(on_subscribe)
+    ```
+
+  </TabPanel>
+  </$Show>
+  <$Show if="sdk:csharp">
+  <TabPanel id="csharp" label="C#">
+
+    ```c#
+    var myChannel = supabase.Realtime.Channel("test-channel");
+    var broadcast = myChannel.Register<ShoutBroadcast>();
+
+    await myChannel.Subscribe();
+
+    // Send a broadcast message over the WebSocket
+    await broadcast.Send("shout", new ShoutBroadcast { Message = "Hi" });
     ```
 
   </TabPanel>
@@ -719,6 +773,26 @@ You can pass configuration options while initializing the Supabase Client.
 
   </TabPanel>
   </$Show>
+  <$Show if="sdk:csharp">
+  <TabPanel id="csharp" label="C#">
+
+    By default, broadcast messages are only sent to other clients. You can broadcast messages back to the sender by setting the `broadcastSelf` parameter to `true`.
+
+    ```c#
+    var myChannel = supabase.Realtime.Channel("room-2");
+    var broadcast = myChannel.Register<ShoutBroadcast>(broadcastSelf: true);
+    broadcast.AddBroadcastEventHandler((sender, _) =>
+    {
+        Console.WriteLine(broadcast.Current());
+    });
+
+    await myChannel.Subscribe();
+
+    await broadcast.Send("test-my-messages", new ShoutBroadcast { Message = "talking to myself" });
+    ```
+
+  </TabPanel>
+  </$Show>
 </Tabs>
 
 ### Acknowledge messages
@@ -824,6 +898,23 @@ You can pass configuration options while initializing the Supabase Client.
   <$Show if="sdk:python">
   <TabPanel id="python" label="Python">
   Unsupported in Python yet.
+  </TabPanel>
+  </$Show>
+  <$Show if="sdk:csharp">
+  <TabPanel id="csharp" label="C#">
+
+    You can confirm that the Realtime servers have received your message by setting the `broadcastAck` parameter to `true`. `Send` then returns `true` once the server acknowledges the message.
+
+    ```c#
+    var myChannel = supabase.Realtime.Channel("room-3");
+    var broadcast = myChannel.Register<ShoutBroadcast>(broadcastAck: true);
+
+    await myChannel.Subscribe();
+
+    var acknowledged = await broadcast.Send("acknowledge", new ShoutBroadcast { Message = "Hi" });
+    Console.WriteLine(acknowledged);
+    ```
+
   </TabPanel>
   </$Show>
 </Tabs>
