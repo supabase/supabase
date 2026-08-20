@@ -18,6 +18,7 @@ import {
 } from 'ui'
 
 import { ButtonTooltip } from '../ui/ButtonTooltip'
+import { DevToolbarMenuGroup } from './DevToolbarMenuGroup'
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
 import { TimezoneDropdown } from './UserDropdown/TimezoneDropdown'
 import { ProfileImage } from '@/components/ui/ProfileImage'
@@ -140,6 +141,8 @@ export function UserDropdown({
             </DropdownMenuGroup>
           </>
         )}
+
+        <DevToolbarMenuGroup />
 
         <DropdownMenuGroup>
           <DropdownMenuLabel>Theme</DropdownMenuLabel>

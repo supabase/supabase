@@ -256,6 +256,61 @@ describe('DevToolbar', () => {
     })
   })
 
+  describe('enableToolbar', () => {
+    beforeEach(() => {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
+    })
+
+    it('enables toolbar and exposes isAvailable in local development', async () => {
+      vi.resetModules()
+      const { DevToolbarProvider, useDevToolbar } = await import('./DevToolbarContext')
+      const { DevToolbarTrigger } = await import('./DevToolbarTrigger')
+      const { TooltipProvider } = await import('ui')
+
+      function ToolbarLauncher() {
+        const { isAvailable, enableToolbar } = useDevToolbar()
+        return (
+          <button type="button" onClick={enableToolbar}>
+            {isAvailable ? 'Launch toolbar' : 'Unavailable'}
+          </button>
+        )
+      }
+
+      render(
+        <TooltipProvider>
+          <DevToolbarProvider apiUrl="http://localhost:3000">
+            <ToolbarLauncher />
+            <DevToolbarTrigger />
+          </DevToolbarProvider>
+        </TooltipProvider>
+      )
+
+      expect(screen.getByRole('button', { name: 'Launch toolbar' })).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Open dev toolbar' })).not.toBeInTheDocument()
+
+      await userEvent.setup().click(screen.getByRole('button', { name: 'Launch toolbar' }))
+
+      expect(localStorage.getItem('dev-telemetry-toolbar-enabled')).toBe('true')
+      expect(screen.getByRole('button', { name: 'Open dev toolbar' })).toBeInTheDocument()
+    })
+
+    it('returns isAvailable false in production', async () => {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'prod'
+
+      vi.resetModules()
+      const { useDevToolbar } = await import('./DevToolbarContext')
+
+      function ToolbarAvailability() {
+        const { isAvailable } = useDevToolbar()
+        return <span>{isAvailable ? 'available' : 'unavailable'}</span>
+      }
+
+      render(<ToolbarAvailability />)
+
+      expect(screen.getByText('unavailable')).toBeInTheDocument()
+    })
+  })
+
   describe('window.devToolbar function', () => {
     beforeEach(() => {
       process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'

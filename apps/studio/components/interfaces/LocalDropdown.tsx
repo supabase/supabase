@@ -17,6 +17,7 @@ import {
 } from 'ui'
 
 import { ButtonTooltip } from '../ui/ButtonTooltip'
+import { DevToolbarMenuGroup } from './DevToolbarMenuGroup'
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
 import { ProfileImage } from '@/components/ui/ProfileImage'
 import { useTrack } from '@/lib/telemetry/track'
@@ -73,6 +74,7 @@ export const LocalDropdown = ({
           <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
           Feature previews
         </DropdownMenuItem>
+        <DevToolbarMenuGroup />
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuLabel>Theme</DropdownMenuLabel>

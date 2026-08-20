@@ -53,6 +53,13 @@ export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps
   const sseRetryDelayRef = useRef(SSE_INITIAL_RETRY_MS)
   const sseRetryTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
+  const enableToolbar = useCallback(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, 'true')
+    } catch {}
+    setIsEnabled(true)
+  }, [])
+
   const dismissToolbar = useCallback(() => {
     try {
       localStorage.removeItem(STORAGE_KEY)
@@ -72,17 +79,12 @@ export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps
       setIsEnabled(true)
     }
 
-    window.devToolbar = () => {
-      try {
-        localStorage.setItem(STORAGE_KEY, 'true')
-      } catch {}
-      setIsEnabled(true)
-    }
+    window.devToolbar = enableToolbar
 
     return () => {
       delete window.devToolbar
     }
-  }, [isDefaultOn])
+  }, [enableToolbar, isDefaultOn])
 
   const appendEvent = useCallback((event: DevTelemetryEvent) => {
     setEvents((prev) => {
@@ -189,9 +191,11 @@ export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps
   return (
     <DevToolbarContext.Provider
       value={{
+        isAvailable: IS_TOOLBAR_ENABLED,
         isEnabled,
         isOpen,
         setIsOpen,
+        enableToolbar,
         events,
         setEvents,
         dismissToolbar,
@@ -206,9 +210,11 @@ export function useDevToolbar() {
   const context = useContext(DevToolbarContext)
   if (!context) {
     return {
+      isAvailable: false,
       isEnabled: false,
       isOpen: false,
       setIsOpen: () => {},
+      enableToolbar: () => {},
       events: [],
       setEvents: () => {},
       dismissToolbar: () => {},
