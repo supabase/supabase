@@ -6,6 +6,7 @@ import type { CSSProperties, PointerEvent } from 'react'
 import { Button, cn } from 'ui'
 
 import { useDevToolbar } from './DevToolbarContext'
+import { getEventCountBadge } from './utils'
 
 // Duplicated for tree-shaking — bundler must see literal process.env reference.
 // Keep in sync: index.ts, DevToolbarContext.tsx, DevToolbar.tsx, feature-flags.tsx
@@ -163,9 +164,7 @@ export function DevToolbarTrigger() {
 
   if (!IS_TOOLBAR_ENABLED || !isEnabled) return null
 
-  const eventCount = events.length
-  const eventCountLabel = eventCount > 99 ? '99+' : eventCount
-  const isLargeEventCount = eventCount > 99
+  const eventCountBadge = getEventCountBadge(events.length)
   const isDragging = dragPos !== null
   const snapCoords = getSnapCoords(snapPosition, viewport.w, viewport.h)
   const FULL_TRANSITION = `${SNAP_TRANSITION}, opacity 200ms ease`
@@ -240,17 +239,17 @@ export function DevToolbarTrigger() {
           aria-hidden="true"
           className="pointer-events-none"
         />
-        {eventCount > 0 && (
+        {eventCountBadge && (
           <span
             className={cn(
               'absolute -top-1 -right-1',
               'inline-flex items-center justify-center',
               'rounded-full bg-brand text-white dark:text-black',
               'text-[9px] font-medium leading-none tracking-tight tabular-nums',
-              isLargeEventCount ? 'h-3.5 min-w-3.5 px-1' : eventCount < 10 ? 'size-3.5' : 'size-4'
+              eventCountBadge.sizeClass
             )}
           >
-            {eventCountLabel}
+            {eventCountBadge.label}
           </span>
         )}
       </Button>

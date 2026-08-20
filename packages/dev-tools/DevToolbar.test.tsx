@@ -516,4 +516,38 @@ describe('DevToolbar utils', () => {
       expect(valuesAreEqual('value', null)).toBe(false)
     })
   })
+
+  describe('getEventCountBadge', () => {
+    it('returns null for zero or negative counts', async () => {
+      vi.resetModules()
+      const { getEventCountBadge } = await import('./utils')
+
+      expect(getEventCountBadge(0)).toBeNull()
+      expect(getEventCountBadge(-1)).toBeNull()
+    })
+
+    it('returns a compact circle for single-digit counts', async () => {
+      vi.resetModules()
+      const { getEventCountBadge } = await import('./utils')
+
+      expect(getEventCountBadge(7)).toEqual({ label: '7', sizeClass: 'size-3.5' })
+    })
+
+    it('returns a larger circle for double-digit counts', async () => {
+      vi.resetModules()
+      const { getEventCountBadge } = await import('./utils')
+
+      expect(getEventCountBadge(42)).toEqual({ label: '42', sizeClass: 'size-4' })
+    })
+
+    it('returns a capped pill for large counts', async () => {
+      vi.resetModules()
+      const { getEventCountBadge } = await import('./utils')
+
+      expect(getEventCountBadge(150)).toEqual({
+        label: '99+',
+        sizeClass: 'h-3.5 min-w-3.5 px-1',
+      })
+    })
+  })
 })
