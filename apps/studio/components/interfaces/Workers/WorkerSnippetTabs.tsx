@@ -22,21 +22,12 @@ interface WorkerSnippetTabsProps {
   input: Omit<WorkerSnippetInput, 'endpoint' | 'protocol'>
   tabs?: WorkerSnippetTab[]
   className?: string
-  /** Frame the whole thing as a recessed, code-editor-style panel. */
-  editor?: boolean
-  /** Stretch to fill the parent's height; the snippet area scrolls vertically. */
-  fillHeight?: boolean
-  /** Wrap long lines instead of scrolling horizontally. */
-  wrap?: boolean
 }
 
 export const WorkerSnippetTabs = ({
   input,
   tabs = ['cli', 'curl'],
   className,
-  editor = false,
-  fillHeight = false,
-  wrap = false,
 }: WorkerSnippetTabsProps) => {
   const { ref } = useParams()
   const [active, setActive] = useState<WorkerSnippetTab>(tabs[0])
@@ -59,22 +50,8 @@ export const WorkerSnippetTabs = ({
   const value = snippetByTab[activeTab]
 
   return (
-    <div
-      className={cn(
-        'flex flex-col',
-        editor
-          ? 'overflow-hidden rounded-lg border border-default bg-surface-75'
-          : 'gap-y-2',
-        fillHeight && 'h-full min-h-0',
-        className
-      )}
-    >
-      <div
-        className={cn(
-          'flex items-center gap-x-4 border-b border-default',
-          editor && 'shrink-0 px-3'
-        )}
-      >
+    <div className={cn('flex flex-col gap-y-2', className)}>
+      <div className="flex items-center gap-x-4 border-b border-default">
         {tabs.map((tab) => (
           <button
             key={tab}
@@ -94,13 +71,7 @@ export const WorkerSnippetTabs = ({
         ))}
       </div>
 
-      <div
-        className={cn(
-          'relative',
-          fillHeight && 'min-h-0 flex-1',
-          !editor && 'rounded-md border border-default bg-surface-100'
-        )}
-      >
+      <div className="relative rounded-md border border-default bg-surface-100">
         <CopyButton
           text={value}
           iconOnly
@@ -108,13 +79,7 @@ export const WorkerSnippetTabs = ({
           aria-label="Copy snippet"
           className="absolute right-2 top-2 z-10 text-foreground-lighter hover:text-foreground"
         />
-        <pre
-          className={cn(
-            'p-3 pr-10 font-mono text-xs leading-relaxed text-foreground-light',
-            fillHeight ? 'absolute inset-0 overflow-auto' : wrap ? '' : 'overflow-x-auto',
-            wrap && 'whitespace-pre-wrap break-words'
-          )}
-        >
+        <pre className="overflow-x-auto p-3 pr-10 font-mono text-xs leading-relaxed text-foreground-light">
           {value}
         </pre>
       </div>

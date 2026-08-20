@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch, type Control } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -8,6 +8,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogSection,
+  DialogSectionSeparator,
   DialogTitle,
   Form,
   FormControl,
@@ -25,15 +26,44 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { WORKER_MAX_INSTANCES, WORKER_MIN_INSTANCES, WORKER_SIZES } from './Workers.constants'
 import { CreateWorkerSchema, type CreateWorkerForm } from './Workers.schema'
 import { formatSize } from './Workers.utils'
+import { WorkerPromptPanel } from './WorkerPromptPanel'
 import { useWorkerDeployMutation } from '@/data/workers/worker-deploy-mutation'
 
 const FORM_ID = 'create-worker-form'
+
+// The dashboard only deploys the Deno starter; the CLI is where other runtimes
+// get selected, so the snippets below describe a Deno worker.
+const DEPLOYED_RUNTIME = 'deno'
 
 const defaultValues: CreateWorkerForm = {
   name: '',
   size: WORKER_SIZES[0],
   access: 'private',
   instances: WORKER_MIN_INSTANCES,
+}
+
+/**
+ * Live snippets for the values currently in the form. Subscribes on its own so
+ * a keystroke re-renders the snippets rather than the whole dialog.
+ */
+const CreateWorkerSnippets = ({ control }: { control: Control<CreateWorkerForm> }) => {
+  const [name, size, access, instances] = useWatch({
+    control,
+    name: ['name', 'size', 'access', 'instances'],
+  })
+
+  return (
+    <WorkerPromptPanel
+      input={{
+        name,
+        runtime: DEPLOYED_RUNTIME,
+        size,
+        access,
+        // `instances` holds the raw input string while typing, and '' when cleared.
+        instances: Number(instances) || WORKER_MIN_INSTANCES,
+      }}
+    />
+  )
 }
 
 interface CreateWorkerDialogProps {
@@ -157,6 +187,15 @@ export const CreateWorkerDialog = ({ projectRef, open, onOpenChange }: CreateWor
             </DialogSection>
           </form>
         </Form>
+
+        <DialogSectionSeparator />
+
+        <DialogSection className="space-y-2">
+          <p className="text-sm text-foreground-light">
+            Or deploy the same worker from your terminal
+          </p>
+          <CreateWorkerSnippets control={form.control} />
+        </DialogSection>
 
         <DialogFooter>
           <Button variant="default" disabled={isPending} onClick={() => onOpenChange(false)}>
