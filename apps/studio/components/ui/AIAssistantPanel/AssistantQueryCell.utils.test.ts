@@ -62,6 +62,15 @@ describe('assistant query model', () => {
     })
   })
 
+  it('starts as a logs query when the source is logs', () => {
+    const time_range = { _tag: 'relative_time_range' as const, unit: 'day' as const, amount: 1 }
+    expect(createAssistantQueryModel('select 1 from logs', { _tag: 'logs', time_range })).toEqual({
+      _tag: 'logs',
+      uncheckedSql: untrustedLogSql('select 1 from logs'),
+      time_range,
+    })
+  })
+
   it('rebrands the live SQL for the current backend', () => {
     const database = createAssistantQueryModel('select 1')
     expect(setAssistantQuerySql(database, 'select 2').uncheckedSql).toBe(untrustedSql('select 2'))
