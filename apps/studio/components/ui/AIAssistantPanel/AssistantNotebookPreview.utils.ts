@@ -96,6 +96,18 @@ export function getCellMetadataLine(cell: CellWire | AgentCell): string | null {
   }
 }
 
+/** Header metadata for a diff row, including a before → after pair on replacements. */
+export function getEntryMetadataLine(entry: NotebookCellDiffEntry): string | null {
+  if (entry._tag !== 'replaced') {
+    return getCellMetadataLine(entry.cell)
+  }
+
+  const beforeMetadata = getCellMetadataLine(entry.before)
+  const afterMetadata = getCellMetadataLine(entry.after)
+  if (beforeMetadata === afterMetadata) return afterMetadata
+  return `${beforeMetadata ?? 'No metadata'} → ${afterMetadata ?? 'No metadata'}`
+}
+
 export type NotebookDiffSummary =
   | { mode: 'create'; cellCount: number }
   | { mode: 'update'; counts: { added: number; removed: number; replaced: number; moved: number } }

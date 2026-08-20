@@ -51,6 +51,7 @@ describe('NotebookProposalRenderer', () => {
       <NotebookProposalRenderer
         mode="create"
         state="approval-requested"
+        confirmState="approval-requested"
         input={{
           name: 'New notebook',
           content: {
@@ -64,7 +65,9 @@ describe('NotebookProposalRenderer', () => {
       />
     )
 
+    expect(screen.getByRole('toolbar', { name: 'Notebook toolbar' })).toBeInTheDocument()
     expect(screen.getByText('1 cell')).toBeInTheDocument()
+    expect(screen.getByText('Assistant wants to create this notebook')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Create' }))
     expect(onApprove).toHaveBeenCalledTimes(1)
   })
@@ -78,6 +81,7 @@ describe('NotebookProposalRenderer', () => {
       <NotebookProposalRenderer
         mode="update"
         state="approval-requested"
+        confirmState="approval-requested"
         input={{
           id: NOTEBOOK_ID,
           expected_updated_at: '2024-01-01T00:00:00.000Z',
@@ -102,6 +106,7 @@ describe('NotebookProposalRenderer', () => {
       <NotebookProposalRenderer
         mode="update"
         state="approval-requested"
+        confirmState="approval-requested"
         input={{
           id: NOTEBOOK_ID,
           expected_updated_at: '2024-01-01T00:00:00.000Z',
@@ -128,6 +133,7 @@ describe('NotebookProposalRenderer', () => {
       <NotebookProposalRenderer
         mode="create"
         state="approval-requested"
+        confirmState="approval-requested"
         input={{ nonsense: true }}
         output={undefined}
         onApprove={vi.fn()}
@@ -154,11 +160,25 @@ describe('NotebookProposalRenderer', () => {
     expect(link).toHaveAttribute('href', `/project/default/explorer/notebook/${NOTEBOOK_ID}`)
   })
 
-  it('renders a muted skipped summary when output-denied', () => {
+  it('keeps the preview in the message after skip', () => {
     render(
-      <NotebookProposalRenderer mode="update" state="output-denied" input={{}} output={undefined} />
+      <NotebookProposalRenderer
+        mode="create"
+        state="output-denied"
+        input={{
+          name: 'New notebook',
+          content: {
+            schema_version: 1,
+            cells: [{ _tag: 'markdown_cell', text: 'hello' }],
+          },
+        }}
+        output={undefined}
+      />
     )
 
-    expect(screen.getByText('Skipped notebook update')).toBeInTheDocument()
+    expect(screen.getByRole('toolbar', { name: 'Notebook toolbar' })).toBeInTheDocument()
+    expect(screen.getByText('New notebook')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Create' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Skipped notebook creation')).not.toBeInTheDocument()
   })
 })

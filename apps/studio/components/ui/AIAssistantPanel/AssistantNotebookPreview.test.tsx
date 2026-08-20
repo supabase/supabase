@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { NotebookPreview } from './NotebookPreview'
+import { AssistantNotebookPreview } from './AssistantNotebookPreview'
 import type { NotebookCellDiffEntry } from '@/data/content/notebooks/notebook-operations'
 import type { AgentCell, CellWire } from '@/data/content/notebooks/notebook-schema'
 import { customRender as render } from '@/tests/lib/custom-render'
@@ -29,7 +29,7 @@ const agentDatabaseCell = (database_identifier?: string): AgentCell => ({
   database_identifier,
 })
 
-describe('NotebookPreview', () => {
+describe('AssistantNotebookPreview', () => {
   // The whole safety argument for this feature reduces to this: agent-authored markdown text
   // is rendered as literal source (via CodeBlock), never interpreted into real DOM nodes. A
   // future refactor that swaps in <Markdown> would break this silently.
@@ -40,7 +40,7 @@ describe('NotebookPreview', () => {
       { _tag: 'added', cell: agentMarkdownCell(adversarialText), operationIndex: 0 },
     ]
 
-    const { container } = render(<NotebookPreview entries={entries} mode="update" />)
+    const { container } = render(<AssistantNotebookPreview entries={entries} mode="update" />)
 
     expect(container.querySelectorAll('img')).toHaveLength(0)
     expect(container.querySelectorAll('[href]')).toHaveLength(0)
@@ -53,9 +53,11 @@ describe('NotebookPreview', () => {
       { _tag: 'unchanged', cell: wireMarkdownCell('b', 'two') },
     ]
 
-    render(<NotebookPreview entries={entries} mode="create" />)
+    render(<AssistantNotebookPreview entries={entries} mode="create" />)
 
+    expect(screen.getByRole('toolbar', { name: 'Notebook toolbar' })).toBeInTheDocument()
     expect(screen.getByText('2 cells')).toBeInTheDocument()
+    expect(screen.getByText('New notebook')).toBeInTheDocument()
   })
 
   it('surfaces a metadata-only change on a replaced cell even when the sql is unchanged', () => {
@@ -68,9 +70,12 @@ describe('NotebookPreview', () => {
       },
     ]
 
-    render(<NotebookPreview entries={entries} mode="update" />)
+    render(<AssistantNotebookPreview entries={entries} mode="update" />)
 
     expect(screen.getByText('Database: primary → Database: replica-3')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Replaced Query: Untitled query' })
+    ).toHaveTextContent('Database: primary → Database: replica-3')
   })
 
   it('hides entries past the limit behind a "Show N more" button', async () => {
@@ -79,7 +84,7 @@ describe('NotebookPreview', () => {
       cell: wireMarkdownCell(`cell-${index}`, `text-${index}`),
     }))
 
-    render(<NotebookPreview entries={entries} mode="create" />)
+    render(<AssistantNotebookPreview entries={entries} mode="create" />)
 
     expect(screen.getByText('Show 2 more cells')).toBeInTheDocument()
   })

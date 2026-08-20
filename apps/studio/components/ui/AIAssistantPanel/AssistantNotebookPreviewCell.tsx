@@ -1,4 +1,4 @@
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, FileText, SquareCode } from 'lucide-react'
 import {
   cn,
   Collapsible,
@@ -13,18 +13,20 @@ import { CodeBlock } from 'ui-patterns/CodeBlock'
 import {
   getCellCodeBlockLanguage,
   getCellLabel,
-  getCellMetadataLine,
   getCellMonacoLanguage,
   getCellSourceText,
-} from './NotebookPreview.utils'
+  getEntryMetadataLine,
+} from './AssistantNotebookPreview.utils'
 import { DiffEditor } from '@/components/ui/DiffEditor'
 import type { NotebookCellDiffEntry } from '@/data/content/notebooks/notebook-operations'
 import type { AgentCell, CellWire } from '@/data/content/notebooks/notebook-schema'
 
-export interface NotebookPreviewCellProps {
+export interface AssistantNotebookPreviewCellProps {
   entry: NotebookCellDiffEntry
   isExpanded: boolean
   onExpandedChange: (isExpanded: boolean) => void
+  /** Create previews omit per-row change glyphs — every cell is an add. */
+  mode: 'create' | 'update'
 }
 
 /**
@@ -47,37 +49,46 @@ function getEntryCell(entry: NotebookCellDiffEntry): CellWire | AgentCell {
 }
 
 /** One row of the diff card: a header line that collapses to a single row, plus its content. */
-export const NotebookPreviewCell = ({
+export const AssistantNotebookPreviewCell = ({
   entry,
   isExpanded,
   onExpandedChange,
-}: NotebookPreviewCellProps) => {
+  mode,
+}: AssistantNotebookPreviewCellProps) => {
   const marker = CHANGE_MARKERS[entry._tag]
   const isRemoved = entry._tag === 'removed'
-  const label = getCellLabel(getEntryCell(entry))
+  const cell = getEntryCell(entry)
+  const label = getCellLabel(cell)
+  const metadata = getEntryMetadataLine(entry)
 
   return (
     <Collapsible open={isExpanded} onOpenChange={onExpandedChange}>
       <CollapsibleTrigger
         aria-label={`${marker.changeLabel} ${label}`}
-        className="group flex w-full items-center gap-2 px-3 py-1.5 text-left transition-colors hover:bg-surface-200"
+        className="group flex w-full items-center gap-2 bg-muted px-3 py-2 text-left transition-colors hover:bg-accent"
       >
-        <ChangeGlyph marker={marker} />
+        {mode === 'update' && <ChangeGlyph marker={marker} />}
         <ChevronRight
           size={12}
           className="shrink-0 text-foreground-lighter transition-transform group-data-[state=open]:rotate-90"
         />
+        <CellTypeIcon cell={cell} />
         <span
           className={cn(
-            'truncate text-sm text-foreground-light',
+            'min-w-0 flex-1 truncate text-sm text-foreground',
             isRemoved && 'text-foreground-lighter line-through'
           )}
         >
           {label}
         </span>
+        {metadata && (
+          <span className="min-w-0 max-w-[45%] shrink truncate text-sm text-muted-foreground">
+            {metadata}
+          </span>
+        )}
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <div className="flex flex-col gap-1.5 px-3 pb-2.5">
+        <div className="border-t">
           <CellBody entry={entry} />
         </div>
       </CollapsibleContent>
@@ -108,44 +119,27 @@ const ChangeGlyph = ({ marker }: { marker: ChangeMarker }) => {
   )
 }
 
+/** Same icons the notebook tab uses for query vs markdown cells. */
+const CellTypeIcon = ({ cell }: { cell: CellWire | AgentCell }) => {
+  const Icon = cell._tag === 'markdown_cell' ? FileText : SquareCode
+  return <Icon aria-hidden size={14} className="shrink-0 text-foreground-muted" />
+}
+
 const CellBody = ({ entry }: { entry: NotebookCellDiffEntry }) =>
   entry._tag === 'replaced' ? (
     <ReplacedCellBody before={entry.before} after={entry.after} />
   ) : (
-    <>
-      <CellSource cell={entry.cell} />
-      <MetadataLine text={getCellMetadataLine(entry.cell)} />
-    </>
+    <CellSource cell={entry.cell} />
   )
 
-/**
- * A `replace_cell` can change only the source parameters (`database_identifier`,
- * `time_range`) and leave `sql`/`text` identical — the `DiffEditor` above would then show no
- * change at all, so the metadata is compared independently and rendered as its own
- * before → after line whenever it differs.
- */
-const ReplacedCellBody = ({ before, after }: { before: CellWire; after: AgentCell }) => {
-  const beforeMetadata = getCellMetadataLine(before)
-  const afterMetadata = getCellMetadataLine(after)
-
-  return (
-    <>
-      <DiffEditor
-        original={getCellSourceText(before)}
-        modified={getCellSourceText(after)}
-        language={getCellMonacoLanguage(after)}
-        height={240}
-      />
-      {beforeMetadata !== afterMetadata ? (
-        <MetadataLine
-          text={`${beforeMetadata ?? 'No metadata'} → ${afterMetadata ?? 'No metadata'}`}
-        />
-      ) : (
-        <MetadataLine text={afterMetadata} />
-      )}
-    </>
-  )
-}
+const ReplacedCellBody = ({ before, after }: { before: CellWire; after: AgentCell }) => (
+  <DiffEditor
+    original={getCellSourceText(before)}
+    modified={getCellSourceText(after)}
+    language={getCellMonacoLanguage(after)}
+    height={240}
+  />
+)
 
 /**
  * The cell's source, always rendered as literal text via `CodeBlock` — agent-authored markdown
@@ -154,14 +148,11 @@ const ReplacedCellBody = ({ before, after }: { before: CellWire; after: AgentCel
 const CellSource = ({ cell }: { cell: CellWire | AgentCell }) => (
   <CodeBlock
     hideCopy
+    hideLineNumbers
     language={getCellCodeBlockLanguage(cell)}
     value={getCellSourceText(cell)}
-    hideLineNumbers
     wrapLongLines
-    className="wrap-break-word rounded-none border-0 p-0 text-xs"
+    className="wrap-break-word rounded-none border-0 px-3! py-2! text-xs"
+    wrapperClassName="max-w-none"
   />
 )
-
-/** A plain-text metadata line for a query cell — never rendered as a link or attribute. */
-const MetadataLine = ({ text }: { text: string | null }) =>
-  text ? <p className="text-xs text-foreground-lighter">{text}</p> : null

@@ -249,7 +249,11 @@ function MessagePartNotebookProposal({
     return <p className="text-xs text-danger px-4">{NOTEBOOK_FAILED_LABEL[mode]}</p>
   }
 
-  const approvalId = state === 'approval-requested' ? toolPart.approval?.id : undefined
+  const { confirmState, onApprove, onDeny } = getManualToolApprovalHandlers({
+    state,
+    approval: toolPart.approval,
+    addToolApprovalResponse,
+  })
 
   return (
     <NotebookProposalRenderer
@@ -257,14 +261,9 @@ function MessagePartNotebookProposal({
       state={state}
       input={input}
       output={output}
-      onApprove={
-        approvalId ? () => addToolApprovalResponse?.({ id: approvalId, approved: true }) : undefined
-      }
-      onDeny={
-        approvalId
-          ? () => addToolApprovalResponse?.({ id: approvalId, approved: false })
-          : undefined
-      }
+      confirmState={confirmState}
+      onApprove={onApprove}
+      onDeny={onDeny}
     />
   )
 }
