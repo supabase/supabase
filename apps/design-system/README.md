@@ -64,9 +64,9 @@ There are several parts of this design system that need to be manually updated a
 - `registry/charts.ts`: list of chart components
 - `registry/default/example/*`: the actual example components
 
-You will need to rebuild the design system’s registry after making new additions:
+`pnpm dev`, `pnpm typecheck`, and `pnpm build` generate `__registry__` automatically. If you add registry examples while the app is already running, regenerate it:
 
 ```bash
 cd apps/design-system
-pnpm build:registry
+pnpm generate:registry
 ```

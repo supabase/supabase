@@ -5,16 +5,17 @@
   "type": "module",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "dev": "run-p --race dev:*",
+    "dev": "pnpm run generate:registry && run-p --race dev:*",
     "dev:next": "next dev --turbopack --port 3003",
     "dev:content": "contentlayer2 dev",
     "build": "pnpm run content:build && pnpm run build:registry && next build --turbopack",
-    "build:registry": "tsx ./scripts/build-registry.mts && prettier --log-level silent --write \"registry/**/*.{ts,tsx,mdx}\" --cache",
+    "generate:registry": "tsx ./scripts/build-registry.mts",
+    "build:registry": "pnpm run generate:registry && prettier --log-level silent --write \"registry/**/*.{ts,tsx,mdx}\" --cache",
     "start": "next start",
     "lint": "eslint .",
     "content:build": "contentlayer2 build",
-    "clean": "rimraf .next .turbo tsconfig.tsbuildinfo",
-    "typecheck": "contentlayer2 build && tsc --noEmit -p tsconfig.json"
+    "clean": "rimraf .next .turbo tsconfig.tsbuildinfo __registry__",
+    "typecheck": "contentlayer2 build && pnpm run generate:registry && tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
