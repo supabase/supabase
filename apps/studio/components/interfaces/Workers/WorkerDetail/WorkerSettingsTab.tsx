@@ -1,6 +1,5 @@
-import { Sparkles } from 'lucide-react'
 import { ReactNode } from 'react'
-import { Badge, Card, CardContent } from 'ui'
+import { Badge } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageSection,
@@ -18,8 +17,6 @@ import type { Worker } from '../Workers.types'
 import { formatSize, getRuntimeMeta } from '../Workers.utils'
 import { buildWorkerCliCommands } from '../workerSnippets'
 import { WorkerSnippetTabs } from '../WorkerSnippetTabs'
-import CopyButton from '@/components/ui/CopyButton'
-import { WORKERS_SKILL_MARKDOWN } from '@/lib/constants/workers'
 
 interface WorkerSettingsTabProps {
   worker: Worker
@@ -164,37 +161,6 @@ export const WorkerSettingsTab = ({ worker }: WorkerSettingsTabProps) => {
                 />
               ))}
             </div>
-          </PageSectionContent>
-        </PageSection>
-
-        <PageSection>
-          <PageSectionMeta>
-            <PageSectionSummary>
-              <PageSectionTitle>Agents &amp; skills</PageSectionTitle>
-              <PageSectionDescription>
-                Hand a skill file to your agent so it can invoke, redeploy, and manage this worker.
-              </PageSectionDescription>
-            </PageSectionSummary>
-          </PageSectionMeta>
-          <PageSectionContent>
-            <Card>
-              <CardContent className="flex flex-col gap-3 p-4">
-                <div className="flex items-center gap-2">
-                  <Sparkles size={14} className="text-foreground-light" />
-                  <span className="text-sm text-foreground">SKILL.md</span>
-                  <Badge variant="default">For agents</Badge>
-                </div>
-                <p className="text-sm text-foreground-light">
-                  Drop this skill into Claude Code or any agent to let it deploy and manage workers
-                  from natural language.
-                </p>
-                <div className="flex items-center gap-3">
-                  <CopyButton text={WORKERS_SKILL_MARKDOWN} variant="default" size="tiny">
-                    Copy SKILL.md
-                  </CopyButton>
-                </div>
-              </CardContent>
-            </Card>
           </PageSectionContent>
         </PageSection>
       </PageContainer>
