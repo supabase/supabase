@@ -72,10 +72,7 @@ const WorkersPage: NextPageWithLayout = () => {
               <AlertError error={error} subject="Failed to retrieve workers" />
             )}
             {isSuccess && workers.length === 0 && (
-              <WorkersEmptyState
-                onDeploy={() => setShowDeployInstructions(true)}
-                onCreate={() => setShowCreate(true)}
-              />
+              <WorkersEmptyState onCreate={() => setShowCreate(true)} />
             )}
             {isSuccess && workers.length > 0 && ref && (
               <WorkersList
