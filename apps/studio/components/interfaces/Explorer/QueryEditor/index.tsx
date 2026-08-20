@@ -278,7 +278,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     if (!promptState) return
 
     const { original, modified } = await requestCompletion(prompt, promptState)
-    if (original && modified) {
+    if (original !== undefined && modified !== undefined) {
       setPendingProposal({
         original,
         modified,
