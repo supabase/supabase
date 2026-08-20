@@ -50,3 +50,11 @@ export const formatSelectedDateRange = (value: DatePickerToFrom) => {
     return { from: from.utc().toISOString(), to: to.utc().toISOString() }
   }
 }
+
+export function formatPartner(partner: string, partnerEmail: string | undefined) {
+  let result = `${partner[0].toUpperCase()}${partner.slice(1).toLowerCase()}`
+  if (partnerEmail) {
+    result = `${partnerEmail} (${result})`
+  }
+  return result
+}

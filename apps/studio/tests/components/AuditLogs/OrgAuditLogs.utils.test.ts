@@ -1,7 +1,10 @@
 import dayjs from 'dayjs'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 
-import { formatSelectedDateRange } from '@/components/interfaces/Organization/AuditLogs/AuditLogs.utils'
+import {
+  formatPartner,
+  formatSelectedDateRange,
+} from '@/components/interfaces/Organization/AuditLogs/AuditLogs.utils'
 
 // Pin "now" to a fixed point so date comparisons are deterministic
 const NOW = dayjs('2024-06-15T14:30:00')
@@ -79,5 +82,19 @@ describe('formatSelectedDateRange', () => {
     })
     expect(result.from).toMatch(/Z$/)
     expect(result.to).toMatch(/Z$/)
+  })
+})
+
+describe('formatPartner', () => {
+  test('capitalizes the partner name', () => {
+    expect(formatPartner('github', undefined)).toBe('Github')
+  })
+
+  test('prefixes with the partner email when provided', () => {
+    expect(formatPartner('github', 'a@b.com')).toBe('a@b.com (Github)')
+  })
+
+  test('normalizes casing regardless of input case', () => {
+    expect(formatPartner('GITHUB', undefined)).toBe('Github')
   })
 })
