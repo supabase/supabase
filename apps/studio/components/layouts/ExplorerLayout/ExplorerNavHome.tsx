@@ -70,7 +70,7 @@ export const ExplorerNavHome = ({
             const Icon = EXPLORER_SECTIONS.find((section) => section.type === item.type)?.icon
             const content = (
               <>
-                {Icon && <Icon size={14} className="shrink-0" />}
+                {Icon && <Icon size={14} className="shrink-0" aria-hidden="true" />}
                 <span className="flex-1 truncate text-left">{item.label}</span>
                 <span className="shrink-0 text-xs text-foreground-lighter">
                   {formatRelativeTimeShort(item.updatedAt)}
