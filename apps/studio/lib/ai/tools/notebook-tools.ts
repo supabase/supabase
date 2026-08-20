@@ -24,6 +24,54 @@ export type NotebookToolsContext = {
   authorization?: string
 }
 
+const notebookToolErrorMetadataSchema = z.object({
+  exposeToAssistant: z.boolean(),
+})
+
+export type NotebookToolErrorMetadata = z.infer<typeof notebookToolErrorMetadataSchema>
+
+const notebookToolErrorSchema = notebookToolErrorMetadataSchema.extend({
+  tag: z.literal('notebook_tool_error'),
+  message: z.string(),
+})
+
+export type EncodedNotebookToolError = z.infer<typeof notebookToolErrorSchema>
+
+/** Thrown by update_notebook for failures the assistant can act on by retrying. */
+export class NotebookToolError extends Error {
+  readonly metadata: NotebookToolErrorMetadata
+
+  constructor(message: string, metadata: NotebookToolErrorMetadata) {
+    super(message)
+    this.name = 'NotebookToolError'
+    this.metadata = notebookToolErrorMetadataSchema.parse(metadata)
+  }
+}
+
+/** Called from the stream's `onError` (generate-v4.ts), which still has the live Error. */
+export function encodeNotebookToolError(error: unknown): string | null {
+  if (!(error instanceof NotebookToolError)) return null
+  return JSON.stringify(
+    notebookToolErrorSchema.parse({
+      ...error.metadata,
+      tag: 'notebook_tool_error',
+      message: error.message,
+    })
+  )
+}
+
+/** Called from the history filter (generate-assistant-response.ts) on a persisted errorText. */
+export function decodeNotebookToolError(errorText: string): EncodedNotebookToolError | null {
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(errorText)
+  } catch {
+    return null
+  }
+  const result = notebookToolErrorSchema.safeParse(parsed)
+  return result.success ? result.data : null
+}
+
 export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
   const { projectRef, authorization } = ctx
   const authHeaders = authorization ? { Authorization: authorization } : undefined
@@ -153,8 +201,9 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
         const notebook = await getNotebook({ projectRef, id }, undefined, authHeaders)
 
         if (notebook.updated_at !== expected_updated_at) {
-          throw new Error(
-            `Notebook "${id}" changed since expected_updated_at (${expected_updated_at}); it is now ${notebook.updated_at}. Call get_notebook again and reissue update_notebook against the current content.`
+          throw new NotebookToolError(
+            `Notebook "${id}" changed since expected_updated_at (${expected_updated_at}); it is now ${notebook.updated_at}. Call get_notebook again and reissue update_notebook against the current content.`,
+            { exposeToAssistant: true }
           )
         }
 
@@ -165,7 +214,9 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
 
         const result = applyNotebookOperations(wireNotebook, operations)
         if (!result.success) {
-          throw new Error(describeNotebookOperationError(result.error))
+          throw new NotebookToolError(describeNotebookOperationError(result.error), {
+            exposeToAssistant: true,
+          })
         }
 
         // Same promotion as create_notebook above, inlined here for the same auditability
