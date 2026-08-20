@@ -1430,7 +1430,7 @@ export interface UnifiedLogsBannerDismissButtonClickedEvent {
 /**
  * The logs.all deprecation banner was rendered, fired once per mount. Acts as the
  * denominator for the dismiss rate. Migration outcome itself is measured via decay in
- * `/v1 logs.all` traffic in the warehouse, not from this event.
+ * `/v1/projects/:ref/analytics/endpoints/logs.all` traffic in the warehouse, not from this event.
  *
  * @group Events
  * @source studio
