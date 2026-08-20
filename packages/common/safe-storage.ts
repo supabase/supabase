@@ -61,7 +61,16 @@ function createSafeStorage(kind: StorageKind) {
       const store = getBackingStore(kind)
       if (store === null) return []
       try {
-        return Object.keys(store)
+        // `length` and `key(i)` rather than `Object.keys(store)`: the stored entries are
+        // only own enumerable properties on a plain implementation. jsdom (and this repo's
+        // own test polyfill) expose the methods instead, so `Object.keys` returns
+        // ["getItem", "setItem", ...] and the real entries are invisible.
+        const result: string[] = []
+        for (let i = 0; i < store.length; i++) {
+          const key = store.key(i)
+          if (key !== null) result.push(key)
+        }
+        return result
       } catch (error) {
         reportFailure(kind, 'keys', '*', error)
         return []
