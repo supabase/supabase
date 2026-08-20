@@ -39,7 +39,7 @@ export const WorkerPromptPanel = ({ input, className }: WorkerPromptPanelProps) 
   })
 
   return (
-    <PromptPanel className={className}>
+    <PromptPanel className={className} adaptiveHeight>
       <Prompt value="ai">
         <PromptTitle icon={<Sparkles />}>AI Prompt</PromptTitle>
         <PromptCopy>{snippets.aiPrompt}</PromptCopy>
