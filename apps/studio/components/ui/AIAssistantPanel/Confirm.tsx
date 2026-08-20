@@ -10,6 +10,8 @@ interface ConfirmFooterProps {
   confirmLabelLoading?: string
   isLoading?: boolean
   isDisabled?: boolean
+  /** Escape hatch for consumers that attach the bar directly under their own frame. */
+  className?: string
   onCancel?: () => void | Promise<void>
   onConfirm?: () => void | Promise<void>
 }
@@ -22,6 +24,7 @@ export const ConfirmFooter = ({
   confirmLabelLoading = 'Working...',
   isLoading = false,
   isDisabled = false,
+  className,
   onCancel,
   onConfirm,
 }: ConfirmFooterProps) => {
@@ -32,7 +35,8 @@ export const ConfirmFooter = ({
       className={cn(
         'flex items-center justify-between py-2 pr-2 pl-4 text-xs text-foreground gap-3 shrink-0',
         'relative overflow-hidden border-t bg-border shadow-inset',
-        'bg-linear-to-r from-background-surface-75 to-background-surface-200'
+        'bg-linear-to-r from-background-surface-75 to-background-surface-200',
+        className
       )}
     >
       <div className="flex-1 relative z-10">{message}</div>
