@@ -174,10 +174,11 @@ export const AssistantChat = ({
   // on org-level pages, where there's no project in the URL,
   // resolve it fresh from the chat's own projectRef instead.
   const isOrgViewSupportChat = !project?.ref && !!supportMetadata?.projectRef
-  const { data: supportChatProjectDetail } = useProjectDetailQuery(
-    { ref: supportMetadata?.projectRef },
-    { enabled: isOrgViewSupportChat }
-  )
+  const {
+    data: supportChatProjectDetail,
+    isError: isSupportChatProjectError,
+    refetch: refetchSupportChatProjectDetail,
+  } = useProjectDetailQuery({ ref: supportMetadata?.projectRef }, { enabled: isOrgViewSupportChat })
   // Mirrors the readiness check in SupportAssistantSuccessCardContent — a project still
   // coming up, or with a connection string that isn't valid yet, isn't ready to send to.
   const isSupportChatProjectReady =
@@ -684,6 +685,24 @@ export const AssistantChat = ({
               type="default"
               title="Assistant has been temporarily disabled"
               description="We're currently looking into getting it back online"
+            />
+          )}
+
+          {isOrgViewSupportChat && isSupportChatProjectError && (
+            <Admonition
+              type="warning"
+              layout="horizontal"
+              title="Couldn't load this project's details"
+              description="The assistant needs this to respond to your support request."
+              actions={
+                <Button
+                  variant="default"
+                  size="tiny"
+                  onClick={() => refetchSupportChatProjectDetail()}
+                >
+                  Try again
+                </Button>
+              }
             />
           )}
 

@@ -197,21 +197,34 @@ export function SupportAssistantSuccessCardContent({
           aria-hidden
         />
       </CardHeader>
-      {chat ? (
-        <SupportAssistantResponsePreview chat={chat as SupportAssistantPreviewChat} />
-      ) : isProjectDetailError ? (
-        <SupportAssistantResponseErrorState
-          onRetry={(event) => {
-            event.stopPropagation()
-            refetchProjectDetail()
-          }}
-        />
-      ) : (
-        <CardContent>
-          <SupportAssistantResponseLoadingSkeleton />
-        </CardContent>
-      )}
+      <SupportAssistantCardBody
+        chat={chat as SupportAssistantPreviewChat | undefined}
+        isError={isProjectDetailError}
+        onRetry={(event) => {
+          event.stopPropagation()
+          refetchProjectDetail()
+        }}
+      />
     </Card>
+  )
+}
+
+function SupportAssistantCardBody({
+  chat,
+  isError,
+  onRetry,
+}: {
+  chat: SupportAssistantPreviewChat | undefined
+  isError: boolean
+  onRetry: (event: MouseEvent<HTMLButtonElement>) => void
+}) {
+  if (chat) return <SupportAssistantResponsePreview chat={chat} />
+  if (isError) return <SupportAssistantResponseErrorState onRetry={onRetry} />
+
+  return (
+    <CardContent>
+      <SupportAssistantResponseLoadingSkeleton />
+    </CardContent>
   )
 }
 
