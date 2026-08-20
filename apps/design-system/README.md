@@ -12,13 +12,15 @@ pnpm i
 pnpm dev
 ```
 
-The `dev` command runs both the Next.js development server and Contentlayer concurrently, which is recommended for most development workflows.
+The `dev` command generates `__registry__`, then runs the Next.js development server and Contentlayer together. That is the recommended workflow.
 
 ### Alternative commands
 
-You can also run the development server and content watcher separately:
+You can also run the development server and content watcher separately. Generate the registry first, because `dev:next` and `dev:content` do not:
 
 ```bash
+pnpm generate:registry
+
 # Run only the Next.js development server
 pnpm dev:next
 
@@ -26,19 +28,11 @@ pnpm dev:next
 pnpm dev:content
 ```
 
-Or run the development server from the root directory:
+From the repo root, `pnpm dev:design-system` runs the same `dev` script, so it also generates `__registry__`. If you split the watchers from the root, generate first:
 
 ```bash
-pnpm dev:design-system
-```
-
-To run both the development server and content watcher from the root directory, you can use:
-
-```bash
-# Run the development server
-pnpm dev:design-system
-
-# Run the content watcher (in a separate terminal shell)
+pnpm --filter=design-system generate:registry
+pnpm --filter=design-system dev:next
 pnpm --filter=design-system dev:content
 ```
 
@@ -46,25 +40,27 @@ Open [http://localhost:3003](http://localhost:3003) in your browser to see the r
 
 ### Watching for MDX changes
 
-The `dev` command automatically watches for changes to MDX files with hot reload. If you're running the `pnpm dev:next` separately, you'll need to run `pnpm dev:content` in a separate terminal shell to watch for content changes.
+The `dev` command watches MDX files and hot-reloads them. If you are running `pnpm dev:next` on its own, also run `pnpm dev:content` in another terminal.
 
 ### Adding components
 
-The design system _references_ components rather than housing them. That’s an important distinction to make, as everything that follows here is about the documentation of components. You can add or edit components in one of these two places:
+The design system _references_ components rather than housing them. That distinction matters: everything below is about documenting components, not implementing them. Add or edit the components themselves in one of these two places:
 
 - [`packages/ui`](https://github.com/supabase/supabase/tree/master/packages/ui): basic UI components
-- [`packages/ui-patterns`](https://github.com/supabase/supabase/tree/master/packages/ui-patterns): components which are built using NPM libraries or amalgamations of components from `patterns/ui`
+- [`packages/ui-patterns`](https://github.com/supabase/supabase/tree/master/packages/ui-patterns): components built from libraries or from `packages/ui`
 
-There are several parts of this design system that need to be manually updated after components have been added or removed (from documentation). These include:
+After you add or remove documented components, update these source files:
 
 - `config/docs.ts`: list of components in the sidebar
-- `content/docs`: the actual component documentation
-- `registry/examples.ts`: list of example components
-- `registry/fragments.ts`: list of fragment components
-- `registry/charts.ts`: list of chart components
-- `registry/default/example/*`: the actual example components
+- `content/docs`: the component documentation
+- `registry/examples.ts`: example components
+- `registry/fragments.ts`: fragment components
+- `registry/charts.ts`: chart components
+- `registry/copy-writing.ts`: copywriting examples
+- `registry/default/example/*`: the example component implementations
+- `registry/default/block/*`: chart block implementations, when you add a chart
 
-`pnpm dev`, `pnpm typecheck`, and `pnpm build` generate `__registry__` automatically. If you add registry examples while the app is already running, regenerate it:
+Do not edit `__registry__`. `pnpm dev`, `pnpm typecheck`, and `pnpm build` generate it from the files above, and it is gitignored. If you add registry entries while the app is already running, regenerate it:
 
 ```bash
 cd apps/design-system
