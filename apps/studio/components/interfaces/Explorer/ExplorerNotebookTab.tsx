@@ -23,6 +23,7 @@ import {
   NotebookText,
   Play,
   Save,
+  SearchX,
   SquareCode,
   Trash,
 } from 'lucide-react'
@@ -190,9 +191,9 @@ export const ExplorerNotebookTab = () => {
 
   if (isNotFound) {
     return (
-      <div className="px-20 flex flex-col h-full items-center justify-center bg-surface-100">
+      <div className="p-4 h-full bg-surface-100">
         <EmptyStatePresentational
-          icon={<Notebook className="text-foreground-lighter" />}
+          icon={<SearchX className="text-foreground-lighter" />}
           title="Notebook not found"
           description="This notebook may have been deleted or does not exist."
           contentClassName="[&>h3]:text-sm [&>p]:text-xs"

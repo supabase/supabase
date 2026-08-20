@@ -386,8 +386,13 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
               placeholder={!promptState?.isOpen ? generatePlaceholder(os) : ''}
               placeholderClassName="top-[13px]"
               className={variant === 'embedded' ? 'h-44' : undefined}
-              actions={{ runQuery: { enabled: !isRunDisabled, callback: handleRunQuery } }}
-              options={{ minimap: { enabled: false }, padding: { top: 8 } }}
+              actions={{
+                runQuery: { enabled: !isRunDisabled, callback: handleRunQuery },
+              }}
+              options={{
+                minimap: { enabled: false },
+                padding: { top: 8 },
+              }}
               onInputChange={(value) => onSqlChange(value ?? '')}
               onMount={(editor, monaco) => {
                 editor.onDidBlurEditorWidget(() => onSqlCommitRef.current?.(sqlRef.current))
