@@ -65,7 +65,7 @@ Keep this key secret. Anyone with the private key can forge SAML requests on beh
 
 </Admonition>
 
-<Admonition type="tip">
+<Admonition type="note">
 
 For a production deployment, consider using a 4096-bit key by adding `-pkeyopt rsa_keygen_bits:4096` to the `openssl genpkey` command above.
 
@@ -136,7 +136,7 @@ curl http://<your-domain>/auth/v1/sso/saml/metadata
 
 This returns an XML document containing your SP entity ID, ACS endpoint URL, and signing certificate. You will need to provide this to your IdP.
 
-<Admonition type="tip">
+<Admonition type="note">
 
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 Add `?download=true` to the request URL to get the metadata as a downloadable XML file with a 5-year validity period - this is useful for IdPs that require a file upload instead of a URL.

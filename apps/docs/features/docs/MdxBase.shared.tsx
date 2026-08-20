@@ -34,9 +34,8 @@ import { ArrowDown, Check, X } from 'lucide-react'
 import Link from 'next/link'
 import { type ComponentPropsWithoutRef } from 'react'
 import { Badge, Button } from 'ui'
-import { Admonition, type AdmonitionProps } from 'ui-patterns/admonition'
+import { Admonition, type AdmonitionProps } from 'ui-patterns/Admonition'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
-import { IconPanel } from 'ui-patterns/IconPanel'
 import SqlToRest from 'ui-patterns/SqlToRest'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
 
@@ -91,7 +90,6 @@ const components = {
   GlassPanel,
   IconArrowDown: ArrowDown,
   IconCheck: Check,
-  IconPanel,
   IconX: X,
   Image: (props: ImageProps) => <Image className="rounded-md w-full" {...props} />,
   Link,

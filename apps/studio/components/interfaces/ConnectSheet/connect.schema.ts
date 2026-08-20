@@ -95,8 +95,8 @@ const frameworkReactFilesStep: StepDefinition = {
 
 const frameworkShadcnStep: StepDefinition = {
   id: 'shadcn-add',
-  title: 'Add Supabase UI components',
-  description: 'Install Supabase UI components via the shadcn registry.',
+  title: 'Add Supabase Library blocks',
+  description: 'Install Supabase Library blocks via the shadcn registry.',
   content: 'steps/shadcn/command',
 }
 
@@ -322,7 +322,7 @@ export const connectSchema: ConnectSchema = {
       id: 'frameworkUi',
       type: 'switch',
       label: 'Shadcn',
-      description: 'Install Supabase UI components with shadcn.',
+      description: 'Install Supabase Library blocks with shadcn.',
       defaultValue: false,
       dependsOn: { framework: ['nextjs', 'react'] },
     },

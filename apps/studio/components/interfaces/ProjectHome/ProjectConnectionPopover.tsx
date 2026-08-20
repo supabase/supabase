@@ -15,10 +15,12 @@ import {
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getConnectionStrings } from '@/components/interfaces/Connect/DatabaseSettings.utils'
+import { appendHighAvailabilitySslParams } from '@/components/interfaces/ConnectSheet/DatabaseSettings.utils'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { pluckObjectFields } from '@/lib/helpers'
 
@@ -57,6 +59,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
     { enabled: IS_PLATFORM && open && !!projectRef }
   )
   const primaryDatabase = databases?.find((db) => db.identifier === projectRef)
+  const isHighAvailability = useIsHighAvailability()
 
   const directConnectionString = useMemo(() => {
     if (
@@ -68,11 +71,12 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
       return ''
     }
     const connectionInfo = pluckObjectFields(primaryDatabase, [...DB_FIELDS])
-    return getConnectionStrings({
+    const uri = getConnectionStrings({
       connectionInfo: { ...EMPTY_CONNECTION_INFO, ...connectionInfo },
       metadata: { projectRef },
     }).direct.uri
-  }, [primaryDatabase, projectRef])
+    return isHighAvailability ? appendHighAvailabilitySslParams(uri) : uri
+  }, [primaryDatabase, projectRef, isHighAvailability])
 
   const cliCommands = useMemo(
     () =>

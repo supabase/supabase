@@ -174,7 +174,7 @@ const additionalResources = [
     title: 'AI tools',
     description: 'Develop with Supabase AI-first using plugins, MCP, and skills.',
     icon: 'ai-tools',
-    href: '/guides/ai',
+    href: '/guides/ai-tools',
   },
   {
     title: 'Platform guides',
@@ -201,10 +201,10 @@ const additionalResources = [
     href: '/guides/integrations',
   },
   {
-    title: 'Supabase UI',
+    title: 'Supabase Library',
     description: 'A collection of pre-built Supabase components to speed up your project.',
     icon: 'ui',
-    href: 'https://supabase.com/ui',
+    href: 'https://supabase.com/library',
     external: true,
   },
   {
@@ -393,18 +393,16 @@ const HomePage = () => (
             </div>
           </div>
 
-          <div className="col-span-8 grid grid-cols-12 not-prose">
-            <IconLinkList
-              labelledBy="self-hosting"
-              className="col-span-full lg:col-span-8"
-              itemClassName="col-span-6"
-              items={selfHostingOptions.map((option) => ({
-                title: option.title,
-                href: option.href,
-                icon: <IconLinkMenuIcon icon={option.icon} />,
-              }))}
-            />
-          </div>
+          <IconLinkList
+            labelledBy="self-hosting"
+            className="col-span-8 not-prose"
+            itemClassName="col-span-6"
+            items={selfHostingOptions.map((option) => ({
+              title: option.title,
+              href: option.href,
+              icon: <IconLinkMenuIcon icon={option.icon} />,
+            }))}
+          />
         </div>
       )}
     </div>

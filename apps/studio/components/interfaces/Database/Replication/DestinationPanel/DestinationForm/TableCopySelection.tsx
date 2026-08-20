@@ -1,8 +1,8 @@
 import { useParams } from 'common'
 import { useMemo } from 'react'
-import type { UseFormReturn } from 'react-hook-form'
+import { useWatch, type UseFormReturn } from 'react-hook-form'
 import { FormControl, FormField, Select, SelectContent, SelectItem, SelectTrigger } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
 
@@ -32,7 +32,10 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
   const { ref: projectRef } = useParams()
   const sourceId = useReplicationSourceId({ projectRef })
 
-  const { publicationName, tableSyncCopyMode, tableSyncCopyTableIds } = form.watch()
+  const [publicationName, tableSyncCopyMode, tableSyncCopyTableIds] = useWatch({
+    control: form.control,
+    name: ['publicationName', 'tableSyncCopyMode', 'tableSyncCopyTableIds'],
+  })
 
   const {
     data: publications = [],

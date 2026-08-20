@@ -1,9 +1,11 @@
 import { describe, expect, test } from 'vitest'
 
 import {
+  appendHighAvailabilitySslParams,
   buildConnectionStringPooler,
   getSelfHostedDirectStrings,
   getSelfHostedPoolerStrings,
+  HIGH_AVAILABILITY_SSL_PARAMS,
 } from '../DatabaseSettings.utils'
 import type { DeploymentMode } from '@/hooks/misc/useDeploymentMode'
 
@@ -99,6 +101,7 @@ describe('buildConnectionStringPooler', () => {
       connectionStringsShared: sharedPlatform,
       connectionStringsDedicated: dedicatedPlatform,
       ipv4Addon: true,
+      isHighAvailability: false,
     })
 
     expect(result.transactionShared).toBe(sharedPlatform.pooler.uri)
@@ -115,6 +118,7 @@ describe('buildConnectionStringPooler', () => {
       connectionInfo,
       connectionStringsShared: sharedPlatform,
       ipv4Addon: false,
+      isHighAvailability: false,
     })
     expect(result.ipv4SupportedForDedicatedPooler).toBe(false)
     expect(result.transactionDedicated).toBeUndefined()
@@ -128,6 +132,7 @@ describe('buildConnectionStringPooler', () => {
       connectionInfo,
       connectionStringsShared: sharedPlatform,
       ipv4Addon: false,
+      isHighAvailability: false,
     })
 
     expect(result.direct).toBe(directUri)
@@ -144,6 +149,7 @@ describe('buildConnectionStringPooler', () => {
       connectionInfo: { db_host: 'supabase.example.com', db_port: 5432 },
       connectionStringsShared: sharedPlatform,
       ipv4Addon: true,
+      isHighAvailability: false,
     })
 
     expect(result.transactionShared).toBe(
@@ -167,8 +173,69 @@ describe('buildConnectionStringPooler', () => {
       connectionInfo: { db_host: 'supabase.example.com', db_port: 0 },
       connectionStringsShared: sharedPlatform,
       ipv4Addon: false,
+      isHighAvailability: false,
     })
     expect(result.sessionShared).toContain(':5432/postgres')
     expect(result.direct).toContain(':5432/postgres')
+  })
+
+  test('platform high availability: collapses every slot to the direct URI with SSL params', () => {
+    const directUri = `${sharedPlatform.direct.uri}?${HIGH_AVAILABILITY_SSL_PARAMS}`
+    const result = buildConnectionStringPooler({
+      deploymentMode: platform,
+      connectionInfo,
+      connectionStringsShared: sharedPlatform,
+      connectionStringsDedicated: dedicatedPlatform,
+      ipv4Addon: true,
+      isHighAvailability: true,
+    })
+
+    expect(result.direct).toBe(directUri)
+    expect(result.transactionShared).toBe(directUri)
+    expect(result.sessionShared).toBe(directUri)
+    // No pooler on Multigres: dedicated slots stay empty and the IPv4 flag is
+    // off even when a dedicated pooler config and the addon were passed in
+    expect(result.transactionDedicated).toBeUndefined()
+    expect(result.sessionDedicated).toBeUndefined()
+    expect(result.ipv4SupportedForDedicatedPooler).toBe(false)
+  })
+
+  test('platform without high availability appends no SSL params', () => {
+    const result = buildConnectionStringPooler({
+      deploymentMode: platform,
+      connectionInfo,
+      connectionStringsShared: sharedPlatform,
+      connectionStringsDedicated: dedicatedPlatform,
+      ipv4Addon: true,
+      isHighAvailability: false,
+    })
+
+    expect(result.direct).toBe(sharedPlatform.direct.uri)
+    expect(result.transactionShared).toBe(sharedPlatform.pooler.uri)
+    expect(result.direct).not.toContain('sslnegotiation')
+    expect(result.transactionShared).not.toContain('sslnegotiation')
+  })
+})
+
+describe('appendHighAvailabilitySslParams', () => {
+  test('appends with ? when the URI has no query string', () => {
+    expect(appendHighAvailabilitySslParams('postgresql://u:p@host:5432/db')).toBe(
+      `postgresql://u:p@host:5432/db?${HIGH_AVAILABILITY_SSL_PARAMS}`
+    )
+  })
+
+  test('appends with & when the URI already has a query string', () => {
+    expect(appendHighAvailabilitySslParams('postgresql://u:p@host:5432/db?options=x')).toBe(
+      `postgresql://u:p@host:5432/db?options=x&${HIGH_AVAILABILITY_SSL_PARAMS}`
+    )
+  })
+
+  test('does not double-append when sslnegotiation is already present', () => {
+    const uri = `postgresql://u:p@host:5432/db?${HIGH_AVAILABILITY_SSL_PARAMS}`
+    expect(appendHighAvailabilitySslParams(uri)).toBe(uri)
+  })
+
+  test('leaves an empty string untouched', () => {
+    expect(appendHighAvailabilitySslParams('')).toBe('')
   })
 })

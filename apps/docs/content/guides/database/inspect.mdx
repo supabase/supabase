@@ -1,5 +1,5 @@
 ---
-title: 'Debugging and monitoring'
+title: 'Database debugging and monitoring'
 description: 'Inspecting your Postgres database for common issues around disk, query performance, index, locks, and more using the terminal.'
 ---
 
@@ -19,7 +19,7 @@ You can examine your database and queries for these issues using either the [Sup
 
 The Supabase CLI comes with a range of tools to help inspect your Postgres instances for potential issues. The CLI gets the information from <a href="https://www.postgresql.org/docs/current/internals.html" target="_blank">Postgres internals</a>. Therefore, most tools provided are compatible with any Postgres databases regardless if they are a Supabase project or not.
 
-You can find installation instructions for the Supabase CLI <a href="/docs/guides/cli" target="_blank">here</a>.
+You can find installation instructions for the Supabase CLI <a href="/docs/guides/local-development" target="_blank">here</a>.
 
 ### The `inspect db` command
 
@@ -240,7 +240,7 @@ from pg_statio_user_tables;
 
 This shows the ratio of data blocks fetched from the Postgres [shared_buffers](https://www.postgresql.org/docs/15/runtime-config-resource.html#RUNTIME-CONFIG-RESOURCE-MEMORY) cache against the data blocks that were read from disk/OS cache.
 
-If either of your index or table hit rate are < 99% then this can indicate your compute plan is too small for your current workload and you would benefit from more memory. [Upgrading your compute](/docs/guides/platform/compute-and-disk#compute) is easy and can be done from your [project dashboard](/dashboard/project/_/settings/compute-and-disk).
+If either of your index or table hit rate are < 99% then this can indicate your compute plan is too small for your current workload and you would benefit from more memory. [Upgrading your compute](/docs/guides/platform/compute-and-disk#compute) can be done from your [project dashboard](/dashboard/project/_/settings/infrastructure).
 
 ### Optimizing poor performing queries
 

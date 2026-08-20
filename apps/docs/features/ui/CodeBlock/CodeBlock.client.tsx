@@ -113,7 +113,7 @@ export function CodeCopyButton({ className, content }: { className?: string; con
             onClick={handleCopy}
             onBlur={resetStatus}
             className={cn(
-              'border rounded-md p-1',
+              'cursor-pointer border rounded-md p-1',
               copied && 'bg-selection',
               'hover:bg-selection transition',
               className
@@ -163,7 +163,7 @@ export function CodeBlockControls({ content }: { content: string }) {
           <button
             tabIndex={0}
             onClick={toggleWrap}
-            className={cn('border rounded-md p-1', 'hover:bg-selection transition')}
+            className={cn('cursor-pointer border rounded-md p-1', 'hover:bg-selection transition')}
             aria-label={isWrapped ? 'Disable word wrap' : 'Enable word wrap'}
           >
             {isWrapped ? (

@@ -48,7 +48,7 @@ export const ProductMenu = ({ page, menu, onItemClick }: ProductMenuProps) => {
               </div>
             </div>
             {idx !== menu.length - 1 && (
-              <div className="h-px w-[calc(100%-1.5rem)] mx-auto md:w-full bg-border-overlay" />
+              <div className="w-[calc(100%-1.5rem)] mx-auto border-t border-default md:w-full" />
             )}
           </div>
         ))}

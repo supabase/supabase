@@ -13,8 +13,8 @@ const CHART_COLORS = {
   GREEN_2: 'hsl(var(--brand-500))',
   RED_1: 'hsl(var(--destructive-default))',
   RED_2: 'hsl(var(--destructive-500))',
-  YELLOW_1: 'var(--chart-warning)',
-  YELLOW_2: 'var(--chart-warning-muted)',
+  YELLOW_1: 'var(--chart-warning, hsl(var(--warning-default)))',
+  YELLOW_2: 'var(--chart-warning-muted, hsl(var(--warning-500)))',
 }
 
 type LogsBarChartDatum = {

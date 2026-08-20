@@ -11,10 +11,11 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import { PERMISSIONS_DESCRIPTIONS } from './OAuthApps.constants'
-import { getRequesterLogo } from './OAuthApps.utils'
+import { getOAuthImpersonationWarning, getRequesterLogo } from './OAuthApps.utils'
 import {
   CONNECT_LOGO_LIGHT_TILE_CLASSNAME,
   LogoBox,
@@ -196,10 +197,11 @@ export const AuthorizeConnectLogo = ({
     () =>
       getRequesterLogo({
         icon,
+        name,
         redirectUri,
         useDarkVariant: resolvedTheme === 'dark',
       }),
-    [icon, redirectUri, resolvedTheme]
+    [icon, name, redirectUri, resolvedTheme]
   )
 
   const hasUsableLogo = Boolean(logo.src) && failedIcon !== logo.src
@@ -223,6 +225,25 @@ export const AuthorizeConnectLogo = ({
         </LogoBox>
       }
       right={<SupabaseLogo forceLight={forceLightPair} />}
+    />
+  )
+}
+
+export const AuthorizeImpersonationWarning = ({
+  name,
+  redirectUri,
+}: {
+  name: string
+  redirectUri?: string | null
+}) => {
+  const warning = getOAuthImpersonationWarning({ name, redirectUri })
+  if (!warning) return null
+
+  return (
+    <Admonition
+      type="caution"
+      title="Check this redirect before authorizing"
+      description={`This request uses the name ${warning.brandDisplayName}, but after you authorize you will be redirected to ${warning.redirectHost}, not ${warning.brandDisplayName}.`}
     />
   )
 }

@@ -15,7 +15,11 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatSql } from '@/lib/formatSql'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
-export const useAddDefinitions = (id: string, monaco: Monaco | null) => {
+export const useAddDefinitions = (
+  id: string,
+  monaco: Monaco | null,
+  { enabled = true }: { enabled?: boolean } = {}
+) => {
   const { data: project } = useSelectedProjectQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
@@ -29,28 +33,28 @@ export const useAddDefinitions = (id: string, monaco: Monaco | null) => {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
-    { enabled: intellisenseEnabled }
+    { enabled: enabled && intellisenseEnabled }
   )
   const { data: functions, isSuccess: isFunctionsSuccess } = useDatabaseFunctionsQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
-    { enabled: intellisenseEnabled }
+    { enabled: enabled && intellisenseEnabled }
   )
   const { data: schemas, isSuccess: isSchemasSuccess } = useSchemasQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
-    { enabled: intellisenseEnabled }
+    { enabled: enabled && intellisenseEnabled }
   )
   const { data: tableColumns, isSuccess: isTableColumnsSuccess } = useTableColumnsQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
-    { enabled: intellisenseEnabled }
+    { enabled: enabled && intellisenseEnabled }
   )
 
   const pgInfoRef = useRef<any>(null)
@@ -58,6 +62,7 @@ export const useAddDefinitions = (id: string, monaco: Monaco | null) => {
   const filteredSchemas = useSchemasFilteredForHighAvailability(schemas)
 
   const isPgInfoReady =
+    enabled &&
     intellisenseEnabled &&
     isTableColumnsSuccess &&
     isSchemasSuccess &&

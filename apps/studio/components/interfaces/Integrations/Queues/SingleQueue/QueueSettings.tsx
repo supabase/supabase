@@ -25,7 +25,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { pgmqArchiveTable, pgmqQueueTable } from '../Queues.utils'
@@ -214,7 +214,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
       toast.success('Successfully updated permissions')
       setOpen(false)
     } catch (error: unknown) {
-      toast.error(`Failed to update permissions: ${getErrorMessage(error)}`)
+      toast.error(`Failed to update permissions: ${getErrorMessage(error, 'unknown error')}`)
     } finally {
       setIsSaving(false)
     }

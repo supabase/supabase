@@ -76,7 +76,7 @@ function AiTools({ className }: { className?: string }) {
         <button
           tabIndex={0}
           onClick={copyMarkdown}
-          className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground text-left transition-colors"
+          className="flex cursor-pointer items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground text-left transition-colors"
         >
           {copied ? (
             <Check size={14} strokeWidth={1.5} className="text-brand" />

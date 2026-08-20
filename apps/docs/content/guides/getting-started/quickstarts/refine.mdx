@@ -18,21 +18,25 @@ The `refine-supabase` preset adds `@refinedev/supabase` supplementary package th
 npm create refine-app@latest -- --preset refine-supabase my-app
 ```
 
-![Refine welcome page](/docs/img/refine-qs-welcome-page.png)
+<Admonition type="note">
 
-## 4. Install Agent Skills (optional)
+The CLI may prompt for an email address. The `refine-supabase` preset also ships with demo Supabase credentials. Replace them in step 5 with your own project.
 
-Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
-
-To install, run the following command in the root of your project:
+To skip the email prompt in a non-interactive shell, pipe a blank line:
 
 ```bash
-npx skills add supabase/agent-skills
+printf '\n' | npm create refine-app@latest -- --preset refine-supabase my-app
 ```
+
+</Admonition>
+
+## 4. Set up AI tooling (optional)
+
+<$Partial path="quickstart_ai_tooling.mdx" />
 
 ## 5. Update `supabaseClient` with environment variables
 
-Update the `supabaseClient` with the `SUPABASE_URL` and `SUPABASE_KEY` of your Supabase API, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=refine&tab=frameworks). The `supabaseClient` is used in auth provider and data provider methods that allow the Refine app to connect to your Supabase backend.
+Create a `.env` file and populate it with your Supabase URL and publishable key, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=refine&connectTab=frameworks).
 
 <Button variant="primary" asChild>
   <a href="/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=refine">
@@ -40,21 +44,19 @@ Update the `supabaseClient` with the `SUPABASE_URL` and `SUPABASE_KEY` of your S
   </a>
 </Button>
 
-```ts name=src/utility/supabaseClient.ts
-import { createClient } from '@refinedev/supabase'
-
-const SUPABASE_URL = '<your-supabase-url>'
-const SUPABASE_KEY = '<your-supabase-publishable-key>'
-
-export const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
-  db: {
-    schema: 'public',
-  },
-  auth: {
-    persistSession: true,
-  },
-})
+```text name=.env
+VITE_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+VITE_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 ```
+
+The `refine-supabase` preset hardcodes Refine's own demo Supabase project in `src/providers/constants.ts`, and initializes the client from it in `src/providers/supabase-client.ts`. Replace the hardcoded values so the client reads your project credentials from the environment variables above instead:
+
+```ts name=src/providers/constants.ts
+export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
+export const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+```
+
+The `supabaseClient` is used by the auth and data providers to connect your Refine app to Supabase.
 
 <$Partial path="api_settings.mdx" variables={{ "framework": "refine", "tab": "frameworks" }} />
 
@@ -64,7 +66,11 @@ Use the following code to automatically add resources and generate code for the 
 
 This defines pages for `list`, `create`, `show` and `edit` actions inside the `src/pages/instruments/` directory with a `<HeadlessInferencer />` component.
 
-The `<HeadlessInferencer />` component depends on `@refinedev/react-table` and `@refinedev/react-hook-form` packages. To avoid errors, you should install them as dependencies with `npm install @refinedev/react-table @refinedev/react-hook-form`.
+The `<HeadlessInferencer />` component depends on `@refinedev/react-table`, `@refinedev/react-hook-form`, and `react-live` packages. To avoid errors, install them as dependencies:
+
+```bash
+npm install @refinedev/react-table @refinedev/react-hook-form react-live
+```
 
 <Admonition type="note">
 
@@ -82,7 +88,7 @@ npm run refine create-resource instruments
 
 Add routes for the `list`, `create`, `show`, and `edit` pages.
 
-<Admonition type="tip">
+<Admonition type="note">
 
 Remove the `index` route for the Welcome page presented with the `<Welcome />` component.
 
@@ -96,26 +102,27 @@ import routerProvider, {
   NavigateToResource,
   UnsavedChangesNotifier,
 } from '@refinedev/react-router'
-import { dataProvider, liveProvider } from '@refinedev/supabase'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { liveProvider } from '@refinedev/supabase'
+import { BrowserRouter, Route, Routes } from 'react-router'
 
 import './App.css'
 
-import authProvider from './authProvider'
+import authProvider from './providers/auth'
+import { dataProvider } from './providers/data'
+import { supabaseClient } from './providers/supabase-client'
 import {
   InstrumentsCreate,
   InstrumentsEdit,
   InstrumentsList,
   InstrumentsShow,
 } from './pages/instruments'
-import { supabaseClient } from './utility'
 
 function App() {
   return (
     <BrowserRouter>
       <RefineKbarProvider>
         <Refine
-          dataProvider={dataProvider(supabaseClient)}
+          dataProvider={dataProvider}
           liveProvider={liveProvider(supabaseClient)}
           authProvider={authProvider}
           routerProvider={routerProvider}
@@ -154,14 +161,52 @@ function App() {
 export default App
 ```
 
-## 8. View instruments pages
+## 8. Allow writes to the instruments table
 
-Start the app with the following command:
+The scaffolded pages create and edit instruments, but the database setup in step 2 grants read access only. Without write privileges and matching policies, the create and edit pages fail with `permission denied for table instruments`.
+
+Run the following in the [SQL Editor](/dashboard/project/_/sql/new) to grant the privileges and add the policies:
+
+```sql SQL_EDITOR
+grant insert, update, delete on public.instruments to anon;
+
+create policy "public can insert instruments"
+on public.instruments
+for insert to anon
+with check (true);
+
+create policy "public can update instruments"
+on public.instruments
+for update to anon
+using (true)
+with check (true);
+
+create policy "public can delete instruments"
+on public.instruments
+for delete to anon
+using (true);
+```
+
+<Admonition type="caution">
+
+These policies let anyone with your publishable key modify the `instruments` table. They exist so you can try the scaffolded UI against sample data. Scope writes to authenticated users before you put real data in this table.
+
+</Admonition>
+
+## 9. Start the app
+
+Run the development server, then open `/instruments` in your browser (Vite defaults to http://localhost:5173). You should see the instruments pages along the `/instruments` routes. You can edit and add new instruments using the Inferencer-generated UI.
 
 ```bash
 npm run dev
 ```
 
-Open http://localhost:5173/instruments in a browser, and you should be able to see the instruments pages along the `/instruments` routes. You can edit and add new instruments using the Inferencer generated UI.
-
 The Inferencer auto-generated code gives you a good starting point on which to keep building your `list`, `create`, `show` and `edit` pages. You can get these by clicking the `Show the auto-generated code` buttons in their respective pages.
+
+<$Partial path="quickstart_going_to_production.mdx" />
+
+## Next steps
+
+- Set up [Auth](/docs/guides/auth) for your app
+- [Insert more data](/docs/guides/database/import-data) into your database
+- Upload and serve static files using [Storage](/docs/guides/storage)

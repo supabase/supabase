@@ -1,7 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
-import { FilePlus, FolderPlus, Plus, X } from 'lucide-react'
+import { FilePlus, FolderPlus, Plus, ScrollText, X } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -24,6 +25,8 @@ import {
 
 import { SearchList } from './SQLEditorNavV2/SearchList'
 import { SQLEditorNav } from './SQLEditorNavV2/SQLEditorNav'
+import { useIsDatabaseConnectionsEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { type SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -38,7 +41,10 @@ export const SQLEditorMenu = () => {
   const { data: project } = useSelectedProjectQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const topForPostgres = useFlag('topForPostgres')
+  const { enabled: isDatabaseConnectionsEnabled } = useIsDatabaseConnectionsEnabled()
+  const sqlEditorLogsSource = useFlag('sqlEditorLogsSource')
+  const otelLegacyLogs = useFlag('otelLegacyLogs')
+  const canCreateLogsSnippet = sqlEditorLogsSource && otelLegacyLogs
 
   const [search, setSearch] = useState('')
   const [showSearch, setShowSearch] = useState(false)
@@ -66,7 +72,7 @@ export const SQLEditorMenu = () => {
     snapV2.addNewFolder({ projectRef: ref })
   }
 
-  const handleNewQuery = async () => {
+  const handleNewQuery = async (source: SqlSnippetSource = 'database') => {
     if (!ref) return console.error('Project ref is required')
     if (!project) return console.error('Project is required')
     if (!profile) return console.error('Profile is required')
@@ -74,7 +80,8 @@ export const SQLEditorMenu = () => {
       return toast('Your queries will not be saved as you do not have sufficient permissions')
     }
     try {
-      router.push(`/project/${ref}/sql/new?skip=true`)
+      const suffix = source === 'logs' ? '&source=logs' : ''
+      router.push(`/project/${ref}/sql/new?skip=true${suffix}`)
       setSearch('')
       setShowSearch(false)
     } catch (error: any) {
@@ -156,6 +163,12 @@ export const SQLEditorMenu = () => {
                 <FilePlus size={14} />
                 Create a new snippet
               </DropdownMenuItem>
+              {canCreateLogsSnippet && (
+                <DropdownMenuItem className="gap-x-2" onClick={() => handleNewQuery('logs')}>
+                  <ScrollText size={14} />
+                  Create a new logs query
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem className="gap-x-2" onClick={() => createNewFolder()}>
                 <FolderPlus size={14} />
                 Create a new folder
@@ -167,13 +180,17 @@ export const SQLEditorMenu = () => {
         {showSearch ? <SearchList search={debouncedSearch} /> : <SQLEditorNav sort={sort} />}
       </div>
 
-      {!topForPostgres && (
-        <div className="p-4 border-t sticky bottom-0 bg-studio">
+      <div className="p-4 border-t sticky bottom-0 bg-studio">
+        {isDatabaseConnectionsEnabled ? (
+          <Button asChild block variant="default">
+            <Link href={`/project/${ref}/observability/connections`}>View running queries</Link>
+          </Button>
+        ) : (
           <Button block variant="default" onClick={() => appState.setOnGoingQueriesPanelOpen(true)}>
             View running queries
           </Button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }

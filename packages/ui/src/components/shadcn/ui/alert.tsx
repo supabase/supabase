@@ -31,40 +31,54 @@ const Alert = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>
 >(({ className, variant, ...props }, ref) => (
-  <div ref={ref} role="alert" className={cn(alertVariants({ variant }), className)} {...props} />
+  <div
+    ref={ref}
+    data-slot="alert"
+    role="alert"
+    className={cn(alertVariants({ variant }), className)}
+    {...props}
+  />
 ))
 Alert.displayName = 'Alert'
 
-const AlertTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
-  ({ className, ...props }, ref) => <h5 ref={ref} className={cn('mb-0.5', className)} {...props} />
-)
-AlertTitle.displayName = 'AlertTitle'
-
-const AlertDescription = React.forwardRef<
+const AlertTitle = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
->(({ className, children, ...props }, ref) => {
-  // Automatically wrap primitive text nodes (string/number) in <p> tags for semantic HTML
-  const content =
-    typeof children === 'string' || typeof children === 'number' ? <p>{children}</p> : children
+>(({ className, ...props }, ref) => (
+  <p
+    ref={ref}
+    data-slot="alert-title"
+    className={cn('!mt-0 mb-0.5 font-medium', className)}
+    {...props}
+  />
+))
+AlertTitle.displayName = 'AlertTitle'
 
-  return (
-    <div
-      ref={ref}
-      className={cn(
-        'text-sm text-foreground-light font-normal',
-        // Optically align text in container
-        'mb-0.5',
-        // Handle paragraphs
-        '[&_p]:mb-0.5 [&_p:last-child]:mb-0',
-        className
-      )}
-      {...props}
-    >
-      {content}
-    </div>
-  )
-})
+const AlertDescription = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, children, ...props }, ref) => {
+    // Automatically wrap primitive text nodes (string/number) in <p> tags for semantic HTML
+    const content =
+      typeof children === 'string' || typeof children === 'number' ? <p>{children}</p> : children
+
+    return (
+      <div
+        ref={ref}
+        data-slot="alert-description"
+        className={cn(
+          'text-sm text-foreground-light font-normal',
+          // Optically align text in container
+          'mb-0.5',
+          // Handle paragraphs (keep Studio density; shadcn uses mb-4)
+          '[&_p]:mb-0.5 [&_p:last-child]:mb-0',
+          className
+        )}
+        {...props}
+      >
+        {content}
+      </div>
+    )
+  }
+)
 AlertDescription.displayName = 'AlertDescription'
 
 export { Alert, AlertDescription, AlertTitle }

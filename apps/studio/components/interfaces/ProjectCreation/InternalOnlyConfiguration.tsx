@@ -1,7 +1,8 @@
 import { useParams } from 'common'
+import { useRef } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { type CloudProvider } from 'shared-data'
-import { FormControl, FormField, Input } from 'ui'
+import { FormControl, FormField, Input, useWatch } from 'ui'
 import { CollapsibleCardSection } from 'ui-patterns/CollapsibleCardSection'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -17,6 +18,10 @@ interface InternalOnlyConfigurationProps {
 export const InternalOnlyConfiguration = ({ form }: InternalOnlyConfigurationProps) => {
   const { slug } = useParams()
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
+  const highAvailability = useWatch({ control: form.control, name: 'highAvailability' })
+  // Held here (outside the collapsible content) so the selector's last valid
+  // selection survives the section being collapsed and reopened.
+  const lastValidPostgresVersionSelection = useRef('')
 
   return (
     <Panel.Content>
@@ -36,6 +41,8 @@ export const InternalOnlyConfiguration = ({ form }: InternalOnlyConfigurationPro
                   cloudProvider={form.getValues('cloudProvider') as CloudProvider}
                   organizationSlug={slug}
                   dbRegion={form.getValues('dbRegion')}
+                  disabled={highAvailability}
+                  lastValidSelectionRef={lastValidPostgresVersionSelection}
                 />
               )}
             />
@@ -49,21 +56,23 @@ export const InternalOnlyConfiguration = ({ form }: InternalOnlyConfigurationPro
               <div className="flex flex-col gap-y-4">
                 <CloudProviderSelector form={form} />
 
-                <FormField
-                  control={form.control}
-                  name="postgresVersion"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label="Custom Postgres version"
-                      layout="horizontal"
-                      description="Specify a custom version of Postgres (defaults to the latest)."
-                    >
-                      <FormControl>
-                        <Input placeholder="e.g 17.6.1.104" {...field} autoComplete="off" />
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
+                {!highAvailability && (
+                  <FormField
+                    control={form.control}
+                    name="postgresVersion"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        label="Custom Postgres version"
+                        layout="horizontal"
+                        description="Specify a custom version of Postgres (defaults to the latest)."
+                      >
+                        <FormControl>
+                          <Input placeholder="e.g 17.6.1.104" {...field} autoComplete="off" />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                )}
 
                 <FormField
                   control={form.control}

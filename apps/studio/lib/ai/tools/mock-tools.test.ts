@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getMockTools } from './mock-tools'
+import { getMockTools, MOCK_NOTEBOOKS_DATA } from './mock-tools'
+import { getNotebookTools } from './notebook-tools'
+import type { AgentNotebook } from '@/data/content/notebooks/notebook-schema'
 import { createInProcessSupabaseMCPClient } from '@/lib/ai/supabase-mcp'
 
 // The one real tool in the eval harness (search_docs) is sourced from an
@@ -31,7 +33,7 @@ describe('ai/tools/mock-tools getMockTools', () => {
     expect(result).toHaveProperty('search_docs', SEARCH_DOCS)
     // A couple of the deterministic mocks, to confirm the merge
     expect(result).toHaveProperty('list_tables')
-    expect(result).toHaveProperty('get_logs')
+    expect(result).toHaveProperty('query_logs')
   })
 
   // This is the regression guard: if the eval's MCP wiring breaks (contract
@@ -60,5 +62,209 @@ describe('ai/tools/mock-tools getMockTools', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
+  })
+
+  describe('notebook tools', () => {
+    const AUTH_HEALTH_NOTEBOOK_ID = MOCK_NOTEBOOKS_DATA[0].id
+    const EDGE_FUNCTION_NOTEBOOK_ID = MOCK_NOTEBOOKS_DATA[1].id
+
+    it('list_notebooks reflects the two seeded fixtures', async () => {
+      const mockTools = await getMockTools(undefined, new AbortController().signal)
+      if (!mockTools.list_notebooks.execute) throw new Error('execute is undefined')
+
+      const result = await mockTools.list_notebooks.execute(
+        { limit: 20 },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+
+      expect(result.notebooks.map((notebook) => notebook.name)).toEqual([
+        'Auth health check',
+        'Edge function error triage',
+      ])
+      expect(result.notebooks.map((notebook) => notebook.cell_count)).toEqual([3, 2])
+      expect(result.notebooks[1].description).toBeUndefined()
+      expect(result.cursor).toBeUndefined()
+    })
+
+    it('get_notebook resolves cells in order and rejects an unknown id', async () => {
+      const mockTools = await getMockTools(undefined, new AbortController().signal)
+      if (!mockTools.get_notebook.execute) throw new Error('execute is undefined')
+
+      const result = await mockTools.get_notebook.execute(
+        { id: AUTH_HEALTH_NOTEBOOK_ID },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+
+      expect(result.cells.map((cell) => cell._tag)).toEqual([
+        'markdown_cell',
+        'database_cell',
+        'log_cell',
+      ])
+
+      const [, databaseCell, logCell] = result.cells
+      if (databaseCell._tag !== 'database_cell') throw new Error('expected database_cell')
+      if (logCell._tag !== 'log_cell') throw new Error('expected log_cell')
+
+      expect(databaseCell.sql).toContain('signups')
+      expect(databaseCell.row_limit).toBe(30)
+      expect(logCell.time_range).toEqual({ _tag: 'relative_time_range', unit: 'hour', amount: 1 })
+
+      await expect(
+        mockTools.get_notebook.execute(
+          { id: 'unknown-notebook-id' },
+          { toolCallId: 'test', messages: [], context: {} }
+        )
+      ).rejects.toThrow(/not found/i)
+    })
+
+    it('overrides create_notebook needsApproval to false, unlike the real tool', async () => {
+      const mockTools = await getMockTools(undefined, new AbortController().signal)
+
+      expect(getNotebookTools().create_notebook.needsApproval).toBe(true)
+      expect(mockTools.create_notebook.needsApproval).toBe(false)
+    })
+
+    it('create_notebook stores a new notebook visible via get_notebook and list_notebooks', async () => {
+      const mockTools = await getMockTools(undefined, new AbortController().signal)
+      if (!mockTools.create_notebook.execute) throw new Error('execute is undefined')
+      if (!mockTools.get_notebook.execute) throw new Error('execute is undefined')
+      if (!mockTools.list_notebooks.execute) throw new Error('execute is undefined')
+
+      const content: AgentNotebook = {
+        schema_version: 1,
+        cells: [
+          { _tag: 'markdown_cell', text: '# New notebook' },
+          { _tag: 'database_cell', sql: 'select 1', row_limit: 10 },
+        ],
+      }
+
+      const created = await mockTools.create_notebook.execute(
+        { name: 'New notebook', content },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+      expect(created).toEqual({ id: expect.any(String), name: 'New notebook' })
+
+      const fetched = await mockTools.get_notebook.execute(
+        { id: created.id },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+      expect(fetched.cells).toHaveLength(2)
+      expect(fetched.cells.every((cell) => typeof cell._id === 'string')).toBe(true)
+
+      const listed = await mockTools.list_notebooks.execute(
+        { limit: 20 },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+      expect(listed.notebooks).toHaveLength(3)
+      const newEntry = listed.notebooks.find((notebook) => notebook.id === created.id)
+      expect(newEntry?.cell_count).toBe(2)
+    })
+
+    it('overrides update_notebook needsApproval to false, unlike the real tool', async () => {
+      const mockTools = await getMockTools(undefined, new AbortController().signal)
+
+      expect(getNotebookTools().update_notebook.needsApproval).toBe(true)
+      expect(mockTools.update_notebook.needsApproval).toBe(false)
+    })
+
+    it('update_notebook inserts and deletes cells, and list_notebooks reflects the new cell count', async () => {
+      const mockTools = await getMockTools(undefined, new AbortController().signal)
+      if (!mockTools.get_notebook.execute) throw new Error('execute is undefined')
+      if (!mockTools.update_notebook.execute) throw new Error('execute is undefined')
+      if (!mockTools.list_notebooks.execute) throw new Error('execute is undefined')
+
+      const before = await mockTools.get_notebook.execute(
+        { id: AUTH_HEALTH_NOTEBOOK_ID },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+      const [markdownCell, , logCell] = before.cells
+
+      const result = await mockTools.update_notebook.execute(
+        {
+          id: AUTH_HEALTH_NOTEBOOK_ID,
+          expected_updated_at: before.updated_at,
+          operations: [
+            {
+              _tag: 'insert_cell',
+              after_cell_id: markdownCell._id,
+              cell: { _tag: 'database_cell', sql: 'select 1', row_limit: 10 },
+            },
+            { _tag: 'delete_cell', cell_id: logCell._id },
+          ],
+        },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+      expect(result).toEqual({ id: AUTH_HEALTH_NOTEBOOK_ID, name: 'Auth health check' })
+
+      const after = await mockTools.get_notebook.execute(
+        { id: AUTH_HEALTH_NOTEBOOK_ID },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+      expect(after.cells.map((cell) => cell._tag)).toEqual([
+        'markdown_cell',
+        'database_cell',
+        'database_cell',
+      ])
+
+      const listed = await mockTools.list_notebooks.execute(
+        { limit: 20 },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+      const entry = listed.notebooks.find((notebook) => notebook.id === AUTH_HEALTH_NOTEBOOK_ID)
+      expect(entry?.cell_count).toBe(3)
+    })
+
+    it('update_notebook rejects an unknown cell_id without mutating the notebook', async () => {
+      const mockTools = await getMockTools(undefined, new AbortController().signal)
+      if (!mockTools.get_notebook.execute) throw new Error('execute is undefined')
+      if (!mockTools.update_notebook.execute) throw new Error('execute is undefined')
+
+      const before = await mockTools.get_notebook.execute(
+        { id: EDGE_FUNCTION_NOTEBOOK_ID },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+
+      await expect(
+        mockTools.update_notebook.execute(
+          {
+            id: EDGE_FUNCTION_NOTEBOOK_ID,
+            expected_updated_at: before.updated_at,
+            operations: [{ _tag: 'delete_cell', cell_id: 'does-not-exist' }],
+          },
+          { toolCallId: 'test', messages: [], context: {} }
+        )
+      ).rejects.toThrow(/does-not-exist/)
+
+      const after = await mockTools.get_notebook.execute(
+        { id: EDGE_FUNCTION_NOTEBOOK_ID },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+      expect(after.cells.map((cell) => cell._tag)).toEqual(['markdown_cell', 'log_cell'])
+    })
+
+    it('is isolated per call to getMockTools', async () => {
+      const firstCall = await getMockTools(undefined, new AbortController().signal)
+      if (!firstCall.create_notebook.execute) throw new Error('execute is undefined')
+
+      await firstCall.create_notebook.execute(
+        {
+          name: 'Ephemeral notebook',
+          content: { schema_version: 1, cells: [{ _tag: 'markdown_cell', text: 'hi' }] },
+        },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+
+      const secondCall = await getMockTools(undefined, new AbortController().signal)
+      if (!secondCall.list_notebooks.execute) throw new Error('execute is undefined')
+
+      const result = await secondCall.list_notebooks.execute(
+        { limit: 20 },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+      expect(result.notebooks.map((notebook) => notebook.name)).toEqual([
+        'Auth health check',
+        'Edge function error triage',
+      ])
+    })
   })
 })

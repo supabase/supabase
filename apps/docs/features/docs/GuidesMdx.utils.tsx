@@ -34,6 +34,7 @@ const PUBLISHED_SECTIONS = [
   'graphql',
   'integrations',
   'local-development',
+  'monitoring-and-debugging',
   'platform',
   'queues',
   'realtime',
@@ -41,7 +42,6 @@ const PUBLISHED_SECTIONS = [
   'security',
   'self-hosting',
   'storage',
-  'telemetry',
 ] as const
 
 const getGuidesMarkdownInternal = async (slug: string[]) => {
