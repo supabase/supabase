@@ -298,14 +298,18 @@ describe('DevToolbar', () => {
       process.env.NEXT_PUBLIC_ENVIRONMENT = 'prod'
 
       vi.resetModules()
-      const { useDevToolbar } = await import('./DevToolbarContext')
+      const { DevToolbarProvider, useDevToolbar } = await import('./DevToolbarContext')
 
       function ToolbarAvailability() {
         const { isAvailable } = useDevToolbar()
         return <span>{isAvailable ? 'available' : 'unavailable'}</span>
       }
 
-      render(<ToolbarAvailability />)
+      render(
+        <DevToolbarProvider apiUrl="http://localhost:3000">
+          <ToolbarAvailability />
+        </DevToolbarProvider>
+      )
 
       expect(screen.getByText('unavailable')).toBeInTheDocument()
     })
