@@ -314,13 +314,14 @@ export const ExplorerNotebookTab = () => {
                         <QueryCell
                           key={cell._id}
                           cell={cell}
+                          onEdit={persistNotebookTab}
                           ref={(instance) => {
                             if (instance) queryCellRefs.current.set(cell._id, instance)
                             else queryCellRefs.current.delete(cell._id)
                           }}
                         />
                       ) : (
-                        <MarkdownCell key={cell._id} cell={cell} />
+                        <MarkdownCell key={cell._id} cell={cell} onEdit={persistNotebookTab} />
                       )
                     )}
                   </div>
