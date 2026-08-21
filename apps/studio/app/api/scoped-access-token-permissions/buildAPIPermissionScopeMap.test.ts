@@ -194,9 +194,6 @@ describe('MCPToolScopeMappings', () => {
     )
   })
 
-  // Drift guard: the exact tool registry of @supabase/mcp-server-supabase@0.11.0, the version the
-  // platform pins. When the platform bumps the MCP server, this list (and the mapping) must be
-  // re-derived from the controller's assertMcpOAuthScope calls.
   test('covers exactly the tool registry of the deployed MCP server', () => {
     expect(Object.keys(MCPToolScopeMappings).sort()).toEqual([
       'apply_migration',
