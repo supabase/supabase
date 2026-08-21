@@ -27,6 +27,7 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { AVAILABLE_REPLICA_REGIONS } from './InstanceConfiguration.constants'
 import GeographyData from './MapData.json'
+import { getReadReplicaPath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
@@ -303,9 +304,7 @@ const MapView = () => {
                             <DropdownMenuSeparator />
 
                             <DropdownMenuItem className="gap-x-2">
-                              <Link
-                                href={`/project/${ref}/database/replication/replica/${database.identifier}`}
-                              >
+                              <Link href={getReadReplicaPath(ref, database.identifier)}>
                                 Manage replica
                               </Link>
                             </DropdownMenuItem>
