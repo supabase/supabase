@@ -137,6 +137,7 @@ export const AssistantQueryCell = ({
       onConfirm={onApprove}
     >
       <QueryEditor
+        isReadOnly
         id={id}
         variant="viewport"
         title={title}
