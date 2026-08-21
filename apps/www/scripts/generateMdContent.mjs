@@ -178,18 +178,20 @@ const redirectedSlugs = new Set(
     .map((redirect) => redirect.source.slice(1))
 )
 
-const liveEntries = allEntries.filter((entry) => !redirectedSlugs.has(entry.slug))
+// The index slug is exempt: its HTML page is /, not /index, so a /index
+// redirect never refers to the homepage and must not strip its markdown.
+const liveEntries = allEntries.filter(
+  (entry) => entry.slug === 'index' || !redirectedSlugs.has(entry.slug)
+)
 const excludedSlugs = allEntries
-  .filter((entry) => redirectedSlugs.has(entry.slug))
+  .filter((entry) => entry.slug !== 'index' && redirectedSlugs.has(entry.slug))
   .map((entry) => entry.slug)
 if (excludedSlugs.length > 0) {
   console.log(`🚫 Excluded ${excludedSlugs.length} redirected slugs: ${excludedSlugs.join(', ')}`)
 }
 
-if (excludedSlugs.includes('index')) {
-  console.error(
-    '❌ A redirect with source /index would strip the homepage markdown. The homepage HTML lives at /, so the index slug must never be redirect-excluded.'
-  )
+if (!liveEntries.some((entry) => entry.slug === 'index')) {
+  console.error('❌ Missing content/md/index.md — middleware maps / to the index slug.')
   process.exit(1)
 }
 

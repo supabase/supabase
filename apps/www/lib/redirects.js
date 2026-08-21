@@ -3395,4 +3395,5 @@ module.exports = [
   { permanent: true, source: '/vector.md', destination: '/modules/vector.md' },
   { permanent: true, source: '/homepage.md', destination: '/index.md' },
   { permanent: true, source: '/.md', destination: '/index.md' },
+  { permanent: true, source: '/index', destination: '/' },
 ]

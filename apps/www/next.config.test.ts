@@ -75,6 +75,13 @@ describe('next.config.mjs', () => {
 
     expect(getPathMatch('/.md')('/.md')).toBeTruthy()
     expect(getPathMatch('/.md')('/foo.md')).toBe(false)
+
+    expect(redirects).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ source: '/index', destination: '/', permanent: true }),
+      ])
+    )
+    expect(getPathMatch('/index')('/index.md')).toBe(false)
   })
 
   it('preserves the filename when redirecting legacy customer logos', async () => {

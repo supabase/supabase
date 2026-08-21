@@ -123,7 +123,7 @@ describe('www middleware', () => {
       expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/api-v2/md/index')
     })
 
-    it('serves /.md as homepage markdown when it bypasses the config redirect', () => {
+    it('falls back to serving /.md as homepage markdown if the config 308 is ever removed', () => {
       const req = makeRequest('/.md')
       const res = middleware(req)
 
