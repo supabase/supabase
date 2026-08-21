@@ -86,7 +86,7 @@ function assertValidDatabaseIdentifiers(
   validIdentifiers: Set<string>
 ): void {
   for (const cell of cells) {
-    if (cell._tag !== 'database_cell' || !cell.database_identifier) continue
+    if (cell._tag !== 'database_cell' || cell.database_identifier === undefined) continue
     if (!validIdentifiers.has(cell.database_identifier)) {
       throw new NotebookToolError(
         `Unknown database_identifier "${cell.database_identifier}" — call list_databases to see this project's valid identifiers.`,
@@ -196,7 +196,9 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
       needsApproval: true,
       execute: async ({ name, description, content }) => {
         if (
-          content.cells.some((cell) => cell._tag === 'database_cell' && cell.database_identifier)
+          content.cells.some(
+            (cell) => cell._tag === 'database_cell' && cell.database_identifier !== undefined
+          )
         ) {
           const databases = await getReadReplicas({ projectRef }, undefined, authHeaders)
           assertValidDatabaseIdentifiers(
@@ -254,7 +256,11 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
             ? [operation.cell]
             : []
         )
-        if (newCells.some((cell) => cell._tag === 'database_cell' && cell.database_identifier)) {
+        if (
+          newCells.some(
+            (cell) => cell._tag === 'database_cell' && cell.database_identifier !== undefined
+          )
+        ) {
           const databases = await getReadReplicas({ projectRef }, undefined, authHeaders)
           assertValidDatabaseIdentifiers(
             newCells,

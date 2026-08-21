@@ -495,6 +495,34 @@ describe('ai/tools/notebook-tools', () => {
       await expect(execute).rejects.toMatchObject({ metadata: { exposeToAssistant: true } })
     })
 
+    it('should throw an assistant-exposable error instead of PUTting when a database_cell carries an empty database_identifier', async () => {
+      mockDatabases(['test-project', 'test-project-replica-1'])
+
+      const tools = getNotebookTools({ projectRef: 'test-project' })
+      if (!tools.create_notebook.execute) throw new Error('execute is undefined')
+
+      const execute = tools.create_notebook.execute(
+        {
+          name: 'Signup funnel',
+          content: {
+            schema_version: 1,
+            cells: [
+              {
+                _tag: 'database_cell',
+                sql: 'select 1',
+                row_limit: 100,
+                database_identifier: '',
+              },
+            ],
+          },
+        },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+
+      await expect(execute).rejects.toBeInstanceOf(NotebookToolError)
+      await expect(execute).rejects.toMatchObject({ metadata: { exposeToAssistant: true } })
+    })
+
     it('should succeed when a database_cell carries a database_identifier that matches a real database', async () => {
       mockDatabases(['test-project', 'test-project-replica-1'])
       mockCreateNotebookPut()
@@ -714,6 +742,73 @@ describe('ai/tools/notebook-tools', () => {
       ).resolves.toMatchObject({ id: 'notebook-1', name: 'Signup funnel' })
     })
 
+    it('should throw an assistant-exposable error instead of PUTting when an inserted database_cell carries an unknown database_identifier', async () => {
+      mockGetNotebook()
+      mockDatabases(['test-project'])
+
+      const tools = getNotebookTools({ projectRef: 'test-project' })
+      if (!tools.update_notebook.execute) throw new Error('execute is undefined')
+
+      const execute = tools.update_notebook.execute(
+        {
+          id: 'notebook-1',
+          expected_updated_at: '2026-01-01T00:00:00.000Z',
+          operations: [
+            {
+              _tag: 'insert_cell',
+              after_cell_id: 'cell-1',
+              cell: {
+                _tag: 'database_cell',
+                sql: 'select * from auth.users limit 100',
+                row_limit: 100,
+                database_identifier: 'made-up-replica',
+              },
+            },
+          ],
+        },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+
+      await expect(execute).rejects.toThrow(/made-up-replica/)
+      await expect(execute).rejects.toBeInstanceOf(NotebookToolError)
+      await expect(execute).rejects.toMatchObject({ metadata: { exposeToAssistant: true } })
+    })
+
+    it('should succeed when an inserted database_cell carries a database_identifier that matches a real database', async () => {
+      mockGetNotebook()
+      mockDatabases(['test-project', 'test-project-replica-1'])
+      addAPIMock({
+        method: 'put',
+        path: '/platform/projects/:ref/content',
+        response: () => new HttpResponse(null),
+      })
+
+      const tools = getNotebookTools({ projectRef: 'test-project' })
+      if (!tools.update_notebook.execute) throw new Error('execute is undefined')
+
+      await expect(
+        tools.update_notebook.execute(
+          {
+            id: 'notebook-1',
+            expected_updated_at: '2026-01-01T00:00:00.000Z',
+            operations: [
+              {
+                _tag: 'insert_cell',
+                after_cell_id: 'cell-1',
+                cell: {
+                  _tag: 'database_cell',
+                  sql: 'select * from auth.users limit 100',
+                  row_limit: 100,
+                  database_identifier: 'test-project-replica-1',
+                },
+              },
+            ],
+          },
+          { toolCallId: 'test', messages: [], context: {} }
+        )
+      ).resolves.toMatchObject({ id: 'notebook-1', name: 'Signup funnel' })
+    })
+
     it('should succeed without validating or fetching databases when no operation introduces a database_cell', async () => {
       // cell-2 already carries an identifier that wouldn't validate today (e.g. its
       // replica was since removed) — but this update never touches it, so it must not
@@ -742,7 +837,7 @@ describe('ai/tools/notebook-tools', () => {
                   : cell
               ),
             },
-          } as unknown as GetUserContentByIdResponse),
+          }),
       })
       addAPIMock({
         method: 'put',
