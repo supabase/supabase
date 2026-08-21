@@ -47,7 +47,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Replication</PageHeaderTitle>
-            <PageHeaderDescription>Read replicas and analytics pipelines</PageHeaderDescription>
+            <PageHeaderDescription>Send data to external destinations</PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>

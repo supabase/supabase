@@ -6,7 +6,6 @@ import {
   SelectGroup,
   SelectItem,
   SelectLabel,
-  SelectSeparator,
   SelectTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -21,6 +20,7 @@ import {
   useIsETLSnowflakePrivateAlpha,
 } from '../useIsETLPrivateAlpha'
 import { DestinationType } from './DestinationPanel.types'
+import { ReadReplicasMovedCallout } from './ReadReplicasMovedCallout'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
@@ -32,9 +32,13 @@ interface DestinationTypeOption {
   enabled: boolean
 }
 
-interface DestinationTypeGroup {
-  label: string
-  options: DestinationTypeOption[]
+const STAGE_BADGE_VARIANT: Record<
+  NonNullable<DestinationTypeOption['stage']>,
+  'warning' | 'destructive' | 'default'
+> = {
+  'Early Access': 'warning',
+  Deprecated: 'destructive',
+  'Public Alpha': 'default',
 }
 
 export const DestinationTypeSelection = () => {
@@ -48,7 +52,6 @@ export const DestinationTypeSelection = () => {
   const [urlDestinationType, setDestinationType] = useQueryState(
     'destinationType',
     parseAsStringEnum<DestinationType>([
-      'Read Replica',
       'BigQuery',
       'Analytics Bucket',
       'DuckLake',
@@ -69,75 +72,51 @@ export const DestinationTypeSelection = () => {
   const { type: existingDestinationType } = useDestinationInformation({ id: edit })
   const destinationType = existingDestinationType ?? urlDestinationType
 
-  // In edit mode the type is locked, so only surface the option that matches the
-  // destination being edited. Otherwise show every type the project has access to.
   const isOptionVisible = (value: DestinationType, hasAccess: boolean) =>
     editMode ? destinationType === value : hasAccess
 
-  const groups: DestinationTypeGroup[] = [
-    {
-      label: 'Other',
-      options: [
-        {
-          value: 'Read Replica',
-          label: 'Read Replica',
-          description:
-            'Deploy a read-only database in another region for lower latency and workload isolation',
-          stage: null,
-          enabled: isOptionVisible('Read Replica', infrastructureReadReplicas),
-        },
-      ],
-    },
-    {
-      label: 'Pipelines',
-      options: [
-        {
-          value: 'Analytics Bucket',
-          label: 'Analytics Bucket',
-          description: 'Write Apache Iceberg tables to Supabase Storage for analytics workflows',
-          stage: 'Deprecated',
-          enabled: isOptionVisible('Analytics Bucket', etlEnableIceberg),
-        },
-        {
-          value: 'BigQuery',
-          label: 'BigQuery',
-          description: "Replicate changes to Google Cloud's data warehouse for analytics and BI",
-          stage: 'Public Alpha',
-          enabled: isOptionVisible('BigQuery', etlEnableBigQuery),
-        },
-        {
-          value: 'DuckLake',
-          label: 'DuckLake',
-          description: 'Replicate changes to a DuckLake catalog backed by S3-compatible storage',
-          stage: 'Early Access',
-          enabled: isOptionVisible('DuckLake', etlEnableDucklake),
-        },
-        {
-          value: 'Snowflake',
-          label: 'Snowflake',
-          description:
-            'Replicate changes to Snowflake for warehouse analytics and downstream data workflows',
-          stage: 'Early Access',
-          enabled: isOptionVisible('Snowflake', etlEnableSnowflake),
-        },
-        {
-          value: 'ClickHouse',
-          label: 'ClickHouse',
-          description: 'Stream changes to a ClickHouse cluster for fast columnar analytics',
-          stage: 'Early Access',
-          enabled: isOptionVisible('ClickHouse', etlEnableClickHouse),
-        },
-      ],
-    },
-  ]
+  const options: DestinationTypeOption[] = (
+    [
+      {
+        value: 'Analytics Bucket',
+        label: 'Analytics Bucket',
+        description: 'Write Apache Iceberg tables to Supabase Storage for analytics workflows',
+        stage: 'Deprecated',
+        enabled: isOptionVisible('Analytics Bucket', etlEnableIceberg),
+      },
+      {
+        value: 'BigQuery',
+        label: 'BigQuery',
+        description: "Replicate changes to Google Cloud's data warehouse for analytics and BI",
+        stage: 'Public Alpha',
+        enabled: isOptionVisible('BigQuery', etlEnableBigQuery),
+      },
+      {
+        value: 'DuckLake',
+        label: 'DuckLake',
+        description: 'Replicate changes to a DuckLake catalog backed by S3-compatible storage',
+        stage: 'Early Access',
+        enabled: isOptionVisible('DuckLake', etlEnableDucklake),
+      },
+      {
+        value: 'Snowflake',
+        label: 'Snowflake',
+        description:
+          'Replicate changes to Snowflake for warehouse analytics and downstream data workflows',
+        stage: 'Early Access',
+        enabled: isOptionVisible('Snowflake', etlEnableSnowflake),
+      },
+      {
+        value: 'ClickHouse',
+        label: 'ClickHouse',
+        description: 'Stream changes to a ClickHouse cluster for fast columnar analytics',
+        stage: 'Early Access',
+        enabled: isOptionVisible('ClickHouse', etlEnableClickHouse),
+      },
+    ] satisfies DestinationTypeOption[]
+  ).filter((option) => option.enabled)
 
-  const visibleGroups = groups
-    .map((group) => ({ ...group, options: group.options.filter((option) => option.enabled) }))
-    .filter((group) => group.options.length > 0)
-
-  const selectedOption = visibleGroups
-    .flatMap((group) => group.options)
-    .find((option) => option.value === destinationType)
+  const selectedOption = options.find((option) => option.value === destinationType)
 
   const stageDescription =
     selectedOption?.stage === 'Public Alpha' ? (
@@ -168,86 +147,78 @@ export const DestinationTypeSelection = () => {
     ) : undefined
 
   return (
-    <FormItemLayout
-      isReactForm={false}
-      layout="horizontal"
-      className="p-5 [&>div]:gap-y-1 [&>div>span]:text-foreground-lighter"
-      label="Type"
-      description={typeDescription}
-    >
-      <Select
-        disabled={editMode}
-        value={destinationType ?? undefined}
-        onValueChange={(value) => setDestinationType(value as DestinationType)}
+    <>
+      <FormItemLayout
+        isReactForm={false}
+        layout="horizontal"
+        className="p-5 [&>div]:gap-y-1 [&>div>span]:text-foreground-lighter"
+        label="Type"
+        description={typeDescription}
       >
-        <SelectTrigger className="h-auto py-2">
-          {selectedOption ? (
-            <div className="flex items-center gap-x-3 text-left">
-              <DestinationIcon
-                type={selectedOption.value}
-                size={20}
-                className="shrink-0 text-foreground-light"
-              />
-              <div className="flex items-center gap-x-2">
-                <span className="text-sm text-foreground">{selectedOption.label}</span>
-                {selectedOption.stage && (
-                  <Badge
-                    variant={
-                      selectedOption.stage === 'Early Access'
-                        ? 'warning'
-                        : selectedOption.stage === 'Deprecated'
-                          ? 'destructive'
-                          : 'default'
-                    }
-                  >
-                    {selectedOption.stage}
-                  </Badge>
-                )}
+        <Select
+          disabled={editMode}
+          value={destinationType ?? undefined}
+          onValueChange={(value) => setDestinationType(value as DestinationType)}
+        >
+          <SelectTrigger className="h-auto py-2">
+            {selectedOption ? (
+              <div className="flex items-center gap-x-3 text-left">
+                <DestinationIcon
+                  type={selectedOption.value}
+                  size={20}
+                  className="shrink-0 text-foreground-light"
+                />
+                <div className="flex items-center gap-x-2">
+                  <span className="text-sm text-foreground">{selectedOption.label}</span>
+                  {selectedOption.stage && (
+                    <Badge variant={STAGE_BADGE_VARIANT[selectedOption.stage]}>
+                      {selectedOption.stage}
+                    </Badge>
+                  )}
+                </div>
               </div>
-            </div>
-          ) : (
-            <span className="text-foreground-lighter">Select a destination type</span>
-          )}
-        </SelectTrigger>
-        <SelectContent align="end">
-          {visibleGroups.map((group, index) => (
-            <SelectGroup key={group.label}>
-              {index > 0 && <SelectSeparator />}
-              <SelectLabel>{group.label}</SelectLabel>
-              {group.options.map((option) => (
-                <SelectItem key={option.value} value={option.value} className="py-2">
-                  <div className="flex items-center gap-x-3">
-                    <DestinationIcon
-                      type={option.value}
-                      size={20}
-                      className="shrink-0 text-foreground-light"
-                    />
-                    <div className="flex flex-col gap-y-0.5">
-                      <div className="flex items-center gap-x-2">
-                        <span className="text-foreground">{option.label}</span>
-                        {option.stage && (
-                          <Badge
-                            variant={
-                              option.stage === 'Early Access'
-                                ? 'warning'
-                                : option.stage === 'Deprecated'
-                                  ? 'destructive'
-                                  : 'default'
-                            }
-                          >
-                            {option.stage}
-                          </Badge>
-                        )}
+            ) : (
+              <span className="text-foreground-lighter">Select a destination type</span>
+            )}
+          </SelectTrigger>
+          <SelectContent align="end">
+            {options.length > 0 && (
+              <SelectGroup>
+                <SelectLabel>Pipelines</SelectLabel>
+                {options.map((option) => (
+                  <SelectItem key={option.value} value={option.value} className="py-2">
+                    <div className="flex items-center gap-x-3">
+                      <DestinationIcon
+                        type={option.value}
+                        size={20}
+                        className="shrink-0 text-foreground-light"
+                      />
+                      <div className="flex flex-col gap-y-0.5">
+                        <div className="flex items-center gap-x-2">
+                          <span className="text-foreground">{option.label}</span>
+                          {option.stage && (
+                            <Badge variant={STAGE_BADGE_VARIANT[option.stage]}>
+                              {option.stage}
+                            </Badge>
+                          )}
+                        </div>
+                        <span className="text-xs text-foreground-lighter">
+                          {option.description}
+                        </span>
                       </div>
-                      <span className="text-xs text-foreground-lighter">{option.description}</span>
                     </div>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          ))}
-        </SelectContent>
-      </Select>
-    </FormItemLayout>
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            )}
+          </SelectContent>
+        </Select>
+      </FormItemLayout>
+      {!editMode && infrastructureReadReplicas && (
+        <div className="px-5 pb-5">
+          <ReadReplicasMovedCallout />
+        </div>
+      )}
+    </>
   )
 }
