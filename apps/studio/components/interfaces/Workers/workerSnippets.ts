@@ -1,7 +1,7 @@
 import { WORKERS_REGION, workerUrl } from './Workers.constants'
 import type { WorkerAccess } from './Workers.types'
-import { formatSize } from './Workers.utils'
-import { CLI_NAME } from '@/lib/constants/workers'
+import { formatRuntime, formatSize } from './Workers.utils'
+import { CLI_NAME, PRODUCT_NAME } from '@/lib/constants/workers'
 
 export interface WorkerSnippetInput {
   name: string
@@ -14,6 +14,7 @@ export interface WorkerSnippetInput {
 }
 
 export interface WorkerSnippets {
+  aiPrompt: string
   configToml: string
   cli: string
   curl: string
@@ -91,7 +92,14 @@ export function buildWorkerSnippets(input: WorkerSnippetInput): WorkerSnippets {
     `print(res.json())`,
   ].join('\n')
 
-  return { configToml, cli, curl, javascript, python }
+  const aiPrompt = [
+    `Deploy a Supabase ${PRODUCT_NAME} worker named "${name}".`,
+    `Use the ${formatRuntime(input.runtime)} runtime on a ${formatSize(input.size)} instance,`,
+    `${input.access} access, ${input.instances} instance${input.instances === 1 ? '' : 's'}.`,
+    `Write the config to supabase/config.toml and run \`supabase ${CLI_NAME} push ${name}\`.`,
+  ].join(' ')
+
+  return { aiPrompt, configToml, cli, curl, javascript, python }
 }
 
 export interface WorkerCliCommand {

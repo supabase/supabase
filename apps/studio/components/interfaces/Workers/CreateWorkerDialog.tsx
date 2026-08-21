@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch, type Control } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -24,18 +24,39 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import { WorkerPromptPanel } from './WorkerPromptPanel'
 import { WORKER_MAX_INSTANCES, WORKER_MIN_INSTANCES, WORKER_SIZES } from './Workers.constants'
 import { CreateWorkerSchema, type CreateWorkerForm } from './Workers.schema'
 import { formatSize } from './Workers.utils'
 import { useWorkerDeployMutation } from '@/data/workers/worker-deploy-mutation'
 
 const FORM_ID = 'create-worker-form'
+const DEPLOYED_RUNTIME = 'deno'
 
 const defaultValues: CreateWorkerForm = {
   name: '',
   size: WORKER_SIZES[0],
   access: 'private',
   instances: WORKER_MIN_INSTANCES,
+}
+
+const CreateWorkerSnippets = ({ control }: { control: Control<CreateWorkerForm> }) => {
+  const [name, size, access, instances] = useWatch({
+    control,
+    name: ['name', 'size', 'access', 'instances'],
+  })
+
+  return (
+    <WorkerPromptPanel
+      input={{
+        name,
+        runtime: DEPLOYED_RUNTIME,
+        size,
+        access,
+        instances: Number(instances) || WORKER_MIN_INSTANCES,
+      }}
+    />
+  )
 }
 
 interface CreateWorkerDialogProps {
@@ -91,7 +112,7 @@ export const CreateWorkerDialog = ({ projectRef, open, onOpenChange }: CreateWor
                 control={form.control}
                 name="size"
                 render={({ field }) => (
-                  <FormItemLayout label="Size" description="Fixed at deploy time">
+                  <FormItemLayout label="Size">
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
@@ -114,10 +135,7 @@ export const CreateWorkerDialog = ({ projectRef, open, onOpenChange }: CreateWor
                 control={form.control}
                 name="access"
                 render={({ field }) => (
-                  <FormItemLayout
-                    label="Access"
-                    description="Public workers accept requests with an anon key"
-                  >
+                  <FormItemLayout label="Access">
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
@@ -159,6 +177,13 @@ export const CreateWorkerDialog = ({ projectRef, open, onOpenChange }: CreateWor
             />
           </form>
         </Form>
+
+        <DialogSectionSeparator />
+
+        <DialogSection className="space-y-2">
+          <p className="text-sm text-foreground-light">Deploy the worker from your terminal</p>
+          <CreateWorkerSnippets control={form.control} />
+        </DialogSection>
 
         <DialogFooter>
           <Button variant="default" disabled={isPending} onClick={() => onOpenChange(false)}>
