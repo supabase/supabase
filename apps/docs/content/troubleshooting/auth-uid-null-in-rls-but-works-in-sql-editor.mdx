@@ -1,0 +1,114 @@
+---
+title = "auth.uid() returns null in RLS on live requests but works in the SQL editor"
+topics = [ "auth", "database" ]
+keywords = [ "RLS", "JWT", "auth.uid", "42501", "request.jwt.claims", "JWT Signing Keys", "PostgREST" ]
+
+[[errors]]
+http_status_code = 403
+code = "42501"
+---
+
+A common and confusing situation: a Row Level Security policy such as `with check (user_id = auth.uid())`
+rejects authenticated REST requests with a [`42501`](/docs/guides/troubleshooting/database-api-42501-errors)
+error (surfaced as `401` or `403`), yet the exact same insert succeeds in the SQL editor when you set the
+claims by hand:
+
+```sql
+begin;
+select set_config('request.jwt.claims', '{"sub":"<your-user-id>","role":"authenticated"}', true);
+set local role authenticated;
+select auth.uid();              -- returns your user id correctly
+insert into public.your_table (..., user_id) values (..., '<your-user-id>');  -- passes RLS
+rollback;
+```
+
+If the manual repro works, your **schema, RLS policy, and `auth.uid()` are correct**. `auth.uid()` simply
+reads `current_setting('request.jwt.claims', true) ->> 'sub'`. The failure on live requests means PostgREST
+(the Data API) never populated `request.jwt.claims` for that request, so it ran as the anonymous role,
+`auth.uid()` returned `null`, and `null = user_id` is always false.
+
+This frequently appears after enabling or rotating the new [JWT Signing Keys](/docs/guides/auth/signing-keys).
+
+## Why this happens
+
+`request.jwt.claims` ends up empty on a live request in only a few ways:
+
+- **The `Authorization: Bearer` header doesn't carry the user's access token.** A very common cause is sending
+  the `anon` or publishable API key as the bearer token. API keys are recognized by Auth but
+  [do not carry a `sub` claim](/docs/guides/troubleshooting/auth-error-401-invalid-claim-missing-sub--AFwMR),
+  so `auth.uid()` is `null`.
+- **The token's signature or `kid` can't be verified by the Data API**, so PostgREST rejects it and falls back
+  to the anonymous role. This is the typical cause right after enabling or rotating JWT Signing Keys — for
+  example a key was revoked while its tokens were still in flight, or the client is holding a token signed by a
+  key the project no longer trusts.
+- **The token is expired.**
+
+<Admonition type="note">
+
+With the new API keys, a `sb_publishable_…` or `sb_secret_…` key must be sent in the `apikey` header — it
+cannot be used as an `Authorization: Bearer` token. The bearer token must always be a user **access token**.
+
+</Admonition>
+
+## How to diagnose
+
+The key idea is to inspect the *exact* token on the failing request, not the one you think you're sending.
+
+### 1. Decode the token that is actually on the wire
+
+Open your browser DevTools → Network tab → click the failing request → Request Headers → copy the
+`Authorization` value and decode it (for example at jwt.io). Confirm:
+
+- `role` is `authenticated` (not `anon`)
+- `sub` is your user's UUID
+- `exp` is in the future
+- it is **not** the same value as your `apikey` header
+
+### 2. Confirm the platform accepts that exact token
+
+```bash
+curl https://<project-ref>.supabase.co/auth/v1/user \
+  -H "apikey: <your publishable or anon key>" \
+  -H "Authorization: Bearer <the exact token from step 1>"
+```
+
+- `200` with your user → the token is valid and its signature is trusted. Continue to step 3.
+- `401` → this is a signing-key problem: the token's `kid` isn't trusted by the project. Re-login to mint a
+  fresh token signed by the current **in-use** key, avoid revoking a key whose tokens are still in flight, and
+  if you revoked one too early, move it back to **standby** so its tokens verify again. See
+  [JWT Signing Keys](/docs/guides/auth/signing-keys).
+
+### 3. See exactly what Postgres receives
+
+This is the decisive test. Create a small debug function and call it through the REST API with the same
+headers:
+
+```sql
+create or replace function public.whoami()
+returns jsonb language sql stable as $$
+  select jsonb_build_object(
+    'uid', auth.uid(),
+    'role', auth.role(),
+    'claims', current_setting('request.jwt.claims', true)
+  );
+$$;
+```
+
+```bash
+curl -X POST https://<project-ref>.supabase.co/rest/v1/rpc/whoami \
+  -H "apikey: <your publishable or anon key>" \
+  -H "Authorization: Bearer <the exact token from step 1>" \
+  -H "Content-Type: application/json" -d '{}'
+```
+
+- `claims` empty / `role` is `anon` → the user token isn't reaching the Data API. The header was not sent, was
+  overwritten by a proxy or SDK, was set to an API key, or you are using a client instance without the user's
+  session attached. Fix this on the client so the request goes out with the user access token in
+  `Authorization`. When creating the client per request on the server, forward the user's JWT explicitly.
+- `claims` populated with your `sub` and `role` is `authenticated` → `auth.uid()` works on live requests, and
+  the original `42501` was transient (for example the session was not attached at the moment you tested).
+  Re-run your request.
+
+Remember the [admonition in the RLS guide](/docs/guides/database/postgres/row-level-security): when a request
+is unauthenticated, `auth.uid()` returns `null`, so policies like `using (auth.uid() = user_id)` silently fail
+because `null = user_id` is never true.
