@@ -12,7 +12,8 @@ export type GitHubConnectionsVariables = {
 
 export async function getGitHubConnections(
   { organizationId }: GitHubConnectionsVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headers?: HeadersInit
 ) {
   if (!organizationId) throw new Error('organizationId is required')
 
@@ -23,6 +24,7 @@ export async function getGitHubConnections(
       },
     },
     signal,
+    headers,
   })
 
   if (error) handleError(error)

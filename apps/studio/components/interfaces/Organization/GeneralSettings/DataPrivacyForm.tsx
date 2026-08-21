@@ -8,7 +8,7 @@ import { useAIOptInForm } from '@/hooks/forms/useAIOptInForm'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export const DataPrivacyForm = () => {
-  const { form, onSubmit, isUpdating, currentOptInLevel } = useAIOptInForm()
+  const { form, onSubmit, isUpdating, currentOptInLevel, currentRepoAccess } = useAIOptInForm()
   const { can: canUpdateOrganization } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'organizations'
@@ -19,8 +19,8 @@ export const DataPrivacyForm = () => {
     : undefined
 
   useEffect(() => {
-    form.reset({ aiOptInLevel: currentOptInLevel })
-  }, [currentOptInLevel, form])
+    form.reset({ aiOptInLevel: currentOptInLevel, hasRepoAccess: currentRepoAccess })
+  }, [currentOptInLevel, currentRepoAccess, form])
 
   return (
     <Form {...form}>

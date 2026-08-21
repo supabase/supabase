@@ -20,6 +20,7 @@ vi.mock('@/data/config/project-settings-v2-query', () => ({
 
 vi.mock('@/hooks/misc/useOrgOptedIntoAi', () => ({
   getAiOptInLevel: vi.fn(),
+  getAiRepoAccess: vi.fn(),
 }))
 
 vi.mock('@/components/interfaces/Billing/Subscription/Subscription.utils', () => ({
@@ -41,6 +42,7 @@ describe('getAIDetails', () => {
   let mockGetProjectDetail: ReturnType<typeof vi.fn>
   let mockGetProjectSettings: ReturnType<typeof vi.fn>
   let mockGetAiOptInLevel: ReturnType<typeof vi.fn>
+  let mockGetAiRepoAccess: ReturnType<typeof vi.fn>
   let mockSubscriptionHasHipaaAddon: ReturnType<typeof vi.fn>
   let mockCheckEntitlement: ReturnType<typeof vi.fn>
 
@@ -61,6 +63,7 @@ describe('getAIDetails', () => {
     mockGetProjectDetail = vi.mocked(projectQuery.getProjectDetail)
     mockGetProjectSettings = vi.mocked(settingsQuery.getProjectSettings)
     mockGetAiOptInLevel = vi.mocked(aiHook.getAiOptInLevel)
+    mockGetAiRepoAccess = vi.mocked(aiHook.getAiRepoAccess)
     mockSubscriptionHasHipaaAddon = vi.mocked(subscriptionUtils.subscriptionHasHipaaAddon)
     mockCheckEntitlement = vi.mocked(entitlementsQuery.checkEntitlement)
 
@@ -77,6 +80,7 @@ describe('getAIDetails', () => {
     mockSubscriptionHasHipaaAddon.mockReturnValue(false)
     mockCheckEntitlement.mockResolvedValue({ hasAccess: false })
     mockGetAiOptInLevel.mockReturnValue('schema')
+    mockGetAiRepoAccess.mockReturnValue(false)
   })
 
   it('returns the resolved posture when the project belongs to the org', async () => {
@@ -94,6 +98,8 @@ describe('getAIDetails', () => {
       planId: 'pro',
       region: 'us-east-1',
       isSensitive: false,
+      parentProjectRef: undefined,
+      hasRepoAccess: false,
     })
   })
 
@@ -152,6 +158,12 @@ describe('getAIDetails', () => {
       undefined,
       HEADERS
     )
+    expect(mockCheckEntitlement).toHaveBeenCalledWith(
+      ORG_SLUG,
+      'assistant.repo_access',
+      undefined,
+      HEADERS
+    )
     expect(mockGetProjectDetail).toHaveBeenCalledWith(
       { ref: PROJECT_REF, skipWake: true },
       undefined,
@@ -162,6 +174,21 @@ describe('getAIDetails', () => {
       undefined,
       HEADERS
     )
+  })
+
+  it('requires the repository tag and entitlement', async () => {
+    mockGetAiRepoAccess.mockReturnValue(true)
+    mockCheckEntitlement.mockImplementation(async (_slug, feature) => ({
+      hasAccess: feature === 'assistant.repo_access',
+    }))
+
+    const result = await getAIDetails({
+      orgSlug: ORG_SLUG,
+      projectRef: PROJECT_REF,
+      authorization: AUTH,
+    })
+
+    expect(result.hasRepoAccess).toBe(true)
   })
 
   describe('when the project does not belong to the org', () => {
@@ -239,6 +266,8 @@ describe('getAIDetails', () => {
 
     it('disables the opt-in level for a sensitive project', async () => {
       mockGetProjectSettings.mockResolvedValue({ is_sensitive: true })
+      mockGetAiRepoAccess.mockReturnValue(true)
+      mockCheckEntitlement.mockResolvedValue({ hasAccess: true })
 
       const result = await getAIDetails({
         orgSlug: ORG_SLUG,
@@ -248,6 +277,7 @@ describe('getAIDetails', () => {
 
       expect(result.aiOptInLevel).toBe('disabled')
       expect(result.hasHipaaAddon).toBe(true)
+      expect(result.hasRepoAccess).toBe(false)
     })
 
     it('disables the opt-in level when project sensitivity is unknown', async () => {

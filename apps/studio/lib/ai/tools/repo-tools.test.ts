@@ -3,13 +3,12 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { getRepoTools } from './repo-tools'
 
-const executionOptions = (sandbox: Experimental_SandboxSession) =>
-  ({
-    toolCallId: 'call',
-    messages: [],
-    context: undefined,
-    experimental_sandbox: sandbox,
-  }) as any
+const executionOptions = (sandbox: Experimental_SandboxSession) => ({
+  toolCallId: 'call',
+  messages: [],
+  context: undefined as never,
+  experimental_sandbox: sandbox,
+})
 
 function mockSandbox(): Experimental_SandboxSession {
   return {
@@ -45,7 +44,7 @@ function setup() {
 }
 
 describe('getRepoTools', () => {
-  it('quotes search input before running ripgrep', async () => {
+  it('quotes search input before running grep', async () => {
     const { tools, sandbox } = setup()
 
     await tools.search_repo.execute?.({ query: "user's query" }, executionOptions(sandbox))
@@ -90,7 +89,10 @@ describe('getRepoTools', () => {
       stderr: '',
     })
 
-    await tools.open_pull_request.execute?.({ title: 'Fix the issue' }, executionOptions(sandbox))
+    await tools.open_pull_request!.execute?.(
+      { title: 'Fix the issue', patch: 'diff --git a/a b/a' },
+      executionOptions(sandbox)
+    )
 
     expect(openPullRequest).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -100,5 +102,18 @@ describe('getRepoTools', () => {
         patch: 'diff --git a/a b/a',
       })
     )
+  })
+
+  it('omits PR creation without GitHub connection update permission', () => {
+    const tools = getRepoTools({
+      connectionId: 42,
+      authorization: 'Bearer token',
+      baseRef: 'main',
+      headBranch: 'assistant/chat',
+      canOpenPullRequest: false,
+    })
+
+    expect(tools).not.toHaveProperty('open_pull_request')
+    expect(tools).toHaveProperty('read_repo_file')
   })
 })

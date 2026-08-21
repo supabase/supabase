@@ -38,12 +38,14 @@ export function getRepoTools({
   authorization,
   baseRef,
   headBranch,
+  canOpenPullRequest = true,
   openPullRequest = createGitHubPullRequest,
 }: {
   connectionId: number
   authorization: string
   baseRef: string
   headBranch: string
+  canOpenPullRequest?: boolean
   openPullRequest?: typeof createGitHubPullRequest
 }) {
   return {
@@ -55,9 +57,9 @@ export function getRepoTools({
       }),
       execute: async ({ query, glob }, options) => {
         const sandbox = requireSandbox(options)
-        const globArgs = glob ? `--glob ${shellQuote(glob)}` : ''
+        const globArgs = glob ? `--include=${shellQuote(glob)}` : ''
         const result = await sandbox.run({
-          command: `rg --line-number --color never --max-count 100 ${globArgs} -- ${shellQuote(query)} . || [ $? -eq 1 ]`,
+          command: `grep -RIn -m 100 --exclude-dir=.git --binary-files=without-match ${globArgs} -- ${shellQuote(query)} . || [ $? -eq 1 ]`,
           abortSignal: options.abortSignal,
         })
         return { matches: truncate(result.stdout) }
@@ -92,36 +94,60 @@ export function getRepoTools({
           content,
           abortSignal: options.abortSignal,
         })
-        return { path, bytes: Buffer.byteLength(content) }
-      },
-    }),
-    open_pull_request: tool({
-      description:
-        'Ask the user to open a pull request containing every repository change made in this chat.',
-      inputSchema: z.object({
-        title: z.string().min(1).max(120),
-        body: z.string().max(20_000).optional(),
-      }),
-      execute: async ({ title, body }, options): Promise<GitHubPullRequest> => {
-        const sandbox = requireSandbox(options)
         const { stdout: patch } = await sandbox.run({
-          command: 'git diff --binary --no-ext-diff',
+          command: 'git add -N . && git diff --binary --no-ext-diff',
           abortSignal: options.abortSignal,
         })
-        if (!patch.trim()) throw new Error('There are no repository changes to open')
-
-        return openPullRequest({
-          connectionId,
-          authorization,
-          baseRef,
-          headBranch,
-          title,
-          body,
-          patch,
-          signal: options.abortSignal,
-        })
+        if (Buffer.byteLength(patch) > MAX_TOOL_OUTPUT) {
+          throw new Error('Repository change is too large to review in one pull request')
+        }
+        return { path, bytes: Buffer.byteLength(content), patch }
       },
     }),
+    ...(canOpenPullRequest
+      ? {
+          open_pull_request: tool({
+            description:
+              'Ask the user to open a pull request containing every repository change made in this chat.',
+            inputSchema: z.object({
+              title: z.string().min(1).max(120),
+              body: z.string().max(20_000).optional(),
+              patch: z
+                .string()
+                .min(1)
+                .max(MAX_TOOL_OUTPUT)
+                .describe('The exact patch returned by the final write_repo_file call.'),
+            }),
+            execute: async (
+              { title, body, patch: proposedPatch },
+              options
+            ): Promise<GitHubPullRequest> => {
+              const sandbox = requireSandbox(options)
+              const { stdout: patch } = await sandbox.run({
+                command: 'git add -N . && git diff --binary --no-ext-diff',
+                abortSignal: options.abortSignal,
+              })
+              if (!patch.trim()) throw new Error('There are no repository changes to open')
+              if (patch !== proposedPatch) {
+                throw new Error(
+                  'Repository changes changed after the pull request preview was prepared'
+                )
+              }
+
+              return openPullRequest({
+                connectionId,
+                authorization,
+                baseRef,
+                headBranch,
+                title,
+                body,
+                patch,
+                signal: options.abortSignal,
+              })
+            },
+          }),
+        }
+      : {}),
   }
 }
 

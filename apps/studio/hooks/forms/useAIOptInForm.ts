@@ -10,7 +10,7 @@ import { useOrganizationUpdateMutation } from '@/data/organizations/organization
 import { invalidateOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-import { getAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { getAiOptInLevel, getAiRepoAccess } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { OPT_IN_TAGS } from '@/lib/constants'
 import type { ResponseError } from '@/types'
@@ -20,6 +20,7 @@ export const AIOptInSchema = z.object({
   aiOptInLevel: z.enum(['disabled', 'schema', 'schema_and_log', 'schema_and_log_and_data'], {
     required_error: 'AI Opt-in level selection is required',
   }),
+  hasRepoAccess: z.boolean(),
 })
 
 export type AIOptInFormValues = z.infer<typeof AIOptInSchema>
@@ -47,6 +48,7 @@ export const useAIOptInForm = (onSuccessCallback?: () => void) => {
     resolver: zodResolver(AIOptInSchema),
     defaultValues: {
       aiOptInLevel: getAiOptInLevel(selectedOrganization?.opt_in_tags),
+      hasRepoAccess: getAiRepoAccess(selectedOrganization?.opt_in_tags),
     },
   })
 
@@ -64,7 +66,8 @@ export const useAIOptInForm = (onSuccessCallback?: () => void) => {
       (tag: string) =>
         tag !== OPT_IN_TAGS.AI_SQL &&
         tag !== (OPT_IN_TAGS.AI_DATA ?? 'AI_DATA') &&
-        tag !== (OPT_IN_TAGS.AI_LOG ?? 'AI_LOG')
+        tag !== (OPT_IN_TAGS.AI_LOG ?? 'AI_LOG') &&
+        tag !== OPT_IN_TAGS.AI_REPO
     )
 
     if (
@@ -82,6 +85,9 @@ export const useAIOptInForm = (onSuccessCallback?: () => void) => {
     }
     if (values.aiOptInLevel === 'schema_and_log_and_data') {
       updatedOptInTags.push(OPT_IN_TAGS.AI_DATA)
+    }
+    if (values.aiOptInLevel !== 'disabled' && values.hasRepoAccess) {
+      updatedOptInTags.push(OPT_IN_TAGS.AI_REPO)
     }
 
     updatedOptInTags = [...new Set(updatedOptInTags)]
@@ -107,5 +113,6 @@ export const useAIOptInForm = (onSuccessCallback?: () => void) => {
     onSubmit,
     isUpdating,
     currentOptInLevel: getAiOptInLevel(selectedOrganization?.opt_in_tags),
+    currentRepoAccess: getAiRepoAccess(selectedOrganization?.opt_in_tags),
   }
 }

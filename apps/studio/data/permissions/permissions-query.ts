@@ -8,8 +8,8 @@ import type { Permission, ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type PermissionsResponse = Permission[]
 
-export async function getPermissions(signal?: AbortSignal) {
-  const { data, error } = await get('/platform/profile/permissions', { signal })
+export async function getPermissions(signal?: AbortSignal, headers?: HeadersInit) {
+  const { data, error } = await get('/platform/profile/permissions', { signal, headers })
   if (error) {
     handleError(error, {
       sentryContext: {

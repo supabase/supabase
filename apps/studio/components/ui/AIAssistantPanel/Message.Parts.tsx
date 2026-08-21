@@ -11,10 +11,13 @@ import { useMessageActionsContext, useMessageInfoContext } from './Message.Conte
 import {
   deployEdgeFunctionInputSchema,
   deployEdgeFunctionOutputSchema,
+  openPullRequestInputSchema,
+  openPullRequestOutputSchema,
   parseExecuteSqlChartResult,
 } from './Message.utils'
 import { MessageMarkdown } from './MessageMarkdown'
 import { NotebookProposalRenderer, type NotebookProposalMode } from './NotebookProposalRenderer'
+import { PullRequestRenderer } from './PullRequestRenderer'
 import { parseSupportRequestMessage, SupportRequestMessage } from './SupportRequestMessage'
 
 function MessagePartText({ textPart }: { textPart: TextUIPart }) {
@@ -62,6 +65,13 @@ function MessagePartDynamicTool({ toolPart }: { toolPart: DynamicToolUIPart }) {
 }
 
 function MessagePartTool({ toolPart }: { toolPart: ToolUIPart }) {
+  const repoLabels: Record<string, [string, string]> = {
+    'tool-search_repo': ['Searching repository...', 'Searched repository'],
+    'tool-read_repo_file': ['Reading repository file...', 'Read repository file'],
+    'tool-write_repo_file': ['Updating repository...', 'Updated repository working copy'],
+  }
+  const repoLabel = repoLabels[toolPart.type]
+
   return (
     <Tool
       icon={
@@ -72,10 +82,14 @@ function MessagePartTool({ toolPart }: { toolPart: ToolUIPart }) {
         )
       }
       label={
-        <div>
-          {toolPart.state === 'input-streaming' ? 'Running ' : 'Ran '}
-          <span className="text-foreground-lighter">{`${toolPart.type.replace('tool-', '')}`}</span>
-        </div>
+        repoLabel ? (
+          repoLabel[toolPart.state === 'input-streaming' ? 0 : 1]
+        ) : (
+          <div>
+            {toolPart.state === 'input-streaming' ? 'Running ' : 'Ran '}
+            <span className="text-foreground-lighter">{`${toolPart.type.replace('tool-', '')}`}</span>
+          </div>
+        )
       }
     />
   )
@@ -268,6 +282,36 @@ function MessagePartNotebookProposal({
   )
 }
 
+function MessagePartOpenPullRequest({ toolPart }: { toolPart: ToolUIPart }) {
+  const { state, input, output } = toolPart
+  const { addToolApprovalResponse } = useMessageActionsContext()
+
+  if (state === 'input-streaming') return <MessagePartTool toolPart={toolPart} />
+  if (state === 'output-error') {
+    return <p className="text-xs text-danger">Failed to open pull request.</p>
+  }
+
+  const parsedInput = openPullRequestInputSchema.safeParse(input)
+  if (!parsedInput.success) return null
+  const parsedOutput = openPullRequestOutputSchema.safeParse(output)
+  const { confirmState, onApprove, onDeny } = getManualToolApprovalHandlers({
+    state,
+    approval: toolPart.approval,
+    addToolApprovalResponse,
+  })
+
+  return (
+    <PullRequestRenderer
+      {...parsedInput.data}
+      url={parsedOutput.success ? parsedOutput.data.url : undefined}
+      number={parsedOutput.success ? parsedOutput.data.number : undefined}
+      confirmState={confirmState}
+      onApprove={onApprove}
+      onDeny={onDeny}
+    />
+  )
+}
+
 const MessagePart = {
   Text: MessagePartText,
   Dynamic: MessagePartDynamicTool,
@@ -276,6 +320,7 @@ const MessagePart = {
   ExecuteSql: MessagePartExecuteSql,
   DeployEdgeFunction: MessagePartDeployEdgeFunction,
   NotebookProposal: MessagePartNotebookProposal,
+  OpenPullRequest: MessagePartOpenPullRequest,
 } as const
 
 export function MessagePartSwitcher({
@@ -291,6 +336,11 @@ export function MessagePartSwitcher({
     case 'tool-search_docs':
     case 'tool-get_active_incidents':
     case 'tool-load_knowledge': {
+      return <MessagePart.Tool toolPart={part} />
+    }
+    case 'tool-search_repo':
+    case 'tool-read_repo_file':
+    case 'tool-write_repo_file': {
       return <MessagePart.Tool toolPart={part} />
     }
     case 'reasoning':
@@ -309,6 +359,9 @@ export function MessagePartSwitcher({
     }
     case 'tool-update_notebook': {
       return <MessagePart.NotebookProposal toolPart={part} mode="update" />
+    }
+    case 'tool-open_pull_request': {
+      return <MessagePart.OpenPullRequest toolPart={part} />
     }
 
     case 'source-url':

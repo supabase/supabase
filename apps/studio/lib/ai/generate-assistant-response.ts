@@ -22,6 +22,7 @@ import {
   GENERAL_PROMPT,
   LIMITATIONS_PROMPT,
   NOTEBOOKS_PROMPT,
+  REPO_PROMPT,
   SECURITY_PROMPT,
 } from '@/lib/ai/prompts'
 import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
@@ -122,6 +123,7 @@ export async function generateAssistantResponse({
       ${GENERAL_PROMPT}
       ${CHAT_PROMPT}
       ${isExplorerEnabled ? NOTEBOOKS_PROMPT : ''}
+      ${sandbox ? REPO_PROMPT : ''}
       ${SECURITY_PROMPT}
       ${LIMITATIONS_PROMPT}
 
