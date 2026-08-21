@@ -2,7 +2,12 @@ import { components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
 
-import { getNotebookTools } from './notebook-tools'
+import {
+  decodeNotebookToolError,
+  encodeNotebookToolError,
+  getNotebookTools,
+  NotebookToolError,
+} from './notebook-tools'
 import type { AgentNotebook } from '@/data/content/notebooks/notebook-schema'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
@@ -29,16 +34,16 @@ type GetUserContentResponse = components['schemas']['GetUserContentResponse']
 const NOTEBOOK_CONTENT = {
   schema_version: 1,
   cells: [
-    { _tag: 'markdown_cell', id: 'cell-1', text: '# Signup funnel' },
+    { _tag: 'markdown_cell', _id: 'cell-1', text: '# Signup funnel' },
     {
       _tag: 'database_cell',
-      id: 'cell-2',
+      _id: 'cell-2',
       sql: 'select * from auth.users limit 100',
       row_limit: 100,
     },
     {
       _tag: 'log_cell',
-      id: 'cell-3',
+      _id: 'cell-3',
       sql: 'select timestamp, event_message from edge_logs limit 10',
       time_range: { _tag: 'relative_time_range', unit: 'hour', amount: 1 },
     },
@@ -204,17 +209,17 @@ describe('ai/tools/notebook-tools', () => {
         visibility: 'project',
         updated_at: '2026-01-01T00:00:00.000Z',
         cells: [
-          { _tag: 'markdown_cell', id: 'cell-1', text: '# Signup funnel' },
+          { _tag: 'markdown_cell', _id: 'cell-1', text: '# Signup funnel' },
           {
             _tag: 'database_cell',
-            id: 'cell-2',
+            _id: 'cell-2',
             row_limit: 100,
             view: 'table',
             sql: 'select * from auth.users limit 100',
           },
           {
             _tag: 'log_cell',
-            id: 'cell-3',
+            _id: 'cell-3',
             time_range: { _tag: 'relative_time_range', unit: 'hour', amount: 1 },
             view: 'table',
             sql: 'select timestamp, event_message from edge_logs limit 10',
@@ -423,7 +428,7 @@ describe('ai/tools/notebook-tools', () => {
       expect(sentBody?.type).toBe('notebook')
 
       const content = sentBody?.content as { cells: Array<Record<string, unknown>> }
-      expect(content.cells.map((cell) => cell.id ?? cell.text)).toEqual([
+      expect(content.cells.map((cell) => cell._id ?? cell.text)).toEqual([
         'cell-1',
         '# New section',
         'cell-2',
@@ -432,40 +437,80 @@ describe('ai/tools/notebook-tools', () => {
       expect(result).toEqual({ id: 'notebook-1', name: 'Signup funnel' })
     })
 
-    it('should throw a descriptive error instead of PUTting when an operation targets an unknown cell id', async () => {
+    it('should throw a descriptive, assistant-exposable error instead of PUTting when an operation targets an unknown cell id', async () => {
       mockGetNotebook()
 
       const tools = getNotebookTools({ projectRef: 'test-project' })
       if (!tools.update_notebook.execute) throw new Error('execute is undefined')
 
-      await expect(
-        tools.update_notebook.execute(
-          {
-            id: 'notebook-1',
-            expected_updated_at: '2026-01-01T00:00:00.000Z',
-            operations: [{ _tag: 'delete_cell', cell_id: 'missing-cell' }],
-          },
-          { toolCallId: 'test', messages: [], context: {} }
-        )
-      ).rejects.toThrow('No cell with id "missing-cell"')
+      const execute = tools.update_notebook.execute(
+        {
+          id: 'notebook-1',
+          expected_updated_at: '2026-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'missing-cell' }],
+        },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+
+      await expect(execute).rejects.toThrow('No cell with id "missing-cell"')
+      await expect(execute).rejects.toBeInstanceOf(NotebookToolError)
+      await expect(execute).rejects.toMatchObject({ metadata: { exposeToAssistant: true } })
     })
 
-    it('should throw instead of PUTting when the notebook changed since expected_updated_at', async () => {
+    it('should throw an assistant-exposable error instead of PUTting when the notebook changed since expected_updated_at', async () => {
       mockGetNotebook()
 
       const tools = getNotebookTools({ projectRef: 'test-project' })
       if (!tools.update_notebook.execute) throw new Error('execute is undefined')
 
-      await expect(
-        tools.update_notebook.execute(
-          {
-            id: 'notebook-1',
-            expected_updated_at: '2025-12-31T00:00:00.000Z',
-            operations: [{ _tag: 'delete_cell', cell_id: 'cell-3' }],
-          },
-          { toolCallId: 'test', messages: [], context: {} }
-        )
-      ).rejects.toThrow(/changed since expected_updated_at/)
+      const execute = tools.update_notebook.execute(
+        {
+          id: 'notebook-1',
+          expected_updated_at: '2025-12-31T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'cell-3' }],
+        },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+
+      await expect(execute).rejects.toThrow(/changed since expected_updated_at/)
+      await expect(execute).rejects.toBeInstanceOf(NotebookToolError)
+      await expect(execute).rejects.toMatchObject({ metadata: { exposeToAssistant: true } })
+    })
+  })
+
+  describe('encodeNotebookToolError / decodeNotebookToolError', () => {
+    it('round-trips a NotebookToolError through JSON', () => {
+      const error = new NotebookToolError('Notebook changed since expected_updated_at', {
+        exposeToAssistant: true,
+      })
+
+      const encoded = encodeNotebookToolError(error)
+      expect(encoded).not.toBeNull()
+
+      const decoded = decodeNotebookToolError(encoded!)
+      expect(decoded).toEqual({
+        exposeToAssistant: true,
+        tag: 'notebook_tool_error',
+        message: 'Notebook changed since expected_updated_at',
+      })
+    })
+
+    it('does not encode a plain Error', () => {
+      expect(encodeNotebookToolError(new Error('boom'))).toBeNull()
+    })
+
+    it('does not decode a plain error message', () => {
+      expect(decodeNotebookToolError('boom')).toBeNull()
+    })
+
+    it('does not decode unrelated JSON', () => {
+      expect(decodeNotebookToolError(JSON.stringify({ foo: 'bar' }))).toBeNull()
+    })
+
+    it('does not decode JSON that merely looks like a NotebookToolError but lacks the tag', () => {
+      expect(
+        decodeNotebookToolError(JSON.stringify({ exposeToAssistant: true, message: 'boom' }))
+      ).toBeNull()
     })
   })
 })

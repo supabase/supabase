@@ -18,11 +18,18 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  MultiSelector,
+  MultiSelectorContent,
+  MultiSelectorItem,
+  MultiSelectorList,
+  MultiSelectorTrigger,
+} from 'ui-patterns/multi-select'
 
 import { ExplorerToolbarAction } from '../ExplorerToolbar'
 import { type QueryDisplay, type QueryResult } from '../types'
 import { checkHasNonPositiveValues } from '@/components/ui/QueryBlock/QueryBlock.utils'
-import { type ChartConfig } from '@/data/content/notebooks/notebook-schema'
+import { MAX_CHART_Y_SERIES, type ChartConfig } from '@/data/content/notebooks/notebook-schema'
 
 interface DisplaySettingsButtonProps {
   display: QueryDisplay
@@ -32,9 +39,11 @@ interface DisplaySettingsButtonProps {
   onChange: (display: QueryDisplay) => void
 }
 
-// [Joshen] TODO support multiple y axis charts
-// [Joshen] TODO onUpdateChartConfig can likely be shifted into the notebook-state
-// so this component doesn't need to know about other cells
+const getLogScaleDisabledReason = (y_series: string[]) => {
+  if (y_series.length === 0) return 'Select a column for the Y axis first'
+  if (y_series.length > 1) return 'Only available with a single Y axis column'
+  return 'Data contains zero or negative values'
+}
 
 export const DisplaySettingsButton = ({
   display,
@@ -47,21 +56,22 @@ export const DisplaySettingsButton = ({
   const {
     type = 'bar',
     x_column,
-    y_columns = [],
+    y_series = [],
     cumulative = false,
     show_labels = false,
     scale = 'linear',
   } = chart ?? {}
 
   const hasNonPositiveValues = useMemo(
-    () => checkHasNonPositiveValues(result?.rows ?? [], y_columns[0]),
-    [result, y_columns]
+    () => checkHasNonPositiveValues(result?.rows ?? [], y_series[0]),
+    [result, y_series]
   )
 
+  // Logarithmic scale only applies to a single series.
   const canToggleLogScale = useMemo(() => {
-    if (y_columns.length === 0 || !result || (result.rows ?? []).length === 0) return false
+    if (y_series.length !== 1 || !result || (result.rows ?? []).length === 0) return false
     return !hasNonPositiveValues
-  }, [hasNonPositiveValues, result, y_columns.length])
+  }, [hasNonPositiveValues, result, y_series.length])
 
   const onChangeView = (view: 'table' | 'chart') => {
     onChange({ ...display, view })
@@ -73,7 +83,7 @@ export const DisplaySettingsButton = ({
       chart: {
         type: chart?.type ?? 'bar',
         x_column: chart?.x_column ?? '',
-        y_columns: chart?.y_columns ?? [],
+        y_series: chart?.y_series ?? [],
         cumulative: chart?.cumulative ?? false,
         scale: chart?.scale ?? 'linear',
         show_labels: chart?.show_labels ?? false,
@@ -87,17 +97,17 @@ export const DisplaySettingsButton = ({
   })
 
   useEffect(() => {
-    if (hasNonPositiveValues && scale === 'log') {
+    if (scale === 'log' && (hasNonPositiveValues || y_series.length > 1)) {
       resetToLinearScale()
     }
-  }, [hasNonPositiveValues, scale])
+  }, [hasNonPositiveValues, scale, y_series.length])
 
   return (
     <Popover>
       <PopoverTrigger asChild>
         <ExplorerToolbarAction disabled={disabled} icon={<Settings2 />} tooltip="Result settings" />
       </PopoverTrigger>
-      <PopoverContent side="bottom" className="flex flex-col gap-y-3 p-0 py-3 mr-8">
+      <PopoverContent side="bottom" className="flex flex-col gap-y-3 p-0 py-3 mr-8 w-80">
         <div className="flex flex-col gap-y-3 px-3">
           <p className="text-xs tracking-tighter uppercase font-mono text-foreground-lighter">
             Result display settings
@@ -147,12 +157,17 @@ export const DisplaySettingsButton = ({
             </FormItemLayout>
 
             <div className="px-3 flex flex-col gap-y-2">
-              <FormItemLayout isReactForm={false} layout="flex-row-reverse" label="X axis">
+              <FormItemLayout
+                isReactForm={false}
+                layout="flex-row-reverse"
+                label="X axis"
+                className="[&>div:first-child]:xl:w-3/5"
+              >
                 <Select
                   value={x_column}
                   onValueChange={(x_column) => onUpdateChartConfig({ x_column })}
                 >
-                  <SelectTrigger className="w-32">
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select a column" />
                   </SelectTrigger>
                   <SelectContent>
@@ -165,32 +180,57 @@ export const DisplaySettingsButton = ({
                 </Select>
               </FormItemLayout>
 
-              <FormItemLayout isReactForm={false} layout="flex-row-reverse" label="Y Axis">
-                <Select
-                  value={y_columns?.[0]}
-                  onValueChange={(y_column) => onUpdateChartConfig({ y_columns: [y_column] })}
+              <FormItemLayout
+                isReactForm={false}
+                layout="flex-row-reverse"
+                label="Y Axis"
+                className="[&>div:first-child]:xl:w-3/5"
+              >
+                <MultiSelector
+                  values={y_series}
+                  onValuesChange={(values) => {
+                    if (values.length > MAX_CHART_Y_SERIES) return
+                    onUpdateChartConfig({ y_series: values })
+                  }}
+                  className="w-full"
                 >
-                  <SelectTrigger className="w-32">
-                    <SelectValue placeholder="Select a column" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {columns.map((x) => (
-                      <SelectItem key={x} value={x}>
-                        {x}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  <MultiSelectorTrigger
+                    mode="inline-combobox"
+                    label={`Select up to ${MAX_CHART_Y_SERIES} columns`}
+                    deletableBadge
+                    badgeLimit="wrap"
+                    showIcon={false}
+                    className="min-w-32!"
+                  />
+                  <MultiSelectorContent>
+                    <MultiSelectorList>
+                      {columns.map((x) => (
+                        <MultiSelectorItem
+                          key={x}
+                          value={x}
+                          disabled={y_series.length >= MAX_CHART_Y_SERIES && !y_series.includes(x)}
+                        >
+                          {x}
+                        </MultiSelectorItem>
+                      ))}
+                    </MultiSelectorList>
+                  </MultiSelectorContent>
+                </MultiSelector>
               </FormItemLayout>
 
-              <FormItemLayout isReactForm={false} layout="flex-row-reverse" label="Scale">
+              <FormItemLayout
+                isReactForm={false}
+                layout="flex-row-reverse"
+                label="Scale"
+                className="[&>div:first-child]:xl:w-3/5"
+              >
                 <Select
                   value={scale}
                   onValueChange={(scale) =>
                     onUpdateChartConfig({ scale: scale as 'log' | 'linear' })
                   }
                 >
-                  <SelectTrigger className="w-32">
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select a column" />
                   </SelectTrigger>
                   <SelectContent>
@@ -207,9 +247,7 @@ export const DisplaySettingsButton = ({
                       </TooltipTrigger>
                       {!canToggleLogScale && (
                         <TooltipContent side="left">
-                          {y_columns.length === 0
-                            ? 'Select a column for the Y axis first'
-                            : 'Data contains zero or negative values'}
+                          {getLogScaleDisabledReason(y_series)}
                         </TooltipContent>
                       )}
                     </Tooltip>

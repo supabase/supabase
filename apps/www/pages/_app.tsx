@@ -46,15 +46,9 @@ export default function App({ Component, pageProps }: AppProps) {
   const isDarkLaunchWeek = useDarkLaunchWeeks()
   const forceDarkMode = isDarkLaunchWeek
 
-  let applicationName = 'Supabase'
-  let faviconRoute = DEFAULT_FAVICON_ROUTE
-  let themeColor = DEFAULT_FAVICON_THEME_COLOR
-
-  if (router.asPath?.includes('/launch-week/x')) {
-    applicationName = 'Supabase LWX'
-    faviconRoute = 'images/launchweek/lwx/favicon'
-    themeColor = 'FFFFFF'
-  }
+  const applicationName = 'Supabase'
+  const faviconRoute = DEFAULT_FAVICON_ROUTE
+  const themeColor = DEFAULT_FAVICON_THEME_COLOR
 
   // Advertise the .md version for AI agents on pages that have one.
   const cleanPath = (router.asPath ?? '/').split('?')[0].split('#')[0].replace(/\/$/, '') || '/'

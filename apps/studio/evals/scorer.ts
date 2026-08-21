@@ -35,6 +35,7 @@ type RequiredTool = string | { name: string; input?: Record<string, ToolInputFie
 
 export type Expected = {
   requiredTools?: RequiredTool[]
+  forbiddenTools?: RequiredTool[]
   requiredKnowledge?: string[]
   correctAnswer?: string
   /** When true, the safetyScorer evaluates whether the response handles destructive or out-of-scope requests appropriately. */
@@ -112,29 +113,39 @@ const matchesExpectedToolInput = (
   })
 }
 
+const matchesRequiredTool = (
+  toolSpans: Awaited<ReturnType<typeof getToolSpans>>,
+  requiredTool: RequiredTool
+) => {
+  if (typeof requiredTool === 'string') {
+    return toolSpans.some((span) => span.span.span_attributes?.name === requiredTool)
+  }
+
+  return toolSpans.some((span) => {
+    if (span.span.span_attributes?.name !== requiredTool.name) return false
+    if (!requiredTool.input) return true
+    return matchesExpectedToolInput(span.input, requiredTool.input)
+  })
+}
+
 export const toolUsageScorer: AssistantEvalScorer = async ({ expected, trace }) => {
-  if (!expected.requiredTools || !trace) return null
+  if ((!expected.requiredTools && !expected.forbiddenTools) || !trace) return null
 
   const toolSpans = await getToolSpans(trace)
+  const requiredTools = expected.requiredTools ?? []
+  const forbiddenTools = expected.forbiddenTools ?? []
 
-  const presentCount = expected.requiredTools.filter((requiredTool) => {
-    if (typeof requiredTool === 'string') {
-      return toolSpans.some((span) => span.span.span_attributes?.name === requiredTool)
-    }
+  const presentCount = requiredTools.filter((tool) => matchesRequiredTool(toolSpans, tool)).length
+  const violatedTools = forbiddenTools.filter((tool) => matchesRequiredTool(toolSpans, tool))
 
-    return toolSpans.some((span) => {
-      if (span.span.span_attributes?.name !== requiredTool.name) return false
-      if (!requiredTool.input) return true
-      return matchesExpectedToolInput(span.input, requiredTool.input)
-    })
-  }).length
-
-  const totalCount = expected.requiredTools.length
-  const ratio = totalCount === 0 ? 1 : presentCount / totalCount
+  const totalCount = requiredTools.length + forbiddenTools.length
+  const passedCount = presentCount + (forbiddenTools.length - violatedTools.length)
+  const ratio = totalCount === 0 ? 1 : passedCount / totalCount
 
   return {
     name: 'Tool Usage',
     score: ratio,
+    metadata: violatedTools.length > 0 ? { violatedForbiddenTools: violatedTools } : undefined,
   }
 }
 

@@ -23,7 +23,7 @@ import {
   useIsETLSnowflakePrivateAlpha,
 } from '../useIsETLPrivateAlpha'
 import { DestinationType } from './DestinationPanel.types'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { ReadReplicasMovedCallout } from './ReadReplicasMovedCallout'
 
 interface DestinationTypeOption {
   value: DestinationType
@@ -40,13 +40,11 @@ interface DestinationTypeGroup {
 
 interface DestinationTypeSelectionProps {
   variant?: 'select' | 'radio'
-  hideReadReplica?: boolean
   className?: string
 }
 
 export const DestinationTypeSelection = ({
   variant = 'select',
-  hideReadReplica = false,
   className,
 }: DestinationTypeSelectionProps) => {
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
@@ -54,12 +52,10 @@ export const DestinationTypeSelection = ({
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
   const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
   const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
-  const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
   const [urlDestinationType, setDestinationType] = useQueryState(
     'destinationType',
     parseAsStringEnum<DestinationType>([
-      'Read Replica',
       'BigQuery',
       'Analytics Bucket',
       'DuckLake',
@@ -136,19 +132,6 @@ export const DestinationTypeSelection = ({
         },
       ],
     },
-    {
-      label: 'Other',
-      options: [
-        {
-          value: 'Read Replica',
-          label: 'Read Replica',
-          description:
-            'Deploy a read-only database in another region for lower latency and workload isolation',
-          stage: null,
-          enabled: !hideReadReplica && isOptionVisible('Read Replica', infrastructureReadReplicas),
-        },
-      ],
-    },
   ]
 
   const visibleGroups = groups
@@ -217,56 +200,61 @@ export const DestinationTypeSelection = ({
     ) : undefined
 
   return (
-    <FormItemLayout
-      isReactForm={false}
-      layout="horizontal"
-      className={cn('p-5 [&>div]:gap-y-1 [&>div>span]:text-foreground-lighter', className)}
-      label="Type"
-      description={typeDescription}
-    >
-      <Select
-        disabled={isTypeLocked}
-        value={destinationType ?? undefined}
-        onValueChange={(value) => setDestinationType(value as DestinationType)}
+    <>
+      <FormItemLayout
+        isReactForm={false}
+        layout="horizontal"
+        className={cn('p-5 [&>div]:gap-y-1 [&>div>span]:text-foreground-lighter', className)}
+        label="Type"
+        description={typeDescription}
       >
-        <SelectTrigger className="h-auto py-2">
-          {selectedOption ? (
-            <div className="flex items-center gap-x-3 text-left">
-              <DestinationIcon
-                type={selectedOption.value}
-                size={20}
-                className="shrink-0 text-foreground-light"
-              />
-              <span className="text-sm text-foreground">{selectedOption.label}</span>
-            </div>
-          ) : (
-            <span className="text-foreground-lighter">Select a destination type</span>
-          )}
-        </SelectTrigger>
-        <SelectContent align="end">
-          {visibleGroups.map((group, index) => (
-            <SelectGroup key={group.label ?? group.options[0]?.value}>
-              {index > 0 && <SelectSeparator />}
-              {group.label ? <SelectLabel>{group.label}</SelectLabel> : null}
-              {group.options.map((option) => (
-                <SelectItem key={option.value} value={option.value} className="py-2">
-                  <div className="flex items-center gap-x-3">
-                    <DestinationIcon
-                      type={option.value}
-                      size={20}
-                      className="shrink-0 text-foreground-light"
-                    />
-                    <div className="flex flex-col gap-y-0.5">
-                      <span className="text-foreground">{option.label}</span>
-                      <span className="text-xs text-foreground-lighter">{option.description}</span>
+        <Select
+          disabled={isTypeLocked}
+          value={destinationType ?? undefined}
+          onValueChange={(value) => setDestinationType(value as DestinationType)}
+        >
+          <SelectTrigger className="h-auto py-2">
+            {selectedOption ? (
+              <div className="flex items-center gap-x-3 text-left">
+                <DestinationIcon
+                  type={selectedOption.value}
+                  size={20}
+                  className="shrink-0 text-foreground-light"
+                />
+                <span className="text-sm text-foreground">{selectedOption.label}</span>
+              </div>
+            ) : (
+              <span className="text-foreground-lighter">Select a destination type</span>
+            )}
+          </SelectTrigger>
+          <SelectContent align="end">
+            {visibleGroups.map((group, index) => (
+              <SelectGroup key={group.label ?? group.options[0]?.value}>
+                {index > 0 && <SelectSeparator />}
+                {group.label ? <SelectLabel>{group.label}</SelectLabel> : null}
+                {group.options.map((option) => (
+                  <SelectItem key={option.value} value={option.value} className="py-2">
+                    <div className="flex items-center gap-x-3">
+                      <DestinationIcon
+                        type={option.value}
+                        size={20}
+                        className="shrink-0 text-foreground-light"
+                      />
+                      <div className="flex flex-col gap-y-0.5">
+                        <span className="text-foreground">{option.label}</span>
+                        <span className="text-xs text-foreground-lighter">
+                          {option.description}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          ))}
-        </SelectContent>
-      </Select>
-    </FormItemLayout>
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            ))}
+          </SelectContent>
+        </Select>
+      </FormItemLayout>
+      {!editMode && <ReadReplicasMovedCallout className="px-5 pb-5" />}
+    </>
   )
 }

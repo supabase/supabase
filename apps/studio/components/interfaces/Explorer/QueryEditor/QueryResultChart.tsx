@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { type ChartConfig as ChartSeriesConfig } from 'ui'
 import { Chart, ChartBar, ChartCard, ChartContent, ChartLine } from 'ui-patterns/Chart'
 
 import { type QueryResult } from '../types'
@@ -11,8 +12,11 @@ interface QueryResultChartProps {
   result?: QueryResult
 }
 
-// [Joshen] Will need to implement log scale - refer to QueryBlock.tsx `effectiveLogScale`
-// [Joshen] Will also need to implement error handling where appropriate (e.g if query errors)
+const Y_SERIES_COLORS = [
+  'hsl(var(--brand-default))',
+  'hsl(var(--chart-blue))',
+  'hsl(var(--chart-3))',
+]
 
 const toChartValue = (value: unknown): string | number => {
   if (typeof value === 'number' || typeof value === 'string') return value
@@ -21,21 +25,36 @@ const toChartValue = (value: unknown): string | number => {
 }
 
 export const QueryResultChart = ({ chart, result }: QueryResultChartProps) => {
-  const { type, x_column, y_columns = [], cumulative, show_labels, scale } = chart ?? {}
+  const { type, x_column, y_series = [], cumulative, show_labels, scale } = chart ?? {}
 
-  const hasConfig = !!x_column && y_columns.length > 0
+  const hasConfig = !!x_column && y_series.length > 0
+  // Logarithmic scale only makes sense for a single series — DisplaySettingsButton
+  // resets `scale` to linear once a second Y column is added
+  const effectiveScale = y_series.length > 1 ? 'linear' : scale
+
+  const chartConfig: ChartSeriesConfig = useMemo(
+    () =>
+      y_series.reduce((acc, key, index) => {
+        acc[key] = { label: key, color: Y_SERIES_COLORS[index] }
+        return acc
+      }, {} as ChartSeriesConfig),
+    [y_series]
+  )
+
   const chartRows = useMemo(() => {
     const xKey = x_column ?? ''
-    const yKey = y_columns[0] ?? ''
-    return (result?.rows ?? []).map((row) => ({
-      [xKey]: toChartValue(row[xKey]),
-      [yKey]: toChartValue(row[yKey]),
-    }))
-  }, [result, x_column, y_columns])
+    return (result?.rows ?? []).map((row) => {
+      const chartRow: Record<string, string | number> = { [xKey]: toChartValue(row[xKey]) }
+      y_series.forEach((yKey) => {
+        chartRow[yKey] = toChartValue(row[yKey])
+      })
+      return chartRow
+    })
+  }, [result, x_column, y_series])
 
   const cumulativeResults = useMemo(
-    () => getCumulativeResults({ rows: chartRows }, { yKey: y_columns[0] ?? '' }),
-    [chartRows, y_columns]
+    () => getCumulativeResults({ rows: chartRows }, { yKey: y_series }),
+    [chartRows, y_series]
   )
   const resultToRender = cumulative ? cumulativeResults : chartRows
 
@@ -70,14 +89,16 @@ export const QueryResultChart = ({ chart, result }: QueryResultChartProps) => {
               <ChartBar
                 isFullHeight
                 xKey={x_column}
-                dataKey={y_columns[0]}
+                dataKey={y_series[0]}
+                dataKeys={y_series}
+                config={chartConfig}
                 showXAxis={show_labels}
                 showYAxis={show_labels}
                 data={resultToRender}
                 YAxisProps={{
-                  scale: scale === 'log' ? 'log' : 'auto',
-                  domain: scale === 'log' ? [1, 'auto'] : undefined,
-                  tickFormatter: scale === 'log' ? formatLogTick : undefined,
+                  scale: effectiveScale === 'log' ? 'log' : 'auto',
+                  domain: effectiveScale === 'log' ? [1, 'auto'] : undefined,
+                  tickFormatter: effectiveScale === 'log' ? formatLogTick : undefined,
                 }}
               />
             )}
@@ -85,14 +106,16 @@ export const QueryResultChart = ({ chart, result }: QueryResultChartProps) => {
               <ChartLine
                 isFullHeight
                 xKey={x_column}
-                dataKey={y_columns[0]}
+                dataKey={y_series[0]}
+                dataKeys={y_series}
+                config={chartConfig}
                 showXAxis={show_labels}
                 showYAxis={show_labels}
                 data={resultToRender}
                 YAxisProps={{
-                  scale: scale === 'log' ? 'log' : 'auto',
-                  domain: scale === 'log' ? [1, 'auto'] : undefined,
-                  tickFormatter: scale === 'log' ? formatLogTick : undefined,
+                  scale: effectiveScale === 'log' ? 'log' : 'auto',
+                  domain: effectiveScale === 'log' ? [1, 'auto'] : undefined,
+                  tickFormatter: effectiveScale === 'log' ? formatLogTick : undefined,
                 }}
               />
             )}

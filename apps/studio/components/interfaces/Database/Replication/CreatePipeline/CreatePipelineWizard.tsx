@@ -62,6 +62,7 @@ import {
   useIsETLPrivateAlpha,
   useIsETLSnowflakePrivateAlpha,
 } from '../useIsETLPrivateAlpha'
+import { useRedirectLegacyReadReplicaDestination } from '../useRedirectLegacyReadReplicaDestination'
 import { CreatePipelineGate } from './CreatePipelineGate'
 import {
   getPipelineCreateConnectionStepFieldNames,
@@ -122,10 +123,11 @@ export const CreatePipelineWizard = () => {
   )
   const validationSectionRef = useRef<React.ComponentRef<typeof PipelineValidationAdmonition>>(null)
 
+  useRedirectLegacyReadReplicaDestination()
+
   const [urlDestinationType] = useQueryState(
     'destinationType',
     parseAsStringEnum<DestinationType>([
-      'Read Replica',
       'BigQuery',
       'Analytics Bucket',
       'DuckLake',
@@ -436,12 +438,6 @@ export const CreatePipelineWizard = () => {
   }, [defaultValues, form, resetValidation, selectedType])
 
   useEffect(() => {
-    if (urlDestinationType === 'Read Replica' && projectRef) {
-      router.replace(`${listHref}?destinationType=${encodeURIComponent('Read Replica')}`)
-    }
-  }, [listHref, projectRef, router, urlDestinationType])
-
-  useEffect(() => {
     if (!isDirty) {
       form.reset(defaultValues)
       resetValidation()
@@ -547,7 +543,7 @@ export const CreatePipelineWizard = () => {
                   <LocalReplicationUnavailableAdmonition className="pt-2" />
                 </SteppedFlowHeader>
                 <CardContent>
-                  <DestinationTypeSelection variant="radio" hideReadReplica />
+                  <DestinationTypeSelection variant="radio" />
                 </CardContent>
               </>
             )}

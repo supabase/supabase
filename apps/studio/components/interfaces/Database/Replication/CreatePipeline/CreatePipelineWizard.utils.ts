@@ -18,7 +18,7 @@ export const getDestinationSetupDocsUrl = (destinationType: DestinationType) =>
     ? `${DOCS_URL}/guides/database/replication/bigquery#configure-bigquery-as-a-destination`
     : `${DOCS_URL}/guides/database/replication/pipelines#step-3-configure-a-destination`
 
-export type PipelineDestinationType = Exclude<DestinationType, 'Read Replica'>
+export type PipelineDestinationType = DestinationType
 
 export const PIPELINE_DESTINATION_TYPES: PipelineDestinationType[] = [
   'BigQuery',

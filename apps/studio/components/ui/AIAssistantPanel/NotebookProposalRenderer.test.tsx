@@ -25,8 +25,8 @@ const mockNotebookRow = (overrides: Partial<Record<string, unknown>> = {}) => ({
   content: {
     schema_version: 1,
     cells: [
-      { _tag: 'markdown_cell', id: 'cell-1', text: 'hello' },
-      { _tag: 'markdown_cell', id: 'cell-2', text: 'world' },
+      { _tag: 'markdown_cell', _id: 'cell-1', text: 'hello' },
+      { _tag: 'markdown_cell', _id: 'cell-2', text: 'world' },
     ],
   },
   ...overrides,
@@ -51,6 +51,7 @@ describe('NotebookProposalRenderer', () => {
       <NotebookProposalRenderer
         mode="create"
         state="approval-requested"
+        confirmState="approval-requested"
         input={{
           name: 'New notebook',
           content: {
@@ -64,7 +65,9 @@ describe('NotebookProposalRenderer', () => {
       />
     )
 
+    expect(screen.getByRole('toolbar', { name: 'Notebook toolbar' })).toBeInTheDocument()
     expect(screen.getByText('1 cell')).toBeInTheDocument()
+    expect(screen.getByText('Assistant wants to create this notebook')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Create' }))
     expect(onApprove).toHaveBeenCalledTimes(1)
   })
@@ -78,6 +81,7 @@ describe('NotebookProposalRenderer', () => {
       <NotebookProposalRenderer
         mode="update"
         state="approval-requested"
+        confirmState="approval-requested"
         input={{
           id: NOTEBOOK_ID,
           expected_updated_at: '2024-01-01T00:00:00.000Z',
@@ -94,50 +98,57 @@ describe('NotebookProposalRenderer', () => {
     expect(onApprove).toHaveBeenCalledTimes(1)
   })
 
-  it('warns and withholds the diff when the notebook changed since expected_updated_at', async () => {
-    const onApprove = vi.fn()
-    mockContentItem(mockNotebookRow({ updated_at: '2024-06-01T00:00:00.000Z' }))
-
-    render(
-      <NotebookProposalRenderer
-        mode="update"
-        state="approval-requested"
-        input={{
-          id: NOTEBOOK_ID,
-          expected_updated_at: '2024-01-01T00:00:00.000Z',
-          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
-        }}
-        output={undefined}
-        onApprove={onApprove}
-        onDeny={vi.fn()}
-      />
-    )
-
-    expect(
-      await screen.findByText('This notebook changed since the assistant planned this update')
-    ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Refresh' })).toBeInTheDocument()
-    expect(onApprove).not.toHaveBeenCalled()
-  })
-
   it('falls back to a raw-input admonition without dropping the confirm footer on a parse failure', async () => {
     const user = userEvent.setup()
+    const onApprove = vi.fn()
     const onDeny = vi.fn()
 
     render(
       <NotebookProposalRenderer
         mode="create"
         state="approval-requested"
+        confirmState="approval-requested"
         input={{ nonsense: true }}
         output={undefined}
-        onApprove={vi.fn()}
+        onApprove={onApprove}
         onDeny={onDeny}
       />
     )
 
     expect(screen.getByText("Couldn't render a preview for this notebook")).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Create' })).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Skip' }))
     expect(onDeny).toHaveBeenCalledTimes(1)
+    expect(onApprove).not.toHaveBeenCalled()
+  })
+
+  it('withholds Apply changes when the update cannot be applied as written', async () => {
+    const user = userEvent.setup()
+    const onApprove = vi.fn()
+    const onDeny = vi.fn()
+    mockContentItem(mockNotebookRow())
+
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="approval-requested"
+        confirmState="approval-requested"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'missing' }],
+        }}
+        output={undefined}
+        onApprove={onApprove}
+        onDeny={onDeny}
+      />
+    )
+
+    expect(await screen.findByText("This update can't be applied as written")).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Apply changes' })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Skip' }))
+    expect(onDeny).toHaveBeenCalledTimes(1)
+    expect(onApprove).not.toHaveBeenCalled()
   })
 
   it('renders an Open notebook link once output is available', () => {
@@ -154,11 +165,25 @@ describe('NotebookProposalRenderer', () => {
     expect(link).toHaveAttribute('href', `/project/default/explorer/notebook/${NOTEBOOK_ID}`)
   })
 
-  it('renders a muted skipped summary when output-denied', () => {
+  it('keeps the preview in the message after skip', () => {
     render(
-      <NotebookProposalRenderer mode="update" state="output-denied" input={{}} output={undefined} />
+      <NotebookProposalRenderer
+        mode="create"
+        state="output-denied"
+        input={{
+          name: 'New notebook',
+          content: {
+            schema_version: 1,
+            cells: [{ _tag: 'markdown_cell', text: 'hello' }],
+          },
+        }}
+        output={undefined}
+      />
     )
 
-    expect(screen.getByText('Skipped notebook update')).toBeInTheDocument()
+    expect(screen.getByRole('toolbar', { name: 'Notebook toolbar' })).toBeInTheDocument()
+    expect(screen.getByText('New notebook')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Create' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Skipped notebook creation')).not.toBeInTheDocument()
   })
 })

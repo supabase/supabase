@@ -13,6 +13,8 @@ import factoryIcon from '../assets/factory-icon.svg'
 import geminiCliIcon from '../assets/gemini-cli-icon.svg'
 import gooseDarkIcon from '../assets/goose-icon-dark.svg'
 import gooseIcon from '../assets/goose-icon.svg'
+import grokDarkIcon from '../assets/grok-icon-dark.svg'
+import grokIcon from '../assets/grok-icon.svg'
 import kimiDarkIcon from '../assets/kimi-icon-dark.svg'
 import kimiIcon from '../assets/kimi-icon.svg'
 import kiroIcon from '../assets/kiro-icon.svg'
@@ -44,6 +46,7 @@ const MCP_CLIENT_ICON_ASSETS = {
   factory: { light: factoryIcon, dark: factoryDarkIcon },
   'gemini-cli': { light: geminiCliIcon, dark: geminiCliIcon },
   goose: { light: gooseIcon, dark: gooseDarkIcon },
+  grok: { light: grokIcon, dark: grokDarkIcon },
   kimi: { light: kimiIcon, dark: kimiDarkIcon },
   kiro: { light: kiroIcon, dark: kiroIcon },
   openai: { light: openaiIcon, dark: openaiDarkIcon },

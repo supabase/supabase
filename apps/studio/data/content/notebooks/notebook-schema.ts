@@ -14,10 +14,12 @@ const isoDateTimeSchema = z.string().transform((raw, ctx) => {
   return parsed
 })
 
+export const MAX_CHART_Y_SERIES = 3
+
 const chartConfigSchema = z.object({
   type: z.enum(['bar', 'line']),
   x_column: z.string(),
-  y_columns: z.array(z.string()),
+  y_series: z.array(z.string()).max(MAX_CHART_Y_SERIES),
   cumulative: z.boolean(),
   scale: z.enum(['linear', 'log']).default('linear'),
   show_labels: z.boolean(),
@@ -52,17 +54,10 @@ export const timeRangeSchema = z
     { message: 'must be later than the start of the range', path: ['end'] }
   )
 
-// Source parameters — the per-backend values a query needs beyond its SQL. Declared
-// here, in the wire contract, because this schema is the shape shared with the API and
-// the agent tool surface, so it is where the validation has to be authoritative. The
-// runtime registry (data/query-sources/query-source-registry.ts) borrows these rather
-// than redeclaring them. Each is spread flat into its cell — no `source` wrapper — to
-// keep the JSON an agent has to author as shallow as possible.
 export const databaseSourceSchema = z.object({
   /**
    * Which database the query runs against: the read-replica `identifier`, or absent
-   * for the project's primary. Named `database_identifier` rather than `identifier`
-   * because every cell already carries an `id`.
+   * for the project's primary.
    */
   database_identifier: z.string().optional(),
 })
@@ -71,14 +66,11 @@ export const logsSourceSchema = z.object({
   time_range: timeRangeSchema,
 })
 
-const cellBaseSchema = z.object({
-  id: z.string(),
+const markdownFieldsSchema = z.object({
+  text: z.string(),
 })
 
-// Fields every runnable cell shares, regardless of backend. `sql` is deliberately NOT
-// here: it stays on each member so the domain transform can brand it per dialect and
-// generic code holding a `QueryCell` can't hand it to the wrong wire boundary.
-const queryCellBaseSchema = cellBaseSchema.extend({
+const queryFieldsBaseSchema = z.object({
   title: z.string().optional(),
   view: z.enum(['table', 'chart']).optional(),
   // Persisted independently of `view` so a user who switches to the table and back
@@ -86,22 +78,32 @@ const queryCellBaseSchema = cellBaseSchema.extend({
   chart: chartConfigSchema.optional(),
 })
 
-const markdownCellSchema = cellBaseSchema.extend({
-  _tag: z.literal('markdown_cell'),
-  text: z.string(),
-})
-
-const databaseCellSchema = queryCellBaseSchema.extend({
-  _tag: z.literal('database_cell'),
+const databaseFieldsSchema = queryFieldsBaseSchema.extend({
   sql: z.string(),
   row_limit: z.number(),
   ...databaseSourceSchema.shape,
 })
 
-const logCellSchema = queryCellBaseSchema.extend({
-  _tag: z.literal('log_cell'),
+const logFieldsSchema = queryFieldsBaseSchema.extend({
   sql: z.string(),
   ...logsSourceSchema.shape,
+})
+
+// The wire shape: a cell that's been saved always carries the backend's real `_id` — the
+// backend assigns one on every write and returns it on every subsequent read.
+const markdownCellSchema = markdownFieldsSchema.extend({
+  _tag: z.literal('markdown_cell'),
+  _id: z.string(),
+})
+
+const databaseCellSchema = databaseFieldsSchema.extend({
+  _tag: z.literal('database_cell'),
+  _id: z.string(),
+})
+
+const logCellSchema = logFieldsSchema.extend({
+  _tag: z.literal('log_cell'),
+  _id: z.string(),
 })
 
 const cellSchema = z.discriminatedUnion('_tag', [
@@ -110,8 +112,6 @@ const cellSchema = z.discriminatedUnion('_tag', [
   logCellSchema,
 ])
 
-// The wire shape: every notebook fetched from the API has this shape, with backend-
-// generated cell `id`s and plaintext `sql`.
 export const notebookSchema = z.object({
   schema_version: z.literal(1),
   cells: z.array(cellSchema),
@@ -121,16 +121,14 @@ export type NotebookWire = z.infer<typeof notebookSchema>
 export type CellWire = z.infer<typeof cellSchema>
 
 // Cells for the create/update PUT body (data/content/notebooks/notebook-upsert-mutation.ts).
-// An existing cell being kept or edited carries its real backend-assigned `id` so the
-// backend can diff it against the previous version; a newly inserted cell has no `id` at
-// all — the backend generates one on write. `sql` must already be a SafeSqlFragment /
-// SafeLogSqlFragment — i.e. promoted at the point of user action per the
-// safe-sql-execution skill — never a raw string or an UntrustedSqlFragment/unchecked_sql,
-// since neither proves this specific save was user-authored.
+// An existing cell being kept or edited carries its real backend-assigned `_id` so the
+// backend can diff it against the previous version; a newly inserted cell — or one whose
+// `_id` is a client-fabricated draft id (see DRAFT_ID_PREFIX below) — has no `_id` at all
+// once it reaches the wire, so the backend generates one on write.
 const writableCellSchema = z.discriminatedUnion('_tag', [
-  markdownCellSchema.extend({ id: z.string().optional() }),
-  databaseCellSchema.extend({ id: z.string().optional() }),
-  logCellSchema.extend({ id: z.string().optional() }),
+  markdownFieldsSchema.extend({ _tag: z.literal('markdown_cell'), _id: z.string().optional() }),
+  databaseFieldsSchema.extend({ _tag: z.literal('database_cell'), _id: z.string().optional() }),
+  logFieldsSchema.extend({ _tag: z.literal('log_cell'), _id: z.string().optional() }),
 ])
 
 export const writableNotebookSchema = z.object({
@@ -150,12 +148,25 @@ export type WritableNotebook = Omit<z.infer<typeof writableNotebookSchema>, 'cel
   cells: Array<WritableCell>
 }
 
+// Same shape as WritableCell/WritableNotebook but with `sql` left as a plain, unbranded
+// string — the actual write-body wire shape (`_id` optional, unlike the required `_id` on
+// CellWire/NotebookWire above, since a cell being created for the first time has none yet).
+type WritableCellWire = z.infer<typeof writableCellSchema>
+type WritableNotebookWire = z.infer<typeof writableNotebookSchema>
+
+// Agents cannot yet target a specific read replica: there's no tool exposing a project's
+// real replica identifiers, so a model asked to fill this field has no legitimate value to
+// put there — and an invented one silently breaks the cell, since its connection string can
+// never resolve (see QueryEditor's run handler). Omit the field entirely until replica
+// selection is actually wired up for agents, rather than leave it for a model to guess at.
+const agentDatabaseFieldsSchema = databaseFieldsSchema.omit({ database_identifier: true })
+
 // Agents have restrictions on writing IDs to preserve guarantees about ID
-// uniqueness.
+// uniqueness
 export const agentCellSchema = z.discriminatedUnion('_tag', [
-  markdownCellSchema.omit({ id: true }).strict(),
-  databaseCellSchema.omit({ id: true }).strict(),
-  logCellSchema.omit({ id: true }).strict(),
+  markdownFieldsSchema.extend({ _tag: z.literal('markdown_cell') }).strict(),
+  agentDatabaseFieldsSchema.extend({ _tag: z.literal('database_cell') }).strict(),
+  logFieldsSchema.extend({ _tag: z.literal('log_cell') }).strict(),
 ])
 
 export const agentNotebookSchema = z.object({
@@ -166,8 +177,28 @@ export const agentNotebookSchema = z.object({
 export type AgentNotebook = z.infer<typeof agentNotebookSchema>
 export type AgentCell = z.infer<typeof agentCellSchema>
 
-// The domain shape: parses the same wire cell (`cellSchema`), transforms `sql` into a
-// branded `unchecked_sql`, and defaults `view` to 'table'
+// A backend-recognized `_id` is required once a cell is saved (see cellSchema above), but a
+// cell can exist client-side before that first save — created fresh in the editor (see
+// components/interfaces/Explorer/utils.ts) — and needs *some* stable identity in the
+// meantime for React keys and state lookups. A draft id fills that gap. It's never sent to
+// the backend as a real `_id` (see wireId below): a cell with a draft id reaches the wire
+// exactly like a brand-new one, so the backend assigns its own.
+const DRAFT_ID_PREFIX = 'draft-'
+
+export function generateDraftId(): string {
+  return `${DRAFT_ID_PREFIX}${crypto.randomUUID()}`
+}
+
+export function isDraftId(id: string): boolean {
+  return id.startsWith(DRAFT_ID_PREFIX)
+}
+
+function wireId(id: string | undefined): { _id: string } | Record<string, never> {
+  return id !== undefined && !isDraftId(id) ? { _id: id } : {}
+}
+
+// The domain shape: parses the wire cell (`cellSchema`), transforms `sql` into a branded
+// `unchecked_sql`, and defaults `view` to 'table'.
 const cellDomainSchema = cellSchema.transform((cell) => {
   switch (cell._tag) {
     case 'markdown_cell':
@@ -191,9 +222,6 @@ export const notebookDomainSchema = z.object({
 export type NotebookContent = z.infer<typeof notebookDomainSchema>
 export type Cell = z.infer<typeof cellDomainSchema>
 
-// Reverse of cellDomainSchema's transform, for display-only conversions (e.g. deriving a
-// diff preview client-side). Never promoted or executed — writes still go through
-// acceptUntrustedSql/acceptUntrustedLogsSql at the point of user action.
 export function toWireCell(cell: Cell): CellWire {
   switch (cell._tag) {
     case 'markdown_cell':
@@ -211,6 +239,27 @@ export function toWireCell(cell: Cell): CellWire {
 
 export function toWireNotebook(content: NotebookContent): NotebookWire {
   return { schema_version: content.schema_version, cells: content.cells.map(toWireCell) }
+}
+
+export function toWireWritableCell(cell: WritableCell): WritableCellWire {
+  switch (cell._tag) {
+    case 'markdown_cell': {
+      const { _id, ...rest } = cell
+      return { ...rest, ...wireId(_id) }
+    }
+    case 'database_cell': {
+      const { _id, ...rest } = cell
+      return { ...rest, ...wireId(_id) }
+    }
+    case 'log_cell': {
+      const { _id, ...rest } = cell
+      return { ...rest, ...wireId(_id) }
+    }
+  }
+}
+
+export function toWireWritableNotebook(content: WritableNotebook): WritableNotebookWire {
+  return { schema_version: content.schema_version, cells: content.cells.map(toWireWritableCell) }
 }
 
 export type MarkdownCell = Extract<Cell, { _tag: 'markdown_cell' }>

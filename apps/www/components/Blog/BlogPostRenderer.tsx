@@ -16,6 +16,7 @@ import LW13Summary from '@/components/LaunchWeek/13/Releases/LWSummary'
 import LW14Summary from '@/components/LaunchWeek/14/Releases/LWSummary'
 import LW15Summary from '@/components/LaunchWeek/15/LWSummary'
 import LWXSummary from '@/components/LaunchWeek/X/LWXSummary'
+import { MarkdownActions } from '@/components/MarkdownActions'
 import { getBlogThumbnailImage } from '@/lib/blog-images'
 import { compileBlogMdx } from '@/lib/mdx/compileBlogMdx'
 import mdxComponents from '@/lib/mdx/mdxComponents'
@@ -225,7 +226,8 @@ const BlogPostRenderer = async ({
                   {isLaunchWeek14 && <LW14Summary />}
                   {isLaunchWeek15 && <LW15Summary />}
 
-                  <div className="block lg:hidden py-8">
+                  <div className="lg:hidden py-8 flex flex-col gap-6">
+                    <MarkdownActions pagePath={`/blog/${blogMetaData.slug}`} pageType="blog" />
                     <ShareArticleActions title={blogMetaData.title} slug={blogMetaData.slug} />
                   </div>
 
@@ -291,7 +293,8 @@ const BlogPostRenderer = async ({
                       On this page
                     </p>
                     <div className="overflow-y-auto min-h-0 flex-1">{toc}</div>
-                    <div className="shrink-0">
+                    <div className="shrink-0 flex flex-col gap-6">
+                      <MarkdownActions pagePath={`/blog/${blogMetaData.slug}`} pageType="blog" />
                       <ShareArticleActions title={blogMetaData.title} slug={blogMetaData.slug} />
                     </div>
                   </div>
