@@ -24,6 +24,8 @@ const schema = z.object({
 
 const formId = 'sign-in-mfa-form'
 
+const SUPPORT_EMAIL_HREF = `mailto:support@supabase.com?subject=${encodeURIComponent('Unable to sign in via MFA')}`
+
 function getFactorDisplayName(factor: Pick<Factor, 'friendly_name'> | null | undefined): string {
   const name = factor?.friendly_name?.trim()
   return name && name.length > 0 ? name : 'your authenticator app'
@@ -113,9 +115,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
               <Link href="/sign-in">Back to sign in</Link>
             </Button>
             <Button asChild variant="default">
-              <Link href="https://supabase.com/support" target="_blank" rel="noreferrer">
-                Contact support
-              </Link>
+              <a href={SUPPORT_EMAIL_HREF}>Email support</a>
             </Button>
           </>
         }
@@ -128,7 +128,12 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
       {isLoadingFactors && <GenericSkeletonLoader />}
 
       {isErrorFactors && (
-        <AlertError error={factorsError} subject="Failed to retrieve factors" hideContactSupport />
+        <AlertError
+          error={factorsError}
+          subject="Failed to retrieve factors"
+          description="Try refreshing your browser. If the issue persists, email support@supabase.com."
+          hideContactSupport
+        />
       )}
 
       {isSuccessFactors && (
