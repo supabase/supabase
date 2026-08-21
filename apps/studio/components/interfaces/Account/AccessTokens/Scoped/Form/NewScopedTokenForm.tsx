@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useReducedMotion } from 'common'
 import { ChevronRight, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
@@ -85,6 +86,7 @@ export const NewScopedTokenForm = ({
   })
 
   const { data: permissionScopeMap, isError } = useGetEnabledEndpointsForCapability()
+  const prefersReducedMotion = useReducedMotion()
 
   useEffect(() => {
     if (isError) {
@@ -95,8 +97,11 @@ export const NewScopedTokenForm = ({
 
   useEffect(() => {
     if (missingPermissionsAttempts === 0) return
-    missingPermissionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-  }, [missingPermissionsAttempts])
+    missingPermissionsRef.current?.scrollIntoView({
+      behavior: prefersReducedMotion ? 'auto' : 'smooth',
+      block: 'nearest',
+    })
+  }, [missingPermissionsAttempts, prefersReducedMotion])
 
   const isClassicMode = resourceAccess === 'account'
 
