@@ -69,22 +69,32 @@ export default function IntegrationsContent({
 
   const [debouncedSearchTerm] = useDebounce(search, 300)
   const [isSearching, setIsSearching] = useState(false)
+  const [searchError, setSearchError] = useState(false)
   const searchIdRef = useRef(0)
 
   useEffect(() => {
     if (debouncedSearchTerm.trim() === '') {
       setIsSearching(false)
+      setSearchError(false)
       setPartners(initialPartners)
       return
     }
     setIsSearching(true)
+    setSearchError(false)
     const currentSearchId = ++searchIdRef.current
     searchCatalogPartners(debouncedSearchTerm)
       .then((results) => {
-        if (currentSearchId === searchIdRef.current) setPartners(results ?? [])
+        if (currentSearchId !== searchIdRef.current) return
+        // null is a soft failure from searchCatalogPartners — not an empty result set.
+        if (results === null) {
+          setSearchError(true)
+          return
+        }
+        setSearchError(false)
+        setPartners(results)
       })
       .catch(() => {
-        if (currentSearchId === searchIdRef.current) setPartners([])
+        if (currentSearchId === searchIdRef.current) setSearchError(true)
       })
       .finally(() => {
         if (currentSearchId === searchIdRef.current) setIsSearching(false)
@@ -340,7 +350,11 @@ export default function IntegrationsContent({
 
             {/* Grid view */}
             {viewMode === 'grid' &&
-              (listPartners.length ? (
+              (searchError ? (
+                <p className="text-foreground-lighter text-sm">
+                  Unable to search partners. Try again.
+                </p>
+              ) : listPartners.length ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4">
                   {visiblePartners.map((p) => (
                     <Link
@@ -388,7 +402,11 @@ export default function IntegrationsContent({
 
             {/* List view */}
             {viewMode === 'list' &&
-              (listPartners.length ? (
+              (searchError ? (
+                <p className="text-foreground-lighter text-sm">
+                  Unable to search partners. Try again.
+                </p>
+              ) : listPartners.length ? (
                 <div className="border bg-background rounded-xl overflow-hidden divide-y">
                   {visiblePartners.map((p) => (
                     <Link
@@ -431,7 +449,7 @@ export default function IntegrationsContent({
                 </p>
               ))}
 
-            {hasMorePartners && (
+            {!searchError && hasMorePartners && (
               <div
                 ref={partnersLoadMoreRef}
                 className="flex justify-center py-4"
