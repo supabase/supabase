@@ -588,6 +588,59 @@ describe('SQLEditor.utils:updateWithoutWhere', () => {
     expect(match).toBe(false)
   })
 
+  it('catches update without a where clause preceded by a line comment', () => {
+    const match = isUpdateWithoutWhere(stripIndent`
+      -- deactivate everyone
+      UPDATE messages SET id = 1;
+    `)
+
+    expect(match).toBe(true)
+  })
+
+  it('catches update without a where clause preceded by a block comment', () => {
+    const match = isUpdateWithoutWhere(`/* cleanup */ UPDATE messages SET id = 1;`)
+    expect(match).toBe(true)
+  })
+
+  it('catches update where the only "where" sits inside a trailing line comment', () => {
+    const match = isUpdateWithoutWhere(`UPDATE messages SET id = 1 -- where id = 2\n;`)
+    expect(match).toBe(true)
+  })
+
+  it('catches update where the only "where" sits inside a block comment', () => {
+    const match = isUpdateWithoutWhere(`UPDATE messages SET id = 1 /* where id = 2 */;`)
+    expect(match).toBe(true)
+  })
+
+  it('does not flag update with a real where clause and a comment mentioning where', () => {
+    const match = isUpdateWithoutWhere(`UPDATE messages SET id = 1 WHERE id = 2; -- where`)
+    expect(match).toBe(false)
+  })
+
+  it('does not flag update with a real where clause when a string literal contains a semicolon', () => {
+    const match = isUpdateWithoutWhere(`UPDATE messages SET name = 'a;b' WHERE id = 1;`)
+    expect(match).toBe(false)
+  })
+
+  it('catches update without a where clause when a string literal contains a semicolon', () => {
+    const match = isUpdateWithoutWhere(`UPDATE messages SET name = 'a;b';`)
+    expect(match).toBe(true)
+  })
+
+  it('does not treat a double dash inside a string literal as a comment', () => {
+    const match = isUpdateWithoutWhere(`UPDATE messages SET name = 'a--b' WHERE id = 1;`)
+    expect(match).toBe(false)
+  })
+
+  it('does not treat a quote inside a comment as opening a string literal', () => {
+    const match = isUpdateWithoutWhere(stripIndent`
+      -- don't touch this
+      UPDATE messages SET id = 1;
+    `)
+
+    expect(match).toBe(true)
+  })
+
   it('contains both an update query and a delete query, triggers destructive', () => {
     const match = checkDestructiveQuery(stripIndent`
       delete from countries; update countries set name = 'hello';
