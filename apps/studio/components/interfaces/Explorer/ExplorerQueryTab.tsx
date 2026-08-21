@@ -102,7 +102,10 @@ export const ExplorerQueryTab = () => {
         explorerQueryState.updateDraft({ id, name })
         tabs.updateTab(createTabId('query', { id }), { label: name })
       }}
-      onSqlChange={(sql) => explorerQueryState.updateDraft({ id, sql })}
+      onSqlChange={(sql) => {
+        tabs.makeTabPermanent(createTabId('query', { id }))
+        explorerQueryState.updateDraft({ id, sql })
+      }}
       onSourceChange={(source) => explorerQueryState.updateDraft({ id, source })}
       onResultChange={handleResultChange}
       onRowLimitChange={(rowLimit) => explorerQueryState.updateDraft({ id, rowLimit })}
