@@ -587,6 +587,95 @@ export const dataset: AssistantEvalCase[] = [
   {
     input: {
       prompt:
+        "Create a notebook called 'Replica read check' with a query that counts rows in the customers table, and make sure it runs against my read replica, not the primary database.",
+      mockTables: {
+        public: [
+          {
+            name: 'customers',
+            rls_enabled: true,
+            columns: [
+              { name: 'id', data_type: 'uuid' },
+              { name: 'created_at', data_type: 'timestamp with time zone' },
+            ],
+          },
+        ],
+      },
+    },
+    expected: {
+      requiredTools: [
+        'list_databases',
+        { name: 'create_notebook', input: { name: { equals: 'Replica read check' } } },
+      ],
+      correctAnswer:
+        "Calls list_databases before creating the notebook, then creates a notebook via create_notebook named 'Replica read check' with a database_cell that counts rows in customers and sets database_identifier to 'mock-project-ref-replica-1' — the non-primary database the mock list_databases fixture returns — not 'mock-project-ref' (the primary) and not some other fabricated string.",
+    },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Exercises calling list_databases before setting a database_cell to target a non-primary database',
+    },
+  },
+  {
+    input: {
+      prompt:
+        "Create a notebook called 'Customer signups overview' with a query that shows the 20 most recently created customers.",
+      mockTables: {
+        public: [
+          {
+            name: 'customers',
+            rls_enabled: true,
+            columns: [
+              { name: 'id', data_type: 'uuid' },
+              { name: 'created_at', data_type: 'timestamp with time zone' },
+            ],
+          },
+        ],
+      },
+    },
+    expected: {
+      requiredTools: [
+        { name: 'create_notebook', input: { name: { equals: 'Customer signups overview' } } },
+      ],
+      correctAnswer:
+        "Creates a notebook via create_notebook named 'Customer signups overview' with a database_cell selecting the 20 most recent customers. Since the user never named a specific database or replica, the cell either omits database_identifier or sets it to 'mock-project-ref' (the primary) — it must not set it to 'mock-project-ref-replica-1' or any other non-primary/fabricated value.",
+    },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Guards against targeting a non-primary database when the user never asked for a specific one — the cell must omit database_identifier or target the primary, never a replica',
+    },
+  },
+  {
+    input: {
+      prompt:
+        "Create a notebook called 'EU replica check' with a query that counts rows in the customers table, targeting my EU read replica.",
+      mockTables: {
+        public: [
+          {
+            name: 'customers',
+            rls_enabled: true,
+            columns: [
+              { name: 'id', data_type: 'uuid' },
+              { name: 'created_at', data_type: 'timestamp with time zone' },
+            ],
+          },
+        ],
+      },
+    },
+    expected: {
+      requiredTools: ['list_databases'],
+      correctAnswer:
+        "Calls list_databases and finds no EU-region replica among the real results. Either creates the notebook against a database_identifier it actually found (while noting it isn't in the EU) or asks the user to confirm before proceeding — it does not invent an identifier that merely sounds like an EU replica.",
+    },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Guards against fabricating a database_identifier when the user names a region/replica that list_databases does not actually return',
+    },
+  },
+  {
+    input: {
+      prompt:
         "Create a notebook with a query that lists every row in the projects table — I don't want the results limited.",
     },
     expected: {
