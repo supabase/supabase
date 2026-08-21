@@ -83,6 +83,9 @@ export function getManualToolApprovalHandlers({
   confirmState?: ConfirmFooterApprovalState
   onApprove?: () => void
   onDeny?: () => void
+  /** Deny with a specific reason instead of USER_SKIPPED_TOOL_REASON, e.g. for an automatic
+   *  denial that should tell the model what went wrong rather than that the user skipped it. */
+  denyWithReason?: (reason: string) => void
 } {
   const confirmState = getManualToolApprovalConfirmState({ state, approval })
   const approvalId = getManualToolApprovalId({ state, approval })
@@ -97,5 +100,7 @@ export function getManualToolApprovalHandlers({
         approved: false,
         reason: USER_SKIPPED_TOOL_REASON,
       }),
+    denyWithReason: (reason: string) =>
+      addToolApprovalResponse?.({ id: approvalId, approved: false, reason }),
   }
 }
