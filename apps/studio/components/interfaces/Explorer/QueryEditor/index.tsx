@@ -263,7 +263,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   }
 
   const acceptSqlProposal = () => {
-    if (!pendingProposal) return
+    if (isReadOnly || !pendingProposal) return
     if (sql === pendingProposal.original) {
       onSqlChange(pendingProposal.modified)
       onSqlCommit?.(pendingProposal.modified)
