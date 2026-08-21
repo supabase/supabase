@@ -776,7 +776,7 @@ alter role "postgres" set "log_min_duration_statement" to '2s';
 
 ### `log_min_error_statement`
 
-When an event is logged, beyond just the primary message, multiple subfields are also captured, such as the [status code](https://www.postgresql.org/docs/current/errcodes-appendix.html). The `log_min_error_statement` field determines if the query responsible for the log should be recorded, too, under the `query` subfield.
+When an event is logged, beyond the primary message, multiple subfields are also captured, such as the [status code](https://www.postgresql.org/docs/current/errcodes-appendix.html). The `log_min_error_statement` field determines if the query responsible for the log should be recorded, too, under the `query` subfield.
 
 If the event is equally or more severe than `log_min_error_statement`, the query will be captured. To view the varying severity levels, reference [log_min_messages](#logminmessages).
 
