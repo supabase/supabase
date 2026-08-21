@@ -46,12 +46,9 @@ Test it directly with either options:
 Using the same credentials the client uses, try to select the row that changed:
 
 ```js
-const { data, error } = await supabase
-  .from('messages')
-  .select('*')
-  .eq('id', theRowIdThatChanged);
+const { data, error } = await supabase.from('messages').select('*').eq('id', theRowIdThatChanged)
 
-console.log({ data, error });
+console.log({ data, error })
 ```
 
 Or on the dashboard, open Table Editor, and try to view the row as the subscribing user's role.
@@ -86,15 +83,17 @@ By default, Postgres only sends the primary key in the "old row" for `UPDATE` an
 alter table messages replica identity full;
 ```
 
+If the table has Row Level Security enabled, `replica identity full` isn't enough by itself: the `old` record still contains only the primary key. There's no way around this while RLS is on — don't rely on other `payload.old` fields for a policy-protected table.
+
 A typical case: a `status` column moves from `pending` to `completed`, and the client checks
 
 ```js
 if (payload.old.status !== payload.new.status) {
-  notifyUser();
+  notifyUser()
 }
 ```
 
-Without `replica identity full`, `payload.old.status` is `undefined`, and this comparison quietly fails.
+Without `replica identity full` (or with RLS enabled), `payload.old.status` is `undefined`, and `undefined !== 'completed'` is `true` — so the check fires `notifyUser()` on every update, not just the ones where status actually changed.
 
 ## Step 4: Check the subscription code itself
 
@@ -116,12 +115,12 @@ const channel = supabase
       filter: `room_id=eq.${roomId}`,
     },
     (payload) => {
-      console.log('Got an update:', payload.new);
+      console.log('Got an update:', payload.new)
     }
   )
   .subscribe((status) => {
-    console.log('Subscription status:', status);
-  });
+    console.log('Subscription status:', status)
+  })
 ```
 
 Log the status callback. Don't assume `.subscribe()` worked.
@@ -148,12 +147,12 @@ useEffect(() => {
       { event: 'UPDATE', schema: 'public', table: 'messages', filter: `room_id=eq.${roomId}` },
       (payload) => console.log(payload.new)
     )
-    .subscribe();
+    .subscribe()
 
   return () => {
-    supabase.removeChannel(channel);
-  };
-}, [roomId]);
+    supabase.removeChannel(channel)
+  }
+}, [roomId])
 ```
 
 That cleanup line is the part people skip. Without it, the old channel keeps running against the previous `roomId` in the background, and nothing in the UI tells you it's happening. See [Next.js 13/14 stale data when changing RLS or table data](./nextjs-1314-stale-data-when-changing-rls-or-table-data-85b8oQ) for an adjacent version of the same bug.
@@ -166,8 +165,8 @@ This shows up most in automated tests, where subscribe and write happen back-to-
 
 ```js
 // Risky — writing immediately after subscribing
-const channel = supabase.channel('test-channel').on(/* ... */).subscribe();
-await supabase.from('messages').insert({ text: 'hello' });
+const channel = supabase.channel('test-channel').on(/* ... */).subscribe()
+await supabase.from('messages').insert({ text: 'hello' })
 ```
 
 The reliable fix isn't a fixed delay — it's waiting for the backend to confirm the `postgres_changes` extension is listening, via the `system` message it emits:
@@ -177,13 +176,13 @@ supabase
   .channel('room1')
   .on('system', '*', (payload) => {
     if (payload.extension === 'postgres_changes' && payload.status === 'ok') {
-      console.log('changes are ready', payload); // safe to write now
+      console.log('changes are ready', payload) // safe to write now
     }
   })
   .on('postgres_changes', { event: '*', schema: '*' }, (payload) => {
-    console.log('Change received!', payload);
+    console.log('Change received!', payload)
   })
-  .subscribe();
+  .subscribe()
 ```
 
 No need to `await` anything here — react to the message inside the handler (e.g. set a flag) before triggering the write. This `system` message isn't formally documented yet.
@@ -193,10 +192,10 @@ If you can't wire this up right now, a short fixed delay after `SUBSCRIBED` is a
 ```js
 channel.subscribe(async (status) => {
   if (status === 'SUBSCRIBED') {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    await supabase.from('messages').insert({ text: 'hello' });
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await supabase.from('messages').insert({ text: 'hello' })
   }
-});
+})
 ```
 
 ## Step 7: Is Realtime enabled?
