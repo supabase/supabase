@@ -1,8 +1,9 @@
+import { Ruler } from 'lucide-react'
+import { isValidElement } from 'react'
 import { describe, expect, it } from 'vitest'
 
 import { lintInfoMap } from './Linter.utils'
 import { Lint } from '@/data/lint/lint-query'
-import { DOCS_URL } from '@/lib/constants'
 
 const projectRef = 'abc'
 const trickySchema = 'a&b=c'
@@ -73,10 +74,13 @@ describe('Linter.utils lintInfoMap pitr_archiving_stale entry', () => {
     const info = lintInfoMap.find((entry) => entry.name === 'pitr_archiving_stale')
     expect(info, 'expected pitr_archiving_stale in lintInfoMap').toBeDefined()
 
+    expect(info!.title).toBe('PITR archiving may be broken')
+    expect(isValidElement(info!.icon) && info!.icon.type).toBe(Ruler)
     expect(info!.category).toBe('security')
-    expect(info!.link({ projectRef, metadata: {} as unknown as Lint['metadata'] })).toBe(
-      '/project/abc/database/backups/pitr'
+    // metadata is unused by this entry's link(), and every field on Lint['metadata'] is optional, so {} needs no cast
+    expect(info!.link({ projectRef, metadata: {} })).toBe('/project/abc/database/backups/pitr')
+    expect(info!.docsLink).toBe(
+      'https://supabase.com/docs/guides/platform/backups#point-in-time-recovery'
     )
-    expect(info!.docsLink).toBe(`${DOCS_URL}/guides/platform/backups#point-in-time-recovery`)
   })
 })
