@@ -85,6 +85,7 @@ export const ExplorerChatTab = () => {
       onNewChat={() => createChat()}
       onSelectChat={openChat}
       onBranchChat={handleBranchChat}
+      onInputChange={() => tabs.makeTabPermanent(createTabId('chat', { id }))}
       renderHeader={(headerProps) => (
         <ExplorerChatToolbar {...headerProps} chatId={id} shortcutsEnabled={shortcutsEnabled} />
       )}

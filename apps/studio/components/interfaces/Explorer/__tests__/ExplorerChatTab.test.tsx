@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => ({
   createChat: vi.fn(),
   ensureChatInstance: vi.fn(),
   handleTabClose: vi.fn(),
+  makeTabPermanent: vi.fn(),
   openChat: vi.fn(),
   push: vi.fn(),
   useParams: vi.fn(),
@@ -34,6 +35,7 @@ vi.mock('@/state/tabs', async (importOriginal) => {
     ...actual,
     useTabsStateSnapshot: () => ({
       handleTabClose: mocks.handleTabClose,
+      makeTabPermanent: mocks.makeTabPermanent,
       openTabs: ['chat-chat-1'],
     }),
   }
@@ -55,13 +57,23 @@ vi.mock('@/components/ui/AIAssistantPanel/AssistantChat', () => ({
   AssistantChat: ({
     chatId,
     onSelectChat,
+    onInputChange,
   }: {
     chatId: string
     onSelectChat: (id: string) => void
+    onInputChange?: (value: string) => void
   }) => (
-    <button type="button" tabIndex={0} data-chat-id={chatId} onClick={() => onSelectChat('chat-2')}>
-      Assistant
-    </button>
+    <>
+      <button
+        type="button"
+        tabIndex={0}
+        data-chat-id={chatId}
+        onClick={() => onSelectChat('chat-2')}
+      >
+        Assistant
+      </button>
+      <textarea aria-label="Chat input" onChange={(e) => onInputChange?.(e.target.value)} />
+    </>
   ),
 }))
 
@@ -92,6 +104,16 @@ describe('ExplorerChatTab', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Assistant' }))
 
     expect(mocks.openChat).toHaveBeenCalledWith('chat-2')
+  })
+
+  it('persists the tab once the user starts typing in the chat input', () => {
+    customRender(<ExplorerChatTab />)
+
+    fireEvent.change(screen.getByRole('textbox', { name: 'Chat input' }), {
+      target: { value: 'How do I' },
+    })
+
+    expect(mocks.makeTabPermanent).toHaveBeenCalledWith('chat-chat-1')
   })
 
   it('removes an orphaned tab only after chat hydration completes', () => {
