@@ -5,14 +5,12 @@ import { ExplorerChatTab } from '../ExplorerChatTab'
 import { customRender } from '@/tests/lib/custom-render'
 
 const mocks = vi.hoisted(() => ({
-  addTab: vi.fn(),
   createBranch: vi.fn(),
   createChat: vi.fn(),
   ensureChatInstance: vi.fn(),
   handleTabClose: vi.fn(),
   openChat: vi.fn(),
   push: vi.fn(),
-  updateTab: vi.fn(),
   useParams: vi.fn(),
   assistantSnapshot: vi.fn(),
 }))
@@ -35,10 +33,8 @@ vi.mock('@/state/tabs', async (importOriginal) => {
   return {
     ...actual,
     useTabsStateSnapshot: () => ({
-      addTab: mocks.addTab,
       handleTabClose: mocks.handleTabClose,
       openTabs: ['chat-chat-1'],
-      updateTab: mocks.updateTab,
     }),
   }
 })
@@ -80,7 +76,7 @@ describe('ExplorerChatTab', () => {
     })
   })
 
-  it('renders and registers the routed chat without changing sidebar selection', () => {
+  it('renders the routed chat and ensures its instance without changing sidebar selection', () => {
     customRender(<ExplorerChatTab />)
 
     expect(mocks.ensureChatInstance).toHaveBeenCalledWith('chat-1')
@@ -88,13 +84,6 @@ describe('ExplorerChatTab', () => {
       'data-chat-id',
       'chat-1'
     )
-    expect(mocks.addTab).toHaveBeenCalledWith({
-      id: 'chat-chat-1',
-      type: 'chat',
-      label: 'Investigate errors',
-      metadata: { chatId: 'chat-1' },
-      isPreview: false,
-    })
   })
 
   it('routes shared chat navigation through Explorer', () => {
