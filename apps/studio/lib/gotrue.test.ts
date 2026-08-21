@@ -14,8 +14,14 @@ describe('getSignUpReturnTo', () => {
     expect(getSignUpReturnTo('')).toBe(DEFAULT_SIGNUP_RETURN_PATH)
   })
 
-  it('rewrites /organizations to /new', () => {
+  it('rewrites /org and /organizations to /new', () => {
+    expect(getSignUpReturnTo('/org')).toBe(DEFAULT_SIGNUP_RETURN_PATH)
     expect(getSignUpReturnTo('/organizations')).toBe(DEFAULT_SIGNUP_RETURN_PATH)
+  })
+
+  it('rewrites org list paths while preserving query params', () => {
+    expect(getSignUpReturnTo('/org?foo=bar')).toBe('/new?foo=bar')
+    expect(getSignUpReturnTo('/organizations?foo=bar')).toBe('/new?foo=bar')
   })
 
   it('preserves explicit destinations including invite paths', () => {
@@ -25,6 +31,7 @@ describe('getSignUpReturnTo', () => {
 
   it('uses the first value when returnTo is an array', () => {
     expect(getSignUpReturnTo(['/join?token=abc', '/other'])).toBe('/join?token=abc')
+    expect(getSignUpReturnTo(['/org'])).toBe(DEFAULT_SIGNUP_RETURN_PATH)
     expect(getSignUpReturnTo(['/organizations'])).toBe(DEFAULT_SIGNUP_RETURN_PATH)
   })
 })
@@ -39,13 +46,24 @@ describe('buildSignUpReturnPath', () => {
     expect(buildSignUpReturnPath(undefined)).toBe(DEFAULT_SIGNUP_RETURN_PATH)
   })
 
-  it('rewrites /organizations to /new', () => {
+  it('rewrites /org and /organizations to /new', () => {
     // @ts-ignore
     delete window.location
     // @ts-ignore
     window.location = { search: '' }
 
+    expect(buildSignUpReturnPath('/org')).toBe(DEFAULT_SIGNUP_RETURN_PATH)
     expect(buildSignUpReturnPath('/organizations')).toBe(DEFAULT_SIGNUP_RETURN_PATH)
+  })
+
+  it('rewrites org list paths while preserving query params', () => {
+    // @ts-ignore
+    delete window.location
+    // @ts-ignore
+    window.location = { search: '' }
+
+    expect(buildSignUpReturnPath('/org?foo=bar')).toBe('/new?foo=bar')
+    expect(buildSignUpReturnPath('/organizations?foo=bar')).toBe('/new?foo=bar')
   })
 
   it('preserves invite returnTo paths', () => {
@@ -71,7 +89,7 @@ describe('buildSignUpReturnPath', () => {
     // @ts-ignore
     delete window.location
     // @ts-ignore
-    window.location = { search: '?returnTo=/organizations&foo=bar' }
+    window.location = { search: '?returnTo=/org&foo=bar' }
 
     expect(buildSignUpReturnPath('/new')).toBe('/new?foo=bar')
   })

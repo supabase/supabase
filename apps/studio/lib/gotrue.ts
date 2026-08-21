@@ -10,14 +10,19 @@ export const DEFAULT_SIGNUP_RETURN_PATH = '/new'
 /**
  * When unauthenticated users hit protected dashboard routes, withAuth sets
  * returnTo to the current path. Marketing entry via /dashboard often ends up
- * as returnTo=/organizations. New users who switch to sign-up should start
- * org creation instead.
+ * as returnTo=/org (or /organizations). New users who switch to sign-up should
+ * start org creation instead.
  */
 export function getSignUpReturnTo(returnTo: string | string[] | undefined): string {
   const value = Array.isArray(returnTo) ? returnTo[0] : returnTo
 
-  if (!value || value === DEFAULT_FALLBACK_PATH) {
+  if (!value) {
     return DEFAULT_SIGNUP_RETURN_PATH
+  }
+
+  const [pathname, query] = value.split('?', 2)
+  if (pathname === DEFAULT_FALLBACK_PATH || pathname === '/org') {
+    return query ? `${DEFAULT_SIGNUP_RETURN_PATH}?${query}` : DEFAULT_SIGNUP_RETURN_PATH
   }
 
   return value
