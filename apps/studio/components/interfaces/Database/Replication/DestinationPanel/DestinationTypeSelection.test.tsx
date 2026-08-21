@@ -60,6 +60,7 @@ const addBackgroundMocks = () => {
 describe('DestinationTypeSelection', () => {
   beforeEach(() => {
     mockInfrastructureReadReplicas.mockReturnValue(true)
+    window.localStorage.clear()
   })
 
   test('shows placeholder when no type is selected', async () => {
