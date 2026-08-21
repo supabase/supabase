@@ -73,6 +73,29 @@ export function decodeNotebookToolError(errorText: string): EncodedNotebookToolE
   return result.success ? result.data : null
 }
 
+/**
+ * Rejects a made-up `database_identifier` before it's written: it would pass schema
+ * validation (it's just a string) but silently break the cell at run time, since
+ * QueryEditor's connection-string lookup can't resolve an identifier that isn't real.
+ *
+ * @throws NotebookToolError if any cell has a `database_identifier` that isn't in the
+ * list of valid identifiers for this project.
+ */
+function assertValidDatabaseIdentifiers(
+  cells: ReadonlyArray<{ _tag: string; database_identifier?: string }>,
+  validIdentifiers: Set<string>
+): void {
+  for (const cell of cells) {
+    if (cell._tag !== 'database_cell' || cell.database_identifier === undefined) continue
+    if (!validIdentifiers.has(cell.database_identifier)) {
+      throw new NotebookToolError(
+        `Unknown database_identifier "${cell.database_identifier}" — call list_databases to see this project's valid identifiers.`,
+        { exposeToAssistant: true }
+      )
+    }
+  }
+}
+
 export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
   const { projectRef, authorization } = ctx
   const authHeaders = authorization ? { Authorization: authorization } : undefined
@@ -172,6 +195,18 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
       }),
       needsApproval: true,
       execute: async ({ name, description, content }) => {
+        if (
+          content.cells.some(
+            (cell) => cell._tag === 'database_cell' && cell.database_identifier !== undefined
+          )
+        ) {
+          const databases = await getReadReplicas({ projectRef }, undefined, authHeaders)
+          assertValidDatabaseIdentifiers(
+            content.cells,
+            new Set((databases ?? []).map((database) => database.identifier))
+          )
+        }
+
         // This approval gate is the user gesture that promotes each cell's SQL from
         // untrusted to safe — keep the promotion here, not in a shared helper, so it's
         // auditable directly alongside the `needsApproval: true` above.
@@ -216,6 +251,23 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
       }),
       needsApproval: true,
       execute: async ({ id, expected_updated_at, operations }) => {
+        const newCells = operations.flatMap((operation) =>
+          operation._tag === 'insert_cell' || operation._tag === 'replace_cell'
+            ? [operation.cell]
+            : []
+        )
+        if (
+          newCells.some(
+            (cell) => cell._tag === 'database_cell' && cell.database_identifier !== undefined
+          )
+        ) {
+          const databases = await getReadReplicas({ projectRef }, undefined, authHeaders)
+          assertValidDatabaseIdentifiers(
+            newCells,
+            new Set((databases ?? []).map((database) => database.identifier))
+          )
+        }
+
         const notebook = await getNotebook({ projectRef, id }, undefined, authHeaders)
 
         if (notebook.updated_at !== expected_updated_at) {
