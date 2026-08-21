@@ -133,6 +133,9 @@ export const AssistantQueryCell = ({
       cancelLabel="Skip"
       confirmLabel="Run query"
       confirmLabelLoading="Running..."
+      successMessage="Query executed"
+      errorMessage="Failed to execute SQL"
+      deniedMessage="Skipped query"
       onCancel={onDeny}
       onConfirm={onApprove}
     >
