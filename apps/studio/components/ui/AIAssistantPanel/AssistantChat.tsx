@@ -3,7 +3,7 @@ import { useChat } from '@ai-sdk/react'
 import { lastAssistantMessageIsCompleteWithApprovalResponses } from 'ai'
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useParams, useSearchParamsShallow } from 'common/hooks'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { Eraser, Pencil, X } from 'lucide-react'
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Button, cn, KeyboardShortcut } from 'ui'
@@ -98,6 +98,7 @@ export const AssistantChat = ({
     useSelectedOrganizationQuery()
 
   const disablePrompts = useFlag('disableAssistantPrompts')
+  const shouldReduceMotion = useReducedMotion()
   const snap = useAiAssistantStateSnapshot()
   const state = useAiAssistantState()
   const currentChat = snap.chats[chatId]
@@ -540,8 +541,12 @@ export const AssistantChat = ({
                 )}
                 {isChatLoading && (
                   <motion.span
-                    animate={{ opacity: [1, 0] }}
-                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                    animate={shouldReduceMotion ? { opacity: 1 } : { opacity: [1, 0] }}
+                    transition={
+                      shouldReduceMotion
+                        ? { duration: 0 }
+                        : { duration: 1, repeat: Infinity, ease: 'linear' }
+                    }
                     className="inline-block w-1.5 h-4 bg-foreground-lighter mt-4"
                   />
                 )}

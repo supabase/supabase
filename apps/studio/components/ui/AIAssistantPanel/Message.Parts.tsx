@@ -282,8 +282,14 @@ const MessagePart = {
   NotebookProposal: MessagePartNotebookProposal,
 } as const
 
-function MessagePartContainer({ children, wide = false }: { children: ReactNode; wide?: boolean }) {
-  return <div className={cn('w-full mx-auto', wide ? 'max-w-6xl' : 'max-w-3xl')}>{children}</div>
+function MessagePartContainer({
+  children,
+  isWide = false,
+}: {
+  children: ReactNode
+  isWide?: boolean
+}) {
+  return <div className={cn('w-full mx-auto', isWide ? 'max-w-6xl' : 'max-w-3xl')}>{children}</div>
 }
 
 const isWideMessagePart = (part: NonNullable<VercelMessage['parts']>[number]) =>
@@ -355,5 +361,5 @@ export function MessagePartSwitcher({
   // Tool rows depend on being direct siblings to share their compact spacing and dividers.
   if (isCompactToolPart(part)) return content
 
-  return <MessagePartContainer wide={isWideMessagePart(part)}>{content}</MessagePartContainer>
+  return <MessagePartContainer isWide={isWideMessagePart(part)}>{content}</MessagePartContainer>
 }
