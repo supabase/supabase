@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
@@ -62,7 +62,17 @@ import {
 } from '@/hooks/misc/useSelectedProject'
 import { GB, PROJECT_STATUS } from '@/lib/constants'
 
-export function DiskManagementForm({ chartsClassName }: { chartsClassName?: string } = {}) {
+export function DiskManagementForm({
+  chartsClassName,
+  overviewExtra,
+  beforeScaling,
+}: {
+  chartsClassName?: string
+  /** Rendered above usage charts in the overview block (for example topology). */
+  overviewExtra?: ReactNode
+  /** Rendered between overview and the Scaling section (for example read replicas). */
+  beforeScaling?: ReactNode
+} = {}) {
   const { ref: projectRef } = useParams()
   const { data: project, isPending: isProjectPending } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
@@ -391,7 +401,8 @@ export function DiskManagementForm({ chartsClassName }: { chartsClassName?: stri
       <form id="disk-compute-form" onSubmit={form.handleSubmit(onSubmit)}>
         <PageContainer size="default" className="pb-16">
           <PageSection>
-            <PageSectionContent>
+            <PageSectionContent className="flex flex-col gap-y-6">
+              {overviewExtra}
               <ComputeAndDiskUsageCharts className={chartsClassName} />
             </PageSectionContent>
           </PageSection>
@@ -419,6 +430,8 @@ export function DiskManagementForm({ chartsClassName }: { chartsClassName?: stri
               />
             </div>
           )}
+
+          {beforeScaling}
 
           <PageSection>
             <PageSectionMeta>
