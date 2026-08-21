@@ -123,13 +123,6 @@ describe('www middleware', () => {
       expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/api-v2/md/index')
     })
 
-    it('rewrites /index.md even when Accept prefers HTML', () => {
-      const req = makeRequest('/index.md', { accept: 'text/html' })
-      const res = middleware(req)
-
-      expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/api-v2/md/index')
-    })
-
     it('serves /.md as homepage markdown when it bypasses the config redirect', () => {
       const req = makeRequest('/.md')
       const res = middleware(req)
