@@ -250,6 +250,8 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     }
 
     onRun?.()
+    // [Joshen] This is deliberate to commit the sql, rather than the passed rawSql
+    // As we want to save the cell's content into the store, rather than what's getting run
     onSqlCommit?.(sql)
 
     if (query._tag === 'logs') {
