@@ -3,8 +3,24 @@ import { useParams } from 'common'
 import { useContext, useEffect } from 'react'
 
 import { contentKeys } from '@/data/content/keys'
-import { notebooksState } from '@/state/notebooks/notebooks-state'
-import { TabsStateContext } from '@/state/tabs'
+import { notebooksState, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
+import { hasUnsavedChanges } from '@/state/sql-editor/sql-editor-lifecycle'
+import { TabsStateContext, type Tab } from '@/state/tabs'
+
+const NotebookTabStatusIndicator = ({ tab }: { tab: Tab }) => {
+  const notebooksSnap = useNotebooksStateSnapshot()
+  const notebookId = tab.metadata?.notebookId
+  const status = notebookId ? notebooksSnap.notebooks[notebookId]?.status : undefined
+  if (!hasUnsavedChanges(status)) return null
+
+  return (
+    <span
+      role="img"
+      aria-label="Unsaved changes"
+      className="block size-2 shrink-0 rounded-full bg-warning"
+    />
+  )
+}
 
 /**
  * Evicts a notebook's content from the valtio store and the React Query cache
@@ -32,6 +48,7 @@ export const ExplorerNotebookTabCoordinator = () => {
         notebooksState.removeNotebook({ id: notebookId })
         queryClient.removeQueries({ queryKey: contentKeys.resource(ref, notebookId) })
       },
+      StatusIndicator: NotebookTabStatusIndicator,
     })
   }, [ref, tabs, queryClient])
 

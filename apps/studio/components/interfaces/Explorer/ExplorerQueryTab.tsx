@@ -19,6 +19,7 @@ export const ExplorerQueryTab = () => {
   const querySnap = useExplorerQueryStateSnapshot()
 
   const [restoredQueryKey, setRestoredQueryKey] = useState<string>()
+  const [showQuery, setShowQuery] = useState(true)
 
   const stateDraft = id ? querySnap.drafts[id] : undefined
   const draft = stateDraft?.projectRef === ref ? stateDraft : undefined
@@ -37,6 +38,8 @@ export const ExplorerQueryTab = () => {
 
   useEffect(() => {
     if (!id || !ref) return
+
+    setShowQuery(true)
     explorerQueryState.restoreDraft({ id, projectRef: ref })
     setRestoredQueryKey(`${ref}:${id}`)
   }, [id, ref])
@@ -86,12 +89,13 @@ export const ExplorerQueryTab = () => {
 
   return (
     <QueryEditor
-      showQuery
       id={id}
       variant="viewport"
       title={draft.name}
       query={query}
       result={result}
+      showQuery={showQuery}
+      onShowQueryChange={setShowQuery}
       roleImpersonationState={roleImpersonationState}
       onTitleChange={(value) => {
         const name = value.trim() || 'Untitled query'

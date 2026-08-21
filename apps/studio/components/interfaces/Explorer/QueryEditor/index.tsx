@@ -110,7 +110,7 @@ type QueryEditorProps = {
   toolbarActions?: ReactNode
   className?: string
   showQuery: boolean
-  onShowQueryChange?: (showQuery: boolean) => void
+  onShowQueryChange: (showQuery: boolean) => void
   /** When true, toolbar and editor run actions are disabled. */
   isRunDisabled?: boolean
   onTitleChange: (title: string) => void
@@ -344,7 +344,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
             icon={showQuery ? <EyeOff /> : <Eye />}
             disabled={pendingProposal !== null}
             tooltip={showQuery ? 'Hide query' : 'Show query'}
-            onClick={() => onShowQueryChange?.(!showQuery)}
+            onClick={() => onShowQueryChange(!showQuery)}
           />
           <ExplorerToolbarAction
             loading={isExecuting}

@@ -89,7 +89,10 @@ export const ExplorerNotebookTab = () => {
   const queryCellRefs = useRef(new Map<string, QueryEditorHandle>())
 
   const { mutate: updateNotebook, isPending: isUpdating } = useUpsertNotebookMutation({
-    onSuccess: () => toast.success('Successfully saved notebook!'),
+    onSuccess: () => {
+      if (id) snap.markSaved({ id })
+      toast.success('Successfully saved notebook!')
+    },
   })
   const { mutate: deleteNotebook, isPending: isDeleting } = useContentDeleteMutation({
     onSuccess: () => {
