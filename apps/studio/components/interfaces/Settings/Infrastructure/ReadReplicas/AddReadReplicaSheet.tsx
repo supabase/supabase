@@ -18,7 +18,7 @@ export const AddReadReplicaSheet = ({
   onSuccess,
   onRecommendCompute,
 }: AddReadReplicaSheetProps) => {
-  const [addReplica, setAddReplica] = useQueryState(
+  const [visible, setVisible] = useQueryState(
     'addReplica',
     parseAsBoolean.withDefault(false).withOptions({
       history: 'push',
@@ -27,13 +27,12 @@ export const AddReadReplicaSheet = ({
     })
   )
 
-  const visible = addReplica === true
   const checkIsDirtyRef = useRef<() => boolean>(() => false)
   const pendingRecommendationRef = useRef<RecommendedComputeForReadReplicas | null>(null)
 
   const onClose = () => {
     checkIsDirtyRef.current = () => false
-    setAddReplica(false)
+    setVisible(false)
   }
 
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
