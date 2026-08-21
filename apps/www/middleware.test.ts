@@ -11,7 +11,7 @@ import { middleware } from './middleware'
 vi.mock('./app/api-v2/md/content.generated', () => ({
   MD_CONTENT: new Map<string, string>(),
   MD_PAGES: new Set<string>(['homepage', 'auth', 'pricing']),
-  CHANGELOG_PAGES: new Set<string>(['changelog/100', 'changelog/pipelines']),
+  CHANGELOG_PAGES: new Set<string>(['changelog', 'changelog/100', 'changelog/pipelines']),
 }))
 
 function makeRequest(

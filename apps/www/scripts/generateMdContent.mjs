@@ -218,6 +218,13 @@ for (const entry of allEntries) {
 // content:build:core; absent locally e.g. when CHANGELOG_SYNC_APP_* secrets are unset.
 const changelogSlugs = (await collectMdFiles(changelogMdDir, 'changelog')).sort()
 
+// The middleware matches request slugs against these keys verbatim, and its
+// tests mock this set — a dropped prefix would ship silently with green tests.
+if (changelogSlugs.some((s) => !s.startsWith('changelog/'))) {
+  console.error('❌ Changelog slugs must carry the changelog/ prefix the middleware matches on.')
+  process.exit(1)
+}
+
 if (changelogSlugs.length === 0) {
   if (process.env.VERCEL) {
     console.error(
@@ -228,6 +235,14 @@ if (changelogSlugs.length === 0) {
   console.warn(
     '⚠️  No changelog slugs found in public/changelog — changelog md negotiation off in this build'
   )
+}
+
+const changelogIndexExists = await fs.access(path.join(wwwDir, 'public/changelog.md')).then(
+  () => true,
+  () => false
+)
+if (changelogIndexExists) {
+  changelogSlugs.unshift('changelog')
 }
 
 const contentEntries = liveEntries

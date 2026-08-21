@@ -14,7 +14,7 @@ export function middleware(request: NextRequest) {
   // entry — NextURL preserves trailing-slash style on rewrite targets.
   const slug = (basePathname === '/' ? 'homepage' : basePathname.slice(1)).replace(/\/$/, '')
   const isMdEligible = MD_PAGES.has(slug)
-  const isChangelogEntry = slug === 'changelog' || CHANGELOG_PAGES.has(slug)
+  const isChangelogEntry = CHANGELOG_PAGES.has(slug)
 
   const decision = negotiateMarkdown(
     { acceptHeader: request.headers.get('accept') ?? '' },
