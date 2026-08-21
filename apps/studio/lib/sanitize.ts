@@ -147,6 +147,10 @@ export function sanitizeArrayOfObjects(
     }
 
     if (typeof value === 'object') {
+      // `seen` tracks the current ancestor chain so `[Circular]` means the value
+      // references one of its own ancestors. Entries are removed once a subtree is
+      // fully processed, otherwise a value reachable by two paths (a shared, but
+      // non-circular, reference) would be misreported as circular.
       if (seen.has(value)) {
         return '[Circular]'
       }
@@ -157,6 +161,7 @@ export function sanitizeArrayOfObjects(
         for (let i = 0; i < value.length; i++) {
           outArr[i] = sanitizeValue(value[i], depth + 1)
         }
+        seen.delete(value)
         return outArr
       }
 
@@ -170,6 +175,7 @@ export function sanitizeArrayOfObjects(
             outObj[k] = sanitizeValue(v, depth + 1)
           }
         }
+        seen.delete(value)
         return outObj
       }
 
@@ -181,6 +187,7 @@ export function sanitizeArrayOfObjects(
           const redactedVal = shouldRedactByKey(k) ? redaction : sanitizeValue(v, depth + 1)
           out.push([redactedKey, redactedVal])
         }
+        seen.delete(value)
         return out
       }
 
@@ -190,6 +197,7 @@ export function sanitizeArrayOfObjects(
         for (const v of value.values()) {
           out.push(sanitizeValue(v, depth + 1))
         }
+        seen.delete(value)
         return out
       }
 
@@ -200,7 +208,6 @@ export function sanitizeArrayOfObjects(
           message: redactString(value.message),
           stack: truncationNotice,
         }
-        seen.set(value, o)
         return o
       }
 
