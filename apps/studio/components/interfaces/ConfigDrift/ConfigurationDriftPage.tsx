@@ -294,8 +294,16 @@ export function ConfigurationDriftPage() {
 
   if (!isReady) {
     return (
-      <Card className="flex min-h-52 items-center justify-center px-6 text-center text-sm text-foreground-light">
-        Configuration drift is unavailable for this project.
+      <Card className="flex min-h-52 items-center justify-center text-center">
+        <div className="max-w-lg">
+          <Github className="mx-auto mb-3 h-6 w-6 text-foreground-muted" />
+          <p className="mt-1 text-sm text-foreground-light">
+            This requires a GitHub integration connected to this project, which will enable this
+            project to be managed by a config.toml file.{' '}
+            <Link href={`/project/${projectRef}/settings/integrations`}>Connect a GitHub repo</Link>
+            to get started.
+          </p>
+        </div>
       </Card>
     )
   }

@@ -14,7 +14,7 @@ export const useGenerateSettingsMenu = () => {
   const { data: project, isPending } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
   const showDashboardPreferences = useFlag('dashboardPreferences')
-  const showConfigDrift = useFlag('ConfigDrift')
+  const showConfigDrift = useFlag('ConfigDrift') && IS_PLATFORM
 
   const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
 

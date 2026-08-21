@@ -52,14 +52,11 @@ export const useGitHubConnectionsQuery = <TData = GitHubConnectionsData>(
 
 export const useProjectGitHubConnectionQuery = ({ ref }: { ref?: string }) => {
   const { data: organization } = useSelectedOrganizationQuery()
-  const { data: connections, ...props } = useGitHubConnectionsQuery(
+  return useGitHubConnectionsQuery(
     { organizationId: organization?.id },
-    { enabled: !!ref && !!organization?.id }
+    {
+      enabled: !!ref && !!organization?.id,
+      select: (data) => data?.find((c) => c.project.ref === ref),
+    }
   )
-
-  const existingConnection = useMemo(
-    () => connections?.find((c) => c.project.ref === ref),
-    [connections, ref]
-  )
-  return { data: existingConnection, ...props }
 }

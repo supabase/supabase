@@ -24,7 +24,7 @@ export const githubConfigKeys = {
 export async function getGitHubConfig(
   { connectionId, branch }: GitHubConfigVariables,
   signal?: AbortSignal
-): Promise<GithubConfigQueryResponse> {
+) {
   if (!connectionId) throw new Error('connectionId is required')
 
   const { data, error } = await get(

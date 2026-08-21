@@ -12,7 +12,7 @@ import { useProjectGitHubConnectionQuery } from '@/data/integrations/github-conn
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 
-function getGitBranchName(branch?: Branch): string | undefined {
+export function getGitBranchName(branch?: Branch): string | undefined {
   return branch?.git_branch?.trim() || (branch?.is_default ? undefined : branch?.name?.trim())
 }
 
@@ -96,18 +96,19 @@ export function useSelectedGitHubConfigDrift() {
       githubConfig: githubConfigData?.config,
     })
   }, [projectConfig?.attributes, githubConfigData?.config])
+  const isPending =
+    isProjectPending ||
+    (shouldLoad &&
+      (isBranchesPending ||
+        isConnectionPending ||
+        (hasConnection && (isProjectConfigPending || isGithubConfigPending))))
   const isReady = shouldLoad && hasConnection && isProjectConfigSuccess && isGithubConfigSuccess
   const issueCount = summary.driftedFields.length
 
   return {
     requestedGitBranch: gitBranch,
     isReady,
-    isPending:
-      isProjectPending ||
-      (shouldLoad &&
-        (isBranchesPending ||
-          isConnectionPending ||
-          (hasConnection && (isProjectConfigPending || isGithubConfigPending)))),
+    isPending,
     isFetching:
       isProjectFetching ||
       (shouldLoad &&
