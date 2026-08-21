@@ -10,7 +10,7 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 /** Shown while muscle-memory still opens Database → Replication for replicas. */
-export const ReadReplicasMovedCallout = () => {
+export const ReadReplicasMovedCallout = ({ className }: { className?: string }) => {
   const { ref: projectRef } = useParams()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
   const [isDismissed, setIsDismissed, { isSuccess: isDismissalLoaded }] = useLocalStorageQuery(
@@ -18,29 +18,33 @@ export const ReadReplicasMovedCallout = () => {
     false
   )
 
-  if (!infrastructureReadReplicas || !isDismissalLoaded || isDismissed) return null
+  if (!projectRef || !infrastructureReadReplicas || !isDismissalLoaded || isDismissed) {
+    return null
+  }
 
   return (
-    <Admonition
-      type="note"
-      layout="responsive"
-      title="Read replicas have moved"
-      description="Manage read replicas on the Infrastructure page, alongside compute and disk."
-      actions={
-        <>
-          <Button asChild variant="default" size="tiny">
-            <Link href={getInfrastructurePath(projectRef)}>Go to Infrastructure</Link>
-          </Button>
-          <ButtonTooltip
-            icon={<X />}
-            variant="text"
-            className="w-6"
-            tooltip={{ content: { side: 'bottom', text: 'Dismiss' } }}
-            aria-label="Dismiss read replicas moved notice"
-            onClick={() => setIsDismissed(true)}
-          />
-        </>
-      }
-    />
+    <div className={className}>
+      <Admonition
+        type="note"
+        layout="responsive"
+        title="Read replicas have moved"
+        description="Manage read replicas on the Infrastructure page, alongside compute and disk."
+        actions={
+          <>
+            <Button asChild variant="default" size="tiny">
+              <Link href={getInfrastructurePath(projectRef)}>Go to Infrastructure</Link>
+            </Button>
+            <ButtonTooltip
+              icon={<X />}
+              variant="text"
+              className="w-6"
+              tooltip={{ content: { side: 'bottom', text: 'Dismiss' } }}
+              aria-label="Dismiss read replicas moved notice"
+              onClick={() => setIsDismissed(true)}
+            />
+          </>
+        }
+      />
+    </div>
   )
 }

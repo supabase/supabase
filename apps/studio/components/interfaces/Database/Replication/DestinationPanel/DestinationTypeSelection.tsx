@@ -212,11 +212,7 @@ export const DestinationTypeSelection = () => {
           </SelectContent>
         </Select>
       </FormItemLayout>
-      {!editMode && (
-        <div className="px-5 pb-5">
-          <ReadReplicasMovedCallout />
-        </div>
-      )}
+      {!editMode && <ReadReplicasMovedCallout className="px-5 pb-5" />}
     </>
   )
 }
