@@ -126,36 +126,34 @@ language sql;
 
 The Supabase Dashboard contains tools to help you identify timed-out and long-running queries.
 
-### Using the Logs Explorer
+### Using the SQL Editor
 
-Go to the [Logs Explorer](/dashboard/project/_/logs/explorer), and run the following query to identify timed-out events (`statement timeout`) and queries that successfully run for longer than 10 seconds (`duration`).
+Go to the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs), set the query source to **Logs**, and run the following query to identify timed-out events (`statement timeout`) and queries that successfully run for longer than 10 seconds (`duration`).
 
 ```sql
 select
-  cast(postgres_logs.timestamp as datetime) as timestamp,
+  timestamp,
   event_message,
-  parsed.error_severity,
-  parsed.user_name,
-  parsed.query,
-  parsed.detail,
-  parsed.hint,
-  parsed.sql_state_code,
-  parsed.backend_type
-from
-  postgres_logs
-  cross join unnest(metadata) as metadata
-  cross join unnest(metadata.parsed) as parsed
+  log_attributes['parsed.error_severity'] as error_severity,
+  log_attributes['parsed.user_name'] as user_name,
+  log_attributes['parsed.query'] as query,
+  log_attributes['parsed.detail'] as detail,
+  log_attributes['parsed.hint'] as hint,
+  log_attributes['parsed.sql_state_code'] as sql_state_code,
+  log_attributes['parsed.backend_type'] as backend_type
+from logs
 where
-  regexp_contains(event_message, 'duration|statement timeout')
+  source = 'postgres_logs'
+  and match(event_message, 'duration|statement timeout')
   -- (OPTIONAL) MODIFY OR REMOVE
-  and parsed.user_name = 'authenticator' -- <--------CHANGE
+  and log_attributes['parsed.user_name'] = 'authenticator' -- <--------CHANGE
 order by timestamp desc
 limit 100;
 ```
 
 ### Using the Query Performance page
 
-Go to the [Query Performance page](/dashboard/project/_/advisors/query-performance?preset=slowest_execution) and filter by relevant role and query speeds. This only identifies slow-running but successful queries. Unlike the Log Explorer, it does not show you timed-out queries.
+Go to the [Query Performance page](/dashboard/project/_/advisors/query-performance?preset=slowest_execution) and filter by relevant role and query speeds. This only identifies slow-running but successful queries. Unlike the logs, it does not show you timed-out queries.
 
 ### Understanding roles in logs
 
@@ -178,5 +176,5 @@ Filter by the `parsed.user_name` field to only retrieve logs made by specific us
 ... query
 where
   -- find events from the relevant role
-  parsed.user_name = '<ROLE>'
+  log_attributes['parsed.user_name'] = '<ROLE>'
 ```

@@ -7,7 +7,6 @@ import { DiffType, type IStandaloneCodeEditor } from './SQLEditor.types'
 import {
   analyzeQueryIssues,
   appendEnableRLSStatements,
-  applyAutoLimit,
   assembleCompletionDiff,
   buildCompletionRequestBody,
   buildDebugChatArgs,
@@ -30,7 +29,6 @@ import {
   resolveDiffKeyAction,
   shouldAutoGenerateTitle,
   sqlSourceToDialect,
-  trimTrailingSemicolons,
 } from './SQLEditor.utils'
 import type { DatabaseEventTrigger } from '@/data/database-event-triggers/database-event-triggers-query'
 import type { Database } from '@/data/read-replicas/replicas-query'
@@ -47,166 +45,6 @@ const buildTrigger = (overrides: Partial<DatabaseEventTrigger> = {}): DatabaseEv
   owner: 'postgres',
   function_definition: null,
   ...overrides,
-})
-
-describe('SQLEditor.utils.ts:trimTrailingSemicolons', () => {
-  test('removes a single trailing semicolon', () => {
-    const sql = safeSql`select * from countries;`
-    expect(trimTrailingSemicolons(sql)).toBe('select * from countries')
-  })
-  test('removes multiple trailing semicolons', () => {
-    const sql = safeSql`select * from countries;;;;;;;`
-    expect(trimTrailingSemicolons(sql)).toBe('select * from countries')
-  })
-  test('leaves a fragment with no trailing semicolon unchanged', () => {
-    const sql = safeSql`select * from countries`
-    expect(trimTrailingSemicolons(sql)).toBe('select * from countries')
-  })
-  test('does not touch semicolons that are not trailing', () => {
-    const sql = safeSql`select 1; select 2`
-    expect(trimTrailingSemicolons(sql)).toBe('select 1; select 2')
-  })
-})
-
-describe('SQLEditor.utils.ts:applyAutoLimit', () => {
-  test('Should return false if limit passed is <= 0', () => {
-    const sql = safeSql`select * from countries;`
-    const limit = -1
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return true if limit passed is > 0', () => {
-    const sql = safeSql`select * from countries;`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(true)
-  })
-  test('Should return false if query already has a limit', () => {
-    const sql = safeSql`select * from countries limit 10;`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query already has a limit (check for case-insensitiveness)', () => {
-    const sql = safeSql`SELECT * FROM countries LIMIT 10;`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query already has a limit with whitespace before the semi colon', () => {
-    const sql = safeSql`select * from countries limit 10 ;`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query already has a limit and offset', () => {
-    const sql = safeSql`select * from countries limit 10 offset 0;`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query already has a limit and offset with whitespace before the semi colon', () => {
-    const sql = safeSql`select * from countries limit 10 offset 0 ;`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query already has a limit and offset (flip order of limit and offset)', () => {
-    const sql = safeSql`select * from countries offset 0 limit 1;`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query already has a limit, even if no value provided for limit', () => {
-    const sql = safeSql`select * from countries limit`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query uses `FETCH FIRST` instead of limit ', () => {
-    const sql = safeSql`select * from countries FETCH FIRST 5 rows only`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query uses `fetch first` instead of limit ', () => {
-    const sql = safeSql`select * from countries fetch first 5 rows only`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query uses `fetch   first` (with random spaces) instead of limit ', () => {
-    const sql = safeSql`select * from countries FETCH FIRST 5 rows only`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query is not a select statement', () => {
-    const sql = safeSql`create table test (id int8 primary key, name varchar);`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if there are multiple queries I', () => {
-    const sql1 = safeSql`select * from countries;
-select * from cities;`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql1, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if there are multiple queries II', () => {
-    const sql1 = safeSql`select * from countries;
-select * from cities`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql1, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  // [Joshen] Opting to just avoid appending in this case to prevent making the logic overly complex atm
-  test('Should return false if query has with a comment I', () => {
-    const sql = safeSql`-- This is a comment
-select * from cities`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query has with a comment II', () => {
-    const sql = safeSql`select * from cities
--- This is a comment`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-
-  // [Joshen] These will just need to test the cases when appendAutoLimit returns true then
-  test('Should add the limit param properly if query ends without a semi colon', () => {
-    const sql = safeSql`select * from countries`
-    const limit = 100
-    const { sql: formattedSql } = applyAutoLimit(sql, limit)
-    expect(formattedSql).toBe('select * from countries limit 100;')
-  })
-  test('Should add the limit param properly if query ends with a semi colon', () => {
-    const sql = safeSql`select * from countries;`
-    const limit = 100
-    const { sql: formattedSql } = applyAutoLimit(sql, limit)
-    expect(formattedSql).toBe('select * from countries limit 100;')
-  })
-  test('Should add the limit param properly if query ends with multiple semi colon', () => {
-    const sql = safeSql`select * from countries;;;;;;;`
-    const limit = 100
-    const { sql: formattedSql } = applyAutoLimit(sql, limit)
-    expect(formattedSql).toBe('select * from countries limit 100;')
-  })
-  test('Should not append a limit if query already has one with whitespace before the semi colon', () => {
-    const sql = safeSql`select * from countries limit 10 ;`
-    const limit = 100
-    const { sql: formattedSql } = applyAutoLimit(sql, limit)
-    expect(formattedSql).toBe('select * from countries limit 10 ;')
-  })
-  test('returns the SafeSqlFragment result unchanged when no limit is appended', () => {
-    const sql = safeSql`select * from countries limit 10;`
-    const { sql: formattedSql } = applyAutoLimit(sql, 100)
-    expect(formattedSql).toBe(sql)
-  })
 })
 
 describe('SQLEditor.utils.ts:shouldAutoGenerateTitle', () => {
