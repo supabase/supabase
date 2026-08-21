@@ -242,6 +242,43 @@ describe('ai/tools/mock-tools getMockTools', () => {
       expect(after.cells.map((cell) => cell._tag)).toEqual(['markdown_cell', 'log_cell'])
     })
 
+    it('overrides delete_notebook needsApproval to false, unlike the real tool', async () => {
+      const mockTools = await getMockTools(undefined, new AbortController().signal)
+
+      expect(getNotebookTools().delete_notebook.needsApproval).toBe(true)
+      expect(mockTools.delete_notebook.needsApproval).toBe(false)
+    })
+
+    it('delete_notebook removes the notebook, and list_notebooks no longer returns it', async () => {
+      const mockTools = await getMockTools(undefined, new AbortController().signal)
+      if (!mockTools.delete_notebook.execute) throw new Error('execute is undefined')
+      if (!mockTools.list_notebooks.execute) throw new Error('execute is undefined')
+
+      const result = await mockTools.delete_notebook.execute(
+        { id: AUTH_HEALTH_NOTEBOOK_ID },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+      expect(result).toEqual({ id: AUTH_HEALTH_NOTEBOOK_ID, name: 'Auth health check' })
+
+      const listed = await mockTools.list_notebooks.execute(
+        { limit: 20 },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+      expect(listed.notebooks.map((notebook) => notebook.id)).toEqual([EDGE_FUNCTION_NOTEBOOK_ID])
+    })
+
+    it('delete_notebook rejects an unknown id', async () => {
+      const mockTools = await getMockTools(undefined, new AbortController().signal)
+      if (!mockTools.delete_notebook.execute) throw new Error('execute is undefined')
+
+      await expect(
+        mockTools.delete_notebook.execute(
+          { id: 'unknown-notebook-id' },
+          { toolCallId: 'test', messages: [], context: {} }
+        )
+      ).rejects.toThrow(/unknown-notebook-id/)
+    })
+
     it('is isolated per call to getMockTools', async () => {
       const firstCall = await getMockTools(undefined, new AbortController().signal)
       if (!firstCall.create_notebook.execute) throw new Error('execute is undefined')

@@ -401,6 +401,82 @@ describe('NotebookProposalRenderer', () => {
     expect(screen.getByText('Failed to create notebook')).toBeInTheDocument()
   })
 
+  it('renders the delete-mode preview once the notebook is fetched and approves on confirm', async () => {
+    const user = userEvent.setup()
+    const onApprove = vi.fn()
+    mockContentItem(mockNotebookRow())
+
+    render(
+      <NotebookProposalRenderer
+        mode="delete"
+        state="approval-requested"
+        confirmState="approval-requested"
+        input={{ id: NOTEBOOK_ID }}
+        output={undefined}
+        onApprove={onApprove}
+        onDeny={vi.fn()}
+      />
+    )
+
+    expect(await screen.findByText('Delete "Signup funnel"?')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Delete' }))
+    expect(onApprove).toHaveBeenCalledTimes(1)
+  })
+
+  it('denies the delete proposal on skip', async () => {
+    const user = userEvent.setup()
+    const onDeny = vi.fn()
+    mockContentItem(mockNotebookRow())
+
+    render(
+      <NotebookProposalRenderer
+        mode="delete"
+        state="approval-requested"
+        confirmState="approval-requested"
+        input={{ id: NOTEBOOK_ID }}
+        output={undefined}
+        onApprove={vi.fn()}
+        onDeny={onDeny}
+      />
+    )
+
+    await screen.findByText('Delete "Signup funnel"?')
+    await user.click(screen.getByRole('button', { name: 'Skip' }))
+    expect(onDeny).toHaveBeenCalledTimes(1)
+  })
+
+  it('falls back to a raw-input admonition for a delete proposal on a parse failure', async () => {
+    render(
+      <NotebookProposalRenderer
+        mode="delete"
+        state="approval-requested"
+        confirmState="approval-requested"
+        input={{ nonsense: true }}
+        output={undefined}
+        onApprove={vi.fn()}
+        onDeny={vi.fn()}
+      />
+    )
+
+    expect(screen.getByText("Couldn't render a preview for this notebook")).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Delete' })).not.toBeInTheDocument()
+  })
+
+  it('shows the deleted notebook name once the delete completes, without an Open notebook action', () => {
+    render(
+      <NotebookProposalRenderer
+        mode="delete"
+        state="output-available"
+        confirmState="success"
+        input={{ id: NOTEBOOK_ID }}
+        output={{ id: NOTEBOOK_ID, name: 'Signup funnel' }}
+      />
+    )
+
+    expect(screen.getByText('Notebook deleted: Signup funnel')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Open notebook' })).not.toBeInTheDocument()
+  })
+
   it('keeps the preview in the message after skip', () => {
     render(
       <NotebookProposalRenderer

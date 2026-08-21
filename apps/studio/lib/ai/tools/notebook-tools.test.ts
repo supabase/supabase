@@ -83,9 +83,33 @@ const NOTEBOOK_CONTENT = {
   ],
 }
 
+function mockGetNotebook() {
+  addAPIMock({
+    method: 'get',
+    path: '/platform/projects/:ref/content/item/:id',
+    response: () =>
+      HttpResponse.json<GetUserContentByIdResponse>({
+        id: 'notebook-1',
+        name: 'Signup funnel',
+        description: undefined,
+        visibility: 'project',
+        favorite: false,
+        folder_id: null,
+        inserted_at: '2026-01-01T00:00:00.000Z',
+        updated_at: '2026-01-01T00:00:00.000Z',
+        owner_id: 1,
+        project_id: 1,
+        type: 'notebook',
+        content: NOTEBOOK_CONTENT,
+        // The generated response type expects a stricter cell union than this hand-written
+        // fixture provides; the cells themselves are exercised by the schema tests above.
+      } as unknown as GetUserContentByIdResponse),
+  })
+}
+
 describe('ai/tools/notebook-tools', () => {
   describe('getNotebookTools', () => {
-    it('should return list_databases, list_notebooks, get_notebook, create_notebook, and update_notebook tools', () => {
+    it('should return list_databases, list_notebooks, get_notebook, create_notebook, update_notebook, and delete_notebook tools', () => {
       const tools = getNotebookTools()
 
       expect(Object.keys(tools)).toEqual([
@@ -94,6 +118,7 @@ describe('ai/tools/notebook-tools', () => {
         'get_notebook',
         'create_notebook',
         'update_notebook',
+        'delete_notebook',
       ])
     })
 
@@ -104,11 +129,12 @@ describe('ai/tools/notebook-tools', () => {
       expect(tools.get_notebook.needsApproval).toBeUndefined()
     })
 
-    it('should require approval to create or update a notebook', () => {
+    it('should require approval to create, update, or delete a notebook', () => {
       const tools = getNotebookTools()
 
       expect(tools.create_notebook.needsApproval).toBe(true)
       expect(tools.update_notebook.needsApproval).toBe(true)
+      expect(tools.delete_notebook.needsApproval).toBe(true)
     })
   })
 
@@ -569,28 +595,6 @@ describe('ai/tools/notebook-tools', () => {
   })
 
   describe('update_notebook', () => {
-    function mockGetNotebook() {
-      addAPIMock({
-        method: 'get',
-        path: '/platform/projects/:ref/content/item/:id',
-        response: () =>
-          HttpResponse.json<GetUserContentByIdResponse>({
-            id: 'notebook-1',
-            name: 'Signup funnel',
-            description: undefined,
-            visibility: 'project',
-            favorite: false,
-            folder_id: null,
-            inserted_at: '2026-01-01T00:00:00.000Z',
-            updated_at: '2026-01-01T00:00:00.000Z',
-            owner_id: 1,
-            project_id: 1,
-            type: 'notebook',
-            content: NOTEBOOK_CONTENT,
-          } as unknown as GetUserContentByIdResponse),
-      })
-    }
-
     it('should re-fetch the notebook, apply the operations, and PUT the resolved content', async () => {
       mockGetNotebook()
       let sentBody: Record<string, unknown> | undefined
@@ -860,6 +864,54 @@ describe('ai/tools/notebook-tools', () => {
           { toolCallId: 'test', messages: [], context: {} }
         )
       ).resolves.toMatchObject({ id: 'notebook-1', name: 'Signup funnel' })
+    })
+  })
+
+  describe('delete_notebook', () => {
+    it('should fetch the notebook, delete it, and return its id and name', async () => {
+      mockGetNotebook()
+      let capturedRequest: Request | undefined
+      addAPIMock({
+        method: 'delete',
+        path: '/platform/projects/:ref/content',
+        response: ({ request }) => {
+          capturedRequest = request
+          return HttpResponse.json([{ id: 'notebook-1' }])
+        },
+      })
+
+      const tools = getNotebookTools({ projectRef: 'test-project' })
+      if (!tools.delete_notebook.execute) throw new Error('execute is undefined')
+
+      const result = await tools.delete_notebook.execute(
+        { id: 'notebook-1' },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+
+      const url = new URL(capturedRequest!.url)
+      expect(url.pathname).toContain('/projects/test-project/content')
+      expect(url.searchParams.get('ids')).toBe('notebook-1')
+      expect(result).toEqual({ id: 'notebook-1', name: 'Signup funnel' })
+    })
+
+    it('should throw when the notebook does not exist, without calling delete', async () => {
+      addAPIMock({
+        method: 'get',
+        path: '/platform/projects/:ref/content/item/:id',
+        response: () => HttpResponse.json<APIErrorBody>({ message: 'Not found' }, { status: 404 }),
+      })
+
+      const tools = getNotebookTools({ projectRef: 'test-project' })
+      if (!tools.delete_notebook.execute) throw new Error('execute is undefined')
+
+      // No mock registered for DELETE /platform/projects/:ref/content: MSW fails the test
+      // on any unhandled request, so this also asserts the endpoint was never called.
+      await expect(
+        tools.delete_notebook.execute(
+          { id: 'missing' },
+          { toolCallId: 'test', messages: [], context: {} }
+        )
+      ).rejects.toThrow()
     })
   })
 
