@@ -48,7 +48,7 @@ export const ConfirmFooter = ({
         className
       )}
     >
-      <div className="min-w-0 flex flex-1 items-center gap-2">
+      <div role="status" className="min-w-0 flex flex-1 items-center gap-2">
         {outcome === 'success' && <Check className="size-3.5 shrink-0 text-brand" />}
         {outcome === 'error' && <X className="size-3.5 shrink-0 text-danger" />}
         <span>{message}</span>
@@ -130,14 +130,12 @@ export const Confirm = ({
   const bar = getConfirmFooterBar(state)
   const showLoading = bar.isLoading || extraLoading || isLoading
   const isApprovalRequested = state === 'approval-requested'
-  const footerMessage =
-    bar.outcome === 'success'
-      ? (successMessage ?? message)
-      : bar.outcome === 'error'
-        ? (errorMessage ?? message)
-        : bar.outcome === 'denied'
-          ? (deniedMessage ?? message)
-          : message
+  const outcomeMessages = {
+    success: successMessage,
+    error: errorMessage,
+    denied: deniedMessage,
+  }
+  const footerMessage = bar.outcome ? (outcomeMessages[bar.outcome] ?? message) : message
 
   return (
     <div

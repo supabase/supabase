@@ -85,22 +85,30 @@ export const NotebookProposalRenderer = (props: NotebookProposalRendererProps) =
       </Button>
     ) : undefined
 
-  return mode === 'create' ? (
-    <CreateNotebookProposal
-      input={input}
-      confirmState={confirmState}
-      footerAction={footerAction}
-      onApprove={onApprove}
-      onDeny={onDeny}
-    />
-  ) : (
-    <UpdateNotebookProposal
-      input={input}
-      confirmState={confirmState}
-      footerAction={footerAction}
-      onApprove={onApprove}
-      onDeny={onDeny}
-    />
+  const proposal =
+    mode === 'create' ? (
+      <CreateNotebookProposal
+        input={input}
+        confirmState={confirmState}
+        footerAction={confirmState === undefined ? undefined : footerAction}
+        onApprove={onApprove}
+        onDeny={onDeny}
+      />
+    ) : (
+      <UpdateNotebookProposal
+        input={input}
+        confirmState={confirmState}
+        footerAction={confirmState === undefined ? undefined : footerAction}
+        onApprove={onApprove}
+        onDeny={onDeny}
+      />
+    )
+
+  return (
+    <>
+      {proposal}
+      {confirmState === undefined && footerAction}
+    </>
   )
 }
 

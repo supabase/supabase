@@ -10,11 +10,14 @@ import {
   toQueryLogsResult,
 } from './MessagePartQueryLogs.utils'
 
-type QueryLogsToolPart = Pick<ToolUIPart, 'toolCallId' | 'state' | 'input' | 'output' | 'errorText'>
+type QueryLogsToolPart = Pick<
+  ToolUIPart,
+  'toolCallId' | 'state' | 'input' | 'output' | 'errorText'
+> & { rawInput?: unknown }
 
 export function MessagePartQueryLogs({ toolPart }: { toolPart: QueryLogsToolPart }) {
   const { id } = useMessageInfoContext()
-  const { toolCallId, state, input: submittedInput, output } = toolPart
+  const { toolCallId, state, input: submittedInput, rawInput, output } = toolPart
 
   if (state === 'input-streaming' || state === 'input-available') {
     return (
@@ -27,7 +30,7 @@ export function MessagePartQueryLogs({ toolPart }: { toolPart: QueryLogsToolPart
 
   if (state !== 'output-available' && state !== 'output-error') return null
 
-  const parsedInput = parseQueryLogsInput(submittedInput)
+  const parsedInput = parseQueryLogsInput(submittedInput ?? rawInput)
   if (!parsedInput.success) return null
 
   const result =

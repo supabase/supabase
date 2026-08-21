@@ -14,7 +14,10 @@ import { Confirm } from './Confirm'
 import { type ConfirmFooterApprovalState } from './Confirm.utils'
 import { QueryEditor } from '@/components/interfaces/Explorer/QueryEditor'
 import { type QueryDisplay, type QueryResult } from '@/components/interfaces/Explorer/types'
-import { type QuerySourceBinding } from '@/data/query-sources/query-source-registry'
+import {
+  type QuerySourceBinding,
+  type QuerySourceTag,
+} from '@/data/query-sources/query-source-registry'
 import { useTrack } from '@/lib/telemetry/track'
 import { useLocalRoleImpersonationState } from '@/state/role-impersonation-state'
 
@@ -35,6 +38,22 @@ interface AssistantQueryCellProps {
 }
 
 const DEFAULT_SOURCE: QuerySourceBinding = { _tag: 'database' }
+
+const QUERY_OUTCOME_MESSAGES: Record<
+  QuerySourceTag,
+  { success: string; error: string; denied: string }
+> = {
+  database: {
+    success: 'Query executed',
+    error: 'Failed to execute SQL',
+    denied: 'Skipped query',
+  },
+  logs: {
+    success: 'Query executed',
+    error: 'Failed to query logs',
+    denied: 'Skipped query',
+  },
+}
 
 /** Assistant adapter around the shared QueryEditor. Local state only — nothing is persisted. */
 export const AssistantQueryCell = ({
@@ -123,6 +142,7 @@ export const AssistantQueryCell = ({
   }
 
   const isConfirming = confirmState !== undefined
+  const outcomeMessages = QUERY_OUTCOME_MESSAGES[source._tag]
 
   return (
     <Confirm
@@ -133,9 +153,9 @@ export const AssistantQueryCell = ({
       cancelLabel="Skip"
       confirmLabel="Run query"
       confirmLabelLoading="Running..."
-      successMessage="Query executed"
-      errorMessage="Failed to execute SQL"
-      deniedMessage="Skipped query"
+      successMessage={outcomeMessages.success}
+      errorMessage={outcomeMessages.error}
+      deniedMessage={outcomeMessages.denied}
       onCancel={onDeny}
       onConfirm={onApprove}
     >
