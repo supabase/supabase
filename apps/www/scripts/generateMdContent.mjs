@@ -237,10 +237,13 @@ if (changelogSlugs.length === 0) {
   )
 }
 
-const changelogIndexExists = await fs.access(path.join(wwwDir, 'public/changelog.md')).then(
-  () => true,
-  () => false
-)
+let changelogIndexExists = false
+try {
+  await fs.access(path.join(wwwDir, 'public/changelog.md'))
+  changelogIndexExists = true
+} catch (err) {
+  if (err.code !== 'ENOENT') throw err
+}
 if (changelogIndexExists) {
   changelogSlugs.unshift('changelog')
 }
