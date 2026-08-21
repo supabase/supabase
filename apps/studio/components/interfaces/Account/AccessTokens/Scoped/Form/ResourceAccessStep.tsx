@@ -330,8 +330,7 @@ const ProjectMultiSelectList = ({
   const handleScroll = (event: React.UIEvent) => {
     const element = event.currentTarget as HTMLElement
     const offset = 50 // Offset by approximately 1 item to start fetching next page before hitting the bottom
-    const isAtBottom = element.scrollHeight - element.scrollTop >= element.clientHeight - offset
-
+    const isAtBottom = element.scrollTop + element.clientHeight >= element.scrollHeight - offset
     if (hasNextPage && isAtBottom) {
       fetchNextPage()
     }
