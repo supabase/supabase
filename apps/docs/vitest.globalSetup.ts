@@ -1,4 +1,4 @@
-import { cpSync, existsSync } from 'node:fs'
+import { cpSync, existsSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 
 // Mirrors `pnpm run codegen:examples` so the test suite is self-contained.
@@ -12,5 +12,9 @@ export default function setup() {
   if (!existsSync(source)) {
     throw new Error(`Expected repo-root examples directory at ${source}`)
   }
+  // Replace rather than merge, matching `codegen:examples`. cpSync copies over
+  // what is already there but never deletes, so a renamed or removed example
+  // would linger here and only here, since the npm path now clears first.
+  rmSync(dest, { recursive: true, force: true })
   cpSync(source, dest, { recursive: true })
 }
