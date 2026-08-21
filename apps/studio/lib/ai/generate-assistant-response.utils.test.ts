@@ -115,6 +115,30 @@ describe('prepareMessagesForModel', () => {
     expect(result[0].parts).toEqual([])
   })
 
+  it('strips update_notebook previous_content before it reaches the model on history replay', () => {
+    const messages = [
+      assistantMessage([
+        toolPart({
+          state: 'output-available',
+          output: {
+            id: 'notebook-1',
+            name: 'Signup funnel',
+            previous_content: { schema_version: 1, cells: [] },
+          },
+        }),
+      ]),
+    ]
+
+    const result = prepareMessagesForModel(messages, 'schema')
+
+    expect(result[0].parts).toEqual([
+      toolPart({
+        state: 'output-available',
+        output: { id: 'notebook-1', name: 'Signup funnel' },
+      }),
+    ])
+  })
+
   it('keeps non-tool parts untouched', () => {
     const messages = [assistantMessage([{ type: 'text', text: 'hello' }])]
 

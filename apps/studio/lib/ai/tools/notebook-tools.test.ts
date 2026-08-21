@@ -632,7 +632,37 @@ describe('ai/tools/notebook-tools', () => {
         'cell-2',
       ])
       expect(content.cells[2].sql).toBe('select * from auth.users limit 100')
-      expect(result).toEqual({ id: 'notebook-1', name: 'Signup funnel' })
+      // previous_content is the pre-update notebook (unaffected by this update's
+      // operations), not the post-update `sentBody` asserted above — it lets the client
+      // re-derive the diff at the time of approval
+      expect(result).toEqual({
+        id: 'notebook-1',
+        name: 'Signup funnel',
+        previous_content: {
+          schema_version: 1,
+          cells: [
+            { _tag: 'markdown_cell', _id: 'cell-1', text: '# Signup funnel' },
+            {
+              _tag: 'database_cell',
+              _id: 'cell-2',
+              sql: 'select * from auth.users limit 100',
+              row_limit: 100,
+              view: 'table',
+            },
+            {
+              _tag: 'log_cell',
+              _id: 'cell-3',
+              sql: 'select timestamp, event_message from edge_logs limit 10',
+              time_range: { _tag: 'relative_time_range', unit: 'hour', amount: 1 },
+              view: 'table',
+            },
+          ],
+        },
+      })
+      expect((tools.update_notebook as any).toModelOutput({ output: result })).toEqual({
+        type: 'json',
+        value: { id: 'notebook-1', name: 'Signup funnel' },
+      })
     })
 
     it('should throw a descriptive, assistant-exposable error instead of PUTting when an operation targets an unknown cell id', async () => {
