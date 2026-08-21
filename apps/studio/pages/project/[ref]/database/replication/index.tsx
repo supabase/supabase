@@ -1,10 +1,19 @@
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { ReadReplicasMovedCallout } from '@/components/interfaces/Database/Replication/DestinationPanel/ReadReplicasMovedCallout'
 import { Destinations } from '@/components/interfaces/Database/Replication/Destinations'
 import { ReplicationDiagram } from '@/components/interfaces/Database/Replication/ReplicationDiagram'
 import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
-import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { HighAvailabilityDisabledEmptyState } from '@/components/ui/HighAvailability/HighAvailabilityDisabledEmptyState'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
@@ -35,34 +44,28 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
 
   return (
     <PipelineRequestStatusProvider>
-      <ScaffoldContainer>
-        <ScaffoldSection isFullWidth>
-          <div className="w-full mb-6">
-            <div className="flex items-center gap-x-2 mb-1">
-              <h3 className="text-foreground text-xl prose">Replication</h3>
-            </div>
-            <p className="prose text-sm max-w-full">
-              Deploy Read Replicas across multiple regions, or use Pipelines to replicate database
-              changes to analytics destinations.
-            </p>
-          </div>
-        </ScaffoldSection>
-      </ScaffoldContainer>
+      <PageHeader size="large">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Replication</PageHeaderTitle>
+            <PageHeaderDescription>Send data to external destinations</PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
 
-      {isPending ? (
-        <ScaffoldContainer>
+      <PageContainer size="large">
+        {isPending ? (
           <GenericSkeletonLoader />
-        </ScaffoldContainer>
-      ) : (
-        <>
-          <ReplicationDiagram />
-          <ScaffoldContainer>
-            <ScaffoldSection isFullWidth className="pt-6!">
+        ) : (
+          <PageSection>
+            <PageSectionContent className="flex flex-col gap-12">
+              <ReadReplicasMovedCallout />
+              <ReplicationDiagram />
               <Destinations />
-            </ScaffoldSection>
-          </ScaffoldContainer>
-        </>
-      )}
+            </PageSectionContent>
+          </PageSection>
+        )}
+      </PageContainer>
     </PipelineRequestStatusProvider>
   )
 }

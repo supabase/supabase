@@ -220,7 +220,7 @@ const Press = () => {
             href={x.href}
             key={x.href}
             target="_blank"
-            className="flex flex-col justify-start items-stretch group cursor-pointer transition rounded-xl focus-visible:ring-2 focus-visible:ring-foreground-lighter outline-hidden outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-foreground-lighter"
+            className="flex flex-col justify-start items-stretch group cursor-pointer rounded-xl focus-ring"
           >
             <Panel
               hasActiveOnHover
@@ -247,7 +247,7 @@ const Press = () => {
             href={x.href}
             key={x.href}
             target="_blank"
-            className="flex flex-col justify-start items-stretch group cursor-pointer transition rounded-xl focus-visible:ring-2 focus-visible:ring-foreground-lighter outline-hidden outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-foreground-lighter"
+            className="flex flex-col justify-start items-stretch group cursor-pointer rounded-xl focus-ring"
           >
             <Panel
               hasActiveOnHover

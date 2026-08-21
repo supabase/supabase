@@ -52,6 +52,46 @@ describe('preserveQueryAndHash', () => {
 })
 
 describe('matchRedirect query/hash preservation', () => {
+  it('redirects the legacy compute and disk route while preserving query and hash', () => {
+    expect(
+      matchRedirect({
+        pathname: '/project/abc/settings/compute-and-disk',
+        search: { upgrade: 'micro' },
+        isPlatform: true,
+        hash: 'disk',
+      })
+    ).toEqual({
+      destination: '/project/abc/settings/infrastructure?upgrade=micro#disk',
+      permanent: true,
+    })
+  })
+
+  it('redirects legacy replication replica detail to infrastructure', () => {
+    expect(
+      matchRedirect({
+        pathname: '/project/abc/database/replication/replica/replica-1',
+        search: {},
+        isPlatform: true,
+      })
+    ).toEqual({
+      destination: '/project/abc/settings/infrastructure/replica/replica-1',
+      permanent: true,
+    })
+  })
+
+  it('redirects the legacy compute billing panel to the CPU section', () => {
+    expect(
+      matchRedirect({
+        pathname: '/project/abc/settings/billing/subscription',
+        search: { panel: 'computeInstance', source: 'banner' },
+        isPlatform: true,
+      })
+    ).toEqual({
+      destination: '/project/abc/settings/infrastructure?source=banner#cpu',
+      permanent: true,
+    })
+  })
+
   it('carries the incoming query and hash through a plain rule', () => {
     expect(
       matchRedirect({

@@ -41,7 +41,7 @@ For better performance with large files, use the direct storage hostname: `https
 
 Buckets must exist on the destination before you can copy objects into them. You can create them through the dashboard UI, or with the **SQL Editor**.
 
-<Admonition type="tip">
+<Admonition type="note">
 
 If you already restored your platform database to self-hosted using the [restore guide](/docs/guides/self-hosting/restore-from-platform), your bucket definitions are already present. You can skip this step.
 
@@ -123,7 +123,7 @@ For large migrations, consider adding `--transfers 4` to increase parallelism, o
 
 </Admonition>
 
-## Verify
+## Verify the copy
 
 Compare object counts between source and destination:
 

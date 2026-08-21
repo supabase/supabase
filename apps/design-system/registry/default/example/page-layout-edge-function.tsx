@@ -261,6 +261,7 @@ export default function PageLayoutEdgeFunction() {
           {pages.map((page) => (
             <NavMenuItem key={page.id} active={activePage === page.id}>
               <button
+                tabIndex={0}
                 type="button"
                 aria-pressed={activePage === page.id}
                 className="h-full cursor-pointer appearance-none bg-transparent text-inherit"

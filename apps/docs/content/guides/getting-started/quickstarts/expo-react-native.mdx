@@ -4,6 +4,8 @@ subtitle: 'Learn how to create a Supabase project, add some sample data to your 
 breadcrumb: 'Framework Quickstarts'
 ---
 
+<AiPrompt id="expo-react-native" />
+
 <$Partial path="quickstart_db_setup.mdx" />
 
 ## 3. Create an Expo app
@@ -14,15 +16,9 @@ Create a minimal Expo app using the `create-expo-app` command with the blank Typ
 npx create-expo-app my-app --template blank-typescript
 ```
 
-## 4. Install Agent Skills (optional)
+## 4. Set up AI tooling (optional)
 
-Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
-
-To install, run the following command in the root of your project:
-
-```bash
-npx skills add supabase/agent-skills
-```
+<$Partial path="quickstart_ai_tooling.mdx" />
 
 ## 5. Install the Supabase client library
 
@@ -36,10 +32,12 @@ cd my-app && npx expo install @supabase/supabase-js react-native-url-polyfill ex
 
 ## 6. Declare Supabase environment variables
 
-Create a `.env` file in the root of your project and populate it with your Supabase connection variables that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true).
+Create a `.env` file in the root of your project and populate it with your Supabase connection variables that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&connectTab=mobiles&framework=exporeactnative).
 
 <Button variant="primary" asChild>
-  <a href="/dashboard/project/_?showConnect=true">Open Connect panel</a>
+  <a href="/dashboard/project/_?showConnect=true&connectTab=mobiles&framework=exporeactnative">
+    Open Connect panel
+  </a>
 </Button>
 
 Expo requires environment variables to be prefixed with `EXPO_PUBLIC_` to be accessible in your app code.
@@ -49,7 +47,7 @@ EXPO_PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
 EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 ```
 
-<$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "" }} />
+<$Partial path="api_settings.mdx" variables={{ "framework": "exporeactnative", "tab": "mobiles" }} />
 
 ## 7. Initialize the Supabase client
 
@@ -64,8 +62,8 @@ import { createClient } from '@supabase/supabase-js'
 
 import 'expo-sqlite/localStorage/install'
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL
-const supabasePublishableKey = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!
+const supabasePublishableKey = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
 
 export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
   auth: {
@@ -89,16 +87,36 @@ import { FlatList, StyleSheet, Text, View } from 'react-native'
 
 import { supabase } from './lib/supabase'
 
+type Instrument = {
+  id: number
+  name: string
+}
+
 export default function App() {
-  const [instruments, setInstruments] = useState([])
+  const [instruments, setInstruments] = useState<Instrument[]>([])
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     getInstruments()
   }, [])
 
   async function getInstruments() {
-    const { data } = await supabase.from('instruments').select()
-    setInstruments(data)
+    const { data, error } = await supabase.from('instruments').select()
+
+    if (error) {
+      setError(error.message)
+      return
+    }
+
+    setInstruments(data ?? [])
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text>Error loading instruments: {error}</Text>
+      </View>
+    )
   }
 
   return (
@@ -134,6 +152,8 @@ Run the development server and scan the QR code with the Expo Go app on your pho
 ```bash
 npx expo start
 ```
+
+<$Partial path="quickstart_going_to_production.mdx" />
 
 ## Next steps
 

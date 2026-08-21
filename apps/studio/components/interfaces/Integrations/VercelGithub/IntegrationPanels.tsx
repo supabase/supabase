@@ -291,7 +291,7 @@ export const EmptyIntegrationConnection = forwardRef<
     },
     ref
   ) => {
-    const label = children ?? 'Add new project connection'
+    const label = children ?? 'Add connection'
 
     return (
       <div

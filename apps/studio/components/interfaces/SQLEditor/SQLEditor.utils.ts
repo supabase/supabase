@@ -1,12 +1,7 @@
-import {
-  literal,
-  safeSql,
-  untrustedSql,
-  type SafeSqlFragment,
-  type UntrustedSqlFragment,
-} from '@supabase/pg-meta'
+import { untrustedSql, type SafeSqlFragment, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { TABLE_EVENT_ACTIONS } from 'common/telemetry-constants'
 
+import { isLogsSource, sqlSourceToFenceLanguage, type SqlSnippetSource } from './querySource'
 import {
   alterDatabasePreventConnectionStatements,
   destructiveSqlRegex,
@@ -15,10 +10,17 @@ import {
   untitledSnippetTitle,
   updateWithoutWhereRegex,
 } from './SQLEditor.constants'
-import { ContentDiff, type IStandaloneCodeEditor, type PotentialIssues } from './SQLEditor.types'
+import {
+  ContentDiff,
+  DiffType,
+  type IStandaloneCodeEditor,
+  type PotentialIssues,
+} from './SQLEditor.types'
 import type { SnippetWithContent } from '@/data/content/sql-folders-query'
 import type { DatabaseEventTrigger } from '@/data/database-event-triggers/database-event-triggers-query'
+import { untrustedLogSql, type UntrustedLogSqlFragment } from '@/data/logs/safe-analytics-sql'
 import type { Database } from '@/data/read-replicas/replicas-query'
+import { applyAutoLimit } from '@/data/sql/utils'
 import { generateUuid } from '@/lib/api/snippets.browser'
 import { removeCommentsFromSql } from '@/lib/helpers'
 import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
@@ -67,6 +69,7 @@ export const createSqlSnippetSkeletonV2 = ({
   project_id,
   folder_id,
   idOverride,
+  source = 'database',
 }: {
   name: string
   sql: string
@@ -78,10 +81,14 @@ export const createSqlSnippetSkeletonV2 = ({
    * with a known id, such as to prevent flicker in the SQL editor when adding new unsaved snippets.
    */
   idOverride?: string
+  /**
+   * Which backend the new snippet targets.
+   */
+  source?: SqlSnippetSource
 }): SnippetWithContent => {
   const id = idOverride ?? generateUuid([folder_id, `${name}.sql`])
 
-  return {
+  const base = {
     ...NEW_SQL_SNIPPET_SKELETON,
     id,
     owner_id,
@@ -91,12 +98,29 @@ export const createSqlSnippetSkeletonV2 = ({
     favorite: false,
     inserted_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
+    status: 'new' as const,
+  }
+
+  if (source === 'logs') {
+    return {
+      ...base,
+      type: 'log_sql',
+      content: {
+        schema_version: NEW_SQL_SNIPPET_SKELETON.content.schema_version,
+        content_id: id ?? '',
+        unchecked_sql: untrustedLogSql(sql ?? ''),
+      },
+    }
+  }
+
+  return {
+    ...base,
+    type: 'sql',
     content: {
       ...NEW_SQL_SNIPPET_SKELETON.content,
       content_id: id ?? '',
       unchecked_sql: untrustedSql(sql ?? ''),
-    } as any,
-    status: 'new',
+    },
   }
 }
 
@@ -290,6 +314,26 @@ export function buildExecuteParams({
   }
 }
 
+/**
+ * Derives the stable snippet id + loading state for the editor from the URL.
+ */
+export function deriveSnippetIdentity({
+  urlId,
+  generatedId,
+  snippets,
+}: {
+  urlId: string | undefined
+  generatedId: string
+  snippets: Record<string, { snippet: { content?: unknown } }>
+}): { id: string; isLoading: boolean } {
+  const id = !urlId || urlId === 'new' ? generatedId : urlId
+
+  const snippetIsLoading = !(id in snippets && snippets[id].snippet.content !== undefined)
+  const isLoading = urlId === 'new' ? false : snippetIsLoading
+
+  return { id, isLoading }
+}
+
 export const generateMigrationCliCommand = (id: string, name: string, isNpx = false) =>
   `
 ${isNpx ? 'npx ' : ''}supabase snippets download ${id} |
@@ -336,66 +380,6 @@ export const compareAsNewSnippet = (sqlDiff: ContentDiff) => {
 }
 
 /**
- * Removes trailing `;` characters from a safe SQL fragment. Only ever removes
- * existing terminators — never adds text — so the result is exactly as safe
- * as the input; the brand carries over intentionally. This is the one place
- * in the file allowed to reassert `SafeSqlFragment` on a derived string —
- * every other function composes new fragments through `safeSql`/`literal`.
- */
-export function trimTrailingSemicolons(sql: SafeSqlFragment): SafeSqlFragment {
-  return sql.replace(/;+\s*$/, '') as SafeSqlFragment
-}
-
-// [Joshen] Just FYI as well the checks here on whether to append limit is quite restricted
-// This is to prevent dashboard from accidentally appending limit to the end of a query
-// thats not supposed to have any, since there's too many cases to cover.
-// We can however look into making this logic better in the future
-// i.e It's harder to append the limit param, than just leaving the query as it is
-// Otherwise we'd need a full on parser to do this properly
-//
-// Only accepts `SafeSqlFragment`: this decides whether to build (and builds)
-// a new SQL fragment that gets executed, so every caller — including ones
-// that only want the `appendAutoLimit` flag for a display hint — must already
-// hold safe SQL. Composes the ` limit N;` suffix through `safeSql`/`literal`
-// rather than gluing raw template-literal text onto the fragment and casting
-// the result, so the only new content this function ever stamps safe is an
-// internally-generated integer literal, never arbitrary concatenated text.
-export function applyAutoLimit(
-  sql: SafeSqlFragment,
-  limit: number = 0
-): { sql: SafeSqlFragment; appendAutoLimit: boolean } {
-  // Remove lines and whitespaces to use for checking
-  const cleanedSql = sql.trim().replaceAll('\n', ' ').replaceAll(/\s+/g, ' ')
-
-  // Check how many queries
-  const regMatch = cleanedSql.matchAll(/[a-zA-Z]*[0-9]*[;]+/g)
-  const queries = new Array(...regMatch)
-  const indexSemiColon = cleanedSql.lastIndexOf(';')
-  const hasComments = cleanedSql.includes('--')
-  const hasMultipleQueries =
-    queries.length > 1 || (indexSemiColon > 0 && indexSemiColon !== cleanedSql.length - 1)
-
-  // Check if need to auto limit rows
-  const appendAutoLimit =
-    limit > 0 &&
-    !hasComments &&
-    !hasMultipleQueries &&
-    cleanedSql.toLowerCase().startsWith('select') &&
-    !cleanedSql.toLowerCase().match(/fetch\s+first/i) &&
-    !cleanedSql.match(/limit$/i) &&
-    !cleanedSql.match(/limit;$/i) &&
-    !cleanedSql.match(/limit [0-9]* offset [0-9]*\s*[;]?$/i) &&
-    !cleanedSql.match(/limit [0-9]*\s*[;]?$/i)
-
-  if (!appendAutoLimit) return { sql, appendAutoLimit: false }
-
-  const core = cleanedSql.endsWith(';') ? trimTrailingSemicolons(sql) : sql
-  const suffixed = safeSql`${core} limit ${literal(limit)};`
-
-  return { sql: suffixed, appendAutoLimit: true }
-}
-
-/**
  * Resolves the SQL to act on from the editor: the current selection if there is
  * one, otherwise the full editor contents, falling back to the snippet's stored
  * SQL. Mirrors the logic that used to be duplicated inline across the run,
@@ -408,7 +392,7 @@ export function applyAutoLimit(
  */
 export function getEditorSql(
   editor: IStandaloneCodeEditor,
-  snippetContent?: UntrustedSqlFragment
+  snippetContent?: string
 ): UntrustedSqlFragment {
   const selection = editor.getSelection()
   const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
@@ -448,9 +432,186 @@ export function assembleCompletionDiff(
 }
 
 /**
- * Builds the prompt text used to ask the assistant to debug a failing snippet.
+ * The SQL dialect the AI writes. Mirrors the `dialect` enum the completion API
+ * route accepts — a snippet's dialect follows its source and never flips, so a
+ * logs snippet always gets ClickHouse SQL and a database snippet Postgres.
  */
-export function buildDebugPromptText(sql: string, errorMessage: string): string {
-  const prompt = `Help me to debug the attached sql snippet which gives the following error: \n\n${errorMessage}`
-  return `${prompt}\n\nSQL Query:\n\`\`\`sql\n${sql}\n\`\`\``
+export type SqlDialect = 'postgres' | 'clickhouse'
+
+/**
+ * Maps a snippet's query source to the dialect the AI should write in. Logs
+ * snippets run against the ClickHouse-backed analytics endpoint; everything
+ * else runs against the user's Postgres database.
+ */
+export function sqlSourceToDialect(source: SqlSnippetSource): SqlDialect {
+  return isLogsSource(source) ? 'clickhouse' : 'postgres'
+}
+
+/**
+ * Builds the request body sent to the AI completion endpoint. `dialect` is
+ * omitted when undefined so callers that don't care keep the route's Postgres
+ * default. `options` is the caller-provided extra fields (e.g.
+ * `completionMetadata`), merged in last so it can override the defaults if it
+ * ever needs to.
+ */
+export function buildCompletionRequestBody({
+  projectRef,
+  connectionString,
+  orgSlug,
+  dialect,
+  options,
+}: {
+  projectRef: string | undefined
+  connectionString: string | undefined | null
+  orgSlug: string | undefined
+  dialect?: SqlDialect
+  options?: { completionMetadata?: unknown }
+}): {
+  projectRef: string | undefined
+  connectionString: string | undefined | null
+  language: 'sql'
+  orgSlug: string | undefined
+  dialect?: SqlDialect
+  completionMetadata?: unknown
+} {
+  return {
+    projectRef,
+    connectionString,
+    language: 'sql',
+    orgSlug,
+    ...(dialect !== undefined && { dialect }),
+    ...(options ?? {}),
+  }
+}
+
+/**
+ * Names the dialect for a logs snippet, whose SQL is ClickHouse against the `logs`
+ * table. The in-app assistant also learns this from the message's `sqlSource`
+ * metadata, but the same text is offered as "Copy prompt" and pasted into external
+ * models, so it has to stand on its own — otherwise a logs error gets Postgres advice.
+ */
+const CLICKHOUSE_LOGS_DEBUG_HINT =
+  'This query runs against the Supabase logs table on a ClickHouse-backed engine, not Postgres.'
+
+/** The shared ask + error + dialect preamble behind both debug entry points. */
+function buildDebugRequestText(errorMessage: string, source: SqlSnippetSource): string {
+  const ask = `Help me to debug the attached sql snippet which gives the following error: \n\n${errorMessage}`
+  return isLogsSource(source) ? `${ask}\n\n${CLICKHOUSE_LOGS_DEBUG_HINT}` : ask
+}
+
+/**
+ * Builds the prompt text used to ask the assistant to debug a failing snippet, and
+ * offered verbatim as the dropdown's copyable prompt.
+ */
+export function buildDebugPromptText(
+  sql: string,
+  errorMessage: string,
+  source: SqlSnippetSource
+): string {
+  const fence = sqlSourceToFenceLanguage(source)
+  return `${buildDebugRequestText(errorMessage, source)}\n\nSQL Query:\n\`\`\`${fence}\n${sql}\n\`\`\``
+}
+
+// Accepts either brand: the debug flow only reads the SQL as text (it's stripped
+// and interpolated into a prompt), so a logs-branded fragment is fine here.
+type DebugSnippet =
+  | { snippet: { content?: { unchecked_sql?: UntrustedSqlFragment | UntrustedLogSqlFragment } } }
+  | undefined
+type DebugResult = { error?: { message?: string } } | undefined
+
+/**
+ * Extracts the SQL (disclaimer stripped) and error message used to debug a
+ * failing snippet, shared by `buildDebugPrompt` and `onDebug`. Falls back to
+ * an empty query / `'Unknown error'` rather than throwing when the snippet or
+ * its last result aren't available yet.
+ */
+export function extractDebugContext(
+  snippet: DebugSnippet,
+  result: DebugResult
+): { sql: string; errorMessage: string } {
+  const sql = (snippet?.snippet.content?.unchecked_sql ?? '')
+    .replace(sqlAiDisclaimerComment, '')
+    .trim()
+  const errorMessage = result?.error?.message ?? 'Unknown error'
+  return { sql, errorMessage }
+}
+
+/**
+ * Builds the `aiSnap.newChat(...)` payload for the debug-this-snippet flow.
+ */
+export function buildDebugChatArgs(
+  snippet: DebugSnippet,
+  result: DebugResult,
+  source: SqlSnippetSource
+): {
+  name: string
+  sqlSnippets: Array<{ label: string; content: string; source: SqlSnippetSource }>
+  initialInput: string
+} {
+  const { sql, errorMessage } = extractDebugContext(snippet, result)
+  return {
+    name: 'Debug SQL snippet',
+    sqlSnippets: [{ label: 'Current Query', content: sql, source }],
+    initialInput: buildDebugRequestText(errorMessage, source),
+  }
+}
+
+/** What `drainDiffRequest` should do with a pending diff request, given the editor's current value. */
+export type DiffRequestPlan =
+  | { kind: 'replace'; text: string }
+  | { kind: 'diff'; diff: ContentDiff; diffType: DiffType }
+
+/**
+ * Decides how to apply a pending diff request to the editor: if the editor is
+ * empty, just copy the request's SQL straight in; otherwise open a diff
+ * between what's there and the requested SQL. Pure decision only — the
+ * effect (`drainDiffRequest`) is left to actually touch the editor/diff state.
+ */
+export function planDiffRequestApplication({
+  existingValue,
+  request,
+}: {
+  existingValue: string
+  request: { diffType: DiffType; sql: string }
+}): DiffRequestPlan {
+  if (existingValue.length === 0) {
+    return { kind: 'replace', text: request.sql }
+  }
+  return {
+    kind: 'diff',
+    diff: { original: existingValue, modified: request.sql },
+    diffType: request.diffType,
+  }
+}
+
+/** What the window keydown handler should do for a key event, given the diff/prompt state. */
+export type DiffKeyAction =
+  | { type: 'accept' }
+  | { type: 'escape'; shouldDiscard: boolean }
+  | { type: 'none' }
+
+/**
+ * Decides how the SQL editor's window-level keydown handler should react:
+ * accept an open diff on Cmd/Ctrl+Enter, or discard-and-dismiss on Escape.
+ * No-ops when neither a diff nor the AI prompt is open, or for any other key.
+ */
+export function resolveDiffKeyAction(
+  e: Pick<KeyboardEvent, 'key' | 'metaKey' | 'ctrlKey'>,
+  {
+    isDiffOpen,
+    isPromptOpen,
+    os,
+  }: { isDiffOpen: boolean; isPromptOpen: boolean; os: 'macos' | 'windows' | undefined }
+): DiffKeyAction {
+  if (!isDiffOpen && !isPromptOpen) return { type: 'none' }
+
+  switch (e.key) {
+    case 'Enter':
+      if ((os === 'macos' ? e.metaKey : e.ctrlKey) && isDiffOpen) return { type: 'accept' }
+      return { type: 'none' }
+    case 'Escape':
+      return { type: 'escape', shouldDiscard: isDiffOpen }
+    default:
+      return { type: 'none' }
+  }
 }

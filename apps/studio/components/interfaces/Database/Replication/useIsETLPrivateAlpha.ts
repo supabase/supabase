@@ -39,16 +39,22 @@ export const useIsETLSnowflakePrivateAlpha = () => {
   return useIsCurrentOrgInFlagList('etlEnableSnowflakePrivateAlpha')
 }
 
+export const useIsETLClickHousePrivateAlpha = () => {
+  return useIsCurrentOrgInFlagList('etlEnableClickHousePrivateAlpha')
+}
+
 export const useIsETLPrivateAlpha = () => {
   const hasAccessToETLBigQuery = useIsCurrentOrgInFlagList('etlEnableBigQueryPrivateAlpha')
   const hasAccessToETLIceberg = useIsCurrentOrgInFlagList('etlEnableIcebergPrivateAlpha')
   const hasAccessToETLDucklake = useIsCurrentOrgInFlagList('etlEnableDucklakePrivateAlpha')
   const hasAccessToETLSnowflake = useIsCurrentOrgInFlagList('etlEnableSnowflakePrivateAlpha')
+  const hasAccessToETLClickHouse = useIsCurrentOrgInFlagList('etlEnableClickHousePrivateAlpha')
 
   return (
     hasAccessToETLBigQuery ||
     hasAccessToETLIceberg ||
     hasAccessToETLDucklake ||
-    hasAccessToETLSnowflake
+    hasAccessToETLSnowflake ||
+    hasAccessToETLClickHouse
   )
 }

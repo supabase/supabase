@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 import { Badge, Button } from 'ui'
 
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import ShimmerLine from '@/components/ui/ShimmerLine'
 import {
   useInvalidateProjectDetailsQuery,
@@ -89,9 +90,7 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
 
               <div className="flex items-center justify-center space-x-2">
                 <Button asChild variant="default">
-                  <Link href={`/project/${ref}/settings/infrastructure`}>
-                    Check database health
-                  </Link>
+                  <Link href={getInfrastructurePath(ref)}>Check database health</Link>
                 </Button>
                 <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
                   <Link

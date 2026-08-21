@@ -80,7 +80,7 @@ export const BucketTableRow = ({
           key={bucket.id}
           data-bucket-id={bucket.id}
           className={cn(
-            'relative cursor-pointer h-16 group inset-focus',
+            'relative cursor-pointer h-16 group focus-inset',
             isDisabled && 'opacity-50 [&>td]:hover:bg-transparent cursor-not-allowed'
           )}
           onClick={handleRowActivate}

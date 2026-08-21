@@ -53,7 +53,7 @@ on document_sections for select to authenticated using (
 );
 ```
 
-<Admonition type="tip">
+<Admonition type="note">
 
 In this example, the current user is determined using the built-in `auth.uid()` function when the query is executed through your project's auto-generated [REST API](/docs/guides/api). If you are connecting to your Supabase database through a direct Postgres connection, see [Direct Postgres Connection](#direct-postgres-connection) below for directions on how to achieve the same access control.
 
@@ -120,7 +120,7 @@ RLS is latency-sensitive, so extra caution should be taken before implementing t
 
 </Admonition>
 
-<Admonition type="tip">
+<Admonition type="note">
 
 For data sources other than Postgres, see [Foreign Data Wrappers](/docs/guides/database/extensions/wrappers/overview) for a list of external sources supported today. If your data lives in a source not provided in the list, contact [support](/dashboard/support/new) and we'll be happy to discuss your use case.
 
@@ -164,7 +164,7 @@ import foreign schema public limit to (users, documents)
   from server foreign_server into external;
 ```
 
-<Admonition type="tip">
+<Admonition type="note">
 
 This example maps the `authenticated` role in Supabase to the `postgres` user in the external DB. In production, it's best to create a custom user on the external DB that has the minimum permissions necessary to access the information you need.
 

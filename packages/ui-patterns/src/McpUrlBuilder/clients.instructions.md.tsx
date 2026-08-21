@@ -88,6 +88,47 @@ export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
       </>
     ),
   },
+  grok: {
+    primary: ({ url }) => (
+      <>
+        <paragraph>Add the Supabase MCP server to Grok:</paragraph>
+        <code lang="bash" value={MCP_CLI_COMMANDS['grok'].install!(url)} />
+      </>
+    ),
+    alternate: () => (
+      <>
+        <paragraph>
+          The command writes the server to your user config (
+          <inlineCode value="~/.grok/config.toml" />
+          ), making it available across all your projects. Start Grok and complete the Supabase
+          OAuth flow when prompted on first use.
+        </paragraph>
+        <paragraph>
+          Verify the connection by running <inlineCode value="/mcps" /> inside a Grok session, or{' '}
+          <inlineCode value="grok mcp doctor supabase" /> from your terminal.
+        </paragraph>
+      </>
+    ),
+  },
+  kimi: {
+    alternate: () => (
+      <>
+        <paragraph>
+          Kimi Code reads <inlineCode value=".kimi-code/mcp.json" /> from your current working
+          directory. To make the server available in every project, place the file under{' '}
+          <inlineCode value="$KIMI_CODE_HOME" /> instead, which defaults to{' '}
+          <inlineCode value="~/.kimi-code" />.
+        </paragraph>
+        <paragraph>
+          Restart Kimi Code or start a new session to load the server, then check its status by
+          running:
+        </paragraph>
+        <code lang="bash" value="/mcp" />
+        <paragraph>To configure MCP servers and complete the Supabase OAuth login, run:</paragraph>
+        <code lang="bash" value="/mcp-config" />
+      </>
+    ),
+  },
   'gemini-cli': {
     primary: ({ isPlatform, url }) => (
       <>
@@ -167,21 +208,6 @@ export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
           alt="Antigravity MCP server settings showing the Authenticate button next to the Supabase server"
         />
       </>
-    ),
-  },
-  windsurf: {
-    primary: () => (
-      <blockquote data={{ callout: 'warning' }}>
-        <paragraph>
-          Ensure you are running Windsurf version <inlineCode value="0.1.37" /> or higher.
-        </paragraph>
-      </blockquote>
-    ),
-    alternate: () => (
-      <paragraph>
-        Windsurf does not currently support remote MCP servers over HTTP transport. You need to use
-        the mcp-remote package as a proxy.
-      </paragraph>
     ),
   },
   goose: {

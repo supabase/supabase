@@ -1,4 +1,4 @@
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, mergeRefs, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, mergeRefs, useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { XIcon } from 'lucide-react'
 import Head from 'next/head'
@@ -27,7 +27,7 @@ import {
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { useMainScrollContainer, useSetMainScrollContainer } from '../MainScrollContainerContext'
 import { useMobileSheet } from '../Navigation/NavigationBar/MobileSheetContext'
-import ProductMenuBar from '../Navigation/ProductMenuBar'
+import { ProductMenuBar } from '../Navigation/ProductMenuBar'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
 import { getSectionKeyFromPathname, MobileMenuContent } from './LayoutHeader/MobileMenuContent'
@@ -43,7 +43,6 @@ import { UpgradingState } from './UpgradingState'
 import { CreateBranchModal } from '@/components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from '@/components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { BannerFreeMicroUpgrade } from '@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade'
-import { BannerUnifiedLogs } from '@/components/ui/BannerStack/Banners/BannerUnifiedLogs'
 import { BANNER_ID, useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import PartnerIcon from '@/components/ui/PartnerIcon'
@@ -106,6 +105,7 @@ export interface ProjectLayoutProps {
   isLoading?: boolean
   isBlocking?: boolean
   product?: string
+  productMenuBadge?: ReactNode
   productMenu?: ReactNode
   browserTitle?: {
     entity?: string
@@ -124,6 +124,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       isLoading = false,
       isBlocking = true,
       product = '',
+      productMenuBadge,
       productMenu,
       browserTitle,
       children,
@@ -153,10 +154,6 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const showUpgradeBanner = isNanoCompute && isComputeNearExhaustion
     const [isFreeMicroUpgradeBannerDismissed] = useLocalStorageQuery(
       LOCAL_STORAGE_KEYS.FREE_MICRO_UPGRADE_BANNER_DISMISSED(selectedProject?.ref ?? ''),
-      false
-    )
-    const [isUnifiedLogsBannerDismissed] = useLocalStorageQuery(
-      LOCAL_STORAGE_KEYS.UNIFIED_LOGS_BANNER_DISMISSED,
       false
     )
     const [isProjectIntegrationBannerDismissed, setIsProjectIntegrationBannerDismissed] =
@@ -236,20 +233,6 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       dismissBanner,
     ])
 
-    useEffect(() => {
-      if (!selectedProject?.ref) return
-      if (IS_PLATFORM && !isUnifiedLogsBannerDismissed) {
-        addBanner({
-          id: BANNER_ID.UNIFIED_LOGS,
-          isDismissed: false,
-          content: <BannerUnifiedLogs />,
-          priority: 1,
-        })
-      } else {
-        dismissBanner(BANNER_ID.UNIFIED_LOGS)
-      }
-    }, [selectedProject?.ref, isUnifiedLogsBannerDismissed, addBanner, dismissBanner])
-
     useLayoutEffect(() => {
       const unregister = registerOpenMenu(() => {
         setMobileSheetContent(
@@ -298,7 +281,11 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                       isBlocking={isBlocking}
                       productMenu={productMenu}
                     >
-                      <ProductMenuBar title={product} className={productMenuClassName}>
+                      <ProductMenuBar
+                        title={product}
+                        titleBadge={productMenuBadge}
+                        className={productMenuClassName}
+                      >
                         {productMenu}
                       </ProductMenuBar>
                     </MenuBarWrapper>

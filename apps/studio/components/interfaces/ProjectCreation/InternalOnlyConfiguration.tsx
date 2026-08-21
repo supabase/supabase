@@ -1,14 +1,15 @@
 import { useParams } from 'common'
+import { useRef } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { type CloudProvider } from 'shared-data'
-import { Card, CardContent, FormControl, FormField, Input } from 'ui'
+import { FormControl, FormField, Input, useWatch } from 'ui'
 import { CollapsibleCardSection } from 'ui-patterns/CollapsibleCardSection'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CloudProviderSelector } from './CloudProviderSelector'
-import { HighAvailabilityInput } from './HighAvailabilityInput'
 import { PostgresVersionSelector } from './PostgresVersionSelector'
 import { CreateProjectForm } from './ProjectCreation.schema'
+import Panel from '@/components/ui/Panel'
 
 interface InternalOnlyConfigurationProps {
   form: UseFormReturn<CreateProjectForm>
@@ -17,41 +18,45 @@ interface InternalOnlyConfigurationProps {
 export const InternalOnlyConfiguration = ({ form }: InternalOnlyConfigurationProps) => {
   const { slug } = useParams()
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
+  const highAvailability = useWatch({ control: form.control, name: 'highAvailability' })
+  // Held here (outside the collapsible content) so the selector's last valid
+  // selection survives the section being collapsed and reopened.
+  const lastValidPostgresVersionSelection = useRef('')
 
   return (
-    <Card className="border-0 border-b rounded-none">
-      <CardContent>
-        <CollapsibleCardSection
-          title="Internal-only Configuration"
-          description="These settings are only visible to internal staff"
-        >
-          <div className="flex flex-col gap-y-6">
-            <div className="flex flex-col gap-y-4">
-              <FormField
-                control={form.control}
-                name="postgresVersionSelection"
-                render={({ field }) => (
-                  <PostgresVersionSelector
-                    field={field}
-                    form={form}
-                    cloudProvider={form.getValues('cloudProvider') as CloudProvider}
-                    organizationSlug={slug}
-                    dbRegion={form.getValues('dbRegion')}
-                  />
-                )}
-              />
+    <Panel.Content>
+      <CollapsibleCardSection
+        title="Internal-only Configuration"
+        description="These settings are only visible to internal staff"
+      >
+        <div className="flex flex-col gap-y-6">
+          <div className="flex flex-col gap-y-4">
+            <FormField
+              control={form.control}
+              name="postgresVersionSelection"
+              render={({ field }) => (
+                <PostgresVersionSelector
+                  field={field}
+                  form={form}
+                  cloudProvider={form.getValues('cloudProvider') as CloudProvider}
+                  organizationSlug={slug}
+                  dbRegion={form.getValues('dbRegion')}
+                  disabled={highAvailability}
+                  lastValidSelectionRef={lastValidPostgresVersionSelection}
+                />
+              )}
+            />
+          </div>
 
-              <HighAvailabilityInput form={form} />
-            </div>
+          {showNonProdFields && (
+            <div>
+              <p className="text-xs text-foreground-lighter mb-6">
+                The settings below are only applicable for local/staging projects
+              </p>
+              <div className="flex flex-col gap-y-4">
+                <CloudProviderSelector form={form} />
 
-            {showNonProdFields && (
-              <div>
-                <p className="text-xs text-foreground-lighter mb-6">
-                  The settings below are only applicable for local/staging projects
-                </p>
-                <div className="flex flex-col gap-y-4">
-                  <CloudProviderSelector form={form} />
-
+                {!highAvailability && (
                   <FormField
                     control={form.control}
                     name="postgresVersion"
@@ -67,28 +72,28 @@ export const InternalOnlyConfiguration = ({ form }: InternalOnlyConfigurationPro
                       </FormItemLayout>
                     )}
                   />
+                )}
 
-                  <FormField
-                    control={form.control}
-                    name="instanceType"
-                    render={({ field }) => (
-                      <FormItemLayout
-                        label="Custom instance type"
-                        layout="horizontal"
-                        description="Specify a custom instance type."
-                      >
-                        <FormControl>
-                          <Input placeholder="e.g t3.nano" {...field} autoComplete="off" />
-                        </FormControl>
-                      </FormItemLayout>
-                    )}
-                  />
-                </div>
+                <FormField
+                  control={form.control}
+                  name="instanceType"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label="Custom instance type"
+                      layout="horizontal"
+                      description="Specify a custom instance type."
+                    >
+                      <FormControl>
+                        <Input placeholder="e.g t3.nano" {...field} autoComplete="off" />
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
               </div>
-            )}
-          </div>
-        </CollapsibleCardSection>
-      </CardContent>
-    </Card>
+            </div>
+          )}
+        </div>
+      </CollapsibleCardSection>
+    </Panel.Content>
   )
 }
