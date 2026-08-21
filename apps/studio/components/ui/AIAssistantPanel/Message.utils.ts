@@ -143,6 +143,19 @@ export const updateNotebookInputSchema = z.object({
 
 export const notebookToolOutputSchema = z.object({ id: z.string(), name: z.string() })
 
+export const openPullRequestInputSchema = z.object({
+  title: z.string(),
+  body: z.string().optional(),
+  patch: z.string(),
+})
+
+export const openPullRequestOutputSchema = z.object({
+  url: z.string().url(),
+  number: z.number(),
+  branch: z.string(),
+  sha: z.string(),
+})
+
 export const rateMessageResponseSchema = z.object({
   category: z.enum([
     'sql_generation',

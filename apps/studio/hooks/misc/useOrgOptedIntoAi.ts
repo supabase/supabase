@@ -32,6 +32,9 @@ export const getAiOptInLevel = (tags: string[] | undefined): AiOptInLevel => {
   }
 }
 
+export const getAiRepoAccess = (tags: string[] | undefined) =>
+  tags?.includes(OPT_IN_TAGS.AI_REPO) ?? false
+
 /**
  * Determines if the organization has opted into *any* level of AI features (schema or schema_and_log or schema_and_log_and_data).
  * This is primarily for backward compatibility.
@@ -50,6 +53,7 @@ export function useOrgAiOptInLevel(): {
   aiOptInLevel: AiOptInLevel
   includeSchemaMetadata: boolean
   isHipaaProjectDisallowed: boolean
+  hasRepoAccess: boolean
 } {
   const { data: selectedProject } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
@@ -80,5 +84,7 @@ export function useOrgAiOptInLevel(): {
     aiOptInLevel,
     includeSchemaMetadata,
     isHipaaProjectDisallowed: preventProjectFromUsingAI,
+    hasRepoAccess:
+      !preventProjectFromUsingAI && aiOptInLevel !== 'disabled' && getAiRepoAccess(optInTags),
   }
 }

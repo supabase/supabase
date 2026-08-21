@@ -4,7 +4,7 @@ import { checkEntitlement } from '@/data/entitlements/entitlements-query'
 import { getOrganizations } from '@/data/organizations/organizations-query'
 import { getProjectDetail } from '@/data/projects/project-detail-query'
 import { getOrgSubscription } from '@/data/subscriptions/org-subscription-query'
-import { getAiOptInLevel, type AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { getAiOptInLevel, getAiRepoAccess, type AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 export type AIDetails = {
   aiOptInLevel: AiOptInLevel
@@ -14,6 +14,8 @@ export type AIDetails = {
   planId: string | undefined
   region: string | undefined
   isSensitive: boolean | null | undefined
+  parentProjectRef: string | undefined
+  hasRepoAccess: boolean
 }
 
 // Resolves the AI opt-in level, model access and tracing inputs for one org/project pair.
@@ -33,15 +35,22 @@ export const getAIDetails = async ({
     ...(authorization && { Authorization: authorization }),
   }
 
-  const [organizations, subscription, advanceModelAccess, project, projectSettings] =
-    await Promise.all([
-      getOrganizations({ headers }),
-      getOrgSubscription({ orgSlug }, undefined, headers),
-      checkEntitlement(orgSlug, 'assistant.advance_model', undefined, headers),
-      // skipWake: only organization_id and region are needed, neither requires a running project
-      getProjectDetail({ ref: projectRef, skipWake: true }, undefined, headers),
-      getProjectSettings({ projectRef }, undefined, headers),
-    ])
+  const [
+    organizations,
+    subscription,
+    advanceModelAccess,
+    repoAccessEntitlement,
+    project,
+    projectSettings,
+  ] = await Promise.all([
+    getOrganizations({ headers }),
+    getOrgSubscription({ orgSlug }, undefined, headers),
+    checkEntitlement(orgSlug, 'assistant.advance_model', undefined, headers),
+    checkEntitlement(orgSlug, 'assistant.repo_access', undefined, headers),
+    // skipWake: only organization_id and region are needed, neither requires a running project
+    getProjectDetail({ ref: projectRef, skipWake: true }, undefined, headers),
+    getProjectSettings({ projectRef }, undefined, headers),
+  ])
 
   const selectedOrg = organizations.find((org) => org.slug === orgSlug)
   const region = project?.region
@@ -59,6 +68,8 @@ export const getAIDetails = async ({
       planId: undefined,
       region,
       isSensitive,
+      parentProjectRef: project?.parent_project_ref,
+      hasRepoAccess: false,
     }
   }
 
@@ -66,14 +77,20 @@ export const getAIDetails = async ({
 
   // Mirrors the client-side gate in useOrgAiOptInLevel, which had no server-side equivalent
   const isRestrictedByHipaa = hasHipaaAddon && isSensitive !== false
+  const aiOptInLevel = isRestrictedByHipaa ? 'disabled' : getAiOptInLevel(selectedOrg.opt_in_tags)
 
   return {
-    aiOptInLevel: isRestrictedByHipaa ? 'disabled' : getAiOptInLevel(selectedOrg.opt_in_tags),
+    aiOptInLevel,
     hasAccessToAdvanceModel: advanceModelAccess.hasAccess,
     hasHipaaAddon,
     orgId: selectedOrg.id,
     planId: selectedOrg.plan.id,
     region,
     isSensitive,
+    parentProjectRef: project.parent_project_ref,
+    hasRepoAccess:
+      aiOptInLevel !== 'disabled' &&
+      getAiRepoAccess(selectedOrg.opt_in_tags) &&
+      repoAccessEntitlement.hasAccess,
   }
 }

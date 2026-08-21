@@ -22,6 +22,8 @@ export const getTools = async ({
   supportMode,
   isExplorerEnabled,
   signal,
+  repoTools,
+  hasRepoAccess = false,
 }: {
   projectRef: string
   connectionString: string
@@ -37,6 +39,8 @@ export const getTools = async ({
   // Required: tools fetched from the remote MCP server hold an HTTP connection
   // that is closed when this signal aborts (i.e. when the request ends).
   signal: AbortSignal
+  repoTools?: ToolSet
+  hasRepoAccess?: boolean
 }) => {
   // Always include studio tools
   let tools: ToolSet = getStudioTools({ projectRef, connectionString, authorization, aiOptInLevel })
@@ -80,12 +84,15 @@ export const getTools = async ({
       ...getReportTools({ projectRef, authorization }),
       ...(isExplorerEnabled ? getNotebookTools({ projectRef, authorization }) : {}),
       ...(baseUrl ? getIncidentTools({ baseUrl }) : {}),
+      ...repoTools,
     }
   }
 
   // Filter all tools based on the (potentially modified) AI opt-in level
   const toolsWithSupport = supportMode ? { ...tools, ...getSupportLifecycleTools() } : tools
-  const filteredTools: ToolSet = filterToolsByOptInLevel(toolsWithSupport, aiOptInLevel)
+  const filteredTools: ToolSet = filterToolsByOptInLevel(toolsWithSupport, aiOptInLevel, {
+    hasRepoAccess,
+  })
 
   return filteredTools
 }

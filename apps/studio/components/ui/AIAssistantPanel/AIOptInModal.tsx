@@ -23,7 +23,8 @@ interface AIOptInModalProps {
 }
 
 export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
-  const { form, onSubmit, isUpdating, currentOptInLevel } = useAIOptInForm(onCancel)
+  const { form, onSubmit, isUpdating, currentOptInLevel, currentRepoAccess } =
+    useAIOptInForm(onCancel)
   const { can: canUpdateOrganization } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'organizations'
@@ -37,9 +38,9 @@ export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
 
   useEffect(() => {
     if (visible) {
-      form.reset({ aiOptInLevel: currentOptInLevel })
+      form.reset({ aiOptInLevel: currentOptInLevel, hasRepoAccess: currentRepoAccess })
     }
-  }, [visible, currentOptInLevel, form])
+  }, [visible, currentOptInLevel, currentRepoAccess, form])
 
   return (
     <Dialog open={visible} onOpenChange={onOpenChange}>

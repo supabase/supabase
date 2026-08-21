@@ -71,6 +71,11 @@
         "OPENAI_API_KEY",
         "BRAINTRUST_API_KEY",
         "BRAINTRUST_PROJECT_ID",
+        "TOOL_APPROVAL_SECRET",
+        "VERCEL_OIDC_TOKEN",
+        "VERCEL_TEAM_ID",
+        "VERCEL_PROJECT_ID",
+        "VERCEL_TOKEN",
         // Gates the dashboard assistant between the remote MCP server and the
         // legacy in-process one (see lib/ai/tools/mcp-tools.ts).
         "USE_REMOTE_MCP",
@@ -130,12 +135,7 @@
         "S3_PROTOCOL_ACCESS_KEY_ID",
         "S3_PROTOCOL_ACCESS_KEY_SECRET",
       ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**",
-        "!.next/dev/**/*",
-        "dist/**",
-      ],
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*", "dist/**"],
     },
   },
 }

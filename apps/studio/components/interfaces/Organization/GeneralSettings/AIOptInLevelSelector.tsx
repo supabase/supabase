@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
-import { Control } from 'react-hook-form'
-import { FormField, RadioGroup, RadioGroupItem } from 'ui'
+import { Control, useWatch } from 'react-hook-form'
+import { FormField, RadioGroup, RadioGroupItem, Switch } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { OptInToOpenAIToggle } from './OptInToOpenAIToggle'
@@ -20,6 +20,7 @@ export const AIOptInLevelSelector = ({
   label,
   layout = 'vertical',
 }: AIOptInLevelSelectorProps) => {
+  const aiOptInLevel = useWatch({ control, name: 'aiOptInLevel' })
   const {
     aiOptInLevelDisabled,
     aiOptInLevelSchema,
@@ -123,6 +124,27 @@ export const AIOptInLevelSelector = ({
                 </div>
               ))}
             </RadioGroup>
+          )}
+        />
+        <FormField
+          control={control}
+          name="hasRepoAccess"
+          render={({ field }) => (
+            <div className="flex items-start justify-between gap-6 border-t pt-4">
+              <div>
+                <p className="text-sm font-medium text-foreground">Repository access</p>
+                <p className="text-sm text-foreground-light">
+                  Allow the Assistant to read the connected GitHub repository and propose changes
+                  through pull requests.
+                </p>
+              </div>
+              <Switch
+                aria-label="Repository access"
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                disabled={disabled || aiOptInLevel === 'disabled'}
+              />
+            </div>
           )}
         />
       </div>

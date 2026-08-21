@@ -1,11 +1,17 @@
 import pgMeta from '@supabase/pg-meta'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import type { JwtPayload } from '@supabase/supabase-js'
 import { pipeUIMessageStreamToResponse, safeValidateUIMessages, toUIMessageStream } from 'ai'
 import { IS_PLATFORM } from 'common'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
+import { getBranches } from '@/data/branches/branches-query'
+import { createGitHubRepoArchive } from '@/data/integrations/github-connection-repo'
+import { getGitHubConnections } from '@/data/integrations/github-connections-query'
+import { getPermissions } from '@/data/permissions/permissions-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { doPermissionsCheck } from '@/hooks/misc/useCheckPermissions'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { getAIDetails } from '@/lib/ai/ai-details'
 import { NO_SCHEMA_ACCESS_MESSAGE } from '@/lib/ai/assistant-context'
@@ -25,7 +31,11 @@ import {
   isKnownAssistantModelId,
   type AssistantModelId,
 } from '@/lib/ai/model.utils'
+import { resolveRepoRef } from '@/lib/ai/repo-ref'
+import { isSandboxConfigured } from '@/lib/ai/sandbox/sandbox-config'
+import { createLazySandboxSession } from '@/lib/ai/sandbox/vercel-sandbox-session'
 import { getTools } from '@/lib/ai/tools'
+import { getRepoTools } from '@/lib/ai/tools/repo-tools'
 import { apiWrapper } from '@/lib/api/apiWrapper'
 import { executeQuery } from '@/lib/api/self-hosted/query'
 import { getURL } from '@/lib/helpers'
@@ -126,6 +136,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
   let projectRegion: string | undefined
   let orgId: number | undefined
   let planId: string | undefined
+  let parentProjectRef: string | undefined
+  let hasRepoAccess = false
 
   if (!IS_PLATFORM) {
     aiOptInLevel = 'schema'
@@ -143,6 +155,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       planId = aiDetails.planId
       projectIsSensitive = aiDetails.isSensitive
       projectRegion = aiDetails.region
+      parentProjectRef = aiDetails.parentProjectRef
+      hasRepoAccess = aiDetails.hasRepoAccess
     } catch (error) {
       return res.status(400).json({
         error: 'There was an error fetching your organization details',
@@ -180,6 +194,50 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     // is what tears down the remote MCP connection opened in getTools.
     res.on('close', () => abortController.abort())
 
+    let sandbox: ReturnType<typeof createLazySandboxSession> | undefined
+    let repoTools: ReturnType<typeof getRepoTools> | undefined
+
+    if (IS_PLATFORM && hasRepoAccess && isSandboxConfigured() && orgId && chatId && authorization) {
+      try {
+        const headers = { 'Content-Type': 'application/json', Authorization: authorization }
+        const rootProjectRef = parentProjectRef ?? projectRef
+        const [connections, branches, permissions] = await Promise.all([
+          getGitHubConnections({ organizationId: orgId }, abortController.signal, headers),
+          getBranches({ projectRef: rootProjectRef }, abortController.signal).catch(() => []),
+          getPermissions(abortController.signal, headers),
+        ])
+        const connection = connections.find(({ project }) => project.ref === rootProjectRef)
+
+        if (connection) {
+          const currentBranch = branches?.find((branch) => branch.project_ref === projectRef)
+          const ref = resolveRepoRef({ currentBranch, branches })
+          const archive = await createGitHubRepoArchive({
+            connectionId: connection.id,
+            ref: ref ?? undefined,
+            authorization,
+            signal: abortController.signal,
+          })
+          sandbox = createLazySandboxSession({ projectRef, chatId, archive })
+          repoTools = getRepoTools({
+            connectionId: connection.id,
+            authorization,
+            baseRef: archive.ref,
+            headBranch: `supabase-assistant/${chatId.replace(/[^a-zA-Z0-9_-]/g, '-').slice(0, 48)}`,
+            canOpenPullRequest: doPermissionsCheck(
+              permissions,
+              PermissionAction.UPDATE,
+              'integrations.github_connections',
+              undefined,
+              orgSlug,
+              rootProjectRef
+            ),
+          })
+        }
+      } catch (error) {
+        console.error('Failed to prepare connected repository:', error)
+      }
+    }
+
     const tools = await getTools({
       projectRef,
       connectionString,
@@ -190,6 +248,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       supportMode,
       isExplorerEnabled: explorerEnabled,
       signal: abortController.signal,
+      repoTools,
+      hasRepoAccess: Boolean(repoTools),
     })
 
     // Get a list of all schemas to add to context
@@ -242,6 +302,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       onSpanCreated: (spanId) => {
         res.setHeader('x-braintrust-span-id', spanId)
       },
+      sandbox,
     })
 
     const stream = toUIMessageStream({
