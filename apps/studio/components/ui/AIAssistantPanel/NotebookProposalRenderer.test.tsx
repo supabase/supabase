@@ -446,6 +446,34 @@ describe('NotebookProposalRenderer', () => {
     expect(screen.queryByText('Preview unavailable')).not.toBeInTheDocument()
   })
 
+  it('falls back to the compact completed body when the output id does not match the requested notebook', () => {
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="output-available"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
+        }}
+        output={{
+          id: 'some-other-notebook-id',
+          name: 'Signup funnel',
+          previous_content: {
+            schema_version: 1,
+            cells: [
+              { _tag: 'markdown_cell', _id: 'cell-1', text: 'hello' },
+              { _tag: 'markdown_cell', _id: 'cell-2', text: 'world' },
+            ],
+          },
+        }}
+      />
+    )
+
+    expect(screen.getByText('Notebook updated: Signup funnel')).toBeInTheDocument()
+    expect(screen.queryByText('−1')).not.toBeInTheDocument()
+  })
+
   it('derives the diff against live content for a denied update', async () => {
     mockContentItem(mockNotebookRow())
 

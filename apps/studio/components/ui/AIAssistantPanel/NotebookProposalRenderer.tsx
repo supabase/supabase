@@ -343,7 +343,11 @@ function UpdateNotebookProposal({
   if (isCompleted) {
     const parsedOutput = updateNotebookToolOutputSchema.safeParse(output)
     const notebookName = parsedOutput.success ? parsedOutput.data.name : undefined
-    const previousContent = parsedOutput.success ? parsedOutput.data.previous_content : undefined
+    const isOutputForRequestedNotebook =
+      parsedOutput.success && parsedOutput.data.id === parsedInput.data.id
+    const previousContent = isOutputForRequestedNotebook
+      ? parsedOutput.data.previous_content
+      : undefined
     const diff = previousContent
       ? deriveNotebookDiff(previousContent, parsedInput.data.operations)
       : undefined
