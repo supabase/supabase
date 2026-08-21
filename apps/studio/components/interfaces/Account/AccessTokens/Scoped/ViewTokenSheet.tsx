@@ -182,7 +182,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
 
             {token && (
               <>
-                {!hasNoBoundResources && (
+                {hasNoBoundResources && (
                   <Admonition
                     type="destructive"
                     title="This token's resources no longer exist"
