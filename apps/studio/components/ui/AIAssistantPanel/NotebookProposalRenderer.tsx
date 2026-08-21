@@ -13,6 +13,7 @@ import {
   createNotebookInputSchema,
   notebookToolOutputSchema,
   updateNotebookInputSchema,
+  updateNotebookToolOutputSchema,
 } from './Message.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import {
@@ -340,8 +341,31 @@ function UpdateNotebookProposal({
   }
 
   if (isCompleted) {
-    const parsedOutput = notebookToolOutputSchema.safeParse(output)
+    const parsedOutput = updateNotebookToolOutputSchema.safeParse(output)
     const notebookName = parsedOutput.success ? parsedOutput.data.name : undefined
+    const isOutputForRequestedNotebook =
+      parsedOutput.success && parsedOutput.data.id === parsedInput.data.id
+    const previousContent = isOutputForRequestedNotebook
+      ? parsedOutput.data.previous_content
+      : undefined
+    const diff = previousContent
+      ? deriveNotebookDiff(previousContent, parsedInput.data.operations)
+      : undefined
+
+    if (diff?.success) {
+      return (
+        <NotebookConfirm
+          mode="update"
+          confirmState={confirmState}
+          footerAction={footerAction}
+          message={`Assistant wants to update "${notebookName}"`}
+          onApprove={onApprove}
+          onDeny={onDeny}
+        >
+          <AssistantNotebookPreview entries={diff.entries} mode="update" title={notebookName} />
+        </NotebookConfirm>
+      )
+    }
 
     return (
       <NotebookConfirm
