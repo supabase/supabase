@@ -84,7 +84,7 @@ export function useSelectedGitHubConfigDrift() {
     isPending: activeQueries.some((query) => query.isPending),
     isFetching: activeQueries.some((query) => query.isFetching),
     isError: activeQueries.some((query) => query.isError),
-    error: activeQueries.some((query) => query.error),
+    error: activeQueries.find((query) => query.error)?.error,
     hasConfigurationIssues: isReady && issueCount > 0,
     unmanagedFields: summary.unmanagedFields,
     summary,
