@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
 import {
   countConfiguredInCategory,
@@ -34,40 +35,35 @@ export const PermissionsAccordion = ({
   const riskyPreset = activePreset?.isRisky === true ? activePreset : undefined
 
   return (
-    <div className="space-y-3 px-5 sm:px-6 py-6">
-      <div className="space-y-3">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h3 className="text-sm text-foreground">Permissions</h3>
-            <p className="text-foreground-lighter text-sm">
-              Grant the minimum access this token needs. Everything defaults to None. Permissions
-              follow your role in the organizations and projects you're a member of — see{' '}
-              <InlineLink href={`${DOCS_URL}/guides/platform/access-control`}>
-                access control
-              </InlineLink>{' '}
-              for how roles work.
-            </p>
-          </div>
-          <div className="shrink-0">
-            <PermissionPresetSelect selection={selection} onApplyPreset={onApplyPreset} />
-          </div>
-        </div>
-        {riskyPreset !== undefined && (
-          <Admonition
-            type="warning"
-            className="mb-0"
-            title={riskyPreset.label}
-            description={riskyPreset.description}
-          />
-        )}
-      </div>
-
-      <Accordion
-        type="multiple"
-        value={openCategories}
-        onValueChange={setOpenCategories}
-        className="mt-2"
+    <section className="space-y-4 px-5 sm:px-6 py-6">
+      <FormLayout
+        layout="flex-row-reverse"
+        label="Permissions"
+        description={
+          <p className="text-foreground-lighter text-sm">
+            Grant the minimum access this token needs. Everything defaults to None. Permissions
+            follow your role in the organizations and projects you're a member of — see{' '}
+            <InlineLink href={`${DOCS_URL}/guides/platform/access-control`}>
+              access control
+            </InlineLink>{' '}
+            for how roles work.
+          </p>
+        }
       >
+        <PermissionPresetSelect selection={selection} onApplyPreset={onApplyPreset} />
+      </FormLayout>
+
+      {riskyPreset !== undefined && (
+        <Admonition
+          type="warning"
+          // Groups the warning with the header above it, rather than the list it sits on top of.
+          className="mb-4"
+          title={riskyPreset.label}
+          description={riskyPreset.description}
+        />
+      )}
+
+      <Accordion type="multiple" value={openCategories} onValueChange={setOpenCategories}>
         {PERMISSION_CATALOG_BY_CATEGORY.map((category, index) => {
           const configuredCount = countConfiguredInCategory(selection, category.key)
           return (
@@ -111,6 +107,6 @@ export const PermissionsAccordion = ({
           )
         })}
       </Accordion>
-    </div>
+    </section>
   )
 }

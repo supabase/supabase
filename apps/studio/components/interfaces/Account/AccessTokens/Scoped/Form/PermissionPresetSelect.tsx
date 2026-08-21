@@ -28,14 +28,18 @@ export const PermissionPresetSelect = ({
   }
 
   return (
-    <>
+    // A div root so FormLayout's flex-row-reverse column stretches the trigger to its full width,
+    // lining it up with the resource selects in the section above.
+    <div>
       {/* An empty value leaves every option unchecked, which is how "Custom" reads: a state the
           selection can land in, never one you can pick. */}
       <Select value={activePreset?.id ?? ''} onValueChange={handleSelectPreset}>
-        <SelectTrigger className="w-auto" aria-label="Permission preset">
+        <SelectTrigger aria-label="Permission preset">
           <span>Preset · {activePreset?.label ?? 'Custom'}</span>
         </SelectTrigger>
-        <SelectContent className="max-w-80">
+        {/* Pinned to the trigger width, or the Full access description would stretch the dropdown
+            far wider than the selects above. */}
+        <SelectContent className="w-(--radix-select-trigger-width)">
           {PERMISSION_PRESETS.map((preset) => (
             <SelectItem
               key={preset.id}
@@ -64,6 +68,6 @@ export const PermissionPresetSelect = ({
       <span className="sr-only" role="status">
         {announcement}
       </span>
-    </>
+    </div>
   )
 }
