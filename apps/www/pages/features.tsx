@@ -207,20 +207,16 @@ function FeaturesPage() {
                 />
               </InputGroup>
               <div className="hidden md:flex flex-col gap-2.5">
-                <div className="flex items-center gap-2 text-foreground-light hover:text-foreground cursor-pointer! hover:cursor-pointer! transition-colors">
+                <label className="flex cursor-pointer items-center gap-2 text-foreground-light hover:text-foreground transition-colors">
                   <Checkbox
-                    id="self-hosted-filter"
                     checked={showSelfHostedOnly}
                     onCheckedChange={() => setShowSelfHostedOnly(!showSelfHostedOnly)}
                     className="[&_input]:m-0"
                   />
-                  <label
-                    htmlFor="self-hosted-filter"
-                    className="text-sm leading-none! flex-1 text-left"
-                  >
+                  <span className="text-sm leading-none! flex-1 text-left">
                     Show only self-hosted features
-                  </label>
-                </div>
+                  </span>
+                </label>
               </div>
               <div className="hidden md:flex flex-col gap-4">
                 <h2 className="text-sm text-foreground-lighter">Filter by tags:</h2>
@@ -228,23 +224,19 @@ function FeaturesPage() {
                   {products
                     .sort((a, b) => (a.toLowerCase() > b.toLowerCase() ? 1 : -1))
                     .map((product) => (
-                      <div
+                      <label
                         key={product}
-                        className="flex items-center gap-2 text-foreground-light hover:text-foreground cursor-pointer! hover:cursor-pointer! transition-colors"
+                        className="flex cursor-pointer items-center gap-2 text-foreground-light hover:text-foreground transition-colors"
                       >
                         <Checkbox
-                          id={product}
                           checked={selectedProducts.includes(product)}
                           onCheckedChange={() => handleProductChange(product)}
                           className="[&_input]:m-0"
                         />
-                        <label
-                          htmlFor={product}
-                          className="text-sm leading-none! capitalize flex-1 text-left"
-                        >
+                        <span className="text-sm leading-none! capitalize flex-1 text-left">
                           {product}
-                        </label>
-                      </div>
+                        </span>
+                      </label>
                     ))}
                 </div>
                 <div className="text-foreground-muted text-xs">
@@ -278,12 +270,13 @@ function FeaturesPage() {
                 <button
                   tabIndex={0}
                   title="Grid view"
+                  aria-pressed={viewMode === 'grid'}
                   onClick={() => setViewMode('grid')}
                   className={cn(
-                    'relative flex items-center justify-center w-8 h-8 cursor-pointer rounded-l-lg focus-visible:z-10 focus-ring',
+                    'relative flex items-center justify-center w-8 h-8 rounded-l-lg focus-visible:z-10 focus-ring',
                     viewMode === 'grid'
-                      ? 'bg-surface-300 text-foreground'
-                      : 'bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
+                      ? 'cursor-default bg-surface-400 text-foreground'
+                      : 'cursor-pointer bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
                   )}
                 >
                   <LayoutGrid size={14} />
@@ -291,12 +284,13 @@ function FeaturesPage() {
                 <button
                   tabIndex={0}
                   title="Matrix view"
+                  aria-pressed={viewMode === 'matrix'}
                   onClick={() => setViewMode('matrix')}
                   className={cn(
-                    'relative flex items-center justify-center w-8 h-8 cursor-pointer border-l border-muted rounded-r-lg focus-visible:z-10 focus-ring',
+                    'relative flex items-center justify-center w-8 h-8 border-l border-muted rounded-r-lg focus-visible:z-10 focus-ring',
                     viewMode === 'matrix'
-                      ? 'bg-surface-300 text-foreground'
-                      : 'bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
+                      ? 'cursor-default bg-surface-400 text-foreground'
+                      : 'cursor-pointer bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
                   )}
                 >
                   <Table2 size={14} />

@@ -312,12 +312,13 @@ export default function IntegrationsContent({
                 <button
                   tabIndex={0}
                   title="Grid view"
+                  aria-pressed={viewMode === 'grid'}
                   onClick={() => setFilters({ view: 'grid' })}
                   className={cn(
-                    'relative flex items-center justify-center w-8 h-8 cursor-pointer rounded-l-lg focus-visible:z-10 focus-ring',
+                    'relative flex items-center justify-center w-8 h-8 rounded-l-lg focus-visible:z-10 focus-ring',
                     viewMode === 'grid'
-                      ? 'bg-surface-300 text-foreground'
-                      : 'bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
+                      ? 'cursor-default bg-surface-400 text-foreground'
+                      : 'cursor-pointer bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
                   )}
                 >
                   <LayoutGrid size={14} />
@@ -325,12 +326,13 @@ export default function IntegrationsContent({
                 <button
                   tabIndex={0}
                   title="List view"
+                  aria-pressed={viewMode === 'list'}
                   onClick={() => setFilters({ view: 'list' })}
                   className={cn(
-                    'relative flex items-center justify-center w-8 h-8 cursor-pointer border-l border-muted rounded-r-lg focus-visible:z-10 focus-ring',
+                    'relative flex items-center justify-center w-8 h-8 border-l border-muted rounded-r-lg focus-visible:z-10 focus-ring',
                     viewMode === 'list'
-                      ? 'bg-surface-300 text-foreground'
-                      : 'bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
+                      ? 'cursor-default bg-surface-400 text-foreground'
+                      : 'cursor-pointer bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
                   )}
                 >
                   <List size={14} />
