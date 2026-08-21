@@ -23,7 +23,10 @@ import {
 } from 'ui'
 
 import { Markdown } from '@/components/interfaces/Markdown'
-import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
+import {
+  getAddReadReplicaPath,
+  getInfrastructurePath,
+} from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from '@/data/read-replicas/replicas.utils'
@@ -74,7 +77,7 @@ export const DatabaseSelector = ({
 
   const selectedAdditionalOption = additionalOptions.find((x) => x.id === selectedDatabaseId)
 
-  const newReplicaURL = `/project/${projectRef}/database/replication?destinationType=Read+Replica`
+  const newReplicaURL = getAddReadReplicaPath(projectRef)
 
   useEffect(() => {
     if (_selectedDatabaseId && !isForm) state.setSelectedDatabaseId(_selectedDatabaseId)

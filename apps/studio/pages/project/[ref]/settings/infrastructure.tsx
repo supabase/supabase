@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   PageHeader,
   PageHeaderDescription,
@@ -9,11 +10,15 @@ import {
 import { DiskManagementForm } from '@/components/interfaces/DiskManagement/DiskManagementForm'
 import { InfrastructureTopology } from '@/components/interfaces/Settings/Infrastructure/InfrastructureTopology'
 import { ReadReplicasSection } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicasSection'
+import type { RecommendedComputeForReadReplicas } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/recommendCompute'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
 import type { NextPageWithLayout } from '@/types'
 
 const InfrastructureSettings: NextPageWithLayout = () => {
+  const [recommendedCompute, setRecommendedCompute] =
+    useState<RecommendedComputeForReadReplicas | null>(null)
+
   return (
     <>
       <PageHeader size="default">
@@ -28,7 +33,9 @@ const InfrastructureSettings: NextPageWithLayout = () => {
       </PageHeader>
       <DiskManagementForm
         overviewExtra={<InfrastructureTopology />}
-        beforeScaling={<ReadReplicasSection />}
+        beforeScaling={<ReadReplicasSection onRecommendCompute={setRecommendedCompute} />}
+        recommendedCompute={recommendedCompute}
+        onRecommendedComputeApplied={() => setRecommendedCompute(null)}
       />
     </>
   )

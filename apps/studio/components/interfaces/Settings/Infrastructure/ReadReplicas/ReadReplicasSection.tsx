@@ -19,13 +19,18 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { AddReadReplicaSheet } from './AddReadReplicaSheet'
 import { ReadReplicaRow } from './ReadReplicaRow'
 import { REPLICA_STATUS } from './ReadReplicas.constants'
+import type { RecommendedComputeForReadReplicas } from './recommendCompute'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from '@/lib/constants'
 
-export const ReadReplicasSection = () => {
+interface ReadReplicasSectionProps {
+  onRecommendCompute: (size: RecommendedComputeForReadReplicas) => void
+}
+
+export const ReadReplicasSection = ({ onRecommendCompute }: ReadReplicasSectionProps) => {
   const { ref: projectRef } = useParams()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
   const [, setAddReplica] = useQueryState(
@@ -33,6 +38,7 @@ export const ReadReplicasSection = () => {
     parseAsBoolean.withDefault(false).withOptions({
       history: 'push',
       clearOnDefault: true,
+      scroll: false,
     })
   )
 
@@ -147,7 +153,10 @@ export const ReadReplicasSection = () => {
         </PageSectionContent>
       </PageSection>
 
-      <AddReadReplicaSheet onSuccess={() => setStatusRefetchInterval(5000)} />
+      <AddReadReplicaSheet
+        onSuccess={() => setStatusRefetchInterval(5000)}
+        onRecommendCompute={onRecommendCompute}
+      />
     </>
   )
 }
