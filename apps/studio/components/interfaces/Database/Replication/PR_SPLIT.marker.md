@@ -36,7 +36,7 @@ Each slice lists files, rationale, and a suggested commit/PR title. When splitti
 
 - Removed sidebar stepper; single card column (~760px).
 - Header slot via `SteppedFlowHeader` (title, description, optional `actions`).
-- Footer: Back (hidden on step 1), Continue / final action.
+- Footer: Back (hidden on step 1), Next / final action.
 - Quiet step label: `Step X of Y · Label` above the card.
 - `navigationDisabled` disables Back during async work.
 
@@ -74,7 +74,9 @@ Each slice lists files, rationale, and a suggested commit/PR title. When splitti
 **Behaviour:**
 
 - Removed per-card footer: "Cannot be changed after creation" and "Leave feedback".
-- Immutability copy moved to wizard destination step header and review Type field description.
+- Immutability copy lives on the review Type field description (and sheet Type field when used).
+- Select variant can show `ReadReplicasMovedCallout` (replicas live under Infrastructure).
+- Radio variant for the create wizard; no Read Replica option.
 
 ---
 
@@ -135,15 +137,16 @@ Each slice lists files, rationale, and a suggested commit/PR title. When splitti
 **Behaviour:**
 
 - Steps: Destination → Connection → Data → Review.
-- **Validation on Continue only** (default RHF `onSubmit` mode); `form.trigger()` per step on Continue press. No inline errors while typing until Continue is pressed.
-- Continue only disabled on Destination when no type selected; Connection/Data always clickable to surface errors.
+- **Validation on Next only** (default RHF `onSubmit` mode); `form.trigger()` per step on Next press. No inline errors while typing until Next is pressed.
+- Next only disabled on Destination when no type selected; Connection/Data always clickable to surface errors.
 - Step copy on `PIPELINE_CREATE_STEPS`; `PipelineCreateStepDescription` renders plain text (no inline doc links).
 - **Docs button** in header on Connection and Data only (not Destination or Review). URL varies by step via `getPipelineCreateStepDocsUrl`:
   - Connection → destination setup docs (BigQuery-specific or generic configure-a-destination).
   - Data → publication docs.
 - `navigationDisabled` while saving/validating.
-- Destination step header includes immutability: "Cannot be changed after creation."
+- Destination step header: where should this database be replicated?
 - **Destination type change:** Back to destination allows changing type. Switching type resets destination-specific credentials while keeping name, publication, and table sync choices (`mergeFormValuesForDestinationTypeChange`).
+- Create is full-page only. Edit stays on the existing sheet (`?edit=`) for this branch; do not reuse the create wizard for edit.
 
 ---
 
@@ -162,7 +165,7 @@ Each slice lists files, rationale, and a suggested commit/PR title. When splitti
 **Behaviour:**
 
 - Read-only `Input` fields with labels matching earlier steps (e.g. "Project ID", "Name").
-- One **Edit** button per section (Connection, Data) only. Destination type is read-only on review (no Edit).
+- One **Edit** button per section (Destination, Connection, Data), jumping to that step.
 - Removed Source section (always this project).
 - Destination type immutability as field description under Type.
 - Validation failures inline under Connection and Data sections only; removed bottom "Configuration issues" summary admonition.
@@ -171,7 +174,7 @@ Each slice lists files, rationale, and a suggested commit/PR title. When splitti
 - Read-only inputs selectable/copyable (no blur-on-focus hack).
 - `editDisabled` while saving/validating.
 
-**Tests:** Edit navigation, no source section, immutability copy, disabled edit, connection failures in section.
+**Tests:** Edit navigation (including destination), no source section, immutability copy, disabled edit, connection failures in section.
 
 ---
 
@@ -189,24 +192,25 @@ Each slice lists files, rationale, and a suggested commit/PR title. When splitti
 
 ## Changelog (session log)
 
-| Date       | Change                                                                                 |
-| ---------- | -------------------------------------------------------------------------------------- |
-| 2026-08-20 | SteppedFlow: single column, step counter, Back/Continue footer                         |
-| 2026-08-20 | Review: read-only inputs, section Edit, sandwiched validation admonitions              |
-| 2026-08-20 | Removed review footer validation admonition; failures only in sections                 |
-| 2026-08-20 | Sandwiched admonition: `border-t-0`, `layout="responsive"`                             |
-| 2026-08-20 | Docs: header button on connection/data with step-specific URL; plain step descriptions |
-| 2026-08-20 | BigQuery service account key JSON validation                                           |
-| 2026-08-20 | Validation on Continue only (not onChange)                                             |
-| 2026-08-20 | Button disabled: drop `pointer-events-none` for not-allowed cursor                     |
-| 2026-08-20 | Removed return-to-review footer shortcut from SteppedFlow                              |
-| 2026-08-20 | Destination type change resets credentials; Back allows type change again              |
-|            | _Add future rows here_                                                                 |
+| Date       | Change                                                                                                 |
+| ---------- | ------------------------------------------------------------------------------------------------------ |
+| 2026-08-20 | SteppedFlow: single column, step counter, Back/Continue footer                                         |
+| 2026-08-20 | Review: read-only inputs, section Edit, sandwiched validation admonitions                              |
+| 2026-08-20 | Removed review footer validation admonition; failures only in sections                                 |
+| 2026-08-20 | Sandwiched admonition: `border-t-0`, `layout="responsive"`                                             |
+| 2026-08-20 | Docs: header button on connection/data with step-specific URL; plain step descriptions                 |
+| 2026-08-20 | BigQuery service account key JSON validation                                                           |
+| 2026-08-20 | Validation on Continue only (not onChange)                                                             |
+| 2026-08-20 | Button disabled: drop `pointer-events-none` for not-allowed cursor                                     |
+| 2026-08-20 | Removed return-to-review footer shortcut from SteppedFlow                                              |
+| 2026-08-20 | Destination type change resets credentials; Back allows type change again                              |
+| 2026-08-21 | Merged master (Read Replicas removed from Pipelines); footer Next; Edit destination restored on review |
+|            | _Add future rows here_                                                                                 |
 
 ---
 
 ## Out of scope / not in this branch
 
-- Committing or opening new PRs (unless explicitly requested).
-- Destination add/edit sheet validation mode (`DestinationForm/index.tsx` still `onChange` — consider aligning in a follow-up).
 - Mapping API `validation_failures` to RHF field paths (API has `failure_type`, `name`, `reason` only; no field path).
+- Replacing the edit sheet with pipeline-detail Settings tabs (prototype north star; keep sheet for now).
+- Data contract builder, dedicated pre-flight step, managed publications (later handoff slices).

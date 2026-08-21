@@ -160,12 +160,13 @@ Reference: `mergeFormValuesForDestinationTypeChange` in `CreatePipelineWizard.ut
 
 ## Create vs edit
 
-| Mode       | Surface                                       | Notes                               |
-| ---------- | --------------------------------------------- | ----------------------------------- |
-| **Create** | Full-page stepped wizard                      | `/replication/new`                  |
-| **Edit**   | Existing sheet (`DestinationPanel`, `?edit=`) | Do not reuse the full create wizard |
+| Mode                   | Surface                                                | Notes                               |
+| ---------------------- | ------------------------------------------------------ | ----------------------------------- |
+| **Create**             | Full-page stepped wizard                               | `/replication/new`                  |
+| **Edit (this branch)** | Existing sheet (`DestinationPanel`, `?edit=`)          | Do not reuse the full create wizard |
+| **Edit (north star)**  | Pipeline detail → Settings tab, sectioned inline edits | Prototype; not in this PR           |
 
-Edit keeps destination type locked via `?edit=` query (existing behaviour). Create allows type change on the destination step until the pipeline exists.
+Create allows type change on the destination step until the pipeline exists. Edit keeps destination type locked.
 
 ---
 
