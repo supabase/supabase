@@ -488,10 +488,10 @@ export const AssistantChat = ({
         })}
         {hasMessages ? (
           <Conversation className={cn('flex-1')}>
-            <ConversationContent className="w-full px-7 py-8 mb-10 max-w-3xl mx-auto">
+            <ConversationContent className="w-full px-7 py-8 mb-10">
               {renderedMessages}
-              {error && (
-                <>
+              <div className="w-full max-w-3xl mx-auto">
+                {error && (
                   <AlertError
                     error={
                       isContextExceededError
@@ -537,19 +537,19 @@ export const AssistantChat = ({
                       </div>
                     }
                   />
-                </>
-              )}
-              {isChatLoading && (
-                <motion.span
-                  animate={{ opacity: [1, 0] }}
-                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                  className="inline-block w-1.5 h-4 bg-foreground-lighter mt-4"
-                />
-              )}
+                )}
+                {isChatLoading && (
+                  <motion.span
+                    animate={{ opacity: [1, 0] }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                    className="inline-block w-1.5 h-4 bg-foreground-lighter mt-4"
+                  />
+                )}
 
-              <p className="text-center text-xs text-foreground-muted mt-6">
-                The Assistant can make mistakes. Double check responses.
-              </p>
+                <p className="text-center text-xs text-foreground-muted mt-6">
+                  The Assistant can make mistakes. Double check responses.
+                </p>
+              </div>
             </ConversationContent>
             <ConversationScrollButton />
           </Conversation>

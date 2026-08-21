@@ -127,7 +127,7 @@ export const AssistantQueryCell = ({
   return (
     <Confirm
       fill
-      className="h-96"
+      className="h-96 w-full max-w-6xl mx-auto"
       state={confirmState}
       message="Assistant wants to run this query"
       cancelLabel="Skip"
