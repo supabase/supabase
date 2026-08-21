@@ -3384,7 +3384,7 @@ module.exports = [
     permanent: false,
   },
   // Legacy product .txt URLs → new .md routes
-  { permanent: true, source: '/llms/homepage.txt', destination: '/homepage.md' },
+  { permanent: true, source: '/llms/homepage.txt', destination: '/index.md' },
   { permanent: true, source: '/llms/auth.txt', destination: '/auth.md' },
   { permanent: true, source: '/llms/database.txt', destination: '/database.md' },
   { permanent: true, source: '/llms/edge-functions.txt', destination: '/edge-functions.md' },
@@ -3393,4 +3393,6 @@ module.exports = [
   { permanent: true, source: '/llms/vector.txt', destination: '/modules/vector.md' },
   { permanent: true, source: '/llms/pricing.txt', destination: '/pricing.md' },
   { permanent: true, source: '/vector.md', destination: '/modules/vector.md' },
+  { permanent: true, source: '/homepage.md', destination: '/index.md' },
+  { permanent: true, source: '/.md', destination: '/index.md' },
 ]
