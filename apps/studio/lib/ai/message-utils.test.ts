@@ -1,4 +1,4 @@
-import type { DynamicToolUIPart, UIMessage } from 'ai'
+import type { DynamicToolUIPart, ToolUIPart, UIMessage } from 'ai'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -269,7 +269,7 @@ describe('prepareMessagesForAPI', () => {
 
     const result = prepareMessagesForAPI(messages)
 
-    expect((result[0].parts[0] as any).output).toEqual({
+    expect((result[0].parts[0] as ToolUIPart).output).toEqual({
       id: 'notebook-1',
       name: 'Signup funnel',
     })
@@ -282,7 +282,7 @@ describe('prepareMessagesForAPI', () => {
     prepareMessagesForAPI(messages)
 
     expect(messages[0].parts).toBe(originalParts)
-    expect((originalParts[0] as any).output).toHaveProperty('previous_content')
+    expect((originalParts[0] as ToolUIPart).output).toHaveProperty('previous_content')
   })
 
   it('leaves an update_notebook output without previous_content unchanged', () => {
@@ -292,7 +292,7 @@ describe('prepareMessagesForAPI', () => {
 
     const result = prepareMessagesForAPI(messages)
 
-    expect((result[0].parts[0] as any).output).toEqual({
+    expect((result[0].parts[0] as ToolUIPart).output).toEqual({
       id: 'notebook-1',
       name: 'Signup funnel',
     })

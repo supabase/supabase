@@ -51,7 +51,7 @@ export function createAssistantMessageWithExecuteSqlTool(
 }
 
 export function createAssistantMessageWithUpdateNotebookTool(
-  output: Record<string, any> = {
+  output: Record<string, unknown> = {
     id: 'notebook-1',
     name: 'Signup funnel',
     previous_content: { schema_version: 1, cells: [] },
