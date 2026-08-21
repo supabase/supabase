@@ -1,7 +1,8 @@
-import { render } from '@testing-library/react'
+import type { ToolUIPart } from 'ai'
 import { describe, expect, it } from 'vitest'
 
 import { MessagePartSwitcher } from './Message.Parts'
+import { customRender } from '@/tests/lib/custom-render'
 
 type MessagePart = Parameters<typeof MessagePartSwitcher>[0]['part']
 
@@ -11,16 +12,16 @@ describe('MessagePartSwitcher', () => {
       type: 'reasoning',
       state: 'done',
       text: 'I will look up the project details.',
-    } as unknown as MessagePart
+    } satisfies Extract<MessagePart, { type: 'reasoning' }>
     const toolPart = {
       type: 'tool-load_knowledge',
       toolCallId: 'load-knowledge-1',
       state: 'output-available',
       input: {},
       output: {},
-    } as unknown as MessagePart
+    } satisfies ToolUIPart
 
-    const { container } = render(
+    const { container } = customRender(
       <>
         <MessagePartSwitcher part={reasoningPart} />
         <MessagePartSwitcher part={toolPart} />
