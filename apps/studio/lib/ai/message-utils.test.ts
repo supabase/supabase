@@ -6,6 +6,7 @@ import {
   isManualApprovalRequested,
   prepareMessagesForAPI,
 } from './message-utils'
+import { createAssistantMessageWithUpdateNotebookTool } from './test-fixtures'
 
 const makeApprovalPart = (id: string, isAutomatic = false): DynamicToolUIPart =>
   ({
@@ -261,5 +262,39 @@ describe('prepareMessagesForAPI', () => {
     expect(result[1]).toEqual(messages[1])
     expect(result[2]).toEqual(messages[2])
     expect(result[3]).not.toHaveProperty('results')
+  })
+
+  it('strips update_notebook previous_content before re-uploading to the API', () => {
+    const messages = [createAssistantMessageWithUpdateNotebookTool()]
+
+    const result = prepareMessagesForAPI(messages)
+
+    expect((result[0].parts[0] as any).output).toEqual({
+      id: 'notebook-1',
+      name: 'Signup funnel',
+    })
+  })
+
+  it('does not mutate the original message parts when stripping previous_content', () => {
+    const messages = [createAssistantMessageWithUpdateNotebookTool()]
+    const originalParts = messages[0].parts
+
+    prepareMessagesForAPI(messages)
+
+    expect(messages[0].parts).toBe(originalParts)
+    expect((originalParts[0] as any).output).toHaveProperty('previous_content')
+  })
+
+  it('leaves an update_notebook output without previous_content unchanged', () => {
+    const messages = [
+      createAssistantMessageWithUpdateNotebookTool({ id: 'notebook-1', name: 'Signup funnel' }),
+    ]
+
+    const result = prepareMessagesForAPI(messages)
+
+    expect((result[0].parts[0] as any).output).toEqual({
+      id: 'notebook-1',
+      name: 'Signup funnel',
+    })
   })
 })

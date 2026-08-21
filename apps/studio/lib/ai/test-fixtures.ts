@@ -50,6 +50,29 @@ export function createAssistantMessageWithExecuteSqlTool(
   }
 }
 
+export function createAssistantMessageWithUpdateNotebookTool(
+  output: Record<string, any> = {
+    id: 'notebook-1',
+    name: 'Signup funnel',
+    previous_content: { schema_version: 1, cells: [] },
+  },
+  id = 'assistant-notebook-msg-1'
+): UIMessage {
+  return {
+    id,
+    role: 'assistant',
+    parts: [
+      {
+        type: 'tool-update_notebook',
+        state: 'output-available',
+        toolCallId: 'call-notebook-1',
+        input: { id: 'notebook-1', expected_updated_at: '2026-01-01T00:00:00.000Z' },
+        output,
+      } satisfies ToolUIPart,
+    ],
+  }
+}
+
 export function createAssistantMessageWithMultipleTools(
   id = 'assistant-multi-tool-msg-1'
 ): UIMessage {
