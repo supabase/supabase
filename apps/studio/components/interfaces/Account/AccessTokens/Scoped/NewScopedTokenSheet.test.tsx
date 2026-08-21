@@ -258,7 +258,7 @@ describe('NewScopedTokenSheet', () => {
 
   // Permission preset tests
   const FULL_ACCESS_WARNING =
-    'Grants write access to every resource, including your database, API keys, and organization members.'
+    'Grants the highest access each resource offers, including write access to your database, API keys, and organization members.'
 
   const getPresetTrigger = async () => screen.findByRole('combobox', { name: 'Permission preset' })
 

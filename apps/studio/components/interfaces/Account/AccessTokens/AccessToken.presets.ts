@@ -44,12 +44,12 @@ export const getFullAccessDescription = (): string => {
   const nouns = FULL_ACCESS_HIGH_RISK.filter(({ key }) => getCatalogEntry(key) !== undefined).map(
     ({ noun }) => noun
   )
-  if (nouns.length === 0) return 'Grants write access to every resource.'
+  if (nouns.length === 0) return 'Grants the highest access each resource offers.'
   const listed =
     nouns.length === 1
       ? nouns[0]
       : `${nouns.slice(0, -1).join(', ')}, and ${nouns[nouns.length - 1]}`
-  return `Grants write access to every resource, including ${listed}.`
+  return `Grants the highest access each resource offers, including write access to ${listed}.`
 }
 
 export const PERMISSION_PRESETS: PermissionPreset[] = [

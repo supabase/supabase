@@ -55,11 +55,13 @@ describe('getFullAccessDescription', () => {
   test('names high-risk resources that exist in the catalog', () => {
     const description = getFullAccessDescription()
     expect(description).toBe(
-      'Grants write access to every resource, including your database, API keys, and organization members.'
+      'Grants the highest access each resource offers, including write access to your database, API keys, and organization members.'
     )
     for (const key of ['project:database', 'project:api_gateway_keys', 'organization:members']) {
       expect(getCatalogEntry(key)).toBeDefined()
       expect(getCatalogEntry(key)!.risk).toBe('high')
+      // The copy claims write access on these specifically, so they have to be writable
+      expect(getCatalogEntry(key)!.writable).toBe(true)
     }
   })
 })
