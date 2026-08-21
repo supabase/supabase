@@ -86,7 +86,7 @@ export const NewScopedTokenForm = ({
   })
 
   const { data: permissionScopeMap, isError } = useGetEnabledEndpointsForCapability()
-  const prefersReducedMotion = useReducedMotion()
+  const isReducedMotionPreferred = useReducedMotion()
 
   useEffect(() => {
     if (isError) {
@@ -98,10 +98,10 @@ export const NewScopedTokenForm = ({
   useEffect(() => {
     if (missingPermissionsAttempts === 0) return
     missingPermissionsRef.current?.scrollIntoView({
-      behavior: prefersReducedMotion ? 'auto' : 'smooth',
+      behavior: isReducedMotionPreferred ? 'auto' : 'smooth',
       block: 'nearest',
     })
-  }, [missingPermissionsAttempts, prefersReducedMotion])
+  }, [missingPermissionsAttempts, isReducedMotionPreferred])
 
   const isClassicMode = resourceAccess === 'account'
 
