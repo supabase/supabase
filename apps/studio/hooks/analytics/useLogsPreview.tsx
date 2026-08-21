@@ -26,13 +26,91 @@ import {
   genDefaultQuery,
 } from '@/components/interfaces/Settings/Logs/Logs.utils'
 import {
+  genAttributeHydrationQueryOtel,
   genChartQueryOtel,
   genCountQueryOtel,
   genDefaultQueryOtel,
   mapOtelPreviewRow,
+  otelListNeedsHydration,
 } from '@/components/interfaces/Settings/Logs/Logs.utils.otel'
 import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
 import { logsAllEndpointUrl, pickLogsQueryBuilder } from '@/data/logs/logs-endpoint'
+
+// Pads the page's timestamp bracket so a row sitting exactly on the boundary
+// isn't dropped by rounding on the way to an ISO string.
+const HYDRATION_PADDING_MS = 1000
+
+/**
+ * Fetches the attribute-derived columns for one page of already-fetched rows and
+ * merges them in, keeping the row shape the renderers already expect.
+ *
+ * Bounded to the page's own timestamp span — `id` is not in the logs table's
+ * sort key, so the time bracket is what keeps this cheap. Returns the rows
+ * unchanged if there is nothing to fetch.
+ */
+async function hydrateOtelPageAttributes({
+  rows,
+  table,
+  projectRef,
+  endpoint,
+  signal,
+}: {
+  rows: LogData[]
+  table: LogsTableName
+  projectRef: string
+  endpoint: ReturnType<typeof logsAllEndpointUrl>
+  signal?: AbortSignal
+}): Promise<LogData[]> {
+  const ids = rows
+    .map((row) => row.id)
+    .filter((id): id is string => typeof id === 'string' && id.length > 0)
+  const sql = genAttributeHydrationQueryOtel(table, ids)
+  if (sql === null) return rows
+
+  const timestamps = rows.map((row) => Number(row.timestamp)).filter((ts) => Number.isFinite(ts))
+  if (timestamps.length === 0) return rows
+
+  const data = await executeAnalyticsSql({
+    projectRef,
+    endpoint,
+    sql,
+    iso_timestamp_start: new Date(
+      Math.min(...timestamps) / 1000 - HYDRATION_PADDING_MS
+    ).toISOString(),
+    iso_timestamp_end: new Date(
+      Math.max(...timestamps) / 1000 + HYDRATION_PADDING_MS
+    ).toISOString(),
+    signal,
+  })
+
+  return mergeOtelPageAttributes(rows, (data as unknown as Logs)?.result ?? [])
+}
+
+/**
+ * Merges hydrated attribute columns onto their rows by id. Rows with no match
+ * (the attribute query returned fewer rows, or none at all) are passed through
+ * unchanged so the list still renders.
+ *
+ * The list row wins on any shared key. Today `id` is the only one the two
+ * projections have in common, but the list query is the one that normalizes
+ * `timestamp` to microseconds for the renderers and the pagination cursor — so
+ * its values take precedence rather than relying on the projections staying
+ * disjoint.
+ */
+export function mergeOtelPageAttributes(
+  rows: LogData[],
+  attributeRows: Array<Record<string, any>>
+): LogData[] {
+  const attributesById = new Map<string, Record<string, unknown>>(
+    attributeRows.filter((row) => typeof row?.id === 'string').map((row) => [row.id as string, row])
+  )
+  if (attributesById.size === 0) return rows
+
+  return rows.map((row) => {
+    const attributes = row.id ? attributesById.get(row.id) : undefined
+    return attributes ? ({ ...attributes, ...row } as LogData) : row
+  })
+}
 
 interface LogsPreviewHook {
   logData: LogData[]
@@ -102,6 +180,14 @@ function useLogsPreview({
     [useOtel, table, mergedFilters, limit]
   )
 
+  // When the list query uses the lean projection, its attribute-derived columns
+  // come from a second request scoped to the page just returned. See
+  // `otelListNeedsHydration` for when this applies.
+  const needsHydration = useMemo(
+    () => useOtel && otelListNeedsHydration(table, mergedFilters),
+    [useOtel, table, mergedFilters]
+  )
+
   const params: LogsEndpointParams = useMemo(
     () => ({
       iso_timestamp_start: timestampStart,
@@ -111,9 +197,18 @@ function useLogsPreview({
     [timestampStart, timestampEnd, defaultSql]
   )
 
+  // `table` and `needsHydration` are already implied by `defaultSql`, but the
+  // queryFn reads them directly, so they belong in the key.
   const queryKey = useMemo(
-    () => ['projects', projectRef, 'logs', params, defaultSql, { otel: useOtel }],
-    [projectRef, params, defaultSql, useOtel]
+    () => [
+      'projects',
+      projectRef,
+      'logs',
+      params,
+      defaultSql,
+      { otel: useOtel, table, needsHydration },
+    ],
+    [projectRef, params, defaultSql, useOtel, table, needsHydration]
   )
 
   const {
@@ -138,10 +233,26 @@ function useLogsPreview({
         signal,
       })
       const logs = data as unknown as Logs
-      if (useOtel && logs?.result) {
-        return { ...logs, result: logs.result.map(mapOtelPreviewRow) } as Logs
+      if (!useOtel || !logs?.result) return logs
+
+      const result = logs.result.map(mapOtelPreviewRow)
+      if (!needsHydration || result.length === 0) return { ...logs, result } as Logs
+
+      try {
+        const hydrated = await hydrateOtelPageAttributes({
+          rows: result,
+          table,
+          projectRef,
+          endpoint: logsAllEndpointUrl(useOtel),
+          signal,
+        })
+        return { ...logs, result: hydrated } as Logs
+      } catch (error) {
+        // Attribute columns are supplementary — the row still renders its
+        // timestamp and message without them. Don't fail the page over it.
+        console.error('Failed to fetch log attributes for page:', error)
+        return { ...logs, result } as Logs
       }
-      return logs
     },
     refetchOnWindowFocus: false,
     initialPageParam: undefined as string | undefined,

@@ -2,12 +2,14 @@ import { describe, expect, it } from 'vitest'
 
 import { LogsTableName } from './Logs.constants'
 import {
+  genAttributeHydrationQueryOtel,
   genChartQueryOtel,
   genCountQueryOtel,
   genDefaultQueryOtel,
   genSingleLogQueryOtel,
   mapOtelPreviewRow,
   mapOtelSingleLogToLegacy,
+  otelListNeedsHydration,
   otelTimestampToMicros,
 } from './Logs.utils.otel'
 import type { OtelLogRow } from '@/data/logs/otel-inspection.utils'
@@ -17,17 +19,16 @@ import { formatSql } from '@/lib/formatSql'
 const fmt = (fragment: string) => formatSql(fragment)
 
 describe('genDefaultQueryOtel', () => {
-  it('targets the OTEL logs table by source and aliases postgres columns', () => {
+  // Reading any `log_attributes` key decompresses the whole map, so the list
+  // query must not reference it at all — the aliased columns move to
+  // `genAttributeHydrationQueryOtel`.
+  it('omits log_attributes entirely when the filters do not need it', () => {
     expect(fmt(genDefaultQueryOtel(LogsTableName.POSTGRES, {}, 100))).toMatchInlineSnapshot(`
       "-- Logs Preview Query (otel) ['postgres_logs']
       select
         id,
         timestamp,
-        event_message,
-        log_attributes['identifier'] as identifier,
-        log_attributes['parsed.error_severity'] as error_severity,
-        log_attributes['parsed.detail'] as detail,
-        log_attributes['parsed.hint'] as hint
+        event_message
       from
         logs
       where
@@ -39,18 +40,14 @@ describe('genDefaultQueryOtel', () => {
     `)
   })
 
-  it('aliases edge columns to the leaf names the api renderer reads', () => {
-    expect(fmt(genDefaultQueryOtel(LogsTableName.EDGE, {}, 50))).toMatchInlineSnapshot(`
+  it('omits log_attributes for edge logs too', () => {
+    const sql = fmt(genDefaultQueryOtel(LogsTableName.EDGE, {}, 50))
+    expect(sql).toMatchInlineSnapshot(`
       "-- Logs Preview Query (otel) ['edge_logs']
       select
         id,
         timestamp,
-        event_message,
-        log_attributes['identifier'] as identifier,
-        log_attributes['request.method'] as method,
-        log_attributes['request.path'] as path,
-        log_attributes['request.search'] as search,
-        log_attributes['response.status_code'] as status_code
+        event_message
       from
         logs
       where
@@ -60,6 +57,16 @@ describe('genDefaultQueryOtel', () => {
       limit
         50"
     `)
+    expect(sql).not.toContain('log_attributes')
+  })
+
+  // A filter that already reads the map makes the split pointless — the query
+  // pays for the map in WHERE regardless, so the columns stay inline and no
+  // second request is made.
+  it('keeps the aliased columns inline when a filter already reads the map', () => {
+    const sql = fmt(genDefaultQueryOtel(LogsTableName.EDGE, { 'status_code.error': true }))
+    expect(sql).toContain("log_attributes['request.method'] as method")
+    expect(otelListNeedsHydration(LogsTableName.EDGE, { 'status_code.error': true })).toBe(false)
   })
 
   it('maps pg_cron onto postgres_logs with the cron predicate', () => {
@@ -131,6 +138,8 @@ describe('genDefaultQueryOtel', () => {
     `)
   })
 
+  // Text search reads `event_message`, a real column — so it keeps the lean
+  // projection rather than falling back.
   it('translates a search_query filter to a case-insensitive event_message match', () => {
     expect(fmt(genDefaultQueryOtel(LogsTableName.POSTGRES, { search_query: 'deadlock' })))
       .toMatchInlineSnapshot(`
@@ -138,11 +147,7 @@ describe('genDefaultQueryOtel', () => {
       select
         id,
         timestamp,
-        event_message,
-        log_attributes['identifier'] as identifier,
-        log_attributes['parsed.error_severity'] as error_severity,
-        log_attributes['parsed.detail'] as detail,
-        log_attributes['parsed.hint'] as hint
+        event_message
       from
         logs
       where
@@ -531,6 +536,63 @@ describe('genChartQueryOtel', () => {
       order by
         timestamp asc"
     `)
+  })
+})
+
+describe('genAttributeHydrationQueryOtel', () => {
+  it('fetches the aliased columns for one page of ids, scoped to the source', () => {
+    expect(fmt(genAttributeHydrationQueryOtel(LogsTableName.EDGE, ['id-a', 'id-b'])!))
+      .toMatchInlineSnapshot(`
+      "-- Logs Attribute Hydration Query (otel) ['edge_logs']
+      select
+        id,
+        log_attributes['identifier'] as identifier,
+        log_attributes['request.method'] as method,
+        log_attributes['request.path'] as path,
+        log_attributes['request.search'] as search,
+        log_attributes['response.status_code'] as status_code
+      from
+        logs
+      where
+        source = 'edge_logs'
+        and id in ('id-a', 'id-b')
+      limit
+        2"
+    `)
+  })
+
+  it('escapes ids rather than interpolating them raw', () => {
+    const sql = genAttributeHydrationQueryOtel(LogsTableName.EDGE, ["a' or '1'='1"])!
+    expect(sql).toContain("'a'' or ''1''=''1'")
+  })
+
+  // Null lets the caller skip the request rather than send a query that can
+  // only return nothing.
+  it('returns null when there is nothing to fetch', () => {
+    expect(genAttributeHydrationQueryOtel(LogsTableName.EDGE, [])).toBeNull()
+    expect(genAttributeHydrationQueryOtel(LogsTableName.REALTIME, ['id-a'])).toBeNull()
+  })
+})
+
+describe('otelListNeedsHydration', () => {
+  it('is true for a table with attribute columns and map-free filters', () => {
+    expect(otelListNeedsHydration(LogsTableName.EDGE, {})).toBe(true)
+    expect(otelListNeedsHydration(LogsTableName.POSTGRES, { search_query: 'deadlock' })).toBe(true)
+  })
+
+  it('is false when a filter reads the map', () => {
+    expect(otelListNeedsHydration(LogsTableName.POSTGRES, { database: 'replica-1' })).toBe(false)
+    expect(otelListNeedsHydration(LogsTableName.EDGE, { 'method.get': true })).toBe(false)
+  })
+
+  // pg_cron's base condition reads `parsed.application_name`, so it pays for
+  // the map on every query regardless of user filters.
+  it('is false for pg_cron, whose base condition reads the map', () => {
+    expect(otelListNeedsHydration(LogsTableName.PG_CRON, {})).toBe(false)
+  })
+
+  it('is false for tables with no attribute columns to hydrate', () => {
+    expect(otelListNeedsHydration(LogsTableName.REALTIME, {})).toBe(false)
   })
 })
 
