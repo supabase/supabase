@@ -108,7 +108,7 @@ export const ProjectCreationFooter = ({
           <div className="flex justify-between text-sm">
             <span>Additional costs</span>
             <div className="text-brand flex gap-1 items-center font-mono font-medium">
-              <span>${displayedAdditionalMonthlySpend}/m</span>
+              <span role="status">${displayedAdditionalMonthlySpend}/m</span>
               <InfoTooltip side="top" className="max-w-[450px] p-0">
                 <div className="p-4 text-sm text-foreground-light space-y-1">
                   <p>
