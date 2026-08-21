@@ -4,7 +4,7 @@ import { cva, VariantProps } from 'class-variance-authority'
 import { Check, ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
 // @ts-ignore Required to avoid TS error: The inferred type of MultiSelectorContent cannot be named without a reference to @radix-ui
 import type { Popover as PopoverPrimitive } from 'radix-ui'
-import React, { isValidElement, ReactElement, useEffect } from 'react'
+import React, { Children, isValidElement, ReactElement, useEffect } from 'react'
 import {
   Badge,
   cn,
@@ -508,18 +508,10 @@ const MultiSelectorList = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof CommandList> & {
     creatable?: boolean
   }
->(({ className, children, creatable = false }, ref) => {
+>(({ className, children, creatable = false, ...props }, ref) => {
   const { open, inputValue, setInputValue, toggleValue, dropdownMaxHeight } = useMultiSelect()
 
-  const options = !!children
-    ? Array.isArray(children)
-      ? (children as React.ReactNode[])
-      : typeof children === 'object' &&
-          'props' in children &&
-          isValidElement<{ children: ReactElement[] }>(children)
-        ? children.props.children
-        : []
-    : []
+  const options = Children.toArray(children)
   const availableOptions = options
     .filter((x: any) => !!x.props.value)
     .map((x: any) => x.props.value.toLowerCase())
@@ -536,6 +528,7 @@ const MultiSelectorList = React.forwardRef<
       )}
       style={{ maxHeight: dropdownMaxHeight }}
       onWheel={(e) => e.stopPropagation()}
+      {...props}
     >
       {children}
       {creatable && inputValue.length > 0 && !isOptionExists ? (
