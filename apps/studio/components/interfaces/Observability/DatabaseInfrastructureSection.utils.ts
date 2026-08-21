@@ -4,10 +4,11 @@ type NumericValue = string | number | undefined
 
 /**
  * Parses a numeric value that can be a number, string, or undefined.
- * Returns 0 for invalid or missing values.
+ * Returns 0 for invalid or missing values, including non-finite numbers
+ * such as NaN or Infinity that can result from backend division-by-zero.
  */
 export function parseNumericValue(val: NumericValue): number {
-  if (typeof val === 'number') return val
+  if (typeof val === 'number') return Number.isFinite(val) ? val : 0
   if (typeof val === 'string') return parseFloat(val) || 0
   return 0
 }
