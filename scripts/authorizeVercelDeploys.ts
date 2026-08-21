@@ -38,7 +38,13 @@ async function fetchGitHubStatuses(sha: string): Promise<GitHubStatus[]> {
   const url = `https://api.github.com/repos/supabase/supabase/statuses/${sha}`
   console.log(`Fetching GitHub statuses for SHA: ${sha}`)
 
-  const response = await fetch(url)
+  const headers: Record<string, string> = {}
+  
+  if (process.env.GITHUB_TOKEN) {
+    headers['Authorization'] = `token ${process.env.GITHUB_TOKEN}`
+  }
+
+  const response = await fetch(url, { headers })
   if (!response.ok) {
     throw new Error(`Failed to fetch GitHub statuses: ${response.status} ${response.statusText}`)
   }
