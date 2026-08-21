@@ -24,6 +24,16 @@ const withTestDatabase = (
     }
   })
 }
+
+test('update with a password parameterizes it instead of breaking the format() string', () => {
+  const { sql } = pgMeta.roles.update({ id: 1 }, { password: 'secret' })
+  // The password must be a `%L` placeholder passed as a format() argument. A
+  // literal spliced straight into the format string terminates it early.
+  expect(sql).toContain('password %L')
+  expect(sql).not.toContain("password 'secret'")
+  expect(sql).toContain("'secret'")
+})
+
 withTestDatabase('list roles', async ({ executeQuery }) => {
   const { sql, zod } = await pgMeta.roles.list()
   const res = zod.parse(await executeQuery(sql))
