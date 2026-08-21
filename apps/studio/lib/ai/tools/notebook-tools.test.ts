@@ -205,7 +205,7 @@ describe('ai/tools/notebook-tools', () => {
   })
 
   describe('run_notebook', () => {
-    function mockGetNotebook() {
+    function mockGetNotebook(content: unknown = NOTEBOOK_CONTENT) {
       addAPIMock({
         method: 'get',
         path: '/platform/projects/:ref/content/item/:id',
@@ -222,7 +222,7 @@ describe('ai/tools/notebook-tools', () => {
             owner_id: 1,
             project_id: 1,
             type: 'notebook',
-            content: NOTEBOOK_CONTENT,
+            content,
           } as unknown as GetUserContentByIdResponse),
       })
     }
@@ -287,6 +287,101 @@ describe('ai/tools/notebook-tools', () => {
       })
     })
 
+    it('continues primary and log cells when the read replica lookup fails', async () => {
+      mockGetNotebook({
+        schema_version: 1,
+        cells: [
+          {
+            _tag: 'database_cell',
+            _id: 'primary-cell',
+            title: 'Primary query',
+            sql: 'select 1 as primary',
+            row_limit: 100,
+          },
+          {
+            _tag: 'database_cell',
+            _id: 'replica-cell',
+            title: 'Replica query',
+            sql: 'select 1 as replica',
+            row_limit: 100,
+            database_identifier: 'replica-1',
+          },
+          {
+            _tag: 'log_cell',
+            _id: 'log-cell',
+            title: 'Log query',
+            sql: 'select event_message from edge_logs limit 10',
+            time_range: { _tag: 'relative_time_range', unit: 'hour', amount: 1 },
+          },
+        ],
+      })
+
+      addAPIMock({
+        method: 'get',
+        path: '/platform/projects/:ref/databases',
+        response: () =>
+          HttpResponse.json<APIErrorBody>({ message: 'Replica lookup failed' }, { status: 500 }),
+      })
+      addAPIMock({
+        method: 'post',
+        path: '/platform/pg-meta/:ref/query',
+        response: () => HttpResponse.json([{ primary: 1 }]),
+      })
+      addAPIMock({
+        method: 'post',
+        path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+        response: () =>
+          HttpResponse.json<{ result: unknown[] }>({
+            result: [{ event_message: 'started' }],
+          }),
+      })
+
+      const tools = getNotebookTools({
+        projectRef: 'test-project',
+        connectionString: 'encrypted-connection-string',
+        authorization: 'Bearer token',
+        aiOptInLevel: 'schema_and_log_and_data',
+      })
+      if (!tools.run_notebook.execute) throw new Error('execute is undefined')
+
+      const result = await tools.run_notebook.execute(
+        {
+          id: 'notebook-1',
+          expected_updated_at: '2026-01-01T00:00:00.000Z',
+        },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+
+      expect(result).toEqual({
+        id: 'notebook-1',
+        name: 'Signup funnel',
+        updated_at: '2026-01-01T00:00:00.000Z',
+        cells: [
+          {
+            cell_id: 'primary-cell',
+            title: 'Primary query',
+            source: 'database',
+            status: 'success',
+            rows: [{ primary: 1 }],
+          },
+          {
+            cell_id: 'replica-cell',
+            title: 'Replica query',
+            source: 'database',
+            status: 'error',
+            error: { message: 'Replica lookup failed' },
+          },
+          {
+            cell_id: 'log-cell',
+            title: 'Log query',
+            source: 'logs',
+            status: 'success',
+            rows: [{ event_message: 'started' }],
+          },
+        ],
+      })
+    })
+
     it('rejects the run when the notebook changed after it was read', async () => {
       mockGetNotebook()
       const tools = getNotebookTools({ projectRef: 'test-project' })
@@ -325,15 +420,61 @@ describe('ai/tools/notebook-tools', () => {
         ],
       }
 
-      expect(sanitizeNotebookRunOutput(output, 'schema').cells).toMatchObject([
-        { source: 'database', rows: undefined },
-        { source: 'logs', rows: undefined },
-      ])
-      expect(sanitizeNotebookRunOutput(output, 'schema_and_log').cells).toMatchObject([
-        { source: 'database', rows: undefined },
-        { source: 'logs', rows: [{ event_message: 'failed' }] },
-      ])
+      const schemaCells = sanitizeNotebookRunOutput(output, 'schema').cells
+      expect(schemaCells[0]).not.toHaveProperty('rows')
+      expect(schemaCells[1]).not.toHaveProperty('rows')
+
+      const logCells = sanitizeNotebookRunOutput(output, 'schema_and_log').cells
+      expect(logCells[0]).not.toHaveProperty('rows')
+      expect(logCells[1]).toMatchObject({ rows: [{ event_message: 'failed' }] })
       expect(sanitizeNotebookRunOutput(output, 'schema_and_log_and_data')).toEqual(output)
+    })
+
+    it('allowlists unshared cell fields according to status', () => {
+      const output: NotebookRunOutput = {
+        id: 'notebook-1',
+        name: 'Signup funnel',
+        updated_at: '2026-01-01T00:00:00.000Z',
+        cells: [
+          {
+            cell_id: 'success-cell',
+            title: 'Customers',
+            source: 'database',
+            status: 'success',
+            rows: [{ secret: 'row value' }],
+            error: { message: 'client-controlled error' },
+          },
+          {
+            cell_id: 'error-cell',
+            title: 'Failed customers query',
+            source: 'database',
+            status: 'error',
+            rows: [{ secret: 'row value' }],
+            message: 'client-controlled message',
+            error: { message: 'client-controlled error' },
+          },
+        ],
+      }
+
+      expect(sanitizeNotebookRunOutput(output, 'schema').cells).toEqual([
+        {
+          cell_id: 'success-cell',
+          title: 'Customers',
+          source: 'database',
+          status: 'success',
+          message:
+            'The query ran, but its rows were not shared with the Assistant at the current permission level.',
+        },
+        {
+          cell_id: 'error-cell',
+          title: 'Failed customers query',
+          source: 'database',
+          status: 'error',
+          error: {
+            message: 'The query failed. The user can review the error in the notebook run results.',
+          },
+        },
+      ])
     })
   })
 

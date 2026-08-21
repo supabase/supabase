@@ -234,9 +234,15 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
             cell.database_identifier !== undefined &&
             cell.database_identifier !== projectRef
         )
-        const databases = needsReplicaLookup
-          ? await getReadReplicas({ projectRef }, undefined, authHeaders)
-          : []
+        let databases: Awaited<ReturnType<typeof getReadReplicas>> = []
+        let replicaLookupFailure: { error: unknown } | undefined
+        if (needsReplicaLookup) {
+          try {
+            databases = await getReadReplicas({ projectRef }, undefined, authHeaders)
+          } catch (error) {
+            replicaLookupFailure = { error }
+          }
+        }
 
         const cells: NotebookRunCellOutput[] = []
 
@@ -269,11 +275,17 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
               continue
             }
 
-            const selectedConnectionString =
-              cell.database_identifier === undefined || cell.database_identifier === projectRef
-                ? connectionString
-                : databases?.find((database) => database.identifier === cell.database_identifier)
-                    ?.connectionString
+            const requiresReplica =
+              cell.database_identifier !== undefined && cell.database_identifier !== projectRef
+
+            if (requiresReplica && replicaLookupFailure !== undefined) {
+              throw replicaLookupFailure.error
+            }
+
+            const selectedConnectionString = !requiresReplica
+              ? connectionString
+              : databases?.find((database) => database.identifier === cell.database_identifier)
+                  ?.connectionString
 
             if (!selectedConnectionString) {
               throw new Error(
