@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { BoxPlus } from 'icons'
-import { Terminal } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -17,12 +17,12 @@ export const WorkersEmptyState = ({ onDeploy }: WorkersEmptyStateProps) => {
     <EmptyStatePresentational
       icon={BoxPlus}
       title="Deploy your first worker"
-      description="Run backend workers in microVMs next to your database. Dockerfile, Node.js and Deno supported at Private Alpha."
+      description="Spin up and deploy a worker locally, then deploy it to the cloud. Dockerfile, Node.js and Deno supported at Private Alpha."
     >
       <ButtonTooltip
         variant="primary"
         size="tiny"
-        icon={<Terminal size={14} />}
+        icon={<Plus size={14} />}
         disabled={!canDeployWorkers}
         onClick={onDeploy}
         tooltip={{

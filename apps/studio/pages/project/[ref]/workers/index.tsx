@@ -23,6 +23,7 @@ import { WorkersList } from '@/components/interfaces/Workers/WorkersList'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { WorkersLayout } from '@/components/layouts/WorkersLayout/WorkersLayout'
 import { AlertError } from '@/components/ui/AlertError'
+import { AlphaNotice } from '@/components/ui/AlphaNotice'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { workersQueryOptions } from '@/data/workers/workers-query'
 import { PRODUCT_NAME } from '@/lib/constants/workers'
@@ -50,7 +51,7 @@ const WorkersPage: NextPageWithLayout = () => {
           <PageHeaderSummary>
             <PageHeaderTitle>{PRODUCT_NAME}</PageHeaderTitle>
             <PageHeaderDescription>
-              Run backend workers in microVMs next to your database
+              Run fully managed compute in isolation next to your database
             </PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>
@@ -58,7 +59,12 @@ const WorkersPage: NextPageWithLayout = () => {
 
       <PageContainer size="large">
         <PageSection>
-          <PageSectionContent>
+          <PageSectionContent className="flex flex-col gap-y-8">
+            <AlphaNotice
+              entity="Workers"
+              feedbackUrl="https://github.com/orgs/supabase/discussions"
+            />
+
             {isPending && <GenericSkeletonLoader />}
             {isNotEnrolled && (
               <Admonition
