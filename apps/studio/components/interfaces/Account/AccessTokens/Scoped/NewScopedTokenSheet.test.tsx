@@ -2,7 +2,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { HttpResponse } from 'msw'
-import { beforeEach, describe, expect, test } from 'vitest'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { NewScopedTokenSheet } from './NewScopedTokenSheet'
 import type { ProfileContextType } from '@/lib/profile'
@@ -226,6 +226,30 @@ describe('NewScopedTokenSheet', () => {
     fireEvent.click(await screen.findByRole('option', { name: 'Acme Production' }))
     fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
     expect(await screen.findByText('No permissions selected', { selector: '[role="alert"] *' }))
+  })
+  test('scrolls the missing permissions warning into view once per attempt', async () => {
+    const scrollIntoView = vi.spyOn(window.HTMLElement.prototype, 'scrollIntoView')
+    renderSheet()
+    fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
+    await screen.findByRole('dialog')
+    await user.type(await screen.findByLabelText('Name'), 'test')
+    await user.click(await screen.findByRole('radio', { name: /Organization/ }))
+    fireEvent.click(await screen.findByRole('combobox', { name: 'Organizations' }))
+    fireEvent.click(await screen.findByRole('option', { name: 'Acme Production' }))
+    scrollIntoView.mockClear()
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
+    await screen.findByText('No permissions selected', { selector: '[role="alert"] *' })
+    await waitFor(() => expect(scrollIntoView).toHaveBeenCalledTimes(1))
+    expect(scrollIntoView).toHaveBeenLastCalledWith({ behavior: 'smooth', block: 'nearest' })
+
+    // Re-rendering the form while the warning is up must not scroll again
+    await expandPermissionCategory('Database')
+    expect(scrollIntoView).toHaveBeenCalledTimes(1)
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
+    await waitFor(() => expect(scrollIntoView).toHaveBeenCalledTimes(2))
+    scrollIntoView.mockRestore()
   })
   test('creates the token when scope is Organization', async () => {
     renderSheet()

@@ -58,10 +58,10 @@ export const NewScopedTokenForm = ({
   })
   const [step, setStep] = useState<'form' | 'review'>('form')
   const [formValues, setFormValues] = useState<TokenFormValues>(DEFAULT_VALUES)
-  // Dismissal sticks for the sheet's lifetime, so bouncing between steps doesn't resurface it.
   const [isCreateHintDismissed, setIsCreateHintDismissed] = useState(false)
-  const [showMissingPermissionsWarning, setShowMissingPermissionsWarning] = useState(false)
+  const [missingPermissionsAttempts, setMissingPermissionsAttempts] = useState(0)
   const resourceSectionRef = useRef<HTMLDivElement>(null)
+  const missingPermissionsRef = useRef<HTMLDivElement>(null)
   const resourceAccess = useWatch({ control: form.control, name: 'resourceAccess' })
   const selection = useWatch({ control: form.control, name: 'permissions' })
   const organizationSlugs = useWatch({
@@ -93,15 +93,17 @@ export const NewScopedTokenForm = ({
     }
   }, [onCancel, isError])
 
-  // 'account' switches to the classic token flow: name + expiry only, no permissions or review.
+  useEffect(() => {
+    if (missingPermissionsAttempts === 0) return
+    missingPermissionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }, [missingPermissionsAttempts])
+
   const isClassicMode = resourceAccess === 'account'
 
-  // Single owner of the mode switch, so every entry point resets the same dependent fields.
   const handleSelectLegacyMode = () => {
     form.setValue('resourceAccess', 'account', { shouldValidate: true })
     form.setValue('organizationSlugs', [])
     form.setValue('projectRefs', [])
-    // The fields unmount in legacy mode, so drop any validation errors they were holding.
     form.clearErrors(['organizationSlugs', 'projectRefs'])
   }
 
@@ -111,7 +113,7 @@ export const NewScopedTokenForm = ({
       return
     }
     if (configuredCount === 0) {
-      setShowMissingPermissionsWarning(true)
+      setMissingPermissionsAttempts((attempts) => attempts + 1)
       return
     }
     setFormValues(values)
@@ -120,20 +122,17 @@ export const NewScopedTokenForm = ({
 
   const handlePermissionChange = (key: string, mode: PermissionMode) => {
     form.setValue('permissions', { ...selection, [key]: mode })
-    if (mode !== 'none') setShowMissingPermissionsWarning(false)
+    if (mode !== 'none') setMissingPermissionsAttempts(0)
   }
 
   const handleApplyPreset = (preset: PermissionPreset) => {
     const next = applyPreset(preset, selection)
     form.setValue('permissions', next)
-    if (countConfigured(next) > 0) setShowMissingPermissionsWarning(false)
+    if (countConfigured(next) > 0) setMissingPermissionsAttempts(0)
   }
 
   return (
     <>
-      {/* Radix wraps viewport children in an inline-styled display:table div that grows to fit
-          the widest child, which would let one long endpoint path expand the sheet instead of
-          clipping — force it back to block so widths are bounded and rows can truncate. */}
       <ScrollArea className="flex-1 [&>[data-radix-scroll-area-viewport]>div]:block!">
         {step === 'form' ? (
           <Form {...form}>
@@ -180,12 +179,9 @@ export const NewScopedTokenForm = ({
                     onApplyPreset={handleApplyPreset}
                     access={access}
                   />
-                  {showMissingPermissionsWarning && (
-                    <div className="space-y-3 px-5 sm:px-6 pb-6">
+                  {missingPermissionsAttempts > 0 && (
+                    <div ref={missingPermissionsRef} className="space-y-3 px-5 sm:px-6 pb-6">
                       <Admonition
-                        ref={(node) => {
-                          node?.scrollIntoView()
-                        }}
                         type="warning"
                         title="No permissions selected"
                         description="This token won't be able to do anything until you grant at least one permission."
