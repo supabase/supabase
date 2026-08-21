@@ -245,7 +245,7 @@ export function DevToolbarTrigger() {
               'absolute -top-1 -right-1',
               'inline-flex items-center justify-center',
               'rounded-full bg-brand text-black',
-              'text-[9px] font-medium leading-none tracking-tight tabular-nums',
+              'text-[9px] font-medium leading-none tracking-tighter tabular-nums',
               eventCountBadge.sizeClass
             )}
           >
