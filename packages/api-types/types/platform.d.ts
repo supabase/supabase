@@ -8088,7 +8088,7 @@ export interface components {
       owner_id: number
       project_id: number
       /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql'
+      type: 'sql' | 'report' | 'log_sql' | 'notebook'
       updated_at: string
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
@@ -8107,7 +8107,7 @@ export interface components {
           owner_id: number
           project_id: number
           /** @enum {string} */
-          type: 'sql' | 'report' | 'log_sql'
+          type: 'sql' | 'report' | 'log_sql' | 'notebook'
           updated_at: string
           /** @enum {string} */
           visibility: 'user' | 'project' | 'org' | 'public'
@@ -8141,7 +8141,7 @@ export interface components {
         owner_id: number
         project_id: number
         /** @enum {string} */
-        type: 'sql' | 'report' | 'log_sql'
+        type: 'sql' | 'report' | 'log_sql' | 'notebook'
         updated_at: string
         updated_by: {
           id: number
@@ -13663,22 +13663,88 @@ export interface components {
       enabled: boolean
     }
     UpsertContentBody: {
-      content?: {
-        [key: string]: unknown
-      }
+      content?:
+        | {
+            [key: string]: unknown
+          }
+        | {
+            cells: (
+              | {
+                  _id?: string
+                  /** @enum {string} */
+                  _tag: 'database_cell'
+                  chart?: {
+                    cumulative: boolean
+                    /** @enum {string} */
+                    scale: 'linear' | 'log'
+                    show_labels: boolean
+                    /** @enum {string} */
+                    type: 'bar' | 'line'
+                    x_column: string
+                    y_series: string[]
+                  }
+                  row_limit: number
+                  sql: string
+                  title?: string
+                  /** @enum {string} */
+                  view?: 'table' | 'chart'
+                }
+              | {
+                  _id?: string
+                  /** @enum {string} */
+                  _tag: 'log_cell'
+                  chart?: {
+                    cumulative: boolean
+                    /** @enum {string} */
+                    scale: 'linear' | 'log'
+                    show_labels: boolean
+                    /** @enum {string} */
+                    type: 'bar' | 'line'
+                    x_column: string
+                    y_series: string[]
+                  }
+                  sql: string
+                  time_range:
+                    | {
+                        /** @enum {string} */
+                        _tag: 'absolute_time_range'
+                        end: string
+                        start: string
+                      }
+                    | {
+                        /** @enum {string} */
+                        _tag: 'relative_time_range'
+                        amount: number
+                        /** @enum {string} */
+                        unit: 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
+                      }
+                  title?: string
+                  /** @enum {string} */
+                  view?: 'table' | 'chart'
+                }
+              | {
+                  _id?: string
+                  /** @enum {string} */
+                  _tag: 'markdown_cell'
+                  text: string
+                }
+            )[]
+            schema_version: number
+          }
       description?: string
       /**
        * @description A missing `favorite` value means that the value will remained unchanged for updates. Defaults to `false` for inserts.
        * @default false
        */
       favorite?: boolean
-      folder_id?: (null | (string | null)) | null
+      /** Format: uuid */
+      folder_id?: string | null
       id?: string
       name: string
       owner_id?: number
       project_id?: number
       /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql'
+      type: 'sql' | 'report' | 'log_sql' | 'notebook'
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
     }
@@ -25421,7 +25487,7 @@ export interface operations {
         name?: string
         sort_by?: 'name' | 'inserted_at'
         sort_order?: 'asc' | 'desc'
-        type?: 'sql' | 'report' | 'log_sql'
+        type?: 'sql' | 'report' | 'log_sql' | 'notebook'
         visibility?: string
       }
       header?: never
@@ -25579,7 +25645,7 @@ export interface operations {
     parameters: {
       query?: {
         name?: string
-        type?: 'sql' | 'report' | 'log_sql'
+        type?: 'sql' | 'report' | 'log_sql' | 'notebook'
       }
       header?: never
       path: {
@@ -25636,7 +25702,7 @@ export interface operations {
         name?: string
         sort_by?: 'name' | 'inserted_at'
         sort_order?: 'asc' | 'desc'
-        type?: 'sql' | 'report' | 'log_sql'
+        type?: 'sql' | 'report' | 'log_sql' | 'notebook'
         visibility?: string
       }
       header?: never

@@ -1,17 +1,19 @@
 import { useParams } from 'common'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
+import { type PropsWithChildren } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
-import { ConfirmFooter } from './ConfirmFooter'
+import { AssistantNotebookPreview } from './AssistantNotebookPreview'
+import { Confirm } from './Confirm'
+import { type ConfirmFooterApprovalState } from './Confirm.utils'
 import {
   createNotebookInputSchema,
   notebookToolOutputSchema,
   updateNotebookInputSchema,
 } from './Message.utils'
-import { NotebookPreview } from '@/components/interfaces/Explorer/NotebookPreview/NotebookPreview'
 import { AlertError } from '@/components/ui/AlertError'
 import {
   deriveNotebookDiff,
@@ -24,7 +26,7 @@ import { toWireNotebook } from '@/data/content/notebooks/notebook-schema'
 export type NotebookProposalMode = 'create' | 'update'
 
 // input-streaming and output-error are handled by the caller before this component is
-// rendered — see MessagePartCreateNotebook / MessagePartUpdateNotebook in Message.Parts.tsx.
+// rendered — see MessagePartNotebookProposal in Message.Parts.tsx.
 export type NotebookProposalState =
   | 'input-available'
   | 'approval-requested'
@@ -37,25 +39,25 @@ export interface NotebookProposalRendererProps {
   state: NotebookProposalState
   input: unknown
   output: unknown
+  /** Result of `getManualToolApprovalConfirmState`. Drives the Confirm footer. */
+  confirmState?: ConfirmFooterApprovalState
   onApprove?: () => void
   onDeny?: () => void
 }
 
-type NotebookProposalStepProps = Omit<NotebookProposalRendererProps, 'mode' | 'output'>
+type NotebookProposalStepProps = Omit<NotebookProposalRendererProps, 'mode' | 'output' | 'state'>
 
 const MODE_COPY = {
   create: {
     confirmMessage: 'Assistant wants to create this notebook',
     confirmLabel: 'Create',
     confirmLabelLoading: 'Creating...',
-    skippedLabel: 'Skipped notebook creation',
     outputLabel: 'Notebook created',
   },
   update: {
     confirmMessage: 'Assistant wants to update this notebook',
     confirmLabel: 'Apply changes',
     confirmLabelLoading: 'Applying changes...',
-    skippedLabel: 'Skipped notebook update',
     outputLabel: 'Notebook updated',
   },
 } as const
@@ -63,26 +65,31 @@ const MODE_COPY = {
 /**
  * Renders the create/update notebook tool across all approval states. Owns input parsing
  * (via the shared `agentNotebookSchema` / `notebookOperationsSchema`), the update-mode diff
- * fetch, and the `expected_updated_at` version check.
+ * fetch, and the `expected_updated_at` version check. Wraps the preview in `Confirm` the
+ * same way `AssistantQueryCell` wraps `QueryEditor`.
  */
 export const NotebookProposalRenderer = (props: NotebookProposalRendererProps) => {
   const { mode, state, output } = props
-
-  if (state === 'output-denied') {
-    return (
-      <p className="text-xs text-foreground-lighter my-2 px-4">{MODE_COPY[mode].skippedLabel}</p>
-    )
-  }
 
   if (state === 'output-available') {
     return <NotebookOutputSummary mode={mode} output={output} />
   }
 
-  const { input, onApprove, onDeny } = props
+  const { input, confirmState, onApprove, onDeny } = props
   return mode === 'create' ? (
-    <CreateNotebookProposal state={state} input={input} onApprove={onApprove} onDeny={onDeny} />
+    <CreateNotebookProposal
+      input={input}
+      confirmState={confirmState}
+      onApprove={onApprove}
+      onDeny={onDeny}
+    />
   ) : (
-    <UpdateNotebookProposal state={state} input={input} onApprove={onApprove} onDeny={onDeny} />
+    <UpdateNotebookProposal
+      input={input}
+      confirmState={confirmState}
+      onApprove={onApprove}
+      onDeny={onDeny}
+    />
   )
 }
 
@@ -107,82 +114,91 @@ function NotebookOutputSummary({ mode, output }: { mode: NotebookProposalMode; o
   )
 }
 
-interface NotebookConfirmFooterProps {
+interface NotebookConfirmProps {
   mode: NotebookProposalMode
-  state: NotebookProposalState
+  confirmState?: ConfirmFooterApprovalState
   message?: string
   confirmLabel?: string
   confirmLabelLoading?: string
   extraLoading?: boolean
+  denyOnly?: boolean
   onApprove?: () => void
   onDeny?: () => void
 }
 
-/** The footer morphs (label + disabled) across approval-requested/approval-responded and is absent otherwise. */
-function NotebookConfirmFooter({
+/** Confirm card around a notebook preview, matching AssistantQueryCell / EdgeFunctionRenderer. */
+function NotebookConfirm({
   mode,
-  state,
+  confirmState,
   message,
   confirmLabel,
   confirmLabelLoading,
-  extraLoading = false,
+  extraLoading,
+  denyOnly,
   onApprove,
   onDeny,
-}: NotebookConfirmFooterProps) {
-  if (state !== 'approval-requested' && state !== 'approval-responded') return null
-
+  children,
+}: PropsWithChildren<NotebookConfirmProps>) {
   const copy = MODE_COPY[mode]
-  const isApprovalRequested = state === 'approval-requested'
 
   return (
-    <ConfirmFooter
+    <Confirm
+      className="my-4"
+      state={confirmState}
       message={message ?? copy.confirmMessage}
       cancelLabel="Skip"
       confirmLabel={confirmLabel ?? copy.confirmLabel}
       confirmLabelLoading={confirmLabelLoading ?? copy.confirmLabelLoading}
-      isLoading={!isApprovalRequested || extraLoading}
-      onCancel={isApprovalRequested ? onDeny : undefined}
-      onConfirm={isApprovalRequested ? onApprove : undefined}
-    />
+      extraLoading={extraLoading}
+      denyOnly={denyOnly}
+      onCancel={onDeny}
+      onConfirm={denyOnly ? undefined : onApprove}
+    >
+      {children}
+    </Confirm>
   )
 }
 
 function NotebookParseFailure({
   mode,
-  state,
+  confirmState,
   input,
-  onApprove,
   onDeny,
-}: Pick<NotebookProposalRendererProps, 'mode' | 'state' | 'input' | 'onApprove' | 'onDeny'>) {
+}: Pick<NotebookProposalRendererProps, 'mode' | 'confirmState' | 'input' | 'onDeny'>) {
   return (
-    <div className="w-auto overflow-x-hidden my-4 px-4 flex flex-col gap-2">
-      <Admonition
-        type="warning"
-        title="Couldn't render a preview for this notebook"
-        description="The assistant's proposed input didn't match the expected shape. You can still review the raw input below."
-      />
-      <CodeBlock
-        language="json"
-        value={JSON.stringify(input, null, 2)}
-        hideLineNumbers
-        className="text-xs"
-        wrapperClassName="max-h-56"
-      />
-      <NotebookConfirmFooter mode={mode} state={state} onApprove={onApprove} onDeny={onDeny} />
-    </div>
+    <NotebookConfirm mode={mode} confirmState={confirmState} denyOnly onDeny={onDeny}>
+      <div className="flex flex-col gap-2 p-3">
+        <Admonition
+          type="warning"
+          title="Couldn't render a preview for this notebook"
+          description="The assistant's proposed input didn't match the expected shape. You can still review the raw input below."
+        />
+        <CodeBlock
+          language="json"
+          value={JSON.stringify(input, null, 2)}
+          hideLineNumbers
+          className="text-xs"
+          wrapperClassName="max-h-56"
+        />
+      </div>
+    </NotebookConfirm>
   )
 }
 
-function CreateNotebookProposal({ state, input, onApprove, onDeny }: NotebookProposalStepProps) {
+function CreateNotebookProposal({
+  input,
+  confirmState,
+  onApprove,
+  onDeny,
+}: NotebookProposalStepProps) {
   const parsedInput = createNotebookInputSchema.safeParse(input)
 
   if (!parsedInput.success) {
     return (
       <NotebookParseFailure
         mode="create"
-        state={state}
+        confirmState={confirmState}
         input={input}
-        onApprove={onApprove}
         onDeny={onDeny}
       />
     )
@@ -197,14 +213,23 @@ function CreateNotebookProposal({ state, input, onApprove, onDeny }: NotebookPro
   )
 
   return (
-    <div className="w-auto overflow-x-hidden my-4 px-4 flex flex-col gap-2">
-      <NotebookPreview entries={entries} mode="create" />
-      <NotebookConfirmFooter mode="create" state={state} onApprove={onApprove} onDeny={onDeny} />
-    </div>
+    <NotebookConfirm
+      mode="create"
+      confirmState={confirmState}
+      onApprove={onApprove}
+      onDeny={onDeny}
+    >
+      <AssistantNotebookPreview entries={entries} mode="create" title={parsedInput.data.name} />
+    </NotebookConfirm>
   )
 }
 
-function UpdateNotebookProposal({ state, input, onApprove, onDeny }: NotebookProposalStepProps) {
+function UpdateNotebookProposal({
+  input,
+  confirmState,
+  onApprove,
+  onDeny,
+}: NotebookProposalStepProps) {
   const { ref } = useParams()
   const parsedInput = updateNotebookInputSchema.safeParse(input)
 
@@ -213,8 +238,6 @@ function UpdateNotebookProposal({ state, input, onApprove, onDeny }: NotebookPro
     isLoading,
     isError,
     error,
-    refetch,
-    isFetching,
   } = useNotebookQuery(
     { projectRef: ref, id: parsedInput.success ? parsedInput.data.id : undefined },
     { enabled: parsedInput.success }
@@ -224,9 +247,8 @@ function UpdateNotebookProposal({ state, input, onApprove, onDeny }: NotebookPro
     return (
       <NotebookParseFailure
         mode="update"
-        state={state}
+        confirmState={confirmState}
         input={input}
-        onApprove={onApprove}
         onDeny={onDeny}
       />
     )
@@ -243,14 +265,14 @@ function UpdateNotebookProposal({ state, input, onApprove, onDeny }: NotebookPro
 
   if (isError || !notebook) {
     return (
-      <div className="w-auto overflow-x-hidden my-4 px-4 flex flex-col gap-2">
+      <div className="w-auto overflow-x-hidden my-4 flex flex-col gap-2">
         <AlertError error={error} subject="Failed to load notebook" />
-        {(state === 'approval-requested' || state === 'approval-responded') && (
+        {confirmState !== undefined && (
           <Button
             variant="outline"
             size="tiny"
             className="w-fit"
-            disabled={state === 'approval-responded'}
+            disabled={confirmState !== 'approval-requested'}
             onClick={onDeny}
           >
             Skip
@@ -260,49 +282,37 @@ function UpdateNotebookProposal({ state, input, onApprove, onDeny }: NotebookPro
     )
   }
 
-  const isStale = notebook.updated_at !== parsedInput.data.expected_updated_at
+  const diff = deriveNotebookDiff(toWireNotebook(notebook.content), parsedInput.data.operations)
 
-  if (isStale) {
+  if (!diff.success) {
     return (
-      <div className="w-auto overflow-x-hidden my-4 px-4 flex flex-col gap-2">
-        <Admonition
-          type="warning"
-          title="This notebook changed since the assistant planned this update"
-          description={`"${notebook.name}" was updated after the assistant read it. Refresh to see the latest version before deciding.`}
-        />
-        <NotebookConfirmFooter
-          mode="update"
-          state={state}
-          confirmLabel="Refresh"
-          confirmLabelLoading="Refreshing..."
-          extraLoading={isFetching}
-          onDeny={onDeny}
-          onApprove={() => refetch()}
-        />
-      </div>
+      <NotebookConfirm
+        mode="update"
+        confirmState={confirmState}
+        message={`Assistant wants to update "${notebook.name}"`}
+        denyOnly
+        onDeny={onDeny}
+      >
+        <div className="p-3">
+          <Admonition
+            type="warning"
+            title="This update can't be applied as written"
+            description={describeNotebookOperationError(diff.error)}
+          />
+        </div>
+      </NotebookConfirm>
     )
   }
 
-  const diff = deriveNotebookDiff(toWireNotebook(notebook.content), parsedInput.data.operations)
-
   return (
-    <div className="w-auto overflow-x-hidden my-4 px-4 flex flex-col gap-2">
-      {diff.success ? (
-        <NotebookPreview entries={diff.entries} mode="update" />
-      ) : (
-        <Admonition
-          type="warning"
-          title="This update can't be applied as written"
-          description={describeNotebookOperationError(diff.error)}
-        />
-      )}
-      <NotebookConfirmFooter
-        mode="update"
-        state={state}
-        message={`Assistant wants to update "${notebook.name}"`}
-        onApprove={onApprove}
-        onDeny={onDeny}
-      />
-    </div>
+    <NotebookConfirm
+      mode="update"
+      confirmState={confirmState}
+      message={`Assistant wants to update "${notebook.name}"`}
+      onApprove={onApprove}
+      onDeny={onDeny}
+    >
+      <AssistantNotebookPreview entries={diff.entries} mode="update" title={notebook.name} />
+    </NotebookConfirm>
   )
 }

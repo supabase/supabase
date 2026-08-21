@@ -4,7 +4,7 @@ import { useReducedMotion } from 'common'
 import { HaReplicationEdgeData } from './HaInstanceConfiguration.utils'
 import { getPoolerEdgeState, getPoolerStatus } from './HaTopology.utils'
 import { useHaPooler } from './useHaPooler'
-import { EdgeVisualIcon, getEdgeVisual } from '@/components/ui/ReactFlow/EdgeVisual'
+import { EdgeVisualChip, getEdgeVisual } from '@/components/ui/ReactFlow/EdgeVisual'
 
 // The icon chip sits on the horizontal run of this top-to-bottom smoothstep
 // edge, so directional icons point along the actual flow: toward the target's
@@ -52,6 +52,7 @@ export const HaReplicationEdge = ({
         style={{
           ...style,
           stroke: visual.color,
+          strokeWidth: visual.strokeWidth,
           opacity: visual.opacity,
           strokeDasharray: visual.dashArray,
           animation:
@@ -63,10 +64,10 @@ export const HaReplicationEdge = ({
 
       <EdgeLabelRenderer>
         <div
-          className="bg-surface-100 p-1 rounded-sm absolute nodrag nopan border"
+          className="absolute nodrag nopan"
           style={{ transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)` }}
         >
-          <EdgeVisualIcon visual={visual} rotation={rotation} />
+          <EdgeVisualChip visual={visual} rotation={rotation} />
         </div>
       </EdgeLabelRenderer>
     </>

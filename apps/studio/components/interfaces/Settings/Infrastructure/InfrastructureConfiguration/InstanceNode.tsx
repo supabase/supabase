@@ -33,6 +33,7 @@ import {
   ReplicaNodeData,
 } from './InstanceConfiguration.constants'
 import { formatSeconds } from './InstanceConfiguration.utils'
+import { getReadReplicaPath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'
 import { SparkBar } from '@/components/ui/SparkBar'
 import {
@@ -366,9 +367,7 @@ export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="gap-x-2">
-              <Link href={`/project/${ref}/database/replication/replica/${id}`}>
-                Manage replica
-              </Link>
+              <Link href={getReadReplicaPath(ref, id)}>Manage replica</Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

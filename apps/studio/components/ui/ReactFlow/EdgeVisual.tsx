@@ -13,10 +13,10 @@ export interface EdgeVisual {
   color: string
   opacity: number
   dashArray: string
+  strokeWidth: number
   shouldAnimate: boolean
   shouldSpin?: boolean
   isFilled?: boolean
-  strokeWidth?: number
   // The icon depicts the flow direction (it points right, matching a
   // left-to-right layout) — edges in other layouts must rotate it to match
   // their actual direction.
@@ -47,6 +47,7 @@ export const getEdgeVisual = ({
       color: 'var(--foreground-light)',
       opacity: 1,
       dashArray: '5',
+      strokeWidth: 2,
       shouldAnimate: true,
       shouldSpin: true,
     }
@@ -57,6 +58,7 @@ export const getEdgeVisual = ({
       color: 'hsl(var(--brand-default))',
       opacity: 1,
       dashArray: '5',
+      strokeWidth: 2,
       shouldAnimate: true,
       isDirectional: true,
     }
@@ -66,29 +68,34 @@ export const getEdgeVisual = ({
     color: 'var(--foreground-lighter)',
     opacity: 0.5,
     dashArray: '5 5',
+    strokeWidth: 2,
     shouldAnimate: false,
     isFilled: true,
   }
 }
 
 /**
- * The icon half of an edge visual, for the small chip rendered mid-edge.
+ * The round icon chip rendered mid-edge, bordered in the edge's color.
  * Pass `rotation` (degrees) to orient directional icons in layouts that
  * aren't left-to-right.
  */
-export const EdgeVisualIcon = ({ visual, rotation }: { visual: EdgeVisual; rotation?: number }) => {
-  const { Icon, color, shouldSpin, isFilled, strokeWidth, isDirectional } = visual
+export const EdgeVisualChip = ({ visual, rotation }: { visual: EdgeVisual; rotation?: number }) => {
+  const { Icon, color, shouldSpin, isFilled, isDirectional } = visual
 
   return (
-    <Icon
-      size={12}
-      strokeWidth={strokeWidth ?? 2}
-      fill={isFilled ? 'currentColor' : 'none'}
-      className={cn(shouldSpin && 'motion-safe:animate-spin')}
-      style={{
-        color,
-        transform: isDirectional && rotation !== undefined ? `rotate(${rotation}deg)` : undefined,
-      }}
-    />
+    <div
+      className="w-6 h-6 rounded-full flex items-center justify-center border bg-surface-100"
+      style={{ borderColor: color }}
+    >
+      <Icon
+        size={14}
+        className={cn(shouldSpin && 'motion-safe:animate-spin')}
+        style={{
+          color,
+          fill: isFilled ? color : undefined,
+          transform: isDirectional && rotation !== undefined ? `rotate(${rotation}deg)` : undefined,
+        }}
+      />
+    </div>
   )
 }

@@ -11,18 +11,65 @@ import {
 import { getNotebook } from '@/data/content/notebooks/notebook-query'
 import {
   agentNotebookSchema,
-  type CellWire,
-  type NotebookWire,
+  toWireNotebook,
   type WritableCell,
   type WritableNotebook,
 } from '@/data/content/notebooks/notebook-schema'
-import { createNotebook, updateNotebook } from '@/data/content/notebooks/notebook-upsert-mutation'
+import { createNotebook, upsertNotebook } from '@/data/content/notebooks/notebook-upsert-mutation'
 import { acceptUntrustedLogsSql, untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import type { Notebooks } from '@/types'
 
 export type NotebookToolsContext = {
   projectRef?: string
   authorization?: string
+}
+
+const notebookToolErrorMetadataSchema = z.object({
+  exposeToAssistant: z.boolean(),
+})
+
+export type NotebookToolErrorMetadata = z.infer<typeof notebookToolErrorMetadataSchema>
+
+const notebookToolErrorSchema = notebookToolErrorMetadataSchema.extend({
+  tag: z.literal('notebook_tool_error'),
+  message: z.string(),
+})
+
+export type EncodedNotebookToolError = z.infer<typeof notebookToolErrorSchema>
+
+/** Thrown by update_notebook for failures the assistant can act on by retrying. */
+export class NotebookToolError extends Error {
+  readonly metadata: NotebookToolErrorMetadata
+
+  constructor(message: string, metadata: NotebookToolErrorMetadata) {
+    super(message)
+    this.name = 'NotebookToolError'
+    this.metadata = notebookToolErrorMetadataSchema.parse(metadata)
+  }
+}
+
+/** Called from the stream's `onError` (generate-v4.ts), which still has the live Error. */
+export function encodeNotebookToolError(error: unknown): string | null {
+  if (!(error instanceof NotebookToolError)) return null
+  return JSON.stringify(
+    notebookToolErrorSchema.parse({
+      ...error.metadata,
+      tag: 'notebook_tool_error',
+      message: error.message,
+    })
+  )
+}
+
+/** Called from the history filter (generate-assistant-response.ts) on a persisted errorText. */
+export function decodeNotebookToolError(errorText: string): EncodedNotebookToolError | null {
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(errorText)
+  } catch {
+    return null
+  }
+  const result = notebookToolErrorSchema.safeParse(parsed)
+  return result.success ? result.data : null
 }
 
 export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
@@ -80,28 +127,15 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
       execute: async ({ id }) => {
         const notebook = await getNotebook({ projectRef, id }, undefined, authHeaders)
 
+        // toWireNotebook discards the `unchecked_sql` brand for display purposes only — the
+        // result is returned to the agent, never written back.
         return {
           id: notebook.id,
           name: notebook.name,
           description: notebook.description,
           visibility: notebook.visibility,
           updated_at: notebook.updated_at,
-          // Inlined rather than a shared helper: this discards the `unchecked_sql` brand for
-          // display purposes only — the result is returned to the agent, never written back.
-          cells: notebook.content.cells.map((cell) => {
-            switch (cell._tag) {
-              case 'markdown_cell':
-                return cell
-              case 'database_cell': {
-                const { unchecked_sql, ...rest } = cell
-                return { ...rest, sql: unchecked_sql }
-              }
-              case 'log_cell': {
-                const { unchecked_sql, ...rest } = cell
-                return { ...rest, sql: unchecked_sql }
-              }
-            }
-          }),
+          cells: toWireNotebook(notebook.content).cells,
         }
       },
     }),
@@ -167,38 +201,22 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
         const notebook = await getNotebook({ projectRef, id }, undefined, authHeaders)
 
         if (notebook.updated_at !== expected_updated_at) {
-          throw new Error(
-            `Notebook "${id}" changed since expected_updated_at (${expected_updated_at}); it is now ${notebook.updated_at}. Call get_notebook again and reissue update_notebook against the current content.`
+          throw new NotebookToolError(
+            `Notebook "${id}" changed since expected_updated_at (${expected_updated_at}); it is now ${notebook.updated_at}. Call get_notebook again and reissue update_notebook against the current content.`,
+            { exposeToAssistant: true }
           )
         }
 
-        // Inlined rather than a shared helper, right beside this tool's own
-        // `needsApproval: true`: this discards each cell's `unchecked_sql` brand so
-        // applyNotebookOperations can splice cells as plain data. The result is never
-        // written or executed as-is — every cell is re-promoted via
-        // acceptUntrustedSql/acceptUntrustedLogsSql further down in this same execute,
-        // right before the PUT.
-        const wireNotebook: NotebookWire = {
-          schema_version: notebook.content.schema_version,
-          cells: notebook.content.cells.map((cell): CellWire => {
-            switch (cell._tag) {
-              case 'markdown_cell':
-                return cell
-              case 'database_cell': {
-                const { unchecked_sql, ...rest } = cell
-                return { ...rest, sql: unchecked_sql }
-              }
-              case 'log_cell': {
-                const { unchecked_sql, ...rest } = cell
-                return { ...rest, sql: unchecked_sql }
-              }
-            }
-          }),
-        }
+        // The result of applyNotebookOperations is never written or executed as-is — every
+        // cell is re-promoted via acceptUntrustedSql/acceptUntrustedLogsSql further down in
+        // this same execute, right before the PUT.
+        const wireNotebook = toWireNotebook(notebook.content)
 
         const result = applyNotebookOperations(wireNotebook, operations)
         if (!result.success) {
-          throw new Error(describeNotebookOperationError(result.error))
+          throw new NotebookToolError(describeNotebookOperationError(result.error), {
+            exposeToAssistant: true,
+          })
         }
 
         // Same promotion as create_notebook above, inlined here for the same auditability
@@ -214,7 +232,7 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
           }
         })
 
-        await updateNotebook(
+        await upsertNotebook(
           {
             projectRef: projectRef ?? '',
             id,

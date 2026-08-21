@@ -19,6 +19,7 @@ import { ReadReplicaEligibilityWarnings } from './ReadReplicaEligibilityWarnings
 import { ReadReplicaPricingDialog } from './ReadReplicaPricingDialog'
 import { useCheckEligibilityDeployReplica } from './useCheckEligibilityDeployReplica'
 import { AVAILABLE_REPLICA_REGIONS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
+import type { RecommendedComputeForReadReplicas } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/recommendCompute'
 import { Region, useReadReplicaSetUpMutation } from '@/data/read-replicas/replica-setup-mutation'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { AWS_REGIONS_DEFAULT, BASE_PATH } from '@/lib/constants'
@@ -29,6 +30,7 @@ interface ReadReplicaFormProps {
   onSuccess: () => void
   onClose: () => void
   onCancel?: () => void
+  onRecommendCompute: (size: RecommendedComputeForReadReplicas) => void
 }
 
 export const ReadReplicaForm = ({
@@ -37,6 +39,7 @@ export const ReadReplicaForm = ({
   onSuccess,
   onClose,
   onCancel = onClose,
+  onRecommendCompute,
 }: ReadReplicaFormProps) => {
   const { ref: projectRef } = useParams()
   const { data } = useReadReplicasQuery({ projectRef })
@@ -90,7 +93,7 @@ export const ReadReplicaForm = ({
         {typeSelection}
         {!canDeployReplica && (
           <SheetSection>
-            <ReadReplicaEligibilityWarnings />
+            <ReadReplicaEligibilityWarnings onRecommendCompute={onRecommendCompute} />
           </SheetSection>
         )}
         <FormItemLayout

@@ -11,7 +11,7 @@ updateNotifier: false
 enableGlobalVirtualStore: false
 
 catalog:
-  '@monaco-editor/react': ^4.7.0
+  '@monaco-editor/react': 4.8.0-rc.3
   '@sentry/nextjs': ^10.59.0
   '@sentry/tanstackstart-react': ^10.59.0
   '@supabase/auth-js': 2.112.3

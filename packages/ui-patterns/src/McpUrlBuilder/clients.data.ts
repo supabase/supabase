@@ -439,3 +439,12 @@ export const DEFAULT_MCP_URL_NON_PLATFORM = 'http://localhost:54321/mcp'
  * docs document (and what to fall back to in production).
  */
 export const HOSTED_MCP_URL = 'https://mcp.supabase.com/mcp'
+
+/**
+ * Hosted MCP authentication note. Shared by the docs HTML callout and the
+ * markdown export so the two pipelines cannot drift.
+ */
+export const MCP_HOSTED_AUTH_NOTE = {
+  title: 'Authentication',
+  body: "Some MCP clients automatically prompt you to log in during setup. Others require manual authentication steps. Either method opens a browser window where you log in to your Supabase account and grant the MCP client access to your organization. You don't need a personal access token (PAT).",
+} as const

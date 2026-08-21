@@ -9,8 +9,6 @@ import type { Notebook, StateNotebook } from './types'
 import type { SnippetStatus } from '@/data/content/snippet-status'
 import type { Notebooks } from '@/types'
 
-// [Joshen] Deliberately copied from sql-editor-lifecycle cause we might deprecate
-// that in favor of notebooks in the long run
 function statusOnEdit(status: SnippetStatus): SnippetStatus {
   return status === 'saved' ? 'unsaved' : status
 }
@@ -67,8 +65,6 @@ export const notebooksState = proxy({
     const { [id]: notebook, ...otherNotebooks } = notebooksState.notebooks
     notebooksState.notebooks = otherNotebooks
     if (!skipSave) notebooksState.needsSaving.delete(id)
-
-    // TODO: clear notebookSessionState once it exists
   },
 
   /**
@@ -114,7 +110,7 @@ export const notebooksState = proxy({
     if (!stateNotebook?.notebook.content) return
 
     const cells = stateNotebook.notebook.content.cells
-    const insertAt = cellId ? cells.findIndex((c) => c.id === cellId) : -1
+    const insertAt = cellId ? cells.findIndex((c) => c._id === cellId) : -1
     const nextCells = [...cells]
     nextCells.splice(insertAt === -1 ? cells.length : insertAt + 1, 0, cell)
 
@@ -140,7 +136,7 @@ export const notebooksState = proxy({
     if (!stateNotebook?.notebook.content) return
 
     const nextCells = stateNotebook.notebook.content.cells.map((cell) =>
-      cell.id === cellId ? updater(cell) : cell
+      cell._id === cellId ? updater(cell) : cell
     )
     notebooksState.updateCells({ id, cells: nextCells })
   },
@@ -152,7 +148,7 @@ export const notebooksState = proxy({
     const stateNotebook = notebooksState.notebooks[id]
     if (!stateNotebook?.notebook.content) return
 
-    const nextCells = stateNotebook.notebook.content.cells.filter((c) => c.id !== cellId)
+    const nextCells = stateNotebook.notebook.content.cells.filter((c) => c._id !== cellId)
     notebooksState.updateCells({ id, cells: nextCells })
   },
 
@@ -173,7 +169,7 @@ export const notebooksState = proxy({
     if (!stateNotebook?.notebook.content) return
 
     const cells = stateNotebook.notebook.content.cells
-    const currentIndex = cells.findIndex((c) => c.id === cellId)
+    const currentIndex = cells.findIndex((c) => c._id === cellId)
     if (currentIndex === -1) return
 
     const nextIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
@@ -199,8 +195,8 @@ export const notebooksState = proxy({
     if (!stateNotebook?.notebook.content) return
 
     const cells = stateNotebook.notebook.content.cells
-    const oldIndex = cells.findIndex((c) => c.id === activeCellId)
-    const newIndex = cells.findIndex((c) => c.id === overCellId)
+    const oldIndex = cells.findIndex((c) => c._id === activeCellId)
+    const newIndex = cells.findIndex((c) => c._id === overCellId)
     if (oldIndex === -1 || newIndex === -1) return
 
     notebooksState.updateCells({ id, cells: arrayMove([...cells], oldIndex, newIndex) })

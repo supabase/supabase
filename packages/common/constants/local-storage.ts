@@ -104,6 +104,10 @@ export const LOCAL_STORAGE_KEYS = {
   // RLS event trigger banner dismissed
   RLS_EVENT_TRIGGER_BANNER_DISMISSED: (ref: string) => `rls-event-trigger-banner-dismissed-${ref}`,
 
+  // Read replicas moved from Replication → Infrastructure
+  READ_REPLICAS_MOVED_CALLOUT_DISMISSED: (ref: string) =>
+    `read-replicas-moved-callout-dismissed-${ref}`,
+
   PROJECT_SECURITY_DISMISSED_AT: (ref: string) => `project-security-dismissed-at-${ref}`,
 
   DATABASE_CONNECTIONS_BANNER_DISMISSED: (ref: string) =>
@@ -121,6 +125,8 @@ export const LOCAL_STORAGE_KEYS = {
     `project-upgrade-failed-banner-dismissed-at-${ref}`,
   UNIFIED_LOGS_BANNER_DISMISSED: 'unified-logs-banner-dismissed',
   UNIFIED_LOGS_SIDEBAR_BANNER_DISMISSED: 'unified-logs-sidebar-banner-dismissed',
+  // Dated so the key retires with the banner; see BannerLogsAllDeprecation
+  LOGS_ALL_DEPRECATION_2026_09_23: 'logs-all-deprecation-2026-09-23-dismissed',
   SCOPED_TOKENS_MIGRATION_ADMONITION_DISMISSED: 'scoped-tokens-migration-admonition-dismissed',
   STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED: (ref: string, bucketId: string) =>
     `storage-public-bucket-select-policy-warning-dismissed-${ref}-${bucketId}`,
