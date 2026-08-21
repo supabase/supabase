@@ -25,11 +25,8 @@ const NotebookTabStatusIndicator = ({ tab }: { tab: Tab }) => {
 /**
  * Evicts a notebook's content from the valtio store and the React Query cache
  * when its tab closes, so reopening it always refetches instead of showing
- * whatever was last loaded. Only applies to notebooks with no unsaved edits —
- * a dirty notebook is left in the store untouched, same as today, since there's
- * no autosave or discard-confirmation flow for notebooks yet.
- *
- * [Joshen] We'll address discard confirmation separately
+ * whatever was last loaded. Unsaved edits are discarded the same way — safe
+ * because `confirmClose` below has already asked the user to confirm.
  */
 export const ExplorerNotebookTabCoordinator = () => {
   const { ref } = useParams()
@@ -40,13 +37,35 @@ export const ExplorerNotebookTabCoordinator = () => {
     return tabs.registerTabTypeHandler('notebook', {
       onClose: (tab) => {
         const notebookId = tab.metadata?.notebookId
-        if (!ref || !notebookId) return
-
-        const stateNotebook = notebooksState.notebooks[notebookId]
-        if (stateNotebook?.status !== 'saved') return
+        if (!ref || !notebookId || !notebooksState.notebooks[notebookId]) return
 
         notebooksState.removeNotebook({ id: notebookId })
         queryClient.removeQueries({ queryKey: contentKeys.resource(ref, notebookId) })
+      },
+      confirmClose: (notebookTabs) => {
+        const dirtyCount = notebookTabs.filter((tab) => {
+          const notebookId = tab.metadata?.notebookId
+          if (!notebookId) return false
+
+          const stateNotebook = notebooksState.notebooks[notebookId]
+          if (!hasUnsavedChanges(stateNotebook?.status)) return false
+
+          // A never-persisted notebook with no cells has nothing worth confirming before discarding.
+          const isEmptyNewNotebook =
+            stateNotebook?.status === 'new' &&
+            (stateNotebook.notebook.content?.cells.length ?? 0) === 0
+          return !isEmptyNewNotebook
+        }).length
+
+        if (dirtyCount === 0) return null
+
+        return {
+          title: 'Unsaved changes',
+          description:
+            dirtyCount === 1
+              ? 'You have unsaved changes in this notebook. Closing it will discard them.'
+              : `You have unsaved changes in ${dirtyCount} notebooks. Closing them will discard those changes.`,
+        }
       },
       StatusIndicator: NotebookTabStatusIndicator,
     })
