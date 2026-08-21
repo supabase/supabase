@@ -817,7 +817,7 @@ alter role "postgres" set "log_min_error_statement" to 'error';
 
 Determines what _query generated_ logs (not background or networking logs) are recorded based on severity level, as described in the table below.
 
-As an example of how `log_min_messages` works, if the setting were changed to `error`, Postgres would stop recording logs with the severity levels `warning`, `notice`, `info`, and `debug1 ... debug5` events. However, it would continue recording all `error`, `log`, `fatal`, and `panic` occurences.
+As an example of how `log_min_messages` works, if the setting were changed to `error`, Postgres would stop recording logs with the severity levels `warning`, `notice`, `info`, and `debug1 ... debug5` events. However, it would continue recording all `error`, `log`, `fatal`, and `panic` occurrences.
 
 | Severity              | Description                                                                                                                                                                                                                                                          | Example log                                                                                                                                                                          |
 | :-------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
