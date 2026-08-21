@@ -18,64 +18,35 @@ export function getGitBranchName(branch?: Branch): string | undefined {
 
 export function useSelectedGitHubConfigDrift() {
   const { ref: projectRef } = useParams()
-  const {
-    data: project,
-    isPending: isProjectPending,
-    isFetching: isProjectFetching,
-    isError: isProjectError,
-    error: projectError,
-  } = useSelectedProjectQuery()
+  const projectQuery = useSelectedProjectQuery()
+  const project = projectQuery.data
   const parentProjectRef = project?.parentRef ?? projectRef
   const shouldLoad = IS_PLATFORM && Boolean(projectRef) && Boolean(project)
 
-  const {
-    data: branches = [],
-    isPending: isBranchesPending,
-    isFetching: isBranchesFetching,
-    isError: isBranchesError,
-    error: branchesError,
-    isSuccess: isBranchesSuccess,
-    refetch: branchesRefetch,
-  } = useBranchesQuery({ projectRef: parentProjectRef }, { enabled: shouldLoad })
-  const {
-    data: connection,
-    isPending: isConnectionPending,
-    isFetching: isConnectionFetching,
-    isError: isConnectionError,
-    error: connectionError,
-    isSuccess: isConnectionSuccess,
-    refetch: connectionRefetch,
-  } = useProjectGitHubConnectionQuery({ ref: parentProjectRef })
+  const branchesQuery = useBranchesQuery({ projectRef: parentProjectRef }, { enabled: shouldLoad })
+  const connectionQuery = useProjectGitHubConnectionQuery({ ref: parentProjectRef })
+  const connection = connectionQuery.data
   const hasConnection = connection !== undefined
+  const branches = branchesQuery.data ?? []
   const selectedBranch = branches.find((branch) => branch.project_ref === projectRef)
   const gitBranch = getGitBranchName(selectedBranch)
-  const queriesEnabled = shouldLoad && isBranchesSuccess && isConnectionSuccess && hasConnection
+  const queriesEnabled =
+    shouldLoad && branchesQuery.isSuccess && connectionQuery.isSuccess && hasConnection
 
-  const {
-    data: projectConfig,
-    isPending: isProjectConfigPending,
-    isFetching: isProjectConfigFetching,
-    isError: isProjectConfigError,
-    error: projectConfigError,
-    isSuccess: isProjectConfigSuccess,
-    refetch: projectConfigRefetch,
-  } = useQuery({
+  const projectConfigQuery = useQuery({
     ...projectConfigV2QueryOptions({ projectRef }),
     enabled: queriesEnabled,
     staleTime: 30_000,
   })
-  const {
-    data: githubConfigData,
-    isPending: isGithubConfigPending,
-    isFetching: isGithubConfigFetching,
-    isError: isGithubConfigError,
-    error: githubConfigError,
-    isSuccess: isGithubConfigSuccess,
-    refetch: githubConfigRefetch,
-  } = useGitHubConfigQuery(
+  const githubConfigQuery = useGitHubConfigQuery(
     { connectionId: connection?.id, branch: gitBranch },
     { enabled: queriesEnabled }
   )
+
+  const { refetch: branchesRefetch } = branchesQuery
+  const { refetch: connectionRefetch } = connectionQuery
+  const { refetch: projectConfigRefetch } = projectConfigQuery
+  const { refetch: githubConfigRefetch } = githubConfigQuery
 
   const refetch = useCallback(
     () =>
@@ -89,38 +60,31 @@ export function useSelectedGitHubConfigDrift() {
   )
 
   const summary = useMemo(() => {
-    const dashboardConfig = convertProjectConfigToGitHubConfig(projectConfig?.attributes)
+    const dashboardConfig = convertProjectConfigToGitHubConfig(projectConfigQuery.data?.attributes)
 
     return getConfigDriftSummary({
       dashboardConfig: dashboardConfig,
-      githubConfig: githubConfigData?.config,
+      githubConfig: githubConfigQuery.data?.config,
     })
-  }, [projectConfig?.attributes, githubConfigData?.config])
-  const isPending =
-    isProjectPending ||
-    (shouldLoad &&
-      (isBranchesPending ||
-        isConnectionPending ||
-        (hasConnection && (isProjectConfigPending || isGithubConfigPending))))
-  const isReady = shouldLoad && hasConnection && isProjectConfigSuccess && isGithubConfigSuccess
+  }, [projectConfigQuery.data?.attributes, githubConfigQuery.data?.config])
+
+  const activeQueries = [
+    projectQuery,
+    ...(shouldLoad ? [branchesQuery, connectionQuery] : []),
+    ...(shouldLoad && hasConnection ? [projectConfigQuery, githubConfigQuery] : []),
+  ]
+
+  const isReady =
+    shouldLoad && hasConnection && projectConfigQuery.isSuccess && githubConfigQuery.isSuccess
   const issueCount = summary.driftedFields.length
 
   return {
     requestedGitBranch: gitBranch,
     isReady,
-    isPending,
-    isFetching:
-      isProjectFetching ||
-      (shouldLoad &&
-        (isBranchesFetching ||
-          isConnectionFetching ||
-          (hasConnection && (isProjectConfigFetching || isGithubConfigFetching)))),
-    isError:
-      isProjectError ||
-      (shouldLoad &&
-        (isBranchesError || isConnectionError || isProjectConfigError || isGithubConfigError)),
-    error:
-      projectError ?? branchesError ?? connectionError ?? projectConfigError ?? githubConfigError,
+    isPending: activeQueries.some((query) => query.isPending),
+    isFetching: activeQueries.some((query) => query.isFetching),
+    isError: activeQueries.some((query) => query.isError),
+    error: activeQueries.some((query) => query.error),
     hasConfigurationIssues: isReady && issueCount > 0,
     unmanagedFields: summary.unmanagedFields,
     summary,

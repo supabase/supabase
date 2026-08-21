@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { useMemo } from 'react'
 
 import { integrationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
