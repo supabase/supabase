@@ -1,8 +1,89 @@
 module.exports = [
   {
     permanent: true,
+    source: '/images/customers/logos/light/:path*',
+    destination: '/images/customers/logos/on-dark/:path*',
+  },
+  // Legacy root wordmarks moved to on-light/. Keep dreambase-mark.png at logos/ root.
+  {
+    permanent: true,
+    source: '/images/customers/logos/:slug((?!dreambase-mark\\.png)[^/.]+).png',
+    destination: '/images/customers/logos/on-light/:slug.png',
+  },
+  {
+    permanent: true,
+    source: '/blog/pricing',
+    destination: '/pricing',
+  },
+  {
+    permanent: true,
+    source: '/blog/introducing-supabase-etl',
+    destination: '/blog/introducing-supabase-pipelines',
+  },
+  {
+    permanent: true,
+    source: '/blog/supabase-etl',
+    destination: '/blog/introducing-supabase-pipelines',
+  },
+  {
+    permanent: true,
+    source: '/blog/realtime-or-etl-how-to-choose-the-right-tool',
+    destination: '/blog/realtime-or-pipelines-how-to-choose-the-right-tool',
+  },
+  {
+    permanent: true,
+    source: '/features/supabase-etl',
+    destination: '/features/supabase-pipelines',
+  },
+  {
+    permanent: true,
+    source: '/ui/docs/ai-editors-rules/prompts',
+    destination: '/docs/guides/ai-tools/ai-skills',
+  },
+  {
+    permanent: true,
+    source: '/ui/docs/ai-editors-rules/skills',
+    destination: '/docs/guides/ai-tools/ai-skills',
+  },
+  {
+    permanent: true,
+    source: '/ui',
+    destination: '/library',
+  },
+  {
+    permanent: true,
+    source: '/ui/:path*',
+    destination: '/library/:path*',
+  },
+  {
+    permanent: true,
     source: '/auth/Auth',
     destination: '/auth',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/api/api-keys',
+    destination: '/docs/guides/getting-started/api-keys',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/hardening-data-api',
+    destination: '/docs/guides/api/securing-your-api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/api/hardening-data-api',
+    destination: '/docs/guides/api/securing-your-api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/data-api',
+    destination: '/docs/guides/api/securing-your-api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
+    destination: '/docs/guides/api/custom-claims-and-role-based-access-control-rbac',
   },
   {
     permanent: true,
@@ -58,6 +139,11 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/reports/:match*',
     destination: '/docs/guides/observability/:match*',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/telemetry/:match*',
+    destination: '/docs/guides/monitoring-and-debugging/:match*',
   },
   {
     permanent: false,
@@ -1549,6 +1635,16 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/functions/auth#understanding-authorization-headers',
+    destination: '/docs/guides/functions/auth-headers',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/auth#the-verify_jwt-platform-check',
+    destination: '/docs/guides/functions/auth-headers',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/functions/examples',
     destination: '/docs/guides/functions',
   },
@@ -1661,6 +1757,21 @@ module.exports = [
     permanent: true,
     source: '/docs/company/privacy',
     destination: '/privacy',
+  },
+  {
+    permanent: true,
+    source: '/privacy-260316',
+    destination: '/privacy?version=v2',
+  },
+  {
+    permanent: true,
+    source: '/privacy-250528',
+    destination: '/privacy?version=v1',
+  },
+  {
+    permanent: true,
+    source: '/legal/dpa',
+    destination: '/legal/customer-resources/data-processing-addendum',
   },
   {
     permanent: true,
@@ -1796,7 +1907,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/features',
-    destination: '/docs/guides/getting-started/features',
+    destination: '/features',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/features',
+    destination: '/features',
   },
   {
     permanent: true,
@@ -1851,7 +1967,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/with-expo-social-auth',
-    destination: '/docs/guides/getting-started/tutorials/with-expo-react-native-social-auth',
+    destination: '/docs/guides/auth/quickstarts/with-expo-react-native-social-auth',
   },
   {
     permanent: true,
@@ -1861,7 +1977,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/getting-started/tutorials/with-expo-social-auth',
-    destination: '/docs/guides/getting-started/tutorials/with-expo-react-native-social-auth',
+    destination: '/docs/guides/auth/quickstarts/with-expo-react-native-social-auth',
   },
   {
     permanent: true,
@@ -1986,7 +2102,17 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/api',
-    destination: '/docs/reference/api/start',
+    destination: '/docs/reference/api/introduction',
+  },
+  // 'start' was never a real API reference slug — it only ever worked because
+  // the old /reference/api/* routing collapsed every sub-path to the same
+  // monolith, and the bare /docs/reference/api redirect pointed here for years.
+  // Keep redirecting so external links and bookmarks don't 404 now that only
+  // real slugs resolve.
+  {
+    permanent: true,
+    source: '/docs/reference/api/start',
+    destination: '/docs/reference/api/introduction',
   },
   {
     permanent: true,
@@ -2258,85 +2384,112 @@ module.exports = [
     source: '/blog/flutter-authentication-and-authorization-with-rls',
     destination: '/blog/flutter-authorization-with-rls',
   },
+  // /partners/integrations → /partners/catalog redirects
+  // Wrapper listing slugs → clean partner slugs (open the matching listing tab)
+  {
+    permanent: true,
+    source: '/partners/catalog/bigquery-wrapper',
+    destination: '/partners/catalog/bigquery?tab=bigquery-wrapper',
+  },
+  {
+    permanent: true,
+    source: '/partners/catalog/firebase-wrapper',
+    destination: '/partners/catalog/firebase?tab=firebase-wrapper',
+  },
+  {
+    permanent: true,
+    source: '/partners/catalog/stripe-wrapper',
+    destination: '/partners/catalog/stripe?tab=stripe-wrapper',
+  },
+  {
+    permanent: true,
+    source: '/partners/catalog/aikido-security',
+    destination: '/partners/catalog/aikido',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations',
+    destination: '/partners/catalog',
+  },
   {
     permanent: true,
     source: '/docs/guides/integrations/appsmith',
-    destination: '/partners/integrations/appsmith',
+    destination: '/partners/catalog/appsmith',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/auth0',
-    destination: '/partners/integrations/auth0',
+    destination: '/partners/catalog/auth0',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/authsignal',
-    destination: '/partners/integrations/authsignal',
+    destination: '/partners/catalog/authsignal',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/bracket',
-    destination: '/partners/integrations/bracket',
+    destination: '/partners/catalog/bracket',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/clerk',
-    destination: '/partners/integrations/clerk',
+    destination: '/partners/catalog/clerk',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/cloudflare-workers',
-    destination: '/partners/integrations/cloudflare-workers',
+    destination: '/partners/catalog/cloudflare-workers',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/dhiwise',
-    destination: '/partners/integrations/dhiwise',
+    destination: '/partners/catalog/dhiwise',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/directus',
-    destination: '/partners/integrations/directus',
+    destination: '/partners/catalog/directus',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/draftbit',
-    destination: '/partners/integrations/draftbit',
+    destination: '/partners/catalog/draftbit',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/estuary',
-    destination: '/partners/integrations/estuary',
+    destination: '/partners/catalog/estuary',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/fezto',
-    destination: '/partners/integrations/fezto',
+    destination: '/partners/catalog/fezto',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/flutterflow',
-    destination: '/partners/integrations/flutterflow',
+    destination: '/partners/catalog/flutterflow',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/forestadmin',
-    destination: '/partners/integrations/forestadmin',
+    destination: '/partners/catalog/forestadmin',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/illa',
-    destination: '/partners/integrations/illa',
+    destination: '/partners/catalog/illa',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/integrations',
-    destination: '/partners/integrations',
+    destination: '/partners/catalog',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/keyri',
-    destination: '/partners/integrations/keyri',
+    destination: '/partners/catalog/keyri',
   },
   {
     permanent: true,
@@ -2351,78 +2504,110 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/integrations/onesignal',
-    destination: '/partners/integrations/onesignal',
+    destination: '/partners/catalog/onesignal',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/passage',
-    destination: '/partners/integrations/passage',
+    destination: '/partners/catalog/passage',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/pgmustard',
-    destination: '/partners/integrations/pgmustard',
+    destination: '/partners/catalog/pgmustard',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/picket',
-    destination: '/partners/integrations/picket',
+    destination: '/partners/catalog/picket',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/plasmic',
-    destination: '/partners/integrations/plasmic',
+    destination: '/partners/catalog/plasmic',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/polyscale',
-    destination: '/partners/integrations/polyscale',
+    destination: '/partners/catalog/polyscale',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/prisma',
-    destination: '/partners/integrations/prisma',
+    destination: '/partners/catalog/prisma',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations/atomic_crm',
+    destination: '/partners/catalog/atomic-crm',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations/refine_dev',
+    destination: '/partners/catalog/refine',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations/supabase_wrapper_bigquery',
+    destination: '/partners/catalog/bigquery?tab=bigquery-wrapper',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations/supabase_wrapper_firebase',
+    destination: '/partners/catalog/firebase?tab=firebase-wrapper',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations/supabase_wrapper_stripe',
+    destination: '/partners/catalog/stripe?tab=stripe-wrapper',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/sequin',
-    destination: '/partners/integrations/sequin',
+    destination: '/partners/catalog/sequin',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/snaplet',
-    destination: '/partners/integrations/snaplet',
+    destination: '/partners/catalog/snaplet',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/stytch',
-    destination: '/partners/integrations/stytch',
+    destination: '/partners/catalog/stytch',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/supertokens',
-    destination: '/partners/integrations/supertokens',
+    destination: '/partners/catalog/supertokens',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/vercel',
-    destination: '/partners/integrations/vercel',
+    destination: '/partners/catalog/vercel',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/weweb',
-    destination: '/partners/integrations/weweb',
+    destination: '/partners/catalog/weweb',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/zuplo',
-    destination: '/partners/integrations/zuplo',
+    destination: '/partners/catalog/zuplo',
   },
   // toddle.dev pivoted to nordcraft
   {
     permanent: true,
     source: '/partners/integrations/toddle',
-    destination: '/partners/integrations/nordcraft',
+    destination: '/partners/catalog/nordcraft',
+  },
+  // Catch-all: any other /partners/integrations/<slug> not covered by a specific rule above.
+  // Must come after all specific /partners/integrations/* rules
+  {
+    permanent: true,
+    source: '/partners/integrations/:slug*',
+    destination: '/partners/catalog/:slug*',
   },
   {
     permanent: true,
@@ -2644,7 +2829,42 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/database/replication/etl-destinations',
-    destination: '/docs/guides/database/replication/replication-setup',
+    destination: '/docs/guides/database/replication/pipelines',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/analytics/replication',
+    destination: '/docs/guides/database/replication/pipelines',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/external-replication-setup',
+    destination: '/docs/guides/database/replication/pipelines',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/external-replication-monitoring',
+    destination: '/docs/guides/database/replication/pipelines-monitoring',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/external-replication-faq',
+    destination: '/docs/guides/database/replication/pipelines-faq',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/replication-setup',
+    destination: '/docs/guides/database/replication/pipelines',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/replication-monitoring',
+    destination: '/docs/guides/database/replication/pipelines-monitoring',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/replication-faq',
+    destination: '/docs/guides/database/replication/pipelines-faq',
   },
   {
     permanent: true,
@@ -2719,6 +2939,31 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/launch-week/6',
+    destination: '/blog/launch-week-6-wrap-up',
+  },
+  {
+    permanent: true,
+    source: '/launch-week/x',
+    destination: '/blog/launch-week-x-best-launches',
+  },
+  {
+    permanent: true,
+    source: '/launch-week/12',
+    destination: '/blog/launch-week-12-top-10',
+  },
+  {
+    permanent: true,
+    source: '/launch-week/13',
+    destination: '/blog/launch-week-13-top-10',
+  },
+  {
+    permanent: true,
+    source: '/launch-week/14',
+    destination: '/blog/launch-week-14-top-10',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/platform/enterprise-billing',
     destination: '/docs/guides/platform/org-based-billing',
   },
@@ -2740,7 +2985,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/cli/local-development',
-    destination: '/docs/guides/local-development/overview',
+    destination: '/docs/guides/local-development/database-migrations',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/local-development/overview',
+    destination: '/docs/guides/local-development/database-migrations',
   },
   {
     permanent: true,
@@ -2813,7 +3063,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/platform/marketplace',
-    destination: '/docs/guides/integrations/supabase-marketplace',
+    destination: '/docs/guides/integrations/partner-catalog',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/supabase-marketplace',
+    destination: '/docs/guides/integrations/partner-catalog',
   },
   {
     permanent: true,
@@ -3064,6 +3319,42 @@ module.exports = [
     destination: '/docs/guides/database/overview',
   },
 
+  // AI tools move
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/plugins',
+    destination: '/docs/guides/ai-tools/plugins',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/ai-prompts',
+    destination: '/docs/guides/ai-tools/ai-prompts',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/ai-prompts',
+    destination: '/docs/guides/ai-tools/ai-prompts',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/ai-prompts/:slug',
+    destination: '/docs/guides/ai-tools/ai-prompts/:slug',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/ai-skills',
+    destination: '/docs/guides/ai-tools/ai-skills',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/mcp',
+    destination: '/docs/guides/ai-tools/mcp',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/byo-mcp',
+    destination: '/docs/guides/ai-tools/byo-mcp',
+  },
   // design
   {
     permanent: true,
@@ -3092,4 +3383,14 @@ module.exports = [
     destination: '/dashboard/redeem?code=:code',
     permanent: false,
   },
+  // Legacy product .txt URLs → new .md routes
+  { permanent: true, source: '/llms/homepage.txt', destination: '/homepage.md' },
+  { permanent: true, source: '/llms/auth.txt', destination: '/auth.md' },
+  { permanent: true, source: '/llms/database.txt', destination: '/database.md' },
+  { permanent: true, source: '/llms/edge-functions.txt', destination: '/edge-functions.md' },
+  { permanent: true, source: '/llms/realtime.txt', destination: '/realtime.md' },
+  { permanent: true, source: '/llms/storage.txt', destination: '/storage.md' },
+  { permanent: true, source: '/llms/vector.txt', destination: '/modules/vector.md' },
+  { permanent: true, source: '/llms/pricing.txt', destination: '/pricing.md' },
+  { permanent: true, source: '/vector.md', destination: '/modules/vector.md' },
 ]

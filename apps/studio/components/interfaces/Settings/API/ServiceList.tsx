@@ -1,5 +1,5 @@
 import { AlertCircle } from 'lucide-react'
-import { Alert_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
+import { Alert, AlertTitle } from 'ui'
 
 import { PostgrestConfig } from './PostgrestConfig'
 import { ScaffoldSection } from '@/components/layouts/Scaffold'
@@ -10,14 +10,12 @@ export const ServiceList = () => {
   const { data: project, isPending: isLoading } = useSelectedProjectQuery()
 
   return (
-    <ScaffoldSection isFullWidth id="api-settings" className="gap-6">
+    <ScaffoldSection isFullWidth id="api-settings" className="gap-6 py-0!">
       {!isLoading && project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY ? (
-        <Alert_Shadcn_ variant="destructive">
+        <Alert variant="destructive">
           <AlertCircle size={16} />
-          <AlertTitle_Shadcn_>
-            API settings are unavailable as the project is not active
-          </AlertTitle_Shadcn_>
-        </Alert_Shadcn_>
+          <AlertTitle>API settings are unavailable as the project is not active</AlertTitle>
+        </Alert>
       ) : (
         <PostgrestConfig />
       )}

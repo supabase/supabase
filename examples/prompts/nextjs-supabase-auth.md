@@ -47,7 +47,7 @@ Instead, you MUST ALWAYS generate ONLY this pattern:
     getAll() {
       return cookieStore.getAll()
     },
-    setAll(cookiesToSet) {
+    setAll(cookiesToSet, headers) {
       const response = NextResponse.next({
         request,
       })
@@ -55,6 +55,9 @@ Instead, you MUST ALWAYS generate ONLY this pattern:
       cookiesToSet.forEach(({ name, value, options }) => {
         response.cookies.set(name, value, options)
       })
+      Object.entries(headers).forEach(([key, value]) =>
+        response.headers.set(key, value)
+      )
 
       return response
     }
@@ -99,7 +102,7 @@ export async function createClient() {
         getAll() {
           return cookieStore.getAll()
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet, _headers) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
               cookieStore.set(name, value, options)
@@ -135,13 +138,16 @@ export async function proxy(request: NextRequest) {
         getAll() {
           return request.cookies.getAll()
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+        setAll(cookiesToSet, headers) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({
             request,
           })
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
+          )
+          Object.entries(headers).forEach(([key, value]) =>
+            supabaseResponse.headers.set(key, value)
           )
         },
       },

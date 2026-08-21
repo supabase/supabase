@@ -15,7 +15,7 @@ export function TweetCard(props: TweetCard) {
         'bg-surface-75',
         'border group-hover/tweet-card:border-foreground-muted transition-colors',
         'rounded-2xl p-6',
-        'drop-shadow-sm',
+        'drop-shadow-xs',
         props.className
       )}
     >

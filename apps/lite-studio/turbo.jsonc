@@ -1,0 +1,13 @@
+{
+  "$schema": "./../../node_modules/turbo/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "env": [],
+      "passThroughEnv": [],
+      "inputs": ["$TURBO_DEFAULT$"],
+      "outputs": ["build/**"],
+    },
+  },
+}

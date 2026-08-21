@@ -1,8 +1,8 @@
 import { ReactNode } from 'react'
 
-import { StorageMenuV2 } from 'components/interfaces/Storage/StorageMenuV2'
-import { withAuth } from 'hooks/misc/withAuth'
 import { ProjectLayout } from '../ProjectLayout'
+import { StorageMenuV2 } from '@/components/interfaces/Storage/StorageMenuV2'
+import { withAuth } from '@/hooks/misc/withAuth'
 
 export interface StorageLayoutProps {
   title: string
@@ -11,7 +11,11 @@ export interface StorageLayoutProps {
 
 const StorageLayout = ({ title, children }: StorageLayoutProps) => {
   return (
-    <ProjectLayout title={title || 'Storage'} product="Storage" productMenu={<StorageMenuV2 />}>
+    <ProjectLayout
+      product="Storage"
+      browserTitle={{ section: title }}
+      productMenu={<StorageMenuV2 />}
+    >
       {children}
     </ProjectLayout>
   )

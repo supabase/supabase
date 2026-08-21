@@ -1,8 +1,7 @@
 import type { Tool, ToolSet } from 'ai'
 import { z } from 'zod'
-// End of third-party imports
 
-import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 // Add the DatabaseExtension type import
 export type DatabaseExtension = {
@@ -27,19 +26,30 @@ export const toolSetValidationSchema = z.record(
     'list_branches',
     'search_docs',
     'get_advisors',
-    'get_logs',
+    'query_logs',
 
     // Local tools
     'execute_sql',
     'deploy_edge_function',
     'rename_chat',
+    'escalate_to_human',
+    'resolve_support_conversation',
     'list_policies',
+    'list_reports',
+    'get_report',
+    'list_databases',
+    'list_notebooks',
+    'get_notebook',
+    'create_notebook',
+    'update_notebook',
 
     // Fallback tools for self-hosted
     'getSchemaTables',
     'getRlsKnowledge',
     'getFunctions',
     'getEdgeFunctionKnowledge',
+
+    'load_knowledge',
   ]),
   basicToolSchema
 )
@@ -69,8 +79,11 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   execute_sql: TOOL_CATEGORIES.UI,
   deploy_edge_function: TOOL_CATEGORIES.UI,
   rename_chat: TOOL_CATEGORIES.UI,
+  escalate_to_human: TOOL_CATEGORIES.UI,
+  resolve_support_conversation: TOOL_CATEGORIES.UI,
   search_docs: TOOL_CATEGORIES.UI,
   get_active_incidents: TOOL_CATEGORIES.UI,
+  load_knowledge: TOOL_CATEGORIES.UI,
 
   // Schema tools - MCP
   list_tables: TOOL_CATEGORIES.SCHEMA,
@@ -78,6 +91,13 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   list_edge_functions: TOOL_CATEGORIES.SCHEMA,
   list_branches: TOOL_CATEGORIES.SCHEMA,
   list_policies: TOOL_CATEGORIES.SCHEMA,
+  list_reports: TOOL_CATEGORIES.SCHEMA,
+  get_report: TOOL_CATEGORIES.SCHEMA,
+  list_databases: TOOL_CATEGORIES.SCHEMA,
+  list_notebooks: TOOL_CATEGORIES.SCHEMA,
+  get_notebook: TOOL_CATEGORIES.SCHEMA,
+  create_notebook: TOOL_CATEGORIES.SCHEMA,
+  update_notebook: TOOL_CATEGORIES.SCHEMA,
   getSchemaTables: TOOL_CATEGORIES.SCHEMA,
   getRlsKnowledge: TOOL_CATEGORIES.SCHEMA,
   getFunctions: TOOL_CATEGORIES.SCHEMA,
@@ -85,7 +105,7 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
 
   // Log tools - MCP and local
   get_advisors: TOOL_CATEGORIES.LOG,
-  get_logs: TOOL_CATEGORIES.LOG,
+  query_logs: TOOL_CATEGORIES.LOG,
 }
 
 /**
@@ -145,10 +165,16 @@ export function createPrivacyMessageTool(toolInstance: Tool<any, any>) {
     "You don't have permission to use this tool. This is an organization-wide setting requiring you to opt-in. Please choose your preferred data sharing level in your organization's settings. Supabase Assistant uses Amazon Bedrock, which does not store or log your prompts and completions, use them to train AWS models, or distribute them to third parties. By default, no data is shared. Granting permission allows Supabase to send information (like schema, logs, or data, depending on your chosen level) to Bedrock solely to generate responses."
   const condensedPrivacyMessage =
     'Requires opting in to sending data to Bedrock which does not store, train on, or distribute it. You can opt in via organization settings.'
+  const toolDescription = toolInstance.description
+  const description =
+    typeof toolDescription === 'function'
+      ? (...args: Parameters<typeof toolDescription>) =>
+          `${toolDescription(...args)} (Note: ${condensedPrivacyMessage})`
+      : `${toolDescription ?? ''} (Note: ${condensedPrivacyMessage})`
 
   return {
     ...toolInstance,
-    description: `${toolInstance.description} (Note: ${condensedPrivacyMessage})`,
+    description,
     execute: async (_args: any, _context: any) => ({ status: privacyMessage }),
   }
 }

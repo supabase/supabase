@@ -1,5 +1,4 @@
-import { SupaTable } from 'components/grid/types'
-
+import { SupaTable } from '@/components/grid/types'
 import { Lint } from '@/data/lint/lint-query'
 
 export const getEntityLintDetails = (
@@ -23,6 +22,16 @@ export const getEntityLintDetails = (
     count: matchingLint ? 1 : 0,
     matchingLint,
   }
+}
+
+export const getTablePoliciesUrl = (
+  projectRef: string | undefined,
+  schema: string | undefined,
+  name: string | undefined
+): string => {
+  return `/project/${projectRef ?? ''}/database/policies?search=${encodeURIComponent(
+    name ?? ''
+  )}&schema=${encodeURIComponent(schema ?? '')}`
 }
 
 export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
@@ -56,6 +65,10 @@ export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
           stringFormats.includes(format)
         ) {
           return `'${val.replaceAll("'", "''")}'`
+        } else if (typeof val === 'number' || typeof val === 'boolean') {
+          return `${val}`
+        } else if (typeof val === 'string') {
+          return `'${val.replaceAll("'", "''")}'`
         } else {
           return `'${val}'`
         }
@@ -83,7 +96,7 @@ const generateRandomTag = (): `$${string}$` => {
 /**
  * Wrap a string in dollar-quote tags, ensuring the tag does not appear in the string
  *
- * @throws Error if unable to generate a unique tag after multiple attempts
+ * @throws Error if unable to generate a unique dollar-quote tag after multiple attempts
  */
 const safeDollarQuote = (str: string): string => {
   let tag = generateRandomTag()
@@ -108,7 +121,7 @@ const formatArrayForSql = (arr: unknown[]): string => {
     if (Array.isArray(item)) {
       result += formatArrayForSql(item)
     } else if (typeof item === 'string') {
-      result += `"${item.replace(/"/g, '""')}"`
+      result += `'${item.replaceAll("'", "''")}'`
     } else if (!!item && typeof item === 'object') {
       result += `${safeDollarQuote(JSON.stringify(item))}::json`
     } else {

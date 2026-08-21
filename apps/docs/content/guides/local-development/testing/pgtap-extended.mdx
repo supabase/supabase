@@ -67,13 +67,11 @@ create extension if not exists "basejump-supabase_test_helpers" version '0.0.6';
 The test helpers package provides several advantages over writing raw pgTAP tests:
 
 1. **Simplified User Management**
-
    - Create test users with `tests.create_supabase_user()`
    - Switch contexts with `tests.authenticate_as()`
    - Retrieve user IDs using `tests.get_supabase_uid()`
 
 2. **Row Level Security (RLS) Testing Utilities**
-
    - Verify RLS status with `tests.rls_enabled()`
    - Test policy enforcement
    - Simulate different user contexts
@@ -85,7 +83,7 @@ The test helpers package provides several advantages over writing raw pgTAP test
 
 ## Schema-wide Row Level Security testing
 
-When working with Row Level Security, it's crucial to ensure that RLS is enabled on all tables that need it. Create a simple test to verify RLS is enabled across an entire schema:
+When working with Row Level Security, it's crucial to ensure that RLS is enabled on all tables that need it. Create a basic test to verify RLS is enabled across an entire schema:
 
 ```sql
 begin;
@@ -114,7 +112,7 @@ This setup file should contain:
 
 1. All shared extensions and dependencies
 2. Common test utilities
-3. A simple always green test to verify the setup
+3. A basic always-green test to verify the setup
 
 Here's an example setup file:
 
@@ -262,7 +260,6 @@ This demo app implements:
 ### What makes this complex?
 
 1. **Layered Permissions**
-
    - Role hierarchies affect access rights
    - Plan types influence user capabilities
    - Content state (draft/published) affects permissions
@@ -339,7 +336,34 @@ create table public.comments (
 );
 ```
 
-#### 2. RLS policies declaration
+#### 2. Grant role privileges
+
+Grant the necessary privileges for each role, ensuring the principle of least privilege is followed:
+
+```sql
+-- Grant the privileges that roles need
+GRANT SELECT ON public.profiles TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO service_role;
+
+GRANT SELECT ON public.organizations TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.organizations TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.organizations TO service_role;
+
+GRANT SELECT ON public.org_members TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.org_members TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.org_members TO service_role;
+
+GRANT SELECT ON public.posts TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.posts TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.posts TO service_role;
+
+GRANT SELECT ON public.comments TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.comments TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.comments TO service_role;
+```
+
+#### 3. RLS policies declaration
 
 Now to setup the RLS policies for each tables:
 
@@ -468,9 +492,9 @@ create policy "Users can update their own comments"
   on public.comments for update using (author_id = (select auth.uid()));
 ```
 
-#### 3. Test cases:
+#### 4. Test cases:
 
-Now everything is setup, let's write RLS test cases, note that each section could be in its own test:
+With setup complete, write RLS test cases. Each section can be in its own test:
 
 ```sql
 -- Assuming we already have: 000-setup-tests-hooks.sql file we can use tests helpers

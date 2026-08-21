@@ -1,3 +1,5 @@
+const LIBRARY_URL = process.env.NEXT_PUBLIC_LIBRARY_URL ?? process.env.NEXT_PUBLIC_UI_LIBRARY_URL
+
 const rewrites = [
   {
     source: '/:path*',
@@ -22,12 +24,12 @@ const rewrites = [
       ]
     : []),
   {
-    source: '/ui',
-    destination: `${process.env.NEXT_PUBLIC_UI_LIBRARY_URL}`,
+    source: '/library',
+    destination: `${LIBRARY_URL}`,
   },
   {
-    source: '/ui/:path*',
-    destination: `${process.env.NEXT_PUBLIC_UI_LIBRARY_URL}/:path*`,
+    source: '/library/:path*',
+    destination: `${LIBRARY_URL}/:path*`,
   },
   {
     source: '/design-system',
@@ -36,6 +38,14 @@ const rewrites = [
   {
     source: '/design-system/:path*',
     destination: `${process.env.NEXT_PUBLIC_DESIGN_SYSTEM_URL}/:path*`,
+  },
+  {
+    source: '/evals',
+    destination: 'https://supabase-evals.vercel.app',
+  },
+  {
+    source: '/evals/:path*',
+    destination: 'https://supabase-evals.vercel.app/:path*',
   },
 
   {
@@ -64,14 +74,6 @@ const rewrites = [
   {
     source: '/.well-known/security.txt',
     destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/.well-known/security.txt`,
-  },
-  {
-    source: '/llms.txt',
-    destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/llms.txt`,
-  },
-  {
-    source: '/llms/:path(.*\\.txt$)',
-    destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/llms/:path`,
   },
   { source: '/feed.xml', destination: `/rss.xml` },
 ]

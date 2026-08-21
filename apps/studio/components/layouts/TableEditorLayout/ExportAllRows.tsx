@@ -1,28 +1,16 @@
 import { useQueryClient, type QueryClient } from '@tanstack/react-query'
+import { IS_PLATFORM } from 'common'
 import saveAs from 'file-saver'
 import Papa from 'papaparse'
 import { useCallback, useState, type ReactNode } from 'react'
-
-import { IS_PLATFORM } from 'common'
-import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
-import type { Filter, Sort, SupaTable } from 'components/grid/types'
-import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
-import { InlineLink } from 'components/ui/InlineLink'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import type { Entity } from 'data/entity-types/entity-types-infinite-query'
-import { tableEditorKeys } from 'data/table-editor/keys'
-import { getTableEditor, type TableEditorData } from 'data/table-editor/table-editor-query'
-import { isTableLike } from 'data/table-editor/table-editor-types'
-import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
-import { useStaticEffectEvent } from 'hooks/useStaticEffectEvent'
-import { DOCS_URL } from 'lib/constants'
-import type { RoleImpersonationState } from 'lib/role-impersonation'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import {
   BlobCreationError,
   DownloadSaveError,
   FetchRowsError,
   NoConnectionStringError,
+  NoPrimaryKeyForTruncatedRowsError,
   NoRowsToExportError,
   NoTableError,
   OutputConversionError,
@@ -31,6 +19,20 @@ import {
   type ExportAllRowsErrorFamily,
 } from './ExportAllRows.errors'
 import { useProgressToasts } from './ExportAllRows.progress'
+import { hydrateTruncatedRows } from '@/components/grid/components/header/Header.utils'
+import { parseSupaTable } from '@/components/grid/SupabaseGrid.utils'
+import type { Filter, Sort, SupaTable } from '@/components/grid/types'
+import { formatTableRowsToSQL } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import type { Entity } from '@/data/entity-types/entity-types-infinite-query'
+import { tableEditorKeys } from '@/data/table-editor/keys'
+import { getTableEditor, type TableEditorData } from '@/data/table-editor/table-editor-query'
+import { isTableLike } from '@/data/table-editor/table-editor-types'
+import { fetchAllTableRows } from '@/data/table-rows/table-rows-query'
+import { useLatest } from '@/hooks/misc/useLatest'
+import { DOCS_URL } from '@/lib/constants'
+import type { RoleImpersonationState } from '@/lib/role-impersonation'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
@@ -257,6 +259,7 @@ type UseExportAllRowsParams =
           type: 'provided_rows'
           table: SupaTable
           rows: Record<string, unknown>[]
+          roleImpersonationState?: RoleImpersonationState
         }
     ))
 
@@ -281,19 +284,44 @@ export const useExportAllRowsGeneric = (
 
   const [confirmationMessage, setConfirmationMessage] = useState<string | null>(null)
 
-  const exportInternal = useStaticEffectEvent(
+  const exportInternalRef = useLatest(
     async ({ bypassConfirmation }: { bypassConfirmation: boolean }): Promise<void> => {
       if (!params.enabled) return
 
       const { projectRef, connectionString, entity, totalRows } = params
 
-      const exportResult =
+      const exportResult: FetchAllRowsReturn =
         params.type === 'provided_rows'
-          ? convertAndDownload(formatRowsForExport(params.rows, params.table), params.table, {
-              convertToOutputFormat,
-              convertToBlob,
-              save,
-            })
+          ? await (async () => {
+              const hydrated = await hydrateTruncatedRows({
+                rows: params.rows,
+                table: params.table,
+                projectRef,
+                connectionString,
+                roleImpersonationState: params.roleImpersonationState,
+              })
+              if (hydrated.status === 'no_primary_key') {
+                return {
+                  status: 'error' as const,
+                  error: new NoPrimaryKeyForTruncatedRowsError(params.table.name),
+                }
+              }
+              if (hydrated.status === 'fetch_error') {
+                return {
+                  status: 'error' as const,
+                  error: new FetchRowsError(params.table.name, hydrated.error),
+                }
+              }
+              return convertAndDownload(
+                formatRowsForExport(hydrated.rows, params.table),
+                params.table,
+                {
+                  convertToOutputFormat,
+                  convertToBlob,
+                  save,
+                }
+              )
+            })()
           : await fetchAllRows({
               queryClient,
               projectRef: projectRef,
@@ -337,6 +365,9 @@ export const useExportAllRowsGeneric = (
         if (error instanceof TableTooLargeError) {
           return stopTrackerWithError(entity.id, entity.name, MAX_EXPORT_ROW_COUNT_MESSAGE)
         }
+        if (error instanceof NoPrimaryKeyForTruncatedRowsError) {
+          return stopTrackerWithError(entity.id, entity.name, error.message)
+        }
         console.error(
           `Export All Rows > Error: %s%s%s`,
           error.message,
@@ -352,6 +383,11 @@ export const useExportAllRowsGeneric = (
 
       markTrackerComplete(entity.id, exportResult.rowsExported)
     }
+  )
+
+  const exportInternal = useCallback(
+    (args: { bypassConfirmation: boolean }) => exportInternalRef.current(args),
+    [exportInternalRef]
   )
 
   const exportInDesiredFormat = useCallback(

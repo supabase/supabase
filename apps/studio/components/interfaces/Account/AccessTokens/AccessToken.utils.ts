@@ -1,11 +1,15 @@
 import dayjs from 'dayjs'
+
+import { PERMISSION_LIST, ScopedAccessTokenPermission } from './AccessToken.constants'
 import {
   AccessTokenSort,
   AccessTokenSortColumn,
   AccessTokenSortOrder,
   BaseToken,
 } from './AccessToken.types'
-import { PERMISSION_LIST, ScopedAccessTokenPermission } from './AccessToken.constants'
+
+/** Custom expiry dates are capped at one year from today, for classic and scoped tokens alike. */
+export const getMaxCustomExpiryDate = (): dayjs.Dayjs => dayjs().add(1, 'year').endOf('day')
 
 export const handleSortChange = (
   currentSort: AccessTokenSort,
@@ -140,8 +144,6 @@ export const getExpirationDate = (key: string): string | undefined => {
       return dayjs().add(7, 'days').toISOString()
     case 'month':
       return dayjs().add(30, 'days').toISOString()
-    case 'never':
-      return undefined
     default:
       return undefined
   }

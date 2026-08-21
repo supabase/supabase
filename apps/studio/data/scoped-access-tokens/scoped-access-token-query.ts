@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { scopedAccessTokenKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export async function getScopedAccessTokens(signal?: AbortSignal) {
   const { data, error } = await get('/platform/profile/scoped-access-tokens', { signal })

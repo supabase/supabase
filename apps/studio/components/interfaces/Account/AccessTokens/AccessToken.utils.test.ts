@@ -1,6 +1,16 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import dayjs from 'dayjs'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import type { BaseToken } from './AccessToken.types'
+import {
+  filterAndSortTokens,
+  formatAccessText,
+  getExpirationDate,
+  getRealAccess,
+  getResourcePermissions,
+  handleSortChange,
+  mapPermissionToFGA,
+} from './AccessToken.utils'
 
 // Mock PERMISSION_LIST so tests are deterministic and don't break when shared-types updates
 vi.mock('./AccessToken.constants', () => ({
@@ -56,16 +66,6 @@ vi.mock('./AccessToken.constants', () => ({
     },
   ],
 }))
-
-import {
-  handleSortChange,
-  filterAndSortTokens,
-  mapPermissionToFGA,
-  getResourcePermissions,
-  getRealAccess,
-  formatAccessText,
-  getExpirationDate,
-} from './AccessToken.utils'
 
 // --- handleSortChange ---
 
@@ -356,10 +356,6 @@ describe('getExpirationDate', () => {
   it('should return a date exactly 30 days from now for "month"', () => {
     const result = getExpirationDate('month')!
     expect(result).toBe(dayjs(FIXED_DATE).add(30, 'days').toISOString())
-  })
-
-  it('should return undefined for "never"', () => {
-    expect(getExpirationDate('never')).toBeUndefined()
   })
 
   it('should return undefined for an unknown key', () => {

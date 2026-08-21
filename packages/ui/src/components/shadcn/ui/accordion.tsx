@@ -1,10 +1,11 @@
 'use client'
 
-import * as AccordionPrimitive from '@radix-ui/react-accordion'
 import { ChevronDown } from 'lucide-react'
+import { Accordion as AccordionPrimitive } from 'radix-ui'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
+import { getExplicitTabIndex } from '../../../lib/utils/getExplicitTabIndex'
 
 const Accordion = AccordionPrimitive.Root
 
@@ -19,21 +20,40 @@ AccordionItem.displayName = 'AccordionItem'
 const AccordionTrigger = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger> & { hideIcon?: boolean }
->(({ className, children, hideIcon, ...props }, ref) => (
-  <AccordionPrimitive.Header className="flex">
-    <AccordionPrimitive.Trigger
-      ref={ref}
-      className={cn(
-        'flex flex-1 gap-2 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180 text-left',
-        className
-      )}
-      {...props}
-    >
-      {children}
-      {!hideIcon && <ChevronDown className="h-4 w-4 transition-transform duration-200 shrink-0" />}
-    </AccordionPrimitive.Trigger>
-  </AccordionPrimitive.Header>
-))
+>(({ className, children, hideIcon, disabled, tabIndex, ...props }, ref) => {
+  const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
+
+  return (
+    <AccordionPrimitive.Header asChild>
+      <div className="flex">
+        <AccordionPrimitive.Trigger
+          ref={ref}
+          className={cn(
+            'cursor-pointer flex flex-1 gap-2 items-center justify-between py-4 text-left',
+            'font-medium transition-all hover:underline',
+            '[&[data-state=open]>svg]:rotate-180',
+            className
+          )}
+          {...props}
+          disabled={disabled}
+          tabIndex={computedTabIndex}
+        >
+          {children}
+          {!hideIcon && (
+            <ChevronDown
+              aria-hidden="true"
+              className={cn(
+                'h-4 w-4 shrink-0',
+                'transition-transform duration-200',
+                'motion-reduce:transition-none motion-reduce:duration-0'
+              )}
+            />
+          )}
+        </AccordionPrimitive.Trigger>
+      </div>
+    </AccordionPrimitive.Header>
+  )
+})
 AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName
 
 const AccordionContent = React.forwardRef<
@@ -43,7 +63,10 @@ const AccordionContent = React.forwardRef<
   <AccordionPrimitive.Content
     ref={ref}
     className={cn(
-      'overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down',
+      'overflow-hidden text-sm',
+      'transition-all motion-reduce:transition-none',
+      'data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down',
+      'motion-reduce:animate-none',
       className
     )}
     {...props}

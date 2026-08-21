@@ -1,4 +1,5 @@
-import dynamic from 'next/dynamic'
+import { CubeIcon } from '@heroicons/react/outline'
+import { useBreakpoint } from 'common'
 import {
   Check,
   ClipboardCheck,
@@ -12,26 +13,22 @@ import {
   Users,
   UserX,
 } from 'lucide-react'
-import { CubeIcon } from '@heroicons/react/outline'
-import { Image } from 'ui'
+import { Image } from 'ui-patterns/Image'
 
-import { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
-import { frameworks } from 'components/Hero/HeroFrameworks'
-
-import type { FeatureGridProps } from 'components/Solutions/FeatureGrid'
-import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
-import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
-import type { SecuritySectionProps } from 'components/Enterprise/Security'
+import { getSharedSections } from './shared-sections'
 import {
   FrameworkLink,
   type FeaturesSection,
   type HeroSection,
   type Metadata,
 } from './solutions.utils'
-import { getSharedSections } from './shared-sections'
-
-import { useBreakpoint } from 'common'
-import { useSendTelemetryEvent } from 'lib/telemetry'
+import type { SecuritySectionProps } from '@/components/Enterprise/Security'
+import { frameworks } from '@/components/Hero/HeroFrameworks'
+import type { FeatureGridProps } from '@/components/Solutions/FeatureGrid'
+import type { PlatformSectionProps } from '@/components/Solutions/PlatformSection'
+import type { ResultsSectionProps } from '@/components/Solutions/ResultsSection'
+import { TwoColumnsSectionProps } from '@/components/Solutions/TwoColumnsSection'
+import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 const data: () => {
   metadata: Metadata
@@ -117,21 +114,21 @@ const data: () => {
     singleQuote: {
       id: 'social-proof',
       quote: {
-        text: '"Supabase enabled us to focus on building the best email infrastructure for developers, without worrying about backend complexity."',
+        text: 'Supabase enabled us to focus on building the best email infrastructure for developers, without worrying about backend complexity.',
         author: 'Zeno Rocha',
         role: 'CEO, Resend',
         link: '/customers/resend',
         logo: (
           <>
             <Image
-              src="/images/customers/logos/resend.png"
+              src="/images/customers/logos/on-light/resend.png"
               alt="Resend"
               width={128}
               height={48}
               className="object-contain w-24 md:w-32 dark:hidden"
             />
             <Image
-              src="/images/customers/logos/light/resend.png"
+              src="/images/customers/logos/on-dark/resend.png"
               alt="Resend"
               width={128}
               height={48}
@@ -264,7 +261,7 @@ const data: () => {
       customers: [
         {
           name: 'Resend',
-          logo: '/images/customers/logos/resend.png',
+          logo: '/images/customers/logos/on-light/resend.png',
           highlights: [
             'Focus on building the best email infrastructure for developers',
             'Backend complexity handled by Supabase',
@@ -273,7 +270,7 @@ const data: () => {
         },
         {
           name: 'Mobbin',
-          logo: '/images/customers/logos/mobbin.png',
+          logo: '/images/customers/logos/on-light/mobbin.png',
           highlights: [
             'Migrated 200,000 users from Firebase',
             'Better authentication experience at scale',
@@ -282,7 +279,7 @@ const data: () => {
         },
         {
           name: 'Shotgun',
-          logo: '/images/customers/logos/shotgun.png',
+          logo: '/images/customers/logos/on-light/shotgun.png',
           highlights: [
             '83% reduction in data infrastructure costs',
             'Remarkable database efficiency through migration',
@@ -291,7 +288,7 @@ const data: () => {
         },
         {
           name: 'Quilia',
-          logo: '/images/customers/logos/quilia.png',
+          logo: '/images/customers/logos/on-light/quilia.png',
           highlights: [
             '75% reduction in development time',
             '50% lower costs with enhanced security for sensitive client data',

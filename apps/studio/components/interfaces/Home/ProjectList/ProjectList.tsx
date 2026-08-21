@@ -1,19 +1,8 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { NoSearchResults } from 'components/ui/NoSearchResults'
-import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from 'lib/constants'
 import { parseAsArrayOf, parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useMemo } from 'react'
-import type { Organization } from 'types'
 import {
   Card,
   cn,
@@ -36,6 +25,17 @@ import {
   toTableHeadSortValue,
 } from './ProjectListSort.utils'
 import { ProjectTableRow } from './ProjectTableRow'
+import { AlertError } from '@/components/ui/AlertError'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
+import { useOrgIntegrationsQuery } from '@/data/integrations/integrations-query-org-only'
+import { usePermissionsQuery } from '@/data/permissions/permissions-query'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from '@/lib/constants'
+import type { Organization } from '@/types'
 
 export interface ProjectListProps {
   organization?: Organization
@@ -159,7 +159,7 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
 
   if (viewMode === 'table') {
     return (
-      <Card className="flex-1 min-h-0 overflow-y-auto mb-8">
+      <Card className="flex-1 min-h-0 overflow-y-auto">
         <Table>
           {/* [Joshen] Ideally we can figure out sticky table headers here */}
           <TableHeader>
@@ -277,7 +277,7 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
       ) : noResultsFromSearch ? (
         <NoSearchResults searchString={search} />
       ) : (
-        <div className="flex flex-col gap-y-2 md:gap-y-4 pb-6">
+        <div className="flex flex-col gap-y-2 md:gap-y-4">
           <ul
             className={cn(
               'min-h-0 w-full mx-auto',

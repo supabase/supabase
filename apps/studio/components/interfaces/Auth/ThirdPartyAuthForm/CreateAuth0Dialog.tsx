@@ -1,12 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
 import { Trash } from 'lucide-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { useParams } from 'common'
-import { useCreateThirdPartyAuthIntegrationMutation } from 'data/third-party-auth/integration-create-mutation'
 import {
   Button,
   Dialog,
@@ -15,13 +12,16 @@ import {
   DialogHeader,
   DialogSection,
   DialogTitle,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Form_Shadcn_,
-  Input_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Input,
   Separator,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
+import { useCreateThirdPartyAuthIntegrationMutation } from '@/data/third-party-auth/integration-create-mutation'
 
 interface CreateAuth0IntegrationProps {
   visible: boolean
@@ -96,10 +96,10 @@ export const CreateAuth0IntegrationDialog = ({
         </DialogHeader>
         <Separator />
         <DialogSection>
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               {/* Enabled flag can't be changed for now because there's no update API call for integrations */}
-              {/* <FormField_Shadcn_
+              {/* <FormField
               key="enabled"
               control={form.control}
               name="enabled"
@@ -109,13 +109,13 @@ export const CreateAuth0IntegrationDialog = ({
                   label={`Enable Auth0 Auth Connection`}
                   layout="flex"
                 >
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <Switch
                       checked={field.value}
                       onCheckedChange={field.onChange}
                       disabled={field.disabled}
                     />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -124,7 +124,7 @@ export const CreateAuth0IntegrationDialog = ({
                 This will enable a JWT token from your Auth0 project to access data from this
                 Supabase project.
               </p>
-              <FormField_Shadcn_
+              <FormField
                 key="auth0DomainName"
                 control={form.control}
                 name="auth0DomainName"
@@ -132,21 +132,18 @@ export const CreateAuth0IntegrationDialog = ({
                   <FormItemLayout label="Auth0 domain name">
                     <div className="flex flex-row">
                       <Button
-                        type="default"
+                        variant="default"
                         size="small"
                         className="px-2 text-foreground-light rounded-r-none"
                         onClick={() => form.setFocus('auth0DomainName')}
                       >
                         https://
                       </Button>
-                      <FormControl_Shadcn_>
-                        <Input_Shadcn_
-                          className="border-l-0 rounded-none border-r-0 z-50"
-                          {...field}
-                        />
-                      </FormControl_Shadcn_>
+                      <FormControl>
+                        <Input className="border-l-0 rounded-none border-r-0 z-50" {...field} />
+                      </FormControl>
                       <Button
-                        type="default"
+                        variant="default"
                         size="small"
                         className="px-2 text-foreground-light rounded-l-none"
                         onClick={() => form.setFocus('auth0DomainName')}
@@ -158,21 +155,21 @@ export const CreateAuth0IntegrationDialog = ({
                 )}
               />
             </form>
-          </Form_Shadcn_>
+          </Form>
         </DialogSection>
         <DialogFooter>
           {!isCreating && (
             <div className="flex-1">
-              <Button type="danger" onClick={() => onDelete()} icon={<Trash />}>
+              <Button variant="danger" onClick={() => onDelete()} icon={<Trash />}>
                 Remove connection
               </Button>
             </div>
           )}
 
-          <Button disabled={isPending} type="default" onClick={() => onClose()}>
+          <Button disabled={isPending} variant="default" onClick={() => onClose()}>
             Cancel
           </Button>
-          <Button form={FORM_ID} htmlType="submit" disabled={isPending} loading={isPending}>
+          <Button form={FORM_ID} type="submit" disabled={isPending} loading={isPending}>
             {isCreating ? 'Create connection' : 'Update connection'}
           </Button>
         </DialogFooter>

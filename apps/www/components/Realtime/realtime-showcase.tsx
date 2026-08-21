@@ -12,7 +12,7 @@ import iframeAnnotationExample from './examples/iframe-annotation-example'
 import logViewerExample from './examples/log-viewer-example'
 import formPresenceExample from './examples/form-presence-example'
 import cursorTrackingExample from './examples/cursor-tracking-example'
-import { Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import { Tabs, TabsList, TabsTrigger } from 'ui'
 import {
   Users,
   MessageSquare,
@@ -134,7 +134,7 @@ export default function RealtimeShowcase() {
 
   return (
     <div className="bg-surface-75/50 border border-muted rounded-lg h-auto lg:h-[600px]">
-      <Tabs_Shadcn_
+      <Tabs
         value={currentExample.value}
         onValueChange={handleTabChange}
         className="w-full h-full flex flex-col lg:flex-row border-b border-muted h-full items-stretch"
@@ -142,34 +142,34 @@ export default function RealtimeShowcase() {
         {/* Desktop sidebar tabs - hidden on mobile */}
         <div className="hidden lg:block w-48 px-6 py-8 border-r border-muted h-full">
           <h2 className="text-xs uppercase text-foreground-light font-mono mb-4">Examples</h2>
-          <TabsList_Shadcn_ className="border-none flex flex-col h-auto justify-start items-stretch gap-2 bg-transparent">
+          <TabsList className="border-none flex flex-col h-auto justify-start items-stretch gap-2 bg-transparent">
             {EXAMPLES.map((example) => (
-              <TabsTrigger_Shadcn_
+              <TabsTrigger
                 key={example.value}
                 value={example.value}
                 className="justify-start px-2 py-2 h-auto data-[state=active]:bg-transparent data-[state=active]:border-none border-none p-0 data-[state=active]:text-foreground"
               >
                 <example.icon strokeWidth={1.5} size={16} className="mr-3" />
                 {example.label}
-              </TabsTrigger_Shadcn_>
+              </TabsTrigger>
             ))}
-          </TabsList_Shadcn_>
+          </TabsList>
         </div>
 
         {/* Mobile horizontal tabs - shown only on mobile */}
         <div className="lg:hidden px-2 py-2 border-b border-muted w-full overflow-x-auto">
-          <TabsList_Shadcn_ className="border-none flex flex-row h-auto justify-start items-center gap-2 bg-transparent w-max">
+          <TabsList className="border-none flex flex-row h-auto justify-start items-center gap-2 bg-transparent w-max">
             {EXAMPLES.map((example) => (
-              <TabsTrigger_Shadcn_
+              <TabsTrigger
                 key={example.value}
                 value={example.value}
                 className="whitespace-nowrap justify-start px-3 py-2 h-auto data-[state=active]:bg-surface-100 data-[state=active]:border-none rounded-md"
               >
                 <example.icon strokeWidth={1.5} size={14} className="mr-2" />
                 {example.label}
-              </TabsTrigger_Shadcn_>
+              </TabsTrigger>
             ))}
-          </TabsList_Shadcn_>
+          </TabsList>
         </div>
 
         {/* Tab Content - render ExampleLayout with props from current example */}
@@ -183,7 +183,7 @@ export default function RealtimeShowcase() {
             />
           </div>
         </div>
-      </Tabs_Shadcn_>
+      </Tabs>
     </div>
   )
 }

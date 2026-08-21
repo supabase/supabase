@@ -19,7 +19,7 @@ Supabase Auth will send a payload containing these fields to your hook:
 
 <Admonition type="note">
 
-Because the hook is ran just before the insertion into the database, this user will not be found in Postgres at the time the hook is called.
+Because the hook runs immediately before insertion into the database, this user will not be found in Postgres at the time the hook is called.
 
 </Admonition>
 
@@ -344,7 +344,7 @@ revoke execute
 </TabPanel>
 
 <TabPanel id="sql-allow-deny-by-cidr" label="Allow/Deny by IP or CIDR">
-This example shows how you might restrict sign up from a single IP address or a range of them using [PostgreSQL’s built-in](https://www.postgresql.org/docs/current/datatype-net-types.html) `inet` and `<<` operators for [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) -- a method of representing IP address ranges.
+This example shows how you might restrict sign up from a single IP address or a range of them using [Postgres’s built-in](https://www.postgresql.org/docs/current/datatype-net-types.html) `inet` and `<<` operators for [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) -- a method of representing IP address ranges.
 For instance: `123.123.123.123/32` represents only a single IP address, while `123.123.123.0/24` means all IP addresses starting with `123.123.123.`.
 
 The `before-user-created` hook solves this by:
@@ -404,7 +404,7 @@ begin
   -- Step 1: Check for explicit allow
   select count(*) into allow_count
   from public.signup_networks
-  where type = 'allow' and ip::inet << cidr;
+  where type = 'allow' and ip <<= cidr;
 
   if allow_count > 0 then
     -- If explicitly allowed, allow signup
@@ -414,7 +414,7 @@ begin
   -- Step 2: Check for explicit deny
   select count(*) into deny_count
   from public.signup_networks
-  where type = 'deny' and ip::inet << cidr;
+  where type = 'deny' and ip <<= cidr;
 
   if deny_count > 0 then
     return jsonb_build_object(
@@ -599,7 +599,7 @@ Deno.serve(async (req) => {
 </TabPanel>
 
 <TabPanel id="http-allow-deny-by-cidr" label="Allow/Deny by IP or CIDR">
-This example shows how you might restrict sign up from a single IP address or a range of them using [PostgreSQL’s built-in](https://www.postgresql.org/docs/current/datatype-net-types.html) `inet` and `<<` operators for [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) -- a method of representing IP address ranges.
+This example shows how you might restrict sign up from a single IP address or a range of them using [Postgres’s built-in](https://www.postgresql.org/docs/current/datatype-net-types.html) `inet` and `<<` operators for [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) -- a method of representing IP address ranges.
 For instance: `123.123.123.123/32` represents only a single IP address, while `123.123.123.0/24` means all IP addresses starting with `123.123.123.`.
 
 The `before-user-created` hook solves this by:
@@ -722,12 +722,12 @@ supabase functions new before-user-created-hook
 Add the following code to your edge function:
 
 ```ts
-import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js'
+import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 
 const whSecret = Deno.env.get('BEFORE_USER_CREATED_HOOK_SECRET')?.replace('v1,whsec_', '')
 const supabaseUrl = Deno.env.get('SUPABASE_URL')
-const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+const supabaseKey = Deno.env.get('SUPABASE_SECRET_KEY')
 
 const wh = new Webhook(whSecret)
 const supabase = createClient(supabaseUrl, supabaseKey)

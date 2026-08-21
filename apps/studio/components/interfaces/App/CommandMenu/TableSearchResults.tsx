@@ -1,63 +1,52 @@
-'use client'
-
-import { useMemo } from 'react'
-import { Database, Loader2 } from 'lucide-react'
+import { useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Database, Loader2 } from 'lucide-react'
+import { useEffect, useMemo } from 'react'
+
 import {
-  SkeletonResults,
   EmptyState,
   ResultsList,
+  SkeletonResults,
   type SearchResult,
 } from './ContextSearchResults.shared'
+import { useInfiniteTablesQuery } from '@/data/tables/tables-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface TableSearchResultsProps {
-  query: string
+  debouncedFilterString: string
 }
 
-export function TableSearchResults({ query }: TableSearchResultsProps) {
+export function TableSearchResults({ debouncedFilterString }: TableSearchResultsProps) {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const trimmedQuery = query.trim()
+  const [sentinelRef, sentinelEntry] = useIntersectionObserver({
+    threshold: 0,
+    rootMargin: '200px 0px 200px 0px',
+  })
 
   const {
-    data: tables,
-    isLoading: isLoadingTables,
+    data: tablesData,
+    isSuccess,
     isError: isErrorTables,
-  } = useTablesQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      includeColumns: false,
-      sortByProperty: 'name',
-    },
-    {
-      enabled: !!project?.ref,
-    }
-  )
+    isPending: isLoadingTables,
+    hasNextPage: hasNextTablesPage,
+    isFetchingNextPage: isFetchingNextTablesPage,
+    fetchNextPage: fetchNextTablesPage,
+  } = useInfiniteTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    includeColumns: false,
+    pageSize: 50,
+    nameFilter: debouncedFilterString,
+  })
+
+  const tables = useMemo(() => tablesData?.pages.flat() ?? [], [tablesData])
 
   const tableResults: SearchResult[] = useMemo(() => {
     if (!tables) return []
 
-    const filtered = trimmedQuery
-      ? tables.filter((table) => {
-          const searchLower = trimmedQuery.toLowerCase()
-          const tableName = table.name?.toLowerCase() || ''
-          const schemaName = table.schema?.toLowerCase() || ''
-          const fullName = `${schemaName}.${tableName}`
-
-          return (
-            tableName.includes(searchLower) ||
-            schemaName.includes(searchLower) ||
-            fullName.includes(searchLower)
-          )
-        })
-      : tables
-
-    // Limit results for performance
-    return filtered.slice(0, 20).map((table) => {
+    return tables.map((table) => {
       const displayName =
         table.schema && table.schema !== 'public'
           ? `${table.schema}.${table.name}`
@@ -75,79 +64,71 @@ export function TableSearchResults({ query }: TableSearchResultsProps) {
         description,
       }
     })
-  }, [tables, trimmedQuery])
+  }, [tables])
 
   const totalTables = tables?.length ?? 0
 
-  const renderFooter = () => (
-    <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between min-h-9 h-9 px-4 border-t bg-surface-200 text-xs text-foreground-light z-10">
-      <div className="flex items-center gap-x-2">
-        {isLoadingTables ? (
-          <span className="flex items-center gap-2">
-            <Loader2 size={14} className="animate-spin" /> Loading...
-          </span>
-        ) : (
-          <span>
-            Total: {totalTables.toLocaleString()} table{totalTables !== 1 ? 's' : ''}
-          </span>
-        )}
-      </div>
-    </div>
-  )
-
-  if (isLoadingTables) {
-    return (
-      <div className="relative h-full flex flex-col">
-        <div className="flex-1 min-h-0 overflow-hidden">
-          <SkeletonResults />
-        </div>
-        {renderFooter()}
-      </div>
-    )
-  }
-
-  if (isErrorTables) {
-    return (
-      <div className="relative h-full flex flex-col">
-        <div className="flex-1 min-h-0 overflow-hidden">
-          <div className="h-full flex flex-col items-center justify-center py-12 px-4 gap-4 text-center text-foreground-lighter">
-            <Database className="h-6 w-6" strokeWidth={1.5} />
-            <p className="text-sm">Failed to load tables</p>
-          </div>
-        </div>
-        {renderFooter()}
-      </div>
-    )
-  }
-
-  if (tableResults.length === 0) {
-    return (
-      <div className="relative h-full flex flex-col">
-        <div className="flex-1 min-h-0 overflow-hidden">
-          <EmptyState icon={Database} label="Database Tables" query={query} />
-        </div>
-        {renderFooter()}
-      </div>
-    )
-  }
+  useEffect(() => {
+    if (
+      sentinelEntry?.isIntersecting &&
+      hasNextTablesPage &&
+      !isFetchingNextTablesPage &&
+      isSuccess
+    ) {
+      fetchNextTablesPage()
+    }
+  }, [
+    isSuccess,
+    sentinelEntry?.isIntersecting,
+    hasNextTablesPage,
+    isFetchingNextTablesPage,
+    fetchNextTablesPage,
+  ])
 
   return (
     <div className="relative h-full flex flex-col">
       <div className="flex-1 min-h-0 overflow-hidden">
-        <ResultsList
-          results={tableResults}
-          icon={Database}
-          getRoute={(result) => {
-            const table = tables?.find((t) => String(t.id) === result.id)
-            if (!table || !projectRef) return `/project/${projectRef}/editor` as `/${string}`
+        {isLoadingTables ? (
+          <SkeletonResults />
+        ) : isErrorTables ? (
+          <div className="h-full flex flex-col items-center justify-center py-12 px-4 gap-4 text-center text-foreground-lighter">
+            <Database className="h-6 w-6" strokeWidth={1.5} />
+            <p className="text-sm">Failed to load tables</p>
+          </div>
+        ) : tableResults.length === 0 ? (
+          <EmptyState icon={Database} label="Database Tables" query={debouncedFilterString} />
+        ) : (
+          <>
+            <ResultsList
+              results={tableResults}
+              icon={Database}
+              getRoute={(result) => {
+                const table = tables?.find((t) => String(t.id) === result.id)
+                if (!table || !projectRef) return `/project/${projectRef}/editor` as `/${string}`
 
-            const schemaParam = table.schema ? `?schema=${table.schema}` : ''
-            return `/project/${projectRef}/editor/${table.id}${schemaParam}` as `/${string}`
-          }}
-          className="pb-9"
-        />
+                const schemaParam = table.schema ? `?schema=${table.schema}` : ''
+                return `/project/${projectRef}/editor/${table.id}${schemaParam}` as `/${string}`
+              }}
+              infiniteLoadingObserverRef={sentinelRef}
+              className="pb-9"
+            />
+            <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between min-h-9 h-9 px-4 border-t bg-surface-200 text-xs text-foreground-light z-10">
+              <div className="flex items-center gap-x-2">
+                {isLoadingTables ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 size={14} className="animate-spin" /> Loading...
+                  </span>
+                ) : (
+                  <span>
+                    Total: {totalTables.toLocaleString()} table{totalTables !== 1 ? 's' : ''}
+                    {hasNextTablesPage ? ' loaded' : ''}
+                  </span>
+                )}
+              </div>
+            </div>
+          </>
+        )}
       </div>
-      {renderFooter()}
     </div>
   )
 }

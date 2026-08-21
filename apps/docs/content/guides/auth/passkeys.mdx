@@ -1,0 +1,542 @@
+---
+id: 'passkeys'
+title: 'Passkey authentication'
+subtitle: 'Allow users to sign in with passkeys (WebAuthn)'
+---
+
+[Passkeys](https://fidoalliance.org/passkeys/) are a passwordless credential built on the [WebAuthn](https://www.w3.org/TR/webauthn-3/) standard. The user proves possession of a private key stored on their device (or password manager) using biometrics, a PIN, or a hardware security key. The matching public key is registered with Supabase Auth and used to verify future sign-ins. Passkeys are phishing-resistant and remove the need to manage shared secrets.
+
+<Admonition type="caution" title="Experimental">
+
+Passkey support is experimental. The API may change without notice. You must explicitly opt-in when creating the Supabase client. See [Enable in the client](#enable-in-the-client).
+
+</Admonition>
+
+<Admonition type="note">
+
+**Requires `@supabase/supabase-js` v2.105.0 and later, `supabase_flutter` v2.15.0 and later, or `supabase-swift` v2.48.0 and later.** Upgrade your client library to use passkey authentication.
+
+</Admonition>
+
+## How does it work?
+
+Each sign-in or registration is a WebAuthn ceremony with three steps:
+
+1. **Options**: the client requests a challenge from Supabase Auth.
+2. **Ceremony**: the platform's passkey API (`navigator.credentials.create()` / `get()` on web, or a passkey plugin on iOS, Android, and macOS) prompts the user for biometrics or a security key.
+3. **Verify**: the signed response is sent back to Supabase Auth, which validates the challenge and either stores the new credential or issues a session.
+
+Supabase Auth uses [discoverable credentials](https://www.w3.org/TR/webauthn-3/#discoverable-credential) for sign-in. The user does not need to provide an email, phone, or username — the authenticator resolves the account from the credential it stores.
+
+Registering a passkey requires an existing, confirmed, non-anonymous user. Sign-in works for any user that has previously registered a passkey, provided their email or phone is confirmed and the account is not banned.
+
+## Enable passkey authentication
+
+### Dashboard
+
+Open the [Passkeys settings](/dashboard/project/_/auth/passkeys) from the **Authentication → Passkeys** section of the Dashboard, turn on **Enable Passkey authentication**, and fill in the WebAuthn [relying party](https://www.w3.org/TR/webauthn-3/#relying-party) details:
+{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
+
+- **Relying Party Display Name**: a human-readable name for your application shown during the passkey prompt (for example, "My App").
+- **Relying Party ID**: the bare domain name for your application (for example, "example.com"). Do not include a scheme, port, or path. This determines which passkeys can be used.
+- **Relying Party Origins**: comma-separated list of allowed origins (for example "https://example.com,https://app.example.com"). Up to 5 origins.
+  - HTTPS is required except for loopback addresses ("localhost", "127.0.0.1", "[::1]").
+  - Each origin's hostname must match or be a subdomain of the Relying Party ID.
+  - Android native apps can use an app origin of the form `android:apk-key-hash:<base64url SHA-256 of the signing certificate>`.
+
+The dashboard pre-fills these from your project's Site URL and project name. Adjust them if your production app is served from a different domain.
+
+<Admonition type="caution" title="Changing the Relying Party ID invalidates existing passkeys">
+
+Passkeys are cryptographically bound to the Relying Party (RP) ID they were registered against. Changing the RP ID makes every existing passkey unusable for sign-in, and users will need to register a new one. Pick the RP ID carefully before users start enrolling, and keep it stable once they do.
+
+</Admonition>
+
+### CLI
+
+Add the following to `supabase/config.toml`:
+
+```toml
+[auth.passkey]
+enabled = true
+
+[auth.webauthn]
+rp_display_name = "My App"
+rp_id = "example.com"
+rp_origins = ["https://example.com", "https://app.example.com"]
+```
+
+The `[auth.webauthn]` section is required when `auth.passkey.enabled` is `true`.
+
+### Management API
+
+You can also configure passkeys via the [Management API](/docs/reference/api/introduction):
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Read the current passkey configuration
+curl -X GET "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  | jq '{passkey_enabled, webauthn_rp_id, webauthn_rp_display_name, webauthn_rp_origins}'
+
+# Enable passkeys and set the WebAuthn relying party
+curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "passkey_enabled": true,
+    "webauthn_rp_display_name": "My App",
+    "webauthn_rp_id": "example.com",
+    "webauthn_rp_origins": "https://example.com,https://app.example.com"
+  }'
+```
+
+## Enable in the client
+
+<Admonition type="caution" title="Experimental">
+
+Passkey support is currently experimental and requires explicit opt-in as the API may change without notice.
+
+</Admonition>
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```ts
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    experimental: { passkey: true },
+  },
+})
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+The Dart SDK does not require an opt-in flag — the methods are annotated `@experimental` so the analyzer surfaces them as preview API. The server independently rejects calls with `passkey_disabled` when the dashboard toggle is off.
+
+```dart
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+await Supabase.initialize(
+  url: supabaseUrl,
+  anonKey: supabaseAnonKey,
+);
+final supabase = Supabase.instance.client;
+```
+
+`supabase_flutter` performs the server side of the WebAuthn ceremony for you and delegates the platform prompt (FaceID/TouchID/security key) to an authenticator you supply, instead of depending on a passkey plugin directly. Add a passkey plugin to your own app and pass its authenticator to `registerPasskey()` and `signInWithPasskey()`. The [`passkeys`](https://pub.dev/packages/passkeys) plugin's `PasskeyAuthenticator` implements the `PasskeyAuthenticatorInterface` these methods expect (since `passkeys` `2.21.0`), but you can pass any implementation of that interface:
+
+```dart
+import 'package:passkeys/authenticator.dart';
+
+final authenticator = PasskeyAuthenticator();
+```
+
+Platform setup that the library cannot do for you (Associated Domains on iOS/macOS, Digital Asset Links on Android, and including the [`passkeys`](https://pub.dev/packages/passkeys) web SDK in `index.html` on web) is documented in the `supabase_flutter` package README.
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+The Swift SDK gates passkey support behind `@_spi(Experimental)`. Add this import to every file that uses passkey APIs:
+
+```swift
+@_spi(Experimental) import Supabase
+```
+
+The `SupabaseClient` itself needs no extra configuration — the experimental SPI is enabled at the import site, not at client initialization.
+
+Platform setup the library cannot perform for you (Associated Domains entitlement and a relying-party server with HTTPS) must be configured in your Xcode project. Refer to [Apple's documentation on passkeys](https://developer.apple.com/documentation/authenticationservices/public-private_key_authentication/supporting_passkeys) for details.
+
+</TabPanel>
+</Tabs>
+
+## Register a passkey
+
+A user must be signed in before they can register a passkey. Typically, you call this from a security settings page, or directly after sign-up.
+
+`auth.registerPasskey()` runs the full WebAuthn ceremony. It fetches a challenge, invokes the platform passkey API, and verifies the response with Supabase Auth.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```ts
+const { data, error } = await supabase.auth.registerPasskey()
+
+if (error) {
+  // User cancelled, browser doesn't support WebAuthn, or verification failed
+  console.error(error)
+} else {
+  console.log('Registered passkey', data.id)
+}
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+try {
+  final Passkey passkey = await supabase.auth.registerPasskey(authenticator);
+  print('Registered passkey ${passkey.id}');
+} on AuthException catch (e) {
+  // The Supabase server rejected the credential.
+  print(e);
+} catch (e) {
+  // User cancelled or the platform ceremony failed.
+  print(e);
+}
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Available on iOS 16+, macOS 13+, and visionOS 1+. Requires `@_spi(Experimental) import Supabase`.
+
+```swift
+do {
+  let passkey = try await supabase.auth.registerPasskey(
+    presentationAnchor: view.window!
+  )
+  print("Registered passkey \(passkey.id)")
+} catch {
+  // AuthError from the server, or user cancelled the native UI.
+  print(error)
+}
+```
+
+For lower-level control (or on tvOS/watchOS), use `getPasskeyRegistrationOptions()` + `verifyPasskeyRegistration(challengeId:credentialResponse:)` from the [Auth Passkey](/docs/reference/swift/auth-passkey-api) reference.
+
+</TabPanel>
+</Tabs>
+
+The returned passkey contains the new credential's metadata:
+
+```ts
+{
+  id: string             // UUID — use this to update or delete the passkey
+  friendly_name?: string // Derived from the authenticator's AAGUID
+  created_at: string
+}
+```
+
+A friendly name is automatically derived from the authenticator's Authenticator Attestation GUID (AAGUID). For example, `iCloud Keychain`, `Google Password Manager`, `1Password`. Users can rename their passkey afterwards — see [Manage passkeys](#manage-passkeys).
+
+See the `registerPasskey` reference ([JavaScript](/docs/reference/javascript/auth-registerpasskey) · [Dart](/docs/reference/dart/auth-registerpasskey) · [Swift](/docs/reference/swift/auth-registerpasskey)) for the full API.
+
+## Sign in with a passkey
+
+`auth.signInWithPasskey()` runs the full discoverable-credential authentication ceremony. The user picks an account from the authenticator's UI — your app does not need to ask for an email or phone number upfront.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```ts
+const { data, error } = await supabase.auth.signInWithPasskey()
+
+if (error) {
+  console.error(error)
+} else {
+  // data.session and data.user are set; the client also dispatches a SIGNED_IN event
+  console.log('Signed in as', data.user?.email)
+}
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+try {
+  final AuthResponse res = await supabase.auth.signInWithPasskey(authenticator);
+  // res.session and res.user are set; the client also fires AuthChangeEvent.signedIn
+  print('Signed in as ${res.user?.email}');
+} on AuthException catch (e) {
+  print(e);
+}
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Available on iOS 16+, macOS 13+, and visionOS 1+. Requires `@_spi(Experimental) import Supabase`.
+
+```swift
+do {
+  let response = try await supabase.auth.signInWithPasskey(
+    presentationAnchor: view.window!
+  )
+  // response.session and response.user are set; the client also fires a signedIn event.
+  print("Signed in as \(response.user?.email ?? "")")
+} catch {
+  print(error)
+}
+```
+
+For lower-level control (or on tvOS/watchOS), use `getPasskeyAuthenticationOptions()` + `verifyPasskeyAuthentication(challengeId:credentialResponse:)` from the [Auth Passkey](/docs/reference/swift/auth-passkey-api) reference.
+
+</TabPanel>
+</Tabs>
+
+See the `signInWithPasskey` reference ([JavaScript](/docs/reference/javascript/auth-signinwithpasskey) · [Dart](/docs/reference/dart/auth-signinwithpasskey) · [Swift](/docs/reference/swift/auth-signinwithpasskey)) for the full API.
+
+## Two-step API
+
+For native flows, custom UI, or full control over the WebAuthn ceremony, use the lower-level `auth.passkey` namespace. Each operation is split into "start" and "verify".
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+Registration:
+
+```ts
+const { data: options } = await supabase.auth.passkey.startRegistration()
+// Run the WebAuthn ceremony yourself (e.g.: using a native WebAuthn library)
+const credential = await runRegistrationCeremony(options.options)
+await supabase.auth.passkey.verifyRegistration({
+  challengeId: options.challenge_id,
+  credential,
+})
+```
+
+Authentication:
+
+```ts
+const { data: options } = await supabase.auth.passkey.startAuthentication()
+// Run the WebAuthn ceremony yourself (e.g.: using a native WebAuthn library)
+const credential = await runAuthenticationCeremony(options.options)
+const { data } = await supabase.auth.passkey.verifyAuthentication({
+  challengeId: options.challenge_id,
+  credential,
+})
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+Registration:
+
+```dart
+final registration = await supabase.auth.passkey.startRegistration();
+// Run the platform ceremony yourself (e.g. using a passkey plugin).
+final Map<String, dynamic> credential = await runRegistrationCeremony(
+  registration.options,
+);
+final passkey = await supabase.auth.passkey.verifyRegistration(
+  challengeId: registration.challengeId,
+  credential: credential,
+);
+```
+
+Authentication:
+
+```dart
+final authentication = await supabase.auth.passkey.startAuthentication();
+// Run the platform ceremony yourself (e.g. using a passkey plugin).
+final Map<String, dynamic> credential = await runAuthenticationCeremony(
+  authentication.options,
+);
+final AuthResponse res = await supabase.auth.passkey.verifyAuthentication(
+  challengeId: authentication.challengeId,
+  credential: credential,
+);
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Requires `@_spi(Experimental) import Supabase`. Works on all Apple platforms (iOS, macOS, tvOS, watchOS, visionOS).
+
+Registration:
+
+```swift
+let options = try await supabase.auth.getPasskeyRegistrationOptions()
+// Run the platform authenticator yourself (e.g. via ASAuthorizationController).
+let credential: AnyJSON = try await runRegistrationCeremony(options.options)
+let passkey = try await supabase.auth.verifyPasskeyRegistration(
+  challengeId: options.challengeId,
+  credentialResponse: credential
+)
+```
+
+Authentication:
+
+```swift
+let options = try await supabase.auth.getPasskeyAuthenticationOptions()
+// Run the platform authenticator yourself (e.g. via ASAuthorizationController).
+let credential: AnyJSON = try await runAuthenticationCeremony(options.options)
+let response = try await supabase.auth.verifyPasskeyAuthentication(
+  challengeId: options.challengeId,
+  credentialResponse: credential
+)
+```
+
+</TabPanel>
+</Tabs>
+
+The `options` field returned from the start methods matches the [WebAuthn `PublicKeyCredentialCreationOptions`](https://www.w3.org/TR/webauthn-3/#dictdef-publickeycredentialcreationoptions) and [`PublicKeyCredentialRequestOptions`](https://www.w3.org/TR/webauthn-3/#dictdef-publickeycredentialrequestoptions) shapes (with `ArrayBuffer` fields encoded as base64url).
+
+See the `auth.passkey` reference ([JavaScript](/docs/reference/javascript/auth-passkey-api) · [Dart](/docs/reference/dart/auth-passkey-api) · [Swift](/docs/reference/swift/auth-passkey-api)) for the full API.
+
+## Manage passkeys
+
+List, rename, and delete the current user's passkeys:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```ts
+// List
+const { data: passkeys } = await supabase.auth.passkey.list()
+// [{ id, friendly_name, created_at, last_used_at? }, ...]
+
+// Rename
+await supabase.auth.passkey.update({
+  passkeyId: passkeys[0].id,
+  friendlyName: 'Work laptop',
+})
+
+// Delete
+await supabase.auth.passkey.delete({ passkeyId: passkeys[0].id })
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+// List
+final List<Passkey> passkeys = await supabase.auth.passkey.list();
+
+// Rename
+await supabase.auth.passkey.update(
+  passkeyId: passkeys.first.id,
+  friendlyName: 'Work laptop',
+);
+
+// Delete
+await supabase.auth.passkey.delete(passkeyId: passkeys.first.id);
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Requires `@_spi(Experimental) import Supabase`.
+
+```swift
+// List
+let passkeys: [PasskeyListItem] = try await supabase.auth.listPasskeys()
+
+// Rename
+let updated = try await supabase.auth.renamePasskey(
+  id: passkeys.first!.id,
+  friendlyName: "Work laptop"
+)
+
+// Delete
+try await supabase.auth.deletePasskey(id: passkeys.first!.id)
+```
+
+</TabPanel>
+</Tabs>
+
+`friendlyName` is limited to 120 characters. `lastUsedAt` is updated each time the passkey is used to sign in.
+
+See the `auth.passkey` reference ([JavaScript](/docs/reference/javascript/auth-passkey-api) · [Dart](/docs/reference/dart/auth-passkey-api) · [Swift](/docs/reference/swift/auth-passkey-api)) for the full API.
+
+## Admin API
+
+Server-side admin endpoints let you inspect and revoke a user's passkeys. These require the project's secret key and must only be called from a trusted server.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```ts
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(supabaseUrl, supabaseSecretKey, {
+  auth: { experimental: { passkey: true } },
+})
+
+const { data } = await supabase.auth.admin.passkey.listPasskeys({ userId })
+
+await supabase.auth.admin.passkey.deletePasskey({ userId, passkeyId })
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final supabase = SupabaseClient(supabaseUrl, secretKey);
+
+final List<Passkey> passkeys = await supabase.auth.admin.passkey.listPasskeys(
+  userId: userId,
+);
+
+await supabase.auth.admin.passkey.deletePasskey(
+  userId: userId,
+  passkeyId: passkeyId,
+);
+```
+
+</TabPanel>
+</Tabs>
+
+See the `auth.admin.passkey` reference ([JavaScript](/docs/reference/javascript/auth-admin-passkey-api) · [Dart](/docs/reference/dart/auth-admin-passkey-api)) for the full API. The Swift SDK does not expose admin passkey methods.
+
+## Error codes
+
+| Code                            | Meaning                                                                          |
+| ------------------------------- | -------------------------------------------------------------------------------- |
+| `passkey_disabled`              | Passkey sign-in is not enabled for this project.                                 |
+| `too_many_passkeys`             | The user has reached the maximum number of passkeys allowed per account.         |
+| `webauthn_credential_exists`    | This authenticator has already been registered to the account.                   |
+| `webauthn_credential_not_found` | The credential in the assertion is not registered with Supabase Auth.            |
+| `webauthn_challenge_not_found`  | The challenge ID is unknown or has already been consumed.                        |
+| `webauthn_challenge_expired`    | The challenge expired before the client returned a credential.                   |
+| `webauthn_verification_failed`  | The signature, attestation, or assertion did not validate against the challenge. |
+
+In addition, `signInWithPasskey()` returns the usual sign-in failure modes: `email_not_confirmed`, `phone_not_confirmed`, and `user_banned`.
+
+## Limitations
+
+- SSO users cannot register passkeys.
+- Anonymous users cannot register passkeys — link an email or phone first.

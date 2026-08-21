@@ -1,5 +1,5 @@
-upstream kong_upstream {
-    server kong:8000;
+upstream api_gw_upstream {
+    server api-gw:8000;
     keepalive 2;
 }
 
@@ -43,15 +43,19 @@ server {
     }
 
     location /auth {
-        proxy_pass http://kong_upstream;
+        proxy_pass http://api_gw_upstream;
     }
 
     location /rest {
-        proxy_pass http://kong_upstream;
+        proxy_pass http://api_gw_upstream;
+    }
+
+    location /graphql {
+        proxy_pass http://api_gw_upstream;
     }
 
     location /realtime/v1/ {
-        proxy_pass http://kong_upstream;
+        proxy_pass http://api_gw_upstream;
 
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -67,43 +71,25 @@ server {
     }
 
     location /storage/v1/ {
-        proxy_pass http://storage:5000/;
+        proxy_pass http://api_gw_upstream;
+
         proxy_buffering off;
+        proxy_request_buffering off;
 
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $remote_addr;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-Host $http_host;
-        proxy_set_header X-Forwarded-Port $server_port;
-
-        # Required for TUS resumable upload Location headers and S3 signature verification.
-        proxy_set_header X-Forwarded-Prefix /storage/v1;
+        chunked_transfer_encoding off;
 
         client_max_body_size 0;
-
-        # CORS headers for Storage (bypasses Kong, which normally handles CORS)
-        if ($request_method = OPTIONS) {
-            add_header 'Access-Control-Allow-Origin' '*';
-            add_header 'Access-Control-Allow-Methods' 'GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS';
-            add_header 'Access-Control-Allow-Headers' '*';
-            add_header 'Content-Length' 0;
-            add_header 'Content-Type' 'text/plain charset=UTF-8';
-            return 204;
-        }
-
-        add_header 'Access-Control-Allow-Origin' '*';
     }
 
     location /functions {
-        proxy_pass http://kong_upstream;
-    }
-
-    location /graphql {
-        proxy_pass http://kong_upstream;
+        proxy_pass http://api_gw_upstream;
     }
 
     location /mcp {
-        proxy_pass http://kong_upstream;
+        proxy_pass http://api_gw_upstream;
+    }
+
+    location /sso {
+        proxy_pass http://api_gw_upstream;
     }
 }

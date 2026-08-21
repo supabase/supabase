@@ -1,12 +1,11 @@
 'use client'
 
 import type { User } from '@supabase/supabase-js'
-import { Command, Database, LogOut, Settings, UserIcon } from 'lucide-react'
 import { logOut } from 'common'
-
-import type { menuItem } from 'ui-patterns/AuthenticatedDropdownMenu'
-import { useSetCommandMenuOpen } from 'ui-patterns'
+import { Command, Database, LogOut, Settings, UserIcon } from 'lucide-react'
 import { useRouter } from 'next/compat/router'
+import type { menuItem } from 'ui-patterns/AuthenticatedDropdownMenu'
+import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 const useDropdownMenu = (user: User | null) => {
   const router = useRouter()

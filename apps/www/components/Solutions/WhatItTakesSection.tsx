@@ -1,7 +1,7 @@
-import Link from 'next/link'
-import { ArrowUpRight } from 'lucide-react'
-import { Button } from 'ui'
 import SectionContainer from 'components/Layouts/SectionContainer'
+import { ArrowUpRight } from 'lucide-react'
+import Link from 'next/link'
+import { Button } from 'ui'
 
 export interface WhatItTakesItem {
   id: string
@@ -28,7 +28,12 @@ const WhatItTakesSection = ({ id, heading, items, className = '' }: WhatItTakesS
             className="flex flex-col gap-3 p-6 rounded-lg border border-default bg-surface-75"
           >
             <p className="text-foreground-light">{item.description}</p>
-            <Button asChild type="default" size="tiny" icon={<ArrowUpRight className="w-3 h-3" />}>
+            <Button
+              asChild
+              variant="default"
+              size="tiny"
+              icon={<ArrowUpRight className="w-3 h-3" />}
+            >
               <Link href={item.url}>{item.linkLabel ?? 'Read more'}</Link>
             </Button>
           </div>

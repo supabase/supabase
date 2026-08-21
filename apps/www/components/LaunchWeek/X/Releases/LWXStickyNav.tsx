@@ -25,7 +25,7 @@ const LWXStickyNav: FC = () => {
     })
 
     links.current?.forEach((link) => {
-      link.classList.remove('!text-foreground')
+      link.classList.remove('text-foreground!')
 
       const sanitizedHref = decodeURI(link.getAttribute('href') ?? '')
         .split('#')
@@ -34,7 +34,7 @@ const LWXStickyNav: FC = () => {
       const isMatch = sanitizedHref === newActiveAnchor
 
       if (isMatch) {
-        link.classList.add('!text-foreground')
+        link.classList.add('text-foreground!')
       }
     })
   }
@@ -52,8 +52,8 @@ const LWXStickyNav: FC = () => {
 
   return (
     <div className="absolute inset-0 pointer-events-none w-full h-full">
-      <nav className="sticky z-30 top-0 bg-[#06080999] backdrop-blur-sm pointer-events-auto w-full border-t border-b border-[#111718] h-[60px] flex items-center">
-        <SectionContainer className="!max-w-none !py-0 lg:!container flex items-center justify-between font-mono gap-4 md:gap-8 text-sm">
+      <nav className="sticky z-30 top-0 bg-[#06080999] backdrop-blur-xs pointer-events-auto w-full border-t border-b border-[#111718] h-[60px] flex items-center">
+        <SectionContainer className="max-w-none! py-0! lg:container! flex items-center justify-between font-mono gap-4 md:gap-8 text-sm">
           <div className="flex items-center gap-4 md:gap-8">
             <div className="flex items-center gap-3 leading-none uppercase">
               <Link href="/launch-week" className="text-foreground tracking-[1px]">

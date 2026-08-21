@@ -47,6 +47,13 @@ interface MiddlewareResponse {
 
 export const FIRST_REFERRER_COOKIE_NAME = '_sb_first_referrer'
 
+/**
+ * Short-lived (60s) diagnostic cookie written by www middleware on /dashboard and /docs paths.
+ * Encodes: hit=1&would_stamp={0|1}&has_cookie={0|1}
+ * Read by Studio telemetry to report middleware reach and attribution signals to PostHog.
+ */
+export const MW_DIAG_COOKIE_NAME = '_sb_mw_diag'
+
 /** 365 days in seconds */
 export const FIRST_REFERRER_COOKIE_MAX_AGE = 365 * 24 * 60 * 60
 
@@ -80,6 +87,43 @@ export function isExternalReferrer(referrer: string): boolean {
   try {
     const hostname = new URL(referrer).hostname
     return hostname !== 'supabase.com' && !hostname.endsWith('.supabase.com')
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Returns true if the referrer URL is an OAuth/SSO redirect that should NOT
+ * be treated as a genuine traffic source.
+ *
+ * A referrer should reflect how someone discovered Supabase, not how they
+ * authenticated. This function identifies auth provider redirects:
+ * - accounts.google.com — blocked entirely (dedicated SSO subdomain)
+ * - github.com with no path (bare domain) — blocked (OAuth strips the path
+ *   via origin-when-cross-origin Referrer-Policy)
+ * - github.com/login/oauth/* — blocked (explicit OAuth path, rare)
+ * - github.com with a specific path — allowed (genuine repo/README referrals)
+ */
+export function isOAuthRedirectReferrer(referrer: string): boolean {
+  if (!referrer) return false
+  try {
+    const url = new URL(referrer)
+    const hostname = url.hostname
+
+    // Google SSO — entire subdomain is auth traffic
+    if (hostname === 'accounts.google.com') return true
+
+    // GitHub — bare domain (no meaningful path) is OAuth redirect noise
+    if (hostname === 'github.com') {
+      const path = url.pathname
+      if (path === '/') return true
+      // Explicit OAuth path (rare — GitHub usually strips this)
+      if (path.startsWith('/login/oauth')) return true
+      // Any other path = genuine referral (README, repo, discussion, etc.)
+      return false
+    }
+
+    return false
   } catch {
     return false
   }
@@ -167,7 +211,7 @@ export function buildFirstReferrerData({
 // ---------------------------------------------------------------------------
 
 export function serializeFirstReferrerCookie(data: FirstReferrerData): string {
-  return encodeURIComponent(JSON.stringify(data))
+  return JSON.stringify(data)
 }
 
 // ---------------------------------------------------------------------------
@@ -200,7 +244,10 @@ export function hasPaidSignals(url: URL): boolean {
  * Decides whether the first-referrer cookie should be (re-)stamped.
  *
  * - No cookie + external referrer → stamp (first visit attribution)
+ * - No cookie + OAuth/SSO redirect referrer → skip (auth ≠ discovery)
  * - Cookie exists + paid signals in URL → stamp (paid traffic refresh)
+ *   Note: OAuth check intentionally skipped for paid refresh — the paid
+ *   signal comes from the URL (gclid, utm_medium=cpc), not the referrer.
  * - Otherwise → skip
  */
 export function shouldRefreshCookie(
@@ -208,6 +255,7 @@ export function shouldRefreshCookie(
   request: { referrer: string; url: string }
 ): { stamp: boolean } {
   if (!existingCookie) {
+    if (isOAuthRedirectReferrer(request.referrer)) return { stamp: false }
     return { stamp: isExternalReferrer(request.referrer) }
   }
 
@@ -263,6 +311,42 @@ export function stampFirstReferrerCookie(
 }
 
 // ---------------------------------------------------------------------------
+// Middleware diagnostic cookie — parse (client-side)
+// ---------------------------------------------------------------------------
+
+export interface MwDiagData {
+  hit: boolean
+  would_stamp: boolean
+  has_existing_cookie: boolean
+}
+
+/**
+ * Parse the short-lived middleware diagnostic cookie written by www middleware
+ * on /dashboard and /docs paths. Returns null if the cookie is absent or malformed.
+ */
+export function parseMwDiagCookie(cookieHeader: string): MwDiagData | null {
+  try {
+    const cookies = cookieHeader.split(';')
+    const match = cookies.map((c) => c.trim()).find((c) => c.startsWith(`${MW_DIAG_COOKIE_NAME}=`))
+
+    if (!match) return null
+
+    const rawValue = match.slice(`${MW_DIAG_COOKIE_NAME}=`.length)
+    const params = new URLSearchParams(decodeURIComponent(rawValue))
+
+    if (params.get('hit') !== '1') return null
+
+    return {
+      hit: true,
+      would_stamp: params.get('would_stamp') === '1',
+      has_existing_cookie: params.get('has_cookie') === '1',
+    }
+  } catch {
+    return null
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Parse cookie from document.cookie header (client-side)
 // ---------------------------------------------------------------------------
 
@@ -276,7 +360,18 @@ export function parseFirstReferrerCookie(cookieHeader: string): FirstReferrerDat
     if (!match) return null
 
     const value = match.slice(`${FIRST_REFERRER_COOKIE_NAME}=`.length)
-    const parsed = JSON.parse(decodeURIComponent(value)) as unknown
+    const decoded = decodeURIComponent(value)
+    // Handle double-encoded cookies from before the serializer fix.
+    // Next.js cookies.set() encodes automatically, but serializeFirstReferrerCookie
+    // previously called encodeURIComponent too, producing double-encoded values.
+    let jsonString: string
+    try {
+      JSON.parse(decoded)
+      jsonString = decoded
+    } catch {
+      jsonString = decodeURIComponent(decoded)
+    }
+    const parsed = JSON.parse(jsonString) as unknown
 
     if (!parsed || typeof parsed !== 'object') return null
 

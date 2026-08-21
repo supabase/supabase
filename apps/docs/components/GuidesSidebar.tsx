@@ -1,13 +1,16 @@
 'use client'
 
-import { Check, Copy, ExternalLink } from 'lucide-react'
+import { Feedback } from '~/components/Feedback'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { askAiUrls, isFeatureEnabled, useCopyMarkdownFromUrl } from 'common'
+import { Chatgpt, Claude } from 'icons'
+import { Check, Copy, Sparkles } from 'lucide-react'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
-import { isFeatureEnabled } from 'common'
 import { cn } from 'ui'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 import { Toc, TOCItems, TOCScrollArea } from 'ui-patterns/Toc'
-import { Feedback } from '~/components/Feedback'
+
 import { useTocAnchors } from '../features/docs/GuidesMdx.state'
 
 interface TOCHeader {
@@ -18,59 +21,84 @@ interface TOCHeader {
 }
 
 function AiTools({ className }: { className?: string }) {
-  const [copied, setCopied] = useState(false)
   const path = usePathname()
+  const sendTelemetryEvent = useSendTelemetryEvent()
+  const { copied, copyMarkdown } = useCopyMarkdownFromUrl()
+  const urls = askAiUrls(`https://supabase.com/docs${path}`)
 
-  async function copyMarkdown() {
-    const mdUrl = `/docs/${path}.md`
+  function handleAgentSetupClick() {
+    sendTelemetryEvent({ action: 'agent_setup_clicked' })
+  }
 
-    try {
-      const res = await fetch(mdUrl)
-      const text = await res.text()
-      await navigator.clipboard.writeText(text)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    } catch (error) {
-      console.error('Failed to copy markdown', error)
+  async function handleCopy() {
+    const ok = await copyMarkdown(`/docs${path}.md`, {
+      fallback: () => document.getElementById('sb-docs-guide-main-article')?.innerHTML ?? '',
+    })
+    if (ok) {
+      sendTelemetryEvent({ action: 'copy_as_markdown_clicked', properties: { pageType: 'guide' } })
     }
   }
 
   return (
-    <section className={cn(className)} aria-labelledby="ask-ai-title">
+    <section className={cn(className)} aria-labelledby="ai-tools-title">
       <h3
-        id="ask-ai-title"
+        id="ai-tools-title"
         className="block font-mono uppercase text-xs text-foreground-light mb-3"
       >
         AI Tools
       </h3>
       <div className="flex flex-col gap-2">
+        <Link
+          href="/guides/ai-tools"
+          onClick={handleAgentSetupClick}
+          className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
+        >
+          <Sparkles size={14} strokeWidth={1.5} />
+          Connect your AI agent
+        </Link>
         <button
-          onClick={copyMarkdown}
-          className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground text-left transition-colors"
+          tabIndex={0}
+          onClick={handleCopy}
+          className="flex cursor-pointer items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground text-left transition-colors"
         >
           {copied ? (
-            <Check size={14} strokeWidth={1.5} className="text-brand" />
+            <Check size={14} strokeWidth={1.5} className="text-brand" aria-hidden />
           ) : (
-            <Copy size={14} strokeWidth={1.5} />
+            <Copy size={14} strokeWidth={1.5} aria-hidden />
           )}
           {copied ? 'Copied!' : 'Copy as Markdown'}
         </button>
+        <span className="sr-only" role="status">
+          {copied ? 'Copied to clipboard' : ''}
+        </span>
         <a
-          href={`https://chatgpt.com/?hint=search&q=Read from https://supabase.com/docs${path} so I can ask questions about its contents`}
+          href={urls.chatgpt}
           target="_blank"
+          onClick={() =>
+            sendTelemetryEvent({
+              action: 'ask_ai_clicked',
+              properties: { agent: 'chatgpt', pageType: 'guide' },
+            })
+          }
           rel="noreferrer noopener"
           className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
         >
-          <ExternalLink size={14} strokeWidth={1.5} />
+          <Chatgpt size={14} aria-hidden />
           Ask ChatGPT
         </a>
         <a
-          href={`https://claude.ai/new?q=Read from https://supabase.com/docs${path} so I can ask questions about its contents`}
+          href={urls.claude}
           target="_blank"
+          onClick={() =>
+            sendTelemetryEvent({
+              action: 'ask_ai_clicked',
+              properties: { agent: 'claude', pageType: 'guide' },
+            })
+          }
           rel="noreferrer noopener"
           className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
         >
-          <ExternalLink size={14} strokeWidth={1.5} />
+          <Claude size={14} aria-hidden />
           Ask Claude
         </a>
       </div>

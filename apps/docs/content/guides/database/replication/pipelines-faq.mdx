@@ -1,0 +1,228 @@
+---
+id: 'pipelines-faq'
+title: 'Pipelines FAQ'
+description: 'Frequently asked questions about Supabase Pipelines.'
+subtitle: 'Common questions and answers about Supabase Pipelines.'
+sidebar_label: 'FAQ'
+---
+
+<$Partial path="pipelines-public-alpha.mdx" />
+
+## What destinations are supported?
+
+Pipelines currently supports **BigQuery** as the managed destination. See the [BigQuery destination guide](/docs/guides/database/replication/bigquery) for configuration details.
+
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
+You can [request early access to ClickHouse, Snowflake, and DuckLake](/go/supabase-pipelines-new-destinations). Supported destinations can be Supabase-managed or third-party systems as support expands.
+
+## Does the destination's region affect performance?
+
+Yes. The further apart your source database, the pipeline, and your destination are, the more network latency is added to replication, which increases replication lag and reduces throughput.
+
+Managed Pipelines run in **AWS `eu-central-1` (Frankfurt)**. For the best performance, place both your source project and destination as close to Frankfurt as possible. When configuring a destination provider such as BigQuery, choose its closest available region.
+
+If you can only optimize one side, prioritize placing your **destination** close to the pipeline's region. Replicated data continuously streams out to the destination, so latency on that leg has a bigger impact on overall replication lag than latency between the pipeline and the source.
+
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
+## Which plans support Pipelines?
+
+Pipelines requires a Pro, Team, or Enterprise plan. During public alpha, access is being rolled out gradually, so an eligible plan does not guarantee that Pipelines is enabled for every organization yet. If it is not available, request access from the **Database > Replication** page or contact your account manager.
+
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
+## What happened to Analytics Buckets replication?
+
+We are currently working on a new Supabase Warehouse product designed to address the limitations of the previous Analytics Buckets. Our goal is to build a solution we can confidently stand behind, rather than continuing to support an approach that does not meet the quality and flexibility we want for our users.
+
+As a result, replication into Analytics Buckets via Pipelines is no longer supported. Right now, **BigQuery** is the only supported managed destination, and we are actively working on expanding capabilities.
+
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
+## What does Pipelines install in the database?
+
+When you enable Pipelines, Supabase installs database objects that help track replication state and support schema changes:
+
+- An event trigger that runs on every `ALTER TABLE` statement. Supabase uses this to support schema change handling.
+- A set of tables in the `etl` schema. These tables track replication state for your pipelines.
+
+The replication state tables are not updated very often, especially after the initial sync is complete.
+
+## What schema changes are supported?
+
+Schema change support is currently in beta and limited to the BigQuery destination.
+
+Supported schema changes:
+
+- Adding a scalar, top-level column (created as `NULLABLE` in BigQuery)
+- Removing a column
+- Renaming a column
+- Dropping a `NOT NULL` constraint
+- Setting or dropping supported column default metadata
+
+Initial BigQuery table creation preserves whether each scalar, non-array Postgres column allows `NULL`. Arrays use BigQuery's `REPEATED` mode. For later changes, `DROP NOT NULL` relaxes a BigQuery `REQUIRED` column to `NULLABLE`, while `SET NOT NULL` leaves an existing BigQuery column nullable and logs a warning. Newly added scalar, top-level columns are always nullable in BigQuery. Supported defaults are applied separately as destination metadata and do not populate existing destination rows. Pipelines does not currently support changing column data types. See [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support) for details.
+
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
+## What happens when you disable Pipelines?
+
+Disabling Pipelines removes the database objects that were installed in your source database, including the replication state tables in the `etl` schema and the DDL event trigger.
+
+To remove Pipelines from a project, delete all Pipelines destinations first. After all destinations are deleted, the disable action becomes available. For the Dashboard steps, see [Disabling Pipelines](/docs/guides/database/replication/pipelines#disabling-pipelines).
+
+Disabling Pipelines stops Supabase from managing replication for the project. It does not delete tables or data that were already written to your destination.
+
+## Why is a table not being replicated?
+
+Common reasons:
+
+- **Missing primary key**: BigQuery requires each source table to have a primary key and requires the publication to include its columns. This is a BigQuery Pipelines requirement, not a general requirement for publishing Postgres inserts.
+- **Not in publication**: Ensure the table is included in your Postgres publication
+- **Generated columns**: Generated columns are skipped during replication
+
+Check your publication settings and verify your table meets the requirements.
+
+Custom data types replicate as strings. Check that your destination can interpret those string values correctly.
+
+## Why are partitioned tables replicated as separate tables?
+
+Postgres controls this with the publication's `publish_via_partition_root` setting. If the setting is `false`, or if you created the publication manually with SQL and did not set it, Postgres publishes changes from the leaf partitions. Pipelines then creates destination tables for those leaf partitions. If `publish_via_partition_root = true`, Postgres publishes changes as the partition root, so the partition hierarchy is treated as the published partition root.
+
+Publications created from the Dashboard replication flow use `publish_via_partition_root = true`.
+
+See [Partitioned tables](/docs/guides/database/replication/pipelines#partitioned-tables) for examples and the full behavior.
+
+## How does replica identity affect updates and deletes?
+
+If inserts replicate but updates or deletes fail, the source table might not be sending enough old-row identity through Postgres logical replication.
+
+Every table sent to BigQuery must have a primary key, and every primary-key column must be included in the publication. For updates and deletes, use the primary key replica identity or `REPLICA IDENTITY FULL`. Full replica identity is also recommended for tables with large `text`, `jsonb`, `bytea`, or other values that Postgres can store out of line.
+
+```sql
+alter table public.your_table replica identity full;
+```
+
+Full replica identity increases WAL volume and only affects new WAL records. Fix the setting before generating more changes. If the failing update is already retained in WAL, restarting may fail again; recreate the pipeline or restart the affected table's initial sync. See [BigQuery source table requirements](/docs/guides/database/replication/bigquery#source-table-requirements) for details.
+
+## Why aren't publication changes reflected after adding or removing tables?
+
+After modifying your Postgres publication, you must restart the replication pipeline for changes to take effect. See [Adding or removing tables](/docs/guides/database/replication/pipelines#adding-or-removing-tables) for instructions.
+
+## Why is a pipeline in failed state?
+
+A pipeline enters **Failed** when it encounters a non-retryable pipeline-level error during startup or ongoing replication. The pipeline stops instead of silently skipping the failure. To recover:
+
+1. Check the error message by hovering over the **Failed** status
+2. Click **View pipeline** for detailed information
+3. Fix the underlying issue (e.g., schema mismatches, destination connectivity)
+4. Restart the pipeline
+
+See [Handling errors](/docs/guides/database/replication/pipelines-monitoring#handling-errors) for more details.
+
+## Why was the pipeline stopped?
+
+A pipeline is stopped when you select **Stop pipeline**, when its project becomes inactive, or while an operation requires it to restart. A non-retryable configuration, schema, or data error can instead put the pipeline in **Failed** state. Transient connection and destination errors retry automatically when possible.
+
+To recover:
+
+1. Check whether the pipeline is **Stopped**, **Stopping**, or **Failed**
+2. If it failed, review the error details and [replication logs](/dashboard/project/_/logs/replication-logs)
+3. Fix the underlying issue, such as destination connectivity, schema mismatches, permissions, or rate limits
+4. Start or restart the pipeline from [**Database > Replication**](/dashboard/project/_/database/replication)
+
+If the same error continues after restart, the pipeline may stop again. Review [Monitor pipeline status](/docs/guides/database/replication/pipelines-monitoring) for troubleshooting steps.
+
+## Why is replication lag increasing?
+
+Lag increases when Postgres produces WAL faster than the pipeline can confirm it has processed. Common causes include a slow or rate-limited destination, a pipeline issue, heavy source database activity, long transactions, network latency between the pipeline and source database, or a stopped/disconnected pipeline.
+
+Open [**Database > Replication**](/dashboard/project/_/database/replication), click **View pipeline**, and check **Waiting to sync**, **WAL retention remaining**, **Last check-in**, **Connected**, and **Slot status**. See [Dealing with replication lag](/docs/guides/database/replication/pipelines-monitoring#dealing-with-replication-lag) for the full investigation and response flow.
+
+## What does a `Lost` slot status mean?
+
+`Lost` means Postgres has already removed WAL files that the pipeline's replication slot needed. The pipeline cannot continue from that slot.
+
+You can recreate the pipeline, or open the pipeline's **Advanced settings**, set **Invalidated slot behavior** to **Recreate**, and start the pipeline again. The pipeline resets its saved table-sync state, creates a new replication slot, and replaces each destination table through a new initial sync. This destructive restart is required for consistency because the old slot can no longer provide every change the pipeline missed, and the data processed during the new initial sync is billed again.
+
+See [Slot statuses](/docs/guides/database/replication/pipelines-monitoring#slot-statuses) for all slot states and what to do next.
+
+## Why is a table in error state?
+
+Table errors occur during the initial sync. To recover, click **View pipeline**, find the affected table, and click its restart action. This restarts that table's initial sync from the beginning, deletes its existing destination data, and bills the successfully processed row data again.
+
+## How to verify replication is working
+
+Check the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard:
+
+1. Verify your pipeline shows **Running** status
+2. Click **View pipeline** to check table states
+3. Ensure all tables show **Live** state (actively replicating)
+4. Monitor replication lag metrics
+
+See [Monitor pipeline status](/docs/guides/database/replication/pipelines-monitoring) for comprehensive monitoring instructions.
+
+## How to stop replication
+
+You can manage your pipeline using the actions menu in the destinations list. See [Managing your pipeline](/docs/guides/database/replication/pipelines#managing-your-pipeline) for details on available actions.
+
+<Admonition type="note">
+
+Stopping replication causes changes to queue up in the WAL.
+
+Stopping requests a graceful shutdown, so the pipeline can remain **Stopping** for up to five minutes while in-flight work finishes. Configured pipeline-hour billing continues while the pipeline is stopped. Delete the destination to end that charge.
+
+</Admonition>
+
+## What happens if a project becomes inactive?
+
+If your project becomes inactive, Pipelines stops any running pipelines and does not automatically resume them after the project is restarted.
+
+After restarting the project, restart each replication pipeline manually from the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard.
+
+## What happens after a downgrade to the free plan?
+
+When a project is downgraded to the Free Plan, all replication pipelines created with Pipelines for that project are deleted.
+
+## What happens if a table is deleted at the destination?
+
+Don't delete or modify tables or views managed by Pipelines. For BigQuery, deleting a managed object can stop replication and may require a new, billable initial sync. Pipelines does not guarantee that it will automatically repair or fully resynchronize a destination object that was removed manually.
+
+**To permanently remove a table from your destination you have two options:**
+
+**Option 1: End replication permanently**
+
+1. Delete the destination to permanently end replication and pipeline-hour billing. Stopping the pipeline alone does not end pipeline-hour billing.
+2. Delete the table at your destination
+3. Don't restart the pipeline while the table remains in its publication
+
+**Option 2: Remove from publication first**
+
+1. Remove the table from your Postgres publication using `ALTER PUBLICATION ... DROP TABLE`
+2. Restart your replication pipeline to apply the change (the table at the destination will remain but stop receiving new changes)
+3. Delete the table at your destination
+
+<Admonition type="note">
+
+Removing a table from the publication and restarting the pipeline does not delete the table downstream, it only stops replicating new changes to it.
+
+</Admonition>
+
+## Can data be processed more than once?
+
+Yes. Pipelines uses at-least-once processing. Failed destination write attempts that Pipelines retries are not counted. Data is counted only after the destination acknowledges successful processing.
+
+In rare cases, Pipelines can count an acknowledged batch but crash or be interrupted before its replication checkpoint is persisted. Recovery can then process and count the same data again.
+
+BigQuery uses the replicated source primary key and CDC ordering metadata to converge on the current table state. Pipelines does not provide a history of each delivery attempt that you can query or guarantee exactly-once event processing.
+
+## Where to find replication logs
+
+Navigate to the [**Logs > Replication**](/dashboard/project/_/logs/replication-logs) section of the Dashboard to see all pipeline logs. Logs contain diagnostic information. If you're experiencing issues, contact support with your error details.
+
+## How to get help
+
+If you need assistance:
+
+1. Check [Set up Pipelines](/docs/guides/database/replication/pipelines) and [Monitor pipeline status](/docs/guides/database/replication/pipelines-monitoring)
+2. Review this FAQ for common issues
+3. Contact support with your error details and logs

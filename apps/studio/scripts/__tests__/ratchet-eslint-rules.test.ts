@@ -2,6 +2,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+
 import { runRatchet } from '../ratchet-eslint-rules'
 
 const studioRoot = path.resolve(__dirname, '../..')
@@ -80,6 +81,28 @@ describe('ratchet-eslint-rules integration', () => {
     const combinedErrors = errorSpy.mock.calls.map((args) => args.join(' ')).join('\n')
     expect(combinedErrors).toContain(`${relativeToCwd('apps/studio/src/a.ts')} (+1)`)
     expect(combinedErrors).toContain(`${relativeToCwd('apps/studio/src/b.ts')} (+1)`)
+  })
+
+  it('reads rule ids from --rules-file', () => {
+    const tmp = createTempDir()
+    const metadataPath = path.join(tmp, 'baseline.json')
+    const rulesFilePath = path.join(tmp, 'rules.json')
+    writeFileSync(rulesFilePath, JSON.stringify(['no-console', 'no-debugger']))
+
+    const eslintResults = buildEslintResults([
+      { filePath: repoPath('apps/studio/src/a.ts'), rules: { 'no-console': 1, 'no-debugger': 2 } },
+    ])
+
+    const result = invokeRatchet(
+      ['--metadata', metadataPath, '--rules-file', rulesFilePath, '--init'],
+      eslintResults
+    )
+
+    expect(result).toBe(0)
+
+    const metadata = JSON.parse(readFileSync(metadataPath, 'utf8'))
+    expect(metadata.rules['no-console']).toBe(1)
+    expect(metadata.rules['no-debugger']).toBe(2)
   })
 
   it('falls back gracefully when baseline is missing per-file data', () => {

@@ -1,6 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { differenceInDays } from 'date-fns'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { MoreVertical, TrashIcon } from 'lucide-react'
 import {
   Button,
@@ -12,6 +11,8 @@ import {
   TableRow,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export const StorageCredItem = ({
   description,
@@ -62,7 +63,7 @@ export const StorageCredItem = ({
             <DropdownMenuTrigger asChild>
               <Button
                 icon={<MoreVertical size={14} strokeWidth={1} />}
-                type="text"
+                variant="text"
                 className="px-1.5 text-foreground-lighter hover:text-foreground"
               />
             </DropdownMenuTrigger>

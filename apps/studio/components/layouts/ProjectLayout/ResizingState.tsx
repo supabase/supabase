@@ -1,8 +1,8 @@
 import { useParams } from 'common'
 import { Loader2 } from 'lucide-react'
 
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { PROJECT_STATUS } from 'lib/constants'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 export const ResizingState = () => {
   const { ref } = useParams()
@@ -28,12 +28,10 @@ export const ResizingState = () => {
               <Loader2 className="animate-spin text-foreground-light" size={18} />
             </div>
             <div className="flex flex-col gap-1">
-              <p>Resizing Project Compute size</p>
+              <p>Resizing project</p>
               <p className="text-sm text-foreground-light">
-                Your project is being restarted to apply compute size changes.
-              </p>
-              <p className="text-sm text-foreground-light">
-                This can take a few minutes. Project will be offline while it is being restarted.
+                Your project is being restarted to apply compute size changes. It will remain
+                offline until fully restarted. This can take a few minutes.
               </p>
             </div>
           </div>

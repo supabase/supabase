@@ -11,26 +11,24 @@ import {
   Users,
   UserX,
 } from 'lucide-react'
+import { PRODUCT_SHORTNAMES } from 'shared-data/products'
+import { Image } from 'ui-patterns/Image'
 
-import { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
-import { frameworks } from 'components/Hero/HeroFrameworks'
-
-import type { FeatureGridProps } from 'components/Solutions/FeatureGrid'
-import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
-import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
-import type { SecuritySectionProps } from 'components/Enterprise/Security'
+import MainProducts from '../MainProducts'
+import { getSharedSections } from './shared-sections'
 import {
   FrameworkLink,
   type FeaturesSection,
   type HeroSection,
   type Metadata,
 } from './solutions.utils'
-import { getSharedSections } from './shared-sections'
-import MainProducts from '../MainProducts'
-import { Image } from 'ui'
-import { PRODUCT_SHORTNAMES } from 'shared-data/products'
-
-import { useSendTelemetryEvent } from 'lib/telemetry'
+import type { SecuritySectionProps } from '@/components/Enterprise/Security'
+import { frameworks } from '@/components/Hero/HeroFrameworks'
+import type { FeatureGridProps } from '@/components/Solutions/FeatureGrid'
+import type { PlatformSectionProps } from '@/components/Solutions/PlatformSection'
+import type { ResultsSectionProps } from '@/components/Solutions/ResultsSection'
+import { TwoColumnsSectionProps } from '@/components/Solutions/TwoColumnsSection'
+import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 const data: () => {
   metadata: Metadata
@@ -115,21 +113,21 @@ const data: () => {
     singleQuote: {
       id: 'social-proof',
       quote: {
-        text: '"We wanted a backend that could accelerate our development while maintaining security and scalability. Supabase stood out due to its automation, integrations, and ecosystem."',
+        text: 'We wanted a backend that could accelerate our development while maintaining security and scalability. Supabase stood out due to its automation, integrations, and ecosystem.',
         author: 'Raunak Kathuria',
         role: 'VP of Engineering, Deriv',
         link: '/customers/deriv',
         logo: (
           <>
             <Image
-              src="/images/customers/logos/deriv.png"
+              src="/images/customers/logos/on-light/deriv.png"
               alt="Deriv"
               width={128}
               height={48}
               className="object-contain w-24 md:w-32 dark:hidden"
             />
             <Image
-              src="/images/customers/logos/light/deriv.png"
+              src="/images/customers/logos/on-dark/deriv.png"
               alt="Deriv"
               width={128}
               height={48}
@@ -263,7 +261,7 @@ const data: () => {
       customers: [
         {
           name: 'Deriv',
-          logo: '/images/customers/logos/deriv.png',
+          logo: '/images/customers/logos/on-light/deriv.png',
           highlights: [
             'Accelerating online trading with scalable Postgres',
             'Automation, integrations, and ecosystem',
@@ -272,7 +270,7 @@ const data: () => {
         },
         {
           name: 'Bree',
-          logo: '/images/customers/logos/bree.png',
+          logo: '/images/customers/logos/on-light/bree.png',
           highlights: [
             '10X performance gains when switching from Fauna',
             'Greater developer velocity and AI-ready foundation',
@@ -281,7 +279,7 @@ const data: () => {
         },
         {
           name: 'Next Door Lending',
-          logo: '/images/customers/logos/next-door-lending.png',
+          logo: '/images/customers/logos/on-light/next-door-lending.png',
           highlights: [
             'Top 10 mortgage broker with Supabase',
             'Leveraged Postgres for lending workflows',
@@ -290,13 +288,13 @@ const data: () => {
         },
         {
           name: 'Rally',
-          logo: '/images/customers/logos/rally.png',
+          logo: '/images/customers/logos/on-light/rally.png',
           highlights: ['Building financial applications on Supabase'],
           cta: { label: 'Read the case study', href: '/customers/rally' },
         },
         {
           name: 'Xendit',
-          logo: '/images/customers/logos/xendit.png',
+          logo: '/images/customers/logos/on-light/xendit.png',
           highlights: [
             'Full solution shipped to production in less than one week',
             'Payment processor with transaction verification',

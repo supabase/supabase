@@ -3,8 +3,8 @@ import { supabase } from '../supabase'
 import { onMounted, ref, toRefs } from 'vue'
 import Avatar from './Avatar.vue';
 
-const props = defineProps(['session'])
-const { session } = toRefs(props)
+const props = defineProps(['claims'])
+const { claims } = toRefs(props)
 
 const loading = ref(true)
 const username = ref('')
@@ -18,12 +18,10 @@ onMounted(() => {
 async function getProfile() {
     try {
         loading.value = true
-        const { user } = session.value
-
         let { data, error, status } = await supabase
             .from('profiles')
             .select(`username, website, avatar_url`)
-            .eq('id', user.id)
+            .eq('id', claims.value.sub)
             .single()
 
         if (error && status !== 406) throw error
@@ -43,10 +41,8 @@ async function getProfile() {
 async function updateProfile() {
     try {
         loading.value = true
-        const { user } = session.value
-
         const updates = {
-            id: user.id,
+            id: claims.value.sub,
             username: username.value,
             website: website.value,
             avatar_url: avatar_url.value,
@@ -81,7 +77,7 @@ async function signOut() {
         <Avatar v-model:path="avatar_url" @upload="updateProfile" size="10" />
         <div>
             <label for="email">Email</label>
-            <input id="email" type="text" :value="session.user.email" disabled />
+            <input id="email" type="text" :value="claims.email" disabled />
         </div>
         <div>
             <label for="username">Name</label>

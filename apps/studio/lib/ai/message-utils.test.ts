@@ -1,7 +1,119 @@
-import type { UIMessage } from 'ai'
+import type { DynamicToolUIPart, UIMessage } from 'ai'
 import { describe, expect, it } from 'vitest'
 
-import { prepareMessagesForAPI } from './message-utils'
+import {
+  getParallelApprovalIdsToReject,
+  isManualApprovalRequested,
+  prepareMessagesForAPI,
+} from './message-utils'
+
+const makeApprovalPart = (id: string, isAutomatic = false): DynamicToolUIPart =>
+  ({
+    type: 'dynamic-tool',
+    toolName: 'test_tool',
+    toolCallId: id,
+    state: 'approval-requested',
+    input: {},
+    approval: { id, ...(isAutomatic ? { isAutomatic: true } : {}) },
+  }) as DynamicToolUIPart
+
+const makeResultPart = (id: string): DynamicToolUIPart => ({
+  type: 'dynamic-tool',
+  toolName: 'test_tool',
+  toolCallId: id,
+  state: 'output-available',
+  input: {},
+  output: {},
+})
+
+describe('isManualApprovalRequested', () => {
+  it('returns true for a human approval-requested tool part', () => {
+    expect(isManualApprovalRequested(makeApprovalPart('a1'))).toBe(true)
+  })
+
+  it('returns false for an automatic approval', () => {
+    expect(isManualApprovalRequested(makeApprovalPart('a1', true))).toBe(false)
+  })
+
+  it('returns false for a tool result part', () => {
+    expect(isManualApprovalRequested(makeResultPart('r1'))).toBe(false)
+  })
+
+  it('returns false for a content part with no state or approval', () => {
+    expect(isManualApprovalRequested({ type: 'text', text: 'hello' })).toBe(false)
+  })
+})
+
+describe('getParallelApprovalIdsToReject', () => {
+  it('returns [] for empty messages', () => {
+    expect(getParallelApprovalIdsToReject([])).toEqual([])
+  })
+
+  it('returns [] when there are no assistant messages', () => {
+    const messages: UIMessage[] = [{ id: '1', role: 'user', parts: [] }]
+    expect(getParallelApprovalIdsToReject(messages)).toEqual([])
+  })
+
+  it('returns [] when last assistant message has no pending approvals', () => {
+    const messages: UIMessage[] = [{ id: '1', role: 'assistant', parts: [makeResultPart('r1')] }]
+    expect(getParallelApprovalIdsToReject(messages)).toEqual([])
+  })
+
+  it('returns [] when there is only one pending approval', () => {
+    const messages: UIMessage[] = [{ id: '1', role: 'assistant', parts: [makeApprovalPart('a1')] }]
+    expect(getParallelApprovalIdsToReject(messages)).toEqual([])
+  })
+
+  it('returns all but the first id when there are multiple pending approvals', () => {
+    const messages: UIMessage[] = [
+      {
+        id: '1',
+        role: 'assistant',
+        parts: [makeApprovalPart('a1'), makeApprovalPart('a2'), makeApprovalPart('a3')],
+      },
+    ]
+    expect(getParallelApprovalIdsToReject(messages)).toEqual(['a2', 'a3'])
+  })
+
+  it('only inspects the last assistant message', () => {
+    const messages: UIMessage[] = [
+      {
+        id: '1',
+        role: 'assistant',
+        parts: [makeApprovalPart('old1'), makeApprovalPart('old2')],
+      },
+      { id: '2', role: 'user', parts: [] },
+      { id: '3', role: 'assistant', parts: [makeApprovalPart('new1')] },
+    ]
+    expect(getParallelApprovalIdsToReject(messages)).toEqual([])
+  })
+
+  it('ignores non-approval tool parts', () => {
+    const messages: UIMessage[] = [
+      {
+        id: '1',
+        role: 'assistant',
+        parts: [makeResultPart('r1'), makeApprovalPart('a1'), makeApprovalPart('a2')],
+      },
+    ]
+    expect(getParallelApprovalIdsToReject(messages)).toEqual(['a2'])
+  })
+
+  it('ignores automatic approvals when picking extras to reject', () => {
+    const messages: UIMessage[] = [
+      {
+        id: '1',
+        role: 'assistant',
+        parts: [
+          makeApprovalPart('auto', true),
+          makeApprovalPart('manual-1'),
+          makeApprovalPart('manual-2'),
+        ],
+      },
+    ]
+    expect(getParallelApprovalIdsToReject(messages)).toEqual(['manual-2'])
+  })
+})
 
 describe('prepareMessagesForAPI', () => {
   it('should limit messages to last 7 entries', () => {

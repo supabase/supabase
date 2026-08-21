@@ -1,0 +1,15 @@
+# DEPRECATED: Envoy is now the default API gateway defined directly in
+# docker-compose.yml, so this override is no longer needed and does nothing.
+#
+# This no-op shim is kept for one release cycle so existing COMPOSE_FILE
+# entries referencing it do not break. Remove it from your configuration:
+#
+#   sh run.sh config remove envoy
+#
+# To run Kong instead of Envoy, use the Kong override:
+#
+#   sh run.sh config add kong
+#
+# This file will be removed in a future release.
+
+services: {}

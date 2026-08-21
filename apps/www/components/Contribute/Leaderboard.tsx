@@ -1,18 +1,13 @@
 'use client'
 
-import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
-import { parseAsString, useQueryState } from 'nuqs'
-import {
-  Select_Shadcn_ as Select,
-  SelectContent_Shadcn_ as SelectContent,
-  SelectItem_Shadcn_ as SelectItem,
-  SelectTrigger_Shadcn_ as SelectTrigger,
-  SelectValue_Shadcn_ as SelectValue,
-} from 'ui'
-import { LeaderboardContent } from './LeaderboardContent'
 import { LEADERBOARD_PERIODS } from '~/data/contribute'
+import { ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
+import { parseAsString, useQueryState } from 'nuqs'
 import { use } from 'react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'ui'
+
+import { LeaderboardContent } from './LeaderboardContent'
 
 export function LeaderboardClient({
   initialLeaderboardPromise,

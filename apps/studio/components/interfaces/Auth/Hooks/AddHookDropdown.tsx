@@ -1,11 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronDown } from 'lucide-react'
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { ChevronDown } from 'lucide-react'
+import { useMemo } from 'react'
 import {
   Button,
   DropdownMenu,
@@ -15,22 +11,31 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
-import { HOOKS_DEFINITIONS, HOOK_DEFINITION_TITLE, Hook } from './hooks.constants'
+
+import { Hook, HOOK_DEFINITION_TITLE, HOOKS_DEFINITIONS } from './hooks.constants'
 import { extractMethod, isValidHook } from './hooks.utils'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useMemo } from 'react'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface AddHookDropdownProps {
   buttonText?: string
   align?: 'end' | 'center'
-  type?: 'primary' | 'default'
+  variant?: 'primary' | 'default'
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
   onSelectHook: (hook: HOOK_DEFINITION_TITLE) => void
 }
 
 export const AddHookDropdown = ({
   buttonText = 'Add hook',
   align = 'end',
-  type = 'primary',
+  variant = 'primary',
+  open,
+  onOpenChange,
   onSelectHook,
 }: AddHookDropdownProps) => {
   const { ref: projectRef } = useParams()
@@ -66,7 +71,7 @@ export const AddHookDropdown = ({
     return (
       <ButtonTooltip
         disabled
-        type={type}
+        variant={variant}
         tooltip={{
           content: { side: 'bottom', text: 'You need additional permissions to add auth hooks' },
         }}
@@ -77,9 +82,9 @@ export const AddHookDropdown = ({
   }
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
-        <Button type={type} iconRight={<ChevronDown />}>
+        <Button variant={variant} iconRight={<ChevronDown />}>
           {buttonText}
         </Button>
       </DropdownMenuTrigger>

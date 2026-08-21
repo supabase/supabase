@@ -1,11 +1,12 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useParams } from 'common/hooks'
-import { EnableIndexAdvisorButton } from 'components/interfaces/QueryPerformance/IndexAdvisor/EnableIndexAdvisorButton'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useTrack } from 'lib/telemetry/track'
 import { Lightbulb } from 'lucide-react'
+
 import { BannerCard } from '../BannerCard'
 import { useBannerStack } from '../BannerStackProvider'
+import { EnableIndexAdvisorButton } from '@/components/interfaces/QueryPerformance/IndexAdvisor/EnableIndexAdvisorButton'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const BannerIndexAdvisor = () => {
   const track = useTrack()

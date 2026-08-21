@@ -1,8 +1,9 @@
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { FilterPopover } from 'components/ui/FilterPopover'
 import { X } from 'lucide-react'
-import { AdvisorSeverity, AdvisorTab } from 'state/advisor-state'
-import { Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import { Tabs, TabsList, TabsTrigger } from 'ui'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { FilterPopover } from '@/components/ui/FilterPopover'
+import { AdvisorSeverity, AdvisorTab } from '@/state/advisor-state'
 
 const severityOptions = [
   { label: 'Critical', value: 'critical' },
@@ -39,27 +40,24 @@ export const AdvisorFilters = ({
   return (
     <div className="border-b overflow-x-auto">
       <div className="flex items-center justify-between gap-x-4 h-[calc(var(--header-height)-1px)]">
-        <Tabs_Shadcn_ value={activeTab} onValueChange={onTabChange} className="h-full pl-4">
-          <TabsList_Shadcn_ className="border-b-0 gap-4 h-full">
-            <TabsTrigger_Shadcn_ value="all" className="h-full text-xs">
+        <Tabs value={activeTab} onValueChange={onTabChange} className="h-full pl-4">
+          <TabsList className="border-b-0 gap-4 h-full">
+            <TabsTrigger value="all" className="h-full text-xs">
               All
-            </TabsTrigger_Shadcn_>
-            <TabsTrigger_Shadcn_ value="security" className="h-full text-xs">
+            </TabsTrigger>
+            <TabsTrigger value="security" className="h-full text-xs">
               Security
-            </TabsTrigger_Shadcn_>
-            <TabsTrigger_Shadcn_ value="performance" className="h-full text-xs">
+            </TabsTrigger>
+            <TabsTrigger value="performance" className="h-full text-xs">
               Performance
-            </TabsTrigger_Shadcn_>
+            </TabsTrigger>
             {isPlatform && (
-              <TabsTrigger_Shadcn_
-                value="messages"
-                className="h-full text-xs flex items-center gap-2"
-              >
+              <TabsTrigger value="messages" className="h-full text-xs flex items-center gap-2">
                 Messages
-              </TabsTrigger_Shadcn_>
+              </TabsTrigger>
             )}
-          </TabsList_Shadcn_>
-        </Tabs_Shadcn_>
+          </TabsList>
+        </Tabs>
         <div className="flex items-center gap-x-2 pr-3">
           {isPlatform && (
             <FilterPopover
@@ -84,7 +82,7 @@ export const AdvisorFilters = ({
             }}
           />
           <ButtonTooltip
-            type="text"
+            variant="text"
             className="w-7 h-7 p-0"
             icon={<X strokeWidth={1.5} />}
             onClick={onClose}

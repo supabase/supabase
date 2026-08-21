@@ -1,43 +1,64 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IS_PLATFORM, useParams } from 'common'
+import { IS_PLATFORM } from 'common'
 import { ChevronDown } from 'lucide-react'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import * as z from 'zod'
-
-import { DocsButton } from 'components/ui/DocsButton'
-import { getTemporaryAPIKey } from 'data/api-keys/temp-api-keys-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from 'lib/constants'
 import {
   Button,
-  FormControl_Shadcn_,
-  FormDescription_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  Form_Shadcn_,
-  Input_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Switch,
 } from 'ui'
-import { RealtimeConfig } from './useRealtimeMessages'
+import * as z from 'zod'
 
-interface ChooseChannelPopoverProps {
+import { RealtimeConfig } from './useRealtimeMessages'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { getTemporaryAPIKey } from '@/data/api-keys/temp-api-keys-query'
+import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+
+type ControlledOpenProps =
+  | { open: boolean; onOpenChange: (open: boolean) => void }
+  | { open?: undefined; onOpenChange?: undefined }
+
+type ChooseChannelPopoverProps = {
   config: RealtimeConfig
   onChangeConfig: Dispatch<SetStateAction<RealtimeConfig>>
-}
+} & ControlledOpenProps
 
 const FormSchema = z.object({ channel: z.string(), isPrivate: z.boolean() })
 
-export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPopoverProps) => {
-  const [open, setOpen] = useState(false)
-  const { ref } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+export const ChooseChannelPopover = ({
+  config,
+  onChangeConfig,
+  open: controlledOpen,
+  onOpenChange,
+}: ChooseChannelPopoverProps) => {
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isControlled = controlledOpen !== undefined
+  const open = isControlled ? controlledOpen : internalOpen
+
+  const setOpen = (v: boolean) => {
+    if (isControlled) {
+      onOpenChange?.(v)
+    } else {
+      setInternalOpen(v)
+    }
+  }
+  const track = useTrack()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
@@ -56,13 +77,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
 
   const onSubmit = async () => {
     setOpen(false)
-    sendEvent({
-      action: 'realtime_inspector_listen_channel_clicked',
-      groups: {
-        project: ref ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
-    })
+    track('realtime_inspector_listen_channel_clicked')
 
     let token = config.token
 
@@ -80,56 +95,66 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
     })
   }
 
+  const channelPopoverTrigger = (
+    <PopoverTrigger asChild>
+      <Button className="rounded-r-none" variant="default" size="tiny" iconRight={<ChevronDown />}>
+        <p
+          className="max-w-[120px] truncate"
+          title={config.channelName.length > 0 ? config.channelName : ''}
+        >
+          {config.channelName.length > 0 ? `Channel: ${config.channelName}` : 'Join a channel'}
+        </p>
+      </Button>
+    </PopoverTrigger>
+  )
+
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={onOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
-        <Button className="rounded-r-none" type="default" size="tiny" iconRight={<ChevronDown />}>
-          <p
-            className="max-w-[120px] truncate"
-            title={config.channelName.length > 0 ? config.channelName : ''}
-          >
-            {config.channelName.length > 0 ? `Channel: ${config.channelName}` : 'Join a channel'}
-          </p>
-        </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-[320px]" align="start">
+    <Popover open={open} onOpenChange={onOpen}>
+      {!open && config.channelName.length === 0 ? (
+        <ShortcutTooltip shortcutId={SHORTCUT_IDS.INSPECTOR_JOIN_CHANNEL} side="bottom">
+          {channelPopoverTrigger}
+        </ShortcutTooltip>
+      ) : (
+        channelPopoverTrigger
+      )}
+      <PopoverContent className="p-0 w-[320px]" align="start">
         <div className="p-4 flex flex-col text-sm">
           {config.channelName.length === 0 ? (
             <>
-              <Form_Shadcn_ {...form}>
+              <Form {...form}>
                 <form
                   id="realtime-channel"
                   onSubmit={form.handleSubmit(() => onSubmit())}
                   className="flex flex-col gap-y-4"
                 >
-                  <FormField_Shadcn_
+                  <FormField
                     name="channel"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
+                      <FormItem className="flex flex-col gap-y-2">
                         <div className="flex flex-col gap-y-1">
                           <label className="text-foreground text-xs">Name of channel</label>
-                          <div className="flex flex-row">
-                            <FormControl_Shadcn_>
-                              <Input_Shadcn_
+                          <InputGroup>
+                            <FormControl>
+                              <InputGroupInput
                                 {...field}
                                 autoComplete="off"
                                 className="rounded-r-none text-xs px-2.5 py-1 h-auto"
                                 placeholder="Enter a channel name"
                               />
-                            </FormControl_Shadcn_>
-
-                            <Button
-                              type="primary"
-                              className="rounded-l-none"
-                              disabled={form.getValues().channel.length === 0}
-                              onClick={() => onSubmit()}
-                            >
-                              Listen to channel
-                            </Button>
-                          </div>
+                            </FormControl>
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupButton
+                                variant="primary"
+                                disabled={form.getValues().channel.length === 0}
+                                onClick={() => onSubmit()}
+                              >
+                                Listen to channel
+                              </InputGroupButton>
+                            </InputGroupAddon>
+                          </InputGroup>
                         </div>
-                        <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
+                        <FormDescription className="text-xs text-foreground-lighter">
                           The channel you initialize with the Supabase Realtime client. Learn more
                           in{' '}
                           <a
@@ -140,34 +165,32 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                           >
                             our docs
                           </a>
-                        </FormDescription_Shadcn_>
-                      </FormItem_Shadcn_>
+                        </FormDescription>
+                      </FormItem>
                     )}
                   />
 
-                  <FormField_Shadcn_
+                  <FormField
                     key="isPrivate"
                     control={form.control}
                     name="isPrivate"
                     render={({ field }) => (
-                      <FormItem_Shadcn_ className="">
+                      <FormItem className="">
                         <div className="flex flex-row items-center gap-x-2">
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <Switch
                               checked={field.value}
                               onCheckedChange={field.onChange}
                               disabled={field.disabled}
                             />
-                          </FormControl_Shadcn_>
-                          <FormLabel_Shadcn_ className="text-xs">
-                            Is channel private?
-                          </FormLabel_Shadcn_>
+                          </FormControl>
+                          <FormLabel className="text-xs">Is channel private?</FormLabel>
                         </div>
-                        <FormDescription_Shadcn_ className="text-xs text-foreground-lighter mt-2">
+                        <FormDescription className="text-xs text-foreground-lighter mt-2">
                           If the channel is marked as private, it will use RLS policies to filter
                           messages.
-                        </FormDescription_Shadcn_>
-                      </FormItem_Shadcn_>
+                        </FormDescription>
+                      </FormItem>
                     )}
                   />
 
@@ -177,7 +200,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                     href={`${DOCS_URL}/guides/realtime/authorization`}
                   />
                 </form>
-              </Form_Shadcn_>
+              </Form>
             </>
           ) : (
             <div className="space-y-2">
@@ -197,7 +220,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                 If you leave this channel, all of the messages populated on this page will disappear
               </p>
               <Button
-                type="default"
+                variant="default"
                 onClick={() => onChangeConfig({ ...config, channelName: '', enabled: false })}
               >
                 Leave channel
@@ -205,7 +228,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
             </div>
           )}
         </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

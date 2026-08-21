@@ -2,91 +2,90 @@
 title: 'Use Supabase with Hono'
 subtitle: 'Learn how to create a Supabase project, add some sample data to your database, secure it with auth, and query the data from a Hono app.'
 breadcrumb: 'Framework Quickstarts'
-hideToc: true
 ---
 
-<StepHikeCompact>
+<AiPrompt id="hono" />
 
-  <StepHikeCompact.Step step={1}>
+<$Partial path="quickstart_db_setup.mdx" />
 
-    <StepHikeCompact.Details title="Create a Hono app">
+## 3. Create a Hono app
 
-    Bootstrap the Hono example app from the Supabase Samples using the CLI.
+Bootstrap the Hono example app from the Supabase Samples using the CLI.
 
-    </StepHikeCompact.Details>
+```bash
+npx supabase@latest bootstrap hono
+```
 
-    <StepHikeCompact.Code>
+## 4. Set up AI tooling (optional)
 
-      ```bash name=Terminal
-      npx supabase@latest bootstrap hono
-      ```
+<$Partial path="quickstart_ai_tooling.mdx" />
 
-    </StepHikeCompact.Code>
+## 5. Install dependencies
 
-  </StepHikeCompact.Step>
+The `package.json` file in the project includes the necessary dependencies, including `@supabase/supabase-js` and `@supabase/ssr` to help with server-side auth.
 
-  <StepHikeCompact.Step step={2}>
-    <StepHikeCompact.Details title="Install the Supabase client library">
+```bash
+npm install
+```
 
-    The `package.json` file in the project includes the necessary dependencies, including `@supabase/supabase-js` and `@supabase/ssr` to help with server-side auth.
+## 6. Declare Supabase environment variables
 
-    </StepHikeCompact.Details>
+Copy the `.env.example` file to `.env`.
 
-    <StepHikeCompact.Code>
+```bash
+cp .env.example .env
+```
 
-      ```bash name=Terminal
-      npm install
-      ```
+Update the values with your Supabase project URL and publishable key, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&connectTab=frameworks).
 
-    </StepHikeCompact.Code>
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_?showConnect=true">Open Connect panel</a>
+</Button>
 
-  </StepHikeCompact.Step>
+<$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "" }} />
 
-  <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Set up the required environment variables">
+## 7. Set up anonymous sign-ins
 
-    Copy the `.env.example` file to `.env` and update the values with your Supabase project URL and anon key.
+This app signs users in anonymously, so [enable anonymous sign-ins](/dashboard/project/_/auth/providers) in the Auth settings.
 
-    Lastly, [enable anonymous sign-ins](/dashboard/project/_/auth/providers) in the Auth settings.
+Anonymous sign-ins use the `authenticated` role, but the database setup in step 2 grants read access to the `anon` role only. Without the privilege and a matching policy for `authenticated`, the instruments query returns no rows. Run the following in the [SQL Editor](/dashboard/project/_/sql/new) to grant the privilege and add the policy:
 
-    <ProjectConfigVariables variable="url" />
-    <ProjectConfigVariables variable="publishable" />
-    <ProjectConfigVariables variable="anon" />
+```sql SQL_EDITOR
+grant select on public.instruments to authenticated;
 
-    </StepHikeCompact.Details>
-    <StepHikeCompact.Code>
+create policy "authenticated can read instruments"
+on public.instruments
+for select to authenticated
+using (true);
+```
 
+## 8. Query data from the app
 
-      ```bash name=Terminal
-      cp .env.example .env
-      ```
+The bootstrapped app already includes the route that reads your `instruments` table, in `src/index.tsx`. The middleware in `src/middleware/auth.middleware.ts` creates a request-scoped Supabase client, so `getSupabase(c)` returns a client that already carries the signed-in user's auth token. Your RLS policies apply to the query.
 
-{/* TODO: Not ideal for frameworks that have no entry in Connect */}
-<$Partial path="api_settings_steps.mdx" variables={{ "framework": "", "tab": "frameworks" }} />
+```tsx name=src/index.tsx
+app.get('/instruments', async (c) => {
+  const supabase = getSupabase(c)
+  const { data, error } = await supabase.from('instruments').select('*')
 
-    </StepHikeCompact.Code>
+  if (error) {
+    console.error(error)
+    return c.json({ error: error.message }, 500)
+  }
 
-  </StepHikeCompact.Step>
+  return c.json(data)
+})
+```
 
-  <StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Start the app">
+## 9. Start the app
 
-    Start the app, go to http://localhost:5173.
+Start the app, go to http://localhost:5173, sign in anonymously, then open the instruments list.
 
-    Learn how [server side auth](/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=hono) works with Hono.
+```bash
+npm run dev
+```
 
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```bash name=Terminal
-      npm run dev
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-</StepHikeCompact>
+<$Partial path="quickstart_going_to_production.mdx" />
 
 ## Next steps
 

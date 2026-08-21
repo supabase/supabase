@@ -1,17 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { AlertCircle, Info, Search } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import InformationBox from 'components/ui/InformationBox'
-import { NoSearchResults } from 'components/ui/NoSearchResults'
-import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Card,
@@ -28,7 +20,18 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { PublicationSkeleton } from './PublicationSkeleton'
+import { AlertError } from '@/components/ui/AlertError'
+import InformationBox from '@/components/ui/InformationBox'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { useDatabasePublicationUpdateMutation } from '@/data/database-publications/database-publications-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface PublicationEvent {
   event: string
@@ -39,6 +42,20 @@ export const PublicationsList = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [filterString, setFilterString] = useState<string>('')
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search publications' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
+    setFilterString('')
+  })
 
   const {
     data = [],
@@ -95,27 +112,27 @@ export const PublicationsList = () => {
 
   return (
     <>
-      <div className="mb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <Input
-              size="tiny"
-              icon={<Search />}
-              className="w-48"
-              placeholder="Search for a publication"
-              value={filterString}
-              onChange={(e) => setFilterString(e.target.value)}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center">
+          <Input
+            ref={searchInputRef}
+            size="tiny"
+            icon={<Search />}
+            className="w-48"
+            placeholder="Search for a publication"
+            value={filterString}
+            onChange={(e) => setFilterString(e.target.value)}
+            onKeyDown={onSearchInputEscape(filterString, setFilterString)}
+          />
+        </div>
+        {isPermissionsLoaded && !canUpdatePublications && (
+          <div className="w-[500px]">
+            <InformationBox
+              icon={<AlertCircle className="text-foreground-light" strokeWidth={2} />}
+              title="You need additional permissions to update database publications"
             />
           </div>
-          {isPermissionsLoaded && !canUpdatePublications && (
-            <div className="w-[500px]">
-              <InformationBox
-                icon={<AlertCircle className="text-foreground-light" strokeWidth={2} />}
-                title="You need additional permissions to update database publications"
-              />
-            </div>
-          )}
-        </div>
+        )}
       </div>
 
       <div className="w-full overflow-hidden overflow-x-auto">
@@ -140,6 +157,18 @@ export const PublicationsList = () => {
                 <TableRow>
                   <TableCell colSpan={7}>
                     <AlertError error={error} subject="Failed to retrieve publications" />
+                  </TableCell>
+                </TableRow>
+              )}
+
+              {!isLoading && publications.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={7}>
+                    <NoSearchResults
+                      searchString={filterString}
+                      onResetFilter={() => setFilterString('')}
+                      className="border-none !p-0"
+                    />
                   </TableCell>
                 </TableRow>
               )}
@@ -188,7 +217,11 @@ export const PublicationsList = () => {
                     ))}
                     <TableCell>
                       <div className="flex justify-end">
-                        <Button asChild type="default" style={{ paddingTop: 3, paddingBottom: 3 }}>
+                        <Button
+                          asChild
+                          variant="default"
+                          style={{ paddingTop: 3, paddingBottom: 3 }}
+                        >
                           <Link href={`/project/${ref}/database/publications/${x.id}`}>
                             {x.tables === null
                               ? 'All tables'
@@ -203,14 +236,6 @@ export const PublicationsList = () => {
           </Table>
         </Card>
       </div>
-
-      {!isLoading && publications.length === 0 && (
-        <NoSearchResults
-          searchString={filterString}
-          onResetFilter={() => setFilterString('')}
-          className="rounded-t-none border-t-0"
-        />
-      )}
 
       <ConfirmationModal
         visible={toggleListenEventValue !== null}

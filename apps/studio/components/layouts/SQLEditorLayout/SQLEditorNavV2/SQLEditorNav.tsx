@@ -1,45 +1,54 @@
 import { keepPreviousData } from '@tanstack/react-query'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { Heart } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
-import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
-import { MoveQueryModal } from 'components/interfaces/SQLEditor/MoveQueryModal'
-import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
-import { generateSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
-import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import { EmptyPrivateQueriesPanel } from 'components/layouts/SQLEditorLayout/PrivateSqlSnippetEmpty'
-import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
-import { useSqlEditorTabsCleanup } from 'components/layouts/Tabs/Tabs.utils'
-import { useContentCountQuery } from 'data/content/content-count-query'
-import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import { useSQLSnippetFoldersDeleteMutation } from 'data/content/sql-folders-delete-mutation'
-import { Snippet, SnippetFolder, useSQLSnippetFoldersQuery } from 'data/content/sql-folders-query'
-import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
-import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProfile } from 'lib/profile'
-import { useSnippetFolders, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import { TreeView } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   InnerSideBarEmptyPanel,
   InnerSideMenuCollapsible,
   InnerSideMenuCollapsibleContent,
   InnerSideMenuCollapsibleTrigger,
   InnerSideMenuSeparator,
-} from 'ui-patterns'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { CommunitySnippetsSection } from './CommunitySnippetsSection'
+} from 'ui-patterns/InnerSideMenu'
+
 import { DeleteSnippetsModal } from './DeleteSnippetsModal'
-import SQLEditorLoadingSnippets from './SQLEditorLoadingSnippets'
-import { DEFAULT_SECTION_STATE, type SectionState } from './SQLEditorNav.constants'
-import { formatFolderResponseForTreeView, getLastItemIds, ROOT_NODE } from './SQLEditorNav.utils'
-import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
+import { LogsSnippetsSection } from './LogsSnippetsSection'
+import { ReferenceSnippetsSection } from './ReferenceSnippetsSection'
 import { ShareSnippetModal } from './ShareSnippetModal'
+import { SQLEditorLoadingSnippets } from './SQLEditorLoadingSnippets'
+import { DEFAULT_SECTION_STATE, type SectionState } from './SQLEditorNav.constants'
+import {
+  formatFolderResponseForTreeView,
+  getLastItemIds,
+  ROOT_NODE,
+  withActiveSnippet,
+} from './SQLEditorNav.utils'
+import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
 import { UnshareSnippetModal } from './UnshareSnippetModal'
+import { DownloadSnippetModal } from '@/components/interfaces/SQLEditor/DownloadSnippetModal'
+import { MoveQueryModal } from '@/components/interfaces/SQLEditor/MoveQueryModal'
+import { getSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
+import { RenameQueryModal } from '@/components/interfaces/SQLEditor/RenameQueryModal'
+import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
+import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
+import { EmptyPrivateQueriesPanel } from '@/components/layouts/SQLEditorLayout/PrivateSqlSnippetEmpty'
+import { EditorMenuListSkeleton } from '@/components/layouts/TableEditorLayout/EditorMenuListSkeleton'
+import { useSqlEditorTabsCleanup } from '@/components/layouts/Tabs/Tabs.utils'
+import { useContentCountQuery } from '@/data/content/content-count-query'
+import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
+import { useSQLSnippetFoldersDeleteMutation } from '@/data/content/sql-folders-delete-mutation'
+import { Snippet, SnippetFolder, useSQLSnippetFoldersQuery } from '@/data/content/sql-folders-query'
+import { useSqlSnippetsQuery } from '@/data/content/sql-snippets-query'
+import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
+import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProfile } from '@/lib/profile'
+import { isNewFolder } from '@/state/sql-editor/sql-editor-lifecycle'
+import { useSnippetFolders, useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 interface SQLEditorNavProps {
   sort?: 'inserted_at' | 'name'
@@ -53,6 +62,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   const { data: project } = useSelectedProjectQuery()
   const tabs = useTabsStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const { clearSnippetsFromHistory } = useDashboardHistory()
 
   const [sectionVisibility, setSectionVisibility] = useLocalStorage<SectionState>(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_SECTION_STATE(projectRef ?? ''),
@@ -62,11 +72,18 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     shared: showSharedSnippets,
     favorite: showFavoriteSnippets,
     private: showPrivateSnippets,
+    logs: showLogsSnippets,
   } = sectionVisibility
+
+  // Both flags gate the entry point: `sqlEditorLogsSource` enables the feature and
+  // `otelLegacyLogs` confirms the org's logs live in the ClickHouse backend a logs
+  // snippet queries.
+  const isLogsSourceEnabled = useFlag('sqlEditorLogsSource')
+  const isOtelLogsEnabled = useFlag('otelLegacyLogs')
+  const canShowLogsSection = isLogsSourceEnabled && isOtelLogsEnabled
 
   const [showMoveModal, setShowMoveModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [showRenameModal, setShowRenameModal] = useState(false)
 
   const [expandedFolderIds, setExpandedFolderIds] = useState<string[]>([])
   const [selectedSnippets, setSelectedSnippets] = useState<Snippet[]>([])
@@ -128,10 +145,11 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
       }
     )
 
-    if (snippet && snippet.visibility === 'user' && !snippetInfo.snippetIds.has(snippet.id)) {
-      snippetInfo.snippetIds.add(snippet.id)
-      snippetInfo.snippets = [...snippetInfo.snippets, snippet]
-    }
+    snippetInfo.snippets = withActiveSnippet(
+      snippetInfo.snippets,
+      snippet,
+      (s) => s.visibility === 'user' && getSnippetSource(s) !== 'logs'
+    )
 
     return snippetInfo
   }, [privateSnippetsPages?.pages, subResults, isLoading, isPlaceholderData, isFetching, snippet])
@@ -171,6 +189,11 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     [folders, privateSnippets]
   )
 
+  const privateSnippetsTreeNodeIds = useMemo(
+    () => new Set(privateSnippetsTreeState.map((node) => node.id.toString())),
+    [privateSnippetsTreeState]
+  )
+
   const privateSnippetsLastItemIds = useMemo(
     () => getLastItemIds(privateSnippetsTreeState),
     [privateSnippetsTreeState]
@@ -196,11 +219,11 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   )
 
   const favoriteSnippets = useMemo(() => {
-    let snippets = favoriteSqlSnippetsData?.pages.flatMap((page) => page.contents ?? []) ?? []
-
-    if (snippet && snippet.favorite && !snippets.find((x) => x.id === snippet.id)) {
-      snippets.push(snippet as any)
-    }
+    const snippets = withActiveSnippet(
+      favoriteSqlSnippetsData?.pages.flatMap((page) => page.contents ?? []) ?? [],
+      snippet,
+      (s) => !!s.favorite && getSnippetSource(s) !== 'logs'
+    )
 
     return (
       snippets
@@ -247,11 +270,11 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   )
 
   const sharedSnippets = useMemo(() => {
-    let snippets = sharedSqlSnippetsData?.pages.flatMap((page) => page.contents ?? []) ?? []
-
-    if (snippet && snippet.visibility === 'project' && !snippets.find((x) => x.id === snippet.id)) {
-      snippets.push(snippet as any)
-    }
+    const snippets = withActiveSnippet(
+      sharedSqlSnippetsData?.pages.flatMap((page) => page.contents ?? []) ?? [],
+      snippet,
+      (s) => s.visibility === 'project' && getSnippetSource(s) !== 'logs'
+    )
 
     return (
       snippets.sort((a, b) => {
@@ -276,12 +299,21 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     [projectSnippetsTreeState]
   )
 
+  // The Logs section owns its own query and bubbles loaded snippets here so tab
+  // cleanup treats them as live (and prunes stale ones).
+  const [logsSnippetsInView, setLogsSnippetsInView] = useState<{
+    snippets: Snippet[]
+    isComplete: boolean
+    isSettled: boolean
+  }>({ snippets: [], isComplete: false, isSettled: false })
+
   const allSnippetsInView = useMemo(
     () => [
-      ...(privateSnippetsPages?.pages.flatMap((x) => x.contents) ?? []),
-      ...(sharedSqlSnippetsData?.pages.flatMap((x) => x.contents) ?? []),
+      ...(privateSnippetsPages?.pages.flatMap((x) => x.contents ?? []) ?? []),
+      ...(sharedSqlSnippetsData?.pages.flatMap((x) => x.contents ?? []) ?? []),
+      ...logsSnippetsInView.snippets,
     ],
-    [privateSnippetsPages, sharedSqlSnippetsData]
+    [privateSnippetsPages, sharedSqlSnippetsData, logsSnippetsInView.snippets]
   )
 
   // ==========================
@@ -318,6 +350,10 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   // ===============
 
   const postDeleteCleanup = (ids: string[]) => {
+    // Purge the deleted snippets from dashboard history first, so that navigating
+    // to the SQL editor doesn't redirect back to a deleted snippet
+    clearSnippetsFromHistory(ids)
+
     // [Refactor] To investigate - deleting a snippet while it's open, will have it in the side nav
     // for a bit, before it gets removed (assumingly invalidated)
     setShowDeleteModal(false)
@@ -392,12 +428,21 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
 
   useEffect(() => {
     if (snippet !== undefined && isSuccess) {
-      if (snippet.visibility === 'project') {
+      // Source is checked before visibility: a logs snippet lives in the Logs section
+      // whatever its visibility, so branching on visibility first would open Private
+      // (or Shared) and leave the section the snippet is actually in collapsed.
+      if (getSnippetSource(snippet) === 'logs') {
+        setSectionVisibility({ ...sectionVisibility, logs: true })
+      } else if (snippet.visibility === 'project') {
         setSectionVisibility({ ...sectionVisibility, shared: true })
       } else if (snippet.visibility === 'user') {
         setSectionVisibility({ ...sectionVisibility, private: true })
       }
-      if (snippet.folder_id && !expandedFolderIds.includes(snippet.folder_id)) {
+      if (
+        snippet.folder_id &&
+        !expandedFolderIds.includes(snippet.folder_id) &&
+        privateSnippetsTreeNodeIds.has(snippet.folder_id)
+      ) {
         setExpandedFolderIds([...expandedFolderIds, snippet.folder_id])
       }
     }
@@ -411,7 +456,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   useEffect(() => {
     if (projectRef && privateSnippetsPages?.pages) {
       privateSnippetsPages.pages.forEach((page) => {
-        page.contents?.forEach((snippet: Snippet) => {
+        page.contents?.forEach((snippet) => {
           snapV2.addSnippet({ projectRef, snippet })
         })
         page.folders?.forEach((folder) => snapV2.addFolder({ projectRef, folder }))
@@ -441,10 +486,24 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
 
   const sqlEditorTabsCleanup = useSqlEditorTabsCleanup()
   useEffect(() => {
-    if (isSuccess) {
-      sqlEditorTabsCleanup({ snippets: allSnippetsInView as any })
+    // Wait for the logs query to settle (when enabled) so a logs failure doesn't
+    // freeze database-tab cleanup. Logs tabs are only prunable once every logs page
+    // has been fetched — until then the list is partial and a tab whose snippet sits
+    // on an unfetched page would be pruned as stale, so they're preserved instead.
+    if (isSuccess && (!canShowLogsSection || logsSnippetsInView.isSettled)) {
+      sqlEditorTabsCleanup({
+        snippets: allSnippetsInView,
+        canPruneLogsTabs: canShowLogsSection && logsSnippetsInView.isComplete,
+      })
     }
-  }, [allSnippetsInView, isSuccess, sqlEditorTabsCleanup])
+  }, [
+    allSnippetsInView,
+    isSuccess,
+    canShowLogsSection,
+    logsSnippetsInView.isComplete,
+    logsSnippetsInView.isSettled,
+    sqlEditorTabsCleanup,
+  ])
 
   return (
     <>
@@ -464,7 +523,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
             <InnerSideMenuCollapsibleTrigger
               title={`Shared ${numProjectSnippets > 0 ? ` (${numProjectSnippets})` : ''}`}
             />
-            <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
+            <InnerSideMenuCollapsibleContent className="group-data-open:pt-2">
               {isLoadingSharedSqlSnippets ? (
                 <SQLEditorLoadingSnippets />
               ) : sharedSnippets.length === 0 ? (
@@ -504,7 +563,6 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                           setSelectedSnippets([element.metadata as unknown as Snippet])
                         }}
                         onSelectRename={() => {
-                          setShowRenameModal(true)
                           setSelectedSnippetToRename(element.metadata as Snippet)
                         }}
                         onSelectDownload={() => {
@@ -540,7 +598,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
             <InnerSideMenuCollapsibleTrigger
               title={`Favorites ${numFavoriteSnippets > 0 ? ` (${numFavoriteSnippets})` : ''}`}
             />
-            <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
+            <InnerSideMenuCollapsibleContent className="group-data-open:pt-2">
               {isLoadingFavoriteSqlSnippets ? (
                 <SQLEditorLoadingSnippets />
               ) : favoriteSnippets.length === 0 ? (
@@ -550,7 +608,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                   description={
                     <>
                       Save a query to favorites for easy accessibility by clicking the{' '}
-                      <Heart size={12} className="inline-block relative align-center -top-[1px]" />{' '}
+                      <Heart size={12} className="inline-block relative align-center -top-px" />{' '}
                       icon.
                     </>
                   }
@@ -586,7 +644,6 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                           setSelectedSnippets([element.metadata as unknown as Snippet])
                         }}
                         onSelectRename={() => {
-                          setShowRenameModal(true)
                           setSelectedSnippetToRename(element.metadata as Snippet)
                         }}
                         onSelectDownload={() => {
@@ -622,7 +679,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
           title={`PRIVATE
             ${numPrivateSnippets > 0 ? ` (${numPrivateSnippets})` : ''}`}
         />
-        <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
+        <InnerSideMenuCollapsibleContent className="group-data-open:pt-2">
           {isLoading ? (
             <EditorMenuListSkeleton />
           ) : folders.length === 0 && privateSnippets.length === 0 ? (
@@ -694,7 +751,6 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                       if (props.isBranch) {
                         snapV2.editFolder(element.id as string)
                       } else {
-                        setShowRenameModal(true)
                         setSelectedSnippetToRename(element.metadata as Snippet)
                       }
                     }}
@@ -710,10 +766,11 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                     onSelectShare={() => setSelectedSnippetToShare(element.metadata as Snippet)}
                     onEditSave={(name: string) => {
                       // [Joshen] Inline editing only for folders for now
-                      if (name.length === 0 && element.id === 'new-folder') {
-                        snapV2.removeFolder(element.id as string)
+                      const folderId = element.id as string
+                      if (name.length === 0 && isNewFolder(snapV2.folders[folderId]?.status)) {
+                        snapV2.removeFolder(folderId)
                       } else if (name.length > 0) {
-                        snapV2.saveFolder({ id: element.id as string, name })
+                        snapV2.saveFolder({ id: folderId, name })
                       }
                     }}
                     hasNextPage={hasNextPage}
@@ -740,15 +797,39 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
 
       <InnerSideMenuSeparator />
 
-      <CommunitySnippetsSection />
+      {canShowLogsSection && (
+        <>
+          <LogsSnippetsSection
+            open={showLogsSnippets}
+            onOpenChange={(value) =>
+              setSectionVisibility({ ...(sectionVisibility ?? DEFAULT_SECTION_STATE), logs: value })
+            }
+            sort={sort}
+            activeSnippet={snippet}
+            selectedSnippetIds={selectedSnippets.map((x) => x.id)}
+            onSnippetsLoaded={setLogsSnippetsInView}
+            onSelectDelete={(snippet) => {
+              setShowDeleteModal(true)
+              setSelectedSnippets([snippet])
+            }}
+            onSelectRename={(snippet) => {
+              setSelectedSnippetToRename(snippet)
+            }}
+          />
+
+          <InnerSideMenuSeparator />
+        </>
+      )}
+
+      <ReferenceSnippetsSection />
 
       <InnerSideMenuSeparator />
 
       <RenameQueryModal
         snippet={selectedSnippetToRename}
-        visible={showRenameModal}
-        onCancel={() => setShowRenameModal(false)}
-        onComplete={() => setShowRenameModal(false)}
+        visible={!!selectedSnippetToRename}
+        onCancel={() => setSelectedSnippetToRename(undefined)}
+        onComplete={() => setSelectedSnippetToRename(undefined)}
       />
 
       <MoveQueryModal
@@ -762,8 +843,8 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
 
       <DownloadSnippetModal
         id={selectedSnippetToDownload?.id ?? ''}
-        visible={selectedSnippetToDownload !== undefined}
-        onCancel={() => setSelectedSnippetToDownload(undefined)}
+        open={selectedSnippetToDownload !== undefined}
+        onOpenChange={() => setSelectedSnippetToDownload(undefined)}
       />
 
       <ShareSnippetModal

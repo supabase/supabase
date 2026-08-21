@@ -1,21 +1,52 @@
 import { useParams } from 'common'
-import { AlertTriangle, Info } from 'lucide-react'
+import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import OrganizationPicker from 'components/interfaces/Integrations/Vercel/OrganizationPicker'
-import { Markdown } from 'components/interfaces/Markdown'
-import { getHasInstalledObject } from 'components/layouts/IntegrationsLayout/Integrations.utils'
-import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
-import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
-import { useIntegrationsQuery } from 'data/integrations/integrations-query'
-import { useVercelIntegrationCreateMutation } from 'data/integrations/vercel-integration-create-mutation'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
-import type { NextPageWithLayout, Organization } from 'types'
+import {
+  VercelIntegrationFooter,
+  VercelIntegrationInterstitialErrorState,
+  VercelIntegrationLogo,
+} from '@/components/interfaces/Integrations/Vercel/VercelIntegrationInterstitial'
+import { getHasInstalledObject } from '@/components/layouts/IntegrationsLayout/Integrations.utils'
+import {
+  InterstitialAccountRow,
+  InterstitialActionError,
+  InterstitialLayout,
+} from '@/components/layouts/InterstitialLayout'
+import { useIntegrationsQuery } from '@/data/integrations/integrations-query'
+import { useVercelIntegrationCreateMutation } from '@/data/integrations/vercel-integration-create-mutation'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { withAuth } from '@/hooks/misc/withAuth'
+import {
+  buildVercelInstallRouteQuery,
+  getErrorMessage,
+  resolveVercelInstallSource,
+} from '@/lib/integrations/vercel-install.utils'
+import { buildStudioPageTitle } from '@/lib/page-title'
+import { useProfileNameAndPicture } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
+import { useIntegrationInstallationSnapshot } from '@/state/integration-installation'
+import type { NextPageWithLayout, Organization } from '@/types'
+
+const PAGE_TITLE = buildStudioPageTitle({
+  section: 'Install Vercel Integration',
+  brand: 'Supabase',
+})
 
 /**
  * Variations of the Vercel integration flow.
@@ -28,35 +59,36 @@ import type { NextPageWithLayout, Organization } from 'types'
 export type VercelIntegrationFlow = 'deploy-button' | 'marketing'
 
 const VercelIntegration: NextPageWithLayout = () => {
+  const track = useTrack()
   const router = useRouter()
-  const { code, configurationId, teamId, source, externalId } = useParams()
-  const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
-
   const snapshot = useIntegrationInstallationSnapshot()
+  const { code, configurationId, currentProjectId, externalId, next, teamId, source } = useParams()
+
+  const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
+  const [validationError, setValidationError] = useState<string>()
+
+  const { username, primaryEmail, avatarUrl } = useProfileNameAndPicture()
+  const displayName = primaryEmail ?? username ?? ''
 
   /**
    * Fetch the list of organization based integration installations for Vercel.
    *
    * Array of integrations installed on all
    */
-  const { data: integrationData } = useIntegrationsQuery()
+  const {
+    data: integrationData,
+    isPending: isLoadingIntegrationsQuery,
+    isError: isIntegrationsError,
+    error: integrationsError,
+  } = useIntegrationsQuery()
 
   const {
     data: organizationsData,
     isPending: isLoadingOrganizationsQuery,
     isSuccess: isOrganizationsDataSuccess,
+    isError: isOrganizationsError,
+    error: organizationsError,
   } = useOrganizationsQuery()
-
-  useEffect(() => {
-    if (organizationsData !== undefined && integrationData !== undefined) {
-      const firstOrg = organizationsData[0]
-
-      if (firstOrg && selectedOrg === null) {
-        setSelectedOrg(firstOrg)
-        router.query.organizationSlug = firstOrg.slug
-      }
-    }
-  }, [organizationsData, integrationData])
 
   /**
    * Organizations with extra `installationInstalled` attribute
@@ -87,12 +119,25 @@ const VercelIntegration: NextPageWithLayout = () => {
    */
   function handleRouteChange() {
     const orgSlug = selectedOrg?.slug
+    const vercelInstallSource = resolveVercelInstallSource({
+      source,
+      currentProjectId,
+      externalId,
+    })
+    const query = buildVercelInstallRouteQuery({
+      source: vercelInstallSource,
+      organizationSlug: orgSlug,
+      configurationId,
+      currentProjectId,
+      externalId,
+      next,
+    })
 
-    switch (source) {
+    switch (vercelInstallSource) {
       case 'deploy-button': {
         router.push({
           pathname: `/integrations/vercel/${orgSlug}/deploy-button/new-project`,
-          query: router.query,
+          query,
         })
         break
       }
@@ -100,56 +145,72 @@ const VercelIntegration: NextPageWithLayout = () => {
       case 'external': {
         router.push({
           pathname: `/integrations/vercel/${orgSlug}/marketplace/choose-project`,
-          query: router.query,
+          query,
         })
         break
       }
       default:
-        toast.error(
+        setValidationError(
           `Unsupported Vercel installation source: ${source}. Please contact support if this error persists.`
         )
     }
   }
 
-  const { mutate, isPending: isLoadingVercelIntegrationCreateMutation } =
-    useVercelIntegrationCreateMutation({
-      onMutate() {
-        snapshot.setLoading(true)
-      },
-      onSuccess() {
-        handleRouteChange()
-        snapshot.setLoading(false)
-      },
-      onError(error) {
-        toast.error(`Creating Vercel integration failed: ${error.message}`)
-      },
-    })
+  const {
+    mutate,
+    isPending: isLoadingVercelIntegrationCreateMutation,
+    error: createIntegrationError,
+    reset: resetCreateIntegrationError,
+  } = useVercelIntegrationCreateMutation({
+    onMutate() {
+      snapshot.setLoading(true)
+    },
+    onSuccess() {
+      handleRouteChange()
+      snapshot.setLoading(false)
+    },
+    onError() {
+      snapshot.setLoading(false)
+    },
+  })
+  const actionError =
+    validationError ??
+    (createIntegrationError
+      ? `Creating Vercel integration failed: ${createIntegrationError.message}`
+      : undefined)
 
   function onInstall() {
+    setValidationError(undefined)
+    resetCreateIntegrationError()
     const orgSlug = selectedOrg?.slug
 
     const isIntegrationInstalled = orgSlug ? installed[orgSlug] : false
 
     if (!orgSlug) {
-      return toast.error('Please select an organization')
+      return setValidationError('Please select an organization')
     }
 
     if (!code) {
-      return toast.error('Vercel code missing')
+      return setValidationError('Vercel code missing')
     }
 
     if (!configurationId) {
-      return toast.error('Vercel Configuration ID missing')
+      return setValidationError('Vercel configuration ID missing')
     }
 
     if (!source) {
-      return toast.error('Vercel Configuration source missing')
+      return setValidationError('Vercel configuration source missing')
     }
 
     /**
      * Only install if integration hasn't already been installed
      */
     if (!isIntegrationInstalled) {
+      track(
+        'integration_install_submitted',
+        { integrationName: 'Vercel', method: source },
+        { organization: orgSlug }
+      )
       mutate({
         code,
         configurationId,
@@ -163,99 +224,184 @@ const VercelIntegration: NextPageWithLayout = () => {
     }
   }
 
-  const dataLoading = isLoadingVercelIntegrationCreateMutation || isLoadingOrganizationsQuery
+  const dataLoading =
+    isLoadingVercelIntegrationCreateMutation ||
+    isLoadingOrganizationsQuery ||
+    isLoadingIntegrationsQuery
 
   const noOrganizations = useMemo(() => {
     return isOrganizationsDataSuccess && organizationsData?.length === 0 ? true : false
   }, [isOrganizationsDataSuccess, organizationsData])
 
-  const alreadyInstalled = useMemo(() => {
-    return selectedOrg && installed[selectedOrg.slug] && source === 'marketplace' && !dataLoading
-      ? true
-      : false
-  }, [installed, selectedOrg, source, dataLoading])
+  const missingParams = [
+    !code ? 'code' : undefined,
+    !configurationId ? 'configurationId' : undefined,
+    !source ? 'source' : undefined,
+  ].filter(Boolean) as string[]
+
+  const isError = isOrganizationsError || isIntegrationsError
+  const errorMessage = getErrorMessage(organizationsError) ?? getErrorMessage(integrationsError)
+  const showLoadingState = isLoadingOrganizationsQuery || isLoadingIntegrationsQuery
 
   const disableInstallationForm =
-    (isLoadingVercelIntegrationCreateMutation && !dataLoading) ||
-    // disables installation button if integration is already installed and it is Marketplace flow
-    alreadyInstalled ||
-    noOrganizations
+    dataLoading || noOrganizations || !selectedOrg || missingParams.length > 0 || isError
 
-  const isLoading = useMemo(() => {
-    return isLoadingVercelIntegrationCreateMutation || isLoadingOrganizationsQuery
-  }, [isLoadingVercelIntegrationCreateMutation, isLoadingOrganizationsQuery])
+  useEffect(() => {
+    if (organizationsData !== undefined && integrationData !== undefined) {
+      const firstOrg = organizationsData[0]
+
+      if (firstOrg && selectedOrg === null) {
+        setSelectedOrg(firstOrg)
+      }
+    }
+  }, [organizationsData, integrationData, selectedOrg])
 
   return (
     <>
-      <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
-        <ScaffoldColumn className="mx-auto w-full max-w-md">
-          <h2>Choose organization</h2>
-          <>
-            <Markdown content={`Choose the Supabase organization you wish to install in`} />
-            <OrganizationPicker
-              integrationName="Vercel"
-              selectedOrg={selectedOrg}
-              disabled={noOrganizations || isLoading}
-              onSelectedOrgChange={(org) => {
-                setSelectedOrg(org)
-                router.query.organizationSlug = org.slug
-              }}
-              configurationId={configurationId}
+      <Head>
+        <title>{PAGE_TITLE}</title>
+      </Head>
+
+      <InterstitialLayout
+        logo={<VercelIntegrationLogo />}
+        title="Install Vercel integration"
+        description="Choose the Supabase organization Vercel can connect to"
+        footer={<VercelIntegrationFooter />}
+      >
+        <div className="px-6 pb-6">
+          {showLoadingState ? (
+            <InstallationLoadingState />
+          ) : isError ? (
+            <VercelIntegrationInterstitialErrorState
+              title="Unable to load installation"
+              errorMessage={errorMessage}
             />
-            {alreadyInstalled && (
-              <Alert_Shadcn_ variant="warning">
-                <AlertTriangle className="h-4 w-4" strokeWidth={2} />
-                <AlertTitle_Shadcn_>Vercel Integration is already installed.</AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  You will need to choose another organization to install the integration.
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
-            )}
-            {noOrganizations && (
-              <Alert_Shadcn_ variant="warning">
-                <AlertTriangle className="h-4 w-4" strokeWidth={2} />
-                <AlertTitle_Shadcn_>
-                  No Supabase Organizations to install Integration.
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_ className="prose">
-                  You will need to create a Supabase Organization before you can install the Vercel
-                  Integration. You can create a new organization{' '}
-                  <Link href="https://supabase.com/dashboard/new" target="_blank">
-                    here
-                  </Link>
-                  .
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
-            )}
-            <div className="flex flex-row w-full justify-end">
-              <Button
-                size="medium"
-                className="self-end"
-                disabled={disableInstallationForm || isLoadingVercelIntegrationCreateMutation}
-                loading={isLoadingVercelIntegrationCreateMutation}
-                onClick={onInstall}
-              >
-                Install integration
-              </Button>
+          ) : (
+            <div className="flex flex-col gap-5">
+              <InterstitialAccountRow avatarUrl={avatarUrl} displayName={displayName} />
+
+              <OrganizationSelect
+                organizations={organizationsData ?? []}
+                selectedOrg={selectedOrg}
+                disabled={noOrganizations || dataLoading}
+                installed={installed}
+                onSelectedOrgChange={(organization) => {
+                  setSelectedOrg(organization)
+                  setValidationError(undefined)
+                  resetCreateIntegrationError()
+                }}
+              />
+
+              {missingParams.length > 0 && (
+                <Admonition
+                  type="warning"
+                  title="Missing Vercel installation details"
+                  description={`Retry from Vercel. The installation URL is missing: ${missingParams.join(
+                    ', '
+                  )}.`}
+                />
+              )}
+
+              {noOrganizations && (
+                <Admonition
+                  type="warning"
+                  title="No Supabase organizations found"
+                  description={
+                    <>
+                      Create a Supabase organization before installing the Vercel integration. You
+                      can create a new organization{' '}
+                      <Link href="https://supabase.com/dashboard/new" target="_blank">
+                        here
+                      </Link>
+                      .
+                    </>
+                  }
+                />
+              )}
+
+              <div className="flex flex-col gap-2">
+                <Button
+                  block
+                  variant="primary"
+                  disabled={disableInstallationForm}
+                  loading={dataLoading}
+                  onClick={onInstall}
+                >
+                  {selectedOrg && installed[selectedOrg.slug] ? 'Continue' : 'Install integration'}
+                </Button>
+                <InterstitialActionError error={actionError} />
+              </div>
             </div>
-          </>
-        </ScaffoldColumn>
-      </ScaffoldContainer>
-      <ScaffoldContainer className="flex flex-col gap-6 py-3">
-        <Alert_Shadcn_ variant="default">
-          <Info className="h-4 w-4" strokeWidth={2} />
-          <AlertTitle_Shadcn_>You can uninstall this Integration at any time.</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
-            Remove this integration at any time from Vercel or the Supabase dashboard.
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
-      </ScaffoldContainer>
+          )}
+        </div>
+      </InterstitialLayout>
     </>
   )
 }
 
-VercelIntegration.getLayout = (page) => (
-  <VercelIntegrationWindowLayout>{page}</VercelIntegrationWindowLayout>
+const InstallationLoadingState = () => (
+  <div className="flex flex-col gap-5">
+    <Card className="shadow-none">
+      <CardContent className="flex items-center gap-3 border-none px-4 py-3">
+        <ShimmeringLoader className="size-8 flex-shrink-0 rounded-full py-0" />
+        <div className="min-w-0 flex-1 space-y-2">
+          <ShimmeringLoader className="h-3 w-20 py-0" />
+          <ShimmeringLoader className="h-4 w-40 max-w-full py-0" />
+        </div>
+      </CardContent>
+    </Card>
+    <section className="space-y-2" aria-label="Organization loading">
+      <ShimmeringLoader className="h-3 w-24 py-0" />
+      <ShimmeringLoader className="h-[34px] w-full rounded-md py-0" />
+    </section>
+    <ShimmeringLoader className="h-10 w-full rounded-md py-0" />
+  </div>
 )
 
-export default VercelIntegration
+interface OrganizationSelectProps {
+  organizations: Organization[]
+  selectedOrg: Organization | null
+  disabled?: boolean
+  installed: Record<string, boolean>
+  onSelectedOrgChange: (organization: Organization) => void
+}
+
+function OrganizationSelect({
+  organizations,
+  selectedOrg,
+  disabled,
+  installed,
+  onSelectedOrgChange,
+}: OrganizationSelectProps) {
+  return (
+    <section className="space-y-2" aria-label="Organization">
+      <p className="text-xs font-medium uppercase tracking-wider text-foreground-light">
+        Organization
+      </p>
+      <Select
+        value={selectedOrg?.slug ?? ''}
+        disabled={disabled}
+        onValueChange={(slug) => {
+          const org = organizations.find((org) => org.slug === slug)
+          if (org) onSelectedOrgChange(org)
+        }}
+      >
+        <SelectTrigger size="small" aria-label="Supabase organization to install Vercel into">
+          <SelectValue placeholder="Choose an organization" />
+        </SelectTrigger>
+        <SelectContent>
+          {organizations.map((org) => (
+            <SelectItem key={org.slug} value={org.slug} className="text-xs">
+              <div className="flex items-center gap-2">
+                <span className="truncate">{org.name}</span>
+                {installed[org.slug] && <Badge className="flex-none!">Installed</Badge>}
+              </div>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </section>
+  )
+}
+
+export default withAuth(VercelIntegration)

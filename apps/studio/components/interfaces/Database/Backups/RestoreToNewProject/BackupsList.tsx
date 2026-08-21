@@ -1,9 +1,10 @@
-import Panel from 'components/ui/Panel'
-import { useCloneBackupsQuery } from 'data/projects/clone-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Badge, Button } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+
 import { BackupsEmpty } from '../BackupsEmpty'
+import Panel from '@/components/ui/Panel'
+import { useCloneBackupsQuery } from '@/data/projects/clone-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface BackupsListProps {
   onSelectRestore: (id: number) => void
@@ -35,7 +36,7 @@ export const BackupsList = ({ onSelectRestore, disabled, hasAccess }: BackupsLis
                       displayAs="utc"
                       utcTimestamp={backup.inserted_at}
                       labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
-                      className="text-left !text-sm font-mono tracking-tight"
+                      className="text-left text-sm! font-mono tracking-tight"
                     />
                   </div>
                   <div>
@@ -45,7 +46,7 @@ export const BackupsList = ({ onSelectRestore, disabled, hasAccess }: BackupsLis
                     {(backup.status as any) === 'COMPLETED' && (
                       <Button
                         className="ml-auto"
-                        type="outline"
+                        variant="outline"
                         onClick={() => onSelectRestore(backup.id)}
                         disabled={disabled}
                       >

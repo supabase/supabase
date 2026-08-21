@@ -1,18 +1,18 @@
-import ReactMarkdown from 'react-markdown'
-import { CodeBlock } from 'ui'
-import { Heading } from 'ui/src/components/CustomHTMLElements'
 import { type TOCHeader } from '~/components/GuidesSidebar'
-import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import type { Parameter } from '~/lib/refGenerator/refTypes'
 import specFile from '~/spec/cli_v1_config.yaml' with { type: 'yml' }
+import ReactMarkdown from 'react-markdown'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
+import { Heading } from 'ui/src/components/CustomHTMLElements'
 
 const meta = {
   title: 'Supabase CLI config',
 }
 
 const generateMetadata = genGuideMeta(() => ({
-  pathname: '/guides/cli/config',
+  pathname: '/guides/local-development/cli/config',
   meta,
 }))
 
@@ -36,7 +36,7 @@ const Config = () => {
   const editLink = newEditLink('supabase/supabase/blob/master/apps/docs/spec/cli_v1_config.yaml')
 
   return (
-    <GuideTemplate meta={meta} editLink={editLink}>
+    <GuideTemplate meta={meta} editLink={editLink} pathname="/guides/local-development/cli/config">
       <ReactMarkdown>{specFile.info.description}</ReactMarkdown>
       <div>{content}</div>
     </GuideTemplate>

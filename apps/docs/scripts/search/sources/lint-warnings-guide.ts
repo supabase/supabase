@@ -1,11 +1,11 @@
-import { createAppAuth } from '@octokit/auth-app'
 import { Octokit } from '@octokit/core'
-import crypto, { createHash } from 'node:crypto'
+import { retry } from '@octokit/plugin-retry'
+import { createHash } from 'node:crypto'
+import { githubAuthOptions } from '../../../lib/octokit.auth.js'
+import { OCTOKIT_RETRY_OPTIONS } from '../../../lib/octokit.constants.js'
 import { BaseLoader, BaseSource } from './base.js'
 
-const appId = process.env.DOCS_GITHUB_APP_ID
-const installationId = process.env.DOCS_GITHUB_APP_INSTALLATION_ID
-const privateKey = process.env.DOCS_GITHUB_APP_PRIVATE_KEY
+const RetryOctokit = Octokit.plugin(retry)
 
 const getBasename = (path: string) => path.split('/').at(-1)!.replace(/\.md$/, '')
 
@@ -24,24 +24,14 @@ export class LintWarningsGuideLoader extends BaseLoader {
   }
 
   async load() {
-    if (!appId || !installationId || !privateKey) {
-      throw new Error('Missing DOCS_GITHUB_APP_* environment variables')
-    }
-
-    const octokit = new Octokit({
-      authStrategy: createAppAuth,
-      auth: {
-        appId,
-        installationId,
-        privateKey: crypto.createPrivateKey(privateKey).export({ type: 'pkcs8', format: 'pem' }),
-      },
-    })
+    const octokit = new RetryOctokit(githubAuthOptions())
 
     const response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
       owner: this.org,
       repo: this.repo,
       path: this.docsDir,
       ref: this.branch,
+      request: OCTOKIT_RETRY_OPTIONS,
       headers: {
         'X-GitHub-Api-Version': '2022-11-28',
       },
@@ -62,15 +52,19 @@ export class LintWarningsGuideLoader extends BaseLoader {
     // Fetch all lint files and combine them into a single guide
     const lints = await Promise.all(
       lintsList.map(async ({ path }) => {
-        const fileResponse = await fetch(
-          `https://raw.githubusercontent.com/${this.org}/${this.repo}/${this.branch}/${path}`
-        )
+        const fileResponse = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
+          owner: this.org,
+          repo: this.repo,
+          path,
+          ref: this.branch,
+          request: OCTOKIT_RETRY_OPTIONS,
+        })
 
-        if (fileResponse.status >= 400) {
+        if (!('content' in fileResponse.data) || fileResponse.data.type !== 'file') {
           throw Error(`Could not get contents of file ${this.org}/${this.repo}/${path}`)
         }
 
-        const content = await fileResponse.text()
+        const content = Buffer.from(fileResponse.data.content, 'base64').toString('utf-8')
         const basename = getBasename(path)
 
         return {

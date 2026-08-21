@@ -1,21 +1,20 @@
 import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {
-  LogsDatePicker,
-  parseCustomInput,
-  convertToDays,
-  getAvailableInForDays,
-  generateDynamicHelper,
-  generateDynamicHelpers,
-  generateHelpersFromInput,
-} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import { PREVIEWER_DATEPICKER_HELPERS } from 'components/interfaces/Settings/Logs/Logs.constants'
-import { DatetimeHelper } from 'components/interfaces/Settings/Logs/Logs.types'
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { describe, expect, test, vi } from 'vitest'
+
 import { render } from '../../helpers'
+import { PREVIEWER_DATEPICKER_HELPERS } from '@/components/interfaces/Settings/Logs/Logs.constants'
+import {
+  generateDynamicHelper,
+  generateDynamicHelpers,
+  generateHelpersFromInput,
+  parseCustomInput,
+} from '@/components/interfaces/Settings/Logs/Logs.datePickerHelpers'
+import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
+import { DatetimeHelper } from '@/components/interfaces/Settings/Logs/Logs.types'
 
 dayjs.extend(timezone)
 dayjs.extend(utc)
@@ -70,39 +69,6 @@ describe('parseCustomInput', () => {
   })
 })
 
-describe('convertToDays', () => {
-  test('converts minutes to days', () => {
-    expect(convertToDays(1440, 'minute')).toBe(1)
-    expect(convertToDays(720, 'minute')).toBe(0.5)
-  })
-
-  test('converts hours to days', () => {
-    expect(convertToDays(24, 'hour')).toBe(1)
-    expect(convertToDays(48, 'hour')).toBe(2)
-  })
-
-  test('days remain unchanged', () => {
-    expect(convertToDays(7, 'day')).toBe(7)
-  })
-})
-
-describe('getAvailableInForDays', () => {
-  test('returns all plans for <= 1 day', () => {
-    expect(getAvailableInForDays(0.5)).toEqual(['free', 'pro', 'team', 'enterprise', 'platform'])
-    expect(getAvailableInForDays(1)).toEqual(['free', 'pro', 'team', 'enterprise', 'platform'])
-  })
-
-  test('returns pro+ for <= 7 days', () => {
-    expect(getAvailableInForDays(2)).toEqual(['pro', 'team', 'enterprise', 'platform'])
-    expect(getAvailableInForDays(7)).toEqual(['pro', 'team', 'enterprise', 'platform'])
-  })
-
-  test('returns team+ for > 7 days', () => {
-    expect(getAvailableInForDays(8)).toEqual(['team', 'enterprise', 'platform'])
-    expect(getAvailableInForDays(30)).toEqual(['team', 'enterprise', 'platform'])
-  })
-})
-
 describe('generateDynamicHelper', () => {
   test('generates helper with correct text', () => {
     const helper = generateDynamicHelper(5, 'hour')
@@ -121,14 +87,6 @@ describe('generateDynamicHelper', () => {
     expect(generateDynamicHelper(2, 'day').text).toBe('Last 2 days')
   })
 
-  test('generates helper with correct availableIn based on time range', () => {
-    const minuteHelper = generateDynamicHelper(30, 'minute')
-    expect(minuteHelper.availableIn).toEqual(['free', 'pro', 'team', 'enterprise', 'platform'])
-
-    const dayHelper = generateDynamicHelper(14, 'day')
-    expect(dayHelper.availableIn).toEqual(['team', 'enterprise', 'platform'])
-  })
-
   test('calcFrom returns correct ISO string', () => {
     const helper = generateDynamicHelper(1, 'hour')
     const from = dayjs(helper.calcFrom())
@@ -138,7 +96,7 @@ describe('generateDynamicHelper', () => {
 })
 
 describe('generateDynamicHelpers', () => {
-  test('generates 3 helpers for minutes, hours, days', () => {
+  test('generates helpers for every supported relative unit', () => {
     const helpers = generateDynamicHelpers(5)
     expect(helpers).toHaveLength(3)
     expect(helpers[0].text).toBe('Last 5 minutes')
@@ -154,7 +112,7 @@ describe('generateHelpersFromInput', () => {
     expect(generateHelpersFromInput('2yoie')).toBeNull()
   })
 
-  test('returns 3 helpers for number only input', () => {
+  test('returns a helper for every unit for number only input', () => {
     const helpers = generateHelpersFromInput('25')
     expect(helpers).toHaveLength(3)
     expect(helpers![0].text).toBe('Last 25 minutes')
@@ -288,7 +246,7 @@ test('disabled helpers are disabled', async () => {
     },
   ]
 
-  const el = render(
+  render(
     <LogsDatePicker
       helpers={helpers}
       onSubmit={mockFn}
@@ -336,6 +294,19 @@ test('passing a value prop shows the correct dates in the label', async () => {
   await screen.findByText(
     `${from.format('DD MMM')}, ${from.format('HH:mm')} - ${to.format('DD MMM')}, ${to.format('HH:mm')}`
   )
+})
+
+test('opening with an unparseable date value (legacy epoch-ms its/ite) does not crash', async () => {
+  render(
+    <LogsDatePicker
+      helpers={[]}
+      value={{ from: '1784211420000', to: '1784211540000' }}
+      onSubmit={mockFn}
+    />
+  )
+
+  await userEvent.click(await screen.findByRole('button'))
+  expect(await screen.findByText('Apply')).toBeInTheDocument()
 })
 
 test('passing a helper as a value prop shows the helper text in the label', async () => {

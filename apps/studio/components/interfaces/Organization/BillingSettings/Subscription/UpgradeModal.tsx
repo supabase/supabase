@@ -1,12 +1,23 @@
+import { useParams } from 'common'
 import { includes, without } from 'lodash'
 import { useReducer, useState } from 'react'
 import { toast } from 'sonner'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  TextArea,
+} from 'ui'
 
-import { useParams } from 'common'
-import { useSendUpgradeFeedbackMutation } from 'data/feedback/upgrade-survey-send'
-import type { OrgSubscription } from 'data/subscriptions/types'
-import { Input, Modal } from 'ui'
 import { generateUpgradeReasons } from '../helpers'
+import { useSendUpgradeFeedbackMutation } from '@/data/feedback/upgrade-survey-send'
+import type { OrgSubscription } from '@/data/subscriptions/types'
 
 export interface UpgradeSurveyModalProps {
   visible: boolean
@@ -60,23 +71,18 @@ const UpgradeSurveyModal = ({
   }
 
   return (
-    <>
-      <Modal
-        alignFooter="right"
-        size="xlarge"
-        loading={isSubmitting}
-        visible={visible}
-        onCancel={onClose}
-        onConfirm={onSubmit}
-        cancelText="Skip"
-        header="We're excited for your upgrade"
-      >
-        <Modal.Content className="space-y-4">
-          <p className="text-sm text-foreground-light">
+    <Dialog open={visible} onOpenChange={onClose}>
+      <DialogContent size="xlarge">
+        <DialogHeader>
+          <DialogTitle>We're excited for your upgrade</DialogTitle>
+          <DialogDescription>
             What reasons motivated your decision to upgrade? Your feedback helps us improve Supabase
             as much as we can.
-          </p>
-          <div className="space-y-8 mt-6">
+          </DialogDescription>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <DialogSection>
+          <div className="flex flex-col space-y-8`">
             <div className="flex flex-wrap gap-2" data-toggle="buttons">
               {upgradeReasons.map((option) => {
                 const active = selectedReasons.find((x) => x === option)
@@ -84,12 +90,12 @@ const UpgradeSurveyModal = ({
                   <label
                     key={option}
                     className={`
-                      flex cursor-pointer items-center space-x-2 rounded-md py-1 
+                      flex cursor-pointer items-center space-x-2 rounded-md py-1
                       pl-2 pr-3 text-center text-sm
-                      shadow-sm transition-all duration-100
+                      shadow-xs transition-all duration-100
                       ${
                         active
-                          ? ` bg-foreground text-background opacity-100 hover:bg-opacity-75`
+                          ? ` bg-foreground text-background opacity-100 hover:bg-foreground/75`
                           : ` bg-border-strong text-foreground opacity-25 hover:opacity-50`
                       }
                   `}
@@ -106,19 +112,35 @@ const UpgradeSurveyModal = ({
                 )
               })}
             </div>
-            <div className="text-area-text-sm">
-              <Input.TextArea
+            <div className="text-area-text-sm flex flex-col gap-y-2">
+              <label htmlFor="message" className="text-sm whitespace-pre-line wrap-break-word">
+                Anything else that we can improve on?
+              </label>
+              <TextArea
                 id="message"
                 name="message"
                 value={message}
                 onChange={(event: any) => setMessage(event.target.value)}
-                label="Anything else that we can improve on?"
+                rows={3}
               />
             </div>
           </div>
-        </Modal.Content>
-      </Modal>
-    </>
+        </DialogSection>
+        <DialogFooter>
+          <Button variant="default" disabled={isSubmitting} onClick={() => onClose()}>
+            Skip
+          </Button>
+          <Button
+            variant="primary"
+            disabled={isSubmitting}
+            loading={isSubmitting}
+            onClick={onSubmit}
+          >
+            Confirm
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 

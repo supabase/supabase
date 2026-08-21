@@ -112,7 +112,8 @@ next-env.d.ts
 # DynamoDB Local files
 .dynamodb/
 
-.vscode
+.vscode/*
+!.vscode/content-listing.code-snippets
 .idea
 .vercel
 
@@ -122,7 +123,8 @@ next-env.d.ts
 !.claude/scripts/
 !.claude/skills/
 .claude/skills/me-*
-CLAUDE.md
+!.claude/CLAUDE.md
+CLAUDE.local.md
 
 #include template .env file for docker-compose
 !docker/.env
@@ -160,3 +162,8 @@ keys.json
 
 # Application
 **/.superset/**
+
+# examples
+examples/**/package-lock.json
+examples/**/yarn.lock
+examples/**/pnpm-lock.yaml

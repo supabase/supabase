@@ -1,10 +1,9 @@
 import { useParams } from 'common'
-
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { PropsWithChildren } from 'react'
-import { SimpleCodeBlock } from 'ui'
+import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
+
 import { Markdown } from '../Markdown'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface ContentSnippetProps {
   apikey?: string
@@ -28,8 +27,7 @@ const ContentSnippet = ({
   children,
 }: PropsWithChildren<ContentSnippetProps>) => {
   const { ref: projectRef } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const codeSnippet = snippet[selectedLanguage]?.(apikey, endpoint).replaceAll(
     '[ref]',
@@ -37,17 +35,7 @@ const ContentSnippet = ({
   )
 
   const handleCopy = () => {
-    sendEvent({
-      action: 'api_docs_code_copy_button_clicked',
-      properties: {
-        title: snippet.title,
-        selectedLanguage,
-      },
-      groups: {
-        project: projectRef ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
-    })
+    track('api_docs_code_copy_button_clicked', { title: snippet.title, selectedLanguage })
   }
 
   return (
@@ -70,7 +58,7 @@ const ContentSnippet = ({
       {children}
       {codeSnippet !== undefined && (
         <div className="px-4 codeblock-container">
-          <div className="bg rounded p-2">
+          <div className="bg rounded-sm p-2">
             <SimpleCodeBlock className={selectedLanguage} onCopy={handleCopy}>
               {codeSnippet}
             </SimpleCodeBlock>

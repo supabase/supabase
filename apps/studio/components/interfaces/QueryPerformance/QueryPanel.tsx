@@ -1,7 +1,7 @@
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
 import { ArrowDown, ArrowUp } from 'lucide-react'
 import { PropsWithChildren } from 'react'
-import { Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 export const QueryPanelContainer = ({
   children,
@@ -21,8 +21,8 @@ export const QueryPanelScoreSection = ({
   className,
   name,
   description,
-  before,
-  after,
+  before: rawBefore,
+  after: rawAfter,
   hideArrowMarkers = false,
 }: {
   className?: string
@@ -31,58 +31,63 @@ export const QueryPanelScoreSection = ({
   before?: number
   after?: number
   hideArrowMarkers?: boolean
-}) => (
-  <div className={cn('py-4 px-4 flex', className)}>
-    <div className="flex gap-x-2 w-48">
-      <span className="text-sm">{name}</span>
-      <Tooltip>
-        <TooltipTrigger asChild className="mt-1">
-          <InformationCircleIcon className="transition text-foreground-muted w-3 h-3 data-[state=delayed-open]:text-foreground-light" />
-        </TooltipTrigger>
-        <TooltipContent side="top" className="w-52 text-center">
-          {description}
-        </TooltipContent>
-      </Tooltip>
-    </div>
-    <div className="flex flex-col gap-y-1">
-      <div className="flex gap-x-2 text-sm">
-        <span className="text-foreground-light w-20">Currently:</span>
-        <span
-          className={cn(
-            'font-mono',
-            before !== undefined && after !== undefined && before !== after
-              ? 'text-foreground-light'
-              : ''
-          )}
-        >
-          {before}
-        </span>
+}) => {
+  const before = rawBefore !== undefined ? Number(rawBefore) : undefined
+  const after = rawAfter !== undefined ? Number(rawAfter) : undefined
+
+  return (
+    <div className={cn('py-4 px-4 flex', className)}>
+      <div className="flex gap-x-2 w-48">
+        <span className="text-sm">{name}</span>
+        <Tooltip>
+          <TooltipTrigger asChild className="mt-1">
+            <InformationCircleIcon className="transition text-foreground-muted w-3 h-3 data-[state=delayed-open]:text-foreground-light" />
+          </TooltipTrigger>
+          <TooltipContent side="top" className="w-52 text-center">
+            {description}
+          </TooltipContent>
+        </Tooltip>
       </div>
-      {before !== undefined && after !== undefined && before !== after && (
-        <div className="flex items-center gap-x-2 text-sm">
-          <span className="text-foreground-light w-20">With index:</span>
-          <span className="font-mono">{after}</span>
-          {before !== undefined && !hideArrowMarkers && (
-            <div className="flex items-center gap-x-1">
-              {after > before ? (
-                <ArrowUp size={14} className="text-warning" />
-              ) : (
-                <ArrowDown size={14} className="text-brand" />
-              )}
-              {typeof before === 'number' && before !== 0 && !isNaN(before) && isFinite(before) && (
-                <span
-                  className={cn(
-                    'font-mono tracking-tighter',
-                    after > before ? 'text-warning' : 'text-brand'
-                  )}
-                >
-                  {(((before - after) / before) * 100).toFixed(2)}%
-                </span>
-              )}
-            </div>
-          )}
+      <div className="flex flex-col gap-y-1">
+        <div className="flex gap-x-2 text-sm">
+          <span className="text-foreground-light w-20">Currently:</span>
+          <span
+            className={cn(
+              'font-mono',
+              before !== undefined && after !== undefined && before !== after
+                ? 'text-foreground-light'
+                : ''
+            )}
+          >
+            {before}
+          </span>
         </div>
-      )}
+        {before !== undefined && after !== undefined && before !== after && (
+          <div className="flex items-center gap-x-2 text-sm">
+            <span className="text-foreground-light w-20">With index:</span>
+            <span className="font-mono">{after}</span>
+            {before !== undefined && !hideArrowMarkers && (
+              <div className="flex items-center gap-x-1">
+                {after > before ? (
+                  <ArrowUp size={14} className="text-warning" />
+                ) : (
+                  <ArrowDown size={14} className="text-brand" />
+                )}
+                {before !== 0 && !isNaN(before) && isFinite(before) && (
+                  <span
+                    className={cn(
+                      'font-mono tracking-tighter',
+                      after > before ? 'text-warning' : 'text-brand'
+                    )}
+                  >
+                    {(((before - after) / before) * 100).toFixed(2)}%
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
-  </div>
-)
+  )
+}

@@ -14,13 +14,13 @@ export default function SheetNonmodal() {
   return (
     <Sheet modal={false}>
       <SheetTrigger asChild>
-        <Button type="outline">Show Sheet</Button>
+        <Button variant="outline">Show Sheet</Button>
       </SheetTrigger>
       <SheetContent className="flex flex-col gap-0">
         <SheetHeader>
           <SheetTitle>Log details</SheetTitle>
         </SheetHeader>
-        <div className="overflow-auto flex-grow px-0">
+        <div className="overflow-auto grow px-0">
           <SheetSection>
             <p className="text-sm text-foreground-lighter">
               This sheet does not block the underlying content, but it does overlap it.
@@ -29,7 +29,7 @@ export default function SheetNonmodal() {
         </div>
         <SheetFooter>
           <SheetClose asChild>
-            <Button type="outline">Close</Button>
+            <Button variant="outline">Close</Button>
           </SheetClose>
         </SheetFooter>
       </SheetContent>

@@ -1,53 +1,65 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import Link from 'next/link'
 import { useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { ToggleSpendCapButton } from 'components/ui/ToggleSpendCapButton'
-import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
-import { useRealtimeConfigurationUpdateMutation } from 'data/realtime/realtime-config-mutation'
-import {
-  REALTIME_DEFAULT_CONFIG,
-  useRealtimeConfigurationQuery,
-} from 'data/realtime/realtime-config-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormMessage_Shadcn_,
-  Input_Shadcn_,
-  PrePostTab,
+  Form,
+  FormControl,
+  FormField,
+  FormInputGroupInput,
+  FormMessage,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
   Switch,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import * as z from 'zod'
+
+import { AlertError } from '@/components/ui/AlertError'
+import { ToggleSpendCapButton } from '@/components/ui/ToggleSpendCapButton'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
+import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
+import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
+import { useRealtimeConfigurationUpdateMutation } from '@/data/realtime/realtime-config-mutation'
+import {
+  REALTIME_DEFAULT_CONFIG,
+  useRealtimeConfigurationQuery,
+} from '@/data/realtime/realtime-config-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const formId = 'realtime-configuration-form'
+
+const REALTIME_SOFT_LIMITS = {
+  max_concurrent_users: 50_000,
+  max_events_per_second: 50_000,
+  max_presence_events_per_second: 5_000,
+  max_payload_size_in_kb: 3_000,
+}
+
+const MAX_POSTGRES_CHANGES_POOL = 20
 
 export const RealtimeSettings = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization, isSuccess: isSuccessOrganization } = useSelectedOrganizationQuery()
-  const {
-    can: canUpdateConfig,
-    isLoading: isLoadingPermissions,
-    isSuccess: isPermissionsLoaded,
-  } = useAsyncCheckPermissions(PermissionAction.REALTIME_ADMIN_READ, '*')
+  const { can: canUpdateConfig, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.REALTIME_ADMIN_READ,
+    '*'
+  )
 
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
 
@@ -55,20 +67,54 @@ export const RealtimeSettings = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const {
-    data,
-    error,
-    isPending: isLoading,
-    isError,
-  } = useRealtimeConfigurationQuery({
+  const { data, error, isError, isPending } = useRealtimeConfigurationQuery({
     projectRef,
   })
 
   const { data: policies, isSuccess: isSuccessPolicies } = useDatabasePoliciesQuery({
     projectRef,
     connectionString: project?.connectionString,
-    schema: 'realtime',
+    schemas: ['realtime'],
   })
+
+  // Per-plan realtime ceilings come from the org's entitlements (plan + any overrides).
+  // The effective limit is the lower of the entitlement and the soft cap, so an unlimited
+  // plan is still bounded and self-hosted / loading falls back to the soft cap.
+  const { getEntitlementMax: getMaxConcurrentUsers, isSuccess: isSuccessMaxConcurrentUsers } =
+    useCheckEntitlements('realtime.max_concurrent_users')
+  const { getEntitlementMax: getMaxEventsPerSecond, isSuccess: isSuccessMaxEventsPerSecond } =
+    useCheckEntitlements('realtime.max_events_per_second')
+  const {
+    getEntitlementMax: getMaxPresenceEventsPerSecond,
+    isSuccess: isSuccessMaxPresenceEventsPerSecond,
+  } = useCheckEntitlements('realtime.max_presence_events_per_second')
+  const { getEntitlementMax: getMaxPayloadSizeInKb, isSuccess: isSuccessMaxPayloadSizeInKb } =
+    useCheckEntitlements('realtime.max_payload_size_in_kb')
+
+  const isRealtimeEntitlementsLoaded =
+    isSuccessMaxConcurrentUsers &&
+    isSuccessMaxEventsPerSecond &&
+    isSuccessMaxPresenceEventsPerSecond &&
+    isSuccessMaxPayloadSizeInKb
+
+  const isLoading = isPending || !isRealtimeEntitlementsLoaded
+
+  const maxConcurrentUsersLimit = Math.min(
+    getMaxConcurrentUsers() ?? Infinity,
+    REALTIME_SOFT_LIMITS.max_concurrent_users
+  )
+  const maxEventsPerSecondLimit = Math.min(
+    getMaxEventsPerSecond() ?? Infinity,
+    REALTIME_SOFT_LIMITS.max_events_per_second
+  )
+  const maxPresenceEventsPerSecondLimit = Math.min(
+    getMaxPresenceEventsPerSecond() ?? Infinity,
+    REALTIME_SOFT_LIMITS.max_presence_events_per_second
+  )
+  const maxPayloadSizeInKbLimit = Math.min(
+    getMaxPayloadSizeInKb() ?? Infinity,
+    REALTIME_SOFT_LIMITS.max_payload_size_in_kb
+  )
 
   const isFreePlan = organization?.plan.id === 'free'
   const isUsageBillingEnabled = organization?.usage_billing_enabled
@@ -89,23 +135,118 @@ export const RealtimeSettings = () => {
       },
     })
 
-  const FormSchema = z.object({
-    connection_pool: z.coerce
-      .number()
-      .min(1)
-      .max(maxConn?.maxConnections ?? 100),
-    max_concurrent_users: z.coerce.number().min(1).max(50000),
-    max_events_per_second: z.coerce.number().min(1).max(10000),
-    max_presence_events_per_second: z.coerce.number().min(1).max(10000),
-    max_payload_size_in_kb: z.coerce.number().min(1).max(3000),
-    suspend: z.boolean(),
-    // [Joshen] These fields are temporarily hidden from the UI
-    // max_bytes_per_second: z.coerce.number().min(1).max(10000000),
-    // max_channels_per_client: z.coerce.number().min(1).max(10000),
-    // max_joins_per_second: z.coerce.number().min(1).max(5000),
+  const FormSchema = z.discriminatedUnion('suspend', [
+    z.object({
+      suspend: z.literal(true),
+      connection_pool: z.coerce
+        .number()
+        .min(1)
+        .max(maxConn?.maxConnections ?? 100)
+        .optional(),
+      postgres_changes_pool: z.coerce.number().min(1).max(MAX_POSTGRES_CHANGES_POOL).optional(),
+      max_concurrent_users: z.coerce
+        .number()
+        .min(1)
+        .max(
+          maxConcurrentUsersLimit,
+          `Cannot exceed ${maxConcurrentUsersLimit.toLocaleString()} concurrent clients`
+        )
+        .optional(),
+      max_events_per_second: z.coerce
+        .number()
+        .min(1)
+        .max(
+          maxEventsPerSecondLimit,
+          `Cannot exceed ${maxEventsPerSecondLimit.toLocaleString()} events per second`
+        )
+        .optional(),
+      max_presence_events_per_second: z.coerce
+        .number()
+        .min(1)
+        .max(
+          maxPresenceEventsPerSecondLimit,
+          `Cannot exceed ${maxPresenceEventsPerSecondLimit.toLocaleString()} presence events per second`
+        )
+        .optional(),
+      max_payload_size_in_kb: z.coerce
+        .number()
+        .min(1)
+        .max(
+          maxPayloadSizeInKbLimit,
+          `Cannot exceed ${maxPayloadSizeInKbLimit.toLocaleString()} KB`
+        )
+        .optional(),
+      // [Joshen] These fields are temporarily hidden from the UI
+      // max_bytes_per_second: z.coerce.number().min(1).max(10000000).optional(),
+      // max_channels_per_client: z.coerce.number().min(1).max(10000).optional(),
+      // max_joins_per_second: z.coerce.number().min(1).max(5000).optional(),
 
-    allow_public: z.boolean(),
-  })
+      allow_public: z.boolean().optional(),
+    }),
+    z.object({
+      suspend: z.literal(false),
+      connection_pool: z.coerce
+        .number()
+        .min(1)
+        .max(maxConn?.maxConnections ?? 100),
+      postgres_changes_pool: z.coerce.number().min(1).max(MAX_POSTGRES_CHANGES_POOL),
+      max_concurrent_users: z.coerce
+        .number()
+        .min(1)
+        .max(
+          maxConcurrentUsersLimit,
+          `Cannot exceed ${maxConcurrentUsersLimit.toLocaleString()} concurrent clients`
+        ),
+      max_events_per_second: z.coerce
+        .number()
+        .min(1)
+        .max(
+          maxEventsPerSecondLimit,
+          `Cannot exceed ${maxEventsPerSecondLimit.toLocaleString()} events per second`
+        ),
+      max_presence_events_per_second: z.coerce
+        .number()
+        .min(1)
+        .max(
+          maxPresenceEventsPerSecondLimit,
+          `Cannot exceed ${maxPresenceEventsPerSecondLimit.toLocaleString()} presence events per second`
+        ),
+      max_payload_size_in_kb: z.coerce
+        .number()
+        .min(1)
+        .max(
+          maxPayloadSizeInKbLimit,
+          `Cannot exceed ${maxPayloadSizeInKbLimit.toLocaleString()} KB`
+        ),
+      // [Joshen] These fields are temporarily hidden from the UI
+      // max_bytes_per_second: z.coerce.number().min(1).max(10000000),
+      // max_channels_per_client: z.coerce.number().min(1).max(10000),
+      // max_joins_per_second: z.coerce.number().min(1).max(5000),
+
+      allow_public: z.boolean(),
+    }),
+  ])
+
+  const configValues = data ?? REALTIME_DEFAULT_CONFIG
+  const sharedFormValues = {
+    connection_pool: configValues.connection_pool ?? REALTIME_DEFAULT_CONFIG.connection_pool,
+    postgres_changes_pool:
+      configValues.postgres_changes_pool ?? REALTIME_DEFAULT_CONFIG.postgres_changes_pool,
+    max_concurrent_users:
+      configValues.max_concurrent_users ?? REALTIME_DEFAULT_CONFIG.max_concurrent_users,
+    max_events_per_second:
+      configValues.max_events_per_second ?? REALTIME_DEFAULT_CONFIG.max_events_per_second,
+    max_presence_events_per_second:
+      configValues.max_presence_events_per_second ??
+      REALTIME_DEFAULT_CONFIG.max_presence_events_per_second,
+    max_payload_size_in_kb:
+      configValues.max_payload_size_in_kb ?? REALTIME_DEFAULT_CONFIG.max_payload_size_in_kb,
+    allow_public: !(configValues.private_only ?? REALTIME_DEFAULT_CONFIG.private_only),
+  }
+  const formValues: z.infer<typeof FormSchema> = {
+    suspend: configValues.suspend ?? REALTIME_DEFAULT_CONFIG.suspend,
+    ...sharedFormValues,
+  }
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -113,68 +254,106 @@ export const RealtimeSettings = () => {
       ...REALTIME_DEFAULT_CONFIG,
       allow_public: !REALTIME_DEFAULT_CONFIG.private_only,
     },
-    values: {
-      ...(data ?? REALTIME_DEFAULT_CONFIG),
-      allow_public: !(data?.private_only ?? REALTIME_DEFAULT_CONFIG.private_only),
-    } as any,
+    values: formValues,
   })
 
-  const { allow_public, suspend } = form.watch()
+  const [allow_public, suspend] = useWatch({
+    control: form.control,
+    name: ['allow_public', 'suspend'],
+  })
   const isSettingToPrivate = !data?.private_only && !allow_public
   const isDisablingRealtime = !isRealtimeDisabled && suspend
   const isEnablingRealtime = isRealtimeDisabled && !suspend
 
-  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = (data) => {
+  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = (_data) => {
     if (!projectRef) return console.error('Project ref is required')
+    if (!isRealtimeEntitlementsLoaded) return
     setIsConfirmNextModalOpen(true)
   }
 
   const onConfirmSave = () => {
     if (!projectRef) return console.error('Project ref is required')
-    const data = form.getValues()
+    if (!isRealtimeEntitlementsLoaded) return
+    const values = form.getValues()
 
     // [Joshen] Casting to `Number` here as the values are being set as string when edited in the form
     // and returned in form.getValues() - I might be missing some easy util function from RHF though
     updateRealtimeConfig({
       ref: projectRef,
-      private_only: !data.allow_public,
-      connection_pool: Number(data.connection_pool),
-      max_concurrent_users: Number(data.max_concurrent_users),
-      max_events_per_second: Number(data.max_events_per_second),
-      max_presence_events_per_second: Number(data.max_presence_events_per_second),
-      max_payload_size_in_kb: Number(data.max_payload_size_in_kb),
-      suspend: data.suspend,
+      private_only: !values.allow_public,
+      connection_pool: Number(
+        values.connection_pool ?? data?.connection_pool ?? REALTIME_DEFAULT_CONFIG.connection_pool
+      ),
+      postgres_changes_pool: Number(
+        values.postgres_changes_pool ??
+          data?.postgres_changes_pool ??
+          REALTIME_DEFAULT_CONFIG.postgres_changes_pool
+      ),
+      max_concurrent_users: Number(
+        values.max_concurrent_users ??
+          data?.max_concurrent_users ??
+          REALTIME_DEFAULT_CONFIG.max_concurrent_users
+      ),
+      max_events_per_second: Number(
+        values.max_events_per_second ??
+          data?.max_events_per_second ??
+          REALTIME_DEFAULT_CONFIG.max_events_per_second
+      ),
+      max_presence_events_per_second: Number(
+        values.max_presence_events_per_second ??
+          data?.max_presence_events_per_second ??
+          REALTIME_DEFAULT_CONFIG.max_presence_events_per_second
+      ),
+      max_payload_size_in_kb: Number(
+        values.max_payload_size_in_kb ??
+          data?.max_payload_size_in_kb ??
+          REALTIME_DEFAULT_CONFIG.max_payload_size_in_kb
+      ),
+      suspend: values.suspend,
     })
+  }
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent>
+          <GenericSkeletonLoader />
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
     <>
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
           {isError ? (
             <AlertError error={error} subject="Failed to retrieve realtime settings" />
           ) : (
             <Card>
               <CardContent className="space-y-4">
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="suspend"
                   render={({ field }) => (
                     <>
                       <FormItemLayout
+                        id="suspend"
                         layout="flex-row-reverse"
                         label="Enable Realtime service"
                         description="If disabled, no clients will be able to connect and new connections will be rejected"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Switch
+                            id="suspend"
+                            aria-label="Toggle enabling of realtime service"
                             checked={!field.value}
                             onCheckedChange={(checked) => field.onChange(!checked)}
                             disabled={!canUpdateConfig}
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
-                      <FormMessage_Shadcn_ />
+                      <FormMessage />
                     </>
                   )}
                 />
@@ -182,53 +361,51 @@ export const RealtimeSettings = () => {
                   <Admonition
                     showIcon={false}
                     type={isDisablingRealtime || isEnablingRealtime ? 'warning' : 'default'}
-                  >
-                    <div className="flex items-center gap-x-2">
-                      <div>
-                        <h5 className="text-foreground mb-1">
-                          {isDisablingRealtime
-                            ? 'Realtime service will be disabled'
-                            : isEnablingRealtime
-                              ? 'Realtime service will be re-enabled'
-                              : isRealtimeDisabled
-                                ? 'Realtime service is disabled'
-                                : null}
-                        </h5>
-                        <p className="text-foreground-light">
-                          {isDisablingRealtime
-                            ? 'Clients will no longer be able to connect to your project’s realtime service once saved'
-                            : isEnablingRealtime
-                              ? "Clients will be able to connect to your project's realtime service again once saved"
-                              : isRealtimeDisabled
-                                ? 'You will need to enable it to continue using Realtime'
-                                : null}
-                        </p>
-                      </div>
-                    </div>
-                  </Admonition>
+                    title={
+                      isDisablingRealtime
+                        ? 'Realtime service will be disabled'
+                        : isEnablingRealtime
+                          ? 'Realtime service will be re-enabled'
+                          : isRealtimeDisabled
+                            ? 'Realtime service is disabled'
+                            : ''
+                    }
+                    description={
+                      isDisablingRealtime
+                        ? 'Clients will no longer be able to connect to your project’s realtime service once saved'
+                        : isEnablingRealtime
+                          ? "Clients will be able to connect to your project's realtime service again once saved"
+                          : isRealtimeDisabled
+                            ? 'You will need to enable it to continue using Realtime'
+                            : null
+                    }
+                  />
                 )}
               </CardContent>
 
               {!suspend && (
                 <>
                   <CardContent>
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="allow_public"
                       render={({ field }) => (
                         <>
                           <FormItemLayout
+                            id="allow_public"
                             layout="flex-row-reverse"
                             label="Allow public access to channels"
                             description="If disabled, only private channels will be allowed"
                           >
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Switch
+                                id="allow_public"
+                                aria-label="Toggle allow public access"
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
                                 disabled={!canUpdateConfig}
                               />
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </FormItemLayout>
 
                           {isSuccessPolicies &&
@@ -237,25 +414,23 @@ export const RealtimeSettings = () => {
                             !isRealtimeDisabled && (
                               <Admonition
                                 showIcon={false}
+                                className="mt-2"
                                 type="warning"
                                 title="No Realtime RLS policies found"
                                 description={
-                                  <>
-                                    <p className="prose max-w-full text-sm">
-                                      Private mode is {isSettingToPrivate ? 'being ' : ''}
-                                      enabled, but no RLS policies exists on the{' '}
-                                      <code className="text-code-inline">
-                                        realtime.messages
-                                      </code>{' '}
-                                      table. No messages will be received by users.
-                                    </p>
-
-                                    <Button asChild type="default" className="mt-2">
-                                      <Link href={`/project/${projectRef}/realtime/policies`}>
-                                        Create policy
-                                      </Link>
-                                    </Button>
-                                  </>
+                                  <p className="prose max-w-full text-sm">
+                                    Private mode is {isSettingToPrivate ? 'being ' : ''}
+                                    enabled, but no RLS policies exist on the{' '}
+                                    <code className="text-code-inline">realtime.messages</code>{' '}
+                                    table. No messages will be received by users.
+                                  </p>
+                                }
+                                actions={
+                                  <Button asChild variant="default">
+                                    <Link href={`/project/${projectRef}/realtime/policies`}>
+                                      Create policy
+                                    </Link>
+                                  </Button>
                                 }
                               />
                             )}
@@ -264,83 +439,129 @@ export const RealtimeSettings = () => {
                     />
                   </CardContent>
                   <CardContent>
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="connection_pool"
                       render={({ field }) => (
                         <>
                           <FormItemLayout
+                            id="connection_pool"
                             layout="flex-row-reverse"
                             label="Database connection pool size"
                             description="Realtime Authorization uses this database pool to check client access"
                           >
-                            <FormControl_Shadcn_>
-                              <PrePostTab postTab="connections">
-                                <Input_Shadcn_
+                            <FormControl>
+                              <InputGroup>
+                                <FormInputGroupInput
                                   {...field}
+                                  id="connection_pool"
                                   type="number"
                                   disabled={!canUpdateConfig}
                                   value={field.value || ''}
                                 />
-                              </PrePostTab>
-                            </FormControl_Shadcn_>
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>connections</InputGroupText>
+                                </InputGroupAddon>
+                              </InputGroup>
+                            </FormControl>
                           </FormItemLayout>
-                          {!!maxConn && field.value > maxConn.maxConnections * 0.5 && (
-                            <Admonition
-                              showIcon={false}
-                              type="warning"
-                              title={`Pool size is greater than 50% of the max connections (${maxConn.maxConnections}) on your database`}
-                              description="This may result in instability and unreliability with your database connections."
-                            />
-                          )}
+                          {!!maxConn &&
+                            field.value &&
+                            field.value > maxConn.maxConnections * 0.5 && (
+                              <Admonition
+                                showIcon={false}
+                                type="warning"
+                                title={`Pool size is greater than 50% of the max connections (${maxConn.maxConnections}) on your database`}
+                                description="This may result in instability and unreliability with your database connections."
+                              />
+                            )}
                         </>
                       )}
                     />
                   </CardContent>
                   <CardContent>
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
-                      name="max_concurrent_users"
+                      name="postgres_changes_pool"
                       render={({ field }) => (
                         <FormItemLayout
+                          id="postgres_changes_pool"
                           layout="flex-row-reverse"
-                          label="Max concurrent clients"
-                          description="Sets maximum number of concurrent clients that can connect to your Realtime service"
+                          label="Postgres Changes connection pool size"
+                          description="Postgres Changes uses this database pool to create subscriptions when clients subscribe"
                         >
-                          <FormControl_Shadcn_>
-                            <PrePostTab postTab="clients">
-                              <Input_Shadcn_
+                          <FormControl>
+                            <InputGroup>
+                              <FormInputGroupInput
                                 {...field}
+                                id="postgres_changes_pool"
                                 type="number"
                                 disabled={!canUpdateConfig}
                                 value={field.value || ''}
                               />
-                            </PrePostTab>
-                          </FormControl_Shadcn_>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>connections</InputGroupText>
+                              </InputGroupAddon>
+                            </InputGroup>
+                          </FormControl>
+                        </FormItemLayout>
+                      )}
+                    />
+                  </CardContent>
+                  <CardContent>
+                    <FormField
+                      control={form.control}
+                      name="max_concurrent_users"
+                      render={({ field }) => (
+                        <FormItemLayout
+                          id="max_concurrent_users"
+                          layout="flex-row-reverse"
+                          label="Max concurrent clients"
+                          description="Sets maximum number of concurrent clients that can connect to your Realtime service"
+                        >
+                          <FormControl>
+                            <InputGroup>
+                              <FormInputGroupInput
+                                {...field}
+                                id="max_concurrent_users"
+                                type="number"
+                                disabled={!canUpdateConfig}
+                                value={field.value || ''}
+                              />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>clients</InputGroupText>
+                              </InputGroupAddon>
+                            </InputGroup>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
                   </CardContent>
                   <CardContent className="space-y-2">
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="max_events_per_second"
                       render={({ field }) => (
                         <FormItemLayout
+                          id="max_events_per_second"
                           layout="flex-row-reverse"
                           label="Max events per second"
                           description="Sets maximum number of events per second that can be sent to your Realtime service"
                         >
-                          <FormControl_Shadcn_>
-                            <PrePostTab postTab="events/s">
-                              <Input_Shadcn_
+                          <FormControl>
+                            <InputGroup>
+                              <FormInputGroupInput
                                 {...field}
+                                id="max_events_per_second"
                                 type="number"
                                 disabled={!isUsageBillingEnabled || !canUpdateConfig}
                                 value={field.value || ''}
                               />
-                            </PrePostTab>
-                          </FormControl_Shadcn_>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>events/s</InputGroupText>
+                              </InputGroupAddon>
+                            </InputGroup>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
@@ -357,7 +578,7 @@ export const RealtimeSettings = () => {
                                 : 'You may adjust this setting in the organization billing settings'}
                             </p>
                           </div>
-                          <div className="flex-grow flex items-center justify-end">
+                          <div className="grow flex items-center justify-end">
                             {isFreePlan ? (
                               <UpgradePlanButton
                                 source="realtimeSettings"
@@ -373,25 +594,30 @@ export const RealtimeSettings = () => {
                     )}
                   </CardContent>
                   <CardContent className="space-y-2">
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="max_presence_events_per_second"
                       render={({ field }) => (
                         <FormItemLayout
+                          id="max_presence_events_per_second"
                           layout="flex-row-reverse"
                           label="Max presence events per second"
                           description="Sets maximum number of presence events per second that can be sent to your Realtime service"
                         >
-                          <FormControl_Shadcn_>
-                            <PrePostTab postTab="events/s">
-                              <Input_Shadcn_
+                          <FormControl>
+                            <InputGroup>
+                              <FormInputGroupInput
                                 {...field}
+                                id="max_presence_events_per_second"
                                 type="number"
                                 disabled={!isUsageBillingEnabled || !canUpdateConfig}
                                 value={field.value || ''}
                               />
-                            </PrePostTab>
-                          </FormControl_Shadcn_>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>events/s</InputGroupText>
+                              </InputGroupAddon>
+                            </InputGroup>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
@@ -408,7 +634,7 @@ export const RealtimeSettings = () => {
                                 : 'You may adjust this setting in the organization billing settings'}
                             </p>
                           </div>
-                          <div className="flex-grow flex items-center justify-end">
+                          <div className="grow flex items-center justify-end">
                             {isFreePlan ? (
                               <UpgradePlanButton
                                 source="realtimeSettings"
@@ -424,25 +650,30 @@ export const RealtimeSettings = () => {
                     )}
                   </CardContent>
                   <CardContent className="space-y-2">
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="max_payload_size_in_kb"
                       render={({ field }) => (
                         <FormItemLayout
+                          id="max_payload_size_in_kb"
                           layout="flex-row-reverse"
                           label="Max payload size in KB"
                           description="Sets maximum number of payload size in KB that can be sent to your Realtime service"
                         >
-                          <FormControl_Shadcn_>
-                            <PrePostTab postTab="KB">
-                              <Input_Shadcn_
+                          <FormControl>
+                            <InputGroup>
+                              <FormInputGroupInput
                                 {...field}
+                                id="max_payload_size_in_kb"
                                 type="number"
                                 disabled={!isUsageBillingEnabled || !canUpdateConfig}
                                 value={field.value || ''}
                               />
-                            </PrePostTab>
-                          </FormControl_Shadcn_>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>KB</InputGroupText>
+                              </InputGroupAddon>
+                            </InputGroup>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
@@ -459,7 +690,7 @@ export const RealtimeSettings = () => {
                                 : 'You may adjust this setting in the organization billing settings'}
                             </p>
                           </div>
-                          <div className="flex-grow flex items-center justify-end">
+                          <div className="grow flex items-center justify-end">
                             {isFreePlan ? (
                               <UpgradePlanButton
                                 addon="spendCap"
@@ -487,15 +718,20 @@ export const RealtimeSettings = () => {
                 </div>
                 <div className="flex items-center gap-x-2">
                   {form.formState.isDirty && (
-                    <Button type="default" onClick={() => form.reset(data as any)}>
+                    <Button variant="default" onClick={() => form.reset(formValues)}>
                       Cancel
                     </Button>
                   )}
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     form={formId}
-                    disabled={!canUpdateConfig || isUpdatingConfig || !form.formState.isDirty}
+                    disabled={
+                      !canUpdateConfig ||
+                      isUpdatingConfig ||
+                      !form.formState.isDirty ||
+                      !isRealtimeEntitlementsLoaded
+                    }
                     loading={isUpdatingConfig}
                   >
                     Save changes
@@ -505,7 +741,7 @@ export const RealtimeSettings = () => {
             </Card>
           )}
         </form>
-      </Form_Shadcn_>
+      </Form>
 
       <ConfirmationModal
         visible={isConfirmNextModalOpen}

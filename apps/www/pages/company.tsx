@@ -1,22 +1,21 @@
-import { useRouter } from 'next/router'
-
 import Layout from '~/components/Layouts/Default'
-
-import SectionHeader from 'components/UI/SectionHeader'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import Panel from '~/components/Panel'
+import { breadcrumbs } from '~/lib/breadcrumbs'
+import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
 import CTABanner from 'components/CTABanner/index'
 import ImageGrid from 'components/ImageGrid'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-
-import PressData from 'data/Press'
+import SectionHeader from 'components/UI/SectionHeader'
 import CommunityData from 'data/Community'
 import CompaniesData from 'data/Companies'
 import InvestorData from 'data/Investors'
-
+import PressData from 'data/Press'
+import { NextSeo } from 'next-seo'
+import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
-
-import { Button, Card_legacy_, Space } from 'ui'
-import { NextSeo } from 'next-seo'
+import { useRouter } from 'next/router'
+import { Button } from 'ui'
 
 type Props = {}
 
@@ -43,6 +42,14 @@ const Index = ({}: Props) => {
           ],
         }}
       />
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.company)),
+          }}
+        />
+      </Head>
       <Layout>
         <Header />
         <Community />
@@ -60,12 +67,7 @@ export default Index
 const Header = () => {
   return (
     <>
-      <div
-        className="
-          sm:py-18
-          container relative mx-auto px-6 py-16 text-center md:py-24 lg:px-16 lg:py-24
-          xl:px-20"
-      >
+      <div className="section-container text-center py-16 sm:py-18 md:py-24">
         <h1 className="text-foreground text-5xl">
           Join one of the world's fastest growing open source communities.
         </h1>
@@ -78,22 +80,18 @@ const Team = () => {
   return (
     <div className="border-t border-default">
       <SectionContainer>
-        <SectionHeader title="Team" paragraph={<div></div>} />
+        <SectionHeader title="Team" />
         <div className="grid grid-cols-2 md:grid-cols-12">
           <div className="col-span-8 ">
-            <p>
-              <p className="text-foreground text-lg">
-                Supabase is fully remote, with a strong affinity for open source maintainers and
-                ex-Founders. Our engineering team is made up of developers from AWS, Google,
-                Palantir, Stripe, and other YC companies.
-              </p>
+            <p className="text-foreground text-lg">
+              Supabase is fully remote, with a strong affinity for open source maintainers and
+              ex-Founders. Our engineering team is made up of developers from AWS, Google, Palantir,
+              Stripe, and other YC companies.
             </p>
           </div>
           <div className=" col-span-4 pt-8 md:mt-0 md:text-right">
             <a href="https://supabase.com/careers">
-              <Button size="medium" className="text-white">
-                Join the team
-              </Button>
+              <Button size="medium">Join the team</Button>
             </a>
           </div>
         </div>
@@ -114,8 +112,7 @@ const Community = () => {
               key={x.title}
               className={`
               space-y-4 text-center lg:text-left
-              ${i !== CommunityData.length - 1 ? 'border-default lg:border-r' : ''}
-              ${i === 1 ? 'border-default md:border-0 lg:border-r ' : ''}
+              ${i !== CommunityData.length - 1 ? 'border-default lg:border-r lg:pr-4' : ''}
           `}
             >
               <div
@@ -135,7 +132,7 @@ const Community = () => {
                 />
               </div>
               <div>
-                <h1 className="text-foreground mb-0 text-4xl">{x.stat}</h1>
+                <h1 className="text-foreground mb-0 text-3xl">{x.stat}</h1>
                 <p className="text-foreground-light text-sm">{x.statLabel}</p>
               </div>
             </div>
@@ -163,12 +160,7 @@ const Investors = () => {
           title="Our investors"
           paragraph={
             <>
-              <p>
-                <p className="text-lg">
-                  We've raised over $116 million in funding, backed by some of the world's leading
-                  investors.
-                </p>
-              </p>
+              We've raised $1 billion in funding, backed by some of the world's leading investors.
             </>
           }
         />
@@ -177,24 +169,18 @@ const Investors = () => {
       <div className="mx-auto mt-5 mb-16 grid max-w-lg gap-0.5 lg:max-w-none lg:grid-cols-4">
         {InvestorData.filter((x) => x.lead === true).map((x) => (
           <div key={x.name}>
-            <div
-              className="
-              bg-surface-100
-              col-span-1 flex h-32 content-end
-              items-center justify-center"
-            >
-              <div className="relative h-8 w-full overflow-auto">
+            <div className="bg-surface-100 col-span-1 flex h-32 content-end items-center justify-center">
+              <div
+                className="relative w-full overflow-hidden"
+                style={{ height: `${(x.scale ?? 1) * 2}rem` }}
+              >
                 <Image
                   layout="fill"
                   src={`${x.img}`}
                   alt={x.name}
                   objectFit="scale-down"
                   objectPosition="center"
-                  className="
-                    opacity-50
-                    contrast-0
-                    filter
-                  "
+                  className="opacity-50 contrast-0 filter"
                 />
               </div>
             </div>
@@ -228,35 +214,57 @@ const Press = () => {
       <div>
         <SectionHeader title={'Press'} />
       </div>
-      <div className="mx-auto mt-5 grid gap-5 lg:max-w-none lg:grid-cols-3">
+      <div className="mx-auto mt-5 grid gap-5 sm:grid-cols-2 lg:max-w-none lg:grid-cols-4">
         {PressData.filter((x) => x.type == 'article').map((x) => (
-          <Link href={x.href} key={x.href} target="_blank">
-            <Card_legacy_ key={`press_${x.href}`} hoverable className="h-36">
-              <Space className="h-40 justify-between" direction="vertical">
-                <div>
-                  <h1 className="text-foreground text-xl">{x.type.toUpperCase()}</h1>
+          <Link
+            href={x.href}
+            key={x.href}
+            target="_blank"
+            className="flex flex-col justify-start items-stretch group cursor-pointer rounded-xl focus-ring"
+          >
+            <Panel
+              hasActiveOnHover
+              outerClassName="h-full"
+              innerClassName="flex md:flex-col gap-3 sm:gap-2 h-full items-start p-2"
+            >
+              <div className="md:p-2 md:pt-1 flex flex-col h-full md:h-auto grow gap-0.5 md:gap-1.5 justify-center md:justify-start">
+                <h3 className="text-sm md:text-base text-foreground leading-5!">
+                  {x.type.toUpperCase()}
+                </h3>
+                <div className="flex flex-wrap items-center gap-1 mb-0.5">
                   <p className="text-foreground-light line-clamp block h-12 overflow-hidden text-ellipsis text-base">
                     {x.title}
                   </p>
                 </div>
-              </Space>
-            </Card_legacy_>
+              </div>
+            </Panel>
           </Link>
         ))}
       </div>
       <div className="mx-auto mt-5 grid gap-5 sm:grid-cols-2 lg:max-w-none lg:grid-cols-4">
         {PressData.filter((x) => x.type == 'podcast').map((x) => (
-          <Link href={x.href} key={x.href} target="_blank">
-            <Card_legacy_ key={`press_${x.href}`} hoverable className="h-36">
-              <Space className="h-40 justify-between" direction="vertical">
-                <div>
-                  <h1 className="text-foreground text-xl">{x.type.toUpperCase()}</h1>
+          <Link
+            href={x.href}
+            key={x.href}
+            target="_blank"
+            className="flex flex-col justify-start items-stretch group cursor-pointer rounded-xl focus-ring"
+          >
+            <Panel
+              hasActiveOnHover
+              outerClassName="h-full"
+              innerClassName="flex md:flex-col gap-3 sm:gap-2 h-full items-start p-2"
+            >
+              <div className="md:p-2 md:pt-1 flex flex-col h-full md:h-auto grow gap-0.5 md:gap-1.5 justify-center md:justify-start">
+                <h3 className="text-sm md:text-base text-foreground leading-5!">
+                  {x.type.toUpperCase()}
+                </h3>
+                <div className="flex flex-wrap items-center gap-1 mb-0.5">
                   <p className="text-foreground-light line-clamp block h-12 overflow-hidden text-ellipsis text-base">
                     {x.title}
                   </p>
                 </div>
-              </Space>
-            </Card_legacy_>
+              </div>
+            </Panel>
           </Link>
         ))}
       </div>

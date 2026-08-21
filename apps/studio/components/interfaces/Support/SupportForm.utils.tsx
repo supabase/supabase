@@ -1,13 +1,12 @@
 // End of third-party imports
 
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import {
   DocsSearchResultType as PageType,
   type DocsSearchResult as Page,
   type DocsSearchResultSection as PageSection,
 } from 'common'
-import { getProjectDetail } from 'data/projects/project-detail-query'
 import dayjs from 'dayjs'
-import { DOCS_URL } from 'lib/constants'
 import { partition } from 'lodash'
 import { Book, Github, Hash, MessageSquare } from 'lucide-react'
 import {
@@ -18,12 +17,31 @@ import {
   type inferParserType,
   type UseQueryStatesKeysMap,
 } from 'nuqs'
-import type { Organization } from 'types'
 
-import { CATEGORY_OPTIONS } from './Support.constants'
+import { CATEGORY_OPTIONS, type ExtendedSupportCategories } from './Support.constants'
+import { getProjectDetail } from '@/data/projects/project-detail-query'
+import { DOCS_URL } from '@/lib/constants'
+import type { Organization } from '@/types'
 
 export const NO_PROJECT_MARKER = 'no-project'
 export const NO_ORG_MARKER = 'no-org'
+
+export const DISABLE_SUPPORT_ACCESS_CATEGORIES: ExtendedSupportCategories[] = [
+  SupportCategories.ACCOUNT_DELETION,
+  SupportCategories.SALES_ENQUIRY,
+  SupportCategories.REFUND,
+]
+
+export function canAllowSupportAccess(
+  category: ExtendedSupportCategories | undefined,
+  projectRef: string
+): boolean {
+  return (
+    !!category &&
+    !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(category) &&
+    projectRef !== NO_PROJECT_MARKER
+  )
+}
 
 export const formatMessage = ({
   message,
@@ -56,9 +74,9 @@ export function getPageIcon(page: Page) {
     case PageType.Markdown:
     case PageType.Reference:
     case PageType.Integration:
-      return <Book strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <Book strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     case PageType.GithubDiscussion:
-      return <Github strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <Github strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }
@@ -69,9 +87,9 @@ export function getPageSectionIcon(page: Page) {
     case PageType.Markdown:
     case PageType.Reference:
     case PageType.Integration:
-      return <Hash strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <Hash strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     case PageType.GithubDiscussion:
-      return <MessageSquare strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <MessageSquare strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }
@@ -139,11 +157,24 @@ export type SupportFormUrlKeys = inferParserType<typeof supportFormUrlState>
 
 export const loadSupportFormInitialParams = createLoader(supportFormUrlState)
 
+export function loadSupportFormInitialParamsFromObject(
+  initialParams: Partial<SupportFormUrlKeys>
+): SupportFormUrlKeys {
+  const normalizedParams = Object.fromEntries(
+    Object.entries(initialParams).flatMap(([key, value]) =>
+      value == null ? [] : [[key, String(value)]]
+    )
+  )
+
+  return loadSupportFormInitialParams(normalizedParams)
+}
+
 const serializeSupportFormInitialParams = createSerializer(supportFormUrlState)
 
 export function createSupportFormUrl(initialParams: Partial<SupportFormUrlKeys>) {
   const serializedParams = serializeSupportFormInitialParams(initialParams)
-  return `/support/new${serializedParams ?? ''}`
+  const query = serializedParams && serializedParams !== '?' ? serializedParams : ''
+  return `/support/new${query}`
 }
 
 /**
@@ -192,4 +223,35 @@ export async function selectInitialOrgAndProject({
     projectRef: null,
     orgSlug: orgs[0]?.slug ?? null,
   }
+}
+
+// Chrome blocks scrollIntoView (triggered by .focus()) when overflow-x: hidden and
+// overflow-y: auto are on the same element. Manually scroll the sidebar instead.
+export function scrollToRequiredField(formId: string, fieldName: string) {
+  const form = document.getElementById(formId)
+  if (!form) return
+
+  // Selects use data-support-field since they have no name attr; inputs/textareas use name.
+  const el =
+    form.querySelector(`[data-support-field="${fieldName}"]`) ??
+    form.querySelector(`[name="${fieldName}"]`)
+  if (!(el instanceof HTMLElement)) return
+
+  const scrollContainer = findScrollableParent(el)
+  if (scrollContainer) {
+    const offset = el.getBoundingClientRect().top - scrollContainer.getBoundingClientRect().top - 80
+    scrollContainer.scrollTo({ top: scrollContainer.scrollTop + offset, behavior: 'smooth' })
+  }
+
+  el.focus({ preventScroll: true })
+}
+
+function findScrollableParent(el: HTMLElement): HTMLElement | null {
+  let parent = el.parentElement
+  while (parent && parent !== document.body) {
+    const { overflowY } = window.getComputedStyle(parent)
+    if (overflowY === 'auto' || overflowY === 'scroll') return parent
+    parent = parent.parentElement
+  }
+  return null
 }

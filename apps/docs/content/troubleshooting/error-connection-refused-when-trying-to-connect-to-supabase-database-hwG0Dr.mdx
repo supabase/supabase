@@ -16,8 +16,12 @@ message = "connect ECONNREFUSED 1.2.3.4:5432"
 message = "psql: error: connection to server at \"db.xxxxxxxxxxxxxxxxxxxx.supabase.co\" (1.2.3.4), port 5432 failed: Connection refused Is the server running on that host and accepting TCP/IP connections?"
 ---
 
-If you're not able to connect to the Supabase database and see the error `connect ECONNREFUSED 1.2.3.4:5432` or `psql: error: connection to server at "db.xxxxxxxxxxxxxxxxxxxx.supabase.co" (1.2.3.4), port 5432 failed: Connection refused
-Is the server running on that host and accepting TCP/IP connections?`, this could be because there are banned IPs on your project caused by Fail2ban as it kicks in when attempting 2 wrong passwords in a row.
+If you're not able to connect to the Supabase database and see one of the errors below, this could be because there are banned IPs on your project caused by Fail2ban as it kicks in when attempting 2 wrong passwords in a row.
+
+- `connect ECONNREFUSED 1.2.3.4:5432`
+- `psql: error: connection to server at "db.xxxxxxxxxxxxxxxxxxxx.supabase.co" (1.2.3.4), port 5432 failed: Connection refused
+Is the server running on that host and accepting TCP/IP connections?`
+- `Circuit breaker open: Unable to establish connection to upstream database`
 
 These bans will clear after 30mins but you can unban the IPs using the Supabase CLI https://supabase.com/docs/guides/cli following the commands below.
 

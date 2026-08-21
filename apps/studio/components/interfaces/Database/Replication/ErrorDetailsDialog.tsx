@@ -1,7 +1,6 @@
 import {
   Button,
   cn,
-  CodeBlock,
   Dialog,
   DialogClose,
   DialogContent,
@@ -11,6 +10,7 @@ import {
   DialogSectionSeparator,
   DialogTitle,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 interface ErrorDetailsDialogProps {
   open: boolean
@@ -36,7 +36,7 @@ export const ErrorDetailsDialog = ({
           </DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
-        <DialogSection className="!p-0">
+        <DialogSection className="p-0!">
           <div className="px-4 py-3">
             <p className="text-sm text-foreground-light">
               The following error occurred during replication:
@@ -50,7 +50,7 @@ export const ErrorDetailsDialog = ({
             )}
             language="bash"
             value={reason}
-            className="[&_code]:text-xs [&_code]:text-foreground [&_span]:!text-foreground"
+            className="[&_code]:text-xs [&_code]:text-foreground [&_span]:text-foreground!"
           />
           {solution && (
             <div className="px-4 py-3">
@@ -60,7 +60,7 @@ export const ErrorDetailsDialog = ({
         </DialogSection>
         <DialogFooter>
           <DialogClose>
-            <Button type="default">Close</Button>
+            <Button variant="default">Close</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

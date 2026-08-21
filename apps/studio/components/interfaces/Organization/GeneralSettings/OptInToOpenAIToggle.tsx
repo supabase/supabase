@@ -1,5 +1,3 @@
-import { InlineLink } from 'components/ui/InlineLink'
-
 import {
   Button,
   Dialog,
@@ -10,11 +8,13 @@ import {
   DialogTrigger,
 } from 'ui'
 
+import { InlineLink } from '@/components/ui/InlineLink'
+
 export const OptInToOpenAIToggle = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="outline" className="w-fit">
+        <Button variant="outline" className="w-fit">
           Learn more about data privacy
         </Button>
       </DialogTrigger>

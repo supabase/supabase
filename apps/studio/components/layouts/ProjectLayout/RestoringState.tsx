@@ -1,48 +1,77 @@
+import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { CheckCircle, Download, Loader } from 'lucide-react'
 import { useEffect, useState } from 'react'
-
-import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
-import { useDownloadableBackupQuery } from 'data/database/backup-query'
-import { useInvalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
-import { useProjectStatusQuery } from 'data/projects/project-status-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
 import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
-const RestoringState = () => {
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useBackupDownloadMutation } from '@/data/database/backup-download-mutation'
+import { useDownloadableBackupQuery } from '@/data/database/backup-query'
+import { useInvalidateProjectDetailsQuery } from '@/data/projects/project-detail-query'
+import { useProjectStatusQuery } from '@/data/projects/project-status-query'
+import { useLongRunningTransitionState } from '@/hooks/misc/useLongRunningTransitionState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
+import {
+  clearPersistedTransitionStartTime,
+  minutesToMilliseconds,
+} from '@/lib/project-transition-state'
+import { getRestoreLongRunningThresholdMinutes } from '@/lib/restore-estimate'
+
+export const POLL_INTERVAL_MS = 4000
+
+export const RestoringState = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const [loading, setLoading] = useState(false)
-  const [isCompleted, setIsCompleted] = useState(false)
+  const [isConfirming, setIsConfirming] = useState(false)
+  const [hasLeftHealthyState, setHasLeftHealthyState] = useState(false)
+  const restoreStateStartStorageKey = ref
+    ? LOCAL_STORAGE_KEYS.PROJECT_RESTORING_STARTED_AT(ref)
+    : null
 
   const { data } = useDownloadableBackupQuery({ projectRef: ref })
   const backups = data?.backups ?? []
   const logicalBackups = backups.filter((b) => !b.isPhysicalBackup)
+  const longRunningThresholdMinutes = getRestoreLongRunningThresholdMinutes(project?.volumeSizeGb)
+  const longRunningThresholdMs = minutesToMilliseconds(longRunningThresholdMinutes)
+  const isTakingLongerThanExpected = useLongRunningTransitionState({
+    storageKey: restoreStateStartStorageKey,
+    thresholdMs: longRunningThresholdMs,
+  })
 
   const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
 
-  const { data: projectStatusData, isSuccess: isProjectStatusSuccess } = useProjectStatusQuery(
+  const { data: projectStatusData } = useProjectStatusQuery(
     { projectRef: ref },
     {
       enabled: project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY,
       refetchInterval: (query) => {
-        const data = query.state.data
-        return data?.status === PROJECT_STATUS.ACTIVE_HEALTHY ? false : 4000
+        const status = query.state.data?.status
+        if (status === PROJECT_STATUS.RESTORE_FAILED) return false
+        if (status === PROJECT_STATUS.ACTIVE_HEALTHY && hasLeftHealthyState) return false
+        return POLL_INTERVAL_MS
       },
     }
   )
 
-  useEffect(() => {
-    if (!isProjectStatusSuccess) return
-    if (projectStatusData.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
-      setIsCompleted(true)
-    }
-  }, [isProjectStatusSuccess, projectStatusData, ref, invalidateProjectDetailsQuery])
+  const projectStatus = projectStatusData?.status
+
+  // Right after a restore is triggered the status endpoint can still report the stale
+  // pre-restore ACTIVE_HEALTHY, so completion is only trusted once the status has been
+  // observed leaving the healthy state.
+  if (
+    !hasLeftHealthyState &&
+    projectStatus !== undefined &&
+    projectStatus !== PROJECT_STATUS.ACTIVE_HEALTHY
+  ) {
+    setHasLeftHealthyState(true)
+  }
+
+  const hasRestoreFailed = projectStatus === PROJECT_STATUS.RESTORE_FAILED
+  const isCompleted = hasLeftHealthyState && projectStatus === PROJECT_STATUS.ACTIVE_HEALTHY
 
   const { mutate: downloadBackup, isPending: isDownloading } = useBackupDownloadMutation({
     onSuccess: (res) => {
@@ -65,10 +94,29 @@ const RestoringState = () => {
   }
 
   const onConfirm = async () => {
-    if (!project) return console.error('Project is required')
-    setLoading(true)
-    if (ref) await invalidateProjectDetailsQuery(ref)
+    if (!ref) return console.error('Project ref is required')
+    setIsConfirming(true)
+    try {
+      await invalidateProjectDetailsQuery(ref)
+    } finally {
+      setIsConfirming(false)
+    }
   }
+
+  useEffect(() => {
+    if (!isCompleted && !hasRestoreFailed) return
+
+    if (restoreStateStartStorageKey) {
+      clearPersistedTransitionStartTime(restoreStateStartStorageKey)
+    }
+    if (hasRestoreFailed && ref) void invalidateProjectDetailsQuery(ref)
+  }, [
+    isCompleted,
+    hasRestoreFailed,
+    restoreStateStartStorageKey,
+    ref,
+    invalidateProjectDetailsQuery,
+  ])
 
   return (
     <div className="flex items-center justify-center h-full">
@@ -87,7 +135,7 @@ const RestoringState = () => {
               </div>
             </div>
             <div className="border-t border-overlay flex items-center justify-end py-4 px-8">
-              <Button disabled={loading} loading={loading} onClick={onConfirm}>
+              <Button disabled={isConfirming} loading={isConfirming} onClick={onConfirm}>
                 Return to project
               </Button>
             </div>
@@ -106,23 +154,35 @@ const RestoringState = () => {
                     size of your database. Your project will be offline while the restoration is
                     running.
                   </p>
+                  {isTakingLongerThanExpected && (
+                    <Admonition
+                      type="warning"
+                      title="This is taking longer than usual"
+                      layout="responsive"
+                      description="Contact support if this project remains in a restoring state."
+                      actions={
+                        <Button asChild variant="default">
+                          <SupportLink
+                            queryParams={{
+                              category: SupportCategories.DATABASE_UNRESPONSIVE,
+                              projectRef: project?.ref ?? ref,
+                              subject: 'Project stuck in restoring state',
+                              message: `Project "${project?.name ?? 'Unknown project'}" (ref: ${project?.ref ?? ref ?? 'unknown'}) has remained in a restoring state for over ${longRunningThresholdMinutes} minutes.`,
+                            }}
+                          >
+                            Contact support
+                          </SupportLink>
+                        </Button>
+                      }
+                      className="mt-5!"
+                    />
+                  )}
                 </div>
               </div>
             </div>
             <div className="border-t border-overlay flex items-center justify-end py-4 px-8 gap-x-2">
-              <Button asChild type="default">
-                <SupportLink
-                  queryParams={{
-                    category: SupportCategories.DATABASE_UNRESPONSIVE,
-                    projectRef: project?.ref,
-                    subject: 'Ongoing restoration for project',
-                  }}
-                >
-                  Contact support
-                </SupportLink>
-              </Button>
               <ButtonTooltip
-                type="default"
+                variant="default"
                 icon={<Download />}
                 loading={isDownloading}
                 disabled={logicalBackups.length === 0}
@@ -144,5 +204,3 @@ const RestoringState = () => {
     </div>
   )
 }
-
-export default RestoringState

@@ -1,4 +1,4 @@
-import { Mermaid } from 'ui'
+import { Mermaid } from 'ui-patterns/Mermaid'
 
 export default function MermaidSequenceApi() {
   return (

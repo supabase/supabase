@@ -553,19 +553,19 @@ functions:
           }.decodeSingle<City>()
           ```
   - id: rpc
-    title: 'Stored Procedures: rpc()'
+    title: 'Database Functions: rpc()'
     description: |
-      You can call stored procedures as a "Remote Procedure Call".
+      You can call functions as a "Remote Procedure Call".
 
       That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
       It's especially useful when the logic rarely changes - like password resets and updates.
 
       - When calling `rpc` with parameters, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization) in the function parameter.
     examples:
-      - id: call-a-stored-procedure
-        name: Call a stored procedure
+      - id: call-a-database-function
+        name: Call a database function
         isSpotlight: true
-        description: This is an example invoking a stored procedure.
+        description: This is an example invoking a database function.
         code: |
           ```kotlin
           supabase.postgrest.rpc("hello_world")
@@ -2141,7 +2141,7 @@ functions:
       - id: sign-up-with-redirect
         name: Sign up with a redirect URL
         description: |
-          - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+          - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
         code: |
           ```kotlin
           val user = supabase.gotrue.signUpWith(Email, redirectUrl = "https://example.com") {
@@ -2203,7 +2203,7 @@ functions:
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/redirect-urls).
-      - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
       - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://supabase.com/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
     examples:
@@ -2257,7 +2257,7 @@ functions:
         isSpotlight: false
         description: |
           - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectUrl` parameter. This parameter defaults to the [`SITE_URL`](/docs/guides/auth/redirect-urls). It does not redirect the user immediately after invoking this method.
-          - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+          - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
           - oAuthUrl() provides the URL which needs to be opened in a browser.
           - The redirectTo URL needs to be setup correctly in your project under Authentication -> URL Configuration -> Redirect URLs.
           - To see how you can use a custom in-app browser on Android, check our [demo](https://github.com/supabase-community/supabase-kt/tree/development/demos/android-login) on GitHub.
@@ -2281,7 +2281,7 @@ functions:
     title: 'signInWithSSO()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithSSO'
     notes: |
-      - Before you can call this method you need to [establish a connection](/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
+      - Before you can call this method you need to [establish a connection](/docs/guides/auth/enterprise-sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
       - If you've associated an email domain to the identity provider, you can use the `SSO.withDomain()` function in the `loginWith` method to start a sign-in flow.
       - In case you need to use a different way to start the authentication flow with an identity provider, you can use the `SSO.withProviderId` function. For example:
           - Mapping specific user email addresses with an identity provider.
@@ -3109,7 +3109,7 @@ functions:
       Subscribe to realtime changes in your database.
     title: 'on().subscribe()'
     notes: |
-      - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/database/api#managing-realtime).
+      - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api).
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
       - When using a method with a generic type like `track`, `broadcast` or `broadcastFlow`, you have to provide a [serializable class](/docs/reference/kotlin/installing#serialization) as the type parameter.
     examples:

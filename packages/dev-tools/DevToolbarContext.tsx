@@ -1,14 +1,14 @@
 'use client'
 
-import { type ClientTelemetryEvent, ensurePlatformSuffix, posthogClient } from 'common'
+import { ensurePlatformSuffix, posthogClient, useFlag, type ClientTelemetryEvent } from 'common'
 import {
-  type ReactNode,
   createContext,
   useCallback,
   useContext,
   useEffect,
   useRef,
   useState,
+  type ReactNode,
 } from 'react'
 
 import type {
@@ -18,7 +18,11 @@ import type {
 } from './types'
 import { getCookie } from './utils'
 
-const IS_LOCAL_DEV = process.env.NODE_ENV === 'development'
+// Duplicated for tree-shaking — bundler must see literal process.env reference.
+// Keep in sync: index.ts, DevToolbar.tsx, DevToolbarTrigger.tsx, feature-flags.tsx
+const env = process.env.NEXT_PUBLIC_ENVIRONMENT
+const IS_TOOLBAR_ENABLED = env === 'local' || env === 'staging'
+const IS_LOCAL_DEV = env === 'local'
 const MAX_EVENTS = 200
 const STORAGE_KEY = 'dev-telemetry-toolbar-enabled'
 
@@ -28,7 +32,7 @@ const SSE_BACKOFF_MULTIPLIER = 2
 
 declare global {
   interface Window {
-    devTelemetry?: () => void
+    devToolbar?: () => void
   }
 }
 
@@ -44,39 +48,45 @@ export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps
   const [isOpen, setIsOpen] = useState(false)
   const [events, setEvents] = useState<DevTelemetryEvent[]>([])
 
+  const isDefaultOn = useFlag('devToolbarDefaultOn')
+
   const sseRetryDelayRef = useRef(SSE_INITIAL_RETRY_MS)
   const sseRetryTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
+  const enableToolbar = useCallback(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, 'true')
+    } catch {}
+    setIsEnabled(true)
+  }, [])
+
+  // Persist 'false' rather than clearing the key, so an explicit opt-out survives
+  // a reload and takes precedence over the devToolbarDefaultOn flag.
   const dismissToolbar = useCallback(() => {
     try {
-      localStorage.removeItem(STORAGE_KEY)
+      localStorage.setItem(STORAGE_KEY, 'false')
     } catch {}
     setIsEnabled(false)
     setIsOpen(false)
   }, [])
 
   useEffect(() => {
-    if (!IS_LOCAL_DEV) return
+    if (!IS_TOOLBAR_ENABLED) return
 
     let stored: string | null = null
     try {
       stored = localStorage.getItem(STORAGE_KEY)
     } catch {}
-    if (stored === 'true') {
+    if (stored === 'true' || (stored !== 'false' && isDefaultOn)) {
       setIsEnabled(true)
     }
 
-    window.devTelemetry = () => {
-      try {
-        localStorage.setItem(STORAGE_KEY, 'true')
-      } catch {}
-      setIsEnabled(true)
-    }
+    window.devToolbar = enableToolbar
 
     return () => {
-      delete window.devTelemetry
+      delete window.devToolbar
     }
-  }, [])
+  }, [enableToolbar, isDefaultOn])
 
   const appendEvent = useCallback((event: DevTelemetryEvent) => {
     setEvents((prev) => {
@@ -105,7 +115,7 @@ export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps
   }, [appendEvent, isEnabled])
 
   useEffect(() => {
-    if (!isEnabled || typeof EventSource === 'undefined') return
+    if (!IS_LOCAL_DEV || !isEnabled || typeof EventSource === 'undefined') return
 
     let eventSource: EventSource | null = null
     let isMounted = true
@@ -176,16 +186,18 @@ export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps
     }
   }, [apiUrl, appendEvent, isEnabled])
 
-  if (!IS_LOCAL_DEV) {
+  if (!IS_TOOLBAR_ENABLED) {
     return <>{children}</>
   }
 
   return (
     <DevToolbarContext.Provider
       value={{
+        isAvailable: IS_TOOLBAR_ENABLED,
         isEnabled,
         isOpen,
         setIsOpen,
+        enableToolbar,
         events,
         setEvents,
         dismissToolbar,
@@ -200,9 +212,11 @@ export function useDevToolbar() {
   const context = useContext(DevToolbarContext)
   if (!context) {
     return {
+      isAvailable: false,
       isEnabled: false,
       isOpen: false,
       setIsOpen: () => {},
+      enableToolbar: () => {},
       events: [],
       setEvents: () => {},
       dismissToolbar: () => {},

@@ -1,11 +1,11 @@
-import React from 'react'
+import dayjs from 'dayjs'
 // import authors from 'lib/authors.json'
 import Image from 'next/image'
 import Link from 'next/link'
+import React from 'react'
+
 // import type Author from '~/types/author'
 import type PostTypes from '../../types/post'
-
-import dayjs from 'dayjs'
 
 interface Props {
   event: PostTypes
@@ -32,7 +32,7 @@ const EventGridItem = ({ event }: Props) => {
     >
       <div className="flex flex-col space-y-2">
         <div className="flex flex-col space-y-1">
-          <div className="border-default relative mb-3 w-full aspect-[2/1] lg:aspect-[5/3] overflow-hidden rounded-lg border shadow-sm">
+          <div className="border-default relative mb-3 w-full aspect-2/1 lg:aspect-5/3 overflow-hidden rounded-lg border shadow-xs">
             {!event.thumb ? (
               <div className="bg-background-alternative w-full h-full" />
             ) : (
@@ -58,14 +58,14 @@ const EventGridItem = ({ event }: Props) => {
               <p>{dayjs(event.date).format('D MMM YYYY')}</p>
               {event.readingTime && (
                 <>
-                  <p>•</p>
+                  <p>·</p>
                   <p>{event.readingTime}</p>
                 </>
               )}
             </div>
           )}
           <h3 className="text-foreground max-w-sm text-xl">{event.title}</h3>
-          <p className="text-foreground-light max-w-sm text-base !mb-0">{event.description}</p>
+          <p className="text-foreground-light max-w-sm text-base mb-0!">{event.description}</p>
         </div>
       </div>
     </Link>

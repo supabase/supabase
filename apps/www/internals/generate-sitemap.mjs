@@ -1,4 +1,4 @@
-import { writeFileSync } from 'fs'
+import { readFileSync, writeFileSync } from 'fs'
 import { globby } from 'globby'
 import prettier from 'prettier'
 
@@ -10,18 +10,17 @@ async function generate() {
     'pages/*.tsx',
     'pages/*.mdx',
     'pages/**/*.tsx',
-    'data/**/*.mdx',
     '_blog/*.mdx',
     '_case-studies/*.mdx',
     '_customers/*.mdx',
     '_events/*.mdx',
     '_alternatives/*.mdx',
-    '!data/*.mdx',
     '!pages/_*.js',
     '!pages/_*.tsx',
     '!pages/api',
     '!pages/404.tsx',
     '.next/server/pages/partners/integrations/*.html',
+    '.next/server/pages/partners/catalog/*.html',
     '.next/server/pages/partners/experts/*.html',
     '.next/server/pages/features/*.html',
   ])
@@ -38,7 +37,7 @@ async function generate() {
     .map((page) => {
       const path = page
         .replace('.next/server/pages', '')
-        .replace('pages', '')
+        .replace(/^pages/, '')
         .replace('.html', '')
         // add a `/` for blog posts
         .replace('_blog', `/${blogUrl}`)
@@ -62,8 +61,10 @@ async function generate() {
       if (route === '/blog/categories/[category]') return null
       if (route === '/partners/experts/[slug]') return null
       if (route === '/partners/integrations/[slug]') return null
+      if (route === '/partners/catalog/[slug]') return null
       if (route === '/launch-week/ticket-image') return null
       if (route === '/launch-week/tickets/[username]') return null
+      if (route === '/changelog/[slug]') return null
 
       /**
        * Blog based urls
@@ -115,10 +116,45 @@ async function generate() {
     })
     .filter(Boolean)
 
+  // Changelog detail pages are dynamic routes; include them from generated changelog RSS links.
+  const changelogDetailUrls = (() => {
+    try {
+      const rss = readFileSync('public/changelog-rss.xml', 'utf-8')
+      const matches = [
+        ...rss.matchAll(/<link>(https:\/\/supabase\.com\/changelog\/\d+[^<]*)<\/link>/g),
+      ]
+      const uniqueUrls = [...new Set(matches.map((match) => match[1]))]
+
+      return uniqueUrls.map(
+        (url) => `
+        <url>
+            <loc>${url}</loc>
+            <changefreq>weekly</changefreq>
+            <priority>0.5</priority>
+        </url>
+      `
+      )
+    } catch {
+      return []
+    }
+  })()
+
+  // /evals is a separate app proxied onto supabase.com via a rewrite in lib/rewrites.js,
+  // so it has no page file for the globs above to find. Hardcode it here.
+  const proxiedAppUrls = [
+    `
+        <url>
+            <loc>https://supabase.com/evals</loc>
+            <changefreq>weekly</changefreq>
+            <priority>0.5</priority>
+        </url>
+      `,
+  ]
+
   const sitemap = `
     <?xml version="1.0" encoding="UTF-8"?>
     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-        ${[...staticUrls].join('')}
+        ${[...staticUrls, ...changelogDetailUrls, ...proxiedAppUrls].join('')}
     </urlset>
     `
 

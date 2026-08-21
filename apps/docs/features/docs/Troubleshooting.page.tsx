@@ -16,11 +16,15 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
   return (
     <SidebarSkeleton
       hideSideNav
-      className="@container/troubleshooting-entry-layout w-full max-w-screen-lg mx-auto lg:py-8 lg:px-5"
+      className="@container/troubleshooting-entry-layout w-full max-w-(--breakpoint-lg) mx-auto lg:py-8 lg:px-5"
     >
       <div className="px-5 py-8 lg:px-0 lg:py-0">
         <Breadcrumbs minLength={1} forceDisplayOnMobile />
-        <article className="prose max-w-none mt-4">
+        <article
+          id="sb-docs-troubleshooting-main-article"
+          data-testid="sb-docs-troubleshooting-main-article"
+          className="prose max-w-none mt-4"
+        >
           <h1>{entry.data.title}</h1>
           {dateUpdated && (
             <p className="text-sm text-foreground-lighter">
@@ -28,7 +32,7 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
             </p>
           )}
           <hr className="my-7" aria-hidden />
-          <div className="grid gap-10 @3xl/troubleshooting-entry-layout:grid-cols-[1fr,250px]">
+          <div className="grid gap-10 @3xl/troubleshooting-entry-layout:grid-cols-[1fr_250px]">
             <div className="min-w-0">
               <MDXRemoteBase source={entry.content} />
             </div>

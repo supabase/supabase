@@ -1,24 +1,30 @@
 import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
-import { ReactNode, useEffect, useState } from 'react'
-import {
-  NumericFilter,
-  ReportsNumericFilter,
-} from 'components/interfaces/Reports/v2/ReportsNumericFilter'
+import { ReactNode, useCallback, useEffect, useState } from 'react'
+
 import { FilterInput } from './components/FilterInput'
 import { FilterPill } from './components/FilterPill'
 import { IndexAdvisorFilter } from './components/IndexAdvisorFilter'
 import { RolesFilterDropdown } from './components/RolesFilterDropdown'
 import { SortIndicator } from './components/SortIndicator'
+import { SourceFilterDropdown } from './components/SourceFilterDropdown'
 import { useIndexAdvisorStatus } from './hooks/useIsIndexAdvisorStatus'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
-import { useDebouncedValue } from 'hooks/misc/useDebouncedValue'
+import {
+  NumericFilter,
+  ReportsNumericFilter,
+} from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
+import { useDebouncedValue } from '@/hooks/misc/useDebouncedValue'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const QueryPerformanceFilterBar = ({
   actions,
   showRolesFilter = false,
+  showSourceFilter = false,
 }: {
   actions?: ReactNode
   showRolesFilter?: boolean
+  showSourceFilter?: boolean
 }) => {
   const { sort, clearSort } = useQueryPerformanceSort()
   const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
@@ -27,6 +33,7 @@ export const QueryPerformanceFilterBar = ({
     {
       search: searchQuery,
       roles: defaultFilterRoles,
+      sources: defaultFilterSources,
       callsFilter: callsFilterRaw,
       totalTimeFilter: totalTimeFilterRaw,
       indexAdvisor,
@@ -35,6 +42,7 @@ export const QueryPerformanceFilterBar = ({
   ] = useQueryStates({
     search: parseAsString.withDefault(''),
     roles: parseAsArrayOf(parseAsString).withDefault([]),
+    sources: parseAsArrayOf(parseAsString).withDefault([]),
     callsFilter: parseAsJson<NumericFilter | null>((value) =>
       value === null || value === undefined ? null : (value as NumericFilter)
     ),
@@ -47,8 +55,9 @@ export const QueryPerformanceFilterBar = ({
   const callsFilter = callsFilterRaw ?? null
   const totalTimeFilter = totalTimeFilterRaw ?? null
 
-  const [filters, setFilters] = useState<{ roles: string[] }>({
+  const [filters, setFilters] = useState<{ roles: string[]; sources: string[] }>({
     roles: defaultFilterRoles,
+    sources: defaultFilterSources,
   })
   const [inputValue, setInputValue] = useState(searchQuery)
 
@@ -59,6 +68,11 @@ export const QueryPerformanceFilterBar = ({
   const onFilterRolesChange = (roles: string[]) => {
     setFilters({ ...filters, roles })
     setSearchParams({ roles })
+  }
+
+  const onFilterSourcesChange = (sources: string[]) => {
+    setFilters({ ...filters, sources })
+    setSearchParams({ sources })
   }
 
   const debouncedInputValue = useDebouncedValue(inputValue, 300)
@@ -72,6 +86,45 @@ export const QueryPerformanceFilterBar = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedInputValue])
 
+  const hasActiveFilters = Boolean(
+    inputValue ||
+    filters.roles.length > 0 ||
+    filters.sources.length > 0 ||
+    callsFilter ||
+    totalTimeFilter ||
+    indexAdvisor === 'true' ||
+    sort
+  )
+
+  const handleResetFilters = useCallback(() => {
+    setInputValue('')
+    setFilters({ roles: [], sources: [] })
+    setSearchParams({
+      search: '',
+      roles: [],
+      sources: [],
+      callsFilter: null,
+      totalTimeFilter: null,
+      indexAdvisor: 'false',
+    })
+    clearSort()
+  }, [setSearchParams, clearSort])
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      const el = document.getElementById('keyword')
+      if (el instanceof HTMLInputElement) {
+        el.focus()
+        el.select()
+      }
+    },
+    { label: 'Search queries' }
+  )
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, handleResetFilters, {
+    enabled: hasActiveFilters,
+  })
+
   const getCallsFilterDisplay = () => {
     if (!callsFilter) return null
     return `${callsFilter.operator} ${callsFilter.value}`
@@ -83,7 +136,7 @@ export const QueryPerformanceFilterBar = ({
   }
 
   return (
-    <div className="px-4 py-1.5 bg-surface-200 border-t -mt-px flex justify-between items-center overflow-x-auto overflow-y-hidden w-full flex-shrink-0">
+    <div className="px-4 py-1.5 bg-surface-200 border-t -mt-px flex justify-between items-center overflow-x-auto overflow-y-hidden w-full shrink-0">
       <div className="flex items-center gap-x-4">
         <div className="flex items-center gap-x-2">
           <FilterInput value={inputValue} onChange={setInputValue} />
@@ -139,8 +192,8 @@ export const QueryPerformanceFilterBar = ({
                 value={filters.roles.join(', ')}
                 onClear={(e) => {
                   e.stopPropagation()
-                  setFilters({ roles: [] })
-                  setSearchParams({ roles: [] })
+                  setFilters({ ...filters, roles: [] })
+                  setSearchParams({ ...filters, roles: [] })
                 }}
               />
             ) : (
@@ -149,6 +202,13 @@ export const QueryPerformanceFilterBar = ({
                 onSaveFilters={onFilterRolesChange}
               />
             ))}
+
+          {showSourceFilter && (
+            <SourceFilterDropdown
+              activeOptions={filters.sources}
+              onSaveFilters={onFilterSourcesChange}
+            />
+          )}
 
           {isIndexAdvisorEnabled && (
             <IndexAdvisorFilter

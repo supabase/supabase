@@ -75,7 +75,7 @@ If you don't need an email address (or `account_email` isn't available for your 
 
 ![Kakao consent items configuration](/docs/img/guides/auth-kakao/kakao-developers-consent-items-set.png)
 
-<Admonition type="tip">
+<Admonition type="note">
 
 In the Kakao Developers Portal, the "account_email" consent item is only available for apps that are registered as "Biz App". To convert your app to a "Biz App", go to **App Settings** > **App** > **General**, and complete the required fields in the **Business Information** section.
 
@@ -104,7 +104,8 @@ When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/a
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('<your-project-url>', '<sb_publishable_... or anon key>')
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 async function signInWithKakao() {
@@ -140,6 +141,18 @@ When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth
 suspend fun signInWithKakao() {
 	supabase.auth.signInWith(Kakao)
 }
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+When your user signs in, call [`SignIn()`](/docs/reference/csharp/sign-in-with-oauth) with `Provider.Kakao` as the provider:
+
+```c#
+var state = await supabase.Auth.SignIn(Provider.Kakao);
+var signInUrl = state.Uri;
 ```
 
 </TabPanel>
@@ -186,6 +199,17 @@ When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) 
 suspend fun signOut() {
 	supabase.auth.signOut()
 }
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+When your user signs out, call [SignOut()](/docs/reference/csharp/sign-out) to remove them from the browser session and any objects from local storage:
+
+```c#
+await supabase.Auth.SignOut();
 ```
 
 </TabPanel>

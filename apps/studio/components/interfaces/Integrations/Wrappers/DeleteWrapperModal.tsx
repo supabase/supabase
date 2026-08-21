@@ -1,14 +1,23 @@
 import { useParams } from 'common'
-import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
-import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
-import { Modal } from 'ui'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from 'ui'
 
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { getWrapperMetaForWrapper, wrapperMetaComparator } from './Wrappers.utils'
+import { useFDWDeleteMutation } from '@/data/fdw/fdw-delete-mutation'
+import { useFDWsQuery } from '@/data/fdw/fdws-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const DeleteWrapperModal = () => {
   const { id, ref } = useParams()
@@ -34,11 +43,7 @@ export const DeleteWrapperModal = () => {
   )
   const selectedWrapper = wrappers.find((x) => x.id.toString() === selectedWrapperIdToDelete)
 
-  const {
-    mutate: deleteFDW,
-    isPending: isDeleting,
-    isSuccess: isSuccessDelete,
-  } = useFDWDeleteMutation({
+  const { mutateAsync: deleteFDW, isSuccess: isSuccessDelete } = useFDWDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully disabled ${selectedWrapper?.name} foreign data wrapper`)
       setSelectedWrapperToDelete(null)
@@ -51,7 +56,7 @@ export const DeleteWrapperModal = () => {
     if (!selectedWrapper) return console.error('Wrapper is required')
     if (!wrapperMeta) return console.error('Wrapper meta is required')
 
-    deleteFDW({
+    await deleteFDW({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       wrapper: selectedWrapper,
@@ -73,22 +78,25 @@ export const DeleteWrapperModal = () => {
   ])
 
   return (
-    <Modal
-      size="medium"
-      variant="danger"
-      alignFooter="right"
-      loading={isDeleting}
-      visible={selectedWrapper !== undefined}
-      onCancel={() => setSelectedWrapperToDelete(null)}
-      onConfirm={() => onConfirmDelete()}
-      header={`Confirm to disable ${selectedWrapper?.name}`}
+    <AlertDialog
+      open={selectedWrapper !== undefined}
+      onOpenChange={() => setSelectedWrapperToDelete(null)}
     >
-      <Modal.Content>
-        <p className="text-sm">
-          Are you sure you want to disable {selectedWrapper?.name}? This will also remove all tables
-          created with this wrapper.
-        </p>
-      </Modal.Content>
-    </Modal>
+      <AlertDialogContent size="medium">
+        <AlertDialogHeader>
+          <AlertDialogTitle>{`Confirm to disable ${selectedWrapper?.name}`}</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to disable {selectedWrapper?.name}? This will also remove all
+            tables created with this wrapper.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction variant="danger" onClick={onConfirmDelete}>
+            Confirm
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }

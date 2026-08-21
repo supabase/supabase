@@ -1,6 +1,7 @@
-import { at } from 'lodash-es'
 import { ReactNode } from 'react'
 import { config, logConstants } from 'shared-data'
+
+import { resolveSharedDataPath } from './SharedData.utils'
 
 const sharedData = {
   config,
@@ -25,12 +26,10 @@ function SharedData({
   data: keyof typeof sharedData
   children: ((selectedData: (typeof sharedData)[keyof typeof sharedData]) => ReactNode) | string
 }) {
-  let selectedData = sharedData[data] as any
-  return typeof children === 'string'
-    ? ((typeof (selectedData = at(selectedData, [children])[0]) === 'object'
-        ? `${selectedData.value ?? ''} ${selectedData.unit ?? ''}`.trim()
-        : selectedData) as unknown as ReactNode)
-    : children(selectedData)
+  if (typeof children === 'string') {
+    return resolveSharedDataPath(sharedData[data], children) as ReactNode
+  }
+  return children(sharedData[data])
 }
 
 export { SharedData }

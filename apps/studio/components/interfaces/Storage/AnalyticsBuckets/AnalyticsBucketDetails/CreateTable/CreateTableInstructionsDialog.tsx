@@ -14,6 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
+
 import { CreateTableInstructions } from './CreateTableInstructions'
 import { CreateTableSheet } from './CreateTableSheet'
 
@@ -27,9 +28,12 @@ export const CreateTableInstructionsDialog = () => {
     <>
       <div className="flex items-center">
         <Button
-          type="primary"
+          variant="primary"
           icon={<Plus />}
-          className={cn(enableCreationOfTablesFromDashboard && 'rounded-r-none hover:z-10')}
+          className={cn(
+            enableCreationOfTablesFromDashboard &&
+              'rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm'
+          )}
           onClick={() => {
             if (enableCreationOfTablesFromDashboard) setShowSheet(true)
             else setShowModal(true)
@@ -41,8 +45,9 @@ export const CreateTableInstructionsDialog = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                type="primary"
-                className="w-7 rounded-l-none -ml-[1px]"
+                variant="primary"
+                aria-label="More table creation options"
+                className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
                 icon={<ChevronDown />}
               />
             </DropdownMenuTrigger>

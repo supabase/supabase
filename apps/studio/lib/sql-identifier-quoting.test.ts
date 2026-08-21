@@ -1,5 +1,6 @@
 import { parse } from 'libpg-query'
 import { describe, expect, it } from 'vitest'
+
 import { extractIdentifiers, isQuotedInSql, needsQuoting } from './sql-identifier-quoting'
 
 describe('needsQuoting', () => {

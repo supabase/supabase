@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, expect, test } from 'vitest'
 
-import pgMeta from '../src/index'
+import pgMeta, { safeSql } from '../src/index'
 import { cleanupRoot, createTestDatabase } from './db/utils'
 
 beforeAll(async () => {
@@ -37,7 +37,7 @@ withTestDatabase('retrieve, create, update, delete', async ({ executeQuery }) =>
     activation: 'AFTER',
     events: ['UPDATE'],
     orientation: 'ROW',
-    condition: '(old.* IS DISTINCT FROM new.*)',
+    condition: safeSql`(old.* IS DISTINCT FROM new.*)`,
   })
   await executeQuery(createSql)
 

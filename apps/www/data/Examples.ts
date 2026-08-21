@@ -261,14 +261,6 @@ const Examples: Example[] = [
     description: 'Using OpenAI in Edge Functions.',
     repo_url: 'https://supabase.com/docs/guides/ai/examples/openai',
   },
-  // {
-  //   type: 'example',
-  //   tags: ['Supabase'],
-  //   products: [PRODUCT_NAMES.FUNCTIONS],
-  //   title: 'With supabase-js',
-  //   description: 'Use the Supabase client inside your Edge Function.',
-  //   repo_url: 'https://supabase.com/docs/guides/functions/auth',
-  // },
   {
     type: 'example',
     tags: ['Stripe'],
@@ -292,7 +284,7 @@ const Examples: Example[] = [
     title: 'Huggingface Image Captioning',
     description:
       'Use the Hugging Face Inference API to make calls to 100,000+ Machine Learning models from Supabase Edge Functions.',
-    repo_url: 'https://supabase.com/docs/guides/functions/auth',
+    repo_url: 'https://supabase.com/docs/guides/ai/examples/huggingface-image-captioning',
   },
   {
     type: 'example',

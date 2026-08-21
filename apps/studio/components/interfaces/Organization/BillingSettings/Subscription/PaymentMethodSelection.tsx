@@ -2,18 +2,6 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
 import { useParams } from 'common'
-import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
-import {
-  NewPaymentMethodElement,
-  type PaymentMethodElementRef,
-} from 'components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
-import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
-import { useOrganizationPaymentMethodSetupIntent } from 'data/organizations/organization-payment-method-setup-intent-mutation'
-import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
-import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
-import { SetupIntentResponse } from 'data/stripe/setup-intent-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH, STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { Loader, Plus } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import {
@@ -26,8 +14,25 @@ import {
   useState,
 } from 'react'
 import { toast } from 'sonner'
-import { Checkbox_Shadcn_, Listbox } from 'ui'
+import { Button, Checkbox, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
+import {
+  NewPaymentMethodElement,
+  type PaymentMethodElementRef,
+} from '@/components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
+import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
+import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizations/organization-customer-profile-update-mutation'
+import { useOrganizationPaymentMethodSetupIntent } from '@/data/organizations/organization-payment-method-setup-intent-mutation'
+import { useOrganizationPaymentMethodsQuery } from '@/data/organizations/organization-payment-methods-query'
+import { useOrganizationTaxIdQuery } from '@/data/organizations/organization-tax-id-query'
+import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
+import { SetupIntentResponse } from '@/data/stripe/setup-intent-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { BASE_PATH, STRIPE_PUBLIC_KEY } from '@/lib/constants'
+import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -36,6 +41,11 @@ export interface PaymentMethodSelectionProps {
   onSelectPaymentMethod: (id: string) => void
   layout?: 'vertical' | 'horizontal'
   readOnly: boolean
+  onAddressChange?: (address: CustomerAddress) => void
+  onTaxIdChange?: (taxId: CustomerTaxId | null) => void
+  useAsDefaultBillingAddress: boolean
+  onUseAsDefaultBillingAddressChange: (useAsDefault: boolean) => void
+  onClose?: () => void
 }
 
 const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
@@ -44,15 +54,20 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     onSelectPaymentMethod,
     layout = 'vertical',
     readOnly,
+    onAddressChange,
+    onTaxIdChange,
+    useAsDefaultBillingAddress,
+    onUseAsDefaultBillingAddressChange,
+    onClose,
   }: PaymentMethodSelectionProps,
   ref
 ) {
   const { slug } = useParams()
+  const snap = useOrgSettingsPageStateSnapshot()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
   const [setupIntent, setSetupIntent] = useState<SetupIntentResponse | undefined>(undefined)
-  const [useAsDefaultBillingAddress, setUseAsDefaultBillingAddress] = useState(true)
   const { resolvedTheme } = useTheme()
   const paymentRef = useRef<PaymentMethodElementRef | null>(null)
   const [setupNewPaymentMethod, setSetupNewPaymentMethod] = useState<boolean | null>(null)
@@ -60,7 +75,14 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     useOrganizationCustomerProfileQuery({
       slug,
     })
-  const { data: taxId, isPending: isCustomerTaxIdLoading } = useOrganizationTaxIdQuery({ slug })
+  const {
+    data: taxId,
+    isPending: isCustomerTaxIdLoading,
+    isError: isTaxIdError,
+  } = useOrganizationTaxIdQuery({ slug })
+  const { mutateAsync: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation({
+    onError: () => {},
+  })
 
   const { data: allPaymentMethods, isPending: isLoading } = useOrganizationPaymentMethodsQuery({
     slug,
@@ -167,6 +189,75 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     }
   }, [selectedPaymentMethod, paymentMethods, onSelectPaymentMethod])
 
+  const getFormValues = async (): ReturnType<PaymentMethodElementRef['getFormValues']> => {
+    if (setupNewPaymentMethod || (paymentMethods?.data && paymentMethods.data.length === 0)) {
+      return paymentRef.current?.getFormValues()
+    } else {
+      return {
+        address: customerProfile?.address ?? ({} as CustomerAddress),
+        customerName: customerProfile?.billing_name || '',
+        taxId: taxId ?? null,
+      }
+    }
+  }
+
+  // Validate address/tax ID with a dry run before proceeding with Stripe,
+  // so validation errors (e.g. invalid tax ID) block the flow early.
+  const validateBillingProfile = async (): Promise<boolean> => {
+    if (!useAsDefaultBillingAddress) return true
+
+    if (isTaxIdError || isCustomerTaxIdLoading) {
+      toast.error(
+        isTaxIdError
+          ? 'Unable to load current tax ID. Please try again.'
+          : 'Tax ID is still loading. Please wait and try again.'
+      )
+      return false
+    }
+
+    const formValues = await getFormValues()
+    if (!formValues) return false
+
+    try {
+      await updateCustomerProfile({
+        slug,
+        address: formValues.address,
+        billing_name: formValues.customerName,
+        tax_id: formValues.taxId,
+        dry_run: true,
+      })
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to validate billing profile'
+      if (errorMessage.includes('The tax ID type does not match the billing address country')) {
+        toast.error(
+          <div>
+            <p>{errorMessage} Update your billing address or tax ID before upgrading your plan.</p>
+            <Button
+              variant="default"
+              className="mt-2"
+              onClick={() => {
+                if (onClose) {
+                  onClose()
+                  snap.setPanelKey(undefined)
+                  const el = document.getElementById('address')
+                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                }
+              }}
+            >
+              Update tax ID
+            </Button>
+          </div>
+        )
+      } else {
+        toast.error(errorMessage)
+      }
+      return false
+    }
+
+    return true
+  }
+
   // If createPaymentMethod already exists, use it. Otherwise, define it here.
   const createPaymentMethod = async (): ReturnType<
     PaymentMethodElementRef['createPaymentMethod']
@@ -186,14 +277,15 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
       return {
         paymentMethod: { id: selectedPaymentMethod } as PaymentMethod,
         customerName: useAsDefaultBillingAddress ? customerProfile?.billing_name || '' : null,
-        address: useAsDefaultBillingAddress ? customerProfile?.address ?? null : null,
-        taxId: useAsDefaultBillingAddress ? taxId ?? null : null,
+        address: useAsDefaultBillingAddress ? (customerProfile?.address ?? null) : null,
+        taxId: useAsDefaultBillingAddress ? (taxId ?? null) : null,
       }
     }
   }
 
   useImperativeHandle(ref, () => ({
     createPaymentMethod,
+    validateBillingProfile,
   }))
 
   return (
@@ -204,15 +296,15 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
         size="invisible"
         onOpen={() => {
           // [Joshen] This is to ensure that hCaptcha popup remains clickable
-          if (document !== undefined) document.body.classList.add('!pointer-events-auto')
+          if (document !== undefined) document.body.classList.add('pointer-events-auto!')
         }}
         onClose={() => {
           setSetupIntent(undefined)
-          if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+          if (document !== undefined) document.body.classList.remove('pointer-events-auto!')
         }}
         onVerify={(token) => {
           setCaptchaToken(token)
-          if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+          if (document !== undefined) document.body.classList.remove('pointer-events-auto!')
         }}
         onExpire={() => {
           setCaptchaToken(null)
@@ -226,48 +318,56 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
             <p className="text-sm text-foreground-light">Retrieving payment methods</p>
           </div>
         ) : paymentMethods?.data && paymentMethods?.data.length > 0 && !setupNewPaymentMethod ? (
-          <Listbox
+          <FormItemLayout
+            id="payment-method"
+            isReactForm={false}
             layout={layout}
             label="Payment method"
-            value={selectedPaymentMethod}
-            onChange={onSelectPaymentMethod}
-            className="flex items-center"
+            className="gap-[2px]"
+            size="tiny"
           >
-            {paymentMethods?.data.map((method: any) => {
-              const label = `•••• •••• •••• ${method.card.last4}`
-              return (
-                <Listbox.Option
-                  key={method.id}
-                  label={label}
-                  value={method.id}
-                  addOnBefore={() => {
-                    return (
-                      <img
-                        alt="Credit Card Brand"
-                        src={`${BASE_PATH}/img/payment-methods/${method.card.brand
-                          .replace(' ', '-')
-                          .toLowerCase()}.png`}
-                        width="32"
-                      />
-                    )
-                  }}
-                >
-                  <div>{label}</div>
-                </Listbox.Option>
-              )
-            })}
-            <div
-              className="flex items-center px-3 py-2 space-x-2 transition cursor-pointer group hover:bg-surface-300"
-              onClick={() => {
-                setSetupNewPaymentMethod(true)
+            <Select
+              value={selectedPaymentMethod}
+              onValueChange={(value) => {
+                if (value === 'new') {
+                  setSetupNewPaymentMethod(true)
+                  return
+                }
+                onSelectPaymentMethod(value)
               }}
             >
-              <Plus size={16} />
-              <p className="transition text-foreground-light group-hover:text-foreground">
-                Add new payment method
-              </p>
-            </div>
-          </Listbox>
+              <SelectTrigger id="payment-method">
+                <SelectValue className="flex gap-2" />
+              </SelectTrigger>
+              <SelectContent>
+                {paymentMethods?.data.map((method) => {
+                  const label = `•••• •••• •••• ${method.card?.last4}`
+                  return (
+                    <SelectItem key={method.id} value={method.id}>
+                      <div className="flex gap-2">
+                        <img
+                          alt="Credit Card Brand"
+                          src={`${BASE_PATH}/img/payment-methods/${method.card?.brand
+                            .replace(' ', '-')
+                            .toLowerCase()}.png`}
+                          width="32"
+                        />
+                        {label}
+                      </div>
+                    </SelectItem>
+                  )
+                })}
+                <SelectItem value="new">
+                  <div className="flex gap-2">
+                    <Plus size={16} />
+                    <p className="transition text-foreground-light group-hover:text-foreground">
+                      Add new payment method
+                    </p>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </FormItemLayout>
         ) : null}
 
         {stripePromise && setupIntent && customerProfile && (
@@ -280,16 +380,20 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
                 customerName={customerProfile?.billing_name}
                 currentAddress={customerProfile?.address}
                 currentTaxId={taxId}
+                onAddressChange={onAddressChange}
+                onTaxIdChange={onTaxIdChange}
               />
             </Elements>
 
             {/* If the customer already has a billing address, optionally allow overwriting it - if they have no address, we use that as a default */}
             {customerProfile?.address != null && (
               <div className="flex items-center space-x-2 mt-4">
-                <Checkbox_Shadcn_
+                <Checkbox
                   id="defaultBillingAddress"
                   checked={useAsDefaultBillingAddress}
-                  onCheckedChange={() => setUseAsDefaultBillingAddress(!useAsDefaultBillingAddress)}
+                  onCheckedChange={() => {
+                    onUseAsDefaultBillingAddressChange(!useAsDefaultBillingAddress)
+                  }}
                 />
                 <label
                   htmlFor="defaultBillingAddress"

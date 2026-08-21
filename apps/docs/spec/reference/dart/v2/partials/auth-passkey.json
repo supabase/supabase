@@ -1,0 +1,5 @@
+{
+  "id": "auth-passkey",
+  "title": "Auth Passkey",
+  "notes": "This section contains methods for WebAuthn passkey registration, authentication, and management. Methods are invoked behind the `supabase.auth.passkey` namespace.\n\nThese methods expose the server side of the WebAuthn ceremony. The client side (the FaceID/TouchID/security key prompt) has to be performed with a platform passkey API: `navigator.credentials.create()`/`get()` on web, or a passkey plugin on iOS/Android/macOS. Options and credentials are exchanged as `Map<String, dynamic>` in the W3C WebAuthn Level 3 JSON format.\n\nFor a one-call alternative that runs the full ceremony, see [`signInWithPasskey()`](/docs/reference/dart/auth-signinwithpasskey) and [`registerPasskey()`](/docs/reference/dart/auth-registerpasskey) on `supabase_flutter`.\n\nPasskey support is a BETA feature and must be enabled for your project in the Supabase Dashboard under Authentication > Configuration > Passkeys.\n"
+}

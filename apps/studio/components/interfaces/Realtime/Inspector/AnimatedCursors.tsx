@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { MousePointer2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 export const AnimatedCursors = () => {
   const [cursor1Position, setCursor1Position] = useState({ x: 20, y: 20 })

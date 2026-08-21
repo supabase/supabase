@@ -1,20 +1,17 @@
-import type { CloudProvider } from 'shared-data'
-import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
+import { AWS_REGIONS } from 'shared-data'
 
-import type { components } from 'data/api'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import type { components } from '@/data/api'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 
 export const AWS_REGIONS_DEFAULT =
   process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
     ? AWS_REGIONS.SOUTHEAST_ASIA
     : AWS_REGIONS.EAST_US_2
 
-// TO DO, change default to US region for prod
-export const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
-
 export const MANAGED_BY = {
   VERCEL_MARKETPLACE: 'vercel-marketplace',
   AWS_MARKETPLACE: 'aws-marketplace',
+  STRIPE_PROJECTS: 'stripe-projects',
   SUPABASE: 'supabase',
 }
 
@@ -35,11 +32,7 @@ export const PRICING_TIER_PRODUCT_IDS = {
 }
 
 export function useDefaultProvider() {
-  const defaultProvider: CloudProvider =
-    process.env.NEXT_PUBLIC_ENVIRONMENT &&
-    ['staging', 'preview'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT)
-      ? 'AWS_K8S'
-      : 'AWS'
+  const defaultProvider = 'AWS'
 
   const { infraCloudProviders: validCloudProviders } = useCustomContent(['infra:cloud_providers'])
 
@@ -47,16 +40,10 @@ export function useDefaultProvider() {
     return defaultProvider
   }
 
-  return (validCloudProviders?.[0] ?? 'AWS') as CloudProvider
+  return validCloudProviders?.[0] ?? 'AWS'
 }
 
 export const PROVIDERS = {
-  FLY: {
-    id: 'FLY',
-    name: 'Fly.io',
-    default_region: FLY_REGIONS_DEFAULT,
-    regions: { ...FLY_REGIONS },
-  },
   AWS: {
     id: 'AWS',
     name: 'AWS',
@@ -74,7 +61,10 @@ export const PROVIDERS = {
   AWS_NIMBUS: {
     id: 'AWS_NIMBUS',
     name: 'AWS (Nimbus)',
-    default_region: AWS_REGIONS_DEFAULT,
+    default_region:
+      process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
+        ? AWS_REGIONS.SOUTHEAST_ASIA
+        : AWS_REGIONS.EAST_US,
     regions: { ...AWS_REGIONS },
   },
 } as const

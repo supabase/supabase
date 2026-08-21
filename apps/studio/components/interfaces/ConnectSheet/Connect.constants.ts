@@ -1,5 +1,6 @@
-import { DOCS_URL } from 'lib/constants'
-import { CodeBlockLang } from 'ui'
+import { type CodeBlockLang } from 'ui-patterns/CodeBlock'
+
+import { DOCS_URL } from '@/lib/constants'
 
 export type DatabaseConnectionType =
   | 'uri'
@@ -108,7 +109,7 @@ export const FRAMEWORKS: ConnectionType[] = [
   },
   {
     key: 'remix',
-    label: 'Remix',
+    label: 'React Router',
     icon: 'remix',
     guideLink: `${DOCS_URL}/guides/auth/server-side/creating-a-client?framework=remix&environment=remix-loader`,
     children: [
@@ -395,7 +396,7 @@ export const connectionStringMethodOptions: Record<
     value: 'direct',
     label: 'Direct connection',
     description:
-      'Ideal for applications with persistent and long-lived connections, such as those running on virtual machines or long-standing containers.',
+      'Ideal for applications with persistent and long-lived connections such as those running on virtual machines or long-standing containers.',
   },
   transaction: {
     value: 'transaction',
@@ -407,6 +408,6 @@ export const connectionStringMethodOptions: Record<
     value: 'session',
     label: 'Session pooler',
     description:
-      'Only recommended as an alternative to Direct Connection, when connecting via an IPv4 network.',
+      'Only recommended as an alternative to direct connection when connecting via an IPv4 network.',
   },
 }

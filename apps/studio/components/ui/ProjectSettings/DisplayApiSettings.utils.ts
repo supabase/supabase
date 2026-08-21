@@ -1,39 +1,13 @@
 import dayjs from 'dayjs'
-import { useRef } from 'react'
 
-import useLogsQuery from 'hooks/analytics/useLogsQuery'
-
-export function useLastUsedAPIKeysLogQuery({
-  projectRef,
-  enabled,
-}: {
-  projectRef: string
-  enabled?: boolean
-}) {
-  const now = useRef(new Date()).current
-  return useLogsQuery(
-    projectRef,
-    {
-      iso_timestamp_start: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
-      iso_timestamp_end: now.toISOString(),
-      sql: "-- last-used-anon--service_role-api-keys\nSELECT unix_millis(max(timestamp)) as timestamp, payload.role, payload.signature_prefix FROM edge_logs cross join unnest(metadata) as m cross join unnest(m.request) as request cross join unnest(request.sb) as sb cross join unnest(sb.jwt) as jwt cross join unnest(jwt.apikey) as apikey cross join unnest(apikey.payload) as payload WHERE apikey.invalid is null and payload.issuer = 'supabase' and payload.algorithm = 'HS256' and payload.role in ('anon', 'service_role') GROUP BY payload.role, payload.signature_prefix",
-    },
-    enabled
-  )
-}
+import type { ApiKeyLastUsed } from '@/data/analytics/api-keys-last-used-query'
 
 export function getLastUsedAPIKeys(
   apiKeys: {
     tags: string
     api_key: string
   }[],
-  logData:
-    | {
-        timestamp: number
-        role?: 'anon' | 'service_role' | string
-        signature_prefix?: string
-      }[]
-    | null
+  logData: ApiKeyLastUsed[] | null | undefined
 ) {
   if (apiKeys.length < 1 || !logData || logData.length < 1) {
     return {}

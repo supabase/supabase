@@ -148,6 +148,13 @@ export const formatBytes = (
   return isNegative ? '-' + formattedValue : formattedValue
 }
 
+export const formatBytesMinMB = (bytes: any, decimals = 2) => {
+  if (bytes === 0 || bytes === undefined) return '0 MB'
+  const MB = 1024 * 1024
+  if (Math.abs(bytes) < MB) return formatBytes(bytes, decimals, 'MB')
+  return formatBytes(bytes, decimals)
+}
+
 export const snakeToCamel = (str: string) =>
   str.replace(/([-_][a-z])/g, (group: string) =>
     group.toUpperCase().replace('-', '').replace('_', '')
@@ -344,6 +351,9 @@ const formatSemver = (version: string) => {
   return formattedSemver
 }
 
+// Windows of a year or more read better as years than day counts
+export const formatRestoreWindow = (days: number) => (days >= 365 ? '1 year' : `${days} days`)
+
 export const getSemanticVersion = (version: string) => {
   if (!version) return 0
 
@@ -428,3 +438,16 @@ export const createWrappedSymbol = (name: string, display: string): Symbol => {
 // unreachable.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function neverGuard(_: never): any {}
+
+export function isObject(
+  maybeObject: unknown
+): maybeObject is Record<string | symbol | number, unknown> {
+  return maybeObject !== null && typeof maybeObject === 'object' && !Array.isArray(maybeObject)
+}
+
+export function isObjectContainingKeys<T extends string | symbol | number>(
+  maybeObject: unknown,
+  keys: Array<T>
+): maybeObject is { [K in T]: unknown } {
+  return isObject(maybeObject) && keys.every((key) => key in maybeObject)
+}

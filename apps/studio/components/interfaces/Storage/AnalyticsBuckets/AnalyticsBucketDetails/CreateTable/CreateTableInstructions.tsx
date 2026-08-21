@@ -1,32 +1,32 @@
+import { useParams } from 'common'
 import { Eye, EyeOff } from 'lucide-react'
 import { useMemo, useState } from 'react'
-
-import { useParams } from 'common'
-import CommandRender from 'components/interfaces/Functions/CommandRender'
-import { convertKVStringArrayToJson } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import CopyButton from 'components/ui/CopyButton'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import {
-  getDecryptedValues,
-  useVaultSecretDecryptedValueQuery,
-} from 'data/vault/vault-secret-decrypted-value-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import {
-  Accordion_Shadcn_,
-  AccordionContent_Shadcn_,
-  AccordionItem_Shadcn_,
-  AccordionTrigger_Shadcn_,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
   Card,
   CardFooter,
   CardHeader,
   CardTitle,
-  CodeBlock,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
+
 import { useAnalyticsBucketWrapperInstance } from '../useAnalyticsBucketWrapperInstance'
 import { getPyicebergSnippet } from './CreateTableInstructions.constants'
+import CommandRender from '@/components/interfaces/Functions/CommandRender'
+import { convertKVStringArrayToJson } from '@/components/interfaces/Integrations/Wrappers/Wrappers.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import CopyButton from '@/components/ui/CopyButton'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import {
+  getDecryptedValues,
+  useVaultSecretDecryptedValueQuery,
+} from '@/data/vault/vault-secret-decrypted-value-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 export const CreateTableInstructions = ({
   hideHeader = false,
@@ -111,9 +111,9 @@ export const CreateTableInstructions = ({
         </CardHeader>
       )}
 
-      <Accordion_Shadcn_ defaultValue={['step-1']} type="multiple">
-        <AccordionItem_Shadcn_ value="step-1">
-          <AccordionTrigger_Shadcn_ className="px-6 py-3 text-sm">
+      <Accordion defaultValue={['step-1']} type="multiple">
+        <AccordionItem value="step-1">
+          <AccordionTrigger className="px-6 py-3 text-sm">
             <div className="flex items-center gap-x-4">
               <div className="w-6 h-6 rounded-full border flex items-center justify-center text-xs font-mono">
                 1
@@ -122,8 +122,8 @@ export const CreateTableInstructions = ({
                 Set up Python project with <code>uv</code>
               </p>
             </div>
-          </AccordionTrigger_Shadcn_>
-          <AccordionContent_Shadcn_ className="border-0 px-6 pt-1">
+          </AccordionTrigger>
+          <AccordionContent className="border-0 px-6 pt-1">
             <CommandRender
               commands={[
                 {
@@ -143,11 +143,11 @@ export const CreateTableInstructions = ({
                 },
               ]}
             />
-          </AccordionContent_Shadcn_>
-        </AccordionItem_Shadcn_>
+          </AccordionContent>
+        </AccordionItem>
 
-        <AccordionItem_Shadcn_ value="step-2">
-          <AccordionTrigger_Shadcn_ className="px-6 py-3 text-sm">
+        <AccordionItem value="step-2">
+          <AccordionTrigger className="px-6 py-3 text-sm">
             <div className="flex items-center gap-x-4">
               <div className="w-6 h-6 rounded-full border flex items-center justify-center text-xs font-mono">
                 2
@@ -156,8 +156,8 @@ export const CreateTableInstructions = ({
                 Replace <code>main.py</code> with the following snippet
               </p>
             </div>
-          </AccordionTrigger_Shadcn_>
-          <AccordionContent_Shadcn_ className="border-0 px-6 pt-2">
+          </AccordionTrigger>
+          <AccordionContent className="border-0 px-6 pt-2">
             <p className="text-foreground mb-3 prose max-w-full text-sm">
               The following snippet creates a namespace <code>default</code>, then creates a sample
               table
@@ -172,7 +172,7 @@ export const CreateTableInstructions = ({
               />
               <div className="flex items-center gap-x-1.5 absolute top-2 right-2">
                 <CopyButton
-                  type="default"
+                  variant="default"
                   loading={isFetchingSecretsOnCopy}
                   asyncText={async () => {
                     if (!!decryptedS3AccessKey && !!decryptedS3SecretKey && !!decryptedToken) {
@@ -208,7 +208,7 @@ export const CreateTableInstructions = ({
                   }}
                 />
                 <ButtonTooltip
-                  type="default"
+                  variant="default"
                   className="w-7"
                   loading={isFetchingSecretValues}
                   onClick={() => setShowKeys(!showKeys)}
@@ -226,19 +226,19 @@ export const CreateTableInstructions = ({
                 />
               </div>
             </div>
-          </AccordionContent_Shadcn_>
-        </AccordionItem_Shadcn_>
+          </AccordionContent>
+        </AccordionItem>
 
-        <AccordionItem_Shadcn_ value="step-3">
-          <AccordionTrigger_Shadcn_ className="px-6 py-3 text-sm">
+        <AccordionItem value="step-3">
+          <AccordionTrigger className="px-6 py-3 text-sm">
             <div className="flex items-center gap-x-4">
               <div className="w-6 h-6 rounded-full border flex items-center justify-center text-xs font-mono">
                 3
               </div>
               <p className="prose text-sm font-normal">Run the Python script</p>
             </div>
-          </AccordionTrigger_Shadcn_>
-          <AccordionContent_Shadcn_ className="border-0 px-6 pt-2">
+          </AccordionTrigger>
+          <AccordionContent className="border-0 px-6 pt-2">
             <CommandRender
               commands={[
                 {
@@ -248,9 +248,9 @@ export const CreateTableInstructions = ({
                 },
               ]}
             />
-          </AccordionContent_Shadcn_>
-        </AccordionItem_Shadcn_>
-      </Accordion_Shadcn_>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
 
       <CardFooter className="bg">
         <p className="text-xs text-foreground-light">

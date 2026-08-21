@@ -2,150 +2,120 @@
 title: 'Use Supabase with Python'
 subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Python app.'
 breadcrumb: 'Framework Quickstarts'
-hideToc: true
 ---
 
-<StepHikeCompact>
+<AiPrompt id="flask" />
 
-  <StepHikeCompact.Step step={1}>
+<$Partial path="quickstart_db_setup.mdx" />
 
-    <$Partial path="quickstart_db_setup.mdx" />
+## 3. Create a Python app with Flask
 
-  </StepHikeCompact.Step>
+Create a new directory for your Python app and set up a virtual environment.
 
-  <StepHikeCompact.Step step={2}>
+```bash
+mkdir my-app && cd my-app
+python3 -m venv venv
+source venv/bin/activate
+```
 
-    <StepHikeCompact.Details title="Create a Python app with Flask">
+## 4. Set up AI tooling (optional)
 
-    Create a new directory for your Python app and set up a virtual environment.
+<$Partial path="quickstart_ai_tooling.mdx" />
 
-    </StepHikeCompact.Details>
+## 5. Install Flask and the Supabase client library
 
-    <StepHikeCompact.Code>
+The fastest way to get started is to use Flask for the web framework and the `supabase-py` client library which provides a convenient interface for working with Supabase from a Python app.
 
-      ```bash name=Terminal
-      mkdir my-app && cd my-app
-      python3 -m venv venv
-      source venv/bin/activate
-      ```
+Install both packages using pip.
 
-    </StepHikeCompact.Code>
+```bash
+pip install flask supabase
+```
 
-  </StepHikeCompact.Step>
+## 6. Create environment variables file
 
-  <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Install Flask and the Supabase client library">
+Create a `.env` file in your project root and populate it with your Supabase connection variables that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=flask):
 
-    The fastest way to get started is to use Flask for the web framework and the `supabase-py` client library which provides a convenient interface for working with Supabase from a Python app.
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=flask">
+    Open Connect panel
+  </a>
+</Button>
 
-    Install both packages using pip.
+```text name=.env
+SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
+```
 
-    </StepHikeCompact.Details>
+<$Partial path="api_settings.mdx" variables={{ "framework": "flask", "tab": "frameworks" }} />
 
-    <StepHikeCompact.Code>
+## 7. Create the Supabase client
 
-      ```bash name=Terminal
-      pip install flask supabase
-      ```
+Install the `python-dotenv` package to load environment variables:
 
-    </StepHikeCompact.Code>
+```bash
+pip install python-dotenv
+```
 
-  </StepHikeCompact.Step>
+Create an `app.py` file and initialize the Flask app and the Supabase client from your environment variables.
 
-  <StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Create Environment Variables file">
+```python name=app.py
+import os
+from flask import Flask
+from supabase import create_client, Client
+from postgrest import APIError
+from dotenv import load_dotenv
 
-    Create a `.env` file in your project root and populate it with your Supabase connection variables:
+load_dotenv()
 
-    <ProjectConfigVariables variable="url" />
-    <ProjectConfigVariables variable="publishable" />
-    <ProjectConfigVariables variable="anon" />
+app = Flask(__name__)
 
-    </StepHikeCompact.Details>
+supabase: Client = create_client(
+    os.environ.get("SUPABASE_URL"),
+    os.environ.get("SUPABASE_PUBLISHABLE_KEY")
+)
+```
 
-    <StepHikeCompact.Code>
+## 8. Query data from the app
 
-      <$CodeTabs>
+Add a route to `app.py` that fetches data from your `instruments` table.
 
-        ```text name=.env
-        SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
-        SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
-        ```
+```python name=app.py
+@app.route('/')
+def index():
+    try:
+        response = supabase.table('instruments').select("*").execute()
+    except APIError as error:
+        return f'<p>Error loading instruments: {error.message}</p>'
 
-      </$CodeTabs>
+    instruments = response.data
 
-      <$Partial path="api_settings_steps.mdx" variables={{ "framework": "", "tab": "" }} />
+    html = '<h1>Instruments</h1><ul>'
+    for instrument in instruments:
+        html += f'<li>{instrument["name"]}</li>'
+    html += '</ul>'
 
-    </StepHikeCompact.Code>
+    return html
 
-  </StepHikeCompact.Step>
+if __name__ == '__main__':
+    app.run(debug=True)
+```
 
-  <StepHikeCompact.Step step={5}>
-    <StepHikeCompact.Details title="Query data from the app">
+## 9. Start the app
 
-    Install the `python-dotenv` package to load environment variables:
+Run the Flask development server, and go to http://localhost:5000 in your browser, you should see the list of instruments.
 
-    ```bash
-    pip install python-dotenv
-    ```
+```bash
+python app.py
+```
 
-    Create an `app.py` file and add a route that fetches data from your `instruments` table using the Supabase client.
+<Admonition type="note">
 
-    </StepHikeCompact.Details>
-    <StepHikeCompact.Code>
+On macOS, port 5000 is used by the AirPlay Receiver service. If the page doesn't load, turn AirPlay Receiver off in **System Settings > General > AirDrop & Handoff**, or run the app on another port with `app.run(debug=True, port=5001)`.
 
-      ```python name=app.py
-      import os
-      from flask import Flask
-      from supabase import create_client, Client
-      from dotenv import load_dotenv
+</Admonition>
 
-      load_dotenv()
-
-      app = Flask(__name__)
-
-      supabase: Client = create_client(
-          os.environ.get("SUPABASE_URL"),
-          os.environ.get("SUPABASE_PUBLISHABLE_KEY")
-      )
-
-      @app.route('/')
-      def index():
-          response = supabase.table('instruments').select("*").execute()
-          instruments = response.data
-
-          html = '<h1>Instruments</h1><ul>'
-          for instrument in instruments:
-              html += f'<li>{instrument["name"]}</li>'
-          html += '</ul>'
-
-          return html
-
-      if __name__ == '__main__':
-          app.run(debug=True)
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={6}>
-    <StepHikeCompact.Details title="Start the app">
-
-    Run the Flask development server, go to http://localhost:5000 in a browser and you should see the list of instruments.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```bash name=Terminal
-      python app.py
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-</StepHikeCompact>
+<$Partial path="quickstart_going_to_production.mdx" />
 
 ## Next steps
 

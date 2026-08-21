@@ -20,30 +20,13 @@ There are several reasons why you might want to add social login to your applica
 
 Supabase supports a suite of social providers. Follow these guides to configure a social provider for your platform.
 
-<div className="grid grid-cols-12 xs:gap-x-10 gap-y-10 not-prose py-8">
-  <NavData data="socialLoginItems">
-    {(data) =>
-      data.map((item) => (
-        <Link
-          href={`${item.url}`}
-          key={item.name}
-          passHref
-          className="col-span-12 xs:col-span-6 lg:col-span-4 xl:col-span-3"
-        >
-          <IconPanel
-            title={item.name}
-            span="col-span-6"
-            icon={item.icon}
-            isDarkMode={item.isDarkMode}
-            hasLightIcon={item.hasLightIcon}
-          >
-            {item.description}
-          </IconPanel>
-        </Link>
-      ))
-    }
-  </NavData>
-</div>
+<AuthProviders type="social" label="Social providers" />
+
+<Admonition type="note">
+
+Need to integrate with a provider not listed here? You can add any OAuth2 or OIDC-compatible provider using [Custom OAuth/OIDC Providers](/docs/guides/auth/custom-oauth-providers).
+
+</Admonition>
 
 ## Provider tokens
 

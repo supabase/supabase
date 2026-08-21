@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 
-import type { components } from 'data/api'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { secretsKeys } from './keys'
+import type { components } from '@/data/api'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type SecretsVariables = {
   projectRef?: string

@@ -1,9 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useState } from 'react'
-import { useAppStateSnapshot } from 'state/app-state'
 import { Button, SidePanel } from 'ui'
 
 import { Bucket } from './Content/Bucket'
@@ -20,7 +17,10 @@ import { UserManagement } from './Content/UserManagement'
 import { FirstLevelNav } from './FirstLevelNav'
 import LanguageSelector from './LanguageSelector'
 import { SecondLevelNav } from './SecondLevelNav'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 /**
  * [Joshen] Reminder: when we choose to release this as a main feature
@@ -45,19 +45,19 @@ export const ProjectAPIDocs = () => {
   const language = snap.docsLanguage
 
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeys } = useAPIKeysQuery(
+  const { data: apiKeysData } = useAPIKeys(
     { projectRef: ref },
     { enabled: snap.showProjectApiDocs && canReadAPIKeys }
   )
+  const { anonKey } = apiKeysData ?? {}
 
   const { data: endpoint } = useProjectApiUrl(
     { projectRef: ref },
     { enabled: snap.showProjectApiDocs }
   )
 
-  const { anonKey } = getKeys(apiKeys)
   const apikey = showKeys
-    ? anonKey?.api_key ?? 'SUPABASE_CLIENT_ANON_KEY'
+    ? (anonKey?.api_key ?? 'SUPABASE_CLIENT_ANON_KEY')
     : 'SUPABASE_CLIENT_ANON_KEY'
 
   return (
@@ -75,7 +75,7 @@ export const ProjectAPIDocs = () => {
             <div className="flex items-center space-x-1">
               {!isEntityDocs && <LanguageSelector simplifiedVersion />}
               {isIntroduction && (
-                <Button type="default" onClick={() => setShowKeys(!showKeys)}>
+                <Button variant="default" onClick={() => setShowKeys(!showKeys)}>
                   {showKeys ? 'Hide keys' : 'Show keys'}
                 </Button>
               )}

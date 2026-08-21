@@ -60,7 +60,7 @@ It's good practice to create the extension within a separate schema (like `exten
 
 ## Usage
 
-To demonstrate how `timescaledb` works, let's consider a simple example where we have a table that stores temperature data from different sensors. We will create a table named "temperatures" and store data for two sensors.
+To demonstrate how `timescaledb` works, consider an example where we have a table that stores temperature data from different sensors. Create a table named "temperatures" and store data for two sensors.
 
 First we create a hypertable, which is a virtual table that is partitioned into chunks based on time intervals. The hypertable acts as a proxy for the actual table and makes it easy to query and manage time-series data.
 

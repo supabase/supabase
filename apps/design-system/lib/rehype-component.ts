@@ -9,21 +9,6 @@ import { Index } from '../__registry__'
 import { styles } from '../registry/styles'
 import { UnistNode, UnistTree } from '@/types/unist'
 
-// ComponentType
-
-function inspectComponentProps<T>(component: React.ComponentType<T>): void {
-  // Assert the component's props type
-  const defaultProps = (component as React.ComponentType<any>).defaultProps || {}
-
-  // console.log('Component props:')
-  // console.log('----------------')
-
-  for (const propName in defaultProps) {
-    const propType = typeof defaultProps[propName]
-    console.log(`${propName}: ${propType}`)
-  }
-}
-
 export function rehypeComponent() {
   return async (tree: UnistTree) => {
     visit(tree, (node: UnistNode) => {

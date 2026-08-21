@@ -1,21 +1,28 @@
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { AppBannerWrapper } from 'components/interfaces/App/AppBannerWrapper'
-import { Sidebar } from 'components/interfaces/Sidebar'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useCheckLatestDeploy } from 'hooks/use-check-latest-deploy'
+import { useBreakpoint, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
-import { useAppStateSnapshot } from 'state/app-state'
-import { ResizablePanel, ResizablePanelGroup, SidebarProvider } from 'ui'
+import { ResizablePanel, ResizablePanelGroup, SidebarProvider, usePanelRef } from 'ui'
+import { SkipToContent } from 'ui-patterns/SkipToContent'
 
 import { BannerStack } from '../ui/BannerStack/BannerStack'
-import { BannerStackProvider } from '../ui/BannerStack/BannerStackProvider'
-import { LayoutHeader } from './ProjectLayout/LayoutHeader/LayoutHeader'
+import { LayoutHeader } from './Navigation/LayoutHeader/LayoutHeader'
+import MobileNavigationBar from './Navigation/NavigationBar/MobileNavigationBar'
+import { MobileSheetProvider } from './Navigation/NavigationBar/MobileSheetContext'
+import { StudioMobileSheetNav } from './Navigation/NavigationBar/StudioMobileSheetNav'
 import { LayoutSidebar } from './ProjectLayout/LayoutSidebar'
-import { LayoutSidebarProvider } from './ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
-import { MobileSheetProvider } from './ProjectLayout/NavigationBar/MobileSheetContext'
+import {
+  LayoutSidebarProvider,
+  SIDEBAR_KEYS,
+} from './ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
+import { AppBannerWrapper } from '@/components/interfaces/App/AppBannerWrapper'
+import { Sidebar } from '@/components/interfaces/Sidebar'
+import { useSyncScopedIntrospection } from '@/data/scoped-introspection'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
+import { useCheckLatestDeploy } from '@/hooks/use-check-latest-deploy'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useAppStateSnapshot } from '@/state/app-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export interface DefaultLayoutProps {
   headerTitle?: string
@@ -37,33 +44,44 @@ export const DefaultLayout = ({
   headerTitle,
   hideMobileMenu,
 }: PropsWithChildren<DefaultLayoutProps>) => {
+  useSyncScopedIntrospection()
+  useCheckLatestDeploy()
+
   const { ref } = useParams()
   const router = useRouter()
+  const panelRef = usePanelRef()
+  const isMobile = useBreakpoint('md')
   const appSnap = useAppStateSnapshot()
-  const showProductMenu = !!ref && router.pathname !== '/project/[ref]'
+  const { isMaximised, activeSidebar } = useSidebarManagerSnapshot()
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
 
-  const [lastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
+  const [isMounted, setIsMounted] = useState(false)
 
-  const backToDashboardURL =
-    appSnap.lastRouteBeforeVisitingAccountPage.length > 0
+  const backToDashboardURL = router.pathname.startsWith('/account')
+    ? appSnap.lastRouteBeforeVisitingAccountPage.length > 0
       ? appSnap.lastRouteBeforeVisitingAccountPage
-      : !!lastVisitedOrganization
+      : IS_PLATFORM && !!lastVisitedOrganization
         ? `/org/${lastVisitedOrganization}`
-        : '/organizations'
-
-  useCheckLatestDeploy()
+        : IS_PLATFORM
+          ? '/organizations'
+          : '/project/default'
+    : undefined
 
   const contentMinSizePercentage = 50
   const contentMaxSizePercentage = 70
 
-  const [isMounted, setIsMounted] = useState(false)
-
   useEffect(() => {
     setIsMounted(true)
   }, [])
+
+  useEffect(() => {
+    if (!isMounted || !panelRef.current || !activeSidebar || isMobile) return
+    if (isMaximised) {
+      panelRef.current.collapse()
+    } else {
+      panelRef.current.resize(`${contentMaxSizePercentage}%`)
+    }
+  }, [isMounted, isMaximised, panelRef, activeSidebar, isMobile])
 
   // This is required to prevent layout shift when rendering resizable panels (they initially render at 50%, then shift
   // to whatever is specified).
@@ -76,55 +94,56 @@ export const DefaultLayout = ({
       <LayoutSidebarProvider>
         <ProjectContextProvider projectRef={ref}>
           <MobileSheetProvider>
-            <BannerStackProvider>
-              <div className="flex flex-col h-screen w-screen">
-                {/* Top Banner */}
-                <AppBannerWrapper />
-                <div className="flex-shrink-0">
-                  <MobileNavigationBar hideMobileMenu={hideMobileMenu} />
-                  <LayoutHeader
-                    showProductMenu={showProductMenu}
-                    headerTitle={headerTitle}
-                    backToDashboardURL={
-                      router.pathname.startsWith('/account') ? backToDashboardURL : undefined
-                    }
+            <div className="flex flex-col h-screen w-screen">
+              <SkipToContent href="#main" />
+              {/* Top Banner */}
+              <AppBannerWrapper />
+              <div className="shrink-0">
+                {isMobile && (
+                  <MobileNavigationBar
+                    hideMobileMenu={hideMobileMenu}
+                    backToDashboardURL={backToDashboardURL}
                   />
-                </div>
-                {/* Main Content Area */}
-                <div className="flex flex-1 w-full overflow-y-hidden">
-                  {/* Sidebar - Only show for project pages, not account pages */}
-                  {!router.pathname.startsWith('/account') && <Sidebar />}
-                  {/* Main Content with Layout Sidebar */}
-                  <ResizablePanelGroup
-                    orientation="horizontal"
-                    className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
-                    autoSaveId="default-layout-content"
-                  >
-                    <ResizablePanel
-                      id="panel-content"
-                      className="w-full"
-                      minSize={`${contentMinSizePercentage}`}
-                      maxSize={`${contentMaxSizePercentage}`}
-                      defaultSize={`${contentMaxSizePercentage}`}
-                    >
-                      <div className="h-full overflow-y-auto">{children}</div>
-                    </ResizablePanel>
-                    <LayoutSidebar
-                      minSize={`${100 - contentMaxSizePercentage}`}
-                      maxSize={`${100 - contentMinSizePercentage}`}
-                      defaultSize={`${100 - contentMaxSizePercentage}`}
-                    />
-                  </ResizablePanelGroup>
-                </div>
+                )}
+                <LayoutHeader headerTitle={headerTitle} backToDashboardURL={backToDashboardURL} />
               </div>
+              {/* Main Content Area */}
+              <div className="flex flex-1 w-full overflow-y-hidden">
+                {/* Sidebar - Only show for project pages, not account pages */}
+                {!router.pathname.startsWith('/account') && <Sidebar />}
+                {/* Main Content with Layout Sidebar */}
+                <ResizablePanelGroup
+                  orientation="horizontal"
+                  className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
+                  autoSaveId="default-layout-content"
+                >
+                  <ResizablePanel
+                    id="panel-content"
+                    className="w-full"
+                    panelRef={panelRef}
+                    collapsible={activeSidebar?.id === SIDEBAR_KEYS.AI_ASSISTANT}
+                    minSize={`${contentMinSizePercentage}`}
+                    maxSize={`${contentMaxSizePercentage}`}
+                    defaultSize={`${contentMaxSizePercentage}`}
+                  >
+                    <main id="main" tabIndex={-1} className="h-full overflow-y-auto outline-hidden">
+                      {children}
+                    </main>
+                  </ResizablePanel>
+                  <LayoutSidebar
+                    minSize={`${100 - contentMaxSizePercentage}`}
+                    maxSize="100"
+                    defaultSize={`${100 - contentMaxSizePercentage}`}
+                  />
+                </ResizablePanelGroup>
+              </div>
+            </div>
 
-              <BannerStack />
-            </BannerStackProvider>
+            <BannerStack />
+            <StudioMobileSheetNav />
           </MobileSheetProvider>
         </ProjectContextProvider>
       </LayoutSidebarProvider>
     </SidebarProvider>
   )
 }
-
-export default DefaultLayout

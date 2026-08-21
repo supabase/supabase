@@ -1,16 +1,16 @@
 import { useQuery } from '@tanstack/react-query'
 import type { operations } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { organizationKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type DesiredInstanceSizeForAvailableRegions =
   operations['ProjectsController_getRegions']['parameters']['query']['desired_instance_size']
 
 export type OrganizationAvailableRegionsVariables = {
   slug?: string
-  cloudProvider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
+  cloudProvider: 'AWS' | 'AWS_K8S' | 'AWS_NIMBUS'
   desiredInstanceSize?: DesiredInstanceSizeForAvailableRegions
 }
 

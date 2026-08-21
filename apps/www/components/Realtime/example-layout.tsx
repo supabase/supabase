@@ -1,8 +1,11 @@
 'use client'
-import SandpackWrapper from './sandpack'
-import { Button, CodeBlock } from 'ui'
-import { useState } from 'react'
+
 import { ChevronLeft, ChevronRight, Code, Eye } from 'lucide-react'
+import { useState } from 'react'
+import { Button } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
+
+import SandpackWrapper from './sandpack'
 
 export type ExampleLayoutProps = {
   appJsCode: string
@@ -38,7 +41,7 @@ ${appJsCode}`
         <div>
           <div className="flex w-fit gap-1">
             <Button
-              type="text"
+              variant="text"
               onClick={() => setViewMode('code')}
               icon={<Code size={14} />}
               size="tiny"
@@ -48,7 +51,7 @@ ${appJsCode}`
               <span className="hidden sm:inline">Code</span>
             </Button>
             <Button
-              type="text"
+              variant="text"
               onClick={() => setViewMode('preview')}
               size="tiny"
               icon={<Eye size={14} />}
@@ -65,19 +68,19 @@ ${appJsCode}`
         {/* Right: Navigation */}
         <div className="flex gap-1 justify-end">
           <Button
-            type="outline"
+            variant="outline"
             onClick={onPrevious}
             disabled={!onPrevious}
-            className="p-1 rounded hover:bg-surface-200 text-foreground-light disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-1 rounded-sm hover:bg-surface-200 text-foreground-light disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Previous example"
           >
             <ChevronLeft size={16} />
           </Button>
           <Button
-            type="outline"
+            variant="outline"
             onClick={onNext}
             disabled={!onNext}
-            className="p-1 rounded hover:bg-surface-200 text-foreground-light disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-1 rounded-sm hover:bg-surface-200 text-foreground-light disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Next example"
           >
             <ChevronRight size={16} />
@@ -100,7 +103,7 @@ ${appJsCode}`
         <CodeBlock
           hideLineNumbers
           wrapperClassName="w-full"
-          className="!bg-transparent h-[500px] lg:h-full overflow-auto p-8 border-none rounded-none"
+          className="bg-transparent! h-[500px] lg:h-full overflow-auto p-8 border-none rounded-none"
           wrapLines
           language="jsx"
         >

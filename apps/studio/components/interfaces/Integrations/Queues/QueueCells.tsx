@@ -1,11 +1,12 @@
 import dayjs from 'dayjs'
 import { Check, Loader2, X } from 'lucide-react'
 
-import { useQueuesMetricsQuery } from 'data/database-queues/database-queues-metrics-query'
-import { PostgresQueue } from 'data/database-queues/database-queues-query'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DATETIME_FORMAT } from 'lib/constants'
+import { pgmqQueueTable } from './Queues.utils'
+import { useQueuesMetricsQuery } from '@/data/database-queues/database-queues-metrics-query'
+import { PostgresQueue } from '@/data/database-queues/database-queues-query'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DATETIME_FORMAT } from '@/lib/constants'
 
 export interface QueueWithMetrics extends PostgresQueue {
   id: string // Add unique id for DataGrid
@@ -43,7 +44,7 @@ export const QueueRLSCell = ({ queue }: QueueCellProps) => {
     schema: 'pgmq',
   })
 
-  const queueTable = queueTables?.find((x) => x.name === `q_${queue.queue_name}`)
+  const queueTable = queueTables?.find((x) => x.name === pgmqQueueTable(queue.queue_name))
   const isRlsEnabled = !!queueTable?.rls_enabled
 
   return (

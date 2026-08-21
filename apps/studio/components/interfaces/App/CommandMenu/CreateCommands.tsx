@@ -1,7 +1,6 @@
 'use client'
 
 import { IS_PLATFORM } from 'common'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import {
   Clock5,
   Code2,
@@ -39,6 +38,7 @@ import {
   getIntegrationRoute,
   useCreateCommandsConfig,
 } from './CreateCommands.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 
 const AiIconAnimation = dynamic(() => import('ui').then((mod) => mod.AiIconAnimation))
 const Badge = dynamic(() => import('ui').then((mod) => mod.Badge))
@@ -46,7 +46,6 @@ const EdgeFunctions = dynamic(() => import('icons').then((mod) => mod.EdgeFuncti
 const AnalyticsBucket = dynamic(() => import('icons').then((mod) => mod.AnalyticsBucket))
 const FilesBucket = dynamic(() => import('icons').then((mod) => mod.FilesBucket))
 const VectorBucket = dynamic(() => import('icons').then((mod) => mod.VectorBucket))
-const Graphql = dynamic(() => import('icons').then((mod) => mod.Graphql))
 
 const CREATE_STUDIO_ENTITY = 'Create Studio Entity'
 
@@ -131,7 +130,7 @@ export function useCreateCommands(options?: CommandOptions) {
             {
               id: 'create-rls-policy',
               name: 'Create RLS Policy',
-              route: `/project/${ref}/auth/policies?new=true`,
+              route: `/project/${ref}/database/policies?new=true`,
               icon: () => <ShieldPlus />,
             },
             ...(IS_PLATFORM
@@ -331,7 +330,7 @@ export function useCreateCommands(options?: CommandOptions) {
         const getIcon = () => {
           if (isWrapper) {
             return (
-              <div className="w-6 h-6 relative bg-white border rounded-md flex items-center justify-center [&>img]:!p-1 [&>svg]:!p-1">
+              <div className="w-6 h-6 relative bg-white border rounded-md flex items-center justify-center [&>img]:p-1! [&>svg]:p-1!">
                 {integration.icon()}
               </div>
             )
@@ -363,17 +362,20 @@ export function useCreateCommands(options?: CommandOptions) {
       .filter(Boolean) as ICommand[]
   }, [ref, allIntegrations, installedIntegrationIds])
 
+  // Observability commands are only available on the platform, not for self-hosted/CLI
   const observabilityCommands = useMemo(
     () => [
-      ...(IS_PLATFORM && reportsEnabled
-        ? ([
-            {
-              id: 'create-observability-report',
-              name: 'Create Custom Report',
-              route: `/project/${ref}/observability/api-overview?newReport=true`,
-              icon: () => <Telescope />,
-            },
-          ].filter(Boolean) as ICommand[])
+      ...(IS_PLATFORM
+        ? reportsEnabled
+          ? ([
+              {
+                id: 'create-observability-report',
+                name: 'Create Custom Report',
+                route: `/project/${ref}/observability/api-overview?newReport=true`,
+                icon: () => <Telescope />,
+              },
+            ].filter(Boolean) as ICommand[])
+          : []
         : []),
     ],
     [ref, reportsEnabled]

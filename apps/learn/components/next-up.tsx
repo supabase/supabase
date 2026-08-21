@@ -1,5 +1,5 @@
-import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
+import Link from 'next/link'
 import { Button } from 'ui'
 
 interface NextUpProps {
@@ -23,7 +23,7 @@ export function NextUp({ title, description, href, chapterNumber }: NextUpProps)
           <div className="mt-2">
             <Link href={href}>
               <Button
-                type="default"
+                variant="default"
                 iconRight={<ArrowRight className="h-4 w-4" />}
                 className="flex items-center gap-2"
               >

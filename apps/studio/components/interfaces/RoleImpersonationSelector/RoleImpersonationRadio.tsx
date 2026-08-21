@@ -3,24 +3,29 @@ import { cn } from 'ui'
 
 export interface RoleImpersonationRadioProps<T extends string> {
   label?: string
+  description?: string
   value: T
   isSelected: boolean | 'partially'
   onSelectedChange: (value: T) => void
   icon?: React.ReactNode
+  fullWidth?: boolean
 }
 
-function RoleImpersonationRadio<T extends string>({
+export function RoleImpersonationRadio<T extends string>({
   label,
+  description,
   value,
   isSelected,
   onSelectedChange,
   icon,
+  fullWidth = false,
 }: RoleImpersonationRadioProps<T>) {
   return (
     <label
       className={cn(
-        'border border-default rounded-md bg-surface-200 hover:bg-overlay-hover hover:border-control px-4 py-3 w-44 cursor-pointer transition-colors',
-        isSelected && 'border-foreground-muted hover:border-foreground-muted bg-surface-300'
+        'border border-default rounded-md bg-surface-200 hover:bg-overlay-hover hover:border-control-hover px-4 py-3 cursor-pointer transition-colors',
+        fullWidth ? 'w-full' : 'w-44',
+        isSelected && 'border-control-hover hover:border-control-hover bg-surface-300'
       )}
       tabIndex={0}
       onKeyDown={(e) => {
@@ -62,10 +67,10 @@ function RoleImpersonationRadio<T extends string>({
           isSelected && 'text-foreground'
         )}
       >
-        {label ?? value} role
+        {label ?? value}
       </span>
+
+      {description && <p className="text-foreground-lighter text-xs">{description}</p>}
     </label>
   )
 }
-
-export default RoleImpersonationRadio

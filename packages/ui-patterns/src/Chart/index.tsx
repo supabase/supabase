@@ -1,9 +1,9 @@
 'use client'
 
-import { Slot } from '@radix-ui/react-slot'
 import dayjs from 'dayjs'
 import { HelpCircle, Loader2 } from 'lucide-react'
 import Link from 'next/link'
+import { Slot } from 'radix-ui'
 import * as React from 'react'
 import { useContext, useMemo, useRef, useState } from 'react'
 import {
@@ -43,11 +43,13 @@ export type ChartConfig = {
 interface ChartContextValue {
   isLoading?: boolean
   isDisabled?: boolean
+  isErrored?: boolean
 }
 
 const ChartContext = React.createContext<ChartContextValue>({
   isLoading: false,
   isDisabled: false,
+  isErrored: false,
 })
 
 export const useChart = () => {
@@ -59,15 +61,19 @@ interface ChartProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
   isLoading?: boolean
   isDisabled?: boolean
+  isErrored?: boolean
   className?: string
 }
 
-const chartTableClasses = `[&_tr]:border-b [&_tr]:border-border [&_thead_tr]:!bg-transparent [&_thead_th]:!py-2 [&_thead_th]:!px-card [&_thead_th]:h-auto [&_tbody_td]:py-2.5 [&_tbody_td]:px-card [&_tbody_td]:text-xs [&_table]:mb-1 [&_table]:border-b [&_table]:border-border`
+const chartTableClasses = `[&_tr]:border-b [&_tr]:border-border [&_thead_tr]:bg-transparent! [&_thead_th]:py-2! [&_thead_th]:!px-card [&_thead_th]:h-auto [&_tbody_td]:py-2.5 [&_tbody_td]:px-card [&_tbody_td]:text-xs [&_table]:mb-1 [&_table]:border-b [&_table]:border-border`
 
 const Chart = React.forwardRef<HTMLDivElement, ChartProps>(
-  ({ children, isLoading = false, isDisabled = false, className, ...props }, ref) => {
+  (
+    { children, isLoading = false, isDisabled = false, isErrored = false, className, ...props },
+    ref
+  ) => {
     return (
-      <ChartContext.Provider value={{ isLoading, isDisabled }}>
+      <ChartContext.Provider value={{ isLoading, isDisabled, isErrored }}>
         <div ref={ref} className={cn('relative w-full', className)} {...props}>
           {children}
         </div>
@@ -86,7 +92,7 @@ interface ChartCardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
   ({ children, className, asChild, ...props }, ref) => {
-    const Comp = asChild ? Slot : Card
+    const Comp = asChild ? Slot.Slot : Card
     return (
       <Comp ref={ref} className={cn('relative w-full', className)} {...props}>
         {children}
@@ -183,7 +189,7 @@ const ChartActions = React.forwardRef<HTMLDivElement, ChartActionsProps>(
               <Tooltip key={index}>
                 <TooltipTrigger asChild>
                   <Button
-                    type="default"
+                    variant="default"
                     size="tiny"
                     className={cn('px-1.5 text-foreground-lighter', action.className)}
                     onClick={action.onClick}
@@ -263,7 +269,7 @@ const ChartMetric = React.forwardRef<HTMLDivElement, ChartMetricProps>(
           {status && (
             <span
               className={cn(
-                'flex-shrink-0 w-1.5 h-1.5 rounded-full flex',
+                'shrink-0 w-1.5 h-1.5 rounded-full flex',
                 status === 'positive' && 'bg-brand',
                 status === 'negative' && 'bg-destructive',
                 status === 'warning' && 'bg-warning',
@@ -306,6 +312,7 @@ interface ChartContentProps extends React.HTMLAttributes<HTMLDivElement> {
   isEmpty?: boolean
   emptyState?: React.ReactNode
   loadingState?: React.ReactNode
+  errorState?: React.ReactNode
   disabledState?: React.ReactNode
   disabledActions?: ChartAction[]
 }
@@ -318,19 +325,22 @@ const ChartContent = React.forwardRef<HTMLDivElement, ChartContentProps>(
       isEmpty = false,
       emptyState,
       loadingState,
+      errorState,
       disabledState,
       disabledActions,
       ...props
     },
     ref
   ) => {
-    const { isLoading, isDisabled } = useChart()
+    const { isLoading, isDisabled, isErrored } = useChart()
     let content: React.ReactNode
 
     if (isDisabled) {
       content = disabledState
     } else if (isLoading) {
       content = loadingState
+    } else if (isErrored) {
+      content = errorState
     } else if (isEmpty) {
       content = emptyState
     } else {
@@ -350,8 +360,8 @@ ChartContent.displayName = 'ChartContent'
 interface ChartEmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string
   icon?: React.ReactNode
-  title: string
-  description: string
+  title?: string
+  description?: string
 }
 
 const ChartEmptyState = React.forwardRef<HTMLDivElement, ChartEmptyStateProps>(
@@ -370,8 +380,8 @@ const ChartEmptyState = React.forwardRef<HTMLDivElement, ChartEmptyStateProps>(
             {icon}
           </div>
         )}
-        <h3 className="text-sm font-medium text-foreground-light">{title}</h3>
-        <p className="text-sm text-foreground-lighter">{description}</p>
+        {title && <h3 className="text-sm font-medium text-foreground-light">{title}</h3>}
+        {description && <p className="text-sm text-foreground-lighter">{description}</p>}
       </div>
     )
   }
@@ -465,7 +475,7 @@ const ChartDisabledState = ({ icon, label, description, actions }: ChartDisabled
             {actions.map((action, index) => (
               <Button
                 key={index}
-                type="primary"
+                variant="primary"
                 size="tiny"
                 className={cn(action.className)}
                 onClick={action.onClick}
@@ -546,7 +556,7 @@ const ChartSparklineTooltip = ({ active, payload, label }: RechartsTooltipProps<
   }
 
   return (
-    <div className="bg-black/90 text-white p-2 rounded text-xs">
+    <div className="bg-black/90 text-white p-2 rounded-sm text-xs">
       {label && (
         <div className="dark:text-foreground-light text-white/60">
           {formatTimestamp(payload[0].payload.timestamp)}

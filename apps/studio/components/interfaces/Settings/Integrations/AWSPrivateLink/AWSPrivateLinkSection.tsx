@@ -1,38 +1,58 @@
+import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
 import {
-  ScaffoldContainer,
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import { ResourceList } from 'components/ui/Resource/ResourceList'
-import { UpgradeToPro } from 'components/ui/UpgradeToPro'
-import { useAWSAccountDeleteMutation } from 'data/aws-accounts/aws-account-delete-mutation'
-import { useAWSAccountsQuery } from 'data/aws-accounts/aws-accounts-query'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from 'lib/constants'
-import { Button, Card, CardContent, cn } from 'ui'
-import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
-import { IntegrationImageHandler } from '../IntegrationsSettings'
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  Button,
+  Card,
+  CardContent,
+  cn,
+} from 'ui'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
+
+import { IntegrationSectionIcon } from '../IntegrationsSettings'
+import { getConnectionTitle } from './AWSPrivateLink.utils'
 import { AWSPrivateLinkAccountItem } from './AWSPrivateLinkAccountItem'
+import { AWSPrivateLinkAttentionAdmonition } from './AWSPrivateLinkAttentionAdmonition'
 import { AWSPrivateLinkForm } from './AWSPrivateLinkForm'
+import { ResourceList } from '@/components/ui/Resource/ResourceList'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useAWSAccountDeleteMutation } from '@/data/aws-accounts/aws-account-delete-mutation'
+import type { AWSAccount } from '@/data/aws-accounts/aws-accounts-query'
+import { useAWSAccountsQuery } from '@/data/aws-accounts/aws-accounts-query'
+import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from '@/lib/constants'
 
 export const AWSPrivateLinkSection = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: accounts } = useAWSAccountsQuery({ projectRef: project?.ref })
 
-  const [selectedAccount, setSelectedAccount] = useState<any>(null)
+  const [selectedAccount, setSelectedAccount] = useState<AWSAccount>()
   const [showForm, setShowForm] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
-  const { mutate: deleteAccount, isPending: isDeleting } = useAWSAccountDeleteMutation({
+  const { mutateAsync: deleteAccount, isPending: isDeleting } = useAWSAccountDeleteMutation({
     onSuccess: () => {
-      toast.success('Account will be deleted shortly')
+      toast.success('Connection will be deleted shortly')
       setShowDeleteModal(false)
-      setSelectedAccount(null)
+      setShowForm(false)
+      setSelectedAccount(undefined)
     },
   })
 
@@ -40,103 +60,133 @@ export const AWSPrivateLinkSection = () => {
   const promptPlanUpgrade = IS_PLATFORM && !hasPrivateLinkAccess
 
   const onAddAccount = () => {
-    setSelectedAccount(null)
+    setSelectedAccount(undefined)
     setShowForm(true)
   }
 
-  const onEditAccount = (account: any) => {
+  const onEditAccount = (account: AWSAccount) => {
     setSelectedAccount(account)
     setShowForm(true)
   }
 
-  const onDeleteAccount = (account: any) => {
-    setSelectedAccount(account)
-    setShowDeleteModal(true)
+  const onConfirmDelete = async () => {
+    if (!selectedAccount || !project) return
+
+    await deleteAccount({
+      projectRef: project.ref,
+      awsAccountId: selectedAccount.aws_account_id,
+      databaseIdentifier:
+        selectedAccount.database_type === 'READ_REPLICA'
+          ? selectedAccount.database_identifier
+          : undefined,
+    })
   }
 
-  const onConfirmDelete = () => {
-    if (selectedAccount && project) {
-      deleteAccount({ projectRef: project.ref, awsAccountId: selectedAccount.aws_account_id })
-    }
+  let deleteDatabaseCopy = 'the primary database'
+  if (selectedAccount?.database_type === 'READ_REPLICA') {
+    deleteDatabaseCopy = selectedAccount.database_identifier
+      ? `the read replica (ID: ${formatDatabaseID(selectedAccount.database_identifier)})`
+      : 'the read replica (ID: Unknown identifier)'
   }
+
+  const deleteConnectionTitle = selectedAccount
+    ? getConnectionTitle({
+        account_name: selectedAccount.account_name,
+        aws_account_id: selectedAccount.aws_account_id,
+      })
+    : ''
+  const showDeleteConnectionId =
+    !!selectedAccount && deleteConnectionTitle === selectedAccount.aws_account_id
 
   return (
     <>
-      <ScaffoldContainer>
-        <ScaffoldSection className="py-12">
-          <ScaffoldSectionDetail title="AWS PrivateLink">
-            <p>Connect to your Supabase project from your AWS VPC using AWS PrivateLink.</p>
-            <IntegrationImageHandler title="aws" />
-          </ScaffoldSectionDetail>
-          <ScaffoldSectionContent>
-            <div className="space-y-6">
-              <div>
-                <h5 className="text-foreground mb-2">
-                  How does the AWS PrivateLink integration work?
-                </h5>
-                <p className="text-foreground-light text-sm mb-6">
-                  Connecting to AWS PrivateLink allows you to create a private connection between
-                  your AWS VPC and your Supabase project.
-                </p>
-                {promptPlanUpgrade && (
-                  <div className="mb-6">
-                    <UpgradeToPro
-                      layout="vertical"
-                      primaryText="Only available on Team or Enterprise Plan and above"
-                      secondaryText="Connect your AWS VPC privately to your Supabase project using AWS PrivateLink."
-                      buttonText="Upgrade to Team"
-                      source="aws-privatelink-integration"
+      <PageSection>
+        <PageSectionMeta>
+          <div className="flex flex-1 items-start gap-5">
+            <IntegrationSectionIcon title="aws" />
+            <PageSectionSummary>
+              <PageSectionTitle>AWS PrivateLink</PageSectionTitle>
+              <PageSectionDescription>
+                Private connectivity from a connected AWS VPC, without the public internet.
+              </PageSectionDescription>
+            </PageSectionSummary>
+          </div>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <div className="space-y-6">
+            {promptPlanUpgrade && (
+              <UpgradeToPro
+                layout="responsive"
+                primaryText="Available on Team and Enterprise plans"
+                secondaryText="Upgrade to add a PrivateLink connection."
+                buttonText="Upgrade to Team"
+                source="aws-privatelink-integration"
+              />
+            )}
+            <div className={cn(promptPlanUpgrade && 'opacity-25 pointer-events-none')}>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-medium text-foreground">Connections</h3>
+                <Button variant="default" icon={<Plus />} onClick={onAddAccount}>
+                  Add connection
+                </Button>
+              </div>
+              <AWSPrivateLinkAttentionAdmonition accounts={accounts} className="mb-3" />
+              {(accounts?.length ?? 0) > 0 ? (
+                <ResourceList>
+                  {accounts?.map((account) => (
+                    <AWSPrivateLinkAccountItem
+                      key={`${account.aws_account_id}-${account.database_identifier ?? 'primary'}`}
+                      account={account}
+                      onView={() => onEditAccount(account)}
                     />
-                  </div>
-                )}
-              </div>
-              <div className={cn(promptPlanUpgrade && 'opacity-25 pointer-events-none')}>
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-foreground text-sm">AWS Accounts</h3>
-                  <Button type={promptPlanUpgrade ? 'default' : 'primary'} onClick={onAddAccount}>
-                    Add Account
-                  </Button>
-                </div>
-                {(accounts?.length ?? 0) > 0 ? (
-                  <ResourceList>
-                    {accounts?.map((account) => (
-                      <AWSPrivateLinkAccountItem
-                        key={account.aws_account_id}
-                        {...account}
-                        onEdit={() => onEditAccount(account)}
-                        onDelete={() => onDeleteAccount(account)}
-                      />
-                    ))}
-                  </ResourceList>
-                ) : (
-                  <Card>
-                    <CardContent>
-                      <p className="text-foreground-lighter text-sm">No accounts connected</p>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
+                  ))}
+                </ResourceList>
+              ) : (
+                <Card>
+                  <CardContent>
+                    <p className="text-foreground-lighter text-sm">No connections yet</p>
+                  </CardContent>
+                </Card>
+              )}
             </div>
-          </ScaffoldSectionContent>
-        </ScaffoldSection>
-      </ScaffoldContainer>
+          </div>
+        </PageSectionContent>
+      </PageSection>
 
-      <AWSPrivateLinkForm account={selectedAccount} open={showForm} onOpenChange={setShowForm} />
+      <AWSPrivateLinkForm
+        account={selectedAccount}
+        open={showForm}
+        onOpenChange={setShowForm}
+        onDelete={() => setShowDeleteModal(true)}
+      />
 
-      <ConfirmationModal
-        variant="destructive"
-        visible={showDeleteModal}
-        title="Confirm to delete AWS Account"
-        confirmLabel="Delete"
-        loading={isDeleting}
-        onCancel={() => setShowDeleteModal(false)}
-        onConfirm={onConfirmDelete}
+      <AlertDialog
+        open={showDeleteModal}
+        onOpenChange={(open) => {
+          if (!open && !isDeleting) setShowDeleteModal(false)
+        }}
       >
-        <p className="text-sm text-foreground-light">
-          Are you sure you want to delete the AWS account connection for{' '}
-          {selectedAccount?.aws_account_id}?
-        </p>
-      </ConfirmationModal>
+        <AlertDialogContent size="small">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete connection</AlertDialogTitle>
+            <AlertDialogDescription>
+              This removes the PrivateLink connection for{' '}
+              {showDeleteConnectionId ? (
+                <code className="text-code-inline">{deleteConnectionTitle}</code>
+              ) : (
+                deleteConnectionTitle
+              )}{' '}
+              on {deleteDatabaseCopy}. Applications using this private path will lose access.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction variant="danger" loading={isDeleting} onClick={onConfirmDelete}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }

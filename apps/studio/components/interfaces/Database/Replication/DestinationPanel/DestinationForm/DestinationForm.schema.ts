@@ -1,37 +1,43 @@
 import * as z from 'zod'
 
-// [Joshen] JFYI if we plan to add another type here, I reckon we split this out into smaller components
-// then as FormSchema is getting quite complex with some fields that aren't necessary if the type is one or the other
-export const DestinationPanelFormSchema = z.object({
-  // Common fields
+import { AnalyticsBucketFormSchema } from './AnalyticsBucket/AnalyticsBucket.schema'
+import { BigQueryFormSchema } from './BigQuery/BigQuery.schema'
+import { ClickHouseFormSchema } from './ClickHouse/ClickHouse.schema'
+import { DuckLakeFormSchema } from './DuckLake/DuckLake.schema'
+import { SnowflakeFormSchema } from './Snowflake/Snowflake.schema'
+
+const CommonFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   publicationName: z.string().min(1, 'Publication is required'),
-  maxFillMs: z.number().min(1, 'Max Fill milliseconds should be greater than 0').int().optional(),
+  tableSyncCopyMode: z.enum([
+    'include_all_tables',
+    'skip_all_tables',
+    'include_tables',
+    'skip_tables',
+  ]),
+  tableSyncCopyTableIds: z.array(z.string()),
+  maxFillMs: z
+    .number()
+    .int('Batch wait time must be a whole number of milliseconds')
+    .min(0, 'Batch wait time must be 0 or greater')
+    .optional(),
   maxTableSyncWorkers: z
     .number()
-    .min(1, 'Max table sync workers should be greater than 0')
-    .int()
+    .min(1, 'Max table sync workers must be greater than 0')
+    .int('Max table sync workers must be a whole number')
     .optional(),
   maxCopyConnectionsPerTable: z
     .number()
     .int()
-    .min(1, 'Max copy connections per table should be greater than 0')
+    .min(1, 'Max copy connections per table must be greater than 0')
     .optional(),
   invalidatedSlotBehavior: z.enum(['error', 'recreate']).optional(),
-  // BigQuery fields
-  projectId: z.string().optional(),
-  datasetId: z.string().optional(),
-  serviceAccountKey: z.string().optional(),
-  connectionPoolSize: z.number().int().min(1).optional(),
-  maxStalenessMins: z.number().nonnegative().optional(),
-  // Analytics Bucket fields, only warehouse name and namespace are visible + editable fields
-  warehouseName: z.string().optional(),
-  namespace: z.string().optional(),
-  newNamespaceName: z.string().optional(),
-  catalogToken: z.string().optional(),
-  s3AccessKeyId: z.string().optional(),
-  s3SecretAccessKey: z.string().optional(),
-  s3Region: z.string().optional(),
 })
+
+export const DestinationPanelFormSchema = CommonFormSchema.extend(BigQueryFormSchema.shape)
+  .extend(AnalyticsBucketFormSchema.shape)
+  .extend(DuckLakeFormSchema.shape)
+  .extend(SnowflakeFormSchema.shape)
+  .extend(ClickHouseFormSchema.shape)
 
 export type DestinationPanelSchemaType = z.infer<typeof DestinationPanelFormSchema>

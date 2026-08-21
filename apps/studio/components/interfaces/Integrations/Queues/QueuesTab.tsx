@@ -1,11 +1,8 @@
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { useQueuesQuery } from 'data/database-queues/database-queues-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { RefreshCw, Search, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
 import { Button, cn, LoadingLine } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -13,6 +10,12 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { CreateQueueSheet } from './CreateQueueSheet'
 import { formatQueueColumns, prepareQueuesForDataGrid } from './Queues.utils'
+import { AlertError } from '@/components/ui/AlertError'
+import { useQueuesQuery } from '@/data/database-queues/database-queues-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const QueuesTab = () => {
   const router = useRouter()
@@ -26,6 +29,26 @@ export const QueuesTab = () => {
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
+
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  const clearSearch = () => {
+    setSearch('')
+    setSearchQuery('')
+  }
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search queues' }
+  )
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, clearSearch)
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, () => setCreateQueueSheetShown(true), {
+    label: 'Create queue',
+  })
 
   const {
     data: queues,
@@ -60,6 +83,7 @@ export const QueuesTab = () => {
         <div className="h-full w-full flex flex-col relative">
           <div className="bg-surface-200 py-3 px-10 flex items-center justify-between flex-wrap">
             <Input
+              ref={searchInputRef}
               size="tiny"
               className="w-52"
               placeholder="Search for a queue"
@@ -67,6 +91,7 @@ export const QueuesTab = () => {
               value={search ?? ''}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {
+                onSearchInputEscape(search ?? '', clearSearch)(e)
                 if (e.code === 'Enter' || e.code === 'NumpadEnter') setSearchQuery(search.trim())
               }}
               actions={[
@@ -74,12 +99,9 @@ export const QueuesTab = () => {
                   <Button
                     key="clear"
                     size="tiny"
-                    type="text"
+                    variant="text"
                     icon={<X />}
-                    onClick={() => {
-                      setSearch('')
-                      setSearchQuery('')
-                    }}
+                    onClick={clearSearch}
                     className="p-0 h-5 w-5"
                   />
                 ),
@@ -88,7 +110,7 @@ export const QueuesTab = () => {
 
             <div className="flex items-center gap-x-2">
               <Button
-                type="default"
+                variant="default"
                 icon={<RefreshCw />}
                 loading={isRefetching}
                 onClick={() => refetch()}
@@ -102,7 +124,7 @@ export const QueuesTab = () => {
           <LoadingLine loading={isLoading || isRefetching} />
 
           <DataGrid
-            className="flex-grow border-t-0"
+            className="grow border-t-0! border-b-0!"
             rowHeight={44}
             headerRowHeight={36}
             columns={columns}
@@ -111,7 +133,7 @@ export const QueuesTab = () => {
             rowClass={() => {
               return cn(
                 'cursor-pointer',
-                '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+                '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
                 '[&>.rdg-cell:first-child>div]:ml-8'
               )
             }}

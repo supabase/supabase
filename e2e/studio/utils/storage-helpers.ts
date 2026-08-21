@@ -1,7 +1,11 @@
 import { expect, Page } from '@playwright/test'
-import { waitForApiResponse } from './wait-for-response.js'
-import { toUrl } from './to-url.js'
+
 import { dismissToastsIfAny } from './dismiss-toast.js'
+import { toUrl } from './to-url.js'
+import { waitForApiResponse } from './wait-for-response.js'
+
+/** Inline rename/create input in the storage file explorer (not the search box). */
+export const getStorageRowNameInput = (page: Page) => page.locator('.storage-row-input')
 
 /**
  * Navigates to a the storage home view
@@ -97,16 +101,13 @@ export const deleteBucket = async (page: Page, ref: string, bucketName: string) 
   await page.getByRole('button', { name: 'Delete bucket' }).click()
   await apiPromise
 
-  // Verify bucket was deleted - should redirect to files page
-  await expect(page, 'Should redirect to storage files page after deletion').toHaveURL(
-    new RegExp(`/storage/files$`)
-  )
-
-  // Verify bucket is no longer in the list
+  // Verify bucket is no longer in the list. The post-delete redirect to
+  // /storage/files can race other history updates, so asserting the row
+  // is gone is a more stable signal that the delete actually succeeded.
   await expect(
     page.getByRole('row').filter({ hasText: bucketName }),
     `Bucket ${bucketName} should not be visible after deletion`
-  ).not.toBeVisible()
+  ).not.toBeVisible({ timeout: 10000 })
 }
 
 /**
@@ -151,8 +152,8 @@ export const createFolder = async (page: Page, folderName: string) => {
   await expect(createFolderBtn, 'Create folder button should be visible').toBeVisible()
   await createFolderBtn.click()
 
-  // A textbox with "Untitled folder" appears - type the new name
-  const nameInput = page.getByRole('textbox')
+  // Inline folder name input appears (search box is a separate textbox)
+  const nameInput = getStorageRowNameInput(page)
   await expect(nameInput, 'Folder name input should be visible').toBeVisible()
   await nameInput.fill(folderName)
   await nameInput.press('Enter')
@@ -175,14 +176,14 @@ export const uploadFile = async (page: Page, filePath: string, fileName: string)
   const fileInput = page.locator('input[type="file"]')
   await fileInput.setInputFiles(filePath)
 
-  // Wait for upload to complete - file should appear in the explorer
-  await page.waitForTimeout(15_000) // Allow time for upload to process
-
+  await expect(page.getByRole('status')).not.toBeVisible()
   // Verify file appears in the explorer by title
   await expect(
     page.getByTitle(fileName),
     `File ${fileName} should be visible in explorer after upload`
   ).toBeVisible()
+  // Verify its action button is visible too as it means the upload is indeed complete
+  await expect(page.getByRole('button', { name: `${fileName} actions` })).toBeVisible()
 }
 
 /**
@@ -225,8 +226,8 @@ export const renameItem = async (page: Page, oldName: string, newName: string) =
   // Click rename option from context menu
   await page.getByRole('menuitem', { name: 'Rename' }).click()
 
-  // A textbox appears - clear and type new name
-  const nameInput = page.getByRole('textbox')
+  const nameInput = getStorageRowNameInput(page)
+  await expect(nameInput, 'Rename input should be visible').toBeVisible()
   await nameInput.fill(newName)
   await nameInput.press('Enter')
 

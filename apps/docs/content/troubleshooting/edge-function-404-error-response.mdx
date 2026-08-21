@@ -1,0 +1,142 @@
+---
+title = "Edge Function 404 error response"
+topics = [ "functions" ]
+keywords = [ "404", "error" ]
+database_id = "a3cfff33-d640-4395-99bc-a110b7fb637c"
+
+[[errors]]
+http_status_code = 404
+code = "NOT_FOUND"
+message = "Requested function was not found"
+
+[[errors]]
+http_status_code = 404
+code = "NOT_FOUND_FUNCTION_BLOB"
+message = "Function deployment bundle not found"
+---
+
+The edge function is not recognized by Supabase, or its deployed bundle cannot be found.
+
+## Context for the error
+
+If the Supabase Edge Function Runtime does not recognize the function specified in the URL endpoint:
+
+```sh
+https://PROJECT_REF.supabase.co/functions/v1/UNRECOGNIZED_FUNCTION_NAME
+```
+
+then the runtime will return a 404 error.
+
+## Solving the error
+
+### Step 1: Identifying the error
+
+<Admonition type="note">
+
+If the tests return a 404 but do not match the criteria below, the error is coming from your app's logic.
+
+</Admonition>
+
+### Inspecting the return message from the request
+
+<Admonition type="caution">
+
+Platform 404 errors cannot be detected in the browser. Instead, to confirm 404s from the browser, you must [check the logs](#inspecting-the-logs) instead.
+
+Browsers misreport 404s as generic `CORS errors`. As a result, the [Supabase JavaScript client](/docs/reference/javascript/introduction) surfaces only a generic message: `Failed to send a request to the Edge Function`.
+
+</Admonition>
+
+When an edge function fails due to a platform 404 error, it will return the error:
+
+```json
+{
+  "code": "NOT_FOUND",
+  "message": "Requested function was not found"
+}
+```
+
+A different platform 404 error, `NOT_FOUND_FUNCTION_BLOB`, can occur when the function name is recognized but the runtime cannot find the deployed bundle. This can happen even when the function appears as `ACTIVE` in the dashboard, because the status shows that the function record exists while the actual deployment bundle is missing or inaccessible:
+
+```json
+{
+  "code": "NOT_FOUND_FUNCTION_BLOB",
+  "message": "Function deployment bundle not found"
+}
+```
+
+The difference between the two errors is:
+
+- `NOT_FOUND`: The function name in the request URL is not recognized.
+- `NOT_FOUND_FUNCTION_BLOB`: The function name is recognized, but the runtime cannot find the deployed bundle.
+
+### Inspecting the logs
+
+<Admonition type='note'>
+
+Always configure an appropriate time frame when querying the logs
+
+        ![image](/docs/img/troubleshooting/edge_function_404_set_timeframe.png)
+
+</Admonition>
+
+You cannot inspect the function dashboard to find platform 404 errors, instead, run the below query in the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs&content=select%20distinct%0A%20%20log_attributes%5B%27request.pathname%27%5D%20as%20function_name%2C%0A%20%20log_attributes%5B%27response.status_code%27%5D%20as%20status_code%2C%0A%20%20case%0A%20%20%20%20when%20log_attributes%5B%27execution_id%27%5D%20%3D%20%27%27%20then%20%27FUNCTION_NOT_FOUND%27%0A%20%20%20%20else%20%27FUNCTION%20RECOGNIZED%3A%20custom%20404%20message%20in%20app%20logic%27%0A%20%20end%20as%20type_of_404%0Afrom%20logs%0Awhere%0A%20%20source%20%3D%20%27function_edge_logs%27%0A%20%20and%20toInt32OrZero%28log_attributes%5B%27response.status_code%27%5D%29%20%3D%20404%0Alimit%2010%3B). The results show all requests that reached Supabase but were rejected as unrecognizable.
+
+```sql
+select distinct
+  log_attributes['request.pathname'] as function_name,
+  log_attributes['response.status_code'] as status_code,
+  case
+    when log_attributes['execution_id'] = '' then 'FUNCTION_NOT_FOUND'
+    else 'FUNCTION RECOGNIZED: custom 404 message in app logic'
+  end as type_of_404
+from logs
+where
+  source = 'function_edge_logs'
+  and toInt32OrZero(log_attributes['response.status_code']) = 404
+limit 10;
+```
+
+### Step 2: Check the function for typos
+
+In your code, make sure your function name doesn't have any typos, such as:
+
+- miscapitalization
+- em-dashes instead of dashes
+- misplaced characters
+- unnecessary slashes `///`
+
+### Step 3: Try calling the function from the dashboard
+
+When selecting your function in the [Function Dashboard](/dashboard/project/_/functions), you should have the option to make a test call:
+
+![image](/docs/img/troubleshooting/edge_function_404_test_call.png)
+
+If the call works, consider double checking your code for typos or to see if it is overwriting the function name dynamically. Otherwise, go on to step 4.
+
+### Step 4: Redeploy the function
+
+If step 3 fails, it may be a sign of an internal bug and it may be necessary to redeploy your function. The same applies if you see the `NOT_FOUND_FUNCTION_BLOB` error, which means the function is recognized but its deployed bundle cannot be found. This can occur even when the function appears as `ACTIVE` in the dashboard.
+
+This can be done within the [Function Dashboard](/dashboard/project/_/functions) under the respective function's code tab:
+
+![image](/docs/img/troubleshooting/edge_function_404_redeploy.png)
+
+Alternatively, if you develop locally, you can redeploy the function with the [Supabase CLI](/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=macos):
+
+```sh
+# Redeploy one affected function
+supabase functions deploy FUNCTION_NAME
+
+# Or redeploy all functions if several are affected
+supabase functions deploy
+```
+
+After redeploying, retry the request. If the error persists, write in a ticket to [Supabase Support](/dashboard/support/new).
+
+## Additional resources
+
+- [Securing Edge Functions](/docs/guides/functions/auth)
+- [Debugging Edge Functions](/docs/guides/functions/logging)
+- [Quickstart Deployment: Dashboard](/docs/guides/functions/quickstart-dashboard)
+- [Quickstart Deployment: CLI](/docs/guides/functions/quickstart)

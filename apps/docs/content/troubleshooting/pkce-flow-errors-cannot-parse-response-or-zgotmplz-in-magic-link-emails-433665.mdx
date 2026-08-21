@@ -32,7 +32,6 @@ The email templating system often uses a language like Go, which has built-in se
 You may observe two distinct issues:
 
 1.  **The `#ZgotmplZ` Error**:
-
     - **Cause**: This error occurs when you attempt to use a non-standard URL scheme (like `your-app-scheme://` for a mobile app deep link) directly within a template variable like `{{ .SiteURL }}` in your email templates. Go's security features sanitize this perceived "unsafe" URL, replacing it with the `#ZgotmplZ` placeholder. This prevents the link from being rendered correctly and thus from working.
 
 2.  **The 'Cannot Parse Response' Error**:
@@ -62,7 +61,7 @@ Now that your `SITE_URL` is correctly set to a web domain, you can safely use th
 
 This is the most crucial step to resolve both the broken PKCE handshake and the email link scanner issues.
 
-- **Create a Web Callback Page**: Develop a simple web page on your `SITE_URL` (e.g., `https://example.com/auth/callback`). This page will be the initial destination when the user clicks the magic link in the email.
+- **Create a Web Callback Page**: Create a web page on your `SITE_URL` (e.g., `https://example.com/auth/callback`). This page is the initial destination when the user clicks the magic link in the email.
 - **Add a User-Initiated Button**: On this callback page, include a button or explicit action that the user _must_ click to proceed. For example, a button labeled "Verify & Open App."
   - **Why this is essential**:
     - It prevents email link scanners from automatically triggering the final deep link, ensuring the one-time token is not consumed prematurely.

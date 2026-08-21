@@ -1,20 +1,17 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { Background, ColorMode, ReactFlow, ReactFlowProvider, useReactFlow } from '@xyflow/react'
 import { useParams } from 'common'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo } from 'react'
-import ReactFlow, { Background, ReactFlowProvider, useReactFlow } from 'reactflow'
 
-import { getStatusName } from '../Pipeline.utils'
-import { PrimaryDatabaseNode, ReadReplicaNode, ReplicationNode } from './Nodes'
+import { PrimaryDatabaseNode, ReplicationNode } from './Nodes'
 import { getDagreGraphLayout } from './ReplicationDiagram.utils'
-import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
-import { replicationKeys } from '@/data/replication/keys'
-import { ReplicationPipelineStatusResponse } from '@/data/replication/pipeline-status-query'
-import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import { timeout } from '@/lib/helpers'
 
-import 'reactflow/dist/style.css'
+import '@xyflow/react/dist/style.css'
+
+import { SmoothstepEdge } from './Edges'
+import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 
 export const ReplicationDiagram = () => {
   return (
@@ -27,36 +24,30 @@ export const ReplicationDiagram = () => {
 const nodeTypes = {
   primary: PrimaryDatabaseNode,
   replication: ReplicationNode,
-  readReplica: ReadReplicaNode,
 }
+
+const edgeTypes = { smoothstep: SmoothstepEdge }
 
 const ReplicationDiagramContent = () => {
   const reactFlow = useReactFlow()
   const { resolvedTheme } = useTheme()
-  const queryClient = useQueryClient()
   const { ref: projectRef = 'default' } = useParams()
 
-  const { data: databases = [], isSuccess: isSuccessReplicas } = useReadReplicasQuery({
-    projectRef,
-  })
-  const readReplicas = databases.filter((x) => x.identifier !== projectRef)
-
-  const { data, isSuccess: isSuccessDestinations } = useReplicationDestinationsQuery({
+  const {
+    data,
+    error: destinationsError,
+    isSuccess: isSuccessDestinations,
+    isError: isErrorDestinations,
+  } = useReplicationDestinationsQuery({
     projectRef,
   })
   const destinations = useMemo(() => data?.destinations ?? [], [data])
-
-  const { data: pipelinesData } = useReplicationPipelinesQuery({ projectRef })
+  const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
+  const skipRenderingDestinations = isErrorDestinations && isLocalETLNotSetUp
 
   const nodes = useMemo(() => {
     return [
       { id: projectRef, type: 'primary', data: {}, position: { x: 0, y: 5 } },
-      ...readReplicas.map((x) => ({
-        id: x.identifier,
-        type: 'readReplica',
-        data: {},
-        position: { x: 0, y: 0 },
-      })),
       ...destinations.map((x) => ({
         id: x.id.toString(),
         type: 'replication',
@@ -64,49 +55,20 @@ const ReplicationDiagramContent = () => {
         position: { x: 0, y: 0 },
       })),
     ]
-  }, [destinations, projectRef, readReplicas])
+  }, [destinations, projectRef])
 
   const edges = useMemo(() => {
-    return [
-      ...readReplicas.map((x) => {
-        const isReplicating = x.status === 'ACTIVE_HEALTHY'
+    const shiftEdgeEnd = destinations.length > 1
 
-        return {
-          id: `${projectRef}-${x.identifier}`,
-          source: projectRef,
-          target: x.identifier,
-          type: 'smoothstep',
-          className: '!cursor-default',
-          animated: isReplicating,
-          style: {
-            opacity: isReplicating ? 1 : 0.4,
-            strokeDasharray: isReplicating ? undefined : '5 5',
-          },
-        }
-      }),
-      ...destinations.map((x) => {
-        const pipeline = (pipelinesData?.pipelines ?? []).find((p) => p.destination_id === x.id)
-        const pipelineStatus = queryClient.getQueryData(
-          replicationKeys.pipelinesStatus(projectRef, pipeline?.id)
-        ) as ReplicationPipelineStatusResponse
-        const statusName = getStatusName(pipelineStatus?.status)
-        const isReplicating = statusName === 'started'
-
-        return {
-          id: `${projectRef}-${x.id}`,
-          source: projectRef,
-          target: x.id.toString(),
-          type: 'smoothstep',
-          className: '!cursor-default',
-          animated: isReplicating,
-          style: {
-            opacity: isReplicating ? 1 : 0.4,
-            strokeDasharray: isReplicating ? undefined : '5 5',
-          },
-        }
-      }),
-    ]
-  }, [destinations, pipelinesData?.pipelines, projectRef, queryClient, readReplicas])
+    return destinations.map((x) => ({
+      id: `${projectRef}-${x.id}`,
+      source: projectRef,
+      target: x.id.toString(),
+      type: 'smoothstep',
+      className: 'cursor-default!',
+      data: { type: 'etl', identifier: x.id.toString(), shiftEdgeEnd },
+    }))
+  }, [destinations, projectRef])
 
   const backgroundPatternColor =
     resolvedTheme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.4)'
@@ -122,12 +84,16 @@ const ReplicationDiagramContent = () => {
   }
 
   useEffect(() => {
-    if (nodes.length > 0 && isSuccessDestinations && isSuccessReplicas) setReactFlow()
-  }, [nodes, isSuccessDestinations, isSuccessReplicas])
+    if (nodes.length > 0 && (isSuccessDestinations || skipRenderingDestinations)) {
+      setReactFlow()
+    }
+  }, [nodes, isSuccessDestinations, skipRenderingDestinations])
 
   return (
-    <div className="nowheel relative min-h-[350px]">
+    <div className="nowheel relative h-[350px] w-full border border-muted rounded-md overflow-hidden">
       <ReactFlow
+        // FIXME: https://github.com/xyflow/xyflow/issues/4876
+        colorMode={'' as unknown as ColorMode}
         fitView
         fitViewOptions={{ minZoom: 0.8, maxZoom: 0.9 }}
         className="bg"
@@ -137,10 +103,11 @@ const ReplicationDiagramContent = () => {
         nodesConnectable={false}
         zoomOnDoubleClick={false}
         edgesFocusable={false}
-        edgesUpdatable={false}
+        edgesReconnectable={false}
         defaultNodes={[]}
         defaultEdges={[]}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         proOptions={{ hideAttribution: true }}
       >
         <Background color={backgroundPatternColor} />

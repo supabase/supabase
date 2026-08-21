@@ -1,44 +1,45 @@
 import { DevelopersDropdown } from 'components/Nav/DevelopersDropdown'
 import { ProductDropdown } from 'components/Nav/ProductDropdown'
 import { SolutionsDropdown } from 'components/Nav/SolutionsDropdown'
-
 import { data as DevelopersData } from 'data/Developers'
 import MainProductsData from 'data/MainProducts'
 import { navData as SolutionsData } from 'data/Solutions'
 
+export type Menu = ReturnType<typeof getMenu>
+
 export const getMenu = () => ({
   primaryNav: [
     {
-      title: 'Product',
+      title: 'Product' as const,
       hasDropdown: true,
       dropdown: <ProductDropdown />,
       dropdownContainerClassName: 'rounded-xl',
       subMenu: MainProductsData,
     },
     {
-      title: 'Developers',
+      title: 'Developers' as const,
       hasDropdown: true,
       dropdown: <DevelopersDropdown />,
       dropdownContainerClassName: 'rounded-xl',
       subMenu: DevelopersData,
     },
     {
-      title: 'Solutions',
+      title: 'Solutions' as const,
       hasDropdown: true,
       dropdown: <SolutionsDropdown />,
       dropdownContainerClassName: 'rounded-xl',
       subMenu: SolutionsData,
     },
     {
-      title: 'Pricing',
+      title: 'Pricing' as const,
       url: '/pricing',
     },
     {
-      title: 'Docs',
+      title: 'Docs' as const,
       url: '/docs',
     },
     {
-      title: 'Blog',
+      title: 'Blog' as const,
       url: '/blog',
     },
   ],

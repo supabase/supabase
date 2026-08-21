@@ -5,20 +5,20 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query'
+import { components } from 'api-types'
 import { useMemo } from 'react'
 
-import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import { MAX_RETRY_FAILURE_COUNT } from 'data/query-client'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
+import { getBucketNumberEstimate, getBucketNumberEstimateKey } from './buckets-max-size-limit-query'
+import { storageKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { MAX_RETRY_FAILURE_COUNT } from '@/data/query-client'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
 import {
   ResponseError,
   type UseCustomInfiniteQueryOptions,
   type UseCustomQueryOptions,
-} from 'types'
-import { getBucketNumberEstimate, getBucketNumberEstimateKey } from './buckets-max-size-limit-query'
-import { storageKeys } from './keys'
+} from '@/types'
 
 export type BucketsVariables = { projectRef?: string }
 
@@ -227,6 +227,11 @@ export const useBucketInfoQueryPreferCached = (bucketId?: string, projectRef?: s
 
 const shouldRetryBucketsQuery = (failureCount: number, error: unknown) => {
   if (error instanceof ResponseError) {
+    // If the bucket doesn't exist or was deleted, don't retry — it will never succeed.
+    if (error.code === 404) {
+      return false
+    }
+
     if (
       error.message.includes('Missing tenant config') ||
       error.message.includes('Project has no active API keys')

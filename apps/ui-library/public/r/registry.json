@@ -1,8 +1,24 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
-  "name": "Supabase UI Library",
-  "homepage": "https://supabase.com/ui",
+  "name": "Supabase Library",
+  "homepage": "https://supabase.com/library",
   "items": [
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "safe-next-path",
+      "type": "registry:lib",
+      "title": "Safe next path",
+      "description": "Validates same-origin paths before redirecting.",
+      "registryDependencies": [],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "registry/default/blocks/safe-next-path/lib/safe-next-path.ts",
+          "type": "registry:lib",
+          "target": "lib/safe-next-path.ts"
+        }
+      ]
+    },
     {
       "name": "password-based-auth-nextjs",
       "type": "registry:block",
@@ -12,7 +28,8 @@
         "button",
         "card",
         "input",
-        "label"
+        "label",
+        "https://supabase.com/library/r/safe-next-path.json"
       ],
       "dependencies": [
         "@supabase/ssr@latest",
@@ -112,7 +129,8 @@
         "button",
         "card",
         "input",
-        "label"
+        "label",
+        "https://supabase.com/library/r/safe-next-path.json"
       ],
       "files": [
         {
@@ -154,7 +172,8 @@
         "button",
         "card",
         "input",
-        "label"
+        "label",
+        "https://supabase.com/library/r/safe-next-path.json"
       ],
       "dependencies": [
         "@supabase/ssr@latest",
@@ -232,7 +251,8 @@
         "button",
         "card",
         "input",
-        "label"
+        "label",
+        "https://supabase.com/library/r/safe-next-path.json"
       ],
       "dependencies": [
         "@supabase/ssr@latest",
@@ -326,7 +346,8 @@
       "description": "Social Auth flow for Nextjs and Supabase",
       "registryDependencies": [
         "button",
-        "card"
+        "card",
+        "https://supabase.com/library/r/safe-next-path.json"
       ],
       "dependencies": [
         "@supabase/ssr@latest",
@@ -420,7 +441,8 @@
       "description": "Social Auth flow for React Router and Supabase",
       "registryDependencies": [
         "button",
-        "card"
+        "card",
+        "https://supabase.com/library/r/safe-next-path.json"
       ],
       "dependencies": [
         "@supabase/ssr@latest",
@@ -481,7 +503,8 @@
       "description": "Social Auth flow for TanStack and Supabase",
       "registryDependencies": [
         "button",
-        "card"
+        "card",
+        "https://supabase.com/library/r/safe-next-path.json"
       ],
       "dependencies": [
         "@supabase/ssr@latest",
@@ -1401,6 +1424,312 @@
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-flow-nextjs",
+      "type": "registry:component",
+      "title": "Realtime Flow",
+      "description": "Real-time flow diagram editor for collaborative applications.",
+      "registryDependencies": [],
+      "dependencies": [
+        "@xyflow/react@latest",
+        "@supabase-labs/y-supabase@latest",
+        "y-protocols@latest",
+        "yjs@latest",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-flow/hooks/use-realtime-flow.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-flow/components/realtime-flow.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.",
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-flow-react",
+      "type": "registry:component",
+      "title": "Realtime Flow",
+      "description": "Real-time flow diagram editor for collaborative applications.",
+      "registryDependencies": [],
+      "dependencies": [
+        "@xyflow/react@latest",
+        "@supabase-labs/y-supabase@latest",
+        "y-protocols@latest",
+        "yjs@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-flow/hooks/use-realtime-flow.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-flow/components/realtime-flow.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/react/lib/supabase/client.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-flow-react-router",
+      "type": "registry:component",
+      "title": "Realtime Flow",
+      "description": "Real-time flow diagram editor for collaborative applications.",
+      "registryDependencies": [],
+      "dependencies": [
+        "@xyflow/react@latest",
+        "@supabase-labs/y-supabase@latest",
+        "y-protocols@latest",
+        "yjs@latest",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-flow/hooks/use-realtime-flow.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-flow/components/realtime-flow.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-flow-tanstack",
+      "type": "registry:component",
+      "title": "Realtime Flow",
+      "description": "Real-time flow diagram editor for collaborative applications.",
+      "registryDependencies": [],
+      "dependencies": [
+        "@xyflow/react@latest",
+        "@supabase-labs/y-supabase@latest",
+        "y-protocols@latest",
+        "yjs@latest",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-flow/hooks/use-realtime-flow.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-flow/components/realtime-flow.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-monaco-nextjs",
+      "type": "registry:component",
+      "title": "Realtime Monaco",
+      "description": "Real-time Monaco editor for collaborative applications.",
+      "registryDependencies": [],
+      "dependencies": [
+        "@monaco-editor/react@latest",
+        "y-monaco@latest",
+        "yjs@latest",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-monaco/hooks/use-connect-on-mount.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-monaco/components/realtime-monaco.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.",
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-monaco-react",
+      "type": "registry:component",
+      "title": "Realtime Monaco",
+      "description": "Real-time Monaco editor for collaborative applications.",
+      "registryDependencies": [],
+      "dependencies": [
+        "@monaco-editor/react@latest",
+        "y-monaco@latest",
+        "yjs@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-monaco/hooks/use-connect-on-mount.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-monaco/components/realtime-monaco.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/react/lib/supabase/client.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-monaco-react-router",
+      "type": "registry:component",
+      "title": "Realtime Monaco",
+      "description": "Real-time Monaco editor for collaborative applications.",
+      "registryDependencies": [],
+      "dependencies": [
+        "@monaco-editor/react@latest",
+        "y-monaco@latest",
+        "yjs@latest",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-monaco/hooks/use-connect-on-mount.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-monaco/components/realtime-monaco.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-monaco-tanstack",
+      "type": "registry:component",
+      "title": "Realtime Monaco",
+      "description": "Real-time Monaco editor for collaborative applications.",
+      "registryDependencies": [],
+      "dependencies": [
+        "@monaco-editor/react@latest",
+        "y-monaco@latest",
+        "yjs@latest",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-monaco/hooks/use-connect-on-mount.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-monaco/components/realtime-monaco.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
       "name": "infinite-query-hook",
       "type": "registry:block",
       "title": "Infinite Query Hook",
@@ -1416,6 +1745,212 @@
           "type": "registry:hook"
         }
       ]
+    },
+    {
+      "name": "oauth-consent-nextjs",
+      "type": "registry:block",
+      "title": "OAuth Consent for Next.js",
+      "description": "OAuth 2.1 consent screen and route for an existing authenticated application.",
+      "docs": "After installation, set the following in `supabase/config.toml`. Recent CLI versions already write an `[auth.oauth_server]` section with `enabled = false` — edit that section rather than adding a second one:\n\n```toml\n[auth.oauth_server]\nenabled = true\nauthorization_url_path = \"/oauth/consent\"\n```\n\nYou'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.",
+      "registryDependencies": [
+        "button",
+        "card",
+        "https://supabase.com/library/r/safe-next-path.json"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/oauth-consent/components/oauth-consent.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/oauth-consent/hooks/use-oauth-consent.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/oauth-consent-nextjs/app/oauth/consent/page.tsx",
+          "type": "registry:page",
+          "target": "app/oauth/consent/page.tsx"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": ""
+      }
+    },
+    {
+      "name": "oauth-consent-react",
+      "type": "registry:block",
+      "title": "OAuth Consent for React",
+      "description": "OAuth 2.1 consent component for an existing authenticated application.",
+      "docs": "After installation, set the following in `supabase/config.toml`. Recent CLI versions already write an `[auth.oauth_server]` section with `enabled = false` — edit that section rather than adding a second one:\n\n```toml\n[auth.oauth_server]\nenabled = true\nauthorization_url_path = \"/oauth/consent\"\n```\n\nYou'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
+      "registryDependencies": [
+        "button",
+        "card",
+        "https://supabase.com/library/r/safe-next-path.json"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/oauth-consent/components/oauth-consent.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/oauth-consent/hooks/use-oauth-consent.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react/lib/supabase/client.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest"
+      ],
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
+      }
+    },
+    {
+      "name": "oauth-consent-react-router",
+      "type": "registry:block",
+      "title": "OAuth Consent for React Router",
+      "description": "OAuth 2.1 consent screen and route for an existing authenticated application.",
+      "docs": "After installation, set the following in `supabase/config.toml`. Recent CLI versions already write an `[auth.oauth_server]` section with `enabled = false` — edit that section rather than adding a second one:\n\n```toml\n[auth.oauth_server]\nenabled = true\nauthorization_url_path = \"/oauth/consent\"\n```\n\nYou'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
+      "registryDependencies": [
+        "button",
+        "card",
+        "https://supabase.com/library/r/safe-next-path.json"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/oauth-consent/components/oauth-consent.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/oauth-consent/hooks/use-oauth-consent.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/oauth-consent-react-router/app/routes/oauth.consent.tsx",
+          "type": "registry:file",
+          "target": "app/routes/oauth.consent.tsx"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
+      }
+    },
+    {
+      "name": "oauth-consent-tanstack",
+      "type": "registry:block",
+      "title": "OAuth Consent for TanStack Start",
+      "description": "OAuth 2.1 consent screen and route for an existing authenticated application.",
+      "docs": "After installation, set the following in `supabase/config.toml`. Recent CLI versions already write an `[auth.oauth_server]` section with `enabled = false` — edit that section rather than adding a second one:\n\n```toml\n[auth.oauth_server]\nenabled = true\nauthorization_url_path = \"/oauth/consent\"\n```\n\nYou'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
+      "registryDependencies": [
+        "button",
+        "card",
+        "https://supabase.com/library/r/safe-next-path.json"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/oauth-consent/components/oauth-consent.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/oauth-consent/hooks/use-oauth-consent.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/oauth-consent-tanstack/routes/oauth/consent.tsx",
+          "type": "registry:file",
+          "target": "routes/oauth/consent.tsx"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "tanstack-db-nextjs",
+      "type": "registry:block",
+      "title": "TanStack DB for Next.js and Supabase",
+      "description": "TanStack DB integration with Supabase collections for type-safe database operations",
+      "registryDependencies": [
+        "button",
+        "input",
+        "label",
+        "sheet"
+      ],
+      "dependencies": [
+        "supa-tdb-collection@latest",
+        "zod@latest",
+        "@tanstack/db@latest",
+        "@tanstack/react-db@latest",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.",
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": ""
+      }
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
@@ -2078,44 +2613,230 @@
       ]
     },
     {
-      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
-      "name": "ai-editor-rules",
-      "type": "registry:file",
-      "title": "Prompt rules for AI Editors",
-      "description": "Prompts for working with Supabase using AI-powered IDE tools",
-      "registryDependencies": [],
-      "dependencies": [],
+      "name": "current-user-avatar-nuxtjs",
+      "type": "registry:block",
+      "title": "Current User Avatar",
+      "description": "Component which renders the current user's avatar.",
+      "registryDependencies": [
+        "avatar"
+      ],
       "files": [
         {
-          "path": "registry/default/ai-editor-rules/create-db-functions.mdc",
-          "type": "registry:file",
-          "target": "~/.cursor/rules/create-db-functions.mdc"
+          "path": "registry/default/current-user-avatar/nuxtjs/app/components/current-user-avatar.vue",
+          "type": "registry:component",
+          "target": "app/components/current-user-avatar.vue"
         },
         {
-          "path": "registry/default/ai-editor-rules/create-migration.mdc",
-          "type": "registry:file",
-          "target": "~/.cursor/rules/create-migration.mdc"
+          "path": "registry/default/current-user-avatar/nuxtjs/app/composables/useCurrentUserName.ts",
+          "type": "registry:component",
+          "target": "app/composables/useCurrentUserName.ts"
         },
         {
-          "path": "registry/default/ai-editor-rules/create-rls-policies.mdc",
-          "type": "registry:file",
-          "target": "~/.cursor/rules/create-rls-policies.mdc"
-        },
-        {
-          "path": "registry/default/ai-editor-rules/postgres-sql-style-guide.mdc",
-          "type": "registry:file",
-          "target": "~/.cursor/rules/postgres-sql-style-guide.mdc"
-        },
-        {
-          "path": "registry/default/ai-editor-rules/writing-supabase-edge-functions.mdc",
-          "type": "registry:file",
-          "target": "~/.cursor/rules/writing-supabase-edge-functions.mdc"
-        },
-        {
-          "path": "registry/default/ai-editor-rules/use-realtime.mdc",
-          "type": "registry:file",
-          "target": "~/.cursor/rules/use-realtime.mdc"
+          "path": "registry/default/current-user-avatar/nuxtjs/app/composables/useCurrentUserImage.ts",
+          "type": "registry:component",
+          "target": "app/composables/useCurrentUserImage.ts"
         }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest"
+      ]
+    },
+    {
+      "name": "current-user-avatar-vue",
+      "type": "registry:block",
+      "title": "Current User Avatar",
+      "description": "Component which renders the current user's avatar.",
+      "registryDependencies": [
+        "avatar"
+      ],
+      "files": [
+        {
+          "path": "registry/default/current-user-avatar/vue/components/current-user-avatar.vue",
+          "type": "registry:component",
+          "target": "components/current-user-avatar.vue"
+        },
+        {
+          "path": "registry/default/current-user-avatar/vue/composables/useCurrentUserName.ts",
+          "type": "registry:component",
+          "target": "composables/useCurrentUserName.ts"
+        },
+        {
+          "path": "registry/default/current-user-avatar/vue/composables/useCurrentUserImage.ts",
+          "type": "registry:component",
+          "target": "composables/useCurrentUserImage.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest"
+      ]
+    },
+    {
+      "name": "realtime-avatar-stack-nuxtjs",
+      "type": "registry:block",
+      "title": "Realtime Avatar Stack",
+      "description": "Component which stack of avatars, tracked by realtime presence.",
+      "registryDependencies": [
+        "avatar",
+        "tooltip"
+      ],
+      "files": [
+        {
+          "path": "registry/default/realtime-avatar-stack/nuxtjs/app/components/realtime-avatar-stack.vue",
+          "type": "registry:component",
+          "target": "app/components/realtime-avatar-stack.vue"
+        },
+        {
+          "path": "registry/default/realtime-avatar-stack/nuxtjs/app/components/avatar-stack.vue",
+          "type": "registry:component",
+          "target": "app/components/avatar-stack.vue"
+        },
+        {
+          "path": "registry/default/realtime-avatar-stack/nuxtjs/app/composables/useCurrentUserImage.ts",
+          "type": "registry:component",
+          "target": "app/composables/useCurrentUserImage.ts"
+        },
+        {
+          "path": "registry/default/realtime-avatar-stack/nuxtjs/app/composables/useCurrentUserName.ts",
+          "type": "registry:component",
+          "target": "app/composables/useCurrentUserName.ts"
+        },
+        {
+          "path": "registry/default/realtime-avatar-stack/nuxtjs/app/composables/useRealtimePresenceRoom.ts",
+          "type": "registry:component",
+          "target": "app/composables/useRealtimePresenceRoom.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest"
+      ]
+    },
+    {
+      "name": "realtime-avatar-stack-vue",
+      "type": "registry:block",
+      "title": "Realtime Avatar Stack",
+      "description": "Component which stack of avatars, tracked by realtime presence.",
+      "registryDependencies": [
+        "avatar",
+        "tooltip"
+      ],
+      "files": [
+        {
+          "path": "registry/default/realtime-avatar-stack/vue/components/realtime-avatar-stack.vue",
+          "type": "registry:component",
+          "target": "components/realtime-avatar-stack.vue"
+        },
+        {
+          "path": "registry/default/realtime-avatar-stack/vue/components/avatar-stack.vue",
+          "type": "registry:component",
+          "target": "components/avatar-stack.vue"
+        },
+        {
+          "path": "registry/default/realtime-avatar-stack/vue/composables/useCurrentUserImage.ts",
+          "type": "registry:component",
+          "target": "composables/useCurrentUserImage.ts"
+        },
+        {
+          "path": "registry/default/realtime-avatar-stack/vue/composables/useCurrentUserName.ts",
+          "type": "registry:component",
+          "target": "composables/useCurrentUserName.ts"
+        },
+        {
+          "path": "registry/default/realtime-avatar-stack/vue/composables/useRealtimePresenceRoom.ts",
+          "type": "registry:component",
+          "target": "composables/useRealtimePresenceRoom.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest"
+      ]
+    },
+    {
+      "name": "realtime-chat-nuxtjs",
+      "type": "registry:block",
+      "title": "Realtime Chat",
+      "description": "Component which provides a realtime chat interface.",
+      "registryDependencies": [
+        "button",
+        "input"
+      ],
+      "files": [
+        {
+          "path": "registry/default/realtime-chat/nuxtjs/app/components/realtime-chat.vue",
+          "type": "registry:component",
+          "target": "app/components/realtime-chat.vue"
+        },
+        {
+          "path": "registry/default/realtime-chat/nuxtjs/app/components/chat-message-item.vue",
+          "type": "registry:component",
+          "target": "app/components/chat-message-item.vue"
+        },
+        {
+          "path": "registry/default/realtime-chat/nuxtjs/app/composables/useChatScroll.ts",
+          "type": "registry:component",
+          "target": "app/composables/useChatScroll.ts"
+        },
+        {
+          "path": "registry/default/realtime-chat/nuxtjs/app/composables/useRealtimeChat.ts",
+          "type": "registry:component",
+          "target": "app/composables/useRealtimeChat.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest",
+        "lucide-vue-next@latest"
+      ]
+    },
+    {
+      "name": "realtime-chat-vue",
+      "type": "registry:block",
+      "title": "Realtime Chat",
+      "description": "Component which provides a realtime chat interface.",
+      "registryDependencies": [
+        "button",
+        "input"
+      ],
+      "files": [
+        {
+          "path": "registry/default/realtime-chat/vue/components/realtime-chat.vue",
+          "type": "registry:component",
+          "target": "components/realtime-chat.vue"
+        },
+        {
+          "path": "registry/default/realtime-chat/vue/components/chat-message-item.vue",
+          "type": "registry:component",
+          "target": "components/chat-message-item.vue"
+        },
+        {
+          "path": "registry/default/realtime-chat/vue/composables/useChatScroll.ts",
+          "type": "registry:component",
+          "target": "composables/useChatScroll.ts"
+        },
+        {
+          "path": "registry/default/realtime-chat/vue/composables/useRealtimeChat.ts",
+          "type": "registry:component",
+          "target": "composables/useRealtimeChat.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest",
+        "lucide-vue-next@latest"
+      ]
+    },
+    {
+      "name": "infinite-query-composable",
+      "type": "registry:component",
+      "title": "Infinite Query for Vue and Supabase",
+      "description": "Vue Composable for infinite lists, fetching data from Supabase.",
+      "files": [
+        {
+          "path": "registry/default/infinite-query/vue/composables/useInfiniteQuery.ts",
+          "type": "registry:component",
+          "target": "composables/useInfiniteQuery.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest",
+        "@supabase/postgrest-js@*"
       ]
     }
   ]

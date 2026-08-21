@@ -20,63 +20,8 @@ Supabase provides a globally distributed [Realtime](https://github.com/supabase/
 - **Multiplayer games** - Synchronized game state and player interactions
 - **Social features** - Live notifications, reactions, and user activity feeds
 
-Check the [Getting Started](/docs/guides/realtime/getting_started) guide to get started.
+<ContentListings id="realtime-get-started" />
 
-## Examples
+<ContentListings id="realtime-examples" />
 
-<div className="grid md:grid-cols-12 gap-4 not-prose">
-  {[
-    {
-      name: 'Multiplayer.dev',
-      description: 'Showcase application displaying cursor movements and chat messages using Broadcast.',
-      href: 'https://multiplayer.dev',
-    },
-    {
-      name: 'Chat',
-      description: 'Supabase UI chat component using Broadcast to send message between users.',
-      href: 'https://supabase.com/ui/docs/nextjs/realtime-chat'
-    },
-    {
-      name: 'Avatar Stack',
-      description: 'Supabase UI avatar stack component using Presence to track connected users.',
-      href: 'https://supabase.com/ui/docs/nextjs/realtime-avatar-stack'
-    },
-    {
-      name: 'Realtime Cursor',
-      description: "Supabase UI realtime cursor component using Broadcast to share users' cursors to build collaborative applications.",
-      href: 'https://supabase.com/ui/docs/nextjs/realtime-cursor'
-    }
-].map((x) => (
-  <div className="col-span-6" key={x.href}>
-    <Link href={x.href} target="_blank" passHref>
-      <GlassPanel title={x.name}>{x.description}</GlassPanel>
-    </Link>
-  </div>
-))}
-
-</div>
-
-## Resources
-
-Find the source code and documentation in the Supabase GitHub repository.
-
-<div className="grid md:grid-cols-12 gap-4 not-prose">
-  {[
-    {
-      name: 'Supabase Realtime',
-      description: 'View the source code.',
-      href: 'https://github.com/supabase/realtime',
-    },
-    {
-      name: 'Realtime: Multiplayer Edition',
-      description: 'Read more about Supabase Realtime.',
-      href: 'https://supabase.com/blog/supabase-realtime-multiplayer-general-availability',
-    },
-  ].map((x) => (
-    <div className="col-span-6" key={x.href}>
-      <Link href={x.href} passHref>
-        <GlassPanel title={x.name}>{x.description}</GlassPanel>
-      </Link>
-    </div>
-  ))}
-</div>
+<ContentListings id="realtime-resources" />

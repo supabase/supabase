@@ -1,12 +1,13 @@
+import { safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { components } from 'api-types'
 import { toast } from 'sonner'
 
-import { components } from 'api-types'
-import { configKeys } from 'data/config/keys'
-import { databaseKeys } from 'data/database/keys'
-import { handleError, patch } from 'data/fetchers'
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { configKeys } from '@/data/config/keys'
+import { databaseKeys } from '@/data/database/keys'
+import { handleError, patch } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type CreateAndExposeAPISchemaVariables = {
   projectRef: string
@@ -26,10 +27,8 @@ export async function createAndExposeApiSchema({
   connectionString,
   existingPostgrestConfig,
 }: CreateAndExposeAPISchemaVariables) {
-  const sql = `
-create schema if not exists api;
-grant usage on schema api to anon, authenticated;
-  `.trim()
+  const sql = safeSql`create schema if not exists api;
+grant usage on schema api to anon, authenticated;`
 
   await executeSql({ projectRef, connectionString, sql })
 

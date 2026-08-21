@@ -1,6 +1,6 @@
+import Panel from '~/components/Panel'
 import React from 'react'
 import { cn } from 'ui'
-import Panel from '~/components/Panel'
 
 export default function LaunchWeekPrizeCard({
   content,
@@ -19,8 +19,8 @@ export default function LaunchWeekPrizeCard({
         'relative h-full flex flex-col bg-[#121516] rounded-lg overflow-hidden text-[#EDEDED]',
         contentClassName
       )}
-      shimmerToColor="hsl(var(--background-alternative-default))"
-      shimmerFromColor="hsl(var(--border-default))"
+      shimmerToColor="var(--background-alternative-default)"
+      shimmerFromColor="var(--border-default)"
     >
       {content}
     </Panel>

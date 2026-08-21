@@ -1,3 +1,4 @@
+import { CubeIcon } from '@heroicons/react/outline'
 import {
   Check,
   ClipboardCheck,
@@ -11,25 +12,22 @@ import {
   Users,
   UserX,
 } from 'lucide-react'
-import { CubeIcon } from '@heroicons/react/outline'
+import { Image } from 'ui-patterns/Image'
 
-import { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
-import { frameworks } from 'components/Hero/HeroFrameworks'
-
-import type { FeatureGridProps } from 'components/Solutions/FeatureGrid'
-import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
-import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
-import type { SecuritySectionProps } from 'components/Enterprise/Security'
+import { getSharedSections } from './shared-sections'
 import {
   FrameworkLink,
   type FeaturesSection,
   type HeroSection,
   type Metadata,
 } from './solutions.utils'
-import { getSharedSections } from './shared-sections'
-import { Image } from 'ui'
-
-import { useSendTelemetryEvent } from 'lib/telemetry'
+import type { SecuritySectionProps } from '@/components/Enterprise/Security'
+import { frameworks } from '@/components/Hero/HeroFrameworks'
+import type { FeatureGridProps } from '@/components/Solutions/FeatureGrid'
+import type { PlatformSectionProps } from '@/components/Solutions/PlatformSection'
+import type { ResultsSectionProps } from '@/components/Solutions/ResultsSection'
+import { TwoColumnsSectionProps } from '@/components/Solutions/TwoColumnsSection'
+import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 const data: () => {
   metadata: Metadata
@@ -116,21 +114,21 @@ const data: () => {
     singleQuote: {
       id: 'social-proof',
       quote: {
-        text: '"Supabase is great because it has everything. I don\'t need a different solution for authentication, a different solution for database, or a different solution for storage."',
+        text: "Supabase is great because it has everything. I don't need a different solution for authentication, a different solution for database, or a different solution for storage.",
         author: 'Yasser Elsaid',
         role: 'Founder, Chatbase',
         link: '/customers/chatbase',
         logo: (
           <>
             <Image
-              src="/images/customers/logos/chatbase.png"
+              src="/images/customers/logos/on-light/chatbase.png"
               alt="Chatbase"
               width={128}
               height={48}
               className="object-contain w-24 md:w-32 dark:hidden"
             />
             <Image
-              src="/images/customers/logos/light/chatbase.png"
+              src="/images/customers/logos/on-dark/chatbase.png"
               alt="Chatbase"
               width={128}
               height={48}
@@ -321,14 +319,23 @@ const data: () => {
       ),
       customers: [
         {
+          name: 'Hyper',
+          logo: '/images/customers/logos/on-light/hyper.png',
+          highlights: [
+            '100x cost reduction by having agents query SQL instead of live platform APIs',
+            'Per-customer isolated databases for agencies managing hundreds of clients',
+          ],
+          cta: { label: 'Read the case study', href: '/customers/hyper' },
+        },
+        {
           name: 'Humata',
-          logo: '/images/customers/logos/humata.png',
+          logo: '/images/customers/logos/on-light/humata.png',
           highlights: ['AI-powered document analysis at scale'],
           cta: { label: 'Read the case study', href: '/customers/humata' },
         },
         {
           name: 'Chatbase',
-          logo: '/images/customers/logos/chatbase.png',
+          logo: '/images/customers/logos/on-light/chatbase.png',
           highlights: [
             'One of the most successful single-founder AI products',
             'Built entirely on Supabase',
@@ -337,7 +344,7 @@ const data: () => {
         },
         {
           name: 'Markprompt',
-          logo: '/images/customers/logos/markprompt.png',
+          logo: '/images/customers/logos/on-light/markprompt.png',
           highlights: ['GDPR-compliant AI chatbots on Supabase'],
           cta: { label: 'Read the case study', href: '/customers/markprompt' },
         },

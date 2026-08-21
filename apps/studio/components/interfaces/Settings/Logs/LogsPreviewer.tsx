@@ -1,20 +1,8 @@
 import { useParams } from 'common'
-import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
-import LoadingOpacity from 'components/ui/LoadingOpacity'
-import ShimmerLine from 'components/ui/ShimmerLine'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import dayjs from 'dayjs'
-import useLogsPreview from 'hooks/analytics/useLogsPreview'
-import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
-import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
-import useSingleLog from 'hooks/analytics/useSingleLog'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { Rewind } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useState } from 'react'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
@@ -29,6 +17,21 @@ import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.
 import { maybeShowUpgradePromptIfNotEntitled } from './Logs.utils'
 import { LogTable } from './LogTable'
 import UpgradePrompt from './UpgradePrompt'
+import { useLogsPreviewShortcuts } from './useLogsPreviewShortcuts'
+import PreviewFilterPanel from '@/components/interfaces/Settings/Logs/PreviewFilterPanel'
+import LoadingOpacity from '@/components/ui/LoadingOpacity'
+import ShimmerLine from '@/components/ui/ShimmerLine'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import useLogsPreview from '@/hooks/analytics/useLogsPreview'
+import { useLogsUrlState } from '@/hooks/analytics/useLogsUrlState'
+import { useSelectedLog } from '@/hooks/analytics/useSelectedLog'
+import useSingleLog from '@/hooks/analytics/useSingleLog'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useUpgradePrompt } from '@/hooks/misc/useUpgradePrompt'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 /**
  * Calculates the appropriate time range for bar click filtering based on the current time range duration.
@@ -112,6 +115,7 @@ export const LogsPreviewer = ({
   const { data: organization } = useSelectedOrganizationQuery()
   const state = useDatabaseSelectorStateSnapshot()
 
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const [showChart, setShowChart] = useState(true)
   const [selectedDatePickerValue, setSelectedDatePickerValue] = useState<DatePickerValue>(
     getDefaultDatePickerValue()
@@ -201,6 +205,7 @@ export const LogsPreviewer = ({
         setTimeRange(newTimestampStart, timestampEnd)
       }
     }
+    setSelectedLogId(null)
     refresh()
   }
 
@@ -212,6 +217,7 @@ export const LogsPreviewer = ({
       setSearch(query || '')
       setSelectedLogId(null)
     } else if (event === 'event-chart-bar-click') {
+      setSelectedLogId(null)
       setTimeRange(from || '', to || '')
     } else if (event === 'datepicker-change') {
       const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
@@ -221,6 +227,7 @@ export const LogsPreviewer = ({
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
       } else {
+        setSelectedLogId(null)
         setTimeRange(from || '', to || '')
       }
     }
@@ -286,7 +293,21 @@ export const LogsPreviewer = ({
     },
     selectedDatePickerValue,
     setSelectedDatePickerValue,
+    searchInputRef,
   }
+
+  useLogsPreviewShortcuts({
+    searchInputRef,
+    hasSearch: search.length > 0,
+    onResetSearch: () => {
+      setSearch('')
+      setSelectedLogId(null)
+    },
+    onRefresh: handleRefresh,
+    onToggleChart: () => setShowChart((prev) => !prev),
+    onLoadOlder: loadOlder,
+    canLoadOlder: !error && logData.length > 0 && !isLoadingOlder,
+  })
 
   return (
     <div className="flex-1 flex flex-col h-full">
@@ -329,7 +350,7 @@ export const LogsPreviewer = ({
           )}
         </div>
       </div>
-      <div className="relative flex flex-col flex-grow flex-1 overflow-auto">
+      <div className="relative flex flex-col grow flex-1 overflow-auto">
         <ShimmerLine active={isLoading} />
         <LoadingOpacity active={isLoading}>
           <LogTable
@@ -350,15 +371,17 @@ export const LogsPreviewer = ({
       </div>
       {!error && logData.length > 0 && (
         <div className="border-t flex flex-row items-center gap-3 p-2">
-          <Button
-            onClick={loadOlder}
-            icon={<Rewind />}
-            type="default"
-            loading={isLoadingOlder}
-            disabled={isLoadingOlder}
-          >
-            Load older
-          </Button>
+          <ShortcutTooltip shortcutId={SHORTCUT_IDS.LOGS_PREVIEW_LOAD_OLDER} side="top">
+            <Button
+              onClick={loadOlder}
+              icon={<Rewind />}
+              variant="default"
+              loading={isLoadingOlder}
+              disabled={isLoadingOlder}
+            >
+              Load older
+            </Button>
+          </ShortcutTooltip>
           <div className="text-sm text-foreground-lighter">
             Showing <span className="font-mono">{logData.length}</span> results
           </div>

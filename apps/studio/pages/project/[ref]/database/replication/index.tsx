@@ -1,53 +1,78 @@
-import { useParams } from 'common'
-import { Destinations } from 'components/interfaces/Database/Replication/Destinations'
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { UnknownInterface } from 'components/ui/UnknownInterface'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { PipelineRequestStatusProvider } from 'state/replication-pipeline-request-status'
-import type { NextPageWithLayout } from 'types'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { ReadReplicasMovedCallout } from '@/components/interfaces/Database/Replication/DestinationPanel/ReadReplicasMovedCallout'
+import { Destinations } from '@/components/interfaces/Database/Replication/Destinations'
 import { ReplicationDiagram } from '@/components/interfaces/Database/Replication/ReplicationDiagram'
+import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { HighAvailabilityDisabledEmptyState } from '@/components/ui/HighAvailability/HighAvailabilityDisabledEmptyState'
+import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
+import type { NextPageWithLayout } from '@/types'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
-  const { ref } = useParams()
+  const { data: selectedProject, isPending } = useSelectedProjectQuery()
+  const { isHighAvailability } = useHighAvailability()
   const showPgReplicate = useIsFeatureEnabled('database:replication')
 
   if (!showPgReplicate) {
-    return <UnknownInterface urlBack={`/project/${ref}/database/schemas`} />
+    return <UnknownInterface urlBack={`/project/${selectedProject?.ref}/database/schemas`} />
+  }
+
+  if (isHighAvailability) {
+    return (
+      <div className="flex h-full w-full items-center justify-center p-6">
+        <HighAvailabilityDisabledEmptyState
+          title="Replication unavailable on High Availability projects"
+          description="We're working to bring replication to High Availability projects. Contact support if this is blocking your work."
+        />
+      </div>
+    )
   }
 
   return (
     <PipelineRequestStatusProvider>
-      <ScaffoldContainer>
-        <ScaffoldSection isFullWidth>
-          <div className="w-full mb-6">
-            <div className="flex items-center gap-x-2 mb-1">
-              <h3 className="text-foreground text-xl prose">Replication</h3>
-            </div>
-            <p className="prose text-sm max-w-full">
-              Deploy read replicas across multiple regions, or replicate database changes to
-              external data warehouses and analytics platforms
-            </p>
-          </div>
-        </ScaffoldSection>
-      </ScaffoldContainer>
+      <PageHeader size="large">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Replication</PageHeaderTitle>
+            <PageHeaderDescription>Send data to external destinations</PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
 
-      <ReplicationDiagram />
-
-      <ScaffoldContainer>
-        <ScaffoldSection isFullWidth className="!pt-6">
-          <Destinations />
-        </ScaffoldSection>
-      </ScaffoldContainer>
+      <PageContainer size="large">
+        {isPending ? (
+          <GenericSkeletonLoader />
+        ) : (
+          <PageSection>
+            <PageSectionContent className="flex flex-col gap-12">
+              <ReadReplicasMovedCallout />
+              <ReplicationDiagram />
+              <Destinations />
+            </PageSectionContent>
+          </PageSection>
+        )}
+      </PageContainer>
     </PipelineRequestStatusProvider>
   )
 }
 
 DatabaseReplicationPage.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database Replication">{page}</DatabaseLayout>
+    <DatabaseLayout title="Replication">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 

@@ -2,146 +2,116 @@
 title: 'Use Supabase with React'
 subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from a React app.'
 breadcrumb: 'Framework Quickstarts'
-hideToc: true
 ---
 
-<StepHikeCompact>
+<AiPrompt id="reactjs" />
 
-  <StepHikeCompact.Step step={1}>
+<$Partial path="quickstart_db_setup.mdx" />
 
-    <$Partial path="quickstart_db_setup.mdx" />
+## 3. Create a React app
 
-  </StepHikeCompact.Step>
+Create a React app using a [Vite](https://vitejs.dev/guide/) template.
 
-  <StepHikeCompact.Step step={2}>
+```bash
+npm create vite@latest my-app -- --template react
+```
 
-    <StepHikeCompact.Details title="Create a React app">
+## 4. Set up AI tooling (optional)
 
-    - Create a React app using a [Vite](https://vitejs.dev/guide/) template.
+<$Partial path="quickstart_ai_tooling.mdx" />
 
-    <$Partial path="uiLibCta.mdx" />
+## 5. Install the Supabase client library
 
-    </StepHikeCompact.Details>
+The fastest way to get started is to use the `supabase-js` client library, which provides a convenient interface for working with Supabase from a React app.
 
-    <StepHikeCompact.Code>
+Navigate to the React app and install `supabase-js`.
 
-      ```bash name=Terminal
-      npm create vite@latest my-app -- --template react
-      ```
+```bash
+cd my-app && npm install @supabase/supabase-js
+```
 
-    </StepHikeCompact.Code>
+## 6. Declare Supabase environment variables
 
-  </StepHikeCompact.Step>
+Create a `.env.local` file and populate it with your Supabase URL and publishable key that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=react&connectTab=frameworks)
 
-  <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Install the Supabase client library">
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=react">
+    Open Connect panel
+  </a>
+</Button>
 
-    The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from a React app.
+```text name=.env.local
+VITE_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+VITE_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
+```
 
-    Navigate to the React app and install `supabase-js`.
+<$Partial path="api_settings.mdx" variables={{ "framework": "react", "tab": "frameworks" }} />
 
-    </StepHikeCompact.Details>
+## 7. Create the Supabase client
 
-    <StepHikeCompact.Code>
+Create a `src/lib` directory in your React app, create a file called `supabaseClient.js`, and add the following code to initialize the Supabase client:
 
-      ```bash name=Terminal
-      cd my-app && npm install @supabase/supabase-js
-      ```
+```js name=src/lib/supabaseClient.js
+import { createClient } from '@supabase/supabase-js'
 
-    </StepHikeCompact.Code>
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
 
-  </StepHikeCompact.Step>
+export const supabase = createClient(supabaseUrl, supabasePublishableKey)
+```
 
-  <StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Declare Supabase Environment Variables">
+## 8. Query data from the app
 
-    Create a `.env.local` file and populate with your Supabase connection variables:
+Replace the contents of `App.jsx` with a `getInstruments` function that fetches the data and displays the query result on the page.
 
-    <ProjectConfigVariables variable="url" />
-    <ProjectConfigVariables variable="publishable" />
-    <ProjectConfigVariables variable="anon" />
+```js name=src/App.jsx
+import { useEffect, useState } from 'react'
 
-    </StepHikeCompact.Details>
+import { supabase } from './lib/supabaseClient'
 
-    <StepHikeCompact.Code>
+function App() {
+  const [instruments, setInstruments] = useState([])
 
-      <$CodeTabs>
+  useEffect(() => {
+    getInstruments()
+  }, [])
 
-        ```text name=.env.local
-        VITE_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
-        VITE_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
-        ```
+  async function getInstruments() {
+    const { data, error } = await supabase.from('instruments').select()
 
-      </$CodeTabs>
+    if (error) {
+      console.error(error)
+      return
+    }
 
-      <$Partial path="api_settings_steps.mdx" variables={{ "framework": "react", "tab": "frameworks" }} />
+    setInstruments(data)
+  }
 
-    </StepHikeCompact.Code>
+  return (
+    <ul>
+      {instruments.map((instrument) => (
+        <li key={instrument.id}>{instrument.name}</li>
+      ))}
+    </ul>
+  )
+}
 
-  </StepHikeCompact.Step>
+export default App
+```
 
-  <StepHikeCompact.Step step={5}>
-    <StepHikeCompact.Details title="Query data from the app">
+## 9. Start the app
 
-    Replace the contents of `App.jsx` to add a `getInstruments` function to fetch the data and display the query result to the page using a Supabase client.
+Run the development server, go to http://localhost:5173 in a browser, and you should see the list of instruments.
 
-    </StepHikeCompact.Details>
-    <StepHikeCompact.Code>
+```bash
+npm run dev
+```
 
-      ```js name=src/App.jsx
-      import { useEffect, useState } from "react";
-      import { createClient } from "@supabase/supabase-js";
-
-      const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY);
-
-      function App() {
-        const [instruments, setInstruments] = useState([]);
-
-        useEffect(() => {
-          getInstruments();
-        }, []);
-
-        async function getInstruments() {
-          const { data } = await supabase.from("instruments").select();
-          setInstruments(data);
-        }
-
-        return (
-          <ul>
-            {instruments.map((instrument) => (
-              <li key={instrument.name}>{instrument.name}</li>
-            ))}
-          </ul>
-        );
-      }
-
-      export default App;
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={6}>
-    <StepHikeCompact.Details title="Start the app">
-
-    Run the development server, go to http://localhost:5173 in a browser and you should see the list of instruments.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```bash name=Terminal
-      npm run dev
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-</StepHikeCompact>
+<$Partial path="quickstart_going_to_production.mdx" />
 
 ## Next steps
 
 - Set up [Auth](/docs/guides/auth) for your app
 - [Insert more data](/docs/guides/database/import-data) into your database
 - Upload and serve static files using [Storage](/docs/guides/storage)
+- Explore [drop-in UI components](/ui) for your Supabase app

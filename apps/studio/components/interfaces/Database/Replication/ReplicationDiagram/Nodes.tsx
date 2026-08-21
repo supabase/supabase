@@ -1,15 +1,13 @@
+import { Handle, Position } from '@xyflow/react'
 import { useParams } from 'common'
-import { AnalyticsBucket, BigQuery, Database } from 'icons'
-import { PropsWithChildren, useMemo } from 'react'
-import { Handle, Position } from 'reactflow'
+import { PropsWithChildren } from 'react'
 import { AWS_REGIONS } from 'shared-data'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
+import { DestinationIcon } from '../DestinationIcon'
 import { getStatusName } from '../Pipeline.utils'
-import { getStatusLabel } from '../ReadReplicas/ReadReplicas.utils'
 import { STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
-import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
+import { getReplicationDestinationType } from './Nodes.utils'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
@@ -23,7 +21,7 @@ const NodeContainer = ({ className, children }: PropsWithChildren<{ className?: 
     <div
       style={{ width: NODE_WIDTH / 2 + 55 }}
       className={cn(
-        'flex items-start justify-between p-3 rounded bg-surface-100 border border-default',
+        'flex items-start justify-between p-3 rounded-sm bg-surface-100 border border-default',
         className
       )}
     >
@@ -36,14 +34,10 @@ export const PrimaryDatabaseNode = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const { data: databases = [] } = useReadReplicasQuery({ projectRef })
-  const hasReadReplicas = databases.some((x) => x.identifier !== projectRef)
-
   const { data: destinationsData } = useReplicationDestinationsQuery({ projectRef })
   const hasDestinations = (destinationsData?.destinations ?? []).length > 0
 
   const region = Object.values(AWS_REGIONS).find((x) => x.code === project?.region)
-  const hasReplication = hasReadReplicas || hasDestinations
 
   return (
     <NodeContainer>
@@ -55,11 +49,15 @@ export const PrimaryDatabaseNode = () => {
       {!!project && (
         <img
           alt="region icon"
-          className="w-8 rounded-sm mt-0.5"
+          className="w-8 rounded-xs mt-0.5"
           src={`${BASE_PATH}/img/regions/${project?.region}.svg`}
         />
       )}
-      {hasReplication && <Handle type="source" position={Position.Right} className="opacity-25" />}
+      <Handle
+        type="source"
+        position={Position.Right}
+        className={hasDestinations ? 'opacity-25' : 'opacity-0'}
+      />
     </NodeContainer>
   )
 }
@@ -80,86 +78,34 @@ export const ReplicationNode = ({ id }: { id: string }) => {
   )
   const statusName = getStatusName(pipelineStatusData?.status)
 
-  const config = destination?.config ?? {}
-  const type =
-    'big_query' in config ? 'BigQuery' : 'iceberg' in config ? 'Analytics Bucket' : undefined
+  const type = getReplicationDestinationType(destination?.config)
 
   return (
     <NodeContainer className="justify-start gap-x-3">
-      {type === 'BigQuery' ? (
-        <BigQuery size={20} className="text-foreground-light" />
-      ) : type === 'Analytics Bucket' ? (
-        <AnalyticsBucket size={20} className="text-foreground-light" />
-      ) : null}
+      {type ? <DestinationIcon type={type} size={20} className="text-foreground-light" /> : null}
       <div className="text-sm flex flex-col gap-y-0.5">
         <div className="flex items-center">
           <p>{type}</p>
-          <Tooltip>
-            <TooltipTrigger>
-              <div className="w-6 h-full flex items-center justify-center">
-                <div
-                  className={cn(
-                    'w-2 h-2 rounded-full',
-                    statusName === 'started'
-                      ? 'bg-brand'
-                      : statusName === 'failed'
-                        ? 'bg-destructive'
-                        : 'bg-selection'
-                  )}
-                />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" className="capitalize">
-              {statusName}
-            </TooltipContent>
-          </Tooltip>
+          {(statusName === 'started' || statusName === 'failed') && (
+            <Tooltip>
+              <TooltipTrigger>
+                <div className="w-6 h-full flex items-center justify-center">
+                  <div
+                    className={cn(
+                      'w-2 h-2 rounded-full',
+                      statusName === 'started' ? 'bg-brand' : 'bg-destructive'
+                    )}
+                  />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="capitalize">
+                {statusName}
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
         <p className="text-foreground-light">{destination?.name}</p>
         <p className="text-foreground-light">ID: {destination?.id}</p>
-      </div>
-      <Handle type="target" position={Position.Left} className="opacity-25" />
-    </NodeContainer>
-  )
-}
-
-export const ReadReplicaNode = ({ id }: { id: string }) => {
-  const { ref: projectRef } = useParams()
-  const { data: databases = [] } = useReadReplicasQuery({ projectRef })
-  const database = databases.find((x) => x.identifier === id)
-
-  const region = Object.values(AWS_REGIONS).find((x) => x.code === database?.region)
-  const formattedId = formatDatabaseID(database?.identifier ?? '')
-  const statusLabel = useMemo(
-    () => getStatusLabel({ status: database?.status }),
-    [database?.status]
-  )
-
-  return (
-    <NodeContainer className="justify-start gap-x-3">
-      <Database size={20} className="text-foreground-light" />
-      <div className="flex flex-col gap-y-0.5">
-        <div className="flex items-center">
-          <p className="text-sm">Read Replica</p>
-          <Tooltip>
-            <TooltipTrigger>
-              <div className="w-6 h-full flex items-center justify-center">
-                <div
-                  className={cn(
-                    'w-2 h-2 rounded-full',
-                    database?.status === 'ACTIVE_HEALTHY' ? 'bg-brand' : 'bg-selection'
-                  )}
-                />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">{statusLabel}</TooltipContent>
-          </Tooltip>
-        </div>
-        <p className="text-sm text-foreground-light">{region?.displayName}</p>
-        <div className="flex gap-x-2 items-center text-sm text-foreground-light">
-          <span>ID: {formattedId}</span>
-          <span>•</span>
-          <span>{region?.code}</span>
-        </div>
       </div>
       <Handle type="target" position={Position.Left} className="opacity-25" />
     </NodeContainer>

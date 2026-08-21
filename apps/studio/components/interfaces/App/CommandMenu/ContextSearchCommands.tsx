@@ -1,15 +1,14 @@
 'use client'
 
+import { useDebounce } from '@uidotdev/usehooks'
 import { IS_PLATFORM } from 'common'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Auth, EdgeFunctions, Storage } from 'icons'
 import { Database } from 'lucide-react'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import {
   CommandHeader,
-  CommandInput,
+  CommandMenuInput,
   CommandWrapper,
   PageType,
   useQuery,
@@ -22,6 +21,8 @@ import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import { ContextSearchResults } from './ContextSearchResults'
 import { orderCommandSectionsByPriority } from './ordering'
 import type { SearchContextValue } from './SearchContext.types'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface SearchContextOption {
   value: SearchContextValue
@@ -36,7 +37,7 @@ const SEARCH_CONTEXT_OPTIONS: SearchContextOption[] = [
     value: 'database-tables',
     label: 'Database Tables',
     pageName: 'Search Database Tables',
-    placeholder: 'Search database tables...',
+    placeholder: 'Search database schema or tables...',
     icon: Database,
   },
   {
@@ -71,12 +72,23 @@ function ContextSearchPage({
 }) {
   const query = useQuery()
 
+  const [filterString, setFilterString] = useState('')
+  const debouncedFilterString = useDebounce(filterString, 300)
+
   return (
-    <CommandWrapper>
+    <CommandWrapper shouldFilter={context !== 'database-tables'}>
       <CommandHeader>
-        <CommandInput placeholder={placeholder} />
+        <CommandMenuInput
+          placeholder={placeholder}
+          value={filterString}
+          onValueChange={setFilterString}
+        />
       </CommandHeader>
-      <ContextSearchResults context={context} query={query} />
+      <ContextSearchResults
+        context={context}
+        query={query}
+        debouncedFilterString={debouncedFilterString}
+      />
     </CommandWrapper>
   )
 }

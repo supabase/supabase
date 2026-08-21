@@ -1,26 +1,26 @@
+import { ident, joinSqlFragments, ROLE_IMPERSONATION_NO_RESULTS, safeSql } from '@supabase/pg-meta'
 import { Query, type QueryFilter } from '@supabase/pg-meta/src/query'
 import { getTableRowsSql } from '@supabase/pg-meta/src/query/table-row-query'
 import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
-import { IS_PLATFORM } from 'common'
-import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
-import { Filter, Sort, SupaRow, SupaTable } from 'components/grid/types'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
-import { isMsSqlForeignTable } from 'data/table-editor/table-editor-types'
-import {
-  ROLE_IMPERSONATION_NO_RESULTS,
-  RoleImpersonationState,
-  wrapWithRoleImpersonation,
-} from 'lib/role-impersonation'
-import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import { ResponseError, UseCustomQueryOptions } from 'types'
+import { IS_PLATFORM, useFlag } from 'common'
 
-import { handleError } from '../fetchers'
-import { useConnectionStringForReadOps } from '../read-replicas/replicas-query'
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { tableRowKeys } from './keys'
 import { formatFilterValue } from './utils'
+import { parseSupaTable } from '@/components/grid/SupabaseGrid.utils'
+import { Filter, Sort, SupaRow, SupaTable } from '@/components/grid/types'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import { handleError } from '@/data/fetchers'
+import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import {
+  PG_META_SCOPED_INTROSPECTION_FLAG,
+  prefetchTableEditor,
+} from '@/data/table-editor/table-editor-query'
+import { isMsSqlForeignTable } from '@/data/table-editor/table-editor-types'
 import { timeout } from '@/lib/helpers'
+import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
+import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 interface GetTableRowsArgs {
   table?: SupaTable
@@ -29,6 +29,7 @@ interface GetTableRowsArgs {
   limit?: number
   page?: number
   roleImpersonationState?: RoleImpersonationState
+  scoped?: boolean
 }
 
 /**
@@ -133,11 +134,15 @@ export const getAllTableRowsSql = ({
     .filter(
       (column) => (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
     )
-    .map((column) => `"${column.name}"::text[]`)
+    .map((column) => safeSql`${ident(column.name)}::text[]`)
 
   let queryChains = query
     .from(table.name, table.schema ?? undefined)
-    .select(arrayBasedColumns.length > 0 ? `*,${arrayBasedColumns.join(',')}` : '*')
+    .select(
+      arrayBasedColumns.length > 0
+        ? joinSqlFragments([safeSql`*`, ...arrayBasedColumns], ',')
+        : safeSql`*`
+    )
 
   filters
     .filter((filter) => filter.value && filter.value !== '')
@@ -315,7 +320,7 @@ type TableRowsVariables = Omit<GetTableRowsArgs, 'table'> & {
 }
 
 export type TableRowsData = TableRows
-type TableRowsError = ExecuteSqlError
+type TableRowsError = ResponseError
 
 async function getTableRows(
   {
@@ -329,6 +334,7 @@ async function getTableRows(
     limit,
     page,
     preflightCheck = false,
+    scoped,
   }: TableRowsVariables,
   signal?: AbortSignal
 ) {
@@ -336,6 +342,7 @@ async function getTableRows(
     projectRef,
     connectionString,
     id: tableId,
+    scoped,
   })
   if (!entity) {
     throw new Error('Table not found')
@@ -391,29 +398,26 @@ async function getTableRows(
 }
 
 export const useTableRowsQuery = <TData = TableRowsData>(
-  {
-    projectRef,
-    connectionString: connectionStringOverride,
-    tableId,
-    ...args
-  }: Omit<TableRowsVariables, 'queryClient'>,
+  { projectRef, tableId, ...args }: Omit<TableRowsVariables, 'queryClient' | 'connectionString'>,
   { enabled = true, ...options }: UseCustomQueryOptions<TableRowsData, TableRowsError, TData> = {}
 ) => {
   const queryClient = useQueryClient()
-  const { connectionString: connectionStringReadOps } = useConnectionStringForReadOps()
-  const connectionString = connectionStringOverride || connectionStringReadOps
+  const { connectionString, identifier: readReplicaIdentifier } = useConnectionStringForReadOps()
+  const scoped = !!useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
 
-  // [Joshen] Exclude preflightCheck from query key
-  const { preflightCheck, ...othersArgs } = args
+  // [Ali] Exclude preflightCheck from query key — it controls how the query
+  // executes (whether an EXPLAIN guard runs first), not what data is returned.
+  const { preflightCheck, ...queryKeyArgs } = args
 
   return useQuery<TableRowsData, TableRowsError, TData>({
     queryKey: tableRowKeys.tableRows(projectRef, {
       table: { id: tableId },
-      connectionString,
-      ...othersArgs,
+      readReplicaIdentifier,
+      ...queryKeyArgs,
+      scoped,
     }),
     queryFn: ({ signal }) =>
-      getTableRows({ queryClient, projectRef, connectionString, tableId, ...args }, signal),
+      getTableRows({ queryClient, projectRef, connectionString, tableId, ...args, scoped }, signal),
     enabled:
       enabled &&
       typeof projectRef !== 'undefined' &&
@@ -423,14 +427,25 @@ export const useTableRowsQuery = <TData = TableRowsData>(
   })
 }
 
+type PrefetchTableRowsVariables = Omit<TableRowsVariables, 'queryClient'> & {
+  readReplicaIdentifier?: string
+}
+
 export function prefetchTableRows(
   client: QueryClient,
-  { projectRef, connectionString, tableId, ...args }: Omit<TableRowsVariables, 'queryClient'>
+  {
+    projectRef,
+    connectionString,
+    tableId,
+    readReplicaIdentifier,
+    ...args
+  }: PrefetchTableRowsVariables
 ) {
   return client.fetchQuery({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- readReplicaIdentifier is used as a stable version of connectionString
     queryKey: tableRowKeys.tableRows(projectRef, {
       table: { id: tableId },
-      connectionString,
+      readReplicaIdentifier,
       ...args,
     }),
     queryFn: ({ signal }) =>

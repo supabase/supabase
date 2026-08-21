@@ -1,9 +1,8 @@
-import { useParams } from 'common'
 import { Pointer } from 'lucide-react'
-import { useRef } from 'react'
-import { InnerSideBarEmptyPanel } from 'ui-patterns/InnerSideMenu'
 import { cn, TreeViewItemVariant } from 'ui'
-import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
+import { InnerSideBarEmptyPanel } from 'ui-patterns/InnerSideMenu'
+
+import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
 
 export const TableMenuEmptyState = () => {
   return (
@@ -12,11 +11,11 @@ export const TableMenuEmptyState = () => {
       description="Any tables or views you create will be listed here."
       className="mx-4"
     >
-      <div className="top-0 left-6 flex flex-col opacity-50 cursor-not-allowed bg-dash-sidebar h-content -mb-7 pointer-events-none scale-75">
-        <div className="relative h-content">
+      <div className="top-0 left-6 flex flex-col opacity-50 cursor-not-allowed bg-dash-sidebar -mb-7 pointer-events-none scale-75">
+        <div className="relative">
           <div className="absolute inset-0 pointer-events-none z-10">
-            <div className="absolute inset-0 bg-gradient-to-t from-transparent from-80% to-100% to-background-surface-100 dark:to-background-surface-75" />
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent from-50% to-100% to-background-surface-100 dark:to-background-surface-75" />
+            <div className="absolute inset-0 bg-linear-to-t from-transparent from-80% to-100% to-background-surface-100 dark:to-background-surface-75" />
+            <div className="absolute inset-0 bg-linear-to-r from-transparent from-50% to-100% to-background-surface-100 dark:to-background-surface-75" />
           </div>
           <div className="absolute left-[150px] bottom-[21px] text-foreground-muted z-10 pointer-events-none">
             <Pointer size={16} className="text-foreground-light" strokeWidth={1.5} />

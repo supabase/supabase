@@ -1,80 +1,110 @@
 import dayjs from 'dayjs'
-import { AlertCircle } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { useState } from 'react'
-
-import AlertError from 'components/ui/AlertError'
-import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
-import { DATETIME_FORMAT } from 'lib/constants'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { Button, Card, CardContent } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import {
+  PageSection,
+  PageSectionAside,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { AddNewFactorModal } from './AddNewFactorModal'
 import DeleteFactorModal from './DeleteFactorModal'
+import { AlertError } from '@/components/ui/AlertError'
+import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
+import { DATETIME_FORMAT } from '@/lib/constants'
 
 export const TOTPFactors = () => {
   const [isAddNewFactorOpen, setIsAddNewFactorOpen] = useState(false)
   const [factorToBeDeleted, setFactorToBeDeleted] = useState<string | null>(null)
   const { data, isPending: isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
 
+  const totpFactors = data?.totp ?? []
+  const canAddApp = isSuccess && totpFactors.length < 2
+  const shouldShowLockoutWarning = isSuccess && totpFactors.length === 1
+
+  const handleAddNewApp = () => setIsAddNewFactorOpen(true)
+
   return (
     <>
-      <section className="space-y-3">
-        <p className="text-sm text-foreground-light">
-          Generate one-time passwords via authenticator apps like 1Password, Authy, etc. as a second
-          factor to verify your identity during sign-in.
-        </p>
-        <div>
-          {isLoading && <GenericSkeletonLoader />}
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Multi-factor authentication</PageSectionTitle>
+            <PageSectionDescription>
+              Use an authenticator app (like Google Authenticator or 1Password) to protect your
+              account.
+            </PageSectionDescription>
+          </PageSectionSummary>
+          {canAddApp && (
+            <PageSectionAside>
+              <Button variant="primary" icon={<Plus />} onClick={handleAddNewApp}>
+                Add app
+              </Button>
+            </PageSectionAside>
+          )}
+        </PageSectionMeta>
+        <PageSectionContent className="flex flex-col gap-4">
+          {shouldShowLockoutWarning && (
+            <Admonition
+              type="danger"
+              layout="responsive"
+              title="Avoid being locked out"
+              description="Add a backup authenticator app now. Losing access to your only app will permanently lock you out of your account."
+              actions={
+                <Button variant="default" icon={<Plus />} onClick={handleAddNewApp}>
+                  Add another app
+                </Button>
+              }
+            />
+          )}
+          {isLoading && (
+            <Card>
+              <CardContent>
+                <GenericSkeletonLoader />
+              </CardContent>
+            </Card>
+          )}
           {isError && (
             <AlertError error={error} subject="Failed to retrieve account security information" />
           )}
           {isSuccess && (
-            <>
-              {data.totp.length === 1 && (
-                <Alert_Shadcn_ variant="default" className="mb-2">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertTitle_Shadcn_>
-                    We recommend configuring two authenticator apps across different devices
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-                    The two authenticator apps will serve as a backup for each other.
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
-              )}
-              <div>
-                {data.totp.map((factor) => {
-                  return (
-                    <div key={factor.id} className="flex flex-row justify-between py-2">
-                      <p className="text-sm text-foreground flex items-center space-x-2">
-                        <span className="text-foreground-light">Name:</span>{' '}
-                        <span>{factor.friendly_name ?? 'No name provided'}</span>
-                      </p>
-                      <div className="flex items-center gap-4">
-                        <p className="text-sm text-foreground-light">
-                          Added on {dayjs(factor.updated_at).format(DATETIME_FORMAT)}
+            <Card>
+              {totpFactors.length === 0 ? (
+                <CardContent>
+                  <p className="text-sm text-foreground-lighter">No authenticator apps yet.</p>
+                </CardContent>
+              ) : (
+                <div className="divide-y">
+                  {totpFactors.map((factor) => (
+                    <CardContent key={factor.id} className="flex justify-between items-center py-4">
+                      <div>
+                        <p className="text-sm">{factor.friendly_name ?? 'No name provided'}</p>
+                        <p className="text-sm text-foreground-lighter">
+                          Added on {dayjs(factor.created_at).format(DATETIME_FORMAT)}
                         </p>
-                        <Button
-                          size="tiny"
-                          type="default"
-                          onClick={() => setFactorToBeDeleted(factor.id)}
-                        >
-                          Remove
-                        </Button>
                       </div>
-                    </div>
-                  )
-                })}
-              </div>
-              {data.totp.length < 2 ? (
-                <>
-                  <div className="pt-2">
-                    <Button onClick={() => setIsAddNewFactorOpen(true)}>Add new app</Button>
-                  </div>
-                </>
-              ) : null}
-            </>
+                      <Button
+                        size="tiny"
+                        variant="default"
+                        onClick={() => setFactorToBeDeleted(factor.id)}
+                      >
+                        Delete{' '}
+                      </Button>
+                    </CardContent>
+                  ))}
+                </div>
+              )}
+            </Card>
           )}
-        </div>
-      </section>
+        </PageSectionContent>
+      </PageSection>
       <AddNewFactorModal
         visible={isAddNewFactorOpen}
         onClose={() => setIsAddNewFactorOpen(false)}
@@ -82,7 +112,7 @@ export const TOTPFactors = () => {
       <DeleteFactorModal
         visible={factorToBeDeleted !== null}
         factorId={factorToBeDeleted}
-        lastFactorToBeDeleted={data?.totp.length === 1}
+        lastFactorToBeDeleted={totpFactors.length === 1}
         onClose={() => setFactorToBeDeleted(null)}
       />
     </>

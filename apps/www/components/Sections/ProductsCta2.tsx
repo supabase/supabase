@@ -1,9 +1,9 @@
-import Link from 'next/link'
-import React from 'react'
-import { Button, cn } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import MagnifiedProducts from '~/components/MagnifiedProducts'
 import { PRODUCT_SHORTNAMES } from '~/lib/constants'
+import Link from 'next/link'
+import React from 'react'
+import { Button, cn } from 'ui'
 
 export type Products = PRODUCT_SHORTNAMES
 
@@ -26,10 +26,10 @@ function ProductsCta(props: Props) {
       <div className="flex flex-col col-span-1 text-center xl:text-left xl:justify-center items-center xl:items-start">
         <h2 className="h2 w-max">Ready to start building?</h2>
         <div className="flex gap-2 py-2">
-          <Button asChild type="primary" size="small" className="h-full">
+          <Button asChild variant="primary" size="small" className="h-full">
             <Link href="https://supabase.com/dashboard">Start for free</Link>
           </Button>
-          <Button asChild type="default" size="small">
+          <Button asChild variant="default" size="small">
             <Link href="https://forms.supabase.com/enterprise">Contact Enterprise</Link>
           </Button>
         </div>

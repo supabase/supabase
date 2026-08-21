@@ -1,11 +1,11 @@
-import { InfraInstanceSize } from 'components/interfaces/DiskManagement/DiskManagement.types'
+import { InfraInstanceSize } from '@/components/interfaces/DiskManagement/DiskManagement.types'
 import {
   calculateComputeSizePrice,
   calculateDiskSizePrice,
-} from 'components/interfaces/DiskManagement/DiskManagement.utils'
-import { DiskType } from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
-import { instanceSizeSpecs } from 'data/projects/new-project.constants'
-import { PlanId } from 'data/subscriptions/types'
+} from '@/components/interfaces/DiskManagement/DiskManagement.utils'
+import { DiskType } from '@/components/interfaces/DiskManagement/ui/DiskManagement.constants'
+import { instanceSizeSpecs } from '@/data/projects/new-project.constants'
+import { PlanId } from '@/data/subscriptions/types'
 
 /**
  * @description

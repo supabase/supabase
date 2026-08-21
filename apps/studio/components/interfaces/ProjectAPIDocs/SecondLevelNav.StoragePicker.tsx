@@ -1,18 +1,10 @@
+import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { cn, Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from 'ui'
 
-import { usePaginatedBucketsQuery } from 'data/storage/buckets-query'
-import {
-  cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-} from 'ui'
 import type { ResourcePickerRenderProps } from './SecondLevelNav.Layout'
-import { keepPreviousData } from '@tanstack/react-query'
+import { usePaginatedBucketsQuery } from '@/data/storage/buckets-query'
 
 type StorageResourceListProps = ResourcePickerRenderProps & {
   projectRef?: string
@@ -101,22 +93,19 @@ export const StorageResourceList = ({
     rawQuery.length > 0 ? 'No buckets found for this search' : 'No buckets available'
 
   return (
-    <Command_Shadcn_ shouldFilter={false}>
-      <CommandInput_Shadcn_
+    <Command shouldFilter={false}>
+      <CommandInput
         showResetIcon
         value={rawQuery}
         onValueChange={setSearch}
         placeholder="Search buckets..."
         handleReset={() => setSearch('')}
       />
-      <CommandList_Shadcn_>
-        <CommandEmpty_Shadcn_
-          hidden={!showEmptyState}
-          className="py-3 text-sm text-foreground-light"
-        >
+      <CommandList>
+        <CommandEmpty hidden={!showEmptyState} className="py-3 text-sm text-foreground-light">
           {emptyMessage}
-        </CommandEmpty_Shadcn_>
-        <CommandGroup_Shadcn_>
+        </CommandEmpty>
+        <CommandGroup>
           {isFetching && buckets.length === 0 ? (
             <div className="px-4 py-3 text-sm text-foreground-light">Loading buckets...</div>
           ) : (
@@ -124,7 +113,7 @@ export const StorageResourceList = ({
               {buckets.map((bucket) => {
                 const isActive = bucket.name === selectedResource
                 return (
-                  <CommandItem_Shadcn_
+                  <CommandItem
                     key={bucket.id}
                     value={bucket.name}
                     className={cn(
@@ -134,17 +123,17 @@ export const StorageResourceList = ({
                     onSelect={() => handleSelect(bucket.name)}
                   >
                     <p className="truncate">{bucket.name}</p>
-                  </CommandItem_Shadcn_>
+                  </CommandItem>
                 )
               })}
               {hasNextPage && <div ref={sentinelRef} className="h-2 w-full" />}
             </div>
           )}
-        </CommandGroup_Shadcn_>
+        </CommandGroup>
         {isFetchingNextPage && (
           <div className="px-4 py-2 text-sm text-foreground-light">Loading more buckets...</div>
         )}
-      </CommandList_Shadcn_>
-    </Command_Shadcn_>
+      </CommandList>
+    </Command>
   )
 }
