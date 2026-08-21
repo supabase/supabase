@@ -1,7 +1,13 @@
 import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta'
-import { tool } from 'ai'
+import { tool, type JSONValue } from 'ai'
 import { z } from 'zod'
 
+import {
+  sanitizeNotebookRunOutput,
+  type NotebookRunCellOutput,
+  type NotebookRunOutput,
+} from './notebook-run-output'
+import { resolveLogTimeRange } from '@/components/interfaces/QuerySources/LogTimeRange.utils'
 import { getContent } from '@/data/content/content-infinite-query'
 import {
   applyNotebookOperations,
@@ -16,12 +22,29 @@ import {
   type WritableNotebook,
 } from '@/data/content/notebooks/notebook-schema'
 import { createNotebook, upsertNotebook } from '@/data/content/notebooks/notebook-upsert-mutation'
+import { executeLogsSql } from '@/data/logs/execute-logs-sql-mutation'
 import { acceptUntrustedLogsSql, untrustedLogSql } from '@/data/logs/safe-analytics-sql'
+import { QUERY_SOURCE_REGISTRY } from '@/data/query-sources/query-source-registry'
+import { getReadReplicas } from '@/data/read-replicas/replicas-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { applyAutoLimit } from '@/data/sql/utils'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import type { Notebooks } from '@/types'
 
 export type NotebookToolsContext = {
   projectRef?: string
+  connectionString?: string
   authorization?: string
+  aiOptInLevel?: AiOptInLevel
+}
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message?: unknown }).message
+    if (typeof message === 'string') return message
+  }
+  return 'An unexpected error occurred while running this query.'
 }
 
 const notebookToolErrorMetadataSchema = z.object({
@@ -73,7 +96,7 @@ export function decodeNotebookToolError(errorText: string): EncodedNotebookToolE
 }
 
 export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
-  const { projectRef, authorization } = ctx
+  const { projectRef, connectionString, authorization, aiOptInLevel = 'schema' } = ctx
   const authHeaders = authorization ? { Authorization: authorization } : undefined
 
   return {
@@ -138,6 +161,128 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
           cells: toWireNotebook(notebook.content).cells,
         }
       },
+    }),
+    run_notebook: tool({
+      description:
+        'Asks the user to run every database and logs query cell in a notebook, in notebook order, and returns each result according to the organization data-sharing permissions. Requires one user approval before any cell executes.',
+      inputSchema: z.object({
+        id: z.string().describe('The id of the notebook to run.'),
+        expected_updated_at: z
+          .string()
+          .describe(
+            'The `updated_at` received from `get_notebook`. The run is rejected if the notebook changed since.'
+          ),
+      }),
+      needsApproval: true,
+      execute: async ({ id, expected_updated_at }) => {
+        const notebook = await getNotebook({ projectRef, id }, undefined, authHeaders)
+
+        if (notebook.updated_at !== expected_updated_at) {
+          throw new NotebookToolError(
+            `Notebook "${id}" changed since expected_updated_at (${expected_updated_at}); it is now ${notebook.updated_at}. Call get_notebook again and reissue run_notebook against the current content.`,
+            { exposeToAssistant: true }
+          )
+        }
+
+        const queryCells = notebook.content.cells.filter(
+          (cell) => cell._tag === 'database_cell' || cell._tag === 'log_cell'
+        )
+        const needsReplicaLookup = queryCells.some(
+          (cell) =>
+            cell._tag === 'database_cell' &&
+            cell.database_identifier !== undefined &&
+            cell.database_identifier !== projectRef
+        )
+        const databases = needsReplicaLookup
+          ? await getReadReplicas({ projectRef }, undefined, authHeaders)
+          : []
+
+        const cells: NotebookRunCellOutput[] = []
+
+        // This execute function only runs after the AI SDK approval gate above resolves true.
+        // That approval is the explicit user gesture which promotes every persisted cell's
+        // untrusted SQL immediately before execution. Run sequentially to preserve notebook
+        // order and avoid racing cells that may depend on earlier writes.
+        for (const cell of queryCells) {
+          const title = cell.title?.trim() || 'Untitled query'
+
+          try {
+            if (cell._tag === 'log_cell') {
+              const result = await executeLogsSql({
+                projectRef: projectRef ?? '',
+                sql: acceptUntrustedLogsSql(cell.unchecked_sql),
+                range: resolveLogTimeRange(cell.time_range),
+                endpoint: QUERY_SOURCE_REGISTRY.logs.endpoint,
+                headers: authHeaders,
+              })
+              if (result.error) throw result.error
+              cells.push({
+                cell_id: cell._id,
+                title,
+                source: 'logs',
+                status: 'success',
+                // The analytics response crossed a JSON fetch boundary, although its shared
+                // data-layer type remains `unknown[]` because individual endpoints vary.
+                rows: result.rows as JSONValue[],
+              })
+              continue
+            }
+
+            const selectedConnectionString =
+              cell.database_identifier === undefined || cell.database_identifier === projectRef
+                ? connectionString
+                : databases?.find((database) => database.identifier === cell.database_identifier)
+                    ?.connectionString
+
+            if (!selectedConnectionString) {
+              throw new Error(
+                `Unable to run query: connection string is missing for database "${cell.database_identifier ?? projectRef ?? 'primary'}"`
+              )
+            }
+
+            const limitedSql = applyAutoLimit(
+              acceptUntrustedSql(cell.unchecked_sql),
+              cell.row_limit
+            )
+            const { result } = await executeSql<JSONValue[]>(
+              {
+                projectRef,
+                connectionString: selectedConnectionString,
+                sql: limitedSql.sql,
+                isStatementTimeoutDisabled: true,
+              },
+              undefined,
+              authHeaders
+            )
+            cells.push({
+              cell_id: cell._id,
+              title,
+              source: 'database',
+              status: 'success',
+              rows: Array.isArray(result) ? result : [],
+            })
+          } catch (error) {
+            cells.push({
+              cell_id: cell._id,
+              title,
+              source: cell._tag === 'log_cell' ? 'logs' : 'database',
+              status: 'error',
+              error: { message: getErrorMessage(error) },
+            })
+          }
+        }
+
+        return {
+          id: notebook.id,
+          name: notebook.name,
+          updated_at: notebook.updated_at,
+          cells,
+        } satisfies NotebookRunOutput
+      },
+      toModelOutput: ({ output }) => ({
+        type: 'json',
+        value: sanitizeNotebookRunOutput(output, aiOptInLevel),
+      }),
     }),
     create_notebook: tool({
       description:

@@ -2,6 +2,7 @@ import { components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
 
+import { sanitizeNotebookRunOutput, type NotebookRunOutput } from './notebook-run-output'
 import {
   decodeNotebookToolError,
   encodeNotebookToolError,
@@ -52,12 +53,13 @@ const NOTEBOOK_CONTENT = {
 
 describe('ai/tools/notebook-tools', () => {
   describe('getNotebookTools', () => {
-    it('should return list_notebooks, get_notebook, create_notebook, and update_notebook tools', () => {
+    it('should return all notebook tools', () => {
       const tools = getNotebookTools()
 
       expect(Object.keys(tools)).toEqual([
         'list_notebooks',
         'get_notebook',
+        'run_notebook',
         'create_notebook',
         'update_notebook',
       ])
@@ -70,11 +72,145 @@ describe('ai/tools/notebook-tools', () => {
       expect(tools.get_notebook.needsApproval).toBeUndefined()
     })
 
-    it('should require approval to create or update a notebook', () => {
+    it('should require approval to run, create, or update a notebook', () => {
       const tools = getNotebookTools()
 
+      expect(tools.run_notebook.needsApproval).toBe(true)
       expect(tools.create_notebook.needsApproval).toBe(true)
       expect(tools.update_notebook.needsApproval).toBe(true)
+    })
+  })
+
+  describe('run_notebook', () => {
+    function mockGetNotebook() {
+      addAPIMock({
+        method: 'get',
+        path: '/platform/projects/:ref/content/item/:id',
+        response: () =>
+          HttpResponse.json<GetUserContentByIdResponse>({
+            id: 'notebook-1',
+            name: 'Signup funnel',
+            description: undefined,
+            visibility: 'project',
+            favorite: false,
+            folder_id: null,
+            inserted_at: '2026-01-01T00:00:00.000Z',
+            updated_at: '2026-01-01T00:00:00.000Z',
+            owner_id: 1,
+            project_id: 1,
+            type: 'notebook',
+            content: NOTEBOOK_CONTENT,
+          } as unknown as GetUserContentByIdResponse),
+      })
+    }
+
+    it('runs database and log cells in notebook order and skips markdown', async () => {
+      mockGetNotebook()
+      const executionOrder: string[] = []
+
+      addAPIMock({
+        method: 'post',
+        path: '/platform/pg-meta/:ref/query',
+        response: () => {
+          executionOrder.push('database')
+          return HttpResponse.json([{ email: 'person@example.com' }])
+        },
+      })
+      addAPIMock({
+        method: 'post',
+        path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+        response: () => {
+          executionOrder.push('logs')
+          return HttpResponse.json<{ result: unknown[] }>({
+            result: [{ event_message: 'started' }],
+          })
+        },
+      })
+
+      const tools = getNotebookTools({
+        projectRef: 'test-project',
+        connectionString: 'encrypted-connection-string',
+        authorization: 'Bearer token',
+        aiOptInLevel: 'schema_and_log_and_data',
+      })
+      if (!tools.run_notebook.execute) throw new Error('execute is undefined')
+
+      const result = await tools.run_notebook.execute(
+        {
+          id: 'notebook-1',
+          expected_updated_at: '2026-01-01T00:00:00.000Z',
+        },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+
+      expect(executionOrder).toEqual(['database', 'logs'])
+      expect(result).toMatchObject({
+        id: 'notebook-1',
+        name: 'Signup funnel',
+        cells: [
+          {
+            cell_id: 'cell-2',
+            source: 'database',
+            status: 'success',
+            rows: [{ email: 'person@example.com' }],
+          },
+          {
+            cell_id: 'cell-3',
+            source: 'logs',
+            status: 'success',
+            rows: [{ event_message: 'started' }],
+          },
+        ],
+      })
+    })
+
+    it('rejects the run when the notebook changed after it was read', async () => {
+      mockGetNotebook()
+      const tools = getNotebookTools({ projectRef: 'test-project' })
+      if (!tools.run_notebook.execute) throw new Error('execute is undefined')
+
+      await expect(
+        tools.run_notebook.execute(
+          { id: 'notebook-1', expected_updated_at: '2025-12-31T00:00:00.000Z' },
+          { toolCallId: 'test', messages: [], context: {} }
+        )
+      ).rejects.toMatchObject({
+        metadata: { exposeToAssistant: true },
+      })
+    })
+
+    it('shares each source result only at its permitted opt-in level', () => {
+      const output: NotebookRunOutput = {
+        id: 'notebook-1',
+        name: 'Signup funnel',
+        updated_at: '2026-01-01T00:00:00.000Z',
+        cells: [
+          {
+            cell_id: 'database-cell',
+            title: 'Customers',
+            source: 'database' as const,
+            status: 'success' as const,
+            rows: [{ email: 'person@example.com' }],
+          },
+          {
+            cell_id: 'log-cell',
+            title: 'Errors',
+            source: 'logs' as const,
+            status: 'success' as const,
+            rows: [{ event_message: 'failed' }],
+          },
+        ],
+      }
+
+      expect(sanitizeNotebookRunOutput(output, 'schema').cells).toMatchObject([
+        { source: 'database', rows: undefined },
+        { source: 'logs', rows: undefined },
+      ])
+      expect(sanitizeNotebookRunOutput(output, 'schema_and_log').cells).toMatchObject([
+        { source: 'database', rows: undefined },
+        { source: 'logs', rows: [{ event_message: 'failed' }] },
+      ])
+      expect(sanitizeNotebookRunOutput(output, 'schema_and_log_and_data')).toEqual(output)
     })
   })
 

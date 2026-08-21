@@ -117,6 +117,29 @@ describe('ai/tools/mock-tools getMockTools', () => {
       ).rejects.toThrow(/not found/i)
     })
 
+    it('shares deterministic run_notebook output with eval models', async () => {
+      const mockTools = await getMockTools(undefined, new AbortController().signal)
+      if (!mockTools.run_notebook.execute) throw new Error('execute is undefined')
+      if (!mockTools.run_notebook.toModelOutput) throw new Error('toModelOutput is undefined')
+
+      const output = await mockTools.run_notebook.execute(
+        { id: AUTH_HEALTH_NOTEBOOK_ID, expected_updated_at: MOCK_NOTEBOOKS_DATA[0].updated_at },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+      const modelOutput = mockTools.run_notebook.toModelOutput({
+        toolCallId: 'test',
+        input: { id: AUTH_HEALTH_NOTEBOOK_ID, expected_updated_at: output.updated_at },
+        output,
+      })
+
+      expect(modelOutput).toMatchObject({
+        type: 'json',
+        value: {
+          cells: expect.arrayContaining([expect.objectContaining({ rows: [] })]),
+        },
+      })
+    })
+
     it('overrides create_notebook needsApproval to false, unlike the real tool', async () => {
       const mockTools = await getMockTools(undefined, new AbortController().signal)
 

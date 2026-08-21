@@ -1,6 +1,7 @@
 import type { ToolUIPart, UIMessage } from 'ai'
 
 import type { ToolName } from '../tool-filter'
+import { sanitizeNotebookRunOutput } from './notebook-run-output'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 interface ToolSanitizer {
@@ -32,8 +33,17 @@ const executeSqlSanitizer: ToolSanitizer = {
   },
 }
 
+const runNotebookSanitizer: ToolSanitizer = {
+  toolName: 'run_notebook',
+  sanitize: (tool, optInLevel) => ({
+    ...tool,
+    output: sanitizeNotebookRunOutput(tool.output, optInLevel),
+  }),
+}
+
 export const ALL_TOOL_SANITIZERS = {
   [executeSqlSanitizer.toolName]: executeSqlSanitizer,
+  [runNotebookSanitizer.toolName]: runNotebookSanitizer,
 }
 
 export function sanitizeMessagePart(
