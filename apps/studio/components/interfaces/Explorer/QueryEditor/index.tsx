@@ -109,6 +109,8 @@ type QueryEditorProps = {
   display?: QueryDisplay
   toolbarActions?: ReactNode
   className?: string
+  showQuery: boolean
+  onShowQueryChange: (showQuery: boolean) => void
   /** When true, toolbar and editor run actions are disabled. */
   isRunDisabled?: boolean
   onTitleChange: (title: string) => void
@@ -137,6 +139,8 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     display,
     toolbarActions,
     className,
+    showQuery,
+    onShowQueryChange,
     isRunDisabled = false,
     onTitleChange,
     onSqlChange,
@@ -162,7 +166,6 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   const rowLimit = query._tag === 'database' ? query.rowLimit : undefined
   const databaseIdentifier = query._tag === 'database' ? query.database_identifier : undefined
 
-  const [showQuery, setShowQuery] = useState(true)
   const [promptInput, setPromptInput] = useState('')
   const [pendingProposal, setPendingProposal] = useState<PendingProposal | null>(null)
   const pendingProposalRef = useLatest(pendingProposal)
@@ -307,7 +310,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   }, [promptState?.isOpen])
 
   return (
-    <Shell className={cn(variant === 'embedded' && 'mx-auto max-w-4xl', className)}>
+    <Shell className={cn(variant === 'embedded' && 'mx-auto max-w-6xl', className)}>
       <ExplorerToolbar>
         <ExplorerToolbarIcon>
           <CodeSquare size={14} />
@@ -341,7 +344,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
             icon={showQuery ? <EyeOff /> : <Eye />}
             disabled={pendingProposal !== null}
             tooltip={showQuery ? 'Hide query' : 'Show query'}
-            onClick={() => setShowQuery((value) => !value)}
+            onClick={() => onShowQueryChange(!showQuery)}
           />
           <ExplorerToolbarAction
             loading={isExecuting}

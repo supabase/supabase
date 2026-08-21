@@ -62,6 +62,7 @@ export const AssistantQueryCell = ({
 
   const [title, setTitle] = useState(fallbackTitle)
   const [query, setQuery] = useState(() => createAssistantQueryModel(initialSql, source))
+  const [showQuery, setShowQuery] = useState(true)
   // undefined uses the tool output; null intentionally clears it after changing source.
   const [resultOverride, setResultOverride] = useState<QueryResult | null>()
   const [localDisplay, setLocalDisplay] = useState<QueryDisplay | undefined>(undefined)
@@ -71,6 +72,7 @@ export const AssistantQueryCell = ({
     previousId.current = id
     setTitle(fallbackTitle)
     setQuery(createAssistantQueryModel(initialSql, source))
+    setShowQuery(true)
     setResultOverride(undefined)
     setLocalDisplay(undefined)
   }
@@ -140,6 +142,8 @@ export const AssistantQueryCell = ({
         title={title}
         query={query}
         result={result}
+        showQuery={showQuery}
+        onShowQueryChange={setShowQuery}
         roleImpersonationState={roleImpersonationState}
         display={display}
         isRunDisabled={isConfirming}
