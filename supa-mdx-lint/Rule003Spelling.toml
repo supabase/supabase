@@ -402,7 +402,7 @@ allow_list = [
     "SolidStart",
     "Spotify",
     "Sqitch",
-    "subfield",
+    "[Ss]ubfield(s)?",
     "Supabase",
     "[Ss]yslog(s)?",
     "mTLS",
