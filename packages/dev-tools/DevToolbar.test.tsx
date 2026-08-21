@@ -617,7 +617,7 @@ describe('DevToolbar utils', () => {
 
       expect(getEventCountBadge(150)).toEqual({
         label: '99+',
-        sizeClass: 'h-3.5 min-w-3.5 px-1',
+        sizeClass: 'h-4 min-w-4 px-1',
       })
     })
   })
