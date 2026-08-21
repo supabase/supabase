@@ -12,7 +12,7 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
   const dateUpdated = entry.data.database_id.startsWith('pseudo-')
     ? new Date()
     : (await getTroubleshootingUpdatedDates()).get(entry.data.database_id)
-  const errorCodes = entry.data.errors?.map(formatError).filter(Boolean) ?? []
+  const errorCodes = [...new Set(entry.data.errors?.map(formatError).filter(Boolean) ?? [])]
 
   return (
     <SidebarSkeleton
@@ -67,9 +67,9 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
                 <>
                   <h3 className="text-sm text-foreground-lighter mb-3">Related error codes</h3>
                   <div className="flex flex-wrap gap-0.5">
-                    {errorCodes.map((errorCode, index) => (
+                    {errorCodes.map((errorCode) => (
                       <Link
-                        key={index}
+                        key={errorCode}
                         href={`/guides/troubleshooting${serializeTroubleshootingSearchParams({ errorCodes: [errorCode] })}`}
                       >
                         <PillTag className="hover:bg-200 focus-visible:bg-foreground-muted hover:border-control focus-visible:border-control transition-colors">
