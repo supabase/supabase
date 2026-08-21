@@ -87,12 +87,31 @@ describe('genDefaultQueryOtel', () => {
   })
 
   it('selects only id/timestamp/event_message for tables without a column map', () => {
+    expect(fmt(genDefaultQueryOtel(LogsTableName.STORAGE, {}))).toMatchInlineSnapshot(`
+      "-- Logs Preview Query (otel) ['storage_logs']
+      select
+        id,
+        timestamp,
+        event_message
+      from
+        logs
+      where
+        source = 'storage_logs'
+      order by
+        timestamp desc
+      limit
+        100"
+    `)
+  })
+
+  it('aliases the top-level level column for multigres', () => {
     expect(fmt(genDefaultQueryOtel(LogsTableName.MULTIGRES, {}))).toMatchInlineSnapshot(`
       "-- Logs Preview Query (otel) ['multigres_logs']
       select
         id,
         timestamp,
-        event_message
+        event_message,
+        log_attributes['level'] as level
       from
         logs
       where
@@ -405,7 +424,7 @@ describe('genChartQueryOtel', () => {
     `)
   })
 
-  it('uses JSONExtractString for multigres severity (event_message is a JSON string)', () => {
+  it('uses the top-level level attribute for multigres severity', () => {
     expect(fmt(genChartQueryOtel(LogsTableName.MULTIGRES, params, {}))).toMatchInlineSnapshot(`
       "-- Logs Chart Query (otel) ['multigres_logs']
       select
@@ -413,19 +432,15 @@ describe('genChartQueryOtel', () => {
         countIf (
           not (
             (
-              JSONExtractString (event_message, 'level') in ('ERROR', 'FATAL', 'PANIC')
+              log_attributes['level'] in ('ERROR', 'FATAL', 'PANIC')
             )
-            or (
-              JSONExtractString (event_message, 'level') in ('WARN', 'WARNING')
-            )
+            or (log_attributes['level'] in ('WARN', 'WARNING'))
           )
         ) as ok_count,
         countIf (
-          JSONExtractString (event_message, 'level') in ('ERROR', 'FATAL', 'PANIC')
+          log_attributes['level'] in ('ERROR', 'FATAL', 'PANIC')
         ) as error_count,
-        countIf (
-          JSONExtractString (event_message, 'level') in ('WARN', 'WARNING')
-        ) as warning_count
+        countIf (log_attributes['level'] in ('WARN', 'WARNING')) as warning_count
       from
         logs
       where
