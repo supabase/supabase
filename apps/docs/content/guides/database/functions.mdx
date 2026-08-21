@@ -472,7 +472,7 @@ By default, database functions can be executed by any role. There are two main w
     alter default privileges in schema public revoke execute on functions from anon, authenticated;
     ```
 
-    The revoke from `public` has to leave out `in schema public`. A schema-scoped default privilege can only add privileges, so it never reaches the `execute` that Postgres grants to `public` on every new function.
+    The revoke from `public` has to leave out `in schema public`. A schema-scoped default privilege can undo a matching schema-scoped grant, but it never reaches the `execute` that Postgres grants to `public` on every new function.
 
     You can then regrant permissions for a specific function to a specific role:
 
