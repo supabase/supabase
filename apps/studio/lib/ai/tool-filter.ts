@@ -42,6 +42,10 @@ export const toolSetValidationSchema = z.record(
     'get_notebook',
     'create_notebook',
     'update_notebook',
+    'search_repo',
+    'read_repo_file',
+    'write_repo_file',
+    'open_pull_request',
 
     // Fallback tools for self-hosted
     'getSchemaTables',
@@ -67,6 +71,8 @@ export const TOOL_CATEGORIES = {
   LOG: 'log',
   // Data-level tools that require schema_and_log_and_data opt-in
   DATA: 'data',
+  // Source code tools require the independent repository-access permission
+  REPO: 'repo',
 } as const
 
 type ToolCategory = (typeof TOOL_CATEGORIES)[keyof typeof TOOL_CATEGORIES]
@@ -105,6 +111,11 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   // Log tools - MCP and local
   get_advisors: TOOL_CATEGORIES.LOG,
   query_logs: TOOL_CATEGORIES.LOG,
+
+  search_repo: TOOL_CATEGORIES.REPO,
+  read_repo_file: TOOL_CATEGORIES.REPO,
+  write_repo_file: TOOL_CATEGORIES.REPO,
+  open_pull_request: TOOL_CATEGORIES.REPO,
 }
 
 /**
@@ -120,6 +131,8 @@ function getMinimumOptInLevel(category: ToolCategory): AiOptInLevel | null {
       return 'schema_and_log'
     case TOOL_CATEGORIES.DATA:
       return 'schema_and_log_and_data'
+    case TOOL_CATEGORIES.REPO:
+      return null
     default:
       return null
   }
@@ -128,12 +141,18 @@ function getMinimumOptInLevel(category: ToolCategory): AiOptInLevel | null {
 /**
  * Check if a tool is allowed based on the current opt-in level
  */
-function isToolAllowed(toolName: string, aiOptInLevel: AiOptInLevel): boolean {
+function isToolAllowed(
+  toolName: string,
+  aiOptInLevel: AiOptInLevel,
+  hasRepoAccess: boolean
+): boolean {
   const category = TOOL_CATEGORY_MAP[toolName]
 
   if (!category) {
     return false
   }
+
+  if (category === TOOL_CATEGORIES.REPO) return hasRepoAccess
 
   const minimumLevel = getMinimumOptInLevel(category)
 
@@ -181,12 +200,16 @@ export function createPrivacyMessageTool(toolInstance: Tool<any, any>) {
 /**
  * Filter tools based on the AI opt-in level
  */
-export function filterToolsByOptInLevel(tools: ToolSet, aiOptInLevel: AiOptInLevel): ToolSet {
+export function filterToolsByOptInLevel(
+  tools: ToolSet,
+  aiOptInLevel: AiOptInLevel,
+  { hasRepoAccess = false }: { hasRepoAccess?: boolean } = {}
+): ToolSet {
   return Object.fromEntries(
     Object.entries(tools)
       .filter(([toolName]) => TOOL_CATEGORY_MAP[toolName] !== undefined)
       .map(([toolName, toolInstance]) => {
-        if (isToolAllowed(toolName, aiOptInLevel)) {
+        if (isToolAllowed(toolName, aiOptInLevel, hasRepoAccess)) {
           return [toolName, toolInstance]
         }
 
