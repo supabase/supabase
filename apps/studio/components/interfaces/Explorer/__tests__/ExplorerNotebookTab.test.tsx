@@ -1,11 +1,13 @@
-import { screen, waitFor, within } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { HttpResponse } from 'msw'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ExplorerNotebookTab } from '../ExplorerNotebookTab'
+import { setCellSql } from '../QueryCell/QueryCell.utils'
 import { createMarkdownCellSkeleton, createQueryCellSkeleton } from '../utils'
+import { isQueryCell } from '@/data/content/notebooks/notebook-schema'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import { notebooksState } from '@/state/notebooks/notebooks-state'
 import type { Notebook } from '@/state/notebooks/types'
@@ -226,6 +228,31 @@ describe('ExplorerNotebookTab', () => {
       await waitFor(() => expect(queries).toHaveLength(2))
       expect(queries.some((query) => query.includes('select 1'))).toBe(true)
       expect(queries.some((query) => query.includes('delete from foo'))).toBe(true)
+    })
+
+    it('picks up a SQL commit that lands after this render but before the click handler runs', async () => {
+      seedNotebook([readOnlyCell])
+      const queries = mockDatabaseQueryRequests()
+
+      renderNotebookTab()
+
+      const runNotebookButton = await screen.findByRole('button', { name: 'Run notebook' })
+      await waitFor(() => expect(runNotebookButton).toBeEnabled())
+
+      // Simulates the store commit a Monaco blur performs synchronously right before the
+      // click (see QueryCell's onSqlCommit), without letting the resulting re-render reach
+      // this component first — the exact race "type mutating SQL, then immediately click
+      // Run notebook" hits in the browser.
+      notebooksState.updateCell({
+        id: NOTEBOOK_ID,
+        cellId: readOnlyCell._id,
+        updater: (cell) => (isQueryCell(cell) ? setCellSql(cell, 'delete from foo') : cell),
+      })
+      fireEvent.click(runNotebookButton)
+
+      const dialog = await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
+      expect(within(dialog).getByText('Read-only query')).toBeInTheDocument()
+      expect(queries).toHaveLength(0)
     })
 
     it('runs only the read-only cells when "Skip these queries" is checked', async () => {

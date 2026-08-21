@@ -67,7 +67,11 @@ import {
 import { useUpsertNotebookMutation } from '@/data/content/notebooks/notebook-upsert-mutation'
 import { acceptUntrustedLogsSql } from '@/data/logs/safe-analytics-sql'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
+import {
+  getNotebooksStateSnapshot,
+  useCurrentNotebook,
+  useNotebooksStateSnapshot,
+} from '@/state/notebooks/notebooks-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export const ExplorerNotebookTab = () => {
@@ -135,10 +139,17 @@ export const ExplorerNotebookTab = () => {
     }
   }
 
+  const getFreshCells = () => {
+    const freshNotebook = id ? getNotebooksStateSnapshot().notebooks[id] : undefined
+    if (!freshNotebook || freshNotebook.projectRef !== ref) return cells
+    return freshNotebook.notebook.content?.cells ?? []
+  }
+
   const handleRunNotebook = () => {
-    const mutatingCells = findMutatingQueryCells(cells)
+    const freshCells = getFreshCells()
+    const mutatingCells = findMutatingQueryCells(freshCells)
     if (mutatingCells.length === 0) {
-      runNotebook(queryCellIds)
+      runNotebook(freshCells.filter(isQueryCell).map((cell) => cell._id))
     } else {
       setSkipMutatingCells(false)
       setPendingMutationCells(mutatingCells)
