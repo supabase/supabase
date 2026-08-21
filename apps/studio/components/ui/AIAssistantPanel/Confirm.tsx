@@ -1,7 +1,8 @@
-import { type PropsWithChildren } from 'react'
+import { Check, X } from 'lucide-react'
+import { type PropsWithChildren, type ReactNode } from 'react'
 import { Button, cn } from 'ui'
 
-import { getConfirmFooterBar } from './Confirm.utils'
+import { getConfirmFooterBar, type ConfirmFooterApprovalState } from './Confirm.utils'
 
 interface ConfirmFooterProps {
   message: string
@@ -10,6 +11,9 @@ interface ConfirmFooterProps {
   confirmLabelLoading?: string
   isLoading?: boolean
   isDisabled?: boolean
+  outcome?: 'success' | 'error' | 'denied'
+  showActions?: boolean
+  action?: ReactNode
   /** Omit the confirm button so only Skip remains (unparseable / unapplyable previews). */
   denyOnly?: boolean
   /** Escape hatch for consumers that attach the bar directly under their own frame. */
@@ -26,6 +30,9 @@ export const ConfirmFooter = ({
   confirmLabelLoading = 'Working...',
   isLoading = false,
   isDisabled = false,
+  outcome,
+  showActions = true,
+  action,
   denyOnly = false,
   className,
   onCancel,
@@ -41,17 +48,28 @@ export const ConfirmFooter = ({
         className
       )}
     >
-      <div className="min-w-0 flex-1">{message}</div>
-      <div className="flex shrink-0 items-center gap-2">
-        <Button size="tiny" variant="outline" onClick={onCancel} disabled={isInactive}>
-          {cancelLabel}
-        </Button>
-        {!denyOnly && (
-          <Button size="tiny" variant="primary" onClick={onConfirm} disabled={isInactive}>
-            {isLoading ? confirmLabelLoading : confirmLabel}
-          </Button>
-        )}
+      <div role="status" className="min-w-0 flex flex-1 items-center gap-2">
+        {outcome === 'success' && <Check className="size-3.5 shrink-0 text-brand" />}
+        {outcome === 'error' && <X className="size-3.5 shrink-0 text-danger" />}
+        <span>{message}</span>
       </div>
+      {(showActions || action) && (
+        <div className="flex shrink-0 items-center gap-2">
+          {showActions && (
+            <>
+              <Button size="tiny" variant="outline" onClick={onCancel} disabled={isInactive}>
+                {cancelLabel}
+              </Button>
+              {!denyOnly && (
+                <Button size="tiny" variant="primary" onClick={onConfirm} disabled={isInactive}>
+                  {isLoading ? confirmLabelLoading : confirmLabel}
+                </Button>
+              )}
+            </>
+          )}
+          {action}
+        </div>
+      )}
     </div>
   )
 }
@@ -61,11 +79,15 @@ interface ConfirmProps {
    * Result of `getManualToolApprovalConfirmState`. Interactive buttons only for
    * `approval-requested`; `approval-responded` is the post-approve loading morph.
    */
-  state?: string
+  state?: ConfirmFooterApprovalState
   message: string
   cancelLabel?: string
   confirmLabel?: string
   confirmLabelLoading?: string
+  successMessage?: string
+  errorMessage?: string
+  deniedMessage?: string
+  footerAction?: ReactNode
   extraLoading?: boolean
   isLoading?: boolean
   /**
@@ -93,6 +115,10 @@ export const Confirm = ({
   cancelLabel = 'Skip',
   confirmLabel = 'Confirm',
   confirmLabelLoading = 'Working...',
+  successMessage,
+  errorMessage,
+  deniedMessage,
+  footerAction,
   extraLoading = false,
   isLoading = false,
   fill = false,
@@ -104,6 +130,12 @@ export const Confirm = ({
   const bar = getConfirmFooterBar(state)
   const showLoading = bar.isLoading || extraLoading || isLoading
   const isApprovalRequested = state === 'approval-requested'
+  const outcomeMessages = {
+    success: successMessage,
+    error: errorMessage,
+    denied: deniedMessage,
+  }
+  const footerMessage = bar.outcome ? (outcomeMessages[bar.outcome] ?? message) : message
 
   return (
     <div
@@ -120,12 +152,15 @@ export const Confirm = ({
       </div>
       {bar.show && (
         <ConfirmFooter
-          message={message}
+          message={footerMessage}
           cancelLabel={cancelLabel}
           confirmLabel={confirmLabel}
           confirmLabelLoading={confirmLabelLoading}
           isLoading={showLoading}
           isDisabled={!isApprovalRequested}
+          outcome={bar.outcome}
+          showActions={isApprovalRequested}
+          action={footerAction}
           denyOnly={denyOnly}
           onCancel={onCancel}
           onConfirm={onConfirm}

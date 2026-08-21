@@ -1,4 +1,9 @@
-export type ConfirmFooterApprovalState = 'approval-requested' | 'approval-responded'
+export type ConfirmFooterApprovalState =
+  | 'approval-requested'
+  | 'approval-responded'
+  | 'success'
+  | 'error'
+  | 'denied'
 
 /** Sent with Skip so the model sees a user choice, not the SDK default "Tool execution denied." */
 export const USER_SKIPPED_TOOL_REASON = 'The user skipped this action.'
@@ -11,20 +16,27 @@ export type ToolApprovalFields = {
 }
 
 /**
- * Whether the confirm bar should render, and whether it is in the post-approve loading
- * morph. Driven by the AI SDK tool approval state; any other state hides the bar.
+ * Whether the confirm bar should render, and whether it is loading or in a terminal state.
+ * Driven by the AI SDK tool approval state; any other state hides the bar.
  */
-export function getConfirmFooterBar(state?: string): { show: boolean; isLoading: boolean } {
+export function getConfirmFooterBar(state?: ConfirmFooterApprovalState): {
+  show: boolean
+  isLoading: boolean
+  outcome?: 'success' | 'error' | 'denied'
+} {
   if (state === 'approval-requested') return { show: true, isLoading: false }
   if (state === 'approval-responded') return { show: true, isLoading: true }
+  if (state === 'success' || state === 'error' || state === 'denied') {
+    return { show: true, isLoading: false, outcome: state }
+  }
   return { show: false, isLoading: false }
 }
 
 /**
  * Maps a tool part onto the confirm footer. Follows the AI SDK `useChat` rule:
  * interactive Approve/Deny only for `approval-requested` when `!approval.isAutomatic`.
- * `approval-responded` keeps a loading morph after a manual approve; denials and
- * automatic decisions hide the bar.
+ * `approval-responded` keeps a loading morph after a manual approve. Completed manual
+ * approvals stay visible as a terminal outcome; automatic decisions never get a footer.
  *
  * @see https://ai-sdk.dev/docs/agents/tool-approvals
  */
@@ -38,6 +50,9 @@ export function getManualToolApprovalConfirmState({
   if (approval?.isAutomatic) return undefined
   if (state === 'approval-requested') return 'approval-requested'
   if (state === 'approval-responded' && approval?.approved !== false) return 'approval-responded'
+  if (state === 'output-available' && approval?.approved === true) return 'success'
+  if (state === 'output-error' && approval?.approved === true) return 'error'
+  if (state === 'output-denied' && approval?.approved === false) return 'denied'
   return undefined
 }
 

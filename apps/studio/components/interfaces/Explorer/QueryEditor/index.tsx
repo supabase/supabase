@@ -109,6 +109,7 @@ export type QueryEditorHandle = {
 
 type QueryEditorProps = {
   id: string
+  isReadOnly?: boolean
   variant: 'embedded' | 'viewport'
   title: string
   query: ExplorerQueryModel
@@ -139,6 +140,7 @@ type QueryEditorProps = {
 export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(function QueryEditor(
   {
     id,
+    isReadOnly = false,
     variant,
     title,
     query,
@@ -307,7 +309,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   }
 
   const acceptSqlProposal = () => {
-    if (!pendingProposal) return
+    if (isReadOnly || !pendingProposal) return
     if (sql === pendingProposal.original) {
       onSqlChange(pendingProposal.modified)
       onSqlCommit?.(pendingProposal.modified)
@@ -426,6 +428,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
               <CodeEditor
                 id={`explorer-query-${id}`}
                 language="pgsql"
+                isReadOnly={isReadOnly}
                 value={sql}
                 placeholder={!promptState?.isOpen ? generatePlaceholder(os) : ''}
                 placeholderClassName="top-[13px]"
