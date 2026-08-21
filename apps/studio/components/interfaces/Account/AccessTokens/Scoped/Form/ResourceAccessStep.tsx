@@ -25,11 +25,15 @@ import {
 
 import type { ResourceAccessMode } from '../../AccessToken.permissions'
 import { getIsProjectScopedOnly } from '../../AccessToken.roles'
-import { useOrgAndProjectData } from '../../hooks/useOrgAndProjectData'
 import type { TokenFormValues } from './NewScopedTokenForm.utils'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { usePermissionsQuery } from '@/data/permissions/permissions-query'
-import { ProjectInfoInfinite } from '@/data/projects/projects-infinite-query'
+import {
+  ProjectInfoInfinite,
+  ProjectsInfiniteData,
+  useProjectsInfiniteQuery,
+} from '@/data/projects/projects-infinite-query'
 import { Organization } from '@/types'
 
 interface ResourceAccessStepProps {
@@ -64,7 +68,19 @@ export const ResourceAccessStep = ({
   setValue,
   onSelectLegacyToken,
 }: ResourceAccessStepProps) => {
-  const { organizations, projects } = useOrgAndProjectData()
+  const { data: organizations = [] } = useOrganizationsQuery()
+  const {
+    data: projectsData,
+    hasNextPage,
+    fetchNextPage,
+  } = useProjectsInfiniteQuery({
+    limit: 100,
+  })
+
+  const projects = useMemo(
+    () => projectsData?.pages.flatMap((page) => page.projects) ?? [],
+    [projectsData]
+  )
   const organizationsBySlug = useMemo(
     () =>
       organizations.reduce(
@@ -121,7 +137,7 @@ export const ResourceAccessStep = ({
             label="Resource access"
             description={
               <p className="text-foreground-lighter text-sm">
-                Need a token with full access to your account or one for the Supabase MCP server?{' '}
+                Need a token with full access to your account?{' '}
                 <button
                   type="button"
                   tabIndex={0}
@@ -234,13 +250,11 @@ export const ResourceAccessStep = ({
                   />
                   <MultiSelectorContent>
                     <MultiSelectorInput placeholder="Search projects" showResetIcon />
-                    <MultiSelectorList>
-                      {projectsForOrg.map((project) => (
-                        <MultiSelectorItem key={project.ref} value={project.ref}>
-                          {project.name}
-                        </MultiSelectorItem>
-                      ))}
-                    </MultiSelectorList>
+                    <ProjectMultiSelectList
+                      projects={projectsForOrg}
+                      hasNextPage={hasNextPage}
+                      fetchNextPage={fetchNextPage}
+                    />
                   </MultiSelectorContent>
                 </MultiSelector>
               </FormItemLayout>
@@ -301,5 +315,34 @@ export const ResourceAccessStep = ({
         />
       )}
     </section>
+  )
+}
+
+const ProjectMultiSelectList = ({
+  projects,
+  hasNextPage,
+  fetchNextPage,
+}: {
+  projects: ProjectsInfiniteData['projects']
+  hasNextPage: boolean
+  fetchNextPage: () => void
+}) => {
+  const handleScroll = (event: React.UIEvent) => {
+    const element = event.currentTarget as HTMLElement
+    const offset = 50 // Offset by approximately 1 item to start fetching next page before hitting the bottom
+    const isAtBottom = element.scrollTop + element.clientHeight >= element.scrollHeight - offset
+    if (hasNextPage && isAtBottom) {
+      fetchNextPage()
+    }
+  }
+
+  return (
+    <MultiSelectorList onScroll={handleScroll}>
+      {projects.map((project) => (
+        <MultiSelectorItem key={project.ref} value={project.ref}>
+          {project.name}
+        </MultiSelectorItem>
+      ))}
+    </MultiSelectorList>
   )
 }

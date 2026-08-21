@@ -7,7 +7,7 @@ sidebar_label: 'Debugging'
 
 The [Storage Logs](/dashboard/project/_/logs/storage-logs) provide a convenient way to examine all incoming request logs to your Storage service. You can filter by time and keyword searches.
 
-For more advanced filtering needs, use the [Logs Explorer](/dashboard/project/_/logs/explorer) to query the Storage logs dataset directly. The Logs Explorer is separate from the SQL Editor and uses a subset of the BigQuery SQL syntax rather than traditional SQL.
+For more advanced filtering needs, use the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs) with the query source set to **Logs** to query the Storage logs directly. A Logs query runs ClickHouse SQL rather than Postgres SQL. Every log line is a row in the `logs` table, tagged by a `source` column, with structured fields in a `log_attributes` map.
 
 <Admonition type="note">
   
@@ -15,24 +15,21 @@ For more details on filtering the log tables, see [Advanced Log Filtering](/docs
 
 </Admonition>
 
-## Example Storage queries for the Logs Explorer
+## Example Storage queries
 
 ### Filter by status 5XX error
 
 ```sql
 select
   id,
-  storage_logs.timestamp,
+  timestamp,
   event_message,
-  r.statusCode,
-  e.message as errorMessage,
-  e.raw as rawError
-from
-  storage_logs
-  cross join unnest(metadata) as m
-  cross join unnest(m.res) as r
-  cross join unnest(m.error) as e
-where r.statusCode >= 500
+  toInt32OrZero(log_attributes['res.statusCode']) as statusCode,
+  log_attributes['error.message'] as errorMessage,
+  log_attributes['error.raw'] as rawError
+from logs
+where source = 'storage_logs'
+  and toInt32OrZero(log_attributes['res.statusCode']) >= 500
 order by timestamp desc
 limit 100;
 ```
@@ -42,17 +39,14 @@ limit 100;
 ```sql
 select
   id,
-  storage_logs.timestamp,
+  timestamp,
   event_message,
-  r.statusCode,
-  e.message as errorMessage,
-  e.raw as rawError
-from
-  storage_logs
-  cross join unnest(metadata) as m
-  cross join unnest(m.res) as r
-  cross join unnest(m.error) as e
-where r.statusCode >= 400 and r.statusCode < 500
+  toInt32OrZero(log_attributes['res.statusCode']) as statusCode,
+  log_attributes['error.message'] as errorMessage,
+  log_attributes['error.raw'] as rawError
+from logs
+where source = 'storage_logs'
+  and toInt32OrZero(log_attributes['res.statusCode']) between 400 and 499
 order by timestamp desc
 limit 100;
 ```
@@ -60,12 +54,10 @@ limit 100;
 ### Filter by method
 
 ```sql
-select id, storage_logs.timestamp, event_message, r.method
-from
-  storage_logs
-  cross join unnest(metadata) as m
-  cross join unnest(m.req) as r
-where r.method in ("POST")
+select id, timestamp, event_message, log_attributes['req.method'] as method
+from logs
+where source = 'storage_logs'
+  and log_attributes['req.method'] in ('POST')
 order by timestamp desc
 limit 100;
 ```
@@ -73,12 +65,10 @@ limit 100;
 ### Filter by IP address
 
 ```sql
-select id, storage_logs.timestamp, event_message, r.remoteAddress
-from
-  storage_logs
-  cross join unnest(metadata) as m
-  cross join unnest(m.req) as r
-where r.remoteAddress in ("IP_ADDRESS")
+select id, timestamp, event_message, log_attributes['req.remoteAddress'] as remoteAddress
+from logs
+where source = 'storage_logs'
+  and log_attributes['req.remoteAddress'] in ('IP_ADDRESS')
 order by timestamp desc
 limit 100;
 ```

@@ -6,6 +6,7 @@ Aaron Brooks
 Aaron Byrne
 Adam Mohammed
 Adam Mokan
+Adam Whitlock
 AJ Matias
 Akash Manimaran
 Akilesh Sethu
@@ -89,8 +90,8 @@ Dimitrios Liappis
 Div Arora
 Divit D
 Divya Sharma
+Donna Alexandra
 Douglas Hunley
-Dustin Keib
 Eduardo Gurgel
 Eleftheria Trivyzaki
 Eliot Whalan
@@ -98,6 +99,7 @@ Emmett Folger
 Erfi Anugrah
 Eric Kharitonashvili
 Etienne Stalmans
+Evan Cummack
 Eyal Ehrlich
 Fabrizio Fenoglio
 Fady A
@@ -203,6 +205,7 @@ Márton Boros
 Matthew Hambright
 Matt Hudson
 Matt Johnston
+Matt Robinson
 Matt Rossman
 Matt Smiley
 Matthias Luft
@@ -239,6 +242,7 @@ Pedro Rodrigues
 Peter Lyn
 Peter Soderberg
 Pierre Ducroquet
+Pierre Frances
 Qiao Han
 Quintin Willison
 Rafael Chacón
@@ -265,6 +269,7 @@ Samir Ketema
 Sana Cordeaux
 Sasi Kanumuri
 Sara Read
+Satya Rohith Gannamanedi
 Sean Oliver
 Sean Romberg
 Sean Thompson
@@ -310,6 +315,7 @@ Victor Farazdagi
 Warwick Mitchell
 Wen Bo Xie
 Wendie Cheung
+Yara Lacerda
 Yorvi Arias
 Yuliya Marinova
 Zach Marinov

@@ -66,6 +66,19 @@ describe('matchRedirect query/hash preservation', () => {
     })
   })
 
+  it('redirects legacy replication replica detail to infrastructure', () => {
+    expect(
+      matchRedirect({
+        pathname: '/project/abc/database/replication/replica/replica-1',
+        search: {},
+        isPlatform: true,
+      })
+    ).toEqual({
+      destination: '/project/abc/settings/infrastructure/replica/replica-1',
+      permanent: true,
+    })
+  })
+
   it('redirects the legacy compute billing panel to the CPU section', () => {
     expect(
       matchRedirect({

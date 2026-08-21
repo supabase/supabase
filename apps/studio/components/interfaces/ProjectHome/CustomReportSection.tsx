@@ -29,7 +29,7 @@ import { DEFAULT_CHART_CONFIG } from '@/components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from '@/data/analytics/constants'
 import { useInvalidateAnalyticsQuery } from '@/data/analytics/utils'
 import { useContentInfiniteQuery } from '@/data/content/content-infinite-query'
-import { Content } from '@/data/content/content-query'
+import { Content, ContentOfType } from '@/data/content/content-query'
 import {
   UpsertContentPayload,
   useContentUpsertMutation,
@@ -58,7 +58,7 @@ export function CustomReportSection() {
     { projectRef: ref, type: 'report', name: 'Home', limit: 1 },
     { placeholderData: keepPreviousData }
   )
-  const homeReport = reportsData?.pages?.[0]?.content?.[0] as Content | undefined
+  const homeReport = reportsData?.pages?.[0]?.content?.[0] as ContentOfType<'report'> | undefined
   const reportContent = homeReport?.content as Dashboards.Content | undefined
 
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false)

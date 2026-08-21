@@ -68,7 +68,7 @@ export function ComputeSection({
           <DocsButton href={`${DOCS_URL}/guides/platform/compute-and-disk`} />
         </PageSectionAside>
       </PageSectionMeta>
-      <PageSectionContent ref={settingsRef} className="scroll-mt-24">
+      <PageSectionContent ref={settingsRef} id="compute" className="scroll-mt-24">
         <ComputeSizeField form={form} disabled={disabled} />
       </PageSectionContent>
     </PageSection>

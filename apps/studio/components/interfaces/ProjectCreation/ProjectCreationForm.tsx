@@ -33,6 +33,7 @@ import {
   getHighAvailabilityRegionCode,
   instanceLabel,
   monthlyInstancePrice,
+  resolveDefaultDbRegion,
   smartRegionToExactRegion,
 } from './ProjectCreation.utils'
 import { ProjectCreationFooter } from './ProjectCreationFooter'
@@ -284,12 +285,16 @@ export const ProjectCreationForm = ({
 
   const fixedDefaultRegion = PROVIDERS[selectedCloudProvider].default_region.displayName
   const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
-  const defaultRegion =
-    highAvailability && highAvailabilityRegionCode !== undefined
-      ? highAvailabilityRegion?.name
-      : smartRegionEnabled
-        ? recommendedSmartRegion
-        : (autoDefaultRegion ?? fixedDefaultRegion)
+  const defaultRegion = resolveDefaultDbRegion({
+    cloudProvider: selectedCloudProvider,
+    isHighAvailabilityRestricted:
+      highAvailability === true && highAvailabilityRegionCode !== undefined,
+    highAvailabilityRegionName: highAvailabilityRegion?.name,
+    isSmartRegionEnabled: smartRegionEnabled,
+    recommendedSmartRegion,
+    autoDefaultRegion,
+    fixedDefaultRegion,
+  })
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !hasOutstandingInvoices
   const canConfigureGitHubOnCreate =
@@ -371,7 +376,14 @@ export const ProjectCreationForm = ({
       values.instanceSize &&
       !sizesWithNoCostConfirmationRequired.includes(values.instanceSize as DesiredInstanceSize)
 
-    if (additionalMonthlySpend > 0 && (hasOAuthApps || launchingLargerInstance)) {
+    // High availability projects are free during Alpha, so the forced large compute
+    // doesn't incur the usual compute costs.
+    const requiresCostConfirmation =
+      !values.highAvailability &&
+      additionalMonthlySpend > 0 &&
+      (hasOAuthApps || launchingLargerInstance)
+
+    if (requiresCostConfirmation) {
       track('project_creation_simple_version_confirm_modal_opened', {
         instanceSize: values.instanceSize,
       })
@@ -443,13 +455,9 @@ export const ProjectCreationForm = ({
       extractPostgresVersionDetails(postgresVersionSelection)
 
     const { smartGroup = [], specific = [] } = availableRegionsData?.all ?? {}
-    const selectedRegion =
-      highAvailability && highAvailabilityRegionCode !== undefined
-        ? specific.find((region) => region.code === highAvailabilityRegionCode)
-        : smartRegionEnabled
-          ? (smartGroup.find((x) => x.name === dbRegion) ??
-            specific.find((x) => x.name === dbRegion))
-          : undefined
+    const selectedRegion = smartRegionEnabled
+      ? (smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion))
+      : undefined
 
     if (highAvailability && highAvailabilityRegionCode !== undefined && !selectedRegion) {
       return toast.error(
@@ -680,8 +688,8 @@ export const ProjectCreationForm = ({
                           label="GitHub (optional)"
                           description={
                             <>
-                              Ideal for agent-first workflows: update your schema in code, push it
-                              to GitHub, and Supabase deploys the changes automatically.{' '}
+                              Ideal for agent-first workflows. Update your schema in code and push
+                              it to GitHub. Supabase deploys the changes.{' '}
                               <a
                                 href="https://supabase.com/docs/guides/deployment/branching/github-integration"
                                 target="_blank"

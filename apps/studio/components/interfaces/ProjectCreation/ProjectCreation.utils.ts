@@ -8,13 +8,16 @@ export function smartRegionToExactRegion(smartOrExactRegion: string) {
   return SMART_REGION_TO_EXACT_REGION_MAP.get(smartOrExactRegion) ?? smartOrExactRegion
 }
 
-export function getAvailableRegions(cloudProvider: CloudProvider): Region {
+export function getAvailableRegions(
+  cloudProvider: CloudProvider,
+  environment = process.env.NEXT_PUBLIC_ENVIRONMENT
+): Region {
   switch (cloudProvider) {
     case 'AWS':
     case 'AWS_K8S':
       return AWS_REGIONS
     case 'AWS_NIMBUS':
-      if (process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod') {
+      if (environment !== 'prod') {
         // Only allow Southeast Asia for Nimbus (local/staging)
         return {
           SOUTHEAST_ASIA: AWS_REGIONS.SOUTHEAST_ASIA,
@@ -28,6 +31,41 @@ export function getAvailableRegions(cloudProvider: CloudProvider): Region {
     default:
       throw new Error('Invalid cloud provider')
   }
+}
+
+type ResolveDefaultDbRegionArgs = {
+  cloudProvider: CloudProvider
+  isHighAvailabilityRestricted: boolean
+  highAvailabilityRegionName: string | undefined
+  isSmartRegionEnabled: boolean
+  recommendedSmartRegion: string | undefined
+  autoDefaultRegion: string | undefined
+  fixedDefaultRegion: string
+  environment?: string
+}
+
+export function resolveDefaultDbRegion({
+  cloudProvider,
+  isHighAvailabilityRestricted,
+  highAvailabilityRegionName,
+  isSmartRegionEnabled,
+  recommendedSmartRegion,
+  autoDefaultRegion,
+  fixedDefaultRegion,
+  environment = process.env.NEXT_PUBLIC_ENVIRONMENT,
+}: ResolveDefaultDbRegionArgs): string | undefined {
+  if (isHighAvailabilityRestricted) return highAvailabilityRegionName
+  if (isSmartRegionEnabled) return recommendedSmartRegion
+
+  // The geolocated default is only usable if the provider actually offers that region
+  // (e.g. AWS_NIMBUS is restricted to a single region)
+  const isAutoDefaultRegionAvailable = Object.entries(
+    getAvailableRegions(cloudProvider, environment)
+  ).some(([, region]) => region.displayName === autoDefaultRegion)
+
+  return isAutoDefaultRegionAvailable && autoDefaultRegion !== undefined
+    ? autoDefaultRegion
+    : fixedDefaultRegion
 }
 
 /**
