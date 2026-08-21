@@ -17,10 +17,15 @@ import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 import type { SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
 import type { AiSupportStatus } from '@/data/feedback/ai-chat-front-sync'
 import { constructHeaders } from '@/data/fetchers'
+import { getQueryClient } from '@/data/query-client'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { prepareMessagesForAPI } from '@/lib/ai/message-utils'
 import { isKnownAssistantModelId } from '@/lib/ai/model.utils'
 import type { AssistantModelId } from '@/lib/ai/model.utils'
+import {
+  applyNotebookCacheEffects,
+  collectNotebookCacheEffects,
+} from '@/lib/ai/notebook-cache-invalidation'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 
 type SuggestionsType = {
@@ -277,6 +282,14 @@ function createChatInstance(
   state: AiAssistantState,
   options: { id: string; initialMessages: MessageType[] }
 ) {
+  // Seeded so effects already reflected in persisted history aren't replayed on the first
+  // onFinish after a reload.
+  const processedNotebookToolCallIds = new Set<string>(
+    collectNotebookCacheEffects(options.initialMessages, new Set()).map(
+      (effect) => effect.toolCallId
+    )
+  )
+
   return new Chat<MessageType>({
     id: options.id,
     messages: options.initialMessages.map((message) => sanitizeForCloning(message)),
@@ -367,6 +380,16 @@ function createChatInstance(
           import('@/state/ai-chat-front-sync')
             .then(({ syncSupportChatToFront }) => syncSupportChatToFront(options.id, state))
             .catch(() => {})
+        }
+
+        // Invalidate caches for any notebooks the assistant created/updated in this turn
+        const projectRef = state.context.projectRef
+        if (projectRef) {
+          const effects = collectNotebookCacheEffects(messages, processedNotebookToolCallIds)
+          effects.forEach((effect) => processedNotebookToolCallIds.add(effect.toolCallId))
+          if (effects.length > 0) {
+            void applyNotebookCacheEffects({ queryClient: getQueryClient(), projectRef, effects })
+          }
         }
       }
     },
