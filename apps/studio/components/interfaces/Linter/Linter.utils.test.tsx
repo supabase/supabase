@@ -78,6 +78,7 @@ describe('Linter.utils lintInfoMap pitr_archiving_stale entry', () => {
     expect(isValidElement(info!.icon)).toBe(true)
     expect(isValidElement(info!.icon) && info!.icon.type).toBe(Ruler)
     expect(info!.category).toBe('security')
+    expect(info!.linkText).toBe('View settings')
     // metadata is unused by this entry's link(), and every field on Lint['metadata'] is optional, so {} needs no cast
     expect(info!.link({ projectRef, metadata: {} })).toBe('/project/abc/database/backups/pitr')
     expect(info!.docsLink).toBe(
