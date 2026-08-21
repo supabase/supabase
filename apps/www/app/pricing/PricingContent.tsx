@@ -42,11 +42,14 @@ export default function PricingContent() {
 
       <div className="text-center mt-10 xl:mt-16 mx-auto max-w-lg flex flex-col gap-8">
         <div className="flex justify-center gap-2">
-          <a href="#compare-plans">
-            <Button size="tiny" variant="secondary" iconRight={<ArrowDownIcon className="w-3" />}>
-              Compare Plans
-            </Button>
-          </a>
+          <Button
+            size="tiny"
+            variant="secondary"
+            asChild
+            iconRight={<ArrowDownIcon className="w-3" />}
+          >
+            <a href="#compare-plans">Compare Plans</a>
+          </Button>
           <Button
             size="tiny"
             variant="default"
