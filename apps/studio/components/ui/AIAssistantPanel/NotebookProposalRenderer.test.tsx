@@ -339,6 +339,113 @@ describe('NotebookProposalRenderer', () => {
     expect(screen.queryByText("This update can't be applied as written")).not.toBeInTheDocument()
   })
 
+  it('renders the snapshot-derived diff for a completed delete_cell update, without fetching the notebook', () => {
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="output-available"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
+        }}
+        output={{
+          id: NOTEBOOK_ID,
+          name: 'Signup funnel',
+          previous_content: {
+            schema_version: 1,
+            cells: [
+              { _tag: 'markdown_cell', _id: 'cell-1', text: 'hello' },
+              { _tag: 'markdown_cell', _id: 'cell-2', text: 'world' },
+            ],
+          },
+        }}
+      />
+    )
+
+    expect(screen.getByText('−1')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Open notebook' })).toHaveAttribute(
+      'href',
+      `/project/default/explorer/notebook/${NOTEBOOK_ID}`
+    )
+  })
+
+  it('renders a single added cell for a completed insert_cell update, not a phantom duplicate', () => {
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="output-available"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [
+            {
+              _tag: 'insert_cell',
+              after_cell_id: 'cell-1',
+              cell: { _tag: 'markdown_cell', text: 'new section' },
+            },
+          ],
+        }}
+        output={{
+          id: NOTEBOOK_ID,
+          name: 'Signup funnel',
+          previous_content: {
+            schema_version: 1,
+            cells: [{ _tag: 'markdown_cell', _id: 'cell-1', text: 'hello' }],
+          },
+        }}
+      />
+    )
+
+    expect(screen.getByText('+1')).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Added Markdown cell' })).toHaveLength(1)
+  })
+
+  it('falls back to the compact completed body when previous_content is absent', () => {
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="output-available"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
+        }}
+        output={{ id: NOTEBOOK_ID, name: 'Signup funnel' }}
+      />
+    )
+
+    expect(screen.getByText('Notebook updated: Signup funnel')).toBeInTheDocument()
+    expect(screen.queryByText("This update can't be applied as written")).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Open notebook' })).toBeInTheDocument()
+  })
+
+  it('falls back to the compact completed body when the snapshot no longer matches the operations', () => {
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="output-available"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'missing' }],
+        }}
+        output={{
+          id: NOTEBOOK_ID,
+          name: 'Signup funnel',
+          previous_content: {
+            schema_version: 1,
+            cells: [{ _tag: 'markdown_cell', _id: 'cell-1', text: 'hello' }],
+          },
+        }}
+      />
+    )
+
+    expect(screen.getByText('Notebook updated: Signup funnel')).toBeInTheDocument()
+    expect(screen.queryByText("This update can't be applied as written")).not.toBeInTheDocument()
+    expect(screen.queryByText('Preview unavailable')).not.toBeInTheDocument()
+  })
+
   it('derives the diff against live content for a denied update', async () => {
     mockContentItem(mockNotebookRow())
 
