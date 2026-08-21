@@ -232,12 +232,18 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
    * decided by `query._tag`, the same discriminant that picks the execution endpoint, so
    * Postgres SQL cannot reach the analytics wire or vice versa.
    */
-  const handleRunQuery = async (rawSql: string = sql, force: boolean = false) => {
+  const handleRunQuery = async ({
+    rawSql = sql,
+    shouldForce = false,
+  }: {
+    rawSql?: string
+    shouldForce?: boolean
+  } = {}) => {
     if (!project || isBusy || pendingProposal || isRunDisabled || rawSql.trim().length === 0) return
 
     if (query._tag === 'database') {
       const issues = analyzeQueryIssues(rawSql, eventTriggers)
-      if (hasBlockingIssues(issues, force)) {
+      if (hasBlockingIssues(issues, shouldForce)) {
         setPendingRun({ sql: rawSql, issues })
         return
       }
@@ -286,7 +292,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     if (!pendingRun) return
     const runSql = pendingRun.sql
     setPendingRun(undefined)
-    handleRunQuery(runSql, true)
+    handleRunQuery({ rawSql: runSql, shouldForce: true })
   }
 
   const handleConfirmPendingRunWithRLS = () => {
@@ -295,7 +301,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     if (tables.length === 0) return
     const rewrittenSql = appendEnableRLSStatements(pendingRun.sql, tables)
     setPendingRun(undefined)
-    handleRunQuery(rewrittenSql, true)
+    handleRunQuery({ rawSql: rewrittenSql, shouldForce: true })
   }
 
   const acceptSqlProposal = () => {
