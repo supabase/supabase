@@ -33,6 +33,7 @@ import {
   getHighAvailabilityRegionCode,
   instanceLabel,
   monthlyInstancePrice,
+  resolveDefaultDbRegion,
   smartRegionToExactRegion,
 } from './ProjectCreation.utils'
 import { ProjectCreationFooter } from './ProjectCreationFooter'
@@ -284,12 +285,16 @@ export const ProjectCreationForm = ({
 
   const fixedDefaultRegion = PROVIDERS[selectedCloudProvider].default_region.displayName
   const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
-  const defaultRegion =
-    highAvailability && highAvailabilityRegionCode !== undefined
-      ? highAvailabilityRegion?.name
-      : smartRegionEnabled
-        ? recommendedSmartRegion
-        : (autoDefaultRegion ?? fixedDefaultRegion)
+  const defaultRegion = resolveDefaultDbRegion({
+    cloudProvider: selectedCloudProvider,
+    isHighAvailabilityRestricted:
+      highAvailability === true && highAvailabilityRegionCode !== undefined,
+    highAvailabilityRegionName: highAvailabilityRegion?.name,
+    isSmartRegionEnabled: smartRegionEnabled,
+    recommendedSmartRegion,
+    autoDefaultRegion,
+    fixedDefaultRegion,
+  })
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !hasOutstandingInvoices
   const canConfigureGitHubOnCreate =
