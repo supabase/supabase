@@ -91,7 +91,7 @@ Policies are implicit `where` clauses, so it's common to run `select` statements
 
 {/* prettier-ignore */}
 ```js
-const { data } = supabase
+const { data } = await supabase
   .from('table')
   .select()
 ```
@@ -100,7 +100,7 @@ Always add a filter:
 
 {/* prettier-ignore */}
 ```js
-const { data } = supabase
+const { data } = await supabase
   .from('table')
   .select()
   .eq('user_id', userId)
@@ -121,7 +121,7 @@ using (
   (select auth.uid()) in (
     select user_id
     from team_user
-    where team_user.team_id = team_id -- joins to the source "test_table.team_id"
+    where team_user.team_id = test_table.team_id -- joins to the source table
   )
 );
 ```

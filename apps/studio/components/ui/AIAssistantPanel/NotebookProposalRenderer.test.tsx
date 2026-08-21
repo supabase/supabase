@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { HttpResponse } from 'msw'
 import { describe, expect, it, vi } from 'vitest'
@@ -25,8 +25,8 @@ const mockNotebookRow = (overrides: Partial<Record<string, unknown>> = {}) => ({
   content: {
     schema_version: 1,
     cells: [
-      { _tag: 'markdown_cell', id: 'cell-1', text: 'hello' },
-      { _tag: 'markdown_cell', id: 'cell-2', text: 'world' },
+      { _tag: 'markdown_cell', _id: 'cell-1', text: 'hello' },
+      { _tag: 'markdown_cell', _id: 'cell-2', text: 'world' },
     ],
   },
   ...overrides,
@@ -51,6 +51,7 @@ describe('NotebookProposalRenderer', () => {
       <NotebookProposalRenderer
         mode="create"
         state="approval-requested"
+        confirmState="approval-requested"
         input={{
           name: 'New notebook',
           content: {
@@ -64,7 +65,9 @@ describe('NotebookProposalRenderer', () => {
       />
     )
 
+    expect(screen.getByRole('toolbar', { name: 'Notebook toolbar' })).toBeInTheDocument()
     expect(screen.getByText('1 cell')).toBeInTheDocument()
+    expect(screen.getByText('Assistant wants to create this notebook')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Create' }))
     expect(onApprove).toHaveBeenCalledTimes(1)
   })
@@ -78,6 +81,7 @@ describe('NotebookProposalRenderer', () => {
       <NotebookProposalRenderer
         mode="update"
         state="approval-requested"
+        confirmState="approval-requested"
         input={{
           id: NOTEBOOK_ID,
           expected_updated_at: '2024-01-01T00:00:00.000Z',
@@ -94,71 +98,328 @@ describe('NotebookProposalRenderer', () => {
     expect(onApprove).toHaveBeenCalledTimes(1)
   })
 
-  it('warns and withholds the diff when the notebook changed since expected_updated_at', async () => {
-    const onApprove = vi.fn()
-    mockContentItem(mockNotebookRow({ updated_at: '2024-06-01T00:00:00.000Z' }))
-
-    render(
-      <NotebookProposalRenderer
-        mode="update"
-        state="approval-requested"
-        input={{
-          id: NOTEBOOK_ID,
-          expected_updated_at: '2024-01-01T00:00:00.000Z',
-          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
-        }}
-        output={undefined}
-        onApprove={onApprove}
-        onDeny={vi.fn()}
-      />
-    )
-
-    expect(
-      await screen.findByText('This notebook changed since the assistant planned this update')
-    ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Refresh' })).toBeInTheDocument()
-    expect(onApprove).not.toHaveBeenCalled()
-  })
-
   it('falls back to a raw-input admonition without dropping the confirm footer on a parse failure', async () => {
     const user = userEvent.setup()
+    const onApprove = vi.fn()
     const onDeny = vi.fn()
 
     render(
       <NotebookProposalRenderer
         mode="create"
         state="approval-requested"
+        confirmState="approval-requested"
         input={{ nonsense: true }}
         output={undefined}
-        onApprove={vi.fn()}
+        onApprove={onApprove}
         onDeny={onDeny}
       />
     )
 
     expect(screen.getByText("Couldn't render a preview for this notebook")).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Create' })).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Skip' }))
     expect(onDeny).toHaveBeenCalledTimes(1)
+    expect(onApprove).not.toHaveBeenCalled()
   })
 
-  it('renders an Open notebook link once output is available', () => {
+  it('withholds Apply changes and auto-denies with the failure reason when the update cannot be applied as written', async () => {
+    const onApprove = vi.fn()
+    const onDeny = vi.fn()
+    const denyWithReason = vi.fn()
+    mockContentItem(mockNotebookRow())
+
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="approval-requested"
+        confirmState="approval-requested"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'missing' }],
+        }}
+        output={undefined}
+        onApprove={onApprove}
+        onDeny={onDeny}
+        denyWithReason={denyWithReason}
+      />
+    )
+
+    expect(await screen.findByText("This update can't be applied as written")).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Apply changes' })).not.toBeInTheDocument()
+    expect(denyWithReason).toHaveBeenCalledWith(
+      'No cell with id "missing" exists in this notebook.'
+    )
+    expect(onDeny).not.toHaveBeenCalled()
+    expect(onApprove).not.toHaveBeenCalled()
+  })
+
+  it('falls back to sending the failure reason through Skip if auto-deny did not resolve the approval', async () => {
+    const user = userEvent.setup()
+    const denyWithReason = vi.fn()
+    mockContentItem(mockNotebookRow())
+
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="approval-requested"
+        confirmState="approval-requested"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'missing' }],
+        }}
+        output={undefined}
+        denyWithReason={denyWithReason}
+      />
+    )
+
+    const skipButton = await screen.findByRole('button', { name: 'Skip' })
+    denyWithReason.mockClear()
+    await user.click(skipButton)
+
+    expect(denyWithReason).toHaveBeenCalledWith(
+      'No cell with id "missing" exists in this notebook.'
+    )
+  })
+
+  it('does not auto-deny an unapplyable update once it has already been responded to', async () => {
+    const denyWithReason = vi.fn()
+    mockContentItem(mockNotebookRow())
+
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="approval-responded"
+        confirmState={undefined}
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'missing' }],
+        }}
+        output={undefined}
+        denyWithReason={denyWithReason}
+      />
+    )
+
+    await screen.findByText("This update can't be applied as written")
+    expect(denyWithReason).not.toHaveBeenCalled()
+  })
+
+  it('keeps the create preview and marks it successful once output is available', () => {
     render(
       <NotebookProposalRenderer
         mode="create"
         state="output-available"
-        input={{}}
+        confirmState="success"
+        input={{
+          name: 'Signup funnel',
+          content: {
+            schema_version: 1,
+            cells: [{ _tag: 'markdown_cell', text: 'hello' }],
+          },
+        }}
         output={{ id: NOTEBOOK_ID, name: 'Signup funnel' }}
       />
     )
 
-    const link = screen.getByRole('link', { name: 'Open notebook' })
-    expect(link).toHaveAttribute('href', `/project/default/explorer/notebook/${NOTEBOOK_ID}`)
+    expect(screen.getByRole('toolbar', { name: 'Notebook toolbar' })).toBeInTheDocument()
+    expect(screen.getByText('Signup funnel')).toBeInTheDocument()
+    expect(screen.getByText('Notebook created')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Create' })).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Open notebook' })).toHaveAttribute(
+      'href',
+      `/project/default/explorer/notebook/${NOTEBOOK_ID}`
+    )
   })
 
-  it('renders a muted skipped summary when output-denied', () => {
+  it('shows the notebook action after an automatic create succeeds', () => {
     render(
-      <NotebookProposalRenderer mode="update" state="output-denied" input={{}} output={undefined} />
+      <NotebookProposalRenderer
+        mode="create"
+        state="output-available"
+        input={{
+          name: 'Signup funnel',
+          content: {
+            schema_version: 1,
+            cells: [{ _tag: 'markdown_cell', text: 'hello' }],
+          },
+        }}
+        output={{ id: NOTEBOOK_ID, name: 'Signup funnel' }}
+      />
     )
 
-    expect(screen.getByText('Skipped notebook update')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Open notebook' })).toHaveAttribute(
+      'href',
+      `/project/default/explorer/notebook/${NOTEBOOK_ID}`
+    )
+  })
+
+  it('shows the notebook action after an automatic update succeeds', () => {
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="output-available"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
+        }}
+        output={{ id: NOTEBOOK_ID, name: 'Signup funnel' }}
+      />
+    )
+
+    expect(screen.getByRole('link', { name: 'Open notebook' })).toHaveAttribute(
+      'href',
+      `/project/default/explorer/notebook/${NOTEBOOK_ID}`
+    )
+  })
+
+  it('does not show the "can\'t be applied" warning for a completed update whose target cell no longer exists', async () => {
+    mockContentItem(
+      mockNotebookRow({
+        content: {
+          schema_version: 1,
+          cells: [{ _tag: 'markdown_cell', _id: 'cell-2', text: 'world' }],
+        },
+      })
+    )
+
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="output-available"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
+        }}
+        output={{ id: NOTEBOOK_ID, name: 'Signup funnel' }}
+      />
+    )
+
+    await waitFor(() => expect(screen.queryByText('Loading notebook...')).not.toBeInTheDocument())
+    expect(screen.queryByText("This update can't be applied as written")).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Open notebook' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Open notebook' })).toHaveAttribute(
+      'href',
+      `/project/default/explorer/notebook/${NOTEBOOK_ID}`
+    )
+  })
+
+  it('shows the notebook action inside the Confirm footer for a manually approved completed update', async () => {
+    mockContentItem(
+      mockNotebookRow({
+        content: {
+          schema_version: 1,
+          cells: [{ _tag: 'markdown_cell', _id: 'cell-2', text: 'world' }],
+        },
+      })
+    )
+
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="output-available"
+        confirmState="success"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
+        }}
+        output={{ id: NOTEBOOK_ID, name: 'Signup funnel' }}
+      />
+    )
+
+    const openNotebookLink = await screen.findByRole('link', { name: 'Open notebook' })
+    expect(openNotebookLink).toHaveAttribute(
+      'href',
+      `/project/default/explorer/notebook/${NOTEBOOK_ID}`
+    )
+    expect(screen.queryByText("This update can't be applied as written")).not.toBeInTheDocument()
+  })
+
+  it('derives the diff against live content for a denied update', async () => {
+    mockContentItem(mockNotebookRow())
+
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="output-denied"
+        confirmState="denied"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
+        }}
+        output={undefined}
+      />
+    )
+
+    expect(await screen.findByText('−1')).toBeInTheDocument()
+  })
+
+  it('derives the diff against live content for an errored update', async () => {
+    mockContentItem(mockNotebookRow())
+
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="output-error"
+        confirmState="error"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
+        }}
+        output={undefined}
+      />
+    )
+
+    expect(await screen.findByText('−1')).toBeInTheDocument()
+  })
+
+  it('keeps the create preview and marks it failed when the tool errors', () => {
+    render(
+      <NotebookProposalRenderer
+        mode="create"
+        state="output-error"
+        confirmState="error"
+        input={{
+          name: 'New notebook',
+          content: {
+            schema_version: 1,
+            cells: [{ _tag: 'markdown_cell', text: 'hello' }],
+          },
+        }}
+        output={undefined}
+      />
+    )
+
+    expect(screen.getByRole('toolbar', { name: 'Notebook toolbar' })).toBeInTheDocument()
+    expect(screen.getByText('New notebook')).toBeInTheDocument()
+    expect(screen.getByText('Failed to create notebook')).toBeInTheDocument()
+  })
+
+  it('keeps the preview in the message after skip', () => {
+    render(
+      <NotebookProposalRenderer
+        mode="create"
+        state="output-denied"
+        input={{
+          name: 'New notebook',
+          content: {
+            schema_version: 1,
+            cells: [{ _tag: 'markdown_cell', text: 'hello' }],
+          },
+        }}
+        output={undefined}
+      />
+    )
+
+    expect(screen.getByRole('toolbar', { name: 'Notebook toolbar' })).toBeInTheDocument()
+    expect(screen.getByText('New notebook')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Create' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Skipped notebook creation')).not.toBeInTheDocument()
   })
 })

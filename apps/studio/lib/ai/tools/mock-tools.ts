@@ -178,18 +178,18 @@ export const MOCK_NOTEBOOKS_DATA: MockNotebook[] = [
       cells: [
         {
           _tag: 'markdown_cell',
-          id: 'c1a0b8e2-3f47-4a52-9d18-6b0c4e2f7a91',
+          _id: 'c1a0b8e2-3f47-4a52-9d18-6b0c4e2f7a91',
           text: '# Auth health\n\nRun this daily: signup volume, then anything the auth service logged as an error.',
         },
         {
           _tag: 'database_cell',
-          id: 'd2b1c9f3-4a58-4b63-8e29-7c1d5f3a8b02',
+          _id: 'd2b1c9f3-4a58-4b63-8e29-7c1d5f3a8b02',
           title: 'Signups per day',
           sql: "select date_trunc('day', created_at) as day, count(*) as signups\nfrom auth.users\ngroup by day\norder by day desc",
           row_limit: 30,
           chart: {
             x_column: 'day',
-            y_columns: ['signups'],
+            y_series: ['signups'],
             cumulative: false,
             type: 'line',
             scale: 'log',
@@ -198,7 +198,7 @@ export const MOCK_NOTEBOOKS_DATA: MockNotebook[] = [
         },
         {
           _tag: 'log_cell',
-          id: 'e3c2d0a4-5b69-4c74-9f3a-8d2e6a4b9c13',
+          _id: 'e3c2d0a4-5b69-4c74-9f3a-8d2e6a4b9c13',
           title: 'Auth errors',
           sql: "select timestamp, event_message\nfrom auth_logs\nwhere event_message like '%error%'\norder by timestamp desc",
           time_range: { _tag: 'relative_time_range', unit: 'hour', amount: 1 },
@@ -216,12 +216,12 @@ export const MOCK_NOTEBOOKS_DATA: MockNotebook[] = [
       cells: [
         {
           _tag: 'markdown_cell',
-          id: 'f4d3e1b5-7c80-4d85-8a4b-9e3f7b5c0d24',
+          _id: 'f4d3e1b5-7c80-4d85-8a4b-9e3f7b5c0d24',
           text: '# Edge function errors\n\nFailures from the last day, newest first.',
         },
         {
           _tag: 'log_cell',
-          id: '0a5e4f2c-8d91-4e96-9b5c-af408c6d1e35',
+          _id: '0a5e4f2c-8d91-4e96-9b5c-af408c6d1e35',
           title: 'hello-world failures',
           sql: "select timestamp, event_message\nfrom function_edge_logs\nwhere event_message like '%TypeError%'\norder by timestamp desc",
           time_range: { _tag: 'relative_time_range', unit: 'day', amount: 1 },
@@ -363,15 +363,15 @@ function createMockNotebookStore() {
 
   const assignCellIds = (cells: OperationResultCell[]): CellWire[] =>
     cells.map((cell): CellWire => {
-      if ('id' in cell) return cell
-      const id = `mock-cell-${++cellCount}`
+      if ('_id' in cell) return cell
+      const _id = `mock-cell-${++cellCount}`
       switch (cell._tag) {
         case 'markdown_cell':
-          return { ...cell, id }
+          return { ...cell, _id }
         case 'database_cell':
-          return { ...cell, id }
+          return { ...cell, _id }
         case 'log_cell':
-          return { ...cell, id }
+          return { ...cell, _id }
       }
     })
 
@@ -411,14 +411,36 @@ function createMockNotebookStore() {
 
 type MockNotebookStore = ReturnType<typeof createMockNotebookStore>
 
-// All four notebook tools are real, locally-defined ai-SDK tools, so wrap them and
+const MOCK_DATABASES_DATA = [
+  {
+    identifier: 'mock-project-ref',
+    is_primary: true,
+    region: 'us-east-1',
+    status: 'ACTIVE_HEALTHY',
+  },
+  {
+    identifier: 'mock-project-ref-replica-1',
+    is_primary: false,
+    region: 'us-west-1',
+    status: 'ACTIVE_HEALTHY',
+  },
+]
+
+// All five notebook tools are real, locally-defined ai-SDK tools, so wrap them and
 // override only execute/needsApproval — evals must validate the model's arguments
 // against the exact schemas production uses (agentCellSchema's `.strict()` rejection of
 // agent-authored cell ids, update_notebook's real operations schema, etc).
 function createMockNotebookTools(store: MockNotebookStore) {
-  const { list_notebooks, get_notebook, create_notebook, update_notebook } = getNotebookTools()
+  const { list_databases, list_notebooks, get_notebook, create_notebook, update_notebook } =
+    getNotebookTools()
 
   return {
+    list_databases: {
+      ...list_databases,
+      execute: async (_args: object, _options: ToolExecutionOptions<unknown>) => ({
+        databases: MOCK_DATABASES_DATA,
+      }),
+    },
     list_notebooks: {
       ...list_notebooks,
       execute: async (

@@ -1,5 +1,6 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { HttpResponse } from 'msw'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -7,7 +8,7 @@ import { ExplorerNotebookTab } from '../ExplorerNotebookTab'
 import { createMarkdownCellSkeleton, createQueryCellSkeleton } from '../utils'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import { notebooksState } from '@/state/notebooks/notebooks-state'
-import type { Notebook, StateNotebook } from '@/state/notebooks/types'
+import type { Notebook } from '@/state/notebooks/types'
 import { createTabsState, TabsStateContext } from '@/state/tabs'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
@@ -43,7 +44,7 @@ const NOTEBOOK_ID = 'notebook-test'
 const databaseCell = createQueryCellSkeleton({ sql: 'select 1' })
 const logCell = {
   _tag: 'log_cell' as const,
-  id: 'log-cell-1',
+  _id: 'log-cell-1',
   view: 'table' as const,
   chart: undefined,
   unchecked_sql: untrustedLogSql('select * from edge_logs limit 1'),
@@ -51,12 +52,9 @@ const logCell = {
 }
 const markdownCell = createMarkdownCellSkeleton()
 
-/**
- * Assigns directly into the store rather than going through `setNotebook` — that helper
- * no-ops when a notebook with content already exists, which would make reseeding between
- * tests (or within one, for the empty-notebook case) silently keep the previous cells.
- */
-const seedNotebook = (cells: Notebooks.Cell[]) => {
+/** Clears any prior fixture so seeding exercises the same store-loading path as the app. */
+const seedNotebook = (cells: Notebooks.Cell[], status: 'new' | 'saved' = 'saved') => {
+  delete notebooksState.notebooks[NOTEBOOK_ID]
   const notebook: Notebook = {
     id: NOTEBOOK_ID,
     type: 'notebook',
@@ -67,8 +65,8 @@ const seedNotebook = (cells: Notebooks.Cell[]) => {
     project_id: 1,
     content: { schema_version: 1, cells },
   }
-  const stateNotebook: StateNotebook = { projectRef: 'default', notebook, status: 'saved' }
-  notebooksState.notebooks[NOTEBOOK_ID] = stateNotebook
+  if (status === 'new') notebooksState.addNotebook({ projectRef: 'default', notebook })
+  else notebooksState.setNotebook({ projectRef: 'default', notebook })
 }
 
 const renderNotebookTab = () =>
@@ -87,16 +85,58 @@ beforeEach(() => {
   seedNotebook([databaseCell, logCell, markdownCell])
 })
 
-afterEach(() => notebooksState.needsSaving.clear())
+afterEach(() => {
+  notebooksState.needsSaving.clear()
+  notebooksState.cellLocalState.clear()
+  safeLocalStorage.removeItem(LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE)
+})
 
 describe('ExplorerNotebookTab', () => {
+  it('hides SQL by default for saved notebooks and caps query cells at 6xl', () => {
+    renderNotebookTab()
+
+    const queryCells = Array.from(document.querySelectorAll('[data-slot="explorer-query"]'))
+    expect(queryCells).toHaveLength(2)
+    queryCells.forEach((cell) => expect(cell).toHaveClass('max-w-6xl'))
+
+    expect(screen.queryByRole('textbox', { name: 'SQL editor' })).not.toBeInTheDocument()
+  })
+
+  it('shows SQL by default for a new notebook', async () => {
+    seedNotebook([databaseCell, logCell, markdownCell], 'new')
+
+    renderNotebookTab()
+
+    expect(await screen.findAllByRole('textbox', { name: 'SQL editor' })).toHaveLength(2)
+  })
+
+  it('keeps query visibility when the notebook tab remounts', async () => {
+    const view = renderNotebookTab()
+
+    const showQueryButton = document.querySelector('.lucide-eye')?.closest('button')
+    expect(showQueryButton).toBeInstanceOf(HTMLButtonElement)
+    await userEvent.click(showQueryButton as HTMLButtonElement)
+    expect(await screen.findAllByRole('textbox', { name: 'SQL editor' })).toHaveLength(1)
+
+    view.unmount()
+    renderNotebookTab()
+
+    expect(await screen.findAllByRole('textbox', { name: 'SQL editor' })).toHaveLength(1)
+  })
+
   it('runs every database and log cell, and skips markdown cells, on "Run notebook"', async () => {
+    // `useAddDefinitions` fires its own background keywords/functions/schemas/table-columns
+    // fetches against this same generic pg-meta query endpoint (differentiated by the `key`
+    // search param) as soon as a database cell's editor mounts — those are expected and
+    // unrelated to the actual cell run.
+    const INTELLISENSE_KEYS = ['keywords', 'database-functions', 'schemas', 'table-columns']
     const dbRequests: Request[] = []
     addAPIMock({
       method: 'post',
       path: '/platform/pg-meta/:ref/query',
       response: ({ request }) => {
-        dbRequests.push(request)
+        const key = new URL(request.url).searchParams.get('key')
+        if (!key || !INTELLISENSE_KEYS.includes(key)) dbRequests.push(request)
         return HttpResponse.json([{ result: 1 }])
       },
     })
@@ -129,5 +169,23 @@ describe('ExplorerNotebookTab', () => {
 
     const runNotebookButton = await screen.findByRole('button', { name: 'Run notebook' })
     expect(runNotebookButton).toBeDisabled()
+  })
+
+  it('toggles and persists the Intellisense enabled preference from "More options"', async () => {
+    const readPersistedValue = () => {
+      const item = safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE)
+      return item === null ? true : (JSON.parse(item) as boolean)
+    }
+    const initialValue = readPersistedValue()
+
+    renderNotebookTab()
+
+    const moreOptionsButton = await screen.findByRole('button', { name: 'More options' })
+    await userEvent.click(moreOptionsButton)
+
+    const intellisenseItem = await screen.findByRole('menuitem', { name: 'Intellisense enabled' })
+    await userEvent.click(intellisenseItem)
+
+    await waitFor(() => expect(readPersistedValue()).toBe(!initialValue))
   })
 })

@@ -4048,6 +4048,8 @@ export interface components {
       max_payload_size_in_kb: number | null
       /** @description Sets maximum number of presence events per second rate limit */
       max_presence_events_per_second: number | null
+      /** @description Sets connection pool size used to create Postgres Changes subscriptions */
+      postgres_changes_pool: number | null
       /** @description Whether to enable presence */
       presence_enabled: boolean
       /** @description Whether to only allow private channels */
@@ -4885,6 +4887,8 @@ export interface components {
       max_payload_size_in_kb?: number
       /** @description Sets maximum number of presence events per second rate limit */
       max_presence_events_per_second?: number
+      /** @description Sets connection pool size used to create Postgres Changes subscriptions */
+      postgres_changes_pool?: number
       /** @description Whether to enable presence */
       presence_enabled?: boolean
       /** @description Whether to only allow private channels */
@@ -5298,6 +5302,7 @@ export interface components {
             | 'project_restore_after_expiry'
             | 'assistant.advance_model'
             | 'integrations.github_connections'
+            | 'integrations.github_push_webhooks_limit'
             | 'dedicated_pooler'
             | 'observability.dashboard_advanced_metrics'
             | 'api.members.invitations'
@@ -7223,6 +7228,13 @@ export interface operations {
           'application/openmetrics-text': string
           'text/plain': string
         }
+      }
+      /** @description Project must be active and healthy, or metrics are not available for this project */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Unauthorized */
       401: {

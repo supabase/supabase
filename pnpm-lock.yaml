@@ -7,8 +7,8 @@ settings:
 catalogs:
   default:
     '@monaco-editor/react':
-      specifier: ^4.7.0
-      version: 4.7.0
+      specifier: 4.8.0-rc.3
+      version: 4.8.0-rc.3
     '@sentry/nextjs':
       specifier: ^10.59.0
       version: 10.59.0
@@ -944,9 +944,12 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: ^1.29.0
         version: 1.29.0(supports-color@8.1.1)(zod@3.25.76)
+      '@modelcontextprotocol/server':
+        specifier: ^2.0.0
+        version: 2.0.0
       '@monaco-editor/react':
         specifier: 'catalog:'
-        version: 4.7.0(monaco-editor@0.52.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        version: 4.8.0-rc.3(monaco-editor@0.52.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@next/bundle-analyzer':
         specifier: 16.2.3
         version: 16.2.3
@@ -984,8 +987,8 @@ importers:
         specifier: 'catalog:'
         version: 2.112.3
       '@supabase/mcp-server-supabase':
-        specifier: ^0.10.0
-        version: 0.10.0(@modelcontextprotocol/sdk@1.29.0(supports-color@8.1.1)(zod@3.25.76))(zod@3.25.76)
+        specifier: ^0.11.0
+        version: 0.11.0(@modelcontextprotocol/server@2.0.0)(zod@3.25.76)
       '@supabase/pg-meta':
         specifier: workspace:*
         version: link:../../packages/pg-meta
@@ -1427,7 +1430,7 @@ importers:
         version: 3.3.1(react-hook-form@7.72.1(react@19.2.6))
       '@monaco-editor/react':
         specifier: 'catalog:'
-        version: 4.7.0(monaco-editor@0.52.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        version: 4.8.0-rc.3(monaco-editor@0.52.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@react-router/fs-routes':
         specifier: ^7.4.0
         version: 7.4.0(@react-router/dev@7.13.2(@react-router/serve@7.17.0(react-router@7.18.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(supports-color@8.1.1)(typescript@6.0.2))(@types/node@22.13.14)(babel-plugin-macros@3.1.0)(jiti@2.7.0)(lightningcss@1.33.0)(react-router@7.18.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.22.4)(typescript@6.0.2)(vite@8.0.16(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0))(yaml@2.9.0))(typescript@6.0.2)
@@ -2666,7 +2669,7 @@ importers:
         version: 3.3.1(react-hook-form@7.72.1(react@19.2.6))
       '@monaco-editor/react':
         specifier: 'catalog:'
-        version: 4.7.0(monaco-editor@0.52.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        version: 4.8.0-rc.3(monaco-editor@0.52.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@supabase/sql-to-rest':
         specifier: ^0.1.6
         version: 0.1.6(encoding@0.1.13)(supports-color@8.1.1)
@@ -4798,6 +4801,10 @@ packages:
   '@mjackson/node-fetch-server@0.2.0':
     resolution: {integrity: sha512-EMlH1e30yzmTpGLQjlFmaDAjyOeZhng1/XCd7DExR8PNAnG/G1tyruZxEoUe11ClnwGhGrtsdnyyUx1frSzjng==}
 
+  '@modelcontextprotocol/core@2.0.0':
+    resolution: {integrity: sha512-pJCEwGG7Lfr/+PQp9ZTwKXNeO5wzbfKL7H3MYpCorM4oFBoQrdjnBgEoqG+RjhsvS1FKrDbKux+M1HhlnGWqcA==}
+    engines: {node: '>=20'}
+
   '@modelcontextprotocol/sdk@1.29.0':
     resolution: {integrity: sha512-zo37mZA9hJWpULgkRpowewez1y6ML5GsXJPY8FI0tBBCd77HEvza4jDqRKOXgHNn867PVGCyTdzqpz0izu5ZjQ==}
     engines: {node: '>=18'}
@@ -4808,11 +4815,15 @@ packages:
       '@cfworker/json-schema':
         optional: true
 
-  '@monaco-editor/loader@1.5.0':
-    resolution: {integrity: sha512-hKoGSM+7aAc7eRTRjpqAZucPmoNOC4UUbknb/VNoTkEIkCPhqV8LfbsgM1webRM7S/z21eHEx9Fkwx8Z/C/+Xw==}
+  '@modelcontextprotocol/server@2.0.0':
+    resolution: {integrity: sha512-YhHWdHfpFMQfd0prsEnxKeS3Qz3ytIGmsS0sth4KDjnacIT7hxk6hXHkJ9KysxlkvTM+WZAtQbbcUhdoP4Hvtw==}
+    engines: {node: '>=20'}
 
-  '@monaco-editor/react@4.7.0':
-    resolution: {integrity: sha512-cyzXQCtO47ydzxpQtCGSQGOC8Gk3ZUeBXFAxD+CWXYFo5OqZyZUonFl0DwUlTyAfRHntBfw2p3w4s9R6oe1eCA==}
+  '@monaco-editor/loader@1.7.0':
+    resolution: {integrity: sha512-gIwR1HrJrrx+vfyOhYmCZ0/JcWqG5kbfG7+d3f/C1LXk2EvzAbHSg3MQ5lO2sMlo9izoAZ04shohfKLVT6crVA==}
+
+  '@monaco-editor/react@4.8.0-rc.3':
+    resolution: {integrity: sha512-fNGFOqgHZKisVv7FlDbRL31oCRJfHBi7vIZJfy4zcbWElxqLRR5nLeG0CYwIUnq7txgPvRnRR1otcFvbs7ZSdA==}
     peerDependencies:
       monaco-editor: 0.52.2
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
@@ -7514,17 +7525,17 @@ packages:
     resolution: {integrity: sha512-gfv481mTOVWtZIJgXupxZpni2V2UWPf6jeF/jOK7HdMHdH+mt6sU0sHHwf0POsPip8ltlulu9OUHgwVzl5ddRw==}
     engines: {node: '>=22.0.0'}
 
-  '@supabase/mcp-server-supabase@0.10.0':
-    resolution: {integrity: sha512-CVnB+4wBFsQeYwr5phNZyG33nNPUVBAJFB99vn55Z5Zn5+sxopybBPeYtrz8J9rqLkXad/xb7Xow4sz0JMq/XQ==}
+  '@supabase/mcp-server-supabase@0.11.0':
+    resolution: {integrity: sha512-++eAgAmq3SAnj3nf2Ic0i2Si9oFmTn9ppEJOioABf7+DZ/w3blPuxLlSTSBZV5+Sf1SdueMpTvYvkKJh0zx+/Q==}
     hasBin: true
     peerDependencies:
-      '@modelcontextprotocol/sdk': ^1.25.2
+      '@modelcontextprotocol/server': ^2.0.0
       zod: ^3.25.0 || ^4.0.0
 
-  '@supabase/mcp-utils@0.6.0':
-    resolution: {integrity: sha512-4r7RTEMZgFw4VqTgsQrM0KUWXdEOASPHEjIfuBaGb0SXPHIIe6W8xBnocidjtfQnKagxMJb0RXY4rqwwShJ2zw==}
+  '@supabase/mcp-utils@0.7.0':
+    resolution: {integrity: sha512-PDTPOn/0AEPWwAXc8I98wruYucGwNLCAfiCu0eZS1mE+E/e0xZhdSY3nfE2n+sh8p5aaep5Kqd9Wt0rThAKgdQ==}
     peerDependencies:
-      '@modelcontextprotocol/sdk': ^1.25.2
+      '@modelcontextprotocol/server': ^2.0.0
       zod: ^3.25.0 || ^4.0.0
 
   '@supabase/phoenix@0.4.5':
@@ -20775,6 +20786,10 @@ snapshots:
 
   '@mjackson/node-fetch-server@0.2.0': {}
 
+  '@modelcontextprotocol/core@2.0.0':
+    dependencies:
+      zod: 4.4.3
+
   '@modelcontextprotocol/sdk@1.29.0(supports-color@8.1.1)(zod@3.25.76)':
     dependencies:
       '@hono/node-server': 1.19.17(hono@4.13.1)
@@ -20797,13 +20812,18 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@monaco-editor/loader@1.5.0':
+  '@modelcontextprotocol/server@2.0.0':
+    dependencies:
+      '@modelcontextprotocol/core': 2.0.0
+      zod: 4.4.3
+
+  '@monaco-editor/loader@1.7.0':
     dependencies:
       state-local: 1.0.7
 
-  '@monaco-editor/react@4.7.0(monaco-editor@0.52.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+  '@monaco-editor/react@4.8.0-rc.3(monaco-editor@0.52.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
     dependencies:
-      '@monaco-editor/loader': 1.5.0
+      '@monaco-editor/loader': 1.7.0
       monaco-editor: 0.52.2
       react: 19.2.6
       react-dom: 19.2.6(react@19.2.6)
@@ -23897,20 +23917,20 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@supabase/mcp-server-supabase@0.10.0(@modelcontextprotocol/sdk@1.29.0(supports-color@8.1.1)(zod@3.25.76))(zod@3.25.76)':
+  '@supabase/mcp-server-supabase@0.11.0(@modelcontextprotocol/server@2.0.0)(zod@3.25.76)':
     dependencies:
       '@mjackson/multipart-parser': 0.10.1
-      '@modelcontextprotocol/sdk': 1.29.0(supports-color@8.1.1)(zod@3.25.76)
-      '@supabase/mcp-utils': 0.6.0(@modelcontextprotocol/sdk@1.29.0(supports-color@8.1.1)(zod@3.25.76))(zod@3.25.76)
+      '@modelcontextprotocol/server': 2.0.0
+      '@supabase/mcp-utils': 0.7.0(@modelcontextprotocol/server@2.0.0)(zod@3.25.76)
       common-tags: 1.8.2
       gqlmin: 0.3.1
       graphql: 16.11.0
       openapi-fetch: 0.13.8
       zod: 3.25.76
 
-  '@supabase/mcp-utils@0.6.0(@modelcontextprotocol/sdk@1.29.0(supports-color@8.1.1)(zod@3.25.76))(zod@3.25.76)':
+  '@supabase/mcp-utils@0.7.0(@modelcontextprotocol/server@2.0.0)(zod@3.25.76)':
     dependencies:
-      '@modelcontextprotocol/sdk': 1.29.0(supports-color@8.1.1)(zod@3.25.76)
+      '@modelcontextprotocol/server': 2.0.0
       zod: 3.25.76
 
   '@supabase/phoenix@0.4.5': {}

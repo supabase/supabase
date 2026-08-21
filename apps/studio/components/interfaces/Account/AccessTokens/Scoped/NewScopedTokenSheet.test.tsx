@@ -256,6 +256,61 @@ describe('NewScopedTokenSheet', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
   }, 10_000)
 
+  // Permission preset tests
+  const FULL_ACCESS_WARNING =
+    'Grants the highest access each resource offers, including write access to your database, API keys, and organization members.'
+
+  const getPresetTrigger = async () => screen.findByRole('combobox', { name: 'Permission preset' })
+
+  const openPresetMenu = async () => {
+    fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
+    await screen.findByRole('dialog')
+    fireEvent.click(await getPresetTrigger())
+  }
+
+  test('applies a preset to every permission row', async () => {
+    renderSheet()
+    await openPresetMenu()
+    fireEvent.click(await screen.findByRole('option', { name: 'Read-only' }))
+
+    expect((await getPresetTrigger()).textContent).toContain('Read-only')
+    // The bulk change is announced rather than left to the user to notice
+    expect((await screen.findByRole('status')).textContent).toBe('All permissions set to read')
+
+    await expandPermissionCategory('Project')
+    const select = await screen.findByLabelText('Project Settings', { exact: false })
+    expect(select.textContent).toBe('Read')
+  })
+
+  test('warns about full access in the menu and inline once applied', async () => {
+    renderSheet()
+    await openPresetMenu()
+
+    const fullAccess = await screen.findByRole('option', { name: /^Full access/ })
+    const describedBy = fullAccess.getAttribute('aria-describedby')
+    expect(describedBy).not.toBeNull()
+    expect(document.getElementById(describedBy!)?.textContent).toBe(FULL_ACCESS_WARNING)
+
+    fireEvent.click(fullAccess)
+    // The warning survives the menu closing
+    await screen.findByText(FULL_ACCESS_WARNING, { selector: '[role="alert"] *' })
+    expect((await getPresetTrigger()).textContent).toContain('Full access')
+  })
+
+  test('falls back to Custom when a row diverges from the preset', async () => {
+    renderSheet()
+    await openPresetMenu()
+    fireEvent.click(await screen.findByRole('option', { name: /^Full access/ }))
+    await screen.findByText(FULL_ACCESS_WARNING, { selector: '[role="alert"] *' })
+
+    await expandPermissionCategory('Project')
+    fireEvent.click(await screen.findByLabelText('Project Settings', { exact: false }))
+    fireEvent.click(await screen.findByRole('option', { name: 'None' }))
+
+    await waitFor(async () => expect((await getPresetTrigger()).textContent).toContain('Custom'))
+    expect(screen.queryByText(FULL_ACCESS_WARNING, { selector: '[role="alert"] *' })).toBeNull()
+  })
+
   test('opens the experimental API dialog from the dropdown', async () => {
     renderSheet()
     await user.click(await screen.findByRole('button', { name: 'Choose token scope' }))
