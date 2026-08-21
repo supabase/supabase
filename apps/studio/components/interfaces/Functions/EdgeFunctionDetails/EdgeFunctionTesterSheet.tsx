@@ -223,6 +223,12 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
       }
     })
 
+    // Header names are case-insensitive (RFC 9110 §5.1), so a header typed as
+    // "content-type" has to replace the default rather than be sent next to it.
+    const hasCustomContentType = Object.keys(customHeaders).some(
+      (key) => key.toLowerCase() === 'content-type'
+    )
+
     // Construct query parameters
     const queryString = values.queryParams
       .filter(({ key, value }) => key && value)
@@ -240,7 +246,7 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
           Authorization: `Bearer ${accessToken}`,
         }),
         'x-test-authorization': testAuthorization ?? `Bearer ${serviceKey?.api_key}`,
-        'Content-Type': 'application/json',
+        ...(hasCustomContentType ? {} : { 'Content-Type': 'application/json' }),
         ...customHeaders,
       },
     })
