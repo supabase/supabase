@@ -1,0 +1,357 @@
+---
+id: 'ai-multimodal-embeddings-gemini'
+title: 'Multimodal Embeddings with Gemini'
+subtitle: 'Store and search multimodal Gemini embeddings in Postgres with pgvector.'
+breadcrumb: 'AI Quickstarts'
+---
+
+Google recently released [Gemini Embedding 2](https://ai.google.dev/gemini-api/docs/embeddings), a powerful new embedding model that supports **text, images, and audio** in a single unified vector space. Combined with Supabase and [`pgvector`](https://github.com/pgvector/pgvector), you can build multimodal similarity search entirely within your Postgres database.
+
+In this guide we'll explain what embeddings are, what makes Gemini's new model interesting, and how to store and query embeddings in PostgreSQL using `pgvector`.
+
+<Admonition type="tip">
+
+Supabase has released an open source toolkit for developing AI applications using Postgres and pgvector. Learn more in the [AI & Vectors docs](/docs/guides/ai).
+
+</Admonition>
+
+## What are embeddings?
+
+Embeddings capture the "relatedness" of text, images, video, or other types of information. This relatedness is most commonly used for:
+
+- **Search:** how similar is a search term to a body of text?
+- **Recommendations:** how similar are two products?
+- **Classifications:** how do we categorize a body of text?
+- **Clustering:** how do we identify trends?
+
+Let's explore an example of text embeddings. Say we have three phrases:
+
+1. "The cat chases the mouse"
+2. "The kitten hunts rodents"
+3. "I like ham sandwiches"
+
+Your job is to group phrases with similar meaning. If you are a human, this should be obvious. Phrases 1 and 2 are almost identical, while phrase 3 has a completely different meaning.
+
+Although phrases 1 and 2 are similar, they share no common vocabulary (besides "the"). Yet their meanings are nearly identical. How can we teach a computer that these are the same?
+
+## How do embeddings work?
+
+Embeddings compress discrete information (words & symbols) into distributed continuous-valued data (vectors). If we took our phrases from before and plotted them on a chart, it might look something like this:
+
+```
+        "The kitten hunts rodents"
+    •
+
+  "The cat chases the mouse"
+    •
+
+
+
+                          "I like ham sandwiches"
+                              •
+```
+
+Phrases 1 and 2 would be plotted close to each other, since their meanings are similar. We would expect phrase 3 to live somewhere far away since it isn't related. If we had a fourth phrase, "Sally ate Swiss cheese", this might exist somewhere between phrase 3 (cheese can go on sandwiches) and phrase 1 (mice like Swiss cheese).
+
+In this example we only have 2 dimensions: the X and Y axis. In reality, we would need many more dimensions to effectively capture the complexities of human language.
+
+## Gemini Embedding 2
+
+Google offers an [embedding API](https://ai.google.dev/gemini-api/docs/embeddings) as part of the Gemini platform. You feed it text, images, or audio, and it outputs a vector of floating point numbers that represents the "meaning" of that content.
+
+The latest model, `gemini-embedding-2-preview`, outputs **3072 dimensions** by default. What makes it special:
+
+- **Multimodal:** embed text, images, and audio into the same vector space, enabling cross-modal search (e.g., search images with text)
+- **Matryoshka Representation Learning (MRL):** truncate embeddings to smaller dimensions (768, 512, 256, etc.) to trade off accuracy for storage and speed
+- **High quality:** state-of-the-art performance on the [MTEB leaderboard](https://huggingface.co/spaces/mteb/leaderboard)
+
+Why is this useful? Once we have generated embeddings on multiple pieces of content, it is trivial to calculate how similar they are using vector math operations like cosine distance. A perfect use case for this is search. Your process might look something like this:
+
+1. Pre-process your knowledge base and generate embeddings for each item
+2. Store your embeddings to be referenced later (more on this)
+3. Build a search interface that prompts your user for input
+4. Take the user's input, generate a one-time embedding, then perform a similarity search against your pre-processed embeddings
+5. Return the most similar items to the user
+
+## Embeddings in practice
+
+At a small scale, you could store your embeddings in a CSV file, load them into Python, and use a library like `numPy` to calculate similarity between them. Unfortunately this likely won't scale well:
+
+- What if I need to store and search over a large number of documents and embeddings (more than can fit in memory)?
+- What if I want to create/update/delete embeddings dynamically?
+- What if I'm not using Python?
+
+### Using PostgreSQL
+
+Enter [`pgvector`](https://github.com/pgvector/pgvector), an extension for PostgreSQL that allows you to both store and query vector embeddings within your database. Let's try it out.
+
+First we'll enable the **Vector** extension. In Supabase, this can be done from the web portal through `Database` → `Extensions`. You can also do this in SQL by running:
+
+```sql
+create extension vector;
+```
+
+Next let's create a table to store our items and their embeddings. We'll use 768 dimensions since Gemini's MRL feature lets us truncate to smaller sizes for efficiency:
+
+```sql
+create table items (
+  id bigserial primary key,
+  content text,
+  metadata jsonb,
+  embedding vector(768)
+);
+```
+
+`pgvector` introduces a new data type called `vector`. In the code above, we create a column named `embedding` with the `vector` data type. The size of the vector defines how many dimensions the vector holds. Gemini's `gemini-embedding-2-preview` model outputs 3072 dimensions by default, but thanks to MRL we can truncate to 768 dimensions without significant quality loss — saving ~75% on storage and improving query speed.
+
+We also create a `text` column named `content` to store the original text, and a `jsonb` column named `metadata` for any additional information about each item.
+
+Soon we're going to need to perform a similarity search over these embeddings. Let's create a function to do that:
+
+```sql
+create or replace function match_items (
+  query_embedding vector(768),
+  match_threshold float,
+  match_count int
+)
+returns table (
+  id bigint,
+  content text,
+  metadata jsonb,
+  similarity float
+)
+language sql stable
+as $$
+  select
+    items.id,
+    items.content,
+    items.metadata,
+    1 - (items.embedding <=> query_embedding) as similarity
+  from items
+  where items.embedding <=> query_embedding < 1 - match_threshold
+  order by items.embedding <=> query_embedding
+  limit match_count;
+$$;
+```
+
+`pgvector` introduces 3 new operators that can be used to calculate similarity:
+
+| Operator | Description |
+| --- | --- |
+| `<->` | Euclidean distance |
+| `<#>` | negative inner product |
+| `<=>` | cosine distance |
+
+Cosine similarity works well with normalized embeddings, so we will use that here.
+
+Now we can call `match_items()`, pass in our embedding, similarity threshold, and match count, and we'll get a list of all items that match. And since this is all managed by Postgres, our application code becomes very simple.
+
+### Indexing
+
+Once your table starts to grow with embeddings, you will likely want to add an index to speed up queries. Vector indexes are particularly important when you're ordering results because vectors are not grouped by similarity, so finding the closest by sequential scan is a resource-intensive operation.
+
+Each distance operator requires a different type of index. We expect to order by cosine distance, so we need a `vector_cosine_ops` index. You can use either IVFFlat or HNSW — HNSW generally provides better recall:
+
+```sql
+create index on items using hnsw (embedding vector_cosine_ops);
+```
+
+For IVFFlat, a good starting number of lists is `4 * sqrt(table_rows)`:
+
+```sql
+create index on items using ivfflat (embedding vector_cosine_ops)
+with
+  (lists = 100);
+```
+
+You can read more about indexing on `pgvector`'s GitHub page [here](https://github.com/pgvector/pgvector#indexing).
+
+### Generating embeddings
+
+Let's use the Google Gemini SDK to generate embeddings. First, install the dependencies:
+
+```bash
+npm install @google/genai @supabase/supabase-js
+```
+
+Create a helper to initialize the Gemini client and generate embeddings:
+
+```typescript
+import { GoogleGenAI } from "@google/genai";
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+
+export async function getEmbedding(input: string): Promise<number[]> {
+  const response = await ai.models.embedContent({
+    model: "gemini-embedding-2-preview",
+    contents: [{ parts: [{ text: input }] }],
+    config: {
+      outputDimensionality: 768,
+    },
+  });
+
+  const values = response.embeddings?.[0]?.values;
+  if (!values) {
+    throw new Error("No embeddings returned from API");
+  }
+
+  return normalizeVector(values);
+}
+
+function normalizeVector(vector: number[]): number[] {
+  let sumOfSquares = 0;
+  for (const val of vector) {
+    sumOfSquares += val * val;
+  }
+  const magnitude = Math.sqrt(sumOfSquares);
+  if (magnitude === 0) return vector;
+  return vector.map((val) => val / magnitude);
+}
+```
+
+We normalize the vectors after generation. This is a best practice when using truncated dimensions via MRL — it ensures cosine similarity calculations remain accurate.
+
+Now let's store some documents:
+
+```typescript
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
+
+async function storeDocuments() {
+  const documents = [
+    "The cat chases the mouse",
+    "The kitten hunts rodents",
+    "I like ham sandwiches",
+  ];
+
+  for (const content of documents) {
+    // Generate embedding using Gemini
+    const embedding = await getEmbedding(content);
+
+    // Store in Supabase
+    await supabase.from("items").insert({
+      content,
+      metadata: { source: "example" },
+      embedding,
+    });
+  }
+}
+```
+
+### Building a search function
+
+Now let's build a search function that takes a user's query, generates an embedding, and finds the most similar items:
+
+```typescript
+async function search(query: string) {
+  // Generate a one-time embedding for the query
+  const embedding = await getEmbedding(query);
+
+  // Perform similarity search via Supabase RPC
+  const { data: items, error } = await supabase.rpc("match_items", {
+    query_embedding: embedding,
+    match_threshold: 0.5,
+    match_count: 10,
+  });
+
+  if (error) throw error;
+
+  return items;
+}
+
+// Example usage
+const results = await search("small feline catching prey");
+console.log(results);
+// Returns "The cat chases the mouse" and "The kitten hunts rodents"
+// but NOT "I like ham sandwiches"
+```
+
+## Multimodal search
+
+This is where Gemini Embedding 2 really shines. Unlike text-only models, you can embed images and audio into the **same vector space**. This means you can search for images using text, or find audio clips similar to an image.
+
+```typescript
+export interface MultimodalPart {
+  text?: string;
+  inlineData?: {
+    data: string; // base64
+    mimeType: string;
+  };
+}
+
+export async function getMultimodalEmbedding(
+  parts: MultimodalPart[]
+): Promise<number[]> {
+  const response = await ai.models.embedContent({
+    model: "gemini-embedding-2-preview",
+    contents: [{ parts }],
+    config: {
+      outputDimensionality: 768,
+    },
+  });
+
+  const values = response.embeddings?.[0]?.values;
+  if (!values) throw new Error("No embeddings returned");
+
+  return normalizeVector(values);
+}
+```
+
+Now you can embed an image and search for it with text:
+
+```typescript
+// Embed an image
+const imageBase64 = fs.readFileSync("photo.jpg").toString("base64");
+const imageEmbedding = await getMultimodalEmbedding([
+  {
+    inlineData: {
+      data: imageBase64,
+      mimeType: "image/jpeg",
+    },
+  },
+]);
+
+// Store it
+await supabase.from("items").insert({
+  content: "photo.jpg",
+  metadata: { type: "image", mimeType: "image/jpeg" },
+  embedding: imageEmbedding,
+});
+
+// Later, search with text — finds the image!
+const results = await search("a photograph");
+```
+
+This cross-modal capability opens up powerful use cases like visual search engines, audio content discovery, and mixed-media recommendation systems.
+
+## Choosing dimensions
+
+Gemini Embedding 2 supports Matryoshka Representation Learning, which means you can choose your embedding size:
+
+| Dimensions | Storage per vector | Best for |
+| --- | --- | --- |
+| 3072 (default) | ~24 KB | Maximum accuracy |
+| 768 | ~6 KB | Good balance of accuracy and speed |
+| 256 | ~2 KB | Large-scale, speed-critical applications |
+
+In this project we use **768 dimensions** — it gives us roughly equivalent quality to OpenAI's `text-embedding-ada-002` (which is also 1536-dimensional) while using half the storage. For most applications, 768 dimensions provides an excellent accuracy-to-efficiency tradeoff.
+
+To change the dimension, update two things:
+
+1. The `outputDimensionality` in your API call
+2. The `vector(n)` size in your SQL table definition
+
+## Wrapping up
+
+With Gemini Embedding 2 and Supabase, you get:
+
+- **Multimodal embeddings** — text, images, and audio in one vector space
+- **Flexible dimensions** — choose your accuracy vs speed tradeoff with MRL
+- **Managed infrastructure** — Supabase handles your Postgres + pgvector so you don't have to
+- **Simple queries** — similarity search is just a SQL function call
+
+The full source code for a working multimodal search application using this stack is available in this repository. Check out the [Supabase AI & Vectors docs](https://supabase.com/docs/guides/ai) for more advanced patterns like Retrieval Augmented Generation (RAG).
