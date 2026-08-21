@@ -188,4 +188,24 @@ describe('ExplorerNotebookTab', () => {
 
     await waitFor(() => expect(readPersistedValue()).toBe(!initialValue))
   })
+
+  it('persists the preview tab when saving the notebook', async () => {
+    addAPIMock({
+      method: 'put',
+      path: '/platform/projects/:ref/content',
+      response: () => HttpResponse.json({ id: NOTEBOOK_ID }),
+    })
+
+    const tabsState = createTabsState('default')
+    const tabId = createTabId('notebook', { id: NOTEBOOK_ID })
+    tabsState.addTab({ id: tabId, type: 'notebook', metadata: { notebookId: NOTEBOOK_ID } })
+    expect(tabsState.tabsMap[tabId]?.isPreview).toBe(true)
+
+    renderNotebookTab(tabsState)
+
+    const saveButton = await screen.findByRole('button', { name: 'Save changes' })
+    await userEvent.click(saveButton)
+
+    await waitFor(() => expect(tabsState.tabsMap[tabId]?.isPreview).toBe(false))
+  })
 })
