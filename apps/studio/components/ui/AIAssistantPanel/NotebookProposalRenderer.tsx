@@ -100,6 +100,8 @@ export const NotebookProposalRenderer = (props: NotebookProposalRendererProps) =
     ) : (
       <UpdateNotebookProposal
         input={input}
+        state={state}
+        output={output}
         confirmState={confirmState}
         footerAction={confirmState === undefined ? undefined : footerAction}
         onApprove={onApprove}
@@ -234,23 +236,33 @@ function CreateNotebookProposal({
   )
 }
 
+const TERMINAL_CONFIRM_STATES: ConfirmFooterApprovalState[] = ['success', 'error', 'denied']
+
 /**
- * An update whose operations don't apply to the notebook as currently loaded (e.g. an
- * operation targets a cell id that no longer exists). There's nothing for the user to decide
- * here, so instead of asking them to Skip, deny automatically with the specific reason —
- * same text `update_notebook`'s server-side execute() would throw for the same failure — so
- * the model sees why and can retry (e.g. re-fetch and reissue) without the user's involvement.
+ * An update whose operations don't apply to the notebook as currently loaded
+ * (e.g. an operation targets a cell id that no longer exists). There's nothing
+ * for the user to decide here, so instead of asking them to Skip, deny
+ * automatically with the specific reason — same text `update_notebook`'s
+ * server-side execute() would throw for the same failure — so the model sees
+ * why and can retry (e.g. re-fetch and reissue) without the user's involvement.
+ *
+ * For a terminal `confirmState` (the decision already happened), re-deriving
+ * against live content is just for display, and "can't be applied as written"
+ * is inaccurate — nothing is being applied anymore. Instead, state that the
+ * notebook has changed since, so the preview can't be reconstructed.
  */
 function UnapplyableNotebookUpdateNotice({
   notebookName,
   reason,
   confirmState,
+  footerAction,
   onDeny,
   denyWithReason,
 }: {
   notebookName: string
   reason: string
   confirmState?: ConfirmFooterApprovalState
+  footerAction?: ReactNode
   onDeny?: () => void
   denyWithReason?: (reason: string) => void
 }) {
@@ -262,20 +274,31 @@ function UnapplyableNotebookUpdateNotice({
     if (confirmState === 'approval-requested') onUnapplyable()
   }, [confirmState])
 
+  const isTerminal = confirmState !== undefined && TERMINAL_CONFIRM_STATES.includes(confirmState)
+
   return (
     <NotebookConfirm
       mode="update"
       confirmState={confirmState}
+      footerAction={footerAction}
       message={`Assistant wants to update "${notebookName}"`}
       denyOnly
       onDeny={() => (denyWithReason ? denyWithReason(reason) : onDeny?.())}
     >
       <div className="p-3">
-        <Admonition
-          type="warning"
-          title="This update can't be applied as written"
-          description={reason}
-        />
+        {isTerminal ? (
+          <Admonition
+            type="warning"
+            title="Preview unavailable"
+            description="This notebook has changed since, so the preview can't be reconstructed."
+          />
+        ) : (
+          <Admonition
+            type="warning"
+            title="This update can't be applied as written"
+            description={reason}
+          />
+        )}
       </div>
     </NotebookConfirm>
   )
@@ -283,14 +306,17 @@ function UnapplyableNotebookUpdateNotice({
 
 function UpdateNotebookProposal({
   input,
+  state,
+  output,
   confirmState,
   footerAction,
   onApprove,
   onDeny,
   denyWithReason,
-}: NotebookProposalStepProps) {
+}: NotebookProposalStepProps & { state: NotebookProposalState; output: unknown }) {
   const { ref } = useParams()
   const parsedInput = updateNotebookInputSchema.safeParse(input)
+  const isCompleted = state === 'output-available'
 
   const {
     data: notebook,
@@ -299,7 +325,7 @@ function UpdateNotebookProposal({
     error,
   } = useNotebookQuery(
     { projectRef: ref, id: parsedInput.success ? parsedInput.data.id : undefined },
-    { enabled: parsedInput.success }
+    { enabled: parsedInput.success && !isCompleted }
   )
 
   if (!parsedInput.success) {
@@ -310,6 +336,25 @@ function UpdateNotebookProposal({
         input={input}
         onDeny={onDeny}
       />
+    )
+  }
+
+  if (isCompleted) {
+    const parsedOutput = notebookToolOutputSchema.safeParse(output)
+    const notebookName = parsedOutput.success ? parsedOutput.data.name : undefined
+
+    return (
+      <NotebookConfirm
+        mode="update"
+        confirmState={confirmState}
+        footerAction={footerAction}
+        onApprove={onApprove}
+        onDeny={onDeny}
+      >
+        <div className="p-3 text-sm text-foreground-light truncate">
+          {notebookName ? `Notebook updated: ${notebookName}` : MODE_COPY.update.outputLabel}
+        </div>
+      </NotebookConfirm>
     )
   }
 
@@ -349,6 +394,7 @@ function UpdateNotebookProposal({
         notebookName={notebook.name}
         reason={describeNotebookOperationError(diff.error)}
         confirmState={confirmState}
+        footerAction={footerAction}
         onDeny={onDeny}
         denyWithReason={denyWithReason}
       />
