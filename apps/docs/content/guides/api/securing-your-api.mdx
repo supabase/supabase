@@ -189,7 +189,7 @@ Revoke automatic grants when you want new objects in `public` to remain inaccess
      revoke execute on functions from public;
    ```
 
-The last statement leaves out `in schema public` on purpose. A schema-scoped default privilege is merged with the built-in Postgres default rather than replacing it, so it can't take away the `EXECUTE` privilege that Postgres grants to `PUBLIC` on every new function. Only the schema-less form replaces that default, and it covers functions `postgres` creates in any schema.
+The last statement leaves out `in schema public` on purpose. Postgres merges a schema-scoped default privilege with its built-in default instead of replacing it. Such an entry can only add privileges, so it never reaches the `EXECUTE` that Postgres grants to `PUBLIC`. Only the schema-less form replaces that default. It covers every function `postgres` creates, in any schema, so extensions you enable afterwards need an explicit `grant execute` before `anon` or `authenticated` can call their functions.
 
 New tables, functions, and sequences now require explicit grants before Data API roles can access them.
 
