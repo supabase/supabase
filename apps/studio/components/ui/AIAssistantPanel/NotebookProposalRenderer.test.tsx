@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { HttpResponse } from 'msw'
 import { describe, expect, it, vi } from 'vitest'
@@ -255,8 +255,35 @@ describe('NotebookProposalRenderer', () => {
     )
   })
 
-  it('shows the notebook action after an automatic update succeeds', async () => {
-    mockContentItem(mockNotebookRow())
+  it('shows the notebook action after an automatic update succeeds', () => {
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="output-available"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
+        }}
+        output={{ id: NOTEBOOK_ID, name: 'Signup funnel' }}
+      />
+    )
+
+    expect(screen.getByRole('link', { name: 'Open notebook' })).toHaveAttribute(
+      'href',
+      `/project/default/explorer/notebook/${NOTEBOOK_ID}`
+    )
+  })
+
+  it('does not show the "can\'t be applied" warning for a completed update whose target cell no longer exists', async () => {
+    mockContentItem(
+      mockNotebookRow({
+        content: {
+          schema_version: 1,
+          cells: [{ _tag: 'markdown_cell', _id: 'cell-2', text: 'world' }],
+        },
+      })
+    )
 
     render(
       <NotebookProposalRenderer
@@ -271,10 +298,85 @@ describe('NotebookProposalRenderer', () => {
       />
     )
 
-    expect(await screen.findByRole('link', { name: 'Open notebook' })).toHaveAttribute(
+    await waitFor(() => expect(screen.queryByText('Loading notebook...')).not.toBeInTheDocument())
+    expect(screen.queryByText("This update can't be applied as written")).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Open notebook' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Open notebook' })).toHaveAttribute(
       'href',
       `/project/default/explorer/notebook/${NOTEBOOK_ID}`
     )
+  })
+
+  it('shows the notebook action inside the Confirm footer for a manually approved completed update', async () => {
+    mockContentItem(
+      mockNotebookRow({
+        content: {
+          schema_version: 1,
+          cells: [{ _tag: 'markdown_cell', _id: 'cell-2', text: 'world' }],
+        },
+      })
+    )
+
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="output-available"
+        confirmState="success"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
+        }}
+        output={{ id: NOTEBOOK_ID, name: 'Signup funnel' }}
+      />
+    )
+
+    const openNotebookLink = await screen.findByRole('link', { name: 'Open notebook' })
+    expect(openNotebookLink).toHaveAttribute(
+      'href',
+      `/project/default/explorer/notebook/${NOTEBOOK_ID}`
+    )
+    expect(screen.queryByText("This update can't be applied as written")).not.toBeInTheDocument()
+  })
+
+  it('derives the diff against live content for a denied update', async () => {
+    mockContentItem(mockNotebookRow())
+
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="output-denied"
+        confirmState="denied"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
+        }}
+        output={undefined}
+      />
+    )
+
+    expect(await screen.findByText('−1')).toBeInTheDocument()
+  })
+
+  it('derives the diff against live content for an errored update', async () => {
+    mockContentItem(mockNotebookRow())
+
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="output-error"
+        confirmState="error"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
+        }}
+        output={undefined}
+      />
+    )
+
+    expect(await screen.findByText('−1')).toBeInTheDocument()
   })
 
   it('keeps the create preview and marks it failed when the tool errors', () => {
