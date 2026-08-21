@@ -1,0 +1,60 @@
+---
+id: 'stripe-projects'
+title: 'Stripe Projects'
+description: 'Provision a Supabase project from the Stripe CLI'
+---
+
+## Overview
+
+[Stripe Projects](https://docs.stripe.com/stripe-projects) is a workflow in the Stripe CLI that provisions real services and returns working credentials from a single command. Supabase is available in the catalog, so one command provisions a Postgres database along with the rest of Supabase (Auth, Storage, Edge Functions, and Realtime), without opening a dashboard.
+
+Stripe Projects is designed for both humans and AI agents. The provisioning steps are deterministic and repeatable whether you run them yourself or an agent runs them for you.
+
+<Admonition type="note">
+
+Stripe Projects is currently a developer preview. If you run into issues, [reach out on Discord](https://discord.supabase.com/) or open an issue on [GitHub](https://github.com/supabase/supabase/issues).
+
+</Admonition>
+
+## Quickstart
+
+[Install the Stripe CLI](https://docs.stripe.com/stripe-cli/install), then run:
+
+```bash
+stripe plugin install projects
+stripe projects init my-app
+stripe projects add supabase/project
+stripe projects env --sync
+```
+
+This creates a new Supabase project in your account with a Postgres database ready to connect, and writes the project credentials to a local `.env` file. If you already have a Supabase account, the flow prompts you to link it instead of creating a new one.
+
+To open the Supabase dashboard directly:
+
+```bash
+stripe projects open supabase
+```
+
+To rotate your database credentials:
+
+```bash
+stripe projects rotate supabase/project
+```
+
+For the full command reference, see [Stripe's Stripe Projects docs](https://docs.stripe.com/stripe-projects).
+
+## Authorizing the request
+
+The first time you provision a project this way, Supabase shows an authorization screen so you can confirm the request before anything is created:
+
+- If you're not signed in to Supabase with the email Stripe has on file, you're asked to sign out and back in as that account.
+- If the Stripe account is already linked to a Supabase organization, you just confirm the request.
+- Otherwise, confirming creates a new Supabase organization on your behalf.
+
+Your Supabase project and organization work exactly like ones you create directly — you keep full access to the dashboard, your connection strings, and your data. Nothing is proxied or white-labeled.
+
+## Limitations
+
+- Stripe Projects is in developer preview, so behavior may change.
+<!-- Inferred from the Supabase-side authorization screen's confirmation states, not confirmed against the account-request API schema — worth double-checking with the Stripe Projects team before publishing. -->
+- Provisioning links to a Supabase organization by matching the email on the Stripe account to a Supabase account; there's no option in the CLI flow to choose a different existing organization.
