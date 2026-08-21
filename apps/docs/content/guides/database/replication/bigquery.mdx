@@ -121,6 +121,25 @@ Source tables must also use a BigQuery-compatible Postgres `REPLICA IDENTITY` se
 
 For a general explanation of how replica identity affects update and delete events, see [How does replica identity affect updates and deletes?](/docs/guides/database/replication/pipelines-faq#how-does-replica-identity-affect-updates-and-deletes).
 
+## Column names
+
+BigQuery supports [flexible column names](https://cloud.google.com/bigquery/docs/schemas#flexible-column-names), including spaces, most punctuation, and non-ASCII Unicode characters. Pipelines replicates a source column under its exact Postgres name, so you don't need to rename columns to make them BigQuery-compatible before replicating a table.
+
+BigQuery treats column names as case-insensitive. Pipelines matches that behavior by folding ASCII letters only: source columns named, for example, `Name` and `name` map to the same BigQuery column and are treated as a naming conflict, while columns that differ only by non-ASCII case (such as `Ä` and `ä`) are treated as distinct. Avoid source tables whose replicated columns differ only by case to prevent this conflict.
+
+## Table partitioning and clustering
+
+You can configure BigQuery partitioning and clustering for individual replicated tables to control their physical layout and improve query performance and cost.
+
+Partitioning and clustering settings are applied only when Pipelines creates or recreates a destination table. Restarting a pipeline doesn't modify a table that already exists, and changing either setting has no effect until the table is created again — for example, when a table is replicated for the first time, when its replication state is reset, or when a source truncate causes Pipelines to create a new physical table. Resynchronize a table if you want new partitioning or clustering settings to apply to it.
+
+Partitioning and clustering are independent: you can set either one or both for a table. Leave both unset to use BigQuery's default unpartitioned, unclustered layout.
+
+- **Partitioning**: Partition by a `date`, `timestamp`, or `timestamptz` column with `hour`, `day`, `month`, or `year` granularity (`date` columns don't support `hour`), by an integer column using a start, end, and interval range, or by ingestion time.
+- **Clustering**: Cluster by one to four ordered, distinct replicated columns. BigQuery validates whether the clustering column types are supported.
+
+See the BigQuery documentation for [partition expressions](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#partition_expression) and [clustering column requirements](https://cloud.google.com/bigquery/docs/creating-clustered-tables#clustered_column_requirements).
+
 For updates, Postgres does not always send a complete old row through logical replication. It can also mark unchanged toasted values as `unchanged toast` instead of resending the value. BigQuery change data capture (CDC) upserts require a complete new row because omitted columns are not preserved in the destination. The replication pipeline can reconstruct a complete update when the old row image contains the missing value, which is reliable with `REPLICA IDENTITY FULL`.
 
 If a BigQuery pipeline fails with an error about a partial update row, set `REPLICA IDENTITY FULL` on the affected source table and restart the pipeline. Changing replica identity only affects new WAL records, so a retained update that was written before the change may still need to be skipped by recreating the pipeline or restarting the affected table's initial sync.
