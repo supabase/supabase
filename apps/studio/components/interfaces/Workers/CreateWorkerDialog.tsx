@@ -3,11 +3,13 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
+  cn,
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogSection,
+  DialogSectionSeparator,
   DialogTitle,
   Form,
   FormControl,
@@ -65,15 +67,11 @@ export const CreateWorkerDialog = ({ projectRef, open, onOpenChange }: CreateWor
           <DialogTitle>Deploy a worker</DialogTitle>
         </DialogHeader>
 
+        <DialogSectionSeparator />
+
         <Form {...form}>
           <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
             <DialogSection className="space-y-4">
-              <Admonition
-                type="default"
-                title="Deploys a Deno starter worker"
-                description="The dashboard deploys a hello-world worker you can then edit and redeploy with the Supabase CLI."
-              />
-
               <FormField
                 control={form.control}
                 name="name"
@@ -93,7 +91,7 @@ export const CreateWorkerDialog = ({ projectRef, open, onOpenChange }: CreateWor
                 control={form.control}
                 name="size"
                 render={({ field }) => (
-                  <FormItemLayout label="Size">
+                  <FormItemLayout label="Size" description="Fixed at deploy time">
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
@@ -116,7 +114,10 @@ export const CreateWorkerDialog = ({ projectRef, open, onOpenChange }: CreateWor
                 control={form.control}
                 name="access"
                 render={({ field }) => (
-                  <FormItemLayout label="Access">
+                  <FormItemLayout
+                    label="Access"
+                    description="Public workers accept requests with an anon key"
+                  >
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
@@ -136,10 +137,7 @@ export const CreateWorkerDialog = ({ projectRef, open, onOpenChange }: CreateWor
                 control={form.control}
                 name="instances"
                 render={({ field }) => (
-                  <FormItemLayout
-                    label="Instances"
-                    description={`${WORKER_MIN_INSTANCES} to ${WORKER_MAX_INSTANCES}`}
-                  >
+                  <FormItemLayout label="Instances">
                     <FormControl>
                       <Input
                         {...field}
@@ -152,6 +150,13 @@ export const CreateWorkerDialog = ({ projectRef, open, onOpenChange }: CreateWor
                 )}
               />
             </DialogSection>
+
+            <Admonition
+              type="default"
+              title="Deploys a Deno starter worker"
+              description="The dashboard deploys a hello-world worker you can then edit and redeploy with the Supabase CLI."
+              className={cn('mb-0 rounded-none border-x-0 border-b-0')}
+            />
           </form>
         </Form>
 
