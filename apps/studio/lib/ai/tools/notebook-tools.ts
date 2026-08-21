@@ -17,6 +17,7 @@ import {
 } from '@/data/content/notebooks/notebook-schema'
 import { createNotebook, upsertNotebook } from '@/data/content/notebooks/notebook-upsert-mutation'
 import { acceptUntrustedLogsSql, untrustedLogSql } from '@/data/logs/safe-analytics-sql'
+import { getReadReplicas } from '@/data/read-replicas/replicas-query'
 import type { Notebooks } from '@/types'
 
 export type NotebookToolsContext = {
@@ -77,6 +78,23 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
   const authHeaders = authorization ? { Authorization: authorization } : undefined
 
   return {
+    list_databases: tool({
+      description:
+        'List the databases available for this project — the primary and any read replicas.',
+      inputSchema: z.object({}),
+      execute: async () => {
+        const databases = await getReadReplicas({ projectRef }, undefined, authHeaders)
+
+        return {
+          databases: (databases ?? []).map((database) => ({
+            identifier: database.identifier,
+            is_primary: database.identifier === projectRef,
+            region: database.region,
+            status: database.status,
+          })),
+        }
+      },
+    }),
     list_notebooks: tool({
       description: 'List the notebooks saved for this project',
       inputSchema: z.object({
