@@ -31,7 +31,7 @@ export const createLogCellSkeleton = ({
   return {
     title,
     _tag: 'log_cell' as const,
-    id: generateDraftId(),
+    _id: generateDraftId(),
     view: 'table' as const,
     chart: undefined,
     unchecked_sql: untrustedLogSql(sql ?? ''),
