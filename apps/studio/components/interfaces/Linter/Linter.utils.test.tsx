@@ -75,6 +75,7 @@ describe('Linter.utils lintInfoMap pitr_archiving_stale entry', () => {
     expect(info, 'expected pitr_archiving_stale in lintInfoMap').toBeDefined()
 
     expect(info!.title).toBe('PITR archiving may be broken')
+    expect(isValidElement(info!.icon)).toBe(true)
     expect(isValidElement(info!.icon) && info!.icon.type).toBe(Ruler)
     expect(info!.category).toBe('security')
     // metadata is unused by this entry's link(), and every field on Lint['metadata'] is optional, so {} needs no cast
