@@ -11,6 +11,7 @@ import { middleware } from './middleware'
 vi.mock('./app/api-v2/md/content.generated', () => ({
   MD_CONTENT: new Map<string, string>(),
   MD_PAGES: new Set<string>(['homepage', 'auth', 'pricing']),
+  CHANGELOG_PAGES: new Set<string>(['changelog/100', 'changelog/pipelines']),
 }))
 
 function makeRequest(
@@ -132,6 +133,18 @@ describe('www middleware', () => {
       expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/changelog/100.md')
     })
 
+    it('serves markdown for explicit non-legacy changelog .md requests even when Accept excludes it', () => {
+      const req = makeRequest('/changelog/pipelines.md', {
+        accept: 'application/x-content-negotiation-probe',
+      })
+      const res = middleware(req)
+
+      expect(res.status).not.toBe(406)
+      expect(res.headers.get('x-middleware-rewrite')).toBe(
+        'https://supabase.com/changelog/pipelines.md'
+      )
+    })
+
     it('rewrites the changelog index .md request without doubling the suffix', () => {
       const req = makeRequest('/changelog.md', { accept: 'text/markdown' })
       const res = middleware(req)
@@ -183,6 +196,31 @@ describe('www middleware', () => {
       const res = middleware(req)
 
       expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/changelog/100.md')
+    })
+
+    it('negotiates markdown for non-legacy changelog slugs', () => {
+      const req = makeRequest('/changelog/pipelines', { accept: 'text/markdown' })
+      const res = middleware(req)
+
+      expect(res.headers.get('x-middleware-rewrite')).toBe(
+        'https://supabase.com/changelog/pipelines.md'
+      )
+    })
+
+    it('passes through unpublished numeric-prefix changelog slugs', () => {
+      const req = makeRequest('/changelog/999-not-published', { accept: 'text/markdown' })
+      const res = middleware(req)
+
+      expect(res.headers.get('x-middleware-rewrite')).toBeNull()
+      expect(res.status).not.toBe(406)
+    })
+
+    it('passes through deep paths under a published changelog slug', () => {
+      const req = makeRequest('/changelog/100/bar', { accept: 'text/markdown' })
+      const res = middleware(req)
+
+      expect(res.headers.get('x-middleware-rewrite')).toBeNull()
+      expect(res.status).not.toBe(406)
     })
 
     it('rewrites the bare changelog index to its static .md file', () => {
@@ -284,6 +322,15 @@ describe('www middleware', () => {
 
     it('returns 406 on changelog entries when Accept excludes every type', () => {
       const req = makeRequest('/changelog/100', {
+        accept: 'application/x-content-negotiation-probe',
+      })
+      const res = middleware(req)
+
+      expect(res.status).toBe(406)
+    })
+
+    it('returns 406 for non-legacy changelog entries when Accept matches nothing', () => {
+      const req = makeRequest('/changelog/pipelines', {
         accept: 'application/x-content-negotiation-probe',
       })
       const res = middleware(req)

@@ -2,7 +2,7 @@ import { stampFirstReferrerCookie } from 'common/first-referrer-cookie'
 import { negotiateMarkdown } from 'common/markdown-negotiation'
 import { NextResponse, type NextRequest } from 'next/server'
 
-import { MD_PAGES } from './app/api-v2/md/content.generated'
+import { CHANGELOG_PAGES, MD_PAGES } from './app/api-v2/md/content.generated'
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -14,7 +14,7 @@ export function middleware(request: NextRequest) {
   // entry — NextURL preserves trailing-slash style on rewrite targets.
   const slug = (basePathname === '/' ? 'homepage' : basePathname.slice(1)).replace(/\/$/, '')
   const isMdEligible = MD_PAGES.has(slug)
-  const isChangelogEntry = slug === 'changelog' || /^changelog\/\d+/.test(slug)
+  const isChangelogEntry = slug === 'changelog' || CHANGELOG_PAGES.has(slug)
 
   const decision = negotiateMarkdown(
     { acceptHeader: request.headers.get('accept') ?? '' },
