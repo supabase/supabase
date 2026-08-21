@@ -6,7 +6,17 @@ import { useRouter } from 'next/compat/router'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useCallback, useEffect, useState, type ChangeEvent } from 'react'
-import { Badge, Button, Checkbox, cn, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
+import {
+  Badge,
+  Button,
+  Checkbox,
+  cn,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  ToggleGroup,
+  ToggleGroupItem,
+} from 'ui'
 
 import {
   FeaturesMatrix,
@@ -266,36 +276,38 @@ function FeaturesPage() {
               <span className="text-foreground-muted text-xs">
                 {filteredFeatures.length} feature{filteredFeatures.length !== 1 ? 's' : ''}
               </span>
-              <div className="flex items-center rounded-lg border border-muted">
-                <button
-                  tabIndex={0}
+              <ToggleGroup
+                type="single"
+                value={viewMode}
+                onValueChange={(value) => value && setViewMode(value as ViewMode)}
+                aria-label="Feature layout"
+                className="flex items-center gap-0 rounded-lg border border-muted"
+              >
+                <ToggleGroupItem
+                  value="grid"
                   title="Grid view"
-                  aria-pressed={viewMode === 'grid'}
-                  onClick={() => setViewMode('grid')}
                   className={cn(
-                    'relative flex items-center justify-center w-8 h-8 rounded-l-lg focus-visible:z-10 focus-ring',
-                    viewMode === 'grid'
-                      ? 'cursor-default bg-surface-400 text-foreground'
-                      : 'cursor-pointer bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
+                    'relative flex items-center justify-center w-8 h-8 p-0 rounded-none rounded-l-lg focus-visible:z-10 focus-ring',
+                    'cursor-pointer bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200',
+                    'data-[state=on]:cursor-default data-[state=on]:bg-surface-400 data-[state=on]:text-foreground',
+                    'aria-checked:bg-surface-400 aria-checked:text-foreground'
                   )}
                 >
                   <LayoutGrid size={14} />
-                </button>
-                <button
-                  tabIndex={0}
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value="matrix"
                   title="Matrix view"
-                  aria-pressed={viewMode === 'matrix'}
-                  onClick={() => setViewMode('matrix')}
                   className={cn(
-                    'relative flex items-center justify-center w-8 h-8 border-l border-muted rounded-r-lg focus-visible:z-10 focus-ring',
-                    viewMode === 'matrix'
-                      ? 'cursor-default bg-surface-400 text-foreground'
-                      : 'cursor-pointer bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
+                    'relative flex items-center justify-center w-8 h-8 p-0 rounded-none rounded-r-lg border-l border-muted focus-visible:z-10 focus-ring',
+                    'cursor-pointer bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200',
+                    'data-[state=on]:cursor-default data-[state=on]:bg-surface-400 data-[state=on]:text-foreground',
+                    'aria-checked:bg-surface-400 aria-checked:text-foreground'
                   )}
                 >
                   <Table2 size={14} />
-                </button>
-              </div>
+                </ToggleGroupItem>
+              </ToggleGroup>
             </div>
 
             {viewMode === 'matrix' ? (
