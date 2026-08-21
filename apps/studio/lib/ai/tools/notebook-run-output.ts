@@ -72,10 +72,26 @@ export function sanitizeNotebookRunOutput(
         (cell.source === 'logs' && aiOptInLevel === 'schema_and_log')
 
       if (cell.status === 'success') {
-        return canShareRows ? cell : { ...cell, rows: undefined, message: HIDDEN_RESULT_MESSAGE }
+        return canShareRows
+          ? cell
+          : {
+              cell_id: cell.cell_id,
+              title: cell.title,
+              source: cell.source,
+              status: cell.status,
+              message: HIDDEN_RESULT_MESSAGE,
+            }
       }
 
-      return canShareRows ? cell : { ...cell, error: { message: HIDDEN_ERROR_MESSAGE } }
+      return canShareRows
+        ? cell
+        : {
+            cell_id: cell.cell_id,
+            title: cell.title,
+            source: cell.source,
+            status: cell.status,
+            error: { message: HIDDEN_ERROR_MESSAGE },
+          }
     }),
   }
 }
