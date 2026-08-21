@@ -106,7 +106,6 @@ import { Route as ProjectRefSqlExamplesRouteImport } from './routes/project/$ref
 import { Route as ProjectRefSqlIdRouteImport } from './routes/project/$ref/sql/$id'
 import { Route as ProjectRefSettingsLogDrainsRouteImport } from './routes/project/$ref/settings/log-drains'
 import { Route as ProjectRefSettingsIntegrationsRouteImport } from './routes/project/$ref/settings/integrations'
-import { Route as ProjectRefSettingsInfrastructureIndexRouteImport } from './routes/project/$ref/settings/infrastructure/index'
 import { Route as ProjectRefSettingsGeneralRouteImport } from './routes/project/$ref/settings/general'
 import { Route as ProjectRefSettingsDashboardRouteImport } from './routes/project/$ref/settings/dashboard'
 import { Route as ProjectRefSettingsApiKeysRouteImport } from './routes/project/$ref/settings/api-keys'
@@ -206,6 +205,7 @@ import { Route as ProjectRefStorageFilesIndexRouteImport } from './routes/projec
 import { Route as ProjectRefStorageAnalyticsIndexRouteImport } from './routes/project/$ref/storage/analytics/index'
 import { Route as ProjectRefSettingsWebhooksIndexRouteImport } from './routes/project/$ref/settings/webhooks/index'
 import { Route as ProjectRefSettingsJwtIndexRouteImport } from './routes/project/$ref/settings/jwt/index'
+import { Route as ProjectRefSettingsInfrastructureIndexRouteImport } from './routes/project/$ref/settings/infrastructure/index'
 import { Route as ProjectRefSettingsApiKeysIndexRouteImport } from './routes/project/$ref/settings/api-keys/index'
 import { Route as ProjectRefLogsExplorerIndexRouteImport } from './routes/project/$ref/logs/explorer/index'
 import { Route as ProjectRefIntegrationsIdIndexRouteImport } from './routes/project/$ref/integrations/$id/index'
@@ -824,12 +824,6 @@ const ProjectRefSettingsIntegrationsRoute =
     path: '/integrations',
     getParentRoute: () => ProjectRefSettingsRoute,
   } as any)
-const ProjectRefSettingsInfrastructureIndexRoute =
-  ProjectRefSettingsInfrastructureIndexRouteImport.update({
-    id: '/infrastructure/',
-    path: '/infrastructure/',
-    getParentRoute: () => ProjectRefSettingsRoute,
-  } as any)
 const ProjectRefSettingsGeneralRoute =
   ProjectRefSettingsGeneralRouteImport.update({
     id: '/general',
@@ -1380,6 +1374,12 @@ const ProjectRefSettingsJwtIndexRoute =
   ProjectRefSettingsJwtIndexRouteImport.update({
     id: '/jwt/',
     path: '/jwt/',
+    getParentRoute: () => ProjectRefSettingsRoute,
+  } as any)
+const ProjectRefSettingsInfrastructureIndexRoute =
+  ProjectRefSettingsInfrastructureIndexRouteImport.update({
+    id: '/infrastructure/',
+    path: '/infrastructure/',
     getParentRoute: () => ProjectRefSettingsRoute,
   } as any)
 const ProjectRefSettingsApiKeysIndexRoute =
@@ -2256,7 +2256,6 @@ export interface FileRoutesByFullPath {
   '/project/$ref/settings/api-keys': typeof ProjectRefSettingsApiKeysRouteWithChildren
   '/project/$ref/settings/dashboard': typeof ProjectRefSettingsDashboardRoute
   '/project/$ref/settings/general': typeof ProjectRefSettingsGeneralRoute
-  '/project/$ref/settings/infrastructure/': typeof ProjectRefSettingsInfrastructureIndexRoute
   '/project/$ref/settings/integrations': typeof ProjectRefSettingsIntegrationsRoute
   '/project/$ref/settings/log-drains': typeof ProjectRefSettingsLogDrainsRoute
   '/project/$ref/sql/$id': typeof ProjectRefSqlIdRoute
@@ -2345,6 +2344,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/integrations/$id/': typeof ProjectRefIntegrationsIdIndexRoute
   '/project/$ref/logs/explorer/': typeof ProjectRefLogsExplorerIndexRoute
   '/project/$ref/settings/api-keys/': typeof ProjectRefSettingsApiKeysIndexRoute
+  '/project/$ref/settings/infrastructure/': typeof ProjectRefSettingsInfrastructureIndexRoute
   '/project/$ref/settings/jwt/': typeof ProjectRefSettingsJwtIndexRoute
   '/project/$ref/settings/webhooks/': typeof ProjectRefSettingsWebhooksIndexRoute
   '/project/$ref/storage/analytics/': typeof ProjectRefStorageAnalyticsIndexRoute
@@ -2557,7 +2557,6 @@ export interface FileRoutesByTo {
   '/project/$ref/settings/api': typeof ProjectRefSettingsApiRoute
   '/project/$ref/settings/dashboard': typeof ProjectRefSettingsDashboardRoute
   '/project/$ref/settings/general': typeof ProjectRefSettingsGeneralRoute
-  '/project/$ref/settings/infrastructure': typeof ProjectRefSettingsInfrastructureIndexRoute
   '/project/$ref/settings/integrations': typeof ProjectRefSettingsIntegrationsRoute
   '/project/$ref/settings/log-drains': typeof ProjectRefSettingsLogDrainsRoute
   '/project/$ref/sql/$id': typeof ProjectRefSqlIdRoute
@@ -2646,6 +2645,7 @@ export interface FileRoutesByTo {
   '/project/$ref/integrations/$id': typeof ProjectRefIntegrationsIdIndexRoute
   '/project/$ref/logs/explorer': typeof ProjectRefLogsExplorerIndexRoute
   '/project/$ref/settings/api-keys': typeof ProjectRefSettingsApiKeysIndexRoute
+  '/project/$ref/settings/infrastructure': typeof ProjectRefSettingsInfrastructureIndexRoute
   '/project/$ref/settings/jwt': typeof ProjectRefSettingsJwtIndexRoute
   '/project/$ref/settings/webhooks': typeof ProjectRefSettingsWebhooksIndexRoute
   '/project/$ref/storage/analytics': typeof ProjectRefStorageAnalyticsIndexRoute
@@ -2875,7 +2875,6 @@ export interface FileRoutesById {
   '/project/$ref/settings/api-keys': typeof ProjectRefSettingsApiKeysRouteWithChildren
   '/project/$ref/settings/dashboard': typeof ProjectRefSettingsDashboardRoute
   '/project/$ref/settings/general': typeof ProjectRefSettingsGeneralRoute
-  '/project/$ref/settings/infrastructure/': typeof ProjectRefSettingsInfrastructureIndexRoute
   '/project/$ref/settings/integrations': typeof ProjectRefSettingsIntegrationsRoute
   '/project/$ref/settings/log-drains': typeof ProjectRefSettingsLogDrainsRoute
   '/project/$ref/sql/$id': typeof ProjectRefSqlIdRoute
@@ -2964,6 +2963,7 @@ export interface FileRoutesById {
   '/project/$ref/integrations/$id/': typeof ProjectRefIntegrationsIdIndexRoute
   '/project/$ref/logs/explorer/': typeof ProjectRefLogsExplorerIndexRoute
   '/project/$ref/settings/api-keys/': typeof ProjectRefSettingsApiKeysIndexRoute
+  '/project/$ref/settings/infrastructure/': typeof ProjectRefSettingsInfrastructureIndexRoute
   '/project/$ref/settings/jwt/': typeof ProjectRefSettingsJwtIndexRoute
   '/project/$ref/settings/webhooks/': typeof ProjectRefSettingsWebhooksIndexRoute
   '/project/$ref/storage/analytics/': typeof ProjectRefStorageAnalyticsIndexRoute
@@ -3192,7 +3192,6 @@ export interface FileRouteTypes {
     | '/project/$ref/settings/api-keys'
     | '/project/$ref/settings/dashboard'
     | '/project/$ref/settings/general'
-    | '/project/$ref/settings/infrastructure/'
     | '/project/$ref/settings/integrations'
     | '/project/$ref/settings/log-drains'
     | '/project/$ref/sql/$id'
@@ -3281,6 +3280,7 @@ export interface FileRouteTypes {
     | '/project/$ref/integrations/$id/'
     | '/project/$ref/logs/explorer/'
     | '/project/$ref/settings/api-keys/'
+    | '/project/$ref/settings/infrastructure/'
     | '/project/$ref/settings/jwt/'
     | '/project/$ref/settings/webhooks/'
     | '/project/$ref/storage/analytics/'
@@ -3493,7 +3493,6 @@ export interface FileRouteTypes {
     | '/project/$ref/settings/api'
     | '/project/$ref/settings/dashboard'
     | '/project/$ref/settings/general'
-    | '/project/$ref/settings/infrastructure'
     | '/project/$ref/settings/integrations'
     | '/project/$ref/settings/log-drains'
     | '/project/$ref/sql/$id'
@@ -3582,6 +3581,7 @@ export interface FileRouteTypes {
     | '/project/$ref/integrations/$id'
     | '/project/$ref/logs/explorer'
     | '/project/$ref/settings/api-keys'
+    | '/project/$ref/settings/infrastructure'
     | '/project/$ref/settings/jwt'
     | '/project/$ref/settings/webhooks'
     | '/project/$ref/storage/analytics'
@@ -3810,7 +3810,6 @@ export interface FileRouteTypes {
     | '/project/$ref/settings/api-keys'
     | '/project/$ref/settings/dashboard'
     | '/project/$ref/settings/general'
-    | '/project/$ref/settings/infrastructure/'
     | '/project/$ref/settings/integrations'
     | '/project/$ref/settings/log-drains'
     | '/project/$ref/sql/$id'
@@ -3899,6 +3898,7 @@ export interface FileRouteTypes {
     | '/project/$ref/integrations/$id/'
     | '/project/$ref/logs/explorer/'
     | '/project/$ref/settings/api-keys/'
+    | '/project/$ref/settings/infrastructure/'
     | '/project/$ref/settings/jwt/'
     | '/project/$ref/settings/webhooks/'
     | '/project/$ref/storage/analytics/'
@@ -4761,13 +4761,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefSettingsIntegrationsRouteImport
       parentRoute: typeof ProjectRefSettingsRoute
     }
-    '/project/$ref/settings/infrastructure/': {
-      id: '/project/$ref/settings/infrastructure/'
-      path: '/infrastructure'
-      fullPath: '/project/$ref/settings/infrastructure/'
-      preLoaderRoute: typeof ProjectRefSettingsInfrastructureIndexRouteImport
-      parentRoute: typeof ProjectRefSettingsRoute
-    }
     '/project/$ref/settings/general': {
       id: '/project/$ref/settings/general'
       path: '/general'
@@ -5459,6 +5452,13 @@ declare module '@tanstack/react-router' {
       path: '/jwt'
       fullPath: '/project/$ref/settings/jwt/'
       preLoaderRoute: typeof ProjectRefSettingsJwtIndexRouteImport
+      parentRoute: typeof ProjectRefSettingsRoute
+    }
+    '/project/$ref/settings/infrastructure/': {
+      id: '/project/$ref/settings/infrastructure/'
+      path: '/infrastructure'
+      fullPath: '/project/$ref/settings/infrastructure/'
+      preLoaderRoute: typeof ProjectRefSettingsInfrastructureIndexRouteImport
       parentRoute: typeof ProjectRefSettingsRoute
     }
     '/project/$ref/settings/api-keys/': {
@@ -6822,15 +6822,15 @@ interface ProjectRefSettingsRouteChildren {
   ProjectRefSettingsApiKeysRoute: typeof ProjectRefSettingsApiKeysRouteWithChildren
   ProjectRefSettingsDashboardRoute: typeof ProjectRefSettingsDashboardRoute
   ProjectRefSettingsGeneralRoute: typeof ProjectRefSettingsGeneralRoute
-  ProjectRefSettingsInfrastructureIndexRoute: typeof ProjectRefSettingsInfrastructureIndexRoute
-  ProjectRefSettingsInfrastructureReplicaReplicaIdRoute: typeof ProjectRefSettingsInfrastructureReplicaReplicaIdRoute
   ProjectRefSettingsIntegrationsRoute: typeof ProjectRefSettingsIntegrationsRoute
   ProjectRefSettingsLogDrainsRoute: typeof ProjectRefSettingsLogDrainsRoute
   ProjectRefSettingsBillingUsageRoute: typeof ProjectRefSettingsBillingUsageRoute
   ProjectRefSettingsJwtLegacyRoute: typeof ProjectRefSettingsJwtLegacyRoute
   ProjectRefSettingsWebhooksEndpointIdRoute: typeof ProjectRefSettingsWebhooksEndpointIdRoute
+  ProjectRefSettingsInfrastructureIndexRoute: typeof ProjectRefSettingsInfrastructureIndexRoute
   ProjectRefSettingsJwtIndexRoute: typeof ProjectRefSettingsJwtIndexRoute
   ProjectRefSettingsWebhooksIndexRoute: typeof ProjectRefSettingsWebhooksIndexRoute
+  ProjectRefSettingsInfrastructureReplicaReplicaIdRoute: typeof ProjectRefSettingsInfrastructureReplicaReplicaIdRoute
 }
 
 const ProjectRefSettingsRouteChildren: ProjectRefSettingsRouteChildren = {
@@ -6839,18 +6839,18 @@ const ProjectRefSettingsRouteChildren: ProjectRefSettingsRouteChildren = {
   ProjectRefSettingsApiKeysRoute: ProjectRefSettingsApiKeysRouteWithChildren,
   ProjectRefSettingsDashboardRoute: ProjectRefSettingsDashboardRoute,
   ProjectRefSettingsGeneralRoute: ProjectRefSettingsGeneralRoute,
-  ProjectRefSettingsInfrastructureIndexRoute:
-    ProjectRefSettingsInfrastructureIndexRoute,
-  ProjectRefSettingsInfrastructureReplicaReplicaIdRoute:
-    ProjectRefSettingsInfrastructureReplicaReplicaIdRoute,
   ProjectRefSettingsIntegrationsRoute: ProjectRefSettingsIntegrationsRoute,
   ProjectRefSettingsLogDrainsRoute: ProjectRefSettingsLogDrainsRoute,
   ProjectRefSettingsBillingUsageRoute: ProjectRefSettingsBillingUsageRoute,
   ProjectRefSettingsJwtLegacyRoute: ProjectRefSettingsJwtLegacyRoute,
   ProjectRefSettingsWebhooksEndpointIdRoute:
     ProjectRefSettingsWebhooksEndpointIdRoute,
+  ProjectRefSettingsInfrastructureIndexRoute:
+    ProjectRefSettingsInfrastructureIndexRoute,
   ProjectRefSettingsJwtIndexRoute: ProjectRefSettingsJwtIndexRoute,
   ProjectRefSettingsWebhooksIndexRoute: ProjectRefSettingsWebhooksIndexRoute,
+  ProjectRefSettingsInfrastructureReplicaReplicaIdRoute:
+    ProjectRefSettingsInfrastructureReplicaReplicaIdRoute,
 }
 
 const ProjectRefSettingsRouteWithChildren =

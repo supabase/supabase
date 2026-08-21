@@ -33,6 +33,7 @@ import { toast } from 'sonner'
 import {
   AiIconAnimation,
   Button,
+  Checkbox,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -41,7 +42,9 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import { findMutatingQueryCells } from './ExplorerNotebookTab.utils'
 import {
   ExplorerToolbar,
   ExplorerToolbarAction,
@@ -86,6 +89,10 @@ export const ExplorerNotebookTab = () => {
 
   const [isRunningNotebook, setIsRunningNotebook] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [pendingMutationCells, setPendingMutationCells] = useState<
+    { id: string; title: string }[] | null
+  >(null)
+  const [skipMutatingCells, setSkipMutatingCells] = useState(false)
   const queryCellRefs = useRef(new Map<string, QueryEditorHandle>())
 
   const { mutate: updateNotebook, isPending: isUpdating } = useUpsertNotebookMutation({
@@ -117,15 +124,35 @@ export const ExplorerNotebookTab = () => {
     }
   }
 
-  const handleRunNotebook = async () => {
+  const runNotebook = async (cellIdsToRun: string[]) => {
     setIsRunningNotebook(true)
     try {
       await Promise.allSettled(
-        queryCellIds.map((cellId) => queryCellRefs.current.get(cellId)?.run())
+        cellIdsToRun.map((cellId) => queryCellRefs.current.get(cellId)?.run())
       )
     } finally {
       setIsRunningNotebook(false)
     }
+  }
+
+  const handleRunNotebook = () => {
+    const mutatingCells = findMutatingQueryCells(cells)
+    if (mutatingCells.length === 0) {
+      runNotebook(queryCellIds)
+    } else {
+      setSkipMutatingCells(false)
+      setPendingMutationCells(mutatingCells)
+    }
+  }
+
+  const handleConfirmRunNotebook = () => {
+    const mutatingCellIds = new Set((pendingMutationCells ?? []).map((cell) => cell.id))
+    const cellIdsToRun = skipMutatingCells
+      ? queryCellIds.filter((id) => !mutatingCellIds.has(id))
+      : queryCellIds
+
+    setPendingMutationCells(null)
+    runNotebook(cellIdsToRun)
   }
 
   const handleSaveNotebook = () => {
@@ -343,6 +370,42 @@ export const ExplorerNotebookTab = () => {
         <p className="text-sm">
           This action cannot be undone. Are you sure you want to delete '{name}'?
         </p>
+      </ConfirmationModal>
+
+      <ConfirmationModal
+        size="small"
+        visible={pendingMutationCells !== null}
+        title="Confirm to run notebook"
+        confirmLabel={skipMutatingCells ? 'Run read-only cells' : 'Run all cells'}
+        variant="warning"
+        onCancel={() => setPendingMutationCells(null)}
+        onConfirm={handleConfirmRunNotebook}
+      >
+        <p className="text-sm">
+          This notebook has {pendingMutationCells?.length ?? 0}{' '}
+          {pendingMutationCells?.length === 1 ? 'query' : 'queries'} that{' '}
+          {pendingMutationCells?.length === 1 ? 'modifies' : 'modify'} data or schema and cannot be
+          undone once run:
+        </p>
+        <ul className="text-sm list-disc pl-4 mt-2">
+          {pendingMutationCells?.map((cell) => (
+            <li key={cell.id}>{cell.title}</li>
+          ))}
+        </ul>
+        <FormItemLayout
+          isReactForm={false}
+          layout="flex"
+          id="skipMutatingCells"
+          label="Skip these queries"
+          description="Run only the read-only cells in this notebook"
+          className="mt-4 [&>div:first-child>button]:translate-y-0.5"
+        >
+          <Checkbox
+            id="skipMutatingCells"
+            checked={skipMutatingCells}
+            onCheckedChange={(value) => setSkipMutatingCells(!!value)}
+          />
+        </FormItemLayout>
       </ConfirmationModal>
     </div>
   )
