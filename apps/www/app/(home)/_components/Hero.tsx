@@ -1,13 +1,15 @@
 'use client'
 
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { useIsLoggedIn } from 'common'
 import Link from 'next/link'
 import { Button } from 'ui'
 
 import SectionContainer from '@/components/Layouts/SectionContainer'
-import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
+import { getDashboardCtaHref } from '@/lib/dashboard-links'
 
 export function Hero() {
+  const isLoggedIn = useIsLoggedIn()
   const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
@@ -26,7 +28,7 @@ export function Hero() {
         <div className="flex items-center gap-2">
           <Button asChild size="medium">
             <Link
-              href={DASHBOARD_SIGN_UP_URL}
+              href={getDashboardCtaHref(isLoggedIn)}
               onClick={() =>
                 sendTelemetryEvent({
                   action: 'start_project_button_clicked',
