@@ -143,8 +143,8 @@ async function ingestMdxSection(section) {
 }
 
 function sortSlugs(a, b) {
-  if (a === 'homepage') return -1
-  if (b === 'homepage') return 1
+  if (a === 'index') return -1
+  if (b === 'index') return 1
   return a.localeCompare(b)
 }
 
@@ -184,6 +184,13 @@ const excludedSlugs = allEntries
   .map((entry) => entry.slug)
 if (excludedSlugs.length > 0) {
   console.log(`🚫 Excluded ${excludedSlugs.length} redirected slugs: ${excludedSlugs.join(', ')}`)
+}
+
+if (excludedSlugs.includes('index')) {
+  console.error(
+    '❌ A redirect with source /index would strip the homepage markdown. The homepage HTML lives at /, so the index slug must never be redirect-excluded.'
+  )
+  process.exit(1)
 }
 
 const dynamicCollisions = staticSlugs.filter((s) => DYNAMIC_SLUGS.includes(s))
