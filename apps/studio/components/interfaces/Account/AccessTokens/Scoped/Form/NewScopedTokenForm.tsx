@@ -19,6 +19,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 
 import { CLASSIC_TOKEN_WARNING } from '../../AccessToken.constants'
 import { countConfigured, PermissionMode } from '../../AccessToken.permissions'
+import { applyPreset, type PermissionPreset } from '../../AccessToken.presets'
 import { useTokenAccessEvaluation } from '../../hooks/useTokenAccessEvaluation'
 import { DEFAULT_EXPIRY, TokenFormSchema, TokenFormValues } from './NewScopedTokenForm.utils'
 import { NewScopedTokenFormReview } from './NewScopedTokenFormReview'
@@ -122,6 +123,12 @@ export const NewScopedTokenForm = ({
     if (mode !== 'none') setShowMissingPermissionsWarning(false)
   }
 
+  const handleApplyPreset = (preset: PermissionPreset) => {
+    const next = applyPreset(preset, selection)
+    form.setValue('permissions', next)
+    if (countConfigured(next) > 0) setShowMissingPermissionsWarning(false)
+  }
+
   return (
     <>
       {/* Radix wraps viewport children in an inline-styled display:table div that grows to fit
@@ -170,6 +177,7 @@ export const NewScopedTokenForm = ({
                   <PermissionsAccordion
                     selection={selection}
                     onChange={handlePermissionChange}
+                    onApplyPreset={handleApplyPreset}
                     access={access}
                   />
                   {showMissingPermissionsWarning && (
