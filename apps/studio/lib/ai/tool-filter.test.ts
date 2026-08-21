@@ -140,6 +140,7 @@ describe('filterToolsByOptInLevel', () => {
     // Log tools
     get_advisors: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     query_logs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
+    search_repo: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     // Unknown tool - should be filtered out entirely
     some_other_tool: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
   } as unknown as ToolSet
@@ -196,6 +197,7 @@ describe('filterToolsByOptInLevel', () => {
       'list_policies',
       'get_advisors',
       'query_logs',
+      'search_repo',
     ])
   })
 
@@ -210,19 +212,30 @@ describe('filterToolsByOptInLevel', () => {
       'list_policies',
       'get_advisors',
       'query_logs',
+      'search_repo',
     ])
   })
 
   it('should stub log tools for schema opt-in level', async () => {
     const tools = filterToolsByOptInLevel(mockTools, 'schema')
 
-    await expectStubsFor(tools, ['get_advisors', 'query_logs'])
+    await expectStubsFor(tools, ['get_advisors', 'query_logs', 'search_repo'])
+  })
+
+  it('gates repository tools independently from the data opt-in ladder', async () => {
+    const denied = filterToolsByOptInLevel(mockTools, 'schema_and_log_and_data')
+    const allowed = filterToolsByOptInLevel(mockTools, 'schema', { hasRepoAccess: true })
+
+    expect(await checkStub('search_repo', denied.search_repo)).toBe(true)
+    expect(await checkStub('search_repo', allowed.search_repo)).toBe(false)
   })
 
   // No execute_sql tool, so nothing additional to stub for schema_and_log opt-in level
 
   it('should not stub any tools for schema_and_log_and_data opt-in level', async () => {
-    const tools = filterToolsByOptInLevel(mockTools, 'schema_and_log_and_data')
+    const tools = filterToolsByOptInLevel(mockTools, 'schema_and_log_and_data', {
+      hasRepoAccess: true,
+    })
 
     await expectStubsFor(tools, [])
   })
