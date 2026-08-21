@@ -17,6 +17,7 @@ import { mdxBodyToMarkdown } from './lib/mdxToMarkdown.mjs'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const wwwDir = path.join(__dirname, '..')
 const contentDir = path.join(wwwDir, 'content/md')
+const changelogMdDir = path.join(wwwDir, 'public/changelog')
 const outputPath = path.join(wwwDir, 'app/api-v2/md/content.generated.ts')
 
 // Matches lib/posts.tsx FILENAME_SUBSTRING — strips YYYY-MM-DD- (11 chars).
@@ -214,19 +215,8 @@ for (const entry of allEntries) {
 }
 
 // public/changelog/*.md is written by generateStaticContent.mjs earlier in
-// content:build:core; absent locally when CHANGELOG_SYNC_APP_* secrets are unset.
-const changelogMdDir = path.join(wwwDir, 'public/changelog')
-let changelogFilenames
-try {
-  changelogFilenames = await fs.readdir(changelogMdDir)
-} catch (err) {
-  if (err.code !== 'ENOENT') throw err
-  changelogFilenames = []
-}
-const changelogSlugs = changelogFilenames
-  .filter((f) => f.endsWith('.md'))
-  .map((f) => `changelog/${f.slice(0, -3)}`)
-  .sort()
+// content:build:core; absent locally e.g. when CHANGELOG_SYNC_APP_* secrets are unset.
+const changelogSlugs = (await collectMdFiles(changelogMdDir, 'changelog')).sort()
 
 if (changelogSlugs.length === 0) {
   if (process.env.VERCEL) {
