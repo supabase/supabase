@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { HttpResponse } from 'msw'
@@ -76,6 +76,30 @@ const renderNotebookTab = () =>
     </TabsStateContext.Provider>
   )
 
+// `useAddDefinitions` fires its own background keywords/functions/schemas/table-columns
+// fetches against this same generic pg-meta query endpoint (differentiated by the `key`
+// search param) as soon as a database cell's editor mounts — those are expected and
+// unrelated to an actual cell run.
+const INTELLISENSE_KEYS = ['keywords', 'database-functions', 'schemas', 'table-columns']
+
+/** Mocks the database query endpoint and returns the SQL text of every non-intellisense request. */
+const mockDatabaseQueryRequests = () => {
+  const queries: string[] = []
+  addAPIMock({
+    method: 'post',
+    path: '/platform/pg-meta/:ref/query',
+    response: async ({ request }) => {
+      const key = new URL(request.url).searchParams.get('key')
+      if (!key || !INTELLISENSE_KEYS.includes(key)) {
+        const body = (await request.clone().json()) as { query?: string }
+        queries.push(body.query ?? '')
+      }
+      return HttpResponse.json([{ result: 1 }])
+    },
+  })
+  return queries
+}
+
 beforeEach(() => {
   setupSqlEditorMocks()
   testContext.flags.otelLegacyLogs = true
@@ -125,21 +149,7 @@ describe('ExplorerNotebookTab', () => {
   })
 
   it('runs every database and log cell, and skips markdown cells, on "Run notebook"', async () => {
-    // `useAddDefinitions` fires its own background keywords/functions/schemas/table-columns
-    // fetches against this same generic pg-meta query endpoint (differentiated by the `key`
-    // search param) as soon as a database cell's editor mounts — those are expected and
-    // unrelated to the actual cell run.
-    const INTELLISENSE_KEYS = ['keywords', 'database-functions', 'schemas', 'table-columns']
-    const dbRequests: Request[] = []
-    addAPIMock({
-      method: 'post',
-      path: '/platform/pg-meta/:ref/query',
-      response: ({ request }) => {
-        const key = new URL(request.url).searchParams.get('key')
-        if (!key || !INTELLISENSE_KEYS.includes(key)) dbRequests.push(request)
-        return HttpResponse.json([{ result: 1 }])
-      },
-    })
+    const dbRequests = mockDatabaseQueryRequests()
 
     const logRequests: Request[] = []
     addAPIMock({
@@ -160,6 +170,79 @@ describe('ExplorerNotebookTab', () => {
     await waitFor(() => expect(dbRequests).toHaveLength(1))
     await waitFor(() => expect(logRequests).toHaveLength(1))
     await waitFor(() => expect(runNotebookButton).toBeEnabled())
+  })
+
+  describe('mutation confirmation on "Run notebook"', () => {
+    const readOnlyCell = createQueryCellSkeleton({ title: 'Read-only query', sql: 'select 1' })
+    const mutatingCell = createQueryCellSkeleton({
+      title: 'Mutating query',
+      sql: 'delete from foo',
+    })
+
+    beforeEach(() => {
+      seedNotebook([readOnlyCell, mutatingCell])
+    })
+
+    it('opens a confirmation modal instead of running immediately when a cell mutates data', async () => {
+      const queries = mockDatabaseQueryRequests()
+
+      renderNotebookTab()
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Run notebook' }))
+
+      const dialog = await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
+      expect(within(dialog).getByText('Mutating query')).toBeInTheDocument()
+      expect(queries).toHaveLength(0)
+    })
+
+    it('runs no cells when the confirmation is cancelled', async () => {
+      const queries = mockDatabaseQueryRequests()
+
+      renderNotebookTab()
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Run notebook' }))
+      await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
+
+      await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+
+      await waitFor(() =>
+        expect(
+          screen.queryByRole('dialog', { name: 'Confirm to run notebook' })
+        ).not.toBeInTheDocument()
+      )
+      expect(queries).toHaveLength(0)
+    })
+
+    it('runs every cell, including the mutating one, when confirmed with "Run all cells"', async () => {
+      const queries = mockDatabaseQueryRequests()
+
+      renderNotebookTab()
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Run notebook' }))
+      await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
+
+      await userEvent.click(screen.getByRole('button', { name: 'Run all cells' }))
+
+      await waitFor(() => expect(queries).toHaveLength(2))
+      expect(queries.some((query) => query.includes('select 1'))).toBe(true)
+      expect(queries.some((query) => query.includes('delete from foo'))).toBe(true)
+    })
+
+    it('runs only the read-only cells when "Skip these queries" is checked', async () => {
+      const queries = mockDatabaseQueryRequests()
+
+      renderNotebookTab()
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Run notebook' }))
+      await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
+
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Skip these queries' }))
+      await userEvent.click(screen.getByRole('button', { name: 'Run read-only cells' }))
+
+      await waitFor(() => expect(queries).toHaveLength(1))
+      expect(queries[0]).toContain('select 1')
+      expect(queries.some((query) => query.includes('delete from foo'))).toBe(false)
+    })
   })
 
   it('disables "Run notebook" when the notebook has no database or log cells', async () => {
