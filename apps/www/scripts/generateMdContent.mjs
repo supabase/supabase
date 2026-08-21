@@ -213,6 +213,33 @@ for (const entry of allEntries) {
   seen.add(entry.slug)
 }
 
+// public/changelog/*.md is written by generateStaticContent.mjs earlier in
+// content:build:core; absent locally when CHANGELOG_SYNC_APP_* secrets are unset.
+const changelogMdDir = path.join(wwwDir, 'public/changelog')
+let changelogFilenames
+try {
+  changelogFilenames = await fs.readdir(changelogMdDir)
+} catch (err) {
+  if (err.code !== 'ENOENT') throw err
+  changelogFilenames = []
+}
+const changelogSlugs = changelogFilenames
+  .filter((f) => f.endsWith('.md'))
+  .map((f) => `changelog/${f.slice(0, -3)}`)
+  .sort()
+
+if (changelogSlugs.length === 0) {
+  if (process.env.VERCEL) {
+    console.error(
+      '❌ No changelog slugs found in public/changelog — changelog generation produced nothing.'
+    )
+    process.exit(1)
+  }
+  console.warn(
+    '⚠️  No changelog slugs found in public/changelog — changelog md negotiation off in this build'
+  )
+}
+
 const contentEntries = liveEntries
   .map((e) => `  [${JSON.stringify(e.slug)}, ${JSON.stringify(e.content)}]`)
   .join(',\n')
@@ -228,9 +255,11 @@ ${contentEntries},
 export const MD_PAGES = new Set<string>([
 ${pageEntries},
 ])
+
+export const CHANGELOG_PAGES = new Set<string>(${JSON.stringify(changelogSlugs, null, 2)})
 `
 
 await fs.writeFile(outputPath, output, 'utf-8')
 console.log(
-  `✅ Generated ${outputPath} (${liveEntries.length} files, ${allPageSlugs.length} pages)`
+  `✅ Generated ${outputPath} (${liveEntries.length} files, ${allPageSlugs.length} pages, ${changelogSlugs.length} changelog)`
 )
