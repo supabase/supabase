@@ -90,6 +90,7 @@
     "@types/d3-geo": "^3.1.0",
     "@uidotdev/usehooks": "^2.4.1",
     "@vercel/functions": "^2.1.0",
+    "@vercel/sandbox": "3.0.0",
     "@xyflow/react": "^12.10.1",
     "@zip.js/zip.js": "^2.7.29",
     "ai": "7.0.59",

@@ -3,6 +3,7 @@ import {
   convertToModelMessages,
   isStepCount,
   isToolUIPart,
+  type Experimental_SandboxSession,
   type LanguageModel,
   type ModelMessage,
   type SystemModelMessage,
@@ -48,6 +49,7 @@ export async function generateAssistantResponse({
   requestedModel,
   abortSignal,
   onSpanCreated,
+  sandbox,
 }: {
   messages: UIMessage[]
   model: LanguageModel
@@ -70,6 +72,7 @@ export async function generateAssistantResponse({
   providerOptions?: Record<string, any>
   abortSignal?: AbortSignal
   onSpanCreated?: (spanId: string) => void
+  sandbox?: Experimental_SandboxSession
 }) {
   const shouldTrace = allowTracing ?? IS_TRACING_ENABLED
 
@@ -158,6 +161,17 @@ export async function generateAssistantResponse({
       messages: coreMessages,
       ...(providerOptions && { providerOptions }),
       tools,
+      ...(sandbox && { experimental_sandbox: sandbox }),
+      toolApproval: {
+        execute_sql: 'user-approval',
+        deploy_edge_function: 'user-approval',
+        create_notebook: 'user-approval',
+        update_notebook: 'user-approval',
+        open_pull_request: 'user-approval',
+      },
+      ...(process.env.TOOL_APPROVAL_SECRET && {
+        experimental_toolApprovalSecret: process.env.TOOL_APPROVAL_SECRET,
+      }),
       ...(abortSignal && { abortSignal }),
       ...(span && {
         onEnd: ({ steps, finishReason }) => {
