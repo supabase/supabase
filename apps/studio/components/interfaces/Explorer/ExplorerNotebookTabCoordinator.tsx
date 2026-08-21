@@ -2,8 +2,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useContext, useEffect } from 'react'
 
-import { contentKeys } from '@/data/content/keys'
-import { notebooksState } from '@/state/notebooks/notebooks-state'
+import { evictNotebookFromCaches } from '@/data/content/notebooks/notebook-cache'
 import { TabsStateContext } from '@/state/tabs'
 
 /**
@@ -26,11 +25,7 @@ export const ExplorerNotebookTabCoordinator = () => {
         const notebookId = tab.metadata?.notebookId
         if (!ref || !notebookId) return
 
-        const stateNotebook = notebooksState.notebooks[notebookId]
-        if (stateNotebook?.status !== 'saved') return
-
-        notebooksState.removeNotebook({ id: notebookId })
-        queryClient.removeQueries({ queryKey: contentKeys.resource(ref, notebookId) })
+        evictNotebookFromCaches({ queryClient, projectRef: ref, id: notebookId, mode: 'remove' })
       },
     })
   }, [ref, tabs, queryClient])
