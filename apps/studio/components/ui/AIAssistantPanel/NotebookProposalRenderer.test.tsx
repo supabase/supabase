@@ -151,18 +151,97 @@ describe('NotebookProposalRenderer', () => {
     expect(onApprove).not.toHaveBeenCalled()
   })
 
-  it('renders an Open notebook link once output is available', () => {
+  it('keeps the create preview and marks it successful once output is available', () => {
     render(
       <NotebookProposalRenderer
         mode="create"
         state="output-available"
-        input={{}}
+        confirmState="success"
+        input={{
+          name: 'Signup funnel',
+          content: {
+            schema_version: 1,
+            cells: [{ _tag: 'markdown_cell', text: 'hello' }],
+          },
+        }}
         output={{ id: NOTEBOOK_ID, name: 'Signup funnel' }}
       />
     )
 
-    const link = screen.getByRole('link', { name: 'Open notebook' })
-    expect(link).toHaveAttribute('href', `/project/default/explorer/notebook/${NOTEBOOK_ID}`)
+    expect(screen.getByRole('toolbar', { name: 'Notebook toolbar' })).toBeInTheDocument()
+    expect(screen.getByText('Signup funnel')).toBeInTheDocument()
+    expect(screen.getByText('Notebook created')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Create' })).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Open notebook' })).toHaveAttribute(
+      'href',
+      `/project/default/explorer/notebook/${NOTEBOOK_ID}`
+    )
+  })
+
+  it('shows the notebook action after an automatic create succeeds', () => {
+    render(
+      <NotebookProposalRenderer
+        mode="create"
+        state="output-available"
+        input={{
+          name: 'Signup funnel',
+          content: {
+            schema_version: 1,
+            cells: [{ _tag: 'markdown_cell', text: 'hello' }],
+          },
+        }}
+        output={{ id: NOTEBOOK_ID, name: 'Signup funnel' }}
+      />
+    )
+
+    expect(screen.getByRole('link', { name: 'Open notebook' })).toHaveAttribute(
+      'href',
+      `/project/default/explorer/notebook/${NOTEBOOK_ID}`
+    )
+  })
+
+  it('shows the notebook action after an automatic update succeeds', async () => {
+    mockContentItem(mockNotebookRow())
+
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="output-available"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
+        }}
+        output={{ id: NOTEBOOK_ID, name: 'Signup funnel' }}
+      />
+    )
+
+    expect(await screen.findByRole('link', { name: 'Open notebook' })).toHaveAttribute(
+      'href',
+      `/project/default/explorer/notebook/${NOTEBOOK_ID}`
+    )
+  })
+
+  it('keeps the create preview and marks it failed when the tool errors', () => {
+    render(
+      <NotebookProposalRenderer
+        mode="create"
+        state="output-error"
+        confirmState="error"
+        input={{
+          name: 'New notebook',
+          content: {
+            schema_version: 1,
+            cells: [{ _tag: 'markdown_cell', text: 'hello' }],
+          },
+        }}
+        output={undefined}
+      />
+    )
+
+    expect(screen.getByRole('toolbar', { name: 'Notebook toolbar' })).toBeInTheDocument()
+    expect(screen.getByText('New notebook')).toBeInTheDocument()
+    expect(screen.getByText('Failed to create notebook')).toBeInTheDocument()
   })
 
   it('keeps the preview in the message after skip', () => {

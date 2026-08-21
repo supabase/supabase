@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { type PropsWithChildren } from 'react'
+import { type PropsWithChildren, type ReactNode } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
@@ -25,14 +25,13 @@ import { toWireNotebook } from '@/data/content/notebooks/notebook-schema'
 
 export type NotebookProposalMode = 'create' | 'update'
 
-// input-streaming and output-error are handled by the caller before this component is
-// rendered — see MessagePartNotebookProposal in Message.Parts.tsx.
 export type NotebookProposalState =
   | 'input-available'
   | 'approval-requested'
   | 'approval-responded'
   | 'output-denied'
   | 'output-available'
+  | 'output-error'
 
 export interface NotebookProposalRendererProps {
   mode: NotebookProposalMode
@@ -45,7 +44,12 @@ export interface NotebookProposalRendererProps {
   onDeny?: () => void
 }
 
-type NotebookProposalStepProps = Omit<NotebookProposalRendererProps, 'mode' | 'output' | 'state'>
+type NotebookProposalStepProps = Omit<
+  NotebookProposalRendererProps,
+  'mode' | 'output' | 'state'
+> & {
+  footerAction?: ReactNode
+}
 
 const MODE_COPY = {
   create: {
@@ -69,48 +73,42 @@ const MODE_COPY = {
  * same way `AssistantQueryCell` wraps `QueryEditor`.
  */
 export const NotebookProposalRenderer = (props: NotebookProposalRendererProps) => {
-  const { mode, state, output } = props
-
-  if (state === 'output-available') {
-    return <NotebookOutputSummary mode={mode} output={output} />
-  }
-
-  const { input, confirmState, onApprove, onDeny } = props
-  return mode === 'create' ? (
-    <CreateNotebookProposal
-      input={input}
-      confirmState={confirmState}
-      onApprove={onApprove}
-      onDeny={onDeny}
-    />
-  ) : (
-    <UpdateNotebookProposal
-      input={input}
-      confirmState={confirmState}
-      onApprove={onApprove}
-      onDeny={onDeny}
-    />
-  )
-}
-
-function NotebookOutputSummary({ mode, output }: { mode: NotebookProposalMode; output: unknown }) {
   const { ref } = useParams()
+  const { mode, state, input, output, confirmState, onApprove, onDeny } = props
   const parsedOutput = notebookToolOutputSchema.safeParse(output)
-  const label = MODE_COPY[mode].outputLabel
+  const footerAction =
+    state === 'output-available' && parsedOutput.success && ref ? (
+      <Button asChild variant="default" size="tiny">
+        <Link href={`/project/${ref}/explorer/notebook/${parsedOutput.data.id}`}>
+          Open notebook
+        </Link>
+      </Button>
+    ) : undefined
+
+  const proposal =
+    mode === 'create' ? (
+      <CreateNotebookProposal
+        input={input}
+        confirmState={confirmState}
+        footerAction={confirmState === undefined ? undefined : footerAction}
+        onApprove={onApprove}
+        onDeny={onDeny}
+      />
+    ) : (
+      <UpdateNotebookProposal
+        input={input}
+        confirmState={confirmState}
+        footerAction={confirmState === undefined ? undefined : footerAction}
+        onApprove={onApprove}
+        onDeny={onDeny}
+      />
+    )
 
   return (
-    <div className="flex items-center justify-between gap-2 my-2 mx-4 px-3 py-1.5 text-sm border rounded-md bg-surface-75">
-      <span className="text-foreground-light truncate">
-        {parsedOutput.success ? `${label}: ${parsedOutput.data.name}` : label}
-      </span>
-      {parsedOutput.success && ref && (
-        <Button asChild variant="default" size="tiny">
-          <Link href={`/project/${ref}/explorer/notebook/${parsedOutput.data.id}`}>
-            Open notebook
-          </Link>
-        </Button>
-      )}
-    </div>
+    <>
+      {proposal}
+      {confirmState === undefined && footerAction}
+    </>
   )
 }
 
@@ -122,6 +120,7 @@ interface NotebookConfirmProps {
   confirmLabelLoading?: string
   extraLoading?: boolean
   denyOnly?: boolean
+  footerAction?: ReactNode
   onApprove?: () => void
   onDeny?: () => void
 }
@@ -135,6 +134,7 @@ function NotebookConfirm({
   confirmLabelLoading,
   extraLoading,
   denyOnly,
+  footerAction,
   onApprove,
   onDeny,
   children,
@@ -149,6 +149,10 @@ function NotebookConfirm({
       cancelLabel="Skip"
       confirmLabel={confirmLabel ?? copy.confirmLabel}
       confirmLabelLoading={confirmLabelLoading ?? copy.confirmLabelLoading}
+      successMessage={copy.outputLabel}
+      errorMessage={`Failed to ${mode} notebook`}
+      deniedMessage={`Skipped notebook ${mode === 'create' ? 'creation' : 'update'}`}
+      footerAction={footerAction}
       extraLoading={extraLoading}
       denyOnly={denyOnly}
       onCancel={onDeny}
@@ -188,6 +192,7 @@ function NotebookParseFailure({
 function CreateNotebookProposal({
   input,
   confirmState,
+  footerAction,
   onApprove,
   onDeny,
 }: NotebookProposalStepProps) {
@@ -216,6 +221,7 @@ function CreateNotebookProposal({
     <NotebookConfirm
       mode="create"
       confirmState={confirmState}
+      footerAction={footerAction}
       onApprove={onApprove}
       onDeny={onDeny}
     >
@@ -227,6 +233,7 @@ function CreateNotebookProposal({
 function UpdateNotebookProposal({
   input,
   confirmState,
+  footerAction,
   onApprove,
   onDeny,
 }: NotebookProposalStepProps) {
@@ -308,6 +315,7 @@ function UpdateNotebookProposal({
     <NotebookConfirm
       mode="update"
       confirmState={confirmState}
+      footerAction={footerAction}
       message={`Assistant wants to update "${notebook.name}"`}
       onApprove={onApprove}
       onDeny={onDeny}
