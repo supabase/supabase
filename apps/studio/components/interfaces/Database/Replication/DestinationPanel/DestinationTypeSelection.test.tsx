@@ -60,6 +60,7 @@ const addBackgroundMocks = () => {
 describe('DestinationTypeSelection', () => {
   beforeEach(() => {
     mockInfrastructureReadReplicas.mockReturnValue(true)
+    window.localStorage.clear()
   })
 
   test('shows placeholder when no type is selected', async () => {
@@ -171,9 +172,9 @@ describe('DestinationTypeSelection', () => {
     customRender(<DestinationTypeSelection />)
 
     expect(await screen.findByText('Read replicas have moved')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Add read replica' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Go to Infrastructure' })).toHaveAttribute(
       'href',
-      expect.stringContaining('/settings/infrastructure?addReplica=true')
+      expect.stringContaining('/settings/infrastructure')
     )
   })
 

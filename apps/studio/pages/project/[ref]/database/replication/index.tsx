@@ -9,6 +9,7 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { ReadReplicasMovedCallout } from '@/components/interfaces/Database/Replication/DestinationPanel/ReadReplicasMovedCallout'
 import { Destinations } from '@/components/interfaces/Database/Replication/Destinations'
 import { ReplicationDiagram } from '@/components/interfaces/Database/Replication/ReplicationDiagram'
 import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
@@ -58,6 +59,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
         ) : (
           <PageSection>
             <PageSectionContent className="flex flex-col gap-12">
+              <ReadReplicasMovedCallout />
               <ReplicationDiagram />
               <Destinations />
             </PageSectionContent>

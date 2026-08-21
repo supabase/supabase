@@ -22,7 +22,6 @@ import {
 import { DestinationType } from './DestinationPanel.types'
 import { ReadReplicasMovedCallout } from './ReadReplicasMovedCallout'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 interface DestinationTypeOption {
   value: DestinationType
@@ -47,7 +46,6 @@ export const DestinationTypeSelection = () => {
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
   const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
   const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
-  const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
   const [urlDestinationType, setDestinationType] = useQueryState(
     'destinationType',
@@ -214,11 +212,7 @@ export const DestinationTypeSelection = () => {
           </SelectContent>
         </Select>
       </FormItemLayout>
-      {!editMode && infrastructureReadReplicas && (
-        <div className="px-5 pb-5">
-          <ReadReplicasMovedCallout />
-        </div>
-      )}
+      {!editMode && <ReadReplicasMovedCallout className="px-5 pb-5" />}
     </>
   )
 }

@@ -104,6 +104,10 @@ export const LOCAL_STORAGE_KEYS = {
   // RLS event trigger banner dismissed
   RLS_EVENT_TRIGGER_BANNER_DISMISSED: (ref: string) => `rls-event-trigger-banner-dismissed-${ref}`,
 
+  // Read replicas moved from Replication → Infrastructure
+  READ_REPLICAS_MOVED_CALLOUT_DISMISSED: (ref: string) =>
+    `read-replicas-moved-callout-dismissed-${ref}`,
+
   PROJECT_SECURITY_DISMISSED_AT: (ref: string) => `project-security-dismissed-at-${ref}`,
 
   DATABASE_CONNECTIONS_BANNER_DISMISSED: (ref: string) =>
