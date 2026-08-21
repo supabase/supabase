@@ -32,13 +32,8 @@ const executeSqlSanitizer: ToolSanitizer = {
   },
 }
 
-/**
- * `previous_content` (the pre-update notebook snapshot used to re-derive the client-side
- * diff) is for UI display only — it must never reach the model. `toModelOutput` on the tool
- * itself covers the same turn, but history replay (`convertToModelMessages` without `tools`
- * in generate-assistant-response.ts) skips `toModelOutput` entirely, so it has to be
- * stripped here too.
- */
+// `previous_content` is UI-only and must never reach the model — `toModelOutput` on the
+// tool covers the same turn, but history replay skips it, so it's stripped here too.
 const updateNotebookSanitizer: ToolSanitizer = {
   toolName: 'update_notebook',
   sanitize: (tool) => {

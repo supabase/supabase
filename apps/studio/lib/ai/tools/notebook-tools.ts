@@ -315,10 +315,8 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
         )
 
         // `previous_content` lets the client re-derive the diff it already showed for
-        // approval without re-fetching the notebook — which would return the *post*-update
-        // content by the time a completed tool part renders. Stripped before it ever
-        // reaches the model: see toModelOutput below and the tool-sanitizer / message-utils
-        // strips for the same-turn, replay, and re-upload paths respectively.
+        // approval, without re-fetching a notebook that's now post-update. Never reaches
+        // the model — see toModelOutput below.
         return { id, name: notebook.name, previous_content: wireNotebook }
       },
       toModelOutput: ({ output }) => ({
