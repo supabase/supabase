@@ -9,7 +9,7 @@ import { createMarkdownCellSkeleton, createQueryCellSkeleton } from '../utils'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import { notebooksState } from '@/state/notebooks/notebooks-state'
 import type { Notebook } from '@/state/notebooks/types'
-import { createTabsState, TabsStateContext } from '@/state/tabs'
+import { createTabId, createTabsState, TabsStateContext } from '@/state/tabs'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { setupSqlEditorMocks } from '@/tests/lib/sql-editor-test-utils'
@@ -69,9 +69,9 @@ const seedNotebook = (cells: Notebooks.Cell[], status: 'new' | 'saved' = 'saved'
   else notebooksState.setNotebook({ projectRef: 'default', notebook })
 }
 
-const renderNotebookTab = () =>
+const renderNotebookTab = (tabsState = createTabsState('default')) =>
   customRender(
-    <TabsStateContext.Provider value={createTabsState('default')}>
+    <TabsStateContext.Provider value={tabsState}>
       <ExplorerNotebookTab />
     </TabsStateContext.Provider>
   )

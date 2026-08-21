@@ -94,6 +94,7 @@ export const ExplorerNotebookTab = () => {
       toast.success('Successfully saved notebook!')
     },
   })
+
   const { mutate: deleteNotebook, isPending: isDeleting } = useContentDeleteMutation({
     onSuccess: () => {
       toast.success('Successfully deleted notebook')
@@ -112,7 +113,15 @@ export const ExplorerNotebookTab = () => {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
 
+  const persistNotebookTab = () => {
+    const notebookId = currentNotebook?.notebook.id
+    if (!notebookId) return
+
+    tabs.makeTabPermanent(createTabId('notebook', { id: notebookId }))
+  }
+
   const handleSaveTitle = (titleValue: string) => {
+    persistNotebookTab()
     const trimmedName = titleValue.trim()
     if (id && trimmedName && trimmedName !== name) {
       snap.renameNotebook({ id, name: trimmedName })
@@ -121,6 +130,7 @@ export const ExplorerNotebookTab = () => {
   }
 
   const handleRunNotebook = async () => {
+    persistNotebookTab()
     setIsRunningNotebook(true)
     try {
       await Promise.allSettled(
@@ -134,6 +144,8 @@ export const ExplorerNotebookTab = () => {
   const handleSaveNotebook = () => {
     const notebookId = currentNotebook?.notebook.id
     if (!ref || !notebookId || !name || !content) return
+
+    persistNotebookTab()
 
     const writableContent: WritableNotebook = {
       schema_version: content.schema_version,
@@ -176,6 +188,8 @@ export const ExplorerNotebookTab = () => {
   }
 
   const handleDragEnd = (event: DragEndEvent) => {
+    persistNotebookTab()
+
     const { active, over } = event
     if (!id || !over || active.id === over.id) return
 
@@ -183,6 +197,8 @@ export const ExplorerNotebookTab = () => {
   }
 
   const onSelectAddCell = (type: 'markdown' | 'query') => {
+    persistNotebookTab()
+
     const notebookId = currentNotebook?.notebook.id
     if (!notebookId) return
 
