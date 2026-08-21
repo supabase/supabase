@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { type PropsWithChildren, type ReactNode } from 'react'
+import { useEffect, useEffectEvent, type PropsWithChildren, type ReactNode } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
@@ -42,6 +42,9 @@ export interface NotebookProposalRendererProps {
   confirmState?: ConfirmFooterApprovalState
   onApprove?: () => void
   onDeny?: () => void
+  /** Denies with a specific reason instead of a generic "user skipped" — used to auto-deny
+   *  an update that can't be applied as written so the model sees why and can retry. */
+  denyWithReason?: (reason: string) => void
 }
 
 type NotebookProposalStepProps = Omit<
@@ -74,7 +77,7 @@ const MODE_COPY = {
  */
 export const NotebookProposalRenderer = (props: NotebookProposalRendererProps) => {
   const { ref } = useParams()
-  const { mode, state, input, output, confirmState, onApprove, onDeny } = props
+  const { mode, state, input, output, confirmState, onApprove, onDeny, denyWithReason } = props
   const parsedOutput = notebookToolOutputSchema.safeParse(output)
   const footerAction =
     state === 'output-available' && parsedOutput.success && ref ? (
@@ -101,6 +104,7 @@ export const NotebookProposalRenderer = (props: NotebookProposalRendererProps) =
         footerAction={confirmState === undefined ? undefined : footerAction}
         onApprove={onApprove}
         onDeny={onDeny}
+        denyWithReason={denyWithReason}
       />
     )
 
@@ -230,12 +234,60 @@ function CreateNotebookProposal({
   )
 }
 
+/**
+ * An update whose operations don't apply to the notebook as currently loaded (e.g. an
+ * operation targets a cell id that no longer exists). There's nothing for the user to decide
+ * here, so instead of asking them to Skip, deny automatically with the specific reason —
+ * same text `update_notebook`'s server-side execute() would throw for the same failure — so
+ * the model sees why and can retry (e.g. re-fetch and reissue) without the user's involvement.
+ */
+function UnapplyableNotebookUpdateNotice({
+  notebookName,
+  reason,
+  confirmState,
+  onDeny,
+  denyWithReason,
+}: {
+  notebookName: string
+  reason: string
+  confirmState?: ConfirmFooterApprovalState
+  onDeny?: () => void
+  denyWithReason?: (reason: string) => void
+}) {
+  const onUnapplyable = useEffectEvent(() => {
+    denyWithReason?.(reason)
+  })
+
+  useEffect(() => {
+    if (confirmState === 'approval-requested') onUnapplyable()
+  }, [confirmState])
+
+  return (
+    <NotebookConfirm
+      mode="update"
+      confirmState={confirmState}
+      message={`Assistant wants to update "${notebookName}"`}
+      denyOnly
+      onDeny={() => (denyWithReason ? denyWithReason(reason) : onDeny?.())}
+    >
+      <div className="p-3">
+        <Admonition
+          type="warning"
+          title="This update can't be applied as written"
+          description={reason}
+        />
+      </div>
+    </NotebookConfirm>
+  )
+}
+
 function UpdateNotebookProposal({
   input,
   confirmState,
   footerAction,
   onApprove,
   onDeny,
+  denyWithReason,
 }: NotebookProposalStepProps) {
   const { ref } = useParams()
   const parsedInput = updateNotebookInputSchema.safeParse(input)
@@ -293,21 +345,13 @@ function UpdateNotebookProposal({
 
   if (!diff.success) {
     return (
-      <NotebookConfirm
-        mode="update"
+      <UnapplyableNotebookUpdateNotice
+        notebookName={notebook.name}
+        reason={describeNotebookOperationError(diff.error)}
         confirmState={confirmState}
-        message={`Assistant wants to update "${notebook.name}"`}
-        denyOnly
         onDeny={onDeny}
-      >
-        <div className="p-3">
-          <Admonition
-            type="warning"
-            title="This update can't be applied as written"
-            description={describeNotebookOperationError(diff.error)}
-          />
-        </div>
-      </NotebookConfirm>
+        denyWithReason={denyWithReason}
+      />
     )
   }
 
