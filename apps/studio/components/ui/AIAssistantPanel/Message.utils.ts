@@ -141,6 +141,11 @@ export const updateNotebookInputSchema = z.object({
   operations: notebookOperationsSchema,
 })
 
+export const runNotebookInputSchema = z.object({
+  id: z.string(),
+  expected_updated_at: z.string(),
+})
+
 export const notebookToolOutputSchema = z.object({ id: z.string(), name: z.string() })
 
 export const updateNotebookToolOutputSchema = notebookToolOutputSchema.extend({
