@@ -241,7 +241,7 @@ function MessagePartNotebookProposal({
     )
   }
 
-  const { confirmState, onApprove, onDeny } = getManualToolApprovalHandlers({
+  const { confirmState, onApprove, onDeny, denyWithReason } = getManualToolApprovalHandlers({
     state,
     approval: toolPart.approval,
     addToolApprovalResponse,
@@ -256,6 +256,7 @@ function MessagePartNotebookProposal({
       confirmState={confirmState}
       onApprove={onApprove}
       onDeny={onDeny}
+      denyWithReason={denyWithReason}
     />
   )
 }

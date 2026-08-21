@@ -122,10 +122,10 @@ describe('NotebookProposalRenderer', () => {
     expect(onApprove).not.toHaveBeenCalled()
   })
 
-  it('withholds Apply changes when the update cannot be applied as written', async () => {
-    const user = userEvent.setup()
+  it('withholds Apply changes and auto-denies with the failure reason when the update cannot be applied as written', async () => {
     const onApprove = vi.fn()
     const onDeny = vi.fn()
+    const denyWithReason = vi.fn()
     mockContentItem(mockNotebookRow())
 
     render(
@@ -141,14 +141,69 @@ describe('NotebookProposalRenderer', () => {
         output={undefined}
         onApprove={onApprove}
         onDeny={onDeny}
+        denyWithReason={denyWithReason}
       />
     )
 
     expect(await screen.findByText("This update can't be applied as written")).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Apply changes' })).not.toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Skip' }))
-    expect(onDeny).toHaveBeenCalledTimes(1)
+    expect(denyWithReason).toHaveBeenCalledWith(
+      'No cell with id "missing" exists in this notebook.'
+    )
+    expect(onDeny).not.toHaveBeenCalled()
     expect(onApprove).not.toHaveBeenCalled()
+  })
+
+  it('falls back to sending the failure reason through Skip if auto-deny did not resolve the approval', async () => {
+    const user = userEvent.setup()
+    const denyWithReason = vi.fn()
+    mockContentItem(mockNotebookRow())
+
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="approval-requested"
+        confirmState="approval-requested"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'missing' }],
+        }}
+        output={undefined}
+        denyWithReason={denyWithReason}
+      />
+    )
+
+    const skipButton = await screen.findByRole('button', { name: 'Skip' })
+    denyWithReason.mockClear()
+    await user.click(skipButton)
+
+    expect(denyWithReason).toHaveBeenCalledWith(
+      'No cell with id "missing" exists in this notebook.'
+    )
+  })
+
+  it('does not auto-deny an unapplyable update once it has already been responded to', async () => {
+    const denyWithReason = vi.fn()
+    mockContentItem(mockNotebookRow())
+
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="approval-responded"
+        confirmState={undefined}
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'missing' }],
+        }}
+        output={undefined}
+        denyWithReason={denyWithReason}
+      />
+    )
+
+    await screen.findByText("This update can't be applied as written")
+    expect(denyWithReason).not.toHaveBeenCalled()
   })
 
   it('keeps the create preview and marks it successful once output is available', () => {

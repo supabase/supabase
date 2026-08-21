@@ -152,6 +152,23 @@ describe('getManualToolApprovalHandlers', () => {
     })
   })
 
+  it('denyWithReason sends the given reason instead of USER_SKIPPED_TOOL_REASON', () => {
+    const addToolApprovalResponse = vi.fn()
+    const { denyWithReason } = getManualToolApprovalHandlers({
+      state: 'approval-requested',
+      approval: { id: 'approval-1' },
+      addToolApprovalResponse,
+    })
+
+    denyWithReason?.('No cell with id "missing" exists in this notebook.')
+
+    expect(addToolApprovalResponse).toHaveBeenCalledWith({
+      id: 'approval-1',
+      approved: false,
+      reason: 'No cell with id "missing" exists in this notebook.',
+    })
+  })
+
   it('does not call addToolApprovalResponse for automatic approvals', () => {
     const addToolApprovalResponse = vi.fn()
     const handlers = getManualToolApprovalHandlers({
