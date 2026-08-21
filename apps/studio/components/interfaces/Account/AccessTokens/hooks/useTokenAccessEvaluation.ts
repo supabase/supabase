@@ -34,13 +34,15 @@ export const useTokenAccessEvaluation = ({
   enabled = true,
 }: UseTokenAccessEvaluationArgs): TokenAccessEvaluation => {
   const { data: permissions } = usePermissionsQuery({ enabled })
-  const { organizations, projects, isLoadingOrgs, isLoadingProjects } = useOrgAndProjectData({
-    enabled,
-  })
+  const { organizations, projects, isLoadingOrgs, isLoadingProjects, hasMoreProjects } =
+    useOrgAndProjectData({
+      enabled,
+    })
 
-  // Org/project lists still loading: resources the user *does* have access to would read as
-  // inaccessible, so report unknown instead.
-  const hasCompleteResourceLists = !isLoadingOrgs && !isLoadingProjects
+  // Org/project lists still loading, or the project list truncated at the first page: either way
+  // resources the user *does* have access to would read as inaccessible, so report unknown
+  // instead.
+  const hasCompleteResourceLists = !isLoadingOrgs && !isLoadingProjects && !hasMoreProjects
 
   const context = useMemo(
     () =>

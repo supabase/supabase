@@ -12,7 +12,11 @@ export const useOrgAndProjectData = (options: UseOrgAndProjectDataOptions = {}) 
 
   const { data: organizations = [], isLoading: isLoadingOrgs } = useOrganizationsQuery({ enabled })
 
-  const { data: projectsData, isLoading: isLoadingProjects } = useProjectsInfiniteQuery({
+  const {
+    data: projectsData,
+    isLoading: isLoadingProjects,
+    hasNextPage: hasMoreProjects = false,
+  } = useProjectsInfiniteQuery({
     limit: 100,
   })
 
@@ -26,5 +30,9 @@ export const useOrgAndProjectData = (options: UseOrgAndProjectDataOptions = {}) 
     projects,
     isLoadingOrgs,
     isLoadingProjects,
+    // Only the first page is ever fetched, so `projects` is a prefix of the real list for
+    // anyone with more than `limit`. Callers that ask "is this ref mine?" must not read a
+    // miss as a no.
+    hasMoreProjects,
   }
 }
