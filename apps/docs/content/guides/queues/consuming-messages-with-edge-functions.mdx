@@ -39,7 +39,7 @@ async function processMessage(message: QueueMessage) {
   // Delete the message from the queue
   const { error: deleteError } = await supabase.schema('pgmq_public').rpc('delete', {
     queue_name: queueName,
-    msg_id: message.msg_id,
+    message_id: message.msg_id,
   })
 
   if (deleteError) {
