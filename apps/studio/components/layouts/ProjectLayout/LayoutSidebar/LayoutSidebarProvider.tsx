@@ -60,7 +60,7 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
   const sidebarURLParamRef = useLatest(sidebarURLParam)
   const sidebarLocalStorageRef = useLatest(sidebarLocalStorage)
 
-  useRegisterSidebar(SIDEBAR_KEYS.AI_ASSISTANT, () => <AIAssistant />, {}, !!project)
+  useRegisterSidebar(SIDEBAR_KEYS.AI_ASSISTANT, () => <AIAssistant />, {}, true)
   useRegisterSidebar(SIDEBAR_KEYS.EDITOR_PANEL, () => <EditorPanel />, {}, !!project)
   useRegisterSidebar(SIDEBAR_KEYS.ADVISOR_PANEL, () => <AdvisorPanel />, {}, true)
   useRegisterSidebar(
