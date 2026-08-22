@@ -47,7 +47,8 @@ word list.
 6. Use second person, present tense, short paragraphs, and ordered steps for
    sequential actions.
 7. Search `apps/docs/WORD_LIST.md` when introducing or reviewing technical terms,
-   UI actions, abbreviations, and potentially ambiguous language.
+   UI actions, abbreviations, and potentially ambiguous language. This targeted
+   search doesn't replace the full-file compliance check below.
 8. Keep code samples executable in their stated context and consistent with
    repository formatting. Clearly mark intentionally omitted code. Use lowercase
    SQL keywords.
@@ -60,6 +61,20 @@ word list.
 11. Use `/docs/...` paths for pages in Supabase docs and site-root paths such as
     `/dashboard` for pages outside docs. Use descriptive link text and sparse
     admonitions with the appropriate severity.
+
+## Compliance checklist
+
+Before handing off, re-read `apps/docs/CONTRIBUTING.md` and `apps/docs/WORD_LIST.md`
+in full, not just the sections searched during drafting, and confirm:
+
+- [ ] Parentheses used only for acronyms or `(Optional)`, not prose asides
+- [ ] Bold, italics, and code used only for their distinct purposes (UI labels,
+      must-not-miss terms), not for visual emphasis alone
+- [ ] No dash-based asides where a direct sentence reads better
+- [ ] Terminology matches `WORD_LIST.md` (including any terms flagged as
+      imprecise, not just spelling/capitalization)
+- [ ] Headings, admonitions, and links follow CONTRIBUTING.md's "Styling,
+      formatting, and grammar" and "Components and elements" sections
 
 ## Validation
 
