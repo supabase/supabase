@@ -127,16 +127,20 @@ describe('ExplorerNotebookTab', () => {
   it('runs every database and log cell, and skips markdown cells, on "Run notebook"', async () => {
     // `useAddDefinitions` fires its own background keywords/functions/schemas/table-columns
     // fetches against this same generic pg-meta query endpoint (differentiated by the `key`
-    // search param) as soon as a database cell's editor mounts — those are expected and
-    // unrelated to the actual cell run.
+    // search param) as soon as a database cell's editor mounts, and `QueryEditor` runs an
+    // event-trigger lookup for `analyzeQueryIssues` — both are expected and unrelated to the
+    // actual cell run.
     const INTELLISENSE_KEYS = ['keywords', 'database-functions', 'schemas', 'table-columns']
     const dbRequests: Request[] = []
     addAPIMock({
       method: 'post',
       path: '/platform/pg-meta/:ref/query',
-      response: ({ request }) => {
+      response: async ({ request }) => {
         const key = new URL(request.url).searchParams.get('key')
-        if (!key || !INTELLISENSE_KEYS.includes(key)) dbRequests.push(request)
+        const { query } = (await request.clone().json()) as { query?: string }
+        const isIntellisenseRequest = !!key && INTELLISENSE_KEYS.includes(key)
+        const isEventTriggerRequest = !!query?.includes('pg_event_trigger')
+        if (!isIntellisenseRequest && !isEventTriggerRequest) dbRequests.push(request)
         return HttpResponse.json([{ result: 1 }])
       },
     })
