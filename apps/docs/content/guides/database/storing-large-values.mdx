@@ -1,0 +1,158 @@
+---
+id: 'storing-large-values'
+title: 'Storing large values and avoiding TOAST bloat'
+description: 'How Postgres stores large text and JSON, and how to model large payloads such as LLM prompts and responses so they do not bloat your tables.'
+subtitle: 'Model large text/JSON payloads without bloating your tables.'
+---
+
+This guide explains how Postgres stores large values. It also helps you decide whether to keep large values in Postgres or offload them to Storage.
+
+Applications that store large values in a single column can grow a table to tens or hundreds of GB even with relatively few rows. Large values can include LLM prompts and responses, chat memory, big JSON documents, and base64 blobs. You may need strategies to keep tables lean.
+
+If a table has grown unexpectedly large, work through these steps:
+
+1. [Confirm it's a TOAST problem](#diagnosing-a-toast-problem).
+2. [Decide whether to keep the data in Postgres or offload it to Storage](#deciding-where-to-store-large-values).
+3. [Keep the data in Postgres](#keeping-large-values-in-postgres) or [offload it to Storage](#offloading-large-values-to-storage).
+4. [Reclaim any space](#reclaiming-space) that is already lost.
+
+First, understand how Postgres stores large values.
+
+## How Postgres stores large values with TOAST
+
+When a row is wider than about 2 KB, Postgres automatically compresses large column values. Postgres moves them out of the main table into a companion table using TOAST, the Oversized-Attribute Storage Technique. Your queries don't change. However, a table's size is often dominated by its hidden TOAST relation rather than the columns you see.
+
+Postgres splits each stored value into about 2 KB chunks. It saves the chunks as rows in the TOAST table. For details, see the Postgres docs on [TOAST](https://www.postgresql.org/docs/current/storage-toast.html).
+
+A column's storage strategy controls this behavior:
+
+| Strategy   | Compression | Out-of-line storage | Notes                                           |
+| ---------- | ----------- | ------------------- | ----------------------------------------------- |
+| `EXTENDED` | Yes         | Yes                 | Default for `text`, `jsonb`, `bytea`            |
+| `EXTERNAL` | No          | Yes                 | Faster partial reads, larger storage            |
+| `MAIN`     | Yes         | Last resort         | Keeps data in-line when it fits                 |
+| `PLAIN`    | No          | No                  | Only for types that can't be stored out-of-line |
+
+<Admonition type="note">
+
+LLM payloads are usually high-entropy and unique. Postgres's default compression recovers little space from them. The value still gets TOASTed, but it doesn't shrink much. How much you store matters more than your compression settings.
+
+</Admonition>
+
+## Diagnosing a TOAST problem
+
+You might have a TOAST problem if you see these symptoms:
+
+- A table is far larger than its row count suggests, and `pg_total_relation_size` is dominated by TOAST.
+- Disk usage doesn't drop after you delete many rows.
+
+If disk usage doesn't drop after deletes, that is expected Postgres behavior. See [Reclaiming space](#reclaiming-space) to learn why, and how to recover the space.
+
+## Deciding where to store large values
+
+Use this decision framework. It is not a strict rule:
+
+| Keep in Postgres when…                                       | Offload to Storage when…                                                 |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| You query into the value and filter or index on its contents | You only read the whole value back by key                                |
+| Values are modest and bounded, usually low KB                | Values are large, from hundreds of KB to MB, or unbounded                |
+| You need transactional consistency with the row              | The payload is an artifact, such as a generated file or raw response log |
+| Row count is moderate                                        | The table grows without limit, such as one row per request               |
+
+For AI apps, use this split:
+
+- Keep small, frequently queried fields in Postgres: status, token counts, and a short summary.
+- Offload the raw prompt, response, or log to Storage. Keep a path pointer in Postgres. For more information, see [Storage](/docs/guides/storage).
+
+## Keeping large values in Postgres
+
+If the data belongs in Postgres, model it to limit bloat:
+
+- **Prefer `jsonb` over `json`** for structured payloads. See [Managing JSON data](/docs/guides/database/json).
+- **Don't store the same payload twice.** Keeping both a truncated preview and the full response in separate columns doubles the TOAST footprint with no benefit.
+- **Split cold, large columns into a side table** keyed by the primary key. Keep the hot, frequently-updated row narrow. This reduces churn and keeps the main table fast:
+
+  ```sql
+  create table requests (
+    id bigint primary key generated always as identity,
+    created_at timestamptz default now(),
+    status text,
+    input_tokens int,
+    output_tokens int
+  );
+
+  create table request_payloads (
+    request_id bigint primary key references requests (id) on delete cascade,
+    prompt text,
+    response jsonb
+  );
+  ```
+
+- **Set a retention policy.** If old rows aren't needed, delete them on a schedule with [pg_cron](/docs/guides/database/extensions/pg_cron). Deleting alone won't shrink the file. See [Reclaiming space](#reclaiming-space).
+- **Consider `lz4` column compression.** Supabase's Postgres supports `lz4`, which is faster than the default `pglz` and often compresses better. Set it per column with `ALTER TABLE … ALTER COLUMN … SET COMPRESSION lz4`. For the underlying setting, see [`default_toast_compression`](https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-DEFAULT-TOAST-COMPRESSION). Compression applies only to values written after you make the change. It helps structured or repetitive JSON more than unique text.
+- **Keep embeddings small.** Embeddings are large values too. A vector's storage scales with its dimension count: pgvector stores `4 × dimensions + 8 bytes`. A 1536-dimension vector is therefore about 6 KB, so it gets TOASTed. pgvector runs similarity search by querying and indexing the vector column. An embedding with fewer dimensions stores less. You can also store it as `halfvec`, which uses 2 bytes per dimension instead of 4. For large-scale workloads, Supabase Vector Buckets store embeddings in object storage. This feature is in early development. Review its current status first. See [Vector Buckets](/docs/guides/storage/vector/introduction) and the [pgvector guide](/docs/guides/database/extensions/pgvector).
+
+## Offloading large values to Storage
+
+Follow these steps to store large payloads in Storage and keep only a pointer in Postgres:
+
+1. Create a table with metadata columns and a path column:
+
+   ```sql
+   create table generations (
+     id bigint primary key generated always as identity,
+     created_at timestamptz default now(),
+     model text,
+     input_tokens int,
+     output_tokens int,
+     response_path text -- e.g. 'responses/2026/06/abc123.json' in a Storage bucket
+   );
+   ```
+
+2. Upload the large payload to Storage and store the path in Postgres:
+
+   ```js
+   // Upload the large payload to Storage, store only the path in Postgres
+   const path = `responses/${id}.json`
+   await supabase.storage.from('generations').upload(path, JSON.stringify(payload))
+   await supabase.from('generations').update({ response_path: path }).eq('id', id)
+   ```
+
+This keeps the table small and fast to query while the heavy bytes live in object storage.
+
+## Measuring bloat
+
+To check how much of a table and its TOAST relation is live data versus reclaimable free space:
+
+1. Enable `pgstattuple`. It is available on Supabase:
+
+   ```sql
+   create extension if not exists pgstattuple;
+
+   with t as (select 'public.your_table'::regclass as rel)
+   select 'heap'  as scope, s.* from t, lateral pgstattuple_approx(t.rel) s
+   union all
+   select 'toast' as scope, s.* from t, lateral pgstattuple_approx(
+     (select reltoastrelid from pg_class where oid = t.rel)::regclass) s;
+   ```
+
+2. Read the results:
+   - A high `approx_free_percent` means reclaimable bloat.
+   - A high `approx_tuple_percent` means the data is genuinely large. Reduce what you store.
+
+For more information, see [`pgstattuple`](https://www.postgresql.org/docs/current/pgstattuple.html).
+
+`pgstattuple_approx` samples the table, so it stays cheap on large relations. The exact `pgstattuple()` function does a full-table scan. Avoid running it on a large or busy database under heavy load.
+
+## Reclaiming space
+
+Plain `VACUUM` reclaims dead tuples into reusable free space. It only returns space to the operating system when entirely-empty pages sit at the end of the table. It can't shrink a file that's bloated in the middle. For details, see the [Postgres docs](https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-SPACE-RECOVERY).
+
+To shrink the files, rewrite the table:
+
+1. Use [`pg_repack`](/docs/guides/database/extensions/pg_repack). It runs online and is the recommended option.
+2. Or use `VACUUM FULL`. It takes an exclusive lock, so run it only during a maintenance window.
+
+Both options need roughly 2× the table's size in free disk while they run.
+
+Reclaiming space lowers your **used** space immediately. However, the **provisioned** disk doesn't shrink on its own. It is right-sized to 1.2× your database size during the next [Postgres version upgrade](/docs/guides/platform/upgrading#disk-sizing).
