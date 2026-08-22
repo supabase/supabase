@@ -74,25 +74,54 @@ describe('findMutatingQueryCells', () => {
   }
 
   it('returns an empty array when there are no mutating database cells', () => {
-    expect(findMutatingQueryCells([readOnlyDatabaseCell, markdownCell])).toEqual([])
+    expect(findMutatingQueryCells({ cells: [readOnlyDatabaseCell, markdownCell] })).toEqual([])
   })
 
   it('flags mutating database cells with their id and title', () => {
-    expect(findMutatingQueryCells([readOnlyDatabaseCell, mutatingDatabaseCell])).toEqual([
-      { id: 'cell-2', title: 'Cleanup' },
-    ])
+    expect(findMutatingQueryCells({ cells: [readOnlyDatabaseCell, mutatingDatabaseCell] })).toEqual(
+      [{ id: 'cell-2', title: 'Cleanup' }]
+    )
   })
 
   it('excludes log cells even when their SQL looks mutating', () => {
-    expect(findMutatingQueryCells([mutatingDatabaseCell, mutatingLogCell])).toEqual([
+    expect(findMutatingQueryCells({ cells: [mutatingDatabaseCell, mutatingLogCell] })).toEqual([
       { id: 'cell-2', title: 'Cleanup' },
     ])
   })
 
   it('falls back to "Untitled query" when a mutating cell has no title', () => {
     const untitledCell: Cell = { ...mutatingDatabaseCell, title: undefined }
-    expect(findMutatingQueryCells([untitledCell])).toEqual([
+    expect(findMutatingQueryCells({ cells: [untitledCell] })).toEqual([
       { id: 'cell-2', title: 'Untitled query' },
     ])
+  })
+
+  it('flags a cell whose live SQL mutates even though the stored SQL is read-only', () => {
+    const getLiveSql = (cellId: string) =>
+      cellId === 'cell-1' ? 'delete from auth.users' : undefined
+
+    expect(
+      findMutatingQueryCells({ cells: [readOnlyDatabaseCell, mutatingDatabaseCell], getLiveSql })
+    ).toEqual([
+      { id: 'cell-1', title: 'Signups' },
+      { id: 'cell-2', title: 'Cleanup' },
+    ])
+  })
+
+  it('flags a cell whose stored SQL mutates even when its live SQL looks read-only', () => {
+    const getLiveSql = (cellId: string) =>
+      cellId === 'cell-2' ? 'select * from auth.users' : undefined
+
+    expect(
+      findMutatingQueryCells({ cells: [readOnlyDatabaseCell, mutatingDatabaseCell], getLiveSql })
+    ).toEqual([{ id: 'cell-2', title: 'Cleanup' }])
+  })
+
+  it('falls back to the stored SQL when the live getter has nothing for a cell', () => {
+    const getLiveSql = () => undefined
+
+    expect(
+      findMutatingQueryCells({ cells: [readOnlyDatabaseCell, mutatingDatabaseCell], getLiveSql })
+    ).toEqual([{ id: 'cell-2', title: 'Cleanup' }])
   })
 })

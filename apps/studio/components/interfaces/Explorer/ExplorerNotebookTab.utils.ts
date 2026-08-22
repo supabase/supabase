@@ -17,14 +17,25 @@ export function isMutatingSql(sql: string): boolean {
 }
 
 /**
- * The database cells (log cells are read-only analytics queries and excluded) among
- * `cells` whose SQL mutates data or schema, for flagging before a notebook-wide run.
+ * The database cells whose SQL mutates data or schema, for flagging before a notebook-wide run.
  */
-export function findMutatingQueryCells(
+export function findMutatingQueryCells({
+  cells,
+  getLiveSql,
+}: {
   cells: readonly Snapshot<Cell>[]
-): { id: string; title: string }[] {
+  /**
+   * Lets a caller also check each cell's live editor buffer as well
+   * The store only updates on a Monaco blur commit, which fires asynchronously,
+   * so a scan against the store alone can miss SQL typed just before the run click.
+   * */
+  getLiveSql?: (cellId: string) => string | undefined
+}): { id: string; title: string }[] {
   return cells
     .filter((cell): cell is Snapshot<DatabaseCell> => cell._tag === 'database_cell')
-    .filter((cell) => isMutatingSql(cell.unchecked_sql))
+    .filter((cell) => {
+      const liveSql = getLiveSql?.(cell._id)
+      return isMutatingSql(cell.unchecked_sql) || (liveSql !== undefined && isMutatingSql(liveSql))
+    })
     .map((cell) => ({ id: cell._id, title: cell.title ?? 'Untitled query' }))
 }

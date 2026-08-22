@@ -32,8 +32,18 @@ vi.mock('common', async (importOriginal) => {
 })
 
 vi.mock('@/components/ui/CodeEditor/CodeEditor', () => ({
-  CodeEditor: ({ value }: { value: string }) => (
-    <textarea aria-label="SQL editor" value={value} readOnly />
+  CodeEditor: ({
+    value,
+    onInputChange,
+  }: {
+    value: string
+    onInputChange?: (value: string | undefined) => void
+  }) => (
+    <textarea
+      aria-label="SQL editor"
+      value={value}
+      onChange={(e) => onInputChange?.(e.target.value)}
+    />
   ),
 }))
 
@@ -249,6 +259,31 @@ describe('ExplorerNotebookTab', () => {
         updater: (cell) => (isQueryCell(cell) ? setCellSql(cell, 'delete from foo') : cell),
       })
       fireEvent.click(runNotebookButton)
+
+      const dialog = await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
+      expect(within(dialog).getByText('Read-only query')).toBeInTheDocument()
+      expect(queries).toHaveLength(0)
+    })
+
+    it('picks up SQL typed into the live editor buffer that has not yet been committed to the store', async () => {
+      seedNotebook([readOnlyCell], 'new')
+      const queries = mockDatabaseQueryRequests()
+
+      renderNotebookTab()
+
+      const sqlEditor = await screen.findByRole('textbox', { name: 'SQL editor' })
+      fireEvent.change(sqlEditor, { target: { value: 'delete from foo' } })
+
+      // No blur fired, so the store still has the original read-only SQL — the check must
+      // read the live buffer directly, not `notebooksState`, to catch this.
+      expect(
+        notebooksState.notebooks[NOTEBOOK_ID]?.notebook.content?.cells.find(
+          (cell) => cell._id === readOnlyCell._id
+        )
+      ).toMatchObject({ unchecked_sql: 'select 1' })
+
+      const runNotebookButton = screen.getByRole('button', { name: 'Run notebook' })
+      await userEvent.click(runNotebookButton)
 
       const dialog = await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
       expect(within(dialog).getByText('Read-only query')).toBeInTheDocument()

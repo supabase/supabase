@@ -147,7 +147,10 @@ export const ExplorerNotebookTab = () => {
 
   const handleRunNotebook = () => {
     const freshCells = getFreshCells()
-    const mutatingCells = findMutatingQueryCells(freshCells)
+    const mutatingCells = findMutatingQueryCells({
+      cells: freshCells,
+      getLiveSql: (cellId) => queryCellRefs.current.get(cellId)?.getSql(),
+    })
     if (mutatingCells.length === 0) {
       runNotebook(freshCells.filter(isQueryCell).map((cell) => cell._id))
     } else {
