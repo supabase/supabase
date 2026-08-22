@@ -148,33 +148,40 @@ describe('LayoutSidebar', () => {
       mockProjectData = mockProject
     })
 
-    it('does not register project-related sidebars when no project is available', async () => {
+    it('registers the AI Assistant sidebar but not other project-related sidebars when no project is available', async () => {
       renderSidebar()
 
       // Wait a bit to ensure sidebars have been registered
       await waitFor(() => {
-        // Project-related sidebars should not be registered
-        expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.AI_ASSISTANT]).toBeUndefined()
+        // The AI Assistant works from org-level pages (e.g. the support ticket flow), so it
+        // should register even without a project
+        expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.AI_ASSISTANT]).toBeDefined()
+        // Other project-related sidebars should still not be registered
         expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.EDITOR_PANEL]).toBeUndefined()
         // Advisor panel should still be available (doesn't require project)
         expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.ADVISOR_PANEL]).toBeDefined()
       })
     })
 
-    it('does not render project-related sidebars even when toggled', async () => {
+    it('renders the AI Assistant sidebar when toggled, but not other project-related sidebars', async () => {
       renderSidebar()
 
       await waitFor(() => {
         expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.ADVISOR_PANEL]).toBeDefined()
       })
 
-      // Try to toggle AI_ASSISTANT - should not work since it's not registered
+      // AI Assistant should render since it's registered even without a project
       act(() => {
         sidebarManagerState.toggleSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
       })
 
-      // Should not render since it's not registered
-      expect(screen.queryByTestId('ai-assistant-sidebar')).toBeNull()
+      expect(await screen.findByTestId('ai-assistant-sidebar')).toBeTruthy()
+
+      // Try to toggle EDITOR_PANEL - should not work since it's not registered
+      act(() => {
+        sidebarManagerState.toggleSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+      })
+
       expect(screen.queryByTestId('editor-panel-sidebar')).toBeNull()
 
       // Advisor panel should work
