@@ -63,50 +63,40 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
   const legacyServiceRole = keys.find((x) => x.name === 'service_role')?.api_key ?? '[YOUR API KEY]'
 
   const httpUrl = useWatch({ control: form.control, name: 'http_url' })
-  const httpHeaders = useWatch({ control: form.control, name: 'httpHeaders' })
 
   const { data: tables = [] } = useTableNamesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
-  // Handle auth header auto-add for edge functions
+  // Auto-add a default Authorization header for edge functions that require JWT
+  // verification, but only when one isn't already present. This must NOT watch
+  // `httpHeaders` (or otherwise re-run on every header edit): doing so previously
+  // caused this effect to immediately overwrite any manual edit to the Authorization
+  // header's value (including trying to clear/remove it), since every keystroke
+  // updated `httpHeaders`, re-triggered the effect, and got reverted back to the
+  // computed service role token. See: header value appears "stuck" and uneditable.
   useEffect(() => {
     if (!isSuccessEdgeFunctions) return
 
     const isEdgeFunctionSelected = isEdgeFunctionUrl(httpUrl, ref ?? '', restUrl)
+    if (!httpUrl || !isEdgeFunctionSelected) return
 
-    if (httpUrl && isEdgeFunctionSelected) {
-      const fnSlug = httpUrl.split('/').at(-1)
-      const fn = functions.find((x) => x.slug === fnSlug)
-      const authorizationHeader = httpHeaders.find((x) => x.name === 'Authorization')
-      const edgeFunctionAuthHeaderVal = `Bearer ${legacyServiceRole}`
+    const fnSlug = httpUrl.split('/').at(-1)
+    const fn = functions.find((x) => x.slug === fnSlug)
+    if (!fn?.verify_jwt) return
 
-      if (fn?.verify_jwt && authorizationHeader == null) {
-        const newAuthHeader = {
-          id: uuidv4(),
-          name: 'Authorization',
-          value: edgeFunctionAuthHeaderVal,
-        }
-        form.setValue('httpHeaders', [...httpHeaders, newAuthHeader])
-      } else if (fn?.verify_jwt && authorizationHeader?.value !== edgeFunctionAuthHeaderVal) {
-        const updatedHttpHeaders = httpHeaders.map((x) => {
-          if (x.name === 'Authorization') return { ...x, value: edgeFunctionAuthHeaderVal }
-          else return x
-        })
-        form.setValue('httpHeaders', updatedHttpHeaders)
-      }
+    const currentHeaders = form.getValues('httpHeaders')
+    const authorizationHeader = currentHeaders.find((x) => x.name === 'Authorization')
+    if (authorizationHeader != null) return
+
+    const newAuthHeader = {
+      id: uuidv4(),
+      name: 'Authorization',
+      value: `Bearer ${legacyServiceRole}`,
     }
-  }, [
-    form,
-    functions,
-    httpHeaders,
-    httpUrl,
-    isSuccessEdgeFunctions,
-    legacyServiceRole,
-    ref,
-    restUrl,
-  ])
+    form.setValue('httpHeaders', [...currentHeaders, newAuthHeader])
+  }, [form, functions, httpUrl, isSuccessEdgeFunctions, legacyServiceRole, ref, restUrl])
 
   return (
     <div>
