@@ -49,10 +49,13 @@ export const useDatabaseCronJobToggleMutation = ({
   return useMutation<DatabaseCronJobToggleData, ResponseError, DatabaseCronJobToggleVariables>({
     mutationFn: (vars) => toggleDatabaseCronJob(vars),
     async onSuccess(data, variables, context) {
-      const { projectRef } = variables
-      await queryClient.invalidateQueries({
-        queryKey: databaseCronJobsKeys.jobs(projectRef),
-      })
+      const { projectRef, searchTerm } = variables
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: databaseCronJobsKeys.jobs(projectRef) }),
+        queryClient.invalidateQueries({
+          queryKey: databaseCronJobsKeys.listInfiniteMinimal(projectRef, searchTerm),
+        }),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
