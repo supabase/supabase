@@ -25,9 +25,9 @@ export function findMutatingQueryCells({
 }: {
   cells: readonly Snapshot<Cell>[]
   /**
-   * Lets a caller also check each cell's live editor buffer as well
-   * The store only updates on a Monaco blur commit, which fires asynchronously,
-   * so a scan against the store alone can miss SQL typed just before the run click.
+   * Lets a caller also check each cell's live editor buffer as well. The store
+   * only updates on a Monaco blur commit, which fires asynchronously, so a scan
+   * against the store alone can miss SQL typed just before the run click.
    * */
   getLiveSql?: (cellId: string) => string | undefined
 }): { id: string; title: string }[] {
