@@ -159,18 +159,6 @@ export const AssistantChat = ({
 
   const { mutateAsync: rateMessage } = useRateMessageMutation()
 
-  const { data: tables } = useTablesQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      schema: 'public',
-    },
-    { enabled: isApiKeySet }
-  )
-
-  const currentTable = tables?.find((t) => t.id.toString() === entityId)
-  const currentSchema = searchParams?.get('schema') ?? 'public'
-
   // on org-level pages, where there's no project in the URL,
   // resolve it fresh from the chat's own projectRef instead.
   const isOrgViewSupportChat = !project?.ref && !!supportMetadata?.projectRef
@@ -181,6 +169,25 @@ export const AssistantChat = ({
   } = useProjectDetailQuery({ ref: supportMetadata?.projectRef }, { enabled: isOrgViewSupportChat })
   const isSupportChatProjectReady = isProjectReadyForAssistant(supportChatProjectDetail)
   const isResolvingSupportChatConnectionString = isOrgViewSupportChat && !isSupportChatProjectReady
+
+  // Table browsing needs the same org-view support chat fallback as the send context below,
+  // otherwise the assistant has no schema awareness for a support chat opened from an org page.
+  const tablesProjectRef = isOrgViewSupportChat ? supportMetadata?.projectRef : project?.ref
+  const tablesConnectionString = isOrgViewSupportChat
+    ? supportChatProjectDetail?.connectionString
+    : project?.connectionString
+
+  const { data: tables } = useTablesQuery(
+    {
+      projectRef: tablesProjectRef,
+      connectionString: tablesConnectionString,
+      schema: 'public',
+    },
+    { enabled: isApiKeySet && (!isOrgViewSupportChat || isSupportChatProjectReady) }
+  )
+
+  const currentTable = tables?.find((t) => t.id.toString() === entityId)
+  const currentSchema = searchParams?.get('schema') ?? 'public'
 
   // Update context in state. On org-level pages there's no project in the URL, so
   // fall back to the open chat's own support metadata (see
