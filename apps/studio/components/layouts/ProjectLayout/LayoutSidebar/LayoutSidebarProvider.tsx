@@ -10,6 +10,7 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTrack } from '@/lib/telemetry/track'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import {
@@ -46,6 +47,14 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
   const { data: org } = useSelectedOrganizationQuery()
   const track = useTrack()
   const { openSidebar, closeSidebar, activeSidebar } = useSidebarManagerSnapshot()
+  const aiAssistant = useAiAssistantStateSnapshot()
+  // On org-level pages there's no project in the URL, but an org-view support chat
+  // (see SupportAssistantSuccessCardContent) resolves its own project and syncs it into
+  // this context as soon as its chat is created — before the sidebar is ever opened.
+  // Registering on that too (rather than unconditionally) keeps the AI Assistant closed
+  // to the rest of the org UI (header button, shortcut, help panel) until a support chat
+  // actually has a resolved project to show.
+  const hasResolvedAssistantProject = !!project || !!aiAssistant.context.projectRef
 
   const [sidebarURLParam, setSidebarUrlParam] = useQueryState('sidebar', parseAsString)
   const [sidebarLocalStorage, setSidebarLocalStorage, { isSuccess: isLoadedLocalStorage }] =
@@ -60,7 +69,12 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
   const sidebarURLParamRef = useLatest(sidebarURLParam)
   const sidebarLocalStorageRef = useLatest(sidebarLocalStorage)
 
-  useRegisterSidebar(SIDEBAR_KEYS.AI_ASSISTANT, () => <AIAssistant />, {}, true)
+  useRegisterSidebar(
+    SIDEBAR_KEYS.AI_ASSISTANT,
+    () => <AIAssistant />,
+    {},
+    hasResolvedAssistantProject
+  )
   useRegisterSidebar(SIDEBAR_KEYS.EDITOR_PANEL, () => <EditorPanel />, {}, !!project)
   useRegisterSidebar(SIDEBAR_KEYS.ADVISOR_PANEL, () => <AdvisorPanel />, {}, true)
   useRegisterSidebar(

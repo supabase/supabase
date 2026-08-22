@@ -83,6 +83,12 @@ vi.mock('@/lib/telemetry/track', () => ({
   useTrack: () => vi.fn(),
 }))
 
+let mockAiAssistantContext: { projectRef?: string } = {}
+
+vi.mock('@/state/ai-assistant-state', () => ({
+  useAiAssistantStateSnapshot: () => ({ context: mockAiAssistantContext }),
+}))
+
 const resetSidebarManagerState = () => {
   Object.keys(sidebarManagerState.sidebars).forEach((id) => {
     sidebarManagerState.unregisterSidebar(id)
@@ -99,6 +105,7 @@ describe('LayoutSidebar', () => {
     resetSidebarManagerState()
     localStorage.clear()
     vi.clearAllMocks()
+    mockAiAssistantContext = {}
   })
 
   const renderSidebar = () =>
@@ -148,48 +155,70 @@ describe('LayoutSidebar', () => {
       mockProjectData = mockProject
     })
 
-    it('registers the AI Assistant sidebar but not other project-related sidebars when no project is available', async () => {
-      renderSidebar()
+    describe('without a resolved support chat context', () => {
+      it('does not register the AI Assistant sidebar', async () => {
+        renderSidebar()
 
-      // Wait a bit to ensure sidebars have been registered
-      await waitFor(() => {
-        // The AI Assistant works from org-level pages (e.g. the support ticket flow), so it
-        // should register even without a project
-        expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.AI_ASSISTANT]).toBeDefined()
-        // Other project-related sidebars should still not be registered
+        await waitFor(() => {
+          expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.ADVISOR_PANEL]).toBeDefined()
+        })
+
+        // With no project and no org-view support chat context, the AI Assistant should
+        // stay closed to the rest of the org UI (header button, shortcut, help panel) —
+        // only an org-view support chat with a resolved project should unlock it.
+        expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.AI_ASSISTANT]).toBeUndefined()
         expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.EDITOR_PANEL]).toBeUndefined()
-        // Advisor panel should still be available (doesn't require project)
-        expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.ADVISOR_PANEL]).toBeDefined()
       })
     })
 
-    it('renders the AI Assistant sidebar when toggled, but not other project-related sidebars', async () => {
-      renderSidebar()
-
-      await waitFor(() => {
-        expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.ADVISOR_PANEL]).toBeDefined()
+    describe('with a resolved support chat context', () => {
+      beforeEach(() => {
+        // Simulate an org-view support chat having resolved its own project
+        // (see SupportAssistantSuccessCardContent), before the sidebar is opened.
+        mockAiAssistantContext = { projectRef: 'support-chat-project' }
       })
 
-      // AI Assistant should render since it's registered even without a project
-      act(() => {
-        sidebarManagerState.toggleSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+      it('registers the AI Assistant sidebar but not other project-related sidebars', async () => {
+        renderSidebar()
+
+        // Wait a bit to ensure sidebars have been registered
+        await waitFor(() => {
+          expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.AI_ASSISTANT]).toBeDefined()
+          // Other project-related sidebars should still not be registered
+          expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.EDITOR_PANEL]).toBeUndefined()
+          // Advisor panel should still be available (doesn't require project)
+          expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.ADVISOR_PANEL]).toBeDefined()
+        })
       })
 
-      expect(await screen.findByTestId('ai-assistant-sidebar')).toBeTruthy()
+      it('renders the AI Assistant sidebar when toggled, but not other project-related sidebars', async () => {
+        renderSidebar()
 
-      // Try to toggle EDITOR_PANEL - should not work since it's not registered
-      act(() => {
-        sidebarManagerState.toggleSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+        await waitFor(() => {
+          expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.ADVISOR_PANEL]).toBeDefined()
+        })
+
+        // AI Assistant should render since it's registered
+        act(() => {
+          sidebarManagerState.toggleSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+        })
+
+        expect(await screen.findByTestId('ai-assistant-sidebar')).toBeTruthy()
+
+        // Try to toggle EDITOR_PANEL - should not work since it's not registered
+        act(() => {
+          sidebarManagerState.toggleSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+        })
+
+        expect(screen.queryByTestId('editor-panel-sidebar')).toBeNull()
+
+        // Advisor panel should work
+        act(() => {
+          sidebarManagerState.toggleSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)
+        })
+
+        expect(await screen.findByTestId('advisor-panel-sidebar')).toBeTruthy()
       })
-
-      expect(screen.queryByTestId('editor-panel-sidebar')).toBeNull()
-
-      // Advisor panel should work
-      act(() => {
-        sidebarManagerState.toggleSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)
-      })
-
-      expect(await screen.findByTestId('advisor-panel-sidebar')).toBeTruthy()
     })
   })
 
