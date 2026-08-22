@@ -89,12 +89,15 @@ const renderNotebookTab = () =>
   )
 
 // `useAddDefinitions` fires its own background keywords/functions/schemas/table-columns
-// fetches against this same generic pg-meta query endpoint (differentiated by the `key`
-// search param) as soon as a database cell's editor mounts — those are expected and
-// unrelated to an actual cell run.
-const INTELLISENSE_KEYS = ['keywords', 'database-functions', 'schemas', 'table-columns']
+// fetches, and `QueryEditor` fires a background database-event-triggers fetch (for the
+// run-time RLS/event-trigger warning check), against this same generic pg-meta query
+// endpoint (differentiated by the `key` search param) as soon as a database cell's editor
+// mounts — those are expected and unrelated to an actual cell run.
+const BACKGROUND_QUERY_KEYS = ['keywords', 'database-functions', 'schemas', 'table-columns']
+const isBackgroundQueryKey = (key: string) =>
+  BACKGROUND_QUERY_KEYS.includes(key) || key.endsWith('database-event-triggers')
 
-/** Mocks the database query endpoint and returns the SQL text of every non-intellisense request. */
+/** Mocks the database query endpoint and returns the SQL text of every non-background request. */
 const mockDatabaseQueryRequests = () => {
   const queries: string[] = []
   addAPIMock({
@@ -102,7 +105,7 @@ const mockDatabaseQueryRequests = () => {
     path: '/platform/pg-meta/:ref/query',
     response: async ({ request }) => {
       const key = new URL(request.url).searchParams.get('key')
-      if (!key || !INTELLISENSE_KEYS.includes(key)) {
+      if (!key || !isBackgroundQueryKey(key)) {
         const body = (await request.clone().json()) as { query?: string }
         queries.push(body.query ?? '')
       }

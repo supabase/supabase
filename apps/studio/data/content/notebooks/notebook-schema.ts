@@ -154,18 +154,11 @@ export type WritableNotebook = Omit<z.infer<typeof writableNotebookSchema>, 'cel
 type WritableCellWire = z.infer<typeof writableCellSchema>
 type WritableNotebookWire = z.infer<typeof writableNotebookSchema>
 
-// Agents cannot yet target a specific read replica: there's no tool exposing a project's
-// real replica identifiers, so a model asked to fill this field has no legitimate value to
-// put there — and an invented one silently breaks the cell, since its connection string can
-// never resolve (see QueryEditor's run handler). Omit the field entirely until replica
-// selection is actually wired up for agents, rather than leave it for a model to guess at.
-const agentDatabaseFieldsSchema = databaseFieldsSchema.omit({ database_identifier: true })
-
 // Agents have restrictions on writing IDs to preserve guarantees about ID
 // uniqueness
 export const agentCellSchema = z.discriminatedUnion('_tag', [
   markdownFieldsSchema.extend({ _tag: z.literal('markdown_cell') }).strict(),
-  agentDatabaseFieldsSchema.extend({ _tag: z.literal('database_cell') }).strict(),
+  databaseFieldsSchema.extend({ _tag: z.literal('database_cell') }).strict(),
   logFieldsSchema.extend({ _tag: z.literal('log_cell') }).strict(),
 ])
 

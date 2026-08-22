@@ -128,11 +128,17 @@ export const ExplorerNotebookTab = () => {
     }
   }
 
-  const runNotebook = async (cellIdsToRun: string[]) => {
+  const runNotebook = async ({
+    cellIdsToRun,
+    force = false,
+  }: {
+    cellIdsToRun: string[]
+    force?: boolean
+  }) => {
     setIsRunningNotebook(true)
     try {
       await Promise.allSettled(
-        cellIdsToRun.map((cellId) => queryCellRefs.current.get(cellId)?.run())
+        cellIdsToRun.map((cellId) => queryCellRefs.current.get(cellId)?.run(force))
       )
     } finally {
       setIsRunningNotebook(false)
@@ -152,7 +158,7 @@ export const ExplorerNotebookTab = () => {
       getLiveSql: (cellId) => queryCellRefs.current.get(cellId)?.getSql(),
     })
     if (mutatingCells.length === 0) {
-      runNotebook(freshCells.filter(isQueryCell).map((cell) => cell._id))
+      runNotebook({ cellIdsToRun: freshCells.filter(isQueryCell).map((cell) => cell._id) })
     } else {
       setSkipMutatingCells(false)
       setPendingMutationCells(mutatingCells)
@@ -166,7 +172,7 @@ export const ExplorerNotebookTab = () => {
       : queryCellIds
 
     setPendingMutationCells(null)
-    runNotebook(cellIdsToRun)
+    runNotebook({ cellIdsToRun, force: true })
   }
 
   const handleSaveNotebook = () => {
