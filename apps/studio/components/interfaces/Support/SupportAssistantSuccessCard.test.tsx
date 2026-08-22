@@ -92,8 +92,6 @@ const supportRequest: SubmittedSupportRequest = {
   frontConversationId: 'front-conversation-1',
 }
 
-// A minimal but contract-accurate ProjectDetailResponse, so a mock drifting
-// from the OpenAPI shape (missing fields, stale enum values) fails to compile.
 const readyProjectDetail: ProjectDetailResponse = {
   id: 1,
   ref: 'project-1',

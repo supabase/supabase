@@ -17,6 +17,7 @@ import { ASSISTANT_ERRORS } from './AiAssistant.constants'
 import {
   containsLogsSnippets,
   hasPendingToolApproval,
+  isProjectReadyForAssistant,
   onErrorChat,
   resolvePendingToolApprovalsAsDenied,
 } from './AIAssistant.utils'
@@ -31,7 +32,6 @@ import { Message } from './Message'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
 import { useRateMessageMutation } from '@/data/ai/rate-message-mutation'
-import { isValidConnString } from '@/data/fetchers'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
@@ -179,13 +179,7 @@ export const AssistantChat = ({
     isError: isSupportChatProjectError,
     refetch: refetchSupportChatProjectDetail,
   } = useProjectDetailQuery({ ref: supportMetadata?.projectRef }, { enabled: isOrgViewSupportChat })
-  // Mirrors the readiness check in SupportAssistantSuccessCardContent — a project still
-  // coming up, or with a connection string that isn't valid yet, isn't ready to send to.
-  const isSupportChatProjectReady =
-    !!supportChatProjectDetail &&
-    supportChatProjectDetail.status !== 'COMING_UP' &&
-    supportChatProjectDetail.status !== 'UNKNOWN' &&
-    isValidConnString(supportChatProjectDetail.connectionString)
+  const isSupportChatProjectReady = isProjectReadyForAssistant(supportChatProjectDetail)
   const isResolvingSupportChatConnectionString = isOrgViewSupportChat && !isSupportChatProjectReady
 
   // Update context in state. On org-level pages there's no project in the URL, so

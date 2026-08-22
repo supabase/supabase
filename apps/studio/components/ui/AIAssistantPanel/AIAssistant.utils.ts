@@ -13,11 +13,24 @@ import { databasePoliciesKeys } from '@/data/database-policies/keys'
 import { databaseTriggerKeys } from '@/data/database-triggers/keys'
 import { databaseKeys } from '@/data/database/keys'
 import { enumeratedTypesKeys } from '@/data/enumerated-types/keys'
-import { handleError } from '@/data/fetchers'
+import { handleError, isValidConnString } from '@/data/fetchers'
+import type { ProjectDetail } from '@/data/projects/project-detail-query'
 import { tableKeys } from '@/data/tables/keys'
 import { tryParseJson } from '@/lib/helpers'
 import type { SqlSnippet } from '@/state/ai-assistant-state'
 import { ResponseError } from '@/types'
+
+// [Monica] Whether a project has finished provisioning and has a usable connection string
+export function isProjectReadyForAssistant(
+  projectDetail: Pick<ProjectDetail, 'status' | 'connectionString'> | undefined
+): boolean {
+  return (
+    !!projectDetail &&
+    projectDetail.status !== 'COMING_UP' &&
+    projectDetail.status !== 'UNKNOWN' &&
+    isValidConnString(projectDetail.connectionString)
+  )
+}
 
 export type MutationCategory = 'functions' | 'rls-policies'
 

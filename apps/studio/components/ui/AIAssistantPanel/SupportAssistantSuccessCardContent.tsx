@@ -1,7 +1,15 @@
 import type { UIMessage as MessageType } from '@ai-sdk/react'
 import { ArrowUpRight } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from 'react'
 import type { JSX, MouseEvent } from 'react'
 import type { StreamdownProps } from 'streamdown'
 import {
@@ -16,11 +24,11 @@ import {
   Skeleton,
 } from 'ui'
 
+import { isProjectReadyForAssistant } from './AIAssistant.utils'
 import { buildSupportAssistantPrompt } from '@/components/interfaces/Support/SupportAssistant.utils'
 import type { SubmittedSupportRequest } from '@/components/interfaces/Support/SupportForm.state'
 import { NO_PROJECT_MARKER } from '@/components/interfaces/Support/SupportForm.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { isValidConnString } from '@/data/fetchers'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useTrack } from '@/lib/telemetry/track'
 import {
@@ -72,21 +80,10 @@ export function SupportAssistantSuccessCardContent({
     refetch: refetchProjectDetail,
   } = useProjectDetailQuery({ ref: request.projectRef }, { enabled: hasAssistantContext })
 
-  // Mirrors the readiness check useProjectDetailQuery itself polls on: a project
-  // still coming up, or one without a usable connection string yet, isn't ready
-  // to receive requests, even though the query already returned some data.
-  const isProjectReady =
-    !!projectDetail &&
-    projectDetail.status !== 'COMING_UP' &&
-    projectDetail.status !== 'UNKNOWN' &&
-    isValidConnString(projectDetail.connectionString)
+  const isProjectReady = isProjectReadyForAssistant(projectDetail)
   const connectionString = projectDetail?.connectionString ?? undefined
 
-  useEffect(() => {
-    if (!hasAssistantContext) return
-    if (!isProjectReady) return
-    if (createdChatIdRef.current) return
-
+  const createSupportChat = useEffectEvent(() => {
     aiAssistantState.setContext({
       projectRef: request.projectRef,
       orgSlug: request.organizationSlug,
@@ -100,9 +97,15 @@ export function SupportAssistantSuccessCardContent({
 
     createdChatIdRef.current = newChatId
     setChatId(newChatId)
-    // aiAssistantState is a stable context value (same identity across renders)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [aiAssistant, assistantPrompt, connectionString, hasAssistantContext, isProjectReady, request])
+  })
+
+  useEffect(() => {
+    if (!hasAssistantContext) return
+    if (!isProjectReady) return
+    if (createdChatIdRef.current) return
+
+    createSupportChat()
+  }, [hasAssistantContext, isProjectReady])
 
   const handleOpenAssistant = () => {
     track(
@@ -153,9 +156,6 @@ export function SupportAssistantSuccessCardContent({
 
   if (!hasAssistantContext) return null
 
-  // Before the chat exists (still loading, or failed) there's nothing for the card to
-  // open — disable its click/keyboard handlers so only "Try again" (while erroring) is
-  // interactive, and clicking mid-load can't open the sidebar with no chat prepared.
   const isInteractive = !!chat
 
   return (
