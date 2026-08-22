@@ -286,7 +286,7 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
         <p className="text-sm text-foreground-lighter">
           Manually{' '}
           <InlineLink
-            href={`${DOCS_URL}/guides/self-hosting/docker#exposing-your-postgres-database`}
+            href={`${DOCS_URL}/guides/self-hosting/accessing-postgres#expose-postgres-for-direct-connections`}
           >
             configurable
           </InlineLink>{' '}

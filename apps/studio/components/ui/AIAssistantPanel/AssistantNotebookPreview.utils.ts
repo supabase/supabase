@@ -83,11 +83,8 @@ export function getCellMetadataLine(cell: OperationResultCell): string | null {
   switch (cell._tag) {
     case 'markdown_cell':
       return null
-    case 'database_cell': {
-      const databaseIdentifier =
-        'database_identifier' in cell ? cell.database_identifier : undefined
-      return databaseIdentifier ? `Database: ${databaseIdentifier}` : null
-    }
+    case 'database_cell':
+      return cell.database_identifier ? `Database: ${cell.database_identifier}` : null
     case 'log_cell':
       return `Time range: ${formatTimeRange(cell.time_range)}`
   }
