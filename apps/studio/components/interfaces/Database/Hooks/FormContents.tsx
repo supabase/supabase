@@ -93,9 +93,10 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
     const isEdgeFunctionSelected = isEdgeFunctionUrl(httpUrl, ref ?? '', restUrl)
     if (!httpUrl || !isEdgeFunctionSelected) return
 
-    // Drop empty segments so a trailing slash on the URL doesn't turn the slug
-    // into an empty string (which would never match a function).
-    const pathSegments = httpUrl.split('/').filter(Boolean)
+    // Parse the pathname (not the raw URL) so a trailing slash or a query
+    // string / fragment doesn't end up folded into the slug — either of
+    // those would fail to match any function and skip adding the header.
+    const pathSegments = new URL(httpUrl).pathname.split('/').filter(Boolean)
     const fnSlug = pathSegments.at(-1)
     const fn = functions.find((x) => x.slug === fnSlug)
     if (!fn?.verify_jwt) return
