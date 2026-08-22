@@ -16,6 +16,7 @@ import { type ExplorerResourceType } from './ExplorerLayout.constants'
 import { ExplorerNavChats } from './ExplorerNavChats'
 import { ExplorerNavHome } from './ExplorerNavHome'
 import { ExplorerNavNotebooks } from './ExplorerNavNotebooks'
+import { ExplorerNotebookTabCoordinator } from '@/components/interfaces/Explorer/ExplorerNotebookTabCoordinator'
 import { ExplorerQueryTabCoordinator } from '@/components/interfaces/Explorer/ExplorerQueryTabCoordinator'
 import {
   useCreateChat,
@@ -70,6 +71,9 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
       }
     >
       <ExplorerQueryTabCoordinator />
+
+      <ExplorerNotebookTabCoordinator />
+
       <div className="flex flex-col h-full">
         <div className={cn('h-10 md:min-h-(--header-height) flex items-center bg-surface-100')}>
           <EditorTabs

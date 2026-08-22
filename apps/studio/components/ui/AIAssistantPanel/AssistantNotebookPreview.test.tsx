@@ -23,10 +23,11 @@ const wireDatabaseCell = (id: string, database_identifier?: string): CellWire =>
   database_identifier,
 })
 
-const agentDatabaseCell = (): AgentCell => ({
+const agentDatabaseCell = (database_identifier?: string): AgentCell => ({
   _tag: 'database_cell',
   sql: 'select 1',
   row_limit: 100,
+  database_identifier,
 })
 
 describe('AssistantNotebookPreview', () => {
@@ -55,11 +56,12 @@ describe('AssistantNotebookPreview', () => {
       { _tag: 'unchanged', cell: wireMarkdownCell('b', 'two') },
     ]
 
-    render(<AssistantNotebookPreview entries={entries} mode="create" />)
+    const { container } = render(<AssistantNotebookPreview entries={entries} mode="create" />)
 
     expect(screen.getByRole('toolbar', { name: 'Notebook toolbar' })).toBeInTheDocument()
     expect(screen.getByText('2 cells')).toBeInTheDocument()
     expect(screen.getByText('New notebook')).toBeInTheDocument()
+    expect(container.firstElementChild).toHaveClass('max-w-6xl')
   })
 
   it('surfaces a metadata-only change on a replaced cell even when the sql is unchanged', () => {
@@ -67,17 +69,17 @@ describe('AssistantNotebookPreview', () => {
       {
         _tag: 'replaced',
         before: wireDatabaseCell('cell-1', 'primary'),
-        after: agentDatabaseCell(),
+        after: agentDatabaseCell('replica-3'),
         operationIndex: 0,
       },
     ]
 
     render(<AssistantNotebookPreview entries={entries} mode="update" />)
 
-    expect(screen.getByText('Database: primary → No metadata')).toBeInTheDocument()
+    expect(screen.getByText('Database: primary → Database: replica-3')).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: 'Replaced Query: Untitled query' })
-    ).toHaveTextContent('Database: primary → No metadata')
+    ).toHaveTextContent('Database: primary → Database: replica-3')
   })
 
   it('hides entries past the limit behind a "Show N more" button', async () => {

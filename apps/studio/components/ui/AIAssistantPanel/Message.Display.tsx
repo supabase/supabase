@@ -56,9 +56,11 @@ function MessageDisplayContent({ message }: { message: VercelMessage }) {
             return <MessagePartSwitcher key={idx} part={part} />
           })
         : content && (
-            <MessageDisplayTextMessage id={id} isLoading={isLoading} readOnly={readOnly}>
-              {content}
-            </MessageDisplayTextMessage>
+            <div className="w-full max-w-3xl mx-auto">
+              <MessageDisplayTextMessage id={id} isLoading={isLoading} readOnly={readOnly}>
+                {content}
+              </MessageDisplayTextMessage>
+            </div>
           )}
     </div>
   )

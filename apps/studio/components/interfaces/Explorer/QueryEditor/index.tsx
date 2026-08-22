@@ -101,6 +101,7 @@ export type QueryEditorHandle = {
 
 type QueryEditorProps = {
   id: string
+  isReadOnly?: boolean
   variant: 'embedded' | 'viewport'
   title: string
   query: ExplorerQueryModel
@@ -109,6 +110,8 @@ type QueryEditorProps = {
   display?: QueryDisplay
   toolbarActions?: ReactNode
   className?: string
+  showQuery: boolean
+  onShowQueryChange: (showQuery: boolean) => void
   /** When true, toolbar and editor run actions are disabled. */
   isRunDisabled?: boolean
   onTitleChange: (title: string) => void
@@ -129,6 +132,7 @@ type QueryEditorProps = {
 export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(function QueryEditor(
   {
     id,
+    isReadOnly = false,
     variant,
     title,
     query,
@@ -137,6 +141,8 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     display,
     toolbarActions,
     className,
+    showQuery,
+    onShowQueryChange,
     isRunDisabled = false,
     onTitleChange,
     onSqlChange,
@@ -162,7 +168,6 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   const rowLimit = query._tag === 'database' ? query.rowLimit : undefined
   const databaseIdentifier = query._tag === 'database' ? query.database_identifier : undefined
 
-  const [showQuery, setShowQuery] = useState(true)
   const [promptInput, setPromptInput] = useState('')
   const [pendingProposal, setPendingProposal] = useState<PendingProposal | null>(null)
   const pendingProposalRef = useLatest(pendingProposal)
@@ -258,7 +263,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   }
 
   const acceptSqlProposal = () => {
-    if (!pendingProposal) return
+    if (isReadOnly || !pendingProposal) return
     if (sql === pendingProposal.original) {
       onSqlChange(pendingProposal.modified)
       onSqlCommit?.(pendingProposal.modified)
@@ -307,7 +312,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   }, [promptState?.isOpen])
 
   return (
-    <Shell className={cn(variant === 'embedded' && 'mx-auto max-w-4xl', className)}>
+    <Shell className={cn(variant === 'embedded' && 'mx-auto max-w-6xl', className)}>
       <ExplorerToolbar>
         <ExplorerToolbarIcon>
           <CodeSquare size={14} />
@@ -341,7 +346,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
             icon={showQuery ? <EyeOff /> : <Eye />}
             disabled={pendingProposal !== null}
             tooltip={showQuery ? 'Hide query' : 'Show query'}
-            onClick={() => setShowQuery((value) => !value)}
+            onClick={() => onShowQueryChange(!showQuery)}
           />
           <ExplorerToolbarAction
             loading={isExecuting}
@@ -378,6 +383,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
             <CodeEditor
               id={`explorer-query-${id}`}
               language="pgsql"
+              isReadOnly={isReadOnly}
               value={sql}
               placeholder={!promptState?.isOpen ? generatePlaceholder(os) : ''}
               placeholderClassName="top-[13px]"

@@ -8,7 +8,7 @@ import { ExplorerNotebookTab } from '../ExplorerNotebookTab'
 import { createMarkdownCellSkeleton, createQueryCellSkeleton } from '../utils'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import { notebooksState } from '@/state/notebooks/notebooks-state'
-import type { Notebook, StateNotebook } from '@/state/notebooks/types'
+import type { Notebook } from '@/state/notebooks/types'
 import { createTabsState, TabsStateContext } from '@/state/tabs'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
@@ -52,12 +52,9 @@ const logCell = {
 }
 const markdownCell = createMarkdownCellSkeleton()
 
-/**
- * Assigns directly into the store rather than going through `setNotebook` — that helper
- * no-ops when a notebook with content already exists, which would make reseeding between
- * tests (or within one, for the empty-notebook case) silently keep the previous cells.
- */
-const seedNotebook = (cells: Notebooks.Cell[]) => {
+/** Clears any prior fixture so seeding exercises the same store-loading path as the app. */
+const seedNotebook = (cells: Notebooks.Cell[], status: 'new' | 'saved' = 'saved') => {
+  delete notebooksState.notebooks[NOTEBOOK_ID]
   const notebook: Notebook = {
     id: NOTEBOOK_ID,
     type: 'notebook',
@@ -68,8 +65,8 @@ const seedNotebook = (cells: Notebooks.Cell[]) => {
     project_id: 1,
     content: { schema_version: 1, cells },
   }
-  const stateNotebook: StateNotebook = { projectRef: 'default', notebook, status: 'saved' }
-  notebooksState.notebooks[NOTEBOOK_ID] = stateNotebook
+  if (status === 'new') notebooksState.addNotebook({ projectRef: 'default', notebook })
+  else notebooksState.setNotebook({ projectRef: 'default', notebook })
 }
 
 const renderNotebookTab = () =>
@@ -90,10 +87,43 @@ beforeEach(() => {
 
 afterEach(() => {
   notebooksState.needsSaving.clear()
+  notebooksState.cellLocalState.clear()
   safeLocalStorage.removeItem(LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE)
 })
 
 describe('ExplorerNotebookTab', () => {
+  it('hides SQL by default for saved notebooks and caps query cells at 6xl', () => {
+    renderNotebookTab()
+
+    const queryCells = Array.from(document.querySelectorAll('[data-slot="explorer-query"]'))
+    expect(queryCells).toHaveLength(2)
+    queryCells.forEach((cell) => expect(cell).toHaveClass('max-w-6xl'))
+
+    expect(screen.queryByRole('textbox', { name: 'SQL editor' })).not.toBeInTheDocument()
+  })
+
+  it('shows SQL by default for a new notebook', async () => {
+    seedNotebook([databaseCell, logCell, markdownCell], 'new')
+
+    renderNotebookTab()
+
+    expect(await screen.findAllByRole('textbox', { name: 'SQL editor' })).toHaveLength(2)
+  })
+
+  it('keeps query visibility when the notebook tab remounts', async () => {
+    const view = renderNotebookTab()
+
+    const showQueryButton = document.querySelector('.lucide-eye')?.closest('button')
+    expect(showQueryButton).toBeInstanceOf(HTMLButtonElement)
+    await userEvent.click(showQueryButton as HTMLButtonElement)
+    expect(await screen.findAllByRole('textbox', { name: 'SQL editor' })).toHaveLength(1)
+
+    view.unmount()
+    renderNotebookTab()
+
+    expect(await screen.findAllByRole('textbox', { name: 'SQL editor' })).toHaveLength(1)
+  })
+
   it('runs every database and log cell, and skips markdown cells, on "Run notebook"', async () => {
     // `useAddDefinitions` fires its own background keywords/functions/schemas/table-columns
     // fetches against this same generic pg-meta query endpoint (differentiated by the `key`

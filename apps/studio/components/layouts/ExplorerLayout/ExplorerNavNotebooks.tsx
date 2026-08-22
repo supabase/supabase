@@ -1,3 +1,4 @@
+import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { NotebookText } from 'lucide-react'
 import Link from 'next/link'
@@ -47,7 +48,9 @@ const NotebookListItem = ({
 export const ExplorerNavNotebooks = ({ onBack }: { onBack: () => void }) => {
   const router = useRouter()
   const { ref, id } = useParams()
+
   const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search, 500)
 
   const {
     data: notebooksData,
@@ -58,7 +61,7 @@ export const ExplorerNavNotebooks = ({ onBack }: { onBack: () => void }) => {
   } = useNotebooksInfiniteQuery({
     projectRef: ref,
     limit: 100,
-    name: search,
+    name: search.length === 0 ? search : debouncedSearch,
   })
 
   const notebooks = useMemo(() => {

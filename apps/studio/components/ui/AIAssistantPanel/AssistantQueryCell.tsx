@@ -14,7 +14,10 @@ import { Confirm } from './Confirm'
 import { type ConfirmFooterApprovalState } from './Confirm.utils'
 import { QueryEditor } from '@/components/interfaces/Explorer/QueryEditor'
 import { type QueryDisplay, type QueryResult } from '@/components/interfaces/Explorer/types'
-import { type QuerySourceBinding } from '@/data/query-sources/query-source-registry'
+import {
+  type QuerySourceBinding,
+  type QuerySourceTag,
+} from '@/data/query-sources/query-source-registry'
 import { useTrack } from '@/lib/telemetry/track'
 import { useLocalRoleImpersonationState } from '@/state/role-impersonation-state'
 
@@ -35,6 +38,22 @@ interface AssistantQueryCellProps {
 }
 
 const DEFAULT_SOURCE: QuerySourceBinding = { _tag: 'database' }
+
+const QUERY_OUTCOME_MESSAGES: Record<
+  QuerySourceTag,
+  { success: string; error: string; denied: string }
+> = {
+  database: {
+    success: 'Query executed',
+    error: 'Failed to execute SQL',
+    denied: 'Skipped query',
+  },
+  logs: {
+    success: 'Query executed',
+    error: 'Failed to query logs',
+    denied: 'Skipped query',
+  },
+}
 
 /** Assistant adapter around the shared QueryEditor. Local state only — nothing is persisted. */
 export const AssistantQueryCell = ({
@@ -62,6 +81,7 @@ export const AssistantQueryCell = ({
 
   const [title, setTitle] = useState(fallbackTitle)
   const [query, setQuery] = useState(() => createAssistantQueryModel(initialSql, source))
+  const [showQuery, setShowQuery] = useState(true)
   // undefined uses the tool output; null intentionally clears it after changing source.
   const [resultOverride, setResultOverride] = useState<QueryResult | null>()
   const [localDisplay, setLocalDisplay] = useState<QueryDisplay | undefined>(undefined)
@@ -71,6 +91,7 @@ export const AssistantQueryCell = ({
     previousId.current = id
     setTitle(fallbackTitle)
     setQuery(createAssistantQueryModel(initialSql, source))
+    setShowQuery(true)
     setResultOverride(undefined)
     setLocalDisplay(undefined)
   }
@@ -121,25 +142,32 @@ export const AssistantQueryCell = ({
   }
 
   const isConfirming = confirmState !== undefined
+  const outcomeMessages = QUERY_OUTCOME_MESSAGES[source._tag]
 
   return (
     <Confirm
       fill
-      className="h-96"
+      className="h-96 w-full max-w-6xl mx-auto"
       state={confirmState}
       message="Assistant wants to run this query"
       cancelLabel="Skip"
       confirmLabel="Run query"
       confirmLabelLoading="Running..."
+      successMessage={outcomeMessages.success}
+      errorMessage={outcomeMessages.error}
+      deniedMessage={outcomeMessages.denied}
       onCancel={onDeny}
       onConfirm={onApprove}
     >
       <QueryEditor
+        isReadOnly
         id={id}
         variant="viewport"
         title={title}
         query={query}
         result={result}
+        showQuery={showQuery}
+        onShowQueryChange={setShowQuery}
         roleImpersonationState={roleImpersonationState}
         display={display}
         isRunDisabled={isConfirming}
