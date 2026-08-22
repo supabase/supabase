@@ -1,5 +1,5 @@
 {
-  "$schema": "https://unpkg.com/knip@5/schema-jsonc.json",
+  "$schema": "https://unpkg.com/knip@6/schema-jsonc.json",
   "exclude": ["types", "exports"],
   "ignore": [
     "examples/**",
