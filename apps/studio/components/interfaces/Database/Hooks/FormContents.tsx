@@ -51,8 +51,11 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
 
   const restUrl = project?.restUrl
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: keys = [] } = useAPIKeysQuery(
+  const { can: canReadAPIKeys, isSuccess: isPermissionsSuccess } = useAsyncCheckPermissions(
+    PermissionAction.SECRETS_READ,
+    '*'
+  )
+  const { data: keys = [], isSuccess: isAPIKeysSuccess } = useAPIKeysQuery(
     { projectRef: ref, reveal: true },
     { enabled: canReadAPIKeys }
   )
@@ -61,6 +64,14 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
   })
 
   const legacyServiceRole = keys.find((x) => x.name === 'service_role')?.api_key ?? '[YOUR API KEY]'
+
+  // The service role key is only "final" once we know we're not still waiting on
+  // it: either the API keys query has completed, or the user doesn't have
+  // permission to read it at all (so it will never resolve to a real value).
+  // Without this, if the edge functions list loads before the API keys do, the
+  // default header below could get written with the `[YOUR API KEY]` placeholder
+  // and then never get corrected once the real key arrives.
+  const isServiceRoleKeyResolved = isPermissionsSuccess && (!canReadAPIKeys || isAPIKeysSuccess)
 
   const httpUrl = useWatch({ control: form.control, name: 'http_url' })
 
@@ -77,17 +88,24 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
   // updated `httpHeaders`, re-triggered the effect, and got reverted back to the
   // computed service role token. See: header value appears "stuck" and uneditable.
   useEffect(() => {
-    if (!isSuccessEdgeFunctions) return
+    if (!isSuccessEdgeFunctions || !isServiceRoleKeyResolved) return
 
     const isEdgeFunctionSelected = isEdgeFunctionUrl(httpUrl, ref ?? '', restUrl)
     if (!httpUrl || !isEdgeFunctionSelected) return
 
-    const fnSlug = httpUrl.split('/').at(-1)
+    // Drop empty segments so a trailing slash on the URL doesn't turn the slug
+    // into an empty string (which would never match a function).
+    const pathSegments = httpUrl.split('/').filter(Boolean)
+    const fnSlug = pathSegments.at(-1)
     const fn = functions.find((x) => x.slug === fnSlug)
     if (!fn?.verify_jwt) return
 
     const currentHeaders = form.getValues('httpHeaders')
-    const authorizationHeader = currentHeaders.find((x) => x.name === 'Authorization')
+    // Header names are case-insensitive, so an existing lowercase/mixed-case
+    // "authorization" row still counts as already present.
+    const authorizationHeader = currentHeaders.find(
+      (x) => x.name.toLowerCase() === 'authorization'
+    )
     if (authorizationHeader != null) return
 
     const newAuthHeader = {
@@ -96,7 +114,16 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
       value: `Bearer ${legacyServiceRole}`,
     }
     form.setValue('httpHeaders', [...currentHeaders, newAuthHeader])
-  }, [form, functions, httpUrl, isSuccessEdgeFunctions, legacyServiceRole, ref, restUrl])
+  }, [
+    form,
+    functions,
+    httpUrl,
+    isServiceRoleKeyResolved,
+    isSuccessEdgeFunctions,
+    legacyServiceRole,
+    ref,
+    restUrl,
+  ])
 
   return (
     <div>
