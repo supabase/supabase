@@ -194,7 +194,7 @@ export const AssistantChat = ({
       state.setContext({
         projectRef: supportMetadata.projectRef,
         orgSlug: supportMetadata.organizationSlug,
-        connectionString: supportChatProjectDetail.connectionString ?? undefined,
+        connectionString: supportChatProjectDetail?.connectionString ?? undefined,
       })
       return
     }
