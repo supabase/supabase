@@ -170,17 +170,17 @@ export const AssistantChat = ({
   const isSupportChatProjectReady = isProjectReadyForAssistant(supportChatProjectDetail)
   const isResolvingSupportChatConnectionString = isOrgViewSupportChat && !isSupportChatProjectReady
 
-  // Table browsing needs the same org-view support chat fallback as the send context below,
-  // otherwise the assistant has no schema awareness for a support chat opened from an org page.
-  const tablesProjectRef = isOrgViewSupportChat ? supportMetadata?.projectRef : project?.ref
-  const tablesConnectionString = isOrgViewSupportChat
+  // The project this chat is actually scoped to — falls back to the support chat's own
+  // resolved project on org-level pages, where `project` from the URL is undefined.
+  const resolvedProjectRef = isOrgViewSupportChat ? supportMetadata?.projectRef : project?.ref
+  const resolvedConnectionString = isOrgViewSupportChat
     ? supportChatProjectDetail?.connectionString
     : project?.connectionString
 
   const { data: tables } = useTablesQuery(
     {
-      projectRef: tablesProjectRef,
-      connectionString: tablesConnectionString,
+      projectRef: resolvedProjectRef,
+      connectionString: resolvedConnectionString,
       schema: 'public',
     },
     { enabled: isApiKeySet && (!isOrgViewSupportChat || isSupportChatProjectReady) }
@@ -315,7 +315,7 @@ export const AssistantChat = ({
 
   const handleRateMessage = useCallback(
     async (messageId: string, rating: 'positive' | 'negative', reason?: string) => {
-      if (!project?.ref || !selectedOrganization?.slug) return
+      if (!resolvedProjectRef || !selectedOrganization?.slug) return
 
       // Optimistically update UI
       setMessageRatings((prev) => ({ ...prev, [messageId]: rating }))
@@ -325,7 +325,7 @@ export const AssistantChat = ({
           rating,
           messages: chatMessages,
           messageId,
-          projectRef: project.ref,
+          projectRef: resolvedProjectRef,
           orgSlug: selectedOrganization.slug,
           reason,
           spanId: state.messageSpanIds[messageId],
@@ -346,7 +346,15 @@ export const AssistantChat = ({
         })
       }
     },
-    [chatMessages, project?.ref, selectedOrganization?.slug, rateMessage, track, state, chatId]
+    [
+      chatMessages,
+      resolvedProjectRef,
+      selectedOrganization?.slug,
+      rateMessage,
+      track,
+      state,
+      chatId,
+    ]
   )
 
   const isContextExceededError =
@@ -513,7 +521,7 @@ export const AssistantChat = ({
       sentryContext={{
         component: 'AIAssistant',
         feature: 'AI Assistant Panel',
-        projectRef: project?.ref,
+        projectRef: resolvedProjectRef,
         organizationSlug: selectedOrganization?.slug,
       }}
       actions={[
