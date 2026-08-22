@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { toast } from 'sonner'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -273,5 +273,37 @@ describe('TemplateEditor reset to default', () => {
     expect(within(dialog).getByText('Unable to reset email template')).toBeInTheDocument()
     expect(within(dialog).getByRole('button', { name: 'Reset' })).toBeInTheDocument()
     expect(toast.error).not.toHaveBeenCalled()
+  })
+})
+
+describe('TemplateEditor link validation', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    validateSpamMock.mockImplementation((_vars, callbacks) => callbacks?.onSuccess?.({ rules: [] }))
+  })
+
+  it('warns when the body appends parameters after ConfirmationURL', async () => {
+    renderTemplateEditor()
+
+    fireEvent.change(screen.getByLabelText('Body source'), {
+      target: {
+        value:
+          '<p><a href="{{ .ConfirmationURL }}/?token_hash={{ .TokenHash }}">Reset password</a></p>',
+      },
+    })
+
+    expect(
+      await screen.findByText('These template variables will not produce the expected link')
+    ).toBeInTheDocument()
+  })
+
+  it('does not warn when the body uses ConfirmationURL on its own', () => {
+    renderTemplateEditor({
+      body: '<p><a href="{{ .ConfirmationURL }}">Confirm email address</a></p>',
+    })
+
+    expect(
+      screen.queryByText('These template variables will not produce the expected link')
+    ).not.toBeInTheDocument()
   })
 })
