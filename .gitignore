@@ -177,3 +177,4 @@ docker/auth.env
 docker/az-*/*.env*
 docker/az-*/auth.env
 docker/az-*/.env.unified-auth
+supabase-sync/logs/

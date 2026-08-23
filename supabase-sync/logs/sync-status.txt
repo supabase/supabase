@@ -1,6 +1,0 @@
-timestamp=2026-07-21 05:42:41
-local_storage=/opt/supabase/supabase-data/storage
-cloud1_url=https://zrrffsjbfkphridqyais.supabase.co
-cloud1_bucket=cloud-1
-cloud2_url=https://bxuhcbfdoaflsgbxiqei.supabase.co
-cloud2_bucket=cloud-2
