@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { HttpResponse } from 'msw'
 import { describe, expect, it, vi } from 'vitest'
@@ -122,10 +122,10 @@ describe('NotebookProposalRenderer', () => {
     expect(onApprove).not.toHaveBeenCalled()
   })
 
-  it('withholds Apply changes when the update cannot be applied as written', async () => {
-    const user = userEvent.setup()
+  it('withholds Apply changes and auto-denies with the failure reason when the update cannot be applied as written', async () => {
     const onApprove = vi.fn()
     const onDeny = vi.fn()
+    const denyWithReason = vi.fn()
     mockContentItem(mockNotebookRow())
 
     render(
@@ -141,14 +141,69 @@ describe('NotebookProposalRenderer', () => {
         output={undefined}
         onApprove={onApprove}
         onDeny={onDeny}
+        denyWithReason={denyWithReason}
       />
     )
 
     expect(await screen.findByText("This update can't be applied as written")).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Apply changes' })).not.toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Skip' }))
-    expect(onDeny).toHaveBeenCalledTimes(1)
+    expect(denyWithReason).toHaveBeenCalledWith(
+      'No cell with id "missing" exists in this notebook.'
+    )
+    expect(onDeny).not.toHaveBeenCalled()
     expect(onApprove).not.toHaveBeenCalled()
+  })
+
+  it('falls back to sending the failure reason through Skip if auto-deny did not resolve the approval', async () => {
+    const user = userEvent.setup()
+    const denyWithReason = vi.fn()
+    mockContentItem(mockNotebookRow())
+
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="approval-requested"
+        confirmState="approval-requested"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'missing' }],
+        }}
+        output={undefined}
+        denyWithReason={denyWithReason}
+      />
+    )
+
+    const skipButton = await screen.findByRole('button', { name: 'Skip' })
+    denyWithReason.mockClear()
+    await user.click(skipButton)
+
+    expect(denyWithReason).toHaveBeenCalledWith(
+      'No cell with id "missing" exists in this notebook.'
+    )
+  })
+
+  it('does not auto-deny an unapplyable update once it has already been responded to', async () => {
+    const denyWithReason = vi.fn()
+    mockContentItem(mockNotebookRow())
+
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="approval-responded"
+        confirmState={undefined}
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'missing' }],
+        }}
+        output={undefined}
+        denyWithReason={denyWithReason}
+      />
+    )
+
+    await screen.findByText("This update can't be applied as written")
+    expect(denyWithReason).not.toHaveBeenCalled()
   })
 
   it('keeps the create preview and marks it successful once output is available', () => {
@@ -200,8 +255,35 @@ describe('NotebookProposalRenderer', () => {
     )
   })
 
-  it('shows the notebook action after an automatic update succeeds', async () => {
-    mockContentItem(mockNotebookRow())
+  it('shows the notebook action after an automatic update succeeds', () => {
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="output-available"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
+        }}
+        output={{ id: NOTEBOOK_ID, name: 'Signup funnel' }}
+      />
+    )
+
+    expect(screen.getByRole('link', { name: 'Open notebook' })).toHaveAttribute(
+      'href',
+      `/project/default/explorer/notebook/${NOTEBOOK_ID}`
+    )
+  })
+
+  it('does not show the "can\'t be applied" warning for a completed update whose target cell no longer exists', async () => {
+    mockContentItem(
+      mockNotebookRow({
+        content: {
+          schema_version: 1,
+          cells: [{ _tag: 'markdown_cell', _id: 'cell-2', text: 'world' }],
+        },
+      })
+    )
 
     render(
       <NotebookProposalRenderer
@@ -216,10 +298,220 @@ describe('NotebookProposalRenderer', () => {
       />
     )
 
-    expect(await screen.findByRole('link', { name: 'Open notebook' })).toHaveAttribute(
+    await waitFor(() => expect(screen.queryByText('Loading notebook...')).not.toBeInTheDocument())
+    expect(screen.queryByText("This update can't be applied as written")).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Open notebook' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Open notebook' })).toHaveAttribute(
       'href',
       `/project/default/explorer/notebook/${NOTEBOOK_ID}`
     )
+  })
+
+  it('shows the notebook action inside the Confirm footer for a manually approved completed update', async () => {
+    mockContentItem(
+      mockNotebookRow({
+        content: {
+          schema_version: 1,
+          cells: [{ _tag: 'markdown_cell', _id: 'cell-2', text: 'world' }],
+        },
+      })
+    )
+
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="output-available"
+        confirmState="success"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
+        }}
+        output={{ id: NOTEBOOK_ID, name: 'Signup funnel' }}
+      />
+    )
+
+    const openNotebookLink = await screen.findByRole('link', { name: 'Open notebook' })
+    expect(openNotebookLink).toHaveAttribute(
+      'href',
+      `/project/default/explorer/notebook/${NOTEBOOK_ID}`
+    )
+    expect(screen.queryByText("This update can't be applied as written")).not.toBeInTheDocument()
+  })
+
+  it('renders the snapshot-derived diff for a completed delete_cell update, without fetching the notebook', () => {
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="output-available"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
+        }}
+        output={{
+          id: NOTEBOOK_ID,
+          name: 'Signup funnel',
+          previous_content: {
+            schema_version: 1,
+            cells: [
+              { _tag: 'markdown_cell', _id: 'cell-1', text: 'hello' },
+              { _tag: 'markdown_cell', _id: 'cell-2', text: 'world' },
+            ],
+          },
+        }}
+      />
+    )
+
+    expect(screen.getByText('−1')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Open notebook' })).toHaveAttribute(
+      'href',
+      `/project/default/explorer/notebook/${NOTEBOOK_ID}`
+    )
+  })
+
+  it('renders a single added cell for a completed insert_cell update, not a phantom duplicate', () => {
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="output-available"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [
+            {
+              _tag: 'insert_cell',
+              after_cell_id: 'cell-1',
+              cell: { _tag: 'markdown_cell', text: 'new section' },
+            },
+          ],
+        }}
+        output={{
+          id: NOTEBOOK_ID,
+          name: 'Signup funnel',
+          previous_content: {
+            schema_version: 1,
+            cells: [{ _tag: 'markdown_cell', _id: 'cell-1', text: 'hello' }],
+          },
+        }}
+      />
+    )
+
+    expect(screen.getByText('+1')).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Added Markdown cell' })).toHaveLength(1)
+  })
+
+  it('falls back to the compact completed body when previous_content is absent', () => {
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="output-available"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
+        }}
+        output={{ id: NOTEBOOK_ID, name: 'Signup funnel' }}
+      />
+    )
+
+    expect(screen.getByText('Notebook updated: Signup funnel')).toBeInTheDocument()
+    expect(screen.queryByText("This update can't be applied as written")).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Open notebook' })).toBeInTheDocument()
+  })
+
+  it('falls back to the compact completed body when the snapshot no longer matches the operations', () => {
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="output-available"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'missing' }],
+        }}
+        output={{
+          id: NOTEBOOK_ID,
+          name: 'Signup funnel',
+          previous_content: {
+            schema_version: 1,
+            cells: [{ _tag: 'markdown_cell', _id: 'cell-1', text: 'hello' }],
+          },
+        }}
+      />
+    )
+
+    expect(screen.getByText('Notebook updated: Signup funnel')).toBeInTheDocument()
+    expect(screen.queryByText("This update can't be applied as written")).not.toBeInTheDocument()
+    expect(screen.queryByText('Preview unavailable')).not.toBeInTheDocument()
+  })
+
+  it('falls back to the compact completed body when the output id does not match the requested notebook', () => {
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="output-available"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
+        }}
+        output={{
+          id: 'some-other-notebook-id',
+          name: 'Signup funnel',
+          previous_content: {
+            schema_version: 1,
+            cells: [
+              { _tag: 'markdown_cell', _id: 'cell-1', text: 'hello' },
+              { _tag: 'markdown_cell', _id: 'cell-2', text: 'world' },
+            ],
+          },
+        }}
+      />
+    )
+
+    expect(screen.getByText('Notebook updated: Signup funnel')).toBeInTheDocument()
+    expect(screen.queryByText('−1')).not.toBeInTheDocument()
+  })
+
+  it('derives the diff against live content for a denied update', async () => {
+    mockContentItem(mockNotebookRow())
+
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="output-denied"
+        confirmState="denied"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
+        }}
+        output={undefined}
+      />
+    )
+
+    expect(await screen.findByText('−1')).toBeInTheDocument()
+  })
+
+  it('derives the diff against live content for an errored update', async () => {
+    mockContentItem(mockNotebookRow())
+
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="output-error"
+        confirmState="error"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
+        }}
+        output={undefined}
+      />
+    )
+
+    expect(await screen.findByText('−1')).toBeInTheDocument()
   })
 
   it('keeps the create preview and marks it failed when the tool errors', () => {

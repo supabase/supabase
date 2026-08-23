@@ -38,10 +38,11 @@ const wireLogCell = (id: string): CellWire => ({
   time_range: { _tag: 'relative_time_range', unit: 'day', amount: 7 },
 })
 
-const agentDatabaseCell = (): AgentCell => ({
+const agentDatabaseCell = (database_identifier?: string): AgentCell => ({
   _tag: 'database_cell',
   sql: 'select 1',
   row_limit: 100,
+  database_identifier,
 })
 
 describe('getEntryKey', () => {
@@ -145,26 +146,26 @@ describe('getEntryMetadataLine', () => {
     ).toBe('Database: replica-3')
   })
 
-  it('returns a before → after pair when a replacement drops the database metadata', () => {
+  it('returns a before → after pair when a replacement changes only metadata', () => {
     expect(
       getEntryMetadataLine({
         _tag: 'replaced',
         before: wireDatabaseCell('cell-1', 'Signups', 'primary'),
-        after: agentDatabaseCell(),
+        after: agentDatabaseCell('replica-3'),
         operationIndex: 0,
       })
-    ).toBe('Database: primary → No metadata')
+    ).toBe('Database: primary → Database: replica-3')
   })
 
   it('returns a single line when replacement metadata is unchanged', () => {
     expect(
       getEntryMetadataLine({
         _tag: 'replaced',
-        before: wireDatabaseCell('cell-1', undefined, undefined),
-        after: agentDatabaseCell(),
+        before: wireDatabaseCell('cell-1', 'Signups', 'primary'),
+        after: agentDatabaseCell('primary'),
         operationIndex: 0,
       })
-    ).toBe(null)
+    ).toBe('Database: primary')
   })
 })
 

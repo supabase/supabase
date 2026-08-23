@@ -7,12 +7,11 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { TOKEN_DENIED_REMEDIATION } from '../AccessToken.constants'
 import { scopesToSelection, type ResourceAccessMode } from '../AccessToken.permissions'
 import { useCapabilitySummary } from '../hooks/useCapabilitySummary'
-import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
 import { useTokenAccessEvaluation } from '../hooks/useTokenAccessEvaluation'
 import {
-  ResourceAccessPills,
+  OrganizationAccessPill,
+  ProjectAccessPill,
   useResourceAccessWrap,
-  type ResourceAccessPillItem,
 } from './ResourceAccessPills'
 import { CapabilitiesSection } from './TokenCapabilities/CapabilitiesSection'
 import { CapabilityLevelToggle } from './TokenCapabilities/CapabilityLevelToggle'
@@ -23,13 +22,14 @@ import {
   type CapabilityLevelFilter,
 } from './TokenCapabilities/TokenCapabilities.utils'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useProjectsInfiniteQuery } from '@/data/projects/projects-infinite-query'
 import {
   getEnabledMcpTools,
   useGetEnabledEndpointsForCapability,
 } from '@/data/scoped-access-tokens/permission-scope-map-query'
 import { useScopedAccessTokenQuery } from '@/data/scoped-access-tokens/scoped-access-token-query'
 import { DOCS_URL } from '@/lib/constants'
-import { pluralize } from '@/lib/helpers'
 
 interface ViewTokenSheetProps {
   visible: boolean
@@ -63,7 +63,23 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
 
   // The sheet stays mounted (hidden) on the tokens page; don't fetch org/project data until it's
   // actually opened on a token.
-  const { organizations, projects } = useOrgAndProjectData({ enabled: visible && !!token })
+  const { data: organizations = [] } = useOrganizationsQuery({ enabled: visible && !!token })
+  const { data: projectsData } = useProjectsInfiniteQuery(
+    {
+      limit: 1,
+    },
+    { enabled: visible && !!token }
+  )
+
+  const hasTooManyProjects = useMemo(() => {
+    if (!projectsData) {
+      return false
+    }
+    if (projectsData.pages.length === 0) {
+      return false
+    }
+    return projectsData.pages[0].pagination.count > 100
+  }, [projectsData])
 
   const resourceAccess = token ? SCOPE_TO_RESOURCE_ACCESS[token.scope] : 'project'
   const grantedScopes = useMemo(() => token?.permissions ?? [], [token?.permissions])
@@ -109,55 +125,6 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
   })
   const capabilityTier = getCapabilityDensityTier(capabilities.length)
   const [levelFilter, setLevelFilter] = useState<CapabilityLevelFilter>('all')
-
-  // Accessible resources render with their name. Resources the user has lost access to are
-  // aggregated into an anonymous count — their identifiers aren't shown.
-  const resourceItems = useMemo<ResourceAccessPillItem[]>(() => {
-    const inaccessibleCountItem = (lostCount: number, noun: string) =>
-      lostCount === 0
-        ? []
-        : [
-            {
-              key: 'inaccessible',
-              label: `${lostCount} ${pluralize(lostCount, noun)}`,
-              isInaccessible: true,
-            },
-          ]
-
-    if (resourceAccess === 'project') {
-      const projectsByRef = new Map(projects.map((project) => [project.ref, project]))
-      const accessible = tokenProjectRefs.flatMap((ref) => {
-        const name = projectsByRef.get(ref)?.name
-        if (name === undefined) return []
-        return [{ key: ref, label: name }]
-      })
-      return [
-        ...accessible,
-        ...inaccessibleCountItem(access.inaccessibleProjectRefs.length, 'project'),
-      ]
-    }
-    if (resourceAccess === 'organization') {
-      const organizationsBySlug = new Map(organizations.map((org) => [org.slug, org]))
-      const accessible = tokenOrganizationSlugs.flatMap((slug) => {
-        const name = organizationsBySlug.get(slug)?.name
-        if (name === undefined) return []
-        return [{ key: slug, label: name }]
-      })
-      return [
-        ...accessible,
-        ...inaccessibleCountItem(access.inaccessibleOrgSlugs.length, 'organization'),
-      ]
-    }
-    return [{ key: 'account', label: 'Account-level access' }]
-  }, [
-    resourceAccess,
-    tokenProjectRefs,
-    tokenOrganizationSlugs,
-    projects,
-    organizations,
-    access.inaccessibleProjectRefs,
-    access.inaccessibleOrgSlugs,
-  ])
 
   const enabledMcpTools = useMemo(
     () => getEnabledMcpTools({ grantedScopes, permissionScopeMap }).sort(),
@@ -222,7 +189,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                     description={`${boundResourcesDeletedText}. ${TOKEN_DENIED_REMEDIATION}`}
                   />
                 )}
-                {access.hasNoAccessibleResource && (
+                {!hasTooManyProjects && access.hasNoAccessibleResource && (
                   <Admonition
                     type="destructive"
                     title="This token no longer has access"
@@ -299,11 +266,20 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                           ref={pillsRef}
                           className="flex flex-wrap justify-start gap-1.5 sm:justify-end"
                         >
-                          <ResourceAccessPills
-                            resourceAccess={resourceAccess}
-                            items={resourceItems}
-                            emptyText={hasNoBoundResources ? boundResourcesDeletedText : '-'}
-                          />
+                          {resourceAccess === 'organization'
+                            ? tokenOrganizationSlugs.map((orgSlug) => (
+                                <OrganizationAccessPill
+                                  key={orgSlug}
+                                  slug={orgSlug}
+                                  organization={organizations.find((org) => org.slug === orgSlug)}
+                                />
+                              ))
+                            : null}
+                          {resourceAccess === 'project'
+                            ? tokenProjectRefs.map((projectRef) => (
+                                <ProjectAccessPill key={projectRef} projectRef={projectRef} />
+                              ))
+                            : null}
                         </div>
                       </dd>
                     </div>

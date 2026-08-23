@@ -411,15 +411,42 @@ function createMockNotebookStore() {
 
 type MockNotebookStore = ReturnType<typeof createMockNotebookStore>
 
+const MOCK_DATABASES_DATA = [
+  {
+    identifier: 'mock-project-ref',
+    is_primary: true,
+    region: 'us-east-1',
+    status: 'ACTIVE_HEALTHY',
+  },
+  {
+    identifier: 'mock-project-ref-replica-1',
+    is_primary: false,
+    region: 'us-west-1',
+    status: 'ACTIVE_HEALTHY',
+  },
+]
+
 // All notebook tools are real, locally-defined ai-SDK tools, so wrap them and
 // override only execute/needsApproval — evals must validate the model's arguments
 // against the exact schemas production uses (agentCellSchema's `.strict()` rejection of
 // agent-authored cell ids, update_notebook's real operations schema, etc).
 function createMockNotebookTools(store: MockNotebookStore) {
-  const { list_notebooks, get_notebook, run_notebook, create_notebook, update_notebook } =
-    getNotebookTools({ aiOptInLevel: 'schema_and_log_and_data' })
+  const {
+    list_databases,
+    list_notebooks,
+    get_notebook,
+    run_notebook,
+    create_notebook,
+    update_notebook,
+  } = getNotebookTools({ aiOptInLevel: 'schema_and_log_and_data' })
 
   return {
+    list_databases: {
+      ...list_databases,
+      execute: async (_args: object, _options: ToolExecutionOptions<unknown>) => ({
+        databases: MOCK_DATABASES_DATA,
+      }),
+    },
     list_notebooks: {
       ...list_notebooks,
       execute: async (
