@@ -53,7 +53,6 @@ const baseSchema = z.object({
   DISABLE_SIGNUP: z.boolean(),
   EXTERNAL_ANONYMOUS_USERS_ENABLED: z.boolean(),
   SECURITY_MANUAL_LINKING_ENABLED: z.boolean(),
-
   PASSWORD_MIN_LENGTH: z
     .preprocess(
       (val) => (val === '' || val == null ? undefined : val),
