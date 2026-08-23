@@ -32,8 +32,24 @@ const executeSqlSanitizer: ToolSanitizer = {
   },
 }
 
+// `previous_content` is UI-only and must never reach the model — `toModelOutput` on the
+// tool covers the same turn, but history replay skips it, so it's stripped here too.
+const updateNotebookSanitizer: ToolSanitizer = {
+  toolName: 'update_notebook',
+  sanitize: (tool) => {
+    if (!tool.output || typeof tool.output !== 'object') return tool
+
+    const { previous_content, ...sanitizedOutput } = tool.output as Record<string, unknown>
+    return {
+      ...tool,
+      output: sanitizedOutput,
+    }
+  },
+}
+
 export const ALL_TOOL_SANITIZERS = {
   [executeSqlSanitizer.toolName]: executeSqlSanitizer,
+  [updateNotebookSanitizer.toolName]: updateNotebookSanitizer,
 }
 
 export function sanitizeMessagePart(

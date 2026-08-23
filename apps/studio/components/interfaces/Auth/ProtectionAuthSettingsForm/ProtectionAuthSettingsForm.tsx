@@ -53,19 +53,7 @@ const baseSchema = z.object({
   DISABLE_SIGNUP: z.boolean(),
   EXTERNAL_ANONYMOUS_USERS_ENABLED: z.boolean(),
   SECURITY_MANUAL_LINKING_ENABLED: z.boolean(),
-  SESSIONS_TIMEBOX: z
-    .preprocess(
-      (val) => (val === '' || val == null ? undefined : val),
-      z.coerce
-        .number({
-          required_error: 'Must have a sessions timebox',
-          invalid_type_error: 'Must have a sessions timebox',
-        })
-        .min(0, 'Must be greater than or equal to 0.')
-    )
-    .optional(),
-  SESSIONS_INACTIVITY_TIMEOUT: z.number().min(0, 'Must be greater than or equal to 0').optional(),
-  SESSIONS_SINGLE_PER_USER: z.boolean().optional(),
+
   PASSWORD_MIN_LENGTH: z
     .preprocess(
       (val) => (val === '' || val == null ? undefined : val),
@@ -140,9 +128,6 @@ export const ProtectionAuthSettingsForm = () => {
       SECURITY_CAPTCHA_ENABLED: false,
       SECURITY_CAPTCHA_SECRET: '',
       SECURITY_CAPTCHA_PROVIDER: 'hcaptcha',
-      SESSIONS_TIMEBOX: 0,
-      SESSIONS_INACTIVITY_TIMEOUT: 0,
-      SESSIONS_SINGLE_PER_USER: false,
       PASSWORD_MIN_LENGTH: 6,
       PASSWORD_REQUIRED_CHARACTERS: NO_REQUIRED_CHARACTERS,
       PASSWORD_HIBP_ENABLED: false,
@@ -164,9 +149,6 @@ export const ProtectionAuthSettingsForm = () => {
           SECURITY_CAPTCHA_ENABLED: authConfig.SECURITY_CAPTCHA_ENABLED,
           SECURITY_CAPTCHA_SECRET: authConfig.SECURITY_CAPTCHA_SECRET || '',
           SECURITY_CAPTCHA_PROVIDER,
-          SESSIONS_TIMEBOX: authConfig.SESSIONS_TIMEBOX || 0,
-          SESSIONS_INACTIVITY_TIMEOUT: authConfig.SESSIONS_INACTIVITY_TIMEOUT || 0,
-          SESSIONS_SINGLE_PER_USER: authConfig.SESSIONS_SINGLE_PER_USER || false,
           PASSWORD_MIN_LENGTH: authConfig.PASSWORD_MIN_LENGTH || 6,
           PASSWORD_REQUIRED_CHARACTERS:
             authConfig.PASSWORD_REQUIRED_CHARACTERS || NO_REQUIRED_CHARACTERS,
@@ -180,9 +162,6 @@ export const ProtectionAuthSettingsForm = () => {
           SECURITY_CAPTCHA_ENABLED: authConfig.SECURITY_CAPTCHA_ENABLED,
           SECURITY_CAPTCHA_SECRET: authConfig.SECURITY_CAPTCHA_SECRET || '',
           SECURITY_CAPTCHA_PROVIDER,
-          SESSIONS_TIMEBOX: authConfig.SESSIONS_TIMEBOX || 0,
-          SESSIONS_INACTIVITY_TIMEOUT: authConfig.SESSIONS_INACTIVITY_TIMEOUT || 0,
-          SESSIONS_SINGLE_PER_USER: authConfig.SESSIONS_SINGLE_PER_USER || false,
           PASSWORD_MIN_LENGTH: authConfig.PASSWORD_MIN_LENGTH || 6,
           PASSWORD_REQUIRED_CHARACTERS:
             authConfig.PASSWORD_REQUIRED_CHARACTERS || NO_REQUIRED_CHARACTERS,

@@ -35,7 +35,7 @@ export const ExperimentalTokenDropdown = ({ onCreateToken }: ExperimentalTokenDr
               <Button
                 variant="primary"
                 aria-label="Choose token scope"
-                className="-ml-px rounded-l-none px-[4px] py-[5px] focus-visible:z-10"
+                className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
                 icon={<ChevronDown />}
               />
             </DropdownMenuTrigger>

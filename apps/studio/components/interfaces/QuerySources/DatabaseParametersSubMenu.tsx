@@ -9,6 +9,7 @@ import {
   DropdownMenuSubTrigger,
 } from 'ui'
 
+import { getAddReadReplicaPath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from '@/data/read-replicas/replicas.utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -38,7 +39,7 @@ export const DatabaseParametersSubMenu = ({
   const selectedDatabaseId = identifier ?? projectRef
   const selectedDatabase = databases.find((db) => db.identifier === selectedDatabaseId)
 
-  const newReplicaURL = `/project/${projectRef}/database/replication?destinationType=Read+Replica`
+  const newReplicaURL = getAddReadReplicaPath(projectRef)
 
   return (
     <DropdownMenuSub>

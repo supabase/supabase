@@ -113,7 +113,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
       render={({ field }) => (
         <div className="@container">
           <RadioGroupCard
-            {...field}
+            value={field.value}
             onValueChange={(value: ComputeInstanceAddonVariantId) => {
               setValue('computeSize', value, {
                 shouldDirty: true,
@@ -122,7 +122,6 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
               trigger('provisionedIOPS')
               trigger('throughput')
             }}
-            defaultValue={field.value}
             disabled={disabled}
             className={cn(
               !addonsError && 'grid grid-cols-2 gap-4 @[680px]:grid-cols-3 @[900px]:grid-cols-4'
@@ -215,7 +214,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                 </HoverCard>
                               )}
                               <div className="w-full flex flex-col gap-3 justify-between">
-                                <div className="relative px-3 opacity-50 group-data-checked:opacity-100 flex justify-between">
+                                <div className="relative px-3 opacity-50 group-data-[state=checked]:opacity-100 flex justify-between">
                                   <ComputeBadge
                                     className="inline-flex font-semibold"
                                     infraComputeSize={compute.name as InfraInstanceSize}
@@ -288,7 +287,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                 <div
                   className={cn(
                     'relative text-sm text-left flex flex-col gap-0 px-0 py-3 w-full h-[110px]',
-                    'bg-overlay rounded-md border p-2 hover:border-foreground-muted'
+                    'bg-overlay rounded-md border p-2 hover:border-control-hover'
                   )}
                 >
                   <SupportLink

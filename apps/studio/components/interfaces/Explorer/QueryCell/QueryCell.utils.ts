@@ -17,13 +17,13 @@ export const DEFAULT_CELL_ROW_LIMIT = 100
  * Valtio snapshots are deep-readonly. Readonly properties assign to mutable ones, so only
  * the array needs rebuilding to turn a snapshot's chart back into a writable config.
  */
-type ReadonlyChartConfig = Omit<ChartConfig, 'y_columns'> & {
-  readonly y_columns: readonly string[]
+type ReadonlyChartConfig = Omit<ChartConfig, 'y_series'> & {
+  readonly y_series: readonly string[]
 }
 
 export const cloneChartConfig = (
   chart: ReadonlyChartConfig | undefined
-): ChartConfig | undefined => (chart ? { ...chart, y_columns: [...chart.y_columns] } : undefined)
+): ChartConfig | undefined => (chart ? { ...chart, y_series: [...chart.y_series] } : undefined)
 
 /** The display state a query cell hands the shared editor. */
 // `view` is already defaulted to 'table' by the domain transform, so there is nothing to
@@ -35,7 +35,7 @@ export const getCellDisplay = (cell: Snapshot<QueryCell>): QueryDisplay => ({
 
 /** Fields every query cell carries, copied out of a snapshot so the result is writable. */
 const copyQueryCellBase = (cell: Snapshot<QueryCell>) => ({
-  id: cell.id,
+  _id: cell._id,
   title: cell.title,
   view: cell.view,
   chart: cloneChartConfig(cell.chart),
@@ -113,6 +113,22 @@ export function setCellSql(cell: Snapshot<QueryCell>, sql: string): QueryCell {
     _tag: 'database_cell',
     unchecked_sql: untrustedSql(sql),
     row_limit: cell.row_limit,
+    database_identifier: cell.database_identifier,
+  }
+}
+
+/**
+ * Writes a new row limit onto a database cell. A log cell has no row limit concept, so it
+ * passes through unchanged.
+ */
+export function setCellRowLimit(cell: Snapshot<QueryCell>, rowLimit: number): QueryCell {
+  if (cell._tag === 'log_cell') return cloneQueryCell(cell)
+
+  return {
+    ...copyQueryCellBase(cell),
+    _tag: 'database_cell',
+    unchecked_sql: cell.unchecked_sql,
+    row_limit: rowLimit,
     database_identifier: cell.database_identifier,
   }
 }
