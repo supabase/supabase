@@ -52,7 +52,7 @@ import {
   ExplorerToolbarIcon,
   ExplorerToolbarTitle,
 } from './ExplorerToolbar'
-import { useLoadNotebook } from './hooks'
+import { useCreateChat, useLoadNotebook } from './hooks'
 import { MarkdownCell } from './MarkdownCell'
 import { QueryCell } from './QueryCell'
 import { type QueryEditorHandle } from './QueryEditor'
@@ -79,6 +79,7 @@ export const ExplorerNotebookTab = () => {
   const { id, ref } = useParams()
   const tabs = useTabsStateSnapshot()
   const snap = useNotebooksStateSnapshot()
+  const { createChat } = useCreateChat()
 
   const [isIntellisenseEnabled, setIsIntellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
@@ -293,7 +294,15 @@ export const ExplorerNotebookTab = () => {
         </ExplorerToolbarIcon>
         <ExplorerToolbarTitle onSaveTitle={handleSaveTitle}>{name ?? ''}</ExplorerToolbarTitle>
         <ExplorerToolbarActions>
-          <ExplorerToolbarAction icon={<AiIconAnimation size={16} />}>
+          <ExplorerToolbarAction
+            icon={<AiIconAnimation size={16} />}
+            onClick={() => {
+              createChat({
+                name: `Analyze ${name} notebook`,
+                initialMessage: `Run the notebook "${name}" (id: ${id}) and analyze the results. Summarize the key findings per cell, calling out anomalies or trends, and use any markdown cells for context. Skip or flag any cell that would mutate data rather than running it.`,
+              })
+            }}
+          >
             Analyze
           </ExplorerToolbarAction>
           <ExplorerToolbarAction
