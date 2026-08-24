@@ -26,8 +26,8 @@ export const SSOAdvancedSettings = ({ form }: { form: UseFormReturn<SSOConfigFor
       render={({ field }) => (
         <FormItemLayout
           layout="flex-row-reverse"
-          label="IDJAG Issuer"
-          description="The IDJAG issuer URL of your identity provider."
+          label="ID-JAG Issuer"
+          description="The ID-JAG issuer URL of your identity provider."
         >
           <FormControl>
             <Input placeholder="https://your-org.okta.com" {...field} />
