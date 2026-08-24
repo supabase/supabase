@@ -290,6 +290,11 @@ function createChatInstance(
     )
   )
 
+  // The project a pending request's tool calls actually ran against — captured when the
+  // request is sent, not re-read from (mutable) state.context in onFinish, since the user
+  // can switch projects while the request is still in flight.
+  let requestProjectRef: string | undefined
+
   return new Chat<MessageType>({
     id: options.id,
     messages: options.initialMessages.map((message) => sanitizeForCloning(message)),
@@ -311,6 +316,8 @@ function createChatInstance(
 
         // Get the chat specific to this request to ensure we have the correct name
         const chat = state.chats[options.id]
+
+        requestProjectRef = state.context.projectRef
 
         return {
           ...opts,
@@ -382,7 +389,7 @@ function createChatInstance(
             .catch(() => {})
         }
 
-        const projectRef = state.context.projectRef
+        const projectRef = requestProjectRef
         if (projectRef) {
           const effects = collectNotebookCacheEffects(messages, processedNotebookToolCallIds)
           effects.forEach((effect) => processedNotebookToolCallIds.add(effect.toolCallId))

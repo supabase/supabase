@@ -9,6 +9,7 @@ import type { Notebook } from '@/state/notebooks/types'
 
 const testContext = vi.hoisted(() => ({
   queuedStreams: [] as Array<Array<UIMessageChunk>>,
+  onSend: undefined as (() => void) | undefined,
 }))
 
 vi.mock('ai', async (importOriginal) => {
@@ -16,7 +17,20 @@ vi.mock('ai', async (importOriginal) => {
   return {
     ...actual,
     DefaultChatTransport: class {
-      async sendMessages() {
+      constructor(private options: any = {}) {}
+      async sendMessages(opts: any) {
+        await this.options.prepareSendMessagesRequest?.({
+          api: this.options.api,
+          id: opts.chatId,
+          messages: opts.messages,
+          body: { ...this.options.body, ...opts.body },
+          headers: {},
+          credentials: undefined,
+          requestMetadata: opts.metadata,
+          trigger: opts.trigger,
+          messageId: opts.messageId,
+        })
+        testContext.onSend?.()
         const chunks = testContext.queuedStreams.shift()
         if (!chunks) throw new Error('No queued stream for this sendMessages call')
         return convertArrayToReadableStream(chunks)
@@ -55,6 +69,7 @@ afterEach(() => {
   delete notebooksState.notebooks[NOTEBOOK_ID]
   notebooksState.needsSaving.clear()
   testContext.queuedStreams = []
+  testContext.onSend = undefined
 })
 
 describe('createChatInstance onFinish — notebook cache invalidation via a real Chat/stream', () => {
@@ -107,6 +122,60 @@ describe('createChatInstance onFinish — notebook cache invalidation via a real
     await vi.waitFor(() => {
       expect(notebooksState.notebooks[NOTEBOOK_ID]).toBeUndefined()
     })
+    expect(queryClient.getQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK_ID))).toBeUndefined()
+  })
+
+  it('binds cache effects to the project the request was sent under, not whatever project is active when the stream finishes', async () => {
+    seedNotebook()
+    const OTHER_PROJECT_REF = 'other-project'
+
+    const queryClient = getQueryClient()
+    queryClient.setQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK_ID), { id: NOTEBOOK_ID })
+
+    const state = createAiAssistantState()
+    state.setContext({ projectRef: PROJECT_REF })
+    const chatId = state.createChat({ name: 'Delete a cell' })
+    const chatInstance = state.chatInstances[chatId]
+
+    testContext.queuedStreams.push([
+      { type: 'start' },
+      {
+        type: 'tool-input-available',
+        toolCallId: 'call-1',
+        toolName: 'update_notebook',
+        input: {
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
+        },
+      },
+      { type: 'tool-approval-request', approvalId: 'approval-1', toolCallId: 'call-1' },
+      { type: 'finish' },
+    ])
+    await chatInstance.sendMessage({ text: 'Delete the first cell' })
+
+    testContext.queuedStreams.push([
+      { type: 'start' },
+      {
+        type: 'tool-output-available',
+        toolCallId: 'call-1',
+        output: { id: NOTEBOOK_ID, name: 'Test notebook' },
+      },
+      { type: 'finish' },
+    ])
+
+    // Simulate navigating to a different project while the approval round-trip is in
+    // flight: after the request was sent (with the origin project ref in its body), but
+    // before its stream resolves and onFinish runs.
+    testContext.onSend = () => state.setContext({ projectRef: OTHER_PROJECT_REF })
+
+    await chatInstance.addToolApprovalResponse({ id: 'approval-1', approved: true })
+
+    await vi.waitFor(() => {
+      expect(notebooksState.notebooks[NOTEBOOK_ID]).toBeUndefined()
+    })
+    // Must evict the origin project's cache entry — the one the write actually happened
+    // in — not whichever project happened to be active once the stream finished.
     expect(queryClient.getQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK_ID))).toBeUndefined()
   })
 })
