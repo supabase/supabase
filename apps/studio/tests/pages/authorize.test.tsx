@@ -57,5 +57,6 @@ describe('APIAuthorizationPage', () => {
     })
 
     expect(screen.getByText('Missing authorization link')).toBeInTheDocument()
+    expect(screen.queryByText(/is connected/)).not.toBeInTheDocument()
   })
 })
