@@ -1,11 +1,11 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import {
   buildSupportAssistantPrompt,
-  decodeAssistantHandoff,
-  encodeAssistantHandoff,
+  consumeAssistantHandoff,
   parseSupportAssistantPrompt,
+  storeAssistantHandoff,
 } from './SupportAssistant.utils'
 import type { SubmittedSupportRequest } from './SupportForm.state'
 
@@ -23,6 +23,10 @@ const supportRequest: SubmittedSupportRequest = {
 }
 
 describe('SupportAssistant utils', () => {
+  beforeEach(() => {
+    sessionStorage.clear()
+  })
+
   it('formats support requests as tagged assistant prompts', () => {
     const prompt = buildSupportAssistantPrompt(supportRequest)
 
@@ -71,33 +75,44 @@ describe('SupportAssistant utils', () => {
     expect(parseSupportAssistantPrompt('<support></support>')).toBeNull()
   })
 
-  it('round-trips a request through encode/decode, simulating how router.query delivers it', () => {
-    const encoded = encodeAssistantHandoff(supportRequest)
-    // router.query values are already percent-decoded by Next.js — mirror that here
-    // instead of feeding the raw encoded string straight to decodeAssistantHandoff.
-    const asRouterQueryWouldDeliverIt = decodeURIComponent(encoded)
+  it('round-trips a request through store/consume', () => {
+    storeAssistantHandoff('token-1', supportRequest)
 
-    expect(decodeAssistantHandoff(asRouterQueryWouldDeliverIt)).toEqual(supportRequest)
+    expect(consumeAssistantHandoff('token-1')).toEqual(supportRequest)
   })
 
-  it('does not mangle literal percent characters in the message', () => {
+  it('preserves literal percent characters in the message (no URL encoding involved)', () => {
     const request = { ...supportRequest, message: '100% CPU, literal %20 text' }
-    const encoded = encodeAssistantHandoff(request)
-    const asRouterQueryWouldDeliverIt = decodeURIComponent(encoded)
+    storeAssistantHandoff('token-1', request)
 
-    expect(decodeAssistantHandoff(asRouterQueryWouldDeliverIt)?.message).toBe(
-      '100% CPU, literal %20 text'
-    )
+    expect(consumeAssistantHandoff('token-1')?.message).toBe('100% CPU, literal %20 text')
+  })
+
+  it('removes the entry after consuming it, so it cannot be replayed', () => {
+    storeAssistantHandoff('token-1', supportRequest)
+
+    expect(consumeAssistantHandoff('token-1')).toEqual(supportRequest)
+    expect(consumeAssistantHandoff('token-1')).toBeNull()
+  })
+
+  it('returns null for a token that was never stored', () => {
+    expect(consumeAssistantHandoff('unknown-token')).toBeNull()
   })
 
   it('returns null for malformed JSON', () => {
-    expect(decodeAssistantHandoff('{not valid json')).toBeNull()
+    sessionStorage.setItem('assistant-handoff:token-1', '{not valid json')
+
+    expect(consumeAssistantHandoff('token-1')).toBeNull()
   })
 
   it('returns null for validly-shaped JSON that does not match the expected schema', () => {
-    expect(decodeAssistantHandoff(JSON.stringify({ foo: 'bar' }))).toBeNull()
-    expect(
-      decodeAssistantHandoff(JSON.stringify({ ...supportRequest, allowSupportAccess: 'yes' }))
-    ).toBeNull()
+    sessionStorage.setItem('assistant-handoff:token-1', JSON.stringify({ foo: 'bar' }))
+    expect(consumeAssistantHandoff('token-1')).toBeNull()
+
+    sessionStorage.setItem(
+      'assistant-handoff:token-2',
+      JSON.stringify({ ...supportRequest, allowSupportAccess: 'yes' })
+    )
+    expect(consumeAssistantHandoff('token-2')).toBeNull()
   })
 })

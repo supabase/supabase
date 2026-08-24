@@ -116,6 +116,7 @@ describe('SupportAssistantSuccessCard', () => {
     nextChatMessages = []
     emitChatMessagesChange = undefined
     mockCurrentProjectRef = 'project-1'
+    sessionStorage.clear()
 
     mockNewChat.mockImplementation(() => {
       chatInstances['chat-1'] = createMockChat(nextChatMessages)
@@ -279,17 +280,22 @@ describe('SupportAssistantSuccessCard', () => {
       mockCurrentProjectRef = undefined
     })
 
-    it('renders a handoff link instead of creating a chat in place', async () => {
+    it('renders a handoff link with an opaque token, keeping the ticket content out of the URL', async () => {
       render(<SupportAssistantSuccessCard request={supportRequest} />)
 
       expect(await screen.findByRole('heading', { name: 'While you wait' })).toBeInTheDocument()
       const link = screen.getByRole('link', { name: /open assistant in project/i })
       expect(link).toHaveAttribute('href', expect.stringContaining('/project/project-1?'))
-      expect(link).toHaveAttribute(
-        'href',
-        expect.stringContaining(
-          `assistantHandoff=${encodeURIComponent(JSON.stringify(supportRequest))}`
-        )
+
+      const href = link.getAttribute('href') ?? ''
+      const token = new URL(href, 'https://example.com').searchParams.get('assistantHandoff')
+      expect(token).toBeTruthy()
+      // The message (and the rest of the ticket) must never appear in the URL itself.
+      expect(href).not.toContain(encodeURIComponent(supportRequest.message))
+
+      // The actual ticket content is stashed in sessionStorage instead, keyed by that token.
+      expect(sessionStorage.getItem(`assistant-handoff:${token}`)).toBe(
+        JSON.stringify(supportRequest)
       )
       expect(mockNewChat).not.toHaveBeenCalled()
     })

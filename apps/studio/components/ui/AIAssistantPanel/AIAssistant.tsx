@@ -2,6 +2,7 @@ import type { UIMessage as MessageType } from '@ai-sdk/react'
 import { useParams } from 'common/hooks'
 import { useRouter } from 'next/router'
 import { useEffect, useEffectEvent } from 'react'
+import { toast } from 'sonner'
 
 import { AIAssistantHeader } from './AIAssistantHeader'
 import { AssistantChat } from './AssistantChat'
@@ -9,7 +10,7 @@ import { resolveSnippetSource } from '@/components/interfaces/SQLEditor/querySou
 import {
   ASSISTANT_HANDOFF_QUERY_PARAM,
   buildSupportAssistantPrompt,
-  decodeAssistantHandoff,
+  consumeAssistantHandoff,
 } from '@/components/interfaces/Support/SupportAssistant.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useAiAssistantState, useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -54,8 +55,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     ? resolveSnippetSource(snippet?.snippet, sourceParam)
     : undefined
 
-  const processAssistantHandoff = useEffectEvent((handoffParam: string) => {
-    const request = decodeAssistantHandoff(handoffParam)
+  const processAssistantHandoff = useEffectEvent((handoffToken: string) => {
+    const request = consumeAssistantHandoff(handoffToken)
 
     // A handoff link binds its target project to `request.projectRef`. Reject (and still
     // clean up) any handoff that ends up on a different project's page — a stale link, or
@@ -92,6 +93,14 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       }
 
       state.selectChat(newChatId)
+    } else {
+      // The token didn't resolve (e.g. the link was opened in a new tab, so this tab's
+      // sessionStorage never had it) or belonged to a different project. Start a new chat
+      // rather than silently leaving whichever chat happened to be active for this project —
+      // landing on an unrelated older conversation with no indication anything went wrong
+      // is worse than an empty one.
+      state.newChat()
+      toast.error("Couldn't load your ticket context here — started a new chat instead.")
     }
 
     const { [ASSISTANT_HANDOFF_QUERY_PARAM]: _handledParam, ...restQuery } = router.query
@@ -105,10 +114,10 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   useEffect(() => {
     if (!snap.isInitialized) return
 
-    const handoffParam = router.query[ASSISTANT_HANDOFF_QUERY_PARAM]
-    if (typeof handoffParam !== 'string') return
+    const handoffToken = router.query[ASSISTANT_HANDOFF_QUERY_PARAM]
+    if (typeof handoffToken !== 'string') return
 
-    processAssistantHandoff(handoffParam)
+    processAssistantHandoff(handoffToken)
   }, [snap.isInitialized, router.query[ASSISTANT_HANDOFF_QUERY_PARAM]])
 
   useEffect(() => {

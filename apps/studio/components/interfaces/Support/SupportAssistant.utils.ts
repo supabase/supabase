@@ -82,19 +82,34 @@ const AssistantHandoffSchema = z.object({
   frontConversationId: z.string().optional(),
 })
 
-export function encodeAssistantHandoff(request: SubmittedSupportRequest): string {
-  return encodeURIComponent(JSON.stringify(request))
+const ASSISTANT_HANDOFF_STORAGE_PREFIX = 'assistant-handoff:'
+
+// The handoff URL only ever carries an opaque token — the actual ticket content (subject,
+// message, any attached log links) is kept out of the URL entirely (browser history,
+// referrer headers, server logs, a copy-pasted link) by round-tripping it through
+// sessionStorage instead, scoped to this one tab and gone once it's been read or the tab closes.
+export function storeAssistantHandoff(token: string, request: SubmittedSupportRequest): void {
+  try {
+    sessionStorage.setItem(ASSISTANT_HANDOFF_STORAGE_PREFIX + token, JSON.stringify(request))
+  } catch {
+    // Handoff will just fail closed (no context) on the receiving end — not worth
+    // surfacing an error for a private-browsing/storage-full edge case.
+  }
 }
 
-// `value` comes from `router.query`, which Next.js has already percent-decoded — do not
-// call `decodeURIComponent` again here, or literal `%` characters in the ticket message
-// (e.g. "100% CPU") get mangled.
-export function decodeAssistantHandoff(value: string): SubmittedSupportRequest | null {
+export function consumeAssistantHandoff(token: string): SubmittedSupportRequest | null {
+  const key = ASSISTANT_HANDOFF_STORAGE_PREFIX + token
+
   try {
-    const parsed = AssistantHandoffSchema.safeParse(JSON.parse(value))
+    const raw = sessionStorage.getItem(key)
+    if (!raw) return null
+
+    const parsed = AssistantHandoffSchema.safeParse(JSON.parse(raw))
     return parsed.success ? (parsed.data as SubmittedSupportRequest) : null
   } catch {
     return null
+  } finally {
+    sessionStorage.removeItem(key)
   }
 }
 

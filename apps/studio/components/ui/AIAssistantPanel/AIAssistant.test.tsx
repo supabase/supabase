@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AIAssistant } from './AIAssistant'
 import {
   ASSISTANT_HANDOFF_QUERY_PARAM,
-  encodeAssistantHandoff,
+  storeAssistantHandoff,
 } from '@/components/interfaces/Support/SupportAssistant.utils'
 import type { SubmittedSupportRequest } from '@/components/interfaces/Support/SupportForm.state'
 
@@ -19,6 +19,7 @@ const {
   mockSelectChat,
   mockRouterReplace,
   mockSyncSupportChatToFront,
+  mockToastError,
   routerQuery,
   routeRef,
 } = vi.hoisted(() => ({
@@ -27,8 +28,13 @@ const {
   mockSelectChat: vi.fn(),
   mockRouterReplace: vi.fn(),
   mockSyncSupportChatToFront: vi.fn(),
+  mockToastError: vi.fn(),
   routerQuery: {} as Record<string, string>,
   routeRef: { current: 'project-a' as string | undefined },
+}))
+
+vi.mock('sonner', () => ({
+  toast: { error: mockToastError },
 }))
 
 vi.mock('next/router', () => ({
@@ -105,7 +111,9 @@ describe('AIAssistant handoff', () => {
     mockSelectChat.mockReset()
     mockRouterReplace.mockReset()
     mockSyncSupportChatToFront.mockReset()
+    mockToastError.mockReset()
     routeRef.current = 'project-a'
+    sessionStorage.clear()
 
     mockNewChat.mockImplementation(() => {
       chats['chat-1'] = {}
@@ -114,9 +122,8 @@ describe('AIAssistant handoff', () => {
   })
 
   it('creates and selects the chat when the handoff project matches the route', async () => {
-    routerQuery[ASSISTANT_HANDOFF_QUERY_PARAM] = decodeURIComponent(
-      encodeAssistantHandoff(supportRequest)
-    )
+    storeAssistantHandoff('token-1', supportRequest)
+    routerQuery[ASSISTANT_HANDOFF_QUERY_PARAM] = 'token-1'
 
     render(<AIAssistant />)
 
@@ -136,11 +143,10 @@ describe('AIAssistant handoff', () => {
     )
   })
 
-  it('does not create a chat when the handoff project does not match the route', async () => {
+  it('starts a new chat and shows a toast when the handoff project does not match the route', async () => {
     routeRef.current = 'project-b'
-    routerQuery[ASSISTANT_HANDOFF_QUERY_PARAM] = decodeURIComponent(
-      encodeAssistantHandoff(supportRequest)
-    )
+    storeAssistantHandoff('token-1', supportRequest)
+    routerQuery[ASSISTANT_HANDOFF_QUERY_PARAM] = 'token-1'
 
     render(<AIAssistant />)
 
@@ -148,8 +154,11 @@ describe('AIAssistant handoff', () => {
       expect(mockRouterReplace).toHaveBeenCalledTimes(1)
     })
 
-    expect(mockNewChat).not.toHaveBeenCalled()
+    expect(mockNewChat).toHaveBeenCalledWith()
     expect(mockSelectChat).not.toHaveBeenCalled()
+    expect(mockToastError).toHaveBeenCalledWith(
+      "Couldn't load your ticket context here — started a new chat instead."
+    )
   })
 
   it('does nothing when there is no handoff param', () => {
@@ -157,5 +166,21 @@ describe('AIAssistant handoff', () => {
 
     expect(mockNewChat).not.toHaveBeenCalled()
     expect(mockRouterReplace).not.toHaveBeenCalled()
+  })
+
+  it('cleans up the URL and falls back to a new chat with a toast when the token has no matching sessionStorage entry (e.g. link opened in a new tab)', async () => {
+    routerQuery[ASSISTANT_HANDOFF_QUERY_PARAM] = 'token-never-stored'
+
+    render(<AIAssistant />)
+
+    await waitFor(() => {
+      expect(mockRouterReplace).toHaveBeenCalledTimes(1)
+    })
+
+    expect(mockNewChat).toHaveBeenCalledWith()
+    expect(mockSelectChat).not.toHaveBeenCalled()
+    expect(mockToastError).toHaveBeenCalledWith(
+      "Couldn't load your ticket context here — started a new chat instead."
+    )
   })
 })
