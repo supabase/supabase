@@ -7,6 +7,7 @@ import { prepareMessagesForAPI } from '../message-utils'
 import {
   createAssistantMessageWithExecuteSqlTool,
   createAssistantMessageWithMultipleTools,
+  createAssistantMessageWithUpdateNotebookTool,
   createLongConversation,
 } from '../test-fixtures'
 import { NO_DATA_PERMISSIONS, sanitizeMessagePart } from './tool-sanitizer'
@@ -172,5 +173,24 @@ describe('messages are sanitized based on opt-in level', () => {
         })
       }
     })
+  })
+
+  test('update_notebook previous_content is stripped from the tool output regardless of opt-in level', () => {
+    const message = createAssistantMessageWithUpdateNotebookTool()
+
+    const sanitized = sanitizeMessagePart(message.parts[0], 'schema') as ToolUIPart
+
+    expect(sanitized.output).toEqual({ id: 'notebook-1', name: 'Signup funnel' })
+  })
+
+  test('an update_notebook output that never had previous_content passes through unchanged', () => {
+    const message = createAssistantMessageWithUpdateNotebookTool({
+      id: 'notebook-1',
+      name: 'Signup funnel',
+    })
+
+    const sanitized = sanitizeMessagePart(message.parts[0], 'schema') as ToolUIPart
+
+    expect(sanitized.output).toEqual({ id: 'notebook-1', name: 'Signup funnel' })
   })
 })

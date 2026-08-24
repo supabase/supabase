@@ -315,8 +315,15 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
           authHeaders
         )
 
-        return { id, name: notebook.name }
+        // `previous_content` lets the client re-derive the diff it already showed for
+        // approval, without re-fetching a notebook that's now post-update. Never reaches
+        // the model — see toModelOutput below.
+        return { id, name: notebook.name, previous_content: wireNotebook }
       },
+      toModelOutput: ({ output }) => ({
+        type: 'json',
+        value: { id: output.id, name: output.name },
+      }),
     }),
     delete_notebook: tool({
       description: 'Asks the user to delete a notebook. Requires user approval before deleting.',
