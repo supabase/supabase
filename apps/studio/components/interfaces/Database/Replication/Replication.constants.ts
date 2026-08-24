@@ -8,6 +8,3 @@ export enum PipelineStatusName {
   STOPPING = 'stopping',
   UNKNOWN = 'unknown',
 }
-
-/** @deprecated Import from Settings/Infrastructure/ReadReplicas/ReadReplicas.constants */
-export { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'

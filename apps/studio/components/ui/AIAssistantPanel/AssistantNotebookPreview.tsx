@@ -54,7 +54,7 @@ export const AssistantNotebookPreview = ({
     expandedOverrides[getEntryKey(entry)] === true
 
   return (
-    <div className={cn('flex min-w-0 flex-col', className)}>
+    <div className={cn('flex w-full min-w-0 max-w-6xl mx-auto flex-col', className)}>
       <ExplorerToolbar aria-label="Notebook toolbar">
         <ExplorerToolbarIcon>
           <NotebookText />

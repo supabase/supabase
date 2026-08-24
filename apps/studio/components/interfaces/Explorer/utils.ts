@@ -31,7 +31,7 @@ export const createLogCellSkeleton = ({
   return {
     title,
     _tag: 'log_cell' as const,
-    id: generateDraftId(),
+    _id: generateDraftId(),
     view: 'table' as const,
     chart: undefined,
     unchecked_sql: untrustedLogSql(sql ?? ''),
@@ -40,8 +40,9 @@ export const createLogCellSkeleton = ({
 }
 
 const DEFAULT_MARKDOWN_CONTENT = `
-  # New section
-  Add notes about your queries and results
+# New section
+
+Add notes about your queries and results
 `.trim()
 
 export const createMarkdownCellSkeleton = ({

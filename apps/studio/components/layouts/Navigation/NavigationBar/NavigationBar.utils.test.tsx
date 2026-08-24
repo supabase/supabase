@@ -54,6 +54,11 @@ describe('generateProductRoutes', () => {
     expect(keys(routes)).toEqual(['database', 'auth', 'storage', 'functions', 'realtime'])
   })
 
+  it('includes workers only when the workers flag is enabled', () => {
+    expect(keys(generateProductRoutes(REF, activeProject))).not.toContain('workers')
+    expect(keys(generateProductRoutes(REF, activeProject, { workers: true }))).toContain('workers')
+  })
+
   it('excludes auth when auth feature is disabled', () => {
     const routes = generateProductRoutes(REF, activeProject, { auth: false })
     expect(keys(routes)).not.toContain('auth')
