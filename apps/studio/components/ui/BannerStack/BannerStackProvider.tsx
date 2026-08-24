@@ -7,7 +7,7 @@ export const BANNER_ID = {
   RLS_EVENT_TRIGGER: 'rls-event-trigger-banner',
   FREE_MICRO_UPGRADE: 'free-micro-upgrade-banner',
   TOS_UPDATE: 'tos-update-banner',
-  UNIFIED_LOGS: 'unified-logs-banner',
+  LOGS_ALL_DEPRECATION: 'logs-all-deprecation-banner',
 } as const
 
 export type BannerId = (typeof BANNER_ID)[keyof typeof BANNER_ID]
@@ -48,7 +48,9 @@ export const BannerStackProvider = ({ children }: { children: React.ReactNode })
   const dismissBanner = useCallback((id: string) => {
     setBanners((prev) => prev.map((b) => (b.id === id ? { ...b, isDismissed: true } : b)))
     setTimeout(() => {
-      setBanners((prev) => prev.filter((b) => b.id !== id))
+      // A later addBanner can revive this id before the exit animation
+      // finishes. Drop it only if it is still dismissed.
+      setBanners((prev) => prev.filter((b) => b.id !== id || !b.isDismissed))
     }, 300)
   }, [])
 

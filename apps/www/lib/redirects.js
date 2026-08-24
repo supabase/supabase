@@ -1,6 +1,17 @@
 module.exports = [
   {
     permanent: true,
+    source: '/images/customers/logos/light/:path*',
+    destination: '/images/customers/logos/on-dark/:path*',
+  },
+  // Legacy root wordmarks moved to on-light/. Keep dreambase-mark.png at logos/ root.
+  {
+    permanent: true,
+    source: '/images/customers/logos/:slug((?!dreambase-mark\\.png)[^/.]+).png',
+    destination: '/images/customers/logos/on-light/:slug.png',
+  },
+  {
+    permanent: true,
     source: '/blog/pricing',
     destination: '/pricing',
   },
@@ -33,6 +44,16 @@ module.exports = [
     permanent: true,
     source: '/ui/docs/ai-editors-rules/skills',
     destination: '/docs/guides/ai-tools/ai-skills',
+  },
+  {
+    permanent: true,
+    source: '/ui',
+    destination: '/library',
+  },
+  {
+    permanent: true,
+    source: '/ui/:path*',
+    destination: '/library/:path*',
   },
   {
     permanent: true,
@@ -2918,6 +2939,31 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/launch-week/6',
+    destination: '/blog/launch-week-6-wrap-up',
+  },
+  {
+    permanent: true,
+    source: '/launch-week/x',
+    destination: '/blog/launch-week-x-best-launches',
+  },
+  {
+    permanent: true,
+    source: '/launch-week/12',
+    destination: '/blog/launch-week-12-top-10',
+  },
+  {
+    permanent: true,
+    source: '/launch-week/13',
+    destination: '/blog/launch-week-13-top-10',
+  },
+  {
+    permanent: true,
+    source: '/launch-week/14',
+    destination: '/blog/launch-week-14-top-10',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/platform/enterprise-billing',
     destination: '/docs/guides/platform/org-based-billing',
   },
@@ -3338,7 +3384,7 @@ module.exports = [
     permanent: false,
   },
   // Legacy product .txt URLs → new .md routes
-  { permanent: true, source: '/llms/homepage.txt', destination: '/homepage.md' },
+  { permanent: true, source: '/llms/homepage.txt', destination: '/index.md' },
   { permanent: true, source: '/llms/auth.txt', destination: '/auth.md' },
   { permanent: true, source: '/llms/database.txt', destination: '/database.md' },
   { permanent: true, source: '/llms/edge-functions.txt', destination: '/edge-functions.md' },
@@ -3347,4 +3393,7 @@ module.exports = [
   { permanent: true, source: '/llms/vector.txt', destination: '/modules/vector.md' },
   { permanent: true, source: '/llms/pricing.txt', destination: '/pricing.md' },
   { permanent: true, source: '/vector.md', destination: '/modules/vector.md' },
+  { permanent: true, source: '/homepage.md', destination: '/index.md' },
+  { permanent: true, source: '/.md', destination: '/index.md' },
+  { permanent: true, source: '/index', destination: '/' },
 ]

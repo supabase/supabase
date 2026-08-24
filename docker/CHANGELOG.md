@@ -10,8 +10,26 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
-## Unreleased
-- Self-hosted Supabase: Envoy becomes the default API gateway (breaking change) [#48048](https://github.com/orgs/supabase/discussions/48048) (PR [#48153](https://github.com/supabase/supabase/pull/48153))
+## [0.8.0](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.8.0) - 2026-08-11
+
+⚠️ **Note:** This update contains **breaking changes**. Make sure to read the **important** details below:
+- Envoy is now the default API gateway, replacing Kong. Kong stays available as an opt-in override with `sh run.sh config add kong`. See the [heads-up discussion](https://github.com/orgs/supabase/discussions/48048) and [Update Your Self-Hosted Deployment](https://supabase.com/docs/guides/self-hosting/updating) - PR [#48153](https://github.com/supabase/supabase/pull/48153)
+
+### Configuration
+- ⚠️ Added `API_GW_HTTP_PORT` (falls back to `KONG_HTTP_PORT`; requires `.env` and `docker-compose.yml` update) - PR [#48153](https://github.com/supabase/supabase/pull/48153)
+
+### Documentation
+- Updated several self-hosting how-to guides to reflect the current configuration - PR [#48153](https://github.com/supabase/supabase/pull/48153)
+- Updated architecture diagram for self-hosted Supabase - PR [#48763](https://github.com/supabase/supabase/pull/48763)
+
+### Utils and tests
+- Updated `tests/` to match the API gateway switch to Envoy - PR [#48153](https://github.com/supabase/supabase/pull/48153)
+
+### API gateway
+- ⚠️ Changed the default API gateway from Kong to Envoy; the `kong` service is now `api-gw` (requires `docker-compose.yml` update) - PR [#48153](https://github.com/supabase/supabase/pull/48153)
+- Changed `docker-compose.envoy.yml` to a no-op shim now that Envoy is the default (requires `docker-compose.envoy.yml` update) - PR [#48153](https://github.com/supabase/supabase/pull/48153)
+- Added an optional override for Kong (requires new `docker-compose.kong.yml`) - PR [#48153](https://github.com/supabase/supabase/pull/48153)
+- Updated the Caddy and nginx reverse proxies to forward to `api-gw` (requires `docker-compose.caddy.yml`, `docker-compose.nginx.yml`, `volumes/proxy/caddy/Caddyfile`, and `volumes/proxy/nginx/supabase-nginx.conf.tpl` update) - PR [#48153](https://github.com/supabase/supabase/pull/48153)
 
 ---
 

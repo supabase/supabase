@@ -16,17 +16,9 @@ Create a TanStack Start app using the official CLI.
 npx @tanstack/cli@latest create my-app
 ```
 
-## 4. Install Supabase's Agent Skills (optional)
+## 4. Set up AI tooling (optional)
 
-Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
-
-Install them so your AI coding agent can produce more accurate, reliable code using current Supabase patterns, such as authentication, server-side rendering, and database migrations, rather than relying solely on training data.
-
-To install, run the following command in the root of your project:
-
-```bash
-npx skills add supabase/agent-skills
-```
+<$Partial path="quickstart_ai_tooling.mdx" />
 
 ## 5. Install the Supabase client libraries
 
@@ -57,8 +49,10 @@ VITE_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 
 TanStack Start needs two Supabase clients: a browser client for components that run in the browser, and a server client for loaders and server functions. Create a `src/lib/supabase` folder with a file for each client.
 
+Both clients read the same two variables, through the API available in each environment. The browser client uses `import.meta.env`, which Vite replaces at build time. The server client uses `process.env`, which the server runtime populates from your `.env.local` file.
+
 ```ts name=src/lib/supabase/client.ts
-/// <reference types="vite/types/importMeta.d.ts" />
+/// <reference types="vite/client" />
 import { createBrowserClient } from '@supabase/ssr'
 
 export function createClient() {
@@ -99,29 +93,49 @@ export function createClient() {
 
 ## 8. Query Supabase data from TanStack Start
 
-Replace the contents of `src/routes/index.tsx` with the following to add a loader that queries the `instruments` table through the server client. The loader runs on the server, so the data is part of the initial server-rendered response.
+Create a server function that queries the `instruments` table through the server client. TanStack Start's import protection blocks direct server imports in route files, so wrap the Supabase call in `createServerFn`.
+
+```ts name=src/lib/supabase/fetch-instruments-server-fn.ts
+import { createServerFn } from '@tanstack/react-start'
+
+import { createClient } from '@/lib/supabase/server'
+
+export const fetchInstruments = createServerFn({ method: 'GET' }).handler(async () => {
+  const supabase = createClient()
+  const { data: instruments, error } = await supabase.from('instruments').select()
+
+  if (error) {
+    console.error(error)
+    return { instruments: [], error: error.message }
+  }
+
+  return { instruments, error: null }
+})
+```
+
+Replace the contents of `src/routes/index.tsx` with the following to call the server function from a route loader. The loader runs on the server, so the data is part of the initial server-rendered response.
 
 ```tsx name=src/routes/index.tsx
 import { createFileRoute } from '@tanstack/react-router'
 
-import { createClient } from '@/lib/supabase/server'
+import { fetchInstruments } from '@/lib/supabase/fetch-instruments-server-fn'
 
 export const Route = createFileRoute('/')({
-  loader: async () => {
-    const supabase = createClient()
-    const { data: instruments } = await supabase.from('instruments').select()
-    return { instruments }
-  },
+  loader: async () => fetchInstruments(),
   component: Home,
 })
 
 function Home() {
-  const { instruments } = Route.useLoaderData()
+  const { instruments, error } = Route.useLoaderData()
+
+  if (error) {
+    return <p>Error loading instruments: {error}</p>
+  }
 
   return (
     <ul>
       {instruments?.map((instrument) => (
-        <li key={instrument.name}>{instrument.name}</li>
+        <li key={instrument.id}>{instrument.name}</li>
       ))}
     </ul>
   )
@@ -136,10 +150,11 @@ Run the development server, go to http://localhost:3000 in a browser and you sho
 npm run dev
 ```
 
+<$Partial path="quickstart_going_to_production.mdx" />
+
 ## Next steps
 
-- Learn how to [protect routes and check sessions](/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=tanstack) with the server client
-- Set up a complete [login and sign-up flow](/ui/docs/tanstack/password-based-auth) from the Supabase UI Library
-- Explore [drop-in UI components](/ui) for your Supabase app
+- Learn how to [protect routes and check sessions](/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=tanstack) with the server client, or drop in a complete [login and sign-up flow](/library/docs/tanstack/password-based-auth) from Supabase Library
 - [Insert more data](/docs/guides/database/import-data) into your database
 - Upload and serve static files using [Storage](/docs/guides/storage)
+- Explore [drop-in UI components](/ui) for your Supabase app

@@ -83,4 +83,18 @@ describe('ai/tools getTools', () => {
     expect(tools).toHaveProperty('fallback_tool')
     expect(tools).not.toHaveProperty('list_tables')
   })
+
+  it('excludes notebook tools when isExplorerEnabled is not set', async () => {
+    const tools = await getTools(BASE_PARAMS)
+
+    expect(tools).not.toHaveProperty('list_notebooks')
+    expect(tools).not.toHaveProperty('get_notebook')
+  })
+
+  it('includes notebook tools only when isExplorerEnabled is true', async () => {
+    const tools = await getTools({ ...BASE_PARAMS, isExplorerEnabled: true })
+
+    expect(tools).toHaveProperty('list_notebooks')
+    expect(tools).toHaveProperty('get_notebook')
+  })
 })

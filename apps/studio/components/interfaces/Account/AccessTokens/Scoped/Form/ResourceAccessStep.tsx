@@ -24,10 +24,16 @@ import {
 } from 'ui-patterns/multi-select'
 
 import type { ResourceAccessMode } from '../../AccessToken.permissions'
-import { useOrgAndProjectData } from '../../hooks/useOrgAndProjectData'
+import { getIsProjectScopedOnly } from '../../AccessToken.roles'
 import type { TokenFormValues } from './NewScopedTokenForm.utils'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
-import { ProjectInfoInfinite } from '@/data/projects/projects-infinite-query'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { usePermissionsQuery } from '@/data/permissions/permissions-query'
+import {
+  ProjectInfoInfinite,
+  ProjectsInfiniteData,
+  useProjectsInfiniteQuery,
+} from '@/data/projects/projects-infinite-query'
 import { Organization } from '@/types'
 
 interface ResourceAccessStepProps {
@@ -62,7 +68,19 @@ export const ResourceAccessStep = ({
   setValue,
   onSelectLegacyToken,
 }: ResourceAccessStepProps) => {
-  const { organizations, projects } = useOrgAndProjectData()
+  const { data: organizations = [] } = useOrganizationsQuery()
+  const {
+    data: projectsData,
+    hasNextPage,
+    fetchNextPage,
+  } = useProjectsInfiniteQuery({
+    limit: 100,
+  })
+
+  const projects = useMemo(
+    () => projectsData?.pages.flatMap((page) => page.projects) ?? [],
+    [projectsData]
+  )
   const organizationsBySlug = useMemo(
     () =>
       organizations.reduce(
@@ -89,6 +107,20 @@ export const ResourceAccessStep = ({
   const resourceAccess = useWatch({ control, name: 'resourceAccess' })
   const organizationSlugs = useWatch({ control, name: 'organizationSlugs', defaultValue: [] })
 
+  // Users invited to specific projects (rather than the whole org) can't select that org for an
+  // org-wide token. Skipped while permissions are still loading so nothing gets disabled by
+  // mistake. The project list itself needs no permission filter — /platform/projects is already
+  // scoped server-side to what the user can access.
+  const { data: permissions } = usePermissionsQuery()
+  const projectScopedOrgSlugs = useMemo(() => {
+    if (permissions === undefined) return new Set<string>()
+    return new Set(
+      organizations
+        .map((org) => org.slug)
+        .filter((slug) => getIsProjectScopedOnly(permissions, slug))
+    )
+  }, [permissions, organizations])
+
   const projectsForOrg = useMemo(
     () => projects.filter((project) => organizationSlugs.includes(project.organization_slug)),
     [projects, organizationSlugs]
@@ -105,12 +137,12 @@ export const ResourceAccessStep = ({
             label="Resource access"
             description={
               <p className="text-foreground-lighter text-sm">
-                Need a token with full access to your account or one for the Supabase MCP server?{' '}
+                Need a token with full access to your account?{' '}
                 <button
                   type="button"
+                  tabIndex={0}
                   className={InlineLinkClassName}
                   onClick={onSelectLegacyToken}
-                  tabIndex={0}
                 >
                   Create legacy token
                 </button>
@@ -198,7 +230,7 @@ export const ResourceAccessStep = ({
                 <MultiSelector
                   onValuesChange={field.onChange}
                   values={field.value}
-                  disabled={!organizationSlugs}
+                  disabled={organizationSlugs.length === 0}
                   className="w-full"
                 >
                   <MultiSelectorTrigger
@@ -218,13 +250,11 @@ export const ResourceAccessStep = ({
                   />
                   <MultiSelectorContent>
                     <MultiSelectorInput placeholder="Search projects" showResetIcon />
-                    <MultiSelectorList>
-                      {projectsForOrg.map((project) => (
-                        <MultiSelectorItem key={project.ref} value={project.ref}>
-                          {project.name}
-                        </MultiSelectorItem>
-                      ))}
-                    </MultiSelectorList>
+                    <ProjectMultiSelectList
+                      projects={projectsForOrg}
+                      hasNextPage={hasNextPage}
+                      fetchNextPage={fetchNextPage}
+                    />
                   </MultiSelectorContent>
                 </MultiSelector>
               </FormItemLayout>
@@ -248,7 +278,7 @@ export const ResourceAccessStep = ({
                   mode="combobox"
                   label="Select organizations"
                   badgeLimit="wrap"
-                  showIcon={false}
+                  showIcon={true}
                   deletableBadge
                   className="w-full"
                   ref={field.ref}
@@ -257,11 +287,26 @@ export const ResourceAccessStep = ({
                 <MultiSelectorContent>
                   <MultiSelectorInput placeholder="Search organizations" showResetIcon />
                   <MultiSelectorList>
-                    {organizations.map((organization) => (
-                      <MultiSelectorItem key={organization.slug} value={organization.slug}>
-                        {organization.name}
-                      </MultiSelectorItem>
-                    ))}
+                    {organizations.map((organization) => {
+                      const isProjectScopedOnly = projectScopedOrgSlugs.has(organization.slug)
+                      return (
+                        <MultiSelectorItem
+                          key={organization.slug}
+                          value={organization.slug}
+                          disabled={isProjectScopedOnly}
+                        >
+                          <span className="flex flex-col gap-0.5">
+                            <span>{organization.name}</span>
+                            {isProjectScopedOnly && (
+                              <span className="text-foreground-lighter">
+                                Your access is limited to specific projects. Create a project-scoped
+                                token instead.
+                              </span>
+                            )}
+                          </span>
+                        </MultiSelectorItem>
+                      )
+                    })}
                   </MultiSelectorList>
                 </MultiSelectorContent>
               </MultiSelector>
@@ -270,5 +315,34 @@ export const ResourceAccessStep = ({
         />
       )}
     </section>
+  )
+}
+
+const ProjectMultiSelectList = ({
+  projects,
+  hasNextPage,
+  fetchNextPage,
+}: {
+  projects: ProjectsInfiniteData['projects']
+  hasNextPage: boolean
+  fetchNextPage: () => void
+}) => {
+  const handleScroll = (event: React.UIEvent) => {
+    const element = event.currentTarget as HTMLElement
+    const offset = 50 // Offset by approximately 1 item to start fetching next page before hitting the bottom
+    const isAtBottom = element.scrollTop + element.clientHeight >= element.scrollHeight - offset
+    if (hasNextPage && isAtBottom) {
+      fetchNextPage()
+    }
+  }
+
+  return (
+    <MultiSelectorList onScroll={handleScroll}>
+      {projects.map((project) => (
+        <MultiSelectorItem key={project.ref} value={project.ref}>
+          {project.name}
+        </MultiSelectorItem>
+      ))}
+    </MultiSelectorList>
   )
 }

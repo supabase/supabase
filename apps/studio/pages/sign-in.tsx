@@ -14,14 +14,12 @@ import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useEnabledIdentityProviders } from '@/hooks/misc/useEnabledIdentityProviders'
 import { useInboundBranding } from '@/hooks/misc/useInboundBranding'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useSiwcQueryParamOptIn } from '@/hooks/misc/useSiwcQueryParamOptIn'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { ExternalIdentityProviderConfig } from '@/lib/external-identity-providers'
+import { getSignUpReturnTo } from '@/lib/gotrue'
 import type { NextPageWithLayout } from '@/types'
 
 const SignInPage: NextPageWithLayout = () => {
-  useSiwcQueryParamOptIn()
-
   const router = useRouter()
   const [showOtherOptions, setShowOtherOptions] = useState(false)
 
@@ -134,7 +132,10 @@ const SignInPage: NextPageWithLayout = () => {
         <div className="self-center my-8 text-sm">
           <span className="text-foreground-light">Don’t have an account?</span>{' '}
           <Link
-            href={{ pathname: '/sign-up', query: router.query }}
+            href={{
+              pathname: '/sign-up',
+              query: { ...router.query, returnTo: getSignUpReturnTo(router.query.returnTo) },
+            }}
             className="underline transition text-foreground hover:text-foreground-light"
           >
             Sign up

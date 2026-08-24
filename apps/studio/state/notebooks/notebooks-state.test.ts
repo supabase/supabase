@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { notebooksState } from './notebooks-state'
 import type { Notebook } from './types'
+import type { Notebooks } from '@/types'
 
 function makeNotebook(id: string, overrides: Partial<Notebook> = {}): Notebook {
   return {
@@ -13,7 +14,7 @@ function makeNotebook(id: string, overrides: Partial<Notebook> = {}): Notebook {
     favorite: false,
     owner_id: 7,
     project_id: 42,
-    content: { schema_version: '1.0', cells: [] },
+    content: { schema_version: 1, cells: [] },
     ...overrides,
   }
 }
@@ -25,6 +26,7 @@ describe('notebooksState', () => {
       delete notebooksState.notebooks[id]
     }
     notebooksState.needsSaving.clear()
+    notebooksState.cellLocalState.clear()
   })
 
   it('addNotebook marks a locally-created notebook as new', () => {
@@ -39,12 +41,36 @@ describe('notebooksState', () => {
     expect(notebooksState.notebooks['notebook-1'].status).toBe('saved')
   })
 
+  it('keeps query visibility in session state without marking the notebook as edited', () => {
+    const queryCell = {
+      _tag: 'database_cell' as const,
+      _id: 'cell-1',
+      unchecked_sql: '' as Notebooks.DatabaseCell['unchecked_sql'],
+      row_limit: 100,
+      view: 'table' as const,
+    }
+    notebooksState.setNotebook({
+      projectRef: 'ref',
+      notebook: makeNotebook('notebook-1', {
+        content: { schema_version: 1, cells: [queryCell] },
+      }),
+    })
+
+    expect(notebooksState.cellLocalState.has('cell-1')).toBe(false)
+
+    notebooksState.setQueryVisibility({ cellId: 'cell-1', showQuery: true })
+
+    expect(notebooksState.cellLocalState.get('cell-1')).toEqual({ showQuery: true })
+    expect(notebooksState.notebooks['notebook-1'].status).toBe('saved')
+    expect(notebooksState.needsSaving.has('notebook-1')).toBe(false)
+  })
+
   it('editing a loaded (saved) notebook transitions it to unsaved and queues it for saving', () => {
     notebooksState.setNotebook({ projectRef: 'ref', notebook: makeNotebook('notebook-1') })
 
     notebooksState.updateCells({
       id: 'notebook-1',
-      cells: [{ type: 'markdown', content: 'hello' }],
+      cells: [{ _tag: 'markdown_cell', _id: 'cell-1', text: 'hello' }],
     })
 
     expect(notebooksState.notebooks['notebook-1'].status).toBe('unsaved')
@@ -56,7 +82,7 @@ describe('notebooksState', () => {
 
     notebooksState.updateCells({
       id: 'notebook-1',
-      cells: [{ type: 'markdown', content: 'hello' }],
+      cells: [{ _tag: 'markdown_cell', _id: 'cell-1', text: 'hello' }],
     })
 
     expect(notebooksState.notebooks['notebook-1'].status).toBe('new')
@@ -66,7 +92,7 @@ describe('notebooksState', () => {
     notebooksState.setNotebook({ projectRef: 'ref', notebook: makeNotebook('notebook-1') })
     notebooksState.updateCells({
       id: 'notebook-1',
-      cells: [{ type: 'markdown', content: 'hello' }],
+      cells: [{ _tag: 'markdown_cell', _id: 'cell-1', text: 'hello' }],
     })
     expect(notebooksState.notebooks['notebook-1'].status).toBe('unsaved')
 

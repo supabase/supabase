@@ -623,56 +623,16 @@ export const RISK_LEVEL_LABEL: Record<RiskLevel, string> = {
   high: 'High risk',
 }
 
-export type ResourceAccessMode = 'project' | 'organization' | 'account'
-
-export interface OverallRisk {
-  /** Minimal | Low | Medium | Elevated | High */
-  level: string
-  text: string
-  tone: 'default' | 'low' | 'medium' | 'high'
+export const PERMISSION_MODE_LABEL: Record<PermissionMode, string> = {
+  none: 'None',
+  read: 'Read',
+  readwrite: 'Read-write',
 }
 
-/**
- * Computes the overall token risk from the selected capabilities and the resource-access breadth.
- * Account-level tokens are never below "Elevated", even when read-only.
- */
-export const computeOverallRisk = (
-  selection: PermissionSelection,
-  resourceAccess: ResourceAccessMode
-): OverallRisk => {
-  const active = Object.entries(selection).filter(([, mode]) => mode !== 'none')
-  if (active.length === 0) {
-    return { level: 'Minimal', text: 'Minimal — No capabilities', tone: 'default' }
-  }
+export type ResourceAccessMode = 'project' | 'organization' | 'account'
 
-  const anyWrite = active.some(([, mode]) => mode === 'readwrite')
-  const anyHighWrite = active.some(
-    ([key, mode]) => mode === 'readwrite' && CATALOG_BY_KEY.get(key)?.risk === 'high'
-  )
-
-  const scopeWord =
-    resourceAccess === 'account'
-      ? 'Account-wide'
-      : resourceAccess === 'organization'
-        ? 'Organization-wide'
-        : 'Single-project'
-  const accessWord = anyWrite ? 'read-write' : 'read-only'
-
-  let level: string
-  let tone: OverallRisk['tone']
-  if (resourceAccess === 'account') {
-    level = anyWrite ? 'High' : 'Elevated'
-    tone = anyWrite ? 'high' : 'medium'
-  } else if (anyHighWrite) {
-    level = 'High'
-    tone = 'high'
-  } else if (anyWrite) {
-    level = 'Medium'
-    tone = 'medium'
-  } else {
-    level = 'Low'
-    tone = 'low'
-  }
-
-  return { level, text: `${level} — ${scopeWord} ${accessWord} access`, tone }
+export const RISK_TONE_VARIANT: Record<RiskLevel, 'success' | 'warning' | 'destructive'> = {
+  low: 'success',
+  medium: 'warning',
+  high: 'destructive',
 }

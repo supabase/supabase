@@ -1,16 +1,13 @@
 import { Handle, Position } from '@xyflow/react'
 import { useParams } from 'common'
-import { PropsWithChildren, useMemo } from 'react'
+import { PropsWithChildren } from 'react'
 import { AWS_REGIONS } from 'shared-data'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { DestinationIcon } from '../DestinationIcon'
 import { getStatusName } from '../Pipeline.utils'
-import { getStatusLabel } from '../ReadReplicas/ReadReplicas.utils'
 import { STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
 import { getReplicationDestinationType } from './Nodes.utils'
-import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
@@ -37,14 +34,10 @@ export const PrimaryDatabaseNode = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const { data: databases = [] } = useReadReplicasQuery({ projectRef })
-  const hasReadReplicas = databases.some((x) => x.identifier !== projectRef)
-
   const { data: destinationsData } = useReplicationDestinationsQuery({ projectRef })
   const hasDestinations = (destinationsData?.destinations ?? []).length > 0
 
   const region = Object.values(AWS_REGIONS).find((x) => x.code === project?.region)
-  const hasReplication = hasReadReplicas || hasDestinations
 
   return (
     <NodeContainer>
@@ -63,7 +56,7 @@ export const PrimaryDatabaseNode = () => {
       <Handle
         type="source"
         position={Position.Right}
-        className={hasReplication ? 'opacity-25' : 'opacity-0'}
+        className={hasDestinations ? 'opacity-25' : 'opacity-0'}
       />
     </NodeContainer>
   )
@@ -113,50 +106,6 @@ export const ReplicationNode = ({ id }: { id: string }) => {
         </div>
         <p className="text-foreground-light">{destination?.name}</p>
         <p className="text-foreground-light">ID: {destination?.id}</p>
-      </div>
-      <Handle type="target" position={Position.Left} className="opacity-25" />
-    </NodeContainer>
-  )
-}
-
-export const ReadReplicaNode = ({ id }: { id: string }) => {
-  const { ref: projectRef } = useParams()
-  const { data: databases = [] } = useReadReplicasQuery({ projectRef })
-  const database = databases.find((x) => x.identifier === id)
-
-  const region = Object.values(AWS_REGIONS).find((x) => x.code === database?.region)
-  const formattedId = formatDatabaseID(database?.identifier ?? '')
-  const statusLabel = useMemo(
-    () => getStatusLabel({ status: database?.status }),
-    [database?.status]
-  )
-
-  return (
-    <NodeContainer className="justify-start gap-x-3">
-      <DestinationIcon type="Read Replica" size={20} className="text-foreground-light" />
-      <div className="flex flex-col gap-y-0.5">
-        <div className="flex items-center">
-          <p className="text-sm">Read Replica</p>
-          <Tooltip>
-            <TooltipTrigger>
-              <div className="w-6 h-full flex items-center justify-center">
-                <div
-                  className={cn(
-                    'w-2 h-2 rounded-full',
-                    database?.status === 'ACTIVE_HEALTHY' ? 'bg-brand' : 'bg-selection'
-                  )}
-                />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">{statusLabel}</TooltipContent>
-          </Tooltip>
-        </div>
-        <p className="text-sm text-foreground-light">{region?.displayName}</p>
-        <div className="flex gap-x-2 items-center text-sm text-foreground-light">
-          <span>ID: {formattedId}</span>
-          <span>•</span>
-          <span>{region?.code}</span>
-        </div>
       </div>
       <Handle type="target" position={Position.Left} className="opacity-25" />
     </NodeContainer>

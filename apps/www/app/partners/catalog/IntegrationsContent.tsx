@@ -31,6 +31,8 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  ToggleGroup,
+  ToggleGroupItem,
 } from 'ui'
 import { useDebounce } from 'use-debounce'
 
@@ -266,40 +268,41 @@ export default function IntegrationsContent({
             {showFeatured && (
               <div className="flex flex-col gap-4">
                 <h2 className="text-2xl">Featured</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {featuredPartners.map((p) => (
-                    <Link
-                      key={p.slug}
-                      href={`/partners/catalog/${p.slug}`}
-                      className="group flex h-full flex-col gap-3 rounded-xl border bg-surface-100 p-5 transition-colors hover:bg-surface-200 overflow-hidden"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="relative size-10 shrink-0 rounded-full overflow-hidden bg-muted">
-                          <Image
-                            src={p.logo}
-                            alt={p.title}
-                            fill
-                            className="object-cover bg-white rounded-full overflow-hidden p-1"
-                            sizes="40px"
-                          />
+                    <li key={p.slug} className="flex">
+                      <Link
+                        href={`/partners/catalog/${p.slug}`}
+                        className="group flex h-full flex-col gap-3 rounded-xl border bg-surface-100 p-5 transition-colors hover:bg-surface-200 overflow-hidden w-full"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="relative size-10 shrink-0 rounded-full overflow-hidden bg-muted">
+                            <Image
+                              src={p.logo}
+                              alt={p.title}
+                              fill
+                              className="object-cover bg-white rounded-full overflow-hidden p-1"
+                              sizes="40px"
+                            />
+                          </div>
+                          <div className="flex flex-wrap items-center gap-2 min-w-0">
+                            <h3 className="text-foreground text-base font-medium tracking-tight">
+                              {p.title}
+                            </h3>
+                          </div>
                         </div>
-                        <div className="flex flex-wrap items-center gap-2 min-w-0">
-                          <h3 className="text-foreground text-base font-medium tracking-tight">
-                            {p.title}
-                          </h3>
+                        <p className="text-foreground-lighter text-sm line-clamp-3 text-pretty">
+                          {p.description}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-1">
+                          {p.categories.map((c) => (
+                            <Badge key={c.name}>{c.name}</Badge>
+                          ))}
                         </div>
-                      </div>
-                      <p className="text-foreground-lighter text-sm line-clamp-3 text-pretty">
-                        {p.description}
-                      </p>
-                      <div className="flex flex-wrap items-center gap-1">
-                        {p.categories.map((c) => (
-                          <Badge key={c.name}>{c.name}</Badge>
-                        ))}
-                      </div>
-                    </Link>
+                      </Link>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
             )}
 
@@ -308,78 +311,83 @@ export default function IntegrationsContent({
               <span className="text-foreground-muted text-xs">
                 {listPartners.length} partner{listPartners.length !== 1 ? 's' : ''}
               </span>
-              <div className="flex items-center rounded-lg border border-muted">
-                <button
-                  tabIndex={0}
+              <ToggleGroup
+                type="single"
+                value={viewMode}
+                onValueChange={(value) => value && setFilters({ view: value as ViewMode })}
+                aria-label="Partner layout"
+                className="flex items-center gap-0 rounded-lg border border-muted"
+              >
+                <ToggleGroupItem
+                  value="grid"
                   title="Grid view"
-                  onClick={() => setFilters({ view: 'grid' })}
                   className={cn(
-                    'relative flex items-center justify-center w-8 h-8 rounded-l-lg focus-visible:z-10 focus-ring',
-                    viewMode === 'grid'
-                      ? 'bg-surface-300 text-foreground'
-                      : 'bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
+                    'relative flex items-center justify-center w-8 h-8 p-0 rounded-none rounded-l-lg focus-visible:z-10 focus-ring',
+                    'cursor-pointer bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200',
+                    'data-[state=on]:cursor-default data-[state=on]:bg-surface-400 data-[state=on]:text-foreground',
+                    'aria-checked:bg-surface-400 aria-checked:text-foreground'
                   )}
                 >
                   <LayoutGrid size={14} />
-                </button>
-                <button
-                  tabIndex={0}
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value="list"
                   title="List view"
-                  onClick={() => setFilters({ view: 'list' })}
                   className={cn(
-                    'relative flex items-center justify-center w-8 h-8 border-l border-muted rounded-r-lg focus-visible:z-10 focus-ring',
-                    viewMode === 'list'
-                      ? 'bg-surface-300 text-foreground'
-                      : 'bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
+                    'relative flex items-center justify-center w-8 h-8 p-0 rounded-none rounded-r-lg border-l border-muted focus-visible:z-10 focus-ring',
+                    'cursor-pointer bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200',
+                    'data-[state=on]:cursor-default data-[state=on]:bg-surface-400 data-[state=on]:text-foreground',
+                    'aria-checked:bg-surface-400 aria-checked:text-foreground'
                   )}
                 >
                   <List size={14} />
-                </button>
-              </div>
+                </ToggleGroupItem>
+              </ToggleGroup>
             </div>
 
             {/* Grid view */}
             {viewMode === 'grid' &&
               (listPartners.length ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4">
+                <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4">
                   {visiblePartners.map((p) => (
-                    <Link
-                      key={p.slug}
-                      href={`/partners/catalog/${p.slug}`}
-                      className="flex flex-col justify-start items-stretch group cursor-pointer rounded-xl focus-ring"
-                    >
-                      <Panel
-                        hasActiveOnHover
-                        outerClassName="h-full"
-                        innerClassName="flex md:flex-col gap-3 sm:gap-2 h-full items-start p-2"
+                    <li key={p.slug} className="flex">
+                      <Link
+                        href={`/partners/catalog/${p.slug}`}
+                        className="flex flex-col justify-start items-stretch group cursor-pointer rounded-xl focus-ring w-full"
                       >
-                        <div className="relative rounded-lg min-h-[80px] max-h-[80px] md:max-h-[140px] h-full md:h-auto aspect-square md:w-full md:aspect-video! bg-alternative flex items-center justify-center shadow-inner border border-muted overflow-hidden shrink-0 md:shrink">
-                          <Image
-                            src={p.logo}
-                            alt={p.title}
-                            width={60}
-                            height={60}
-                            className="border w-14 h-14 aspect-square p-1 bg-white rounded-full overflow-hidden"
-                            sizes="60px"
-                          />
-                        </div>
-                        <div className="md:p-2 md:pt-1 flex flex-col h-full md:h-auto grow gap-0.5 md:gap-1.5 justify-center md:justify-start min-w-0">
-                          <h3 className="text-sm md:text-base text-foreground leading-5!">
-                            {p.title}
-                          </h3>
-                          <p className="text-foreground-light text-sm line-clamp-2 flex-1">
-                            {p.description}
-                          </p>
-                          <div className="flex flex-wrap items-center gap-1 mt-1">
-                            {p.categories.map((c) => (
-                              <Badge key={c.name}>{c.name}</Badge>
-                            ))}
+                        <Panel
+                          hasActiveOnHover
+                          outerClassName="h-full"
+                          innerClassName="flex md:flex-col gap-3 sm:gap-2 h-full items-start p-2"
+                        >
+                          <div className="relative rounded-lg min-h-[80px] max-h-[80px] md:max-h-[140px] h-full md:h-auto aspect-square md:w-full md:aspect-video! bg-alternative flex items-center justify-center shadow-inner border border-muted overflow-hidden shrink-0 md:shrink">
+                            <Image
+                              src={p.logo}
+                              alt={p.title}
+                              width={60}
+                              height={60}
+                              className="border w-14 h-14 aspect-square p-1 bg-white rounded-full overflow-hidden"
+                              sizes="60px"
+                            />
                           </div>
-                        </div>
-                      </Panel>
-                    </Link>
+                          <div className="md:p-2 md:pt-1 flex flex-col h-full md:h-auto grow gap-0.5 md:gap-1.5 justify-center md:justify-start min-w-0">
+                            <h3 className="text-sm md:text-base text-foreground leading-5!">
+                              {p.title}
+                            </h3>
+                            <p className="text-foreground-light text-sm line-clamp-2 flex-1">
+                              {p.description}
+                            </p>
+                            <div className="flex flex-wrap items-center gap-1 mt-1">
+                              {p.categories.map((c) => (
+                                <Badge key={c.name}>{c.name}</Badge>
+                              ))}
+                            </div>
+                          </div>
+                        </Panel>
+                      </Link>
+                    </li>
                   ))}
-                </div>
+                </ul>
               ) : (
                 <p className="text-foreground-lighter text-sm">
                   No partners found with these filters.
@@ -389,42 +397,45 @@ export default function IntegrationsContent({
             {/* List view */}
             {viewMode === 'list' &&
               (listPartners.length ? (
-                <div className="border bg-background rounded-xl overflow-hidden divide-y">
+                <ul className="border bg-background rounded-xl overflow-hidden divide-y">
                   {visiblePartners.map((p) => (
-                    <Link
-                      key={p.slug}
-                      href={`/partners/catalog/${p.slug}`}
-                      className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-surface-100"
-                    >
-                      <div className="relative size-10 shrink-0 rounded-full overflow-hidden bg-muted">
-                        <Image
-                          src={p.logo}
-                          alt={p.title}
-                          fill
-                          className="object-cover bg-white rounded-full overflow-hidden p-1"
-                          sizes="40px"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0 flex flex-col gap-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-foreground text-sm font-medium tracking-tight">
-                            {p.title}
-                          </span>
-                          <div className="flex items-center gap-1">
-                            {p.categories.map((c) => (
-                              <Badge key={c.name}>{c.name}</Badge>
-                            ))}
-                          </div>
+                    <li key={p.slug}>
+                      <Link
+                        href={`/partners/catalog/${p.slug}`}
+                        className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-surface-100"
+                      >
+                        <div className="relative size-10 shrink-0 rounded-full overflow-hidden bg-muted">
+                          <Image
+                            src={p.logo}
+                            alt={p.title}
+                            fill
+                            className="object-cover bg-white rounded-full overflow-hidden p-1"
+                            sizes="40px"
+                          />
                         </div>
-                        <p className="text-foreground-lighter text-sm truncate">{p.description}</p>
-                      </div>
-                      <ArrowUpRight
-                        size={16}
-                        className="shrink-0 text-foreground-lighter transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                      />
-                    </Link>
+                        <div className="flex-1 min-w-0 flex flex-col gap-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-foreground text-sm font-medium tracking-tight">
+                              {p.title}
+                            </span>
+                            <div className="flex items-center gap-1">
+                              {p.categories.map((c) => (
+                                <Badge key={c.name}>{c.name}</Badge>
+                              ))}
+                            </div>
+                          </div>
+                          <p className="text-foreground-lighter text-sm truncate">
+                            {p.description}
+                          </p>
+                        </div>
+                        <ArrowUpRight
+                          size={16}
+                          className="shrink-0 text-foreground-lighter transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                        />
+                      </Link>
+                    </li>
                   ))}
-                </div>
+                </ul>
               ) : (
                 <p className="text-foreground-lighter text-sm">
                   No partners found with these filters.
