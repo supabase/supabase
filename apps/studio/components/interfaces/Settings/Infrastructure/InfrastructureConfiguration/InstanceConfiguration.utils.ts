@@ -1,11 +1,9 @@
 import dagre from '@dagrejs/dagre'
 import { Edge, Node, Position } from '@xyflow/react'
 import { groupBy } from 'lodash'
-import { AWS_REGIONS, AWS_REGIONS_KEYS } from 'shared-data'
 
 import {
   AVAILABLE_REPLICA_REGIONS,
-  AWS_REGIONS_COORDINATES,
   NODE_HEIGHT_FALLBACKS,
   NODE_SEP,
   NODE_WIDTH,
@@ -47,26 +45,9 @@ export const generateNodes = ({
         }
       : undefined
 
-  // [Joshen] We should be finding from AVAILABLE_REPLICA_REGIONS instead
-  // but because the new regions (zurich, stockholm, ohio, paris) dont have
-  // coordinates yet in AWS_REGIONS_COORDINATES - we'll need to add them in once
-  // they are ready to spin up coordinates for
-  const primaryRegion = Object.keys(AWS_REGIONS)
-    .map((key) => {
-      return {
-        key: key as AWS_REGIONS_KEYS,
-        name: AWS_REGIONS?.[key as AWS_REGIONS_KEYS].displayName,
-        region: AWS_REGIONS?.[key as AWS_REGIONS_KEYS].code,
-        coordinates: AWS_REGIONS_COORDINATES[key],
-      }
-    })
-    .find((region) => primary.region.includes(region.region))
-
-  // [Joshen] Once we have the coordinates for Zurich and Stockholm, we can remove the above
-  // and uncomment below for better simplicity
-  // const primaryRegion = AVAILABLE_REPLICA_REGIONS.find((region) =>
-  //   primary.region.includes(region.region)
-  // )
+  const primaryRegion = AVAILABLE_REPLICA_REGIONS.find((region) =>
+    primary.region.includes(region.region)
+  )
 
   const primaryNode: Node = {
     position,
