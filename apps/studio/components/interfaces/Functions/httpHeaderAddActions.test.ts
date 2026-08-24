@@ -84,7 +84,7 @@ describe('ensureEdgeFunctionAuthorizationHeader', () => {
       {
         id: 'authorization',
         name: 'Authorization',
-        value: 'Bearer legacy-service-role-jwt',
+        value: 'Bearer old-key',
       },
       { id: 'apikey', name: 'apikey', value: 'sb_secret_123' },
       { id: 'custom-after', name: 'X-After', value: 'after' },
@@ -134,23 +134,26 @@ describe('ensureEdgeFunctionAuthorizationHeader', () => {
     ).toBe(headers)
   })
 
-  it('returns the existing array when Authorization is already normalized', () => {
-    const headers = [
-      {
-        id: 'authorization',
-        name: 'Authorization',
-        value: 'Bearer legacy-service-role-jwt',
-      },
-      { id: 'apikey', name: 'apikey', value: 'sb_secret_123' },
-    ]
+  it.each(['Bearer user-entered-token', ''])(
+    'preserves a user-entered Authorization value: %j',
+    (value) => {
+      const headers = [
+        {
+          id: 'authorization',
+          name: 'Authorization',
+          value,
+        },
+        { id: 'apikey', name: 'apikey', value: 'sb_secret_123' },
+      ]
 
-    expect(
-      ensureEdgeFunctionAuthorizationHeader({
-        headers,
-        serviceRoleKey: 'legacy-service-role-jwt',
-        verifyJwt: true,
-        createRow,
-      })
-    ).toBe(headers)
-  })
+      expect(
+        ensureEdgeFunctionAuthorizationHeader({
+          headers,
+          serviceRoleKey: 'legacy-service-role-jwt',
+          verifyJwt: true,
+          createRow,
+        })
+      ).toBe(headers)
+    }
+  )
 })

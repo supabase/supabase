@@ -33,13 +33,12 @@ export const ensureEdgeFunctionAuthorizationHeader = <TRow extends HTTPHeader>({
 }: EnsureEdgeFunctionAuthorizationHeaderParams<TRow>): TRow[] => {
   if (!verifyJwt || !serviceRoleKey || isNewApiKey(serviceRoleKey)) return headers
 
-  const value = `Bearer ${serviceRoleKey}`
   const isAuthorization = (header: HTTPHeader) =>
     header.name.trim().toLowerCase() === 'authorization'
   const authorizationIndex = headers.findIndex(isAuthorization)
 
   if (authorizationIndex === -1) {
-    return [...headers, createRow('Authorization', value)]
+    return [...headers, createRow('Authorization', `Bearer ${serviceRoleKey}`)]
   }
 
   const authorizationHeader = headers[authorizationIndex]
@@ -47,18 +46,13 @@ export const ensureEdgeFunctionAuthorizationHeader = <TRow extends HTTPHeader>({
     (header, index) => index === authorizationIndex || !isAuthorization(header)
   )
 
-  if (
-    normalizedHeaders.length === headers.length &&
-    authorizationHeader.name === 'Authorization' &&
-    authorizationHeader.value === value
-  ) {
+  if (normalizedHeaders.length === headers.length && authorizationHeader.name === 'Authorization') {
     return headers
   }
 
   normalizedHeaders[authorizationIndex] = {
     ...authorizationHeader,
     name: 'Authorization',
-    value,
   }
   return normalizedHeaders
 }
