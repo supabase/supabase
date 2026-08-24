@@ -1,7 +1,7 @@
 import { useMonaco } from '@monaco-editor/react'
 import { acceptUntrustedSql, untrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { useFlag } from 'common'
-import { CodeSquare, Eye, EyeOff, Play } from 'lucide-react'
+import { CodeSquare, Eye, EyeOff, Play, Sparkles } from 'lucide-react'
 import type { editor as monacoEditor } from 'monaco-editor'
 import {
   forwardRef,
@@ -187,7 +187,6 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   )
 
   const dialect = query._tag === 'logs' ? 'clickhouse' : 'postgres'
-  const { requestCompletion, isCompletionLoading } = useQueryEditorAi({ dialect })
 
   const monaco = useMonaco()
   useAddDefinitions('', monaco, { enabled: dialect === 'postgres' })
@@ -206,6 +205,11 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     databaseIdentifier === undefined || databaseIdentifier === project?.ref
       ? project?.connectionString
       : databases?.find((database) => database.identifier === databaseIdentifier)?.connectionString
+
+  const { requestCompletion, isCompletionLoading } = useQueryEditorAi({
+    dialect,
+    connectionString,
+  })
 
   const { data: eventTriggers } = useDatabaseEventTriggersQuery(
     { projectRef: project?.ref, connectionString },
@@ -343,6 +347,32 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     }
   }
 
+  const handleGenerateQuery = async () => {
+    if (
+      isReadOnly ||
+      !showQuery ||
+      isBusy ||
+      isCompletionLoading ||
+      pendingProposal ||
+      sql.trim().length === 0
+    ) {
+      return
+    }
+
+    const { original, modified } = await requestCompletion(
+      '',
+      { selection: sql, beforeSelection: '', afterSelection: '' },
+      'generate'
+    )
+    if (original !== undefined && modified !== undefined) {
+      setPendingProposal({
+        original,
+        modified,
+        label: 'Review the generated query before accepting it',
+      })
+    }
+  }
+
   const Shell = variant === 'viewport' ? ExplorerQueryViewport : ExplorerQuery
 
   useImperativeHandle(ref, () => ({ run: () => handleRunQuery() }))
@@ -367,7 +397,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
             {toolbarActions}
             {onSourceChange && (
               <QuerySourceMenu
-                disabled={pendingProposal !== null}
+                disabled={pendingProposal !== null || isCompletionLoading}
                 source={toQuerySourceBinding(query)}
                 onSourceChange={(source) => {
                   setPendingProposal(null)
@@ -394,11 +424,30 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
               onClick={() => onShowQueryChange(!showQuery)}
             />
             <ExplorerToolbarAction
+              loading={isCompletionLoading}
+              icon={<Sparkles />}
+              aria-label="Generate query with AI"
+              tooltip="Generate query with AI"
+              disabled={
+                isReadOnly ||
+                !showQuery ||
+                isBusy ||
+                isCompletionLoading ||
+                pendingProposal !== null ||
+                sql.trim().length === 0
+              }
+              onClick={handleGenerateQuery}
+            />
+            <ExplorerToolbarAction
               loading={isExecuting}
               icon={<Play />}
               tooltip="Run query"
               disabled={
-                isBusy || pendingProposal !== null || isRunDisabled || sql.trim().length === 0
+                isBusy ||
+                isCompletionLoading ||
+                pendingProposal !== null ||
+                isRunDisabled ||
+                sql.trim().length === 0
               }
               onClick={() => handleRunQuery()}
             >

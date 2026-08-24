@@ -437,6 +437,7 @@ export function assembleCompletionDiff(
  * logs snippet always gets ClickHouse SQL and a database snippet Postgres.
  */
 export type SqlDialect = 'postgres' | 'clickhouse'
+export type SqlCompletionIntent = 'edit' | 'rewrite' | 'generate'
 
 /**
  * Maps a snippet's query source to the dialect the AI should write in. Logs
@@ -465,7 +466,7 @@ export function buildCompletionRequestBody({
   connectionString: string | undefined | null
   orgSlug: string | undefined
   dialect?: SqlDialect
-  options?: { completionMetadata?: unknown }
+  options?: { completionMetadata?: unknown; intent?: SqlCompletionIntent }
 }): {
   projectRef: string | undefined
   connectionString: string | undefined | null
@@ -473,6 +474,7 @@ export function buildCompletionRequestBody({
   orgSlug: string | undefined
   dialect?: SqlDialect
   completionMetadata?: unknown
+  intent?: SqlCompletionIntent
 } {
   return {
     projectRef,

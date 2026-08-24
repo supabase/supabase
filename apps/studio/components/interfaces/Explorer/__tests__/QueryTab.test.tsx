@@ -1,14 +1,15 @@
 import { act, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { HttpResponse } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ExplorerQueryTab } from '../ExplorerQueryTab'
 import type { ReadReplicasData } from '@/data/read-replicas/replicas-query'
+import { API_URL } from '@/lib/constants'
 import { explorerQueryState } from '@/state/explorer-query'
 import { createTabsState, TabsStateContext } from '@/state/tabs'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, mswServer } from '@/tests/lib/msw'
 import { setupSqlEditorMocks } from '@/tests/lib/sql-editor-test-utils'
 
 const testContext = vi.hoisted(() => ({
@@ -29,6 +30,15 @@ vi.mock('common', async (importOriginal) => {
 vi.mock('@/components/ui/CodeEditor/CodeEditor', () => ({
   CodeEditor: ({ value }: { value: string }) => (
     <textarea aria-label="SQL editor" value={value} readOnly />
+  ),
+}))
+
+vi.mock('@/components/ui/DiffEditor', () => ({
+  DiffEditor: ({ original, modified }: { original: string; modified: string }) => (
+    <div>
+      <pre data-testid="diff-original">{original}</pre>
+      <pre data-testid="diff-modified">{modified}</pre>
+    </div>
   ),
 }))
 
@@ -81,6 +91,51 @@ beforeEach(() => {
 afterEach(() => explorerQueryState.flushPendingPersistence())
 
 describe('QueryTab execution', () => {
+  it('generates a whole database query from the editor and applies it after review', async () => {
+    createDraft({ _tag: 'database' }, 'select all tasks')
+    const bodies: Array<{
+      dialect?: string
+      intent?: string
+      completionMetadata?: {
+        selection?: string
+        textBeforeCursor?: string
+        textAfterCursor?: string
+      }
+    }> = []
+    mswServer.use(
+      http.post(`${API_URL}/ai/code/complete`, async ({ request }) => {
+        bodies.push((await request.json()) as (typeof bodies)[number])
+        return HttpResponse.json('select * from tasks;')
+      })
+    )
+
+    renderQueryTab()
+    const generateButton = await screen.findByRole('button', { name: 'Generate query with AI' })
+    await waitFor(() => expect(generateButton).toBeEnabled())
+    await userEvent.click(generateButton)
+
+    await waitFor(() => expect(bodies).toHaveLength(1))
+    expect(bodies[0]).toMatchObject({
+      dialect: 'postgres',
+      intent: 'generate',
+      completionMetadata: {
+        selection: 'select all tasks',
+        textBeforeCursor: '',
+        textAfterCursor: '',
+      },
+    })
+    expect(await screen.findByText('Review the generated query before accepting it')).toBeVisible()
+    expect(screen.getByTestId('diff-original')).toHaveTextContent('select all tasks')
+
+    await userEvent.click(screen.getByRole('button', { name: 'Accept' }))
+
+    await waitFor(() =>
+      expect(screen.getByRole('textbox', { name: 'SQL editor' })).toHaveValue(
+        'select\n  *\nfrom\n  tasks;'
+      )
+    )
+  })
+
   it('keeps loading while dynamic route parameters are unavailable', () => {
     testContext.params = {}
 

@@ -284,6 +284,16 @@ describe('SQLEditor.utils.ts:buildCompletionRequestBody', () => {
       completionMetadata: { prompt: 'add a where clause' },
     })
   })
+  test('includes the whole-query generation intent', () => {
+    expect(
+      buildCompletionRequestBody({
+        projectRef: 'default',
+        connectionString: 'postgresql://example',
+        orgSlug: 'acme',
+        options: { intent: 'generate' },
+      }).intent
+    ).toBe('generate')
+  })
   test('omits dialect when not provided, so the route keeps its Postgres default', () => {
     const body = buildCompletionRequestBody({
       projectRef: 'default',

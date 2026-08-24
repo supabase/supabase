@@ -1,17 +1,18 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
-import { HttpResponse } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ExplorerNotebookTab } from '../ExplorerNotebookTab'
 import { createMarkdownCellSkeleton, createQueryCellSkeleton } from '../utils'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
+import { API_URL } from '@/lib/constants'
 import { notebooksState } from '@/state/notebooks/notebooks-state'
 import type { Notebook } from '@/state/notebooks/types'
 import { createTabsState, TabsStateContext } from '@/state/tabs'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, mswServer } from '@/tests/lib/msw'
 import { setupSqlEditorMocks } from '@/tests/lib/sql-editor-test-utils'
 import type { Notebooks } from '@/types'
 
@@ -32,6 +33,15 @@ vi.mock('common', async (importOriginal) => {
 vi.mock('@/components/ui/CodeEditor/CodeEditor', () => ({
   CodeEditor: ({ value }: { value: string }) => (
     <textarea aria-label="SQL editor" value={value} readOnly />
+  ),
+}))
+
+vi.mock('@/components/ui/DiffEditor', () => ({
+  DiffEditor: ({ original, modified }: { original: string; modified: string }) => (
+    <div>
+      <pre data-testid="diff-original">{original}</pre>
+      <pre data-testid="diff-modified">{modified}</pre>
+    </div>
   ),
 }))
 
@@ -92,6 +102,43 @@ afterEach(() => {
 })
 
 describe('ExplorerNotebookTab', () => {
+  it('generates a ClickHouse query from a logs cell through the shared editor action', async () => {
+    seedNotebook(
+      [
+        databaseCell,
+        { ...logCell, unchecked_sql: untrustedLogSql('show auth errors') },
+        markdownCell,
+      ],
+      'new'
+    )
+    const bodies: Array<{
+      dialect?: string
+      intent?: string
+      completionMetadata?: { selection?: string }
+    }> = []
+    mswServer.use(
+      http.post(`${API_URL}/ai/code/complete`, async ({ request }) => {
+        bodies.push((await request.json()) as (typeof bodies)[number])
+        return HttpResponse.json('select event_message from logs limit 100')
+      })
+    )
+
+    renderNotebookTab()
+    const generateButtons = await screen.findAllByRole('button', {
+      name: 'Generate query with AI',
+    })
+    expect(generateButtons).toHaveLength(2)
+    await userEvent.click(generateButtons[1])
+
+    await waitFor(() => expect(bodies).toHaveLength(1))
+    expect(bodies[0]).toMatchObject({
+      dialect: 'clickhouse',
+      intent: 'generate',
+      completionMetadata: { selection: 'show auth errors' },
+    })
+    expect(await screen.findByText('Review the generated query before accepting it')).toBeVisible()
+  })
+
   it('hides SQL by default for saved notebooks and caps query cells at 6xl', () => {
     renderNotebookTab()
 

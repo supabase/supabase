@@ -5,6 +5,7 @@ import * as z from 'zod'
 import {
   assembleCompletionDiff,
   buildCompletionRequestBody,
+  type SqlCompletionIntent,
   type SqlDialect,
 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
 import { type EditorSelection } from '@/components/ui/AIEditor/utils'
@@ -17,7 +18,13 @@ import { BASE_PATH } from '@/lib/constants'
 import { formatSql } from '@/lib/formatSql'
 import { getErrorMessage } from '@/lib/get-error-message'
 
-export function useQueryEditorAi({ dialect }: { dialect: SqlDialect }) {
+export function useQueryEditorAi({
+  dialect,
+  connectionString,
+}: {
+  dialect: SqlDialect
+  connectionString?: string | null
+}) {
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
   const { fetchAttributeKeys } = useLogsAttributeKeys()
@@ -28,7 +35,8 @@ export function useQueryEditorAi({ dialect }: { dialect: SqlDialect }) {
 
   const requestCompletion = async (
     prompt: string,
-    context: Pick<EditorSelection, 'selection' | 'beforeSelection' | 'afterSelection'>
+    context: Pick<EditorSelection, 'selection' | 'beforeSelection' | 'afterSelection'>,
+    intent: SqlCompletionIntent = 'edit'
   ) => {
     setIsCompletionLoading(true)
     try {
@@ -49,10 +57,11 @@ export function useQueryEditorAi({ dialect }: { dialect: SqlDialect }) {
         body: JSON.stringify(
           buildCompletionRequestBody({
             projectRef: project?.ref,
-            connectionString: project?.connectionString,
+            connectionString,
             orgSlug: organization?.slug,
             dialect,
             options: {
+              intent,
               completionMetadata: {
                 textBeforeCursor: context.beforeSelection,
                 textAfterCursor: context.afterSelection,

@@ -22,6 +22,7 @@ import {
   SECURITY_PROMPT,
   SQL_COMPLETION_INSTRUCTIONS,
 } from '@/lib/ai/prompts'
+import { getStudioTools } from '@/lib/ai/tools/studio-tools'
 import { apiWrapper } from '@/lib/api/apiWrapper'
 import { executeQuery } from '@/lib/api/self-hosted/query'
 
@@ -141,14 +142,17 @@ const requestBodySchema = z.object({
   language: z.string().optional(),
   dialect: z.enum(['postgres', 'clickhouse']).optional(),
   /**
-   * What the caller wants done. `rewrite` swaps the user instruction for the
-   * canonical BigQuery → ClickHouse rewrite instruction, so the client never has
-   * to carry prompt text. ClickHouse-only; defaults to `edit`.
+   * What the caller wants done. Whole-query intents keep their canonical
+   * instruction server-side, so clients only send the editor contents. `rewrite`
+   * is ClickHouse-only; `generate` follows the requested dialect.
    */
-  intent: z.enum(['edit', 'rewrite']).optional(),
+  intent: z.enum(['edit', 'rewrite', 'generate']).optional(),
 })
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+const GENERATE_QUERY_INSTRUCTION =
+  'Replace the selected editor contents with one complete, valid query that best satisfies them. Treat non-SQL text as a natural-language request. Return only the query.'
+
+export async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: `Method ${req.method} Not Allowed` })
   }
@@ -245,6 +249,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           otherSchemas: schemas.filter((s) => !fetchedSchemaSet.has(s.name)).map((s) => s.name),
         }
 
+    const knowledgeInstruction =
+      intent === 'generate'
+        ? isClickhouse
+          ? 'Before writing the query, call load_knowledge with name `logs`. Use the loaded guidance to write the query, but do not try to run it.'
+          : 'Before writing the query, call load_knowledge with name `pg_best_practices`. Use the loaded guidance to write the query, but do not try to run it.'
+        : ''
+
     const system = isClickhouse
       ? source`
           You write and edit ClickHouse SQL for the Supabase logs table.
@@ -252,11 +263,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           surrounding query valid: no explanation, no comments, and no markdown code fences.
           ${CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS}
           ${SECURITY_PROMPT}
+          ${knowledgeInstruction}
         `
       : source`
           ${COMPLETION_PROMPT}
           ${language === 'sql' ? `${SQL_COMPLETION_INSTRUCTIONS}\n${PG_BEST_PRACTICES}` : EDGE_FUNCTION_PROMPT}
           ${SECURITY_PROMPT}
+          ${knowledgeInstruction}
         `
 
     const schemaSection = isClickhouse
@@ -267,7 +280,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         }
 
     const instruction =
-      isClickhouse && intent === 'rewrite' ? CLICKHOUSE_LOGS_REWRITE_INSTRUCTION : prompt
+      intent === 'generate'
+        ? GENERATE_QUERY_INSTRUCTION
+        : isClickhouse && intent === 'rewrite'
+          ? CLICKHOUSE_LOGS_REWRITE_INSTRUCTION
+          : prompt
 
     const userMessage = source`
       ## ${schemaSection.heading}
@@ -294,6 +311,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       },
     ]
 
+    const { load_knowledge } = getStudioTools()
+
     const { text } = await generateText({
       ...modelParams,
       instructions: {
@@ -304,30 +323,35 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       stopWhen: isStepCount(5),
       messages: coreMessages,
       tools:
-        includeSchema && !schemaListResult.error
+        intent === 'generate' || (includeSchema && !schemaListResult.error)
           ? {
-              getSchemaDefinitions: tool({
-                description: 'Get table and column definitions for one or more schemas',
-                inputSchema: z.object({
-                  schemas: z
-                    .array(z.string())
-                    .describe('The schema names to get the definitions for'),
-                }),
-                execute: async ({ schemas: maybeSchemas }) => {
-                  const validSchemas = maybeSchemas.filter((name) =>
-                    schemas.some((s) => s.name === name)
-                  )
-                  const result = await fetchSchemaDDL(validSchemas, {
-                    projectRef,
-                    connectionString,
-                    headers,
-                  })
-                  if (result.error)
-                    return 'Failed to fetch schema definitions due to a database error.'
-                  if (result.sqlDefinitions.length === 0) return 'No table definitions found.'
-                  return result.sqlDefinitions.join('\n\n')
-                },
-              }),
+              ...(intent === 'generate' ? { load_knowledge } : {}),
+              ...(includeSchema && !schemaListResult.error
+                ? {
+                    getSchemaDefinitions: tool({
+                      description: 'Get table and column definitions for one or more schemas',
+                      inputSchema: z.object({
+                        schemas: z
+                          .array(z.string())
+                          .describe('The schema names to get the definitions for'),
+                      }),
+                      execute: async ({ schemas: maybeSchemas }) => {
+                        const validSchemas = maybeSchemas.filter((name) =>
+                          schemas.some((s) => s.name === name)
+                        )
+                        const result = await fetchSchemaDDL(validSchemas, {
+                          projectRef,
+                          connectionString,
+                          headers,
+                        })
+                        if (result.error)
+                          return 'Failed to fetch schema definitions due to a database error.'
+                        if (result.sqlDefinitions.length === 0) return 'No table definitions found.'
+                        return result.sqlDefinitions.join('\n\n')
+                      },
+                    }),
+                  }
+                : {}),
             }
           : undefined,
     })
