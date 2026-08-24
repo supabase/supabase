@@ -170,12 +170,13 @@ export const AssistantChat = ({
   const isSupportChatProjectReady = isProjectReadyForAssistant(supportChatProjectDetail)
   const isResolvingSupportChatConnectionString = isOrgViewSupportChat && !isSupportChatProjectReady
 
-  // The project this chat is actually scoped to — falls back to the support chat's own
-  // resolved project on org-level pages, where `project` from the URL is undefined.
   const resolvedProjectRef = isOrgViewSupportChat ? supportMetadata?.projectRef : project?.ref
   const resolvedConnectionString = isOrgViewSupportChat
     ? supportChatProjectDetail?.connectionString
     : project?.connectionString
+  const resolvedOrgSlug = isOrgViewSupportChat
+    ? supportMetadata?.organizationSlug
+    : selectedOrganization?.slug
 
   const { data: tables } = useTablesQuery(
     {
@@ -315,7 +316,7 @@ export const AssistantChat = ({
 
   const handleRateMessage = useCallback(
     async (messageId: string, rating: 'positive' | 'negative', reason?: string) => {
-      if (!resolvedProjectRef || !selectedOrganization?.slug) return
+      if (!resolvedProjectRef || !resolvedOrgSlug) return
 
       // Optimistically update UI
       setMessageRatings((prev) => ({ ...prev, [messageId]: rating }))
@@ -326,7 +327,7 @@ export const AssistantChat = ({
           messages: chatMessages,
           messageId,
           projectRef: resolvedProjectRef,
-          orgSlug: selectedOrganization.slug,
+          orgSlug: resolvedOrgSlug,
           reason,
           spanId: state.messageSpanIds[messageId],
         })
@@ -346,15 +347,7 @@ export const AssistantChat = ({
         })
       }
     },
-    [
-      chatMessages,
-      resolvedProjectRef,
-      selectedOrganization?.slug,
-      rateMessage,
-      track,
-      state,
-      chatId,
-    ]
+    [chatMessages, resolvedProjectRef, resolvedOrgSlug, rateMessage, track, state, chatId]
   )
 
   const isContextExceededError =
@@ -522,7 +515,7 @@ export const AssistantChat = ({
         component: 'AIAssistant',
         feature: 'AI Assistant Panel',
         projectRef: resolvedProjectRef,
-        organizationSlug: selectedOrganization?.slug,
+        organizationSlug: resolvedOrgSlug,
       }}
       actions={[
         {
