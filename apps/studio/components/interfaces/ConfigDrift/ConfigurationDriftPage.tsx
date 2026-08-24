@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { BucketPlus } from 'icons'
 import { ArrowRight, CheckCircle2, FileWarning, Github, Minus, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Card, Skeleton } from 'ui'
