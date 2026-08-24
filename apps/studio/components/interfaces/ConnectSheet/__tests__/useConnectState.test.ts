@@ -7,8 +7,11 @@ vi.mock('common', () => ({
   useParams: () => ({ ref: 'test-ref' }),
 }))
 
+const readReplicasMock: {
+  data: Array<{ identifier: string; region: string; inserted_at: string }>
+} = { data: [] }
 vi.mock('@/data/read-replicas/replicas-query', () => ({
-  useReadReplicasQuery: () => ({ data: [] }),
+  useReadReplicasQuery: () => readReplicasMock,
 }))
 
 vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
@@ -498,9 +501,67 @@ describe('useConnectState', () => {
   // ============================================================================
 
   describe('high availability projects', () => {
+    const PRIMARY_DATABASE = {
+      identifier: 'test-ref',
+      region: 'ap-southeast-1',
+      inserted_at: '2024-01-01T00:00:00Z',
+    }
+    const REPLICA_DATABASE = {
+      identifier: 'test-ref-rr-abcdefgh',
+      region: 'ap-southeast-1',
+      inserted_at: '2024-01-02T00:00:00Z',
+    }
+
     afterEach(async () => {
       const { useIsHighAvailability } = await import('@/hooks/misc/useSelectedProject')
       vi.mocked(useIsHighAvailability).mockReturnValue(false)
+      readReplicasMock.data = []
+    })
+
+    test('should offer only the primary and the load balancer as sources for HA projects', async () => {
+      const { useIsHighAvailability } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useIsHighAvailability).mockReturnValue(true)
+      readReplicasMock.data = [PRIMARY_DATABASE, REPLICA_DATABASE]
+
+      const { result } = renderHook(() => useConnectState({ mode: 'direct' }))
+
+      const options = result.current.getFieldOptions('connectionSource')
+      expect(options).toEqual([
+        { value: 'test-ref', label: 'Primary database' },
+        { value: 'load-balancer', label: 'Load balancer (read-only)' },
+      ])
+    })
+
+    test('should keep replicas as sources and omit the load balancer for non-HA projects', () => {
+      readReplicasMock.data = [PRIMARY_DATABASE, REPLICA_DATABASE]
+
+      const { result } = renderHook(() => useConnectState({ mode: 'direct' }))
+
+      const options = result.current.getFieldOptions('connectionSource')
+      expect(options.map((o) => o.value)).toEqual(['test-ref', 'test-ref-rr-abcdefgh'])
+      expect(options.some((o) => o.value === 'load-balancer')).toBe(false)
+    })
+
+    test('should coerce a replica connection source to the primary for HA projects', async () => {
+      const { useIsHighAvailability } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useIsHighAvailability).mockReturnValue(true)
+
+      const { result } = renderHook(() =>
+        useConnectState({ mode: 'direct', connectionSource: 'test-ref-rr-abcdefgh' })
+      )
+
+      expect(result.current.state.connectionSource).toBe('test-ref')
+    })
+
+    test('should preserve the load balancer as a valid connection source for HA projects', async () => {
+      const { useIsHighAvailability } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useIsHighAvailability).mockReturnValue(true)
+
+      const { result } = renderHook(() =>
+        useConnectState({ mode: 'direct', connectionSource: 'load-balancer' })
+      )
+
+      expect(result.current.state.connectionSource).toBe('load-balancer')
     })
 
     test('should hide connectionMethod field for HA projects', async () => {
