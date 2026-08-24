@@ -122,7 +122,6 @@ export const LOCAL_STORAGE_KEYS = {
     `free-micro-upgrade-banner-dismissed-${ref}`,
   PROJECT_UPGRADE_FAILED_BANNER_DISMISSED_AT: (ref: string) =>
     `project-upgrade-failed-banner-dismissed-at-${ref}`,
-  UNIFIED_LOGS_BANNER_DISMISSED: 'unified-logs-banner-dismissed',
   UNIFIED_LOGS_SIDEBAR_BANNER_DISMISSED: 'unified-logs-sidebar-banner-dismissed',
   // Dated so the key retires with the banner; see BannerLogsAllDeprecation
   LOGS_ALL_DEPRECATION_2026_09_23: 'logs-all-deprecation-2026-09-23-dismissed',

@@ -1420,33 +1420,6 @@ export interface ReportsDatabaseGrafanaBannerClickedEvent {
 }
 
 /**
- * User clicks on the Unified Logs banner CTA button in studio project pages.
- *
- * @group Events
- * @source studio
- * @page /project/[ref]/*
- */
-export interface UnifiedLogsBannerCtaButtonClickedEvent {
-  action: 'unified_logs_banner_cta_button_clicked'
-  properties: {
-    is_enabled: boolean
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * User clicked the dismiss button on the Unified Logs banner in studio project pages.
- *
- * @group Events
- * @source studio
- * @page /project/[ref]/*
- */
-export interface UnifiedLogsBannerDismissButtonClickedEvent {
-  action: 'unified_logs_banner_dismiss_button_clicked'
-  groups: TelemetryGroups
-}
-
-/**
  * The logs.all deprecation banner was rendered, fired once per mount. Acts as the
  * denominator for the dismiss rate. Migration outcome itself is measured via decay in
  * `/v1/projects/:ref/analytics/endpoints/logs.all` traffic in the warehouse, not from this event.
@@ -3826,8 +3799,6 @@ export type TelemetryEvent =
   | StudioBillingCancelSubscriptionClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
-  | UnifiedLogsBannerCtaButtonClickedEvent
-  | UnifiedLogsBannerDismissButtonClickedEvent
   | LogsAllDeprecationBannerExposedEvent
   | LogsAllDeprecationBannerDismissButtonClickedEvent
   | IndexAdvisorEnableButtonClickedEvent

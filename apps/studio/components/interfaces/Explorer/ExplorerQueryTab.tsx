@@ -40,19 +40,9 @@ export const ExplorerQueryTab = () => {
     if (!id || !ref) return
 
     setShowQuery(true)
-    const restored = explorerQueryState.restoreDraft({ id, projectRef: ref })
-    const restoredDraft = explorerQueryState.drafts[id]
-    if (restored && restoredDraft) {
-      tabs.addTab({
-        id: createTabId('query', { id }),
-        type: 'query',
-        label: restoredDraft.name,
-        metadata: { queryId: id },
-        isPreview: false,
-      })
-    }
+    explorerQueryState.restoreDraft({ id, projectRef: ref })
     setRestoredQueryKey(`${ref}:${id}`)
-  }, [id, ref, tabs])
+  }, [id, ref])
 
   if (!queryKey || restoredQueryKey !== queryKey) {
     return (
@@ -81,13 +71,6 @@ export const ExplorerQueryTab = () => {
     )
   }
 
-  const handleResultChange = (nextResult: QueryResult) => {
-    explorerQueryState.setResult({
-      id,
-      result: { ...nextResult, executedAt: Date.now() },
-    })
-  }
-
   const display: QueryDisplay = {
     view: draft.view,
     chart: draft.chart ? { ...draft.chart, y_series: [...draft.chart.y_series] } : undefined,
@@ -102,6 +85,15 @@ export const ExplorerQueryTab = () => {
           rowLimit: draft.rowLimit,
         }
 
+  const persistTab = () => tabs.makeTabPermanent(createTabId('query', { id }))
+
+  const handleResultChange = (nextResult: QueryResult) => {
+    explorerQueryState.setResult({
+      id,
+      result: { ...nextResult, executedAt: Date.now() },
+    })
+  }
+
   return (
     <QueryEditor
       id={id}
@@ -114,15 +106,28 @@ export const ExplorerQueryTab = () => {
       onShowQueryChange={setShowQuery}
       roleImpersonationState={roleImpersonationState}
       onTitleChange={(value) => {
+        persistTab()
         const name = value.trim() || 'Untitled query'
         explorerQueryState.updateDraft({ id, name })
         tabs.updateTab(createTabId('query', { id }), { label: name })
       }}
-      onSqlChange={(sql) => explorerQueryState.updateDraft({ id, sql })}
-      onSourceChange={(source) => explorerQueryState.updateDraft({ id, source })}
+      onSqlChange={(sql) => {
+        persistTab()
+        explorerQueryState.updateDraft({ id, sql })
+      }}
+      onSourceChange={(source) => {
+        persistTab()
+        explorerQueryState.updateDraft({ id, source })
+      }}
+      onRowLimitChange={(rowLimit) => {
+        persistTab()
+        explorerQueryState.updateDraft({ id, rowLimit })
+      }}
       onResultChange={handleResultChange}
-      onRowLimitChange={(rowLimit) => explorerQueryState.updateDraft({ id, rowLimit })}
-      onDisplayChange={(display) => explorerQueryState.setDisplay({ id, display })}
+      onDisplayChange={(display) => {
+        persistTab()
+        explorerQueryState.setDisplay({ id, display })
+      }}
     />
   )
 }
