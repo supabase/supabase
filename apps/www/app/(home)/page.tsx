@@ -5,7 +5,7 @@ import { HomeContent } from './_components/HomeContent'
 import { mdAlternates } from '@/lib/md-alternates'
 
 export const metadata: Metadata = {
-  alternates: mdAlternates('homepage'),
+  alternates: mdAlternates('index'),
 }
 
 export default function HomePage() {

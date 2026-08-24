@@ -12,7 +12,7 @@ export function middleware(request: NextRequest) {
 
   // Strip trailing slash so /auth/ and /auth resolve to the same allowlist
   // entry — NextURL preserves trailing-slash style on rewrite targets.
-  const slug = (basePathname === '/' ? 'homepage' : basePathname.slice(1)).replace(/\/$/, '')
+  const slug = (basePathname === '/' ? 'index' : basePathname.slice(1)).replace(/\/$/, '')
   const isMdEligible = MD_PAGES.has(slug)
   const isChangelogEntry = CHANGELOG_PAGES.has(slug)
 
