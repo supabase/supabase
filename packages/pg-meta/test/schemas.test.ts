@@ -135,3 +135,41 @@ withTestDatabase('retrieve, create, update, delete', async ({ executeQuery }) =>
   const finalRes = await executeQuery(finalRetrieveSql)
   expect(finalRes).toMatchInlineSnapshot(`[]`)
 })
+
+withTestDatabase(
+  'update and remove by name for a mixed-case schema name',
+  async ({ executeQuery }) => {
+    // Create a schema whose name is not all-lowercase
+    const { sql: createSql } = pgMeta.schemas.create({ name: 'App' })
+    await executeQuery(createSql)
+
+    // Rename it via the { name } identifier path.
+    // The generated SQL resolves the target through 'name'::regnamespace, which
+    // case-folds unless the identifier is quoted — an unquoted literal fails to
+    // find any mixed-case schema.
+    const { sql: updateSql } = pgMeta.schemas.update({ name: 'App' }, { name: 'Apps' })
+    await executeQuery(updateSql)
+
+    const { sql: retrieveSql, zod } = pgMeta.schemas.retrieve({ name: 'Apps' })
+    const updateRes = zod.parse((await executeQuery(retrieveSql))[0])
+    expect(updateRes).toMatchInlineSnapshot(
+      { id: expect.any(Number) },
+      `
+    {
+      "comment": null,
+      "id": Any<Number>,
+      "name": "Apps",
+      "owner": "postgres",
+    }
+  `
+    )
+
+    // Delete it via the { name } identifier path as well
+    const { sql: deleteSql } = pgMeta.schemas.remove({ name: 'Apps' })
+    await executeQuery(deleteSql)
+
+    const { sql: finalRetrieveSql } = pgMeta.schemas.retrieve({ name: 'Apps' })
+    const finalRes = await executeQuery(finalRetrieveSql)
+    expect(finalRes).toMatchInlineSnapshot(`[]`)
+  }
+)
