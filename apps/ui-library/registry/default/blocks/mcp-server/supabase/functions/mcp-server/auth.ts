@@ -10,9 +10,8 @@ import {
 
 // This function is an OAuth 2.1 protected resource; Supabase Auth is the
 // authorization server. Every accepted token must identify an OAuth client and
-// be audience-bound to this exact MCP resource by the included access-token
-// hook. The session is then confirmed against Auth, so a revoked grant or
-// deleted session takes effect immediately instead of at token expiry.
+// a live user session, so revoked grants and deleted sessions take effect
+// immediately instead of at token expiry.
 
 const FUNCTION_PATH = '/functions/v1/mcp-server'
 const METADATA_PATH = '/.well-known/oauth-protected-resource'
@@ -49,9 +48,9 @@ type AuthenticationResult =
 // Canonical URLs
 // -----------------------------------------------------------------------------
 //
-// The public Supabase project URL is the single source of truth shared with the
-// browser block and access-token hook. It may differ from the Docker-only URL
-// the function uses for internal project API calls during local development.
+// The public Supabase project URL is the source of truth for OAuth discovery
+// and issuer validation. It may differ from the Docker-only URL the function
+// uses for project API calls during local development.
 
 function readTextEnv(name: string, fallback: string): string {
   return Deno.env.get(name)?.trim() || fallback
@@ -122,7 +121,7 @@ export async function authenticateRequest(
 ): Promise<AuthenticationResult> {
   // Step 1: let @supabase/server extract the bearer token, verify its
   // signature against the project's JWKS, and return its normalized auth
-  // context. MCP-specific issuer and resource checks stay below.
+  // context. OAuth client and issuer checks stay below.
   const environment = getSupabaseEnvironment()
   const { data: auth, error } = await verifyAuth(request, {
     auth: 'user',
@@ -165,21 +164,6 @@ export async function authenticateRequest(
   }
   if (claims?.iss !== config.authorizationServer) {
     return { ok: false, response: unauthorized(config, 'The token issuer is invalid') }
-  }
-  if (!audiences.includes(config.resourceUrl)) {
-    // The usual cause is the access-token hook not being enabled, which is easy
-    // to miss because registration, consent, and token exchange still succeed.
-    console.warn(
-      `Token audience ${JSON.stringify(claims?.aud)} does not include ${config.resourceUrl}. ` +
-        'Enable [auth.hook.custom_access_token] in config.toml and run supabase config push.'
-    )
-    return {
-      ok: false,
-      response: unauthorized(
-        config,
-        'This token is not bound to this MCP server. The access-token hook may not be enabled.'
-      ),
-    }
   }
 
   const token = auth.token
