@@ -459,7 +459,7 @@ export const gettingstarted: NavMenuConstant = {
         },
         {
           name: 'Nuxt 3',
-          url: '/guides/getting-started/tutorials/with-nuxt-3' as `/${string}`,
+          url: '/guides/getting-started/tutorials/with-nuxt' as `/${string}`,
         },
         {
           name: 'Angular',
