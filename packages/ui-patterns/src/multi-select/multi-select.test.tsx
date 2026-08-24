@@ -48,6 +48,16 @@ function MultiSelectDemo() {
 }
 
 describe('multi-select', () => {
+  it('supports the tiny control size', () => {
+    render(
+      <MultiSelector size="tiny" values={[]} onValuesChange={() => undefined}>
+        <MultiSelectorTrigger label="Select fruits" />
+      </MultiSelector>
+    )
+
+    expect(screen.getByRole('combobox')).toHaveClass('h-[26px]')
+  })
+
   it('renders selected values with a custom label', () => {
     render(
       <MultiSelector values={['101']} onValuesChange={() => undefined}>

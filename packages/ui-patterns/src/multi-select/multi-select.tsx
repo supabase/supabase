@@ -212,6 +212,21 @@ export interface MultiSelectorTriggerProps extends React.HTMLAttributes<HTMLButt
   renderValue?: (value: string) => React.ReactNode
 }
 
+const MultiSelectorTriggerVariants = cva('', {
+  variants: {
+    size: {
+      tiny: 'h-[26px] px-2.5 py-0.5 text-xs',
+      small: 'min-h-[34px] px-3 py-1.5 text-sm',
+      medium: 'min-h-[38px] px-4 py-2 text-sm',
+      large: 'min-h-[42px] px-4 py-2 text-base',
+      xlarge: 'min-h-[50px] px-6 py-3 text-base',
+    },
+  },
+  defaultVariants: {
+    size: SIZE_VARIANTS_DEFAULT,
+  },
+})
+
 const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTriggerProps>(
   (
     {
@@ -228,7 +243,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
     },
     ref
   ) => {
-    const { activeIndex, values, setInputValue, toggleValue, disabled, open, setOpen } =
+    const { activeIndex, values, setInputValue, toggleValue, disabled, open, setOpen, size } =
       useMultiSelect()
 
     const inputRef = React.useRef<HTMLButtonElement>(null)
@@ -293,8 +308,8 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           type="button"
           role="combobox"
           className={cn(
-            'flex w-full min-w-[200px] min-h-[34px] items-center justify-between rounded-md border',
-            'border-strong px-3 py-1.5 text-sm',
+            'flex w-full min-w-[200px] items-center justify-between rounded-md border',
+            'border-strong',
             // Empty: raised plate. Filled: sunk well for chips.
             values.length > 0 ? 'bg-field' : 'bg-control-raised',
             'placeholder:text-muted-foreground',
@@ -302,6 +317,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
             'disabled:cursor-not-allowed disabled:opacity-50',
             'hover:border-control-hover transition-colors duration-200',
             open && 'border-control-hover',
+            MultiSelectorTriggerVariants({ size }),
             className
           )}
           {...props}
