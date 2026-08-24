@@ -93,17 +93,17 @@ flowchart TB
 
 ## Federated sources (inventory)
 
-| Local path                               | Source repo                            | Ref / branch                   | Pattern                                           |
-| ---------------------------------------- | -------------------------------------- | ------------------------------ | ------------------------------------------------- |
-| `/guides/graphql/*`                      | `supabase/pg_graphql`                  | `master`                       | Fully federated; `pageMap` per page               |
-| `/guides/ai/python/*`                    | `supabase/vecs`                        | `main`                         | Fully federated                                   |
-| `/guides/deployment/ci/*`                | `supabase/setup-cli`                   | `gh-pages`                     | Fully federated                                   |
-| `/guides/deployment/terraform/*`         | `supabase/terraform-provider-supabase` | branch in `terraformConstants` | Federated prose pages                             |
-| `/guides/deployment/terraform/reference` | same                                   | same                           | Federated **JSON schema** (not MDX)               |
-| `/guides/database/extensions/wrappers/*` | `supabase/wrappers`                    | **release tag** `docs_v*.*.*`  | **Hybrid** — local MDX + federated catalog        |
+| Local path                                  | Source repo                            | Ref / branch                   | Pattern                                           |
+| ------------------------------------------- | -------------------------------------- | ------------------------------ | ------------------------------------------------- |
+| `/guides/graphql/*`                         | `supabase/pg_graphql`                  | `master`                       | Fully federated; `pageMap` per page               |
+| `/guides/ai/python/*`                       | `supabase/vecs`                        | `main`                         | Fully federated                                   |
+| `/guides/deployment/ci/*`                   | `supabase/setup-cli`                   | `gh-pages`                     | Fully federated                                   |
+| `/guides/deployment/terraform/*`            | `supabase/terraform-provider-supabase` | branch in `terraformConstants` | Federated prose pages                             |
+| `/guides/deployment/terraform/reference`    | same                                   | same                           | Federated **JSON schema** (not MDX)               |
+| `/guides/database/extensions/wrappers/*`    | `supabase/wrappers`                    | **release tag** `docs_v*.*.*`  | **Hybrid** — local MDX + federated catalog        |
 | `/guides/monitoring-and-debugging/advisors` | `supabase/splinter`                    | `main`                         | **Dynamic listing** — all `docs/*.md` files       |
-| AI Skills index                          | `supabase/agent-skills`                | `main`                         | Lists `skills/*/SKILL.md` at runtime              |
-| `$CodeSample` directive                  | various                                | commit SHA only                | Snippets via `getGitHubFileContentsImmutableOnly` |
+| AI Skills index                             | `supabase/agent-skills`                | `main`                         | Lists `skills/*/SKILL.md` at runtime              |
+| `$CodeSample` directive                     | various                                | commit SHA only                | Snippets via `getGitHubFileContentsImmutableOnly` |
 
 ### Related patterns (not quite "federated docs")
 
