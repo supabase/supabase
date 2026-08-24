@@ -24,7 +24,7 @@ import z from 'zod'
 import PasswordConditionsHelper from './PasswordConditionsHelper'
 import { useSignUpMutation } from '@/data/misc/signup-mutation'
 import { BASE_PATH } from '@/lib/constants'
-import { buildPathWithParams } from '@/lib/gotrue'
+import { buildSignUpReturnPath } from '@/lib/gotrue'
 import { classifyApiError, classifyValidationError } from '@/lib/telemetry/funnel-errors'
 import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 
@@ -110,10 +110,9 @@ export const SignUpForm = () => {
       }
       redirectTo = `${redirectUrlBase}/authorize?${authorizeParams.toString()}`
     } else {
-      // Use getRedirectToPath to handle redirect_to parameter and other query params
+      // Build the post-verification return path from returnTo and other query params.
       const { returnTo } = router.query
-      const basePath = returnTo || '/sign-in'
-      const fullPath = buildPathWithParams(basePath as string)
+      const fullPath = buildSignUpReturnPath(returnTo)
       const fullRedirectUrl = `${redirectUrlBase}${fullPath}`
       redirectTo = fullRedirectUrl
     }
