@@ -27,6 +27,10 @@ const footerData = [
         url: '/edge-functions',
       },
       {
+        text: 'Workers',
+        url: '/workers',
+      },
+      {
         text: 'Realtime',
         url: '/realtime',
       },

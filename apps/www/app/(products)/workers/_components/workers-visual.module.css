@@ -1,0 +1,87 @@
+.flow {
+  stroke-dasharray: 3 9;
+  animation: flow 1.4s linear infinite;
+}
+
+@keyframes flow {
+  to {
+    stroke-dashoffset: -12;
+  }
+}
+
+/*
+ * Ephemeral session lifecycle. Line and worker share one duration/delay
+ * (set inline per instance): the line draws from the source to the worker,
+ * stays connected while the worker runs, then retracts as it shuts down.
+ * Lines use pathLength=1, so dash offsets are path-relative:
+ * 1 = hidden, 0 = fully drawn, -1 = erased from the source side.
+ */
+.sessionLine {
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+  animation-name: session-line;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes session-line {
+  0% {
+    stroke-dashoffset: 1;
+  }
+  10% {
+    stroke-dashoffset: 0;
+  }
+  76% {
+    stroke-dashoffset: 0;
+  }
+  88% {
+    stroke-dashoffset: -1;
+  }
+  100% {
+    stroke-dashoffset: -1;
+  }
+}
+
+.sessionWorker {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation-name: session-worker;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes session-worker {
+  0%,
+  8% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  14% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  78% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  88%,
+  100% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flow,
+  .sessionLine,
+  .sessionWorker {
+    animation: none;
+  }
+  .sessionLine {
+    stroke-dashoffset: 0;
+  }
+  .sessionWorker {
+    opacity: 1;
+  }
+}
