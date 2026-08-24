@@ -143,10 +143,11 @@ withTestDatabase(
     const { sql: createSql } = pgMeta.schemas.create({ name: 'App' })
     await executeQuery(createSql)
 
-    // Rename it via the { name } identifier path.
-    // The generated SQL resolves the target through 'name'::regnamespace, which
-    // case-folds unless the identifier is quoted — an unquoted literal fails to
-    // find any mixed-case schema.
+    // Rename it via the { name } identifier path. The generated SQL resolves
+    // the target through quote_ident('App')::regnamespace, so the mixed-case
+    // name is quoted before the cast and matched exactly; a bare
+    // 'App'::regnamespace literal would be case-folded by Postgres and miss
+    // the schema.
     const { sql: updateSql } = pgMeta.schemas.update({ name: 'App' }, { name: 'Apps' })
     await executeQuery(updateSql)
 
