@@ -1,4 +1,5 @@
 import { useBreakpoint } from 'common'
+import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
 import { Check, CheckCircle, Sparkles, Timer, Zap } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
@@ -62,7 +63,7 @@ const useVibeCodersContent: () => {
       ctas: [
         {
           label: 'Start Your Project',
-          href: 'https://supabase.com/dashboard',
+          href: DASHBOARD_SIGN_UP_URL,
           type: 'primary' as any,
         },
       ],
