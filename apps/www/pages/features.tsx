@@ -202,7 +202,7 @@ function FeaturesPage() {
         </SectionContainer>
         <SectionContainer className="relative grid md:grid-cols-4 md:gap-4 pt-0!">
           <div className="relative w-full h-full">
-            <div className="mb-4 flex flex-col gap-4 sticky top-20">
+            <aside aria-label="Filters" className="mb-4 flex flex-col gap-4 sticky top-20">
               <InputGroup className="w-full">
                 <InputGroupAddon>
                   <Search />
@@ -229,8 +229,14 @@ function FeaturesPage() {
                 </label>
               </div>
               <div className="hidden md:flex flex-col gap-4">
-                <h2 className="text-sm text-foreground-lighter">Filter by tags:</h2>
-                <div className="flex flex-col gap-2.5">
+                <h2 id="feature-tag-filters" className="text-sm text-foreground-lighter">
+                  Filter by tags:
+                </h2>
+                <div
+                  role="group"
+                  aria-labelledby="feature-tag-filters"
+                  className="flex flex-col gap-2.5"
+                >
                   {products
                     .sort((a, b) => (a.toLowerCase() > b.toLowerCase() ? 1 : -1))
                     .map((product) => (
@@ -249,8 +255,12 @@ function FeaturesPage() {
                       </label>
                     ))}
                 </div>
-                <div className="text-foreground-muted text-xs">
-                  Features selected: {filteredFeatures.length}
+                <div
+                  aria-live="polite"
+                  aria-atomic="true"
+                  className="text-foreground-muted text-xs"
+                >
+                  {`${filteredFeatures.length} features selected`}
                 </div>
               </div>
               {HAS_ACTIVE_FILTERS && (
@@ -267,7 +277,7 @@ function FeaturesPage() {
                   Clear all filters
                 </Button>
               )}
-            </div>
+            </aside>
           </div>
           <div className="md:col-span-3 min-w-0 flex flex-col gap-4 md:gap-6">
             <div className="flex items-center justify-between gap-2">
