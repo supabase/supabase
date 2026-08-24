@@ -311,61 +311,62 @@ function FeaturesPage() {
                 No features found with these filters
               </p>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4">
+              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4">
                 {filteredFeatures.map((feature) => (
-                  <Link
-                    key={`feat-${feature.title}`}
-                    href={`/features/${feature.slug}`}
-                    className="flex flex-col justify-start items-stretch group cursor-pointer rounded-xl focus-ring"
-                  >
-                    <Panel
-                      hasActiveOnHover
-                      outerClassName="h-full"
-                      innerClassName="flex md:flex-col gap-3 sm:gap-2 h-full items-start p-2"
+                  <li key={`feat-${feature.title}`} className="flex">
+                    <Link
+                      href={`/features/${feature.slug}`}
+                      className="flex flex-col justify-start items-stretch group cursor-pointer rounded-xl focus-ring w-full"
                     >
-                      <div className="relative rounded-lg min-h-[80px] max-h-[80px] md:max-h-[140px] h-full md:h-auto aspect-square md:w-full md:aspect-video! bg-alternative flex items-center justify-center shadow-inner border border-muted">
-                        <feature.icon className="w-5 h-5 text-foreground-light group-hover:text-foreground transition-colors" />
-                        {feature.status && (
-                          <div className="hidden md:block absolute bottom-1.5 left-1.5">
-                            <Badge
-                              variant={stageBadgeVariant(feature.status.stage)}
-                              className="text-[10px] py-0 px-1.5 h-4 rounded-sm"
-                            >
-                              {stageLabel(feature.status.stage)}
-                            </Badge>
-                          </div>
-                        )}
-                      </div>
-                      <div className="md:p-2 md:pt-1 flex flex-col h-full md:h-auto grow gap-0.5 md:gap-1.5 justify-center md:justify-start">
-                        <h3 className="text-sm md:text-base text-foreground leading-5!">
-                          {feature.title}
-                        </h3>
-                        <p className="text-foreground-light text-sm line-clamp-2">
-                          {feature.subtitle}
-                        </p>
-                        <div className="flex flex-wrap items-center gap-1 mb-0.5">
+                      <Panel
+                        hasActiveOnHover
+                        outerClassName="h-full"
+                        innerClassName="flex md:flex-col gap-3 sm:gap-2 h-full items-start p-2"
+                      >
+                        <div className="relative rounded-lg min-h-[80px] max-h-[80px] md:max-h-[140px] h-full md:h-auto aspect-square md:w-full md:aspect-video! bg-alternative flex items-center justify-center shadow-inner border border-muted">
+                          <feature.icon className="w-5 h-5 text-foreground-light group-hover:text-foreground transition-colors" />
                           {feature.status && (
-                            <Badge
-                              variant={stageBadgeVariant(feature.status.stage)}
-                              className="md:hidden text-[10px] py-0 px-1.5 h-4 rounded-sm"
-                            >
-                              {stageLabel(feature.status.stage)}
-                            </Badge>
+                            <div className="hidden md:block absolute bottom-1.5 left-1.5">
+                              <Badge
+                                variant={stageBadgeVariant(feature.status.stage)}
+                                className="text-[10px] py-0 px-1.5 h-4 rounded-sm"
+                              >
+                                {stageLabel(feature.status.stage)}
+                              </Badge>
+                            </div>
                           )}
-                          {feature.products.map((product) => (
-                            <span
-                              key={product}
-                              className="inline-flex items-center text-[10px] font-medium px-1.5 py-0 h-4 rounded bg-surface-200 text-foreground-light border border-muted capitalize"
-                            >
-                              {productLabel(product)}
-                            </span>
-                          ))}
                         </div>
-                      </div>
-                    </Panel>
-                  </Link>
+                        <div className="md:p-2 md:pt-1 flex flex-col h-full md:h-auto grow gap-0.5 md:gap-1.5 justify-center md:justify-start">
+                          <h3 className="text-sm md:text-base text-foreground leading-5!">
+                            {feature.title}
+                          </h3>
+                          <p className="text-foreground-light text-sm line-clamp-2">
+                            {feature.subtitle}
+                          </p>
+                          <div className="flex flex-wrap items-center gap-1 mb-0.5">
+                            {feature.status && (
+                              <Badge
+                                variant={stageBadgeVariant(feature.status.stage)}
+                                className="md:hidden text-[10px] py-0 px-1.5 h-4 rounded-sm"
+                              >
+                                {stageLabel(feature.status.stage)}
+                              </Badge>
+                            )}
+                            {feature.products.map((product) => (
+                              <span
+                                key={product}
+                                className="inline-flex items-center text-[10px] font-medium px-1.5 py-0 h-4 rounded bg-surface-200 text-foreground-light border border-muted capitalize"
+                              >
+                                {productLabel(product)}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </Panel>
+                    </Link>
+                  </li>
                 ))}
-              </div>
+              </ul>
             )}
           </div>
         </SectionContainer>
