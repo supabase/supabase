@@ -1,0 +1,25 @@
+---
+id: 'automate-with-agents'
+title: 'Hire an agent'
+subtitle: 'Run a read-only monitoring routine in your own agent harness.'
+description: 'Set up Doctor, Security officer, Personal trainer, or Accountant in Claude, Codex, or Cursor.'
+---
+
+This guide explains how to run a Supabase monitoring agent in your own harness. Each agent is a prompt plus a schedule. It reads project data and reports findings. It does not change the project.
+
+## Run a routine
+
+1. Connect the [Supabase MCP server](/docs/guides/ai-tools/mcp) with `project_ref` and `read_only=true`.
+2. Open the agent that matches the job: [Doctor](/docs/guides/monitoring-and-debugging/automate-with-agents/health) for health, [Security officer](/docs/guides/monitoring-and-debugging/automate-with-agents/security) for security, [Personal trainer](/docs/guides/monitoring-and-debugging/automate-with-agents/performance) for performance, or [Accountant](/docs/guides/monitoring-and-debugging/automate-with-agents/usage) for usage.
+3. Set it up in Claude, Codex, Cursor, or copy the prompt into another harness.
+4. Run it on demand first. Then put the same prompt on a schedule.
+
+Each agent page describes what it will output. Send those findings through the connections your harness already has, such as Linear in Codex.
+
+Scheduled tasks start a fresh context on every run, so the prompt is self-contained. Review the first runs before you rely on the schedule.
+
+<Admonition type="caution">
+
+Logs and query results can contain secrets or personal information. Keep the agent read-only, aggregate evidence, and redact sensitive values.
+
+</Admonition>
