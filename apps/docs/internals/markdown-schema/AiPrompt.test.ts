@@ -31,6 +31,19 @@ describe('AiPrompt markdown schema', () => {
     expect(markdown).toContain('```text')
   })
 
+  it('serializes the monitoring overview prompt', () => {
+    const markdown = AiPrompt({
+      props: { id: 'monitoring-and-debugging', includeInMarkdown: true },
+    })
+
+    expect(markdown).toContain('Help me monitor and debug my Supabase project.')
+    expect(markdown).toContain('npm install -g supabase')
+    expect(markdown).toContain('npx plugins add supabase-community/supabase-plugin')
+    expect(markdown).toContain('read-only')
+    expect(markdown).toContain('https://supabase.com/docs/guides/monitoring-and-debugging.md')
+    expect(markdown).toContain('```text')
+  })
+
   it('fails clearly for an unknown opted-in prompt', () => {
     expect(() => AiPrompt({ props: { id: 'missing-prompt', includeInMarkdown: true } })).toThrow(
       'Unknown AiPrompt id: missing-prompt'

@@ -146,6 +146,11 @@ module.exports = [
     destination: '/docs/guides/monitoring-and-debugging/:match*',
   },
   {
+    permanent: true,
+    source: '/docs/guides/monitoring-and-debugging/resolve-issues',
+    destination: '/docs/guides/monitoring-and-debugging/debugging',
+  },
+  {
     permanent: false,
     source: '/blog/2021/03/08/toad-a-link-shorterner-with-simple-apis-for-low-coders',
     destination: '/blog/2021/03/08/toad-a-link-shortener-with-simple-apis-for-low-coders',
