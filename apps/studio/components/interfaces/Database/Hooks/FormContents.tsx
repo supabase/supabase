@@ -27,7 +27,7 @@ import { AVAILABLE_WEBHOOK_TYPES, HOOK_EVENTS } from './Hooks.constants'
 import { HTTPHeaders } from './HTTPHeaders'
 import { HTTPParameters } from './HTTPParameters'
 import { HTTPRequestConfig } from './HTTPRequestConfig'
-import { getEdgeFunctionAuthHeader } from '@/components/interfaces/Functions/httpHeaderAddActions'
+import { ensureEdgeFunctionAuthorizationHeader } from '@/components/interfaces/Functions/httpHeaderAddActions'
 import {
   FormSection,
   FormSectionContent,
@@ -61,8 +61,8 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
     projectRef: ref,
   })
 
-  const { secretKey, serviceKey } = getKeys(keys)
-  const edgeFunctionApiKey = secretKey?.api_key ?? serviceKey?.api_key ?? '[YOUR API KEY]'
+  const { serviceKey } = getKeys(keys)
+  const serviceRoleKey = serviceKey?.api_key
 
   const httpUrl = useWatch({ control: form.control, name: 'http_url' })
   const httpHeaders = useWatch({ control: form.control, name: 'httpHeaders' })
@@ -81,41 +81,18 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
     if (httpUrl && isEdgeFunctionSelected) {
       const fnSlug = httpUrl.split('/').at(-1)
       const fn = functions.find((x) => x.slug === fnSlug)
-      const edgeFunctionAuthHeader = getEdgeFunctionAuthHeader(edgeFunctionApiKey)
-      const existingAuthHeader = httpHeaders.find(
-        (x) => x.name === 'Authorization' || x.name === 'apikey'
-      )
+      const updatedHttpHeaders = ensureEdgeFunctionAuthorizationHeader({
+        headers: httpHeaders,
+        serviceRoleKey,
+        verifyJwt: fn?.verify_jwt,
+        createRow: (name, value) => ({ id: uuidv4(), name, value }),
+      })
 
-      if (fn?.verify_jwt && existingAuthHeader == null) {
-        const newAuthHeader = {
-          id: uuidv4(),
-          name: edgeFunctionAuthHeader.name,
-          value: edgeFunctionAuthHeader.value,
-        }
-        form.setValue('httpHeaders', [...httpHeaders, newAuthHeader])
-      } else if (
-        fn?.verify_jwt &&
-        (existingAuthHeader?.name !== edgeFunctionAuthHeader.name ||
-          existingAuthHeader?.value !== edgeFunctionAuthHeader.value)
-      ) {
-        const updatedHttpHeaders = httpHeaders.map((x) => {
-          if (x.id === existingAuthHeader?.id) {
-            return { ...x, name: edgeFunctionAuthHeader.name, value: edgeFunctionAuthHeader.value }
-          } else return x
-        })
+      if (updatedHttpHeaders !== httpHeaders) {
         form.setValue('httpHeaders', updatedHttpHeaders)
       }
     }
-  }, [
-    form,
-    functions,
-    httpHeaders,
-    httpUrl,
-    isSuccessEdgeFunctions,
-    edgeFunctionApiKey,
-    ref,
-    restUrl,
-  ])
+  }, [form, functions, httpHeaders, httpUrl, isSuccessEdgeFunctions, serviceRoleKey, ref, restUrl])
 
   return (
     <div>
