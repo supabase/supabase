@@ -110,8 +110,7 @@ describe('createChatInstance onFinish — notebook cache invalidation via a real
     await vi.waitFor(() => {
       expect(notebooksState.notebooks[NOTEBOOK_ID]).toBeUndefined()
     })
-    // Removed, not just invalidated — see notebook-cache-invalidation.ts for why 'refresh'
-    // is unsafe here.
+    // Removed, not just invalidated — see notebook-cache.ts for why.
     expect(queryClient.getQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK_ID))).toBeUndefined()
   })
 })

@@ -113,14 +113,15 @@ describe('ExplorerNotebookTab — assistant cache invalidation', () => {
     expect(screen.queryByText('Original content')).not.toBeInTheDocument()
   })
 
-  it('shows the updated cells on remount, when the query cache still holds the pre-eviction notebook (refresh mode leaves cached data in place)', async () => {
+  it('shows the updated cells on remount, when the query cache still holds the pre-eviction notebook', async () => {
     setupSqlEditorMocks()
     seedNotebook()
 
     const queryClient = new QueryClient()
     // Mirrors what a REAL prior fetch would have cached: the full notebook, not a stub —
-    // `mode: 'refresh'` invalidates this entry but does not clear it, so a remounting
-    // `useNotebookQuery` observer reads this stale value synchronously before its refetch lands.
+    // if the cache entry were merely invalidated rather than removed, a remounting
+    // `useNotebookQuery` observer would read this stale value synchronously before its
+    // refetch lands.
     queryClient.setQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK_ID), {
       id: NOTEBOOK_ID,
       type: 'notebook',
