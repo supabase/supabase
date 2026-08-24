@@ -12,7 +12,7 @@ An AI agent can work through this loop for you, but only if it can read your pro
 
 Debugging with an agent needs two things:
 
-- The [Supabase MCP server](/docs/guides/ai-tools/mcp) provides the tools this guide relies on: `get_logs` for a per-service log dump, `query_logs` to run read-only SQL against your logs for filtering and aggregation (see [Querying with the Logs Explorer](/docs/guides/monitoring-and-debugging/logs#querying-with-the-logs-explorer) for the ClickHouse SQL syntax it accepts), `get_advisors` for security and performance findings, and `execute_sql` to inspect your schema and policies.
+- The [Supabase MCP server](/docs/guides/ai-tools/mcp) provides the tools this guide relies on: `get_logs` for a per-service log dump, `query_logs` to run read-only SQL against your logs for filtering and aggregation (see [Query and filter logs](/docs/guides/monitoring-and-debugging/advanced-log-filtering) for the ClickHouse SQL syntax it accepts), `get_advisors` for security and performance findings, and `execute_sql` to inspect your schema and policies.
 - The [Supabase agent skill](/docs/guides/ai-tools/ai-skills) teaches the agent this workflow: locate the failing layer, gather evidence from the matching log source, and verify the fix by re-running the operation that failed.
 
 Install both in one step with the [Supabase plugin for AI coding agents](/docs/guides/ai-tools/plugins). Connecting an agent to your project carries security risks, so read the [MCP security best practices](/docs/guides/ai-tools/mcp#security-risks) first.
@@ -63,7 +63,7 @@ When a query comes up empty, widen along an anchor, such as a timestamp, request
 
 A wide, unfiltered query across every source buries the one line you need and, on paid projects, costs more in scanned data.
 
-The [Logging guide](/docs/guides/monitoring-and-debugging/logs) covers the Logs Explorer, the available log sources, and how to write queries against them.
+The [Query and filter logs](/docs/guides/monitoring-and-debugging/advanced-log-filtering) guide covers the Logs Explorer, the available log sources, and how to write queries against them.
 
 ## Find the guide for your symptom
 
