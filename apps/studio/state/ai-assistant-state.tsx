@@ -382,7 +382,6 @@ function createChatInstance(
             .catch(() => {})
         }
 
-        // Invalidate caches for any notebooks the assistant created/updated in this turn
         const projectRef = state.context.projectRef
         if (projectRef) {
           const effects = collectNotebookCacheEffects(messages, processedNotebookToolCallIds)

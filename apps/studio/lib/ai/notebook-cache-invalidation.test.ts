@@ -134,9 +134,6 @@ describe('applyNotebookCacheEffects', () => {
     expect(queryClient.getQueryState(contentKeys.infiniteList(PROJECT_REF))?.isInvalidated).toBe(
       true
     )
-    // Removed, not just invalidated — a stale cached value would otherwise be read
-    // synchronously by a remounting `useNotebookQuery` before the refetch lands, and
-    // `notebooksState.setNotebook`'s merge guard would then discard the real update.
     expect(queryClient.getQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK.id))).toBeUndefined()
     expect(notebooksState.notebooks[NOTEBOOK.id]).toBeUndefined()
   })

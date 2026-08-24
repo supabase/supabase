@@ -118,10 +118,6 @@ describe('ExplorerNotebookTab — assistant cache invalidation', () => {
     seedNotebook()
 
     const queryClient = new QueryClient()
-    // Mirrors what a REAL prior fetch would have cached: the full notebook, not a stub —
-    // if the cache entry were merely invalidated rather than removed, a remounting
-    // `useNotebookQuery` observer would read this stale value synchronously before its
-    // refetch lands.
     queryClient.setQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK_ID), {
       id: NOTEBOOK_ID,
       type: 'notebook',
@@ -163,7 +159,7 @@ describe('ExplorerNotebookTab — assistant cache invalidation', () => {
     })
 
     // While the tab is unmounted (navigated away to a separate Explorer chat tab), the
-    // assistant updates the notebook — same collector+applier calls as `onFinish`.
+    // assistant updates the notebook.
     const message = createAssistantMessageWithUpdateNotebookTool({
       id: NOTEBOOK_ID,
       name: 'Test notebook',

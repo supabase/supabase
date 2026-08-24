@@ -45,6 +45,10 @@ export async function evictNotebookFromCaches({
   id: string
 }): Promise<boolean> {
   const stateNotebook = notebooksState.notebooks[id]
+  // Deliberately evicts a dirty notebook too, not just a saved one: this only runs after
+  // a caller has already secured confirmation to discard (e.g. confirmClose before
+  // onClose here, or the 'saved'-only pre-check in lib/ai/notebook-cache-invalidation.ts).
+  // A new caller without that confirmation must guard status === 'saved' itself first.
   const canEvict = stateNotebook?.status === 'saved' || hasDiscardableChanges(stateNotebook)
   if (!canEvict) return false
 

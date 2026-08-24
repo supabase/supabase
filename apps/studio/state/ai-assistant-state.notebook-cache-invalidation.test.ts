@@ -11,9 +11,6 @@ const testContext = vi.hoisted(() => ({
   queuedStreams: [] as Array<Array<UIMessageChunk>>,
 }))
 
-// Swaps only the network transport for a scripted one — the real `Chat` class, its stream
-// reducer, and `sendAutomaticallyWhen` all run for real, so this exercises the actual
-// `onFinish` wired up in `createChatInstance`, not a hand-rolled call to its helpers.
 vi.mock('ai', async (importOriginal) => {
   const actual = await importOriginal<typeof import('ai')>()
   return {
@@ -110,7 +107,6 @@ describe('createChatInstance onFinish — notebook cache invalidation via a real
     await vi.waitFor(() => {
       expect(notebooksState.notebooks[NOTEBOOK_ID]).toBeUndefined()
     })
-    // Removed, not just invalidated — see notebook-cache.ts for why.
     expect(queryClient.getQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK_ID))).toBeUndefined()
   })
 })

@@ -58,11 +58,6 @@ export async function applyNotebookCacheEffects({
 
   await Promise.all(
     effects.map((effect) => {
-      // evictNotebookFromCaches's own dirty-notebook guard was loosened for the tab-close
-      // flow, where `confirmClose` has already asked the user to discard unsaved edits.
-      // There's no equivalent confirmation here, so a status check up front keeps a dirty
-      // notebook untouched rather than having an assistant write silently discard local
-      // edits (FE-4255).
       const stateNotebook = notebooksState.notebooks[effect.id]
       if (stateNotebook && stateNotebook.status !== 'saved') return
 
