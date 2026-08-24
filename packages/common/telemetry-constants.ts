@@ -1408,18 +1408,6 @@ export interface StudioPricingSidePanelOpenedEvent {
 }
 
 /**
- * User clicks on grafana banner in studio Reports page.
- *
- * @group Events
- * @source studio
- * @page /reports/database
- */
-export interface ReportsDatabaseGrafanaBannerClickedEvent {
-  action: 'reports_database_grafana_banner_clicked'
-  groups: TelemetryGroups
-}
-
-/**
  * The logs.all deprecation banner was rendered, fired once per mount. Acts as the
  * denominator for the dismiss rate. Migration outcome itself is measured via decay in
  * `/v1/projects/:ref/analytics/endpoints/logs.all` traffic in the warehouse, not from this event.
@@ -2453,42 +2441,6 @@ export interface TableRlsEnabledEvent {
     table_name?: string
   }
   groups: Partial<TelemetryGroups>
-}
-
-/**
- * User clicked the generate policies button in the table editor.
- *
- * @group Events
- * @source studio
- * @page /dashboard/project/{ref}/editor
- */
-export interface RlsGeneratePoliciesClickedEvent {
-  action: 'rls_generate_policies_clicked'
-  groups: TelemetryGroups
-}
-
-/**
- * User removed a generated policy from the table editor.
- *
- * @group Events
- * @source studio
- * @page /dashboard/project/{ref}/editor
- */
-export interface RlsGeneratedPolicyRemovedEvent {
-  action: 'rls_generated_policy_removed'
-  groups: TelemetryGroups
-}
-
-/**
- * User successfully created generated RLS policies for a table.
- *
- * @group Events
- * @source studio
- * @page /dashboard/project/{ref}/editor
- */
-export interface RlsGeneratedPoliciesCreatedEvent {
-  action: 'rls_generated_policies_created'
-  groups: TelemetryGroups
 }
 
 /**
@@ -3798,7 +3750,6 @@ export type TelemetryEvent =
   | StudioPricingPlanCtaClickedEvent
   | StudioBillingCancelSubscriptionClickedEvent
   | StudioPricingSidePanelOpenedEvent
-  | ReportsDatabaseGrafanaBannerClickedEvent
   | LogsAllDeprecationBannerExposedEvent
   | LogsAllDeprecationBannerDismissButtonClickedEvent
   | IndexAdvisorEnableButtonClickedEvent
@@ -3856,9 +3807,6 @@ export type TelemetryEvent =
   | TableCreatedEvent
   | TableDataAddedEvent
   | TableRlsEnabledEvent
-  | RlsGeneratePoliciesClickedEvent
-  | RlsGeneratedPolicyRemovedEvent
-  | RlsGeneratedPoliciesCreatedEvent
   | AuthUsersSearchSubmittedEvent
   | CommandMenuOpenedEvent
   | CommandMenuClosedEvent
