@@ -18,7 +18,7 @@ const TAB_LABEL: Record<WorkerSnippetTab, string> = {
 
 interface WorkerSnippetTabsProps {
   input: Omit<WorkerSnippetInput, 'endpoint' | 'protocol'>
-  tabs?: WorkerSnippetTab[]
+  tabs?: [WorkerSnippetTab, ...WorkerSnippetTab[]]
   className?: string
 }
 
