@@ -52,10 +52,10 @@ export default function App({ Component, pageProps }: AppProps) {
 
   // Advertise the .md version for AI agents on pages that have one.
   const cleanPath = (router.asPath ?? '/').split('?')[0].split('#')[0].replace(/\/$/, '') || '/'
-  const mdSlug = cleanPath === '/' ? 'homepage' : cleanPath.slice(1)
+  const mdSlug = cleanPath === '/' ? 'index' : cleanPath.slice(1)
   const mdAlternateHref = MD_PAGES.has(mdSlug)
     ? cleanPath === '/'
-      ? '/homepage.md'
+      ? '/index.md'
       : `${cleanPath}.md`
     : null
 

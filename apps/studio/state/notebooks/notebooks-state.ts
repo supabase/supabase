@@ -53,6 +53,18 @@ export const notebooksState = proxy({
   },
 
   /**
+   * Marks a notebook as persisted after its first successful save. Every
+   * later save cycle is covered by `updateCells`'s `statusOnEdit` ('saved' ->
+   * 'unsaved' -> ...), but the one-time 'new' -> 'saved' transition has no
+   * other trigger — the resource query that would otherwise pick it up is
+   * disabled while the notebook is still 'new'.
+   */
+  markSaved: ({ id }: { id: string }) => {
+    const stateNotebook = notebooksState.notebooks[id]
+    if (stateNotebook) stateNotebook.status = 'saved'
+  },
+
+  /**
    * Rename follows its own async save directly at the call site rather than going
    * through needsSaving/the debounced scheduler.
    */

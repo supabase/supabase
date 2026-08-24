@@ -2,18 +2,33 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useContext, useEffect } from 'react'
 
-import { contentKeys } from '@/data/content/keys'
-import { notebooksState } from '@/state/notebooks/notebooks-state'
-import { TabsStateContext } from '@/state/tabs'
+import {
+  evictNotebookFromCaches,
+  hasDiscardableChanges,
+} from '@/data/content/notebooks/notebook-cache'
+import { notebooksState, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
+import { TabsStateContext, type Tab } from '@/state/tabs'
+
+const NotebookTabStatusIndicator = ({ tab }: { tab: Tab }) => {
+  const notebooksSnap = useNotebooksStateSnapshot()
+  const notebookId = tab.metadata?.notebookId
+  const stateNotebook = notebookId ? notebooksSnap.notebooks[notebookId] : undefined
+  if (!hasDiscardableChanges(stateNotebook)) return null
+
+  return (
+    <span
+      role="img"
+      aria-label="Unsaved changes"
+      className="block size-2 shrink-0 rounded-full bg-warning"
+    />
+  )
+}
 
 /**
  * Evicts a notebook's content from the valtio store and the React Query cache
  * when its tab closes, so reopening it always refetches instead of showing
- * whatever was last loaded. Only applies to notebooks with no unsaved edits —
- * a dirty notebook is left in the store untouched, same as today, since there's
- * no autosave or discard-confirmation flow for notebooks yet.
- *
- * [Joshen] We'll address discard confirmation separately
+ * whatever was last loaded. Unsaved edits are discarded the same way — safe
+ * because `confirmClose` below has already asked the user to confirm.
  */
 export const ExplorerNotebookTabCoordinator = () => {
   const { ref } = useParams()
@@ -26,12 +41,27 @@ export const ExplorerNotebookTabCoordinator = () => {
         const notebookId = tab.metadata?.notebookId
         if (!ref || !notebookId) return
 
-        const stateNotebook = notebooksState.notebooks[notebookId]
-        if (stateNotebook?.status !== 'saved') return
-
-        notebooksState.removeNotebook({ id: notebookId })
-        queryClient.removeQueries({ queryKey: contentKeys.resource(ref, notebookId) })
+        evictNotebookFromCaches({ queryClient, projectRef: ref, id: notebookId, mode: 'remove' })
       },
+      confirmClose: (notebookTabs) => {
+        const dirtyCount = notebookTabs.filter((tab) => {
+          const notebookId = tab.metadata?.notebookId
+          if (!notebookId) return false
+
+          return hasDiscardableChanges(notebooksState.notebooks[notebookId])
+        }).length
+
+        if (dirtyCount === 0) return null
+
+        return {
+          title: 'Unsaved changes',
+          description:
+            dirtyCount === 1
+              ? 'You have unsaved changes in this notebook. Closing it will discard them.'
+              : `You have unsaved changes in ${dirtyCount} notebooks. Closing them will discard those changes.`,
+        }
+      },
+      StatusIndicator: NotebookTabStatusIndicator,
     })
   }, [ref, tabs, queryClient])
 

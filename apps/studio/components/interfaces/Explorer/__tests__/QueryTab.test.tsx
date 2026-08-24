@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ExplorerQueryTab } from '../ExplorerQueryTab'
 import type { ReadReplicasData } from '@/data/read-replicas/replicas-query'
 import { explorerQueryState } from '@/state/explorer-query'
-import { createTabsState, TabsStateContext } from '@/state/tabs'
+import { createTabId, createTabsState, TabsStateContext } from '@/state/tabs'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { setupSqlEditorMocks } from '@/tests/lib/sql-editor-test-utils'
@@ -27,8 +27,18 @@ vi.mock('common', async (importOriginal) => {
 })
 
 vi.mock('@/components/ui/CodeEditor/CodeEditor', () => ({
-  CodeEditor: ({ value }: { value: string }) => (
-    <textarea aria-label="SQL editor" value={value} readOnly />
+  CodeEditor: ({
+    value,
+    onInputChange,
+  }: {
+    value: string
+    onInputChange?: (value: string | undefined) => void
+  }) => (
+    <textarea
+      aria-label="SQL editor"
+      value={value}
+      onChange={(e) => onInputChange?.(e.target.value)}
+    />
   ),
 }))
 
@@ -46,9 +56,56 @@ vi.mock('../QueryEditor/QuerySourceMenu', () => ({
   ),
 }))
 
-const renderQueryTab = () =>
+vi.mock('../QueryEditor/DisplaySettingsButton', () => ({
+  DisplaySettingsButton: ({
+    display,
+    disabled,
+    onChange,
+  }: {
+    display: { view: 'table' | 'chart' }
+    disabled: boolean
+    onChange: (display: {
+      view: 'table' | 'chart'
+      chart: {
+        type: 'bar'
+        x_column: string
+        y_series: string[]
+        cumulative: boolean
+        scale: 'linear'
+        show_labels: boolean
+      }
+    }) => void
+  }) => (
+    <button
+      aria-label="Result settings"
+      disabled={disabled}
+      tabIndex={0}
+      onClick={() =>
+        onChange({
+          view: 'chart',
+          chart: {
+            type: 'bar',
+            x_column: 'day',
+            y_series: ['requests'],
+            cumulative: false,
+            scale: 'linear',
+            show_labels: true,
+          },
+        })
+      }
+    >
+      {display.view}
+    </button>
+  ),
+}))
+
+vi.mock('../QueryEditor/QueryResultChart', () => ({
+  QueryResultChart: () => <div>Chart results</div>,
+}))
+
+const renderQueryTab = (tabsState = createTabsState('default')) =>
   customRender(
-    <TabsStateContext.Provider value={createTabsState('default')}>
+    <TabsStateContext.Provider value={tabsState}>
       <ExplorerQueryTab />
     </TabsStateContext.Provider>
   )
@@ -115,6 +172,29 @@ describe('QueryTab execution', () => {
       await screen.findByText("Error: Querying logs isn't available for this project yet.")
     ).toBeInTheDocument()
     expect(requests).toHaveLength(0)
+  })
+
+  it('exposes and persists the shared notebook result view options', async () => {
+    createDraft({ _tag: 'database' })
+    explorerQueryState.setResult({
+      id: 'query-test',
+      result: { rows: [{ day: 'Monday', requests: 10 }], executedAt: 1 },
+    })
+
+    renderQueryTab()
+    const settingsButton = await screen.findByRole('button', { name: 'Result settings' })
+    expect(settingsButton).toBeEnabled()
+    expect(settingsButton).toHaveTextContent('table')
+
+    await userEvent.click(settingsButton)
+
+    await waitFor(() =>
+      expect(explorerQueryState.drafts['query-test']).toMatchObject({
+        view: 'chart',
+        chart: { type: 'bar', x_column: 'day', y_series: ['requests'] },
+      })
+    )
+    expect(settingsButton).toHaveTextContent('chart')
   })
 
   it('waits for replicas, then fails closed when the selected database is absent', async () => {
@@ -212,6 +292,22 @@ describe('QueryTab execution', () => {
     await act(async () => {
       explorerQueryState.removeDraft({ id: 'query-test-2', projectRef: 'default' })
     })
+  })
+
+  it('persists the preview tab once typing starts in the SQL editor', async () => {
+    createDraft({ _tag: 'database' })
+
+    const tabsState = createTabsState('default')
+    const tabId = createTabId('query', { id: 'query-test' })
+    tabsState.addTab({ id: tabId, type: 'query', metadata: { queryId: 'query-test' } })
+    expect(tabsState.tabsMap[tabId]?.isPreview).toBe(true)
+
+    renderQueryTab(tabsState)
+
+    const sqlEditor = await screen.findByRole('textbox', { name: 'SQL editor' })
+    await userEvent.type(sqlEditor, ' where true')
+
+    await waitFor(() => expect(tabsState.tabsMap[tabId]?.isPreview).toBe(false))
   })
 
   it('blocks a destructive query behind a confirmation modal, then runs it once confirmed', async () => {
