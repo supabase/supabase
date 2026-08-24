@@ -1,7 +1,12 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { describe, expect, it } from 'vitest'
 
-import { buildSupportAssistantPrompt, parseSupportAssistantPrompt } from './SupportAssistant.utils'
+import {
+  buildSupportAssistantPrompt,
+  decodeAssistantHandoff,
+  encodeAssistantHandoff,
+  parseSupportAssistantPrompt,
+} from './SupportAssistant.utils'
 import type { SubmittedSupportRequest } from './SupportForm.state'
 
 const supportRequest: SubmittedSupportRequest = {
@@ -64,5 +69,35 @@ describe('SupportAssistant utils', () => {
   it('returns null for text without a valid support payload', () => {
     expect(parseSupportAssistantPrompt('Help me debug this issue')).toBeNull()
     expect(parseSupportAssistantPrompt('<support></support>')).toBeNull()
+  })
+
+  it('round-trips a request through encode/decode, simulating how router.query delivers it', () => {
+    const encoded = encodeAssistantHandoff(supportRequest)
+    // router.query values are already percent-decoded by Next.js — mirror that here
+    // instead of feeding the raw encoded string straight to decodeAssistantHandoff.
+    const asRouterQueryWouldDeliverIt = decodeURIComponent(encoded)
+
+    expect(decodeAssistantHandoff(asRouterQueryWouldDeliverIt)).toEqual(supportRequest)
+  })
+
+  it('does not mangle literal percent characters in the message', () => {
+    const request = { ...supportRequest, message: '100% CPU, literal %20 text' }
+    const encoded = encodeAssistantHandoff(request)
+    const asRouterQueryWouldDeliverIt = decodeURIComponent(encoded)
+
+    expect(decodeAssistantHandoff(asRouterQueryWouldDeliverIt)?.message).toBe(
+      '100% CPU, literal %20 text'
+    )
+  })
+
+  it('returns null for malformed JSON', () => {
+    expect(decodeAssistantHandoff('{not valid json')).toBeNull()
+  })
+
+  it('returns null for validly-shaped JSON that does not match the expected schema', () => {
+    expect(decodeAssistantHandoff(JSON.stringify({ foo: 'bar' }))).toBeNull()
+    expect(
+      decodeAssistantHandoff(JSON.stringify({ ...supportRequest, allowSupportAccess: 'yes' }))
+    ).toBeNull()
   })
 })

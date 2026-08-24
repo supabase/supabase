@@ -34,7 +34,7 @@ const isSameSnippet = (snippet: SqlSnippet, currentQuery: CurrentQuerySnippet) =
 
 export const AIAssistant = ({ className }: AIAssistantProps) => {
   const router = useRouter()
-  const { id: entityId, source: sourceParam } = useParams()
+  const { id: entityId, source: sourceParam, ref: routeRef } = useParams()
   const snap = useAiAssistantStateSnapshot()
   const state = useAiAssistantState()
   const { snippets } = useSqlEditorV2StateSnapshot()
@@ -56,39 +56,43 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const processAssistantHandoff = useEffectEvent((handoffParam: string) => {
     const request = decodeAssistantHandoff(handoffParam)
-    if (!request) return
 
-    const newChatId = state.newChat({
-      name: 'Support request',
-      initialMessage: buildSupportAssistantPrompt(request),
-    })
+    // A handoff link binds its target project to `request.projectRef`. Reject (and still
+    // clean up) any handoff that ends up on a different project's page — a stale link, or
+    // one edited/replayed by hand — rather than creating a chat tagged with the wrong project.
+    if (request && request.projectRef === routeRef) {
+      const newChatId = state.newChat({
+        name: 'Support request',
+        initialMessage: buildSupportAssistantPrompt(request),
+      })
 
-    const chat = state.chats[newChatId]
-    if (chat) {
-      chat.supportMetadata = {
-        subject: request.subject,
-        category: request.category,
-        severity: request.severity,
-        organizationSlug: request.organizationSlug,
-        projectRef: request.projectRef,
-        library: request.library,
-        affectedServices: request.affectedServices,
-        allowSupportAccess: request.allowSupportAccess,
-        frontConversationId: request.frontConversationId,
-        threadRef: request.threadRef,
-        isSupportChat: true,
-        lifecycleStatus: 'bot_active',
-        lastSyncedMessageCount: 0,
-        isSyncing: false,
-        isLifecycleSyncing: false,
+      const chat = state.chats[newChatId]
+      if (chat) {
+        chat.supportMetadata = {
+          subject: request.subject,
+          category: request.category,
+          severity: request.severity,
+          organizationSlug: request.organizationSlug,
+          projectRef: request.projectRef,
+          library: request.library,
+          affectedServices: request.affectedServices,
+          allowSupportAccess: request.allowSupportAccess,
+          frontConversationId: request.frontConversationId,
+          threadRef: request.threadRef,
+          isSupportChat: true,
+          lifecycleStatus: 'bot_active',
+          lastSyncedMessageCount: 0,
+          isSyncing: false,
+          isLifecycleSyncing: false,
+        }
+
+        void import('@/state/ai-chat-front-sync')
+          .then(({ syncSupportChatToFront }) => syncSupportChatToFront(newChatId, state))
+          .catch(() => {})
       }
 
-      void import('@/state/ai-chat-front-sync')
-        .then(({ syncSupportChatToFront }) => syncSupportChatToFront(newChatId, state))
-        .catch(() => {})
+      state.selectChat(newChatId)
     }
-
-    state.selectChat(newChatId)
 
     const { [ASSISTANT_HANDOFF_QUERY_PARAM]: _handledParam, ...restQuery } = router.query
     router.replace({ pathname: router.pathname, query: restQuery }, undefined, { shallow: true })

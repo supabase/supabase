@@ -1,3 +1,5 @@
+import { z } from 'zod'
+
 import type { SubmittedSupportRequest } from './SupportForm.state'
 
 const SUPPORT_ASSISTANT_FIELD_LABELS = {
@@ -56,13 +58,32 @@ export function buildSupportAssistantPrompt(request: SubmittedSupportRequest) {
 
 export const ASSISTANT_HANDOFF_QUERY_PARAM = 'assistantHandoff'
 
+const AssistantHandoffSchema = z.object({
+  organizationSlug: z.string().optional(),
+  projectRef: z.string().optional(),
+  category: z.string(),
+  severity: z.string(),
+  subject: z.string(),
+  message: z.string(),
+  affectedServices: z.string(),
+  allowSupportAccess: z.boolean(),
+  library: z.string().optional(),
+  dashboardLogs: z.string().optional(),
+  threadRef: z.string().optional(),
+  frontConversationId: z.string().optional(),
+})
+
 export function encodeAssistantHandoff(request: SubmittedSupportRequest): string {
   return encodeURIComponent(JSON.stringify(request))
 }
 
+// `value` comes from `router.query`, which Next.js has already percent-decoded — do not
+// call `decodeURIComponent` again here, or literal `%` characters in the ticket message
+// (e.g. "100% CPU") get mangled.
 export function decodeAssistantHandoff(value: string): SubmittedSupportRequest | null {
   try {
-    return JSON.parse(decodeURIComponent(value))
+    const parsed = AssistantHandoffSchema.safeParse(JSON.parse(value))
+    return parsed.success ? (parsed.data as SubmittedSupportRequest) : null
   } catch {
     return null
   }
