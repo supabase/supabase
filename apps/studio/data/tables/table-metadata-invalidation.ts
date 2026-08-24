@@ -78,6 +78,7 @@ export const invalidateTableMetadata = async (
     ]),
   ])
 
+  // Invalidate tableRowsAndCount after tableEditor because row queries use it to build their SQL.
   if (includeRows && tableId !== undefined) {
     await queryClient.invalidateQueries({
       queryKey: tableRowKeys.tableRowsAndCount(projectRef, tableId),

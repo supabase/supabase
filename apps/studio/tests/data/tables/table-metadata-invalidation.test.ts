@@ -85,7 +85,7 @@ describe('invalidateTableMetadata', () => {
     )
   })
 
-  test('only invalidates row keys when rows are requested and a table id is available', async () => {
+  test('does not invalidate id-based keys when a table id is unavailable', async () => {
     const queryClient = createQueryClient()
 
     await invalidateTableMetadata(queryClient, {
@@ -95,8 +95,11 @@ describe('invalidateTableMetadata', () => {
       includeRows: true,
     })
 
-    expect(getInvalidatedQueryKeys(queryClient)).not.toContainEqual(
-      tableRowKeys.tableRowsAndCount('project-ref', 1)
-    )
+    const queryKeys = getInvalidatedQueryKeys(queryClient)
+
+    expect(queryKeys).not.toContainEqual(tableEditorKeys.tableEditor('project-ref', 1))
+    expect(queryKeys).not.toContainEqual(databaseKeys.tableDefinition('project-ref', 1))
+    expect(queryKeys).not.toContainEqual(databaseKeys.tableConstraints('project-ref', 1))
+    expect(queryKeys).not.toContainEqual(tableRowKeys.tableRowsAndCount('project-ref', 1))
   })
 })

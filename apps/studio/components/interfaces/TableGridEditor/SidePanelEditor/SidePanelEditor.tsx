@@ -687,7 +687,6 @@ export const SidePanelEditor = ({
                     invalidateTableMetadata(queryClient, {
                       projectRef: project?.ref,
                       schema: table.schema,
-                      tableId: table.id,
                       tableName: table.name,
                       includeLint: true,
                     }),
