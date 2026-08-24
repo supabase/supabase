@@ -50,17 +50,13 @@ The replication state tables are not updated very often, especially after the in
 
 ## What schema changes are supported?
 
-Schema change support is currently in beta and limited to the BigQuery destination.
+Schema change support is in beta and limited to the BigQuery destination.
 
-Supported schema changes:
+Pipelines supports adding, removing, and renaming non-primary-key columns; dropping `NOT NULL`; updating supported defaults; and changing the published column list for a table already in the pipeline.
 
-- Adding a scalar, top-level column (created as `NULLABLE` in BigQuery)
-- Removing a column
-- Renaming a column
-- Dropping a `NOT NULL` constraint
-- Setting or dropping supported column default metadata
+New scalar columns are nullable. Existing BigQuery rows remain `NULL`, and future changes contain the value from Postgres. Removing a published column also removes its stored BigQuery values.
 
-Initial BigQuery table creation preserves whether each scalar, non-array Postgres column allows `NULL`. Arrays use BigQuery's `REPEATED` mode. For later changes, `DROP NOT NULL` relaxes a BigQuery `REQUIRED` column to `NULLABLE`, while `SET NOT NULL` leaves an existing BigQuery column nullable and logs a warning. Newly added scalar, top-level columns are always nullable in BigQuery. Supported defaults are applied separately as destination metadata and do not populate existing destination rows. Pipelines does not currently support changing column data types. See [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support) for details.
+Data type changes aren't applied to BigQuery and require a table resynchronization. Supabase is exploring how to support data type changes without a full resync, but this isn't implemented yet. See [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support) for the full behavior and limitations.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
@@ -121,12 +117,14 @@ See [Handling errors](/docs/guides/database/replication/pipelines-monitoring#han
 
 ## Why was the pipeline stopped?
 
-A pipeline is stopped when you select **Stop pipeline**, when its project becomes inactive, or while an operation requires it to restart. A non-retryable configuration, schema, or data error can instead put the pipeline in **Failed** state. Transient connection and destination errors retry automatically when possible.
+A pipeline is stopped when you select **Stop pipeline**, when its project becomes inactive, when an operation requires it to restart, or when Supabase stops it automatically to protect system resources. A non-retryable configuration, schema, or data error instead puts the pipeline in **Failed** state (see [Why is a pipeline in failed state?](#why-is-a-pipeline-in-failed-state)).
+
+Transient connection and destination errors retry automatically when possible. If a pipeline keeps failing and restarting despite those retries, Supabase automatically stops it rather than letting it keep restarting in a loop and consuming resources indefinitely. You'll receive an email explaining that the pipeline was stopped after repeated failures. This is the same **Stopped** state as a manual stop; the pipeline isn't deleted or canceled, and it doesn't restart on its own.
 
 To recover:
 
 1. Check whether the pipeline is **Stopped**, **Stopping**, or **Failed**
-2. If it failed, review the error details and [replication logs](/dashboard/project/_/logs/replication-logs)
+2. If it's **Failed**, or it was automatically stopped after repeated failures, review the error details and [replication logs](/dashboard/project/_/logs/replication-logs) to find the underlying cause, such as an unsupported schema change or a persistent destination error
 3. Fix the underlying issue, such as destination connectivity, schema mismatches, permissions, or rate limits
 4. Start or restart the pipeline from [**Database > Replication**](/dashboard/project/_/database/replication)
 
@@ -148,7 +146,7 @@ See [Slot statuses](/docs/guides/database/replication/pipelines-monitoring#slot-
 
 ## Why is a table in error state?
 
-Table errors occur during the initial sync. To recover, click **View pipeline**, find the affected table, and click its restart action. This restarts that table's initial sync from the beginning, deletes its existing destination data, and bills the successfully processed row data again.
+A table can enter an error state during the initial sync, or afterward if Pipelines detects a schema change it can't apply safely, such as an unsupported data type change, primary-key change, or an interrupted schema change (see [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support)). To recover, click **View pipeline**, find the affected table, fix the underlying issue if needed, and click its restart action. This restarts that table's initial sync from the beginning, deletes its existing destination data, and bills the successfully processed row data again.
 
 ## How to verify replication is working
 

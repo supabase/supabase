@@ -222,7 +222,7 @@ export const AdvancedSettings = ({
                         </div>
                       }
                       layout="horizontal"
-                      description="How old query results can be while BigQuery applies ongoing changes."
+                      description="How old query results can be while BigQuery applies ongoing changes. Applied when a table is created or recreated; changing it doesn't alter existing destination tables."
                     >
                       <FormControl>
                         <InputGroup>
