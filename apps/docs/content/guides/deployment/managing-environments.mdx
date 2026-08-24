@@ -142,7 +142,7 @@ GRANT ALL ON TABLE public.employees TO service_role;
 ```
 
 You might notice that this auto-generated migration script is more verbose than the manually written one.
-That's because the older diff engines don't account for default privileges added by the initial schema. Projects with the `pg-delta` engine enabled (`[experimental.pgdelta] enabled = true` in `config.toml`, written by a recent `supabase init`) generate a concise migration with lowercase keywords and without the redundant grants.
+That's because the older diff engines don't account for default privileges added by the initial schema. Projects with the `pg-delta` engine enabled (`[experimental.pgdelta] enabled = true` in `config.toml`, written by a recent `supabase init`) generate a concise migration without the redundant grants.
 
 Commit the new migration script to git and you are ready to deploy.
 

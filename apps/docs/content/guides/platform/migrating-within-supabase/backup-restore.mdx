@@ -237,7 +237,7 @@ supabase link --project-ref "$OLD_PROJECT_REF"
 supabase db diff --linked > changes.sql
 ```
 
-The diff engine decides what in these managed schemas belongs to you: your own triggers on managed tables (such as `auth.users`) are included, but platform objects are excluded, and so are RLS policies on `storage.objects`. Recreate those on the new project from your own migration files or through the Dashboard.
+The diff engine decides what in these managed schemas belongs to you: your own triggers on managed tables (such as `auth.users`) and your RLS policies on `storage.objects` are included, while platform objects are excluded. Other objects you created inside these schemas, such as your own functions or indexes, are not diffed - recreate those on the new project from your own migration files or through the Dashboard.
 
 ### Troubleshooting notes
 

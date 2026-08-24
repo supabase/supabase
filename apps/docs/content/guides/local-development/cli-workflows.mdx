@@ -119,7 +119,7 @@ The generated file can include statements you didn't expect. The diff engine exc
 
 <Admonition type="note" label="Customizations in the `auth` and `storage` schemas">
 
-The `auth` and `storage` schemas are managed by Supabase, so the diff engine excludes their platform objects. Your own triggers on managed tables (such as a trigger on `auth.users` calling a function in `public`) are captured automatically. Other customizations inside these schemas, for example RLS policies on `storage.objects`, are not diffed: manage them with [hand-written migrations](/docs/guides/deployment/database-migrations).
+The `auth` and `storage` schemas are managed by Supabase, so the diff engine excludes their platform objects. Your own customizations on top of them are captured automatically: triggers on managed tables (such as a trigger on `auth.users` calling a function in `public`) and RLS policies on `storage.objects` and `storage.buckets`. Other objects you create inside these schemas, such as your own functions or indexes, are not diffed: manage them with [hand-written migrations](/docs/guides/deployment/database-migrations).
 
 </Admonition>
 
@@ -298,7 +298,7 @@ Which approach you use is a project-level decision, set when you first created y
 
 `db schema declarative sync` compares your `supabase/schemas/` files against your existing migrations; it does **not** read the live local database. Changes you make directly in Studio or via SQL are invisible to it, so it reports "No schema changes found" and silently drops them. Always edit the schema files, then sync.
 
-Don't use `db diff` to generate migrations from declarative files: under `pg-delta`, `db diff` never reads `supabase/schemas/` (and the old `[db.migrations].schema_paths` setting no longer changes its baseline; the CLI prints a warning if it's set).
+Don't use `db diff` to generate migrations from declarative files: under `pg-delta`, `db diff` never uses `supabase/schemas/` as its baseline (and the old `[db.migrations].schema_paths` setting no longer changes that baseline; the CLI prints a warning if it's set).
 
 </Admonition>
 
@@ -433,7 +433,7 @@ When `supabase db diff` or `db schema declarative sync` generates a migration, r
 
 ### What `pg-delta` output looks like
 
-Generated SQL uses lowercase keywords, wrapped at a maximum width of 180 characters. You can override this with `[experimental.pgdelta] format_options` in `config.toml`, or set `format_options = "null"` to emit raw statements with no formatting applied.
+Generated SQL uses uppercase keywords, wrapped at a maximum width of 180 characters. You can override this with `[experimental.pgdelta] format_options` in `config.toml`, or set `format_options = "null"` to emit raw statements with no formatting applied.
 
 Most changes produce a single migration file. When a change crosses a transaction boundary (for example `alter type ... add value` followed by a statement that uses the new enum value, which can't run in the same transaction), the CLI writes one ordered migration file per unit instead (such as `<timestamp>_name_schema_changes.sql` and `<timestamp+1s>_name_after_enum_values.sql`). Commit all of them.
 
@@ -461,7 +461,7 @@ Projects still on `migra` see extra noise that `pg-delta` doesn't produce: redun
 
 ### Known limitations of `db diff`
 
-No diff engine captures everything. Most notably, DML (INSERT, UPDATE, DELETE) is never tracked, so data changes must be added to the migration manually. Known cases where the diff can miss changes include publications, storage buckets, and views with `security_invoker`. See the [full list of caveats](/docs/guides/local-development/declarative-database-schemas#known-caveats) in the declarative schemas guide.
+No diff engine captures everything. Most notably, DML (INSERT, UPDATE, DELETE) is never tracked, so data changes must be added to the migration manually. This includes storage buckets, which are rows in the `storage.buckets` table rather than schema objects. See the [full list of caveats](/docs/guides/local-development/declarative-database-schemas#known-caveats) in the declarative schemas guide.
 
 If a diff looks wrong, you can fall back to the legacy engine for a single run (`db diff --use-migra`, or `db pull --diff-engine migra`) to compare, or opt out entirely with `enabled = false` under `[experimental.pgdelta]`. See [Which diff engine you're on](#the-supabase-directory).
 
