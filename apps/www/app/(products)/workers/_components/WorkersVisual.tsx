@@ -1,63 +1,298 @@
+'use client'
+
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { Database } from 'icons'
+import type { LucideIcon } from 'lucide-react'
+import { Bot, Server, User } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { cn } from 'ui'
 
 import styles from './workers-visual.module.css'
+import { WorkersLogo } from './WorkersLogo'
 
-// The Workers mark: solid outer hexagon around an inner isometric cube (see WorkersLogo).
-const WORKER_OUTER_PATH =
-  'M15.75 12V5.99999C15.7497 5.73694 15.6803 5.4786 15.5487 5.25086C15.417 5.02312 15.2278 4.83401 15 4.70249L9.75 1.70249C9.52197 1.57084 9.2633 1.50153 9 1.50153C8.7367 1.50153 8.47803 1.57084 8.25 1.70249L3 4.70249C2.7722 4.83401 2.58299 5.02312 2.45135 5.25086C2.31971 5.4786 2.25027 5.73694 2.25 5.99999V12C2.25027 12.263 2.31971 12.5214 2.45135 12.7491C2.58299 12.9769 2.7722 13.166 3 13.2975L8.25 16.2975C8.47803 16.4291 8.7367 16.4985 9 16.4985C9.2633 16.4985 9.52197 16.4291 9.75 16.2975L15 13.2975C15.2278 13.166 15.417 12.9769 15.5487 12.7491C15.6803 12.5214 15.7497 12.263 15.75 12Z'
-const WORKER_INNER_PATH =
-  'M13 10.6011V7.4004C12.9998 7.26009 12.9587 7.12227 12.8807 7.00079C12.8027 6.8793 12.6906 6.77842 12.5556 6.70826L9.44444 5.10793C9.30932 5.0377 9.15603 5.00073 9 5.00073C8.84397 5.00073 8.69068 5.0377 8.55556 5.10793L5.44444 6.70826C5.30945 6.77842 5.19732 6.8793 5.11932 7.00079C5.04131 7.12227 5.00016 7.26009 5 7.4004V10.6011C5.00016 10.7414 5.04131 10.8792 5.11932 11.0007C5.19732 11.1222 5.30945 11.223 5.44444 11.2932L8.55556 12.8935C8.69068 12.9638 8.84397 13.0007 9 13.0007C9.15603 13.0007 9.30932 12.9638 9.44444 12.8935L12.5556 11.2932C12.6906 11.223 12.8027 11.1222 12.8807 11.0007C12.9587 10.8792 12.9998 10.7414 13 10.6011Z'
-const WORKER_FACE_PATH = 'M6 7.00073L9 9.00073L12 7.00073'
-const WORKER_STEM_PATH = 'M9 12.5V9.00073'
+// Ephemeral sandboxes cycle through this lifecycle on a loop: empty (no
+// container running) -> building -> active -> stopping -> suspended -> empty.
+// Durations are compressed relative to a real Worker's lifetime ("a few
+// minutes" of activity becomes tens of seconds, etc.) so the loop stays
+// watchable on a marketing page.
+type SandboxPhase = 'empty' | 'building' | 'active' | 'stopping' | 'suspended'
 
-const WORKER_SCALE = 2.2
-// half of the scaled 18x18 cube, to center it on (cx, cy)
-const WORKER_OFFSET = (18 * WORKER_SCALE) / 2
+const PHASE_ORDER: SandboxPhase[] = ['empty', 'building', 'active', 'stopping', 'suspended']
 
-function WorkerCube({
-  cx,
-  cy,
-  className,
-  style,
-}: {
-  cx: number
-  cy: number
-  className?: string
-  style?: React.CSSProperties
-}) {
-  const strokeWidth = 1 / WORKER_SCALE
+const PHASE_DURATION_MS: Record<SandboxPhase, [number, number]> = {
+  empty: [3000, 6000],
+  building: [2000, 4000],
+  active: [18000, 32000],
+  stopping: [800, 1600],
+  suspended: [3000, 5000],
+}
+
+const STATUS_META: Record<
+  Exclude<SandboxPhase, 'empty'>,
+  { label: string; dot: string; text: string }
+> = {
+  building: { label: 'Building', dot: 'bg-warning animate-pulse', text: 'text-foreground' },
+  active: { label: 'Active', dot: 'bg-brand', text: 'text-foreground' },
+  stopping: { label: 'Stopping', dot: 'bg-warning', text: 'text-foreground-muted' },
+  suspended: { label: 'Suspended', dot: 'bg-border-stronger', text: 'text-foreground-muted' },
+}
+
+const SANDBOX_RUNTIMES = ['node', 'deno'] as const
+
+const SANDBOX_SLOTS = [
+  { name: 'sandbox1', size: '2 GB · 1 vCPU', delay: 0 },
+  { name: 'sandbox3', size: '2 GB · 1 vCPU', delay: 5500 },
+  { name: 'sandbox2', size: '2 GB · 1 vCPU', delay: 9000 },
+  { name: 'sandbox4', size: '4 GB · 2 vCPU', delay: 3000 },
+] as const
+
+const PERSISTENT_WORKERS = [
+  { name: 'api', runtime: 'node', size: '2 GB · 1 vCPU', since: '2 months ago' },
+  { name: 'embeddings', runtime: 'dockerfile', size: '4 GB · 2 vCPU', since: '3 days ago' },
+] as const
+
+function randomInRange([min, max]: [number, number]) {
+  return min + Math.random() * (max - min)
+}
+
+function formatElapsed(seconds: number) {
+  if (seconds < 60) return `${seconds}s`
+  return `${Math.floor(seconds / 60)}m${seconds % 60}s`
+}
+
+function useSandboxLifecycle(runtimes: readonly string[], initialDelayMs: number) {
+  const prefersReducedMotion = useReducedMotion()
+  const [phase, setPhase] = useState<SandboxPhase>('empty')
+  const [elapsed, setElapsed] = useState(0)
+  const [runtime, setRuntime] = useState<string>(runtimes[0])
+
+  // Drives the phase machine: schedule the next phase, then reschedule
+  // itself from there. Runtime is re-rolled each time a build starts.
+  useEffect(() => {
+    if (prefersReducedMotion) return
+
+    let timeoutId: ReturnType<typeof setTimeout>
+
+    const advance = (current: SandboxPhase) => {
+      const next = PHASE_ORDER[(PHASE_ORDER.indexOf(current) + 1) % PHASE_ORDER.length]
+      if (next === 'building') setRuntime(runtimes[Math.floor(Math.random() * runtimes.length)])
+      setPhase(next)
+      setElapsed(0)
+      timeoutId = setTimeout(() => advance(next), randomInRange(PHASE_DURATION_MS[next]))
+    }
+
+    timeoutId = setTimeout(() => advance('empty'), initialDelayMs)
+    return () => clearTimeout(timeoutId)
+  }, [runtimes, initialDelayMs, prefersReducedMotion])
+
+  // Ticks the elapsed-time counter shown in the card footer while the
+  // sandbox is doing something worth timing.
+  useEffect(() => {
+    if (prefersReducedMotion || phase === 'empty' || phase === 'suspended') return
+    const interval = setInterval(() => setElapsed((value) => value + 1), 1000)
+    return () => clearInterval(interval)
+  }, [phase, prefersReducedMotion])
+
+  if (prefersReducedMotion) return { phase: 'active' as const, elapsed: 96, runtime: runtimes[0] }
+  return { phase, elapsed, runtime }
+}
+
+function WorkerIcon({ dimmed = false }: { dimmed?: boolean }) {
   return (
-    <g transform={`translate(${cx - WORKER_OFFSET}, ${cy - WORKER_OFFSET}) scale(${WORKER_SCALE})`}>
-      <g className={className} style={style}>
-        <path d={WORKER_OUTER_PATH} strokeWidth={strokeWidth} />
-        <path d={WORKER_INNER_PATH} strokeWidth={strokeWidth} strokeLinecap="square" />
-        <path d={WORKER_FACE_PATH} strokeWidth={strokeWidth} strokeLinecap="square" />
-        <path d={WORKER_STEM_PATH} strokeWidth={strokeWidth} strokeLinecap="square" />
-      </g>
-    </g>
+    <div
+      className={cn(
+        'flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-border',
+        dimmed ? 'text-foreground-muted opacity-30' : 'text-foreground-lighter'
+      )}
+    >
+      <WorkersLogo size={16} />
+    </div>
   )
 }
 
-// Workers sit in a horizontal row above the boundary; humans and agents sit
-// below it. Lines rise from each source, cross the dashed boundary, and
-// attach to a worker for as long as it runs.
-const WORKERS_Y = 140
+function WorkerCardShell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex w-full flex-col rounded-lg border border-border bg-surface-75 overflow-hidden">
+      {children}
+    </div>
+  )
+}
 
-// Long-lived workers: always on, steady traffic.
-const PERSISTENT_WORKERS = [
-  { cx: 300, in: 'M420 300 C 420 240, 300 230, 300 164' },
-  { cx: 660, in: 'M540 300 C 540 240, 660 230, 660 164' },
-]
+function WorkerCardHeader({
+  name,
+  runtime,
+  statusSlot,
+}: {
+  name: string
+  runtime: string
+  statusSlot: React.ReactNode
+}) {
+  return (
+    <div className="flex items-center gap-2 px-3 py-2.5">
+      <WorkerIcon />
+      <div className="flex min-w-0 flex-col leading-tight">
+        <span className="truncate font-mono text-xs text-foreground">{name}</span>
+        <span className="truncate font-mono text-[11px] text-foreground-muted">{runtime}</span>
+      </div>
+      <div className="ml-auto flex shrink-0 items-center gap-1.5">{statusSlot}</div>
+    </div>
+  )
+}
 
-// Short-lived workers: the line reaches the worker, stays while it runs,
-// then retracts as the worker shuts down. Durations/delays are staggered
-// so sessions overlap organically.
-const EPHEMERAL_WORKERS = [
-  { cx: 180, in: 'M540 300 C 540 220, 180 260, 180 164', duration: 9, delay: -2 },
-  { cx: 420, in: 'M420 300 C 420 250, 420 220, 420 164', duration: 12, delay: -7 },
-  { cx: 540, in: 'M540 300 C 540 250, 540 220, 540 164', duration: 8, delay: -5 },
-  { cx: 780, in: 'M420 300 C 420 230, 780 250, 780 164', duration: 11, delay: -9.5 },
-]
+function WorkerCardFooter({ left, right }: { left: string; right: string }) {
+  return (
+    <div className="flex bg-bg-surface-100 items-center justify-between border-t border-border px-3 py-2 font-mono text-xs text-foreground-muted">
+      <span>{left}</span>
+      <span>{right}</span>
+    </div>
+  )
+}
+
+// Always-on production backend worker: fixed status, no lifecycle.
+function PersistentWorkerCard({ name, runtime, size, since }: (typeof PERSISTENT_WORKERS)[number]) {
+  return (
+    <WorkerCardShell>
+      <WorkerCardHeader
+        name={name}
+        runtime={runtime}
+        statusSlot={
+          <>
+            <span className="h-1.5 w-1.5 rounded-full bg-brand" aria-hidden />
+            <span className="font-mono text-xs text-foreground">Active</span>
+          </>
+        }
+      />
+      <WorkerCardFooter left={size} right={since} />
+    </WorkerCardShell>
+  )
+}
+
+// Ephemeral sandbox worker: renders as a dashed empty slot until an agent
+// spins it up, then crossfades into a live card that tracks its phase.
+// Lifecycle state is lifted to the parent (see useSandboxLifecycle call
+// sites in WorkersVisual) so the connector lines can react to it too.
+function SandboxCard({
+  name,
+  size,
+  phase,
+  elapsed,
+  runtime,
+}: {
+  name: string
+  size: string
+  phase: SandboxPhase
+  elapsed: number
+  runtime: string
+}) {
+  return (
+    <AnimatePresence mode="popLayout" initial={false}>
+      {phase === 'empty' ? (
+        <motion.div
+          key="empty"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="flex h-[69px] items-center justify-center rounded-lg border border-dashed border-border"
+        >
+          <WorkerIcon dimmed />
+        </motion.div>
+      ) : (
+        <motion.div
+          key="card"
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.96 }}
+          transition={{ duration: 0.3 }}
+        >
+          <WorkerCardShell>
+            <WorkerCardHeader
+              name={name}
+              runtime={runtime}
+              statusSlot={
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.span
+                    key={phase}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex items-center gap-1.5"
+                  >
+                    <span
+                      className={cn('h-1.5 w-1.5 rounded-full', STATUS_META[phase].dot)}
+                      aria-hidden
+                    />
+                    <span className={cn('font-mono text-xs', STATUS_META[phase].text)}>
+                      {STATUS_META[phase].label}
+                    </span>
+                  </motion.span>
+                </AnimatePresence>
+              }
+            />
+            <WorkerCardFooter
+              left={size}
+              right={phase === 'suspended' ? '–' : formatElapsed(elapsed)}
+            />
+          </WorkerCardShell>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
+
+function ApplicationCard() {
+  return (
+    <div className="flex items-center gap-2 rounded-lg border border-dashed px-4 py-2.5">
+      <Database className="h-4 w-4 text-foreground-lighter" strokeWidth={1.5} aria-hidden />
+      <span className="font-mono text-xs uppercase tracking-widest text-foreground-lighter">
+        Application
+      </span>
+    </div>
+  )
+}
+
+function SourceCard({ icon: Icon, label }: { icon: LucideIcon; label: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed min-w-32 px-4 py-4">
+      <Icon className="h-5 w-5 text-foreground-muted" strokeWidth={1.5} aria-hidden />
+      <span className="font-mono text-xs uppercase tracking-widest text-foreground-muted">
+        {label}
+      </span>
+    </div>
+  )
+}
+
+// A single vertical link in the flow: a faint dashed base plus a brand-colored
+// overlay that marches continuously (see .flow) and fades in only while the
+// worker(s) it feeds are doing something — dark/idle otherwise.
+function ConnectorLine({ active = true }: { active?: boolean }) {
+  return (
+    <svg viewBox="0 0 2 24" preserveAspectRatio="none" className="h-full w-px" aria-hidden="true">
+      <line
+        x1="1"
+        y1="0"
+        x2="1"
+        y2="24"
+        className="text-border-strong"
+        stroke="currentColor"
+        strokeWidth="1"
+        strokeDasharray="2 4"
+      />
+      <line
+        x1="1"
+        y1="0"
+        x2="1"
+        y2="24"
+        stroke="currentColor"
+        strokeWidth="1"
+        strokeLinecap="round"
+        className={cn('text-border-muted transition-opacity duration-700', styles.flow)}
+        style={{ opacity: active ? 1 : 0 }}
+      />
+    </svg>
+  )
+}
 
 const RUNTIMES = [
   { name: 'Dockerfile', available: true },
@@ -68,160 +303,55 @@ const RUNTIMES = [
 ]
 
 export function WorkersVisual() {
+  // Lifecycle state for the 4 sandbox slots, lifted up here so the connector
+  // lines below can react to whichever sandboxes they feed.
+  const sandbox1 = useSandboxLifecycle(SANDBOX_RUNTIMES, SANDBOX_SLOTS[0].delay)
+  const sandbox3 = useSandboxLifecycle(SANDBOX_RUNTIMES, SANDBOX_SLOTS[1].delay)
+  const sandbox2 = useSandboxLifecycle(SANDBOX_RUNTIMES, SANDBOX_SLOTS[2].delay)
+  const sandbox4 = useSandboxLifecycle(SANDBOX_RUNTIMES, SANDBOX_SLOTS[3].delay)
+
   return (
-    <figure className="w-full max-w-5xl mx-auto flex flex-col gap-6">
+    <figure className="w-full max-w-3xl mx-auto flex flex-col gap-2 py-8">
       <span className="sr-only">
-        Humans and agents spin up isolated Workers on demand. Some run briefly and shut down; others
-        keep running indefinitely.
+        A diagram showing humans and agents connecting to Workers. Two always-on backend Workers
+        serve the application; agents spin up short-lived sandbox Workers on demand, which build,
+        run, and suspend automatically.
       </span>
-      <svg viewBox="0 0 960 420" fill="none" className="w-full h-auto" aria-hidden="true">
-        {/* Section labels */}
-        <g className="text-foreground-muted font-mono" fill="currentColor" fontSize="11">
-          <text x="480" y="56" textAnchor="middle" letterSpacing="0.1em">
-            WORKERS
-          </text>
-          <text x="480" y="404" textAnchor="middle" letterSpacing="0.1em">
-            HUMANS &amp; AGENTS
-          </text>
-        </g>
 
-        {/* Dashed boundary between the worker row and the sources below */}
-        <path
-          d="M48 232 H 912"
-          className="text-border-strong"
-          stroke="currentColor"
-          strokeWidth="1"
-          strokeDasharray="4 6"
-        />
+      <div className="grid grid-cols-3 gap-x-2" aria-hidden="true">
+        <div className="flex col-span-full justify-center">
+          <ApplicationCard />
+        </div>
 
-        {/* Long-lived routes: faint base + steady dashed flow */}
-        <g className="text-border-strong" stroke="currentColor" strokeWidth="1">
-          {PERSISTENT_WORKERS.map((w) => (
-            <path key={w.in} d={w.in} />
-          ))}
-        </g>
-        <g className="text-brand" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round">
-          {PERSISTENT_WORKERS.map((w) => (
-            <path key={w.in} d={w.in} className={styles.flow} />
-          ))}
-        </g>
+        <div className="col-span-full h-12">
+          <ConnectorLine active />
+        </div>
 
-        {/* Short-lived sessions: line draws in, holds while the worker runs, then retracts */}
-        <g
-          className="text-brand"
-          stroke="currentColor"
-          strokeWidth="1.25"
-          strokeLinecap="round"
-          opacity="0.8"
-        >
-          {EPHEMERAL_WORKERS.map((w) => (
-            <path
-              key={w.in}
-              d={w.in}
-              pathLength={1}
-              className={styles.sessionLine}
-              style={{ animationDuration: `${w.duration}s`, animationDelay: `${w.delay}s` }}
-            />
-          ))}
-        </g>
+        <PersistentWorkerCard {...PERSISTENT_WORKERS[0]} />
+        <SandboxCard name={SANDBOX_SLOTS[0].name} size={SANDBOX_SLOTS[0].size} {...sandbox1} />
+        <SandboxCard name={SANDBOX_SLOTS[1].name} size={SANDBOX_SLOTS[1].size} {...sandbox3} />
 
-        {/* Source nodes: human and agent, icon only */}
-        <g className="text-foreground-lighter">
-          <rect
-            x="388"
-            y="300"
-            width="64"
-            height="64"
-            rx="10"
-            className="text-border"
-            stroke="currentColor"
-            fill="var(--background-surface-75)"
-          />
-          <text
-            x="420"
-            y="338"
-            textAnchor="middle"
-            fontSize="17"
-            className="font-mono"
-            fill="currentColor"
-          >
-            {'>_'}
-          </text>
-          <rect
-            x="508"
-            y="300"
-            width="64"
-            height="64"
-            rx="10"
-            className="text-border"
-            stroke="currentColor"
-            fill="var(--background-surface-75)"
-          />
-          <text
-            x="540"
-            y="339"
-            textAnchor="middle"
-            fontSize="19"
-            className="font-mono"
-            fill="currentColor"
-          >
-            ✳
-          </text>
-        </g>
+        <div className="col-span-full h-2">
+          <ConnectorLine active />
+        </div>
 
-        {/* Workers */}
-        <g
-          className="text-brand"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          {PERSISTENT_WORKERS.map((w) => (
-            <WorkerCube key={w.cx} cx={w.cx} cy={WORKERS_Y} />
-          ))}
-          {EPHEMERAL_WORKERS.map((w) => (
-            <WorkerCube
-              key={w.cx}
-              cx={w.cx}
-              cy={WORKERS_Y}
-              className={styles.sessionWorker}
-              style={{ animationDuration: `${w.duration}s`, animationDelay: `${w.delay}s` }}
-            />
-          ))}
-        </g>
-      </svg>
+        <PersistentWorkerCard {...PERSISTENT_WORKERS[1]} />
+        <SandboxCard name={SANDBOX_SLOTS[2].name} size={SANDBOX_SLOTS[2].size} {...sandbox2} />
+        <SandboxCard name={SANDBOX_SLOTS[3].name} size={SANDBOX_SLOTS[3].size} {...sandbox4} />
 
-      {/* Runtimes */}
-      <figcaption className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-        <span className="text-foreground-muted font-mono text-xs uppercase tracking-widest">
-          Runtimes
-        </span>
-        <ul className="flex flex-wrap items-center justify-center gap-2">
-          {RUNTIMES.map((runtime) => (
-            <li
-              key={runtime.name}
-              className={cn(
-                'flex items-center gap-2 rounded-full border border-border bg-surface-75 px-3 py-1.5 font-mono text-xs',
-                runtime.available ? 'text-foreground-light' : 'text-foreground-muted'
-              )}
-            >
-              <span
-                className={cn(
-                  'w-1.5 h-1.5 rounded-full',
-                  runtime.available ? 'bg-brand' : 'bg-border-stronger'
-                )}
-                aria-hidden
-              />
-              {runtime.name}
-              {!runtime.available && (
-                <span className="uppercase tracking-widest text-[9px] text-foreground-muted">
-                  Soon
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
-      </figcaption>
+        <div className="w-full flex col-span-full h-12">
+          <ConnectorLine active />
+          <ConnectorLine active={sandbox2.phase !== 'empty'} />
+          <ConnectorLine active={sandbox4.phase !== 'empty'} />
+        </div>
+
+        {/* Sources */}
+        <div className="col-span-full flex justify-center gap-2">
+          <SourceCard icon={User} label="Human" />
+          <SourceCard icon={Bot} label="Agent 1" />
+          <SourceCard icon={Bot} label="Agent 2" />
+        </div>
+      </div>
     </figure>
   )
 }

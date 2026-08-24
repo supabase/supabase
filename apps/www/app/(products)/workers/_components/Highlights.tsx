@@ -50,7 +50,7 @@ function HighlightCard({ highlight }: { highlight: Highlight }) {
 export function Highlights() {
   return (
     <div>
-      <SectionContainerWithCn height="none" className="-mt-4 mb-8 md:mb-24">
+      <SectionContainerWithCn height="none" className="mb-8 md:mb-24">
         <ul className="grid grid-cols-2 gap-4 sm:gap-10 gap-y-10 lg:grid-cols-4 md:gap-12 lg:gap-x-8">
           {highlights.map((highlight) => (
             <HighlightCard highlight={highlight} key={highlight.heading} />
