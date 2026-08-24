@@ -15,8 +15,7 @@ const NotebookTabStatusIndicator = ({ tab }: { tab: Tab }) => {
 
   // A never-persisted notebook with no cells has nothing worth flagging as unsaved.
   const isEmptyNewNotebook =
-    stateNotebook?.status === 'new' &&
-    (stateNotebook.notebook.content?.cells.length ?? 0) === 0
+    stateNotebook?.status === 'new' && (stateNotebook.notebook.content?.cells.length ?? 0) === 0
   if (isEmptyNewNotebook) return null
 
   return (
