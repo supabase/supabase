@@ -78,6 +78,8 @@ export const ExplorerQueryTab = () => {
     })
   }
 
+  const persistTab = () => tabs.makeTabPermanent(createTabId('query', { id }))
+
   const query: ExplorerQueryModel =
     draft._tag === 'logs'
       ? { ...toQuerySourceBinding(draft), uncheckedSql: draft.uncheckedSql }
@@ -98,17 +100,24 @@ export const ExplorerQueryTab = () => {
       onShowQueryChange={setShowQuery}
       roleImpersonationState={roleImpersonationState}
       onTitleChange={(value) => {
+        persistTab()
         const name = value.trim() || 'Untitled query'
         explorerQueryState.updateDraft({ id, name })
         tabs.updateTab(createTabId('query', { id }), { label: name })
       }}
       onSqlChange={(sql) => {
-        tabs.makeTabPermanent(createTabId('query', { id }))
+        persistTab()
         explorerQueryState.updateDraft({ id, sql })
       }}
-      onSourceChange={(source) => explorerQueryState.updateDraft({ id, source })}
+      onSourceChange={(source) => {
+        persistTab()
+        explorerQueryState.updateDraft({ id, source })
+      }}
+      onRowLimitChange={(rowLimit) => {
+        persistTab()
+        explorerQueryState.updateDraft({ id, rowLimit })
+      }}
       onResultChange={handleResultChange}
-      onRowLimitChange={(rowLimit) => explorerQueryState.updateDraft({ id, rowLimit })}
     />
   )
 }

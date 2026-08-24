@@ -37,7 +37,11 @@ export const ExplorerNotebookTabCoordinator = () => {
     return tabs.registerTabTypeHandler('notebook', {
       onClose: (tab) => {
         const notebookId = tab.metadata?.notebookId
-        if (!ref || !notebookId || !notebooksState.notebooks[notebookId]) return
+        if (!ref || !notebookId) return
+
+        if (notebooksState.notebooks[notebookId]) {
+          notebooksState.removeNotebook({ id: notebookId })
+        }
 
         notebooksState.removeNotebook({ id: notebookId })
         queryClient.removeQueries({ queryKey: contentKeys.resource(ref, notebookId) })
