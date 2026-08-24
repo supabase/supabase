@@ -5,7 +5,7 @@ import { useCallback, useContext, useEffect, useState } from 'react'
 import { Button } from 'ui'
 
 import { QueryEditor, type ExplorerQueryModel } from './QueryEditor'
-import { type QueryResult } from './types'
+import { type QueryDisplay, type QueryResult } from './types'
 import { toQuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { explorerQueryState, useExplorerQueryStateSnapshot } from '@/state/explorer-query'
 import { useControlledRoleImpersonationState } from '@/state/role-impersonation-state'
@@ -88,6 +88,11 @@ export const ExplorerQueryTab = () => {
     })
   }
 
+  const display: QueryDisplay = {
+    view: draft.view,
+    chart: draft.chart ? { ...draft.chart, y_series: [...draft.chart.y_series] } : undefined,
+  }
+
   const query: ExplorerQueryModel =
     draft._tag === 'logs'
       ? { ...toQuerySourceBinding(draft), uncheckedSql: draft.uncheckedSql }
@@ -104,6 +109,7 @@ export const ExplorerQueryTab = () => {
       title={draft.name}
       query={query}
       result={result}
+      display={display}
       showQuery={showQuery}
       onShowQueryChange={setShowQuery}
       roleImpersonationState={roleImpersonationState}
@@ -116,6 +122,7 @@ export const ExplorerQueryTab = () => {
       onSourceChange={(source) => explorerQueryState.updateDraft({ id, source })}
       onResultChange={handleResultChange}
       onRowLimitChange={(rowLimit) => explorerQueryState.updateDraft({ id, rowLimit })}
+      onDisplayChange={(display) => explorerQueryState.setDisplay({ id, display })}
     />
   )
 }

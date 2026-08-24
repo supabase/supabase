@@ -16,7 +16,7 @@ const isoDateTimeSchema = z.string().transform((raw, ctx) => {
 
 export const MAX_CHART_Y_SERIES = 3
 
-const chartConfigSchema = z.object({
+export const chartConfigSchema = z.object({
   type: z.enum(['bar', 'line']),
   x_column: z.string(),
   y_series: z.array(z.string()).max(MAX_CHART_Y_SERIES),
