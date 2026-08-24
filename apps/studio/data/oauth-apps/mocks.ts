@@ -1,9 +1,6 @@
 import type { OAuthAppsAuthorizeOrganizationProject } from './oauth-apps-authorize-organization-projects-query'
 import type { OAuthAppsAuthorizeIdentity } from './oauth-apps-authorize-organizations-query'
-import type {
-  OAuthAppsAuthorizeRequest,
-  OAuthAppsResourceScope,
-} from './oauth-apps-authorize-request-query'
+import type { OAuthAppsAuthorizeRequest } from './oauth-apps-authorize-request-query'
 import type { OAuthOrganizationRole, OAuthScopeGroup } from './types'
 
 // Real endpoints don't exist yet (PROD-625). ENABLE_MOCKS is a compile-time literal, not an
@@ -31,30 +28,6 @@ const VERCEL_SCOPE_GROUPS: OAuthScopeGroup[] = [
   },
 ]
 
-const VERCEL_RESOURCE_SCOPES: OAuthAppsResourceScope[] = [
-  {
-    resource: 'project',
-    count: 2,
-    scopes: [
-      { name: 'Project Settings', level: 'read_write' },
-      { name: 'Action Runs', level: 'read_write' },
-    ],
-  },
-  {
-    resource: 'database',
-    count: 7,
-    scopes: [
-      { name: 'Logs', level: 'read_write' },
-      { name: 'SQL Snippets', level: 'read_write' },
-      { name: 'Database Webhooks', level: 'read' },
-      { name: 'Development Branches', level: 'read' },
-      { name: 'Production Branches', level: 'read' },
-      { name: 'Backups', level: 'read' },
-      { name: 'Replication', level: 'read' },
-    ],
-  },
-]
-
 const VERCEL_REQUEST: OAuthAppsAuthorizeRequest = {
   client_id: 'vercel',
   app_name: 'Vercel',
@@ -62,7 +35,6 @@ const VERCEL_REQUEST: OAuthAppsAuthorizeRequest = {
   is_verified: true,
   redirect_uri: 'https://vercel.com/api/integrations/supabase/callback',
   scope_groups: VERCEL_SCOPE_GROUPS,
-  resource_scopes: VERCEL_RESOURCE_SCOPES,
 }
 
 const KEMAL_BOT_REQUEST: OAuthAppsAuthorizeRequest = {
@@ -76,13 +48,6 @@ const KEMAL_BOT_REQUEST: OAuthAppsAuthorizeRequest = {
       name: 'Project Settings',
       level: 'read',
       scopes: ['project_settings'],
-    },
-  ],
-  resource_scopes: [
-    {
-      resource: 'project',
-      count: 1,
-      scopes: [{ name: 'Project Settings', level: 'read' }],
     },
   ],
 }
