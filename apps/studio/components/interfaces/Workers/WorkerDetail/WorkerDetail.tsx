@@ -18,6 +18,7 @@ import {
   PopoverTrigger,
 } from 'ui'
 import { PageBreadcrumbs } from 'ui-patterns/PageBreadcrumbs'
+import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
   PageHeaderAside,
@@ -33,17 +34,19 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { RuntimeBadge } from '../RuntimeBadge'
 import { WorkerSnippetTabs } from '../WorkerSnippetTabs'
 import { WorkerStatePill } from '../WorkerStatePill'
+import { WorkerLogsTab } from './WorkerLogsTab'
 import { WorkerOverviewTab } from './WorkerOverviewTab'
 import { WorkerSettingsTab } from './WorkerSettingsTab'
 import { AlertError } from '@/components/ui/AlertError'
 import { workerQueryOptions } from '@/data/workers/worker-query'
 import { PRODUCT_NAME } from '@/lib/constants/workers'
 
-type WorkerTab = 'overview' | 'settings'
-const WORKER_TABS: WorkerTab[] = ['overview', 'settings']
+type WorkerTab = 'overview' | 'logs' | 'settings'
+const WORKER_TABS: WorkerTab[] = ['overview', 'logs', 'settings']
 
 const TAB_LABEL: Record<WorkerTab, string> = {
   overview: 'Overview',
+  logs: 'Logs',
   settings: 'Settings',
 }
 
@@ -155,6 +158,11 @@ export const WorkerDetail = () => {
       </PageNav>
 
       {tab === 'overview' && <WorkerOverviewTab worker={worker} />}
+      {tab === 'logs' && (
+        <PageContainer size="full">
+          <WorkerLogsTab workerName={worker.name} />
+        </PageContainer>
+      )}
       {tab === 'settings' && <WorkerSettingsTab worker={worker} />}
     </div>
   )
