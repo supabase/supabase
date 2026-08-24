@@ -53,7 +53,7 @@ The `config.toml` is safe to commit. It contains no secrets by default. If you a
 
 Projects created with a recent `supabase init` use the `pg-delta` diff engine: `init` writes `[experimental.pgdelta] enabled = true` into `config.toml`. Existing projects without that setting keep the legacy [`migra`](https://github.com/djrobstep/migra) engine until they opt in by adding the same section. To fall back for a single run, pass `--use-migra` to `db diff` or `--diff-engine migra` to `db pull`; to opt out entirely, set `enabled = false`.
 
-This guide describes the `pg-delta` behavior throughout. If your project is still on `migra`, the commands are the same but the generated SQL and some behaviors differ, as called out below.
+This guide describes the `pg-delta` behavior throughout. If your project is still on `migra`, the commands are the same but the generated SQL and some behaviors differ. These differences are called out where they apply.
 
 </Admonition>
 
@@ -141,7 +141,7 @@ Review and clean up the dump before committing. Remove production user data, sec
 
 **Option B: Write seed data by hand** (recommended for most projects):
 
-Create `supabase/seed.sql` with INSERT statements that set up a useful local development state: a few test users, sample data, and so on. This is often better than dumping production data because you control exactly what's in it.
+Create `supabase/seed.sql` with INSERT statements that set up a useful local development state, such as a few test users and sample data. This is often better than dumping production data because you control exactly what's in it.
 
 For more on organizing seed files, glob patterns, and generating realistic data, see [Seeding your database](/docs/guides/local-development/seeding-your-database).
 
@@ -165,7 +165,7 @@ Your project now has a fully reproducible local development environment.
 
 <Admonition type="note" label="What about declarative schemas?">
 
-For an existing project, the pulled migration already serves as your schema baseline. You don't need to also create a `schemas/` directory, because that would mean maintaining two representations of the same schema. If you want to adopt declarative schemas later, `supabase db schema declarative generate` bootstraps the `supabase/schemas/` directory from your live database. See [Declarative database schemas](/docs/guides/local-development/declarative-database-schemas). For day-to-day changes going forward, see [The daily workflow](#the-daily-workflow) below.
+For an existing project, the pulled migration already serves as your schema baseline. You don't need to also create a `schemas/` directory, because that would mean maintaining two representations of the same schema. If you want to adopt declarative schemas later, `supabase db schema declarative generate` bootstraps the `supabase/schemas/` directory from your live database. See [Declarative database schemas](/docs/guides/local-development/declarative-database-schemas). For day-to-day changes going forward, see [The daily workflow](#the-daily-workflow).
 
 </Admonition>
 
@@ -429,7 +429,7 @@ For the full command reference and every flag, see the [CLI reference](/docs/ref
 
 ## Cleaning up generated migrations
 
-When `supabase db diff` or `db schema declarative sync` generates a migration, review it before committing. The sections below cover what to expect and what still needs your judgment.
+When `supabase db diff` or `db schema declarative sync` generates a migration, review it before committing. The following sections cover what to expect and what still needs your judgment.
 
 ### What `pg-delta` output looks like
 
@@ -447,7 +447,7 @@ A migration that must run outside a transaction starts with this directive on it
 
 ### Extension statements
 
-`CREATE EXTENSION IF NOT EXISTS ...` or `DROP EXTENSION ...` may appear when your local and remote extension sets differ. Keep the statement if it reflects a change you want; remove it if the extension is already handled by a previous migration or you don't want to change it. Decide deliberately: a `DROP EXTENSION` applies silently on `db reset`.
+`CREATE EXTENSION IF NOT EXISTS ...` or `DROP EXTENSION ...` might appear when your local and remote extension sets differ. Keep the statement if it reflects a change you want; remove it if the extension is already handled by a previous migration or you don't want to change it. Decide deliberately: a `DROP EXTENSION` applies silently on `db reset`.
 
 ### Coverage warnings
 

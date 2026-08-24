@@ -291,7 +291,7 @@ $$;
 
 </$CodeTabs>
 
-You don't need to order your schema files manually. When generating a migration, the engine analyzes the dependencies between your statements (foreign keys, views over tables, functions used by triggers, and so on) and orders them automatically - file names and directory layout are purely for readability. If your statements contain a genuine dependency cycle, the command reports it as a diagnostic instead of producing a broken migration.
+You don't need to order your schema files manually. When generating a migration, the engine analyzes the dependencies between your statements, such as foreign keys, views over tables, and functions used by triggers, and orders them automatically - file names and directory layout are purely for readability. If your statements contain a genuine dependency cycle, the command reports it as a diagnostic instead of producing a broken migration.
 
 This means you can organize `supabase/schemas/` however you like. For example, one file per table:
 
