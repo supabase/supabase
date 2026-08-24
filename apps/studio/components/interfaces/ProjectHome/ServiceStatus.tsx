@@ -385,7 +385,7 @@ export const ServiceStatus = () => {
               className={cn(SERVICE_ROW_CLASS, 'transition group relative hover:bg-surface-300')}
             >
               {serviceInfo}
-              <div className="flex items-center gap-x-1 transition opacity-0 group-hover:opacity-100">
+              <div className="flex items-center gap-x-1 transition opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100">
                 <span className="text-xs text-foreground">View logs</span>
                 <ChevronRight size={14} className="text-foreground" />
               </div>
