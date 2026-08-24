@@ -1,8 +1,10 @@
 import { useParams } from 'common'
+import { BucketPlus } from 'icons'
 import { ArrowRight, CheckCircle2, FileWarning, Github, Minus, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Card, Skeleton } from 'ui'
 import { CollapsibleCardSection } from 'ui-patterns/CollapsibleCardSection'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import {
   createConfigurationDriftRows,
@@ -294,27 +296,27 @@ export function ConfigurationDriftPage() {
 
   if (!isReady) {
     return (
-      <Card className="flex min-h-52 items-center justify-center text-center">
-        <div className="max-w-lg">
-          <Github className="mx-auto mb-3 h-6 w-6 text-foreground-muted" />
+      <EmptyStatePresentational
+        icon={Github}
+        title="Github integration required"
+        description={
           <p className="mt-1 text-sm text-foreground-light">
-            This feature requires a GitHub integration connected to this project, which will enable
-            this project to be managed by a config.toml file.{' '}
-            <Link
-              className="underline transition underline-offset-2 decoration-inherit hover:decoration-foreground text-inherit hover:text-foreground"
-              href={`/project/${projectRef}/settings/integrations`}
-            >
-              Connect a GitHub repo
-            </Link>{' '}
-            to get started.
+            This feature requires a GitHub integration to enable the project to be managed by a
+            config.toml file.
           </p>
-        </div>
-      </Card>
+        }
+      >
+        <Link href={`/project/${projectRef}/settings/integrations`}>
+          <Button size="tiny" variant="primary" icon={<Plus size={14} />}>
+            Connect a GitHub repo
+          </Button>
+        </Link>
+      </EmptyStatePresentational>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <main className="space-y-6">
       {comparableSettingCount === 0 ? (
         <Card className="flex min-h-44 items-center justify-center px-6 text-center">
           <div className="max-w-lg">
@@ -342,6 +344,6 @@ export function ConfigurationDriftPage() {
       )}
 
       <UnmanagedConfigSection groups={unmanagedGroups} />
-    </div>
+    </main>
   )
 }
