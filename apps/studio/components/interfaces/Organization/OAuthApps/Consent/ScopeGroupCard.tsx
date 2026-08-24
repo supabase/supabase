@@ -1,4 +1,4 @@
-import { Badge, Card, CardContent } from 'ui'
+import { Badge, Card, CardContent, cn } from 'ui'
 
 import { OverRoleAnnotation } from './OverRoleAnnotation'
 import type {
@@ -11,21 +11,39 @@ export interface ScopeGroupCardProps {
   appName: string
   scopeGroups: OAuthScopeGroup[]
   memberRole: OAuthOrganizationRole['role']
+  /** Set to false for a receipt view (e.g. the success screen) that has no intro copy of its own. */
+  showHeading?: boolean
+  /** Set to false when the groups shown are already what was granted, not what's requested. */
+  showOverRoleAnnotations?: boolean
 }
 
-export const ScopeGroupCard = ({ appName, scopeGroups, memberRole }: ScopeGroupCardProps) => {
+export const ScopeGroupCard = ({
+  appName,
+  scopeGroups,
+  memberRole,
+  showHeading = true,
+  showOverRoleAnnotations = true,
+}: ScopeGroupCardProps) => {
   return (
     <section className="flex flex-col">
-      <div>
-        <p className="text-xs font-medium uppercase tracking-wider text-foreground-light">
-          Permissions requested
-        </p>
-        <p className="mt-1 text-xs text-foreground-lighter">
-          Authorizing {appName} grants it the following access permissions to the selected projects.
-        </p>
-      </div>
+      {showHeading && (
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wider text-foreground-light">
+            Permissions requested
+          </p>
+          <p className="mt-1 text-xs text-foreground-lighter">
+            Authorizing {appName} grants it the following access permissions to the selected
+            projects.
+          </p>
+        </div>
+      )}
 
-      <Card className="overflow-hidden shadow-none bg-surface-200/60 border-muted mt-3">
+      <Card
+        className={cn(
+          'overflow-hidden shadow-none bg-surface-200/60 border-muted',
+          showHeading && 'mt-3'
+        )}
+      >
         <CardContent className="border-none p-0">
           <div className="divide-y divide-muted px-4">
             {scopeGroups.map((scopeGroup) => (
@@ -34,7 +52,9 @@ export const ScopeGroupCard = ({ appName, scopeGroups, memberRole }: ScopeGroupC
                   <Badge variant={getScopeLevelBadgeVariant(scopeGroup.level)}>
                     {getScopeLevelLabel(scopeGroup.level)}
                   </Badge>
-                  <OverRoleAnnotation level={scopeGroup.level} memberRole={memberRole} />
+                  {showOverRoleAnnotations && (
+                    <OverRoleAnnotation level={scopeGroup.level} memberRole={memberRole} />
+                  )}
                 </div>
                 <p className="mt-1 text-sm text-foreground-light">{scopeGroup.scopes.join(', ')}</p>
               </div>

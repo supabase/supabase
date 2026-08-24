@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
+import { AuthorizeSuccessScreen } from './AuthorizeSuccessScreen'
 import { AuthorizingAsCard } from './AuthorizingAsCard'
 import { NoProjectsNotice } from './NoProjectsNotice'
 import { EMPTY_ORG_MOCK_SLUG, getMockScenarioId } from './OAuthAppsAuthorizeScreen.utils'
@@ -15,6 +16,7 @@ import {
   LogoPair,
   SupabaseLogo,
 } from '@/components/layouts/InterstitialLayout'
+import type { OAuthAppsAuthorizeApproveResponse } from '@/data/oauth-apps/oauth-apps-authorize-approve-mutation'
 import { useOAuthAppsAuthorizeApproveMutation } from '@/data/oauth-apps/oauth-apps-authorize-approve-mutation'
 import { useOAuthAppsAuthorizeDenyMutation } from '@/data/oauth-apps/oauth-apps-authorize-deny-mutation'
 import { useOAuthAppsAuthorizeOrganizationProjectsQuery } from '@/data/oauth-apps/oauth-apps-authorize-organization-projects-query'
@@ -45,6 +47,7 @@ export const OAuthAppsAuthorizeScreen = ({
   )
   const [selectedProjectRefs, setSelectedProjectRefs] = useState<string[]>([])
   const [projectError, setProjectError] = useState<string>()
+  const [approveResult, setApproveResult] = useState<OAuthAppsAuthorizeApproveResponse | null>(null)
 
   const orgSlug = selectedOrgSlug ?? identity?.organizations[0]?.slug
   const memberOrg = identity?.organizations.find((org) => org.slug === orgSlug)
@@ -58,7 +61,7 @@ export const OAuthAppsAuthorizeScreen = ({
 
   const approveMutation = useOAuthAppsAuthorizeApproveMutation({
     onSuccess: (data) => {
-      window.location.href = data.url
+      setApproveResult(data)
     },
   })
   const denyMutation = useOAuthAppsAuthorizeDenyMutation({
@@ -79,6 +82,43 @@ export const OAuthAppsAuthorizeScreen = ({
   )
 
   if (!request || !identity || !orgSlug || !memberOrg) return null
+
+  // mock_state=success lets a design review load straight into the receipt screen without
+  // clicking through the flow first - it's a preview only, never a substitute for the real
+  // approve mutation's result.
+  const approvedResult: OAuthAppsAuthorizeApproveResponse | null =
+    approveResult ??
+    (mockState === 'success'
+      ? {
+          url: request.redirect_uri,
+          grant: {
+            email: identity.email,
+            role: memberOrg.role,
+            organization_slug: memberOrg.slug,
+            projects: projects ?? [],
+            scope_groups: request.scope_groups,
+          },
+        }
+      : null)
+
+  if (approvedResult) {
+    return (
+      <InterstitialLayout
+        logo={<DestinationLogo name={request.app_name} />}
+        title={`${request.app_name} is connected`}
+        titleClassName="text-2xl"
+        description={`You can return to ${request.app_name} to continue`}
+      >
+        <AuthorizeSuccessScreen
+          appName={request.app_name}
+          grant={approvedResult.grant}
+          onReturn={() => {
+            window.location.href = approvedResult.url
+          }}
+        />
+      </InterstitialLayout>
+    )
+  }
 
   const handleSignOut = async () => {
     await signOut()
@@ -106,7 +146,7 @@ export const OAuthAppsAuthorizeScreen = ({
       return
     }
     setProjectError(undefined)
-    approveMutation.mutate({ id: scenarioId, slug: orgSlug })
+    approveMutation.mutate({ id: scenarioId, slug: orgSlug, projectRefs: selectedProjectRefs })
   }
 
   const handleDeny = () => {

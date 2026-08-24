@@ -5,6 +5,7 @@ const MOCK_STATE_SCENARIOS: Record<string, string> = {
   over_role: OAUTH_APPS_MOCK_SCENARIOS.vercelReadOnly,
   unverified: OAUTH_APPS_MOCK_SCENARIOS.kemalBot,
   empty_org: OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper,
+  success: OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper,
 }
 
 export const EMPTY_ORG_MOCK_SLUG = 'some-other-org'
