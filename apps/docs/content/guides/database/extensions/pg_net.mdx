@@ -442,7 +442,7 @@ inherit direct object-level access (for example, `SELECT`) on `net.http_request_
 
 This doesn't expose request data to unauthenticated or client-side users, for two reasons:
 
-- `net` isn't exposed through the [Data API](/apps/docs/content/guides/api), so anon/publishable keys can't
+- `net` isn't exposed through the [Data API](/docs/guides/api), so anon/publishable keys can't
   access or modify its objects through the API.
 - `anon` and `authenticated` are `NOLOGIN` roles, so they can't establish a direct database connection.
 
