@@ -253,22 +253,20 @@ function FeaturesPage() {
                   Features selected: {filteredFeatures.length}
                 </div>
               </div>
-              <Button
-                tabIndex={HAS_ACTIVE_FILTERS ? 0 : -1}
-                block
-                variant="dashed"
-                onClick={() => {
-                  setSelectedProducts([])
-                  setSearchTerm('')
-                  setShowSelfHostedOnly(false)
-                }}
-                className={cn(
-                  'opacity-0 transition-opacity hidden md:block',
-                  HAS_ACTIVE_FILTERS && 'block! opacity-100'
-                )}
-              >
-                Clear all filters
-              </Button>
+              {HAS_ACTIVE_FILTERS && (
+                <Button
+                  block
+                  variant="dashed"
+                  onClick={() => {
+                    setSelectedProducts([])
+                    setSearchTerm('')
+                    setShowSelfHostedOnly(false)
+                  }}
+                  className="hidden md:block"
+                >
+                  Clear all filters
+                </Button>
+              )}
             </div>
           </div>
           <div className="md:col-span-3 min-w-0 flex flex-col gap-4 md:gap-6">
