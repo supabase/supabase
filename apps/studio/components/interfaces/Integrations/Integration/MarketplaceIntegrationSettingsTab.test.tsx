@@ -1,3 +1,4 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
@@ -16,6 +17,9 @@ import { addAPIMock } from '@/tests/lib/msw'
 // the MSW resolver) is the raw OpenAPI `OAuthAppResponse`. Build fixtures against the API shape.
 type OAuthAppResponse = components['schemas']['OAuthAppResponse']
 type PartnerIntegrationListResponse = components['schemas']['PartnerIntegrationListResponse']
+// Same story for permissions: the frontend `Permission` type narrows nullable wire fields, so build
+// the fixture against the raw `AccessControlPermission` shape the MSW resolver actually returns.
+type AccessControlPermission = components['schemas']['AccessControlPermission']
 
 // `useIntegrationDetail` resolves the integration definition from the route, the marketplace query
 // and feature flags — none of which is the subject of this test. Mock it so each test can drive a
@@ -31,6 +35,12 @@ vi.mock('@/components/interfaces/Integrations/Landing/useIntegrationDetail', () 
 vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
   useSelectedOrganizationQuery: () => ({ data: { slug: 'acme' } }),
 }))
+// `useProjectOAuthIntegrationData` gates the authorized-apps query behind a permission check, which
+// requires a logged-in user and a granted `oauth_apps` permission to ever fire.
+vi.mock('common', async (importOriginal) => {
+  const actual = await importOriginal<Record<string, unknown>>()
+  return { ...actual, useIsLoggedIn: () => true }
+})
 // The auth-config query (used to detect custom SMTP) only runs on the platform.
 vi.mock('@/lib/constants', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>()
@@ -74,6 +84,17 @@ const authorizedApp = (appId: string): OAuthAppResponse => ({
   registration_type: 'manual',
 })
 
+const CAN_READ_OAUTH_APPS_PERMISSION: AccessControlPermission = {
+  actions: [PermissionAction.READ],
+  condition: null,
+  organization_id: null,
+  organization_slug: 'acme',
+  project_ids: null,
+  project_refs: [],
+  resources: ['oauth_apps'],
+  restrictive: false,
+}
+
 /**
  * Registers the five endpoints behind `useProjectOAuthIntegrationData`. Each test supplies only the
  * resources relevant to it; everything else defaults to "nothing connected".
@@ -84,6 +105,11 @@ const mockProjectResources = ({
   oauthApps = [] as OAuthAppResponse[],
   smtpHost = null as string | null,
 } = {}) => {
+  addAPIMock({
+    method: 'get',
+    path: '/platform/profile/permissions',
+    response: () => HttpResponse.json<AccessControlPermission[]>([CAN_READ_OAUTH_APPS_PERMISSION]),
+  })
   addAPIMock({
     method: 'get',
     path: '/v1/projects/:ref/api-keys',

@@ -93,15 +93,15 @@ export const RestartTableDialog = ({
               <ul className="list-disc list-inside space-y-1.5 pl-2">
                 {willCopyTable ? (
                   <li>
-                    <strong>The table's initial sync will restart.</strong> All existing data will
-                    be copied again from the source. This initial sync is billed in addition to
-                    previous initial syncs.
+                    <strong>The table's initial sync will restart.</strong> Existing source rows
+                    will be synced again. Data successfully processed during this initial sync is
+                    billed again.
                   </li>
                 ) : (
                   <li>
-                    <strong>No initial copy will run.</strong> New changes will resume streaming
-                    without backfilling existing source rows. There is no additional initial-copy
-                    charge.
+                    <strong>The table will skip initial sync.</strong> Replication will resume with
+                    new changes only, without syncing existing source rows. There is no additional
+                    initial sync charge.
                   </li>
                 )}
                 <li>

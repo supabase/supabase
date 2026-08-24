@@ -29,12 +29,11 @@ import {
 
 import { Shortcut } from '../ui/Shortcut'
 import { Route } from '../ui/ui.types'
-import { useUnifiedLogsPreview } from './App/FeaturePreview/FeaturePreviewContext'
 import {
-  generateOtherRoutes,
   generateProductRoutes,
   generateSettingsRoutes,
   generateToolRoutes,
+  useGenerateOtherRoutes,
 } from '@/components/layouts/Navigation/NavigationBar/NavigationBar.utils'
 import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
 import { useHideSidebar } from '@/hooks/misc/useHideSidebar'
@@ -252,10 +251,6 @@ const ProjectLinks = () => {
   const { ref } = useParams()
   const { data: project, isPending: isProjectPending } = useSelectedProjectQuery()
   const { securityLints, errorLints } = useLints()
-  const showReports = useIsFeatureEnabled('reports:all')
-  const showLogs = useIsFeatureEnabled('logs:all')
-
-  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const activeRoute = router.pathname.split('/')[3]
 
@@ -272,6 +267,7 @@ const ProjectLinks = () => {
   ])
 
   const authOverviewPageEnabled = useFlag('authOverviewPage')
+  const workersEnabled = useFlag('workers')
 
   const toolRoutes = generateToolRoutes(ref, project)
   const productRoutes = generateProductRoutes(ref, project, {
@@ -280,12 +276,9 @@ const ProjectLinks = () => {
     storage: storageEnabled,
     realtime: realtimeEnabled,
     authOverviewPage: authOverviewPageEnabled,
+    workers: workersEnabled,
   })
-  const otherRoutes = generateOtherRoutes(ref, project, {
-    unifiedLogs: isUnifiedLogsEnabled,
-    showReports,
-    showLogs,
-  })
+  const otherRoutes = useGenerateOtherRoutes()
   const settingsRoutes = generateSettingsRoutes(ref)
 
   return (

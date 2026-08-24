@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMemo } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Badge,
@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
@@ -106,7 +106,7 @@ export const EnableExtensionModal = ({
     resolver: zodResolver(FormSchema),
     defaultValues,
   })
-  const { schema } = form.watch()
+  const schema = useWatch({ control: form.control, name: 'schema' })
 
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
     if (project === undefined) return console.error('Project is required')
@@ -154,23 +154,6 @@ export const EnableExtensionModal = ({
               OrioleDB access method
             </span>
             <DocsButton abbrev={false} className="mt-2" href={`${DOCS_URL}`} />
-          </Admonition>
-        )}
-
-        {extension.name === 'pg_cron' && project?.cloud_provider === 'FLY' && (
-          <Admonition
-            type="warning"
-            title="The pg_cron extension is not fully supported for Fly projects"
-            className="border-x-0 border-t-0 rounded-none"
-          >
-            <p>
-              You can still enable the extension, but pg_cron jobs may not run due to the behavior
-              of Fly projects.
-            </p>
-            <DocsButton
-              className="mt-2"
-              href={`${DOCS_URL}/guides/platform/fly-postgres#limitations`}
-            />
           </Admonition>
         )}
 

@@ -1,6 +1,5 @@
 import { useParams } from 'common'
-import { AnalyticsBucket, BigQuery, ClickHouse, Database } from 'icons'
-import { Minus, Snowflake } from 'lucide-react'
+import { Minus } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -16,6 +15,7 @@ import {
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DeleteDestination } from './DeleteDestination'
+import { DestinationIcon } from './DestinationIcon'
 import { PipelineStatus } from './PipelineStatus'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import { getFormattedLagValue } from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
@@ -150,19 +150,9 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
       {isPipelineSuccess && (
         <TableRow>
           <TableCell>
-            {type === 'BigQuery' ? (
-              <BigQuery size={18} className="text-foreground-light" />
-            ) : type === 'Analytics Bucket' ? (
-              <AnalyticsBucket size={18} className="text-foreground-light" />
-            ) : type === 'DuckLake' ? (
-              <Database size={18} className="text-foreground-light" />
-            ) : type === 'Snowflake' ? (
-              <Snowflake size={18} className="text-foreground-light" />
-            ) : type === 'ClickHouse' ? (
-              <ClickHouse size={18} className="text-foreground-light" />
-            ) : (
-              <Database size={18} className="text-foreground-light" />
-            )}
+            {type ? (
+              <DestinationIcon type={type} size={18} className="text-foreground-light" />
+            ) : null}
           </TableCell>
 
           <TableCell className="max-w-[180px]">

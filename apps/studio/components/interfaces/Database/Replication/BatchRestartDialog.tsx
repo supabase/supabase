@@ -59,28 +59,29 @@ export const BatchRestartDialog = ({
     [affectedTables, tableSyncCopy]
   )
 
-  const initialCopyDescription =
+  const initialSyncDescription =
     copiedTables.length === 0 ? (
       <li>
-        <strong>No table will run an initial copy.</strong> New changes will resume streaming
-        without backfilling existing source rows. There is no additional initial-copy charge.
+        <strong>No table will run an initial sync.</strong> Replication will resume with new changes
+        only, without syncing existing source rows. There is no additional initial sync charge.
       </li>
     ) : copiedTables.length === affectedTables.length ? (
       <li>
         <strong>
-          {copiedTables.length === 1 ? 'The table' : `All ${copiedTables.length} tables`} will run
-          an initial copy.
+          {copiedTables.length === 1
+            ? 'The table will run its initial sync again.'
+            : `All ${copiedTables.length} tables will run initial sync again.`}
         </strong>{' '}
-        Existing rows will be copied again from the source and billed in addition to previous
-        initial copies.
+        Existing source rows will be synced again. Data successfully processed during this initial
+        sync is billed again.
       </li>
     ) : (
       <li>
         <strong>
-          {copiedTables.length} of {affectedTables.length} tables will run an initial copy.
+          {copiedTables.length} of {affectedTables.length} tables will run initial sync again.
         </strong>{' '}
-        The remaining tables will resume streaming without a backfill. Copied rows are billed in
-        addition to previous initial copies.
+        Existing source rows for those tables will be synced again and billed again. The remaining
+        tables will resume replication with new changes only.
       </li>
     )
 
@@ -127,7 +128,7 @@ export const BatchRestartDialog = ({
                 {affectedTables.length === 1 ? '' : 's'} in this pipeline from scratch:
               </p>
               <ul className="list-disc list-inside space-y-1.5 pl-2">
-                {initialCopyDescription}
+                {initialSyncDescription}
                 <li>
                   <strong>All downstream data will be deleted.</strong> All replicated data will be
                   removed.
@@ -150,7 +151,7 @@ export const BatchRestartDialog = ({
                 <strong>{affectedTables.length} currently failed tables</strong> from scratch:
               </p>
               <ul className="list-disc list-inside space-y-1.5 pl-2">
-                {initialCopyDescription}
+                {initialSyncDescription}
                 <li>
                   <strong>Existing downstream data will be deleted.</strong> Replicated data for
                   these tables will be removed.

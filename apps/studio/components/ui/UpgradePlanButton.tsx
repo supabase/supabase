@@ -6,6 +6,7 @@ import { Button } from 'ui'
 
 import { ButtonTooltip } from './ButtonTooltip'
 import { RequestUpgradeToBillingOwners } from './RequestUpgradeToBillingOwners'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -71,7 +72,7 @@ export const UpgradePlanButton = ({
     ? `/org/${slug ?? '_'}/billing?panel=costControl&source=${source}`
     : isOnPaidPlanAndRequestingToPurchaseAddon
       ? addon === 'computeSize'
-        ? `/project/${ref ?? '_'}/settings/compute-and-disk`
+        ? `${getInfrastructurePath(ref)}#compute`
         : `/project/${ref ?? '_'}/settings/addons?panel=${addon}&source=${source}`
       : `/org/${slug ?? '_'}/billing?panel=subscriptionPlan&source=${source}`
 

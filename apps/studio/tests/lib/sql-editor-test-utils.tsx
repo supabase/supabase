@@ -1,10 +1,12 @@
 import { untrustedSql } from '@supabase/pg-meta'
 import type { QueryClient } from '@tanstack/react-query'
 import { renderHook, type RenderHookOptions } from '@testing-library/react'
+import { FeatureFlagContext } from 'common'
 import { http, HttpResponse } from 'msw'
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing'
 import type { ReactNode } from 'react'
 
+import type { SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
 import type {
   ContentDiff,
   DiffController,
@@ -147,6 +149,7 @@ export function seedSnippet({
   sql = '',
   ownerId = 1,
   projectId = 1,
+  source = 'database',
 }: {
   id: string
   projectRef?: string
@@ -154,6 +157,7 @@ export function seedSnippet({
   sql?: string
   ownerId?: number
   projectId?: number
+  source?: SqlSnippetSource
 }) {
   const snippet = createSqlSnippetSkeletonV2({
     name,
@@ -161,6 +165,7 @@ export function seedSnippet({
     owner_id: ownerId,
     project_id: projectId,
     idOverride: id,
+    source,
   })
   sqlEditorState.addSnippet({ projectRef, snippet })
   return snippet
@@ -319,6 +324,8 @@ type RenderSqlEditorHookOptions<TProps> = {
   aiAssistantState?: ReturnType<typeof createAiAssistantState>
   databaseSelectorState?: ReturnType<typeof createDatabaseSelectorState>
   roleImpersonationState?: ReturnType<typeof createRoleImpersonationState>
+  /** ConfigCat flags to expose via FeatureFlagContext (e.g. `{ otelLegacyLogs: true }`). */
+  flags?: Record<string, boolean>
 }
 
 export function renderSqlEditorHook<TResult, TProps = undefined>(
@@ -332,12 +339,10 @@ export function renderSqlEditorHook<TResult, TProps = undefined>(
     options?.roleImpersonationState ??
     createRoleImpersonationState('default', { current: async () => ({}) })
 
-  const wrapper = ({ children }: { children: ReactNode }) => (
-    <CustomWrapper
-      queryClient={options?.queryClient}
-      nuqs={options?.nuqs}
-      profileContext={options?.profileContext}
-    >
+  const flags = options?.flags
+
+  const wrapper = ({ children }: { children: ReactNode }) => {
+    const tree = (
       <RoleImpersonationStateContext.Provider value={roleImpersonationState}>
         <DatabaseSelectorStateContext.Provider value={databaseSelectorState}>
           <AiAssistantStateContext.Provider value={aiAssistantState}>
@@ -347,8 +352,24 @@ export function renderSqlEditorHook<TResult, TProps = undefined>(
           </AiAssistantStateContext.Provider>
         </DatabaseSelectorStateContext.Provider>
       </RoleImpersonationStateContext.Provider>
-    </CustomWrapper>
-  )
+    )
+
+    return (
+      <CustomWrapper
+        queryClient={options?.queryClient}
+        nuqs={options?.nuqs}
+        profileContext={options?.profileContext}
+      >
+        {flags ? (
+          <FeatureFlagContext.Provider value={{ configcat: flags, posthog: {}, hasLoaded: true }}>
+            {tree}
+          </FeatureFlagContext.Provider>
+        ) : (
+          tree
+        )}
+      </CustomWrapper>
+    )
+  }
 
   const result = renderHook(hook, {
     initialProps: options?.initialProps,

@@ -46,7 +46,7 @@ enabled = true
 sql_paths = ['./seeds/*.sql']
 ```
 
-<Admonition type="tip">
+<Admonition type="note">
 
 The CLI processes seed files in the order they are declared in the `sql_paths` array. If a glob pattern is used and matches multiple files, those files are sorted in lexicographic order to ensure consistent execution. Additionally:
 
@@ -66,7 +66,7 @@ Snaplet wound down as a company in 2024 and open-sourced its tooling. `@snaplet/
 
 </Admonition>
 
-<Admonition type="tip">
+<Admonition type="note">
 
 To use Snaplet, you need to have Node.js and npm installed. You can add Node.js to your project by running `npm init -y` in your project directory.
 
@@ -80,7 +80,7 @@ npx @snaplet/seed init
 
 This command will analyze your database and its structure, and then generate a JavaScript client which can be used to define exactly how your data should be generated using code. The `init` command generates a configuration file, `seed.config.ts` and an example script, `seed.ts`, as a starting point.
 
-<Admonition type="tip">
+<Admonition type="note">
 
 During `init` if you are not using an Object Relational Mapper (ORM) or your ORM is not in the supported list, choose `node-postgres`.
 

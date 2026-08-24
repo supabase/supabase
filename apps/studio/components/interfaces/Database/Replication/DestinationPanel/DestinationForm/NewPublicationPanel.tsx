@@ -20,10 +20,12 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
 import { z } from 'zod'
 
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useCreatePublicationMutation } from '@/data/replication/publication-create-mutation'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useReplicationTablesQuery } from '@/data/replication/tables-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 
 interface NewPublicationPanelProps {
   visible: boolean
@@ -37,21 +39,12 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
 
   const { data: tables } = useReplicationTablesQuery({ projectRef, sourceId }, { enabled: visible })
 
-  const { mutate: createPublication, isPending: creatingPublication } =
-    useCreatePublicationMutation({
-      onSuccess: (_, vars) => {
-        toast.success('Successfully created publication')
-        form.reset(defaultValues)
-        onClose(vars.name)
-      },
-    })
-
   const formId = 'publication-editor'
   const FormSchema = z.object({
     name: z.string().min(1, 'Name is required'),
     tables: z.array(z.string()).min(1, 'At least one table is required'),
   })
-  const defaultValues = {
+  const defaultValues: z.infer<typeof FormSchema> = {
     name: '',
     tables: [],
   }
@@ -61,6 +54,28 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
     resolver: zodResolver(FormSchema),
     defaultValues,
   })
+
+  // Always destructure formState values otherwise they won't be updated
+  // See https://react-hook-form.com/docs/useform/formstate
+  const { isDirty } = form.formState
+
+  const closePanel = (newPublication?: string) => {
+    form.reset(defaultValues)
+    onClose(newPublication)
+  }
+
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
+    checkIsDirty: () => isDirty,
+    onClose: () => closePanel(),
+  })
+
+  const { mutate: createPublication, isPending: creatingPublication } =
+    useCreatePublicationMutation({
+      onSuccess: (_, vars) => {
+        toast.success('Successfully created publication')
+        closePanel(vars.name)
+      },
+    })
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
@@ -82,80 +97,83 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
   }
 
   return (
-    <Sheet open={visible} onOpenChange={() => onClose()}>
-      <SheetContent size="default">
-        <div className="flex flex-col h-full">
-          <SheetHeader>
-            <SheetTitle>Create a new publication</SheetTitle>
-            <SheetDescription>Choose which tables to replicate to destinations.</SheetDescription>
-          </SheetHeader>
-          <SheetSection className="grow overflow-auto">
-            <Form {...form}>
-              <form
-                id={formId}
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="flex flex-col gap-y-4"
-              >
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItemLayout label="Name" layout="vertical">
-                      <FormControl>
-                        <Input {...field} placeholder="Name" />
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="tables"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label="Tables"
-                      description="Select at least one table to include in the publication."
-                    >
-                      <FormControl>
-                        <MultiSelector
-                          values={field.value}
-                          onValuesChange={field.onChange}
-                          disabled={creatingPublication}
-                        >
-                          <MultiSelector.Trigger
-                            badgeLimit="wrap"
-                            label="Select tables..."
-                            mode="inline-combobox"
-                          />
-                          <MultiSelector.Content>
-                            <MultiSelector.List>
-                              {tables?.map((table) => (
-                                <MultiSelector.Item
-                                  key={`${table.schema}.${table.name}`}
-                                  value={`${table.schema}.${table.name}`}
-                                >
-                                  {`${table.schema}.${table.name}`}
-                                </MultiSelector.Item>
-                              ))}
-                            </MultiSelector.List>
-                          </MultiSelector.Content>
-                        </MultiSelector>
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
-              </form>
-            </Form>
-          </SheetSection>
-          <SheetFooter>
-            <Button variant="default" disabled={creatingPublication} onClick={() => onClose()}>
-              Cancel
-            </Button>
-            <Button variant="primary" loading={creatingPublication} form={formId} type="submit">
-              Create publication
-            </Button>
-          </SheetFooter>
-        </div>
-      </SheetContent>
-    </Sheet>
+    <>
+      <Sheet open={visible} onOpenChange={handleOpenChange}>
+        <SheetContent size="default">
+          <div className="flex flex-col h-full">
+            <SheetHeader>
+              <SheetTitle>Create a new publication</SheetTitle>
+              <SheetDescription>Choose which tables to replicate to destinations.</SheetDescription>
+            </SheetHeader>
+            <SheetSection className="grow overflow-auto">
+              <Form {...form}>
+                <form
+                  id={formId}
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="flex flex-col gap-y-4"
+                >
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItemLayout label="Name" layout="vertical">
+                        <FormControl>
+                          <Input {...field} placeholder="Name" />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="tables"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        label="Tables"
+                        description="Select at least one table to include in the publication."
+                      >
+                        <FormControl>
+                          <MultiSelector
+                            values={field.value}
+                            onValuesChange={field.onChange}
+                            disabled={creatingPublication}
+                          >
+                            <MultiSelector.Trigger
+                              badgeLimit="wrap"
+                              label="Select tables..."
+                              mode="inline-combobox"
+                            />
+                            <MultiSelector.Content>
+                              <MultiSelector.List>
+                                {tables?.map((table) => (
+                                  <MultiSelector.Item
+                                    key={`${table.schema}.${table.name}`}
+                                    value={`${table.schema}.${table.name}`}
+                                  >
+                                    {`${table.schema}.${table.name}`}
+                                  </MultiSelector.Item>
+                                ))}
+                              </MultiSelector.List>
+                            </MultiSelector.Content>
+                          </MultiSelector>
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                </form>
+              </Form>
+            </SheetSection>
+            <SheetFooter>
+              <Button variant="default" disabled={creatingPublication} onClick={confirmOnClose}>
+                Cancel
+              </Button>
+              <Button variant="primary" loading={creatingPublication} form={formId} type="submit">
+                Create publication
+              </Button>
+            </SheetFooter>
+          </div>
+        </SheetContent>
+      </Sheet>
+      <DiscardChangesConfirmationDialog {...modalProps} />
+    </>
   )
 }

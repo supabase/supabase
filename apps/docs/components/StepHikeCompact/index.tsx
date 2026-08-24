@@ -97,17 +97,29 @@ const Details: FC<PropsWithChildren<IDetails>> = ({ children, title, fullWidth =
         fullWidth && 'w-full'
       )}
     >
-      {title && <h3 className="mt-0 text-foreground text-base">{title}</h3>}
+      {title && (
+        <span className="block mt-0 mb-[18px] text-foreground text-base font-heading font-semibold">
+          {title}
+        </span>
+      )}
       {children}
     </div>
   )
 }
 
 const Code: FC<PropsWithChildren<ICode>> = ({ children }) => {
+  // Not `not-prose`: steps interleave labels and admonitions with their code samples, and
+  // stripping prose leaves that text unstyled and flush against the samples.
   return (
     <div
       data-step-hike="code"
-      className="not-prose min-w-0 w-full [&_.shiki]:!my-0 [&_.shiki-wrapper]:!my-0"
+      className={cn(
+        'min-w-0 w-full',
+        // `Step` spaces the block as a whole, so samples don't carry margins of their own...
+        '[&_.shiki]:!my-0 [&_.shiki-wrapper]:!my-0',
+        // ...but back-to-back samples have no prose between them to separate them.
+        '[&_.shiki+.shiki]:!mt-6'
+      )}
     >
       {children}
     </div>

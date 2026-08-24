@@ -1,6 +1,17 @@
 module.exports = [
   {
     permanent: true,
+    source: '/images/customers/logos/light/:path*',
+    destination: '/images/customers/logos/on-dark/:path*',
+  },
+  // Legacy root wordmarks moved to on-light/. Keep dreambase-mark.png at logos/ root.
+  {
+    permanent: true,
+    source: '/images/customers/logos/:slug((?!dreambase-mark\\.png)[^/.]+).png',
+    destination: '/images/customers/logos/on-light/:slug.png',
+  },
+  {
+    permanent: true,
     source: '/blog/pricing',
     destination: '/pricing',
   },
@@ -33,6 +44,16 @@ module.exports = [
     permanent: true,
     source: '/ui/docs/ai-editors-rules/skills',
     destination: '/docs/guides/ai-tools/ai-skills',
+  },
+  {
+    permanent: true,
+    source: '/ui',
+    destination: '/library',
+  },
+  {
+    permanent: true,
+    source: '/ui/:path*',
+    destination: '/library/:path*',
   },
   {
     permanent: true,
@@ -118,6 +139,11 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/reports/:match*',
     destination: '/docs/guides/observability/:match*',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/telemetry/:match*',
+    destination: '/docs/guides/monitoring-and-debugging/:match*',
   },
   {
     permanent: false,
@@ -1734,6 +1760,21 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/privacy-260316',
+    destination: '/privacy?version=v2',
+  },
+  {
+    permanent: true,
+    source: '/privacy-250528',
+    destination: '/privacy?version=v1',
+  },
+  {
+    permanent: true,
+    source: '/legal/dpa',
+    destination: '/legal/customer-resources/data-processing-addendum',
+  },
+  {
+    permanent: true,
     source: '/docs/company/sla',
     destination: '/sla',
   },
@@ -2061,7 +2102,17 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/api',
-    destination: '/docs/reference/api/start',
+    destination: '/docs/reference/api/introduction',
+  },
+  // 'start' was never a real API reference slug — it only ever worked because
+  // the old /reference/api/* routing collapsed every sub-path to the same
+  // monolith, and the bare /docs/reference/api redirect pointed here for years.
+  // Keep redirecting so external links and bookmarks don't 404 now that only
+  // real slugs resolve.
+  {
+    permanent: true,
+    source: '/docs/reference/api/start',
+    destination: '/docs/reference/api/introduction',
   },
   {
     permanent: true,
@@ -2888,6 +2939,31 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/launch-week/6',
+    destination: '/blog/launch-week-6-wrap-up',
+  },
+  {
+    permanent: true,
+    source: '/launch-week/x',
+    destination: '/blog/launch-week-x-best-launches',
+  },
+  {
+    permanent: true,
+    source: '/launch-week/12',
+    destination: '/blog/launch-week-12-top-10',
+  },
+  {
+    permanent: true,
+    source: '/launch-week/13',
+    destination: '/blog/launch-week-13-top-10',
+  },
+  {
+    permanent: true,
+    source: '/launch-week/14',
+    destination: '/blog/launch-week-14-top-10',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/platform/enterprise-billing',
     destination: '/docs/guides/platform/org-based-billing',
   },
@@ -3308,12 +3384,16 @@ module.exports = [
     permanent: false,
   },
   // Legacy product .txt URLs → new .md routes
-  { permanent: true, source: '/llms/homepage.txt', destination: '/homepage.md' },
+  { permanent: true, source: '/llms/homepage.txt', destination: '/index.md' },
   { permanent: true, source: '/llms/auth.txt', destination: '/auth.md' },
   { permanent: true, source: '/llms/database.txt', destination: '/database.md' },
   { permanent: true, source: '/llms/edge-functions.txt', destination: '/edge-functions.md' },
   { permanent: true, source: '/llms/realtime.txt', destination: '/realtime.md' },
   { permanent: true, source: '/llms/storage.txt', destination: '/storage.md' },
-  { permanent: true, source: '/llms/vector.txt', destination: '/vector.md' },
+  { permanent: true, source: '/llms/vector.txt', destination: '/modules/vector.md' },
   { permanent: true, source: '/llms/pricing.txt', destination: '/pricing.md' },
+  { permanent: true, source: '/vector.md', destination: '/modules/vector.md' },
+  { permanent: true, source: '/homepage.md', destination: '/index.md' },
+  { permanent: true, source: '/.md', destination: '/index.md' },
+  { permanent: true, source: '/index', destination: '/' },
 ]

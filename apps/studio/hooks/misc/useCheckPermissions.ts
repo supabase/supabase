@@ -34,7 +34,7 @@ export function doPermissionsCheck(
   resource: string,
   data?: object,
   organizationSlug?: string,
-  projectRef?: string
+  projectRef?: string | null
 ) {
   if (!permissions || !Array.isArray(permissions)) {
     return false
@@ -76,7 +76,7 @@ export function useGetPermissions(
 function useGetProjectPermissions(
   permissionsOverride?: Permission[],
   organizationSlugOverride?: string,
-  projectRefOverride?: string,
+  projectRefOverride?: string | null,
   enabled = true
 ) {
   const {
@@ -114,7 +114,12 @@ function useGetProjectPermissions(
       ? projectData
       : { ref: projectRefOverride, parent_project_ref: undefined }
 
-  const projectRef = project?.parent_project_ref ? project.parent_project_ref : project?.ref
+  const projectRef =
+    projectRefOverride === null
+      ? null
+      : project?.parent_project_ref
+        ? project.parent_project_ref
+        : project?.ref
 
   const isLoading =
     isLoadingPermissions ||
@@ -142,7 +147,7 @@ export function useAsyncCheckPermissions(
   data?: object,
   overrides?: {
     organizationSlug?: string
-    projectRef?: string
+    projectRef?: string | null
     permissions?: Permission[]
   }
 ) {

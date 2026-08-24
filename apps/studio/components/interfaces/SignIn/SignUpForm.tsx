@@ -5,7 +5,7 @@ import { CheckCircle, Eye, EyeOff } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryStates } from 'nuqs'
 import { useRef, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Alert,
@@ -24,7 +24,7 @@ import z from 'zod'
 import PasswordConditionsHelper from './PasswordConditionsHelper'
 import { useSignUpMutation } from '@/data/misc/signup-mutation'
 import { BASE_PATH } from '@/lib/constants'
-import { buildPathWithParams } from '@/lib/gotrue'
+import { buildSignUpReturnPath } from '@/lib/gotrue'
 import { classifyApiError, classifyValidationError } from '@/lib/telemetry/funnel-errors'
 import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 
@@ -67,6 +67,7 @@ export const SignUpForm = () => {
   const [searchParams] = useQueryStates({
     auth_id: parseAsString.withDefault(''),
     token: parseAsString.withDefault(''),
+    organization_slug: parseAsString.withDefault(''),
   })
 
   const trackFunnelError = useTrackFunnelError()
@@ -102,12 +103,16 @@ export const SignUpForm = () => {
     let redirectTo: string
 
     if (isInsideOAuthFlow) {
-      redirectTo = `${redirectUrlBase}/authorize?auth_id=${searchParams.auth_id}${searchParams.token && `&token=${searchParams.token}`}`
+      const authorizeParams = new URLSearchParams({ auth_id: searchParams.auth_id })
+      if (searchParams.token) authorizeParams.set('token', searchParams.token)
+      if (searchParams.organization_slug) {
+        authorizeParams.set('organization_slug', searchParams.organization_slug)
+      }
+      redirectTo = `${redirectUrlBase}/authorize?${authorizeParams.toString()}`
     } else {
-      // Use getRedirectToPath to handle redirect_to parameter and other query params
+      // Build the post-verification return path from returnTo and other query params.
       const { returnTo } = router.query
-      const basePath = returnTo || '/sign-in'
-      const fullPath = buildPathWithParams(basePath as string)
+      const fullPath = buildSignUpReturnPath(returnTo)
       const fullRedirectUrl = `${redirectUrlBase}${fullPath}`
       redirectTo = fullRedirectUrl
     }
@@ -120,7 +125,7 @@ export const SignUpForm = () => {
     })
   }
 
-  const password = form.watch('password')
+  const password = useWatch({ control: form.control, name: 'password' })
   const isSubmitting = form.formState.isSubmitting || isSigningUp
 
   return (

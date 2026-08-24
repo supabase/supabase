@@ -15,7 +15,7 @@ import {
   TabsList,
   TabsTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { Filter, Sort, SupaTable } from '@/components/grid/types'

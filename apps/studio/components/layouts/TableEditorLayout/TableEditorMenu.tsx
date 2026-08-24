@@ -21,6 +21,7 @@ import { parseSupaTable } from '@/components/grid/SupabaseGrid.utils'
 import { SupaTable } from '@/components/grid/types'
 import { ProtectedSchemaWarning } from '@/components/interfaces/Database/ProtectedSchemaWarning'
 import { ErrorMatcher } from '@/components/interfaces/ErrorHandling/ErrorMatcher'
+import { RestartTroubleshootingFallback } from '@/components/interfaces/ErrorHandling/RestartTroubleshootingFallback'
 import { EditorMenuListSkeleton } from '@/components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InfiniteListDefault, LoaderForIconMenuItems } from '@/components/ui/InfiniteList'
@@ -305,6 +306,7 @@ export const TableEditorMenu = () => {
               error={error ?? 'Failed to load tables'}
               supportFormParams={{ projectRef: project?.ref }}
               className="mx-4 mt-3"
+              fallback={<RestartTroubleshootingFallback />}
             />
           )}
 
