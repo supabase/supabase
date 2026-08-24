@@ -10,8 +10,14 @@ import { TabsStateContext, type Tab } from '@/state/tabs'
 const NotebookTabStatusIndicator = ({ tab }: { tab: Tab }) => {
   const notebooksSnap = useNotebooksStateSnapshot()
   const notebookId = tab.metadata?.notebookId
-  const status = notebookId ? notebooksSnap.notebooks[notebookId]?.status : undefined
-  if (!hasUnsavedChanges(status)) return null
+  const stateNotebook = notebookId ? notebooksSnap.notebooks[notebookId] : undefined
+  if (!hasUnsavedChanges(stateNotebook?.status)) return null
+
+  // A never-persisted notebook with no cells has nothing worth flagging as unsaved.
+  const isEmptyNewNotebook =
+    stateNotebook?.status === 'new' &&
+    (stateNotebook.notebook.content?.cells.length ?? 0) === 0
+  if (isEmptyNewNotebook) return null
 
   return (
     <span
