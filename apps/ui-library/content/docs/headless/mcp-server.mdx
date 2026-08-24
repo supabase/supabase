@@ -1,23 +1,19 @@
 ---
 title: MCP Server
-description: An OAuth-protected MCP server running as a Supabase Edge Function
+description: Add an OAuth-protected MCP server to your product
 ---
 
-A backend-only MCP server that runs as one Edge Function. It owns OAuth
-authentication and Streamable HTTP transport; toolsets plug into one explicit
-manifest. Pair it with the [OAuth Consent block](../nextjs/oauth-consent) for
-the browser-side consent UI.
-
-The block is designed for external agent harnesses such as Codex, Claude Code,
-and ChatGPT. It accepts only OAuth access tokens issued to a registered client;
-ordinary Supabase user JWTs are rejected.
+Give external agents such as Codex, Claude Code, and ChatGPT secure, user-scoped
+access to your product through composable MCP tools. This block runs as a
+Supabase Edge Function and pairs with the
+[OAuth Consent block](../nextjs/oauth-consent) to authorize signed-in users.
 
 ## Installation
 
 <BlockItem name="mcp-server" showOpenInV0={false} />
 
-The files are Deno Edge Function sources with explicit targets, so this installs
-into a Supabase project — or an empty directory — without a `components.json`.
+Installs Deno Edge Function files into a Supabase project or empty directory. No
+`components.json` is required.
 
 ## Folder structure
 
@@ -25,16 +21,15 @@ into a Supabase project — or an empty directory — without a `components.json
 
 ## Configure the project
 
-The function performs OAuth verification itself, so disable the Edge Functions
-gateway JWT check:
+The function verifies OAuth tokens, so disable the gateway JWT check:
 
 ```toml
 [functions.mcp-server]
 verify_jwt = false
 ```
 
-Install the [OAuth Consent block](../nextjs/oauth-consent), then enable the OAuth
-server, dynamic client registration, and the included access-token hook:
+Install the [OAuth Consent block](../nextjs/oauth-consent), then enable OAuth,
+dynamic client registration, and the included token hook:
 
 ```toml
 [auth.oauth_server]
@@ -47,118 +42,40 @@ enabled = true
 uri = "pg-functions://postgres/supabase_mcp/custom_access_token_hook"
 ```
 
-Run `supabase config push` for a linked project or restart the local stack after
-changing `supabase/config.toml`. The migration adds this MCP resource to an
-OAuth token's existing audience values; it does not replace other audiences.
+Set the Auth **Site URL** to the origin that hosts `/oauth/consent`. Use HTTPS in
+production. Run `supabase config push` or restart the local stack after changing
+`supabase/config.toml`.
 
-Set the Auth **Site URL** to the origin that hosts `/oauth/consent`. Supabase
-Auth combines that origin with `authorization_url_path` to build the
-authorization endpoint, which must use HTTPS in production.
+The hook adds this function to each OAuth token's audience; without it, requests
+return 401. Supabase runs one custom access-token hook per project, so add the
+MCP audience logic to your existing hook if needed.
 
-Dynamic registration lets any compatible MCP client propose a new OAuth client
-registration. Keep the consent screen enabled, review registered clients in the
-Dashboard, and disable dynamic registration if you only support clients that
-you register manually.
+Dynamic registration lets any compatible client register. Review clients and
+let users revoke grants, or disable it if you register clients manually.
 
-<Callout type="caution">
-
-A project has one custom access-token hook. If your project already uses one,
-merge the audience logic from the included migration into that function and
-keep your existing hook URI. Do not configure a second hook.
-
-</Callout>
-
-The hook is required. Without it, registration, consent, and token exchange can
-all succeed, but the first MCP request returns 401 because the token is not
-bound to this server.
-
-Configure an asymmetric ES256 or RS256 signing key when clients request the
-`openid` scope; Supabase Auth cannot issue ID tokens for `openid` with HS256.
-Asymmetric signing is also recommended for production OAuth servers. Configure
-it in the [JWT Signing Keys dashboard](https://supabase.com/dashboard/project/_/settings/jwt),
-then obtain a fresh token after rotation. Signing keys affect every newly issued
-project token, so review existing token-verifying services first.
-
-## Run it locally
-
-```bash
-supabase start
-supabase status
-cp supabase/functions/mcp-server/.env.example supabase/functions/.env
-supabase functions serve mcp-server --env-file supabase/functions/.env
-```
-
-Set `MCP_PUBLIC_SUPABASE_URL` in `supabase/functions/.env` to the **API URL
-printed by `supabase status`**. This is necessary because the function may
-receive a Docker-only URL such as `http://kong:8000`, which an OAuth client
-cannot reach.
-
-If the harness cannot reach localhost, expose the local API through an HTTPS
-tunnel and use that public origin for `MCP_PUBLIC_SUPABASE_URL`. Also set the
-local Auth issuer to the same origin, including `/auth/v1`:
-
-```toml
-[auth]
-jwt_issuer = "https://your-tunnel.example/auth/v1"
-```
-
-The issuer, protected-resource metadata, token audience, and URL given to the
-harness must all describe the same public origin.
-
-Connect your agent harness to:
-
-```text
-<project-api-url>/functions/v1/mcp-server
-```
-
-The harness discovers Supabase Auth from the protected-resource metadata,
-registers an OAuth client, and opens the consent UI. Once authorized, call the
-`whoami` tool to verify the user and OAuth client identity.
-
-If you already have an OAuth access token, you can inspect the tool list
-directly:
-
-```bash
-curl -s "$MCP_PUBLIC_SUPABASE_URL/functions/v1/mcp-server" \
-  -H "Authorization: Bearer $OAUTH_ACCESS_TOKEN" \
-  -H 'Content-Type: application/json' \
-  -H 'Accept: application/json, text/event-stream' \
-  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
-```
+Use an ES256 or RS256 signing key when clients request `openid`; HS256 cannot
+issue ID tokens. Configure keys in the
+[JWT Signing Keys dashboard](https://supabase.com/dashboard/project/_/settings/jwt).
+Rotation affects all new project tokens, so check other token consumers first.
 
 ## Authentication
 
-The server uses
-[`@supabase/server`](https://github.com/supabase/server)'s `verifyAuth` and
-`createContextClient` primitives. Every request must have:
+The block accepts only OAuth user tokens with:
 
-- a valid Supabase user token with a non-empty `client_id`
+- a non-empty `client_id`
 - the expected Supabase Auth issuer
 - both `authenticated` and this function's exact URL in `aud`
 - a live Auth session for the token's subject
 
-Every tool receives a user-scoped Supabase client, so grants and Row Level
-Security apply. The session is checked against Auth on every request, making
-revoked grants and deleted sessions effective before token expiry.
+Ordinary user JWTs are rejected. Each tool gets a user-scoped Supabase client.
 
-OAuth scopes such as `openid`, `email`, `profile`, and `phone` control identity
-claims and UserInfo only. They do not restrict Database, Storage, Edge Function,
-or MCP-tool access. Treat the tool registry as a public capability description,
-enforce every data operation with RLS, and use the verified `client_id` in
-policies when a particular OAuth client needs narrower access. Do not expose
-sensitive administrative tools merely because a client requests fewer scopes.
+OAuth scopes control identity, not data or tools. Enforce every operation with
+Row Level Security (RLS). Use `client_id` for client-specific policies, and do
+not expose sensitive admin tools.
 
-The public URL in OAuth metadata must match the origin used by Supabase Auth,
-because the access-token hook derives the resource audience from the token
-issuer. Hosted functions use the project URL automatically.
-`MCP_PUBLIC_SUPABASE_URL` is intended for local development, where it must be the
-external API URL for that same local project.
+## Add tools
 
-## Toolsets
-
-A toolset is a named group of tools. `tools/index.ts` is the registry: its
-manifest array is the complete set of toolsets exposed by the deployment. There
-is no separate mutable registry or environment-level selector.
+`tools/index.ts` is the only registry. Add each toolset to its array:
 
 ```ts
 // supabase/functions/mcp-server/tools/tasks.ts
@@ -195,8 +112,6 @@ export const tasksToolset: Toolset = {
 }
 ```
 
-Import the toolset and add it to the single registry array:
-
 ```ts
 import { tasksToolset } from './tasks.ts'
 import { whoamiToolset } from './whoami.ts'
@@ -204,29 +119,22 @@ import { whoamiToolset } from './whoami.ts'
 const toolRegistry: readonly Toolset[] = [whoamiToolset, tasksToolset]
 ```
 
-The per-request context deliberately stays small:
+Each toolset receives:
 
-- `supabase` is the user-scoped client for Database, Auth, Storage, and Functions
-- `fetchSupabase(path, init)` calls another API on the same project with the
-  user's credentials, without exposing the raw bearer token to toolsets
-- `claims` and `clientId` expose the verified identity
+- `supabase`, a user-scoped client for Database, Auth, Storage, and Functions
+- `fetchSupabase(path, init)` calls project APIs without exposing the token
+- `claims` and `clientId` for the verified identity
 
-`register` may be async, so a toolset can inspect a project API before deciding
-which tools to expose. `fetchSupabase` supplies the authenticated project request
-boundary needed by those toolsets without exposing the bearer token. Database
-operations still use the user-scoped `supabase` client, so RLS applies to every
-call.
-
-Edit the registry to change the deployment's surface. Duplicate names fail at
-worker startup instead of silently replacing tools.
+`register` can be async, so future schema-based toolsets can inspect project APIs
+without changing the server core. Duplicate toolset names fail at startup.
 
 ## Environment
 
-| Variable                  | Default            | Purpose                                                      |
-| ------------------------- | ------------------ | ------------------------------------------------------------ |
-| `MCP_PUBLIC_SUPABASE_URL` | Hosted project URL | Public API origin used in OAuth metadata and token audiences |
-| `MCP_SERVER_NAME`         | `supabase-mcp`     | Protocol-level server name returned to MCP clients           |
-| `MCP_SERVER_DESCRIPTION`  | Generic sentence   | Server instructions sent to clients                          |
+| Variable                  | Default            | Purpose                          |
+| ------------------------- | ------------------ | -------------------------------- |
+| `MCP_PUBLIC_SUPABASE_URL` | Hosted project URL | Public OAuth and MCP API origin  |
+| `MCP_SERVER_NAME`         | `supabase-mcp`     | Server name shown to MCP clients |
+| `MCP_SERVER_DESCRIPTION`  | Generic sentence   | Instructions shown to clients    |
 
 ## Deploy
 
