@@ -31,6 +31,8 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  ToggleGroup,
+  ToggleGroupItem,
 } from 'ui'
 import { useDebounce } from 'use-debounce'
 
@@ -309,34 +311,38 @@ export default function IntegrationsContent({
               <span className="text-foreground-muted text-xs">
                 {listPartners.length} partner{listPartners.length !== 1 ? 's' : ''}
               </span>
-              <div className="flex items-center rounded-lg border border-muted">
-                <button
-                  tabIndex={0}
+              <ToggleGroup
+                type="single"
+                value={viewMode}
+                onValueChange={(value) => value && setFilters({ view: value as ViewMode })}
+                aria-label="Partner layout"
+                className="flex items-center gap-0 rounded-lg border border-muted"
+              >
+                <ToggleGroupItem
+                  value="grid"
                   title="Grid view"
-                  onClick={() => setFilters({ view: 'grid' })}
                   className={cn(
-                    'relative flex items-center justify-center w-8 h-8 rounded-l-lg focus-visible:z-10 focus-ring',
-                    viewMode === 'grid'
-                      ? 'bg-surface-300 text-foreground'
-                      : 'bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
+                    'relative flex items-center justify-center w-8 h-8 p-0 rounded-none rounded-l-lg focus-visible:z-10 focus-ring',
+                    'cursor-pointer bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200',
+                    'data-[state=on]:cursor-default data-[state=on]:bg-surface-400 data-[state=on]:text-foreground',
+                    'aria-checked:bg-surface-400 aria-checked:text-foreground'
                   )}
                 >
                   <LayoutGrid size={14} />
-                </button>
-                <button
-                  tabIndex={0}
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value="list"
                   title="List view"
-                  onClick={() => setFilters({ view: 'list' })}
                   className={cn(
-                    'relative flex items-center justify-center w-8 h-8 border-l border-muted rounded-r-lg focus-visible:z-10 focus-ring',
-                    viewMode === 'list'
-                      ? 'bg-surface-300 text-foreground'
-                      : 'bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
+                    'relative flex items-center justify-center w-8 h-8 p-0 rounded-none rounded-r-lg border-l border-muted focus-visible:z-10 focus-ring',
+                    'cursor-pointer bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200',
+                    'data-[state=on]:cursor-default data-[state=on]:bg-surface-400 data-[state=on]:text-foreground',
+                    'aria-checked:bg-surface-400 aria-checked:text-foreground'
                   )}
                 >
                   <List size={14} />
-                </button>
-              </div>
+                </ToggleGroupItem>
+              </ToggleGroup>
             </div>
 
             {/* Grid view */}

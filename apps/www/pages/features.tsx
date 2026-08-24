@@ -6,7 +6,17 @@ import { useRouter } from 'next/compat/router'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useCallback, useEffect, useState, type ChangeEvent } from 'react'
-import { Badge, Button, Checkbox, cn, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
+import {
+  Badge,
+  Button,
+  Checkbox,
+  cn,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  ToggleGroup,
+  ToggleGroupItem,
+} from 'ui'
 
 import {
   FeaturesMatrix,
@@ -207,20 +217,16 @@ function FeaturesPage() {
                 />
               </InputGroup>
               <div className="hidden md:flex flex-col gap-2.5">
-                <div className="flex items-center gap-2 text-foreground-light hover:text-foreground cursor-pointer! hover:cursor-pointer! transition-colors">
+                <label className="flex cursor-pointer items-center gap-2 text-foreground-light hover:text-foreground transition-colors">
                   <Checkbox
-                    id="self-hosted-filter"
                     checked={showSelfHostedOnly}
                     onCheckedChange={() => setShowSelfHostedOnly(!showSelfHostedOnly)}
                     className="[&_input]:m-0"
                   />
-                  <label
-                    htmlFor="self-hosted-filter"
-                    className="text-sm leading-none! flex-1 text-left"
-                  >
+                  <span className="text-sm leading-none! flex-1 text-left">
                     Show only self-hosted features
-                  </label>
-                </div>
+                  </span>
+                </label>
               </div>
               <div className="hidden md:flex flex-col gap-4">
                 <h2 className="text-sm text-foreground-lighter">Filter by tags:</h2>
@@ -228,23 +234,19 @@ function FeaturesPage() {
                   {products
                     .sort((a, b) => (a.toLowerCase() > b.toLowerCase() ? 1 : -1))
                     .map((product) => (
-                      <div
+                      <label
                         key={product}
-                        className="flex items-center gap-2 text-foreground-light hover:text-foreground cursor-pointer! hover:cursor-pointer! transition-colors"
+                        className="flex cursor-pointer items-center gap-2 text-foreground-light hover:text-foreground transition-colors"
                       >
                         <Checkbox
-                          id={product}
                           checked={selectedProducts.includes(product)}
                           onCheckedChange={() => handleProductChange(product)}
                           className="[&_input]:m-0"
                         />
-                        <label
-                          htmlFor={product}
-                          className="text-sm leading-none! capitalize flex-1 text-left"
-                        >
+                        <span className="text-sm leading-none! capitalize flex-1 text-left">
                           {product}
-                        </label>
-                      </div>
+                        </span>
+                      </label>
                     ))}
                 </div>
                 <div className="text-foreground-muted text-xs">
@@ -274,34 +276,38 @@ function FeaturesPage() {
               <span className="text-foreground-muted text-xs">
                 {filteredFeatures.length} feature{filteredFeatures.length !== 1 ? 's' : ''}
               </span>
-              <div className="flex items-center rounded-lg border border-muted">
-                <button
-                  tabIndex={0}
+              <ToggleGroup
+                type="single"
+                value={viewMode}
+                onValueChange={(value) => value && setViewMode(value as ViewMode)}
+                aria-label="Feature layout"
+                className="flex items-center gap-0 rounded-lg border border-muted"
+              >
+                <ToggleGroupItem
+                  value="grid"
                   title="Grid view"
-                  onClick={() => setViewMode('grid')}
                   className={cn(
-                    'relative flex items-center justify-center w-8 h-8 rounded-l-lg focus-visible:z-10 focus-ring',
-                    viewMode === 'grid'
-                      ? 'bg-surface-300 text-foreground'
-                      : 'bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
+                    'relative flex items-center justify-center w-8 h-8 p-0 rounded-none rounded-l-lg focus-visible:z-10 focus-ring',
+                    'cursor-pointer bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200',
+                    'data-[state=on]:cursor-default data-[state=on]:bg-surface-400 data-[state=on]:text-foreground',
+                    'aria-checked:bg-surface-400 aria-checked:text-foreground'
                   )}
                 >
                   <LayoutGrid size={14} />
-                </button>
-                <button
-                  tabIndex={0}
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value="matrix"
                   title="Matrix view"
-                  onClick={() => setViewMode('matrix')}
                   className={cn(
-                    'relative flex items-center justify-center w-8 h-8 border-l border-muted rounded-r-lg focus-visible:z-10 focus-ring',
-                    viewMode === 'matrix'
-                      ? 'bg-surface-300 text-foreground'
-                      : 'bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
+                    'relative flex items-center justify-center w-8 h-8 p-0 rounded-none rounded-r-lg border-l border-muted focus-visible:z-10 focus-ring',
+                    'cursor-pointer bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200',
+                    'data-[state=on]:cursor-default data-[state=on]:bg-surface-400 data-[state=on]:text-foreground',
+                    'aria-checked:bg-surface-400 aria-checked:text-foreground'
                   )}
                 >
                   <Table2 size={14} />
-                </button>
-              </div>
+                </ToggleGroupItem>
+              </ToggleGroup>
             </div>
 
             {viewMode === 'matrix' ? (
