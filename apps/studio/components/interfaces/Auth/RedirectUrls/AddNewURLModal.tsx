@@ -146,7 +146,7 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
               <div className="flex flex-col gap-y-1 px-5">
                 <Label>URL</Label>
                 <p className="text-sm text-foreground-light">
-                  Paste multiple URLs separated by commas, spaces, or line breaks
+                  Paste multiple URLs at once — one per line
                 </p>
               </div>
               <ScrollArea className={cn(urls.length > 4 ? 'h-[220px]' : '')}>
