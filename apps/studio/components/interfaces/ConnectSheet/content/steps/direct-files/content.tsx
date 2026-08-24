@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { cn } from 'ui'
 import { MultipleCodeBlock } from 'ui-patterns/MultipleCodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -271,12 +272,15 @@ except Exception as e:
         codeBlock
       )}
       {config.passwordInUrl && <PasswordEncodingNote />}
-      {isLoadBalancerSelected && (
-        <p className="text-sm text-foreground-lighter">
-          The load balancer accepts read-only connections. Connect to the primary database for
-          writes.
-        </p>
-      )}
+      {/* Persistent live region so screen readers announce the read-only state
+          when the load balancer is selected */}
+      <p
+        role="status"
+        className={cn('text-sm text-foreground-lighter', !isLoadBalancerSelected && 'sr-only')}
+      >
+        {isLoadBalancerSelected &&
+          'The load balancer accepts read-only connections. Connect to the primary database for writes.'}
+      </p>
       <ConnectionParameters parameters={buildConnectionParameters(connectionParams)} />
     </div>
   )

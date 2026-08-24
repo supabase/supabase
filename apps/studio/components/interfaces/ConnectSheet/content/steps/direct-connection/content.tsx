@@ -1,5 +1,6 @@
 import { Check, KeyRound } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { cn } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -183,12 +184,15 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
         )}
       </div>
       {showPasswordPlaceholder && <PasswordEncodingNote />}
-      {isLoadBalancerSelected && (
-        <p className="text-sm text-foreground-lighter">
-          The load balancer accepts read-only connections. Connect to the primary database for
-          writes.
-        </p>
-      )}
+      {/* Persistent live region so screen readers announce the read-only state
+          when the load balancer is selected */}
+      <p
+        role="status"
+        className={cn('text-sm text-foreground-lighter', !isLoadBalancerSelected && 'sr-only')}
+      >
+        {isLoadBalancerSelected &&
+          'The load balancer accepts read-only connections. Connect to the primary database for writes.'}
+      </p>
       {showSelfHostedDirectNotice && (
         <p className="text-sm text-foreground-lighter">
           Manually{' '}
