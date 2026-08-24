@@ -101,7 +101,7 @@ flowchart TB
 | `/guides/deployment/terraform/*`         | `supabase/terraform-provider-supabase` | branch in `terraformConstants` | Federated prose pages                             |
 | `/guides/deployment/terraform/reference` | same                                   | same                           | Federated **JSON schema** (not MDX)               |
 | `/guides/database/extensions/wrappers/*` | `supabase/wrappers`                    | **release tag** `docs_v*.*.*`  | **Hybrid** — local MDX + federated catalog        |
-| `/guides/database/database-advisors`     | `supabase/splinter`                    | `main`                         | **Dynamic listing** — all `docs/*.md` files       |
+| `/guides/monitoring-and-debugging/advisors` | `supabase/splinter`                    | `main`                         | **Dynamic listing** — all `docs/*.md` files       |
 | AI Skills index                          | `supabase/agent-skills`                | `main`                         | Lists `skills/*/SKILL.md` at runtime              |
 | `$CodeSample` directive                  | various                                | commit SHA only                | Snippets via `getGitHubFileContentsImmutableOnly` |
 
