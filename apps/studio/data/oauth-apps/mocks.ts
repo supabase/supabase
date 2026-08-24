@@ -1,3 +1,4 @@
+import type { OAuthAppsAuthorizeGrant } from './oauth-apps-authorize-approve-mutation'
 import type { OAuthAppsAuthorizeOrganizationProject } from './oauth-apps-authorize-organization-projects-query'
 import type { OAuthAppsAuthorizeIdentity } from './oauth-apps-authorize-organizations-query'
 import type { OAuthAppsAuthorizeRequest } from './oauth-apps-authorize-request-query'
@@ -114,6 +115,29 @@ export function getMockOAuthAppsAuthorizeOrganizationProjects(
   slug: string
 ): OAuthAppsAuthorizeOrganizationProject[] {
   return MOCK_ORGANIZATION_PROJECTS[slug] ?? []
+}
+
+export function getMockOAuthAppsAuthorizeGrant(
+  id: string,
+  slug: string,
+  projectRefs: string[]
+): OAuthAppsAuthorizeGrant {
+  const request = getMockOAuthAppsAuthorizeRequest(id)
+  const identity = getMockOAuthAppsAuthorizeIdentity(id)
+  const organization = identity.organizations.find((org) => org.slug === slug)
+  if (!organization) throw new Error(`User does not belong to organization "${slug}"`)
+
+  const projects = getMockOAuthAppsAuthorizeOrganizationProjects(slug).filter((project) =>
+    projectRefs.includes(project.ref)
+  )
+
+  return {
+    email: identity.email,
+    role: organization.role,
+    organization_slug: organization.slug,
+    projects,
+    scope_groups: request.scope_groups,
+  }
 }
 
 function buildMockRedirectUrl(redirectUri: string, params: Record<string, string>) {
