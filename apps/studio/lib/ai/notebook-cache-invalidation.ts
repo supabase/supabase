@@ -61,7 +61,14 @@ export async function applyNotebookCacheEffects({
         queryClient,
         projectRef,
         id: effect.id,
-        mode: effect._tag === 'upserted' ? 'refresh' : 'remove',
+        // Always 'remove', not 'refresh': notebooksState.removeNotebook runs unconditionally
+        // either way, so a mounted tab shows the same loading state regardless — but
+        // 'refresh' (invalidateQueries) leaves the stale data cached, and a remounting
+        // useNotebookQuery synchronously reads it before the refetch lands. setNotebook's
+        // merge guard then treats that stale merge as "already loaded" and silently drops
+        // the real update. 'remove' (removeQueries) clears the cache entry entirely, so
+        // there's nothing stale to read.
+        mode: 'remove',
       })
     )
   )

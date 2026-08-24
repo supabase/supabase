@@ -112,4 +112,68 @@ describe('ExplorerNotebookTab — assistant cache invalidation', () => {
     expect(await screen.findByText('Updated by assistant')).toBeInTheDocument()
     expect(screen.queryByText('Original content')).not.toBeInTheDocument()
   })
+
+  it('shows the updated cells on remount, when the query cache still holds the pre-eviction notebook (refresh mode leaves cached data in place)', async () => {
+    setupSqlEditorMocks()
+    seedNotebook()
+
+    const queryClient = new QueryClient()
+    // Mirrors what a REAL prior fetch would have cached: the full notebook, not a stub —
+    // `mode: 'refresh'` invalidates this entry but does not clear it, so a remounting
+    // `useNotebookQuery` observer reads this stale value synchronously before its refetch lands.
+    queryClient.setQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK_ID), {
+      id: NOTEBOOK_ID,
+      type: 'notebook',
+      name: 'Test notebook',
+      description: '',
+      favorite: false,
+      visibility: 'project',
+      owner_id: 1,
+      project_id: 1,
+      inserted_at: '2024-01-01T00:00:00.000Z',
+      updated_at: '2024-01-01T00:00:00.000Z',
+      content: {
+        schema_version: 1,
+        cells: [{ _tag: 'markdown_cell', _id: 'cell-1', text: 'Original content' }],
+      },
+    })
+
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref/content/item/:id',
+      response: () =>
+        HttpResponse.json<components['schemas']['GetUserContentByIdResponse']>({
+          id: NOTEBOOK_ID,
+          type: 'notebook',
+          name: 'Test notebook',
+          description: '',
+          favorite: false,
+          folder_id: null,
+          inserted_at: '2024-01-01T00:00:00.000Z',
+          updated_at: '2024-01-02T00:00:00.000Z',
+          visibility: 'project',
+          owner_id: 1,
+          project_id: 1,
+          content: {
+            schema_version: 1,
+            cells: [{ _tag: 'markdown_cell', _id: 'cell-1', text: 'Updated by assistant' }],
+          },
+        }),
+    })
+
+    // While the tab is unmounted (navigated away to a separate Explorer chat tab), the
+    // assistant updates the notebook — same collector+applier calls as `onFinish`.
+    const message = createAssistantMessageWithUpdateNotebookTool({
+      id: NOTEBOOK_ID,
+      name: 'Test notebook',
+    })
+    const effects = collectNotebookCacheEffects([message], new Set())
+    await applyNotebookCacheEffects({ queryClient, projectRef: PROJECT_REF, effects })
+
+    // Simulate navigating back: the notebook tab mounts fresh.
+    renderNotebookTab(queryClient)
+
+    expect(await screen.findByText('Updated by assistant')).toBeInTheDocument()
+    expect(screen.queryByText('Original content')).not.toBeInTheDocument()
+  })
 })

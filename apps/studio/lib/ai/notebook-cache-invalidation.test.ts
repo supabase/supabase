@@ -115,7 +115,7 @@ describe('applyNotebookCacheEffects', () => {
     notebooksState.needsSaving.clear()
   })
 
-  it('invalidates the nav list and refreshes an upserted, saved notebook', async () => {
+  it('invalidates the nav list and evicts an upserted, saved notebook from the cache', async () => {
     notebooksState.setNotebook({ projectRef: PROJECT_REF, notebook: NOTEBOOK })
     const queryClient = new QueryClient()
     queryClient.setQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK.id), { id: NOTEBOOK.id })
@@ -134,9 +134,10 @@ describe('applyNotebookCacheEffects', () => {
     expect(queryClient.getQueryState(contentKeys.infiniteList(PROJECT_REF))?.isInvalidated).toBe(
       true
     )
-    expect(
-      queryClient.getQueryState(contentKeys.resource(PROJECT_REF, NOTEBOOK.id))?.isInvalidated
-    ).toBe(true)
+    // Removed, not just invalidated — a stale cached value would otherwise be read
+    // synchronously by a remounting `useNotebookQuery` before the refetch lands, and
+    // `notebooksState.setNotebook`'s merge guard would then discard the real update.
+    expect(queryClient.getQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK.id))).toBeUndefined()
     expect(notebooksState.notebooks[NOTEBOOK.id]).toBeUndefined()
   })
 
