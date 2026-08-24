@@ -58,14 +58,14 @@ const MOCK_AUTHORIZE_REQUESTS: Record<string, OAuthAppsAuthorizeRequest> = {
   [OAUTH_APPS_MOCK_SCENARIOS.kemalBot]: KEMAL_BOT_REQUEST,
 }
 
-const ANDY_BURNHAM_GMBH_DEVELOPER: OAuthOrganizationRole = {
-  slug: 'andy-burnham-gmbh',
-  name: 'Andy Burnham GmbH',
+const NORTHWIND_TRADERS_DEVELOPER: OAuthOrganizationRole = {
+  slug: 'northwind-traders',
+  name: 'Northwind Traders',
   role: 'Developer',
 }
 
-const ANDY_BURNHAM_GMBH_READ_ONLY: OAuthOrganizationRole = {
-  ...ANDY_BURNHAM_GMBH_DEVELOPER,
+const NORTHWIND_TRADERS_READ_ONLY: OAuthOrganizationRole = {
+  ...NORTHWIND_TRADERS_DEVELOPER,
   role: 'Read-only',
 }
 
@@ -78,22 +78,22 @@ const SOME_OTHER_ORG: OAuthOrganizationRole = {
 const MOCK_IDENTITIES: Record<string, OAuthAppsAuthorizeIdentity> = {
   [OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper]: {
     email: 'kemal@supabase.io',
-    organizations: [ANDY_BURNHAM_GMBH_DEVELOPER, SOME_OTHER_ORG],
+    organizations: [NORTHWIND_TRADERS_DEVELOPER, SOME_OTHER_ORG],
   },
   [OAUTH_APPS_MOCK_SCENARIOS.vercelReadOnly]: {
     email: 'kemal@supabase.io',
-    organizations: [ANDY_BURNHAM_GMBH_READ_ONLY, SOME_OTHER_ORG],
+    organizations: [NORTHWIND_TRADERS_READ_ONLY, SOME_OTHER_ORG],
   },
   [OAUTH_APPS_MOCK_SCENARIOS.kemalBot]: {
     email: 'kemal@supabase.io',
-    organizations: [ANDY_BURNHAM_GMBH_DEVELOPER, SOME_OTHER_ORG],
+    organizations: [NORTHWIND_TRADERS_DEVELOPER, SOME_OTHER_ORG],
   },
 }
 
 const MOCK_ORGANIZATION_PROJECTS: Record<string, OAuthAppsAuthorizeOrganizationProject[]> = {
-  'andy-burnham-gmbh': [
-    { ref: 'andyburnhamgmbhprod1', name: 'production' },
-    { ref: 'andyburnhamgmbhstag1', name: 'staging' },
+  'northwind-traders': [
+    { ref: 'northwindtradersprod1', name: 'production' },
+    { ref: 'northwindtradersstag1', name: 'staging' },
   ],
   'some-other-org': [],
 }
