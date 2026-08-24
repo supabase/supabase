@@ -3,7 +3,7 @@ import { useChat } from '@ai-sdk/react'
 import { lastAssistantMessageIsCompleteWithApprovalResponses } from 'ai'
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useParams, useSearchParamsShallow } from 'common/hooks'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { Eraser, Pencil, X } from 'lucide-react'
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Button, cn, KeyboardShortcut } from 'ui'
@@ -78,6 +78,7 @@ interface AssistantChatProps {
   onBranchChat: (messageId: string) => void
   composerContext?: AssistantChatComposerContext
   renderHeader?: (props: AssistantChatHeaderProps) => ReactNode
+  onInputChange?: (value: string) => void
 }
 
 export const AssistantChat = ({
@@ -89,6 +90,7 @@ export const AssistantChat = ({
   onBranchChat,
   composerContext,
   renderHeader,
+  onInputChange,
 }: AssistantChatProps) => {
   const { id: entityId } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -98,6 +100,7 @@ export const AssistantChat = ({
     useSelectedOrganizationQuery()
 
   const disablePrompts = useFlag('disableAssistantPrompts')
+  const shouldReduceMotion = useReducedMotion()
   const snap = useAiAssistantStateSnapshot()
   const state = useAiAssistantState()
   const currentChat = snap.chats[chatId]
@@ -194,7 +197,7 @@ export const AssistantChat = ({
     addToolApprovalResponse,
     stop,
     regenerate,
-  } = useChat({
+  } = useChat<MessageType>({
     id: chatId,
     ...(chatInstance ? { chat: chatInstance } : {}),
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,
@@ -488,10 +491,10 @@ export const AssistantChat = ({
         })}
         {hasMessages ? (
           <Conversation className={cn('flex-1')}>
-            <ConversationContent className="w-full px-7 py-8 mb-10 max-w-3xl mx-auto">
+            <ConversationContent className="w-full px-7 py-8 mb-10">
               {renderedMessages}
-              {error && (
-                <>
+              <div className="w-full max-w-3xl mx-auto">
+                {error && (
                   <AlertError
                     error={
                       isContextExceededError
@@ -537,19 +540,23 @@ export const AssistantChat = ({
                       </div>
                     }
                   />
-                </>
-              )}
-              {isChatLoading && (
-                <motion.span
-                  animate={{ opacity: [1, 0] }}
-                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                  className="inline-block w-1.5 h-4 bg-foreground-lighter mt-4"
-                />
-              )}
+                )}
+                {isChatLoading && (
+                  <motion.span
+                    animate={shouldReduceMotion ? { opacity: 1 } : { opacity: [1, 0] }}
+                    transition={
+                      shouldReduceMotion
+                        ? { duration: 0 }
+                        : { duration: 1, repeat: Infinity, ease: 'linear' }
+                    }
+                    className="inline-block w-1.5 h-4 bg-foreground-lighter mt-4"
+                  />
+                )}
 
-              <p className="text-center text-xs text-foreground-muted mt-6">
-                The Assistant can make mistakes. Double check responses.
-              </p>
+                <p className="text-center text-xs text-foreground-muted mt-6">
+                  The Assistant can make mistakes. Double check responses.
+                </p>
+              </div>
             </ConversationContent>
             <ConversationScrollButton />
           </Conversation>
@@ -678,7 +685,10 @@ export const AssistantChat = ({
                     : 'Chat to Postgres...'
             }
             value={value}
-            onValueChange={(e) => setValue(e.target.value)}
+            onValueChange={(e) => {
+              setValue(e.target.value)
+              onInputChange?.(e.target.value)
+            }}
             onSubmit={(finalMessage) => {
               sendMessageToAssistant(finalMessage)
             }}

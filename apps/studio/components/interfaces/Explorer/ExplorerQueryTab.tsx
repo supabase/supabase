@@ -19,6 +19,7 @@ export const ExplorerQueryTab = () => {
   const querySnap = useExplorerQueryStateSnapshot()
 
   const [restoredQueryKey, setRestoredQueryKey] = useState<string>()
+  const [showQuery, setShowQuery] = useState(true)
 
   const stateDraft = id ? querySnap.drafts[id] : undefined
   const draft = stateDraft?.projectRef === ref ? stateDraft : undefined
@@ -38,19 +39,10 @@ export const ExplorerQueryTab = () => {
   useEffect(() => {
     if (!id || !ref) return
 
-    const restored = explorerQueryState.restoreDraft({ id, projectRef: ref })
-    const restoredDraft = explorerQueryState.drafts[id]
-    if (restored && restoredDraft) {
-      tabs.addTab({
-        id: createTabId('query', { id }),
-        type: 'query',
-        label: restoredDraft.name,
-        metadata: { queryId: id },
-        isPreview: false,
-      })
-    }
+    setShowQuery(true)
+    explorerQueryState.restoreDraft({ id, projectRef: ref })
     setRestoredQueryKey(`${ref}:${id}`)
-  }, [id, ref, tabs])
+  }, [id, ref])
 
   if (!queryKey || restoredQueryKey !== queryKey) {
     return (
@@ -86,6 +78,8 @@ export const ExplorerQueryTab = () => {
     })
   }
 
+  const persistTab = () => tabs.makeTabPermanent(createTabId('query', { id }))
+
   const query: ExplorerQueryModel =
     draft._tag === 'logs'
       ? { ...toQuerySourceBinding(draft), uncheckedSql: draft.uncheckedSql }
@@ -102,16 +96,28 @@ export const ExplorerQueryTab = () => {
       title={draft.name}
       query={query}
       result={result}
+      showQuery={showQuery}
+      onShowQueryChange={setShowQuery}
       roleImpersonationState={roleImpersonationState}
       onTitleChange={(value) => {
+        persistTab()
         const name = value.trim() || 'Untitled query'
         explorerQueryState.updateDraft({ id, name })
         tabs.updateTab(createTabId('query', { id }), { label: name })
       }}
-      onSqlChange={(sql) => explorerQueryState.updateDraft({ id, sql })}
-      onSourceChange={(source) => explorerQueryState.updateDraft({ id, source })}
+      onSqlChange={(sql) => {
+        persistTab()
+        explorerQueryState.updateDraft({ id, sql })
+      }}
+      onSourceChange={(source) => {
+        persistTab()
+        explorerQueryState.updateDraft({ id, source })
+      }}
+      onRowLimitChange={(rowLimit) => {
+        persistTab()
+        explorerQueryState.updateDraft({ id, rowLimit })
+      }}
       onResultChange={handleResultChange}
-      onRowLimitChange={(rowLimit) => explorerQueryState.updateDraft({ id, rowLimit })}
     />
   )
 }

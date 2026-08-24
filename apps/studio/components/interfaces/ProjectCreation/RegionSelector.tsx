@@ -231,7 +231,11 @@ export const RegionSelector = ({
                 }
               >
                 <FormControl>
-                  <Select value={dbRegion} onValueChange={field.onChange} disabled={isLoading}>
+                  <Select
+                    value={dbRegion}
+                    onValueChange={(value) => value !== '' && field.onChange(value)}
+                    disabled={isLoading}
+                  >
                     <SelectTrigger
                       id="region"
                       className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start"

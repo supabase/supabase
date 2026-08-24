@@ -30,8 +30,8 @@ export function DiskManagementPanelForm() {
         <Admonition
           type="default"
           layout="responsive"
-          title="Disk Management has moved"
-          description="Disk configuration is now managed alongside Project Compute on the Infrastructure page."
+          title="Disk management has moved"
+          description="Disk configuration is now managed alongside project compute on the Infrastructure page."
           actions={
             <Button variant="default" asChild>
               <Link href={getInfrastructurePath(projectRef)}>Go to Infrastructure</Link>
