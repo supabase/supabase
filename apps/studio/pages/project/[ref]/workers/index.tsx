@@ -31,7 +31,7 @@ import type { NextPageWithLayout } from '@/types'
 
 const WorkersPage: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const [showDeployInstructions, setShowDeployInstructions] = useState(false)
+  const [isDeployInstructionsOpen, setIsDeployInstructionsOpen] = useState(false)
   const {
     data: workers,
     error,
@@ -76,20 +76,23 @@ const WorkersPage: NextPageWithLayout = () => {
             {isMissingPermission && <NoPermission resourceText="view this project's workers" />}
             {isUnexpectedError && <AlertError error={error} subject="Failed to retrieve workers" />}
             {isSuccess && workers.length === 0 && (
-              <WorkersEmptyState onDeploy={() => setShowDeployInstructions(true)} />
+              <WorkersEmptyState onDeploy={() => setIsDeployInstructionsOpen(true)} />
             )}
             {isSuccess && workers.length > 0 && ref && (
               <WorkersList
                 projectRef={ref}
                 workers={workers}
-                onDeploy={() => setShowDeployInstructions(true)}
+                onDeploy={() => setIsDeployInstructionsOpen(true)}
               />
             )}
           </PageSectionContent>
         </PageSection>
       </PageContainer>
 
-      <DeployWorkerDialog open={showDeployInstructions} onOpenChange={setShowDeployInstructions} />
+      <DeployWorkerDialog
+        open={isDeployInstructionsOpen}
+        onOpenChange={setIsDeployInstructionsOpen}
+      />
     </div>
   )
 }
