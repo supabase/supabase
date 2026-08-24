@@ -144,7 +144,7 @@ const fetchAPIPermissionScope = async (version: 'v1' | 'v2') => {
 // to tool -> FGA permission groups. Fetched like the OpenAPI spec above.
 const fetchMcpToolPermissions = async () => {
   try {
-    const response = await fetch(`${NEXT_PUBLIC_API_DOMAIN}/mcp-tools-permissions`, {
+    const response = await fetch(`${NEXT_PUBLIC_API_DOMAIN}/platform/mcp-tools-permissions`, {
       method: 'get',
       headers: {
         'Content-Type': 'application/json',
@@ -198,5 +198,5 @@ const API_SPECS_SCHEMA = z.object({
   paths: z.record(z.string(), OPEN_API_PATH_ITEM_SCHEMA),
 })
 
-// tool name -> OR-of-AND FGA permission groups, as served by GET /mcp-tools-permissions.
+// tool name -> OR-of-AND FGA permission groups, as served by GET /platform/mcp-tools-permissions.
 const MCP_TOOLS_SCHEMA: z.ZodType<McpMap> = z.record(z.string(), z.array(z.array(z.string())))

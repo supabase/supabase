@@ -146,7 +146,7 @@ describe('buildAPIPermissionScopeMap', () => {
     mswServer.use(
       http.get('*/api/v1-json', () => HttpResponse.json(v1)),
       http.get('*/api/v2-json', () => HttpResponse.json(v2)),
-      http.get('*/mcp-tools-permissions', () => HttpResponse.json(mcpTools))
+      http.get('*/platform/mcp-tools-permissions', () => HttpResponse.json(mcpTools))
     )
   }
 
@@ -225,7 +225,7 @@ describe('buildAPIPermissionScopeMap', () => {
     mswServer.use(
       http.get('*/api/v1-json', () => HttpResponse.json({ paths: {} })),
       http.get('*/api/v2-json', () => HttpResponse.json({ paths: {} })),
-      http.get('*/mcp-tools-permissions', () => new HttpResponse(null, { status: 503 }))
+      http.get('*/platform/mcp-tools-permissions', () => new HttpResponse(null, { status: 503 }))
     )
 
     await expect(buildAPIPermissionScopeMap()).rejects.toThrow()
