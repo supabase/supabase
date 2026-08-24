@@ -32,6 +32,8 @@ A DuckLake destination has three independent components:
 
 Always query through the DuckLake catalog. Reading the Parquet objects directly can miss inlined changes, delete files, and the current snapshot selected by the catalog.
 
+You can query replicated tables, but treat them and their underlying catalog and object-storage state as read-only. Writes outside Pipelines can conflict with replication and background maintenance.
+
 ## Choose a configuration mode
 
 The Dashboard offers two ways to provide the catalog and storage.
@@ -107,7 +109,7 @@ select *
 from my_ducklake.public.orders;
 ```
 
-See the [DuckLake documentation](https://ducklake.select/docs/stable/) for the current DuckDB extension, Postgres catalog, and S3 secret setup. If your query client can't read a Supabase-backed catalog during Early Access, [contact support](/dashboard/support/new).
+See the [DuckDB connection guide](https://ducklake.select/docs/stable/duckdb/usage/connecting) for the current `ducklake` extension and `ATTACH` syntax. If your query client can't read a Supabase-backed catalog during Early Access, [contact support](/dashboard/support/new).
 
 ## How replication works
 
@@ -119,8 +121,6 @@ For each published Postgres table, Pipelines:
 4. Applies supported source schema changes
 
 Source schema and table names are preserved, while ASCII uppercase letters in column names are converted to lowercase. DuckDB compares schema, table, and column identifiers without ASCII case distinctions, so don't publish names that differ only by ASCII case. Use distinct lowercase column names. Source column names matching the generated `supabase_etl_ducklake_dropped_<ordinal>_<hash>` shape are reserved for schema-change recovery.
-
-Initial-copy data is written to Parquet. Small ongoing changes can be temporarily inlined in the Postgres catalog and remain visible to DuckLake queries. Supabase runs routine maintenance to flush inlined data, combine files, rewrite data files when needed, and clean up unreferenced files. Don't modify catalog tables or object-storage files manually.
 
 A source `TRUNCATE` truncates the DuckLake table. Resetting a table drops and recreates the DuckLake table before running a new initial sync. Removing a source table from the publication stops new changes after the pipeline restarts but leaves the destination table in place.
 
