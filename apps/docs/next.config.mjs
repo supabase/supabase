@@ -187,6 +187,11 @@ const nextConfig = {
         destination: '/guides/database/replication/pipelines-faq',
         permanent: true,
       },
+      {
+        source: '/guides/database/database-advisors',
+        destination: '/guides/monitoring-and-debugging/advisors',
+        permanent: true,
+      },
     ]
   },
   typescript: {

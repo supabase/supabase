@@ -1154,7 +1154,7 @@ export const database: NavMenuConstant = {
         },
         {
           name: 'Database Advisors',
-          url: '/guides/database/database-advisors' as `/${string}`,
+          url: '/guides/monitoring-and-debugging/advisors' as `/${string}`,
         },
         { name: 'Testing your database', url: '/guides/database/testing' },
         {
@@ -1172,8 +1172,8 @@ export const database: NavMenuConstant = {
           url: '/guides/database/postgres/timeouts' as `/${string}`,
         },
         {
-          name: 'Debugging and monitoring',
-          url: '/guides/database/inspect' as `/${string}`,
+          name: 'Inspect the database',
+          url: '/guides/monitoring-and-debugging/inspect' as `/${string}`,
         },
         {
           name: 'Debugging performance issues',
@@ -3084,6 +3084,14 @@ export const telemetry: NavMenuConstant = {
         {
           name: 'Tracing with the client SDKs',
           url: '/guides/monitoring-and-debugging/client-side-tracing' as `/${string}`,
+        },
+        {
+          name: 'Inspect the database',
+          url: '/guides/monitoring-and-debugging/inspect' as `/${string}`,
+        },
+        {
+          name: 'Advisors',
+          url: '/guides/monitoring-and-debugging/advisors' as `/${string}`,
         },
       ],
     },
