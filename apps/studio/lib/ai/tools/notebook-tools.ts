@@ -15,8 +15,9 @@ import {
   type WritableCell,
   type WritableNotebook,
 } from '@/data/content/notebooks/notebook-schema'
-import { createNotebook, updateNotebook } from '@/data/content/notebooks/notebook-upsert-mutation'
+import { createNotebook, upsertNotebook } from '@/data/content/notebooks/notebook-upsert-mutation'
 import { acceptUntrustedLogsSql, untrustedLogSql } from '@/data/logs/safe-analytics-sql'
+import { getReadReplicas } from '@/data/read-replicas/replicas-query'
 import type { Notebooks } from '@/types'
 
 export type NotebookToolsContext = {
@@ -24,11 +25,99 @@ export type NotebookToolsContext = {
   authorization?: string
 }
 
+const notebookToolErrorMetadataSchema = z.object({
+  exposeToAssistant: z.boolean(),
+})
+
+export type NotebookToolErrorMetadata = z.infer<typeof notebookToolErrorMetadataSchema>
+
+const notebookToolErrorSchema = notebookToolErrorMetadataSchema.extend({
+  tag: z.literal('notebook_tool_error'),
+  message: z.string(),
+})
+
+export type EncodedNotebookToolError = z.infer<typeof notebookToolErrorSchema>
+
+/** Thrown by update_notebook for failures the assistant can act on by retrying. */
+export class NotebookToolError extends Error {
+  readonly metadata: NotebookToolErrorMetadata
+
+  constructor(message: string, metadata: NotebookToolErrorMetadata) {
+    super(message)
+    this.name = 'NotebookToolError'
+    this.metadata = notebookToolErrorMetadataSchema.parse(metadata)
+  }
+}
+
+/** Called from the stream's `onError` (generate-v4.ts), which still has the live Error. */
+export function encodeNotebookToolError(error: unknown): string | null {
+  if (!(error instanceof NotebookToolError)) return null
+  return JSON.stringify(
+    notebookToolErrorSchema.parse({
+      ...error.metadata,
+      tag: 'notebook_tool_error',
+      message: error.message,
+    })
+  )
+}
+
+/** Called from the history filter (generate-assistant-response.ts) on a persisted errorText. */
+export function decodeNotebookToolError(errorText: string): EncodedNotebookToolError | null {
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(errorText)
+  } catch {
+    return null
+  }
+  const result = notebookToolErrorSchema.safeParse(parsed)
+  return result.success ? result.data : null
+}
+
+/**
+ * Rejects a made-up `database_identifier` before it's written: it would pass schema
+ * validation (it's just a string) but silently break the cell at run time, since
+ * QueryEditor's connection-string lookup can't resolve an identifier that isn't real.
+ *
+ * @throws NotebookToolError if any cell has a `database_identifier` that isn't in the
+ * list of valid identifiers for this project.
+ */
+function assertValidDatabaseIdentifiers(
+  cells: ReadonlyArray<{ _tag: string; database_identifier?: string }>,
+  validIdentifiers: Set<string>
+): void {
+  for (const cell of cells) {
+    if (cell._tag !== 'database_cell' || cell.database_identifier === undefined) continue
+    if (!validIdentifiers.has(cell.database_identifier)) {
+      throw new NotebookToolError(
+        `Unknown database_identifier "${cell.database_identifier}" — call list_databases to see this project's valid identifiers.`,
+        { exposeToAssistant: true }
+      )
+    }
+  }
+}
+
 export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
   const { projectRef, authorization } = ctx
   const authHeaders = authorization ? { Authorization: authorization } : undefined
 
   return {
+    list_databases: tool({
+      description:
+        'List the databases available for this project — the primary and any read replicas.',
+      inputSchema: z.object({}),
+      execute: async () => {
+        const databases = await getReadReplicas({ projectRef }, undefined, authHeaders)
+
+        return {
+          databases: (databases ?? []).map((database) => ({
+            identifier: database.identifier,
+            is_primary: database.identifier === projectRef,
+            region: database.region,
+            status: database.status,
+          })),
+        }
+      },
+    }),
     list_notebooks: tool({
       description: 'List the notebooks saved for this project',
       inputSchema: z.object({
@@ -106,6 +195,18 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
       }),
       needsApproval: true,
       execute: async ({ name, description, content }) => {
+        if (
+          content.cells.some(
+            (cell) => cell._tag === 'database_cell' && cell.database_identifier !== undefined
+          )
+        ) {
+          const databases = await getReadReplicas({ projectRef }, undefined, authHeaders)
+          assertValidDatabaseIdentifiers(
+            content.cells,
+            new Set((databases ?? []).map((database) => database.identifier))
+          )
+        }
+
         // This approval gate is the user gesture that promotes each cell's SQL from
         // untrusted to safe — keep the promotion here, not in a shared helper, so it's
         // auditable directly alongside the `needsApproval: true` above.
@@ -150,11 +251,29 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
       }),
       needsApproval: true,
       execute: async ({ id, expected_updated_at, operations }) => {
+        const newCells = operations.flatMap((operation) =>
+          operation._tag === 'insert_cell' || operation._tag === 'replace_cell'
+            ? [operation.cell]
+            : []
+        )
+        if (
+          newCells.some(
+            (cell) => cell._tag === 'database_cell' && cell.database_identifier !== undefined
+          )
+        ) {
+          const databases = await getReadReplicas({ projectRef }, undefined, authHeaders)
+          assertValidDatabaseIdentifiers(
+            newCells,
+            new Set((databases ?? []).map((database) => database.identifier))
+          )
+        }
+
         const notebook = await getNotebook({ projectRef, id }, undefined, authHeaders)
 
         if (notebook.updated_at !== expected_updated_at) {
-          throw new Error(
-            `Notebook "${id}" changed since expected_updated_at (${expected_updated_at}); it is now ${notebook.updated_at}. Call get_notebook again and reissue update_notebook against the current content.`
+          throw new NotebookToolError(
+            `Notebook "${id}" changed since expected_updated_at (${expected_updated_at}); it is now ${notebook.updated_at}. Call get_notebook again and reissue update_notebook against the current content.`,
+            { exposeToAssistant: true }
           )
         }
 
@@ -165,7 +284,9 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
 
         const result = applyNotebookOperations(wireNotebook, operations)
         if (!result.success) {
-          throw new Error(describeNotebookOperationError(result.error))
+          throw new NotebookToolError(describeNotebookOperationError(result.error), {
+            exposeToAssistant: true,
+          })
         }
 
         // Same promotion as create_notebook above, inlined here for the same auditability
@@ -181,7 +302,7 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
           }
         })
 
-        await updateNotebook(
+        await upsertNotebook(
           {
             projectRef: projectRef ?? '',
             id,
@@ -193,8 +314,15 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
           authHeaders
         )
 
-        return { id, name: notebook.name }
+        // `previous_content` lets the client re-derive the diff it already showed for
+        // approval, without re-fetching a notebook that's now post-update. Never reaches
+        // the model — see toModelOutput below.
+        return { id, name: notebook.name, previous_content: wireNotebook }
       },
+      toModelOutput: ({ output }) => ({
+        type: 'json',
+        value: { id: output.id, name: output.name },
+      }),
     }),
   }
 }

@@ -1,4 +1,5 @@
 import { CubeIcon } from '@heroicons/react/outline'
+import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
 import { Timer } from 'lucide-react'
 
 import type {
@@ -39,7 +40,7 @@ const data: {
     ctas: [
       {
         label: 'Start your project',
-        href: 'https://supabase.com/dashboard',
+        href: DASHBOARD_SIGN_UP_URL,
         type: 'primary' as any,
       },
       {
