@@ -1,25 +1,39 @@
-import { Badge, Card, CardContent } from 'ui'
+import { Badge, Card, CardContent, cn } from 'ui'
 
 import type { OAuthScopeGroup, OAuthScopeLevel } from '@/data/oauth-apps/types'
 
 export interface ScopeGroupCardProps {
   appName: string
   scopeGroups: OAuthScopeGroup[]
+  /** Set to false for a receipt view (e.g. the success screen) that has no intro copy of its own. */
+  showHeading?: boolean
 }
 
-export const ScopeGroupCard = ({ appName, scopeGroups }: ScopeGroupCardProps) => {
+export const ScopeGroupCard = ({
+  appName,
+  scopeGroups,
+  showHeading = true,
+}: ScopeGroupCardProps) => {
   return (
     <section className="flex flex-col">
-      <div>
-        <p className="text-xs font-medium uppercase tracking-wider text-foreground-light">
-          Permissions requested
-        </p>
-        <p className="mt-1 text-xs text-foreground-lighter">
-          Authorizing {appName} grants it the following access permissions to the selected projects.
-        </p>
-      </div>
+      {showHeading && (
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wider text-foreground-light">
+            Permissions requested
+          </p>
+          <p className="mt-1 text-xs text-foreground-lighter">
+            Authorizing {appName} grants it the following access permissions to the selected
+            projects.
+          </p>
+        </div>
+      )}
 
-      <Card className="overflow-hidden shadow-none bg-surface-200/60 border-muted mt-3">
+      <Card
+        className={cn(
+          'overflow-hidden shadow-none bg-surface-200/60 border-muted',
+          showHeading && 'mt-3'
+        )}
+      >
         <CardContent className="border-none p-0">
           <div className="divide-y divide-muted px-4">
             {scopeGroups.map((scopeGroup) => (
