@@ -1,12 +1,11 @@
-import { useState } from 'react'
 import { Badge, Card, CardContent, CardHeader, CardTitle, cn } from 'ui'
 
 import { AnonIcon, AuthenticatedIcon, ServiceRoleIcon } from './Icons'
 import { RoleImpersonationRadio } from './RoleImpersonationRadio'
 import { UserImpersonationSelector } from './UserImpersonationSelector'
+import { useRoleImpersonationSelection } from './useRoleImpersonationSelection'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { DOCS_URL } from '@/lib/constants'
-import { PostgrestRole } from '@/lib/role-impersonation'
 import {
   useRoleImpersonationStateSnapshot,
   type RoleImpersonationController,
@@ -46,12 +45,7 @@ export const RoleImpersonationSelectorInterface = ({
 }: RoleImpersonationSelectorInterfaceProps) => {
   const isVertical = orientation === 'vertical'
 
-  const [selectedOption, setSelectedOption] = useState<PostgrestRole>(() =>
-    state.role?.type === 'postgrest' &&
-    (state.role.role === 'anon' || state.role.role === 'authenticated')
-      ? state.role.role
-      : 'service_role'
-  )
+  const { selectedOption, onSelectedChange } = useRoleImpersonationSelection(state)
 
   const isAuthenticatedOptionFullySelected = Boolean(
     selectedOption === 'authenticated' &&
@@ -60,23 +54,6 @@ export const RoleImpersonationSelectorInterface = ({
     (('user' in state.role && state.role.user) ||
       ('externalAuth' in state.role && state.role.externalAuth)) // Check for either auth type
   )
-
-  function onSelectedChange(value: PostgrestRole) {
-    if (value === 'service_role') {
-      // do not set a role for service role
-      // as the default role is the "service role"
-      state.setRole(undefined)
-    }
-
-    if (value === 'anon') {
-      state.setRole({
-        type: 'postgrest',
-        role: value,
-      })
-    }
-
-    setSelectedOption(value)
-  }
 
   return (
     <Card className="border-none">

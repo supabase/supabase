@@ -1,7 +1,7 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { ChevronDown, User as IconUser, Loader2, Search, X } from 'lucide-react'
+import { ChevronDown, ChevronsUpDown, User as IconUser, Loader2, Search, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -10,18 +10,29 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   DropdownMenuSeparator,
   Input,
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
   Switch,
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
+  ToggleGroup,
+  ToggleGroupItem,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
@@ -39,14 +50,29 @@ import type { ResponseError } from '@/types'
 
 type AuthenticatorAssuranceLevels = 'aal1' | 'aal2'
 
-export const UserImpersonationSelector = ({ state }: { state: RoleImpersonationController }) => {
+export const UserImpersonationSelector = ({
+  state,
+  compact = false,
+  disabled = false,
+}: {
+  state: RoleImpersonationController
+  compact?: boolean
+  disabled?: boolean
+}) => {
   const [searchText, setSearchText] = useState('')
   const [aal, setAal] = useState<AuthenticatorAssuranceLevels>('aal1')
   const [externalUserId, setExternalUserId] = useState('')
   const [additionalClaims, setAdditionalClaims] = useState('')
+  const [isUserComboboxOpen, setIsUserComboboxOpen] = useState(false)
 
   const { id: tableId } = useParams()
-  const [selectedTab, setSelectedTab] = useState<'user' | 'external'>('user')
+  const [selectedTab, setSelectedTab] = useState<'user' | 'external'>(() =>
+    state.role?.type === 'postgrest' &&
+    state.role.role === 'authenticated' &&
+    state.role.userType === 'external'
+      ? 'external'
+      : 'user'
+  )
 
   const [previousSearches, setPreviousSearches] = useLocalStorage<User[]>(
     LOCAL_STORAGE_KEYS.USER_IMPERSONATION_SELECTOR_PREVIOUS_SEARCHES(tableId!),
@@ -184,6 +210,198 @@ export const UserImpersonationSelector = ({ state }: { state: RoleImpersonationC
   // Clear all search history
   function clearSearchHistory() {
     setPreviousSearches([])
+  }
+
+  if (compact) {
+    return (
+      <fieldset
+        disabled={disabled}
+        aria-disabled={disabled}
+        className={cn(
+          'm-0 flex min-w-0 flex-col gap-y-2.5 border-0 p-0 transition-opacity',
+          disabled && 'opacity-40'
+        )}
+      >
+        <FormItemLayout isReactForm={false} layout="horizontal" size="tiny" label="Users">
+          <ToggleGroup
+            type="single"
+            value={selectedTab}
+            onValueChange={(value) => {
+              if (value === 'user' || value === 'external') setSelectedTab(value)
+            }}
+            variant="default"
+            size="tiny"
+            aria-label="User source"
+            className="w-full"
+          >
+            <ToggleGroupItem value="user" className="w-full">
+              Project
+            </ToggleGroupItem>
+            <ToggleGroupItem value="external" className="w-full">
+              External
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </FormItemLayout>
+
+        <FormItemLayout
+          id="run-as-user"
+          isReactForm={false}
+          layout="horizontal"
+          size="tiny"
+          label="User"
+        >
+          {displayName ? (
+            <div className="flex min-w-0 items-center gap-2">
+              <span className="min-w-0 flex-1 truncate text-xs">{displayName}</span>
+              <Button
+                type="button"
+                size="tiny"
+                variant="default"
+                onClick={stopImpersonating}
+                disabled={isImpersonateLoading}
+                loading={isImpersonateLoading}
+              >
+                Stop
+              </Button>
+            </div>
+          ) : selectedTab === 'user' ? (
+            <Popover open={isUserComboboxOpen} onOpenChange={setIsUserComboboxOpen} modal={false}>
+              <PopoverTrigger asChild>
+                <Button
+                  id="run-as-user"
+                  type="button"
+                  size="tiny"
+                  variant="default"
+                  role="combobox"
+                  aria-label="Find user"
+                  aria-expanded={isUserComboboxOpen}
+                  className="w-full justify-between"
+                  iconRight={
+                    <ChevronsUpDown className="shrink-0 text-foreground-muted" size={14} />
+                  }
+                >
+                  Email, name, or ID
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="p-0" side="bottom" align="start" sameWidthAsTrigger>
+                <Command shouldFilter={false}>
+                  <CommandInput
+                    placeholder="Email, name, or ID"
+                    value={searchText}
+                    onValueChange={setSearchText}
+                  />
+                  <CommandList className="max-h-52">
+                    {(isLoading || isSearching) && (
+                      <div className="flex items-center justify-center gap-2 px-3 py-2">
+                        <Loader2 className="animate-spin" size={14} />
+                        <span className="text-xs text-foreground-light">Loading users…</span>
+                      </div>
+                    )}
+
+                    {isError && <AlertError error={error} subject="Failed to retrieve users" />}
+
+                    {isSuccess && !isSearching && users.length === 0 && (
+                      <CommandEmpty>No users found</CommandEmpty>
+                    )}
+
+                    {isSuccess && !isSearching && users.length > 0 && (
+                      <CommandGroup>
+                        {users.map((user) => {
+                          const emailOrPhone = user.email || user.phone
+                          const userDisplayName = getDisplayName(user, '')
+
+                          return (
+                            <CommandItem
+                              key={user.id}
+                              value={user.id}
+                              onSelect={() => {
+                                void impersonateUser(user)
+                                setIsUserComboboxOpen(false)
+                              }}
+                              className="gap-2"
+                            >
+                              <IconUser size={14} className="shrink-0 text-foreground-lighter" />
+                              <span className="min-w-0 flex-1 truncate">
+                                {emailOrPhone || userDisplayName || user.id}
+                              </span>
+                              {userDisplayName && userDisplayName !== emailOrPhone && (
+                                <span className="max-w-24 truncate text-foreground-lighter">
+                                  {userDisplayName}
+                                </span>
+                              )}
+                            </CommandItem>
+                          )
+                        })}
+                      </CommandGroup>
+                    )}
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          ) : (
+            <InputGroup>
+              <InputGroupInput
+                id="run-as-user"
+                size="tiny"
+                placeholder="External user ID"
+                value={externalUserId}
+                onChange={(event) => setExternalUserId(event.target.value)}
+              />
+              <InputGroupAddon align="inline-end">
+                <InputGroupButton
+                  type="button"
+                  size="tiny"
+                  variant="default"
+                  disabled={!externalUserId}
+                  onClick={impersonateExternalUser}
+                >
+                  Apply
+                </InputGroupButton>
+              </InputGroupAddon>
+            </InputGroup>
+          )}
+        </FormItemLayout>
+
+        {selectedTab === 'external' && !displayName && (
+          <FormItemLayout
+            id="run-as-user-claims"
+            isReactForm={false}
+            layout="horizontal"
+            size="tiny"
+            label="Claims"
+          >
+            <Input
+              id="run-as-user-claims"
+              size="tiny"
+              placeholder="Additional claims (JSON)"
+              value={additionalClaims}
+              onChange={(event) => setAdditionalClaims(event.target.value)}
+            />
+          </FormItemLayout>
+        )}
+
+        <FormItemLayout isReactForm={false} layout="horizontal" size="tiny" label="MFA level">
+          <ToggleGroup
+            type="single"
+            value={aal}
+            onValueChange={(value) => {
+              if (value === 'aal1' || value === 'aal2') setAal(value)
+            }}
+            variant="default"
+            size="tiny"
+            aria-label="MFA assurance level"
+            className="w-full"
+          >
+            <ToggleGroupItem value="aal1" className="w-full">
+              AAL1
+            </ToggleGroupItem>
+            <ToggleGroupItem value="aal2" className="w-full">
+              AAL2
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </FormItemLayout>
+      </fieldset>
+    )
   }
 
   return (
