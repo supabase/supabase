@@ -78,6 +78,7 @@ interface AssistantChatProps {
   onBranchChat: (messageId: string) => void
   composerContext?: AssistantChatComposerContext
   renderHeader?: (props: AssistantChatHeaderProps) => ReactNode
+  onInputChange?: (value: string) => void
 }
 
 export const AssistantChat = ({
@@ -89,6 +90,7 @@ export const AssistantChat = ({
   onBranchChat,
   composerContext,
   renderHeader,
+  onInputChange,
 }: AssistantChatProps) => {
   const { id: entityId } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -683,7 +685,10 @@ export const AssistantChat = ({
                     : 'Chat to Postgres...'
             }
             value={value}
-            onValueChange={(e) => setValue(e.target.value)}
+            onValueChange={(e) => {
+              setValue(e.target.value)
+              onInputChange?.(e.target.value)
+            }}
             onSubmit={(finalMessage) => {
               sendMessageToAssistant(finalMessage)
             }}

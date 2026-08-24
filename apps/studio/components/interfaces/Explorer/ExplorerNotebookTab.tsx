@@ -33,6 +33,7 @@ import { toast } from 'sonner'
 import {
   AiIconAnimation,
   Button,
+  Checkbox,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -41,7 +42,9 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import { findMutatingQueryCells } from './ExplorerNotebookTab.utils'
 import {
   ExplorerToolbar,
   ExplorerToolbarAction,
@@ -64,7 +67,11 @@ import {
 import { useUpsertNotebookMutation } from '@/data/content/notebooks/notebook-upsert-mutation'
 import { acceptUntrustedLogsSql } from '@/data/logs/safe-analytics-sql'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
+import {
+  getNotebooksStateSnapshot,
+  useCurrentNotebook,
+  useNotebooksStateSnapshot,
+} from '@/state/notebooks/notebooks-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export const ExplorerNotebookTab = () => {
@@ -86,11 +93,22 @@ export const ExplorerNotebookTab = () => {
 
   const [isRunningNotebook, setIsRunningNotebook] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [pendingMutationCells, setPendingMutationCells] = useState<
+    { id: string; title: string }[] | null
+  >(null)
+  const [skipMutatingCells, setSkipMutatingCells] = useState(false)
   const queryCellRefs = useRef(new Map<string, QueryEditorHandle>())
+  const savedContentRef = useRef<typeof content>(undefined)
 
   const { mutate: updateNotebook, isPending: isUpdating } = useUpsertNotebookMutation({
-    onSuccess: () => toast.success('Successfully saved notebook!'),
+    onSuccess: () => {
+      if (id && content === savedContentRef.current) {
+        snap.markSaved({ id })
+        toast.success('Successfully saved notebook!')
+      }
+    },
   })
+
   const { mutate: deleteNotebook, isPending: isDeleting } = useContentDeleteMutation({
     onSuccess: () => {
       toast.success('Successfully deleted notebook')
@@ -109,7 +127,15 @@ export const ExplorerNotebookTab = () => {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
 
+  const persistNotebookTab = () => {
+    const notebookId = currentNotebook?.notebook.id
+    if (!notebookId) return
+
+    tabs.makeTabPermanent(createTabId('notebook', { id: notebookId }))
+  }
+
   const handleSaveTitle = (titleValue: string) => {
+    persistNotebookTab()
     const trimmedName = titleValue.trim()
     if (id && trimmedName && trimmedName !== name) {
       snap.renameNotebook({ id, name: trimmedName })
@@ -117,20 +143,60 @@ export const ExplorerNotebookTab = () => {
     }
   }
 
-  const handleRunNotebook = async () => {
+  const runNotebook = async ({
+    cellIdsToRun,
+    force = false,
+  }: {
+    cellIdsToRun: string[]
+    force?: boolean
+  }) => {
+    persistNotebookTab()
     setIsRunningNotebook(true)
+
     try {
       await Promise.allSettled(
-        queryCellIds.map((cellId) => queryCellRefs.current.get(cellId)?.run())
+        cellIdsToRun.map((cellId) => queryCellRefs.current.get(cellId)?.run(force))
       )
     } finally {
       setIsRunningNotebook(false)
     }
   }
 
+  const getFreshCells = () => {
+    const freshNotebook = id ? getNotebooksStateSnapshot().notebooks[id] : undefined
+    if (!freshNotebook || freshNotebook.projectRef !== ref) return cells
+    return freshNotebook.notebook.content?.cells ?? []
+  }
+
+  const handleRunNotebook = () => {
+    const freshCells = getFreshCells()
+    const mutatingCells = findMutatingQueryCells({
+      cells: freshCells,
+      getLiveSql: (cellId) => queryCellRefs.current.get(cellId)?.getSql(),
+    })
+    if (mutatingCells.length === 0) {
+      runNotebook({ cellIdsToRun: freshCells.filter(isQueryCell).map((cell) => cell._id) })
+    } else {
+      setSkipMutatingCells(false)
+      setPendingMutationCells(mutatingCells)
+    }
+  }
+
+  const handleConfirmRunNotebook = () => {
+    const mutatingCellIds = new Set((pendingMutationCells ?? []).map((cell) => cell.id))
+    const cellIdsToRun = skipMutatingCells
+      ? queryCellIds.filter((id) => !mutatingCellIds.has(id))
+      : queryCellIds
+
+    setPendingMutationCells(null)
+    runNotebook({ cellIdsToRun, force: true })
+  }
+
   const handleSaveNotebook = () => {
     const notebookId = currentNotebook?.notebook.id
     if (!ref || !notebookId || !name || !content) return
+
+    persistNotebookTab()
 
     const writableContent: WritableNotebook = {
       schema_version: content.schema_version,
@@ -158,6 +224,11 @@ export const ExplorerNotebookTab = () => {
       }),
     }
 
+    // [Joshen] For tracking if a notebook is updated while being saved, so that we do not
+    // incorrectly show the saved toast if it's subsequently then saved once again while
+    // the initial save is midflight
+    savedContentRef.current = content
+
     updateNotebook({
       projectRef: ref,
       id: notebookId,
@@ -173,6 +244,8 @@ export const ExplorerNotebookTab = () => {
   }
 
   const handleDragEnd = (event: DragEndEvent) => {
+    persistNotebookTab()
+
     const { active, over } = event
     if (!id || !over || active.id === over.id) return
 
@@ -180,6 +253,8 @@ export const ExplorerNotebookTab = () => {
   }
 
   const onSelectAddCell = (type: 'markdown' | 'query') => {
+    persistNotebookTab()
+
     const notebookId = currentNotebook?.notebook.id
     if (!notebookId) return
 
@@ -295,13 +370,14 @@ export const ExplorerNotebookTab = () => {
                         <QueryCell
                           key={cell._id}
                           cell={cell}
+                          onEdit={persistNotebookTab}
                           ref={(instance) => {
                             if (instance) queryCellRefs.current.set(cell._id, instance)
                             else queryCellRefs.current.delete(cell._id)
                           }}
                         />
                       ) : (
-                        <MarkdownCell key={cell._id} cell={cell} />
+                        <MarkdownCell key={cell._id} cell={cell} onEdit={persistNotebookTab} />
                       )
                     )}
                   </div>
@@ -343,6 +419,42 @@ export const ExplorerNotebookTab = () => {
         <p className="text-sm">
           This action cannot be undone. Are you sure you want to delete '{name}'?
         </p>
+      </ConfirmationModal>
+
+      <ConfirmationModal
+        size="small"
+        visible={pendingMutationCells !== null}
+        title="Confirm to run notebook"
+        confirmLabel={skipMutatingCells ? 'Run read-only cells' : 'Run all cells'}
+        variant="warning"
+        onCancel={() => setPendingMutationCells(null)}
+        onConfirm={handleConfirmRunNotebook}
+      >
+        <p className="text-sm">
+          This notebook has {pendingMutationCells?.length ?? 0}{' '}
+          {pendingMutationCells?.length === 1 ? 'query' : 'queries'} that{' '}
+          {pendingMutationCells?.length === 1 ? 'modifies' : 'modify'} data or schema and cannot be
+          undone once run:
+        </p>
+        <ul className="text-sm list-disc pl-4 mt-2">
+          {pendingMutationCells?.map((cell) => (
+            <li key={cell.id}>{cell.title}</li>
+          ))}
+        </ul>
+        <FormItemLayout
+          isReactForm={false}
+          layout="flex"
+          id="skipMutatingCells"
+          label="Skip these queries"
+          description="Run only the read-only cells in this notebook"
+          className="mt-4 [&>div:first-child>button]:translate-y-0.5"
+        >
+          <Checkbox
+            id="skipMutatingCells"
+            checked={skipMutatingCells}
+            onCheckedChange={(value) => setSkipMutatingCells(!!value)}
+          />
+        </FormItemLayout>
       </ConfirmationModal>
     </div>
   )
