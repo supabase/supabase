@@ -58,7 +58,7 @@ export const NODE_HEIGHT_FALLBACKS: Record<string, number> = {
 
 // [Joshen] Coordinates from https://github.com/tobilg/aws-edge-locations/blob/main/data/aws-edge-locations.json
 // In the format of [lon, lat]
-export const AWS_REGIONS_COORDINATES: { [key: string]: [number, number] } = {
+export const AWS_REGIONS_COORDINATES: Record<AWS_REGIONS_KEYS, [number, number]> = {
   SOUTHEAST_ASIA: [103.8, 1.37],
   NORTHEAST_ASIA: [139.42, 35.41],
   NORTHEAST_ASIA_2: [126.98, 37.56],
@@ -79,16 +79,14 @@ export const AWS_REGIONS_COORDINATES: { [key: string]: [number, number] } = {
 }
 
 // [Joshen] Just to make sure that we just depend on AWS_REGIONS to determine available
-export const AVAILABLE_REPLICA_REGIONS: Region[] = Object.keys(AWS_REGIONS)
-  .map((key) => {
-    return {
-      key: key as AWS_REGIONS_KEYS,
-      name: AWS_REGIONS?.[key as AWS_REGIONS_KEYS].displayName,
-      region: AWS_REGIONS?.[key as AWS_REGIONS_KEYS].code,
-      coordinates: AWS_REGIONS_COORDINATES[key],
-    }
-  })
-  .filter((x) => x.coordinates !== undefined)
+export const AVAILABLE_REPLICA_REGIONS: Region[] = (
+  Object.keys(AWS_REGIONS) as AWS_REGIONS_KEYS[]
+).map((key) => ({
+  key,
+  name: AWS_REGIONS[key].displayName,
+  region: AWS_REGIONS[key].code,
+  coordinates: AWS_REGIONS_COORDINATES[key],
+}))
 
 // [Joshen] Just a more user friendly language, so that all the verbs are progressive
 export const INIT_PROGRESS = {
