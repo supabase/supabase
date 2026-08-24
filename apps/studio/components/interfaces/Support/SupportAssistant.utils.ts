@@ -1,3 +1,4 @@
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { z } from 'zod'
 
 import type { SubmittedSupportRequest } from './SupportForm.state'
@@ -58,10 +59,18 @@ export function buildSupportAssistantPrompt(request: SubmittedSupportRequest) {
 
 export const ASSISTANT_HANDOFF_QUERY_PARAM = 'assistantHandoff'
 
+// Not typed as z.ZodType<SubmittedSupportRequest>: zod always models "may be undefined"
+// as an optional key, while SubmittedSupportRequest declares organizationSlug/projectRef
+// as required keys whose value may be undefined — a distinction JSON can't carry anyway,
+// since JSON.stringify drops undefined-valued keys entirely.
 const AssistantHandoffSchema = z.object({
   organizationSlug: z.string().optional(),
   projectRef: z.string().optional(),
-  category: z.string(),
+  category: z.union([
+    z.nativeEnum(SupportCategories),
+    z.literal('Plan_upgrade'),
+    z.literal('Others'),
+  ]),
   severity: z.string(),
   subject: z.string(),
   message: z.string(),

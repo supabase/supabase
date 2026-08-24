@@ -9,6 +9,10 @@ import {
 } from '@/components/interfaces/Support/SupportAssistant.utils'
 import type { SubmittedSupportRequest } from '@/components/interfaces/Support/SupportForm.state'
 
+// Every hook this component depends on is mocked directly below (no React Query hooks,
+// no network calls) — this targets the handoff effect's internal logic, not data fetching,
+// so plain `render` is used here rather than `customRender`/`addAPIMock` (same pattern as
+// the neighboring SupportAssistantSuccessCard.test.tsx).
 const {
   chats,
   mockNewChat,
