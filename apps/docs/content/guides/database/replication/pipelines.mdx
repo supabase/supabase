@@ -293,7 +293,7 @@ If your Postgres publication uses `FOR ALL TABLES` or `FOR TABLES IN SCHEMA`, ne
 
 <Admonition type="note">
 
-Don't delete or modify a table managed by Pipelines while it remains in the publication. This can stop replication and require a new initial sync. To remove it permanently, first remove it from the publication and restart the pipeline, or delete the whole destination. See the [Pipelines FAQ](/docs/guides/database/replication/pipelines-faq#what-happens-if-a-table-is-deleted-at-the-destination) for details.
+Don't manually delete or modify a destination table managed by Pipelines. This can stop replication and require a new initial sync. Supported source schema changes are documented below. To permanently remove a destination table, first remove its source table from the publication and restart the pipeline, then delete the destination table. Alternatively, delete the whole destination. See the [Pipelines FAQ](/docs/guides/database/replication/pipelines-faq#what-happens-if-a-table-is-deleted-at-the-destination) for details.
 
 </Admonition>
 
@@ -316,7 +316,7 @@ Pipelines automatically optimizes how changes are delivered to the destination. 
 If you encounter issues during setup:
 
 - **Publication not appearing**: Ensure you created the Postgres publication via SQL and refresh the dashboard
-- **Tables not showing in publication**: Verify your tables meet the requirements of the selected destination. BigQuery and ClickHouse `ReplacingMergeTree` require a source primary key. ClickHouse updates require `REPLICA IDENTITY FULL`; deletes require primary-key or full identity. DuckLake updates and deletes require a primary-key identity, replica-identity index, or full identity. Snowflake requires `REPLICA IDENTITY FULL` when updates are published.
+- **Tables not showing in publication**: Verify your tables meet the requirements of the selected destination. BigQuery and ClickHouse `ReplacingMergeTree` require a source primary key. ClickHouse updates require `REPLICA IDENTITY FULL`; deletes require primary-key or full identity. DuckLake updates and deletes require a primary-key identity, replica-identity index, or full identity. With a primary-key identity or replica-identity index, include every identity column in the publication. Snowflake requires `REPLICA IDENTITY FULL` when updates are published.
 - **Pipeline failed to start**: Check the error message in the status view for specific details
 - **No data being replicated**: Verify your Postgres publication includes the correct tables and event types
 
@@ -326,7 +326,7 @@ For more troubleshooting help, see the [Pipelines FAQ](/docs/guides/database/rep
 
 Pipelines has the following limitations:
 
-- **Row identity**: Requirements are destination-specific. BigQuery and ClickHouse `ReplacingMergeTree` require a source primary key and its published columns. ClickHouse updates require `REPLICA IDENTITY FULL`; deletes require primary-key or full identity. DuckLake insert-only tables don't require a key, but updates and deletes require a primary-key identity, replica-identity index, or full identity. Snowflake insert-only tables don't require a key. Snowflake deletes require a published primary-key or replica-identity index unless full identity is used. Snowflake updates require `REPLICA IDENTITY FULL`.
+- **Row identity**: Requirements are destination-specific. BigQuery and ClickHouse `ReplacingMergeTree` require a source primary key and its published columns. ClickHouse updates require `REPLICA IDENTITY FULL`; deletes require primary-key or full identity. DuckLake insert-only tables don't require a key, but updates and deletes require a primary-key identity, replica-identity index, or full identity. With a primary-key identity or replica-identity index, include every identity column in the publication. Snowflake insert-only tables don't require a key. Snowflake deletes require a published primary-key or replica-identity index unless full identity is used. Snowflake updates require `REPLICA IDENTITY FULL`.
 - **Custom data types**: Custom values replicate as strings. Check that your destination can interpret those string values correctly.
 - **Generated columns**: Generated columns are skipped. Use triggers to store derived values in regular columns if you need them in the destination.
 - **Replica identity**: Updates and deletes need the mode required by the destination. See the [BigQuery](/docs/guides/database/replication/bigquery#source-table-requirements), [ClickHouse](/docs/guides/database/replication/clickhouse#source-table-requirements), [DuckLake](/docs/guides/database/replication/ducklake#source-table-requirements), and [Snowflake](/docs/guides/database/replication/snowflake#source-table-requirements) requirements.

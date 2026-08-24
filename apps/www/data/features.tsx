@@ -659,7 +659,7 @@ BigQuery is currently available. ClickHouse, DuckLake, and Snowflake are in Earl
 Create a Postgres publication for the tables to replicate. In Database > Replication, add a Pipelines destination, configure its settings, and monitor the pipeline from the Dashboard.
 
 ## Requirements
-Requirements depend on the destination. BigQuery and ClickHouse ReplacingMergeTree require source tables to have primary keys and require the publication to include those columns. ClickHouse updates require REPLICA IDENTITY FULL. ClickHouse deletes require primary-key or full identity. DuckLake updates and deletes require a published primary-key identity, replica-identity index, or full identity. Snowflake updates require REPLICA IDENTITY FULL. Snowflake deletes require a published row identity.
+Requirements depend on the destination. BigQuery and ClickHouse ReplacingMergeTree require source tables to have primary keys and require the publication to include those columns. ClickHouse updates require REPLICA IDENTITY FULL. ClickHouse deletes require primary-key or full identity. DuckLake updates and deletes require a primary-key identity, replica-identity index, or full identity. With a primary-key identity or replica-identity index, include every identity column in the publication. Snowflake updates require REPLICA IDENTITY FULL. Snowflake deletes require a published row identity.
 
 ## Pipelines is valuable for:
 - Near real-time analytics data movement
