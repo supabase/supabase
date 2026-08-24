@@ -86,7 +86,7 @@ describe('/project/[ref]/workers', () => {
 
     await renderWorkersPage()
 
-    expect(screen.getByText(/No workers yet/)).toBeVisible()
+    expect(screen.getByText('Deploy your first worker')).toBeVisible()
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
   })
 
