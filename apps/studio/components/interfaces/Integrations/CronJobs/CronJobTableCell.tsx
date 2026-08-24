@@ -1,4 +1,3 @@
-import parser from 'cron-parser'
 import dayjs from 'dayjs'
 import { Copy, Edit, Minus, MoreVertical, Play, Trash } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
@@ -38,41 +37,11 @@ import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { type CronTableColumn } from './CronJobs.constants'
+import { getNextRun } from './CronJobTableCell.utils'
 import { useDatabaseCronJobRunCommandMutation } from '@/data/database-cron-jobs/database-cron-job-run-mutation'
 import { type CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useDatabaseCronJobToggleMutation } from '@/data/database-cron-jobs/database-cron-jobs-toggle-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-
-const getNextRun = (schedule: string, lastRun?: string) => {
-  // cron-parser can only deal with the traditional cron syntax but technically users can also
-  // use strings like "30 seconds" now, For the latter case, we try our best to parse the next run
-  // (can't guarantee as scope is quite big)
-  if (schedule.includes('*') || schedule.includes('$')) {
-    try {
-      // pg_cron uses '$' for "last day of month", but cron-parser uses 'L'
-      // Convert pg_cron syntax to cron-parser syntax before parsing
-      const normalizedSchedule = schedule.replace(/\$/g, 'L')
-      const interval = parser.parseExpression(normalizedSchedule, { tz: 'UTC' })
-      return interval.next().getTime()
-    } catch (error) {
-      return undefined
-    }
-  } else {
-    // [Joshen] Only going to attempt to parse if the schedule is as simple as "n second" or "n seconds"
-    // Returned undefined otherwise - we can revisit this perhaps if we get feedback about this
-    const [value, unit] = schedule.toLocaleLowerCase().split(' ')
-    if (
-      ['second', 'seconds'].includes(unit) &&
-      !Number.isNaN(Number(value)) &&
-      lastRun !== undefined
-    ) {
-      const parsedLastRun = dayjs(lastRun).add(Number(value), unit as dayjs.ManipulateType)
-      return parsedLastRun.valueOf()
-    } else {
-      return undefined
-    }
-  }
-}
 
 interface CronJobTableCellProps {
   col: CronTableColumn
