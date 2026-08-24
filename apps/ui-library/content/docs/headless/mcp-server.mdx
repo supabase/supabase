@@ -28,27 +28,19 @@ The function verifies OAuth tokens, so disable the gateway JWT check:
 verify_jwt = false
 ```
 
-Install the [OAuth Consent block](../nextjs/oauth-consent), then enable OAuth,
-dynamic client registration, and the included token hook:
+Install the [OAuth Consent block](../nextjs/oauth-consent), then enable OAuth and
+dynamic client registration:
 
 ```toml
 [auth.oauth_server]
 enabled = true
 authorization_url_path = "/oauth/consent"
 allow_dynamic_registration = true
-
-[auth.hook.custom_access_token]
-enabled = true
-uri = "pg-functions://postgres/supabase_mcp/custom_access_token_hook"
 ```
 
 Set the Auth **Site URL** to the origin that hosts `/oauth/consent`. Use HTTPS in
 production. Run `supabase config push` or restart the local stack after changing
 `supabase/config.toml`.
-
-The hook adds this function to each OAuth token's audience; without it, requests
-return 401. Supabase runs one custom access-token hook per project, so add the
-MCP audience logic to your existing hook if needed.
 
 Dynamic registration lets any compatible client register. Review clients and
 let users revoke grants, or disable it if you register clients manually.
@@ -64,7 +56,7 @@ The block accepts only OAuth user tokens with:
 
 - a non-empty `client_id`
 - the expected Supabase Auth issuer
-- both `authenticated` and this function's exact URL in `aud`
+- `authenticated` in `aud`
 - a live Auth session for the token's subject
 
 Ordinary user JWTs are rejected. Each tool gets a user-scoped Supabase client.
@@ -139,7 +131,6 @@ without changing the server core. Duplicate toolset names fail at startup.
 ## Deploy
 
 ```bash
-supabase db push
 supabase config push
 supabase functions deploy mcp-server
 ```
