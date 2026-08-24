@@ -104,7 +104,14 @@ export type ExplorerQueryModel =
     } & LogsSourceParameters)
 
 export type QueryEditorHandle = {
-  run: () => Promise<void>
+  /**
+   * `force` skips this query's own blocking-issue check (destructive op, unwhered
+   * update/delete, missing RLS, …) — for a caller that already gathered its own consent
+   * for this run, e.g. the notebook-wide mutation confirmation.
+   */
+  run: (force?: boolean) => Promise<void>
+  /** The editor's live text buffer, ahead of any blur-triggered commit to the store. */
+  getSql: () => string
 }
 
 type QueryEditorProps = {
@@ -345,7 +352,10 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
 
   const Shell = variant === 'viewport' ? ExplorerQueryViewport : ExplorerQuery
 
-  useImperativeHandle(ref, () => ({ run: () => handleRunQuery() }))
+  useImperativeHandle(ref, () => ({
+    run: (force = false) => handleRunQuery({ shouldForce: force }),
+    getSql: () => sqlRef.current,
+  }))
 
   useEffect(() => {
     if (!promptState?.isOpen) return
