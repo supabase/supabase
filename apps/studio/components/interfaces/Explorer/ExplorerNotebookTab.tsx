@@ -87,11 +87,14 @@ export const ExplorerNotebookTab = () => {
   const [isRunningNotebook, setIsRunningNotebook] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const queryCellRefs = useRef(new Map<string, QueryEditorHandle>())
+  const savedContentRef = useRef<typeof content>(undefined)
 
   const { mutate: updateNotebook, isPending: isUpdating } = useUpsertNotebookMutation({
     onSuccess: () => {
-      if (id) snap.markSaved({ id })
-      toast.success('Successfully saved notebook!')
+      if (id && content === savedContentRef.current) {
+        snap.markSaved({ id })
+        toast.success('Successfully saved notebook!')
+      }
     },
   })
 
@@ -172,6 +175,11 @@ export const ExplorerNotebookTab = () => {
         }
       }),
     }
+
+    // [Joshen] For tracking if a notebook is updated while being saved, so that we do not
+    // incorrectly show the saved toast if it's subsequently then saved once again while
+    // the initial save is midflight
+    savedContentRef.current = content
 
     updateNotebook({
       projectRef: ref,

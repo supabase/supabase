@@ -212,4 +212,36 @@ describe('ExplorerNotebookTab', () => {
 
     await waitFor(() => expect(tabsState.tabsMap[tabId]?.isPreview).toBe(false))
   })
+
+  it('does not mark a newer edit as saved when an earlier save resolves after it', async () => {
+    let resolveSave: (() => void) | undefined
+    const savePromise = new Promise<void>((resolve) => {
+      resolveSave = resolve
+    })
+    addAPIMock({
+      method: 'put',
+      path: '/platform/projects/:ref/content',
+      response: async () => {
+        await savePromise
+        return HttpResponse.json({ id: NOTEBOOK_ID })
+      },
+    })
+
+    renderNotebookTab()
+
+    const saveButton = await screen.findByRole('button', { name: 'Save changes' })
+    await userEvent.click(saveButton)
+    await waitFor(() => expect(saveButton).toBeDisabled())
+
+    // Edit the notebook while the save request above is still in flight.
+    notebooksState.insertCellAfter({ id: NOTEBOOK_ID, cell: createMarkdownCellSkeleton() })
+    expect(notebooksState.notebooks[NOTEBOOK_ID]?.status).toBe('unsaved')
+
+    resolveSave?.()
+    await waitFor(() => expect(saveButton).toBeEnabled())
+
+    // The in-flight save only persisted the older content, so the notebook must still be
+    // considered unsaved rather than clobbered back to 'saved' by the stale response.
+    expect(notebooksState.notebooks[NOTEBOOK_ID]?.status).toBe('unsaved')
+  })
 })
