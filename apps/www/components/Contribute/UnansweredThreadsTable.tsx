@@ -434,6 +434,7 @@ function ThreadRow({
                         const isActive = productArea === area
                         return (
                           <button
+                            tabIndex={0}
                             key={area}
                             onClick={(e) => {
                               e.preventDefault()
@@ -488,6 +489,7 @@ function ThreadRow({
                     const isActive = currentStack === tech
                     return (
                       <button
+                        tabIndex={0}
                         key={tech}
                         onClick={(e) => {
                           e.preventDefault()
@@ -510,6 +512,7 @@ function ThreadRow({
                     <Popover>
                       <PopoverTrigger asChild>
                         <button
+                          tabIndex={0}
                           type="button"
                           onClick={(e) => {
                             e.preventDefault()
@@ -541,6 +544,7 @@ function ThreadRow({
                             const isActive = currentStack === tech
                             return (
                               <button
+                                tabIndex={0}
                                 key={tech}
                                 onClick={(e) => {
                                   e.preventDefault()

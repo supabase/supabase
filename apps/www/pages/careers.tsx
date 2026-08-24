@@ -4,7 +4,12 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import career from '~/data/career.json'
 import { breadcrumbs } from '~/lib/breadcrumbs'
-import { filterGenericJob, groupJobsByTeam, JobItemProps, PLACEHOLDER_JOB_ID } from '~/lib/careers'
+import {
+  filterGenericJob,
+  groupJobsByDepartment,
+  JobItemProps,
+  PLACEHOLDER_JOB_ID,
+} from '~/lib/careers'
 import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
 import Styles from '~/styles/career.module.css'
 import { GetServerSideProps } from 'next'
@@ -32,7 +37,7 @@ export const getServerSideProps: GetServerSideProps = (async ({ res }) => {
   const job_res = await fetch('https://api.ashbyhq.com/posting-api/job-board/supabase')
   const job_data = (await job_res.json()) as { jobs: JobItemProps[] }
 
-  const jobs = groupJobsByTeam(job_data.jobs.filter((job) => !filterGenericJob(job)))
+  const jobs = groupJobsByDepartment(job_data.jobs.filter((job) => !filterGenericJob(job)))
   const placeholderJob = job_data.jobs.find(filterGenericJob)
 
   const contributorResponse = await fetch(
@@ -420,11 +425,11 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
               <br /> We’d love to talk to you.
             </p>
             <div className="mt-10 flex flex-col gap-4">
-              {Object.entries(jobs).map(([team, teamJobs]) => (
-                <div key={team}>
-                  <h3 className="text-foreground-lighter text-sm">{team}</h3>
+              {Object.entries(jobs).map(([department, departmentJobs]) => (
+                <div key={department}>
+                  <h3 className="text-foreground-lighter text-sm">{department}</h3>
                   <div className="mt-2 -space-y-px">
-                    {teamJobs
+                    {departmentJobs
                       .filter((job) => !filterGenericJob(job))
                       .map((job) => (
                         <JobItem job={job} key={job.id} />

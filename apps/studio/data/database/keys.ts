@@ -64,6 +64,8 @@ export const databaseKeys = {
   ) => ['projects', projectRef, 'table-index-advisor', schema, table] as const,
   supamonitorEnabled: (projectRef: string | undefined) =>
     ['projects', projectRef, 'supamonitor-enabled'] as const,
+  databaseActivity: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'database-activity'] as const,
 }
 
 export const getLiveTupleEstimateKey = (

@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, RefreshCw } from 'lucide-react'
 import { parseAsJson, useQueryState } from 'nuqs'
@@ -60,6 +60,7 @@ const REPORT_TITLE = 'Edge Functions'
 
 const EdgeFunctionsUsage = () => {
   const { ref } = useParams()
+  const useOtel = useFlag('otelReports')
   const { data: functions } = useEdgeFunctionsQuery({
     projectRef: ref,
   })
@@ -114,6 +115,7 @@ const EdgeFunctionsUsage = () => {
         region: regionFilter ?? [],
         execution_time: executionTimeFilter,
       },
+      useOtel,
     })
   }, [
     ref,
@@ -123,6 +125,7 @@ const EdgeFunctionsUsage = () => {
     statusCodeFilter,
     regionFilter,
     executionTimeFilter,
+    useOtel,
   ])
 
   const onRefreshReport = useRefreshHandler(

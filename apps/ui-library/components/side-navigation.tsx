@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { CommandMenu } from './command-menu'
 import { ThemeSwitcherDropdown } from './theme-switcher-dropdown'
 import NavigationItem from '@/components/side-navigation-item'
-import { aiEditorsRules, componentPages, gettingStarted, platformBlocks } from '@/config/docs'
+import { componentPages, gettingStarted, oauthBlocks, platformBlocks } from '@/config/docs'
 
 function SideNavigation() {
   return (
@@ -61,7 +61,7 @@ function SideNavigation() {
           <ThemeSwitcherDropdown />
         </div>
         <Link href="/" className="mb-4 block">
-          <h1>Supabase UI Library</h1>
+          <h1>Supabase Library</h1>
         </Link>
         {/* <TopNavigationSearch /> */}
         <CommandMenu />
@@ -76,7 +76,7 @@ function SideNavigation() {
       </div>
       <div className="pb-6">
         <div className="font-mono uppercase text-xs text-foreground-lighter/75 mb-2 px-6 tracking-widest">
-          Blocks
+          UI Blocks
         </div>
         <div className="space-y-0.5">
           {/* Render items based on component definitions */}
@@ -88,12 +88,11 @@ function SideNavigation() {
           ))}
         </div>
       </div>
-
-      <div className="pb-6 flex-1">
+      <div className="pb-6">
         <div className="font-mono uppercase text-xs text-foreground-lighter/75 mb-2 px-6 tracking-widest">
-          {aiEditorsRules.title}
+          {oauthBlocks.title}
         </div>
-        {aiEditorsRules.items.map((item, i) => (
+        {oauthBlocks.items.map((item, i) => (
           <NavigationItem item={item} key={`${item.href}-${i}`} />
         ))}
       </div>

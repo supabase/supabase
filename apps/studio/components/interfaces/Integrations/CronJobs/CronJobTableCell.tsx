@@ -21,7 +21,6 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  DialogTrigger,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -147,16 +146,21 @@ export const CronJobTableCell = ({
     return (
       <div className="flex items-center">
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="text"
-              aria-label="More actions"
-              loading={isRunning}
-              className="h-6 w-6"
-              icon={<MoreVertical />}
-              onClick={(e) => e.stopPropagation()}
-            />
-          </DropdownMenuTrigger>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="text"
+                  loading={isRunning}
+                  className="h-6 w-6"
+                  icon={<MoreVertical />}
+                  onClick={(e) => e.stopPropagation()}
+                  aria-label={`${jobname} actions`}
+                />
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">{jobname} actions</TooltipContent>
+          </Tooltip>
           <DropdownMenuContent align="end" className="w-44 space-y-1">
             <Tooltip>
               <TooltipTrigger className="w-full">
@@ -205,46 +209,50 @@ export const CronJobTableCell = ({
 
   if (col.id === 'active') {
     return (
-      <Dialog open={showToggleModal} onOpenChange={setShowToggleModal}>
-        <DialogTrigger asChild onClick={(e) => e.stopPropagation()}>
-          <div className="flex items-center">
-            <Switch
-              id={`cron-job-active-${jobid}`}
-              aria-label={`${active ? 'Disable' : 'Enable'} cron job`}
-              size="medium"
-              disabled={isToggling}
-              checked={active}
-            />
-          </div>
-        </DialogTrigger>
-        <DialogContent
-          onClick={(e) => e.stopPropagation()}
-          dialogOverlayProps={{ onClick: (e) => e.stopPropagation() }}
-        >
-          <DialogHeader>
-            <DialogTitle>{active ? 'Disable' : 'Enable'} cron job</DialogTitle>
-          </DialogHeader>
-          <DialogSectionSeparator />
-          <DialogSection>
-            <p className="text-sm">
-              Are you sure you want to {active ? 'disable' : 'enable'} the cron job "{jobname}
-              "?{' '}
-            </p>
-          </DialogSection>
-          <DialogFooter>
-            <Button variant="default" onClick={() => setShowToggleModal(false)}>
-              Cancel
-            </Button>
-            <Button
-              variant={active ? 'warning' : 'primary'}
-              loading={isToggling}
-              onClick={onConfirmToggle}
-            >
-              {active ? 'Disable' : 'Enable'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <>
+        <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
+          <Switch
+            id={`cron-job-active-${jobid}`}
+            size="medium"
+            disabled={isToggling}
+            checked={active}
+            aria-label="Cron job active status"
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowToggleModal(true)
+            }}
+          />
+        </div>
+        <Dialog open={showToggleModal} onOpenChange={setShowToggleModal}>
+          <DialogContent
+            onClick={(e) => e.stopPropagation()}
+            dialogOverlayProps={{ onClick: (e) => e.stopPropagation() }}
+          >
+            <DialogHeader>
+              <DialogTitle>{active ? 'Disable' : 'Enable'} cron job</DialogTitle>
+            </DialogHeader>
+            <DialogSectionSeparator />
+            <DialogSection>
+              <p className="text-sm">
+                Are you sure you want to {active ? 'disable' : 'enable'} the cron job "{jobname}
+                "?{' '}
+              </p>
+            </DialogSection>
+            <DialogFooter>
+              <Button variant="default" onClick={() => setShowToggleModal(false)}>
+                Cancel
+              </Button>
+              <Button
+                variant={active ? 'warning' : 'primary'}
+                loading={isToggling}
+                onClick={onConfirmToggle}
+              >
+                {active ? 'Disable' : 'Enable'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </>
     )
   }
 

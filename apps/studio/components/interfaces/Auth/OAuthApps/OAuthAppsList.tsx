@@ -24,7 +24,7 @@ import {
   TableHeadSort,
   TableRow,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'

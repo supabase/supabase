@@ -168,7 +168,8 @@ test.describe('Connect Sheet deep linking', async () => {
 
     await expect(page, 'framework param should be in URL initially').toHaveURL(/framework=nextjs/)
 
-    await page.getByRole('button', { name: /ORM/ }).click()
+    const connectSheet = page.getByLabel('Connect to your project')
+    await connectSheet.getByRole('button', { name: /ORM/ }).click()
 
     await expect(page, 'framework param should be cleared after mode change').not.toHaveURL(
       /framework=nextjs/

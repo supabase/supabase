@@ -1,3 +1,4 @@
+import { HotkeySequence } from '@tanstack/react-hotkeys'
 import { TooltipContentProps } from '@ui/components/shadcn/ui/tooltip'
 import { Fragment, useState, type ReactNode } from 'react'
 import { KeyboardShortcut, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -65,15 +66,21 @@ export const ShortcutTooltip = ({
         className="flex items-center gap-2"
       >
         <span>{label}</span>
-        <span className="flex items-center gap-1">
-          {def.sequence.map((step, i) => (
-            <Fragment key={i}>
-              {i > 0 && <span className="text-foreground-lighter text-[11px]">then</span>}
-              <KeyboardShortcut keys={hotkeyToKeys(step)} />
-            </Fragment>
-          ))}
-        </span>
+        <ShortcutPills sequence={def.sequence} />
       </TooltipContent>
     </Tooltip>
+  )
+}
+
+export const ShortcutPills = ({ sequence }: { sequence: HotkeySequence }) => {
+  return (
+    <span className="flex items-center gap-1">
+      {sequence.map((step, i) => (
+        <Fragment key={i}>
+          {i > 0 && <span className="text-foreground-lighter text-[11px]">then</span>}
+          <KeyboardShortcut keys={hotkeyToKeys(step)} />
+        </Fragment>
+      ))}
+    </span>
   )
 }

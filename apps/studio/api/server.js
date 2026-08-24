@@ -14,9 +14,34 @@ const isTanstack = process.env.STUDIO_FRAMEWORK === 'tanstack'
 // .includeFiles` config in vercel.ts.
 const tanstackEntry = ['..', 'dist', 'server', 'server.js'].join('/')
 
-const handler = isTanstack
+// Initialize server-side Sentry BEFORE the handler module is imported, so its
+// instrumentation is in place when route modules evaluate. Gated to TanStack
+// (the Next deploy uses instrumentation.ts / sentry.server.config.ts instead).
+// Vercel functions can't use a `--import` startup flag, so we import the
+// instrument module here at boot. Vercel provides env vars via process.env.
+// A Sentry boot failure must never take the API down — mirror scripts/serve.js
+// and fall back to the identity wrapper if init or the SDK import throws.
+let wrapFetchWithSentry = (fetchHandler) => fetchHandler
+if (isTanstack) {
+  try {
+    await import('../instrument.server.mjs')
+  } catch (err) {
+    console.warn('[api/server] Sentry server init skipped:', err?.message ?? err)
+  }
+  ;({ wrapFetchWithSentry } = await import('@sentry/tanstackstart-react').catch(() => ({
+    wrapFetchWithSentry: (fetchHandler) => fetchHandler,
+  })))
+}
+
+const rawHandler = isTanstack
   ? (await import(tanstackEntry)).default
   : { fetch: () => new Response('Not Found', { status: 404 }) }
+
+// Wrap the fetch handler so request-scoped errors (including those swallowed
+// into a 500 downstream) are captured with request context.
+const handler = isTanstack
+  ? { ...rawHandler, fetch: wrapFetchWithSentry(rawHandler.fetch.bind(rawHandler)) }
+  : rawHandler
 
 // Vercel's Web API handler convention: export an object with `fetch(request)`.
 // TanStack's server build is already shaped that way — default-export it

@@ -150,7 +150,7 @@
   @apply text-typography-body-light [[data-theme*=dark]_&]:text-typography-body-dark;
 }
 .rdg-header-row .rdg-checkbox {
-  @apply bg-surface-200 border-default rounded-xs border;
+  @apply bg-200 border-default rounded-xs border;
 }
 .rdg-header-row .rdg-checkbox-input:checked + .rdg-checkbox {
   @apply border-default border-4 bg-green-900;
@@ -171,7 +171,7 @@
 
 .rdg-row {
   @apply bg-dash-sidebar transition-colors;
-  @apply hover:bg-surface-200;
+  @apply hover:bg-200;
 }
 
 /* edit button */
@@ -188,7 +188,7 @@
 
 /* select row */
 .rdg-row[aria-selected='true'] {
-  @apply bg-surface-200;
+  @apply bg-200;
 }
 
 .tab-cursor {

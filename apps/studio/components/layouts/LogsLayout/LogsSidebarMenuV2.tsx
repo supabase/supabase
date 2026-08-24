@@ -24,6 +24,7 @@ import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
+import { useShowPostgresUpgradeLogs } from '@/hooks/misc/useShowPostgresUpgradeLogs'
 
 export function SidebarCollapsible({
   children,
@@ -87,6 +88,7 @@ export function LogsSidebarMenuV2() {
 
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
   const showMultigresLogs = useShowMultigresLogs()
+  const showPostgresUpgradeLogs = useShowPostgresUpgradeLogs()
 
   const { data: savedQueriesRes, isPending: savedQueriesLoading } = useContentQuery({
     projectRef: ref,
@@ -190,16 +192,17 @@ export function LogsSidebarMenuV2() {
       : null,
   ].filter((x) => x !== null)
 
-  const OPERATIONAL_COLLECTIONS = IS_PLATFORM
-    ? [
-        {
-          name: 'Postgres Version Upgrade',
-          key: 'pg-upgrade-logs',
-          url: `/project/${ref}/logs/pg-upgrade-logs`,
-          items: [],
-        },
-      ]
-    : []
+  const OPERATIONAL_COLLECTIONS =
+    IS_PLATFORM && showPostgresUpgradeLogs
+      ? [
+          {
+            name: 'Postgres Version Upgrade',
+            key: 'pg-upgrade-logs',
+            url: `/project/${ref}/logs/pg-upgrade-logs`,
+            items: [],
+          },
+        ]
+      : []
 
   const filteredLogs = BASE_COLLECTIONS.filter((collection) => {
     return collection?.name.toLowerCase().includes(searchText.toLowerCase())

@@ -60,10 +60,11 @@ const ColorPalette = () => {
                 const isCopied = copied === reference
                 return (
                   <button
+                    tabIndex={0}
                     key={step * 100}
                     type="button"
                     onClick={() => handleCopy(reference)}
-                    className="group relative flex aspect-square w-full items-center justify-center rounded-sm border border-overlay/40 transition hover:scale-[1.05] focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground"
+                    className="group relative flex aspect-square w-full items-center justify-center rounded-sm border border-overlay/40 transition-transform hover:scale-[1.05] focus-ring"
                     style={{ backgroundColor: reference }}
                     title={reference}
                   >

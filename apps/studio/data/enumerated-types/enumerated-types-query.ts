@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { executeSql } from '../sql/execute-sql-mutation'
 import { enumeratedTypesKeys } from './keys'
 import type { components } from '@/data/api'
+import { isScopedIntrospection, scopedIntrospectionReady } from '@/data/scoped-introspection'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type EnumeratedTypesVariables = {
@@ -20,7 +21,9 @@ export async function getEnumeratedTypes(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { sql } = pgMeta.types.list({ includedSchemas: schemas })
+  // Cold-load race guard -- see the module comment on scoped-introspection.ts.
+  await scopedIntrospectionReady()
+  const { sql } = pgMeta.types.list({ includedSchemas: schemas, scoped: isScopedIntrospection() })
   const { result } = await executeSql(
     {
       projectRef,

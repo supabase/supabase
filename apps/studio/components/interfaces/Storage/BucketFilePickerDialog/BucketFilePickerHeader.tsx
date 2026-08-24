@@ -97,6 +97,7 @@ const HeaderBreadcrumbs = ({
             ) : (
               <button
                 type="button"
+                tabIndex={0}
                 className="max-w-24 truncate border-0 bg-transparent p-0 text-left text-sm text-foreground-lighter transition-colors hover:text-foreground focus-visible:text-foreground"
                 onClick={() => selectBreadcrumb(crumb.index)}
               >

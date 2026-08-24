@@ -1,7 +1,8 @@
 import { useBreakpoint, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
-import { ResizablePanel, ResizablePanelGroup, SidebarProvider } from 'ui'
+import { ResizablePanel, ResizablePanelGroup, SidebarProvider, usePanelRef } from 'ui'
+import { SkipToContent } from 'ui-patterns/SkipToContent'
 
 import { BannerStack } from '../ui/BannerStack/BannerStack'
 import { LayoutHeader } from './Navigation/LayoutHeader/LayoutHeader'
@@ -9,14 +10,19 @@ import MobileNavigationBar from './Navigation/NavigationBar/MobileNavigationBar'
 import { MobileSheetProvider } from './Navigation/NavigationBar/MobileSheetContext'
 import { StudioMobileSheetNav } from './Navigation/NavigationBar/StudioMobileSheetNav'
 import { LayoutSidebar } from './ProjectLayout/LayoutSidebar'
-import { LayoutSidebarProvider } from './ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import {
+  LayoutSidebarProvider,
+  SIDEBAR_KEYS,
+} from './ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 import { AppBannerWrapper } from '@/components/interfaces/App/AppBannerWrapper'
 import { Sidebar } from '@/components/interfaces/Sidebar'
+import { useSyncScopedIntrospection } from '@/data/scoped-introspection'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useCheckLatestDeploy } from '@/hooks/use-check-latest-deploy'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useAppStateSnapshot } from '@/state/app-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export interface DefaultLayoutProps {
   headerTitle?: string
@@ -38,11 +44,18 @@ export const DefaultLayout = ({
   headerTitle,
   hideMobileMenu,
 }: PropsWithChildren<DefaultLayoutProps>) => {
+  useSyncScopedIntrospection()
+  useCheckLatestDeploy()
+
   const { ref } = useParams()
   const router = useRouter()
+  const panelRef = usePanelRef()
+  const isMobile = useBreakpoint('md')
   const appSnap = useAppStateSnapshot()
-
+  const { isMaximised, activeSidebar } = useSidebarManagerSnapshot()
   const { lastVisitedOrganization } = useLastVisitedOrganization()
+
+  const [isMounted, setIsMounted] = useState(false)
 
   const backToDashboardURL = router.pathname.startsWith('/account')
     ? appSnap.lastRouteBeforeVisitingAccountPage.length > 0
@@ -54,18 +67,21 @@ export const DefaultLayout = ({
           : '/project/default'
     : undefined
 
-  useCheckLatestDeploy()
-
-  const isMobile = useBreakpoint('md')
-
   const contentMinSizePercentage = 50
   const contentMaxSizePercentage = 70
-
-  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
     setIsMounted(true)
   }, [])
+
+  useEffect(() => {
+    if (!isMounted || !panelRef.current || !activeSidebar || isMobile) return
+    if (isMaximised) {
+      panelRef.current.collapse()
+    } else {
+      panelRef.current.resize(`${contentMaxSizePercentage}%`)
+    }
+  }, [isMounted, isMaximised, panelRef, activeSidebar, isMobile])
 
   // This is required to prevent layout shift when rendering resizable panels (they initially render at 50%, then shift
   // to whatever is specified).
@@ -79,9 +95,7 @@ export const DefaultLayout = ({
         <ProjectContextProvider projectRef={ref}>
           <MobileSheetProvider>
             <div className="flex flex-col h-screen w-screen">
-              <a className="sr-only" href="#main" tabIndex={0}>
-                Skip to content
-              </a>
+              <SkipToContent href="#main" />
               {/* Top Banner */}
               <AppBannerWrapper />
               <div className="shrink-0">
@@ -106,17 +120,19 @@ export const DefaultLayout = ({
                   <ResizablePanel
                     id="panel-content"
                     className="w-full"
+                    panelRef={panelRef}
+                    collapsible={activeSidebar?.id === SIDEBAR_KEYS.AI_ASSISTANT}
                     minSize={`${contentMinSizePercentage}`}
                     maxSize={`${contentMaxSizePercentage}`}
                     defaultSize={`${contentMaxSizePercentage}`}
                   >
-                    <main id="main" className="h-full overflow-y-auto">
+                    <main id="main" tabIndex={-1} className="h-full overflow-y-auto outline-hidden">
                       {children}
                     </main>
                   </ResizablePanel>
                   <LayoutSidebar
                     minSize={`${100 - contentMaxSizePercentage}`}
-                    maxSize={`${100 - contentMinSizePercentage}`}
+                    maxSize="100"
                     defaultSize={`${100 - contentMaxSizePercentage}`}
                   />
                 </ResizablePanelGroup>

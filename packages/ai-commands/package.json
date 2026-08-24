@@ -7,7 +7,7 @@
   "sideEffects": false,
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "clean": "rimraf node_modules",
+    "clean": "rimraf .turbo tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
     "test": "vitest"
   },

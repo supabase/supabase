@@ -2,7 +2,7 @@ import type { UseFormReturn } from 'react-hook-form'
 // End of third-party imports
 
 import { FormControl, FormField, TextArea } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { IPV4SuggestionAlert } from './IPV4SuggestionAlert'

@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { OrganizationInviteByToken } from '@/data/organization-members/organization-invitation-token-query'
 import { useSignOut } from '@/lib/auth'

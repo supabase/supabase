@@ -1,7 +1,7 @@
 import { components } from 'api-types'
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import apiWrapper from '@/lib/api/apiWrapper'
+import { apiWrapper } from '@/lib/api/apiWrapper'
 import { DEFAULT_EXPOSED_SCHEMAS } from '@/lib/api/self-hosted/constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)

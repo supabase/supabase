@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 import type { PGTable } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -51,6 +51,7 @@ import { lintKeys } from '@/data/lint/keys'
 import { privilegeKeys } from '@/data/privileges/keys'
 import { useTableApiAccessPrivilegesMutation } from '@/data/privileges/table-api-access-mutation'
 import { tableEditorKeys } from '@/data/table-editor/keys'
+import { PG_META_SCOPED_INTROSPECTION_FLAG } from '@/data/table-editor/table-editor-query'
 import { isTableLike, type Entity } from '@/data/table-editor/table-editor-types'
 import { tableRowKeys } from '@/data/table-rows/keys'
 import { tableKeys } from '@/data/tables/keys'
@@ -193,6 +194,7 @@ export const SidePanelEditor = ({
   const { data: project } = useSelectedProjectQuery()
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const { updateRow, addRow, isEditPending } = useTableRowOperations()
+  const scoped = !!useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
   const csvImportKey = useVisibleKey(snap.sidePanel?.type === 'csv-import')
@@ -441,6 +443,11 @@ export const SidePanelEditor = ({
         queryClient.invalidateQueries({
           queryKey: tableKeys.infiniteListPrefix(project?.ref, selectedTable?.schema),
         }),
+        // useTableQuery (FK selectors/formatters) has a 5min staleTime -- without this,
+        // an edited column can serve stale data to any FK target cell pointing at this table.
+        queryClient.invalidateQueries({
+          queryKey: tableKeys.retrieve(project?.ref, selectedTable?.name, selectedTable?.schema),
+        }),
       ])
 
       // We need to invalidate tableRowsAndCount after tableEditor
@@ -677,6 +684,7 @@ export const SidePanelEditor = ({
                 isRLSEnabled,
                 importContent,
                 track,
+                scoped,
               })
 
               createTableSpan.setAttribute('table.created', 1)
@@ -785,6 +793,7 @@ export const SidePanelEditor = ({
           existingForeignKeyRelations,
           primaryKey,
           track,
+          scoped,
         })
 
         if (table === undefined) {

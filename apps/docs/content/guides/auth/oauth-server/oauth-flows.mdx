@@ -158,7 +158,7 @@ https://<project-ref>.supabase.co/auth/v1/oauth/authorize?
 | `client_id`             | The client ID from registration              |
 | `redirect_uri`          | Must exactly match a registered redirect URI |
 | `code_challenge`        | The generated code challenge                 |
-| `code_challenge_method` | Must be `S256` (SHA-256)                     |
+| `code_challenge_method` | `S256` (SHA-256, recommended) or `plain`     |
 
 #### Optional parameters
 
@@ -645,7 +645,7 @@ This enables automatic integration with OIDC-compliant libraries and tools.
 
 Third-party clients should validate access tokens to ensure they're authentic and not tampered with.
 
-<Admonition type="tip">
+<Admonition type="note">
 
 **Recommended: Use asymmetric JWT signing keys**
 
@@ -841,7 +841,7 @@ After revoking access:
 - All refresh tokens for that client are deleted
 - The user will need to re-authorize the application to grant access again
 
-<Admonition type="tip">
+<Admonition type="note">
 
 **Build a settings page for your users**
 
@@ -849,7 +849,7 @@ It's a good practice to provide a settings page where users can view all authori
 
 </Admonition>
 
-For complete API reference, see the [OAuth methods in supabase-js](/docs/reference/javascript/auth-oauth).
+For complete API reference, see the [OAuth methods in supabase-js](/docs/reference/javascript/auth-admin-oauth-server).
 
 ## Next steps
 

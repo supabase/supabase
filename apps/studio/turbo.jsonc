@@ -82,6 +82,7 @@
         "SENTRY_ORG",
         "SENTRY_PROJECT",
         "SENTRY_AUTH_TOKEN",
+        "SKIP_ASSET_UPLOAD",
         "NEXT_PUBLIC_SENTRY_DSN",
         "AWS_BEDROCK_PROFILE",
         "AWS_BEDROCK_ROLE_ARN",

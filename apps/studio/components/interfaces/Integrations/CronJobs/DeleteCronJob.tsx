@@ -32,7 +32,7 @@ export const DeleteCronJob = () => {
   } = useDatabaseCronJobDeleteMutation({
     onSuccess: () => {
       if (cronJob && project) {
-        const { type } = parseCronJobCommand(cronJob.command, project.ref)
+        const { type } = parseCronJobCommand(cronJob.command, project.ref, project.restUrl)
         track('cron_job_removed', { type })
       }
       toast.success(`Successfully removed cron job`)

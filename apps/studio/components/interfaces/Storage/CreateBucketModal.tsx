@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -24,7 +24,7 @@ import {
   SelectValue,
   Switch,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
@@ -108,8 +108,8 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
     },
   })
   const { formatted_size_limit: formattedSizeLimitError } = form.formState.errors
-  const isPublicBucket = form.watch('public')
-  const hasFileSizeLimit = form.watch('has_file_size_limit')
+  const isPublicBucket = useWatch({ control: form.control, name: 'public' })
+  const hasFileSizeLimit = useWatch({ control: form.control, name: 'has_file_size_limit' })
 
   const onSubmit: SubmitHandler<CreateBucketForm> = async (values) => {
     if (!ref) return console.error('Project ref is required')

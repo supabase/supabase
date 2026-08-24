@@ -28,6 +28,12 @@ export type SlotLagMetricKey =
   | 'reply_time_lag'
 
 export type TableState = {
+  id: number
+  schema: string
+  name: string
+  // Deprecated compatibility aliases for `id` and `schema`.`name`. Prefer the
+  // structured fields above; the API keeps these only until platform and
+  // etl-api remove them in a follow-up release.
   table_id: number
   table_name: string
   state:

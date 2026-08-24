@@ -37,10 +37,6 @@ export const TerminalInstructions = forwardRef<
 
   const apiKey = publishableKey?.api_key ?? anonKey?.api_key ?? '[YOUR ANON KEY]'
 
-  // get the .co or .net TLD from the restUrl
-  const restUrl = `https://${endpoint}`
-  const restUrlTld = !!endpoint ? new URL(restUrl).hostname.split('.').pop() : 'co'
-
   const commands: Commands[] = [
     {
       command: 'supabase functions new hello-world',
@@ -68,7 +64,7 @@ export const TerminalInstructions = forwardRef<
       comment: 'Deploy your function',
     },
     {
-      command: `curl -L -X POST 'https://${projectRef}.supabase.${restUrlTld}/functions/v1/hello-world' -H 'Authorization: Bearer ${apiKey}'${anonKey?.type === 'publishable' ? ` -H 'apikey: ${apiKey}'` : ''} --data '{"name":"Functions"}'`,
+      command: `curl -L -X POST '${functionsEndpoint}/hello-world' -H 'Authorization: Bearer ${apiKey}'${anonKey?.type === 'publishable' ? ` -H 'apikey: ${apiKey}'` : ''} --data '{"name":"Functions"}'`,
       description: 'Invokes the hello-world function',
       jsx: () => {
         return (

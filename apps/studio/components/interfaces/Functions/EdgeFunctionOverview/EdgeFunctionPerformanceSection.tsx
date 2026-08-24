@@ -91,7 +91,6 @@ export const EdgeFunctionPerformanceSection = ({
                   },
                 ]}
                 yAxisProps={{
-                  width: 64,
                   tickFormatter: (value: number) => `${Math.round(value)}ms`,
                 }}
               />

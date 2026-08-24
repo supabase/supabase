@@ -1,6 +1,6 @@
 import type { BlockContent, Content, Paragraph, Root } from 'mdast'
 import type { MdxJsxFlowElement } from 'mdast-util-mdx'
-import type { AdmonitionProps } from 'ui-patterns/admonition'
+import type { AdmonitionProps } from 'ui-patterns/Admonition'
 import type { Node } from 'unist'
 import { visit } from 'unist-util-visit'
 
@@ -116,9 +116,8 @@ function mapAdmonitionType(type: string): AdmonitionProps['type'] {
     case 'quote':
     case 'example':
     case 'note':
-      return 'note'
     case 'tip':
-      return 'tip'
+      return 'note'
     case 'warning':
       return 'caution'
     case 'failure':

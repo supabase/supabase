@@ -19,6 +19,7 @@ import {
 import { useMediaQuery } from '../hooks/useMediaQuery'
 import { Kbd } from '../primitives/Kbd'
 import { DataTableFilterControls } from './DataTableFilterControls'
+import { UserLogFilterControl } from '@/components/interfaces/UnifiedLogs/components/UserLogFilterControl'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -63,7 +64,7 @@ export function DataTableFilterControlsDrawer() {
           </DrawerHeader>
         </VisuallyHidden.VisuallyHidden>
         <div className="px-4 flex-1 overflow-y-auto">
-          <DataTableFilterControls />
+          <DataTableFilterControls itemsAfter={{ level: <UserLogFilterControl /> }} />
         </div>
         <DrawerFooter>
           <DrawerClose asChild>
