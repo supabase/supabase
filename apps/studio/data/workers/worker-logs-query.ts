@@ -6,8 +6,9 @@ import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
 import { analyticsLiteral, safeSql } from '@/data/logs/safe-analytics-sql'
 import { IS_PLATFORM } from '@/lib/constants'
 
-// The workers team emits three streams, each exposed as its own `source` on the
-// ClickHouse logs endpoint (O11Y-2360).
+// The three streams the logs endpoint maps `workers_product.logs` onto, keyed by
+// its `metadata.source` attribute. `builds` is exposed as `worker_api_logs` even
+// though the underlying attribute reads `worker_api_events`.
 export const WORKER_LOG_SOURCES = {
   requests: 'worker_ingress_logs',
   output: 'worker_guest_logs',
@@ -22,9 +23,9 @@ export const WORKER_LOG_STREAM_LABEL: Record<WorkerLogStream, string> = {
   builds: 'Builds',
 }
 
-// Which attribute carries the worker name is not confirmed yet — no project has
-// emitted a worker log to read it from. Everything else here is stream-agnostic,
-// so a correction is one string.
+// Which attribute carries the worker name is not confirmed: no `workers_product.logs`
+// row has reached the endpoint tagged with a project ref, so there was none to read
+// it from. Everything else here is stream-agnostic, so a correction is one string.
 const WORKER_NAME_KEY = 'worker_name'
 
 const LOOKBACK_HOURS = 24
