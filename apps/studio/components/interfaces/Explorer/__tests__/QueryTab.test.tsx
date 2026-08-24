@@ -69,13 +69,14 @@ const createDraft = (
     | {
         _tag: 'logs'
         time_range: { _tag: 'relative_time_range'; amount: number; unit: 'hour' }
-      }
+      },
+  sql: string = 'select 1'
 ) => {
   explorerQueryState.removeDraft({ id: 'query-test', projectRef: 'default' })
   explorerQueryState.createDraft({
     id: 'query-test',
     projectRef: 'default',
-    sql: 'select 1',
+    sql,
     source,
   })
 }
@@ -237,5 +238,85 @@ describe('QueryTab execution', () => {
     await userEvent.type(sqlEditor, ' where true')
 
     await waitFor(() => expect(tabsState.tabsMap[tabId]?.isPreview).toBe(false))
+  })
+
+  it('blocks a destructive query behind a confirmation modal, then runs it once confirmed', async () => {
+    createDraft({ _tag: 'database' }, 'delete from foo')
+    const executedQueries: string[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: async ({ request }) => {
+        const { query } = (await request.json()) as { query: string }
+        if (query.trim().toLowerCase().startsWith('delete')) executedQueries.push(query)
+        return HttpResponse.json([])
+      },
+    })
+
+    renderQueryTab()
+    const runButton = await screen.findByRole('button', { name: 'Run' })
+    await waitFor(() => expect(runButton).toBeEnabled())
+    await userEvent.click(runButton)
+
+    expect(await screen.findByText('Potential issue detected')).toBeInTheDocument()
+    expect(executedQueries).toHaveLength(0)
+
+    await userEvent.click(screen.getByRole('button', { name: 'Run query' }))
+
+    await waitFor(() => expect(executedQueries).toHaveLength(1))
+  })
+
+  it('cancels a blocked query without running it', async () => {
+    createDraft({ _tag: 'database' }, 'update foo set bar = 1')
+    const executedQueries: string[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: async ({ request }) => {
+        const { query } = (await request.json()) as { query: string }
+        if (query.trim().toLowerCase().startsWith('update')) executedQueries.push(query)
+        return HttpResponse.json([])
+      },
+    })
+
+    renderQueryTab()
+    const runButton = await screen.findByRole('button', { name: 'Run' })
+    await waitFor(() => expect(runButton).toBeEnabled())
+    await userEvent.click(runButton)
+
+    expect(await screen.findByText('Potential issue detected')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    expect(screen.queryByText('Potential issue detected')).not.toBeInTheDocument()
+    expect(executedQueries).toHaveLength(0)
+  })
+
+  it('runs a CREATE TABLE query with RLS enabled once "Run and enable RLS" is chosen', async () => {
+    createDraft({ _tag: 'database' }, 'create table foo (id int)')
+    const executedQueries: string[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: async ({ request }) => {
+        const { query } = (await request.json()) as { query: string }
+        if (query.trim().toLowerCase().startsWith('create table')) executedQueries.push(query)
+        return HttpResponse.json([])
+      },
+    })
+
+    renderQueryTab()
+    const runButton = await screen.findByRole('button', { name: 'Run' })
+    await waitFor(() => expect(runButton).toBeEnabled())
+    await userEvent.click(runButton)
+
+    expect(await screen.findByText('Potential issue detected')).toBeInTheDocument()
+    expect(executedQueries).toHaveLength(0)
+
+    await userEvent.click(screen.getByRole('button', { name: 'Run and enable RLS' }))
+
+    await waitFor(() => expect(executedQueries).toHaveLength(1))
+    expect(executedQueries[0]).toContain('create table foo (id int)')
+    expect(executedQueries[0]).toContain('ALTER TABLE foo ENABLE ROW LEVEL SECURITY;')
   })
 })
