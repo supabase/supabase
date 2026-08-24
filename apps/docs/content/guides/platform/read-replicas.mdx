@@ -152,7 +152,7 @@ When a Read Replica is deployed, it emits logs from the following services:
 - [PostgREST](/dashboard/project/_/logs/postgrest-logs)
 - [Supavisor](/dashboard/project/_/logs/pooler-logs)
 
-Views on [Log Explorer](/docs/guides/monitoring-and-debugging/logs) are automatically filtered by databases, with the logs of the Primary database displayed by default. Viewing logs from other databases can be toggled with the `Source` button found on the upper-right part section of the Logs Explorer page.
+Single-service [log collections](/docs/guides/monitoring-and-debugging/logs#single-service-collections) filter by database, with the Primary database displayed by default. Switch databases with the **Source** control.
 
 For API logs, logs can originate from the API Load Balancer as well. The upstream database or the one that eventually handles the request can be found under the `Redirect Identifier` field. This is equivalent to `metadata.load_balancer_redirect_identifier` when querying the underlying logs.
 
