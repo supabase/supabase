@@ -1,3 +1,5 @@
+export { AuthorizeSuccessScreen } from './AuthorizeSuccessScreen'
+export type { AuthorizeSuccessScreenProps } from './AuthorizeSuccessScreen'
 export { AuthorizingAsCard } from './AuthorizingAsCard'
 export type { AuthorizingAsCardProps } from './AuthorizingAsCard'
 export { OAuthAppsAuthorizeScreen } from './OAuthAppsAuthorizeScreen'
