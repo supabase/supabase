@@ -1,2 +1,8 @@
+export { AuthorizingAsCard } from './AuthorizingAsCard'
+export type { AuthorizingAsCardProps } from './AuthorizingAsCard'
+export { NoProjectsNotice } from './NoProjectsNotice'
+export type { NoProjectsNoticeProps } from './NoProjectsNotice'
+export { ProjectMultiSelect } from './ProjectMultiSelect'
+export type { ProjectMultiSelectProps } from './ProjectMultiSelect'
 export { ScopeGroupCard } from './ScopeGroupCard'
 export type { ScopeGroupCardProps } from './ScopeGroupCard'
