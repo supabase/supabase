@@ -81,8 +81,13 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
     updateQueryCell((candidate) => ({ ...cloneQueryCell(candidate), title: nextTitle }))
   }
 
-  const handleSqlCommit = (value: string) =>
+  // Running a cell re-commits its current SQL (see QueryEditor's handleRunQuery) even when
+  // nothing changed — skip the store write so that doesn't spuriously mark the notebook
+  // unsaved.
+  const handleSqlCommit = (value: string) => {
+    if (value === cell.unchecked_sql) return
     updateQueryCell((candidate) => setCellSql(candidate, value))
+  }
 
   const handleDisplayChange = (display: QueryDisplay) =>
     updateQueryCell((candidate) => ({
