@@ -31,9 +31,7 @@ test.describe('docs dev runs locally without credentials', () => {
     const response = await page.goto('/docs/guides/monitoring-and-debugging/advisors')
     expect(response?.ok(), `expected 200, got ${response?.status()}`).toBeTruthy()
 
-    await expect(
-      page.getByRole('heading', { name: 'Advisors' })
-    ).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Advisors' })).toBeVisible()
   })
 
   test('a troubleshooting article page renders without Supabase credentials', async ({ page }) => {

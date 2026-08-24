@@ -202,7 +202,8 @@ export const lintInfoMap: LintInfo[] = [
     name: 'materialized_view_in_api',
     title: 'Materialized View in API',
     icon: <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />,
-    link: () => `${DOCS_URL}/guides/monitoring-and-debugging/advisors?lint=0016_materialized_view_in_api`,
+    link: () =>
+      `${DOCS_URL}/guides/monitoring-and-debugging/advisors?lint=0016_materialized_view_in_api`,
     linkText: 'View docs',
     docsLink: `${DOCS_URL}/guides/monitoring-and-debugging/advisors?lint=0016_materialized_view_in_api`,
     category: 'security',
