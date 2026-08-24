@@ -313,7 +313,7 @@ using ( (select auth.uid()) = user_id );
 
 #### Policy tests
 
-When you adapt those four policies to a table, add this file for that table. The path is `supabase/tests/<table>_rls.test.sql`. For a table users share, also assert that a member who is not the owner can read and write, and that a non-member cannot.
+When you adapt those four policies to a table, add this file for that table. The path is `supabase/tests/<table>_rls.test.sql`. For a table users share, also assert that a member who is not the owner can perform the operations its policies allow, and that a non-member cannot.
 
 ```sql supabase/tests/profiles_rls.test.sql
 -- File: supabase/tests/profiles_rls.test.sql
