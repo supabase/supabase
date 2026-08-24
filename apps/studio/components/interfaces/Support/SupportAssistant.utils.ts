@@ -109,7 +109,12 @@ export function consumeAssistantHandoff(token: string): SubmittedSupportRequest 
   } catch {
     return null
   } finally {
-    sessionStorage.removeItem(key)
+    try {
+      sessionStorage.removeItem(key)
+    } catch {
+      // Best-effort cleanup — a failure here shouldn't override the value (or null)
+      // already produced above.
+    }
   }
 }
 

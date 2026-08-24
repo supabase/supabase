@@ -1,5 +1,5 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   buildSupportAssistantPrompt,
@@ -114,5 +114,17 @@ describe('SupportAssistant utils', () => {
       JSON.stringify({ ...supportRequest, allowSupportAccess: 'yes' })
     )
     expect(consumeAssistantHandoff('token-2')).toBeNull()
+  })
+
+  it('still returns the parsed value when cleanup (removeItem) throws', () => {
+    storeAssistantHandoff('token-1', supportRequest)
+
+    const removeItemSpy = vi.spyOn(Storage.prototype, 'removeItem').mockImplementation(() => {
+      throw new Error('storage unavailable')
+    })
+
+    expect(consumeAssistantHandoff('token-1')).toEqual(supportRequest)
+
+    removeItemSpy.mockRestore()
   })
 })
