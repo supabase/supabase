@@ -1,11 +1,16 @@
 import type { UIMessage as MessageType } from '@ai-sdk/react'
 import { useParams } from 'common/hooks'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useEffect, useEffectEvent } from 'react'
 
 import { AIAssistantHeader } from './AIAssistantHeader'
 import { AssistantChat } from './AssistantChat'
 import { resolveSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
+import {
+  ASSISTANT_HANDOFF_QUERY_PARAM,
+  buildSupportAssistantPrompt,
+  decodeAssistantHandoff,
+} from '@/components/interfaces/Support/SupportAssistant.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useAiAssistantState, useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import type { SqlSnippet } from '@/state/ai-assistant-state'
@@ -48,6 +53,59 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const openSnippetSource = isInSQLEditor
     ? resolveSnippetSource(snippet?.snippet, sourceParam)
     : undefined
+
+  const processAssistantHandoff = useEffectEvent((handoffParam: string) => {
+    const request = decodeAssistantHandoff(handoffParam)
+    if (!request) return
+
+    const newChatId = state.newChat({
+      name: 'Support request',
+      initialMessage: buildSupportAssistantPrompt(request),
+    })
+
+    const chat = state.chats[newChatId]
+    if (chat) {
+      chat.supportMetadata = {
+        subject: request.subject,
+        category: request.category,
+        severity: request.severity,
+        organizationSlug: request.organizationSlug,
+        projectRef: request.projectRef,
+        library: request.library,
+        affectedServices: request.affectedServices,
+        allowSupportAccess: request.allowSupportAccess,
+        frontConversationId: request.frontConversationId,
+        threadRef: request.threadRef,
+        isSupportChat: true,
+        lifecycleStatus: 'bot_active',
+        lastSyncedMessageCount: 0,
+        isSyncing: false,
+        isLifecycleSyncing: false,
+      }
+
+      void import('@/state/ai-chat-front-sync')
+        .then(({ syncSupportChatToFront }) => syncSupportChatToFront(newChatId, state))
+        .catch(() => {})
+    }
+
+    state.selectChat(newChatId)
+
+    const { [ASSISTANT_HANDOFF_QUERY_PARAM]: _handledParam, ...restQuery } = router.query
+    router.replace({ pathname: router.pathname, query: restQuery }, undefined, { shallow: true })
+  })
+
+  // Picks up a support chat handed off from an org-level support page. Waits for
+  // `isInitialized` since the assistant state's IndexedDB restore overwrites
+  // `state.chats`/`activeChatId` wholesale once it resolves, which would wipe out a chat
+  // created here if this ran first.
+  useEffect(() => {
+    if (!snap.isInitialized) return
+
+    const handoffParam = router.query[ASSISTANT_HANDOFF_QUERY_PARAM]
+    if (typeof handoffParam !== 'string') return
+
+    processAssistantHandoff(handoffParam)
+  }, [snap.isInitialized, router.query[ASSISTANT_HANDOFF_QUERY_PARAM]])
 
   useEffect(() => {
     if (!shortcutsEnabled || !isInSQLEditor || !snippetContent) return

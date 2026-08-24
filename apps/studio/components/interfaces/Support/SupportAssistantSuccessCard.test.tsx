@@ -68,6 +68,14 @@ vi.mock('@/lib/telemetry/track', () => ({
   useTrack: () => mockTrack,
 }))
 
+let mockCurrentProjectRef: string | undefined = 'project-1'
+
+vi.mock('@/hooks/misc/useSelectedProject', () => ({
+  useSelectedProjectQuery: () => ({
+    data: mockCurrentProjectRef ? { ref: mockCurrentProjectRef } : undefined,
+  }),
+}))
+
 const supportRequest: SubmittedSupportRequest = {
   organizationSlug: 'org-1',
   projectRef: 'project-1',
@@ -107,6 +115,7 @@ describe('SupportAssistantSuccessCard', () => {
     mockTrack.mockReset()
     nextChatMessages = []
     emitChatMessagesChange = undefined
+    mockCurrentProjectRef = 'project-1'
 
     mockNewChat.mockImplementation(() => {
       chatInstances['chat-1'] = createMockChat(nextChatMessages)
@@ -263,5 +272,41 @@ describe('SupportAssistantSuccessCard', () => {
 
     expect(screen.queryByText(/assistant response/i)).not.toBeInTheDocument()
     expect(mockNewChat).not.toHaveBeenCalled()
+  })
+
+  describe('when not already on the ticket project page', () => {
+    beforeEach(() => {
+      mockCurrentProjectRef = undefined
+    })
+
+    it('renders a handoff link instead of creating a chat in place', async () => {
+      render(<SupportAssistantSuccessCard request={supportRequest} />)
+
+      expect(await screen.findByRole('heading', { name: 'While you wait' })).toBeInTheDocument()
+      const link = screen.getByRole('link', { name: /open assistant in project/i })
+      expect(link).toHaveAttribute('href', expect.stringContaining('/project/project-1?'))
+      expect(link).toHaveAttribute(
+        'href',
+        expect.stringContaining(
+          `assistantHandoff=${encodeURIComponent(JSON.stringify(supportRequest))}`
+        )
+      )
+      expect(mockNewChat).not.toHaveBeenCalled()
+    })
+
+    it('tracks the click and does not touch the sidebar manager directly', async () => {
+      const user = userEvent.setup()
+      render(<SupportAssistantSuccessCard request={supportRequest} />)
+
+      const link = await screen.findByRole('link', { name: /open assistant in project/i })
+      await user.click(link)
+
+      expect(mockTrack).toHaveBeenCalledWith(
+        'support_assistant_follow_up_card_clicked',
+        { ticketCategory: SupportCategories.PROBLEM },
+        { project: 'project-1', organization: 'org-1' }
+      )
+      expect(mockOpenSidebar).not.toHaveBeenCalled()
+    })
   })
 })

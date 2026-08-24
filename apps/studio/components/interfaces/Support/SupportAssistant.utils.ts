@@ -54,6 +54,20 @@ export function buildSupportAssistantPrompt(request: SubmittedSupportRequest) {
   ].join('\n')
 }
 
+export const ASSISTANT_HANDOFF_QUERY_PARAM = 'assistantHandoff'
+
+export function encodeAssistantHandoff(request: SubmittedSupportRequest): string {
+  return encodeURIComponent(JSON.stringify(request))
+}
+
+export function decodeAssistantHandoff(value: string): SubmittedSupportRequest | null {
+  try {
+    return JSON.parse(decodeURIComponent(value))
+  } catch {
+    return null
+  }
+}
+
 export function parseSupportAssistantPrompt(text: string): ParsedSupportAssistantPrompt | null {
   const supportMatch = text.match(/<support>([\s\S]*?)<\/support>/i)
   if (!supportMatch) return null
