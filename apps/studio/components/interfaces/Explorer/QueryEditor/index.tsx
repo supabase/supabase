@@ -183,6 +183,9 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   const rowLimit = query._tag === 'database' ? query.rowLimit : undefined
   const databaseIdentifier = query._tag === 'database' ? query.database_identifier : undefined
 
+  const { x_column, y_series } = display?.chart ?? {}
+  const hasConfig = !!x_column && (y_series ?? []).length > 0
+
   const [promptInput, setPromptInput] = useState('')
   const [pendingRun, setPendingRun] = useState<{ sql: string; issues: PotentialIssues }>()
   const [pendingProposal, setPendingProposal] = useState<PendingProposal | null>(null)
@@ -524,7 +527,10 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
 
         <ExplorerQueryResults
           className={cn(
-            (result?.rows ?? []).length === 0 ? 'items-center justify-center' : 'overflow-x-auto'
+            variant === 'embedded' ? 'max-h-80' : '',
+            (result?.rows ?? []).length === 0 || (view === 'chart' && !hasConfig)
+              ? 'items-center justify-center'
+              : 'overflow-x-auto'
           )}
         >
           <QueryResultRenderer view={view} result={result} chart={display?.chart} />

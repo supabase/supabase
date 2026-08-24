@@ -56,6 +56,53 @@ vi.mock('../QueryEditor/QuerySourceMenu', () => ({
   ),
 }))
 
+vi.mock('../QueryEditor/DisplaySettingsButton', () => ({
+  DisplaySettingsButton: ({
+    display,
+    disabled,
+    onChange,
+  }: {
+    display: { view: 'table' | 'chart' }
+    disabled: boolean
+    onChange: (display: {
+      view: 'table' | 'chart'
+      chart: {
+        type: 'bar'
+        x_column: string
+        y_series: string[]
+        cumulative: boolean
+        scale: 'linear'
+        show_labels: boolean
+      }
+    }) => void
+  }) => (
+    <button
+      aria-label="Result settings"
+      disabled={disabled}
+      tabIndex={0}
+      onClick={() =>
+        onChange({
+          view: 'chart',
+          chart: {
+            type: 'bar',
+            x_column: 'day',
+            y_series: ['requests'],
+            cumulative: false,
+            scale: 'linear',
+            show_labels: true,
+          },
+        })
+      }
+    >
+      {display.view}
+    </button>
+  ),
+}))
+
+vi.mock('../QueryEditor/QueryResultChart', () => ({
+  QueryResultChart: () => <div>Chart results</div>,
+}))
+
 const renderQueryTab = (tabsState = createTabsState('default')) =>
   customRender(
     <TabsStateContext.Provider value={tabsState}>
@@ -125,6 +172,29 @@ describe('QueryTab execution', () => {
       await screen.findByText("Error: Querying logs isn't available for this project yet.")
     ).toBeInTheDocument()
     expect(requests).toHaveLength(0)
+  })
+
+  it('exposes and persists the shared notebook result view options', async () => {
+    createDraft({ _tag: 'database' })
+    explorerQueryState.setResult({
+      id: 'query-test',
+      result: { rows: [{ day: 'Monday', requests: 10 }], executedAt: 1 },
+    })
+
+    renderQueryTab()
+    const settingsButton = await screen.findByRole('button', { name: 'Result settings' })
+    expect(settingsButton).toBeEnabled()
+    expect(settingsButton).toHaveTextContent('table')
+
+    await userEvent.click(settingsButton)
+
+    await waitFor(() =>
+      expect(explorerQueryState.drafts['query-test']).toMatchObject({
+        view: 'chart',
+        chart: { type: 'bar', x_column: 'day', y_series: ['requests'] },
+      })
+    )
+    expect(settingsButton).toHaveTextContent('chart')
   })
 
   it('waits for replicas, then fails closed when the selected database is absent', async () => {
