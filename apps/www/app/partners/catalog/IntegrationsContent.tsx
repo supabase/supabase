@@ -154,7 +154,7 @@ export default function IntegrationsContent({
   // Uses wrapping <label> elements (no id/htmlFor) to avoid duplicate HTML IDs in the DOM.
   const filtersPanel = (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-2.5">
+      <div role="group" aria-label="Categories" className="flex flex-col gap-2.5">
         <h2 className="text-xs font-mono uppercase text-foreground-lighter">Categories</h2>
         {allCategories.map((category) => {
           const Icon = getCategoryIcon(category.slug)
@@ -212,7 +212,7 @@ export default function IntegrationsContent({
         <div className="relative grid md:grid-cols-4 md:gap-4">
           {/* Left sidebar — sticky search + filters */}
           <div className="relative w-full h-full">
-            <div className="mb-4 flex flex-col gap-4 sticky top-20">
+            <aside aria-label="Filters" className="mb-4 flex flex-col gap-4 sticky top-20">
               {/* Search bar + mobile filter trigger */}
               <div className="flex gap-2">
                 <InputGroup className="flex-1">
@@ -259,7 +259,7 @@ export default function IntegrationsContent({
 
               {/* Desktop-only filter panel */}
               <div className="hidden md:block">{filtersPanel}</div>
-            </div>
+            </aside>
           </div>
 
           {/* Right: content */}
@@ -308,7 +308,7 @@ export default function IntegrationsContent({
 
             {/* Toolbar: count + view toggle */}
             <div className="flex items-center justify-between gap-2">
-              <span className="text-foreground-muted text-xs">
+              <span aria-live="polite" className="text-foreground-muted text-xs">
                 {listPartners.length} partner{listPartners.length !== 1 ? 's' : ''}
               </span>
               <ToggleGroup

@@ -219,6 +219,7 @@ function MessagePartDeployEdgeFunction({ toolPart }: { toolPart: ToolUIPart }) {
 const NOTEBOOK_DRAFTING_LABEL: Record<NotebookProposalMode, string> = {
   create: 'Drafting notebook...',
   update: 'Drafting notebook update...',
+  delete: 'Preparing to delete notebook...',
 }
 
 function MessagePartNotebookProposal({
@@ -337,6 +338,9 @@ export function MessagePartSwitcher({
       }
       case 'tool-update_notebook': {
         return <MessagePart.NotebookProposal toolPart={part} mode="update" />
+      }
+      case 'tool-delete_notebook': {
+        return <MessagePart.NotebookProposal toolPart={part} mode="delete" />
       }
 
       case 'source-url':

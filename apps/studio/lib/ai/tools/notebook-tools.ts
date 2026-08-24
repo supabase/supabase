@@ -2,6 +2,7 @@ import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta'
 import { tool } from 'ai'
 import { z } from 'zod'
 
+import { deleteContents } from '@/data/content/content-delete-mutation'
 import { getContent } from '@/data/content/content-infinite-query'
 import {
   applyNotebookOperations,
@@ -323,6 +324,20 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
         type: 'json',
         value: { id: output.id, name: output.name },
       }),
+    }),
+    delete_notebook: tool({
+      description: 'Asks the user to delete a notebook. Requires user approval before deleting.',
+      inputSchema: z.object({
+        id: z.string().describe('The id of the notebook to delete.'),
+      }),
+      needsApproval: true,
+      execute: async ({ id }) => {
+        const notebook = await getNotebook({ projectRef, id }, undefined, authHeaders)
+
+        await deleteContents({ projectRef: projectRef ?? '', ids: [id] }, undefined, authHeaders)
+
+        return { id, name: notebook.name }
+      },
     }),
   }
 }
