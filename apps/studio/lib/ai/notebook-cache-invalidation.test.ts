@@ -154,6 +154,24 @@ describe('applyNotebookCacheEffects', () => {
     expect(notebooksState.notebooks[NOTEBOOK.id]).toBeDefined()
   })
 
+  it('leaves an edited (unsaved, non-empty) notebook untouched', async () => {
+    notebooksState.setNotebook({ projectRef: PROJECT_REF, notebook: NOTEBOOK })
+    notebooksState.updateCells({
+      id: NOTEBOOK.id,
+      cells: [{ _tag: 'markdown_cell', _id: 'cell-1', text: 'local edit' }],
+    })
+    expect(notebooksState.notebooks[NOTEBOOK.id].status).toBe('unsaved')
+    const queryClient = new QueryClient()
+
+    await applyNotebookCacheEffects({
+      queryClient,
+      projectRef: PROJECT_REF,
+      effects: [{ _tag: 'upserted', toolCallId: 'call-1', id: NOTEBOOK.id }],
+    })
+
+    expect(notebooksState.notebooks[NOTEBOOK.id]).toBeDefined()
+  })
+
   it('no-ops entirely for an empty effects list', async () => {
     const queryClient = new QueryClient()
     queryClient.setQueryData(contentKeys.allContentLists(PROJECT_REF), [])

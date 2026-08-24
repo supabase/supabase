@@ -4,6 +4,7 @@ import type { ToolUIPart, UIMessage } from 'ai'
 import { notebookToolOutputSchema } from '@/components/ui/AIAssistantPanel/Message.utils'
 import { contentKeys } from '@/data/content/keys'
 import { evictNotebookFromCaches } from '@/data/content/notebooks/notebook-cache'
+import { notebooksState } from '@/state/notebooks/notebooks-state'
 
 export type NotebookCacheEffect =
   | { _tag: 'upserted'; toolCallId: string; id: string }
@@ -56,8 +57,16 @@ export async function applyNotebookCacheEffects({
   ])
 
   await Promise.all(
-    effects.map((effect) =>
-      evictNotebookFromCaches({
+    effects.map((effect) => {
+      // evictNotebookFromCaches's own dirty-notebook guard was loosened for the tab-close
+      // flow, where `confirmClose` has already asked the user to discard unsaved edits.
+      // There's no equivalent confirmation here, so a status check up front keeps a dirty
+      // notebook untouched rather than having an assistant write silently discard local
+      // edits (FE-4255).
+      const stateNotebook = notebooksState.notebooks[effect.id]
+      if (stateNotebook && stateNotebook.status !== 'saved') return
+
+      return evictNotebookFromCaches({
         queryClient,
         projectRef,
         id: effect.id,
@@ -70,6 +79,6 @@ export async function applyNotebookCacheEffects({
         // there's nothing stale to read.
         mode: 'remove',
       })
-    )
+    })
   )
 }
