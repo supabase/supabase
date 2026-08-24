@@ -2,17 +2,11 @@ import { useQuery } from '@tanstack/react-query'
 
 import { oauthAppsKeys } from './keys'
 import { getMockOAuthAppsAuthorizeRequest, USE_MOCKS } from './mocks'
-import type { OAuthScopeGroup, OAuthScopeLevel } from './types'
+import type { OAuthScopeGroup } from './types'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OAuthAppsAuthorizeRequestVariables = {
   id?: string
-}
-
-export type OAuthAppsResourceScope = {
-  resource: string
-  count: number
-  scopes: { name: string; level: OAuthScopeLevel }[]
 }
 
 export type OAuthAppsAuthorizeRequest = {
@@ -22,7 +16,6 @@ export type OAuthAppsAuthorizeRequest = {
   is_verified: boolean
   redirect_uri: string
   scope_groups: OAuthScopeGroup[]
-  resource_scopes: OAuthAppsResourceScope[]
 }
 
 export async function getOAuthAppsAuthorizeRequest({ id }: OAuthAppsAuthorizeRequestVariables) {
