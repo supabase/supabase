@@ -49,7 +49,7 @@ describe('APIAuthorizationPage', () => {
     expect(screen.getByText('Loading...')).toBeInTheDocument()
   })
 
-  test('renders the legacy component when the oauthAppScopedGrants flag is off', () => {
+  test('renders the legacy component when the OauthAppScopedGrants flag is off', () => {
     useRouterMock.mockReturnValue({ isReady: true, push: routerPushMock, query: {} })
 
     customRender(<APIAuthorizationPage dehydratedState={{}} />, {

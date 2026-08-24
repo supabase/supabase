@@ -15,7 +15,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   const router = useRouter()
   const routerReady = router.isReady
   const { auth_id, organization_slug, mock_state } = useParams()
-  const oauthAppScopedGrants = useFlag('oauthAppScopedGrants')
+  const oauthAppScopedGrants = useFlag('OauthAppScopedGrants')
 
   if (!routerReady) {
     return (
