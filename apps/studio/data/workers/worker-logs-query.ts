@@ -23,10 +23,11 @@ export const WORKER_LOG_STREAM_LABEL: Record<WorkerLogStream, string> = {
   builds: 'Builds',
 }
 
-// Which attribute carries the worker name is not confirmed: no `workers_product.logs`
-// row has reached the endpoint tagged with a project ref, so there was none to read
-// it from. Everything else here is stream-agnostic, so a correction is one string.
-const WORKER_NAME_KEY = 'worker_name'
+// The leaf is unconfirmed — no worker row reaches the endpoint yet, so there was none
+// to read it from. The `metadata.` prefix is not a guess: the endpoint discriminates
+// these streams on `metadata.source`, and the workers source carries the project ref
+// as `metadata.project_ref`. A correction is one string.
+const WORKER_NAME_KEY = 'metadata.worker_name'
 
 const LOOKBACK_HOURS = 24
 
