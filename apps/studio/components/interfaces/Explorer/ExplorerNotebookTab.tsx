@@ -98,10 +98,17 @@ export const ExplorerNotebookTab = () => {
   >(null)
   const [skipMutatingCells, setSkipMutatingCells] = useState(false)
   const queryCellRefs = useRef(new Map<string, QueryEditorHandle>())
+  const savedContentRef = useRef<typeof content>(undefined)
 
   const { mutate: updateNotebook, isPending: isUpdating } = useUpsertNotebookMutation({
-    onSuccess: () => toast.success('Successfully saved notebook!'),
+    onSuccess: () => {
+      if (id && content === savedContentRef.current) {
+        snap.markSaved({ id })
+        toast.success('Successfully saved notebook!')
+      }
+    },
   })
+
   const { mutate: deleteNotebook, isPending: isDeleting } = useContentDeleteMutation({
     onSuccess: () => {
       toast.success('Successfully deleted notebook')
@@ -120,7 +127,15 @@ export const ExplorerNotebookTab = () => {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
 
+  const persistNotebookTab = () => {
+    const notebookId = currentNotebook?.notebook.id
+    if (!notebookId) return
+
+    tabs.makeTabPermanent(createTabId('notebook', { id: notebookId }))
+  }
+
   const handleSaveTitle = (titleValue: string) => {
+    persistNotebookTab()
     const trimmedName = titleValue.trim()
     if (id && trimmedName && trimmedName !== name) {
       snap.renameNotebook({ id, name: trimmedName })
@@ -135,7 +150,9 @@ export const ExplorerNotebookTab = () => {
     cellIdsToRun: string[]
     force?: boolean
   }) => {
+    persistNotebookTab()
     setIsRunningNotebook(true)
+
     try {
       await Promise.allSettled(
         cellIdsToRun.map((cellId) => queryCellRefs.current.get(cellId)?.run(force))
@@ -179,6 +196,8 @@ export const ExplorerNotebookTab = () => {
     const notebookId = currentNotebook?.notebook.id
     if (!ref || !notebookId || !name || !content) return
 
+    persistNotebookTab()
+
     const writableContent: WritableNotebook = {
       schema_version: content.schema_version,
       cells: content.cells.map((cell): WritableCell => {
@@ -205,6 +224,11 @@ export const ExplorerNotebookTab = () => {
       }),
     }
 
+    // [Joshen] For tracking if a notebook is updated while being saved, so that we do not
+    // incorrectly show the saved toast if it's subsequently then saved once again while
+    // the initial save is midflight
+    savedContentRef.current = content
+
     updateNotebook({
       projectRef: ref,
       id: notebookId,
@@ -220,6 +244,8 @@ export const ExplorerNotebookTab = () => {
   }
 
   const handleDragEnd = (event: DragEndEvent) => {
+    persistNotebookTab()
+
     const { active, over } = event
     if (!id || !over || active.id === over.id) return
 
@@ -227,6 +253,8 @@ export const ExplorerNotebookTab = () => {
   }
 
   const onSelectAddCell = (type: 'markdown' | 'query') => {
+    persistNotebookTab()
+
     const notebookId = currentNotebook?.notebook.id
     if (!notebookId) return
 
@@ -342,13 +370,14 @@ export const ExplorerNotebookTab = () => {
                         <QueryCell
                           key={cell._id}
                           cell={cell}
+                          onEdit={persistNotebookTab}
                           ref={(instance) => {
                             if (instance) queryCellRefs.current.set(cell._id, instance)
                             else queryCellRefs.current.delete(cell._id)
                           }}
                         />
                       ) : (
-                        <MarkdownCell key={cell._id} cell={cell} />
+                        <MarkdownCell key={cell._id} cell={cell} onEdit={persistNotebookTab} />
                       )
                     )}
                   </div>

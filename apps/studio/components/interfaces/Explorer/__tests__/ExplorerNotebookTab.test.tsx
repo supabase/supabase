@@ -11,7 +11,7 @@ import { isQueryCell } from '@/data/content/notebooks/notebook-schema'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import { notebooksState } from '@/state/notebooks/notebooks-state'
 import type { Notebook } from '@/state/notebooks/types'
-import { createTabsState, TabsStateContext } from '@/state/tabs'
+import { createTabId, createTabsState, TabsStateContext } from '@/state/tabs'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { setupSqlEditorMocks } from '@/tests/lib/sql-editor-test-utils'
@@ -81,9 +81,9 @@ const seedNotebook = (cells: Notebooks.Cell[], status: 'new' | 'saved' = 'saved'
   else notebooksState.setNotebook({ projectRef: 'default', notebook })
 }
 
-const renderNotebookTab = () =>
+const renderNotebookTab = (tabsState = createTabsState('default')) =>
   customRender(
-    <TabsStateContext.Provider value={createTabsState('default')}>
+    <TabsStateContext.Provider value={tabsState}>
       <ExplorerNotebookTab />
     </TabsStateContext.Provider>
   )
@@ -335,5 +335,57 @@ describe('ExplorerNotebookTab', () => {
     await userEvent.click(intellisenseItem)
 
     await waitFor(() => expect(readPersistedValue()).toBe(!initialValue))
+  })
+
+  it('persists the preview tab when saving the notebook', async () => {
+    addAPIMock({
+      method: 'put',
+      path: '/platform/projects/:ref/content',
+      response: () => HttpResponse.json({ id: NOTEBOOK_ID }),
+    })
+
+    const tabsState = createTabsState('default')
+    const tabId = createTabId('notebook', { id: NOTEBOOK_ID })
+    tabsState.addTab({ id: tabId, type: 'notebook', metadata: { notebookId: NOTEBOOK_ID } })
+    expect(tabsState.tabsMap[tabId]?.isPreview).toBe(true)
+
+    renderNotebookTab(tabsState)
+
+    const saveButton = await screen.findByRole('button', { name: 'Save changes' })
+    await userEvent.click(saveButton)
+
+    await waitFor(() => expect(tabsState.tabsMap[tabId]?.isPreview).toBe(false))
+  })
+
+  it('does not mark a newer edit as saved when an earlier save resolves after it', async () => {
+    let resolveSave: (() => void) | undefined
+    const savePromise = new Promise<void>((resolve) => {
+      resolveSave = resolve
+    })
+    addAPIMock({
+      method: 'put',
+      path: '/platform/projects/:ref/content',
+      response: async () => {
+        await savePromise
+        return HttpResponse.json({ id: NOTEBOOK_ID })
+      },
+    })
+
+    renderNotebookTab()
+
+    const saveButton = await screen.findByRole('button', { name: 'Save changes' })
+    await userEvent.click(saveButton)
+    await waitFor(() => expect(saveButton).toBeDisabled())
+
+    // Edit the notebook while the save request above is still in flight.
+    notebooksState.insertCellAfter({ id: NOTEBOOK_ID, cell: createMarkdownCellSkeleton() })
+    expect(notebooksState.notebooks[NOTEBOOK_ID]?.status).toBe('unsaved')
+
+    resolveSave?.()
+    await waitFor(() => expect(saveButton).toBeEnabled())
+
+    // The in-flight save only persisted the older content, so the notebook must still be
+    // considered unsaved rather than clobbered back to 'saved' by the stale response.
+    expect(notebooksState.notebooks[NOTEBOOK_ID]?.status).toBe('unsaved')
   })
 })

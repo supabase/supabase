@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ExplorerQueryTab } from '../ExplorerQueryTab'
 import type { ReadReplicasData } from '@/data/read-replicas/replicas-query'
 import { explorerQueryState } from '@/state/explorer-query'
-import { createTabsState, TabsStateContext } from '@/state/tabs'
+import { createTabId, createTabsState, TabsStateContext } from '@/state/tabs'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { setupSqlEditorMocks } from '@/tests/lib/sql-editor-test-utils'
@@ -27,8 +27,18 @@ vi.mock('common', async (importOriginal) => {
 })
 
 vi.mock('@/components/ui/CodeEditor/CodeEditor', () => ({
-  CodeEditor: ({ value }: { value: string }) => (
-    <textarea aria-label="SQL editor" value={value} readOnly />
+  CodeEditor: ({
+    value,
+    onInputChange,
+  }: {
+    value: string
+    onInputChange?: (value: string | undefined) => void
+  }) => (
+    <textarea
+      aria-label="SQL editor"
+      value={value}
+      onChange={(e) => onInputChange?.(e.target.value)}
+    />
   ),
 }))
 
@@ -46,9 +56,9 @@ vi.mock('../QueryEditor/QuerySourceMenu', () => ({
   ),
 }))
 
-const renderQueryTab = () =>
+const renderQueryTab = (tabsState = createTabsState('default')) =>
   customRender(
-    <TabsStateContext.Provider value={createTabsState('default')}>
+    <TabsStateContext.Provider value={tabsState}>
       <ExplorerQueryTab />
     </TabsStateContext.Provider>
   )
@@ -212,6 +222,22 @@ describe('QueryTab execution', () => {
     await act(async () => {
       explorerQueryState.removeDraft({ id: 'query-test-2', projectRef: 'default' })
     })
+  })
+
+  it('persists the preview tab once typing starts in the SQL editor', async () => {
+    createDraft({ _tag: 'database' })
+
+    const tabsState = createTabsState('default')
+    const tabId = createTabId('query', { id: 'query-test' })
+    tabsState.addTab({ id: tabId, type: 'query', metadata: { queryId: 'query-test' } })
+    expect(tabsState.tabsMap[tabId]?.isPreview).toBe(true)
+
+    renderQueryTab(tabsState)
+
+    const sqlEditor = await screen.findByRole('textbox', { name: 'SQL editor' })
+    await userEvent.type(sqlEditor, ' where true')
+
+    await waitFor(() => expect(tabsState.tabsMap[tabId]?.isPreview).toBe(false))
   })
 
   it('blocks a destructive query behind a confirmation modal, then runs it once confirmed', async () => {

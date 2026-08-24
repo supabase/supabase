@@ -25,11 +25,12 @@ import { useLocalRoleImpersonationState } from '@/state/role-impersonation-state
 
 interface QueryCellProps {
   cell: Snapshot<QueryCellSchema>
+  onEdit?: () => void
 }
 
 /** Notebook adapter around the shared QueryEditor. */
 export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function QueryCell(
-  { cell },
+  { cell, onEdit },
   ref
 ) {
   const snap = useNotebooksStateSnapshot()
@@ -53,6 +54,7 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
     const notebookId = currentNotebook?.notebook.id
     if (!notebookId) return
 
+    onEdit?.()
     snap.updateCell({
       id: notebookId,
       cellId: cell._id,
