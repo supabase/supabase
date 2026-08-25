@@ -23,11 +23,9 @@ export const WORKER_LOG_STREAM_LABEL: Record<WorkerLogStream, string> = {
   builds: 'Builds',
 }
 
-// The leaf is unconfirmed — no worker row reaches the endpoint yet, so there was none
-// to read it from. The `metadata.` prefix is not a guess: the endpoint discriminates
-// these streams on `metadata.source`, and the workers source carries the project ref
-// as `metadata.project_ref`. A correction is one string.
-const WORKER_NAME_KEY = 'metadata.worker_name'
+// Read off a real `workers_product.logs` row in Logflare: `metadata.worker` holds the
+// worker name, alongside `metadata.source` and `metadata.event`.
+const WORKER_NAME_KEY = 'metadata.worker'
 
 const LOOKBACK_HOURS = 24
 
