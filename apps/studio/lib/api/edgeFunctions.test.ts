@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import {
   buildDatabaseEdgeFunctionUrl,
@@ -151,5 +151,78 @@ describe('isValidEdgeFunctionURL', () => {
     for (const url of invalidEdgeFunctionUrls) {
       expect(isValidEdgeFunctionURL(url, false), `Expected ${url} to be invalid`).toBe(false)
     }
+  })
+
+  describe('with NIMBUS_PROD_PROJECTS_URL configured', () => {
+    const APEX = 'example-projects.com'
+    const REF = 'uniquetwentychararef'
+
+    afterEach(() => {
+      vi.unstubAllEnvs()
+    })
+
+    it.each([
+      { name: 'the documented wildcard form', value: `https://*.${APEX}` },
+      { name: 'a trailing slash', value: `https://*.${APEX}/` },
+      { name: 'no wildcard prefix', value: `https://${APEX}` },
+      { name: 'no scheme', value: `*.${APEX}` },
+      { name: 'surrounding whitespace', value: ` https://*.${APEX} ` },
+    ])('accepts a project URL when the env var is written with $name', ({ value }) => {
+      vi.stubEnv('NIMBUS_PROD_PROJECTS_URL', value)
+
+      expect(isValidEdgeFunctionURL(`https://${REF}.${APEX}/functions/v1/hello-world`, true)).toBe(
+        true
+      )
+    })
+
+    it.each([
+      { name: 'a functions subdomain', url: `https://${REF}.functions.${APEX}/functions/v1/hello` },
+      { name: 'a ref containing digits', url: `https://ref1234567890abcdefg.${APEX}/functions/v1/x` },
+      { name: 'an explicit port', url: `https://${REF}.${APEX}:8443/functions/v1/hello-world` },
+      { name: 'a query string', url: `https://${REF}.${APEX}/functions/v1/hello-world?name=1` },
+    ])('accepts $name', ({ url }) => {
+      vi.stubEnv('NIMBUS_PROD_PROJECTS_URL', `https://*.${APEX}`)
+
+      expect(isValidEdgeFunctionURL(url, true), `Expected ${url} to be valid`).toBe(true)
+    })
+
+    it('still accepts default platform URLs', () => {
+      vi.stubEnv('NIMBUS_PROD_PROJECTS_URL', `https://*.${APEX}`)
+
+      for (const url of validEdgeFunctionUrls) {
+        expect(isValidEdgeFunctionURL(url, true), `Expected ${url} to be valid`).toBe(true)
+      }
+    })
+
+    it('still accepts self-hosted URLs off platform', () => {
+      vi.stubEnv('NIMBUS_PROD_PROJECTS_URL', `https://*.${APEX}`)
+
+      for (const url of validLocalEdgeFunctionsUrls) {
+        expect(isValidEdgeFunctionURL(url, false), `Expected ${url} to be valid`).toBe(true)
+      }
+    })
+
+    it.each([
+      { name: 'an unrelated apex domain', url: 'https://someref.notexample.com/functions/v1/x' },
+      { name: 'a lookalike apex domain', url: `https://someref.evil-${APEX}/functions/v1/x` },
+      { name: 'the apex domain itself', url: `https://${APEX}/functions/v1/x` },
+      { name: 'a non-functions path', url: `https://${REF}.${APEX}/rest/v1/x` },
+      { name: 'plain http', url: `http://${REF}.${APEX}/functions/v1/x` },
+    ])('rejects $name', ({ url }) => {
+      vi.stubEnv('NIMBUS_PROD_PROJECTS_URL', `https://*.${APEX}`)
+
+      expect(isValidEdgeFunctionURL(url, true), `Expected ${url} to be invalid`).toBe(false)
+    })
+
+    it.each([{ value: '' }, { value: '   ' }])(
+      'falls back to the default hosts when the env var is blank ($value)',
+      ({ value }) => {
+        vi.stubEnv('NIMBUS_PROD_PROJECTS_URL', value)
+
+        for (const url of validEdgeFunctionUrls) {
+          expect(isValidEdgeFunctionURL(url, true), `Expected ${url} to be valid`).toBe(true)
+        }
+      }
+    )
   })
 })
