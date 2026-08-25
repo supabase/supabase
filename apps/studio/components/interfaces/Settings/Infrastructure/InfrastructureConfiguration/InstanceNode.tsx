@@ -35,7 +35,6 @@ import { formatSeconds } from './InstanceConfiguration.utils'
 import { metricColor } from './InstanceNode.utils'
 import { getReadReplicaPath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'
-import { RegionFlag } from '@/components/ui/RegionFlag'
 import { SparkBar } from '@/components/ui/SparkBar'
 import {
   DatabaseInitEstimations,
@@ -45,6 +44,7 @@ import {
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 import { useComputeMetrics } from '@/hooks/analytics/useComputeMetrics'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { BASE_PATH } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 export const LoadBalancerNode = ({ data }: NodeProps<Node<LoadBalancerData>>) => {
@@ -156,7 +156,11 @@ export const PrimaryNode = ({ data }: NodeProps<Node<PrimaryNodeData>>) => {
               </p>
             </div>
           </div>
-          <RegionFlag className="mt-0.5 w-8" region={region.region} />
+          <img
+            alt="region icon"
+            className="w-8 rounded-xs mt-0.5"
+            src={`${BASE_PATH}/img/regions/${region.region}.svg`}
+          />
         </div>
         {numReplicas > 0 && (
           <div className="border-t p-3 py-2">
@@ -434,7 +438,11 @@ export const RegionNode = ({ data }: any) => {
       style={{ width: regionNodeWidth, height: REGION_NODE_HEIGHT }}
     >
       <div className="absolute bottom-2 flex items-center justify-between gap-x-2">
-        <RegionFlag className="w-5" region={region.region} />
+        <img
+          alt="region icon"
+          className="w-5 rounded-xs"
+          src={`${BASE_PATH}/img/regions/${region.region}.svg`}
+        />
         <p className="text-sm">{region.name}</p>
       </div>
     </div>

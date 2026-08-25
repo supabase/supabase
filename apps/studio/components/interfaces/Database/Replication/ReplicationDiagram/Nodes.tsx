@@ -8,11 +8,11 @@ import { DestinationIcon } from '../DestinationIcon'
 import { getStatusName } from '../Pipeline.utils'
 import { STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
 import { getReplicationDestinationType } from './Nodes.utils'
-import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { BASE_PATH } from '@/lib/constants'
 
 export const NODE_WIDTH = 480
 
@@ -46,7 +46,13 @@ export const PrimaryDatabaseNode = () => {
         <p className="text-foreground-light">{region?.displayName}</p>
         <p className="text-foreground-light">{region?.code}</p>
       </div>
-      {!!project && <RegionFlag className="mt-0.5 w-8" region={project.region} />}
+      {!!project && (
+        <img
+          alt="region icon"
+          className="w-8 rounded-xs mt-0.5"
+          src={`${BASE_PATH}/img/regions/${project?.region}.svg`}
+        />
+      )}
       <Handle
         type="source"
         position={Position.Right}

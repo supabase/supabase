@@ -20,10 +20,9 @@ import { useCheckEligibilityDeployReplica } from './useCheckEligibilityDeployRep
 import { useGetReplicaCost } from './useGetReplicaCost'
 import { AVAILABLE_REPLICA_REGIONS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import type { RecommendedComputeForReadReplicas } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/recommendCompute'
-import { RegionFlag } from '@/components/ui/RegionFlag'
 import { Region, useReadReplicaSetUpMutation } from '@/data/read-replicas/replica-setup-mutation'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { AWS_REGIONS_DEFAULT } from '@/lib/constants'
+import { AWS_REGIONS_DEFAULT, BASE_PATH } from '@/lib/constants'
 
 interface ReadReplicaFormProps {
   typeSelection?: ReactNode
@@ -106,7 +105,11 @@ export const ReadReplicaForm = ({
               <SelectValue placeholder="Select a region">
                 <span className="flex min-w-0 items-center gap-x-2">
                   {selectedRegionDetails !== undefined && (
-                    <RegionFlag className="w-5 shrink-0" region={selectedRegionDetails.region} />
+                    <img
+                      alt=""
+                      className="w-5 shrink-0 rounded-xs"
+                      src={`${BASE_PATH}/img/regions/${selectedRegionDetails.region}.svg`}
+                    />
                   )}
                   <span className="truncate">{selectedRegionDetails?.name}</span>
                 </span>
@@ -116,7 +119,11 @@ export const ReadReplicaForm = ({
               {availableRegions.map((region) => (
                 <SelectItem key={region.key} value={region.key}>
                   <div className="flex gap-x-3 items-center">
-                    <RegionFlag className="w-5" region={region.region} />
+                    <img
+                      alt="region icon"
+                      className="w-5 rounded-xs"
+                      src={`${BASE_PATH}/img/regions/${region.region}.svg`}
+                    />
                     <p className="flex items-center gap-x-2">
                       <span>{region.name}</span>
                       <span className="text-xs text-foreground-lighter font-mono">
