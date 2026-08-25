@@ -3480,6 +3480,40 @@ export interface UpgradeCtaClickedEvent {
 }
 
 /**
+ * User was exposed to the plan badge upgrade experiment.
+ * Fires once per session per enrolled user in any variant (including control), so the
+ * conversion analysis has a baseline cohort. Conversion itself is tracked server-side.
+ * GROWTH experiment: `planBadgeUpgrade` (GROWTH-775).
+ *
+ * @group Events
+ * @page Any authenticated dashboard route — the org dropdown is in the global header
+ * @source studio
+ */
+export interface PlanBadgeUpgradeExperimentExposedEvent {
+  action: 'plan_badge_upgrade_experiment_exposed'
+  properties: {
+    /** The experiment variant the user is enrolled in */
+    variant: 'control' | 'test'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the Free plan badge next to the organization name (in the org dropdown) to
+ * start the upgrade flow. Only reachable in the `test` arm, so this measures click-through
+ * on the treatment rather than comparing arms.
+ * GROWTH experiment: `planBadgeUpgrade` (GROWTH-775).
+ *
+ * @group Events
+ * @page Any authenticated dashboard route — the org dropdown is in the global header
+ * @source studio
+ */
+export interface PlanBadgeUpgradeClickedEvent {
+  action: 'plan_badge_upgrade_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * User clicked the primary CTA on a resource exhaustion warning banner.
  *
  * @group Events
@@ -3897,6 +3931,8 @@ export type TelemetryEvent =
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
   | UpgradeCtaClickedEvent
+  | PlanBadgeUpgradeExperimentExposedEvent
+  | PlanBadgeUpgradeClickedEvent
   | AccessTokenCreatedEvent
   | AccessTokenRemovedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent
