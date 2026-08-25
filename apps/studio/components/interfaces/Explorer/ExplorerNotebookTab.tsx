@@ -503,12 +503,12 @@ export const ExplorerNotebookTab = () => {
         size="small"
         visible={isSaveConflictOpen}
         title="Assistant changes detected"
-        cancelLabel="Discard changes"
+        additionalActionLabel="Discard changes"
         confirmLabel={
           id && snap.serverDivergedWhileDirty.get(id) === 'deleted' ? 'Recreate' : 'Save anyway'
         }
-        onCancel={handleDiscardNotebookChanges}
-        onDismiss={() => setIsSaveConflictOpen(false)}
+        onAdditionalAction={handleDiscardNotebookChanges}
+        onCancel={() => setIsSaveConflictOpen(false)}
         onConfirm={handleSaveAnyway}
       >
         <p className="text-sm">
