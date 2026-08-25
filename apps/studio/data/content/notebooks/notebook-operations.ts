@@ -132,9 +132,11 @@ function findTargetCell(
   return undefined
 }
 
-function noOpMoveOperations(entries: NotebookCellDiffEntry[], notebook: NotebookWire): Set<number> {
-  const noOpMoves = new Set<number>()
-  if (!entries.some((entry) => entry._tag === 'moved')) return noOpMoves
+function downgradeNoOpMoves(
+  entries: NotebookCellDiffEntry[],
+  notebook: NotebookWire
+): NotebookCellDiffEntry[] {
+  if (!entries.some((entry) => entry._tag === 'moved')) return entries
 
   const finalOrder = entries.flatMap((entry) =>
     entry._tag === 'unchanged' || entry._tag === 'moved' ? [entry.cell._id] : []
@@ -153,19 +155,80 @@ function noOpMoveOperations(entries: NotebookCellDiffEntry[], notebook: Notebook
     )
   }
 
-  for (const entry of entries) {
-    if (entry._tag === 'moved' && hasSamePredecessors(entry.cell._id)) {
-      noOpMoves.add(entry.operationIndex)
-    }
-  }
-  return noOpMoves
+  const downgradedIds = new Set<string>()
+  const downgraded = entries.map((entry) => {
+    if (entry._tag !== 'moved' || !hasSamePredecessors(entry.cell._id)) return entry
+
+    downgradedIds.add(entry.cell._id)
+    return { _tag: 'unchanged' as const, cell: entry.cell }
+  })
+
+  return reseatRemovedEntries(downgraded, downgradedIds, notebook)
 }
 
-function buildDiffEntries(
+function settledCellId(entry: NotebookCellDiffEntry): string | undefined {
+  switch (entry._tag) {
+    case 'unchanged':
+    case 'removed':
+      return entry.cell._id
+    case 'added':
+    case 'replaced':
+    case 'moved':
+      return undefined
+  }
+}
+
+function reseatRemovedEntries(
+  entries: NotebookCellDiffEntry[],
+  downgradedIds: Set<string>,
+  notebook: NotebookWire
+): NotebookCellDiffEntry[] {
+  if (downgradedIds.size === 0) return entries
+
+  const originalIndexOf = (cellId: string) =>
+    notebook.cells.findIndex((cell) => cell._id === cellId)
+  const isDowngraded = (entry: NotebookCellDiffEntry) =>
+    entry._tag === 'unchanged' && downgradedIds.has(entry.cell._id)
+
+  const reseated = [...entries]
+  let swapped = true
+  while (swapped) {
+    swapped = false
+    for (let index = 0; index < reseated.length - 1; index++) {
+      const entry = reseated[index]
+      const next = reseated[index + 1]
+      const entryCellId = settledCellId(entry)
+      const nextCellId = settledCellId(next)
+
+      if (entryCellId === undefined || nextCellId === undefined) continue
+      if (entry._tag !== 'removed' && next._tag !== 'removed') continue
+      if (!isDowngraded(entry) && !isDowngraded(next)) continue
+      if (originalIndexOf(nextCellId) > originalIndexOf(entryCellId)) continue
+
+      reseated[index] = next
+      reseated[index + 1] = entry
+      swapped = true
+    }
+  }
+
+  return reseated
+}
+
+export function deriveNotebookDiff(
   notebook: NotebookWire,
-  operations: NotebookOperation[],
-  skippedOperations: ReadonlySet<number>
+  operations: NotebookOperation[]
 ): DeriveNotebookDiffResult {
+  const targetedIds = new Set<string>()
+  for (const operation of operations) {
+    const cellId = targetCellId(operation)
+    if (cellId === undefined) continue
+
+    if (targetedIds.has(cellId)) {
+      return { success: false, error: { _tag: 'conflicting_operations', cell_id: cellId } }
+    }
+    targetedIds.add(cellId)
+  }
+
   const originalIndexById = new Map(notebook.cells.map((cell, index) => [cell._id, index]))
   const entries: NotebookCellDiffEntry[] = notebook.cells.map((cell) => ({
     _tag: 'unchanged',
@@ -236,8 +299,6 @@ function buildDiffEntries(
           }
         }
 
-        if (skippedOperations.has(operationIndex)) break
-
         const found = findTargetCell(entries, operation.cell_id)
         if (found === undefined) {
           return {
@@ -263,31 +324,7 @@ function buildDiffEntries(
     return { success: false, error: { _tag: 'empty_result' } }
   }
 
-  return { success: true, entries }
-}
-
-export function deriveNotebookDiff(
-  notebook: NotebookWire,
-  operations: NotebookOperation[]
-): DeriveNotebookDiffResult {
-  const targetedIds = new Set<string>()
-  for (const operation of operations) {
-    const cellId = targetCellId(operation)
-    if (cellId === undefined) continue
-
-    if (targetedIds.has(cellId)) {
-      return { success: false, error: { _tag: 'conflicting_operations', cell_id: cellId } }
-    }
-    targetedIds.add(cellId)
-  }
-
-  const applied = buildDiffEntries(notebook, operations, new Set<number>())
-  if (!applied.success) return applied
-
-  const noOpMoves = noOpMoveOperations(applied.entries, notebook)
-  if (noOpMoves.size === 0) return applied
-
-  return buildDiffEntries(notebook, operations, noOpMoves)
+  return { success: true, entries: downgradeNoOpMoves(entries, notebook) }
 }
 
 function resultingCells(entries: NotebookCellDiffEntry[]): OperationResultCell[] {
