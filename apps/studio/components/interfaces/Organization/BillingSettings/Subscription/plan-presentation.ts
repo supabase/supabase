@@ -7,7 +7,8 @@ import { useTrackExperimentExposure } from '@/hooks/misc/useTrackExperimentExpos
 
 export type PlanPresentationVariant = 'control' | 'parity' | 'gaps'
 
-const EXPERIMENT_ID = 'pricingPanelPlanPresentation'
+const FLAG_KEY = 'pricingPanelPlanPresentation'
+const EXPERIMENT_ID = 'pricing_panel_plan_presentation'
 
 export function isPlanChangeEligible({
   managedBy,
@@ -33,20 +34,18 @@ export function usePlanPresentationExperiment({
 }: {
   eligible: boolean
 }): PlanPresentationVariant {
-  const flag = usePHFlag<'control' | 'parity' | 'gaps'>(EXPERIMENT_ID)
+  const flag = usePHFlag<'control' | 'parity' | 'gaps'>(FLAG_KEY)
+
+  const isInExperiment =
+    flag === 'control' || flag === 'parity' || flag === 'gaps'
 
   const variant: PlanPresentationVariant = useMemo(() => {
-    if (!eligible) return 'control'
-    if (flag === undefined || flag === false) return 'control'
-    if (flag === 'parity' || flag === 'gaps') return flag
-    return 'control'
-  }, [eligible, flag])
+    if (!eligible || !isInExperiment) return 'control'
+    return flag as PlanPresentationVariant
+  }, [eligible, isInExperiment, flag])
 
-  useTrackExperimentExposure(
-    EXPERIMENT_ID,
-    eligible && flag !== undefined && flag !== false ? (variant as string) : undefined,
-    { currentVariant: variant }
-  )
+  const liveVariant = eligible && isInExperiment ? variant : undefined
+  useTrackExperimentExposure(EXPERIMENT_ID, liveVariant)
 
   return variant
 }
