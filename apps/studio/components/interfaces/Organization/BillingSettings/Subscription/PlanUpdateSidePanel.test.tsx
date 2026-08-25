@@ -8,6 +8,7 @@ import { createMockOrganization, render } from '@/tests/helpers'
 const mockSelectedOrganization = vi.hoisted(() => vi.fn())
 const mockPush = vi.hoisted(() => vi.fn())
 const mockPartnerManagedResource = vi.hoisted(() => vi.fn())
+const mockUsePHFlag = vi.hoisted(() => vi.fn())
 
 vi.mock('common', async (importOriginal) => {
   const original = (await importOriginal()) as typeof import('common')
@@ -27,8 +28,26 @@ vi.mock('next/router', () => ({
 
 vi.mock('shared-data/plans', () => ({
   plans: [
-    { id: 'tier_free', planId: 'free', name: 'Free', costUnit: '/ month', features: [] },
-    { id: 'tier_pro', planId: 'pro', name: 'Pro', costUnit: '/ month', features: [] },
+    {
+      id: 'tier_free',
+      planId: 'free',
+      name: 'Free',
+      costUnit: '/ month',
+      features: ['Unlimited API requests'],
+      description: 'Perfect for passion projects & simple websites.',
+      preface: 'Get started with:',
+      footer: 'Free projects are paused after 1 week of inactivity. Limit of 2 active projects.',
+    },
+    {
+      id: 'tier_pro',
+      planId: 'pro',
+      name: 'Pro',
+      nameBadge: 'Most Popular',
+      costUnit: '/ month',
+      features: ['Email support'],
+      description: 'For production applications with the power to scale.',
+      preface: 'Everything in the Free Plan, plus:',
+    },
   ],
 }))
 
@@ -117,9 +136,18 @@ vi.mock('./SubscriptionPlanUpdateDialog', () => ({
   SubscriptionPlanUpdateDialog: () => null,
 }))
 
+vi.mock('@/hooks/ui/useFlag', () => ({
+  usePHFlag: (...args: any[]) => mockUsePHFlag(...args),
+}))
+
+vi.mock('@/hooks/misc/useTrackExperimentExposure', () => ({
+  useTrackExperimentExposure: vi.fn(),
+}))
+
 describe('PlanUpdateSidePanel', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockUsePHFlag.mockReturnValue('control')
     mockSelectedOrganization.mockReturnValue(
       createMockOrganization({
         slug: 'stripe-org',
@@ -182,5 +210,75 @@ describe('PlanUpdateSidePanel', () => {
     render(<PlanUpdateSidePanel />)
 
     expect(screen.getByTestId('partner-managed-resource')).toBeInTheDocument()
+  })
+
+  describe('parity variant', () => {
+    beforeEach(() => {
+      mockUsePHFlag.mockReturnValue('parity')
+      mockSelectedOrganization.mockReturnValue(
+        createMockOrganization({ slug: 'test-org', billing_partner: null })
+      )
+    })
+
+    it('renders plan description', () => {
+      render(<PlanUpdateSidePanel />)
+      expect(
+        screen.getByText('Perfect for passion projects & simple websites.')
+      ).toBeInTheDocument()
+    })
+
+    it('renders preface line', () => {
+      render(<PlanUpdateSidePanel />)
+      expect(screen.getByText('Everything in the Free Plan, plus:')).toBeInTheDocument()
+    })
+  })
+
+  describe('gaps variant', () => {
+    beforeEach(() => {
+      mockUsePHFlag.mockReturnValue('gaps')
+      mockSelectedOrganization.mockReturnValue(
+        createMockOrganization({ slug: 'test-org', billing_partner: null })
+      )
+    })
+
+    it('renders gap rows on the Free plan', () => {
+      render(<PlanUpdateSidePanel />)
+      expect(screen.getByText('Daily backups')).toBeInTheDocument()
+      expect(screen.getByText('Email support')).toBeInTheDocument()
+    })
+
+    it('shows log retention as a lesser value, not a missing feature', () => {
+      render(<PlanUpdateSidePanel />)
+      expect(screen.getByText('1-day log retention')).toBeInTheDocument()
+    })
+
+    it('renders the Not included label', () => {
+      render(<PlanUpdateSidePanel />)
+      expect(screen.getByText('Not included')).toBeInTheDocument()
+    })
+  })
+
+  describe('control variant', () => {
+    beforeEach(() => {
+      mockUsePHFlag.mockReturnValue('control')
+      mockSelectedOrganization.mockReturnValue(
+        createMockOrganization({ slug: 'test-org', billing_partner: null })
+      )
+    })
+
+    it('does not render preface or description', () => {
+      render(<PlanUpdateSidePanel />)
+      expect(
+        screen.queryByText('Everything in the Free Plan, plus:')
+      ).not.toBeInTheDocument()
+      expect(
+        screen.queryByText('Perfect for passion projects & simple websites.')
+      ).not.toBeInTheDocument()
+    })
+
+    it('does not render gap rows', () => {
+      render(<PlanUpdateSidePanel />)
+      expect(screen.queryByText('Not included')).not.toBeInTheDocument()
+    })
   })
 })
