@@ -3,7 +3,6 @@ import {
   Card,
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogSection,
   DialogSectionSeparator,
@@ -12,6 +11,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -48,18 +48,18 @@ export const ReadReplicaPricingDialog = ({ replicaCost }: ReadReplicaPricingDial
           </DialogTrigger>
         }
       />
-      <DialogContent size="medium">
+      <DialogContent size="medium" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Read replica cost breakdown</DialogTitle>
-          <DialogDescription>
-            The replica matches your primary compute and includes 25% additional disk capacity for
-            WAL files.
-          </DialogDescription>
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection>
           {showNewDiskManagementUI ? (
             <>
+              <p className="mb-3 text-sm text-foreground-light">
+                The replica matches your primary compute and includes 25% additional disk capacity
+                for WAL files.
+              </p>
               <Card>
                 <Table>
                   <TableHeader>
@@ -69,7 +69,7 @@ export const ReadReplicaPricingDialog = ({ replicaCost }: ReadReplicaPricingDial
                       <TableHead className="text-right">Monthly cost</TableHead>
                     </TableRow>
                   </TableHeader>
-                  <TableBody className="[&_td]:py-0 [&_tr]:h-[50px] [&_tr]:border-dotted">
+                  <TableBody>
                     <TableRow>
                       <TableCell>Compute size</TableCell>
                       <TableCell>{compute.label}</TableCell>
@@ -100,7 +100,9 @@ export const ReadReplicaPricingDialog = ({ replicaCost }: ReadReplicaPricingDial
                         </TableCell>
                       </TableRow>
                     )}
-                    <TableRow className="border-t border-solid">
+                  </TableBody>
+                  <TableFooter>
+                    <TableRow>
                       <TableCell colSpan={2} className="font-medium">
                         Estimated total
                       </TableCell>
@@ -108,7 +110,7 @@ export const ReadReplicaPricingDialog = ({ replicaCost }: ReadReplicaPricingDial
                         {totalCost}
                       </TableCell>
                     </TableRow>
-                  </TableBody>
+                  </TableFooter>
                 </Table>
               </Card>
             </>
@@ -123,7 +125,7 @@ export const ReadReplicaPricingDialog = ({ replicaCost }: ReadReplicaPricingDial
               .
             </p>
           )}
-          <TaxDisclaimer className="mt-3" />
+          <TaxDisclaimer className="mt-3 text-sm text-foreground-light" />
         </DialogSection>
       </DialogContent>
     </Dialog>
