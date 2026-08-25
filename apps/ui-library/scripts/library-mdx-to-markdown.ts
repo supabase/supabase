@@ -96,8 +96,8 @@ function rewriteLibraryLinks(tree: Root): void {
 export function transformLibraryMdx(raw: string): string {
   const { content, data } = matter(raw)
   const tree = parseMdx(content)
-  applySchema(tree, markdownSchema)
   rewriteLibraryLinks(tree)
+  applySchema(tree, markdownSchema)
   const body = serializeMdx(tree).trim()
 
   const headerParts: string[] = []
