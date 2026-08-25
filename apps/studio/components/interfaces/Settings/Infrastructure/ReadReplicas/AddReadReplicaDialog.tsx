@@ -1,11 +1,5 @@
 import { useRef } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogSectionSeparator,
-  DialogTitle,
-} from 'ui'
+import { Dialog, DialogContent, DialogHeader, DialogSectionSeparator, DialogTitle } from 'ui'
 
 import { ReadReplicaForm } from './ReadReplicaForm'
 import { useCheckEligibilityDeployReplica } from './ReadReplicaForm/useCheckEligibilityDeployReplica'

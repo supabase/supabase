@@ -46,9 +46,7 @@ export const PrimaryDatabaseNode = () => {
         <p className="text-foreground-light">{region?.displayName}</p>
         <p className="text-foreground-light">{region?.code}</p>
       </div>
-      {!!project && (
-        <RegionFlag className="mt-0.5 w-8" region={project.region} />
-      )}
+      {!!project && <RegionFlag className="mt-0.5 w-8" region={project.region} />}
       <Handle
         type="source"
         position={Position.Right}

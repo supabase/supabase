@@ -10,7 +10,7 @@ interface RegionFlagProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src
 export const RegionFlag = ({ alt = '', className, region, ...props }: RegionFlagProps) => (
   <img
     alt={alt}
-    className={cn('border border-default', className)}
+    className={cn('outline outline-1 outline-foreground-lighter/50', className)}
     src={`${BASE_PATH}/img/regions/${region}.svg`}
     {...props}
   />

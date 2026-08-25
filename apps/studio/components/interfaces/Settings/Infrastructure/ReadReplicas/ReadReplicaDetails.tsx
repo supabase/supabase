@@ -151,9 +151,7 @@ export const ReadReplicaDetails = () => {
                       readOnly
                       className="input-mono"
                       value={regionLabel}
-                      icon={
-                        <RegionFlag className="w-5" region={region ?? ''} />
-                      }
+                      icon={<RegionFlag className="w-5" region={region ?? ''} />}
                     />
                   </FormItemLayout>
                   <FormItemLayout

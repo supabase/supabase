@@ -42,7 +42,6 @@ import { BigQueryFields } from './BigQuery/Fields'
 import { getClickHouseValidationIssues } from './ClickHouse/ClickHouse.utils'
 import { ClickHouseFields } from './ClickHouse/Fields'
 import { DestinationPanelFormSchema as FormSchema } from './DestinationForm.schema'
-import { RegionFlag } from '@/components/ui/RegionFlag'
 import {
   areValidationFailuresEqual,
   buildTableSyncCopyConfig,
@@ -64,6 +63,7 @@ import { ValidationFailuresSection } from './ValidationFailuresSection'
 import { ValidationWarningsDialog } from './ValidationWarningsDialog'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
+import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
