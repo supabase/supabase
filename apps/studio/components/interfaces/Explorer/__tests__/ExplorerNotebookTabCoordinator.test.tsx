@@ -20,7 +20,11 @@ vi.mock('common', async (importOriginal) => {
 
 const NOTEBOOK_ID = 'notebook-coordinator-test'
 
-const seedNotebook = (status: 'new' | 'saved', cells: Notebooks.Cell[] = []) => {
+const seedNotebook = (
+  status: 'new' | 'saved',
+  cells: Notebooks.Cell[] = [],
+  projectRef = 'default'
+) => {
   delete notebooksState.notebooks[NOTEBOOK_ID]
   const notebook: Notebook = {
     id: NOTEBOOK_ID,
@@ -32,8 +36,8 @@ const seedNotebook = (status: 'new' | 'saved', cells: Notebooks.Cell[] = []) => 
     project_id: 1,
     content: { schema_version: 1, cells },
   }
-  if (status === 'new') notebooksState.addNotebook({ projectRef: 'default', notebook })
-  else notebooksState.setNotebook({ projectRef: 'default', notebook })
+  if (status === 'new') notebooksState.addNotebook({ projectRef, notebook })
+  else notebooksState.setNotebook({ projectRef, notebook })
 }
 
 const renderCoordinator = (queryClient: QueryClient) => {
@@ -103,5 +107,25 @@ describe('ExplorerNotebookTabCoordinator', () => {
     const { tabsState, tabId } = renderCoordinator(new QueryClient())
 
     expect(tabsState.getCloseConfirmation([tabId])).toBeNull()
+  })
+
+  it('warns before unload when this project has a notebook with unsaved changes', () => {
+    seedNotebook('new', [createQueryCellSkeleton()])
+    renderCoordinator(new QueryClient())
+
+    const event = new Event('beforeunload', { cancelable: true })
+    window.dispatchEvent(event)
+
+    expect(event.defaultPrevented).toBe(true)
+  })
+
+  it('does not warn before unload for a dirty notebook belonging to another project', () => {
+    seedNotebook('new', [createQueryCellSkeleton()], 'some-other-project')
+    renderCoordinator(new QueryClient())
+
+    const event = new Event('beforeunload', { cancelable: true })
+    window.dispatchEvent(event)
+
+    expect(event.defaultPrevented).toBe(false)
   })
 })

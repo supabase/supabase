@@ -37,7 +37,13 @@ export const ExplorerNotebookTabCoordinator = () => {
 
   useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      const hasUnsaved = Object.values(notebooksState.notebooks).some(hasDiscardableChanges)
+      // `notebooksState.notebooks` is keyed by notebook id across every project the session
+      // has visited, so it has to be filtered by `projectRef` the way every other reader of
+      // the store does. Without it, a dirty notebook left over from another project warns
+      // about unsaved changes the user cannot see from here.
+      const hasUnsaved = Object.values(notebooksState.notebooks).some(
+        (stateNotebook) => stateNotebook.projectRef === ref && hasDiscardableChanges(stateNotebook)
+      )
       if (hasUnsaved) {
         event.preventDefault()
         event.returnValue = true
@@ -46,7 +52,7 @@ export const ExplorerNotebookTabCoordinator = () => {
 
     window.addEventListener('beforeunload', handleBeforeUnload)
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-  }, [])
+  }, [ref])
 
   useEffect(() => {
     return tabs.registerTabTypeHandler('notebook', {
