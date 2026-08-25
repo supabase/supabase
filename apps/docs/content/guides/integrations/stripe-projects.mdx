@@ -58,3 +58,4 @@ Your Supabase project and organization work exactly like ones you create directl
 - Stripe Projects is in developer preview, so behavior may change.
 {/* Inferred from the Supabase-side authorization screen's confirmation states, not confirmed against the account-request API schema; worth double-checking with the Stripe Projects team before publishing. */}
 - Provisioning links to a Supabase organization by matching the email on the Stripe account to a Supabase account; there's no option in the CLI flow to choose a different existing organization.
+- To access the Supabase dashboard for a new Organization provisioned through Stripe Projects, use the `open` command (`stripe projects open supabase`). To log in to the Supabase dashboard directly without the cli, follow the reset password flow for this account.
