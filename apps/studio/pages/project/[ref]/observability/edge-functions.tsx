@@ -243,7 +243,7 @@ const EdgeFunctionsUsage = () => {
                   value: region.key,
                   label: (
                     <div className="flex items-center gap-x-2">
-                      <RegionFlag alt={region.key} className="w-4" region={region.key} />
+                      <RegionFlag aria-hidden="true" className="w-4" region={region.key} />
                       <div className="flex flex-wrap gap-x-2 items-center">
                         <span className="text-foreground text-xs">{region.label}</span>
                         <span className="text-foreground-lighter text-xs">{region.key}</span>
