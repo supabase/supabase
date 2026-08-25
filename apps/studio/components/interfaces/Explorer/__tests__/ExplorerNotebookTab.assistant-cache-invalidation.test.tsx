@@ -10,12 +10,15 @@ import {
   applyNotebookCacheEffects,
   collectNotebookCacheEffects,
 } from '@/lib/ai/notebook-cache-invalidation'
-import { createAssistantMessageWithUpdateNotebookTool } from '@/lib/ai/test-fixtures'
+import {
+  createAssistantMessageWithDeleteNotebookTool,
+  createAssistantMessageWithUpdateNotebookTool,
+} from '@/lib/ai/test-fixtures'
 import { notebooksState } from '@/state/notebooks/notebooks-state'
 import type { Notebook } from '@/state/notebooks/types'
 import { createTabsState, TabsStateContext } from '@/state/tabs'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { setupSqlEditorMocks } from '@/tests/lib/sql-editor-test-utils'
 
 const PROJECT_REF = 'default'
@@ -171,6 +174,35 @@ describe('ExplorerNotebookTab — assistant cache invalidation', () => {
     renderNotebookTab(queryClient)
 
     expect(await screen.findByText('Updated by assistant')).toBeInTheDocument()
+    expect(screen.queryByText('Original content')).not.toBeInTheDocument()
+  })
+
+  it('shows the not-found state after an assistant delete_notebook tool call completes', async () => {
+    setupSqlEditorMocks()
+    seedNotebook()
+
+    const queryClient = new QueryClient()
+    queryClient.setQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK_ID), { id: NOTEBOOK_ID })
+
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref/content/item/:id',
+      response: () =>
+        HttpResponse.json<APIErrorBody>({ message: 'Notebook not found' }, { status: 404 }),
+    })
+
+    renderNotebookTab(queryClient)
+
+    expect(await screen.findByText('Original content')).toBeInTheDocument()
+
+    const message = createAssistantMessageWithDeleteNotebookTool({
+      id: NOTEBOOK_ID,
+      name: 'Test notebook',
+    })
+    const effects = collectNotebookCacheEffects([message], new Set())
+    await applyNotebookCacheEffects({ queryClient, projectRef: PROJECT_REF, effects })
+
+    expect(await screen.findByText('Notebook not found')).toBeInTheDocument()
     expect(screen.queryByText('Original content')).not.toBeInTheDocument()
   })
 })

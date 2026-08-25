@@ -27,6 +27,8 @@ const PROJECT: Project = {
 
 const ENTITLED_FEATURES = ['database']
 
+const buildProject = (overrides: Partial<Project> = {}): Project => ({ ...PROJECT, ...overrides })
+
 const getDedicatedPoolerChart = (project: Project) => {
   const chart = getReportAttributesV2(ENTITLED_FEATURES, project).find(
     (attribute) => attribute.id === 'pgbouncer-connections'
@@ -43,9 +45,20 @@ const getClientConnectionsAttribute = (chart: ReturnType<typeof getDedicatedPool
   return attribute
 }
 
+const getBurstBalanceChart = (project: Project, showDiskIOBurstBalanceChart = true) =>
+  getReportAttributesV2(
+    ENTITLED_FEATURES,
+    project,
+    undefined,
+    undefined,
+    undefined,
+    false,
+    showDiskIOBurstBalanceChart
+  ).find((chart) => chart.id === 'disk-io-burst-balance')
+
 describe('getReportAttributesV2 dedicated pooler chart', () => {
   it('uses PgBouncer copy and links to the docs for standard projects', () => {
-    const chart = getDedicatedPoolerChart(PROJECT)
+    const chart = getDedicatedPoolerChart(buildProject())
     const attribute = getClientConnectionsAttribute(chart)
 
     expect(chart.titleTooltip).toBeUndefined()
@@ -54,12 +67,30 @@ describe('getReportAttributesV2 dedicated pooler chart', () => {
   })
 
   it('uses multipooler copy and drops the docs link for High Availability projects', () => {
-    const chart = getDedicatedPoolerChart({ ...PROJECT, high_availability: true })
+    const chart = getDedicatedPoolerChart(buildProject({ high_availability: true }))
     const attribute = getClientConnectionsAttribute(chart)
 
     expect(chart.docsUrl).toBeUndefined()
     expect(chart.titleTooltip).toContain('multipooler')
     expect(chart.titleTooltip).toContain('docs coming soon')
     expect(attribute).toMatchObject({ label: 'multipooler', tooltip: 'Multipooler connections' })
+  })
+})
+
+describe('getReportAttributesV2 disk-io-burst-balance chart', () => {
+  it('shows the chart for burstable non high availability projects', () => {
+    expect(getBurstBalanceChart(buildProject())?.hide).toBe(false)
+  })
+
+  it('hides the chart for high availability projects', () => {
+    expect(getBurstBalanceChart(buildProject({ high_availability: true }))?.hide).toBe(true)
+  })
+
+  it('hides the chart when the feature flag is off', () => {
+    expect(getBurstBalanceChart(buildProject(), false)?.hide).toBe(true)
+  })
+
+  it('hides the chart for non burstable compute sizes', () => {
+    expect(getBurstBalanceChart(buildProject({ infra_compute_size: '16xlarge' }))?.hide).toBe(true)
   })
 })

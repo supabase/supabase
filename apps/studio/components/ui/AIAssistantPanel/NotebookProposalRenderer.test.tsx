@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { HttpResponse } from 'msw'
 import { describe, expect, it, vi } from 'vitest'
@@ -255,11 +255,12 @@ describe('NotebookProposalRenderer', () => {
     )
   })
 
-  it('shows the notebook action after an automatic update succeeds', () => {
+  it('renders a stable update summary after success instead of diffing against live content', () => {
     render(
       <NotebookProposalRenderer
         mode="update"
         state="output-available"
+        confirmState="success"
         input={{
           id: NOTEBOOK_ID,
           expected_updated_at: '2024-01-01T00:00:00.000Z',
@@ -269,45 +270,16 @@ describe('NotebookProposalRenderer', () => {
       />
     )
 
-    expect(screen.getByRole('link', { name: 'Open notebook' })).toHaveAttribute(
-      'href',
-      `/project/default/explorer/notebook/${NOTEBOOK_ID}`
-    )
-  })
-
-  it('does not show the "can\'t be applied" warning for a completed update whose target cell no longer exists', async () => {
-    mockContentItem(
-      mockNotebookRow({
-        content: {
-          schema_version: 1,
-          cells: [{ _tag: 'markdown_cell', _id: 'cell-2', text: 'world' }],
-        },
-      })
-    )
-
-    render(
-      <NotebookProposalRenderer
-        mode="update"
-        state="output-available"
-        input={{
-          id: NOTEBOOK_ID,
-          expected_updated_at: '2024-01-01T00:00:00.000Z',
-          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
-        }}
-        output={{ id: NOTEBOOK_ID, name: 'Signup funnel' }}
-      />
-    )
-
-    await waitFor(() => expect(screen.queryByText('Loading notebook...')).not.toBeInTheDocument())
+    expect(screen.getByText('Notebook updated: Signup funnel')).toBeInTheDocument()
     expect(screen.queryByText("This update can't be applied as written")).not.toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Open notebook' })).toBeInTheDocument()
+    expect(screen.queryByRole('toolbar', { name: 'Notebook toolbar' })).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Open notebook' })).toHaveAttribute(
       'href',
       `/project/default/explorer/notebook/${NOTEBOOK_ID}`
     )
   })
 
-  it('shows the notebook action inside the Confirm footer for a manually approved completed update', async () => {
+  it('shows the notebook action after a manually approved completed update', async () => {
     mockContentItem(
       mockNotebookRow({
         content: {
@@ -339,7 +311,7 @@ describe('NotebookProposalRenderer', () => {
     expect(screen.queryByText("This update can't be applied as written")).not.toBeInTheDocument()
   })
 
-  it('renders the snapshot-derived diff for a completed delete_cell update, without fetching the notebook', () => {
+  it('renders the stable summary instead of a snapshot-derived delete diff after completion', () => {
     render(
       <NotebookProposalRenderer
         mode="update"
@@ -363,14 +335,15 @@ describe('NotebookProposalRenderer', () => {
       />
     )
 
-    expect(screen.getByText('−1')).toBeInTheDocument()
+    expect(screen.getByText('Notebook updated: Signup funnel')).toBeInTheDocument()
+    expect(screen.queryByText('−1')).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Open notebook' })).toHaveAttribute(
       'href',
       `/project/default/explorer/notebook/${NOTEBOOK_ID}`
     )
   })
 
-  it('renders a single added cell for a completed insert_cell update, not a phantom duplicate', () => {
+  it('renders the stable summary instead of a snapshot-derived insert diff after completion', () => {
     render(
       <NotebookProposalRenderer
         mode="update"
@@ -397,8 +370,9 @@ describe('NotebookProposalRenderer', () => {
       />
     )
 
-    expect(screen.getByText('+1')).toBeInTheDocument()
-    expect(screen.getAllByRole('button', { name: 'Added Markdown cell' })).toHaveLength(1)
+    expect(screen.getByText('Notebook updated: Signup funnel')).toBeInTheDocument()
+    expect(screen.queryByText('+1')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Added Markdown cell' })).not.toBeInTheDocument()
   })
 
   it('falls back to the compact completed body when previous_content is absent', () => {
@@ -474,9 +448,7 @@ describe('NotebookProposalRenderer', () => {
     expect(screen.queryByText('−1')).not.toBeInTheDocument()
   })
 
-  it('derives the diff against live content for a denied update', async () => {
-    mockContentItem(mockNotebookRow())
-
+  it('renders a stable summary for a denied update without diffing against live content', () => {
     render(
       <NotebookProposalRenderer
         mode="update"
@@ -491,12 +463,12 @@ describe('NotebookProposalRenderer', () => {
       />
     )
 
-    expect(await screen.findByText('−1')).toBeInTheDocument()
+    expect(screen.getByText('Skipped notebook update')).toBeInTheDocument()
+    expect(screen.queryByText('−1')).not.toBeInTheDocument()
+    expect(screen.queryByRole('toolbar', { name: 'Notebook toolbar' })).not.toBeInTheDocument()
   })
 
-  it('derives the diff against live content for an errored update', async () => {
-    mockContentItem(mockNotebookRow())
-
+  it('renders a stable summary for an errored update without diffing against live content', () => {
     render(
       <NotebookProposalRenderer
         mode="update"
@@ -511,7 +483,9 @@ describe('NotebookProposalRenderer', () => {
       />
     )
 
-    expect(await screen.findByText('−1')).toBeInTheDocument()
+    expect(screen.getByText('Failed to update notebook')).toBeInTheDocument()
+    expect(screen.queryByText('−1')).not.toBeInTheDocument()
+    expect(screen.queryByRole('toolbar', { name: 'Notebook toolbar' })).not.toBeInTheDocument()
   })
 
   it('keeps the create preview and marks it failed when the tool errors', () => {
