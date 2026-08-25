@@ -7,8 +7,8 @@ import { mdAlternates } from '@/lib/md-alternates'
 
 export const metadata: Metadata = {
   alternates: {
-    canonical: 'https://supabase.com',
     ...mdAlternates('index'),
+    canonical: 'https://supabase.com',
   },
 }
 
