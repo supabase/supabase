@@ -7,7 +7,7 @@ import * as React from 'react'
 import { cn } from '../../../lib/utils/cn'
 
 const toggleVariants = cva(
-  'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors text-foreground-light data-[state=on]:bg-accent data-[state=on]:text-foreground aria-checked:bg-accent aria-checked:text-foreground focus-ring disabled:pointer-events-none disabled:opacity-50 bg-surface-200 hover:bg-surface-300 px-3 py-1 h-auto',
+  'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors text-foreground-light data-[state=on]:bg-accent data-[state=on]:text-foreground aria-checked:bg-accent aria-checked:text-foreground focus-ring disabled:pointer-events-none disabled:opacity-50 bg-surface-200 hover:bg-muted px-3 py-1 h-auto',
   {
     variants: {
       variant: {
