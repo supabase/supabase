@@ -1,6 +1,6 @@
 import {
+  Button,
   Card,
-  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -16,34 +16,40 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { useGetReplicaCost } from './useGetReplicaCost'
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
-export const ReadReplicaPricingDialog = () => {
+interface ReadReplicaPricingDialogProps {
+  replicaCost: ReturnType<typeof useGetReplicaCost>
+}
+
+export const ReadReplicaPricingDialog = ({ replicaCost }: ReadReplicaPricingDialogProps) => {
   const { data: project } = useSelectedProjectQuery()
-  const { totalCost, compute, disk, iops, throughput } = useGetReplicaCost()
+  const { totalCost, compute, disk, iops, throughput } = replicaCost
 
   const showNewDiskManagementUI = project?.cloud_provider === 'AWS'
 
   return (
     <Dialog>
-      <p className="text-sm">
-        New replica will cost an additional <span translate="no">{totalCost}/month</span>.{' '}
-        <DialogTrigger asChild>
-          <button
-            type="button"
-            tabIndex={0}
-            className={cn(InlineLinkClassName, 'cursor-pointer text-foreground-light')}
-          >
-            Learn more
-          </button>
-        </DialogTrigger>
-      </p>
+      <Admonition
+        type="note"
+        layout="responsive"
+        title="Additional monthly cost"
+        description={`Estimated increase: ${totalCost}/month based on your primary database configuration.`}
+        className="mb-0 rounded-none border-x-0"
+        actions={
+          <DialogTrigger asChild>
+            <Button type="button" variant="default" size="tiny">
+              View breakdown
+            </Button>
+          </DialogTrigger>
+        }
+      />
       <DialogContent
         size={showNewDiskManagementUI ? 'medium' : 'small'}
         aria-describedby={undefined}
