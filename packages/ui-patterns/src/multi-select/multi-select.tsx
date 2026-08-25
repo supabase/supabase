@@ -215,7 +215,7 @@ export interface MultiSelectorTriggerProps extends React.HTMLAttributes<HTMLButt
 const MultiSelectorTriggerVariants = cva('', {
   variants: {
     size: {
-      tiny: 'h-[26px] px-2.5 py-0.5 text-xs',
+      tiny: 'h-[26px] p-0.5 text-xs',
       small: 'min-h-[34px] px-3 py-1.5 text-sm',
       medium: 'min-h-[38px] px-4 py-2 text-sm',
       large: 'min-h-[42px] px-4 py-2 text-base',
@@ -325,7 +325,8 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           <div
             ref={badgesRef}
             className={cn(
-              'flex gap-1 -ml-1 overflow-hidden flex-1',
+              'flex gap-1 overflow-hidden flex-1',
+              size !== 'tiny' && '-ml-1',
               IS_BADGE_LIMIT_WRAP && 'flex-wrap',
               !IS_BADGE_LIMIT_WRAP &&
                 'overflow-x-auto scrollbar-thin scrollbar-track-transparent transition-colors scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted scrollbar-thumb-rounded-lg'

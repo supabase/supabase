@@ -55,7 +55,7 @@ describe('multi-select', () => {
       </MultiSelector>
     )
 
-    expect(screen.getByRole('combobox')).toHaveClass('h-[26px]')
+    expect(screen.getByRole('combobox')).toHaveClass('h-[26px]', 'p-0.5')
   })
 
   it('renders selected values with a custom label', () => {
