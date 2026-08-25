@@ -44,6 +44,7 @@ import { Route as AuthSignInPartnerRouteImport } from './routes/_auth/sign-in-pa
 import { Route as AuthSignInMfaRouteImport } from './routes/_auth/sign-in-mfa'
 import { Route as AuthSignInRouteImport } from './routes/_auth/sign-in'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
+import { Route as AuthRecoverAccountAccessRouteImport } from './routes/_auth/recover-account-access'
 import { Route as AuthLostAccountAccessRouteImport } from './routes/_auth/lost-account-access'
 import { Route as AuthForgotPasswordMfaRouteImport } from './routes/_auth/forgot-password-mfa'
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
@@ -500,6 +501,12 @@ const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthRecoverAccountAccessRoute =
+  AuthRecoverAccountAccessRouteImport.update({
+    id: '/recover-account-access',
+    path: '/recover-account-access',
+    getParentRoute: () => AuthRoute,
+  } as any)
 const AuthLostAccountAccessRoute = AuthLostAccountAccessRouteImport.update({
   id: '/lost-account-access',
   path: '/lost-account-access',
@@ -2090,6 +2097,7 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/forgot-password-mfa': typeof AuthForgotPasswordMfaRoute
   '/lost-account-access': typeof AuthLostAccountAccessRoute
+  '/recover-account-access': typeof AuthRecoverAccountAccessRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/sign-in': typeof AuthSignInRoute
   '/sign-in-mfa': typeof AuthSignInMfaRoute
@@ -2402,6 +2410,7 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/forgot-password-mfa': typeof AuthForgotPasswordMfaRoute
   '/lost-account-access': typeof AuthLostAccountAccessRoute
+  '/recover-account-access': typeof AuthRecoverAccountAccessRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/sign-in': typeof AuthSignInRoute
   '/sign-in-mfa': typeof AuthSignInMfaRoute
@@ -2706,6 +2715,7 @@ export interface FileRoutesById {
   '/_auth/forgot-password': typeof AuthForgotPasswordRoute
   '/_auth/forgot-password-mfa': typeof AuthForgotPasswordMfaRoute
   '/_auth/lost-account-access': typeof AuthLostAccountAccessRoute
+  '/_auth/recover-account-access': typeof AuthRecoverAccountAccessRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/_auth/sign-in': typeof AuthSignInRoute
   '/_auth/sign-in-mfa': typeof AuthSignInMfaRoute
@@ -3021,6 +3031,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/forgot-password-mfa'
     | '/lost-account-access'
+    | '/recover-account-access'
     | '/reset-password'
     | '/sign-in'
     | '/sign-in-mfa'
@@ -3333,6 +3344,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/forgot-password-mfa'
     | '/lost-account-access'
+    | '/recover-account-access'
     | '/reset-password'
     | '/sign-in'
     | '/sign-in-mfa'
@@ -3636,6 +3648,7 @@ export interface FileRouteTypes {
     | '/_auth/forgot-password'
     | '/_auth/forgot-password-mfa'
     | '/_auth/lost-account-access'
+    | '/_auth/recover-account-access'
     | '/_auth/reset-password'
     | '/_auth/sign-in'
     | '/_auth/sign-in-mfa'
@@ -4302,6 +4315,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof AuthResetPasswordRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/recover-account-access': {
+      id: '/_auth/recover-account-access'
+      path: '/recover-account-access'
+      fullPath: '/recover-account-access'
+      preLoaderRoute: typeof AuthRecoverAccountAccessRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/lost-account-access': {
@@ -6338,6 +6358,7 @@ interface AuthRouteChildren {
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthForgotPasswordMfaRoute: typeof AuthForgotPasswordMfaRoute
   AuthLostAccountAccessRoute: typeof AuthLostAccountAccessRoute
+  AuthRecoverAccountAccessRoute: typeof AuthRecoverAccountAccessRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AuthSignInRoute: typeof AuthSignInRoute
   AuthSignInMfaRoute: typeof AuthSignInMfaRoute
@@ -6352,6 +6373,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthForgotPasswordMfaRoute: AuthForgotPasswordMfaRoute,
   AuthLostAccountAccessRoute: AuthLostAccountAccessRoute,
+  AuthRecoverAccountAccessRoute: AuthRecoverAccountAccessRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSignInRoute: AuthSignInRoute,
   AuthSignInMfaRoute: AuthSignInMfaRoute,
