@@ -17,7 +17,9 @@ export const Select26Banner = () => (
     <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-center gap-x-5 gap-y-1.5 sm:flex-nowrap">
       <Select26Logo className="shrink-0 text-[11px]" />
       <span className="hidden h-5 w-px shrink-0 bg-[#00482f]/20 dark:bg-white/15 sm:block" />
-      <p className="text-center text-xs font-medium leading-5 sm:text-sm">{SELECT_26_MESSAGE}</p>
+      <p className="hidden text-center text-xs font-medium leading-5 sm:block sm:text-sm">
+        {SELECT_26_MESSAGE}
+      </p>
       <Link
         href={SELECT_26_URL}
         target="_blank"
