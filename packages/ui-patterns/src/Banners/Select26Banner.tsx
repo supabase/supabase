@@ -7,7 +7,7 @@ import { SELECT_26_CTA, SELECT_26_TITLE, SELECT_26_URL, Select26Field } from './
 
 /** Three visible rows; top/bottom reach further inward than the middle row. */
 const WWW_FIELD_BASE_COLS = 24
-const WWW_FIELD_ROW_WIDTHS = [30, 24, 34]
+const WWW_FIELD_ROW_WIDTHS = [26, 24, 28]
 
 export const Select26Banner = () => (
   <div className="relative isolate flex min-h-14 w-full items-center overflow-hidden border-b border-[#00482f]/15 bg-[#f8f3ef] px-4 py-2.5 pr-12 text-base font-medium text-[#001a10] dark:border-white/10 dark:bg-[#0b0e0d] dark:text-[#f8f3ef] sm:px-6 sm:pr-14">
@@ -16,7 +16,7 @@ export const Select26Banner = () => (
       rows={WWW_FIELD_ROW_WIDTHS.length}
       rowWidths={WWW_FIELD_ROW_WIDTHS}
       rowAlign="start"
-      className="absolute inset-y-0 left-0 -z-10 my-auto hidden text-sm opacity-80 dark:opacity-70 sm:flex md:text-base xl:text-[0.95rem]"
+      className="absolute left-0 top-1/2 -z-10 hidden -translate-y-1/2 flex-col text-sm opacity-80 dark:opacity-70 sm:flex md:text-base xl:text-[0.95rem]"
     />
     <Select26Field
       cols={WWW_FIELD_BASE_COLS}
@@ -24,7 +24,7 @@ export const Select26Banner = () => (
       rowWidths={WWW_FIELD_ROW_WIDTHS}
       rowAlign="end"
       mirror
-      className="absolute inset-y-0 right-0 -z-10 my-auto flex text-sm opacity-80 dark:opacity-70 md:text-base xl:text-[0.95rem]"
+      className="absolute right-0 top-1/2 -z-10 flex -translate-y-1/2 flex-col text-sm opacity-80 dark:opacity-70 md:text-base xl:text-[0.95rem]"
     />
     <div className="relative z-10 ml-0 mr-auto flex w-fit max-w-full flex-wrap items-center justify-start gap-x-2 gap-y-1.5 rounded-md bg-[#f8f3ef] px-2.5 py-1 sm:mx-auto sm:flex-nowrap sm:justify-center sm:gap-x-2.5 sm:px-3.5 dark:bg-[#0b0e0d]">
       <p className="text-left leading-5 sm:text-center">

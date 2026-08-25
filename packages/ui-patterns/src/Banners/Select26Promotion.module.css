@@ -7,8 +7,6 @@
 }
 
 .field {
-  display: flex;
-  flex-direction: column;
   width: max-content;
   font-family: 'Departure Mono Superbase', ui-monospace, monospace;
   font-weight: 400;
