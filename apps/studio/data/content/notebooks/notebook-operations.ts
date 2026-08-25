@@ -183,7 +183,7 @@ export function deriveNotebookDiff(
     cell,
   }))
 
-  const insertedAfter = new Map<string, number>()
+  const insertedAfter = new Map<string, Set<NotebookCellDiffEntry>>()
   const insertAfter = (
     anchor: string,
     entry: NotebookCellDiffEntry
@@ -193,9 +193,12 @@ export function deriveNotebookDiff(
       return { _tag: 'unknown_cell_id', cell_id: anchor }
     }
 
-    const offset = insertedAfter.get(anchor) ?? 0
-    entries.splice(anchorIndex + 1 + offset, 0, entry)
-    insertedAfter.set(anchor, offset + 1)
+    const previous = insertedAfter.get(anchor) ?? new Set<NotebookCellDiffEntry>()
+    let index = anchorIndex + 1
+    while (index < entries.length && previous.has(entries[index])) index++
+
+    entries.splice(index, 0, entry)
+    insertedAfter.set(anchor, previous.add(entry))
     return undefined
   }
 

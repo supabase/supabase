@@ -496,6 +496,37 @@ describe('deriveNotebookDiff', () => {
     })
   })
 
+  it('resolves an insert anchored on a cell an earlier operation moved using its new position', () => {
+    // cell-2 moves to the start between the two inserts, so the second one belongs directly
+    // after it there, not after the cell that took over its old slot.
+    const ops: NotebookOperation[] = [
+      {
+        _tag: 'insert_cell',
+        after_cell_id: 'cell-2',
+        cell: { _tag: 'markdown_cell', text: '1st' },
+      },
+      { _tag: 'move_cell', cell_id: 'cell-2', after_cell_id: 'start' },
+      {
+        _tag: 'insert_cell',
+        after_cell_id: 'cell-2',
+        cell: { _tag: 'markdown_cell', text: '2nd' },
+      },
+    ]
+
+    const result = deriveNotebookDiff(NOTEBOOK, ops)
+
+    expect(result).toEqual({
+      success: true,
+      entries: [
+        { _tag: 'moved', cell: NOTEBOOK.cells[1], fromIndex: 1, operationIndex: 1 },
+        { _tag: 'added', cell: { _tag: 'markdown_cell', text: '2nd' }, operationIndex: 2 },
+        { _tag: 'unchanged', cell: NOTEBOOK.cells[0] },
+        { _tag: 'added', cell: { _tag: 'markdown_cell', text: '1st' }, operationIndex: 0 },
+        { _tag: 'unchanged', cell: NOTEBOOK.cells[2] },
+      ],
+    })
+  })
+
   it('reports the same errors as applyNotebookOperations', () => {
     expect(deriveNotebookDiff(NOTEBOOK, [{ _tag: 'delete_cell', cell_id: 'missing' }])).toEqual({
       success: false,
