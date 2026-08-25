@@ -38,7 +38,7 @@ afterEach(() => {
 })
 
 describe('evictNotebookFromCaches', () => {
-  it('removes a saved notebook from the store and invalidates its cache entry in "refresh" mode', async () => {
+  it('removes a saved notebook from the store and drops its cache entry', async () => {
     seedNotebook('saved')
     const queryClient = new QueryClient()
     seedQueryData(queryClient)
@@ -47,26 +47,6 @@ describe('evictNotebookFromCaches', () => {
       queryClient,
       projectRef: PROJECT_REF,
       id: NOTEBOOK_ID,
-      mode: 'refresh',
-    })
-
-    expect(evicted).toBe(true)
-    expect(notebooksState.notebooks[NOTEBOOK_ID]).toBeUndefined()
-    expect(
-      queryClient.getQueryState(contentKeys.resource(PROJECT_REF, NOTEBOOK_ID))?.isInvalidated
-    ).toBe(true)
-  })
-
-  it('removes a saved notebook from the store and drops its cache entry in "remove" mode', async () => {
-    seedNotebook('saved')
-    const queryClient = new QueryClient()
-    seedQueryData(queryClient)
-
-    const evicted = await evictNotebookFromCaches({
-      queryClient,
-      projectRef: PROJECT_REF,
-      id: NOTEBOOK_ID,
-      mode: 'remove',
     })
 
     expect(evicted).toBe(true)
@@ -83,7 +63,6 @@ describe('evictNotebookFromCaches', () => {
       queryClient,
       projectRef: PROJECT_REF,
       id: NOTEBOOK_ID,
-      mode: 'remove',
     })
 
     expect(evicted).toBe(false)
@@ -101,7 +80,6 @@ describe('evictNotebookFromCaches', () => {
       queryClient,
       projectRef: PROJECT_REF,
       id: NOTEBOOK_ID,
-      mode: 'remove',
     })
 
     expect(evicted).toBe(false)
