@@ -454,6 +454,26 @@ describe('deriveNotebookDiff', () => {
     expect(result.entries.map((entry) => entry._tag)).toEqual(['unchanged', 'moved', 'moved'])
   })
 
+  it('keeps a removed entry in place when a move is downgraded to unchanged', () => {
+    // Moving cell-3 after cell-1 is a no-op once cell-2 is deleted, so cell-2 has to stay in
+    // the position it held rather than being pushed below cell-3.
+    const ops: NotebookOperation[] = [
+      { _tag: 'delete_cell', cell_id: 'cell-2' },
+      { _tag: 'move_cell', cell_id: 'cell-3', after_cell_id: 'cell-1' },
+    ]
+
+    const result = deriveNotebookDiff(NOTEBOOK, ops)
+
+    expect(result).toEqual({
+      success: true,
+      entries: [
+        { _tag: 'unchanged', cell: NOTEBOOK.cells[0] },
+        { _tag: 'removed', cell: NOTEBOOK.cells[1], operationIndex: 0 },
+        { _tag: 'unchanged', cell: NOTEBOOK.cells[2] },
+      ],
+    })
+  })
+
   it('leaves removed entries out of the way of inserts anchored at the same cell', () => {
     const ops: NotebookOperation[] = [
       { _tag: 'delete_cell', cell_id: 'cell-2' },
