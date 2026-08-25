@@ -67,7 +67,13 @@ export async function applyNotebookCacheEffects({
   await Promise.all(
     effects.map((effect) => {
       const stateNotebook = notebooksState.notebooks[effect.id]
-      if (stateNotebook && stateNotebook.status !== 'saved') return
+      if (stateNotebook && stateNotebook.status !== 'saved') {
+        notebooksState.markServerDivergence({
+          id: effect.id,
+          type: effect._tag === 'deleted' ? 'deleted' : 'updated',
+        })
+        return
+      }
 
       return evictNotebookFromCaches({ queryClient, projectRef, id: effect.id })
     })
