@@ -220,7 +220,7 @@ export const PricingTableRowDesktop = (props: any) => {
                         <IconPricingMinus plan={planValue} />
                       </div>
                     ) : (
-                      <div className="text-foreground text-xs flex flex-col justify-center gap-1">
+                      <div className="text-foreground text-xs flex flex-col justify-center gap-2">
                         <span className="flex items-center gap-2">
                           {tooltips?.[planName] && (
                             <InfoTooltip
