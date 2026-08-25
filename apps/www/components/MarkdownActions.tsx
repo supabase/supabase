@@ -27,7 +27,7 @@ export function MarkdownActions({
 }: Props) {
   const { copied, copyMarkdown } = useCopyMarkdownFromUrl()
   const sendTelemetryEvent = useSendTelemetryEvent()
-  const mdPath = pagePath === '/' ? '/homepage.md' : `${pagePath}.md`
+  const mdPath = pagePath === '/' ? '/index.md' : `${pagePath}.md`
   const urls = askAiUrls(`${SITE_ORIGIN}${pagePath === '/' ? '' : pagePath}`)
 
   async function handleCopy() {

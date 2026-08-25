@@ -55,6 +55,7 @@ import { AddonVariantId } from '@/data/subscriptions/types'
 import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
   useIsAwsCloudProvider,
@@ -101,6 +102,7 @@ export function DiskManagementForm({
   const isAws = useIsAwsCloudProvider()
   const isAwsK8s = useIsAwsK8sCloudProvider()
   const isAwsNimbus = useIsAwsNimbusCloudProvider()
+  const { isHighAvailability } = useHighAvailability()
 
   const { can: canUpdateDiskConfiguration, isSuccess: isPermissionsLoaded } =
     useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
@@ -234,7 +236,8 @@ export function DiskManagementForm({
 
   const disableDiskInputs = disableDiskSizeInput || isSpendCapEnabled
 
-  const disableComputeInputs = isPlanUpgradeRequired
+  // Compute resizing is not supported for High Availability projects during Alpha
+  const disableComputeInputs = isPlanUpgradeRequired || isHighAvailability
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
   const isProjectResizing = project?.status === PROJECT_STATUS.RESIZING
   const isProjectRequestingDiskChanges = isRequestingChanges && !isProjectResizing
@@ -306,7 +309,10 @@ export function DiskManagementForm({
         })
       }
 
-      if (payload.computeSize !== form.formState.defaultValues?.computeSize) {
+      if (
+        !isHighAvailability &&
+        payload.computeSize !== form.formState.defaultValues?.computeSize
+      ) {
         await updateSubscriptionAddon({
           projectRef: projectRef,
           // cast variant to AddonVariantId to satisfy type
@@ -366,19 +372,21 @@ export function DiskManagementForm({
   }, [modifiedComputeSize, form, isDialogOpen, project])
 
   useEffect(() => {
-    // Initialize field values properly when data has been loaded, preserving any user changes
-    if (isDiskAttributesSuccess || isSuccess) {
+    // Initialize field values properly when data has been loaded, preserving any user changes.
+    // Disk attribute queries never run for High Availability projects (non-AWS cloud provider),
+    // so the project loading is the initialization signal there.
+    if (isDiskAttributesSuccess || isSuccess || isHighAvailability) {
       form.reset(defaultValues, {})
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess, isDiskAttributesSuccess])
+  }, [isSuccess, isDiskAttributesSuccess, isHighAvailability])
 
   // Apply the recommendation only after the sheet's close lifecycle has completed.
   useEffect(() => {
     // The compute add-on supplies the option. Keep the recommendation pending
     // until disk attributes have initialised the form, so a later reset cannot
     // overwrite it. Other infrastructure requests are unrelated to this handoff.
-    if (!recommendedCompute || !isAddonsSuccess) return
+    if (!recommendedCompute || !isAddonsSuccess || isHighAvailability) return
 
     form.setValue('computeSize', recommendedCompute, {
       shouldDirty: true,
@@ -411,6 +419,7 @@ export function DiskManagementForm({
     form,
     isAddonsSuccess,
     isDiskAttributesSuccess,
+    isHighAvailability,
     mainScrollContainer,
     onRecommendedComputeApplied,
     recommendedCompute,

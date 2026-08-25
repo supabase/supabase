@@ -659,6 +659,7 @@ export const ProjectCreationForm = ({
               form={form}
               canCreateProject={canCreateProject}
               instanceSize={instanceSize}
+              highAvailability={highAvailability}
               organizationProjects={organizationProjects}
               isCreatingNewProject={isCreatingNewProject}
               isSuccessNewProject={isSuccessNewProject}

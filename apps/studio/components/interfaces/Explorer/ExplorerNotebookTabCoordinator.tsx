@@ -2,21 +2,18 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useContext, useEffect } from 'react'
 
-import { contentKeys } from '@/data/content/keys'
+import {
+  evictNotebookFromCaches,
+  hasDiscardableChanges,
+} from '@/data/content/notebooks/notebook-cache'
 import { notebooksState, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
-import { hasUnsavedChanges } from '@/state/sql-editor/sql-editor-lifecycle'
 import { TabsStateContext, type Tab } from '@/state/tabs'
 
 const NotebookTabStatusIndicator = ({ tab }: { tab: Tab }) => {
   const notebooksSnap = useNotebooksStateSnapshot()
   const notebookId = tab.metadata?.notebookId
   const stateNotebook = notebookId ? notebooksSnap.notebooks[notebookId] : undefined
-  if (!hasUnsavedChanges(stateNotebook?.status)) return null
-
-  // A never-persisted notebook with no cells has nothing worth flagging as unsaved.
-  const isEmptyNewNotebook =
-    stateNotebook?.status === 'new' && (stateNotebook.notebook.content?.cells.length ?? 0) === 0
-  if (isEmptyNewNotebook) return null
+  if (!hasDiscardableChanges(stateNotebook)) return null
 
   return (
     <span
@@ -39,31 +36,32 @@ export const ExplorerNotebookTabCoordinator = () => {
   const tabs = useContext(TabsStateContext)
 
   useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      const hasUnsaved = Object.values(notebooksState.notebooks).some(hasDiscardableChanges)
+      if (hasUnsaved) {
+        event.preventDefault()
+        event.returnValue = true
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [])
+
+  useEffect(() => {
     return tabs.registerTabTypeHandler('notebook', {
       onClose: (tab) => {
         const notebookId = tab.metadata?.notebookId
         if (!ref || !notebookId) return
 
-        if (notebooksState.notebooks[notebookId]) {
-          notebooksState.removeNotebook({ id: notebookId })
-        }
-
-        notebooksState.removeNotebook({ id: notebookId })
-        queryClient.removeQueries({ queryKey: contentKeys.resource(ref, notebookId) })
+        evictNotebookFromCaches({ queryClient, projectRef: ref, id: notebookId, mode: 'remove' })
       },
       confirmClose: (notebookTabs) => {
         const dirtyCount = notebookTabs.filter((tab) => {
           const notebookId = tab.metadata?.notebookId
           if (!notebookId) return false
 
-          const stateNotebook = notebooksState.notebooks[notebookId]
-          if (!hasUnsavedChanges(stateNotebook?.status)) return false
-
-          // A never-persisted notebook with no cells has nothing worth confirming before discarding.
-          const isEmptyNewNotebook =
-            stateNotebook?.status === 'new' &&
-            (stateNotebook.notebook.content?.cells.length ?? 0) === 0
-          return !isEmptyNewNotebook
+          return hasDiscardableChanges(notebooksState.notebooks[notebookId])
         }).length
 
         if (dirtyCount === 0) return null

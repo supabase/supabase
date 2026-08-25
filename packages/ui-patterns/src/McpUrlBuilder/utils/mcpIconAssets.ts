@@ -10,6 +10,8 @@ import devinDarkIcon from '../assets/devin-icon-dark.svg'
 import devinIcon from '../assets/devin-icon.svg'
 import factoryDarkIcon from '../assets/factory-icon-dark.svg'
 import factoryIcon from '../assets/factory-icon.svg'
+import fxDarkIcon from '../assets/fx-icon-dark.svg'
+import fxIcon from '../assets/fx-icon.svg'
 import geminiCliIcon from '../assets/gemini-cli-icon.svg'
 import gooseDarkIcon from '../assets/goose-icon-dark.svg'
 import gooseIcon from '../assets/goose-icon.svg'
@@ -44,6 +46,7 @@ const MCP_CLIENT_ICON_ASSETS = {
   cursor: { light: cursorIcon, dark: cursorDarkIcon },
   devin: { light: devinIcon, dark: devinDarkIcon },
   factory: { light: factoryIcon, dark: factoryDarkIcon },
+  fx: { light: fxIcon, dark: fxDarkIcon },
   'gemini-cli': { light: geminiCliIcon, dark: geminiCliIcon },
   goose: { light: gooseIcon, dark: gooseDarkIcon },
   grok: { light: grokIcon, dark: grokDarkIcon },

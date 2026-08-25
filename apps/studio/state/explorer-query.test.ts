@@ -234,6 +234,73 @@ describe('explorer query drafts', () => {
     expect(state.drafts['query-1']).toMatchObject({ rowLimit: 100 })
   })
 
+  it('persists and restores result display options independently per draft', () => {
+    const storage = createMemoryStorage()
+    const state = createExplorerQueryState(storage)
+
+    state.createDraft({ id: 'query-1', projectRef: 'project-a' })
+    state.createDraft({ id: 'query-2', projectRef: 'project-a' })
+    state.setDisplay({
+      id: 'query-1',
+      display: {
+        view: 'chart',
+        chart: {
+          type: 'line',
+          x_column: 'day',
+          y_series: ['requests'],
+          cumulative: true,
+          scale: 'log',
+          show_labels: true,
+        },
+      },
+    })
+
+    expect(state.drafts['query-1']).toMatchObject({
+      view: 'chart',
+      chart: { type: 'line', x_column: 'day', y_series: ['requests'] },
+    })
+    expect(state.drafts['query-2']).toMatchObject({ view: 'table', chart: undefined })
+
+    const restored = createExplorerQueryState(storage)
+    expect(restored.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
+    expect(restored.restoreDraft({ id: 'query-2', projectRef: 'project-a' })).toBe(true)
+    expect(restored.drafts['query-1']).toMatchObject({
+      view: 'chart',
+      chart: {
+        type: 'line',
+        x_column: 'day',
+        y_series: ['requests'],
+        cumulative: true,
+        scale: 'log',
+        show_labels: true,
+      },
+    })
+    expect(restored.drafts['query-2']).toMatchObject({ view: 'table', chart: undefined })
+  })
+
+  it('defaults legacy and malformed display options without dropping the draft', () => {
+    const storage = createMemoryStorage()
+    storage.setItem(
+      LOCAL_STORAGE_KEYS.EXPLORER_QUERY_DRAFTS('project-a'),
+      JSON.stringify({
+        'legacy-query': { name: 'Legacy query', sql: 'select 1', updatedAt: 1 },
+        'malformed-query': {
+          name: 'Malformed query',
+          sql: 'select 2',
+          updatedAt: 2,
+          view: 'map',
+          chart: { type: 'pie' },
+        },
+      })
+    )
+
+    const state = createExplorerQueryState(storage)
+    expect(state.restoreDraft({ id: 'legacy-query', projectRef: 'project-a' })).toBe(true)
+    expect(state.restoreDraft({ id: 'malformed-query', projectRef: 'project-a' })).toBe(true)
+    expect(state.drafts['legacy-query']).toMatchObject({ view: 'table', chart: undefined })
+    expect(state.drafts['malformed-query']).toMatchObject({ view: 'table', chart: undefined })
+  })
+
   it('accepts every row limit the row limit menu can produce', () => {
     const storage = createMemoryStorage()
 

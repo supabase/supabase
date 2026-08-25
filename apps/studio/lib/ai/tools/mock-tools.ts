@@ -378,6 +378,7 @@ function createMockNotebookStore() {
   return {
     list: () => [...notebooks.values()],
     get: (id: string) => notebooks.get(id),
+    delete: (id: string) => notebooks.delete(id),
     create: ({
       name,
       description,
@@ -431,8 +432,14 @@ const MOCK_DATABASES_DATA = [
 // against the exact schemas production uses (agentCellSchema's `.strict()` rejection of
 // agent-authored cell ids, update_notebook's real operations schema, etc).
 function createMockNotebookTools(store: MockNotebookStore) {
-  const { list_databases, list_notebooks, get_notebook, create_notebook, update_notebook } =
-    getNotebookTools()
+  const {
+    list_databases,
+    list_notebooks,
+    get_notebook,
+    create_notebook,
+    update_notebook,
+    delete_notebook,
+  } = getNotebookTools()
 
   return {
     list_databases: {
@@ -524,6 +531,18 @@ function createMockNotebookTools(store: MockNotebookStore) {
         if (!result.success) throw new Error(describeNotebookOperationError(result.error))
 
         store.replaceCells(id, result.notebook.cells)
+        return { id, name: notebook.name }
+      },
+    },
+    delete_notebook: {
+      ...delete_notebook,
+      // Same reasoning as create_notebook's override above.
+      needsApproval: false,
+      execute: async ({ id }: { id: string }, _options: ToolExecutionOptions<unknown>) => {
+        const notebook = store.get(id)
+        if (!notebook) throw new Error(`Notebook ${id} not found.`)
+
+        store.delete(id)
         return { id, name: notebook.name }
       },
     },

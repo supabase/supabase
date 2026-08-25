@@ -5,7 +5,7 @@ import { useCallback, useContext, useEffect, useState } from 'react'
 import { Button } from 'ui'
 
 import { QueryEditor, type ExplorerQueryModel } from './QueryEditor'
-import { type QueryResult } from './types'
+import { type QueryDisplay, type QueryResult } from './types'
 import { toQuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { explorerQueryState, useExplorerQueryStateSnapshot } from '@/state/explorer-query'
 import { useControlledRoleImpersonationState } from '@/state/role-impersonation-state'
@@ -71,14 +71,10 @@ export const ExplorerQueryTab = () => {
     )
   }
 
-  const handleResultChange = (nextResult: QueryResult) => {
-    explorerQueryState.setResult({
-      id,
-      result: { ...nextResult, executedAt: Date.now() },
-    })
+  const display: QueryDisplay = {
+    view: draft.view,
+    chart: draft.chart ? { ...draft.chart, y_series: [...draft.chart.y_series] } : undefined,
   }
-
-  const persistTab = () => tabs.makeTabPermanent(createTabId('query', { id }))
 
   const query: ExplorerQueryModel =
     draft._tag === 'logs'
@@ -89,6 +85,15 @@ export const ExplorerQueryTab = () => {
           rowLimit: draft.rowLimit,
         }
 
+  const persistTab = () => tabs.makeTabPermanent(createTabId('query', { id }))
+
+  const handleResultChange = (nextResult: QueryResult) => {
+    explorerQueryState.setResult({
+      id,
+      result: { ...nextResult, executedAt: Date.now() },
+    })
+  }
+
   return (
     <QueryEditor
       id={id}
@@ -96,6 +101,7 @@ export const ExplorerQueryTab = () => {
       title={draft.name}
       query={query}
       result={result}
+      display={display}
       showQuery={showQuery}
       onShowQueryChange={setShowQuery}
       roleImpersonationState={roleImpersonationState}
@@ -118,6 +124,10 @@ export const ExplorerQueryTab = () => {
         explorerQueryState.updateDraft({ id, rowLimit })
       }}
       onResultChange={handleResultChange}
+      onDisplayChange={(display) => {
+        persistTab()
+        explorerQueryState.setDisplay({ id, display })
+      }}
     />
   )
 }
