@@ -11,9 +11,11 @@ test('grant and revoke table privileges for special role identifiers', async () 
   const db = await createTestDatabase()
   try {
     await db.executeQuery(`
-      DROP ROLE IF EXISTS "grant'er", "x$$y", "Public", table_privilege_other;
+      DROP ROLE IF EXISTS "grant'er", "x$$y", "x$pg_meta$y", "x$pg_meta_1$y", "Public", table_privilege_other;
       CREATE ROLE "grant'er";
       CREATE ROLE "x$$y";
+      CREATE ROLE "x$pg_meta$y";
+      CREATE ROLE "x$pg_meta_1$y";
       CREATE ROLE "Public";
       CREATE ROLE table_privilege_other;
       CREATE TABLE public.privilege_quote_probe (id integer);
@@ -33,6 +35,8 @@ test('grant and revoke table privileges for special role identifiers', async () 
         isGrantable: true,
       },
       { relationId: table!.id, grantee: 'x$$y', privilegeType: 'SELECT' },
+      { relationId: table!.id, grantee: 'x$pg_meta$y', privilegeType: 'SELECT' },
+      { relationId: table!.id, grantee: 'x$pg_meta_1$y', privilegeType: 'SELECT' },
       { relationId: table!.id, grantee: 'Public', privilegeType: 'SELECT' },
     ])
     await db.executeQuery(grantSql)
@@ -40,12 +44,14 @@ test('grant and revoke table privileges for special role identifiers', async () 
     const granted = await db.executeQuery<{ role_name: string; granted: boolean }[]>(
       `
         SELECT role_name, has_table_privilege(role_name, 'public.privilege_quote_probe', 'SELECT') AS granted
-        FROM unnest(ARRAY['grant''er', 'x$$y', 'Public', 'table_privilege_other']) AS role_name;
+        FROM unnest(ARRAY['grant''er', 'x$$y', 'x$pg_meta$y', 'x$pg_meta_1$y', 'Public', 'table_privilege_other']) AS role_name;
       `
     )
     expect(granted).toEqual([
       { role_name: "grant'er", granted: true },
       { role_name: 'x$$y', granted: true },
+      { role_name: 'x$pg_meta$y', granted: true },
+      { role_name: 'x$pg_meta_1$y', granted: true },
       { role_name: 'Public', granted: true },
       { role_name: 'table_privilege_other', granted: false },
     ])
@@ -64,6 +70,8 @@ test('grant and revoke table privileges for special role identifiers', async () 
     const { sql: revokeSql } = pgMeta.tablePrivileges.revoke([
       { relationId: table!.id, grantee: "grant'er", privilegeType: 'SELECT' },
       { relationId: table!.id, grantee: 'x$$y', privilegeType: 'SELECT' },
+      { relationId: table!.id, grantee: 'x$pg_meta$y', privilegeType: 'SELECT' },
+      { relationId: table!.id, grantee: 'x$pg_meta_1$y', privilegeType: 'SELECT' },
       { relationId: table!.id, grantee: 'Public', privilegeType: 'SELECT' },
     ])
     await db.executeQuery(revokeSql)
@@ -71,18 +79,22 @@ test('grant and revoke table privileges for special role identifiers', async () 
     const revoked = await db.executeQuery<{ role_name: string; granted: boolean }[]>(
       `
         SELECT role_name, has_table_privilege(role_name, 'public.privilege_quote_probe', 'SELECT') AS granted
-        FROM unnest(ARRAY['grant''er', 'x$$y', 'Public', 'table_privilege_other']) AS role_name;
+        FROM unnest(ARRAY['grant''er', 'x$$y', 'x$pg_meta$y', 'x$pg_meta_1$y', 'Public', 'table_privilege_other']) AS role_name;
       `
     )
     expect(revoked).toEqual([
       { role_name: "grant'er", granted: false },
       { role_name: 'x$$y', granted: false },
+      { role_name: 'x$pg_meta$y', granted: false },
+      { role_name: 'x$pg_meta_1$y', granted: false },
       { role_name: 'Public', granted: false },
       { role_name: 'table_privilege_other', granted: false },
     ])
   } finally {
     await db
-      .executeQuery(`DROP ROLE IF EXISTS "grant'er", "x$$y", "Public", table_privilege_other;`)
+      .executeQuery(
+        `DROP ROLE IF EXISTS "grant'er", "x$$y", "x$pg_meta$y", "x$pg_meta_1$y", "Public", table_privilege_other;`
+      )
       .catch(() => undefined)
     await db.cleanup()
   }
