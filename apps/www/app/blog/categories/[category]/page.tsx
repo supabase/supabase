@@ -4,7 +4,7 @@ import { cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
 
 import CategoryClient from './CategoryClient'
-import { capitalize } from '@/lib/helpers'
+import { capitalize, startCase } from '@/lib/helpers'
 import { getAllCategories, getSortedPosts } from '@/lib/posts'
 import type PostTypes from '@/types/post'
 
@@ -17,10 +17,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const params = await paramsPromise
 
-  const capitalizedCategory = capitalize(params?.category.replaceAll('-', ' '))
+  const categoryLabel = startCase(params?.category.replaceAll('-', ' '))
   return {
-    title: `Blog | ${capitalizedCategory}`,
-    description: 'Latest news from the Supabase team.',
+    title: `Blog | ${categoryLabel}`,
+    description: `Blog posts in ${categoryLabel}.`,
   }
 }
 

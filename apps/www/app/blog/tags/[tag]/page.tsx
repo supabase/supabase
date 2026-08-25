@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
 
 import TagClient from './TagClient'
-import { capitalize } from '@/lib/helpers'
+import { capitalize, startCase } from '@/lib/helpers'
 import { getAllTags, getSortedPosts } from '@/lib/posts'
 import type PostTypes from '@/types/post'
 
@@ -21,10 +21,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const params = await paramsPromise
 
-  const capitalizedTag = capitalize(params?.tag.replaceAll('-', ' '))
+  const tagLabel = startCase(params?.tag.replaceAll('-', ' '))
   return {
-    title: `Blog | ${capitalizedTag}`,
-    description: 'Latest news from the Supabase team.',
+    title: `Blog | ${tagLabel}`,
+    description: `Blog posts tagged ${tagLabel}.`,
   }
 }
 
