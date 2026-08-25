@@ -8,6 +8,7 @@ import {
 } from './notebook-cache-invalidation'
 import {
   createAssistantMessageWithCreateNotebookTool,
+  createAssistantMessageWithDeleteNotebookTool,
   createAssistantMessageWithUpdateNotebookTool,
   createAssistantTextMessage,
   createUserMessage,
@@ -48,6 +49,14 @@ describe('collectNotebookCacheEffects', () => {
     const effects = collectNotebookCacheEffects(messages, new Set())
 
     expect(effects).toEqual([{ _tag: 'upserted', toolCallId: 'call-notebook-1', id: 'notebook-1' }])
+  })
+
+  it('collects a delete_notebook output-available part', () => {
+    const messages = [createAssistantMessageWithDeleteNotebookTool()]
+
+    const effects = collectNotebookCacheEffects(messages, new Set())
+
+    expect(effects).toEqual([{ _tag: 'deleted', toolCallId: 'call-notebook-1', id: 'notebook-1' }])
   })
 
   it('ignores non-terminal tool states', () => {
@@ -126,6 +135,29 @@ describe('applyNotebookCacheEffects', () => {
       queryClient,
       projectRef: PROJECT_REF,
       effects: [{ _tag: 'upserted', toolCallId: 'call-1', id: NOTEBOOK.id }],
+    })
+
+    expect(queryClient.getQueryState(contentKeys.allContentLists(PROJECT_REF))?.isInvalidated).toBe(
+      true
+    )
+    expect(queryClient.getQueryState(contentKeys.infiniteList(PROJECT_REF))?.isInvalidated).toBe(
+      true
+    )
+    expect(queryClient.getQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK.id))).toBeUndefined()
+    expect(notebooksState.notebooks[NOTEBOOK.id]).toBeUndefined()
+  })
+
+  it('invalidates the nav list and evicts a deleted notebook from the cache', async () => {
+    notebooksState.setNotebook({ projectRef: PROJECT_REF, notebook: NOTEBOOK })
+    const queryClient = new QueryClient()
+    queryClient.setQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK.id), { id: NOTEBOOK.id })
+    queryClient.setQueryData(contentKeys.allContentLists(PROJECT_REF), [])
+    queryClient.setQueryData(contentKeys.infiniteList(PROJECT_REF), {})
+
+    await applyNotebookCacheEffects({
+      queryClient,
+      projectRef: PROJECT_REF,
+      effects: [{ _tag: 'deleted', toolCallId: 'call-1', id: NOTEBOOK.id }],
     })
 
     expect(queryClient.getQueryState(contentKeys.allContentLists(PROJECT_REF))?.isInvalidated).toBe(

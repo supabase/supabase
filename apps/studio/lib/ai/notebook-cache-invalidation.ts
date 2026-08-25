@@ -10,10 +10,14 @@ export type NotebookCacheEffect =
   | { _tag: 'upserted'; toolCallId: string; id: string }
   | { _tag: 'deleted'; toolCallId: string; id: string }
 
-const NOTEBOOK_UPSERT_TOOL_TYPES = new Set(['tool-create_notebook', 'tool-update_notebook'])
+const NOTEBOOK_MUTATION_TOOL_TYPES = new Set([
+  'tool-create_notebook',
+  'tool-update_notebook',
+  'tool-delete_notebook',
+])
 
-function isNotebookUpsertPart(part: UIMessage['parts'][number]): part is ToolUIPart {
-  return NOTEBOOK_UPSERT_TOOL_TYPES.has(part.type)
+function isNotebookMutationPart(part: UIMessage['parts'][number]): part is ToolUIPart {
+  return NOTEBOOK_MUTATION_TOOL_TYPES.has(part.type)
 }
 
 export function collectNotebookCacheEffects(
@@ -26,14 +30,18 @@ export function collectNotebookCacheEffects(
     if (message.role !== 'assistant') continue
 
     for (const part of message.parts ?? []) {
-      if (!isNotebookUpsertPart(part)) continue
+      if (!isNotebookMutationPart(part)) continue
       if (part.state !== 'output-available') continue
       if (processed.has(part.toolCallId)) continue
 
       const result = notebookToolOutputSchema.safeParse(part.output)
       if (!result.success) continue
 
-      effects.push({ _tag: 'upserted', toolCallId: part.toolCallId, id: result.data.id })
+      effects.push({
+        _tag: part.type === 'tool-delete_notebook' ? 'deleted' : 'upserted',
+        toolCallId: part.toolCallId,
+        id: result.data.id,
+      })
     }
   }
 
