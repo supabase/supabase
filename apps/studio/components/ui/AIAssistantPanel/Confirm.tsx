@@ -61,7 +61,13 @@ export const ConfirmFooter = ({
                 {cancelLabel}
               </Button>
               {!denyOnly && (
-                <Button size="tiny" variant="primary" onClick={onConfirm} disabled={isInactive}>
+                <Button
+                  size="tiny"
+                  variant="primary"
+                  onClick={onConfirm}
+                  loading={isLoading}
+                  disabled={isInactive}
+                >
                   {isLoading ? confirmLabelLoading : confirmLabel}
                 </Button>
               )}
