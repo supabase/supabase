@@ -85,7 +85,7 @@ const WorkersLayoutContent = ({ children, title }: PropsWithChildren<WorkersLayo
       {canReadWorkers ? (
         children
       ) : (
-        <NoPermission isFullPage resourceText={`view this project's ${PRODUCT_NAME} workers`} />
+        <NoPermission isFullPage resourceText="view this project's workers" />
       )}
     </ProjectLayout>
   )
