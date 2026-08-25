@@ -72,21 +72,21 @@ export const ReadReplicaPricingDialog = ({ replicaCost }: ReadReplicaPricingDial
                   <TableBody>
                     <TableRow>
                       <TableCell>Compute size</TableCell>
-                      <TableCell>{compute.label}</TableCell>
+                      <TableCell className="text-foreground-lighter">{compute.label}</TableCell>
                       <TableCell className="text-right font-mono" translate="no">
                         {compute.cost}
                       </TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>Disk size</TableCell>
-                      <TableCell>{disk.label}</TableCell>
+                      <TableCell className="text-foreground-lighter">{disk.label}</TableCell>
                       <TableCell className="text-right font-mono" translate="no">
                         {disk.cost}
                       </TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>IOPS</TableCell>
-                      <TableCell>{iops.label}</TableCell>
+                      <TableCell className="text-foreground-lighter">{iops.label}</TableCell>
                       <TableCell className="text-right font-mono" translate="no">
                         {iops.cost}
                       </TableCell>
@@ -94,7 +94,9 @@ export const ReadReplicaPricingDialog = ({ replicaCost }: ReadReplicaPricingDial
                     {disk.type === 'gp3' && (
                       <TableRow>
                         <TableCell>Throughput</TableCell>
-                        <TableCell>{throughput.label}</TableCell>
+                        <TableCell className="text-foreground-lighter">
+                          {throughput.label}
+                        </TableCell>
                         <TableCell className="text-right font-mono" translate="no">
                           {throughput.cost}
                         </TableCell>

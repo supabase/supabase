@@ -89,10 +89,12 @@ export const ReadReplicaForm = ({
           className="p-5 [&>div]:gap-y-1 [&>div>span]:text-foreground-lighter"
           label="Region"
           description={
-            <span>
-              This replica will be deployed in{' '}
-              <span translate="no">{selectedRegionDetails?.region}</span>.
-            </span>
+            canDeployReplica ? (
+              <span>
+                This replica will be deployed in{' '}
+                <span translate="no">{selectedRegionDetails?.region}</span>.
+              </span>
+            ) : undefined
           }
         >
           <Select

@@ -2,7 +2,6 @@ import { useRef } from 'react'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogSectionSeparator,
   DialogTitle,
@@ -43,6 +42,7 @@ export const AddReadReplicaDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         size="small"
+        aria-describedby={undefined}
         onCloseAutoFocus={(event) => {
           const recommendation = pendingRecommendationRef.current
           if (!recommendation) return
@@ -57,7 +57,6 @@ export const AddReadReplicaDialog = ({
         <div className="flex min-h-0 flex-col" tabIndex={-1}>
           <DialogHeader>
             <DialogTitle>Add read replica</DialogTitle>
-            <DialogDescription>Choose where to deploy your replica.</DialogDescription>
           </DialogHeader>
           <DialogSectionSeparator />
 
