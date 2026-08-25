@@ -7,12 +7,13 @@ import { Bot, User } from 'lucide-react'
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { cn } from 'ui'
 
-import styles from './workers-visual.module.css'
-import { WorkersLogo } from './WorkersLogo'
+import SectionContainerWithCn from '../../../../components/Layouts/SectionContainerWithCn'
+import styles from './compute-visual.module.css'
+import { ComputeLogo } from './ComputeLogo'
 
 // Ephemeral sandboxes cycle through this lifecycle on a loop: empty (no
 // container running) -> deploying -> active -> stopping -> suspending -> empty.
-// Durations are compressed relative to a real Worker's lifetime ("a few
+// Durations are compressed relative to a real sandbox's lifetime ("a few
 // minutes" of activity becomes tens of seconds, etc.) so the loop stays
 // watchable on a marketing page.
 type SandboxPhase = 'empty' | 'deploying' | 'active' | 'stopping' | 'suspending'
@@ -75,7 +76,7 @@ const SANDBOX_SLOTS = [
   { name: 'migrate-2d8a', size: '4 GB · 2 vCPU', delay: 3000 },
 ] as const
 
-const PERSISTENT_WORKERS = [
+const PERSISTENT_SERVICES = [
   { name: 'api', runtime: 'node', size: '2 GB · 1 vCPU', since: '2mo ago' },
   { name: 'embeddings', runtime: 'dockerfile', size: '4 GB · 2 vCPU', since: '3d ago' },
 ] as const
@@ -148,7 +149,7 @@ function useSandboxLifecycle(
   return { phase, elapsed, runtime, name }
 }
 
-function WorkerIcon({ dimmed = false }: { dimmed?: boolean }) {
+function ComputeIcon({ dimmed = false }: { dimmed?: boolean }) {
   return (
     <div
       className={cn(
@@ -156,12 +157,12 @@ function WorkerIcon({ dimmed = false }: { dimmed?: boolean }) {
         dimmed ? 'text-foreground-muted opacity-30' : 'text-foreground-lighter'
       )}
     >
-      <WorkersLogo size={16} />
+      <ComputeLogo size={16} />
     </div>
   )
 }
 
-function WorkerCardShell({ children }: { children: React.ReactNode }) {
+function ComputeCardShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex w-full flex-col rounded-lg border border-border bg-surface-75 overflow-hidden">
       {children}
@@ -169,7 +170,7 @@ function WorkerCardShell({ children }: { children: React.ReactNode }) {
   )
 }
 
-function WorkerCardHeader({
+function ComputeCardHeader({
   name,
   runtime,
   statusSlot,
@@ -181,7 +182,7 @@ function WorkerCardHeader({
   return (
     <div className="flex flex-col sm:flex-row sm:items-center gap-2 px-3 py-2.5">
       <div className="flex items-center gap-2">
-        <WorkerIcon />
+        <ComputeIcon />
         <div className="flex min-w-0 flex-col leading-tight">
           <span className="truncate text-xs text-foreground">{name}</span>
           <span className="truncate font-mono text-[11px] text-foreground-muted">{runtime}</span>
@@ -192,7 +193,7 @@ function WorkerCardHeader({
   )
 }
 
-function WorkerCardFooter({
+function ComputeCardFooter({
   left,
   right,
   className,
@@ -214,11 +215,16 @@ function WorkerCardFooter({
   )
 }
 
-// Always-on production backend worker: fixed status, no lifecycle.
-function PersistentWorkerCard({ name, runtime, size, since }: (typeof PERSISTENT_WORKERS)[number]) {
+// Always-on production backend service: fixed status, no lifecycle.
+function PersistentServiceCard({
+  name,
+  runtime,
+  size,
+  since,
+}: (typeof PERSISTENT_SERVICES)[number]) {
   return (
-    <WorkerCardShell>
-      <WorkerCardHeader
+    <ComputeCardShell>
+      <ComputeCardHeader
         name={name}
         runtime={runtime}
         statusSlot={
@@ -228,8 +234,8 @@ function PersistentWorkerCard({ name, runtime, size, since }: (typeof PERSISTENT
           </>
         }
       />
-      <WorkerCardFooter className="hidden sm:flex" left={size} right={since} />
-      <WorkerCardFooter
+      <ComputeCardFooter className="hidden sm:flex" left={size} right={since} />
+      <ComputeCardFooter
         className="sm:hidden"
         left={
           <>
@@ -239,14 +245,14 @@ function PersistentWorkerCard({ name, runtime, size, since }: (typeof PERSISTENT
         }
         right={since}
       />
-    </WorkerCardShell>
+    </ComputeCardShell>
   )
 }
 
-// Ephemeral sandbox worker: renders as a dashed empty slot until an agent
+// Ephemeral sandbox: renders as a dashed empty slot until an agent
 // spins it up, then crossfades into a live card that tracks its phase.
 // Lifecycle state is lifted to the parent (see useSandboxLifecycle call
-// sites in WorkersVisual) so the connector lines can react to it too.
+// sites in ComputeVisual) so the connector lines can react to it too.
 function SandboxCard({
   name,
   size,
@@ -271,7 +277,7 @@ function SandboxCard({
           transition={{ duration: 0.3 }}
           className="flex h-full items-center justify-center rounded-lg border border-dashed border-border"
         >
-          <WorkerIcon dimmed />
+          <ComputeIcon dimmed />
         </motion.div>
       ) : (
         <motion.div
@@ -281,8 +287,8 @@ function SandboxCard({
           exit={{ opacity: 0, scale: 0.96 }}
           transition={{ duration: 0.3 }}
         >
-          <WorkerCardShell>
-            <WorkerCardHeader
+          <ComputeCardShell>
+            <ComputeCardHeader
               name={name}
               runtime={runtime}
               statusSlot={
@@ -306,12 +312,12 @@ function SandboxCard({
                 </AnimatePresence>
               }
             />
-            <WorkerCardFooter
+            <ComputeCardFooter
               className="hidden sm:flex"
               left={size}
               right={phase === 'suspending' ? '–' : formatElapsed(elapsed)}
             />
-            <WorkerCardFooter
+            <ComputeCardFooter
               className="sm:hidden"
               left={
                 <AnimatePresence mode="wait" initial={false}>
@@ -335,7 +341,7 @@ function SandboxCard({
               }
               right={phase === 'suspending' ? '–' : formatElapsed(elapsed)}
             />
-          </WorkerCardShell>
+          </ComputeCardShell>
         </motion.div>
       )}
     </AnimatePresence>
@@ -487,7 +493,7 @@ function roundedPath(points: Point[], radius = CORNER_RADIUS) {
 }
 
 // Routes every connector from the measured layout: one line per column from
-// its source card up into the bottom Worker card, plus the always-on column
+// its source card up into the bottom card of that column, plus the always-on
 // feeding the application. Anchoring at card centers and masking the card
 // rectangles is what makes a line read as plugging into the card.
 function buildConnectors(geometry: Geometry, live: Record<string, boolean>): Connector[] {
@@ -512,7 +518,7 @@ function buildConnectors(geometry: Geometry, live: Record<string, boolean>): Con
   const center = (key: NodeKey): Point => ({ x: cx(key), y: cy(key) })
   const at = (x: number, y: number): Point => ({ x, y })
 
-  // Horizontal bands: the empty strips above and below the Worker grid, where
+  // Horizontal bands: the empty strips above and below the card grid, where
   // each connector makes its sideways jog.
   const sourceBand = (bottom('embeddings') + top('human')) / 2
   const appBand = (bottom('app') + top('api')) / 2
@@ -563,7 +569,7 @@ function buildConnectors(geometry: Geometry, live: Record<string, boolean>): Con
 }
 
 // Faint dashed base for every connector, plus a brighter overlay that marches
-// along the path (see .flow) and fades out while the Worker it feeds is idle.
+// along the path (see .flow) and fades out while the workload it feeds is idle.
 function ConnectorLayer({
   geometry,
   live,
@@ -571,7 +577,7 @@ function ConnectorLayer({
   geometry: Geometry | null
   live: Record<string, boolean>
 }) {
-  const maskId = `workers-connectors-mask-${useId()}`
+  const maskId = `compute-connectors-mask-${useId()}`
   if (!geometry) return null
 
   const { width, height, boxes } = geometry
@@ -628,7 +634,7 @@ function ConnectorLayer({
   )
 }
 
-export function WorkersVisual() {
+export function ComputeVisual() {
   // Lifecycle state for the 4 sandbox slots, lifted up here so the connector
   // lines below can react to whichever sandboxes they feed.
   const sandboxTopMid = useSandboxLifecycle(SANDBOX_RUNTIMES, SANDBOX_SLOTS[0])
@@ -648,63 +654,63 @@ export function WorkersVisual() {
   }
 
   return (
-    <figure ref={containerRef} className="relative w-full max-w-3xl mx-auto py-8">
-      <span className="sr-only">
-        A diagram showing humans and agents connecting to Workers. Two always-on backend Workers
-        serve the application; agents spin up short-lived sandbox Workers on demand, which build,
-        run, and suspend automatically.
-      </span>
+    <SectionContainerWithCn>
+      <figure ref={containerRef} className="relative w-full max-w-3xl mx-auto">
+        <span className="sr-only">
+          A diagram showing humans and agents connecting to Supabase Compute. Two always-on backend
+          services serve the application; agents spin up short-lived sandboxes on demand, which
+          build, run, and suspend automatically.
+        </span>
 
-      <div className="aspect-square -z-10 h-full inset-0 mx-auto absolute scale-200 bg-radial from-foreground-muted/5 via-transparent to-transparent" />
+        <ConnectorLayer geometry={geometry} live={live} />
 
-      <ConnectorLayer geometry={geometry} live={live} />
+        <div className="relative grid grid-cols-3 gap-x-2" aria-hidden="true">
+          <div className="flex col-span-full justify-center">
+            <div ref={registerNode('app')}>
+              <ApplicationCard />
+            </div>
+          </div>
 
-      <div className="relative grid grid-cols-3 gap-x-2" aria-hidden="true">
-        <div className="flex col-span-full justify-center">
-          <div ref={registerNode('app')}>
-            <ApplicationCard />
+          <div className="col-span-full h-12" />
+
+          <div ref={registerNode('api')} className="sm:pr-2">
+            <PersistentServiceCard {...PERSISTENT_SERVICES[0]} />
+          </div>
+          <div ref={registerNode('sandboxTopMid')} className="h-full">
+            <SandboxCard size={SANDBOX_SLOTS[0].size} {...sandboxTopMid} />
+          </div>
+          <div ref={registerNode('sandboxTopRight')} className="h-full">
+            <SandboxCard size={SANDBOX_SLOTS[1].size} {...sandboxTopRight} />
+          </div>
+
+          <div className="col-span-full h-2" />
+
+          <div ref={registerNode('embeddings')} className="sm:pr-2">
+            <PersistentServiceCard {...PERSISTENT_SERVICES[1]} />
+          </div>
+          <div ref={registerNode('sandboxBottomMid')} className="h-full">
+            <SandboxCard size={SANDBOX_SLOTS[2].size} {...sandboxBottomMid} />
+          </div>
+          <div ref={registerNode('sandboxBottomRight')} className="h-full">
+            <SandboxCard size={SANDBOX_SLOTS[3].size} {...sandboxBottomRight} />
+          </div>
+
+          <div className="col-span-full h-12" />
+
+          {/* Sources */}
+          <div className="col-span-full flex justify-center gap-2">
+            <div ref={registerNode('human')}>
+              <SourceCard icon={User} label="Human" />
+            </div>
+            <div ref={registerNode('agent1')}>
+              <SourceCard icon={Bot} label="Agent 1" />
+            </div>
+            <div ref={registerNode('agent2')}>
+              <SourceCard icon={Bot} label="Agent 2" />
+            </div>
           </div>
         </div>
-
-        <div className="col-span-full h-12" />
-
-        <div ref={registerNode('api')}>
-          <PersistentWorkerCard {...PERSISTENT_WORKERS[0]} />
-        </div>
-        <div ref={registerNode('sandboxTopMid')} className="h-full">
-          <SandboxCard size={SANDBOX_SLOTS[0].size} {...sandboxTopMid} />
-        </div>
-        <div ref={registerNode('sandboxTopRight')} className="h-full">
-          <SandboxCard size={SANDBOX_SLOTS[1].size} {...sandboxTopRight} />
-        </div>
-
-        <div className="col-span-full h-2" />
-
-        <div ref={registerNode('embeddings')}>
-          <PersistentWorkerCard {...PERSISTENT_WORKERS[1]} />
-        </div>
-        <div ref={registerNode('sandboxBottomMid')} className="h-full">
-          <SandboxCard size={SANDBOX_SLOTS[2].size} {...sandboxBottomMid} />
-        </div>
-        <div ref={registerNode('sandboxBottomRight')} className="h-full">
-          <SandboxCard size={SANDBOX_SLOTS[3].size} {...sandboxBottomRight} />
-        </div>
-
-        <div className="col-span-full h-12" />
-
-        {/* Sources */}
-        <div className="col-span-full flex justify-center gap-2">
-          <div ref={registerNode('human')}>
-            <SourceCard icon={User} label="Human" />
-          </div>
-          <div ref={registerNode('agent1')}>
-            <SourceCard icon={Bot} label="Agent 1" />
-          </div>
-          <div ref={registerNode('agent2')}>
-            <SourceCard icon={Bot} label="Agent 2" />
-          </div>
-        </div>
-      </div>
-    </figure>
+      </figure>
+    </SectionContainerWithCn>
   )
 }

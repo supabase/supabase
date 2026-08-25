@@ -4,38 +4,32 @@ import { EyeOff, KeyRound, Network, Plug, ScanSearch, ShieldCheck } from 'lucide
 const features = [
   {
     title: 'Short-lived credentials',
-    paragraph:
-      'Access to Workers is controlled through Supabase Auth, with short-lived keys instead of long-lived secrets that are hard to revoke.',
+    paragraph: 'Access runs through Supabase Auth with short-lived keys, not standing secrets.',
     icon: <KeyRound className="w-5 h-5 stroke-[1.4px]" />,
   },
   {
     title: 'Zero-config data access',
-    paragraph:
-      'Workers reach your database and Storage with the permissions carried by their key — no connection strings to wire up. The Server SDK removes the boilerplate.',
+    paragraph: 'Reach your database and Storage with the permissions your key already carries.',
     icon: <Plug className="w-5 h-5 stroke-[1.4px]" />,
   },
   {
-    title: 'Per-worker firewalls',
-    paragraph:
-      'Define exactly which external services and ports each Worker can reach. Untrusted code stays inside the boundary you set.',
+    title: 'Per-workload firewalls',
+    paragraph: 'Define which external endpoints and ports each workload can reach.',
     icon: <Network className="w-5 h-5 stroke-[1.4px]" />,
   },
   {
     title: 'Cloaked secrets',
-    paragraph:
-      'Scope secrets to individual Workers. Optionally cloak values at runtime: Supabase injects them only on requests to approved services, so your code — and your agents — never see them.',
+    paragraph: 'Scope secrets per workload, and cloak values so your code never sees them.',
     icon: <EyeOff className="w-5 h-5 stroke-[1.4px]" />,
   },
   {
     title: 'Patched automatically',
-    paragraph:
-      'Kernel-level security patches roll out to every Worker runtime automatically, with no action on your part.',
+    paragraph: 'Kernel-level security patches roll out automatically. Nothing to do on your part.',
     icon: <ShieldCheck className="w-5 h-5 stroke-[1.4px]" />,
   },
   {
     title: 'Dependency scanning',
-    paragraph:
-      'Dependencies are scanned at runtime and you are alerted as new vulnerabilities are disclosed — including packages flagged after you shipped.',
+    paragraph: 'Dependencies are scanned at runtime, with alerts as new vulnerabilities land.',
     icon: <ScanSearch className="w-5 h-5 stroke-[1.4px]" />,
   },
 ]
@@ -52,9 +46,9 @@ export function TrustBoundarySection() {
           <span className="text-foreground-lighter block">preconfigured</span>
         </h2>
         <p className="text-foreground-lighter text-sm lg:text-base">
-          A Worker inherits your project&apos;s auth, roles, and permissions the moment it starts.
-          Agents get a sandbox that is already scoped to the data it is allowed to touch — nothing
-          more.
+          Every sandbox and service inherits your project&apos;s auth, roles, and permissions the
+          moment it starts. Agents get a sandbox that is already scoped to the data it is allowed to
+          touch — nothing more.
         </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">

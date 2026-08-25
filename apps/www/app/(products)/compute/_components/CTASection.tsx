@@ -13,7 +13,7 @@ export function CTASection() {
             <span className="block text-foreground-lighter">next to your data</span>
           </h2>
           <p className="text-foreground-lighter text-sm max-w-md">
-            Workers is in Private Alpha. Join the waitlist and we&apos;ll reach out as invites roll
+            Compute is in Private Alpha. Join the waitlist and we&apos;ll reach out as invites roll
             out.
           </p>
         </div>

@@ -74,7 +74,7 @@ const MainProducts: ProductType = {
     ),
     description_short: 'Sandboxes and backend services',
     label: 'Private Alpha',
-    url: '/workers',
+    url: '/compute',
   },
   [PRODUCT_SHORTNAMES.REALTIME]: {
     name: PRODUCT_NAMES.REALTIME,

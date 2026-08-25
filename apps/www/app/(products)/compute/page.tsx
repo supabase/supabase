@@ -1,15 +1,15 @@
 import type { Metadata } from 'next'
 
-import { WorkersContent } from './_components/WorkersContent'
+import { ComputeContent } from './_components/ComputeContent'
 import { mdAlternates } from '@/lib/md-alternates'
 
 export const metadata: Metadata = {
-  title: 'Workers | Supabase',
+  title: 'Compute | Supabase',
   description:
     'Run AI-agent sandboxes and production backends on one runtime, next to your database. Now in Private Alpha.',
-  alternates: mdAlternates('workers'),
+  alternates: mdAlternates('compute'),
 }
 
-export default function WorkersPage() {
-  return <WorkersContent />
+export default function ComputePage() {
+  return <ComputeContent />
 }

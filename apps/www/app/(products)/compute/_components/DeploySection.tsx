@@ -2,16 +2,18 @@
 
 import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 import { AnimatePresence, motion, useInView } from 'framer-motion'
+import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
+import { Button } from 'ui'
 
 const TERMINAL_LINES = [
-  { text: '$ supabase workers deploy api', delay: 0 },
+  { text: '$ supabase compute deploy api', delay: 0 },
   { text: 'Building from Dockerfile...', delay: 0.3, dim: true },
   { text: "Provisioning 2 GB / 1 vCPU in your database's region...", delay: 0.6, dim: true },
   { text: 'Issuing scoped project credentials...', delay: 0.9, dim: true },
   { text: '', delay: 1.1 },
-  { text: '✓ Worker deployed:', delay: 1.2, accent: true },
-  { text: '  https://your-project.supabase.co/workers/api', delay: 1.3, accent: true },
+  { text: '✓ Service deployed:', delay: 1.2, accent: true },
+  { text: '  https://your-project.supabase.co/compute/api', delay: 1.3, accent: true },
 ]
 
 function TerminalAnimation() {
@@ -58,7 +60,7 @@ export function DeploySection() {
   return (
     <SectionContainerWithCn spacing="sections">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-start">
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col items-start gap-4">
           <span className="text-foreground-muted font-mono text-xs uppercase tracking-widest">
             Deployment
           </span>
@@ -70,6 +72,9 @@ export function DeploySection() {
             The same deployment surface serves humans and agents: one command in a terminal, one
             tool call in an agent session, one request against the API.
           </p>
+          <Button asChild>
+            <Link href="#waitlist">Join the waitlist</Link>
+          </Button>
         </div>
         <TerminalAnimation />
       </div>

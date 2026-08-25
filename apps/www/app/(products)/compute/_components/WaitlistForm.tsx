@@ -155,7 +155,7 @@ export function WaitlistForm() {
       </div>
       <div className="flex flex-col gap-2">
         <Label htmlFor="useCase" className="text-foreground-light text-left">
-          What will you run on Workers?
+          What will you run on Compute?
         </Label>
         <Select
           value={formData.useCase}
@@ -180,7 +180,7 @@ export function WaitlistForm() {
           name="details"
           value={formData.details}
           onChange={handleChange}
-          placeholder="What are you building, and what would you run on Workers?"
+          placeholder="What are you building, and what would you run on Compute?"
           rows={3}
         />
       </div>

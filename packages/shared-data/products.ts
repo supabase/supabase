@@ -11,7 +11,7 @@ export enum PRODUCT_NAMES {
   AUTHENTICATION = 'Authentication',
   STORAGE = 'Storage',
   FUNCTIONS = 'Edge Functions',
-  WORKERS = 'Workers',
+  WORKERS = 'Compute',
   REALTIME = 'Realtime',
 }
 

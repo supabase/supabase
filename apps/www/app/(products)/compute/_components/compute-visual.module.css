@@ -1,4 +1,4 @@
-/* Marching-dashes flow on the connector lines between sources, Workers, and
+/* Marching-dashes flow on the connector lines between sources, workloads, and
  * the application. Every connector path is authored source -> target, so a
  * negative offset makes the dashes travel in the direction of the flow. */
 .flow {

@@ -1,15 +1,15 @@
-interface WorkersLogoProps {
+interface ComputeLogoProps {
   size?: number
   className?: string
 }
 
 /**
- * The Workers mark: a solid outer hexagon around an inner isometric cube.
+ * The Compute mark: a solid outer hexagon around an inner isometric cube.
  * Kept as its own multi-path component because the shared product-icon
  * system (`shared-data/products.ts`) stores a single `d` string per size
  * with one uniform stroke, so it can't carry the per-path linecap styles.
  */
-export function WorkersLogo({ size = 18, className }: WorkersLogoProps) {
+export function ComputeLogo({ size = 18, className }: ComputeLogoProps) {
   return (
     <svg
       width={size}
