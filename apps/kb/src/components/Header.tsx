@@ -5,7 +5,7 @@ export function Header() {
         <a href="https://supabase.com" className="flex items-center gap-3">
           <img
             src={`${import.meta.env.BASE_URL}supabase-logo-wordmark.svg`}
-            alt="Supabase"
+            alt="Supabase home"
             className="h-5 w-auto"
           />
         </a>
