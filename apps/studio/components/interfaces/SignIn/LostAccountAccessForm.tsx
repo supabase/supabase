@@ -17,7 +17,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
 import * as z from 'zod'
 
-import { useCreateAccountRecoveryRequestMutation } from '@/data/misc/create-account-recovery-request'
+import { useCreateAccountRecoveryRequestMutation } from '@/data/account-recovery/create-account-recovery-request-mutation'
 
 const lostAccountSchema = z.object({
   email: z.string().min(1, 'Please provide an email address').email('Must be a valid email'),
