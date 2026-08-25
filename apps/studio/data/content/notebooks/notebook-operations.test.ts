@@ -5,7 +5,7 @@ import {
   deriveNotebookDiff,
   type NotebookOperation,
 } from './notebook-operations'
-import type { NotebookWire } from './notebook-schema'
+import type { AgentCell, NotebookWire } from './notebook-schema'
 
 const NOTEBOOK: NotebookWire = {
   schema_version: 1,
@@ -432,8 +432,8 @@ describe('deriveNotebookDiff', () => {
       ],
     }
 
-    const first = { _tag: 'markdown_cell' as const, text: 'first' }
-    const second = { _tag: 'markdown_cell' as const, text: 'second' }
+    const first = { _tag: 'markdown_cell', text: 'first' } satisfies AgentCell
+    const second = { _tag: 'markdown_cell', text: 'second' } satisfies AgentCell
 
     const result = deriveNotebookDiff(notebook, [
       { _tag: 'insert_cell', after_cell_id: 'cell-1', cell: first },
@@ -471,6 +471,36 @@ describe('deriveNotebookDiff', () => {
       { _tag: 'removed', cell: NOTEBOOK.cells[1], operationIndex: 0 },
       { _tag: 'unchanged', cell: NOTEBOOK.cells[2] },
     ])
+  })
+
+  it('keeps an insert anchored to a downgraded move right after it', () => {
+    const notebook: NotebookWire = {
+      schema_version: 1,
+      cells: [
+        { _tag: 'markdown_cell', _id: 'cell-1', text: '# A' },
+        { _tag: 'markdown_cell', _id: 'cell-2', text: '# B' },
+        { _tag: 'markdown_cell', _id: 'cell-3', text: '# C' },
+      ],
+    }
+
+    const inserted = { _tag: 'markdown_cell', text: 'X' } satisfies AgentCell
+
+    // Moving B after A changes nothing about the surviving order, so the move is
+    // downgraded — but X was inserted after B and must stay right after B.
+    const result = deriveNotebookDiff(notebook, [
+      { _tag: 'insert_cell', after_cell_id: 'cell-2', cell: inserted },
+      { _tag: 'move_cell', cell_id: 'cell-2', after_cell_id: 'cell-1' },
+    ])
+
+    expect(result).toEqual({
+      success: true,
+      entries: [
+        { _tag: 'unchanged', cell: notebook.cells[0] },
+        { _tag: 'unchanged', cell: notebook.cells[1] },
+        { _tag: 'added', cell: inserted, operationIndex: 0 },
+        { _tag: 'unchanged', cell: notebook.cells[2] },
+      ],
+    })
   })
 
   it('downgrades moves that cancel out to unchanged', () => {
