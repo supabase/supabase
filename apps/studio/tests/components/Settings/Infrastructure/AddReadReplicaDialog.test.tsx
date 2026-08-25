@@ -6,13 +6,18 @@ import { describe, expect, test, vi } from 'vitest'
 import { AddReadReplicaDialog } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/AddReadReplicaDialog'
 import { customRender } from '@/tests/lib/custom-render'
 
+const { mockUseCheckEligibilityDeployReplica, mockUseGetReplicaCost } = vi.hoisted(() => ({
+  mockUseCheckEligibilityDeployReplica: vi.fn(() => ({ can: false })),
+  mockUseGetReplicaCost: vi.fn(() => ({})),
+}))
+
 vi.mock(
   '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicaForm/useCheckEligibilityDeployReplica',
-  () => ({ useCheckEligibilityDeployReplica: () => ({ can: false }) })
+  () => ({ useCheckEligibilityDeployReplica: mockUseCheckEligibilityDeployReplica })
 )
 vi.mock(
   '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicaForm/useGetReplicaCost',
-  () => ({ useGetReplicaCost: () => ({}) })
+  () => ({ useGetReplicaCost: mockUseGetReplicaCost })
 )
 vi.mock('@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicaForm', () => ({
   ReadReplicaForm: ({
@@ -53,6 +58,15 @@ const renderDialog = (onRecommendCompute = vi.fn()) => {
 }
 
 describe('AddReadReplicaDialog', () => {
+  test('does not load form data while closed', () => {
+    customRender(
+      <AddReadReplicaDialog open={false} onOpenChange={vi.fn()} onRecommendCompute={vi.fn()} />
+    )
+
+    expect(mockUseCheckEligibilityDeployReplica).not.toHaveBeenCalled()
+    expect(mockUseGetReplicaCost).not.toHaveBeenCalled()
+  })
+
   test('closes an unchanged dialog without confirmation', async () => {
     const user = userEvent.setup()
     renderDialog()

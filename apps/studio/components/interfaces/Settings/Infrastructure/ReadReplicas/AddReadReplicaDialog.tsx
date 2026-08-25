@@ -13,6 +13,31 @@ interface AddReadReplicaDialogProps {
   onRecommendCompute: (size: RecommendedComputeForReadReplicas) => void
 }
 
+interface AddReadReplicaDialogFormProps {
+  onClose: () => void
+  onSuccess?: () => void
+  onRecommendCompute: (size: RecommendedComputeForReadReplicas) => void
+}
+
+const AddReadReplicaDialogForm = ({
+  onClose,
+  onSuccess,
+  onRecommendCompute,
+}: AddReadReplicaDialogFormProps) => {
+  const eligibility = useCheckEligibilityDeployReplica()
+  const replicaCost = useGetReplicaCost()
+
+  return (
+    <ReadReplicaForm
+      eligibility={eligibility}
+      onClose={onClose}
+      onSuccess={() => onSuccess?.()}
+      onRecommendCompute={onRecommendCompute}
+      replicaCost={replicaCost}
+    />
+  )
+}
+
 export const AddReadReplicaDialog = ({
   open,
   onOpenChange,
@@ -20,8 +45,6 @@ export const AddReadReplicaDialog = ({
   onRecommendCompute,
 }: AddReadReplicaDialogProps) => {
   const pendingRecommendationRef = useRef<RecommendedComputeForReadReplicas | null>(null)
-  const eligibility = useCheckEligibilityDeployReplica()
-  const replicaCost = useGetReplicaCost()
 
   const onClose = () => {
     onOpenChange(false)
@@ -54,13 +77,13 @@ export const AddReadReplicaDialog = ({
           </DialogHeader>
           <DialogSectionSeparator />
 
-          <ReadReplicaForm
-            eligibility={eligibility}
-            onClose={onClose}
-            onSuccess={() => onSuccess?.()}
-            onRecommendCompute={closeWithRecommendation}
-            replicaCost={replicaCost}
-          />
+          {open && (
+            <AddReadReplicaDialogForm
+              onClose={onClose}
+              onSuccess={onSuccess}
+              onRecommendCompute={closeWithRecommendation}
+            />
+          )}
         </div>
       </DialogContent>
     </Dialog>
