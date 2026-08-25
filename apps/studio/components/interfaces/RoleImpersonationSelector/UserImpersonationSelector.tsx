@@ -49,6 +49,7 @@ import { type RoleImpersonationController } from '@/state/role-impersonation-sta
 import type { ResponseError } from '@/types'
 
 type AuthenticatorAssuranceLevels = 'aal1' | 'aal2'
+type UserSource = 'user' | 'external'
 
 export const UserImpersonationSelector = ({
   state,
@@ -66,7 +67,7 @@ export const UserImpersonationSelector = ({
   const [isUserComboboxOpen, setIsUserComboboxOpen] = useState(false)
 
   const { id: tableId } = useParams()
-  const [selectedTab, setSelectedTab] = useState<'user' | 'external'>(() =>
+  const [selectedTab, setSelectedTab] = useState<UserSource>(() =>
     state.role?.type === 'postgrest' &&
     state.role.role === 'authenticated' &&
     state.role.userType === 'external'
@@ -214,193 +215,32 @@ export const UserImpersonationSelector = ({
 
   if (compact) {
     return (
-      <fieldset
+      <CompactUserImpersonationSelector
         disabled={disabled}
-        aria-disabled={disabled}
-        className={cn(
-          'm-0 flex min-w-0 flex-col gap-y-2.5 border-0 p-0 transition-opacity',
-          disabled && 'opacity-40'
-        )}
-      >
-        <FormItemLayout isReactForm={false} layout="horizontal" size="tiny" label="Users">
-          <ToggleGroup
-            type="single"
-            value={selectedTab}
-            onValueChange={(value) => {
-              if (value === 'user' || value === 'external') setSelectedTab(value)
-            }}
-            variant="default"
-            size="tiny"
-            aria-label="User source"
-            className="w-full"
-          >
-            <ToggleGroupItem value="user" className="w-full">
-              Project
-            </ToggleGroupItem>
-            <ToggleGroupItem value="external" className="w-full">
-              External
-            </ToggleGroupItem>
-          </ToggleGroup>
-        </FormItemLayout>
-
-        <FormItemLayout
-          id="run-as-user"
-          isReactForm={false}
-          layout="horizontal"
-          size="tiny"
-          label="User"
-        >
-          {displayName ? (
-            <div className="flex min-w-0 items-center gap-2">
-              <span className="min-w-0 flex-1 truncate text-xs">{displayName}</span>
-              <Button
-                type="button"
-                size="tiny"
-                variant="default"
-                onClick={stopImpersonating}
-                disabled={isImpersonateLoading}
-                loading={isImpersonateLoading}
-              >
-                Stop
-              </Button>
-            </div>
-          ) : selectedTab === 'user' ? (
-            <Popover open={isUserComboboxOpen} onOpenChange={setIsUserComboboxOpen} modal={false}>
-              <PopoverTrigger asChild>
-                <Button
-                  id="run-as-user"
-                  type="button"
-                  size="tiny"
-                  variant="default"
-                  role="combobox"
-                  aria-label="Find user"
-                  aria-expanded={isUserComboboxOpen}
-                  className="w-full justify-between"
-                  iconRight={
-                    <ChevronsUpDown className="shrink-0 text-foreground-muted" size={14} />
-                  }
-                >
-                  Email, name, or ID
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="p-0" side="bottom" align="start" sameWidthAsTrigger>
-                <Command shouldFilter={false}>
-                  <CommandInput
-                    placeholder="Email, name, or ID"
-                    value={searchText}
-                    onValueChange={setSearchText}
-                  />
-                  <CommandList className="max-h-52">
-                    {(isLoading || isSearching) && (
-                      <div className="flex items-center justify-center gap-2 px-3 py-2">
-                        <Loader2 className="animate-spin" size={14} />
-                        <span className="text-xs text-foreground-light">Loading users…</span>
-                      </div>
-                    )}
-
-                    {isError && <AlertError error={error} subject="Failed to retrieve users" />}
-
-                    {isSuccess && !isSearching && users.length === 0 && (
-                      <CommandEmpty>No users found</CommandEmpty>
-                    )}
-
-                    {isSuccess && !isSearching && users.length > 0 && (
-                      <CommandGroup>
-                        {users.map((user) => {
-                          const emailOrPhone = user.email || user.phone
-                          const userDisplayName = getDisplayName(user, '')
-
-                          return (
-                            <CommandItem
-                              key={user.id}
-                              value={user.id}
-                              onSelect={() => {
-                                void impersonateUser(user)
-                                setIsUserComboboxOpen(false)
-                              }}
-                              className="gap-2"
-                            >
-                              <IconUser size={14} className="shrink-0 text-foreground-lighter" />
-                              <span className="min-w-0 flex-1 truncate">
-                                {emailOrPhone || userDisplayName || user.id}
-                              </span>
-                              {userDisplayName && userDisplayName !== emailOrPhone && (
-                                <span className="max-w-24 truncate text-foreground-lighter">
-                                  {userDisplayName}
-                                </span>
-                              )}
-                            </CommandItem>
-                          )
-                        })}
-                      </CommandGroup>
-                    )}
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-          ) : (
-            <InputGroup>
-              <InputGroupInput
-                id="run-as-user"
-                size="tiny"
-                placeholder="External user ID"
-                value={externalUserId}
-                onChange={(event) => setExternalUserId(event.target.value)}
-              />
-              <InputGroupAddon align="inline-end">
-                <InputGroupButton
-                  type="button"
-                  size="tiny"
-                  variant="default"
-                  disabled={!externalUserId}
-                  onClick={impersonateExternalUser}
-                >
-                  Apply
-                </InputGroupButton>
-              </InputGroupAddon>
-            </InputGroup>
-          )}
-        </FormItemLayout>
-
-        {selectedTab === 'external' && !displayName && (
-          <FormItemLayout
-            id="run-as-user-claims"
-            isReactForm={false}
-            layout="horizontal"
-            size="tiny"
-            label="Claims"
-          >
-            <Input
-              id="run-as-user-claims"
-              size="tiny"
-              placeholder="Additional claims (JSON)"
-              value={additionalClaims}
-              onChange={(event) => setAdditionalClaims(event.target.value)}
-            />
-          </FormItemLayout>
-        )}
-
-        <FormItemLayout isReactForm={false} layout="horizontal" size="tiny" label="MFA level">
-          <ToggleGroup
-            type="single"
-            value={aal}
-            onValueChange={(value) => {
-              if (value === 'aal1' || value === 'aal2') setAal(value)
-            }}
-            variant="default"
-            size="tiny"
-            aria-label="MFA assurance level"
-            className="w-full"
-          >
-            <ToggleGroupItem value="aal1" className="w-full">
-              AAL1
-            </ToggleGroupItem>
-            <ToggleGroupItem value="aal2" className="w-full">
-              AAL2
-            </ToggleGroupItem>
-          </ToggleGroup>
-        </FormItemLayout>
-      </fieldset>
+        selectedTab={selectedTab}
+        onSelectedTabChange={setSelectedTab}
+        displayName={displayName}
+        isImpersonateLoading={isImpersonateLoading}
+        stopImpersonating={stopImpersonating}
+        isUserComboboxOpen={isUserComboboxOpen}
+        setIsUserComboboxOpen={setIsUserComboboxOpen}
+        searchText={searchText}
+        setSearchText={setSearchText}
+        isLoading={isLoading}
+        isSearching={isSearching}
+        isError={isError}
+        error={error}
+        isSuccess={isSuccess}
+        users={users}
+        impersonateUser={impersonateUser}
+        externalUserId={externalUserId}
+        setExternalUserId={setExternalUserId}
+        impersonateExternalUser={impersonateExternalUser}
+        additionalClaims={additionalClaims}
+        setAdditionalClaims={setAdditionalClaims}
+        aal={aal}
+        setAal={setAal}
+      />
     )
   }
 
@@ -651,6 +491,321 @@ export const UserImpersonationSelector = ({
         </>
       ) : null}
     </>
+  )
+}
+
+type CompactUserImpersonationSelectorProps = {
+  disabled: boolean
+  selectedTab: UserSource
+  onSelectedTabChange: (value: UserSource) => void
+  displayName?: string
+  isImpersonateLoading: boolean
+  stopImpersonating: () => void
+  isUserComboboxOpen: boolean
+  setIsUserComboboxOpen: (open: boolean) => void
+  searchText: string
+  setSearchText: (value: string) => void
+  isLoading: boolean
+  isSearching: boolean
+  isError: boolean
+  error: ResponseError | null
+  isSuccess: boolean
+  users: User[]
+  impersonateUser: (user: User) => Promise<void>
+  externalUserId: string
+  setExternalUserId: (value: string) => void
+  impersonateExternalUser: () => Promise<void>
+  additionalClaims: string
+  setAdditionalClaims: (value: string) => void
+  aal: AuthenticatorAssuranceLevels
+  setAal: (value: AuthenticatorAssuranceLevels) => void
+}
+
+const CompactUserImpersonationSelector = ({
+  disabled,
+  selectedTab,
+  onSelectedTabChange,
+  displayName,
+  isImpersonateLoading,
+  stopImpersonating,
+  isUserComboboxOpen,
+  setIsUserComboboxOpen,
+  searchText,
+  setSearchText,
+  isLoading,
+  isSearching,
+  isError,
+  error,
+  isSuccess,
+  users,
+  impersonateUser,
+  externalUserId,
+  setExternalUserId,
+  impersonateExternalUser,
+  additionalClaims,
+  setAdditionalClaims,
+  aal,
+  setAal,
+}: CompactUserImpersonationSelectorProps) => {
+  return (
+    <fieldset
+      disabled={disabled}
+      aria-disabled={disabled}
+      className={cn(
+        'm-0 flex min-w-0 flex-col gap-y-2.5 border-0 p-0 transition-opacity',
+        disabled && 'opacity-40'
+      )}
+    >
+      <FormItemLayout isReactForm={false} layout="horizontal" size="tiny" label="Users">
+        <ToggleGroup
+          type="single"
+          value={selectedTab}
+          onValueChange={(value) => {
+            if (value === 'user' || value === 'external') onSelectedTabChange(value)
+          }}
+          variant="default"
+          size="tiny"
+          aria-label="User source"
+          className="w-full"
+        >
+          <ToggleGroupItem value="user" className="w-full">
+            Project
+          </ToggleGroupItem>
+          <ToggleGroupItem value="external" className="w-full">
+            External
+          </ToggleGroupItem>
+        </ToggleGroup>
+      </FormItemLayout>
+
+      <FormItemLayout
+        id="run-as-user"
+        isReactForm={false}
+        layout="horizontal"
+        size="tiny"
+        label="User"
+      >
+        <CompactImpersonationControl
+          selectedTab={selectedTab}
+          displayName={displayName}
+          isImpersonateLoading={isImpersonateLoading}
+          stopImpersonating={stopImpersonating}
+          isUserComboboxOpen={isUserComboboxOpen}
+          setIsUserComboboxOpen={setIsUserComboboxOpen}
+          searchText={searchText}
+          setSearchText={setSearchText}
+          isLoading={isLoading}
+          isSearching={isSearching}
+          isError={isError}
+          error={error}
+          isSuccess={isSuccess}
+          users={users}
+          impersonateUser={impersonateUser}
+          externalUserId={externalUserId}
+          setExternalUserId={setExternalUserId}
+          impersonateExternalUser={impersonateExternalUser}
+        />
+      </FormItemLayout>
+
+      {selectedTab === 'external' && !displayName && (
+        <FormItemLayout
+          id="run-as-user-claims"
+          isReactForm={false}
+          layout="horizontal"
+          size="tiny"
+          label="Claims"
+        >
+          <Input
+            id="run-as-user-claims"
+            size="tiny"
+            placeholder="Additional claims (JSON)"
+            value={additionalClaims}
+            onChange={(event) => setAdditionalClaims(event.target.value)}
+          />
+        </FormItemLayout>
+      )}
+
+      <FormItemLayout isReactForm={false} layout="horizontal" size="tiny" label="MFA level">
+        <ToggleGroup
+          type="single"
+          value={aal}
+          disabled={Boolean(displayName)}
+          onValueChange={(value) => {
+            if (value === 'aal1' || value === 'aal2') setAal(value)
+          }}
+          variant="default"
+          size="tiny"
+          aria-label="MFA assurance level"
+          className="w-full"
+        >
+          <ToggleGroupItem value="aal1" className="w-full">
+            AAL1
+          </ToggleGroupItem>
+          <ToggleGroupItem value="aal2" className="w-full">
+            AAL2
+          </ToggleGroupItem>
+        </ToggleGroup>
+      </FormItemLayout>
+    </fieldset>
+  )
+}
+
+type CompactImpersonationControlProps = Pick<
+  CompactUserImpersonationSelectorProps,
+  | 'selectedTab'
+  | 'displayName'
+  | 'isImpersonateLoading'
+  | 'stopImpersonating'
+  | 'isUserComboboxOpen'
+  | 'setIsUserComboboxOpen'
+  | 'searchText'
+  | 'setSearchText'
+  | 'isLoading'
+  | 'isSearching'
+  | 'isError'
+  | 'error'
+  | 'isSuccess'
+  | 'users'
+  | 'impersonateUser'
+  | 'externalUserId'
+  | 'setExternalUserId'
+  | 'impersonateExternalUser'
+>
+
+const CompactImpersonationControl = ({
+  selectedTab,
+  displayName,
+  isImpersonateLoading,
+  stopImpersonating,
+  isUserComboboxOpen,
+  setIsUserComboboxOpen,
+  searchText,
+  setSearchText,
+  isLoading,
+  isSearching,
+  isError,
+  error,
+  isSuccess,
+  users,
+  impersonateUser,
+  externalUserId,
+  setExternalUserId,
+  impersonateExternalUser,
+}: CompactImpersonationControlProps) => {
+  if (displayName) {
+    return (
+      <div className="flex min-w-0 items-center gap-2">
+        <span className="min-w-0 flex-1 truncate text-xs">{displayName}</span>
+        <Button
+          type="button"
+          size="tiny"
+          variant="default"
+          onClick={stopImpersonating}
+          disabled={isImpersonateLoading}
+          loading={isImpersonateLoading}
+        >
+          Stop
+        </Button>
+      </div>
+    )
+  }
+
+  if (selectedTab === 'external') {
+    return (
+      <InputGroup>
+        <InputGroupInput
+          id="run-as-user"
+          size="tiny"
+          placeholder="External user ID"
+          value={externalUserId}
+          onChange={(event) => setExternalUserId(event.target.value)}
+        />
+        <InputGroupAddon align="inline-end">
+          <InputGroupButton
+            type="button"
+            size="tiny"
+            variant="default"
+            disabled={!externalUserId}
+            onClick={impersonateExternalUser}
+          >
+            Apply
+          </InputGroupButton>
+        </InputGroupAddon>
+      </InputGroup>
+    )
+  }
+
+  return (
+    <Popover open={isUserComboboxOpen} onOpenChange={setIsUserComboboxOpen} modal={false}>
+      <PopoverTrigger asChild>
+        <Button
+          id="run-as-user"
+          type="button"
+          size="tiny"
+          variant="default"
+          role="combobox"
+          aria-label="Find user"
+          aria-expanded={isUserComboboxOpen}
+          className="w-full justify-between"
+          iconRight={<ChevronsUpDown className="shrink-0 text-foreground-muted" size={14} />}
+        >
+          Email, name, or ID
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="p-0" side="bottom" align="start" sameWidthAsTrigger>
+        <Command shouldFilter={false}>
+          <CommandInput
+            placeholder="Email, name, or ID"
+            value={searchText}
+            onValueChange={setSearchText}
+          />
+          <CommandList className="max-h-52">
+            {(isLoading || isSearching) && (
+              <div className="flex items-center justify-center gap-2 px-3 py-2">
+                <Loader2 className="animate-spin" size={14} />
+                <span className="text-xs text-foreground-light">Loading users…</span>
+              </div>
+            )}
+
+            {isError && <AlertError error={error} subject="Failed to retrieve users" />}
+
+            {isSuccess && !isSearching && users.length === 0 && (
+              <CommandEmpty>No users found</CommandEmpty>
+            )}
+
+            {isSuccess && !isSearching && users.length > 0 && (
+              <CommandGroup>
+                {users.map((user) => {
+                  const emailOrPhone = user.email || user.phone
+                  const userDisplayName = getDisplayName(user, '')
+
+                  return (
+                    <CommandItem
+                      key={user.id}
+                      value={user.id}
+                      onSelect={() => {
+                        void impersonateUser(user)
+                        setIsUserComboboxOpen(false)
+                      }}
+                      className="gap-2"
+                    >
+                      <IconUser size={14} className="shrink-0 text-foreground-lighter" />
+                      <span className="min-w-0 flex-1 truncate">
+                        {emailOrPhone || userDisplayName || user.id}
+                      </span>
+                      {userDisplayName && userDisplayName !== emailOrPhone && (
+                        <span className="max-w-24 truncate text-foreground-lighter">
+                          {userDisplayName}
+                        </span>
+                      )}
+                    </CommandItem>
+                  )
+                })}
+              </CommandGroup>
+            )}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }
 

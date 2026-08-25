@@ -1,10 +1,14 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { toast } from 'sonner'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { RunAsRoleImpersonationSelector } from '@/components/interfaces/RoleImpersonationSelector/RunAsRoleImpersonationSelector'
+import type { ImpersonationRole } from '@/lib/role-impersonation'
 import type { RoleImpersonationController } from '@/state/role-impersonation-state'
 import { customRender } from '@/tests/lib/custom-render'
+
+vi.mock('sonner', () => ({ toast: { error: vi.fn() } }))
 
 vi.mock('@/components/interfaces/RoleImpersonationSelector/UserImpersonationSelector', () => ({
   UserImpersonationSelector: ({ disabled }: { disabled?: boolean }) => (
@@ -17,16 +21,25 @@ vi.mock('@/components/interfaces/RoleImpersonationSelector/UserImpersonationSele
 }))
 
 describe('RunAsRoleImpersonationSelector', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
   it('enables user settings for authenticated queries and summarizes each role', async () => {
     const user = userEvent.setup()
-    const setRole = vi.fn()
+    let currentRole: ImpersonationRole | undefined
+    const setRole = vi.fn(async (role: ImpersonationRole | undefined) => {
+      currentRole = role
+    })
     const state: RoleImpersonationController = {
-      role: undefined,
+      get role() {
+        return currentRole
+      },
       claims: undefined,
       setRole,
     }
 
-    customRender(<RunAsRoleImpersonationSelector state={state} />)
+    const { rerender } = customRender(<RunAsRoleImpersonationSelector state={state} />)
 
     expect(screen.getByRole('radio', { name: 'PostgresSuperuser' })).toBeChecked()
     expect(screen.getByText('Bypasses RLS and can return all rows.')).toBeVisible()
@@ -38,14 +51,57 @@ describe('RunAsRoleImpersonationSelector', () => {
     expect(screen.getByTestId('user-settings')).not.toBeDisabled()
 
     await user.click(screen.getByRole('radio', { name: 'AnonymousNot logged in' }))
+    rerender(<RunAsRoleImpersonationSelector state={state} />)
 
     expect(screen.getByText('Returns rows available to anonymous users.')).toBeVisible()
     expect(setRole).toHaveBeenCalledWith({ type: 'postgrest', role: 'anon' })
     expect(screen.getByTestId('user-settings')).toBeDisabled()
 
     await user.click(screen.getByRole('radio', { name: 'PostgresSuperuser' }))
+    rerender(<RunAsRoleImpersonationSelector state={state} />)
 
     expect(screen.getByText('Bypasses RLS and can return all rows.')).toBeVisible()
     expect(setRole).toHaveBeenCalledWith(undefined)
+  })
+
+  it('follows externally cleared role state', () => {
+    let currentRole: ImpersonationRole | undefined = {
+      type: 'postgrest',
+      role: 'authenticated',
+      userType: 'native',
+    }
+    const state: RoleImpersonationController = {
+      get role() {
+        return currentRole
+      },
+      claims: undefined,
+      setRole: vi.fn(),
+    }
+
+    const { rerender } = customRender(<RunAsRoleImpersonationSelector state={state} />)
+
+    expect(screen.getByRole('radio', { name: 'AuthenticatedLogged-in user' })).toBeChecked()
+    expect(screen.getByTestId('user-settings')).not.toBeDisabled()
+
+    currentRole = undefined
+    rerender(<RunAsRoleImpersonationSelector state={state} />)
+
+    expect(screen.getByRole('radio', { name: 'PostgresSuperuser' })).toBeChecked()
+    expect(screen.getByTestId('user-settings')).toBeDisabled()
+  })
+
+  it('keeps the current selection and reports rejected role switches', async () => {
+    const user = userEvent.setup()
+    const state: RoleImpersonationController = {
+      role: undefined,
+      claims: undefined,
+      setRole: vi.fn().mockRejectedValue({ message: 'Role switch failed' }),
+    }
+
+    customRender(<RunAsRoleImpersonationSelector state={state} />)
+    await user.click(screen.getByRole('radio', { name: 'AnonymousNot logged in' }))
+
+    expect(screen.getByRole('radio', { name: 'PostgresSuperuser' })).toBeChecked()
+    expect(toast.error).toHaveBeenCalledWith('Failed to impersonate user: Role switch failed')
   })
 })

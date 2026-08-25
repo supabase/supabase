@@ -4,7 +4,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { UserImpersonationSelector } from './UserImpersonationSelector'
 import { useRoleImpersonationSelection } from './useRoleImpersonationSelection'
-import type { PostgrestRole } from '@/lib/role-impersonation'
 import type { RoleImpersonationController } from '@/state/role-impersonation-state'
 
 type RunAsRoleImpersonationSelectorProps = {
@@ -34,7 +33,9 @@ export const RunAsRoleImpersonationSelector = ({ state }: RunAsRoleImpersonation
             orientation="vertical"
             value={selectedOption}
             onValueChange={(value) => {
-              if (value) onSelectedChange(value as PostgrestRole)
+              if (value === 'service_role' || value === 'anon' || value === 'authenticated') {
+                void onSelectedChange(value)
+              }
             }}
             variant="default"
             aria-label="Run query as role"
