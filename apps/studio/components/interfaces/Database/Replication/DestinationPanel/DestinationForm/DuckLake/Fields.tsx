@@ -197,7 +197,7 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
               <div className="flex flex-col gap-y-2">
                 {renderRegionWarning(field.value)}
                 <span>
-                  Warehouse connects to this project's Postgres instance to store the DuckLake
+                  Pipelines connects to this project's Postgres instance to store the DuckLake
                   catalog
                 </span>
               </div>

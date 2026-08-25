@@ -25,11 +25,12 @@ import { useLocalRoleImpersonationState } from '@/state/role-impersonation-state
 
 interface QueryCellProps {
   cell: Snapshot<QueryCellSchema>
+  onEdit?: () => void
 }
 
 /** Notebook adapter around the shared QueryEditor. */
 export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function QueryCell(
-  { cell },
+  { cell, onEdit },
   ref
 ) {
   const snap = useNotebooksStateSnapshot()
@@ -53,6 +54,7 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
     const notebookId = currentNotebook?.notebook.id
     if (!notebookId) return
 
+    onEdit?.()
     snap.updateCell({
       id: notebookId,
       cellId: cell._id,
@@ -79,8 +81,13 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
     updateQueryCell((candidate) => ({ ...cloneQueryCell(candidate), title: nextTitle }))
   }
 
-  const handleSqlCommit = (value: string) =>
+  // Running a cell re-commits its current SQL (see QueryEditor's handleRunQuery) even when
+  // nothing changed — skip the store write so that doesn't spuriously mark the notebook
+  // unsaved.
+  const handleSqlCommit = (value: string) => {
+    if (value === cell.unchecked_sql) return
     updateQueryCell((candidate) => setCellSql(candidate, value))
+  }
 
   const handleDisplayChange = (display: QueryDisplay) =>
     updateQueryCell((candidate) => ({

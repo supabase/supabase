@@ -807,8 +807,11 @@ export const NOTEBOOKS_PROMPT = `
 ## Notebooks
 - Use \`create_notebook\` for a saved, shareable, multi-step investigation or dashboard the user will revisit — e.g. "build me a signup funnel notebook" or "create a notebook to track auth errors".
 - Use \`update_notebook\` to edit an existing notebook — insert, replace, delete, or move cells — instead of recreating it from scratch.
+- Use \`delete_notebook\` only when the user explicitly asks to delete a whole notebook — never to remove a cell from one still in use; that's \`update_notebook\` with a \`delete_cell\` operation. Deleting a notebook is irreversible — warn the user before calling it, the same way you would for any other irreversible operation.
+- When the user asks to read or analyze a notebook using its current results, call \`get_notebook\` and then \`run_notebook\`. The run tool presents all query cells for one user approval, executes them in notebook order, and returns only the results allowed by the organization's sharing level. Do not replace it with one \`execute_sql\` call per cell.
+- Questions only about a notebook's saved structure or query configuration do not require \`run_notebook\`.
 - Use \`execute_sql\` for a single ad-hoc question with no need to persist it.
-- When the request clearly calls for a notebook, call \`create_notebook\` or \`update_notebook\` directly; both tools handle user approval.
+- When the request clearly calls for a notebook, call \`create_notebook\`, \`update_notebook\`, or \`delete_notebook\` directly; all three tools handle user approval.
 - \`update_notebook\` requires \`expected_updated_at\`, the \`updated_at\` you got from \`get_notebook\`. If the notebook changed since, the call is rejected — call \`get_notebook\` again and reissue \`update_notebook\` against the current content.
 - Resolve a notebook referenced by name via \`list_notebooks\` yourself before calling \`get_notebook\`/\`update_notebook\` — never ask the user for a notebook id when a name is enough to look it up. Only ask the user to disambiguate if more than one notebook matches that name.
 - When describing an existing notebook, report each query cell's configuration that changes what it returns — a log cell's time range, a database cell's row limit — and don't count markdown cells as queries.

@@ -21,6 +21,9 @@ vi.mock('common', async (importOriginal) => {
   return { ...actual, useReducedMotion: () => mockUseReducedMotion() }
 })
 
+const { mockTrack } = vi.hoisted(() => ({ mockTrack: vi.fn() }))
+vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => mockTrack }))
+
 const user = userEvent.setup({
   writeToClipboard: true,
 })
@@ -138,6 +141,7 @@ describe('NewScopedTokenSheet', () => {
     })
 
   beforeEach(() => {
+    mockTrack.mockReset()
     mockPermissionsMap()
     mockOrganizations()
     mockProjects()
@@ -416,6 +420,12 @@ describe('NewScopedTokenSheet', () => {
     await waitFor(async () =>
       expect(await window.navigator.clipboard.readText()).toEqual('a_classic_token_value')
     )
+    // resourceAccess must be tracked as 'account' — it is the only path that emits that value
+    expect(mockTrack).toHaveBeenCalledWith('access_token_created', {
+      tokenType: 'classic',
+      expiryPreset: '7d',
+      resourceAccess: 'account',
+    })
     fireEvent.click(await screen.findByLabelText('I have copied the key and stored it securely'))
     fireEvent.click(await screen.findByRole('button', { name: 'Done' }))
     // Dialog has been closed

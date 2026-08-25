@@ -23,6 +23,8 @@ export const notebooksState = proxy({
   needsSaving: proxyMap<string, boolean>([]),
   /** Session-only UI state keyed by cell ID; never persisted with notebook content. */
   cellLocalState: proxyMap<string, NotebookCellLocalState>([]),
+  /** Session-only conflicts where an assistant changed the server while local edits remain. */
+  serverDivergedWhileDirty: proxyMap<string, 'updated' | 'deleted'>([]),
 
   /**
    * Load notebook into the Valtio store. No-ops if already present.
@@ -53,6 +55,25 @@ export const notebooksState = proxy({
   },
 
   /**
+   * Marks a notebook as persisted after its first successful save. Every
+   * later save cycle is covered by `updateCells`'s `statusOnEdit` ('saved' ->
+   * 'unsaved' -> ...), but the one-time 'new' -> 'saved' transition has no
+   * other trigger — the resource query that would otherwise pick it up is
+   * disabled while the notebook is still 'new'.
+   */
+  markSaved: ({ id }: { id: string }) => {
+    const stateNotebook = notebooksState.notebooks[id]
+    if (stateNotebook) stateNotebook.status = 'saved'
+    notebooksState.clearServerDivergence({ id })
+  },
+
+  markServerDivergence: ({ id, type }: { id: string; type: 'updated' | 'deleted' }) =>
+    notebooksState.serverDivergedWhileDirty.set(id, type),
+
+  clearServerDivergence: ({ id }: { id: string }) =>
+    notebooksState.serverDivergedWhileDirty.delete(id),
+
+  /**
    * Rename follows its own async save directly at the call site rather than going
    * through needsSaving/the debounced scheduler.
    */
@@ -74,6 +95,7 @@ export const notebooksState = proxy({
     )
     notebooksState.notebooks = otherNotebooks
     if (!skipSave) notebooksState.needsSaving.delete(id)
+    notebooksState.clearServerDivergence({ id })
   },
 
   /**

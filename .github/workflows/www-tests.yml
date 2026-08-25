@@ -7,6 +7,9 @@ on:
       - 'apps/www/**/*.ts*'
       - 'apps/www/next.config.mjs'
       - 'apps/www/next.config.js'
+      - 'apps/www/lib/**/*.js'
+      - 'apps/www/content/md/**'
+      - 'apps/www/scripts/**/*.mjs'
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
