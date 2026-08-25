@@ -1,10 +1,17 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
+import { usePathname } from 'next/navigation'
+import { cn, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 
 import { CommandCopyButton } from './command-copy-button'
 import { useLocalStorage } from './use-local-storage'
+import {
+  buildBlockInstallPrompt,
+  getInstallCommands,
+  getMarkdownPageUrl,
+  type PackageManager,
+} from '@/lib/install-command'
 
 interface CommandCopyProps {
   name: string
@@ -13,52 +20,30 @@ interface CommandCopyProps {
   framework?: 'react' | 'vue'
 }
 
-type PackageManager = 'npm' | 'pnpm' | 'yarn' | 'bun'
+type InstallationTab = 'prompt' | PackageManager
 
-const LOCAL_STORAGE_KEY = 'package-manager-copy-command'
-
-const getBaseUrl = () => {
-  if (process.env.NEXT_PUBLIC_VERCEL_TARGET_ENV === 'production') {
-    // we have a special alias for the production environment, added in https://github.com/shadcn-ui/ui/pull/8161
-    return `@supabase`
-  } else if (process.env.NEXT_PUBLIC_VERCEL_TARGET_ENV === 'preview') {
-    return `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
-  } else {
-    return 'http://localhost:3004'
-  }
-}
-
-const getComponentPath = (name: string) => {
-  if (process.env.NEXT_PUBLIC_VERCEL_TARGET_ENV === 'production') {
-    return `/${name}`
-  } else {
-    return `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/r/${name}.json`
-  }
-}
+const LOCAL_STORAGE_KEY = 'installation-command-tab'
+const PACKAGE_MANAGERS: PackageManager[] = ['npm', 'pnpm', 'yarn', 'bun']
 
 export function Command({ name, highlight, framework = 'react' }: CommandCopyProps) {
-  const [value, setValue] = useLocalStorage(LOCAL_STORAGE_KEY, 'npm')
+  const pathname = usePathname()
+  const [value, setValue] = useLocalStorage<InstallationTab>(LOCAL_STORAGE_KEY, 'prompt')
 
-  const baseUrl = getBaseUrl()
-  const componentPath = getComponentPath(name)
-
-  const commands: Record<PackageManager, string> =
-    framework === 'vue'
-      ? {
-          npm: `npx shadcn-vue@latest add ${baseUrl}${componentPath}`,
-          pnpm: `pnpm dlx shadcn-vue@latest add ${baseUrl}${componentPath}`,
-          yarn: `yarn dlx shadcn-vue@latest add ${baseUrl}${componentPath}`,
-          bun: `bunx --bun shadcn-vue@latest add ${baseUrl}${componentPath}`,
-        }
-      : {
-          npm: `npx shadcn@latest add ${baseUrl}${componentPath}`,
-          pnpm: `pnpm dlx shadcn@latest add ${baseUrl}${componentPath}`,
-          yarn: `yarn dlx shadcn@latest add ${baseUrl}${componentPath}`,
-          bun: `bunx --bun shadcn@latest add ${baseUrl}${componentPath}`,
-        }
+  const commands = getInstallCommands(name, { framework })
+  const prompt = buildBlockInstallPrompt({
+    pageUrl: getMarkdownPageUrl(pathname ?? ''),
+    name,
+    installCommand: commands.npm,
+  })
+  const tabs: InstallationTab[] = ['prompt', ...PACKAGE_MANAGERS]
+  const activeTab = tabs.includes(value) ? value : 'prompt'
 
   return (
-    <Tabs value={value} onValueChange={setValue} className="w-full">
+    <Tabs
+      value={activeTab}
+      onValueChange={(tab) => setValue(tab as InstallationTab)}
+      className="w-full"
+    >
       <div className="w-full group relative rounded-lg bg-surface-200 dark:bg-surface-100 px-4 py-2 overflow-hidden">
         {highlight && (
           <motion.div
@@ -76,26 +61,39 @@ export function Command({ name, highlight, framework = 'react' }: CommandCopyPro
 
         <div className="flex flex-col">
           <TabsList className="gap-2 relative mb-2 z-10">
-            {(Object.keys(commands) as PackageManager[]).map((manager) => (
-              <TabsTrigger key={manager} value={manager} className="text-xs">
-                {manager}
+            {tabs.map((tab) => (
+              <TabsTrigger key={tab} value={tab} className="text-xs">
+                {tab}
               </TabsTrigger>
             ))}
           </TabsList>
 
-          {(Object.keys(commands) as PackageManager[]).map((manager) => (
-            <TabsContent key={manager} value={manager} className="m-0">
-              <div className="flex items-center">
-                <div className="flex-1 font-mono text-sm text-foreground relative z-10">
-                  <span className="mr-2 text-[#888] select-none">$</span>
-                  {commands[manager]}
+          {tabs.map((tab) => {
+            const isPrompt = tab === 'prompt'
+            const content = isPrompt ? prompt : commands[tab]
+
+            return (
+              <TabsContent key={tab} value={tab} className="m-0">
+                <div className={cn('flex gap-2', isPrompt ? 'items-start' : 'items-center')}>
+                  <div
+                    className={cn(
+                      'min-w-0 flex-1 text-sm text-foreground relative z-10',
+                      isPrompt ? 'leading-6' : 'font-mono'
+                    )}
+                  >
+                    {!isPrompt && <span className="mr-2 text-[#888] select-none">$</span>}
+                    {content}
+                  </div>
+                  <div className="relative z-10 shrink-0">
+                    <CommandCopyButton
+                      command={content}
+                      telemetryCommand={isPrompt ? commands.npm : content}
+                    />
+                  </div>
                 </div>
-                <div className="relative z-10">
-                  <CommandCopyButton command={commands[manager]} />
-                </div>
-              </div>
-            </TabsContent>
-          ))}
+              </TabsContent>
+            )
+          })}
         </div>
       </div>
     </Tabs>

@@ -6,7 +6,13 @@ import { Button_Shadcn_ } from 'ui'
 
 import { useSendTelemetryEvent } from '@/lib/telemetry'
 
-export function CommandCopyButton({ command }: { command: string }) {
+export function CommandCopyButton({
+  command,
+  telemetryCommand = command,
+}: {
+  command: string
+  telemetryCommand?: string
+}) {
   const [copied, setCopied] = useState(false)
   const sendTelemetryEvent = useSendTelemetryEvent()
 
@@ -51,7 +57,7 @@ export function CommandCopyButton({ command }: { command: string }) {
         setCopied(true)
 
         // Parse command and send telemetry event
-        const { framework, packageManager, title } = parseCommandForTelemetry(command)
+        const { framework, packageManager, title } = parseCommandForTelemetry(telemetryCommand)
 
         sendTelemetryEvent({
           action: 'supabase_ui_command_copy_button_clicked',
