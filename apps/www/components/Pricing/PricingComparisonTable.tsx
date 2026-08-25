@@ -4,8 +4,9 @@ import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pric
 import Solutions from '~/data/MainProducts'
 import { Organization } from '~/data/organizations'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { useIsomorphicLayoutEffect } from 'common'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { plans } from 'shared-data/plans'
 import { pricing } from 'shared-data/pricing'
 import {
@@ -123,14 +124,14 @@ const PricingComparisonTable = ({
   const tableRef = useRef<HTMLTableElement>(null)
   const theadRef = useRef<HTMLTableSectionElement>(null)
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const table = tableRef.current
     const thead = theadRef.current
     if (!table || !thead) return
 
     const observer = new ResizeObserver(() => {
       const theadTop = parseFloat(getComputedStyle(thead).top) || 0
-      const categoryTop = theadTop + thead.getBoundingClientRect().height
+      const categoryTop = Math.floor(theadTop + thead.getBoundingClientRect().height)
       table.style.setProperty('--pricing-category-top', `${categoryTop}px`)
     })
     observer.observe(thead)
