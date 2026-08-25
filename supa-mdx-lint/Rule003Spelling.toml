@@ -368,6 +368,7 @@ allow_list = [
     "PostgreSQL",
     "PowerBI",
     "[Pp]refill",
+    "[Pp]roxied",
     "ProGuard",
     "PubSub",
     "Prisma",

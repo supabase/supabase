@@ -17,6 +17,7 @@ import {
   updateNotebookToolOutputSchema,
 } from './Message.utils'
 import { AlertError } from '@/components/ui/AlertError'
+import { hasDiscardableChanges } from '@/data/content/notebooks/notebook-cache'
 import {
   deriveNotebookDiff,
   describeNotebookOperationError,
@@ -24,6 +25,7 @@ import {
 } from '@/data/content/notebooks/notebook-operations'
 import { useNotebookQuery } from '@/data/content/notebooks/notebook-query'
 import { toWireNotebook } from '@/data/content/notebooks/notebook-schema'
+import { useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 
 export type NotebookProposalMode = 'create' | 'update' | 'delete'
 
@@ -383,8 +385,13 @@ function UpdateNotebookProposal({
   denyWithReason,
 }: NotebookProposalStepPropsWithOutput) {
   const { ref } = useParams()
+  const notebooksSnap = useNotebooksStateSnapshot()
   const parsedInput = updateNotebookInputSchema.safeParse(input)
   const isCompleted = state === 'output-available'
+  const hasUnsavedLocalChanges =
+    confirmState === 'approval-requested' &&
+    parsedInput.success &&
+    hasDiscardableChanges(notebooksSnap.notebooks[parsedInput.data.id])
 
   const {
     data: notebook,
@@ -501,6 +508,7 @@ function UpdateNotebookProposal({
       onApprove={onApprove}
       onDeny={onDeny}
     >
+      {hasUnsavedLocalChanges && <UnsavedLocalChangesWarning mode="update" />}
       <AssistantNotebookPreview entries={diff.entries} mode="update" title={notebook.name} />
     </NotebookConfirm>
   )
@@ -515,8 +523,13 @@ function DeleteNotebookProposal({
   onDeny,
 }: NotebookProposalStepPropsWithOutput) {
   const { ref } = useParams()
+  const notebooksSnap = useNotebooksStateSnapshot()
   const parsedInput = deleteNotebookInputSchema.safeParse(input)
   const isCompleted = state === 'output-available'
+  const hasUnsavedLocalChanges =
+    confirmState === 'approval-requested' &&
+    parsedInput.success &&
+    hasDiscardableChanges(notebooksSnap.notebooks[parsedInput.data.id])
 
   const {
     data: notebook,
@@ -593,6 +606,7 @@ function DeleteNotebookProposal({
       onApprove={onApprove}
       onDeny={onDeny}
     >
+      {hasUnsavedLocalChanges && <UnsavedLocalChangesWarning mode="delete" />}
       <div className="p-3">
         <Admonition
           type="destructive"
@@ -601,5 +615,21 @@ function DeleteNotebookProposal({
         />
       </div>
     </NotebookConfirm>
+  )
+}
+
+function UnsavedLocalChangesWarning({ mode }: { mode: 'update' | 'delete' }) {
+  return (
+    <div className="px-2 pt-2">
+      <Admonition
+        type="warning"
+        title="Unsaved local changes"
+        description={
+          mode === 'update'
+            ? "This notebook has unsaved local changes that aren't reflected in this preview. Approving will overwrite them on save."
+            : "This notebook has unsaved local changes that aren't reflected in this preview. Approving will permanently delete them."
+        }
+      />
+    </div>
   )
 }

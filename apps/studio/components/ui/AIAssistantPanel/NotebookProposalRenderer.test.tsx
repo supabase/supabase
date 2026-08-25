@@ -1,10 +1,12 @@
-import { screen } from '@testing-library/react'
+import { cleanup, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { HttpResponse } from 'msw'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { NotebookProposalRenderer } from './NotebookProposalRenderer'
 import type { components } from '@/data/api'
+import type { SnippetStatus } from '@/data/content/snippet-status'
+import { notebooksState } from '@/state/notebooks/notebooks-state'
 import { customRender as render } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -12,21 +14,21 @@ const NOTEBOOK_ID = 'd3aadd77-7c3c-4de7-aa5c-5aa8ac270b44'
 
 const mockNotebookRow = (overrides: Partial<Record<string, unknown>> = {}) => ({
   id: NOTEBOOK_ID,
-  type: 'notebook',
+  type: 'notebook' as const,
   name: 'Signup funnel',
   description: '',
   favorite: false,
   folder_id: null,
   inserted_at: '2024-01-01T00:00:00.000Z',
   updated_at: '2024-01-01T00:00:00.000Z',
-  visibility: 'project',
+  visibility: 'project' as const,
   owner_id: 1,
   project_id: 1,
   content: {
-    schema_version: 1,
+    schema_version: 1 as const,
     cells: [
-      { _tag: 'markdown_cell', _id: 'cell-1', text: 'hello' },
-      { _tag: 'markdown_cell', _id: 'cell-2', text: 'world' },
+      { _tag: 'markdown_cell' as const, _id: 'cell-1', text: 'hello' },
+      { _tag: 'markdown_cell' as const, _id: 'cell-2', text: 'world' },
     ],
   },
   ...overrides,
@@ -41,6 +43,19 @@ const mockContentItem = (row: ReturnType<typeof mockNotebookRow>) =>
         row as unknown as components['schemas']['GetUserContentByIdResponse']
       ),
   })
+
+const setLocalNotebook = (status: SnippetStatus) => {
+  notebooksState.notebooks[NOTEBOOK_ID] = {
+    projectRef: 'default',
+    notebook: mockNotebookRow(),
+    status,
+  }
+}
+
+afterEach(() => {
+  cleanup()
+  notebooksState.notebooks = {}
+})
 
 describe('NotebookProposalRenderer', () => {
   it('renders the create-mode preview and approves on confirm', async () => {
@@ -97,6 +112,70 @@ describe('NotebookProposalRenderer', () => {
     await user.click(screen.getByRole('button', { name: 'Apply changes' }))
     expect(onApprove).toHaveBeenCalledTimes(1)
   })
+
+  it('warns about unsaved local changes without disabling update approval', async () => {
+    const user = userEvent.setup()
+    const onApprove = vi.fn()
+    setLocalNotebook('unsaved')
+    mockContentItem(mockNotebookRow())
+
+    render(
+      <NotebookProposalRenderer
+        mode="update"
+        state="approval-requested"
+        confirmState="approval-requested"
+        input={{
+          id: NOTEBOOK_ID,
+          expected_updated_at: '2024-01-01T00:00:00.000Z',
+          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
+        }}
+        output={undefined}
+        onApprove={onApprove}
+        onDeny={vi.fn()}
+      />
+    )
+
+    expect(
+      await screen.findByText(
+        "This notebook has unsaved local changes that aren't reflected in this preview. Approving will overwrite them on save."
+      )
+    ).toBeInTheDocument()
+
+    const approveButton = screen.getByRole('button', { name: 'Apply changes' })
+    expect(approveButton).toBeEnabled()
+    await user.click(approveButton)
+    expect(onApprove).toHaveBeenCalledTimes(1)
+  })
+
+  it.each([
+    ['saved', true],
+    ['absent', false],
+  ])(
+    'does not warn about unsaved changes when local notebook state is %s',
+    async (_, hasLocalNotebook) => {
+      if (hasLocalNotebook) setLocalNotebook('saved')
+      mockContentItem(mockNotebookRow())
+
+      render(
+        <NotebookProposalRenderer
+          mode="update"
+          state="approval-requested"
+          confirmState="approval-requested"
+          input={{
+            id: NOTEBOOK_ID,
+            expected_updated_at: '2024-01-01T00:00:00.000Z',
+            operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
+          }}
+          output={undefined}
+          onApprove={vi.fn()}
+          onDeny={vi.fn()}
+        />
+      )
+
+      expect(await screen.findByText('−1')).toBeInTheDocument()
+      expect(screen.queryByText('Unsaved local changes')).not.toBeInTheDocument()
+    }
+  )
 
   it('falls back to a raw-input admonition without dropping the confirm footer on a parse failure', async () => {
     const user = userEvent.setup()
@@ -530,6 +609,30 @@ describe('NotebookProposalRenderer', () => {
     expect(await screen.findByText('Delete "Signup funnel"?')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Delete' }))
     expect(onApprove).toHaveBeenCalledTimes(1)
+  })
+
+  it('shows a delete-specific warning for unsaved local changes', async () => {
+    setLocalNotebook('unsaved')
+    mockContentItem(mockNotebookRow())
+
+    render(
+      <NotebookProposalRenderer
+        mode="delete"
+        state="approval-requested"
+        confirmState="approval-requested"
+        input={{ id: NOTEBOOK_ID }}
+        output={undefined}
+        onApprove={vi.fn()}
+        onDeny={vi.fn()}
+      />
+    )
+
+    expect(
+      await screen.findByText(
+        "This notebook has unsaved local changes that aren't reflected in this preview. Approving will permanently delete them."
+      )
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Delete' })).toBeEnabled()
   })
 
   it('denies the delete proposal on skip', async () => {
