@@ -1,52 +1,67 @@
+.logo,
 .artwork {
-  background-image:
-    linear-gradient(
-      to right,
-      color-mix(in srgb, currentColor 10%, transparent) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      to bottom,
-      color-mix(in srgb, currentColor 10%, transparent) 1px,
-      transparent 1px
-    );
-  background-size: 16px 16px;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, monospace;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
 }
 
-.scan {
-  animation: select-26-scan 8s steps(6, end) infinite;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    color-mix(in srgb, currentColor 18%, transparent),
-    transparent
-  );
-  opacity: 0.7;
-  transform: translateX(-100%);
+.logo {
+  --select-cell-width: 0.647em;
+  --select-cell-height: 1.176em;
+  display: inline-grid;
+  grid-template-columns: repeat(8, var(--select-cell-width));
+  grid-template-rows: repeat(3, var(--select-cell-height));
+  height: calc(3 * var(--select-cell-height));
+  overflow: hidden;
+  width: calc(8 * var(--select-cell-width));
 }
 
-@keyframes select-26-scan {
-  0%,
-  12% {
-    opacity: 0;
-    transform: translateX(-100%);
-  }
-
-  18% {
-    opacity: 0.7;
-  }
-
-  48%,
-  100% {
-    opacity: 0;
-    transform: translateX(100%);
-  }
+.logoRow {
+  display: flex;
+  height: var(--select-cell-height);
+  padding-inline: 0.08em;
+  white-space: nowrap;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .scan {
-    animation: none;
-    opacity: 0.18;
-    transform: translateX(0);
-  }
+.supabase {
+  grid-row: 1;
+  background: #3ecf8e;
+  color: #090e0d;
+}
+.select {
+  grid-row: 2;
+  background: #95e6b8;
+  color: #090e0d;
+}
+.year {
+  grid-row: 3;
+  background: #090e0d;
+  color: #fff;
+}
+
+:global(.dark) .year,
+:global([data-theme='dark']) .year {
+  background: #fff;
+  color: #090e0d;
+}
+
+.artwork {
+  display: grid;
+  grid-auto-rows: 1.18em;
+  overflow: hidden;
+  white-space: pre;
+}
+
+.artworkRow {
+  display: block;
+  padding-inline: 0.25em;
+}
+.artworkRow[data-tone='1'] {
+  background: #3ecf8e;
+  color: #090e0d;
+}
+.artworkRow[data-tone='2'] {
+  background: #95e6b8;
+  color: #090e0d;
 }

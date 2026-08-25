@@ -8,14 +8,14 @@ import {
   SELECT_26_MESSAGE,
   SELECT_26_URL,
   Select26Artwork,
-  Select26Mark,
+  Select26Logo,
 } from './Select26Promotion'
 
 export const Select26Banner = () => (
   <div className="relative isolate flex min-h-14 w-full items-center overflow-hidden border-b border-[#00482f]/15 bg-[#f8f3ef] px-4 py-2 pr-12 text-[#001a10] dark:border-white/10 dark:bg-[#0b0e0d] dark:text-[#f8f3ef] sm:px-6 sm:pr-14">
-    <Select26Artwork className="absolute inset-0 -z-10 text-[#00482f] opacity-60 dark:text-[#94e6b7] dark:opacity-30" />
+    <Select26Artwork className="absolute -right-3 top-0 -z-10 h-full rotate-2 text-lg opacity-[0.16] dark:opacity-[0.12] sm:text-xl" />
     <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-center gap-x-5 gap-y-1.5 sm:flex-nowrap">
-      <Select26Mark className="w-28 shrink-0 text-[#00482f] dark:text-[#94e6b7]" />
+      <Select26Logo className="shrink-0 text-[11px]" />
       <span className="hidden h-5 w-px shrink-0 bg-[#00482f]/20 dark:bg-white/15 sm:block" />
       <p className="text-center text-xs font-medium leading-5 sm:text-sm">{SELECT_26_MESSAGE}</p>
       <Link

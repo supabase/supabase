@@ -22,9 +22,7 @@ export const useSelect26PromotionActive = () => {
 
   useEffect(() => {
     if (!isActive) return
-
     let timeoutId: ReturnType<typeof setTimeout> | undefined
-
     const armExpiryTimer = () => {
       const remainingMs = SELECT_26_EXPIRY_MS - Date.now()
       if (remainingMs <= 0) {
@@ -33,7 +31,6 @@ export const useSelect26PromotionActive = () => {
       }
       timeoutId = setTimeout(armExpiryTimer, Math.min(remainingMs, MAX_TIMEOUT_MS))
     }
-
     armExpiryTimer()
     return () => clearTimeout(timeoutId)
   }, [isActive])
@@ -41,60 +38,32 @@ export const useSelect26PromotionActive = () => {
   return isActive
 }
 
-const GLYPHS = {
-  S: ['111', '100', '111', '001', '111'],
-  E: ['111', '100', '110', '100', '111'],
-  L: ['100', '100', '100', '100', '111'],
-  C: ['111', '100', '100', '100', '111'],
-  T: ['111', '010', '010', '010', '010'],
-  2: ['111', '001', '111', '100', '111'],
-  6: ['111', '100', '111', '101', '111'],
-} as const
+const LOGO_ROWS = [
+  { text: 'SUPABASE', tone: 'supabase' },
+  { text: 'SELECT', tone: 'select' },
+  { text: '26', tone: 'year' },
+] as const
 
-const WORD = ['S', 'E', 'L', 'E', 'C', 'T', '2', '6'] as const
+/** The Select 2026 site's canonical left-terminal logo, adapted without its canvas runtime. */
+export const Select26Logo = ({ className }: { className?: string }) => (
+  <span role="img" aria-label="Supabase Select 26" className={cn(styles.logo, className)}>
+    {LOGO_ROWS.map(({ text, tone }) => (
+      <span key={tone} className={cn(styles.logoRow, styles[tone])}>
+        {text}
+      </span>
+    ))}
+  </span>
+)
 
-export const Select26Mark = ({ className }: { className?: string }) => {
-  const cell = 2
-  const glyphWidth = 3 * cell
-  const gap = cell
-  const yearGap = cell * 2
+const ARTWORK_ROWS = ['SUPABASE', 'SELECT 26'] as const
 
-  return (
-    <svg
-      role="img"
-      aria-label="Supabase Select 2026"
-      viewBox="0 0 68 10"
-      className={cn('block h-auto w-full', className)}
-      fill="currentColor"
-    >
-      {WORD.flatMap((character, characterIndex) => {
-        const extraGap = characterIndex >= 6 ? yearGap : 0
-        const xOffset = characterIndex * (glyphWidth + gap) + extraGap
-
-        return GLYPHS[character].flatMap((row, rowIndex) =>
-          [...row].map((value, columnIndex) =>
-            value === '1' ? (
-              <rect
-                key={`${characterIndex}-${rowIndex}-${columnIndex}`}
-                x={xOffset + columnIndex * cell}
-                y={rowIndex * cell}
-                width={cell}
-                height={cell}
-              />
-            ) : null
-          )
-        )
-      })}
-    </svg>
-  )
-}
-
+/** A static, low-cost crop of the 2026 site's FooterGridLogo. */
 export const Select26Artwork = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div
-    aria-hidden
-    className={cn('pointer-events-none overflow-hidden', styles.artwork, className)}
-    {...props}
-  >
-    <div className={cn('h-full w-1/2', styles.scan)} />
+  <div aria-hidden className={cn(styles.artwork, className)} {...props}>
+    {ARTWORK_ROWS.map((row, index) => (
+      <span key={row} className={styles.artworkRow} data-tone={index + 1}>
+        {row}
+      </span>
+    ))}
   </div>
 )
