@@ -30,7 +30,7 @@ import xml from 'react-syntax-highlighter/dist/cjs/languages/hljs/xml'
 import yaml from 'react-syntax-highlighter/dist/cjs/languages/hljs/yaml'
 import { Button, cn, copyToClipboard } from 'ui'
 
-import { monokaiCustomTheme } from './CodeBlock.utils'
+import { getCodeBlockPalette, monokaiCustomTheme } from './CodeBlock.utils'
 
 const codeBlockLangs = [
   'js',
@@ -244,7 +244,7 @@ export const CodeBlock = ({
               paddingLeft: '4px',
               paddingRight: '4px',
               marginRight: '12px',
-              color: styleConfig?.lineNumber ?? '#828282',
+              color: styleConfig?.lineNumber ?? getCodeBlockPalette(isDarkTheme).lineNumber,
               textAlign: 'center',
               fontSize: large ? 14 : 12,
               paddingTop: '4px',
