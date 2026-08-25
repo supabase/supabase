@@ -78,4 +78,21 @@ See the [React client](/library/docs/react/client).
 
     assert.match(output, /https:\/\/supabase\.com\/library\/docs\/react\/client\.md/)
   })
+
+  it('rewrites documentation links nested inside components', () => {
+    const output = transformLibraryMdx(`---
+title: Auth
+description: Auth block
+---
+
+<Callout type="note">
+See the [React client](/library/docs/react/client) before installing.
+</Callout>
+`)
+
+    assert.match(
+      output,
+      /Note: See the \[React client\]\(https:\/\/supabase\.com\/library\/docs\/react\/client\.md\) before installing\./
+    )
+  })
 })
