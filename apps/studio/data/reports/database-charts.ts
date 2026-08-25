@@ -9,6 +9,7 @@ import { ReportAttributes } from '@/components/ui/Charts/ComposedChart.utils'
 import { DiskAttributesData } from '@/data/config/disk-attributes-query'
 import { MaxConnectionsData } from '@/data/database/max-connections-query'
 import { Project } from '@/data/projects/project-detail-query'
+import { resolveHighAvailability } from '@/hooks/misc/useHighAvailability.constants'
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
 
@@ -38,8 +39,12 @@ export const getReportAttributesV2: (
     typeof provisionedDiskIops === 'number' && typeof computeIopsLimit === 'number'
       ? Math.min(provisionedDiskIops, computeIopsLimit)
       : provisionedDiskIops
+  // High Availability projects run on volumes without a burst credit pool, so the
+  // Disk IO Burst Balance chart has no data to show for them.
   const showBurstBalanceChart =
-    !!showDiskIOBurstBalanceChart && hasBurstableIO(project?.infra_compute_size)
+    !!showDiskIOBurstBalanceChart &&
+    hasBurstableIO(project?.infra_compute_size) &&
+    !resolveHighAvailability(project)
   const baselineThroughputMBps = COMPUTE_DISK[computeVariantId]?.baselineThroughputMBps
   const baselineThroughputLabel =
     typeof baselineThroughputMBps === 'number' ? `${baselineThroughputMBps} MB/s` : 'its baseline'
