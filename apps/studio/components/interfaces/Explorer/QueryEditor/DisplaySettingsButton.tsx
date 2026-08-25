@@ -135,7 +135,12 @@ export const DisplaySettingsButton = ({
 
           {view === 'chart' && (
             <div className="flex min-w-0 flex-col gap-y-2.5">
-              <FormItemLayout isReactForm={false} layout="horizontal" size="tiny" label="Chart type">
+              <FormItemLayout
+                isReactForm={false}
+                layout="horizontal"
+                size="tiny"
+                label="Chart type"
+              >
                 <ToggleGroup
                   value={type}
                   onValueChange={(value) => {
