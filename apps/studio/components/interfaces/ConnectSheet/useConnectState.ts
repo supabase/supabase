@@ -154,7 +154,7 @@ function getFieldOptionsFromSource({
       // balancer, so the sources are the primary and the load balancer.
       return [
         ...options.filter((option) => option.value === projectRef),
-        { value: CONNECTION_SOURCE_LOAD_BALANCER, label: 'Load balancer (read-only)' },
+        { value: CONNECTION_SOURCE_LOAD_BALANCER, label: 'Replica (read-only)' },
       ]
     }
 

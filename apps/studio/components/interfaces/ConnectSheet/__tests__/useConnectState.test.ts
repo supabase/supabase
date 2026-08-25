@@ -528,7 +528,7 @@ describe('useConnectState', () => {
       const options = result.current.getFieldOptions('connectionSource')
       expect(options).toEqual([
         { value: 'test-ref', label: 'Primary database' },
-        { value: 'load-balancer', label: 'Load balancer (read-only)' },
+        { value: 'load-balancer', label: 'Replica (read-only)' },
       ])
     })
 

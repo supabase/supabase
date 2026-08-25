@@ -279,7 +279,7 @@ except Exception as e:
         className={cn('text-sm text-foreground-lighter', !isLoadBalancerSelected && 'sr-only')}
       >
         {isLoadBalancerSelected &&
-          'The load balancer accepts read-only connections. Connect to the primary database for writes.'}
+          'Replica connections are read-only. Connect to the primary database for writes.'}
       </p>
       <ConnectionParameters parameters={buildConnectionParameters(connectionParams)} />
     </div>
