@@ -54,7 +54,7 @@ export const ExplorerNotebookTabCoordinator = () => {
         const notebookId = tab.metadata?.notebookId
         if (!ref || !notebookId) return
 
-        evictNotebookFromCaches({ queryClient, projectRef: ref, id: notebookId, mode: 'remove' })
+        evictNotebookFromCaches({ queryClient, projectRef: ref, id: notebookId })
       },
       confirmClose: (notebookTabs) => {
         const dirtyCount = notebookTabs.filter((tab) => {
