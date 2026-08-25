@@ -112,8 +112,8 @@ export const useGenerateSettingsMenu = () => {
           ? [
               {
                 name: 'Code configuration',
-                key: 'configuration-drift',
-                url: `/project/${ref}/settings/configuration-drift`,
+                key: 'code-configuration',
+                url: `/project/${ref}/settings/code-configuration`,
                 items: [],
               },
             ]

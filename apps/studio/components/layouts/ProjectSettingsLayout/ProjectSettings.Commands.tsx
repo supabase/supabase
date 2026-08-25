@@ -52,9 +52,9 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
       ...(IS_PLATFORM && showConfigDrift
         ? [
             {
-              id: 'nav-project-settings-configuration-drift',
+              id: 'nav-project-settings-code-configuration',
               name: 'Code configuration',
-              route: `/project/${ref}/settings/configuration-drift`,
+              route: `/project/${ref}/settings/code-configuration`,
               defaultHidden: true,
             } as IRouteCommand,
           ]

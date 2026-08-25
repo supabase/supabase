@@ -22,9 +22,7 @@ export function GitHubConfigDriftBanner() {
           description={
             <>
               Current environment values are active; {settingsLabel}.{' '}
-              <Link href={`/project/${ref}/settings/configuration-drift`}>
-                Review configuration
-              </Link>
+              <Link href={`/project/${ref}/settings/code-configuration`}>Review configuration</Link>
             </>
           }
         />
