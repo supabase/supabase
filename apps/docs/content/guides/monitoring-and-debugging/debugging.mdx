@@ -1,98 +1,132 @@
 ---
 id: 'debugging'
-title: 'Debugging guide'
-description: 'Isolate and fix Supabase issues by reading the error, isolating the failing layer, and gathering evidence from logs.'
+title: 'Detecting'
+description: 'If you are observing, run a few checks to see whether something is wrong. If you already have a named error, diagnose it next.'
 ---
 
-Debug by evidence, not by guessing. A Supabase error almost always surfaces at one layer but originates at another, so the fastest path to a fix is finding _where_ the problem is, not pattern-matching the symptom. Retrying a failed request rarely helps; isolating the layer does.
+This guide explains how to detect a signal from project data. If you already have a named error, skip the checks and diagnose it.
 
-## Debug with AI tools
+Use this page to:
 
-An AI agent can work through this loop for you, but only if it can read your project's evidence instead of guessing from the error message.
+- Diagnose a named error: [Already have a symptom?](#open-the-directory)
+- Run a [Health](#health), [Security](#security), [Performance](#performance), or [Usage](#usage) check if you are observing
 
-Debugging with an agent needs two things:
+## Already have a symptom? [#open-the-directory]
 
-- The [Supabase MCP server](/docs/guides/ai-tools/mcp) provides the tools this guide relies on: `get_logs` for a per-service log dump, `query_logs` to run read-only SQL against your logs for filtering and aggregation (see [Query and filter logs](/docs/guides/monitoring-and-debugging/advanced-log-filtering) for the ClickHouse SQL syntax it accepts), `get_advisors` for security and performance findings, and `execute_sql` to inspect your schema and policies.
-- The [Supabase agent skill](/docs/guides/ai-tools/ai-skills) teaches the agent this workflow: locate the failing layer, gather evidence from the matching log source, and verify the fix by re-running the operation that failed.
+If you already have an error message, HTTP status, SQLSTATE, product error, or a clear advisor finding, skip the observing checks. Confirm one cause before you change anything.
 
-Install both in one step with the [Supabase plugin for AI coding agents](/docs/guides/ai-tools/plugins). Connecting an agent to your project carries security risks, so read the [MCP security best practices](/docs/guides/ai-tools/mcp#security-risks) first.
+1. Capture the exact HTTP status, error code, and message. A `401` is not a `403`; `PGRST002` is not `PGRST106`. If you use `supabase-js`, errors are returned in `{ data, error }`, not thrown. Inspect `error`; ignoring it hides the failure.
+2. Query the log [source](/docs/guides/monitoring-and-debugging/advanced-log-filtering#logs-explorer) for that layer. When two layers could fit, start closer to the database.
+3. Search [Diagnosing](/docs/guides/troubleshooting) for that error. Each article confirms one cause, applies one fix, and tells you how to verify it.
+4. Re-run the failing operation. Keep the change only when the original symptom is gone. If verification fails, reverse the change and look again.
 
-## Follow these debugging steps
+For client-side or local debugging, see [Auth error codes](/docs/guides/auth/debugging/error-codes), [Storage logs](/docs/guides/storage/debugging/logs), and [Edge Functions debugging tools](/docs/guides/functions/debugging-tools).
 
-Work through these steps in order, skipping straight to a fix before you have evidence for the cause is the most common way to waste time on a bug.
+<Admonition type="danger">
 
-1. **Reproduce the issue and read the error precisely.** Capture the exact status code, the error code, and the full message, not a paraphrase. A `401` is not a `403`; `PGRST002` is not `PGRST106`; a Postgres `SQLSTATE` such as `42501`, `42P01`, or `23505` points at the exact failure. The precise error is your strongest clue. If you're using `supabase-js`, remember that errors are **returned, not thrown**, check the `error` field in the `{ data, error }` response object. Make sure your code inspects `error` — a swallowed error is why many bugs look like "nothing happened".
-2. **Locate the failing layer.** Use the request stack below. The status code and error code usually name the layer for you.
-3. **Gather evidence for that layer.** Query its logs, run the security and performance advisors, and inspect the schema. Logs are the primary tool, and the layer you identified in the previous step tells you which log source to query. See [Read the logs](#read-the-logs) below.
-4. **Isolate the cause** using the troubleshooting guide for that layer (see [Find the guide for your symptom](#find-the-guide-for-your-symptom) below). Confirm your hypothesis against the evidence before you act. Most Supabase issues trace back to a small, known set of causes, and the guide explains how to tell them apart.
-5. **Apply the fix, then verify.** Re-run the exact operation that failed and confirm it now succeeds, and that the corresponding log line is clean. A fix you haven't re-run is still a guess. If a couple of attempts don't resolve it, stop and gather more evidence rather than repeating the same change.
-
-## Check the request stack
-
-A request from a client passes through several layers before it reaches your data. Errors propagate upward, so the layer that _reports_ an error is often not the layer that _caused_ it.
-
-Knowing the shape of the stack is what makes isolating the layer possible.
-
-```
-Client (supabase-js / SSR)
-  → Edge / API gateway → edge_logs (HTTP status, routing, rate limits)
-      The gateway routes each request to ONE of these services. They run in parallel,
-      not as a chain:
-      ├→ PostgREST (Data API)  → postgrest_logs (low-signal; PGRST* evidence lives in edge_logs and postgres_logs)
-      ├→ GoTrue (Auth)         → auth_logs      (login, JWT, OAuth, email)
-      ├→ Storage API           → storage_logs   (uploads, object access)
-      └→ Realtime              → realtime_logs  (channels, presence, broadcast)
-  PostgREST, GoTrue, and Storage each reach the database independently:
-  → Supavisor (connection pooler) → supavisor_logs (pooling, timeouts)
-  → Postgres (SQL, RLS, triggers) → postgres_logs  (SQLSTATE, RLS, functions)
-```
-
-Edge Functions sit outside this stack and log separately: `function_edge_logs` for the HTTP request to the function, and `function_logs` for `console` output from inside it.
-
-<Admonition type="note">
-
-A permission error or an unexpectedly empty result at the API layer is often a Postgres row-level security or privilege problem one layer down, though filters, authentication, query shape, or a stale schema cache can produce the same symptom. When in doubt, trace toward the database.
+Deleting data, disabling row-level security, weakening a policy, or terminating a database process can cause data loss or a security incident. Do not let an automated routine perform these changes.
 
 </Admonition>
 
-## Read the logs
+## Observing [#notice-a-signal]
 
-Once you know the layer, query that layer's log source directly rather than scanning everything. Pick one `source`, bound the time window, and select only the fields you need.
+If you are checking whether the project is healthy, run a few coarse checks against the data sources in [Observe the data](/docs/guides/monitoring-and-debugging/access-data). You want a count, a rate, or a finding, not a root cause.
 
-When a query comes up empty, widen along an anchor, such as a timestamp, request ID, or error code, to follow the same request into the adjacent source (for example from `edge_logs` into `postgres_logs`) instead of broadening into an unfiltered scan.
+- [Logs](/docs/guides/monitoring-and-debugging/advanced-log-filtering) — ClickHouse SQL in the [Logs Explorer](/dashboard/project/_/logs/explorer), MCP `query_logs`, or the [Management API](/docs/reference/api/v1-get-project-logs)
+- [Database](/docs/guides/monitoring-and-debugging/inspect) — SQL in the [SQL Editor](/dashboard/project/_/sql), MCP `execute_sql`, or `supabase inspect db`
+- [Advisors](/docs/guides/monitoring-and-debugging/advisors) — Studio, MCP `get_advisors`, [`supabase db advisors`](/docs/reference/cli/usage#supabase-db-advisors), or the Management API
+- [Metrics](/docs/guides/monitoring-and-debugging/metrics) and [Reports](/docs/guides/monitoring-and-debugging/reports) — Studio charts, or the Metrics API for the same database series
 
-A wide, unfiltered query across every source buries the one line you need and, on paid projects, costs more in scanned data.
+If a check turns up a spike, a named error, or an advisor finding, follow [Already have a symptom?](#open-the-directory). If the result is only a count, narrow the time window and pick one identifier (path, status, SQLSTATE, request ID) first.
 
-The [Query and filter logs](/docs/guides/monitoring-and-debugging/advanced-log-filtering) guide covers the Logs Explorer, the available log sources, and how to write queries against them.
+### Health
 
-## Find the guide for your symptom
+Ask whether API error rates or availability are off.
 
-Match your symptom to a layer, confirm it against that layer's logs, then open the troubleshooting guide for the specific cause and fix. If a symptom could fit two layers (for example, an auth call failing with what looks like an RLS error), start with the layer closest to the database.
+Count API 5xx responses by path. Compare the count to the last quiet window.
 
-Supabase updates these troubleshooting guides continuously, so treat this table as a starting point rather than the final word: if your exact symptom isn't listed, search the [troubleshooting index](/docs/guides/troubleshooting) for the error string.
+```sql
+-- api 5xx by path
+select
+  log_attributes['request.path'] as path,
+  count() as errors
+from logs
+where source = 'edge_logs'
+  and toInt32OrZero(log_attributes['response.status_code']) >= 500
+group by path
+order by errors desc
+limit 20;
+```
 
-| Symptom / error                                                                                                                                                                                                  | Layer → log source                                       | Troubleshooting guides                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Empty `data` array with rows present; wrong rows returned; UPDATE/DELETE affects 0 rows; `42501` permission denied; `service_role` still blocked; policy not matching                                            | RLS & access → `postgres_logs`                           | [Empty select array](/docs/guides/troubleshooting/why-is-my-select-returning-an-empty-data-array-and-i-have-data-in-the-table-xvOPgx) · [service_role hits RLS](/docs/guides/troubleshooting/why-is-my-service-role-key-client-getting-rls-errors-or-not-returning-data-7_1K9z) · [Database API 42501](/docs/guides/troubleshooting/database-api-42501-errors) · [RLS Simplified](/docs/guides/troubleshooting/rls-simplified-BJTcS8) · [Deprecated RLS features](/docs/guides/troubleshooting/deprecated-rls-features-Pm77Zs)                                                                                                                                                                                                                                                                |
-| `PGRST002`/`PGRST106`; "schema cache"; "could not find table/relationship"; new column or table not recognized; `42P01`; `520`; API returns nothing                                                              | Data API (PostgREST) → `edge_logs`, `postgres_logs`      | [Refresh schema cache](/docs/guides/troubleshooting/refresh-postgrest-schema) · [PGRST002](/docs/guides/troubleshooting/postgrest-error-pgrst002-could-not-query-the-database-for-the-schema-cache-c396e9) · [New objects not recognized](/docs/guides/troubleshooting/postgrest-not-recognizing-new-columns-or-functions-bd75f5) · [42P01](/docs/guides/troubleshooting/resolving-42p01-relation-does-not-exist-error-W4_9-V) · [520 errors](/docs/guides/troubleshooting/fixing-520-errors-in-the-database-rest-api-Ur5-B2) · [API not returning](/docs/guides/troubleshooting/why-is-my-supabase-api-call-not-returning-PGzXw0)                                                                                                                                                            |
-| Sign-in/sign-out/session broken; JWT "invalid claim"/"missing sub"; cookies not sent; OAuth redirect wrong; OTP/magic-link expired; MFA/TOTP fails; auth `500`/`503`; emails not arriving                        | Auth → `auth_logs`, `postgres_logs`                      | [401 missing sub](/docs/guides/troubleshooting/auth-error-401-invalid-claim-missing-sub--AFwMR) · [500 auth errors](/docs/guides/troubleshooting/resolving-500-status-authentication-errors-7bU5U8) · [503 AuthRetryableFetchError](/docs/guides/troubleshooting/auth-error-503-authretryablefetcherror-51b88c) · [OTP expired](/docs/guides/troubleshooting/otp-verification-failures-token-has-expired-or-otp_expired-errors-5ee4d0) · [OAuth not redirecting](/docs/guides/troubleshooting/oauth-sign-in-isnt-redirecting-on-the-server-side-ShGMtr) · [No auth emails](/docs/guides/troubleshooting/not-receiving-auth-emails-from-the-supabase-project-OFSNzw) · [Next.js auth](/docs/guides/troubleshooting/how-do-you-troubleshoot-nextjs---supabase-auth-issues-riMCZV)               |
-| `statement timeout`; duplicate key or sequence error; trigger errors; slow `ALTER`; blocked queries; disk/memory/swap pressure; index size                                                                       | Database (Postgres) → `postgres_logs`                    | [Statement timeout](/docs/guides/troubleshooting/canceling-statement-due-to-statement-timeout-581wFv) · [Duplicate key / sequence](/docs/guides/troubleshooting/inserting-into-sequenceserial-table-causes-duplicate-key-violates-unique-constraint-error-pi6DnC) · [Blocked queries](/docs/guides/troubleshooting/how-to-check-if-my-queries-are-being-blocked-by-other-queries-NSKtR1) · [Disk not shrinking](/docs/guides/troubleshooting/disk-size-not-shrinking-after-deleting-data-135390) · [Autovacuum stalled](/docs/guides/troubleshooting/autovacuum-stalled-due-to-inactive-replication-slot-d55aa2) · [High CPU](/docs/guides/troubleshooting/high-cpu-usage)                                                                                                                    |
-| "too many connections"; "remaining connection slots"; `CONNECT_TIMEOUT`; pooler vs. direct connection; read-only transaction; `prepared statement already exists`; `no pg_hba.conf entry`; IPv4/IPv6; SASL/SCRAM | Connections & pooler → `supavisor_logs`, `postgres_logs` | [Too many connections](/docs/guides/troubleshooting/too-many-connections-for-database-postgres) · [Remaining slots](/docs/guides/troubleshooting/database-error-remaining-connection-slots-are-reserved-for-non-replication-superuser-connections-3V3nIb) · [Prepared statement exists](/docs/guides/troubleshooting/error-prepared-statement-xxx-already-exists-3laqeM) · [Read-only transaction](/docs/guides/troubleshooting/resolving-cannot-execute-update-in-a-read-only-transaction-on-transaction-pooler-connections-ef582c) · [CONNECT_TIMEOUT](/docs/guides/troubleshooting/troubleshooting-connect_timeout-or-hanging-queries-in-vercel-serverless-functions-775f92) · [Supavisor terminology](/docs/guides/troubleshooting/supavisor-and-connection-terminology-explained-9pr_ZO) |
-| Edge Function `401`/`404`/`500`/`503`/`504`/`546`; CPU/memory/wall-clock limit hit; won't deploy; boot error; WebSocket drop; `esm.sh` import fails                                                              | Edge Functions → `function_edge_logs`, `function_logs`   | [401](/docs/guides/troubleshooting/edge-function-401-error-response) · [500](/docs/guides/troubleshooting/edge-function-500-error-response) · [503 boot](/docs/guides/troubleshooting/edge-function-503-response) · [504](/docs/guides/troubleshooting/edge-function-504-error-response) · [546 resource limit](/docs/guides/troubleshooting/edge-function-546-error-response) · [Shutdown reasons](/docs/guides/troubleshooting/edge-function-shutdown-reasons-explained) · [Deploy fails](/docs/guides/troubleshooting/edge-function-fails-deploy) · [esm.sh import](/docs/guides/troubleshooting/importing-stripe-or-other-modules-from-esmsh-on-deno-edge-functions-throws-an-error-TmbB5p)                                                                                               |
-| Realtime `TIMED_OUT`; `TooManyChannels`; silent disconnect; missed database changes; broadcast-from-DB warning; heartbeats                                                                                       | Realtime → `realtime_logs`                               | [TIMED_OUT](/docs/guides/troubleshooting/realtime-connections-timed_out-status) · [TooManyChannels](/docs/guides/troubleshooting/realtime-too-many-channels-error) · [Silent disconnects](/docs/guides/troubleshooting/realtime-handling-silent-disconnections-in-backgrounded-applications-592794) · [Broadcast warning](/docs/guides/troubleshooting/realtime-warn-sending-broadcast-message) · [Heartbeats](/docs/guides/troubleshooting/realtime-heartbeat-messages) · [Logger](/docs/guides/troubleshooting/realtime-debugging-with-logger)                                                                                                                                                                                                                                              |
-| Upload or list fails; public bucket inaccessible; `relation "objects" does not exist`; file size limit; folder or RLS issue                                                                                      | Storage → `storage_logs`, `postgres_logs`                | [Public bucket upload/list](/docs/guides/troubleshooting/why-cant-i-uploadlistetc-my-public-bucket-Z6CmGt) · [403 RLS on upload](/docs/guides/troubleshooting/storage-error-403-forbidden-new-row-violates-row-level-security-policy-on-upload-a94384) · [relation objects does not exist](/docs/guides/troubleshooting/relation-objects-does-not-exist-error-during-storage-uploads-8f21f0) · [File size limits](/docs/guides/troubleshooting/upload-file-size-restrictions-Y4wQLT) · [Folder ops / hierarchical RLS](/docs/guides/troubleshooting/supabase-storage-inefficient-folder-operations-and-hierarchical-rls-challenges-b05a4d)                                                                                                                                                    |
-| Webhook not firing; `pg_cron` job not running; `pg_net` queue stuck; `42501 ... http_request_queue`                                                                                                              | Database jobs → `postgres_logs`                          | [Webhook debugging](/docs/guides/troubleshooting/webhook-debugging-guide-M8sk47) · [pg_cron debugging](/docs/guides/troubleshooting/pgcron-debugging-guide-n1KTaz) · [42501 http_request_queue](/docs/guides/troubleshooting/42501--permission-denied-for-table-httprequestqueue-KnozmQ)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| Reading or querying logs; interpreting Postgres logs; finding API errors in logs; reading metrics                                                                                                                | Diagnostics → any log source                             | [Logging guide](/docs/guides/monitoring-and-debugging/logs) · [Interpret Postgres logs](/docs/guides/troubleshooting/how-to-interpret-and-explore-the-postgres-logs-OuCIOj) · [API errors in logs](/docs/guides/troubleshooting/discovering-and-interpreting-api-errors-in-the-logs-7xREI9) · [Logging levels](/docs/guides/troubleshooting/understanding-postgresql-logging-levels-and-how-they-impact-your-project-KXiJRm) · [View database metrics](/docs/guides/troubleshooting/how-to-view-database-metrics-uqf2z_)                                                                                                                                                                                                                                                                      |
+You can also read the same signal on [Reports](/docs/guides/monitoring-and-debugging/reports) (API response errors) without writing SQL. Check connection pressure with [`supabase inspect db role-connections`](/docs/reference/cli/supabase-inspect-db-role-connections), or scrape CPU and connection series from the [Metrics API](/docs/guides/monitoring-and-debugging/metrics).
 
-For query performance and schema-design questions such as indexing, `EXPLAIN`, N+1 queries, or partitioning, see the [Postgres guides](/docs/guides/database/overview).
+### Security
 
-Debugging is complete only once you've re-run the failing operation, confirmed it succeeds, and checked that the layer's logs show a clean result.
+Ask whether advisors or authorization failures need review.
 
-## Per-product debugging
+Pull [Security Advisor](/docs/guides/monitoring-and-debugging/advisors) findings from Studio, MCP `get_advisors`, the CLI, or the Management API. Then count API 401 and 403 responses by path.
 
-Each Supabase product has its own debugging resources. Use these as a starting point when the error originates in a specific service.
+```sql
+-- api 401 and 403 by path
+select
+  log_attributes['request.path'] as path,
+  toInt32OrZero(log_attributes['response.status_code']) as status,
+  count() as events
+from logs
+where source = 'edge_logs'
+  and toInt32OrZero(log_attributes['response.status_code']) in (401, 403)
+group by path, status
+order by events desc
+limit 20;
+```
 
-- [Database — Inspect the database](/docs/guides/monitoring-and-debugging/inspect)
-- [Auth — Error codes](/docs/guides/auth/debugging/error-codes)
-- [Storage — Debugging](/docs/guides/storage/debugging/logs)
-- [Edge Functions — Local debugging](/docs/guides/functions/debugging-tools)
+Read a finding together with the matching log window. Advisors are not a substitute for error rates. Auth error charts in [Reports](/docs/guides/monitoring-and-debugging/reports) show the same 4xx signal without SQL.
+
+### Performance
+
+Ask whether queries are slow, blocked, missing indexes, or going to disk.
+
+Poor performance often shows up as long-running sessions, lock waits, sequential scans, bloat, or a cache hit rate below 99%. Confirm with a check, then [Diagnosing](/docs/guides/troubleshooting).
+
+Look for sessions that have been `active` or `idle in transaction` for more than 30 seconds. You can run the same check with [`supabase inspect db long-running-queries`](/docs/reference/cli/supabase-inspect-db-long-running-queries).
+
+```sql
+select
+  pid,
+  usename as role,
+  state,
+  now() - query_start as duration,
+  wait_event_type,
+  left(query, 80) as query
+from pg_stat_activity
+where datname = current_database()
+  and pid != pg_backend_pid()
+  and state in ('active', 'idle in transaction')
+  and now() - query_start > interval '30 seconds'
+order by duration desc
+limit 20;
+```
+
+Also pull [Performance Advisor](/docs/guides/monitoring-and-debugging/advisors) findings, and use [`supabase inspect db cache-hit`](/docs/reference/cli/supabase-inspect-db-cache-hit) or [`outliers`](/docs/reference/cli/supabase-inspect-db-outliers) for cache and query-time shape. Index or table hit rate below 99% means the instance is reading from disk. [Reports](/docs/guides/monitoring-and-debugging/reports) and the [Metrics API](/docs/guides/monitoring-and-debugging/metrics) show CPU, disk IOPS, and connection pressure for the same window. The command catalog and matching SQL live in [Inspect the database](/docs/guides/monitoring-and-debugging/inspect).
+
+### Usage
+
+Ask whether traffic or storage is growing in a way that will hurt.
+
+Count API requests by path. Compare the count to a recent baseline.
+
+```sql
+-- api requests by path
+select
+  log_attributes['request.path'] as path,
+  count() as requests
+from logs
+where source = 'edge_logs'
+group by path
+order by requests desc
+limit 20;
+```
+
+[Reports](/docs/guides/monitoring-and-debugging/reports) show total requests, disk usage, and database size without SQL. [`supabase inspect db table-sizes`](/docs/reference/cli/supabase-inspect-db-table-sizes) and [`bloat`](/docs/reference/cli/supabase-inspect-db-bloat) name the large relations. The [Management API usage endpoint](/docs/reference/api/v1-get-project-usage-api-count) returns request counts for a script.
+
+Escalate to [Support](/dashboard/support/new) when you cannot access the diagnostic source, the evidence points to a platform failure, or a safe fix needs a permission you do not have. Include the project reference, timestamp with time zone, error code, request ID, and sanitized evidence. Do not include passwords, API keys, or personal data.
