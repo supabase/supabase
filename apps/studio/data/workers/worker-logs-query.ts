@@ -23,9 +23,9 @@ export const WORKER_LOG_STREAM_LABEL: Record<WorkerLogStream, string> = {
   builds: 'Builds',
 }
 
-// Read off a real `workers_product.logs` row in Logflare: `metadata.worker` holds the
-// worker name, alongside `metadata.source` and `metadata.event`.
-const WORKER_NAME_KEY = 'metadata.worker'
+// Read off real rows: ClickHouse flattens the workers attributes without Logflare's
+// `metadata.` prefix, so the worker name is plain `worker`.
+const WORKER_NAME_KEY = 'worker'
 
 const LOOKBACK_HOURS = 24
 
