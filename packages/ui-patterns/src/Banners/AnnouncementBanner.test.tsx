@@ -10,13 +10,16 @@ import {
   SELECT_26_WWW_DISMISSAL_KEY,
 } from './Select26Promotion'
 
-vi.mock('next/navigation', () => ({ usePathname: () => '/database' }))
+const mockUsePathname = vi.fn(() => '/database')
+
+vi.mock('next/navigation', () => ({ usePathname: () => mockUsePathname() }))
 
 describe('AnnouncementBanner', () => {
   const storage = new Map<string, string>()
 
   beforeEach(() => {
     storage.clear()
+    mockUsePathname.mockReturnValue('/database')
     Object.defineProperty(window, 'localStorage', {
       configurable: true,
       value: {
@@ -64,5 +67,15 @@ describe('AnnouncementBanner', () => {
     render(<AnnouncementBanner />)
 
     expect(screen.queryByText(SELECT_26_TITLE)).not.toBeInTheDocument()
+  })
+
+  it('remains dismissible on launch-week routes', async () => {
+    mockUsePathname.mockReturnValue('/launch-week')
+    render(<AnnouncementBanner />)
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Dismiss announcement' }))
+
+    expect(window.localStorage.getItem(SELECT_26_WWW_DISMISSAL_KEY)).toBe('hidden')
+    await waitFor(() => expect(screen.queryByText(SELECT_26_TITLE)).not.toBeInTheDocument())
   })
 })

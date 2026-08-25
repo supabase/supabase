@@ -1,7 +1,6 @@
 'use client'
 
 import { X } from 'lucide-react'
-import { usePathname } from 'next/navigation'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { Button, cn } from 'ui'
 
@@ -29,9 +28,6 @@ export const Announcement = ({
 }: PropsWithChildren<AnnouncementComponentProps>) => {
   const [hidden, setHidden] = useState(true)
 
-  const pathname = usePathname()
-  const isLaunchWeekSection = pathname?.includes('launch-week') ?? false
-
   // override to hide announcement
   if (!show) return null
 
@@ -57,26 +53,26 @@ export const Announcement = ({
     return setHidden(true)
   }
 
-  if (!isLaunchWeekSection && hidden) {
+  if (hidden) {
     return null
-  } else {
-    return (
-      <div className={cn('relative z-40 w-full', className)}>
-        {dismissable && !isLaunchWeekSection && (
-          <div className="absolute right-3 top-1/2 z-50 -translate-y-1/2 sm:right-4">
-            <Button
-              type="button"
-              variant="text"
-              size="tiny"
-              icon={<X size={16} strokeWidth={1.5} />}
-              aria-label="Dismiss announcement"
-              onClick={handleClose}
-              className="rounded-md bg-[#f8f3ef]/85 px-1 text-foreground-muted backdrop-blur-[2px] hover:bg-[#f8f3ef] hover:text-foreground dark:bg-[#0b0e0d]/85 dark:hover:bg-[#0b0e0d]"
-            />
-          </div>
-        )}
-        {children}
-      </div>
-    )
   }
+
+  return (
+    <div className={cn('relative z-40 w-full', className)}>
+      {dismissable && (
+        <div className="absolute right-3 top-1/2 z-50 -translate-y-1/2 sm:right-4">
+          <Button
+            type="button"
+            variant="text"
+            size="tiny"
+            icon={<X size={16} strokeWidth={1.5} />}
+            aria-label="Dismiss announcement"
+            onClick={handleClose}
+            className="rounded-md bg-[#f8f3ef]/85 px-1 text-foreground-muted backdrop-blur-[2px] hover:bg-[#f8f3ef] hover:text-foreground dark:bg-[#0b0e0d]/85 dark:hover:bg-[#0b0e0d]"
+          />
+        </div>
+      )}
+      {children}
+    </div>
+  )
 }

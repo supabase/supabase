@@ -246,9 +246,13 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     ])
 
     useEffect(() => {
+      // Wait until project + dismissal state are known so we do not call
+      // dismissBanner on every early render (it always schedules a setState).
+      if (!selectedProject?.ref || !isSelect26DismissalLoaded) return
+
       const shouldShow = shouldShowSelect26Banner({
         isPlatform: IS_PLATFORM,
-        projectRef: selectedProject?.ref,
+        projectRef: selectedProject.ref,
         dismissalLoaded: isSelect26DismissalLoaded,
         isActive: isSelect26PromotionActive,
         isDismissed: isSelect26BannerDismissed,
