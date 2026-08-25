@@ -112,6 +112,11 @@ overrides:
   node-gyp>tar: ^7.5.21
   nodemailer: ^7.0.11
   postcss: 'catalog:'
+  # Astro tooling (apps/kb) pulls in a peer range that resolves to a newer
+  # prettier/sort-imports than the workspace is pinned to, which reformats
+  # unrelated files across the repo. Force the single version everywhere.
+  prettier: 3.8.1
+  '@ianvs/prettier-plugin-sort-imports': 4.7.0
   qs: ^6.15.2
   refractor>prismjs: ^1.30.0
   tmp: ^0.2.7

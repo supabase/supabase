@@ -53,11 +53,11 @@
   },
   "devDependencies": {
     "@aws-sdk/client-secrets-manager": "^3.1041.0",
-    "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
+    "@ianvs/prettier-plugin-sort-imports": "4.7.0",
     "@types/node": "catalog:",
     "eslint": "^9.0.0",
     "jsdom": "^28.1.0",
-    "prettier": "^3.8.0",
+    "prettier": "3.8.1",
     "prettier-plugin-sql-cst": "^0.18.0",
     "rimraf": "^6.0.0",
     "supabase": "^2.114.0",

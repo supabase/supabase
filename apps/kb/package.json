@@ -7,7 +7,6 @@
     "dev": "astro dev --port 3008",
     "build": "astro build",
     "preview": "astro preview --port 3008",
-    "typecheck": "astro check",
     "clean": "rimraf dist .astro tsconfig.tsbuildinfo"
   },
   "dependencies": {
@@ -17,7 +16,6 @@
     "react-dom": "catalog:"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.10",
     "@tailwindcss/vite": "4.2.4",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
