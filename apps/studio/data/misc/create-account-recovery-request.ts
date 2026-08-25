@@ -7,19 +7,41 @@ import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type CreateAccountRecoveryRequestVariables = {
   email: string
+  organization: string | undefined
+  projectRefs: Array<string> | undefined
+  invoices:
+    | Array<{
+        number: string | undefined
+        amount: number | undefined
+        issueDate: string | undefined
+      }>
+    | undefined
+  memberEmails: Array<string> | undefined
+  notes: string | undefined
   hcaptchaToken: string | null
-  redirectTo: string
 }
 
 export async function createAccountRecoveryRequest({
   email,
   hcaptchaToken,
-  redirectTo,
+  organization,
+  projectRefs,
+  invoices,
+  memberEmails,
+  notes,
 }: CreateAccountRecoveryRequestVariables) {
   // @ts-ignore
   const { data, error } = await post('/platform/account-recovery/requests', {
     // @ts-ignore
-    body: { email, hcaptchaToken, redirectTo },
+    body: {
+      email,
+      hcaptchaToken,
+      organization,
+      projectRefs,
+      invoices,
+      memberEmails,
+      notes,
+    },
   })
 
   if (error) handleError(error)

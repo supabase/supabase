@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Calendar, Form, FormControl, FormField, Input, Separator } from 'ui'
+import { Button, Calendar, Form, FormControl, FormField, Input, Separator, Textarea } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import {
   DatePicker,
@@ -18,21 +18,20 @@ import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/Si
 import * as z from 'zod'
 
 import { useCreateAccountRecoveryRequestMutation } from '@/data/misc/create-account-recovery-request'
-import { BASE_PATH } from '@/lib/constants'
 
 const lostAccountSchema = z.object({
   email: z.string().min(1, 'Please provide an email address').email('Must be a valid email'),
-  organization: z.string().min(1, 'Please provide an organization name or id'),
-  projectIds: z.array(
+  organization: z.string(),
+  projectRefs: z.array(
     z.object({
       value: z.string().optional(),
     })
   ),
   invoices: z.array(
     z.object({
-      number: z.string().min(1, 'Please enter the invoice number').optional(),
-      amount: z.string().min(1, 'Please enter the invoice amount').optional(),
-      date: z.date().optional(),
+      number: z.string().optional(),
+      amount: z.union([z.literal(''), z.coerce.number()]).optional(),
+      issueDate: z.date().optional(),
     })
   ),
   members: z.array(
@@ -40,6 +39,7 @@ const lostAccountSchema = z.object({
       value: z.union([z.literal(''), z.string().email('Must be a valid email')]),
     })
   ),
+  notes: z.string().optional(),
 })
 
 type LostAccountAccessFormData = z.infer<typeof lostAccountSchema>
@@ -56,14 +56,16 @@ export const LostAccountAccessFormWizard = () => {
 
 const ConfirmAccountRecoveryRequest = ({ email }: { email: string }) => {
   return (
-    <Admonition
-      type="default"
-      title={`Check your email (${email}) for a reset code`}
-      description="If elligible, you'll get an email with next steps. This can take a little while — there's nothing else to do here right now"
-    >
-      Supabase will never ask you for your password, a token, an API key, or a database connection
-      string during account recovery — by email, in this flow, or anywhere else.{' '}
-      <Link href="">What we will and won't ask for.</Link>
+    <Admonition type="default" title={`Check your email (${email}) for a reset code`}>
+      <p>
+        If elligible, you'll get an email with next steps. This can take a little while — there's
+        nothing else to do here right now
+      </p>
+      <p>
+        Supabase will never ask you for your password, a token, an API key, or a database connection
+        string during account recovery — by email, in this flow, or anywhere else.{' '}
+        <Link href="">What we will and won't ask for.</Link>
+      </p>
     </Admonition>
   )
 }
@@ -77,7 +79,7 @@ const LostAccountAccessForm = ({ onSuccess }: { onSuccess: (email: string) => vo
     defaultValues: {
       email: '',
       organization: '',
-      projectIds: [{ value: '' }],
+      projectRefs: [{ value: '' }],
       members: [{ value: '' }],
     },
   })
@@ -101,19 +103,22 @@ const LostAccountAccessForm = ({ onSuccess }: { onSuccess: (email: string) => vo
       token = captchaResponse?.response ?? null
     }
 
-    // TODO: remove this (for dev purpose until backend is ready)
-    return onSuccess(data.email)
+    const projectRefs = data.projectRefs.map((p) => p.value).filter((p) => isNotEmpty(p))
+    const memberEmails = data.members.map((m) => m.value).filter((p) => isNotEmpty(p))
 
-    // TODO: restore this (for dev purpose until backend is ready)
-    // createAccountRecoveryRequest({
-    //   email: data.email,
-    //   hcaptchaToken: token,
-    //   redirectTo: `${
-    //     process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-    //       ? location.origin
-    //       : process.env.NEXT_PUBLIC_SITE_URL
-    //   }${BASE_PATH}/reset-password`,
-    // })
+    createAccountRecoveryRequest({
+      email: data.email,
+      organization: data.organization,
+      projectRefs,
+      invoices: data.invoices.map((i) => ({
+        amount: i.amount != '' ? i.amount : undefined,
+        number: i.number,
+        issueDate: i.issueDate != null ? format(i.issueDate, 'yyyy-MM-dd') : undefined,
+      })),
+      memberEmails,
+      notes: data.notes,
+      hcaptchaToken: token,
+    })
   }
 
   return (
@@ -160,7 +165,7 @@ const LostAccountAccessForm = ({ onSuccess }: { onSuccess: (email: string) => vo
 
         <FormField
           control={form.control}
-          name="projectIds"
+          name="projectRefs"
           render={() => (
             <FormItemLayout
               label="Project IDs"
@@ -168,7 +173,7 @@ const LostAccountAccessForm = ({ onSuccess }: { onSuccess: (email: string) => vo
             >
               <SingleValueFieldArray
                 control={form.control}
-                name="projectIds"
+                name="projectRefs"
                 valueFieldName="value"
                 createEmptyRow={() => ({ value: '' })}
                 placeholder="hpjxqfdtriqhiwoqrdyz"
@@ -231,7 +236,7 @@ const LostAccountAccessForm = ({ onSuccess }: { onSuccess: (email: string) => vo
               render={({ field }) => (
                 <FormItemLayout label={<span className="sr-only">Amount</span>}>
                   <FormControl>
-                    <Input {...field} type="text" placeholder="Amount" disabled={isPending} />
+                    <Input {...field} type="number" placeholder="Amount" disabled={isPending} />
                   </FormControl>
                 </FormItemLayout>
               )}
@@ -242,14 +247,14 @@ const LostAccountAccessForm = ({ onSuccess }: { onSuccess: (email: string) => vo
               render={({ field }) => (
                 <FormItemLayout label={<span className="sr-only">Amount</span>}>
                   <FormControl>
-                    <Input {...field} type="text" placeholder="Amount" disabled={isPending} />
+                    <Input {...field} type="number" placeholder="Amount" disabled={isPending} />
                   </FormControl>
                 </FormItemLayout>
               )}
             />
             <FormField
               control={form.control}
-              name="invoices.0.date"
+              name="invoices.0.issueDate"
               render={({ field, fieldState }) => (
                 <FormItemLayout label={<span className="sr-only">Date</span>}>
                   <FormControl>
@@ -274,7 +279,7 @@ const LostAccountAccessForm = ({ onSuccess }: { onSuccess: (email: string) => vo
             />
             <FormField
               control={form.control}
-              name="invoices.1.date"
+              name="invoices.1.issueDate"
               render={({ field, fieldState }) => (
                 <FormItemLayout label={<span className="sr-only">Date</span>}>
                   <FormControl>
@@ -323,6 +328,21 @@ const LostAccountAccessForm = ({ onSuccess }: { onSuccess: (email: string) => vo
           )}
         />
 
+        <FormField
+          control={form.control}
+          name="notes"
+          render={({ field }) => (
+            <FormItemLayout
+              label="Notes"
+              description="Anything that can help us recover your account"
+            >
+              <FormControl>
+                <Textarea {...field} rows={4} className="resize-none" />
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+
         <div className="self-center">
           <HCaptcha
             ref={captchaRef}
@@ -345,4 +365,8 @@ const LostAccountAccessForm = ({ onSuccess }: { onSuccess: (email: string) => vo
       </form>
     </Form>
   )
+}
+
+const isNotEmpty = (value: string | undefined): value is string => {
+  return value != null
 }
