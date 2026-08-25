@@ -36,7 +36,7 @@ async function collectAppRouterPages(
       const nested = await collectAppRouterPages(path.join(dir, dirent.name), nextSegments)
       nested.forEach((filePath, slug) => pages.set(slug, filePath))
     } else if (dirent.name === 'page.tsx') {
-      pages.set(segments.join('/') || 'homepage', path.join(dir, dirent.name))
+      pages.set(segments.join('/') || 'index', path.join(dir, dirent.name))
     }
   }
   return pages

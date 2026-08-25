@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { forwardRef, useState } from 'react'
 import { type Snapshot } from 'valtio'
 
 import { AddCellDropdown } from '../AddCellDropdown'
 import { MoveCellDropdownContent } from '../MoveCellDropdownContent'
-import { QueryEditor } from '../QueryEditor'
+import { QueryEditor, type QueryEditorHandle } from '../QueryEditor'
 import { type QueryDisplay, type QueryResult } from '../types'
 import {
   changeCellSource,
@@ -25,10 +25,14 @@ import { useLocalRoleImpersonationState } from '@/state/role-impersonation-state
 
 interface QueryCellProps {
   cell: Snapshot<QueryCellSchema>
+  onEdit?: () => void
 }
 
 /** Notebook adapter around the shared QueryEditor. */
-export const QueryCell = ({ cell }: QueryCellProps) => {
+export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function QueryCell(
+  { cell, onEdit },
+  ref
+) {
   const snap = useNotebooksStateSnapshot()
   const currentNotebook = useCurrentNotebook()
 
@@ -37,6 +41,8 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
   const roleImpersonationState = useLocalRoleImpersonationState()
 
   const title = cell.title ?? 'Untitled query'
+  const showQuery =
+    snap.cellLocalState.get(cell._id)?.showQuery ?? currentNotebook?.status === 'new'
 
   /**
    * Applies an update to this cell. The updater runs against the cell as the store holds
@@ -48,10 +54,14 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
     const notebookId = currentNotebook?.notebook.id
     if (!notebookId) return
 
+    onEdit?.()
     snap.updateCell({
       id: notebookId,
-      cellId: cell.id,
-      updater: (candidate) => (isQueryCell(candidate) ? updater(candidate) : candidate),
+      cellId: cell._id,
+      updater: (candidate) => {
+        if (!isQueryCell(candidate)) return candidate
+        return updater(candidate)
+      },
     })
   }
 
@@ -86,17 +96,20 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
 
   return (
     <SortableSection
-      id={cell.id}
-      actions={<AddCellDropdown cellId={cell.id} />}
-      gripDropdownContent={<MoveCellDropdownContent cellId={cell.id} />}
+      id={cell._id}
+      actions={<AddCellDropdown cellId={cell._id} />}
+      gripDropdownContent={<MoveCellDropdownContent cellId={cell._id} />}
       gripClassName="mt-2 opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition"
     >
       <QueryEditor
-        id={cell.id}
+        ref={ref}
+        id={cell._id}
         variant="embedded"
         title={title}
         query={toQueryModel(cell, sql)}
         result={result}
+        showQuery={showQuery}
+        onShowQueryChange={(showQuery) => snap.setQueryVisibility({ cellId: cell._id, showQuery })}
         roleImpersonationState={roleImpersonationState}
         display={getCellDisplay(cell)}
         onTitleChange={handleTitleChange}
@@ -109,4 +122,4 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
       />
     </SortableSection>
   )
-}
+})

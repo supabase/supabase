@@ -202,6 +202,228 @@ describe('explorer query drafts', () => {
     expect(persisted[`query-${MAX_PERSISTED_EXPLORER_QUERY_DRAFTS}`]).toBeDefined()
   })
 
+  it('persists and restores a per-draft row limit independently of other drafts', () => {
+    const storage = createMemoryStorage()
+    const state = createExplorerQueryState(storage)
+
+    state.createDraft({ id: 'query-1', projectRef: 'project-a' })
+    state.createDraft({ id: 'query-2', projectRef: 'project-a' })
+    state.updateDraft({ id: 'query-1', rowLimit: 500 })
+
+    expect(state.drafts['query-1']).toMatchObject({ rowLimit: 500 })
+    expect(state.drafts['query-2']).toMatchObject({ rowLimit: 100 })
+
+    const restored = createExplorerQueryState(storage)
+    expect(restored.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
+    expect(restored.restoreDraft({ id: 'query-2', projectRef: 'project-a' })).toBe(true)
+    expect(restored.drafts['query-1']).toMatchObject({ rowLimit: 500 })
+    expect(restored.drafts['query-2']).toMatchObject({ rowLimit: 100 })
+  })
+
+  it('defaults the row limit for drafts persisted before row limits existed', () => {
+    const storage = createMemoryStorage()
+    storage.setItem(
+      LOCAL_STORAGE_KEYS.EXPLORER_QUERY_DRAFTS('project-a'),
+      JSON.stringify({
+        'query-1': { name: 'Legacy query', sql: 'select 1', updatedAt: 1 },
+      })
+    )
+
+    const state = createExplorerQueryState(storage)
+    expect(state.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
+    expect(state.drafts['query-1']).toMatchObject({ rowLimit: 100 })
+  })
+
+  it('persists and restores result display options independently per draft', () => {
+    const storage = createMemoryStorage()
+    const state = createExplorerQueryState(storage)
+
+    state.createDraft({ id: 'query-1', projectRef: 'project-a' })
+    state.createDraft({ id: 'query-2', projectRef: 'project-a' })
+    state.setDisplay({
+      id: 'query-1',
+      display: {
+        view: 'chart',
+        chart: {
+          type: 'line',
+          x_column: 'day',
+          y_series: ['requests'],
+          cumulative: true,
+          scale: 'log',
+          show_labels: true,
+        },
+      },
+    })
+
+    expect(state.drafts['query-1']).toMatchObject({
+      view: 'chart',
+      chart: { type: 'line', x_column: 'day', y_series: ['requests'] },
+    })
+    expect(state.drafts['query-2']).toMatchObject({ view: 'table', chart: undefined })
+
+    const restored = createExplorerQueryState(storage)
+    expect(restored.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
+    expect(restored.restoreDraft({ id: 'query-2', projectRef: 'project-a' })).toBe(true)
+    expect(restored.drafts['query-1']).toMatchObject({
+      view: 'chart',
+      chart: {
+        type: 'line',
+        x_column: 'day',
+        y_series: ['requests'],
+        cumulative: true,
+        scale: 'log',
+        show_labels: true,
+      },
+    })
+    expect(restored.drafts['query-2']).toMatchObject({ view: 'table', chart: undefined })
+  })
+
+  it('defaults legacy and malformed display options without dropping the draft', () => {
+    const storage = createMemoryStorage()
+    storage.setItem(
+      LOCAL_STORAGE_KEYS.EXPLORER_QUERY_DRAFTS('project-a'),
+      JSON.stringify({
+        'legacy-query': { name: 'Legacy query', sql: 'select 1', updatedAt: 1 },
+        'malformed-query': {
+          name: 'Malformed query',
+          sql: 'select 2',
+          updatedAt: 2,
+          view: 'map',
+          chart: { type: 'pie' },
+        },
+      })
+    )
+
+    const state = createExplorerQueryState(storage)
+    expect(state.restoreDraft({ id: 'legacy-query', projectRef: 'project-a' })).toBe(true)
+    expect(state.restoreDraft({ id: 'malformed-query', projectRef: 'project-a' })).toBe(true)
+    expect(state.drafts['legacy-query']).toMatchObject({ view: 'table', chart: undefined })
+    expect(state.drafts['malformed-query']).toMatchObject({ view: 'table', chart: undefined })
+  })
+
+  it('accepts every row limit the row limit menu can produce', () => {
+    const storage = createMemoryStorage()
+
+    for (const rowLimit of [-1, 100, 500, 1000]) {
+      storage.setItem(
+        LOCAL_STORAGE_KEYS.EXPLORER_QUERY_DRAFTS('project-a'),
+        JSON.stringify({
+          'query-1': { name: 'Query', sql: 'select 1', updatedAt: 1, rowLimit },
+        })
+      )
+
+      const state = createExplorerQueryState(storage)
+      expect(state.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
+      expect(state.drafts['query-1']).toMatchObject({ rowLimit })
+    }
+  })
+
+  it('normalizes a fractional persisted row limit to the default', () => {
+    const storage = createMemoryStorage()
+    storage.setItem(
+      LOCAL_STORAGE_KEYS.EXPLORER_QUERY_DRAFTS('project-a'),
+      JSON.stringify({
+        'query-1': { name: 'Query', sql: 'select 1', updatedAt: 1, rowLimit: 100.5 },
+      })
+    )
+
+    const state = createExplorerQueryState(storage)
+    expect(state.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
+    expect(state.drafts['query-1']).toMatchObject({ rowLimit: 100 })
+  })
+
+  it('normalizes an out-of-range persisted row limit to the default', () => {
+    const storage = createMemoryStorage()
+    storage.setItem(
+      LOCAL_STORAGE_KEYS.EXPLORER_QUERY_DRAFTS('project-a'),
+      JSON.stringify({
+        'query-1': { name: 'Query', sql: 'select 1', updatedAt: 1, rowLimit: 999999 },
+      })
+    )
+
+    const state = createExplorerQueryState(storage)
+    expect(state.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
+    expect(state.drafts['query-1']).toMatchObject({ rowLimit: 100 })
+  })
+
+  it('normalizes a non-numeric persisted row limit to the default without dropping the draft', () => {
+    const storage = createMemoryStorage()
+    storage.setItem(
+      LOCAL_STORAGE_KEYS.EXPLORER_QUERY_DRAFTS('project-a'),
+      JSON.stringify({
+        'query-1': { name: 'Query', sql: 'select 1', updatedAt: 1, rowLimit: 'unlimited' },
+      })
+    )
+
+    const state = createExplorerQueryState(storage)
+    expect(state.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
+    expect(state.drafts['query-1']).toMatchObject({ rowLimit: 100, uncheckedSql: 'select 1' })
+  })
+
+  it('persists and restores a per-draft impersonated role independently of other drafts', () => {
+    const storage = createMemoryStorage()
+    const state = createExplorerQueryState(storage)
+
+    state.createDraft({ id: 'query-1', projectRef: 'project-a' })
+    state.createDraft({ id: 'query-2', projectRef: 'project-a' })
+    state.setRole({ id: 'query-1', role: { type: 'postgrest', role: 'anon' } })
+
+    expect(state.drafts['query-1']).toMatchObject({ role: { type: 'postgrest', role: 'anon' } })
+    expect(state.drafts['query-2']).toMatchObject({ role: undefined })
+
+    const restored = createExplorerQueryState(storage)
+    expect(restored.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
+    expect(restored.restoreDraft({ id: 'query-2', projectRef: 'project-a' })).toBe(true)
+    expect(restored.drafts['query-1']).toMatchObject({
+      role: { type: 'postgrest', role: 'anon' },
+    })
+    expect(restored.drafts['query-2']).toMatchObject({ role: undefined })
+  })
+
+  it('clears a persisted role when set back to undefined', () => {
+    const storage = createMemoryStorage()
+    const state = createExplorerQueryState(storage)
+
+    state.createDraft({ id: 'query-1', projectRef: 'project-a' })
+    state.setRole({ id: 'query-1', role: { type: 'postgrest', role: 'service_role' } })
+    state.setRole({ id: 'query-1', role: undefined })
+
+    expect(state.drafts['query-1']).toMatchObject({ role: undefined })
+
+    const restored = createExplorerQueryState(storage)
+    expect(restored.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
+    expect(restored.drafts['query-1']).toMatchObject({ role: undefined })
+  })
+
+  it('drops a malformed persisted role rather than failing to restore the draft', () => {
+    const storage = createMemoryStorage()
+    storage.setItem(
+      LOCAL_STORAGE_KEYS.EXPLORER_QUERY_DRAFTS('project-a'),
+      JSON.stringify({
+        'query-1': {
+          name: 'Query with bad role',
+          sql: 'select 1',
+          updatedAt: 1,
+          role: { type: 'postgrest', role: 'not-a-real-role' },
+        },
+      })
+    )
+
+    const state = createExplorerQueryState(storage)
+    expect(state.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
+    expect(state.drafts['query-1']).toMatchObject({ role: undefined })
+  })
+
+  it('ignores role updates for logs drafts', () => {
+    const storage = createMemoryStorage()
+    const state = createExplorerQueryState(storage)
+
+    state.createDraft({ id: 'query-1', projectRef: 'project-a', source: LOGS_SOURCE })
+    state.setRole({ id: 'query-1', role: { type: 'postgrest', role: 'anon' } })
+
+    expect(state.drafts['query-1']).not.toHaveProperty('role')
+  })
+
   it('removes the persisted draft and its session result when its tab closes', () => {
     const storage = createMemoryStorage()
     const state = createExplorerQueryState(storage)

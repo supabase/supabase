@@ -73,7 +73,7 @@ export function getConnectionsAttentionCopy(attention: ConnectionsAttention): {
   type: 'warning' | 'destructive'
   title: string
   description: string
-  showAcceptLink: boolean
+  shouldShowAcceptLink: boolean
 } | null {
   const { waitingCount, expiredCount } = attention
   if (waitingCount === 0 && expiredCount === 0) return null
@@ -82,8 +82,8 @@ export function getConnectionsAttentionCopy(attention: ConnectionsAttention): {
     return {
       type: 'destructive',
       title: expiredCount === 1 ? 'A connection request expired' : 'Connection requests expired',
-      description: 'Add a new connection to try again. AWS can no longer accept this share.',
-      showAcceptLink: false,
+      description: `AWS can no longer accept ${expiredCount === 1 ? 'this share' : 'these shares'}.`,
+      shouldShowAcceptLink: false,
     }
   }
 
@@ -91,9 +91,8 @@ export function getConnectionsAttentionCopy(attention: ConnectionsAttention): {
     return {
       type: 'warning',
       title: 'Some connections need attention',
-      description:
-        'Accept waiting resource shares in AWS within 12 hours. Expired requests need a new connection.',
-      showAcceptLink: true,
+      description: `Accept the waiting resource share${waitingCount === 1 ? '' : 's'} in AWS within 12 hours.`,
+      shouldShowAcceptLink: true,
     }
   }
 
@@ -101,7 +100,7 @@ export function getConnectionsAttentionCopy(attention: ConnectionsAttention): {
     type: 'warning',
     title:
       waitingCount === 1 ? 'Waiting for the AWS account owner' : 'Waiting for AWS account owners',
-    description: 'Accept the resource share in AWS within 12 hours.',
-    showAcceptLink: true,
+    description: `Accept the resource share${waitingCount === 1 ? '' : 's'} in AWS within 12 hours.`,
+    shouldShowAcceptLink: true,
   }
 }

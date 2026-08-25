@@ -920,14 +920,29 @@ export interface DocsFeedbackClickedEvent {
   }
 }
 
+export type MarkdownAffordancePageType =
+  | 'blog'
+  | 'customers'
+  | 'events'
+  | 'pricing'
+  | 'changelog'
+  | 'guide'
+
 /**
- * User clicked 'Copy as Markdown' option on a page.
+ * User clicked 'Copy as Markdown' on a page and the markdown was copied successfully.
+ * Fires on success only; failed fetch/clipboard writes are not counted.
  *
  * @group Events
- * @source docs
+ * @source www, docs
  */
 export interface CopyAsMarkdownClickedEvent {
   action: 'copy_as_markdown_clicked'
+  properties: {
+    /**
+     * Page class the affordance sits on.
+     */
+    pageType: MarkdownAffordancePageType
+  }
 }
 
 /**
@@ -944,12 +959,16 @@ export interface AgentSetupClickedEvent {
  * User clicked "Ask..." to open a new window to consult an agent about the current page.
  *
  * @group Events
- * @source docs
+ * @source www, docs
  */
 export interface AskAiClickedEvent {
   action: 'ask_ai_clicked'
   properties: {
     agent: 'chatgpt' | 'claude'
+    /**
+     * Page class the affordance sits on.
+     */
+    pageType: MarkdownAffordancePageType
   }
 }
 
@@ -1401,29 +1420,28 @@ export interface ReportsDatabaseGrafanaBannerClickedEvent {
 }
 
 /**
- * User clicks on the Unified Logs banner CTA button in studio project pages.
+ * The logs.all deprecation banner was rendered, fired once per mount. Acts as the
+ * denominator for the dismiss rate. Migration outcome itself is measured via decay in
+ * `/v1/projects/:ref/analytics/endpoints/logs.all` traffic in the warehouse, not from this event.
  *
  * @group Events
  * @source studio
- * @page /project/[ref]/*
+ * @page /project/[ref]/logs/*, /project/[ref]/observability/*
  */
-export interface UnifiedLogsBannerCtaButtonClickedEvent {
-  action: 'unified_logs_banner_cta_button_clicked'
-  properties: {
-    is_enabled: boolean
-  }
+export interface LogsAllDeprecationBannerExposedEvent {
+  action: 'logs_all_deprecation_banner_exposed'
   groups: TelemetryGroups
 }
 
 /**
- * User clicked the dismiss button on the Unified Logs banner in studio project pages.
+ * User dismissed the logs.all deprecation banner.
  *
  * @group Events
  * @source studio
- * @page /project/[ref]/*
+ * @page /project/[ref]/logs/*, /project/[ref]/observability/*
  */
-export interface UnifiedLogsBannerDismissButtonClickedEvent {
-  action: 'unified_logs_banner_dismiss_button_clicked'
+export interface LogsAllDeprecationBannerDismissButtonClickedEvent {
+  action: 'logs_all_deprecation_banner_dismiss_button_clicked'
   groups: TelemetryGroups
 }
 
@@ -1605,7 +1623,8 @@ export interface SessionTerminateSubmittedEvent {
 }
 
 /**
- * User clicked the Cancel query menu item for a database session in the Database Connections activity table.
+ * User clicked Cancel query for a database session in the Database Connections activity table,
+ * either from the row's dropdown menu or from the terminate session confirmation dialog.
  *
  * @group Events
  * @source studio
@@ -1619,6 +1638,10 @@ export interface QueryCancelButtonClickedEvent {
      * Whether the session whose query is being cancelled was itself blocking one or more other sessions.
      */
     isBlocking: boolean
+    /**
+     * Which surface the cancel was triggered from.
+     */
+    origin: 'dropdown_menu' | 'terminate_dialog'
   }
   groups: TelemetryGroups
 }
@@ -3776,8 +3799,8 @@ export type TelemetryEvent =
   | StudioBillingCancelSubscriptionClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
-  | UnifiedLogsBannerCtaButtonClickedEvent
-  | UnifiedLogsBannerDismissButtonClickedEvent
+  | LogsAllDeprecationBannerExposedEvent
+  | LogsAllDeprecationBannerDismissButtonClickedEvent
   | IndexAdvisorEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
   | IndexAdvisorTabClickedEvent

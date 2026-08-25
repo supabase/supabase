@@ -90,6 +90,7 @@ Dimitrios Liappis
 Div Arora
 Divit D
 Divya Sharma
+Donna Alexandra
 Douglas Hunley
 Eduardo Gurgel
 Eleftheria Trivyzaki
@@ -98,6 +99,7 @@ Emmett Folger
 Erfi Anugrah
 Eric Kharitonashvili
 Etienne Stalmans
+Evan Cummack
 Eyal Ehrlich
 Fabrizio Fenoglio
 Fady A
@@ -304,6 +306,7 @@ Tobias Pfeiffer
 Tom Ashley
 Tom G
 Tomás Pozo
+Tomás Torgal
 Tyler Hillery
 Tyler Fontaine
 Tyler Shukert

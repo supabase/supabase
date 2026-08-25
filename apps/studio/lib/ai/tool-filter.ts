@@ -37,10 +37,12 @@ export const toolSetValidationSchema = z.record(
     'list_policies',
     'list_reports',
     'get_report',
+    'list_databases',
     'list_notebooks',
     'get_notebook',
     'create_notebook',
     'update_notebook',
+    'delete_notebook',
 
     // Fallback tools for self-hosted
     'getSchemaTables',
@@ -92,10 +94,12 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   list_policies: TOOL_CATEGORIES.SCHEMA,
   list_reports: TOOL_CATEGORIES.SCHEMA,
   get_report: TOOL_CATEGORIES.SCHEMA,
+  list_databases: TOOL_CATEGORIES.SCHEMA,
   list_notebooks: TOOL_CATEGORIES.SCHEMA,
   get_notebook: TOOL_CATEGORIES.SCHEMA,
   create_notebook: TOOL_CATEGORIES.SCHEMA,
   update_notebook: TOOL_CATEGORIES.SCHEMA,
+  delete_notebook: TOOL_CATEGORIES.SCHEMA,
   getSchemaTables: TOOL_CATEGORIES.SCHEMA,
   getRlsKnowledge: TOOL_CATEGORIES.SCHEMA,
   getFunctions: TOOL_CATEGORIES.SCHEMA,
@@ -163,10 +167,16 @@ export function createPrivacyMessageTool(toolInstance: Tool<any, any>) {
     "You don't have permission to use this tool. This is an organization-wide setting requiring you to opt-in. Please choose your preferred data sharing level in your organization's settings. Supabase Assistant uses Amazon Bedrock, which does not store or log your prompts and completions, use them to train AWS models, or distribute them to third parties. By default, no data is shared. Granting permission allows Supabase to send information (like schema, logs, or data, depending on your chosen level) to Bedrock solely to generate responses."
   const condensedPrivacyMessage =
     'Requires opting in to sending data to Bedrock which does not store, train on, or distribute it. You can opt in via organization settings.'
+  const toolDescription = toolInstance.description
+  const description =
+    typeof toolDescription === 'function'
+      ? (...args: Parameters<typeof toolDescription>) =>
+          `${toolDescription(...args)} (Note: ${condensedPrivacyMessage})`
+      : `${toolDescription ?? ''} (Note: ${condensedPrivacyMessage})`
 
   return {
     ...toolInstance,
-    description: `${toolInstance.description} (Note: ${condensedPrivacyMessage})`,
+    description,
     execute: async (_args: any, _context: any) => ({ status: privacyMessage }),
   }
 }

@@ -3,8 +3,11 @@ import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { proxy, ref, snapshot, useSnapshot } from 'valtio'
 import { z } from 'zod'
 
-import { type QueryResult } from '@/components/interfaces/Explorer/types'
+import { DEFAULT_CELL_ROW_LIMIT } from '@/components/interfaces/Explorer/QueryCell/QueryCell.utils'
+import { type QueryDisplay, type QueryResult } from '@/components/interfaces/Explorer/types'
+import { ROWS_PER_PAGE_OPTIONS } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
 import {
+  chartConfigSchema,
   type DatabaseSourceParameters,
   type LogsSourceParameters,
 } from '@/data/content/notebooks/notebook-schema'
@@ -15,12 +18,15 @@ import {
   toQuerySourceBinding,
   type QuerySourceBinding,
 } from '@/data/query-sources/query-source-registry'
+import { impersonationRoleSchema, type ImpersonationRole } from '@/lib/role-impersonation'
 
 type ExplorerQueryDraftBase = {
   id: string
   projectRef: string
   name: string
   updatedAt: number
+  view: QueryDisplay['view']
+  chart?: QueryDisplay['chart']
 }
 
 /**
@@ -33,6 +39,8 @@ export type DatabaseQueryDraft = ExplorerQueryDraftBase &
   DatabaseSourceParameters & {
     _tag: 'database'
     uncheckedSql: UntrustedSqlFragment
+    rowLimit: number
+    role?: ImpersonationRole
   }
 
 export type LogsQueryDraft = ExplorerQueryDraftBase &
@@ -57,7 +65,9 @@ type PersistedExplorerQueryDraft = {
   source: QuerySourceBinding
   sql: string
   updatedAt: number
-}
+  rowLimit?: number
+  role?: ImpersonationRole
+} & QueryDisplay
 
 type PersistedExplorerQueryDrafts = Record<string, PersistedExplorerQueryDraft>
 
@@ -72,7 +82,26 @@ const persistedDraftSchema = z.object({
   sql: z.string(),
   updatedAt: z.number(),
   source: z.unknown().optional(),
+  rowLimit: z.unknown().optional(),
+  role: z.unknown().optional(),
+  view: z.unknown().optional(),
+  chart: z.unknown().optional(),
 })
+
+const VALID_ROW_LIMITS = ROWS_PER_PAGE_OPTIONS.map((option) => option.value)
+const queryViewSchema = z.enum(['table', 'chart'])
+
+/**
+ * Falls back to the default whenever a persisted row limit isn't one of the values the row
+ * limit menu can actually produce — e.g. a fractional or out-of-range number from corrupted
+ * or hand-edited storage. `undefined` (never persisted) passes through unchanged; `toDraft`
+ * applies the default for that case.
+ */
+const rowLimitSchema = z
+  .number()
+  .refine((value) => VALID_ROW_LIMITS.includes(value))
+  .catch(DEFAULT_CELL_ROW_LIMIT)
+  .optional()
 
 /**
  * Rebuilds a draft from its persisted form, branding the SQL for the backend the binding
@@ -88,7 +117,14 @@ const toDraft = ({
   projectRef: string
   persisted: PersistedExplorerQueryDraft
 }): ExplorerQueryDraft => {
-  const base = { id, projectRef, name: persisted.name, updatedAt: persisted.updatedAt }
+  const base = {
+    id,
+    projectRef,
+    name: persisted.name,
+    updatedAt: persisted.updatedAt,
+    view: persisted.view,
+    chart: persisted.chart,
+  }
 
   if (persisted.source._tag === 'logs') {
     return {
@@ -104,6 +140,8 @@ const toDraft = ({
     _tag: 'database',
     database_identifier: persisted.source.database_identifier,
     uncheckedSql: untrustedSql(persisted.sql),
+    rowLimit: persisted.rowLimit ?? DEFAULT_CELL_ROW_LIMIT,
+    role: persisted.role,
   }
 }
 
@@ -125,6 +163,14 @@ const readPersistedDrafts = (storage: StorageLike, projectRef: string) => {
           ? parsedSource.data
           : createDefaultSourceBinding('database')
 
+        const parsedRole = impersonationRoleSchema.safeParse(draft.data.role)
+        const role = parsedRole.success ? parsedRole.data : undefined
+        const rowLimit = rowLimitSchema.parse(draft.data.rowLimit)
+        const parsedView = queryViewSchema.safeParse(draft.data.view)
+        const view = parsedView.success ? parsedView.data : 'table'
+        const parsedChart = chartConfigSchema.safeParse(draft.data.chart)
+        const chart = parsedChart.success ? parsedChart.data : undefined
+
         return [
           [
             id,
@@ -133,6 +179,10 @@ const readPersistedDrafts = (storage: StorageLike, projectRef: string) => {
               source,
               sql: draft.data.sql,
               updatedAt: draft.data.updatedAt,
+              role,
+              rowLimit,
+              view,
+              chart,
             },
           ],
         ]
@@ -172,6 +222,10 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
       source: toQuerySourceBinding(draft),
       sql: draft.uncheckedSql,
       updatedAt: draft.updatedAt,
+      rowLimit: draft._tag === 'database' ? draft.rowLimit : undefined,
+      role: draft._tag === 'database' ? draft.role : undefined,
+      view: draft.view,
+      chart: draft.chart,
     }
     writePersistedDrafts(storage, draft.projectRef, persisted)
   }
@@ -186,12 +240,14 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
       name = 'Untitled query',
       sql = '',
       source = createDefaultSourceBinding('database'),
+      rowLimit = DEFAULT_CELL_ROW_LIMIT,
     }: {
       id: string
       projectRef: string
       name?: string
       sql?: string
       source?: QuerySourceBinding
+      rowLimit?: number
     }) => {
       const draft = toDraft({
         id,
@@ -201,6 +257,8 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
           source: querySourceBindingSchema.parse(source),
           sql,
           updatedAt: Date.now(),
+          rowLimit,
+          view: 'table',
         },
       })
 
@@ -237,17 +295,22 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
       name,
       source,
       sql,
+      rowLimit,
     }: {
       id: string
       name?: string
       source?: QuerySourceBinding
       sql?: string
+      rowLimit?: number
     }) => {
       const draft = state.drafts[id]
       if (!draft) return
 
       const nextSource = source === undefined ? undefined : querySourceBindingSchema.parse(source)
       if (nextSource !== undefined && nextSource._tag !== draft._tag) delete state.results[id]
+
+      const currentRowLimit = draft._tag === 'database' ? draft.rowLimit : undefined
+      const currentRole = draft._tag === 'database' ? draft.role : undefined
 
       state.drafts[id] = toDraft({
         id,
@@ -257,6 +320,10 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
           source: nextSource ?? toQuerySourceBinding(draft),
           sql: sql ?? draft.uncheckedSql,
           updatedAt: Date.now(),
+          rowLimit: rowLimit ?? currentRowLimit,
+          role: currentRole,
+          view: draft.view,
+          chart: draft.chart,
         },
       })
 
@@ -273,7 +340,7 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
       const pending = pendingPersistence.get(id)
       if (pending) clearTimeout(pending.timeout)
 
-      if (name !== undefined || source !== undefined) persist()
+      if (name !== undefined || source !== undefined || rowLimit !== undefined) persist()
       else {
         const timeout = setTimeout(persist, EXPLORER_QUERY_PERSIST_DELAY)
         pendingPersistence.set(id, { timeout, persist })
@@ -304,6 +371,36 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
 
     setResult: ({ id, result }: { id: string; result: ExplorerQueryResult }) => {
       state.results[id] = ref(result)
+    },
+
+    setDisplay: ({ id, display }: { id: string; display: QueryDisplay }) => {
+      const draft = state.drafts[id]
+      if (!draft) return
+
+      const parsedChart = chartConfigSchema.safeParse(display.chart)
+      const updatedDraft: ExplorerQueryDraft = {
+        ...draft,
+        view: queryViewSchema.parse(display.view),
+        chart: parsedChart.success ? parsedChart.data : undefined,
+        updatedAt: Date.now(),
+      }
+      state.drafts[id] = updatedDraft
+      persistDraft(updatedDraft)
+    },
+
+    /**
+     * Separate from `updateDraft` because `undefined` is a meaningful value here (clearing
+     * the impersonated role), whereas `updateDraft`'s optional fields all use `undefined`
+     * to mean "leave unchanged." Logs drafts have no impersonation concept, so this is a
+     * no-op for them.
+     */
+    setRole: ({ id, role }: { id: string; role: ImpersonationRole | undefined }) => {
+      const draft = state.drafts[id]
+      if (!draft || draft._tag !== 'database') return
+
+      const updatedDraft: DatabaseQueryDraft = { ...draft, role, updatedAt: Date.now() }
+      state.drafts[id] = updatedDraft
+      persistDraft(updatedDraft)
     },
   })
 
