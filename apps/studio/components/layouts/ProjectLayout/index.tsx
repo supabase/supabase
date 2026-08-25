@@ -23,10 +23,6 @@ import {
   useIsMobile,
   usePanelRef,
 } from 'ui'
-import {
-  SELECT_26_STUDIO_DISMISSAL_KEY,
-  useSelect26PromotionActive,
-} from 'ui-patterns/Banners/Select26Promotion'
 
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { useMainScrollContainer, useSetMainScrollContainer } from '../MainScrollContainerContext'
@@ -47,11 +43,6 @@ import { UpgradingState } from './UpgradingState'
 import { CreateBranchModal } from '@/components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from '@/components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { BannerFreeMicroUpgrade } from '@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade'
-import { BannerSelect2026 } from '@/components/ui/BannerStack/Banners/BannerSelect2026'
-import {
-  SELECT_26_BANNER_PRIORITY,
-  shouldShowSelect26Banner,
-} from '@/components/ui/BannerStack/Banners/BannerSelect2026.utils'
 import { BANNER_ID, useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import PartnerIcon from '@/components/ui/PartnerIcon'
@@ -165,9 +156,6 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       LOCAL_STORAGE_KEYS.FREE_MICRO_UPGRADE_BANNER_DISMISSED(selectedProject?.ref ?? ''),
       false
     )
-    const [isSelect26BannerDismissed, , { isSuccess: isSelect26DismissalLoaded }] =
-      useLocalStorageQuery(SELECT_26_STUDIO_DISMISSAL_KEY, false)
-    const isSelect26PromotionActive = useSelect26PromotionActive()
     const [isProjectIntegrationBannerDismissed, setIsProjectIntegrationBannerDismissed] =
       useLocalStorageQuery(
         getProjectIntegrationBannerDismissKey({
@@ -241,38 +229,6 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       selectedProject?.ref,
       showUpgradeBanner,
       isFreeMicroUpgradeBannerDismissed,
-      addBanner,
-      dismissBanner,
-    ])
-
-    useEffect(() => {
-      // Wait until project + dismissal state are known so we do not call
-      // dismissBanner on every early render (it always schedules a setState).
-      if (!selectedProject?.ref || !isSelect26DismissalLoaded) return
-
-      const shouldShow = shouldShowSelect26Banner({
-        isPlatform: IS_PLATFORM,
-        projectRef: selectedProject.ref,
-        dismissalLoaded: isSelect26DismissalLoaded,
-        isActive: isSelect26PromotionActive,
-        isDismissed: isSelect26BannerDismissed,
-      })
-
-      if (shouldShow) {
-        addBanner({
-          id: BANNER_ID.SELECT_26,
-          isDismissed: false,
-          content: <BannerSelect2026 />,
-          priority: SELECT_26_BANNER_PRIORITY,
-        })
-      } else {
-        dismissBanner(BANNER_ID.SELECT_26)
-      }
-    }, [
-      selectedProject?.ref,
-      isSelect26DismissalLoaded,
-      isSelect26PromotionActive,
-      isSelect26BannerDismissed,
       addBanner,
       dismissBanner,
     ])

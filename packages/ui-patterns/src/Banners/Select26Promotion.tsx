@@ -67,7 +67,14 @@ type FieldCell = {
   weight: number
 }
 
-const cellAt = (x: number, y: number, cols: number, rows: number, timeMs: number): FieldCell => {
+const cellAt = (
+  x: number,
+  y: number,
+  cols: number,
+  rows: number,
+  timeMs: number,
+  mirror = false
+): FieldCell => {
   const cx = (cols - 1) / 2
   const cy = (rows - 1) / 2
   const nx = x - cx
@@ -77,7 +84,8 @@ const cellAt = (x: number, y: number, cols: number, rows: number, timeMs: number
 
   const step = Math.floor(timeMs / BRACKET_STEP_MS + y * 1.7 + Math.abs(nx) * 0.8)
   const idx = positiveModulo(step, OPEN_BRACKETS.length)
-  const ch = x <= cx ? OPEN_BRACKETS[idx] : CLOSE_BRACKETS[idx]
+  const onLeft = mirror ? x > cx : x <= cx
+  const ch = onLeft ? OPEN_BRACKETS[idx] : CLOSE_BRACKETS[idx]
 
   const hue = positiveModulo(angle - sweep, Math.PI * 2) / (Math.PI * 2)
   const band = Math.min(4, Math.floor(hue * 5))
@@ -95,6 +103,12 @@ const cellAt = (x: number, y: number, cols: number, rows: number, timeMs: number
 type Select26FieldProps = HTMLAttributes<HTMLDivElement> & {
   cols?: number
   rows?: number
+  /** Per-row column counts; defaults to `cols` for every row. */
+  rowWidths?: number[]
+  /** Which edge shorter rows hug when widths vary. */
+  rowAlign?: 'start' | 'end'
+  /** Mirror bracket glyphs (for right-hand fields; prefer over CSS scale-x). */
+  mirror?: boolean
 }
 
 /**
@@ -102,10 +116,23 @@ type Select26FieldProps = HTMLAttributes<HTMLDivElement> & {
  * radar beam falloff. Stepped updates mirror the Select glyph-engine without
  * shipping its canvas runtime.
  */
-export const Select26Field = ({ cols = 10, rows = 6, className, ...props }: Select26FieldProps) => {
+export const Select26Field = ({
+  cols = 10,
+  rows = 6,
+  rowWidths,
+  rowAlign = 'start',
+  mirror = false,
+  className,
+  ...props
+}: Select26FieldProps) => {
   const rootRef = useRef<HTMLDivElement>(null)
   const [timeMs, setTimeMs] = useState(0)
   const [isVisible, setIsVisible] = useState(true)
+
+  const widths = useMemo(() => {
+    if (rowWidths) return rowWidths
+    return Array.from({ length: rows }, () => cols)
+  }, [rowWidths, rows, cols])
 
   useEffect(() => {
     const node = rootRef.current
@@ -142,34 +169,53 @@ export const Select26Field = ({ cols = 10, rows = 6, className, ...props }: Sele
     return () => cancelAnimationFrame(raf)
   }, [isVisible])
 
-  const cells = useMemo(() => {
-    const next: FieldCell[] = []
-    for (let y = 0; y < rows; y++) {
-      for (let x = 0; x < cols; x++) {
-        next.push(cellAt(x, y, cols, rows, timeMs))
+  const cellsByRow = useMemo(() => {
+    return widths.map((rowCols, y) => {
+      const rowCells: FieldCell[] = []
+      for (let x = 0; x < rowCols; x++) {
+        rowCells.push(cellAt(x, y, rowCols, rows, timeMs, mirror))
       }
-    }
-    return next
-  }, [cols, rows, timeMs])
+      return rowCells
+    })
+  }, [widths, rows, timeMs, mirror])
 
   return (
     <div
       ref={rootRef}
       aria-hidden
-      className={cn(styles.field, 'grid', className)}
-      style={{ gridTemplateColumns: `repeat(${cols}, calc(22 / 34 * 1em))` }}
+      className={cn(
+        styles.field,
+        rowAlign === 'end' ? styles.fieldAlignEnd : styles.fieldAlignStart,
+        className
+      )}
       {...props}
     >
-      {cells.map((cell, index) => (
-        <span
-          key={index}
-          className={styles.cell}
-          data-band={cell.band}
-          style={{ opacity: cell.weight }}
-        >
-          {cell.ch}
-        </span>
-      ))}
+      {cellsByRow.map((rowCells, y) => {
+        const rowCols = widths[y]
+        const cellWidth = 'calc(22 / 34 * 1em)'
+
+        return (
+          <div
+            key={y}
+            className={styles.row}
+            style={{
+              gridTemplateColumns: `repeat(${rowCols}, ${cellWidth})`,
+              width: `calc(${rowCols} * 22 / 34 * 1em)`,
+            }}
+          >
+            {rowCells.map((cell, index) => (
+              <span
+                key={index}
+                className={styles.cell}
+                data-band={cell.band}
+                style={{ opacity: cell.weight }}
+              >
+                {cell.ch}
+              </span>
+            ))}
+          </div>
+        )
+      })}
     </div>
   )
 }
