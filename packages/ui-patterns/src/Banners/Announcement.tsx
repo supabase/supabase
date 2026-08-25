@@ -63,12 +63,14 @@ export const Announcement = ({
     return (
       <div className={cn('relative z-40 w-full', className)}>
         {dismissable && !isLaunchWeekSection && (
-          <div
-            className="absolute z-50 right-4 flex h-full items-center opacity-100 text-foreground-contrast dark:text-foreground transition-opacity hover:opacity-80 hover:cursor-pointer"
+          <button
+            type="button"
+            aria-label="Dismiss announcement"
+            className="absolute z-50 right-4 flex h-full items-center text-foreground-muted transition-colors hover:text-foreground focus-visible:outline-none focus-visible:text-foreground"
             onClick={handleClose}
           >
             <X size={16} />
-          </div>
+          </button>
         )}
         {children}
       </div>

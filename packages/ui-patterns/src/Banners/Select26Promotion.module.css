@@ -1,0 +1,52 @@
+.artwork {
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, currentColor 10%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, currentColor 10%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 16px 16px;
+}
+
+.scan {
+  animation: select-26-scan 8s steps(6, end) infinite;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, currentColor 18%, transparent),
+    transparent
+  );
+  opacity: 0.7;
+  transform: translateX(-100%);
+}
+
+@keyframes select-26-scan {
+  0%,
+  12% {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+
+  18% {
+    opacity: 0.7;
+  }
+
+  48%,
+  100% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scan {
+    animation: none;
+    opacity: 0.18;
+    transform: translateX(0);
+  }
+}
