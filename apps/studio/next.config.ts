@@ -54,6 +54,15 @@ const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   assetPrefix: getAssetPrefix(),
   output: 'standalone',
+  // `csp.ts` reads these at build time, but `lib/api/edgeFunctions.ts` reads
+  // them at request time from inside an API route. Deployments that supply the
+  // values to the build without also exposing them to the function runtime get
+  // a CSP that allows the projects domain while edge function URL validation
+  // still rejects it. Inlining here pins both readers to the same value.
+  env: {
+    NIMBUS_PROD_PROJECTS_URL: process.env.NIMBUS_PROD_PROJECTS_URL,
+    NIMBUS_PROD_PROJECTS_URL_WS: process.env.NIMBUS_PROD_PROJECTS_URL_WS,
+  },
   experimental: {
     clientRouterFilter: false,
   },
