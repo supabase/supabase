@@ -110,7 +110,7 @@ const HomeTabButton = () => {
       value={EXPLORER_HOME_TAB_ID}
       className={cn(
         TabClassName,
-        'relative group border-b border-default',
+        'relative group border-b border-default shadow-none!',
         explorerTabs.length === 0 && 'border-r border-r-default!',
         'bg-dash-sidebar/50 dark:bg-surface-100/50',
         'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
