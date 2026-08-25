@@ -7,34 +7,56 @@ import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type ReplicationPublicationsParams = { projectRef?: string; sourceId?: number }
 
-export type ReplicationPublication =
-  components['schemas']['ReplicationPublicationsResponse']['publications'][number]
+export type ReplicationPublication = {
+  name: string
+  tables: components['schemas']['PublicationDetailsResponse']['tables']
+  config: components['schemas']['PublicationDetailsResponse']['config']
+}
 
 async function fetchReplicationPublications(
   { projectRef, sourceId }: ReplicationPublicationsParams,
   signal?: AbortSignal
-) {
+): Promise<ReplicationPublication[]> {
   if (!projectRef) throw new Error('projectRef is required')
 
   if (!sourceId) throw new Error('sourceId is required')
 
-  const { data, error } = await get(
-    '/platform/replication/{ref}/sources/{source_id}/publications',
+  const { data: listData, error: listError } = await get(
+    '/platform/replication/{ref}/v2/sources/{source_id}/publications',
     {
       params: { path: { ref: projectRef, source_id: sourceId } },
       signal,
     }
   )
-  if (error) {
-    handleError(error)
+  if (listError) {
+    handleError(listError)
   }
 
-  // Filter out:
-  // 1. supabase_realtime (internal publication)
-  // 2. Publications with no tables (would cause validation to fail)
-  const filteredPublications = data.publications.filter(
-    (pub) => pub.name !== 'supabase_realtime' && pub.tables.length > 0
+  // supabase_realtime is an internal publication and never worth resolving details for.
+  const names = listData.publications
+    .map((pub) => pub.name)
+    .filter((name) => name !== 'supabase_realtime')
+
+  const publications = await Promise.all(
+    names.map(async (name) => {
+      const { data, error } = await get(
+        '/platform/replication/{ref}/v2/sources/{source_id}/publications/{publication_name}',
+        {
+          params: {
+            path: { ref: projectRef, source_id: sourceId, publication_name: name },
+          },
+          signal,
+        }
+      )
+      if (error) {
+        handleError(error)
+      }
+      return { name: data.name, tables: data.tables, config: data.config }
+    })
   )
+
+  // Publications with no tables would cause validation to fail, so filter them out.
+  const filteredPublications = publications.filter((pub) => pub.tables.length > 0)
 
   // Sort publications alphabetically by name
   return filteredPublications.sort((a, b) => a.name.localeCompare(b.name))

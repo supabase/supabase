@@ -20,6 +20,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DestinationType } from '../DestinationPanel.types'
+import { TableOptions } from './BigQuery/TableOptions'
 import {
   DEFAULT_CONNECTION_POOL_SIZE,
   DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
@@ -217,7 +218,7 @@ export const AdvancedSettings = ({
                     <FormItemLayout
                       label={
                         <div className="flex flex-col gap-y-2">
-                          <span>Maximum staleness</span>
+                          <span>Maximum staleness*</span>
                           <Badge className="w-min">BigQuery only</Badge>
                         </div>
                       }
@@ -243,6 +244,24 @@ export const AdvancedSettings = ({
                     </FormItemLayout>
                   )}
                 />
+
+                <FormItemLayout
+                  label={
+                    <div className="flex flex-col gap-y-2">
+                      <span>Table partitioning &amp; clustering*</span>
+                      <Badge className="w-min">BigQuery only</Badge>
+                    </div>
+                  }
+                  layout="horizontal"
+                  description="Configure partitioning and clustering for individual tables in the selected publication."
+                >
+                  <TableOptions control={form.control} />
+                </FormItemLayout>
+
+                <p className="text-sm text-foreground-lighter leading-normal">
+                  * Only applied when a table is first created. For a table that already exists,
+                  restart its initial sync to apply the new settings.
+                </p>
               </>
             )}
           </AccordionContent>

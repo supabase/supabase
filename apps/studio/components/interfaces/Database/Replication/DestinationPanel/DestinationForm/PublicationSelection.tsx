@@ -49,7 +49,15 @@ export const PublicationSelection = ({
                 ...field,
                 onChange: (value) => {
                   if (value !== field.value) {
+                    // Every per-table selection is scoped to the previously selected
+                    // publication's table list, so none of it carries over cleanly to a
+                    // different publication — reset it all rather than risk a stale or
+                    // coincidentally-matching table id sticking around.
                     form.setValue('tableSyncCopyTableIds', [], {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
+                    form.setValue('tableOptions', [], {
                       shouldDirty: true,
                       shouldValidate: true,
                     })

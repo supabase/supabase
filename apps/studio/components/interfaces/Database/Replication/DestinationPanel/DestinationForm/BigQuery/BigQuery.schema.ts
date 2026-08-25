@@ -1,5 +1,32 @@
 import * as z from 'zod'
 
+const BigQueryTimePartitionGranularitySchema = z.enum(['hour', 'day', 'month', 'year'])
+
+export const BigQueryPartitionBySchema = z.discriminatedUnion('kind', [
+  z.object({
+    kind: z.literal('time_column'),
+    column: z.string().min(1, 'Column is required'),
+    granularity: BigQueryTimePartitionGranularitySchema.optional(),
+  }),
+  z.object({
+    kind: z.literal('integer_range'),
+    column: z.string().min(1, 'Column is required'),
+    start: z.number().int('Start must be a whole number'),
+    end: z.number().int('End must be a whole number'),
+    interval: z.number().int('Interval must be a whole number'),
+  }),
+  z.object({
+    kind: z.literal('ingestion_time'),
+    granularity: BigQueryTimePartitionGranularitySchema.optional(),
+  }),
+])
+
+export const BigQueryTableOptionSchema = z.object({
+  tableId: z.number().int().nonnegative(),
+  partitionBy: BigQueryPartitionBySchema.optional(),
+  clusterBy: z.array(z.string()).optional(),
+})
+
 export const BigQueryFormSchema = z.object({
   projectId: z.string().optional(),
   datasetId: z.string().optional(),
@@ -14,4 +41,5 @@ export const BigQueryFormSchema = z.object({
     .int('Maximum staleness must be a whole number of minutes')
     .min(0, 'Maximum staleness must be 0 or greater')
     .optional(),
+  tableOptions: z.array(BigQueryTableOptionSchema).optional(),
 })
