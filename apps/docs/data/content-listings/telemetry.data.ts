@@ -45,7 +45,7 @@ export const telemetryDetectResolve: ContentListingGroup = {
       title: 'Detecting',
       href: '/guides/monitoring-and-debugging/debugging',
       description:
-        'Run checks if you are observing, or pick a log source if you already have an error.',
+        'Use logs, metrics, inspect, and advisors to pick up a signal. If you already have an error, go to Diagnosing.',
     },
     {
       title: 'Diagnosing',
