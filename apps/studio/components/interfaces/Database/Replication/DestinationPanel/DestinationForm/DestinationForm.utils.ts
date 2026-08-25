@@ -27,6 +27,8 @@ import { type SnowflakeApiConfig } from './Snowflake/Snowflake.utils'
 import {
   BatchConfig,
   BigQueryDestinationConfig,
+  BigQueryPartitionBy,
+  BigQueryTableOption,
   ClickHouseDestinationConfig,
   DestinationConfig,
   DucklakeDestinationConfig,
@@ -119,6 +121,7 @@ export const generateDefaultValues = ({
       (config as { big_query?: { connection_pool_size?: number } } | undefined)?.big_query
         ?.connection_pool_size ?? DEFAULT_CONNECTION_POOL_SIZE,
     maxStalenessMins: bigQueryConfig?.max_staleness_mins ?? undefined, // Default: null
+    tableOptions: (bigQueryConfig?.table_options?.tables ?? []).map(parseBigQueryTableOption),
     // Analytics Bucket fields
     warehouseName: icebergConfig?.warehouse_name ?? '',
     namespace: icebergConfig?.namespace ?? '',
@@ -234,6 +237,43 @@ export const pruneStaleSelectedTableIds = ({
   return selectedTableIds.filter((id) => publicationTableIds.has(id))
 }
 
+// Derived from the generated response type rather than hand-typed, so `granularity` stays the
+// same literal union the API actually returns instead of a widened `string` needing a cast.
+type BigQueryConfigResponse = Extract<
+  NonNullable<ReplicationDestinationByIdData['config']>,
+  { big_query: unknown }
+>['big_query']
+type BigQueryTableOptionResponse = NonNullable<
+  NonNullable<BigQueryConfigResponse['table_options']>['tables']
+>[number]
+type BigQueryPartitionByResponse = NonNullable<BigQueryTableOptionResponse['partition_by']>
+
+const parseBigQueryPartitionBy = (
+  partitionBy: BigQueryPartitionByResponse
+): BigQueryPartitionBy => {
+  switch (partitionBy.kind) {
+    case 'time_column':
+      return {
+        kind: 'time_column',
+        column: partitionBy.column,
+        granularity: partitionBy.granularity ?? undefined,
+      }
+    case 'integer_range':
+      return { ...partitionBy }
+    case 'ingestion_time':
+      return {
+        kind: 'ingestion_time',
+        granularity: partitionBy.granularity ?? undefined,
+      }
+  }
+}
+
+const parseBigQueryTableOption = (option: BigQueryTableOptionResponse): BigQueryTableOption => ({
+  tableId: option.table_id,
+  partitionBy: option.partition_by ? parseBigQueryPartitionBy(option.partition_by) : undefined,
+  clusterBy: option.cluster_by,
+})
+
 const buildBigQueryConfig = (
   data: z.infer<typeof DestinationPanelFormSchema>
 ): BigQueryDestinationConfig => ({
@@ -242,6 +282,7 @@ const buildBigQueryConfig = (
   serviceAccountKey: data.serviceAccountKey ?? '',
   connectionPoolSize: data.connectionPoolSize,
   maxStalenessMins: data.maxStalenessMins,
+  tableOptions: data.tableOptions,
 })
 
 const buildSnowflakeConfig = (

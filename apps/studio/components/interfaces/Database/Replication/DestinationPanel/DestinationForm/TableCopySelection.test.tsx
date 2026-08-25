@@ -11,7 +11,8 @@ import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 type ReplicationSourcesResponse = components['schemas']['ReplicationSourcesResponse']
-type ReplicationPublicationsResponse = components['schemas']['ReplicationPublicationsResponse']
+type ReadPublicationsV2Response = components['schemas']['ReadPublicationsV2Response']
+type PublicationDetailsResponse = components['schemas']['PublicationDetailsResponse']
 
 const mockSources: ReplicationSourcesResponse = {
   sources: [
@@ -24,15 +25,23 @@ const mockSources: ReplicationSourcesResponse = {
   ],
 }
 
-const mockPublications: ReplicationPublicationsResponse = {
-  publications: [
-    {
-      name: 'analytics',
-      tables: [
-        { id: 101, schema: 'public', name: 'orders' },
-        { id: 202, schema: 'billing', name: 'invoices' },
-      ],
-    },
+const mockPublicationNames: ReadPublicationsV2Response = {
+  publications: [{ name: 'analytics' }],
+}
+
+const mockPublicationDetails: PublicationDetailsResponse = {
+  name: 'analytics',
+  config: {
+    type: 'tables',
+    tables: [
+      { id: 101, schema: 'public', name: 'orders' },
+      { id: 202, schema: 'billing', name: 'invoices' },
+    ],
+    operations: ['insert'],
+  },
+  tables: [
+    { id: 101, schema: 'public', name: 'orders', kind: 'table', partition_parent_id: null },
+    { id: 202, schema: 'billing', name: 'invoices', kind: 'table', partition_parent_id: null },
   ],
 }
 
@@ -47,15 +56,20 @@ const mockSourcesEndpoint = () => {
 const mockPublicationsSuccess = () => {
   addAPIMock({
     method: 'get',
-    path: '/platform/replication/:ref/sources/:source_id/publications',
-    response: () => HttpResponse.json<ReplicationPublicationsResponse>(mockPublications),
+    path: '/platform/replication/:ref/v2/sources/:source_id/publications',
+    response: () => HttpResponse.json<ReadPublicationsV2Response>(mockPublicationNames),
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/v2/sources/:source_id/publications/:publication_name',
+    response: () => HttpResponse.json<PublicationDetailsResponse>(mockPublicationDetails),
   })
 }
 
 const mockPublicationsError = () => {
   addAPIMock({
     method: 'get',
-    path: '/platform/replication/:ref/sources/:source_id/publications',
+    path: '/platform/replication/:ref/v2/sources/:source_id/publications',
     response: () => HttpResponse.json<APIErrorBody>({ message: 'Boom' }, { status: 500 }),
   })
 }
@@ -63,7 +77,7 @@ const mockPublicationsError = () => {
 const mockPublicationsPending = () => {
   addAPIMock({
     method: 'get',
-    path: '/platform/replication/:ref/sources/:source_id/publications',
+    path: '/platform/replication/:ref/v2/sources/:source_id/publications',
     response: () => new Promise<never>(() => {}),
   })
 }

@@ -13,7 +13,7 @@ async function fetchReplicationTables(
   if (!projectRef) throw new Error('projectRef is required')
   if (!sourceId) throw new Error('sourceId is required')
 
-  const { data, error } = await get('/platform/replication/{ref}/sources/{source_id}/tables', {
+  const { data, error } = await get('/platform/replication/{ref}/v2/sources/{source_id}/tables', {
     params: { path: { ref: projectRef, source_id: sourceId } },
     signal,
   })

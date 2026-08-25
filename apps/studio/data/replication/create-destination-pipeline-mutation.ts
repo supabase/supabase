@@ -23,6 +23,23 @@ export type BigQueryDestinationConfig = {
   serviceAccountKey: string
   connectionPoolSize?: number
   maxStalenessMins?: number
+  tableOptions?: BigQueryTableOption[]
+}
+
+export type BigQueryTimePartitionGranularity = 'hour' | 'day' | 'month' | 'year'
+
+export type BigQueryPartitionBy =
+  | { kind: 'time_column'; column: string; granularity?: BigQueryTimePartitionGranularity }
+  | { kind: 'integer_range'; column: string; start: number; end: number; interval: number }
+  | { kind: 'ingestion_time'; granularity?: BigQueryTimePartitionGranularity }
+
+// A single source table's BigQuery partitioning/clustering configuration. `tableId` is the
+// source Postgres table OID, stable across renames, matching the id used by the replication
+// tables/columns endpoints.
+export type BigQueryTableOption = {
+  tableId: number
+  partitionBy?: BigQueryPartitionBy
+  clusterBy?: string[]
 }
 
 export type IcebergDestinationConfig = {
@@ -75,6 +92,72 @@ const maybeOmitBlankSecret = (value: string | undefined, omitBlankSecrets: boole
   if (omitBlankSecrets) return optionalSecret(value)
 
   return value
+}
+
+const buildBigQueryPartitionByApiConfig = (partitionBy: BigQueryPartitionBy) => {
+  switch (partitionBy.kind) {
+    case 'time_column':
+      return {
+        kind: partitionBy.kind,
+        column: partitionBy.column,
+        granularity: partitionBy.granularity,
+      }
+    case 'integer_range':
+      return {
+        kind: partitionBy.kind,
+        column: partitionBy.column,
+        start: partitionBy.start,
+        end: partitionBy.end,
+        interval: partitionBy.interval,
+      }
+    case 'ingestion_time':
+      return { kind: partitionBy.kind, granularity: partitionBy.granularity }
+  }
+}
+
+const buildBigQueryTableOptionApiConfig = (option: BigQueryTableOption) => ({
+  table_id: option.tableId,
+  partition_by: option.partitionBy && buildBigQueryPartitionByApiConfig(option.partitionBy),
+  cluster_by: option.clusterBy,
+})
+
+const isBigQueryTableOptionConfigured = (option: BigQueryTableOption) =>
+  option.partitionBy !== undefined || (option.clusterBy?.length ?? 0) > 0
+
+// `forUpdate` mirrors `omitBlankSecrets` below: omitting `table_options` on create/validate
+// means "none configured", but on update the API only clears a previously-stored value when
+// it's sent as `null` rather than omitted, so an update submitted with zero configured tables
+// must send `null` explicitly.
+const buildBigQueryTableOptionsApiConfig = (
+  tableOptions: BigQueryTableOption[] | undefined,
+  { forUpdate }: { forUpdate: boolean }
+) => {
+  const configuredTableOptions = (tableOptions ?? []).filter(isBigQueryTableOptionConfigured)
+  if (tableOptions === undefined) return undefined
+  if (configuredTableOptions.length === 0) return forUpdate ? null : undefined
+  return { tables: configuredTableOptions.map(buildBigQueryTableOptionApiConfig) }
+}
+
+// Maps the studio-side BigQuery config to the snake_case `{ big_query: ... }` payload accepted
+// by the platform API. Shared by the create / update / validate mutations.
+export function buildBigQueryApiConfig(
+  config: BigQueryDestinationConfig,
+  options: { omitBlankSecrets?: boolean } = {}
+) {
+  const omitBlankSecrets = options.omitBlankSecrets ?? false
+
+  return {
+    big_query: {
+      project_id: config.projectId,
+      dataset_id: config.datasetId,
+      service_account_key: maybeOmitBlankSecret(config.serviceAccountKey, omitBlankSecrets),
+      connection_pool_size: config.connectionPoolSize,
+      max_staleness_mins: config.maxStalenessMins,
+      table_options: buildBigQueryTableOptionsApiConfig(config.tableOptions, {
+        forUpdate: omitBlankSecrets,
+      }),
+    },
+  }
 }
 
 // Maps the studio-side DuckLake config to the snake_case `{ ducklake: ... }` payload accepted
@@ -201,18 +284,9 @@ async function createDestinationPipeline(
   let destination_config: components['schemas']['CreateReplicationDestinationPipelineBody']['destination_config']
 
   if ('bigQuery' in destinationConfig) {
-    const { projectId, datasetId, serviceAccountKey, connectionPoolSize, maxStalenessMins } =
+    destination_config = buildBigQueryApiConfig(
       destinationConfig.bigQuery
-
-    destination_config = {
-      big_query: {
-        project_id: projectId,
-        dataset_id: datasetId,
-        service_account_key: serviceAccountKey,
-        connection_pool_size: connectionPoolSize,
-        max_staleness_mins: maxStalenessMins,
-      },
-    } as components['schemas']['CreateReplicationDestinationPipelineBody']['destination_config']
+    ) as components['schemas']['CreateReplicationDestinationPipelineBody']['destination_config']
   } else if ('iceberg' in destinationConfig) {
     const {
       projectRef: icebergProjectRef,

@@ -1,3 +1,4 @@
+import { components } from 'api-types'
 import { useParams } from 'common'
 import { SqlEditor, TableEditor } from 'icons'
 import { uniq } from 'lodash'
@@ -120,18 +121,23 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
     if (!publication) return toast.error('Unable to find existing publication')
     if (!pipeline) return toast.error('Unable to find existing pipeline')
 
+    if (publication.config.type !== 'tables') {
+      return toast.error('Publication is not configured with an explicit table list')
+    }
+
     try {
       setIsUpdatingReplication(true)
       // [Joshen ALPHA] Assumption here is that all the namespace tables have _changelog as suffix
       // May need to update if that assumption falls short (e.g for those dealing with iceberg APIs directly)
-      const updatedTables = publication.tables
-        .filter((x) => table.name !== getNamespaceTableNameFromPostgresTableName(x))
-        .map(({ schema, name }) => ({ schema, name }))
+      const removedTableId = publication.tables.find(
+        (x) => table.name === getNamespaceTableNameFromPostgresTableName(x)
+      )?.id
+      const updatedTables = publication.config.tables.filter((x) => x.id !== removedTableId)
       await updatePublication({
         projectRef,
         sourceId,
         publicationName: publication.name,
-        tables: updatedTables,
+        config: { ...publication.config, tables: updatedTables },
       })
       await startPipeline({ projectRef, pipelineId: pipeline.id })
       setShowStopReplicationModal(false)
@@ -155,17 +161,24 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
       (t) => getNamespaceTableNameFromPostgresTableName(t) === table.name
     )
     if (!pgTable) return toast.error('Unable to find corresponding Postgres table')
+    if (publication.config.type !== 'tables') {
+      return toast.error('Publication is not configured with an explicit table list')
+    }
 
     try {
       setIsUpdatingReplication(true)
-      const updatedTables = publication.tables
-        .map(({ schema, name }) => ({ schema, name }))
-        .concat([{ schema: pgTable.schema, name: pgTable.name }])
+      const currentTables: NonNullable<components['schemas']['PutPublicationBody']['tables']> =
+        publication.config.tables.map(({ id, columns, row_filter }) => ({
+          id,
+          columns,
+          row_filter,
+        }))
+      const updatedTables = currentTables.concat([{ id: pgTable.id }])
       await updatePublication({
         projectRef,
         sourceId,
         publicationName: publication.name,
-        tables: updatedTables,
+        config: { ...publication.config, tables: updatedTables },
       })
       await startPipeline({ projectRef, pipelineId: pipeline.id })
       setShowStartReplicationModal(false)

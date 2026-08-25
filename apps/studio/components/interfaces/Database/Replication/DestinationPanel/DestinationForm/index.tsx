@@ -37,7 +37,10 @@ import { type DestinationType, type ExistingDestination } from '../DestinationPa
 import { AdvancedSettings } from './AdvancedSettings'
 import { getAnalyticsBucketValidationIssues } from './AnalyticsBucket/AnalyticsBucket.utils'
 import { AnalyticsBucketFields } from './AnalyticsBucket/Fields'
-import { getBigQueryValidationIssues } from './BigQuery/BigQuery.utils'
+import {
+  getBigQueryTableOptionsValidationIssues,
+  getBigQueryValidationIssues,
+} from './BigQuery/BigQuery.utils'
 import { BigQueryFields } from './BigQuery/Fields'
 import { getClickHouseValidationIssues } from './ClickHouse/ClickHouse.utils'
 import { ClickHouseFields } from './ClickHouse/Fields'
@@ -232,6 +235,11 @@ export const DestinationForm = ({
 
         if (selectedType === 'BigQuery') {
           getBigQueryValidationIssues(data, { secretsOptional: editMode }).forEach(
+            ({ path, message }) => {
+              addRequiredFieldError(path, message)
+            }
+          )
+          getBigQueryTableOptionsValidationIssues(data.tableOptions).forEach(
             ({ path, message }) => {
               addRequiredFieldError(path, message)
             }

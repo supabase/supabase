@@ -8,6 +8,11 @@ export const replicationKeys = {
     ['projects', projectRef, 'sources', source_id, 'publications'] as const,
   tables: (projectRef: string | undefined, source_id: number | undefined) =>
     ['projects', projectRef, 'sources', source_id, 'tables'] as const,
+  tableColumns: (
+    projectRef: string | undefined,
+    source_id: number | undefined,
+    tableId: number | undefined
+  ) => ['projects', projectRef, 'sources', source_id, 'tables', tableId, 'columns'] as const,
   costEstimate: (
     projectRef: string | undefined,
     source_id: number | undefined,

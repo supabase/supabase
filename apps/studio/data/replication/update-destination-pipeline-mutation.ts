@@ -3,6 +3,7 @@ import type { components } from 'api-types'
 import { toast } from 'sonner'
 
 import {
+  buildBigQueryApiConfig,
   buildDucklakeApiConfig,
   buildPipelineApiConfig,
   DestinationConfig,
@@ -46,17 +47,9 @@ async function updateDestinationPipeline(
   let destination_config: UpdateDestinationConfig
 
   if ('bigQuery' in destinationConfig) {
-    const { projectId, datasetId, serviceAccountKey, connectionPoolSize, maxStalenessMins } =
-      destinationConfig.bigQuery
-    destination_config = {
-      big_query: {
-        project_id: projectId,
-        dataset_id: datasetId,
-        service_account_key: optionalSecret(serviceAccountKey),
-        connection_pool_size: connectionPoolSize,
-        max_staleness_mins: maxStalenessMins,
-      },
-    } as UpdateDestinationConfig
+    destination_config = buildBigQueryApiConfig(destinationConfig.bigQuery, {
+      omitBlankSecrets: true,
+    }) as UpdateDestinationConfig
   } else if ('iceberg' in destinationConfig) {
     const {
       projectRef: icebergProjectRef,

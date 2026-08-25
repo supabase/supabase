@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import type { components } from 'api-types'
 
 import {
+  buildBigQueryApiConfig,
   buildDucklakeApiConfig,
   DestinationConfig,
   TableSyncCopyConfig,
@@ -44,18 +45,9 @@ async function validateDestination(
   let config: components['schemas']['ValidateReplicationDestinationBody']['config']
 
   if ('bigQuery' in destinationConfig) {
-    const { projectId, datasetId, serviceAccountKey, connectionPoolSize, maxStalenessMins } =
+    config = buildBigQueryApiConfig(
       destinationConfig.bigQuery
-
-    config = {
-      big_query: {
-        project_id: projectId,
-        dataset_id: datasetId,
-        service_account_key: serviceAccountKey,
-        connection_pool_size: connectionPoolSize,
-        max_staleness_mins: maxStalenessMins,
-      },
-    } as components['schemas']['ValidateReplicationDestinationBody']['config']
+    ) as components['schemas']['ValidateReplicationDestinationBody']['config']
   } else if ('iceberg' in destinationConfig) {
     const {
       projectRef: icebergProjectRef,
