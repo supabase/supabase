@@ -33,6 +33,9 @@ export const getReportAttributesV2: (
   showMemoryCommitmentChart
 ) => {
   const computeVariantId = mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
+  // High Availability projects run Multigres, whose dedicated pooler is multipooler rather
+  // than PgBouncer. Multipooler docs aren't published yet, so the docs link is dropped for now.
+  const isHighAvailability = resolveHighAvailability(project)
   const provisionedDiskIops = diskConfig?.attributes?.iops
   const computeIopsLimit = COMPUTE_MAX_IOPS[computeVariantId]
   const effectiveMaxIops =
@@ -44,7 +47,7 @@ export const getReportAttributesV2: (
   const showBurstBalanceChart =
     !!showDiskIOBurstBalanceChart &&
     hasBurstableIO(project?.infra_compute_size) &&
-    !resolveHighAvailability(project)
+    !isHighAvailability
   const baselineThroughputMBps = COMPUTE_DISK[computeVariantId]?.baselineThroughputMBps
   const baselineThroughputLabel =
     typeof baselineThroughputMBps === 'number' ? `${baselineThroughputMBps} MB/s` : 'its baseline'
@@ -508,13 +511,18 @@ export const getReportAttributesV2: (
       YAxisProps: { width: 30 },
       hideChartType: false,
       defaultChartStyle: 'bar',
-      docsUrl: `${DOCS_URL}/guides/platform/compute-and-disk#limits-and-constraints`,
+      titleTooltip: isHighAvailability
+        ? 'Client connections to multipooler, the dedicated pooler for High Availability projects (docs coming soon)'
+        : undefined,
+      docsUrl: isHighAvailability
+        ? undefined
+        : `${DOCS_URL}/guides/platform/compute-and-disk#limits-and-constraints`,
       attributes: [
         {
           attribute: 'client_connections_pgbouncer',
           provider: 'infra-monitoring',
-          label: 'pgbouncer',
-          tooltip: 'PgBouncer connections',
+          label: isHighAvailability ? 'multipooler' : 'pgbouncer',
+          tooltip: isHighAvailability ? 'Multipooler connections' : 'PgBouncer connections',
         },
         {
           attribute: 'pg_pooler_max_connections',
