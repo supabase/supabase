@@ -79,7 +79,7 @@ export const ExplorerNotebookTab = () => {
   const { id, ref } = useParams()
   const tabs = useTabsStateSnapshot()
   const snap = useNotebooksStateSnapshot()
-  const { createChat } = useCreateChat()
+  const { createChat, isCreating } = useCreateChat()
 
   const [isIntellisenseEnabled, setIsIntellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
@@ -296,6 +296,7 @@ export const ExplorerNotebookTab = () => {
         <ExplorerToolbarActions>
           <ExplorerToolbarAction
             icon={<AiIconAnimation size={16} />}
+            loading={isCreating}
             onClick={() => {
               createChat({
                 name: `Analyze ${name} notebook`,

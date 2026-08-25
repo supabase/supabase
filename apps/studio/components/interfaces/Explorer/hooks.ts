@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { useEffect, useEffectEvent } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
 
 import { useNotebookQuery } from '@/data/content/notebooks/notebook-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -92,6 +92,8 @@ export const useCreateChat = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const aiAssistantState = useAiAssistantState()
 
+  const [isCreating, setIsCreating] = useState(false)
+
   const openChat = (id: string) => {
     if (!project) {
       console.error('Project is required')
@@ -115,6 +117,8 @@ export const useCreateChat = () => {
       return undefined
     }
 
+    setIsCreating(true)
+
     // Hydration replaces the chat map and the selected model wholesale, so wait it out before
     // creating anything — otherwise the new chat is dropped as soon as the persisted state lands.
     await whenAiAssistantInitialized(aiAssistantState)
@@ -127,11 +131,13 @@ export const useCreateChat = () => {
     if (model) aiAssistantState.setModel(model)
 
     const id = aiAssistantState.createChat({ name, initialMessage })
+    setIsCreating(false)
+
     router.push(`/project/${project.ref}/explorer/chat/${id}`)
     return id
   }
 
-  return { createChat, openChat }
+  return { createChat, openChat, isCreating }
 }
 
 export const useCreateQuery = () => {
