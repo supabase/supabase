@@ -18,12 +18,6 @@ export function CTASection() {
           </p>
         </div>
         <WaitlistForm />
-        <p className="text-foreground-lighter text-sm">
-          Prefer to talk it through?{' '}
-          <Link href="/contact/sales" className="text-foreground hover:underline">
-            Talk to our team
-          </Link>
-        </p>
       </div>
     </SectionContainerWithCn>
   )
