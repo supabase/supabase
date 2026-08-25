@@ -31,11 +31,11 @@ import { ReportSettings } from '@/components/ui/Charts/ReportSettings'
 import { useChartHoverState } from '@/components/ui/Charts/useChartHoverState'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
+import { RegionFlag } from '@/components/ui/RegionFlag'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
 import { edgeFunctionReports } from '@/data/reports/v2/edge-functions.config'
 import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
-import { BASE_PATH } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { NextPageWithLayout } from '@/types'
@@ -243,10 +243,10 @@ const EdgeFunctionsUsage = () => {
                   value: region.key,
                   label: (
                     <div className="flex items-center gap-x-2">
-                      <img
-                        src={`${BASE_PATH}/img/regions/${region.key}.svg`}
+                      <RegionFlag
                         alt={region.key}
-                        className="w-4 h-4"
+                        className="w-4"
+                        region={region.key}
                       />
                       <div className="flex flex-wrap gap-x-2 items-center">
                         <span className="text-foreground text-xs">{region.label}</span>
