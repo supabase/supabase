@@ -146,13 +146,19 @@ export const SSLConfiguration = () => {
             >
               <div className="flex items-center justify-end mt-2.5 space-x-2">
                 {(isLoading || isSubmitting) && (
-                  <Loader2 className="animate-spin" strokeWidth={1.5} size={16} />
+                  <Loader2
+                    className="animate-spin motion-reduce:animate-none"
+                    strokeWidth={1.5}
+                    size={16}
+                  />
                 )}
                 {isSuccess && (
                   <Tooltip>
                     <TooltipTrigger asChild>
                       {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
-                      <div>
+                      {/* A disabled switch can't take focus, so the wrapper becomes the focus
+                          target to keep the tooltip reachable by keyboard */}
+                      <div tabIndex={isSwitchDisabled ? 0 : undefined}>
                         {/* The dialog is opened from the switch itself rather than a wrapping
                             trigger, so a disabled switch can never open it. */}
                         <Switch
