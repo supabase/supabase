@@ -37,7 +37,7 @@ export default function ProjectPage() {
   const { ref } = useParams()
   const [loading, setLoading] = useState(false)
   const [enableRls, setEnableRls] = useState(true)
-  const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout>>()
+  const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   useEffect(() => {
     return () => {
@@ -101,6 +101,9 @@ export default function ProjectPage() {
             </div>
           </Card>
 
+          <span role="status" aria-live="polite" className="sr-only">
+            {loading ? 'Refreshing status…' : ''}
+          </span>
           {loading && (
             <div className="space-y-2">
               <ShimmeringLoader />
