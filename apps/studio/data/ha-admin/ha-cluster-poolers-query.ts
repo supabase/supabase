@@ -1,6 +1,7 @@
 import { queryOptions } from '@tanstack/react-query'
+import { z } from 'zod'
 
-import { getHaAdmin } from './get-ha-admin'
+import { getHaAdmin, parseHaAdminResponse } from './get-ha-admin'
 import { haAdminKeys } from './keys'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError } from '@/types'
@@ -8,26 +9,49 @@ import type { ResponseError } from '@/types'
 export type HaClusterPoolersVariables = { projectRef?: string }
 export type HaClusterPoolersError = ResponseError
 
-export type Multipooler = {
-  id?: { cell?: string; name?: string }
-  shardKey?: { database?: string; tableGroup?: string; shard?: string }
-  /** @deprecated derived, not authoritative — prefer `routingState.role` */
-  type?: 'UNKNOWN' | 'PRIMARY' | 'REPLICA' | 'DRAINED'
-  servingStatus?: 'SERVING' | 'DISABLED' | 'DRAINING'
-  hostname?: string
-  lifecycleStatus?: { status?: string }
-  routingState?: {
-    role?: string
-    // proto int64s, serialized as strings in JSON
-    rule?: { coordinatorTerm?: string; leaderSubterm?: string }
-  }
-}
+// Hand-modelled subset of multiadmin's OpenAPI spec. Every field is optional
+// because proto3 JSON omits zero values, and enum-shaped fields stay plain
+// strings (expected values in comments) so new proto values degrade gracefully
+// instead of failing the whole parse.
+const multipoolerSchema = z.object({
+  id: z.object({ cell: z.string().optional(), name: z.string().optional() }).optional(),
+  shardKey: z
+    .object({
+      database: z.string().optional(),
+      tableGroup: z.string().optional(),
+      shard: z.string().optional(),
+    })
+    .optional(),
+  // 'UNKNOWN' | 'PRIMARY' | 'REPLICA' | 'DRAINED' — deprecated (derived, not
+  // authoritative), prefer `routingState.role`
+  type: z.string().optional(),
+  // 'SERVING' | 'DISABLED' | 'DRAINING'
+  servingStatus: z.string().optional(),
+  hostname: z.string().optional(),
+  lifecycleStatus: z.object({ status: z.string().optional() }).optional(),
+  routingState: z
+    .object({
+      role: z.string().optional(),
+      // proto int64s, serialized as strings in JSON
+      rule: z
+        .object({ coordinatorTerm: z.string().optional(), leaderSubterm: z.string().optional() })
+        .optional(),
+    })
+    .optional(),
+})
+
+const haClusterPoolersResponseSchema = z.object({
+  poolers: z.array(multipoolerSchema).optional(),
+})
+
+export type Multipooler = z.infer<typeof multipoolerSchema>
 
 async function getHaClusterPoolers(
   { projectRef }: HaClusterPoolersVariables,
   signal?: AbortSignal
 ) {
-  return getHaAdmin<{ poolers?: Multipooler[] }>(projectRef, 'poolers', signal)
+  const data = await getHaAdmin(projectRef, 'poolers', signal)
+  return parseHaAdminResponse(haClusterPoolersResponseSchema, data)
 }
 
 export type HaClusterPoolersData = Awaited<ReturnType<typeof getHaClusterPoolers>>

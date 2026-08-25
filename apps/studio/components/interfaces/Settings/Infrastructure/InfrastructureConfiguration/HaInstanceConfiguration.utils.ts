@@ -1,7 +1,7 @@
 import { Edge, Node } from '@xyflow/react'
 import { groupBy } from 'lodash'
 
-import { getPoolerKey, HaTopology } from './HaTopology.utils'
+import { getPoolerKey, hasPoolerIdentity, HaTopology } from './HaTopology.utils'
 import {
   NODE_CARD_WIDTH,
   SHARD_HEADER_HEIGHT,
@@ -32,6 +32,11 @@ export type HaReplicationEdgeData = {
   name?: string
 }
 
+// Records without a complete identity fall back to a positional id so two of
+// them never collide on the same React Flow node id (which would drop a card).
+const getPoolerNodeId = (pooler: Parameters<typeof getPoolerKey>[0], fallbackId: string) =>
+  hasPoolerIdentity(pooler) ? `pooler-${getPoolerKey(pooler)}` : `pooler-${fallbackId}`
+
 export const generateHaNodesAndEdges = (topology: HaTopology): { nodes: Node[]; edges: Edge[] } => {
   const position = { x: 0, y: 0 }
   const nodes: Node[] = []
@@ -53,7 +58,7 @@ export const generateHaNodesAndEdges = (topology: HaTopology): { nodes: Node[]; 
     let primaryId: string | undefined
 
     if (shard.primary !== undefined) {
-      primaryId = `pooler-${getPoolerKey(shard.primary)}`
+      primaryId = getPoolerNodeId(shard.primary, `${shard.id}-primary`)
       nodes.push({
         position,
         id: primaryId,
@@ -78,8 +83,8 @@ export const generateHaNodesAndEdges = (topology: HaTopology): { nodes: Node[]; 
       }
     }
 
-    shard.replicas.forEach((replica) => {
-      const replicaId = `pooler-${getPoolerKey(replica)}`
+    shard.replicas.forEach((replica, replicaIndex) => {
+      const replicaId = getPoolerNodeId(replica, `${shard.id}-replica-${replicaIndex}`)
       nodes.push({
         position,
         id: replicaId,

@@ -164,7 +164,7 @@ const InstanceConfigurationUI = () => {
         }`}
       >
         {(isLoading || isLoadingProject) && (
-          <Loader2 className="animate-spin text-foreground-light" />
+          <Loader2 className="motion-safe:animate-spin text-foreground-light" />
         )}
         {isError && <AlertError error={error} subject="Failed to retrieve replicas" />}
         {isSuccessReplicas && !isLoadingProject && (
@@ -219,7 +219,7 @@ export const InstanceConfiguration = () => {
   if (isPending) {
     return (
       <div className="h-full w-full flex items-center justify-center">
-        <Loader2 className="animate-spin text-foreground-light" />
+        <Loader2 className="motion-safe:animate-spin text-foreground-light" />
       </div>
     )
   }

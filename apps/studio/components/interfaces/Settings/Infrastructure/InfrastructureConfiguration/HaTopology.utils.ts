@@ -28,6 +28,9 @@ export interface HaTopology {
 export const getPoolerKey = (pooler: Pick<Multipooler, 'id'>) =>
   `${pooler.id?.cell ?? 'unknown'}-${pooler.id?.name ?? 'unknown'}`
 
+export const hasPoolerIdentity = (pooler: Pick<Multipooler, 'id'>) =>
+  pooler.id?.cell !== undefined && pooler.id?.name !== undefined
+
 /**
  * `routingState.role` is the authoritative writable signal; the deprecated
  * `type` field is derived and only used as a fallback when the routing state is
@@ -120,9 +123,15 @@ export const buildHaTopology = ({
   // The /ha-admin passthrough can return the same record multiple times (one
   // copy per cell it fans out to), so both lists must be deduped by id —
   // duplicate poolers would otherwise produce duplicate React Flow node ids,
-  // and extra copies of the primary would render as replicas.
-  const uniqueGateways = uniqBy(gateways, getPoolerKey)
-  const uniquePoolers = uniqBy(poolers, getPoolerKey)
+  // and extra copies of the primary would render as replicas. Records without
+  // a complete identity can't be told apart, so they are never deduped (keying
+  // by the record itself keeps each one unique).
+  const uniqueGateways = uniqBy(gateways, (gateway) =>
+    hasPoolerIdentity(gateway) ? getPoolerKey(gateway) : gateway
+  )
+  const uniquePoolers = uniqBy(poolers, (pooler) =>
+    hasPoolerIdentity(pooler) ? getPoolerKey(pooler) : pooler
+  )
 
   const sortedPoolers = [...uniquePoolers].sort((a, b) =>
     getPoolerKey(a).localeCompare(getPoolerKey(b))

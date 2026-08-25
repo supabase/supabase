@@ -294,6 +294,22 @@ describe('buildHaTopology', () => {
     expect(topology.shards[0].replicas).toEqual([replica])
   })
 
+  it('never dedupes records with omitted identity', () => {
+    const identityless = (overrides: Partial<Multipooler> = {}): Multipooler => ({
+      shardKey: { database: 'postgres', shard: '0' },
+      routingState: { role: 'ROUTING_ROLE_REPLICA' },
+      ...overrides,
+    })
+
+    const topology = buildHaTopology({
+      gateways: [{}, {}],
+      poolers: [primaryPooler(), identityless(), identityless()],
+    })
+
+    expect(topology.gateways).toHaveLength(2)
+    expect(topology.shards[0].replicas).toHaveLength(2)
+  })
+
   it('returns an empty topology for empty responses', () => {
     const topology = buildHaTopology({ gateways: [], poolers: [] })
 
