@@ -421,6 +421,58 @@ describe('deriveNotebookDiff', () => {
     })
   })
 
+  it('places a later same-anchor insert after the anchor after that anchor moves', () => {
+    const notebook: NotebookWire = {
+      schema_version: 1,
+      cells: [
+        { _tag: 'markdown_cell', _id: 'cell-1', text: '# One' },
+        { _tag: 'markdown_cell', _id: 'cell-2', text: '# Two' },
+        { _tag: 'markdown_cell', _id: 'cell-3', text: '# Three' },
+        { _tag: 'markdown_cell', _id: 'cell-4', text: '# Four' },
+      ],
+    }
+
+    const first = { _tag: 'markdown_cell' as const, text: 'first' }
+    const second = { _tag: 'markdown_cell' as const, text: 'second' }
+
+    const result = deriveNotebookDiff(notebook, [
+      { _tag: 'insert_cell', after_cell_id: 'cell-1', cell: first },
+      { _tag: 'move_cell', cell_id: 'cell-1', after_cell_id: 'cell-3' },
+      { _tag: 'insert_cell', after_cell_id: 'cell-1', cell: second },
+    ])
+
+    expect(result).toEqual({
+      success: true,
+      entries: [
+        { _tag: 'added', cell: first, operationIndex: 0 },
+        { _tag: 'unchanged', cell: notebook.cells[1] },
+        { _tag: 'unchanged', cell: notebook.cells[2] },
+        { _tag: 'moved', cell: notebook.cells[0], fromIndex: 0, operationIndex: 1 },
+        { _tag: 'added', cell: second, operationIndex: 2 },
+        { _tag: 'unchanged', cell: notebook.cells[3] },
+      ],
+    })
+  })
+
+  it('does not let a no-op move after a deletion reorder the removed entry', () => {
+    const ops: NotebookOperation[] = [
+      { _tag: 'delete_cell', cell_id: 'cell-2' },
+      { _tag: 'move_cell', cell_id: 'cell-3', after_cell_id: 'cell-1' },
+    ]
+
+    const result = deriveNotebookDiff(NOTEBOOK, ops)
+
+    expect(result.success).toBe(true)
+    if (!result.success) return
+
+    expect(result.entries).toHaveLength(3)
+    expect(result.entries).toEqual([
+      { _tag: 'unchanged', cell: NOTEBOOK.cells[0] },
+      { _tag: 'removed', cell: NOTEBOOK.cells[1], operationIndex: 0 },
+      { _tag: 'unchanged', cell: NOTEBOOK.cells[2] },
+    ])
+  })
+
   it('downgrades moves that cancel out to unchanged', () => {
     // Same operations as the applyNotebookOperations case that lands back on the original
     // order: nothing actually moved, so nothing should be badged as moved.
