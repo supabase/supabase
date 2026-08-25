@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState, type HTMLAttributes } from 'react'
+import { useEffect, useMemo, useRef, useState, type HTMLAttributes } from 'react'
 import { cn } from 'ui'
 
 import styles from './Select26Promotion.module.css'
@@ -20,8 +20,21 @@ export const SELECT_26_STUDIO_DISMISSAL_KEY = 'select-2026-promotion-dismissed'
 const SELECT_26_EXPIRY_MS = new Date(SELECT_26_EXPIRY).getTime()
 const MAX_TIMEOUT_MS = 2_147_483_647
 
-/** Eight-way arrows used by Select 2026 TicketCta / glyph-engine frames. */
-const FIELD_ARROWS = ['↑', '↗', '→', '↘', '↓', '↙', '←', '↖'] as const
+/** Mirrored bracket vocabulary from Select 2026 glyph-engine `brackets` / socials exports. */
+const OPEN_BRACKETS = ['‹', '{', '[', '('] as const
+const CLOSE_BRACKETS = ['›', '}', ']', ')'] as const
+
+/**
+ * Radial sweep angular speed (rad / ms). Glyph-engine radar uses 0.004;
+ * banners run slower so the beam reads without feeling frantic.
+ */
+const SWEEP_SPEED = 0.00055
+/** Bracket face step period (ms), matching glyph-engine `bracketFace`. */
+const BRACKET_STEP_MS = 170
+/** Stepped paint rate — closer to glyph-engine `step` tween than 60fps React. */
+const FRAME_INTERVAL_MS = 70
+
+const positiveModulo = (value: number, modulo: number) => ((value % modulo) + modulo) % modulo
 
 export const isSelect26PromotionActive = (now = Date.now()) => now < SELECT_26_EXPIRY_MS
 
@@ -46,11 +59,37 @@ export const useSelect26PromotionActive = () => {
   return isActive
 }
 
-const arrowAt = (x: number, y: number, cols: number, rows: number) => {
-  const dx = x - (cols - 1) / 2
-  const dy = y - (rows - 1) / 2
-  const index = (((Math.round(Math.atan2(dy, dx) / (Math.PI / 4)) + 2) % 8) + 8) % 8
-  return FIELD_ARROWS[index]
+type FieldCell = {
+  ch: string
+  /** Palette band 0–4 around the sweep. */
+  band: number
+  /** Beam proximity 0–1 (radar falloff). */
+  weight: number
+}
+
+const cellAt = (x: number, y: number, cols: number, rows: number, timeMs: number): FieldCell => {
+  const cx = (cols - 1) / 2
+  const cy = (rows - 1) / 2
+  const nx = x - cx
+  const ny = y - cy
+  const angle = Math.atan2(ny, nx)
+  const sweep = positiveModulo(timeMs * SWEEP_SPEED, Math.PI * 2)
+
+  const step = Math.floor(timeMs / BRACKET_STEP_MS + y * 1.7 + Math.abs(nx) * 0.8)
+  const idx = positiveModulo(step, OPEN_BRACKETS.length)
+  const ch = x <= cx ? OPEN_BRACKETS[idx] : CLOSE_BRACKETS[idx]
+
+  const hue = positiveModulo(angle - sweep, Math.PI * 2) / (Math.PI * 2)
+  const band = Math.min(4, Math.floor(hue * 5))
+
+  const distance = Math.min(
+    positiveModulo(angle - sweep, Math.PI * 2),
+    positiveModulo(sweep - angle, Math.PI * 2)
+  )
+  // Same thresholds as glyph-engine `radarFace`, with a readable off-beam field.
+  const weight = distance < 0.16 ? 1 : distance < 0.42 ? 0.85 : distance < 0.78 ? 0.55 : 0.28
+
+  return { ch, band, weight }
 }
 
 type Select26FieldProps = HTMLAttributes<HTMLDivElement> & {
@@ -59,30 +98,76 @@ type Select26FieldProps = HTMLAttributes<HTMLDivElement> & {
 }
 
 /**
- * Static crop of the Select 2026 TicketCtaSection arrow-field graphic.
- * Radiating eight-way arrows match the glyph-engine frame without its canvas runtime.
+ * Animated Radial sweep: mirrored brackets with rotating colour bands and
+ * radar beam falloff. Stepped updates mirror the Select glyph-engine without
+ * shipping its canvas runtime.
  */
 export const Select26Field = ({ cols = 10, rows = 6, className, ...props }: Select26FieldProps) => {
+  const rootRef = useRef<HTMLDivElement>(null)
+  const [timeMs, setTimeMs] = useState(0)
+  const [isVisible, setIsVisible] = useState(true)
+
+  useEffect(() => {
+    const node = rootRef.current
+    if (!node || typeof IntersectionObserver === 'undefined') return
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry?.isIntersecting ?? false),
+      { rootMargin: '80px' }
+    )
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (!isVisible) return
+    if (
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      return
+    }
+
+    let raf = 0
+    let lastPaint = 0
+    const started = performance.now()
+
+    const tick = (now: number) => {
+      if (now - lastPaint >= FRAME_INTERVAL_MS) {
+        lastPaint = now
+        setTimeMs(now - started)
+      }
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [isVisible])
+
   const cells = useMemo(() => {
-    const next: string[] = []
+    const next: FieldCell[] = []
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
-        next.push(arrowAt(x, y, cols, rows))
+        next.push(cellAt(x, y, cols, rows, timeMs))
       }
     }
     return next
-  }, [cols, rows])
+  }, [cols, rows, timeMs])
 
   return (
     <div
+      ref={rootRef}
       aria-hidden
-      className={cn(styles.field, className)}
-      style={{ gridTemplateColumns: `repeat(${cols}, 1.05em)` }}
+      className={cn(styles.field, 'grid', className)}
+      style={{ gridTemplateColumns: `repeat(${cols}, calc(22 / 34 * 1em))` }}
       {...props}
     >
-      {cells.map((glyph, index) => (
-        <span key={index} className={styles.cell}>
-          {glyph}
+      {cells.map((cell, index) => (
+        <span
+          key={index}
+          className={styles.cell}
+          data-band={cell.band}
+          style={{ opacity: cell.weight }}
+        >
+          {cell.ch}
         </span>
       ))}
     </div>

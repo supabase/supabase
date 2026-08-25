@@ -1,22 +1,65 @@
+@font-face {
+  font-family: 'Departure Mono Superbase';
+  src: url('./fonts/DepartureMonoSuperbase-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 .field {
-  display: grid;
-  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, monospace;
+  font-family: 'Departure Mono Superbase', ui-monospace, monospace;
   font-weight: 400;
   letter-spacing: 0;
   line-height: 1;
   pointer-events: none;
   user-select: none;
-  color: #00482f;
+  /* Select green ramp — matches socials / glyph-engine exports */
+  --select26-b0: #00482f;
+  --select26-b1: #00a85a;
+  --select26-b2: #3ecf8e;
+  --select26-b3: #6dd9a8;
+  --select26-b4: #95e6b8;
 }
 
 :global(.dark) .field,
 :global([data-theme='dark']) .field {
-  color: #94e6b7;
+  --select26-b0: #00bd58;
+  --select26-b1: #3ecf8e;
+  --select26-b2: #95e6b8;
+  --select26-b3: #e1fcd7;
+  --select26-b4: #ffffff;
 }
 
 .cell {
   display: grid;
   place-items: center;
-  width: 1.05em;
-  height: 1.15em;
+  /* Select logo-grid cell: 22×40 at 34px → width/height in em of the field font-size */
+  width: calc(22 / 34 * 1em);
+  height: calc(40 / 34 * 1em);
+}
+
+.cell[data-band='0'] {
+  color: var(--select26-b0);
+}
+
+.cell[data-band='1'] {
+  color: var(--select26-b1);
+}
+
+.cell[data-band='2'] {
+  color: var(--select26-b2);
+}
+
+.cell[data-band='3'] {
+  color: var(--select26-b3);
+}
+
+.cell[data-band='4'] {
+  color: var(--select26-b4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell {
+    transition: none;
+  }
 }

@@ -71,7 +71,7 @@ export const Announcement = ({
               icon={<X size={16} strokeWidth={1.5} />}
               aria-label="Dismiss announcement"
               onClick={handleClose}
-              className="px-1 text-foreground-muted hover:text-foreground"
+              className="rounded-md bg-[#f8f3ef]/85 px-1 text-foreground-muted backdrop-blur-[2px] hover:bg-[#f8f3ef] hover:text-foreground dark:bg-[#0b0e0d]/85 dark:hover:bg-[#0b0e0d]"
             />
           </div>
         )}
