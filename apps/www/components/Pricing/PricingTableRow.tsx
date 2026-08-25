@@ -166,8 +166,10 @@ export const PricingTableRowDesktop = (props: any) => {
         style={{ borderTop: 'none' }}
         id={`${props.sectionId}-desktop`}
       >
+        {/* 108px/84px are pre-hydration fallbacks only; after mount PricingComparisonTable
+            measures the sticky thead into --pricing-category-top and that value wins */}
         <th
-          className="bg-background text-foreground sticky top-[108px] xl:top-[84px] z-10 py-3 pl-6 text-left text-sm font-medium"
+          className="bg-background text-foreground sticky top-[var(--pricing-category-top,108px)] xl:top-[var(--pricing-category-top,84px)] z-10 py-3 pl-6 text-left text-sm font-medium"
           scope="colgroup"
         >
           <div className="flex items-center gap-4">
