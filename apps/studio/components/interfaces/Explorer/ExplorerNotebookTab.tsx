@@ -59,6 +59,7 @@ import { type QueryEditorHandle } from './QueryEditor'
 import { createMarkdownCellSkeleton, createQueryCellSkeleton } from './utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
+import { hasDiscardableChanges } from '@/data/content/notebooks/notebook-cache'
 import {
   isQueryCell,
   WritableCell,
@@ -94,6 +95,7 @@ export const ExplorerNotebookTab = () => {
 
   const [isRunningNotebook, setIsRunningNotebook] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isSaveBeforeAnalyzeOpen, setIsSaveBeforeAnalyzeOpen] = useState(false)
   const [pendingMutationCells, setPendingMutationCells] = useState<
     { id: string; title: string }[] | null
   >(null)
@@ -106,6 +108,10 @@ export const ExplorerNotebookTab = () => {
       if (id && content === savedContentRef.current) {
         snap.markSaved({ id })
         toast.success('Successfully saved notebook!')
+        if (isSaveBeforeAnalyzeOpen) {
+          setIsSaveBeforeAnalyzeOpen(false)
+          handleAnalyze()
+        }
       }
     },
   })
@@ -239,6 +245,21 @@ export const ExplorerNotebookTab = () => {
     })
   }
 
+  const handleAnalyze = () => {
+    createChat({
+      name: `Analyze ${name} notebook`,
+      initialMessage: `Run the notebook "${name}" (id: ${id}) and analyze the results. Summarize the key findings per cell, calling out anomalies or trends, and use any markdown cells for context. Skip or flag any cell that would mutate data rather than running it.`,
+    })
+  }
+
+  const handleClickAnalyze = () => {
+    if (hasDiscardableChanges(currentNotebook)) {
+      setIsSaveBeforeAnalyzeOpen(true)
+    } else {
+      handleAnalyze()
+    }
+  }
+
   const handleConfirmDeleteNotebook = () => {
     if (!ref || !id) return
     deleteNotebook({ projectRef: ref, ids: [id] })
@@ -297,12 +318,7 @@ export const ExplorerNotebookTab = () => {
           <ExplorerToolbarAction
             icon={<AiIconAnimation size={16} />}
             loading={isCreating}
-            onClick={() => {
-              createChat({
-                name: `Analyze ${name} notebook`,
-                initialMessage: `Run the notebook "${name}" (id: ${id}) and analyze the results. Summarize the key findings per cell, calling out anomalies or trends, and use any markdown cells for context. Skip or flag any cell that would mutate data rather than running it.`,
-              })
-            }}
+            onClick={handleClickAnalyze}
           >
             Analyze
           </ExplorerToolbarAction>
@@ -428,6 +444,22 @@ export const ExplorerNotebookTab = () => {
       >
         <p className="text-sm">
           This action cannot be undone. Are you sure you want to delete '{name}'?
+        </p>
+      </ConfirmationModal>
+
+      <ConfirmationModal
+        size="small"
+        visible={isSaveBeforeAnalyzeOpen}
+        title="Save notebook before analyzing?"
+        confirmLabel="Save and analyze"
+        confirmLabelLoading="Saving notebook"
+        loading={isUpdating}
+        onCancel={() => setIsSaveBeforeAnalyzeOpen(false)}
+        onConfirm={handleSaveNotebook}
+      >
+        <p className="text-sm">
+          This notebook has unsaved changes. Save it first so the assistant analyzes the latest
+          content.
         </p>
       </ConfirmationModal>
 
