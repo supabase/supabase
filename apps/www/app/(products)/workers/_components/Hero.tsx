@@ -8,8 +8,8 @@ import { WorkersVisual } from './WorkersVisual'
 export function Hero() {
   return (
     <SectionContainerWithCn spacing="sections">
-      <div className="flex flex-col gap-6 lg:gap-8">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-4 -mt-8">
           <Badge variant="warning">Private Alpha</Badge>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
@@ -22,7 +22,7 @@ export function Hero() {
             compute with built-in security and observability.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mt-2 lg:mt-4">
           <Button asChild size="medium">
             <Link href="#waitlist">Join the waitlist</Link>
           </Button>
