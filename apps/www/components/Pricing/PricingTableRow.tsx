@@ -218,7 +218,7 @@ export const PricingTableRowDesktop = (props: any) => {
                         <IconPricingMinus plan={planValue} />
                       </div>
                     ) : (
-                      <div className="text-foreground text-xs flex flex-col justify-center">
+                      <div className="text-foreground text-xs flex flex-col justify-center gap-1">
                         <span className="flex items-center gap-2">
                           {tooltips?.[planName] && (
                             <InfoTooltip
@@ -233,7 +233,7 @@ export const PricingTableRowDesktop = (props: any) => {
                         </span>
                         {Array.isArray(planValue) &&
                           planValue.slice(1).map((val, idx) => (
-                            <span key={`planval_${i}_${idx}`} className="text-lighter leading-4">
+                            <span key={`planval_${i}_${idx}`} className="text-lighter leading-5">
                               {val}
                             </span>
                           ))}
