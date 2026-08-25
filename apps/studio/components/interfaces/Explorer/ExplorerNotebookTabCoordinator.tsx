@@ -36,6 +36,19 @@ export const ExplorerNotebookTabCoordinator = () => {
   const tabs = useContext(TabsStateContext)
 
   useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      const hasUnsaved = Object.values(notebooksState.notebooks).some(hasDiscardableChanges)
+      if (hasUnsaved) {
+        event.preventDefault()
+        event.returnValue = true
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [])
+
+  useEffect(() => {
     return tabs.registerTabTypeHandler('notebook', {
       onClose: (tab) => {
         const notebookId = tab.metadata?.notebookId
