@@ -48,7 +48,7 @@ For the full command reference, see [Stripe's Stripe Projects docs](https://docs
 The first time you provision a project this way, Supabase shows an authorization screen so you can confirm the request before anything is created:
 
 - If you're not signed in to Supabase with the email Stripe has on file, you're asked to sign out and back in as that account.
-- If the Stripe account is already linked to a Supabase organization, you just confirm the request.
+- If the Stripe account is already linked to a Supabase organization, you confirm the request.
 - Otherwise, confirming creates a new Supabase organization on your behalf.
 
 Your Supabase project and organization work exactly like ones you create directly: you keep full access to the dashboard, your connection strings, and your data. Nothing is proxied or white-labeled.
@@ -56,5 +56,5 @@ Your Supabase project and organization work exactly like ones you create directl
 ## Limitations
 
 - Stripe Projects is in developer preview, so behavior may change.
-{/* Inferred from the Supabase-side authorization screen's confirmation states, not confirmed against the account-request API schema; worth double-checking with the Stripe Projects team before publishing. */}
 - Provisioning links to a Supabase organization by matching the email on the Stripe account to a Supabase account; there's no option in the CLI flow to choose a different existing organization.
+- To access the Supabase dashboard for a new organization provisioned through Stripe Projects, use the `open` command (`stripe projects open supabase`). To log in to the Supabase dashboard directly without the CLI, follow the reset password flow for this account.
