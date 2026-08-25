@@ -131,7 +131,8 @@ const InstanceConfigurationUI = () => {
                     source: 'load-balancer',
                     target: primary.identifier,
                     type: 'smoothstep',
-                    animated: true,
+                    // Static: no data flows between the load balancer and the
+                    // database — the line only indicates a relation.
                     className: 'cursor-default!',
                   },
                 ]

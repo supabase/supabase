@@ -4,7 +4,6 @@ import { Loader2 } from 'lucide-react'
 import { useMemo } from 'react'
 
 import { DiagramFlow } from './DiagramFlow'
-import { HaReplicationEdge } from './HaEdge'
 import { addShardNodes, generateHaNodesAndEdges } from './HaInstanceConfiguration.utils'
 import { HaPrimaryNode, HaReplicaNode, HaShardNode, MultigatewayNode } from './HaInstanceNode'
 import { buildHaTopology, selectTopologyPoolers } from './HaTopology.utils'
@@ -21,9 +20,8 @@ const nodeTypes = {
   HA_SHARD: HaShardNode,
 }
 
-const edgeTypes = {
-  HA_REPLICATION: HaReplicationEdge,
-}
+// The gateway and replication edges both use React Flow's built-in smoothstep.
+const edgeTypes = {}
 
 const POOLER_STATUS_REFRESH_MS = 30_000
 

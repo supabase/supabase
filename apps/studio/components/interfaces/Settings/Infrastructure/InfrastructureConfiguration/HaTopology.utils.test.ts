@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest'
 import {
   buildHaTopology,
   formatCellAsAvailabilityZone,
-  getPoolerEdgeState,
   getPoolerStatus,
   isPrimaryPooler,
   selectTopologyPoolers,
@@ -69,32 +68,6 @@ describe('getPoolerStatus', () => {
     expect(
       getPoolerStatus({ lifecycleStatus: { status: 'QUARANTINED' }, servingStatus: 'SERVING' })
     ).toBe('unhealthy')
-  })
-})
-
-describe('getPoolerEdgeState', () => {
-  it('maps each status onto a single edge state', () => {
-    expect(getPoolerEdgeState('healthy')).toEqual({
-      isReplicating: true,
-      isComingUp: false,
-      isFailed: false,
-    })
-    expect(getPoolerEdgeState('coming_up')).toEqual({
-      isReplicating: false,
-      isComingUp: true,
-      isFailed: false,
-    })
-    expect(getPoolerEdgeState('unhealthy')).toEqual({
-      isReplicating: false,
-      isComingUp: false,
-      isFailed: true,
-    })
-    // Going down renders as the stopped edge visual.
-    expect(getPoolerEdgeState('going_down')).toEqual({
-      isReplicating: false,
-      isComingUp: false,
-      isFailed: false,
-    })
   })
 })
 

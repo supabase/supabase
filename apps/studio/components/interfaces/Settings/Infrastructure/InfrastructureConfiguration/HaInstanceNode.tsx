@@ -86,9 +86,7 @@ export const HaPrimaryNode = ({ data }: NodeProps<Node<HaPoolerNodeData>>) => {
         className={!hasGateway ? 'opacity-0' : ''}
         style={{ background: 'transparent' }}
       />
-      {/* dark-mode brand-600 is the brightest step of the scale — use the
-          deep brand-500 there so the ring marks the primary without glowing */}
-      <div className="flex flex-col rounded-sm bg-surface-100 border border-brand-600 dark:border-brand-500">
+      <div className="flex flex-col rounded-sm bg-surface-100 border border-default">
         <div className="flex items-start justify-between p-3" style={{ width: NODE_CARD_WIDTH }}>
           <div className="flex gap-x-3">
             <div className="w-8 h-8 bg-brand-500 border border-brand-600 rounded-md flex items-center justify-center">
@@ -170,14 +168,13 @@ export const HaReplicaNode = ({ data }: NodeProps<Node<HaPoolerNodeData>>) => {
 }
 
 export const HaShardNode = ({ data }: NodeProps<Node<HaShardNodeData>>) => {
-  const { name, numNodes } = data
+  const { name } = data
 
   return (
     <div className="relative h-full w-full rounded-md border border-default bg-surface-100/25">
       <div className="pointer-events-auto absolute top-3 left-3 flex items-center gap-x-2 rounded-full border border-default bg-surface-100 pl-3 pr-2 py-1">
         <Layers size={14} className="text-foreground-light" />
         <p className="text-sm">{name}</p>
-        <Badge>{numNodes}</Badge>
         <Tooltip>
           {/* Renders a button so the explanation is keyboard reachable */}
           <TooltipTrigger className="flex items-center gap-x-1 text-sm text-foreground-light">

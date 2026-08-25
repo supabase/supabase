@@ -17,10 +17,6 @@ export interface EdgeVisual {
   shouldAnimate: boolean
   shouldSpin?: boolean
   isFilled?: boolean
-  // The icon depicts the flow direction (it points right, matching a
-  // left-to-right layout) — edges in other layouts must rotate it to match
-  // their actual direction.
-  isDirectional?: boolean
 }
 
 // Picks the icon + line appearance for a replication state. Both the icon and the line are derived
@@ -60,7 +56,6 @@ export const getEdgeVisual = ({
       dashArray: '5',
       strokeWidth: 2,
       shouldAnimate: true,
-      isDirectional: true,
     }
   }
   return {
@@ -74,13 +69,9 @@ export const getEdgeVisual = ({
   }
 }
 
-/**
- * The round icon chip rendered mid-edge, bordered in the edge's color.
- * Pass `rotation` (degrees) to orient directional icons in layouts that
- * aren't left-to-right.
- */
-export const EdgeVisualChip = ({ visual, rotation }: { visual: EdgeVisual; rotation?: number }) => {
-  const { Icon, color, shouldSpin, isFilled, isDirectional } = visual
+/** The round icon chip rendered mid-edge, bordered in the edge's color. */
+export const EdgeVisualChip = ({ visual }: { visual: EdgeVisual }) => {
+  const { Icon, color, shouldSpin, isFilled } = visual
 
   return (
     <div
@@ -90,11 +81,7 @@ export const EdgeVisualChip = ({ visual, rotation }: { visual: EdgeVisual; rotat
       <Icon
         size={14}
         className={cn(shouldSpin && 'motion-safe:animate-spin')}
-        style={{
-          color,
-          fill: isFilled ? color : undefined,
-          transform: isDirectional && rotation !== undefined ? `rotate(${rotation}deg)` : undefined,
-        }}
+        style={{ color, fill: isFilled ? color : undefined }}
       />
     </div>
   )

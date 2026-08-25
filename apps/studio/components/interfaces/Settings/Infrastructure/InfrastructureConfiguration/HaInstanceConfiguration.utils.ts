@@ -24,12 +24,6 @@ export type HaPoolerNodeData = {
 
 export type HaShardNodeData = {
   name: string
-  numNodes: number
-}
-
-export type HaReplicationEdgeData = {
-  cell?: string
-  name?: string
 }
 
 // Records without a complete identity fall back to a positional id so two of
@@ -102,12 +96,9 @@ export const generateHaNodesAndEdges = (topology: HaTopology): { nodes: Node[]; 
           id: `${primaryId}-${replicaId}`,
           source: primaryId,
           target: replicaId,
-          type: 'HA_REPLICATION',
+          type: 'smoothstep',
+          animated: true,
           className: 'cursor-default!',
-          data: {
-            cell: replica.id?.cell,
-            name: replica.id?.name,
-          } satisfies HaReplicationEdgeData,
         })
       }
     })
@@ -155,7 +146,6 @@ export const addShardNodes = (nodes: Node[], edges: Edge[]) => {
       type: 'HA_SHARD',
       data: {
         name: children[0].data.shardName,
-        numNodes: children.length,
       } satisfies HaShardNodeData,
     })
   })

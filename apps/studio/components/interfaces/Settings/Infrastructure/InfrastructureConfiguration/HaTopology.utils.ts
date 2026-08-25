@@ -1,6 +1,5 @@
 import { groupBy, partition, uniqBy } from 'lodash'
 
-import type { ReplicationState } from '@/components/ui/ReactFlow/EdgeVisual'
 import type { Multigateway } from '@/data/ha-admin/ha-cluster-gateways-query'
 import type { HaClusterPoolersData, Multipooler } from '@/data/ha-admin/ha-cluster-poolers-query'
 
@@ -74,14 +73,6 @@ export const HA_POOLER_STATUS_LABELS: Record<HaPoolerStatus, string> = {
   going_down: 'Going down',
   unhealthy: 'Unhealthy',
 }
-
-// A pooler that is going down is neither replicating nor failed, which renders
-// as the "stopped" edge visual.
-export const getPoolerEdgeState = (status: HaPoolerStatus): ReplicationState => ({
-  isReplicating: status === 'healthy',
-  isComingUp: status === 'coming_up',
-  isFailed: status === 'unhealthy',
-})
 
 const AWS_AZ_REGEX = /\b[a-z]{2}(?:-[a-z]+)+-\d[a-z]\b/
 
