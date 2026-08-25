@@ -5,6 +5,7 @@ import { AnnouncementBanner } from './AnnouncementBanner'
 import {
   SELECT_26_CTA,
   SELECT_26_MESSAGE,
+  SELECT_26_TITLE,
   SELECT_26_URL,
   SELECT_26_WWW_DISMISSAL_KEY,
 } from './Select26Promotion'
@@ -33,7 +34,11 @@ describe('AnnouncementBanner', () => {
   it('shows the complete Select promotion and external CTA', async () => {
     render(<AnnouncementBanner />)
 
-    expect(await screen.findByText(SELECT_26_MESSAGE)).toBeVisible()
+    const message = await screen.findByText((_, element) => {
+      return element?.tagName === 'P' && element.textContent === SELECT_26_MESSAGE
+    })
+    expect(message).toBeVisible()
+    expect(screen.getByText(SELECT_26_TITLE)).toBeVisible()
     expect(screen.getByRole('link', { name: new RegExp(SELECT_26_CTA) })).toHaveAttribute(
       'href',
       SELECT_26_URL
@@ -50,7 +55,7 @@ describe('AnnouncementBanner', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Dismiss announcement' }))
 
     expect(window.localStorage.getItem(SELECT_26_WWW_DISMISSAL_KEY)).toBe('hidden')
-    await waitFor(() => expect(screen.queryByText(SELECT_26_MESSAGE)).not.toBeInTheDocument())
+    await waitFor(() => expect(screen.queryByText(SELECT_26_TITLE)).not.toBeInTheDocument())
   })
 
   it('honours a previously persisted dismissal', () => {
@@ -58,6 +63,6 @@ describe('AnnouncementBanner', () => {
 
     render(<AnnouncementBanner />)
 
-    expect(screen.queryByText(SELECT_26_MESSAGE)).not.toBeInTheDocument()
+    expect(screen.queryByText(SELECT_26_TITLE)).not.toBeInTheDocument()
   })
 })

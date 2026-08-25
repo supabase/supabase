@@ -3,7 +3,7 @@
 import { X } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { PropsWithChildren, useEffect, useState } from 'react'
-import { cn } from 'ui'
+import { Button, cn } from 'ui'
 
 export interface AnnouncementProps {
   show: boolean
@@ -63,14 +63,17 @@ export const Announcement = ({
     return (
       <div className={cn('relative z-40 w-full', className)}>
         {dismissable && !isLaunchWeekSection && (
-          <button
-            type="button"
-            aria-label="Dismiss announcement"
-            className="absolute z-50 right-4 flex h-full items-center text-foreground-muted transition-colors hover:text-foreground focus-visible:outline-none focus-visible:text-foreground"
-            onClick={handleClose}
-          >
-            <X size={16} />
-          </button>
+          <div className="absolute right-3 top-1/2 z-50 -translate-y-1/2 sm:right-4">
+            <Button
+              type="button"
+              variant="text"
+              size="tiny"
+              icon={<X size={16} strokeWidth={1.5} />}
+              aria-label="Dismiss announcement"
+              onClick={handleClose}
+              className="px-1 text-foreground-muted hover:text-foreground"
+            />
+          </div>
         )}
         {children}
       </div>

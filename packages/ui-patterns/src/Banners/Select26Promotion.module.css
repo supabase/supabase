@@ -1,67 +1,22 @@
-.logo,
-.artwork {
+.field {
+  display: grid;
   font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, monospace;
   font-weight: 400;
   letter-spacing: 0;
   line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  color: #00482f;
 }
 
-.logo {
-  --select-cell-width: 0.647em;
-  --select-cell-height: 1.176em;
-  display: inline-grid;
-  grid-template-columns: repeat(8, var(--select-cell-width));
-  grid-template-rows: repeat(3, var(--select-cell-height));
-  height: calc(3 * var(--select-cell-height));
-  overflow: hidden;
-  width: calc(8 * var(--select-cell-width));
+:global(.dark) .field,
+:global([data-theme='dark']) .field {
+  color: #94e6b7;
 }
 
-.logoRow {
-  display: flex;
-  height: var(--select-cell-height);
-  padding-inline: 0.08em;
-  white-space: nowrap;
-}
-
-.supabase {
-  grid-row: 1;
-  background: #3ecf8e;
-  color: #090e0d;
-}
-.select {
-  grid-row: 2;
-  background: #95e6b8;
-  color: #090e0d;
-}
-.year {
-  grid-row: 3;
-  background: #090e0d;
-  color: #fff;
-}
-
-:global(.dark) .year,
-:global([data-theme='dark']) .year {
-  background: #fff;
-  color: #090e0d;
-}
-
-.artwork {
+.cell {
   display: grid;
-  grid-auto-rows: 1.18em;
-  overflow: hidden;
-  white-space: pre;
-}
-
-.artworkRow {
-  display: block;
-  padding-inline: 0.25em;
-}
-.artworkRow[data-tone='1'] {
-  background: #3ecf8e;
-  color: #090e0d;
-}
-.artworkRow[data-tone='2'] {
-  background: #95e6b8;
-  color: #090e0d;
+  place-items: center;
+  width: 1.05em;
+  height: 1.15em;
 }
