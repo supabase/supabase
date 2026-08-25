@@ -30,7 +30,7 @@ const Error404 = () => {
             </div>
           </nav>
         </div>
-        <div className="absolute" aria-hidden="true">
+        <div className="pointer-events-none absolute" aria-hidden="true">
           <div
             className={`text-foreground select-none text-[14rem] opacity-5 filter transition duration-200 sm:text-[18rem] lg:text-[28rem] ${
               show404 ? 'blur-xs' : 'blur-none'
