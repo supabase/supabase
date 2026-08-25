@@ -31,13 +31,13 @@ const Error404 = () => {
           </nav>
         </div>
         <div className="absolute">
-          <h1
+          <div
             className={`text-foreground select-none text-[14rem] opacity-5 filter transition duration-200 sm:text-[18rem] lg:text-[28rem] ${
               show404 ? 'blur-xs' : 'blur-none'
             }`}
           >
             404
-          </h1>
+          </div>
         </div>
         <div
           className={`flex flex-col items-center justify-center space-y-6 transition ${
@@ -55,6 +55,19 @@ const Error404 = () => {
               <Link href="/">Head back</Link>
             </Button>
           </div>
+          <p className="text-foreground-lighter text-xs">
+            <a href="/docs" className="hover:text-foreground underline">
+              Documentation
+            </a>
+            {' · '}
+            <a href="/sitemap.xml" className="hover:text-foreground underline">
+              Sitemap
+            </a>
+            {' · '}
+            <a href="/llms.txt" className="hover:text-foreground underline">
+              llms.txt
+            </a>
+          </p>
         </div>
       </div>
     </DefaultLayout>
