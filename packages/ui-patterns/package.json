@@ -66,6 +66,14 @@
       "import": "./src/Banners/LW15Banner.tsx",
       "types": "./src/Banners/LW15Banner.tsx"
     },
+    "./Banners/Select26Banner": {
+      "import": "./src/Banners/Select26Banner.tsx",
+      "types": "./src/Banners/Select26Banner.tsx"
+    },
+    "./Banners/Select26Promotion.module.css": {
+      "import": "./src/Banners/Select26Promotion.module.css",
+      "types": "./src/Banners/Select26Promotion.module.css"
+    },
     "./Banners/Select26Promotion": {
       "import": "./src/Banners/Select26Promotion.tsx",
       "types": "./src/Banners/Select26Promotion.tsx"
