@@ -4,7 +4,7 @@ import { cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
 
 import CategoryClient from './CategoryClient'
-import { capitalize, startCase } from '@/lib/helpers'
+import { startCase } from '@/lib/helpers'
 import { getAllCategories, getSortedPosts } from '@/lib/posts'
 import type PostTypes from '@/types/post'
 
@@ -48,16 +48,7 @@ export default async function CategoriesPage({
   })
   const blogs = [...staticPosts] as PostTypes[]
 
-  const capitalizedCategory = capitalize(params.category.replaceAll('-', ' '))
-
   // Key by category so state (search term, view) resets when switching between
   // category pages rather than persisting across the reused page component.
-  return (
-    <CategoryClient
-      key={params.category}
-      posts={blogs}
-      initialView={initialView}
-      category={capitalizedCategory}
-    />
-  )
+  return <CategoryClient key={params.category} posts={blogs} initialView={initialView} />
 }

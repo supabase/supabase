@@ -3,11 +3,15 @@ import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
 
 import TagClient from './TagClient'
-import { capitalize, startCase } from '@/lib/helpers'
+import { startCase } from '@/lib/helpers'
 import { getAllTags, getSortedPosts } from '@/lib/posts'
 import type PostTypes from '@/types/post'
 
 type Params = { tag: string }
+
+// Shared by the metadata title and the visible breadcrumb so the two never
+// disagree. Matches the casing the blog filter chips use.
+const toTagLabel = (tag: string) => startCase(tag.replaceAll('-', ' '))
 
 export async function generateStaticParams() {
   const tags = getAllTags('_blog')
@@ -21,7 +25,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const params = await paramsPromise
 
-  const tagLabel = startCase(params?.tag.replaceAll('-', ' '))
+  const tagLabel = toTagLabel(params.tag)
   return {
     title: `Blog | ${tagLabel}`,
     description: `Blog posts tagged ${tagLabel}.`,
@@ -37,7 +41,13 @@ export default async function TagPage({ params: paramsPromise }: { params: Promi
 
   const staticPosts = getSortedPosts({ directory: '_blog', limit: 0, tags: [params.tag] })
   const blogs = [...staticPosts] as PostTypes[]
-  const capitalizedTag = capitalize(params?.tag.replaceAll('-', ' '))
 
-  return <TagClient key={params.tag} posts={blogs} initialView={initialView} tag={capitalizedTag} />
+  return (
+    <TagClient
+      key={params.tag}
+      posts={blogs}
+      initialView={initialView}
+      tag={toTagLabel(params.tag)}
+    />
+  )
 }
