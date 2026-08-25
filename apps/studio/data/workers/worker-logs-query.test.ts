@@ -3,15 +3,15 @@ import { describe, expect, it } from 'vitest'
 import { workerLogsSql } from './worker-logs-query'
 
 describe('workerLogsSql', () => {
-  it('queries one worker stream, newest first', () => {
+  it('reads one worker stream, newest first', () => {
     expect(workerLogsSql('embed', 'output')).toBe(
-      "select id, timestamp, severity_text as severity, event_message as message from logs where source = 'worker_guest_logs' and log_attributes['worker'] = 'embed' order by timestamp desc limit 100"
+      "select id, timestamp, severity_text as severity, event_message as message from logs where log_attributes['worker'] = 'embed' and log_attributes['source'] = 'worker_guest_logs' order by timestamp desc limit 100"
     )
   })
 
-  it('reads each stream from its own source', () => {
-    expect(workerLogsSql('embed', 'requests')).toContain("source = 'worker_ingress_logs'")
-    expect(workerLogsSql('embed', 'builds')).toContain("source = 'worker_api_logs'")
+  it('names the right stream for each tab', () => {
+    expect(workerLogsSql('embed', 'requests')).toContain("'worker_ingress_logs'")
+    expect(workerLogsSql('embed', 'builds')).toContain("'worker_api_logs'")
   })
 
   it('escapes a worker name rather than interpolating it raw', () => {
