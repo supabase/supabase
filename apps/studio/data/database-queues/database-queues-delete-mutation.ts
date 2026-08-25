@@ -3,8 +3,12 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseQueuesKeys } from './keys'
-import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
+import {
+  isQueueNameValid,
+  pgmqQueueTable,
+} from '@/components/interfaces/Integrations/Queues/Queues.utils'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { invalidateTableMetadata } from '@/data/tables/table-metadata-invalidation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DatabaseQueueDeleteVariables = {
@@ -49,8 +53,19 @@ export const useDatabaseQueueDeleteMutation = ({
   return useMutation<DatabaseQueueDeleteData, ResponseError, DatabaseQueueDeleteVariables>({
     mutationFn: (vars) => deleteDatabaseQueue(vars),
     async onSuccess(data, variables, context) {
-      const { projectRef } = variables
-      await queryClient.invalidateQueries({ queryKey: databaseQueuesKeys.list(projectRef) })
+      const { projectRef, queueName } = variables
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: databaseQueuesKeys.list(projectRef) }),
+        // `pgmq.drop_queue` drops the queue's backing tables, so the pgmq table list has to be
+        // refreshed the same way creating a queue refreshes it. Otherwise the dropped table
+        // keeps counting towards the "queues without RLS" check that gates exposing queues
+        // over PostgREST.
+        invalidateTableMetadata(queryClient, {
+          projectRef,
+          schema: 'pgmq',
+          tableName: pgmqQueueTable(queueName),
+        }),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
