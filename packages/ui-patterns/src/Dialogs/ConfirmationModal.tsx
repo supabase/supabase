@@ -29,6 +29,7 @@ export interface ConfirmationModalProps {
   cancelLabel?: string
   onConfirm: () => void
   onCancel: () => void
+  onDismiss?: () => void
   disabled?: boolean
   variant?: React.ComponentProps<typeof Alert>['variant']
   alert?: {
@@ -51,6 +52,7 @@ export const ConfirmationModal = forwardRef<
       visible,
       onCancel,
       onConfirm,
+      onDismiss,
       loading: loading_,
       cancelLabel = 'Cancel',
       confirmLabel = 'Submit',
@@ -92,9 +94,13 @@ export const ConfirmationModal = forwardRef<
       <Dialog
         open={visible}
         {...props}
-        onOpenChange={() => {
-          if (visible) {
-            onCancel()
+        onOpenChange={(open) => {
+          if (!open && visible) {
+            if (onDismiss) {
+              onDismiss()
+            } else {
+              onCancel()
+            }
           }
         }}
       >
