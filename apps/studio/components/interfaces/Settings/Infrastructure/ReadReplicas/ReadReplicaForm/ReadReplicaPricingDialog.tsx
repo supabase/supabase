@@ -3,7 +3,7 @@ import {
   Card,
   Dialog,
   DialogContent,
-  DialogFooter,
+  DialogDescription,
   DialogHeader,
   DialogSection,
   DialogSectionSeparator,
@@ -20,9 +20,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 
 import { useGetReplicaCost } from './useGetReplicaCost'
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
-import { DocsButton } from '@/components/ui/DocsButton'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { DOCS_URL } from '@/lib/constants'
 
 interface ReadReplicaPricingDialogProps {
   replicaCost: ReturnType<typeof useGetReplicaCost>
@@ -50,33 +48,25 @@ export const ReadReplicaPricingDialog = ({ replicaCost }: ReadReplicaPricingDial
           </DialogTrigger>
         }
       />
-      <DialogContent
-        size={showNewDiskManagementUI ? 'medium' : 'small'}
-        aria-describedby={undefined}
-      >
+      <DialogContent size="medium">
         <DialogHeader>
-          <DialogTitle>Calculating costs for a new read replica</DialogTitle>
+          <DialogTitle>Read replica cost breakdown</DialogTitle>
+          <DialogDescription>
+            The replica matches your primary compute and includes 25% additional disk capacity for
+            WAL files.
+          </DialogDescription>
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection>
           {showNewDiskManagementUI ? (
             <>
-              <p className="text-foreground-light text-sm mb-2">
-                Read replicas will match the compute size of your primary database and will include
-                25% more disk size than the primary database to accommodate WAL files.
-              </p>
-
-              <p className="text-foreground-light text-sm">
-                The additional cost for the replica breaks down to:
-              </p>
-
-              <Card className="mt-2">
+              <Card>
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead className="w-[140px]">Item</TableHead>
                       <TableHead>Description</TableHead>
-                      <TableHead className="text-right">Cost (/month)</TableHead>
+                      <TableHead className="text-right">Monthly cost</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody className="[&_td]:py-0 [&_tr]:h-[50px] [&_tr]:border-dotted">
@@ -110,6 +100,14 @@ export const ReadReplicaPricingDialog = ({ replicaCost }: ReadReplicaPricingDial
                         </TableCell>
                       </TableRow>
                     )}
+                    <TableRow className="border-t border-solid">
+                      <TableCell colSpan={2} className="font-medium">
+                        Estimated total
+                      </TableCell>
+                      <TableCell className="text-right font-mono font-medium" translate="no">
+                        {totalCost}
+                      </TableCell>
+                    </TableRow>
                   </TableBody>
                 </Table>
               </Card>
@@ -127,10 +125,6 @@ export const ReadReplicaPricingDialog = ({ replicaCost }: ReadReplicaPricingDial
           )}
           <TaxDisclaimer className="mt-3" />
         </DialogSection>
-
-        <DialogFooter>
-          <DocsButton href={`${DOCS_URL}/guides/platform/manage-your-usage/read-replicas`} />
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   )
