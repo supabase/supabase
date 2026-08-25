@@ -108,6 +108,7 @@ import { Route as ProjectRefSettingsLogDrainsRouteImport } from './routes/projec
 import { Route as ProjectRefSettingsIntegrationsRouteImport } from './routes/project/$ref/settings/integrations'
 import { Route as ProjectRefSettingsGeneralRouteImport } from './routes/project/$ref/settings/general'
 import { Route as ProjectRefSettingsDashboardRouteImport } from './routes/project/$ref/settings/dashboard'
+import { Route as ProjectRefSettingsCodeConfigurationRouteImport } from './routes/project/$ref/settings/code-configuration'
 import { Route as ProjectRefSettingsApiKeysRouteImport } from './routes/project/$ref/settings/api-keys'
 import { Route as ProjectRefSettingsApiRouteImport } from './routes/project/$ref/settings/api'
 import { Route as ProjectRefSettingsAddonsRouteImport } from './routes/project/$ref/settings/addons'
@@ -834,6 +835,12 @@ const ProjectRefSettingsDashboardRoute =
   ProjectRefSettingsDashboardRouteImport.update({
     id: '/dashboard',
     path: '/dashboard',
+    getParentRoute: () => ProjectRefSettingsRoute,
+  } as any)
+const ProjectRefSettingsCodeConfigurationRoute =
+  ProjectRefSettingsCodeConfigurationRouteImport.update({
+    id: '/code-configuration',
+    path: '/code-configuration',
     getParentRoute: () => ProjectRefSettingsRoute,
   } as any)
 const ProjectRefSettingsApiKeysRoute =
@@ -2254,6 +2261,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/settings/addons': typeof ProjectRefSettingsAddonsRoute
   '/project/$ref/settings/api': typeof ProjectRefSettingsApiRoute
   '/project/$ref/settings/api-keys': typeof ProjectRefSettingsApiKeysRouteWithChildren
+  '/project/$ref/settings/code-configuration': typeof ProjectRefSettingsCodeConfigurationRoute
   '/project/$ref/settings/dashboard': typeof ProjectRefSettingsDashboardRoute
   '/project/$ref/settings/general': typeof ProjectRefSettingsGeneralRoute
   '/project/$ref/settings/integrations': typeof ProjectRefSettingsIntegrationsRoute
@@ -2555,6 +2563,7 @@ export interface FileRoutesByTo {
   '/project/$ref/realtime/settings': typeof ProjectRefRealtimeSettingsRoute
   '/project/$ref/settings/addons': typeof ProjectRefSettingsAddonsRoute
   '/project/$ref/settings/api': typeof ProjectRefSettingsApiRoute
+  '/project/$ref/settings/code-configuration': typeof ProjectRefSettingsCodeConfigurationRoute
   '/project/$ref/settings/dashboard': typeof ProjectRefSettingsDashboardRoute
   '/project/$ref/settings/general': typeof ProjectRefSettingsGeneralRoute
   '/project/$ref/settings/integrations': typeof ProjectRefSettingsIntegrationsRoute
@@ -2873,6 +2882,7 @@ export interface FileRoutesById {
   '/project/$ref/settings/addons': typeof ProjectRefSettingsAddonsRoute
   '/project/$ref/settings/api': typeof ProjectRefSettingsApiRoute
   '/project/$ref/settings/api-keys': typeof ProjectRefSettingsApiKeysRouteWithChildren
+  '/project/$ref/settings/code-configuration': typeof ProjectRefSettingsCodeConfigurationRoute
   '/project/$ref/settings/dashboard': typeof ProjectRefSettingsDashboardRoute
   '/project/$ref/settings/general': typeof ProjectRefSettingsGeneralRoute
   '/project/$ref/settings/integrations': typeof ProjectRefSettingsIntegrationsRoute
@@ -3190,6 +3200,7 @@ export interface FileRouteTypes {
     | '/project/$ref/settings/addons'
     | '/project/$ref/settings/api'
     | '/project/$ref/settings/api-keys'
+    | '/project/$ref/settings/code-configuration'
     | '/project/$ref/settings/dashboard'
     | '/project/$ref/settings/general'
     | '/project/$ref/settings/integrations'
@@ -3491,6 +3502,7 @@ export interface FileRouteTypes {
     | '/project/$ref/realtime/settings'
     | '/project/$ref/settings/addons'
     | '/project/$ref/settings/api'
+    | '/project/$ref/settings/code-configuration'
     | '/project/$ref/settings/dashboard'
     | '/project/$ref/settings/general'
     | '/project/$ref/settings/integrations'
@@ -3808,6 +3820,7 @@ export interface FileRouteTypes {
     | '/project/$ref/settings/addons'
     | '/project/$ref/settings/api'
     | '/project/$ref/settings/api-keys'
+    | '/project/$ref/settings/code-configuration'
     | '/project/$ref/settings/dashboard'
     | '/project/$ref/settings/general'
     | '/project/$ref/settings/integrations'
@@ -4773,6 +4786,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/project/$ref/settings/dashboard'
       preLoaderRoute: typeof ProjectRefSettingsDashboardRouteImport
+      parentRoute: typeof ProjectRefSettingsRoute
+    }
+    '/project/$ref/settings/code-configuration': {
+      id: '/project/$ref/settings/code-configuration'
+      path: '/code-configuration'
+      fullPath: '/project/$ref/settings/code-configuration'
+      preLoaderRoute: typeof ProjectRefSettingsCodeConfigurationRouteImport
       parentRoute: typeof ProjectRefSettingsRoute
     }
     '/project/$ref/settings/api-keys': {
@@ -6820,6 +6840,7 @@ interface ProjectRefSettingsRouteChildren {
   ProjectRefSettingsAddonsRoute: typeof ProjectRefSettingsAddonsRoute
   ProjectRefSettingsApiRoute: typeof ProjectRefSettingsApiRoute
   ProjectRefSettingsApiKeysRoute: typeof ProjectRefSettingsApiKeysRouteWithChildren
+  ProjectRefSettingsCodeConfigurationRoute: typeof ProjectRefSettingsCodeConfigurationRoute
   ProjectRefSettingsDashboardRoute: typeof ProjectRefSettingsDashboardRoute
   ProjectRefSettingsGeneralRoute: typeof ProjectRefSettingsGeneralRoute
   ProjectRefSettingsIntegrationsRoute: typeof ProjectRefSettingsIntegrationsRoute
@@ -6837,6 +6858,8 @@ const ProjectRefSettingsRouteChildren: ProjectRefSettingsRouteChildren = {
   ProjectRefSettingsAddonsRoute: ProjectRefSettingsAddonsRoute,
   ProjectRefSettingsApiRoute: ProjectRefSettingsApiRoute,
   ProjectRefSettingsApiKeysRoute: ProjectRefSettingsApiKeysRouteWithChildren,
+  ProjectRefSettingsCodeConfigurationRoute:
+    ProjectRefSettingsCodeConfigurationRoute,
   ProjectRefSettingsDashboardRoute: ProjectRefSettingsDashboardRoute,
   ProjectRefSettingsGeneralRoute: ProjectRefSettingsGeneralRoute,
   ProjectRefSettingsIntegrationsRoute: ProjectRefSettingsIntegrationsRoute,
