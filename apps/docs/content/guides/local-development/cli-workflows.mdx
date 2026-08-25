@@ -107,7 +107,7 @@ This builds a shadow database from your local `supabase/migrations` directory (e
 supabase/migrations/<timestamp>_remote_schema.sql
 ```
 
-On this initial pull, the whole migration comes from that diff: it captures your remote schema as executable SQL. This migration is your baseline. It represents the current state of your database, and all future changes build on top of it. `db pull` also records this migration as already applied in the remote migration history (the `supabase_migrations.schema_migrations` table), so a later `db push` won't try to reapply it.
+On this initial pull, the whole migration comes from that diff: it captures your remote schema as executable SQL. This migration is your baseline. It represents the current state of your database, and all future changes build on top of it. `db pull` also offers to record this migration as already applied in the remote migration history (the `supabase_migrations.schema_migrations` table). Accept it (non-interactive runs accept automatically) so a later `db push` won't try to reapply it.
 
 If a change crosses a transaction boundary, `db pull` writes more than one ordered migration file instead of a single file. Commit all of them. When connecting with `--db-url`, prefer a direct connection (`db.<project-ref>.supabase.co:5432`) over the connection pooler so the engine can introspect the full catalog reliably.
 
@@ -119,7 +119,7 @@ The generated file can include statements you didn't expect. The diff engine exc
 
 <Admonition type="note" label="Customizations in the `auth` and `storage` schemas">
 
-The `auth` and `storage` schemas are managed by Supabase, so the diff engine excludes their platform objects. Your own customizations on top of them are captured automatically: triggers on managed tables (such as a trigger on `auth.users` calling a function in `public`) and RLS policies on `storage.objects` and `storage.buckets`. Other objects you create inside these schemas, such as your own functions or indexes, are not diffed: manage them with [hand-written migrations](/docs/guides/deployment/database-migrations).
+The `auth` and `storage` schemas are managed by Supabase, so the diff engine excludes their platform objects. Your own customizations on top of them are captured automatically: triggers on managed tables (such as a trigger on `auth.users` calling a function in `public`) and RLS policies on `storage.objects`, `storage.buckets`, and `realtime.messages`. Other objects you create inside these schemas, such as your own functions or indexes, are not diffed: manage them with [hand-written migrations](/docs/guides/deployment/database-migrations).
 
 </Admonition>
 
@@ -221,7 +221,7 @@ Then generate a migration from it:
 supabase db schema declarative sync -f initial-schema
 ```
 
-This compares your declared schema files against your (currently empty) migration history and writes the difference as a migration file in `supabase/migrations/`. The command then offers to apply the migration to your local database; pass `--apply` or `--no-apply` to skip the prompt in scripts.
+This compares your declared schema files against your (currently empty) migration history and writes the difference as a migration file in `supabase/migrations/`. The command then offers to apply the migration to your local database; pass `--apply` or `--no-apply` to skip the prompt in scripts. The global `--yes` flag also applies it.
 
 The `db schema declarative` commands require `pg-delta`, which `supabase init` enabled for you (`[experimental.pgdelta] enabled = true` in `config.toml`). For the full declarative workflow, including managing views and functions and known caveats, see [Declarative database schemas](/docs/guides/local-development/declarative-database-schemas).
 
@@ -435,15 +435,15 @@ When `supabase db diff` or `db schema declarative sync` generates a migration, r
 
 Generated SQL uses uppercase keywords, wrapped at a maximum width of 180 characters. You can override this with `[experimental.pgdelta] format_options` in `config.toml`, or set `format_options = "null"` to emit raw statements with no formatting applied.
 
-Most changes produce a single migration file. When a change crosses a transaction boundary (for example `alter type ... add value` followed by a statement that uses the new enum value, which can't run in the same transaction), the CLI writes one ordered migration file per unit instead (such as `<timestamp>_name_schema_changes.sql` and `<timestamp+1s>_name_after_enum_values.sql`). Commit all of them.
+Most changes produce a single migration file. When a change crosses a transaction boundary (for example `alter type ... add value` followed by a statement that uses the new enum value, which can't run in the same transaction), the CLI writes one ordered migration file per unit instead. The extra files carry a numeric segment suffix, such as `<timestamp>_add-status_1.sql` and `<timestamp+1s>_add-status_2.sql`. Commit all of them.
 
-A migration that must run outside a transaction starts with this directive on its first line:
+A migration whose statements can't run inside a transaction starts with this directive on its first line:
 
 ```sql
 -- pg-delta: transaction=false
 ```
 
-`db reset`, `db push`, and `migration up` honor it by running the file's statements without a wrapping transaction. Never delete that line.
+`db reset`, `db push`, and `migration up` honor it by running the file's statements without a wrapping transaction. Never delete that line. Not every split file carries it: `alter type ... add value` runs in its own transaction, so its file is separate but has no directive.
 
 ### Extension statements
 
@@ -453,11 +453,9 @@ A migration that must run outside a transaction starts with this directive on it
 
 `pg-delta` reports schema objects it doesn't track (such as casts, operators, and text search configurations) as warnings instead of silently dropping them. Add those objects through hand-written migrations. To turn these warnings into hard failures (useful in CI), pass `--strict-coverage`.
 
-<Admonition type="note" label="On the legacy migra engine">
+### Grants and revoke patterns
 
-Projects still on `migra` see extra noise that `pg-delta` doesn't produce: redundant `GRANT` lines for default privileges on `public` tables, and `REVOKE ALL` immediately followed by `GRANT ALL`. If you haven't changed permissions, these lines are safe to remove. Be consistent across your team about whether you keep or remove them.
-
-</Admonition>
+Both engines treat permissions as part of the schema state, so generated migrations can include grant statements you didn't write. New tables can come with explicit `GRANT` lines for the default roles, and a first diff against an existing database can emit long runs of `REVOKE ALL` followed by `GRANT` statements derived from default privileges. If you haven't changed permissions, these lines are harmless and safe to remove. Be consistent across your team about whether you keep or remove them.
 
 ### Known limitations of `db diff`
 
@@ -491,7 +489,7 @@ Under `pg-delta`, declarative files are never part of the `db diff` baseline, so
 
 **A diff looks wrong or comes back empty unexpectedly**
 
-Set `PGDELTA_DEBUG=1` and rerun the command. The CLI writes a debug bundle under `supabase/.temp/pgdelta/` with the extracted catalogs and diagnostics. It shows what the engine saw and is worth attaching to a CLI bug report.
+Set `PGDELTA_DEBUG=1` and rerun the command. The CLI writes a debug bundle under `supabase/.temp/pgdelta/v2/debug/<id>/` with the extracted snapshots, plan, and diagnostics. It shows what the engine saw and is worth attaching to a CLI bug report. Diagnostics also print to stdout alongside the diff SQL while the variable is set, so turn it off before redirecting output to a file.
 
 **Docker issues on `supabase start`**
 

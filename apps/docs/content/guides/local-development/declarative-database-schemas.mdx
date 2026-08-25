@@ -15,7 +15,7 @@ Because the schema files are the source of truth, make every change by editing t
 
 <Admonition type="note">
 
-The `db schema declarative` commands use the `pg-delta` diff engine and require `[experimental.pgdelta] enabled = true` in `config.toml`. Projects created with a recent `supabase init` have this enabled by default; on older projects, add that section (or pass the `--experimental` flag).
+The `db schema declarative` commands use the `pg-delta` diff engine and require `[experimental.pgdelta] enabled = true` in `config.toml`. Projects created with a recent `supabase init` have this enabled by default; on older projects, add that section. For a single run of `sync` or `generate`, the `--experimental` flag also works; `db pull --declarative` reads the config only.
 
 </Admonition>
 
@@ -54,7 +54,7 @@ create table "employees" (
 
   <StepHikeCompact.Step step={2}>
     <StepHikeCompact.Details title="Generate a migration file">
-      Generate a migration file by diffing against your declared schema. The command also offers to apply the migration to your local database; pass `--no-apply` to only generate the file.
+      Generate a migration file by diffing against your declared schema. The command also offers to apply the migration to your local database; pass `--no-apply` to only generate the file. Both `--apply` and the global `--yes` flag apply it without prompting.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
@@ -327,7 +327,7 @@ supabase db schema declarative generate --linked
 
 </$CodeTabs>
 
-This writes per-object SQL files under `supabase/schemas/`, organized by database schema. To later refresh the declarative tree from the remote database (for example, after a change was deployed outside your local workflow), run `supabase db pull --declarative` - it replaces the schema files without creating a migration or touching migration history.
+This writes per-object SQL files under `supabase/schemas/`, organized by database schema. In scripts, pass the target explicitly (`--local`, `--linked`, or `--db-url`) and add `--overwrite` to replace an existing tree without prompting. To later refresh the declarative tree from the remote database (for example, after a change was deployed outside your local workflow), run `supabase db pull --declarative` - it replaces the schema files without creating a migration or touching migration history.
 
 ### Rolling back a schema change
 
@@ -368,6 +368,13 @@ To use these objects with declarative schemas, put their SQL in the reserved `su
 ### Supabase-managed schemas
 
 Platform objects in managed schemas such as `auth` and `storage` are excluded from diffs. Your own customizations on top of them are captured: triggers on managed tables (for example, a trigger on `auth.users` whose function lives in `public`) and RLS policies on `storage.objects` and `storage.buckets`. Other objects you create inside managed schemas, such as your own functions or indexes, are not diffed - manage those through versioned migrations.
+
+### Adopting an existing schema tree
+
+Two checks gate `sync` on a schema tree the CLI didn't generate:
+
+- If your migrations call `pg_net` (for example, database webhooks), enable `[experimental.webhooks]` in `config.toml` first.
+- Declare every extension your schema files depend on. When an older export omits one, interactive `sync` offers to add the missing declarations and re-plan. It can also stage a fresh export into a sibling `-next` directory and print the commands to adopt it.
 
 ### Legacy `migra` engine
 
