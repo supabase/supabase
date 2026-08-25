@@ -72,8 +72,9 @@ export const HaInstanceConfiguration = () => {
 
   if (isPending) {
     return (
-      <div className="h-full w-full flex items-center justify-center">
-        <Loader2 className="motion-safe:animate-spin text-foreground-light" />
+      <div role="status" className="h-full w-full flex items-center justify-center">
+        <span className="sr-only">Loading cluster topology...</span>
+        <Loader2 aria-hidden="true" className="motion-safe:animate-spin text-foreground-light" />
       </div>
     )
   }

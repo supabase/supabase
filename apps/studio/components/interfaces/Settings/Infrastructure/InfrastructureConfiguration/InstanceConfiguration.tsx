@@ -165,7 +165,13 @@ const InstanceConfigurationUI = () => {
         }`}
       >
         {(isLoading || isLoadingProject) && (
-          <Loader2 className="motion-safe:animate-spin text-foreground-light" />
+          <div role="status">
+            <span className="sr-only">Loading infrastructure...</span>
+            <Loader2
+              aria-hidden="true"
+              className="motion-safe:animate-spin text-foreground-light"
+            />
+          </div>
         )}
         {isError && <AlertError error={error} subject="Failed to retrieve replicas" />}
         {isSuccessReplicas && !isLoadingProject && (
@@ -219,8 +225,9 @@ export const InstanceConfiguration = () => {
   // standard diagram (and fires its queries) before swapping.
   if (isPending) {
     return (
-      <div className="h-full w-full flex items-center justify-center">
-        <Loader2 className="motion-safe:animate-spin text-foreground-light" />
+      <div role="status" className="h-full w-full flex items-center justify-center">
+        <span className="sr-only">Loading infrastructure...</span>
+        <Loader2 aria-hidden="true" className="motion-safe:animate-spin text-foreground-light" />
       </div>
     )
   }

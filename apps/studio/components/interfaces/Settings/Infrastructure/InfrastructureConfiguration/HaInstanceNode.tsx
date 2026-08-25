@@ -33,12 +33,10 @@ const PoolerCardSubtitle = ({
 }) => (
   <p className="flex items-center gap-x-1 text-sm text-foreground-light">
     {availabilityZone !== undefined && <span>{availabilityZone}</span>}
-    {!!computeSize && (
-      <>
-        <span className="text-foreground-lighter">·</span>
-        <span>{computeSize}</span>
-      </>
+    {availabilityZone !== undefined && !!computeSize && (
+      <span className="text-foreground-lighter">·</span>
     )}
+    {!!computeSize && <span>{computeSize}</span>}
   </p>
 )
 
@@ -51,7 +49,7 @@ export const MultigatewayNode = ({ data }: NodeProps<Node<MultigatewayNodeData>>
         <div className="flex items-start p-3 gap-x-4" style={{ width: NODE_CARD_WIDTH }}>
           <div className="flex gap-x-3">
             <div className="min-w-8 h-8 bg-blue-600 border border-blue-800 rounded-md flex items-center justify-center">
-              <Network size={16} />
+              <Network aria-hidden="true" size={16} />
             </div>
             <div className="flex flex-col gap-y-0.5">
               <p className="text-sm">Multigateway</p>
@@ -90,7 +88,7 @@ export const HaPrimaryNode = ({ data }: NodeProps<Node<HaPoolerNodeData>>) => {
         <div className="flex items-start justify-between p-3" style={{ width: NODE_CARD_WIDTH }}>
           <div className="flex gap-x-3">
             <div className="w-8 h-8 bg-brand-500 border border-brand-600 rounded-md flex items-center justify-center">
-              <Database size={16} />
+              <Database aria-hidden="true" size={16} />
             </div>
             <div className="flex flex-col gap-y-0.5">
               <div className="flex items-center gap-x-2">
@@ -146,9 +144,9 @@ export const HaReplicaNode = ({ data }: NodeProps<Node<HaPoolerNodeData>>) => {
             )}
           >
             {status === 'coming_up' ? (
-              <Loader2 className="motion-safe:animate-spin" size={16} />
+              <Loader2 aria-hidden="true" className="motion-safe:animate-spin" size={16} />
             ) : (
-              <DatabaseBackup size={16} />
+              <DatabaseBackup aria-hidden="true" size={16} />
             )}
           </div>
           <div className="flex flex-col gap-y-0.5">
@@ -173,13 +171,13 @@ export const HaShardNode = ({ data }: NodeProps<Node<HaShardNodeData>>) => {
   return (
     <div className="relative h-full w-full rounded-md border border-default bg-surface-100/25">
       <div className="pointer-events-auto absolute top-3 left-3 flex items-center gap-x-2 rounded-full border border-default bg-surface-100 pl-3 pr-2 py-1">
-        <Layers size={14} className="text-foreground-light" />
+        <Layers aria-hidden="true" size={14} className="text-foreground-light" />
         <p className="text-sm">{name}</p>
         <Tooltip>
           {/* Renders a button so the explanation is keyboard reachable */}
           <TooltipTrigger className="flex items-center gap-x-1 text-sm text-foreground-light">
             Automatic failover
-            <HelpCircle size={14} />
+            <HelpCircle aria-hidden="true" size={14} />
           </TooltipTrigger>
           <TooltipContent side="bottom" className="max-w-72 text-center">
             If the primary database fails, a replica in this shard is automatically promoted to take
