@@ -1,6 +1,5 @@
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Examples from 'data/Examples'
-import Link from 'next/link'
 import { Button, cn, IconGitHubSolid } from 'ui'
 
 import ExampleCard from '../ExampleCard'
@@ -17,7 +16,7 @@ const BuiltWithSupabase = () => {
           </p>
           <div className="flex justify-center gap-2 py-4">
             <Button asChild variant="default" size="small" className="h-full">
-              <Link href="/docs/guides/examples">View all examples</Link>
+              <a href="/docs/guides/examples" rel="noopener">View all examples</a>
             </Button>
             <Button
               asChild
@@ -25,9 +24,9 @@ const BuiltWithSupabase = () => {
               icon={<IconGitHubSolid size="tiny" className="w-full! h-full!" />}
               size="small"
             >
-              <Link href="https://github.com/supabase/supabase/tree/master/examples">
+              <a href="https://github.com/supabase/supabase/tree/master/examples" target="_blank" rel="noopener noreferrer">
                 Official GitHub library
-              </Link>
+              </a>
             </Button>
           </div>
         </div>

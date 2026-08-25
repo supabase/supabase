@@ -1,6 +1,5 @@
 import Examples from '~/data/Examples'
 import { ArrowLeft, ArrowRight, BookOpen, Github } from 'lucide-react'
-import Link from 'next/link'
 import { useRef } from 'react'
 // import Swiper core and required modules
 import SwiperCore from 'swiper'
@@ -27,15 +26,16 @@ function GithubExamples() {
           </p>
           <div className="flex items-center justify-center gap-2 py-4">
             <Button asChild size="small" variant="default" icon={<BookOpen size={12} />}>
-              <Link href="/docs/guides/resources/examples">View guides</Link>
+              <a href="/docs/guides/resources/examples" rel="noopener">View guides</a>
             </Button>
             <Button asChild size="small" variant="default" icon={<Github size={12} />}>
-              <Link
+              <a
                 href="https://github.com/supabase/supabase/tree/master/examples"
-                as="https://github.com/supabase/supabase/tree/master/examples"
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 Official GitHub library
-              </Link>
+              </a>
             </Button>
           </div>
         </div>
