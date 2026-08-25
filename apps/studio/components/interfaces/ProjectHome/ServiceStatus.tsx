@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { AlertTriangle, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, ChevronRight, CircleOff, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { cn, HoverCard, HoverCardContent, HoverCardTrigger, InfoIcon } from 'ui'
 
@@ -31,6 +31,7 @@ const iconProps = {
 const LoaderIcon = () => <Loader2 {...iconProps} className="animate-spin" />
 const AlertIcon = () => <AlertTriangle {...iconProps} />
 const CheckIcon = () => <CheckCircle2 {...iconProps} className="text-brand" />
+const DisabledIcon = () => <CircleOff {...iconProps} className="text-foreground-lighter" />
 
 export const StatusIcon = ({
   isLoading,
@@ -43,7 +44,7 @@ export const StatusIcon = ({
 }) => {
   //
   if (projectStatus === 'ACTIVE_HEALTHY') return <CheckIcon />
-  if (projectStatus === 'DISABLED') return <AlertIcon />
+  if (projectStatus === 'DISABLED') return <DisabledIcon />
   if (projectStatus === 'COMING_UP') return <LoaderIcon />
   if (isLoading) return <LoaderIcon />
   // isProjectNew has to be above UNHEALTHY because in the first few minutes, some services might be starting up and show as UNHEALTHY
