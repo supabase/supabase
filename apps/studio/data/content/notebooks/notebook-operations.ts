@@ -193,12 +193,15 @@ export function deriveNotebookDiff(
       return { _tag: 'unknown_cell_id', cell_id: anchor }
     }
 
-    const previous = insertedAfter.get(anchor) ?? new Set<NotebookCellDiffEntry>()
+    const inserted = insertedAfter.get(anchor) ?? new Set<NotebookCellDiffEntry>()
     let index = anchorIndex + 1
-    while (index < entries.length && previous.has(entries[index])) index++
+    while (index < entries.length && inserted.has(entries[index])) {
+      index++
+    }
 
     entries.splice(index, 0, entry)
-    insertedAfter.set(anchor, previous.add(entry))
+    inserted.add(entry)
+    insertedAfter.set(anchor, inserted)
     return undefined
   }
 

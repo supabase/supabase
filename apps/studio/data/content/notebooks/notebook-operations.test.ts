@@ -496,7 +496,7 @@ describe('deriveNotebookDiff', () => {
     })
   })
 
-  it('resolves an insert anchored on a cell an earlier operation moved using its new position', () => {
+  it('resolves an insert anchored on a moved cell using its new position', () => {
     // cell-2 moves to the start between the two inserts, so the second one belongs directly
     // after it there, not after the cell that took over its old slot.
     const ops: NotebookOperation[] = [
@@ -522,6 +522,43 @@ describe('deriveNotebookDiff', () => {
         { _tag: 'added', cell: { _tag: 'markdown_cell', text: '2nd' }, operationIndex: 2 },
         { _tag: 'unchanged', cell: NOTEBOOK.cells[0] },
         { _tag: 'added', cell: { _tag: 'markdown_cell', text: '1st' }, operationIndex: 0 },
+        { _tag: 'unchanged', cell: NOTEBOOK.cells[2] },
+      ],
+    })
+  })
+
+  it('keeps earlier same-anchor inserts in place when the anchor moves away', () => {
+    // cell-1 moves after cell-2 once two inserts are already anchored on it; those two stay
+    // where they are, and only the third insert follows cell-1 to its new position.
+    const ops: NotebookOperation[] = [
+      {
+        _tag: 'insert_cell',
+        after_cell_id: 'cell-1',
+        cell: { _tag: 'markdown_cell', text: '1st' },
+      },
+      {
+        _tag: 'insert_cell',
+        after_cell_id: 'cell-1',
+        cell: { _tag: 'markdown_cell', text: '2nd' },
+      },
+      { _tag: 'move_cell', cell_id: 'cell-1', after_cell_id: 'cell-2' },
+      {
+        _tag: 'insert_cell',
+        after_cell_id: 'cell-1',
+        cell: { _tag: 'markdown_cell', text: '3rd' },
+      },
+    ]
+
+    const result = deriveNotebookDiff(NOTEBOOK, ops)
+
+    expect(result).toEqual({
+      success: true,
+      entries: [
+        { _tag: 'added', cell: { _tag: 'markdown_cell', text: '1st' }, operationIndex: 0 },
+        { _tag: 'added', cell: { _tag: 'markdown_cell', text: '2nd' }, operationIndex: 1 },
+        { _tag: 'unchanged', cell: NOTEBOOK.cells[1] },
+        { _tag: 'moved', cell: NOTEBOOK.cells[0], fromIndex: 0, operationIndex: 2 },
+        { _tag: 'added', cell: { _tag: 'markdown_cell', text: '3rd' }, operationIndex: 3 },
         { _tag: 'unchanged', cell: NOTEBOOK.cells[2] },
       ],
     })
