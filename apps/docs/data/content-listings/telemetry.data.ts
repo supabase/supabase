@@ -4,8 +4,6 @@ import type { ContentListingGroup } from '~/lib/content-listings.schema'
 
 export const telemetryAccessWhat: ContentListingGroup = {
   id: 'telemetry-access-what',
-  heading: 'What data you can observe',
-  headingLevel: 'h3',
   type: 'grid',
   columns: 2,
   items: [
@@ -13,56 +11,27 @@ export const telemetryAccessWhat: ContentListingGroup = {
       title: 'Logs',
       href: '/guides/monitoring-and-debugging/advanced-log-filtering',
       description:
-        'Query project logs and look up sources and fields. Record extra Postgres, API, and Realtime events.',
+        'Query ClickHouse logs from Studio, MCP, or the API. Filter events in the Logs UI.',
     },
     {
       title: 'Metrics API',
       href: '/guides/monitoring-and-debugging/metrics',
-      description: 'Scrape Prometheus-compatible database metrics for dashboards and alerting.',
+      description: 'Scrape Prometheus-compatible database metrics, or chart a subset in Reports.',
     },
     {
       title: 'Database',
       href: '/guides/monitoring-and-debugging/inspect',
-      description:
-        'Inspect live Postgres stats such as bloat, cache hit rate, locks, and slow queries.',
+      description: 'Inspect live Postgres stats from the CLI, the SQL Editor, or MCP.',
     },
     {
       title: 'Advisors',
       href: '/guides/monitoring-and-debugging/advisors',
-      description:
-        'Pull deterministic security and performance findings as part of ongoing observability.',
-    },
-  ],
-}
-
-export const telemetryAccessWhere: ContentListingGroup = {
-  id: 'telemetry-access-where',
-  heading: 'Where you can observe it',
-  headingLevel: 'h3',
-  type: 'grid',
-  columns: 2,
-  items: [
-    {
-      title: 'MCP',
-      href: '/guides/monitoring-and-debugging/access-data#mcp',
-      description:
-        'Query logs, run read-only SQL, and fetch advisor findings from an agent harness.',
+      description: 'Pull security and performance findings from Studio, MCP, the CLI, or the API.',
     },
     {
-      title: 'API',
-      href: '/guides/monitoring-and-debugging/access-data#api',
-      description: 'Read logs, advisors, and usage counts, or scrape the Metrics API.',
-    },
-    {
-      title: 'CLI',
-      href: '/guides/monitoring-and-debugging/access-data#cli',
-      description:
-        'Inspect the database and run security or performance advisors from the terminal.',
-    },
-    {
-      title: 'Studio',
-      href: '/guides/monitoring-and-debugging/access-data#studio',
-      description: 'Open Logs, Reports, and Advisors in the browser.',
+      title: 'Reports',
+      href: '/guides/monitoring-and-debugging/reports',
+      description: 'Studio dashboards for API, Auth, Storage, Realtime, and database signals.',
     },
   ],
 }

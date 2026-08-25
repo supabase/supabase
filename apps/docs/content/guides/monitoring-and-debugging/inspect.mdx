@@ -6,7 +6,11 @@ description: 'Read live Postgres statistics such as bloat, cache hit rate, locks
 
 Database performance is a large topic and many factors can contribute. Common causes of poor performance include inefficient schemas or queries, missing or unused indexes, insufficient memory, lock contention, and table bloat.
 
-Use the live Postgres statistics in this guide to check for those conditions. The same checks run as `supabase inspect db` commands, as SQL in the [SQL Editor](/dashboard/project/_/sql), or as MCP `execute_sql`.
+Use the live Postgres statistics in this guide to check for those conditions. You or an agent can run the same checks from:
+
+- Studio: [SQL Editor](/dashboard/project/_/sql)
+- MCP: `execute_sql`
+- CLI: [`supabase inspect db`](/docs/reference/cli/supabase-inspect-db)
 
 Use this page to:
 

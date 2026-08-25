@@ -29,7 +29,6 @@ import {
 import { storageExamples, storageGetStarted, storageResources } from './storage.data'
 import {
   telemetryAccessWhat,
-  telemetryAccessWhere,
   telemetryDetectResolve,
   telemetryExport,
   telemetryHireAgent,
@@ -68,7 +67,6 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   storageExamples,
   storageResources,
   telemetryAccessWhat,
-  telemetryAccessWhere,
   telemetryDetectResolve,
   telemetryHireAgent,
   telemetryExport,
