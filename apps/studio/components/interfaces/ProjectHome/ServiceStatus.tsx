@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { AlertTriangle, CheckCircle2, ChevronRight, CircleOff, Loader2 } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, ChevronRight, Loader2, MinusCircle } from 'lucide-react'
 import Link from 'next/link'
 import { cn, HoverCard, HoverCardContent, HoverCardTrigger, InfoIcon } from 'ui'
 
@@ -31,7 +31,7 @@ const iconProps = {
 const LoaderIcon = () => <Loader2 {...iconProps} className="animate-spin" />
 const AlertIcon = () => <AlertTriangle {...iconProps} />
 const CheckIcon = () => <CheckCircle2 {...iconProps} className="text-brand" />
-const DisabledIcon = () => <CircleOff {...iconProps} className="text-foreground-lighter" />
+const DisabledIcon = () => <MinusCircle {...iconProps} className="text-foreground-lighter" />
 
 export const StatusIcon = ({
   isLoading,
