@@ -15,6 +15,10 @@ type QueryLogsToolPart = Pick<
   'toolCallId' | 'state' | 'input' | 'output' | 'errorText'
 > & { rawInput?: unknown }
 
+function QueryLogsFailure() {
+  return <div className="text-xs text-danger">Failed to query logs.</div>
+}
+
 export function MessagePartQueryLogs({ toolPart }: { toolPart: QueryLogsToolPart }) {
   const { id } = useMessageInfoContext()
   const { toolCallId, state, input: submittedInput, rawInput, output } = toolPart
@@ -31,13 +35,13 @@ export function MessagePartQueryLogs({ toolPart }: { toolPart: QueryLogsToolPart
   if (state !== 'output-available' && state !== 'output-error') return null
 
   const parsedInput = parseQueryLogsInput(submittedInput ?? rawInput)
-  if (!parsedInput.success) return null
+  if (!parsedInput.success) return <QueryLogsFailure />
 
   const result =
     state === 'output-error'
       ? { rows: [], error: { message: toolPart.errorText ?? 'Failed to query logs' } }
       : toQueryLogsResult(output)
-  if (!result) return null
+  if (!result) return <QueryLogsFailure />
 
   return (
     <div className="w-auto overflow-x-hidden my-4 space-y-2">
