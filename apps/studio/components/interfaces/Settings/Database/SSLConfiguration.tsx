@@ -113,6 +113,13 @@ export const SSLConfiguration = () => {
       'Temporary access must first be disabled before SSL enforcement can be disabled'
   }
 
+  let loadingAnnouncement = ''
+  if (isSubmitting) {
+    loadingAnnouncement = 'Updating SSL enforcement'
+  } else if (isLoading) {
+    loadingAnnouncement = 'Loading SSL configuration'
+  }
+
   const env = process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod' ? 'prod' : 'staging'
   const hasSSLCertificate =
     settings?.inserted_at !== undefined && new Date(settings.inserted_at) >= new Date('2021-04-30')
@@ -147,6 +154,7 @@ export const SSLConfiguration = () => {
               <div className="flex items-center justify-end mt-2.5 space-x-2">
                 {(isLoading || isSubmitting) && (
                   <Loader2
+                    aria-hidden="true"
                     className="animate-spin motion-reduce:animate-none"
                     strokeWidth={1.5}
                     size={16}
@@ -176,6 +184,10 @@ export const SSLConfiguration = () => {
                     )}
                   </Tooltip>
                 )}
+                {/* Kept mounted so screen readers announce loading state changes */}
+                <span className="sr-only" role="status">
+                  {loadingAnnouncement}
+                </span>
               </div>
               <SSLEnforcementConfirmDialog
                 open={isConfirmDialogOpen}

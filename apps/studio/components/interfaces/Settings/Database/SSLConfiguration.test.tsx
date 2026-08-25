@@ -107,6 +107,8 @@ describe('SSLConfiguration', () => {
     const sslSwitch = await screen.findByRole('switch')
     expect(sslSwitch).toBeChecked()
     expect(sslSwitch).toBeDisabled()
+    // Nothing is loading for HA projects, so there is no announcement to make
+    expect(screen.getByRole('status')).toBeEmptyDOMElement()
 
     // The tooltip trigger is the wrapper around the (disabled) switch
     await userEvent.hover(sslSwitch.parentElement!)
@@ -143,6 +145,7 @@ describe('SSLConfiguration', () => {
     const sslSwitch = await screen.findByRole('switch')
     expect(sslSwitch).not.toBeChecked()
     expect(sslSwitch).toBeEnabled()
+    expect(screen.getByRole('status')).toBeEmptyDOMElement()
     expect(sslEnforcementRequests.count).toBe(1)
   })
 
