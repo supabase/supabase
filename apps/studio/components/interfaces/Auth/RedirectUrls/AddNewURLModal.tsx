@@ -143,7 +143,7 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <DialogSection className="flex flex-col gap-y-2 px-0">
-              <div className="flex flex-col gap-y-1 px-5">
+              <div className="flex flex-col gap-y-1">
                 <Label>URL</Label>
                 <p className="text-sm text-foreground-light">
                   Paste multiple URLs at once — one per line
