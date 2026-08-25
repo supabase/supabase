@@ -1,0 +1,39 @@
+# Ephemeral: create the GitHub stack object for the observability docs PRs,
+# then this branch/PR can be closed. Do not merge.
+name: link-observability-stack
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  create-stack:
+    if: github.head_ref == 'cursor/link-observability-stack-d794' || github.ref_name == 'cursor/link-observability-stack-d794'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: POST /repos/supabase/supabase/stacks
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          echo "actor=${GITHUB_ACTOR} event=${GITHUB_EVENT_NAME}"
+          http_code=$(curl -sS -o /tmp/stack.json -w "%{http_code}" \
+            -X POST \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2026-03-10" \
+            -H "Content-Type: application/json" \
+            https://api.github.com/repos/supabase/supabase/stacks \
+            -d '{"pull_requests":[49503,49501,49500,49502,49506,49504,49505]}')
+          echo "HTTP ${http_code}"
+          cat /tmp/stack.json
+          echo
+          if [ "${http_code}" != "201" ] && [ "${http_code}" != "200" ]; then
+            echo "Stack create failed"
+            exit 1
+          fi
