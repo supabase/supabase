@@ -119,22 +119,25 @@ export const useCreateChat = () => {
 
     setIsCreating(true)
 
-    // Hydration replaces the chat map and the selected model wholesale, so wait it out before
-    // creating anything — otherwise the new chat is dropped as soon as the persisted state lands.
-    await whenAiAssistantInitialized(aiAssistantState)
+    try {
+      // Hydration replaces the chat map and the selected model wholesale, so wait it out before
+      // creating anything — otherwise the new chat is dropped as soon as the persisted state lands.
+      await whenAiAssistantInitialized(aiAssistantState)
 
-    aiAssistantState.setContext({
-      projectRef: project.ref,
-      orgSlug: organization?.slug,
-      connectionString: project.connectionString ?? '',
-    })
-    if (model) aiAssistantState.setModel(model)
+      aiAssistantState.setContext({
+        projectRef: project.ref,
+        orgSlug: organization?.slug,
+        connectionString: project.connectionString ?? '',
+      })
+      if (model) aiAssistantState.setModel(model)
 
-    const id = aiAssistantState.createChat({ name, initialMessage })
-    setIsCreating(false)
+      const id = aiAssistantState.createChat({ name, initialMessage })
 
-    router.push(`/project/${project.ref}/explorer/chat/${id}`)
-    return id
+      router.push(`/project/${project.ref}/explorer/chat/${id}`)
+      return id
+    } finally {
+      setIsCreating(false)
+    }
   }
 
   return { createChat, openChat, isCreating }
