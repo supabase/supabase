@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { useEffect, useEffectEvent } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
 
 import { useNotebookQuery } from '@/data/content/notebooks/notebook-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -92,6 +92,8 @@ export const useCreateChat = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const aiAssistantState = useAiAssistantState()
 
+  const [isCreating, setIsCreating] = useState(false)
+
   const openChat = (id: string) => {
     if (!project) {
       console.error('Project is required')
@@ -115,23 +117,30 @@ export const useCreateChat = () => {
       return undefined
     }
 
-    // Hydration replaces the chat map and the selected model wholesale, so wait it out before
-    // creating anything — otherwise the new chat is dropped as soon as the persisted state lands.
-    await whenAiAssistantInitialized(aiAssistantState)
+    setIsCreating(true)
 
-    aiAssistantState.setContext({
-      projectRef: project.ref,
-      orgSlug: organization?.slug,
-      connectionString: project.connectionString ?? '',
-    })
-    if (model) aiAssistantState.setModel(model)
+    try {
+      // Hydration replaces the chat map and the selected model wholesale, so wait it out before
+      // creating anything — otherwise the new chat is dropped as soon as the persisted state lands.
+      await whenAiAssistantInitialized(aiAssistantState)
 
-    const id = aiAssistantState.createChat({ name, initialMessage })
-    router.push(`/project/${project.ref}/explorer/chat/${id}`)
-    return id
+      aiAssistantState.setContext({
+        projectRef: project.ref,
+        orgSlug: organization?.slug,
+        connectionString: project.connectionString ?? '',
+      })
+      if (model) aiAssistantState.setModel(model)
+
+      const id = aiAssistantState.createChat({ name, initialMessage })
+
+      router.push(`/project/${project.ref}/explorer/chat/${id}`)
+      return id
+    } finally {
+      setIsCreating(false)
+    }
   }
 
-  return { createChat, openChat }
+  return { createChat, openChat, isCreating }
 }
 
 export const useCreateQuery = () => {
