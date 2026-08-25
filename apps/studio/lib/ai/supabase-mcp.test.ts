@@ -63,30 +63,21 @@ describe('createSupabaseMCPClient', () => {
   })
 
   it('identifies assistant traffic with the x-source-name header', async () => {
-    process.env.NEXT_PUBLIC_MCP_URL = 'https://mcp.supabase.com/mcp'
+      process.env.NEXT_PUBLIC_MCP_URL = 'https://mcp.supabase.com/mcp'
 
-    await createSupabaseMCPClient({ accessToken: ACCESS_TOKEN, projectRef: PROJECT_REF })
+      await createSupabaseMCPClient({ accessToken: ACCESS_TOKEN, projectRef: PROJECT_REF })
 
-    expect(getTransportConfig().transport.headers['x-source-name']).toBe('supabase-studio')
-  })
+      expect(getTransportConfig().transport.headers['x-source-name']).toBe('supabase-studio')
+    })
 
-  it('sends x-source-version from VERCEL_GIT_COMMIT_SHA when available', async () => {
-    process.env.NEXT_PUBLIC_MCP_URL = 'https://mcp.supabase.com/mcp'
-    process.env.VERCEL_GIT_COMMIT_SHA = 'abc1234'
+    it('does not send x-source-version header (stabilizes OAuth config hash)', async () => {
+      process.env.NEXT_PUBLIC_MCP_URL = 'https://mcp.supabase.com/mcp'
+      process.env.VERCEL_GIT_COMMIT_SHA = 'abc1234'
 
-    await createSupabaseMCPClient({ accessToken: ACCESS_TOKEN, projectRef: PROJECT_REF })
+      await createSupabaseMCPClient({ accessToken: ACCESS_TOKEN, projectRef: PROJECT_REF })
 
-    expect(getTransportConfig().transport.headers['x-source-version']).toBe('abc1234')
-  })
-
-  it('omits x-source-version when VERCEL_GIT_COMMIT_SHA is not set', async () => {
-    process.env.NEXT_PUBLIC_MCP_URL = 'https://mcp.supabase.com/mcp'
-    delete process.env.VERCEL_GIT_COMMIT_SHA
-
-    await createSupabaseMCPClient({ accessToken: ACCESS_TOKEN, projectRef: PROJECT_REF })
-
-    expect(getTransportConfig().transport.headers).not.toHaveProperty('x-source-version')
-  })
+      expect(getTransportConfig().transport.headers).not.toHaveProperty('x-source-version')
+    })
 
   it('never leaks the access token into the URL', async () => {
     process.env.NEXT_PUBLIC_MCP_URL = 'https://mcp.supabase.com/mcp'
