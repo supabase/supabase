@@ -23,27 +23,25 @@ import type { RecommendedComputeForReadReplicas } from '@/components/interfaces/
 import { RegionFlag } from '@/components/ui/RegionFlag'
 import { Region, useReadReplicaSetUpMutation } from '@/data/read-replicas/replica-setup-mutation'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { AWS_REGIONS_DEFAULT } from '@/lib/constants'
+import { AWS_REGIONS_DEFAULT, BASE_PATH } from '@/lib/constants'
 
 interface ReadReplicaFormProps {
   typeSelection?: ReactNode
-  eligibility: ReturnType<typeof useCheckEligibilityDeployReplica>
   onSuccess: () => void
   onClose: () => void
   onRecommendCompute: (size: RecommendedComputeForReadReplicas) => void
-  replicaCost: ReturnType<typeof useGetReplicaCost>
 }
 
 export const ReadReplicaForm = ({
   typeSelection,
-  eligibility,
   onSuccess,
   onClose,
   onRecommendCompute,
-  replicaCost,
 }: ReadReplicaFormProps) => {
   const { ref: projectRef } = useParams()
   const { data } = useReadReplicasQuery({ projectRef })
+  const eligibility = useCheckEligibilityDeployReplica()
+  const replicaCost = useGetReplicaCost()
 
   const [defaultRegion] = Object.entries(AWS_REGIONS).find(
     ([_, name]) => name === AWS_REGIONS_DEFAULT

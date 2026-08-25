@@ -37,8 +37,8 @@ export const ReadReplicaPricingDialog = ({ replicaCost }: ReadReplicaPricingDial
       <Admonition
         type="note"
         layout="responsive"
-        title="Additional monthly cost"
-        description={`Estimated increase: ${totalCost}/month based on your primary database configuration.`}
+        title={`Estimated additional cost of ${totalCost}/month`}
+        description="Based on your primary database configuration."
         className="mb-0 rounded-none border-x-0"
         actions={
           <DialogTrigger asChild>
