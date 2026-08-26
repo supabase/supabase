@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { Container, Copy, Package } from 'lucide-react'
+import { Container, Package } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import {
@@ -13,14 +13,10 @@ import {
   Card,
   NavMenu,
   NavMenuItem,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
 } from 'ui'
 import { PageBreadcrumbs } from 'ui-patterns/PageBreadcrumbs'
 import {
   PageHeader,
-  PageHeaderAside,
   PageHeaderDescription,
   PageHeaderIcon,
   PageHeaderMeta,
@@ -31,7 +27,6 @@ import { PageNav } from 'ui-patterns/PageNav'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { RuntimeBadge } from '../RuntimeBadge'
-import { WorkerSnippetTabs } from '../WorkerSnippetTabs'
 import { WorkerStatePill } from '../WorkerStatePill'
 import { WorkerLogsTab } from './WorkerLogsTab'
 import { WorkerOverviewTab } from './WorkerOverviewTab'
@@ -128,27 +123,6 @@ export const WorkerDetail = () => {
               )}
             </PageHeaderDescription>
           </PageHeaderSummary>
-          <PageHeaderAside>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="default" icon={<Copy size={14} />}>
-                  How to call
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent align="start" className="w-[440px] p-4">
-                <WorkerSnippetTabs
-                  input={{
-                    name: worker.name,
-                    runtime: worker.runtime,
-                    size: worker.size,
-                    access: worker.access,
-                    instances: worker.declaredInstances,
-                  }}
-                  tabs={['curl', 'js', 'python']}
-                />
-              </PopoverContent>
-            </Popover>
-          </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>
       <PageNav>
