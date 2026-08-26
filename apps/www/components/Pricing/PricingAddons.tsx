@@ -5,6 +5,7 @@ import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import { FC } from 'react'
+import { ADDONS, usd } from 'shared-data/pricing-catalog'
 import { Button, cn } from 'ui'
 
 import CostControlAnimation from './CostControlAnimation'
@@ -26,7 +27,7 @@ const addons = [
     name: 'Custom Domain',
     heroImg: 'custom-domain-on',
     icon: 'custom-domain-upgrade',
-    price: 'Flat fee $10/month',
+    price: `Flat fee ${usd(ADDONS.customDomain.priceMonthlyPerDomain)}/month`,
     description:
       'Use your own domain for your Supabase project to present a branded experience to your users.',
     ctaText: 'Documentation',
@@ -38,7 +39,7 @@ const addons = [
     name: 'Point in Time Recovery',
     heroImg: 'pitr-on',
     icon: 'pitr-upgrade',
-    price: 'Starts from $100/month',
+    price: `Starts from ${usd(ADDONS.pitr.priceMonthlyPer7DaysRetention)}/month`,
     description: 'Roll back to any specific point in time, down to the second.',
     ctaText: 'Documentation',
     ctaLink: 'https://supabase.com/docs/guides/platform/backups',

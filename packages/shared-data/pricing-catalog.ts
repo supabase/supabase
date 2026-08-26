@@ -53,18 +53,24 @@ export function qty(n: number, style?: 'comma' | 'millionWord'): string {
   return String(n)
 }
 
+const THIN_SPACE = ' '
+
+export function withUnit(n: number, unit: string, style?: 'comma' | 'millionWord'): string {
+  return `${qty(n, style)}${THIN_SPACE}${unit}`
+}
+
 export function gbDisplay(sizeGb: number): string {
-  return sizeGb < 1 ? `${sizeGb * 1000} MB` : `${sizeGb} GB`
+  return sizeGb < 1 ? withUnit(sizeGb * 1000, 'MB') : withUnit(sizeGb, 'GB')
 }
 
 const GP3_PER_GB_MONTH = 0.125
 
-export const PLAN_BILLING: Record<PlanKey, PlanBillingEntry> = {
+export const PLAN_BILLING = {
   free: { priceMonthly: 0, computeCreditsMonthly: null, spendCapAvailable: false },
   pro: { priceMonthly: 25, computeCreditsMonthly: 10, spendCapAvailable: true },
   team: { priceMonthly: 599, computeCreditsMonthly: 10, spendCapAvailable: false },
   enterprise: { priceMonthly: null, computeCreditsMonthly: null, spendCapAvailable: false },
-}
+} as const satisfies Record<PlanKey, PlanBillingEntry>
 
 export const DISK_PRICING: Record<'gp3' | 'io2', DiskTypeEntry> = {
   gp3: {

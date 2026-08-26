@@ -1,3 +1,5 @@
+import { ADDONS, gbDisplay, METERS, qty, usd, withUnit } from './pricing-catalog'
+
 type Pricing = {
   database: PricingCategory
   auth: PricingCategory
@@ -122,9 +124,15 @@ export const pricing: Pricing = {
         key: 'database.size',
         title: 'Database size',
         plans: {
-          free: '500 MB database size per project included',
-          pro: ['8 GB disk size per project included', 'then $0.125 per GB'],
-          team: ['8 GB disk size per project included', 'then $0.125 per GB'],
+          free: `${gbDisplay(METERS.databaseDiskSize.includedByPlan.free)} database size per project included`,
+          pro: [
+            `${gbDisplay(METERS.databaseDiskSize.includedByPlan.pro)} disk size per project included`,
+            `then ${usd(METERS.databaseDiskSize.price)} per GB`,
+          ],
+          team: [
+            `${gbDisplay(METERS.databaseDiskSize.includedByPlan.team)} disk size per project included`,
+            `then ${usd(METERS.databaseDiskSize.price)} per GB`,
+          ],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -156,9 +164,9 @@ export const pricing: Pricing = {
         title: 'Point in time recovery',
         plans: {
           free: false,
-          pro: '$100 per month per 7 days retention',
-          team: '$100 per month per 7 days retention',
-          enterprise: '$100 per month per 7 days retention, >28 days retention available',
+          pro: `${usd(ADDONS.pitr.priceMonthlyPer7DaysRetention)} per month per 7 days retention`,
+          team: `${usd(ADDONS.pitr.priceMonthlyPer7DaysRetention)} per month per 7 days retention`,
+          enterprise: `${usd(ADDONS.pitr.priceMonthlyPer7DaysRetention)} per month per 7 days retention, >28 days retention available`,
         },
         usage_based: false,
       },
@@ -178,8 +186,8 @@ export const pricing: Pricing = {
         title: 'Branching',
         plans: {
           free: false,
-          pro: '$0.01344 per branch, per hour',
-          team: '$0.01344 per branch, per hour',
+          pro: `${usd(METERS.branching.price)} per branch, per hour`,
+          team: `${usd(METERS.branching.price)} per branch, per hour`,
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -188,9 +196,15 @@ export const pricing: Pricing = {
         key: 'database.egress',
         title: 'Egress',
         plans: {
-          free: '5 GB included',
-          pro: ['250 GB included', 'then $0.09 per GB'],
-          team: ['250 GB included', 'then $0.09 per GB'],
+          free: `${withUnit(METERS.egress.includedByPlan.free, 'GB')} included`,
+          pro: [
+            `${withUnit(METERS.egress.includedByPlan.pro, 'GB')} included`,
+            `then ${usd(METERS.egress.price)} per GB`,
+          ],
+          team: [
+            `${withUnit(METERS.egress.includedByPlan.team, 'GB')} included`,
+            `then ${usd(METERS.egress.price)} per GB`,
+          ],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -201,14 +215,14 @@ export const pricing: Pricing = {
         plans: {
           free: false,
           pro: [
-            '$0.053 per pipeline per hour',
-            '$3.00 per GB processed during ongoing replication',
-            '$0.60 per GB processed during initial sync',
+            `${usd(METERS.replicationPipelineHours.price)} per pipeline per hour`,
+            `${usd(METERS.replicationOngoingGb.price, 2)} per GB processed during ongoing replication`,
+            `${usd(METERS.replicationInitialSyncGb.price, 2)} per GB processed during initial sync`,
           ],
           team: [
-            '$0.053 per pipeline per hour',
-            '$3.00 per GB processed during ongoing replication',
-            '$0.60 per GB processed during initial sync',
+            `${usd(METERS.replicationPipelineHours.price)} per pipeline per hour`,
+            `${usd(METERS.replicationOngoingGb.price, 2)} per GB processed during ongoing replication`,
+            `${usd(METERS.replicationInitialSyncGb.price, 2)} per GB processed during initial sync`,
           ],
           enterprise: 'Custom',
         },
@@ -235,9 +249,15 @@ export const pricing: Pricing = {
         key: 'auth.maus',
         title: 'MAUs',
         plans: {
-          free: '50,000 included',
-          pro: ['100,000 included', 'then $0.00325 per MAU'],
-          team: ['100,000 included', 'then $0.00325 per MAU'],
+          free: `${qty(METERS.maus.includedByPlan.free, 'comma')} included`,
+          pro: [
+            `${qty(METERS.maus.includedByPlan.pro, 'comma')} included`,
+            `then ${usd(METERS.maus.price)} per MAU`,
+          ],
+          team: [
+            `${qty(METERS.maus.includedByPlan.team, 'comma')} included`,
+            `then ${usd(METERS.maus.price)} per MAU`,
+          ],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -325,8 +345,14 @@ export const pricing: Pricing = {
         title: 'Advanced Multi-Factor Auth - Phone',
         plans: {
           free: false,
-          pro: ['$75 per month for first project', 'then $10 per month per additional projects'],
-          team: ['$75 per month for first project', 'then $10 per month per additional projects'],
+          pro: [
+            `${usd(ADDONS.advancedMfaPhone.priceMonthlyFirstProject)} per month for first project`,
+            `then ${usd(ADDONS.advancedMfaPhone.priceMonthlyAdditionalProject)} per month per additional projects`,
+          ],
+          team: [
+            `${usd(ADDONS.advancedMfaPhone.priceMonthlyFirstProject)} per month for first project`,
+            `then ${usd(ADDONS.advancedMfaPhone.priceMonthlyAdditionalProject)} per month per additional projects`,
+          ],
           enterprise: 'Custom',
         },
         usage_based: false,
@@ -335,9 +361,15 @@ export const pricing: Pricing = {
         key: 'auth.thirdPartyMAUs',
         title: 'Third-Party MAUs',
         plans: {
-          free: '50,000 included',
-          pro: ['100,000 included', 'then $0.00325 per MAU'],
-          team: ['100,000 included', 'then $0.00325 per MAU'],
+          free: `${qty(METERS.thirdPartyMaus.includedByPlan.free, 'comma')} included`,
+          pro: [
+            `${qty(METERS.thirdPartyMaus.includedByPlan.pro, 'comma')} included`,
+            `then ${usd(METERS.thirdPartyMaus.price)} per MAU`,
+          ],
+          team: [
+            `${qty(METERS.thirdPartyMaus.includedByPlan.team, 'comma')} included`,
+            `then ${usd(METERS.thirdPartyMaus.price)} per MAU`,
+          ],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -347,8 +379,14 @@ export const pricing: Pricing = {
         title: 'Single Sign-On (SAML 2.0)',
         plans: {
           free: false,
-          pro: ['50 included', 'then $0.015 per MAU'],
-          team: ['50 included', 'then $0.015 per MAU'],
+          pro: [
+            `${qty(METERS.ssoMaus.includedByPlan.pro)} included`,
+            `then ${usd(METERS.ssoMaus.price)} per MAU`,
+          ],
+          team: [
+            `${qty(METERS.ssoMaus.includedByPlan.team)} included`,
+            `then ${usd(METERS.ssoMaus.price)} per MAU`,
+          ],
           enterprise: 'Contact Us',
         },
 
@@ -420,9 +458,15 @@ export const pricing: Pricing = {
         key: 'storage.size',
         title: 'Storage',
         plans: {
-          free: '1 GB included',
-          pro: ['100 GB included', 'then $0.0213 per GB'],
-          team: ['100 GB included', 'then $0.0213 per GB'],
+          free: `${withUnit(METERS.storageSize.includedByPlan.free, 'GB')} included`,
+          pro: [
+            `${withUnit(METERS.storageSize.includedByPlan.pro, 'GB')} included`,
+            `then ${usd(METERS.storageSize.price)} per GB`,
+          ],
+          team: [
+            `${withUnit(METERS.storageSize.includedByPlan.team, 'GB')} included`,
+            `then ${usd(METERS.storageSize.price)} per GB`,
+          ],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -431,9 +475,15 @@ export const pricing: Pricing = {
         key: 'storage.cachedEgress',
         title: 'Cached Egress',
         plans: {
-          free: '5 GB included',
-          pro: ['250 GB included', 'then $0.03 per GB'],
-          team: ['250 GB included', 'then $0.03 per GB'],
+          free: `${withUnit(METERS.cachedEgress.includedByPlan.free, 'GB')} included`,
+          pro: [
+            `${withUnit(METERS.cachedEgress.includedByPlan.pro, 'GB')} included`,
+            `then ${usd(METERS.cachedEgress.price)} per GB`,
+          ],
+          team: [
+            `${withUnit(METERS.cachedEgress.includedByPlan.team, 'GB')} included`,
+            `then ${usd(METERS.cachedEgress.price)} per GB`,
+          ],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -476,8 +526,14 @@ export const pricing: Pricing = {
         title: 'Image Transformations',
         plans: {
           free: false,
-          pro: ['100 origin images included', 'then $5 per 1000 origin images'],
-          team: ['100 origin images included', 'then $5 per 1000 origin images'],
+          pro: [
+            `${qty(METERS.imageTransformations.includedByPlan.pro)} origin images included`,
+            `then ${usd(METERS.imageTransformations.price)} per ${qty(METERS.imageTransformations.per)} origin images`,
+          ],
+          team: [
+            `${qty(METERS.imageTransformations.includedByPlan.team)} origin images included`,
+            `then ${usd(METERS.imageTransformations.price)} per ${qty(METERS.imageTransformations.per)} origin images`,
+          ],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -492,9 +548,15 @@ export const pricing: Pricing = {
         key: 'functions.invocations',
         title: 'Invocations',
         plans: {
-          free: '500,000 included',
-          pro: ['2 Million included', 'then $2 per 1 Million'],
-          team: ['2 Million included', 'then $2 per 1 Million'],
+          free: `${qty(METERS.functionsInvocations.includedByPlan.free, 'comma')} included`,
+          pro: [
+            `${qty(METERS.functionsInvocations.includedByPlan.pro, 'millionWord')} included`,
+            `then ${usd(METERS.functionsInvocations.price)} per ${qty(METERS.functionsInvocations.per, 'millionWord')}`,
+          ],
+          team: [
+            `${qty(METERS.functionsInvocations.includedByPlan.team, 'millionWord')} included`,
+            `then ${usd(METERS.functionsInvocations.price)} per ${qty(METERS.functionsInvocations.per, 'millionWord')}`,
+          ],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -520,9 +582,15 @@ export const pricing: Pricing = {
         key: 'realtime.concurrentConnections',
         title: 'Concurrent Peak Connections',
         plans: {
-          free: '200 included',
-          pro: ['500 included', 'then $10 per 1000'],
-          team: ['500 included', 'then $10 per 1000'],
+          free: `${qty(METERS.realtimeConnections.includedByPlan.free)} included`,
+          pro: [
+            `${qty(METERS.realtimeConnections.includedByPlan.pro)} included`,
+            `then ${usd(METERS.realtimeConnections.price)} per ${qty(METERS.realtimeConnections.per)}`,
+          ],
+          team: [
+            `${qty(METERS.realtimeConnections.includedByPlan.team)} included`,
+            `then ${usd(METERS.realtimeConnections.price)} per ${qty(METERS.realtimeConnections.per)}`,
+          ],
           enterprise: 'Custom concurrent connections and volume discount',
         },
         usage_based: true,
@@ -531,9 +599,15 @@ export const pricing: Pricing = {
         key: 'realtime.messagesPerMonth',
         title: 'Messages Per Month',
         plans: {
-          free: '2 Million included',
-          pro: ['5 Million included', 'then $2.50 per Million'],
-          team: ['5 Million included', 'then $2.50 per Million'],
+          free: `${qty(METERS.realtimeMessages.includedByPlan.free, 'millionWord')} included`,
+          pro: [
+            `${qty(METERS.realtimeMessages.includedByPlan.pro, 'millionWord')} included`,
+            `then ${usd(METERS.realtimeMessages.price, 2)} per Million`,
+          ],
+          team: [
+            `${qty(METERS.realtimeMessages.includedByPlan.team, 'millionWord')} included`,
+            `then ${usd(METERS.realtimeMessages.price, 2)} per Million`,
+          ],
           enterprise: 'Volume discounts on messages',
         },
         usage_based: true,
@@ -599,8 +673,16 @@ export const pricing: Pricing = {
         title: 'Log Drain',
         plans: {
           free: false,
-          pro: ['$60 per drain per month', '+ $0.20 per million events', '+ $0.09 per GB egress'],
-          team: ['$60 per drain per month', '+ $0.20 per million events', '+ $0.09 per GB egress'],
+          pro: [
+            `${usd(ADDONS.logDrain.priceMonthlyPerDrain)} per drain per month`,
+            `+ ${usd(ADDONS.logDrain.perMillionEvents, 2)} per million events`,
+            `+ ${usd(ADDONS.logDrain.perGbEgress)} per GB egress`,
+          ],
+          team: [
+            `${usd(ADDONS.logDrain.priceMonthlyPerDrain)} per drain per month`,
+            `+ ${usd(ADDONS.logDrain.perMillionEvents, 2)} per million events`,
+            `+ ${usd(ADDONS.logDrain.perGbEgress)} per GB egress`,
+          ],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -720,9 +802,9 @@ export const pricing: Pricing = {
         title: 'Custom Domains',
         plans: {
           free: false,
-          pro: '$10 per domain per month per project add on',
-          team: '$10 per domain per month per project add on',
-          enterprise: '1, additional $10/domain/month',
+          pro: `${usd(ADDONS.customDomain.priceMonthlyPerDomain)} per domain per month per project add on`,
+          team: `${usd(ADDONS.customDomain.priceMonthlyPerDomain)} per domain per month per project add on`,
+          enterprise: `1, additional ${usd(ADDONS.customDomain.priceMonthlyPerDomain)}/domain/month`,
         },
         usage_based: false,
       },

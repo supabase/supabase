@@ -5,6 +5,7 @@ import Link from 'next/link'
 import React, { useEffect, useRef, useState } from 'react'
 import { useWindowSize } from 'react-use'
 import { plans as allPlans } from 'shared-data/plans'
+import { PLAN_BILLING, usd } from 'shared-data/pricing-catalog'
 import { Button, cn } from 'ui'
 import { ToggleGroup, ToggleGroupItem } from 'ui/src/components/shadcn/ui/toggle-group'
 
@@ -98,7 +99,7 @@ const PricingComputeSection = () => {
                 </>
               )}
               <p className="text-foreground-lighter text-xs mt-2">
-                Paid plans include $10/mo in compute credits, enough to cover one Micro instance.
+                {`Paid plans include ${usd(PLAN_BILLING.pro.computeCreditsMonthly)}/mo in compute credits, enough to cover one Micro instance.`}
               </p>
             </div>
           </div>

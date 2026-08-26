@@ -1,3 +1,5 @@
+import { ADDONS, gbDisplay, METERS, PLAN_BILLING, qty, usd, withUnit } from './pricing-catalog'
+
 export type PlanId = 'free' | 'pro' | 'team' | 'enterprise'
 
 export interface PricingInformation {
@@ -27,16 +29,19 @@ export const plans: PricingInformation[] = [
     costUnit: '/ month',
     href: 'https://supabase.com/dashboard/new?plan=free',
     priceLabel: '',
-    priceMonthly: 0,
+    priceMonthly: PLAN_BILLING.free.priceMonthly,
     description: 'Perfect for passion projects & simple websites.',
     preface: 'Get started with:',
     features: [
       'Unlimited API requests',
-      '50,000 monthly active users',
-      ['500 MB database size', 'Shared CPU • 500 MB RAM'],
-      ['5 GB egress'],
-      ['5 GB cached egress'],
-      '1 GB file storage',
+      `${qty(METERS.maus.includedByPlan.free, 'comma')} monthly active users`,
+      [
+        `${gbDisplay(METERS.databaseDiskSize.includedByPlan.free)} database size`,
+        'Shared CPU • 500 MB RAM',
+      ],
+      [`${qty(METERS.egress.includedByPlan.free)} GB egress`],
+      [`${qty(METERS.cachedEgress.includedByPlan.free)} GB cached egress`],
+      `${qty(METERS.storageSize.includedByPlan.free)} GB file storage`,
       'Community support',
     ],
     footer: 'Free projects are paused after 1 week of inactivity. Limit of 2 active projects.',
@@ -51,18 +56,36 @@ export const plans: PricingInformation[] = [
     href: 'https://supabase.com/dashboard/new?plan=pro',
     priceLabel: 'From',
     warning: 'Includes one project running on Micro compute.',
-    priceMonthly: 25,
+    priceMonthly: PLAN_BILLING.pro.priceMonthly,
     description: 'For production applications with the power to scale.',
     features: [
-      ['100,000 monthly active users', 'then $0.00325 per MAU'],
-      ['8 GB disk size per project', 'then $0.125 per GB'],
-      ['250 GB egress', 'then $0.09 per GB'],
-      ['250 GB cached egress', 'then $0.03 per GB'],
-      ['100 GB file storage', 'then $0.0213 per GB'],
+      [
+        `${qty(METERS.maus.includedByPlan.pro, 'comma')} monthly active users`,
+        `then ${usd(METERS.maus.price)} per MAU`,
+      ],
+      [
+        `${gbDisplay(METERS.databaseDiskSize.includedByPlan.pro)} disk size per project`,
+        `then ${usd(METERS.databaseDiskSize.price)} per GB`,
+      ],
+      [
+        `${withUnit(METERS.egress.includedByPlan.pro, 'GB')} egress`,
+        `then ${usd(METERS.egress.price)} per GB`,
+      ],
+      [
+        `${withUnit(METERS.cachedEgress.includedByPlan.pro, 'GB')} cached egress`,
+        `then ${usd(METERS.cachedEgress.price)} per GB`,
+      ],
+      [
+        `${withUnit(METERS.storageSize.includedByPlan.pro, 'GB')} file storage`,
+        `then ${usd(METERS.storageSize.price)} per GB`,
+      ],
       'Email support',
       'Daily backups stored for 7 days',
       '7-day log retention',
-      ['Add Log Drains', 'additional $60 per drain, per project'],
+      [
+        'Add Log Drains',
+        `additional ${usd(ADDONS.logDrain.priceMonthlyPerDrain)} per drain, per project`,
+      ],
     ],
     preface: 'Everything in the Free Plan, plus:',
     cta: 'Get Started',
@@ -76,7 +99,7 @@ export const plans: PricingInformation[] = [
     href: 'https://supabase.com/dashboard/new?plan=team',
     priceLabel: 'From',
     warning: 'Includes one project running on Micro compute.',
-    priceMonthly: 599,
+    priceMonthly: PLAN_BILLING.team.priceMonthly,
     description: 'Add features such as SSO, control over backups, and industry certifications.',
     features: [
       'SOC2 & ISO 27001',

@@ -1,28 +1,26 @@
-import { Button } from 'ui'
-import Panel from '../Panel'
-import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
+import Link from 'next/link'
+import { DISK_PRICING, qty, usd } from 'shared-data/pricing-catalog'
+import { Button } from 'ui'
 
-const diskTypes = [
-  {
-    name: 'General Purpose',
-    tagline: 'Balance between price and performance',
-    maxSize: '16 TB',
-    size: '8 GB included\nthen $0.125 per GB',
-    iops: '3,000 IOPS included\nthen $0.024 per IOPS',
-    throughput: '125 MB/s included\nthen $0.095 per MB/s',
-    durability: '99.9%',
-  },
-  {
-    name: 'High Performance',
-    tagline: 'For mission critical applications',
-    maxSize: '60 TB',
-    size: '$0.195 per GB',
-    iops: '$0.119 per IOPS',
-    throughput: 'Scales automatically with IOPS',
-    durability: '99.999%',
-  },
-]
+import Panel from '../Panel'
+
+const diskTypes = Object.values(DISK_PRICING).map((disk) => ({
+  name: disk.displayName,
+  tagline: disk.tagline,
+  maxSize: `${disk.maxSizeTb} TB`,
+  size: disk.includedPerProject
+    ? `${disk.includedPerProject.sizeGb} GB included\nthen ${usd(disk.perUnitMonth.sizeGb)} per GB`
+    : `${usd(disk.perUnitMonth.sizeGb)} per GB`,
+  iops: disk.includedPerProject
+    ? `${qty(disk.includedPerProject.iops, 'comma')} IOPS included\nthen ${usd(disk.perUnitMonth.iops)} per IOPS`
+    : `${usd(disk.perUnitMonth.iops)} per IOPS`,
+  throughput:
+    disk.includedPerProject && disk.perUnitMonth.throughputMBps !== null
+      ? `${disk.includedPerProject.throughputMBps} MB/s included\nthen ${usd(disk.perUnitMonth.throughputMBps)} per MB/s`
+      : (disk.throughputNote ?? ''),
+  durability: `${disk.durabilityPercent}%`,
+}))
 
 const PricingDiskSection = () => (
   <div>
