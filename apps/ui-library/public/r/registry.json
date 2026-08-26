@@ -1795,7 +1795,7 @@
       "type": "registry:block",
       "title": "Headless App for TanStack Start",
       "description": "Give your agents a backend: sign-in, OAuth consent, an MCP server, and a page to connect and revoke agents.",
-      "docs": "This overwrites `supabase/config.toml` — merge your own settings back in. Set `site_url` to the origin serving your app, set `PRODUCT_NAME` in `routes/_protected/agents.tsx`, then run `supabase config push` and `supabase functions deploy mcp-server`. Sign in and open `/agents` to connect one. Add tools in `supabase/functions/mcp-server/tools/`.\n\nYou'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
+      "docs": "Set `site_url` in `supabase/config.toml` to the origin serving your app, and `PRODUCT_NAME` in `routes/_protected/agents.tsx`. Run `supabase config push` and `supabase functions deploy mcp-server`, then sign in and open `/agents` to connect an agent. Add tools in `supabase/functions/mcp-server/tools/`.\n\nYou'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
       "registryDependencies": [
         "button",
         "https://supabase.com/library/r/password-based-auth-tanstack.json",

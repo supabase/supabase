@@ -4,11 +4,10 @@ description: Give your agents a backend
 ---
 
 A headless app has no interface of its own. Users sign in once, connect their
-agent, and everything after that happens inside their harness — Claude Code,
-Codex, ChatGPT — through MCP tool calls against your database.
-
-This block is the whole app: sign-in, the consent screen agents are sent to, the
-MCP server they call, and a page to connect and revoke them.
+agent, and everything after that happens through MCP tool calls from whatever
+harness they use, like Claude Code, Codex, or ChatGPT. This block is the whole
+app: sign-in, the consent screen agents are sent to, the MCP server they call,
+and a page to connect and revoke them.
 
 <BlockPreview name="headless-app" />
 
@@ -18,8 +17,8 @@ MCP server they call, and a page to connect and revoke them.
 
 It installs the [Password-Based Auth](/library/docs/tanstack/password-based-auth),
 [OAuth Consent](/library/docs/tanstack/oauth-consent), and
-[MCP Server](/library/docs/headless/mcp-server) blocks, and overwrites
-`supabase/config.toml`. Back up an existing one and merge your settings back in.
+[MCP Server](/library/docs/headless/mcp-server) blocks, along with a complete
+`supabase/config.toml`.
 
 ## Folder structure
 
@@ -57,7 +56,7 @@ It installs the [Password-Based Auth](/library/docs/tanstack/password-based-auth
 ## Add tools
 
 Out of the box the server exposes one tool, `whoami`. Add the rest in
-`supabase/functions/mcp-server/tools/` — each tool runs as the signed-in user
+`supabase/functions/mcp-server/tools/`. Each tool runs as the signed-in user
 with Row Level Security applied. See the
 [MCP Server block](/library/docs/headless/mcp-server) for the tool template.
 

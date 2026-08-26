@@ -24,10 +24,10 @@ const grants: OAuthGrant[] = [
 ]
 
 const screens = {
-  'sign-in': <LoginForm className="mx-auto max-w-sm" />,
+  'sign-in': <LoginForm className="mx-auto w-full max-w-sm" />,
   consent: (
     <OAuthConsentCard
-      className="mx-auto max-w-lg"
+      className="mx-auto w-full max-w-lg"
       clientName="Claude Code"
       productName={PRODUCT_NAME}
       redirectUri="http://localhost:3000/callback"
@@ -37,7 +37,7 @@ const screens = {
   ),
   connect: (
     <ConnectedAgentsView
-      className="mx-auto max-w-lg"
+      className="mx-auto w-full max-w-lg"
       mcpServerUrl={MCP_SERVER_URL}
       productName={PRODUCT_NAME}
       grants={[]}
@@ -45,7 +45,7 @@ const screens = {
   ),
   connected: (
     <ConnectedAgentsView
-      className="mx-auto max-w-lg"
+      className="mx-auto w-full max-w-lg"
       mcpServerUrl={MCP_SERVER_URL}
       productName={PRODUCT_NAME}
       grants={grants}
