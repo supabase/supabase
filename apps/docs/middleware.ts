@@ -16,10 +16,9 @@ export function middleware(request: NextRequest) {
   if (pathname.startsWith(GUIDES_PATH + '/')) {
     const isMdSuffix = pathname.endsWith('.md')
     const slug = pathname.replace(`${GUIDES_PATH}/`, '').replace(/\.md$/, '')
-    const hasMarkdownVariant = GUIDES_MARKDOWN_SLUGS.has(slug)
     const decision = negotiateMarkdown(
       { acceptHeader: request.headers.get('accept') ?? '' },
-      { hasMarkdownVariant, isMarkdownSuffix: isMdSuffix }
+      { hasMarkdownVariant: GUIDES_MARKDOWN_SLUGS.has(slug), isMarkdownSuffix: isMdSuffix }
     )
 
     if (decision === 'not-acceptable') {
@@ -29,8 +28,7 @@ export function middleware(request: NextRequest) {
       })
     }
 
-    const isUnknownMdRequest = isMdSuffix && !hasMarkdownVariant
-    if (decision === 'markdown' || isUnknownMdRequest) {
+    if (decision === 'markdown') {
       const rewriteUrl = new URL(url)
       rewriteUrl.pathname = `${BASE_PATH ?? ''}/api/guides-md/${slug}`
       return NextResponse.rewrite(rewriteUrl)

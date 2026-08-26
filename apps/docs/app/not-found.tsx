@@ -33,13 +33,6 @@ export default function NotFound() {
               </Link>
             </Button>
           </div>
-          <p className="text-sm text-foreground-lighter">
-            <Link href="/">Documentation</Link>
-            {' · '}
-            <Link href="https://supabase.com/sitemap.xml">Sitemap</Link>
-            {' · '}
-            <Link href="https://supabase.com/llms.txt">llms.txt</Link>
-          </p>
           <Recommendations />
         </article>
       </LayoutMainContent>
