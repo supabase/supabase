@@ -180,7 +180,15 @@ export function AiAssistantDropdown({
             <>
               <DropdownMenuSeparator />
               {additionalDropdownItems.map((item, i) => (
-                <DropdownMenuItem key={i} onClick={item.onClick} className="gap-2">
+                // `asChild` only when there is an href: the item then renders as the Link, so
+                // selecting it with the keyboard follows the link. Without an href the child is
+                // a fragment, which Slot cannot merge into, so the default rendering stays.
+                <DropdownMenuItem
+                  key={i}
+                  onClick={item.onClick}
+                  className="gap-2"
+                  asChild={!!item.href}
+                >
                   {item.href ? (
                     <Link href={item.href} target="_blank" rel="noreferrer">
                       {item.icon}
