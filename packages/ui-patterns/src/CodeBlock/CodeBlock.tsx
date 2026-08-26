@@ -195,9 +195,14 @@ export const CodeBlock = ({
         </div>
       )}
       {className ? (
+        // `tabIndex` because this scrolls: without it a keyboard user cannot reach the
+        // overflowing part of a wide snippet at all. Mirrors the same fix made to the docs
+        // code block in #49562.
         <div
+          tabIndex={0}
           className={cn(
             'group relative max-w-[90vw] md:max-w-none overflow-auto',
+            'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
             wrapperClassName
           )}
         >
