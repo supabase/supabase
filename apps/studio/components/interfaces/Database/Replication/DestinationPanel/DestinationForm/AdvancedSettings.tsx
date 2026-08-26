@@ -33,7 +33,7 @@ export type AdvancedSettingsGroup = 'all' | 'connection' | 'data'
 
 const CONNECTION_DESCRIPTION = 'Optional settings for how data is written to the destination.'
 const DATA_DESCRIPTION = 'Optional settings for initial sync and replication slots.'
-const ALL_DESCRIPTION = 'Optional settings to control the pipeline in more depth.'
+const ALL_DESCRIPTION = 'Optional settings to control the pipeline in more depth'
 
 export const AdvancedSettings = ({
   type,
