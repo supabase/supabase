@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { MoreVertical, Plus, Search, Workflow, X } from 'lucide-react'
+import { MessageSquare, MoreVertical, Plus, Search, Workflow, X } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
