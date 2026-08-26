@@ -9,6 +9,11 @@ harness they use, like Claude Code, Codex, or ChatGPT. This block is the whole
 app: sign-in, the consent screen agents are sent to, the MCP server they call,
 and a page to connect and revoke them.
 
+Postgres carries the rules. Write them once as RLS policies, triggers, and
+constraints, and every agent call inherits them. The MCP server passes the
+user's own access token through to the database, so an agent acts as that user
+and cannot reach past what they are allowed to see.
+
 <BlockPreview name="headless-app" />
 
 ## Installation
@@ -53,21 +58,62 @@ It installs the [Password-Based Auth](/library/docs/tanstack/password-based-auth
 5. Sign up, open `/agents`, and paste the prompt into an agent. It registers
    itself, sends you to `/oauth/consent`, and appears in the list once approved.
 
+## Change the database
+
+`supabase/schemas/public/tables/tasks.sql` declares an example `tasks` table with
+Row Level Security, so each user reaches only their own rows. It is the source of
+truth: edit the file, then generate and apply a migration.
+
+```bash
+supabase db diff -f add_task_due_date
+supabase db reset
+```
+
+`supabase db diff` uses `pg-delta` to compare your schema files against a shadow
+database and writes the migration to `supabase/migrations/`. It reads the files,
+not the live database, so changes made in Studio or the SQL editor are not picked
+up.
+
+New objects go in the tree `pgdelta schema export` writes: one directory per
+schema, then one file per object. A table's indexes, triggers, and policies live
+in the table's own file. `schema_paths` in `supabase/config.toml` lists the
+patterns the CLI reads, in dependency order.
+
+```
+supabase/schemas/
+  public/
+    tables/tasks.sql
+    views/open_tasks.sql
+    functions/close_task.sql
+```
+
 ## Add tools
 
 Out of the box the server exposes one tool, `whoami`. Add the rest in
-`supabase/functions/mcp-server/tools/`. Each tool runs as the signed-in user
-with Row Level Security applied. See the
+`supabase/functions/mcp-server/tools/`. Each tool runs as the signed-in user, so
+the policies in your schema decide what an agent can reach. See the
 [MCP Server block](/library/docs/headless/mcp-server) for the tool template.
 
 ## Deploy
 
+There are two things to deploy. First the Supabase project:
+
 ```bash
+supabase link
+supabase db push
 supabase config push
 supabase functions deploy mcp-server
 ```
 
-Set the Auth **Site URL** to your deployed origin.
+Then the app. Push it to Git and import the repository into
+[Vercel](https://vercel.com/new), which detects TanStack Start without extra
+build configuration, and add `VITE_SUPABASE_URL` and
+`VITE_SUPABASE_PUBLISHABLE_KEY` as environment variables. See
+[Vercel's TanStack Start guide](https://vercel.com/docs/frameworks/full-stack/tanstack-start)
+for the Nitro plugin your `vite.config.ts` needs.
+
+Finish by setting the Auth **Site URL** to your deployed domain, so agents land
+on the deployed consent screen.
 
 Your project must sign JWTs with an asymmetric key. On the legacy HS256 secret,
 clients that request the `openid` scope fail. Switch to ES256 or RS256 in
