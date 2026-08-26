@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS, mergeRefs, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, mergeRefs, useFlag, useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { XIcon } from 'lucide-react'
 import Head from 'next/head'
@@ -154,6 +154,8 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const isNanoCompute = selectedProject?.infra_compute_size === 'nano'
     const showUpgradeBanner = isNanoCompute && isComputeNearExhaustion
 
+    const isExplorerEnabled = useFlag('explorer')
+
     const [isFreeMicroUpgradeBannerDismissed] = useLocalStorageQuery(
       LOCAL_STORAGE_KEYS.FREE_MICRO_UPGRADE_BANNER_DISMISSED(selectedProject?.ref ?? ''),
       false
@@ -241,7 +243,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     ])
 
     useEffect(() => {
-      if (!isLocalStorageReady || isExplorerBannerDismissed) return
+      if (!isExplorerEnabled || !isLocalStorageReady || isExplorerBannerDismissed) return
 
       addBanner({
         id: 'explorer-banner',
@@ -249,7 +251,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
         isDismissed: false,
         content: <BannerExplorer />,
       })
-    }, [addBanner, isExplorerBannerDismissed, isLocalStorageReady])
+    }, [addBanner, isExplorerEnabled, isExplorerBannerDismissed, isLocalStorageReady])
 
     useLayoutEffect(() => {
       const unregister = registerOpenMenu(() => {
