@@ -1,30 +1,34 @@
-import { jsonResult } from './result.ts'
-import type { Toolset } from './types.ts'
+import type { McpServer } from 'npm:@modelcontextprotocol/server@2.0.0'
 
-// A user-scoped toolset that needs no database access: it answers straight from
-// the verified token claims, which demonstrates that every tool runs as the
-// signed-in user.
-export const whoamiToolset: Toolset = {
-  name: 'whoami',
-  register(server, { claims, clientId }) {
-    server.registerTool(
-      'whoami',
-      {
-        description: "Return the signed-in user's identity and OAuth client id.",
-        inputSchema: {},
-        annotations: {
-          readOnlyHint: true,
-          destructiveHint: false,
-          openWorldHint: false,
-        },
+import { jsonResult } from './result.ts'
+import type { ToolContext } from './types.ts'
+
+// Answers from verified claims, demonstrating that every tool runs as the
+// signed-in user. client_id is present for OAuth tokens and null for ordinary
+// product sessions.
+export function registerWhoamiTool(
+  server: McpServer,
+  { userClaims, jwtClaims }: ToolContext
+): void {
+  const clientId =
+    typeof jwtClaims?.client_id === 'string' && jwtClaims.client_id ? jwtClaims.client_id : null
+
+  server.registerTool(
+    'whoami',
+    {
+      description: "Return the signed-in user's identity and OAuth client id, when present.",
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        openWorldHint: false,
       },
-      () =>
-        jsonResult({
-          sub: claims.sub ?? null,
-          email: claims.email ?? null,
-          role: claims.role ?? null,
-          client_id: clientId,
-        })
-    )
-  },
+    },
+    () =>
+      jsonResult({
+        id: userClaims.id,
+        email: userClaims.email ?? null,
+        role: userClaims.role ?? null,
+        client_id: clientId,
+      })
+  )
 }

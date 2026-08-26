@@ -1,15 +1,15 @@
-import type { CallToolResult } from 'npm:@modelcontextprotocol/sdk@1.29.0/types'
+import type { CallToolResult } from 'npm:@modelcontextprotocol/server@2.0.0'
 
 // Shared helpers for building MCP tool results, so every tool returns the same
 // shape and signals failure the same way.
 
 /**
- * A successful result. `value` is JSON-serialised into one text block, which is
- * the format MCP clients and models parse most reliably.
+ * A successful structured result with a JSON text fallback for older clients.
  */
 export function jsonResult(value: unknown): CallToolResult {
   return {
-    content: [{ type: 'text', text: JSON.stringify(value) }],
+    content: [{ type: 'text', text: JSON.stringify(value) ?? 'null' }],
+    structuredContent: value ?? null,
   }
 }
 

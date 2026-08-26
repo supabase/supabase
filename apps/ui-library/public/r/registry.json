@@ -1750,18 +1750,13 @@
       "name": "mcp-server",
       "type": "registry:item",
       "title": "MCP Server",
-      "description": "Add an OAuth-protected MCP server to your product.",
-      "docs": "Disable gateway JWT verification, then deploy the Edge Function. Install the [OAuth Consent block](https://supabase.com/library/docs/nextjs/oauth-consent), enable OAuth and dynamic registration, and set the Auth Site URL to the consent app. The block accepts only OAuth user tokens. OAuth scopes do not control data or tool access, so enforce every operation with RLS and use `client_id` for client-specific policies. Review dynamically registered clients and let users revoke grants. See [MCP authentication](https://supabase.com/docs/guides/auth/oauth-server/mcp-authentication) and [token security](https://supabase.com/docs/guides/auth/oauth-server/token-security).",
+      "description": "Add a user-scoped MCP server to your product.",
+      "docs": "Disable gateway JWT verification, then deploy the Edge Function. A trusted product backend can call it with the signed-in user's access token. For external clients, install the [OAuth Consent block](https://supabase.com/library/docs/nextjs/oauth-consent), enable OAuth and dynamic registration, and set the Auth Site URL to the consent app. Every call runs through the user's RLS-scoped client. OAuth tokens include `client_id`; product sessions do not, so define policies for both paths. See [MCP authentication](https://supabase.com/docs/guides/auth/oauth-server/mcp-authentication) and [token security](https://supabase.com/docs/guides/auth/oauth-server/token-security).",
       "files": [
         {
           "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/index.ts",
           "type": "registry:file",
           "target": "supabase/functions/mcp-server/index.ts"
-        },
-        {
-          "path": "registry/default/blocks/mcp-server/supabase/functions/_shared/supabase.ts",
-          "type": "registry:file",
-          "target": "supabase/functions/_shared/supabase.ts"
         },
         {
           "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/deno.json",
