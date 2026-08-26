@@ -1,6 +1,5 @@
-import { Check } from 'lucide-react'
+import { Check, Database, UserCheck, UserX } from 'lucide-react'
 import { Separator, ToggleGroup, ToggleGroupItem } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { UserImpersonationSelector } from './UserImpersonationSelector'
 import { useRoleImpersonationSelection } from './useRoleImpersonationSelection'
@@ -37,7 +36,8 @@ export const RoleImpersonationSelectorInterface = (
   const { state } = props
   const serviceRoleLabel = props.serviceRoleLabel ?? 'Postgres'
   const disallowAuthenticatedOption = props.disallowAuthenticatedOption ?? false
-  const { selectedOption, onSelectedChange } = useRoleImpersonationSelection(state)
+  const { selectedOption, onSelectedChange, keepAuthenticatedSelected } =
+    useRoleImpersonationSelection(state)
 
   const roleSummary = {
     service_role: 'Bypasses RLS and can return all rows.',
@@ -53,49 +53,56 @@ export const RoleImpersonationSelectorInterface = (
           event.preventDefault()
         }}
       >
-        <FormItemLayout isReactForm={false} layout="horizontal" size="tiny" label="Role">
-          <ToggleGroup
-            type="single"
-            orientation="vertical"
-            value={selectedOption}
-            onValueChange={(value) => {
-              if (value === 'service_role' || value === 'anon' || value === 'authenticated') {
-                void onSelectedChange(value)
-              }
-            }}
-            variant="default"
-            aria-label={props.header ?? props.title ?? 'Run query as role'}
-            className="w-full flex-col items-stretch gap-0.5"
-          >
-            <ToggleGroupItem value="service_role" className="w-full justify-between text-left">
+        <ToggleGroup
+          type="single"
+          orientation="vertical"
+          value={selectedOption}
+          onValueChange={(value) => {
+            if (value === 'service_role' || value === 'anon' || value === 'authenticated') {
+              void onSelectedChange(value)
+            }
+          }}
+          variant="default"
+          aria-label={props.header ?? props.title ?? 'Run query as role'}
+          className="w-full flex-col items-stretch gap-0.5"
+        >
+          <ToggleGroupItem value="service_role" className="w-full justify-between text-left">
+            <span className="flex min-w-0 items-center gap-3">
+              <Database size={16} strokeWidth={1.5} className="shrink-0" />
               <span className="flex min-w-0 flex-col items-start">
                 <span>{serviceRoleLabel}</span>
                 <span className="text-xs font-normal text-foreground-lighter">Superuser</span>
               </span>
-              {selectedOption === 'service_role' && <Check size={14} />}
-            </ToggleGroupItem>
+            </span>
+            {selectedOption === 'service_role' && <Check size={14} />}
+          </ToggleGroupItem>
 
-            <ToggleGroupItem value="anon" className="w-full justify-between text-left">
+          <ToggleGroupItem value="anon" className="w-full justify-between text-left">
+            <span className="flex min-w-0 items-center gap-3">
+              <UserX size={16} strokeWidth={1.5} className="shrink-0" />
               <span className="flex min-w-0 flex-col items-start">
                 <span>Anonymous</span>
                 <span className="text-xs font-normal text-foreground-lighter">Not logged in</span>
               </span>
-              {selectedOption === 'anon' && <Check size={14} />}
-            </ToggleGroupItem>
+            </span>
+            {selectedOption === 'anon' && <Check size={14} />}
+          </ToggleGroupItem>
 
-            {!disallowAuthenticatedOption && (
-              <ToggleGroupItem value="authenticated" className="w-full justify-between text-left">
+          {!disallowAuthenticatedOption && (
+            <ToggleGroupItem value="authenticated" className="w-full justify-between text-left">
+              <span className="flex min-w-0 items-center gap-3">
+                <UserCheck size={16} strokeWidth={1.5} className="shrink-0" />
                 <span className="flex min-w-0 flex-col items-start">
                   <span>Authenticated</span>
                   <span className="text-xs font-normal text-foreground-lighter">
                     Logged-in user
                   </span>
                 </span>
-                {selectedOption === 'authenticated' && <Check size={14} />}
-              </ToggleGroupItem>
-            )}
-          </ToggleGroup>
-        </FormItemLayout>
+              </span>
+              {selectedOption === 'authenticated' && <Check size={14} />}
+            </ToggleGroupItem>
+          )}
+        </ToggleGroup>
 
         {!disallowAuthenticatedOption && (
           <>
@@ -103,6 +110,7 @@ export const RoleImpersonationSelectorInterface = (
             <UserImpersonationSelector
               state={state}
               disabled={selectedOption !== 'authenticated'}
+              onUserImpersonationCleared={keepAuthenticatedSelected}
             />
           </>
         )}

@@ -38,5 +38,9 @@ export const useRoleImpersonationSelection = (state: RoleImpersonationController
     }
   }
 
-  return { selectedOption, onSelectedChange }
+  function keepAuthenticatedSelected() {
+    setIsAuthenticatedPending(true)
+  }
+
+  return { selectedOption, onSelectedChange, keepAuthenticatedSelected }
 }

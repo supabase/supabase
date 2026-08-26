@@ -1,6 +1,6 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
-import { ChevronsUpDown, User as IconUser, Loader2 } from 'lucide-react'
+import { ChevronsUpDown, User as IconUser, Loader2, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -42,11 +42,13 @@ type UserSource = 'user' | 'external'
 type UserImpersonationSelectorProps = {
   state: RoleImpersonationController
   disabled?: boolean
+  onUserImpersonationCleared?: () => void
 }
 
 export const UserImpersonationSelector = ({
   state,
   disabled = false,
+  onUserImpersonationCleared,
 }: UserImpersonationSelectorProps) => {
   const [searchText, setSearchText] = useState('')
   const [aal, setAal] = useState<AuthenticatorAssuranceLevels>(() =>
@@ -167,6 +169,41 @@ export const UserImpersonationSelector = ({
     }
   }
 
+  async function changeSelectedSource(value: UserSource) {
+    if (!isUserSelected) {
+      setSelectedSource(value)
+      return
+    }
+
+    try {
+      await state.setRole(undefined)
+      setSelectedSource(value)
+      onUserImpersonationCleared?.()
+    } catch (error) {
+      toast.error(`Failed to stop impersonating user: ${(error as ResponseError).message}`)
+    }
+  }
+
+  async function changeAal(value: AuthenticatorAssuranceLevels) {
+    const previousAal = aal
+    setAal(value)
+
+    if (
+      state.role?.type !== 'postgrest' ||
+      state.role.role !== 'authenticated' ||
+      !isUserSelected
+    ) {
+      return
+    }
+
+    try {
+      await state.setRole({ ...state.role, aal: value }, customAccessTokenHookDetails)
+    } catch (error) {
+      setAal(previousAal)
+      toast.error(`Failed to update MFA assurance level: ${(error as ResponseError).message}`)
+    }
+  }
+
   return (
     <fieldset
       disabled={disabled}
@@ -193,9 +230,8 @@ export const UserImpersonationSelector = ({
         <ToggleGroup
           type="single"
           value={selectedSource}
-          disabled={isUserSelected}
           onValueChange={(value) => {
-            if (value === 'user' || value === 'external') setSelectedSource(value)
+            if (value === 'user' || value === 'external') void changeSelectedSource(value)
           }}
           variant="default"
           size="tiny"
@@ -276,9 +312,8 @@ export const UserImpersonationSelector = ({
         <ToggleGroup
           type="single"
           value={aal}
-          disabled={isUserSelected}
           onValueChange={(value) => {
-            if (value === 'aal1' || value === 'aal2') setAal(value)
+            if (value === 'aal1' || value === 'aal2') void changeAal(value)
           }}
           variant="default"
           size="tiny"
@@ -345,13 +380,14 @@ const ImpersonationControl = ({
         <Button
           type="button"
           size="tiny"
-          variant="default"
+          variant="text"
+          className="px-1"
+          aria-label="Stop impersonating user"
+          icon={<X size={14} />}
           onClick={stopImpersonating}
           disabled={isImpersonateLoading}
           loading={isImpersonateLoading}
-        >
-          Stop
-        </Button>
+        />
       </div>
     )
   }

@@ -41,6 +41,11 @@ describe('RoleImpersonationSelectorInterface', () => {
 
     const { rerender } = customRender(<RoleImpersonationSelectorInterface state={state} />)
 
+    expect(screen.queryByText('Role')).not.toBeInTheDocument()
+    for (const option of screen.getAllByRole('radio')) {
+      expect(option).toHaveClass('w-full')
+      expect(option.querySelector('svg')).toBeInTheDocument()
+    }
     expect(screen.getByRole('radio', { name: 'PostgresSuperuser' })).toBeChecked()
     expect(screen.getByText('Bypasses RLS and can return all rows.')).toBeVisible()
     expect(screen.getByTestId('user-settings')).toBeDisabled()
@@ -88,6 +93,27 @@ describe('RoleImpersonationSelectorInterface', () => {
 
     expect(screen.getByRole('radio', { name: 'PostgresSuperuser' })).toBeChecked()
     expect(screen.getByTestId('user-settings')).toBeDisabled()
+  })
+
+  it('allows switching roles while impersonating a user', async () => {
+    const user = userEvent.setup()
+    const setRole = vi.fn().mockResolvedValue(undefined)
+    const state: RoleImpersonationController = {
+      role: {
+        type: 'postgrest',
+        role: 'authenticated',
+        userType: 'external',
+        externalAuth: { sub: 'external-user', additionalClaims: {} },
+      },
+      claims: undefined,
+      setRole,
+    }
+
+    customRender(<RoleImpersonationSelectorInterface state={state} />)
+
+    await user.click(screen.getByRole('radio', { name: 'AnonymousNot logged in' }))
+
+    expect(setRole).toHaveBeenCalledWith({ type: 'postgrest', role: 'anon' })
   })
 
   it('keeps the current selection and reports rejected role switches', async () => {
