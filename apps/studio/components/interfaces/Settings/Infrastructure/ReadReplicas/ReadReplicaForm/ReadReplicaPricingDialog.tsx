@@ -30,18 +30,18 @@ export const ReadReplicaPricingDialog = ({ replicaCost }: ReadReplicaPricingDial
   const { data: project } = useSelectedProjectQuery()
   const { isLoading, isError, retry, totalCost, compute, disk, iops, throughput } = replicaCost
 
-  const showNewDiskManagementUI = project?.cloud_provider === 'AWS'
+  const isNewDiskManagementUI = project?.cloud_provider === 'AWS'
+
+  let title = `Estimated additional cost of ${totalCost}/month`
+  if (isLoading) title = 'Estimated additional cost'
+  if (isError) title = 'Unable to estimate additional cost'
 
   return (
     <Dialog>
       <Admonition
         type={isError ? 'warning' : 'note'}
         layout="responsive"
-        title={
-          isError
-            ? 'Unable to estimate additional cost'
-            : `Estimated additional cost${isLoading ? '' : ` of ${totalCost}/month`}`
-        }
+        title={title}
         description={
           isError
             ? 'We couldn’t load the required pricing data.'
@@ -74,7 +74,7 @@ export const ReadReplicaPricingDialog = ({ replicaCost }: ReadReplicaPricingDial
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection>
-          {showNewDiskManagementUI ? (
+          {isNewDiskManagementUI ? (
             <>
               <p className="mb-3 text-sm text-foreground-light">
                 The replica matches your primary compute and includes 25% additional disk capacity
