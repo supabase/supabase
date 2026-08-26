@@ -1,5 +1,4 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { useParams } from 'common/hooks'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Badge, Button } from 'ui'
 
@@ -11,12 +10,11 @@ import { useTrack } from '@/lib/telemetry/track'
 
 export const BannerExplorer = () => {
   const track = useTrack()
-  const { ref } = useParams()
   const { dismissBanner } = useBannerStack()
   const { selectFeaturePreview } = useFeaturePreviewModal()
 
   const [, setIsDismissed] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.DATABASE_CONNECTIONS_BANNER_DISMISSED(ref ?? ''),
+    LOCAL_STORAGE_KEYS.EXPLORER_BANNER_DISMISSED,
     false
   )
 
