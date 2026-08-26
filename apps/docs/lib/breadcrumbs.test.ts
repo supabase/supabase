@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { resolveBreadcrumbs } from './breadcrumbs'
 
 describe('resolveBreadcrumbs', () => {
-  it('places troubleshooting under detect and resolve', () => {
+  it('places troubleshooting under detect and diagnose', () => {
     expect(resolveBreadcrumbs('/guides/troubleshooting')).toEqual([
       {
         name: 'Observability',
