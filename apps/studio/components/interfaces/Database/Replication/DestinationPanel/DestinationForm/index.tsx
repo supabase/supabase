@@ -10,7 +10,6 @@ import { Button, DialogSectionSeparator, Form, SheetFooter, SheetSection } from 
 import { Admonition } from 'ui-patterns/Admonition'
 import * as z from 'zod'
 
-import { PipelineRegionField } from '../../CreatePipeline/PipelineRegionField'
 import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLClickHousePrivateAlpha,
@@ -39,6 +38,7 @@ import { DuckLakeFields } from './DuckLake/Fields'
 import { NewPublicationPanel } from './NewPublicationPanel'
 import { NoDestinationsAvailable } from './NoDestinationsAvailable'
 import { PipelineCostDialog } from './PipelineCostDialog'
+import { PipelineRegionField } from './PipelineRegionField'
 import { PublicationSelection } from './PublicationSelection'
 import { SnowflakeFields } from './Snowflake/Fields'
 import { getSnowflakeValidationIssues } from './Snowflake/Snowflake.utils'

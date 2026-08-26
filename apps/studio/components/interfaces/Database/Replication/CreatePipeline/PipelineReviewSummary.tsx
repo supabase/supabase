@@ -6,8 +6,8 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { CREATE_NEW_NAMESPACE } from '../DestinationPanel/DestinationForm/DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationPanel/DestinationForm/DestinationForm.schema'
 import { DUCKLAKE_MODE_CUSTOM } from '../DestinationPanel/DestinationForm/DuckLake/DuckLake.constants'
+import { PIPELINE_REGION } from '../DestinationPanel/DestinationForm/PipelineRegionField'
 import type { PipelineCreateStepId, PipelineDestinationType } from './CreatePipelineWizard.utils'
-import { PIPELINE_REGION } from './PipelineRegionField'
 import {
   CONNECTION_VALIDATION_HINT,
   DATA_VALIDATION_HINT,

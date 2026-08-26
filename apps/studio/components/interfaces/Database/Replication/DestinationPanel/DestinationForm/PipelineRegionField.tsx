@@ -2,7 +2,7 @@ import { AWS_REGIONS } from 'shared-data'
 import { cn } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
+import type { DestinationType } from '../DestinationPanel.types'
 import { RegionFlag } from '@/components/ui/RegionFlag'
 import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
 

@@ -45,6 +45,7 @@ import { DuckLakeFields } from '../DestinationPanel/DestinationForm/DuckLake/Fie
 import { NewPublicationPanel } from '../DestinationPanel/DestinationForm/NewPublicationPanel'
 import { NoDestinationsAvailable } from '../DestinationPanel/DestinationForm/NoDestinationsAvailable'
 import { PipelineCostDialog } from '../DestinationPanel/DestinationForm/PipelineCostDialog'
+import { PipelineRegionField } from '../DestinationPanel/DestinationForm/PipelineRegionField'
 import { PublicationSelection } from '../DestinationPanel/DestinationForm/PublicationSelection'
 import { SnowflakeFields } from '../DestinationPanel/DestinationForm/Snowflake/Fields'
 import { getSnowflakeValidationIssues } from '../DestinationPanel/DestinationForm/Snowflake/Snowflake.utils'
@@ -79,7 +80,6 @@ import {
   type PipelineDestinationType,
 } from './CreatePipelineWizard.utils'
 import { PipelineCreateStepDescription } from './PipelineCreateStepDescription'
-import { PipelineRegionField } from './PipelineRegionField'
 import { PipelineReviewSummary } from './PipelineReviewSummary'
 import {
   CONNECTION_VALIDATION_HINT,
