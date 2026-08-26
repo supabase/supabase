@@ -51,7 +51,11 @@ vi.mock('@/hooks/misc/useInboundBranding', () => ({
 }))
 
 vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
-  useIsFeatureEnabled: () => ({ dashboardAuthSignUp: true }),
+  useIsFeatureEnabled: () => ({
+    dashboardAuthSignUp: true,
+    dashboardAuthSignInWithSso: false,
+    dashboardAuthSignInWithEmail: true,
+  }),
 }))
 
 describe('SignUpPage', () => {

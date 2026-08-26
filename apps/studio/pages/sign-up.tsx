@@ -24,43 +24,41 @@ const SignUpPage: NextPageWithLayout = () => {
     return <UnknownInterface fullHeight={false} urlBack="/sign-in" />
   }
 
-  // Inbound link focused us on a single provider — lead with that one (SignInLayout renders the
-  // matching interstitial frame around it), but let the user reveal the rest of our options.
-  const authContent = focusProvider ? (
-    <div className="flex flex-col gap-5">
-      {!isSubmitted && <SignInWithExternalProvider provider={focusProvider} />}
-      {showOtherOptions || isSubmitted ? (
-        <>
-          <SignInOptions
-            providers={signUpProviders.filter((provider) => provider.id !== focusProvider.id)}
-            dividerBgClass="bg-surface-100"
-          />
-          <SignUpForm onSuccess={() => setIsSubmitted(true)} />
-        </>
-      ) : (
-        <Button
-          block
-          variant="text"
-          size="large"
-          className="-mt-2 text-foreground-light"
-          onClick={() => setShowOtherOptions(true)}
-        >
-          Show other options
-        </Button>
-      )}
-    </div>
-  ) : (
-    <div className="flex flex-col gap-5">
-      <SignInOptions providers={signUpProviders} />
-      <SignUpForm onSuccess={() => setIsSubmitted(true)} />
-    </div>
-  )
-
   return (
     <>
-      {authContent}
+      {focusProvider ? (
+        <div className="flex flex-col gap-5">
+          {!isSubmitted && <SignInWithExternalProvider provider={focusProvider} />}
+          {showOtherOptions ? (
+            <>
+              {!isSubmitted && (
+                <SignInOptions
+                  providers={signUpProviders.filter((provider) => provider.id !== focusProvider.id)}
+                  dividerBgClass="bg-surface-100"
+                />
+              )}
+              <SignUpForm onSuccess={() => setIsSubmitted(true)} />
+            </>
+          ) : (
+            <Button
+              block
+              variant="text"
+              size="large"
+              className="-mt-2 text-foreground-light"
+              onClick={() => setShowOtherOptions(true)}
+            >
+              Show other options
+            </Button>
+          )}
+        </div>
+      ) : (
+        <div className="flex flex-col gap-5">
+          {!isSubmitted && <SignInOptions providers={signUpProviders} />}
+          <SignUpForm onSuccess={() => setIsSubmitted(true)} />
+        </div>
+      )}
 
-      <div className={cn('self-center text-sm mb-8', isSubmitted ? 'mt-2' : 'mt-8')}>
+      <div className={cn('self-center text-center text-sm mb-8', isSubmitted ? 'mt-2' : 'mt-8')}>
         <span className="text-foreground-light">Have an account?</span>{' '}
         <Link
           href="/sign-in"
