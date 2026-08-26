@@ -83,11 +83,8 @@ export function getCellMetadataLine(cell: OperationResultCell): string | null {
   switch (cell._tag) {
     case 'markdown_cell':
       return null
-    case 'database_cell': {
-      const databaseIdentifier =
-        'database_identifier' in cell ? cell.database_identifier : undefined
-      return databaseIdentifier ? `Database: ${databaseIdentifier}` : null
-    }
+    case 'database_cell':
+      return cell.database_identifier ? `Database: ${cell.database_identifier}` : null
     case 'log_cell':
       return `Time range: ${formatTimeRange(cell.time_range)}`
   }
@@ -107,15 +104,16 @@ export function getEntryMetadataLine(entry: NotebookCellDiffEntry): string | nul
 
 export type NotebookDiffSummary =
   | { mode: 'create'; cellCount: number }
+  | { mode: 'run'; cellCount: number }
   | { mode: 'update'; counts: { added: number; removed: number; replaced: number; moved: number } }
 
 /** Summarizes a set of diff entries into counts suitable for a header line. */
 export function summarizeNotebookDiff(
   entries: NotebookCellDiffEntry[],
-  mode: 'create' | 'update'
+  mode: 'create' | 'update' | 'run'
 ): NotebookDiffSummary {
-  if (mode === 'create') {
-    return { mode: 'create', cellCount: entries.length }
+  if (mode === 'create' || mode === 'run') {
+    return { mode, cellCount: entries.length }
   }
 
   const counts = { added: 0, removed: 0, replaced: 0, moved: 0 }
@@ -143,7 +141,7 @@ export function summarizeNotebookDiff(
 
 /** Formats a `NotebookDiffSummary` into the header string. */
 export function formatNotebookDiffSummary(summary: NotebookDiffSummary): string {
-  if (summary.mode === 'create') {
+  if (summary.mode === 'create' || summary.mode === 'run') {
     const { cellCount } = summary
     return `${cellCount} cell${cellCount === 1 ? '' : 's'}`
   }

@@ -17,6 +17,7 @@ import { mdxBodyToMarkdown } from './lib/mdxToMarkdown.mjs'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const wwwDir = path.join(__dirname, '..')
 const contentDir = path.join(wwwDir, 'content/md')
+const changelogMdDir = path.join(wwwDir, 'public/changelog')
 const outputPath = path.join(wwwDir, 'app/api-v2/md/content.generated.ts')
 
 // Matches lib/posts.tsx FILENAME_SUBSTRING — strips YYYY-MM-DD- (11 chars).
@@ -142,8 +143,8 @@ async function ingestMdxSection(section) {
 }
 
 function sortSlugs(a, b) {
-  if (a === 'homepage') return -1
-  if (b === 'homepage') return 1
+  if (a === 'index') return -1
+  if (b === 'index') return 1
   return a.localeCompare(b)
 }
 
@@ -177,12 +178,21 @@ const redirectedSlugs = new Set(
     .map((redirect) => redirect.source.slice(1))
 )
 
-const liveEntries = allEntries.filter((entry) => !redirectedSlugs.has(entry.slug))
+// The index slug is exempt: its HTML page is /, not /index, so a /index
+// redirect never refers to the homepage and must not strip its markdown.
+const liveEntries = allEntries.filter(
+  (entry) => entry.slug === 'index' || !redirectedSlugs.has(entry.slug)
+)
 const excludedSlugs = allEntries
-  .filter((entry) => redirectedSlugs.has(entry.slug))
+  .filter((entry) => entry.slug !== 'index' && redirectedSlugs.has(entry.slug))
   .map((entry) => entry.slug)
 if (excludedSlugs.length > 0) {
   console.log(`🚫 Excluded ${excludedSlugs.length} redirected slugs: ${excludedSlugs.join(', ')}`)
+}
+
+if (!liveEntries.some((entry) => entry.slug === 'index')) {
+  console.error('❌ Missing content/md/index.md — middleware maps / to the index slug.')
+  process.exit(1)
 }
 
 const dynamicCollisions = staticSlugs.filter((s) => DYNAMIC_SLUGS.includes(s))
@@ -213,6 +223,40 @@ for (const entry of allEntries) {
   seen.add(entry.slug)
 }
 
+// public/changelog/*.md is written by generateStaticContent.mjs earlier in
+// content:build:core; absent locally e.g. when CHANGELOG_SYNC_APP_* secrets are unset.
+const changelogSlugs = (await collectMdFiles(changelogMdDir, 'changelog')).sort()
+
+// The middleware matches request slugs against these keys verbatim, and its
+// tests mock this set — a dropped prefix would ship silently with green tests.
+if (changelogSlugs.some((s) => !s.startsWith('changelog/'))) {
+  console.error('❌ Changelog slugs must carry the changelog/ prefix the middleware matches on.')
+  process.exit(1)
+}
+
+if (changelogSlugs.length === 0) {
+  if (process.env.VERCEL) {
+    console.error(
+      '❌ No changelog slugs found in public/changelog — changelog generation produced nothing.'
+    )
+    process.exit(1)
+  }
+  console.warn(
+    '⚠️  No changelog slugs found in public/changelog — changelog md negotiation off in this build'
+  )
+}
+
+let changelogIndexExists = false
+try {
+  await fs.access(path.join(wwwDir, 'public/changelog.md'))
+  changelogIndexExists = true
+} catch (err) {
+  if (err.code !== 'ENOENT') throw err
+}
+if (changelogIndexExists) {
+  changelogSlugs.unshift('changelog')
+}
+
 const contentEntries = liveEntries
   .map((e) => `  [${JSON.stringify(e.slug)}, ${JSON.stringify(e.content)}]`)
   .join(',\n')
@@ -228,9 +272,11 @@ ${contentEntries},
 export const MD_PAGES = new Set<string>([
 ${pageEntries},
 ])
+
+export const CHANGELOG_PAGES = new Set<string>(${JSON.stringify(changelogSlugs, null, 2)})
 `
 
 await fs.writeFile(outputPath, output, 'utf-8')
 console.log(
-  `✅ Generated ${outputPath} (${liveEntries.length} files, ${allPageSlugs.length} pages)`
+  `✅ Generated ${outputPath} (${liveEntries.length} files, ${allPageSlugs.length} pages, ${changelogSlugs.length} changelog)`
 )

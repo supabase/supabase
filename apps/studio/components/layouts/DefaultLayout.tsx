@@ -1,4 +1,4 @@
-import { useBreakpoint, useParams } from 'common'
+import { useBreakpoint, useFlag, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useCallback, useEffect, useState } from 'react'
 import { ResizablePanel, ResizablePanelGroup, SidebarProvider, usePanelRef } from 'ui'
@@ -17,6 +17,7 @@ import {
 } from './ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 import { AppBannerWrapper } from '@/components/interfaces/App/AppBannerWrapper'
+import { GitHubConfigDriftBanner } from '@/components/interfaces/App/GitHubConfigDriftBanner'
 import { Sidebar } from '@/components/interfaces/Sidebar'
 import { useSyncScopedIntrospection } from '@/data/scoped-introspection'
 import { useIsolatedStudioFlow } from '@/hooks/misc/useHideSidebar'
@@ -57,6 +58,7 @@ export const DefaultLayout = ({
   const { isMaximised, activeSidebar } = useSidebarManagerSnapshot()
   const { lastVisitedOrganization } = useLastVisitedOrganization()
   const isolatedFlow = useIsolatedStudioFlow()
+  const showConfigDrift = useFlag('ConfigDrift') && IS_PLATFORM
   const resolvedHeaderTitle = headerTitle ?? (isolatedFlow ? 'New pipeline' : undefined)
   const resolvedHideMobileMenu = hideMobileMenu || isolatedFlow
   const closeIsolatedFlow = useCallback(() => {
@@ -125,6 +127,7 @@ export const DefaultLayout = ({
                     headerTitle={resolvedHeaderTitle}
                     backToDashboardURL={backToDashboardURL}
                   />
+                  {showConfigDrift && ref && <GitHubConfigDriftBanner />}
                 </div>
                 {/* Main Content Area */}
                 <div className="flex flex-1 w-full overflow-y-hidden">

@@ -10,7 +10,10 @@ import {
   toQueryLogsResult,
 } from './MessagePartQueryLogs.utils'
 
-type QueryLogsToolPart = Pick<ToolUIPart, 'toolCallId' | 'state' | 'input' | 'output'>
+type QueryLogsToolPart = Pick<
+  ToolUIPart,
+  'toolCallId' | 'state' | 'input' | 'output' | 'errorText'
+> & { rawInput?: unknown }
 
 function QueryLogsFailure() {
   return <div className="text-xs text-danger">Failed to query logs.</div>
@@ -18,7 +21,7 @@ function QueryLogsFailure() {
 
 export function MessagePartQueryLogs({ toolPart }: { toolPart: QueryLogsToolPart }) {
   const { id } = useMessageInfoContext()
-  const { toolCallId, state, input, output } = toolPart
+  const { toolCallId, state, input: submittedInput, rawInput, output } = toolPart
 
   if (state === 'input-streaming' || state === 'input-available') {
     return (
@@ -29,14 +32,16 @@ export function MessagePartQueryLogs({ toolPart }: { toolPart: QueryLogsToolPart
     )
   }
 
-  if (state === 'output-error') return <QueryLogsFailure />
-  if (state !== 'output-available') return null
+  if (state !== 'output-available' && state !== 'output-error') return null
 
-  const parsedInput = parseQueryLogsInput(input)
-  const result = toQueryLogsResult(output)
-  if (!parsedInput.success || !result) {
-    return <QueryLogsFailure />
-  }
+  const parsedInput = parseQueryLogsInput(submittedInput ?? rawInput)
+  if (!parsedInput.success) return <QueryLogsFailure />
+
+  const result =
+    state === 'output-error'
+      ? { rows: [], error: { message: toolPart.errorText ?? 'Failed to query logs' } }
+      : toQueryLogsResult(output)
+  if (!result) return <QueryLogsFailure />
 
   return (
     <div className="w-auto overflow-x-hidden my-4 space-y-2">
@@ -52,6 +57,7 @@ export function MessagePartQueryLogs({ toolPart }: { toolPart: QueryLogsToolPart
           ),
         }}
         initialResult={result}
+        confirmState={state === 'output-error' ? 'error' : undefined}
       />
     </div>
   )

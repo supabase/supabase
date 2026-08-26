@@ -4,7 +4,7 @@ import { cva, VariantProps } from 'class-variance-authority'
 import { Check, ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
 // @ts-ignore Required to avoid TS error: The inferred type of MultiSelectorContent cannot be named without a reference to @radix-ui
 import type { Popover as PopoverPrimitive } from 'radix-ui'
-import React, { isValidElement, ReactElement, useEffect } from 'react'
+import React, { Children, useEffect } from 'react'
 import {
   Badge,
   cn,
@@ -212,6 +212,21 @@ export interface MultiSelectorTriggerProps extends React.HTMLAttributes<HTMLButt
   renderValue?: (value: string) => React.ReactNode
 }
 
+const MultiSelectorTriggerVariants = cva('', {
+  variants: {
+    size: {
+      tiny: 'h-[26px] p-0.5 text-xs',
+      small: 'min-h-[34px] px-3 py-1.5 text-sm',
+      medium: 'min-h-[38px] px-4 py-2 text-sm',
+      large: 'min-h-[42px] px-4 py-2 text-base',
+      xlarge: 'min-h-[50px] px-6 py-3 text-base',
+    },
+  },
+  defaultVariants: {
+    size: SIZE_VARIANTS_DEFAULT,
+  },
+})
+
 const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTriggerProps>(
   (
     {
@@ -228,7 +243,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
     },
     ref
   ) => {
-    const { activeIndex, values, setInputValue, toggleValue, disabled, open, setOpen } =
+    const { activeIndex, values, setInputValue, toggleValue, disabled, open, setOpen, size } =
       useMultiSelect()
 
     const inputRef = React.useRef<HTMLButtonElement>(null)
@@ -293,8 +308,8 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           type="button"
           role="combobox"
           className={cn(
-            'flex w-full min-w-[200px] min-h-[34px] items-center justify-between rounded-md border',
-            'border-strong px-3 py-1.5 text-sm',
+            'flex w-full min-w-[200px] items-center justify-between rounded-md border',
+            'border-strong',
             // Empty: raised plate. Filled: sunk well for chips.
             values.length > 0 ? 'bg-field' : 'bg-control-raised',
             'placeholder:text-muted-foreground',
@@ -302,6 +317,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
             'disabled:cursor-not-allowed disabled:opacity-50',
             'hover:border-control-hover transition-colors duration-200',
             open && 'border-control-hover',
+            MultiSelectorTriggerVariants({ size }),
             className
           )}
           {...props}
@@ -309,7 +325,8 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           <div
             ref={badgesRef}
             className={cn(
-              'flex gap-1 -ml-1 overflow-hidden flex-1',
+              'flex gap-1 overflow-hidden flex-1',
+              size !== 'tiny' && '-ml-1',
               IS_BADGE_LIMIT_WRAP && 'flex-wrap',
               !IS_BADGE_LIMIT_WRAP &&
                 'overflow-x-auto scrollbar-thin scrollbar-track-transparent transition-colors scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted scrollbar-thumb-rounded-lg'
@@ -508,18 +525,10 @@ const MultiSelectorList = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof CommandList> & {
     creatable?: boolean
   }
->(({ className, children, creatable = false }, ref) => {
+>(({ className, children, creatable = false, ...props }, ref) => {
   const { open, inputValue, setInputValue, toggleValue, dropdownMaxHeight } = useMultiSelect()
 
-  const options = !!children
-    ? Array.isArray(children)
-      ? (children as React.ReactNode[])
-      : typeof children === 'object' &&
-          'props' in children &&
-          isValidElement<{ children: ReactElement[] }>(children)
-        ? children.props.children
-        : []
-    : []
+  const options = Children.toArray(children)
   const availableOptions = options
     .filter((x: any) => !!x.props.value)
     .map((x: any) => x.props.value.toLowerCase())
@@ -536,6 +545,7 @@ const MultiSelectorList = React.forwardRef<
       )}
       style={{ maxHeight: dropdownMaxHeight }}
       onWheel={(e) => e.stopPropagation()}
+      {...props}
     >
       {children}
       {creatable && inputValue.length > 0 && !isOptionExists ? (

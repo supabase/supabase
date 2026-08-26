@@ -384,6 +384,80 @@ describe('/project/[ref]/settings/infrastructure', () => {
     })
   })
 
+  test('renders compute as read-only for High Availability projects', async () => {
+    const user = userEvent.setup()
+
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: {
+        ...PROJECT,
+        cloud_provider: 'AWS_K8S',
+        high_availability: true,
+        infra_compute_size: 'large',
+      } satisfies ProjectDetailResponse,
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref/billing/addons',
+      response: {
+        available_addons: [
+          {
+            name: 'Compute Instance',
+            type: 'compute_instance',
+            variants: COMPUTE_VARIANTS,
+          },
+        ],
+        ref: PROJECT_REF,
+        selected_addons: [
+          {
+            type: 'compute_instance',
+            variant: COMPUTE_VARIANTS[2],
+          },
+        ],
+      },
+    })
+
+    renderInfrastructurePage()
+
+    expect(
+      await screen.findByText("Compute size can't be changed on High Availability projects")
+    ).toBeInTheDocument()
+
+    const largeCompute = await screen.findByRole('radio', { name: /Large/ })
+    await waitFor(() => expect(largeCompute).toBeChecked())
+
+    const microCompute = screen.getByRole('radio', { name: /Micro/ })
+    const smallCompute = screen.getByRole('radio', { name: /Small/ })
+    expect(largeCompute).toBeDisabled()
+    expect(microCompute).toBeDisabled()
+    expect(smallCompute).toBeDisabled()
+
+    // The "Contact Us" card for larger sizes is hidden for High Availability projects
+    expect(screen.queryByText('Contact Us')).not.toBeInTheDocument()
+
+    // Clicking a locked option must not dirty the form or surface the submit flow
+    await user.click(smallCompute)
+    expect(largeCompute).toBeChecked()
+    expect(screen.queryByRole('button', { name: 'Review changes' })).not.toBeInTheDocument()
+  })
+
+  test('keeps compute editable for non High Availability projects', async () => {
+    const user = userEvent.setup()
+    renderInfrastructurePage()
+
+    expect(
+      screen.queryByText("Compute size can't be changed on High Availability projects")
+    ).not.toBeInTheDocument()
+
+    const smallCompute = await screen.findByRole('radio', { name: /Small/ })
+    expect(smallCompute).toBeEnabled()
+    expect(screen.getByText('Contact Us')).toBeInTheDocument()
+
+    await user.click(smallCompute)
+    expect(screen.getByRole('button', { name: 'Review changes' })).toBeEnabled()
+  })
+
   test('submits disk and autoscaling changes to both infrastructure APIs', async () => {
     const user = userEvent.setup()
     let diskRequest: unknown
