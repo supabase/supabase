@@ -22,10 +22,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ path
 
   return new NextResponse('Not found', {
     status: 404,
-    headers: {
-      'Content-Type': 'text/plain; charset=utf-8',
-      'Cache-Control': 'no-store',
-      Vary: 'Accept',
-    },
+    headers: { ...MARKDOWN_404_HEADERS, 'Content-Type': 'text/plain; charset=utf-8' },
   })
 }
