@@ -17,6 +17,7 @@ import {
   updateNotebookToolOutputSchema,
 } from './Message.utils'
 import { AlertError } from '@/components/ui/AlertError'
+import { hasDiscardableChanges } from '@/data/content/notebooks/notebook-cache'
 import {
   deriveNotebookDiff,
   describeNotebookOperationError,
@@ -24,6 +25,7 @@ import {
 } from '@/data/content/notebooks/notebook-operations'
 import { useNotebookQuery } from '@/data/content/notebooks/notebook-query'
 import { toWireNotebook } from '@/data/content/notebooks/notebook-schema'
+import { useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 
 export type NotebookProposalMode = 'create' | 'update' | 'delete'
 
@@ -98,6 +100,14 @@ const NOTEBOOK_ACTION_NOUN: Record<NotebookProposalMode, string> = {
 export const NotebookProposalRenderer = (props: NotebookProposalRendererProps) => {
   const { ref } = useParams()
   const { mode, state, input, output, confirmState, onApprove, onDeny, denyWithReason } = props
+
+  if (
+    mode === 'update' &&
+    (state === 'output-available' || state === 'output-error' || state === 'output-denied')
+  ) {
+    return <UpdateNotebookTerminalSummary state={state} output={output} />
+  }
+
   const parsedOutput = notebookToolOutputSchema.safeParse(output)
   // A deleted notebook no longer exists to open, so this action only applies to create/update.
   const canOpenNotebook = mode !== 'delete' && state === 'output-available'
@@ -146,6 +156,35 @@ export const NotebookProposalRenderer = (props: NotebookProposalRendererProps) =
       {proposal}
       {confirmState === undefined && footerAction}
     </>
+  )
+}
+
+function UpdateNotebookTerminalSummary({
+  state,
+  output,
+}: Pick<NotebookProposalRendererProps, 'state' | 'output'>) {
+  const { ref } = useParams()
+  const parsedOutput = notebookToolOutputSchema.safeParse(output)
+  const label =
+    state === 'output-available'
+      ? parsedOutput.success
+        ? `Notebook updated: ${parsedOutput.data.name}`
+        : 'Notebook updated'
+      : state === 'output-error'
+        ? 'Failed to update notebook'
+        : 'Skipped notebook update'
+
+  return (
+    <div className="flex items-center justify-between gap-2 my-2 mx-4 px-3 py-1.5 text-sm border rounded-md bg-surface-75">
+      <span className="text-foreground-light truncate">{label}</span>
+      {state === 'output-available' && parsedOutput.success && ref && (
+        <Button asChild variant="default" size="tiny">
+          <Link href={`/project/${ref}/explorer/notebook/${parsedOutput.data.id}`}>
+            Open notebook
+          </Link>
+        </Button>
+      )}
+    </div>
   )
 }
 
@@ -346,8 +385,13 @@ function UpdateNotebookProposal({
   denyWithReason,
 }: NotebookProposalStepPropsWithOutput) {
   const { ref } = useParams()
+  const notebooksSnap = useNotebooksStateSnapshot()
   const parsedInput = updateNotebookInputSchema.safeParse(input)
   const isCompleted = state === 'output-available'
+  const hasUnsavedLocalChanges =
+    confirmState === 'approval-requested' &&
+    parsedInput.success &&
+    hasDiscardableChanges(notebooksSnap.notebooks[parsedInput.data.id])
 
   const {
     data: notebook,
@@ -464,6 +508,7 @@ function UpdateNotebookProposal({
       onApprove={onApprove}
       onDeny={onDeny}
     >
+      {hasUnsavedLocalChanges && <UnsavedLocalChangesWarning mode="update" />}
       <AssistantNotebookPreview entries={diff.entries} mode="update" title={notebook.name} />
     </NotebookConfirm>
   )
@@ -478,8 +523,13 @@ function DeleteNotebookProposal({
   onDeny,
 }: NotebookProposalStepPropsWithOutput) {
   const { ref } = useParams()
+  const notebooksSnap = useNotebooksStateSnapshot()
   const parsedInput = deleteNotebookInputSchema.safeParse(input)
   const isCompleted = state === 'output-available'
+  const hasUnsavedLocalChanges =
+    confirmState === 'approval-requested' &&
+    parsedInput.success &&
+    hasDiscardableChanges(notebooksSnap.notebooks[parsedInput.data.id])
 
   const {
     data: notebook,
@@ -556,6 +606,7 @@ function DeleteNotebookProposal({
       onApprove={onApprove}
       onDeny={onDeny}
     >
+      {hasUnsavedLocalChanges && <UnsavedLocalChangesWarning mode="delete" />}
       <div className="p-3">
         <Admonition
           type="destructive"
@@ -564,5 +615,21 @@ function DeleteNotebookProposal({
         />
       </div>
     </NotebookConfirm>
+  )
+}
+
+function UnsavedLocalChangesWarning({ mode }: { mode: 'update' | 'delete' }) {
+  return (
+    <div className="px-2 pt-2">
+      <Admonition
+        type="warning"
+        title="Unsaved local changes"
+        description={
+          mode === 'update'
+            ? "This notebook has unsaved local changes that aren't reflected in this preview. Approving will overwrite them on save."
+            : "This notebook has unsaved local changes that aren't reflected in this preview. Approving will permanently delete them."
+        }
+      />
+    </div>
   )
 }

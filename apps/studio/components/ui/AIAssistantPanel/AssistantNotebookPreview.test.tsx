@@ -92,4 +92,55 @@ describe('AssistantNotebookPreview', () => {
 
     expect(screen.getByText('Show 2 more cells')).toBeInTheDocument()
   })
+
+  it('renders run results inside their matching minified notebook cell', () => {
+    const entries: NotebookCellDiffEntry[] = [
+      { _tag: 'unchanged', cell: wireDatabaseCell('cell-1') },
+    ]
+
+    const { container } = render(
+      <AssistantNotebookPreview
+        entries={entries}
+        mode="run"
+        title="Signup funnel"
+        results={{ 'cell-1': { rows: [] } }}
+      />
+    )
+
+    expect(screen.getByText('Signup funnel')).toBeInTheDocument()
+    expect(screen.getByText('1 cell')).toBeInTheDocument()
+    expect(screen.getByText('Success. No rows returned')).toBeInTheDocument()
+    expect(screen.getByText('0 rows')).toBeInTheDocument()
+    expect(container.querySelector('[data-slot="explorer-query-results"]')).toBeInTheDocument()
+  })
+
+  it('bases result rendering and layout on supplied results rather than preview mode', () => {
+    const entries: NotebookCellDiffEntry[] = [
+      { _tag: 'unchanged', cell: wireDatabaseCell('cell-1') },
+    ]
+
+    const { container } = render(
+      <AssistantNotebookPreview
+        entries={entries}
+        mode="create"
+        results={{ 'cell-1': { rows: [{ value: 1 }] } }}
+      />
+    )
+
+    expect(screen.getByText('1 row')).toBeInTheDocument()
+    expect(container.querySelector('[data-slot="explorer-query-results"]')).toBeInTheDocument()
+    expect(container.querySelector('.flex.flex-col.gap-2')).toBeInTheDocument()
+    expect(container.querySelector('.divide-y.divide-border')).not.toBeInTheDocument()
+  })
+
+  it('keeps a run preview without results in the grouped cell layout', () => {
+    const entries: NotebookCellDiffEntry[] = [
+      { _tag: 'unchanged', cell: wireDatabaseCell('cell-1') },
+    ]
+
+    const { container } = render(<AssistantNotebookPreview entries={entries} mode="run" />)
+
+    expect(container.querySelector('[data-slot="explorer-query-results"]')).not.toBeInTheDocument()
+    expect(container.querySelector('.divide-y.divide-border')).toBeInTheDocument()
+  })
 })

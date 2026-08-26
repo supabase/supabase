@@ -37,6 +37,7 @@ Barco Fourie
 Barry Roodt
 Beng Eu
 Benjamin Coenen
+Beth Long
 Bo Lu
 Bobbie Soedirgo
 Brad Gyger
@@ -243,6 +244,8 @@ Peter Lyn
 Peter Soderberg
 Pierre Ducroquet
 Pierre Frances
+Ping-Min Lin
+Prashansa Kulshrestha
 Qiao Han
 Quintin Willison
 Rafael Chacón

@@ -8,6 +8,7 @@ import {
 } from './notebook-cache-invalidation'
 import {
   createAssistantMessageWithCreateNotebookTool,
+  createAssistantMessageWithDeleteNotebookTool,
   createAssistantMessageWithUpdateNotebookTool,
   createAssistantTextMessage,
   createUserMessage,
@@ -48,6 +49,14 @@ describe('collectNotebookCacheEffects', () => {
     const effects = collectNotebookCacheEffects(messages, new Set())
 
     expect(effects).toEqual([{ _tag: 'upserted', toolCallId: 'call-notebook-1', id: 'notebook-1' }])
+  })
+
+  it('collects a delete_notebook output-available part', () => {
+    const messages = [createAssistantMessageWithDeleteNotebookTool()]
+
+    const effects = collectNotebookCacheEffects(messages, new Set())
+
+    expect(effects).toEqual([{ _tag: 'deleted', toolCallId: 'call-notebook-1', id: 'notebook-1' }])
   })
 
   it('ignores non-terminal tool states', () => {
@@ -113,6 +122,7 @@ describe('applyNotebookCacheEffects', () => {
   afterEach(() => {
     delete notebooksState.notebooks[NOTEBOOK.id]
     notebooksState.needsSaving.clear()
+    notebooksState.serverDivergedWhileDirty.clear()
   })
 
   it('invalidates the nav list and evicts an upserted, saved notebook from the cache', async () => {
@@ -138,7 +148,30 @@ describe('applyNotebookCacheEffects', () => {
     expect(notebooksState.notebooks[NOTEBOOK.id]).toBeUndefined()
   })
 
-  it('leaves a dirty (unsaved) notebook in the store untouched', async () => {
+  it('invalidates the nav list and evicts a deleted notebook from the cache', async () => {
+    notebooksState.setNotebook({ projectRef: PROJECT_REF, notebook: NOTEBOOK })
+    const queryClient = new QueryClient()
+    queryClient.setQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK.id), { id: NOTEBOOK.id })
+    queryClient.setQueryData(contentKeys.allContentLists(PROJECT_REF), [])
+    queryClient.setQueryData(contentKeys.infiniteList(PROJECT_REF), {})
+
+    await applyNotebookCacheEffects({
+      queryClient,
+      projectRef: PROJECT_REF,
+      effects: [{ _tag: 'deleted', toolCallId: 'call-1', id: NOTEBOOK.id }],
+    })
+
+    expect(queryClient.getQueryState(contentKeys.allContentLists(PROJECT_REF))?.isInvalidated).toBe(
+      true
+    )
+    expect(queryClient.getQueryState(contentKeys.infiniteList(PROJECT_REF))?.isInvalidated).toBe(
+      true
+    )
+    expect(queryClient.getQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK.id))).toBeUndefined()
+    expect(notebooksState.notebooks[NOTEBOOK.id]).toBeUndefined()
+  })
+
+  it('records an assistant update while leaving a dirty notebook untouched', async () => {
     notebooksState.addNotebook({ projectRef: PROJECT_REF, notebook: NOTEBOOK })
     const queryClient = new QueryClient()
 
@@ -149,9 +182,10 @@ describe('applyNotebookCacheEffects', () => {
     })
 
     expect(notebooksState.notebooks[NOTEBOOK.id]).toBeDefined()
+    expect(notebooksState.serverDivergedWhileDirty.get(NOTEBOOK.id)).toBe('updated')
   })
 
-  it('leaves an edited (unsaved, non-empty) notebook untouched', async () => {
+  it('records an assistant deletion while leaving an edited notebook untouched', async () => {
     notebooksState.setNotebook({ projectRef: PROJECT_REF, notebook: NOTEBOOK })
     notebooksState.updateCells({
       id: NOTEBOOK.id,
@@ -163,10 +197,25 @@ describe('applyNotebookCacheEffects', () => {
     await applyNotebookCacheEffects({
       queryClient,
       projectRef: PROJECT_REF,
-      effects: [{ _tag: 'upserted', toolCallId: 'call-1', id: NOTEBOOK.id }],
+      effects: [{ _tag: 'deleted', toolCallId: 'call-1', id: NOTEBOOK.id }],
     })
 
     expect(notebooksState.notebooks[NOTEBOOK.id]).toBeDefined()
+    expect(notebooksState.serverDivergedWhileDirty.get(NOTEBOOK.id)).toBe('deleted')
+  })
+
+  it('does not record a conflict for a different notebook', async () => {
+    notebooksState.addNotebook({ projectRef: PROJECT_REF, notebook: NOTEBOOK })
+    const queryClient = new QueryClient()
+
+    await applyNotebookCacheEffects({
+      queryClient,
+      projectRef: PROJECT_REF,
+      effects: [{ _tag: 'upserted', toolCallId: 'call-1', id: 'other-notebook' }],
+    })
+
+    expect(notebooksState.serverDivergedWhileDirty.has(NOTEBOOK.id)).toBe(false)
+    expect(notebooksState.serverDivergedWhileDirty.has('other-notebook')).toBe(false)
   })
 
   it('no-ops entirely for an empty effects list', async () => {

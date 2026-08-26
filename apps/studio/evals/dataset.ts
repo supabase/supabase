@@ -648,6 +648,37 @@ export const dataset: AssistantEvalCase[] = [
   {
     input: {
       prompt:
+        "Create a notebook called 'Primary customer signups' with a query that shows the 20 most recently created customers on my primary database.",
+      mockTables: {
+        public: [
+          {
+            name: 'customers',
+            rls_enabled: true,
+            columns: [
+              { name: 'id', data_type: 'uuid' },
+              { name: 'created_at', data_type: 'timestamp with time zone' },
+            ],
+          },
+        ],
+      },
+    },
+    expected: {
+      requiredTools: [
+        { name: 'create_notebook', input: { name: { equals: 'Primary customer signups' } } },
+      ],
+      forbiddenTools: ['list_databases'],
+      correctAnswer:
+        'Creates the notebook with a database cell selecting the 20 most recent customers and omits the database_identifier key entirely — not present in the cell at all. The primary database does not need a lookup, and database_identifier must never be set to the literal "primary", an empty string, or another guessed value; setting it to "" is a contradiction of "omit the field", not equivalent to omitting it.',
+    },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Guards against fabricating the literal primary identifier or making an unnecessary list_databases round trip for a primary-database notebook',
+    },
+  },
+  {
+    input: {
+      prompt:
         "Create a notebook called 'EU replica check' with a query that counts rows in the customers table, targeting my EU read replica.",
       mockTables: {
         public: [
