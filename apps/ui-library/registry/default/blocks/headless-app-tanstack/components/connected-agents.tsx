@@ -68,19 +68,28 @@ function GrantRow({
   )
 }
 
-interface ConnectedAgentsProps extends React.ComponentPropsWithoutRef<'section'> {
+export interface ConnectedAgentsViewProps extends React.ComponentPropsWithoutRef<'section'> {
   mcpServerUrl: string
   productName?: string
+  grants?: OAuthGrant[] | null
+  isLoading?: boolean
+  error?: string | null
+  revokingClientId?: string | null
+  onRevoke?: (clientId: string) => void
 }
 
-export function ConnectedAgents({
+// The presentational half, so a preview can render either state with fixed data.
+export function ConnectedAgentsView({
   mcpServerUrl,
   productName = 'this app',
+  grants = null,
+  isLoading = false,
+  error = null,
+  revokingClientId = null,
+  onRevoke,
   className,
   ...props
-}: ConnectedAgentsProps) {
-  const { grants, error, isLoading, revokingClientId, revoke } = useOAuthGrants()
-
+}: ConnectedAgentsViewProps) {
   return (
     <section className={cn('flex flex-col gap-6', className)} {...props}>
       <div className="flex flex-col gap-1.5">
@@ -104,7 +113,7 @@ export function ConnectedAgents({
                 key={grant.client.id}
                 grant={grant}
                 isRevoking={revokingClientId === grant.client.id}
-                onRevoke={() => void revoke(grant.client.id)}
+                onRevoke={() => onRevoke?.(grant.client.id)}
               />
             ))}
           </ul>
@@ -118,5 +127,25 @@ export function ConnectedAgents({
         </p>
       )}
     </section>
+  )
+}
+
+interface ConnectedAgentsProps extends React.ComponentPropsWithoutRef<'section'> {
+  mcpServerUrl: string
+  productName?: string
+}
+
+export function ConnectedAgents(props: ConnectedAgentsProps) {
+  const { grants, error, isLoading, revokingClientId, revoke } = useOAuthGrants()
+
+  return (
+    <ConnectedAgentsView
+      grants={grants}
+      error={error}
+      isLoading={isLoading}
+      revokingClientId={revokingClientId}
+      onRevoke={(clientId) => void revoke(clientId)}
+      {...props}
+    />
   )
 }
