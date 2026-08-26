@@ -25,6 +25,13 @@ import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
+
+/** Schemas that are part of PostgreSQL itself or Supabase internals */
+const isSystemSchema = (name: string): boolean =>
+  INTERNAL_SCHEMAS.includes(name) ||
+  name.startsWith('pg_') ||
+  name === 'information_schema'
 
 type SchemaSelectorProps = Omit<ComponentPropsWithoutRef<'div'>, 'onSelect'> & {
   disabled?: boolean
@@ -100,6 +107,9 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
           .sort((a, b) => a.name.localeCompare(b.name)),
       [visibleSchemas, excludedSchemas]
     )
+
+    const userSchemas = schemas.filter((s) => !isSystemSchema(s.name))
+    const systemSchemas = schemas.filter((s) => isSystemSchema(s.name))
 
     return (
       <div ref={ref} className={className} {...rest}>
@@ -197,7 +207,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
                           )}
                         </CommandItem>
                       )}
-                      {schemas.map((schema) => (
+                      {userSchemas.map((schema) => (
                         <CommandItem
                           key={schema.id}
                           className="cursor-pointer flex items-center justify-between space-x-2 w-full"
@@ -216,6 +226,33 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
                           )}
                         </CommandItem>
                       ))}
+                      {systemSchemas.length > 0 && (
+                        <>
+                          <CommandSeparator className="my-1" />
+                          <p className="px-2 py-1.5 text-xs text-foreground-lighter">
+                            System schemas
+                          </p>
+                          {systemSchemas.map((schema) => (
+                            <CommandItem
+                              key={schema.id}
+                              className="cursor-pointer flex items-center justify-between space-x-2 w-full"
+                              onSelect={() => {
+                                onSelectSchema(schema.name)
+                                setOpen(false)
+                              }}
+                              onClick={() => {
+                                onSelectSchema(schema.name)
+                                setOpen(false)
+                              }}
+                            >
+                              <span className="text-foreground-lighter">{schema.name}</span>
+                              {selectedSchemaName === schema.name && (
+                                <Check className="text-brand" strokeWidth={2} size={16} />
+                              )}
+                            </CommandItem>
+                          ))}
+                        </>
+                      )}
                     </ScrollArea>
                   </CommandGroup>
                   {onSelectCreateSchema !== undefined && canCreateSchemas && (
