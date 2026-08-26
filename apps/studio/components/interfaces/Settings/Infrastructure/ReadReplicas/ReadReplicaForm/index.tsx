@@ -23,7 +23,7 @@ import type { RecommendedComputeForReadReplicas } from '@/components/interfaces/
 import { RegionFlag } from '@/components/ui/RegionFlag'
 import { Region, useReadReplicaSetUpMutation } from '@/data/read-replicas/replica-setup-mutation'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { AWS_REGIONS_DEFAULT, BASE_PATH } from '@/lib/constants'
+import { AWS_REGIONS_DEFAULT } from '@/lib/constants'
 
 interface ReadReplicaFormProps {
   typeSelection?: ReactNode
@@ -104,10 +104,9 @@ export const ReadReplicaForm = ({
               <SelectValue placeholder="Select a region">
                 <span className="flex min-w-0 items-center gap-x-2">
                   {selectedRegionDetails !== undefined && (
-                    <img
-                      alt=""
-                      className="w-5 shrink-0 rounded-xs"
-                      src={`${BASE_PATH}/img/regions/${selectedRegionDetails.region}.svg`}
+                    <RegionFlag
+                      className="w-5 shrink-0"
+                      region={selectedRegionDetails.region}
                     />
                   )}
                   <span className="truncate">{selectedRegionDetails?.name}</span>
