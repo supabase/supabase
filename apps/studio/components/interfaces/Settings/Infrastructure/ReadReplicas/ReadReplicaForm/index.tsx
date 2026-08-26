@@ -104,10 +104,7 @@ export const ReadReplicaForm = ({
               <SelectValue placeholder="Select a region">
                 <span className="flex min-w-0 items-center gap-x-2">
                   {selectedRegionDetails !== undefined && (
-                    <RegionFlag
-                      className="w-5 shrink-0"
-                      region={selectedRegionDetails.region}
-                    />
+                    <RegionFlag className="w-5 shrink-0" region={selectedRegionDetails.region} />
                   )}
                   <span className="truncate">{selectedRegionDetails?.name}</span>
                 </span>
