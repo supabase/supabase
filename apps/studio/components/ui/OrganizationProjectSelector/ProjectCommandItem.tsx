@@ -1,8 +1,8 @@
 import { Check } from 'lucide-react'
-import Link from 'next/link'
 import { ReactNode } from 'react'
 import { cn, CommandItem } from 'ui'
 
+import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
 
 export interface ProjectCommandItemProps {
@@ -33,14 +33,8 @@ export function ProjectCommandItem({
 
   const disabled = isOptionDisabled?.(project) ?? false
 
-  const item = (
-    <CommandItem
-      key={project.ref}
-      value={`${project.name.replaceAll('"', '')}-${project.ref}`}
-      className="cursor-pointer w-full"
-      onSelect={handleSelect}
-      disabled={disabled}
-    >
+  const content = (
+    <>
       {renderRow ? (
         renderRow(project)
       ) : (
@@ -56,14 +50,21 @@ export function ProjectCommandItem({
           {checkPosition === 'right' && project.ref === selectedRef && <Check size={16} />}
         </div>
       )}
-    </CommandItem>
+    </>
   )
 
-  return href && !disabled ? (
-    <Link passHref href={href}>
-      {item}
-    </Link>
+  const commandItemProps = {
+    value: `${project.name.replaceAll('"', '')}-${project.ref}`,
+    className: 'cursor-pointer w-full',
+    onSelect: handleSelect,
+    disabled,
+  }
+
+  return href ? (
+    <CommandItemLink href={href} {...commandItemProps}>
+      {content}
+    </CommandItemLink>
   ) : (
-    item
+    <CommandItem {...commandItemProps}>{content}</CommandItem>
   )
 }

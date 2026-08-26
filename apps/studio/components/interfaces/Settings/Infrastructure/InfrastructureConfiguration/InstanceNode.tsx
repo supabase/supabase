@@ -413,7 +413,7 @@ export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
               View connection string
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-x-2">
+            <DropdownMenuItem className="gap-x-2" asChild>
               <Link href={getReadReplicaPath(ref, id)}>Manage replica</Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
