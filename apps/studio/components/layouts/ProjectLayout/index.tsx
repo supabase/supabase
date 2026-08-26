@@ -1,4 +1,4 @@
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, mergeRefs, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, mergeRefs, useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { XIcon } from 'lucide-react'
 import Head from 'next/head'
