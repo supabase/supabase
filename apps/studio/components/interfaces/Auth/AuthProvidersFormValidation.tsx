@@ -101,7 +101,7 @@ const PROVIDER_EMAIL = {
         z.coerce
           .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
           .min(0, 'Must be greater or equal to 0')
-          .max(86400, 'Must be no more than 86400')
+          .max(604800, 'Must be no more than 604800')
       ),
       MAILER_OTP_LENGTH: z.preprocess(
         (val) => (val === '' || val == null ? undefined : val),
