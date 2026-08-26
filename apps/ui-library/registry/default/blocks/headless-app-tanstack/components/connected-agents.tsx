@@ -7,6 +7,13 @@ import {
   type OAuthGrant,
 } from '@/registry/default/blocks/headless-app-tanstack/hooks/use-oauth-grants'
 import { Button } from '@/registry/default/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/registry/default/components/ui/card'
 
 const buildPrompt = (productName: string, mcpServerUrl: string) =>
   `Connect to ${productName} using this MCP server:\n\n${mcpServerUrl}\n\nThen list the tools it gives you.`
@@ -24,20 +31,15 @@ function ConnectPrompt({ prompt }: { prompt: string }) {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <p className="text-sm text-muted-foreground">
-        No agents yet. Paste this prompt into an agent to connect it.
-      </p>
-      <div className="overflow-hidden rounded-lg border bg-card">
-        <pre className="overflow-x-auto whitespace-pre-wrap p-4 font-mono text-sm leading-relaxed">
-          {prompt}
-        </pre>
-        <div className="flex justify-end border-t p-2">
-          <Button type="button" size="sm" variant="outline" onClick={() => void copy()}>
-            {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
-            {copied ? 'Copied' : 'Copy prompt'}
-          </Button>
-        </div>
+    <div className="overflow-hidden rounded-lg border bg-muted">
+      <pre className="overflow-x-auto whitespace-pre-wrap p-4 font-mono text-sm leading-relaxed">
+        {prompt}
+      </pre>
+      <div className="flex justify-end border-t p-2">
+        <Button type="button" size="sm" variant="outline" onClick={() => void copy()}>
+          {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
+          {copied ? 'Copied' : 'Copy prompt'}
+        </Button>
       </div>
     </div>
   )
@@ -53,10 +55,10 @@ function GrantRow({
   onRevoke: () => void
 }) {
   return (
-    <li className="flex items-center gap-4 border-b p-4 last:border-b-0">
+    <li className="flex items-center gap-4 p-4">
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <span className="truncate font-medium">{grant.client.name}</span>
-        <span className="truncate text-xs text-muted-foreground">
+        <span className="truncate text-muted-foreground">
           Connected {formatDate(grant.granted_at)}
           {grant.scopes.length > 0 && ` · ${grant.scopes.join(', ')}`}
         </span>
@@ -68,7 +70,7 @@ function GrantRow({
   )
 }
 
-export interface ConnectedAgentsViewProps extends React.ComponentPropsWithoutRef<'section'> {
+export interface ConnectedAgentsViewProps extends React.ComponentPropsWithoutRef<'div'> {
   mcpServerUrl: string
   productName?: string
   grants?: OAuthGrant[] | null
@@ -90,47 +92,54 @@ export function ConnectedAgentsView({
   className,
   ...props
 }: ConnectedAgentsViewProps) {
+  const hasGrants = grants !== null && grants.length > 0
+
   return (
-    <section className={cn('flex flex-col gap-6', className)} {...props}>
-      <div className="flex flex-col gap-1.5">
-        <h1 className="text-2xl tracking-tight">Connected agents</h1>
-        <p className="text-sm text-muted-foreground">
-          Agents you authorized to use {productName} on your behalf.
-        </p>
-      </div>
+    <div className={cn('flex flex-col gap-6', className)} {...props}>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-2xl">Connected agents</CardTitle>
+          <CardDescription>
+            {hasGrants
+              ? `Agents you authorized to use ${productName} on your behalf.`
+              : 'No agents yet. Paste this prompt into an agent to connect it.'}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {isLoading && (
+            <p role="status" className="text-sm text-muted-foreground">
+              Loading connected agents...
+            </p>
+          )}
 
-      {isLoading && (
-        <p role="status" className="text-sm text-muted-foreground">
-          Loading connected agents...
-        </p>
-      )}
-
-      {grants &&
-        (grants.length > 0 ? (
-          <ul className="rounded-lg border">
-            {grants.map((grant) => (
-              <GrantRow
-                key={grant.client.id}
-                grant={grant}
-                isRevoking={revokingClientId === grant.client.id}
-                onRevoke={() => onRevoke?.(grant.client.id)}
-              />
+          {grants &&
+            (hasGrants ? (
+              <ul className="divide-y rounded-lg border bg-muted text-sm">
+                {grants.map((grant) => (
+                  <GrantRow
+                    key={grant.client.id}
+                    grant={grant}
+                    isRevoking={revokingClientId === grant.client.id}
+                    onRevoke={() => onRevoke?.(grant.client.id)}
+                  />
+                ))}
+              </ul>
+            ) : (
+              <ConnectPrompt prompt={buildPrompt(productName, mcpServerUrl)} />
             ))}
-          </ul>
-        ) : (
-          <ConnectPrompt prompt={buildPrompt(productName, mcpServerUrl)} />
-        ))}
 
-      {error && (
-        <p role="alert" className="text-sm text-destructive">
-          {error}
-        </p>
-      )}
-    </section>
+          {error && (
+            <p role="alert" className="text-sm text-destructive">
+              {error}
+            </p>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   )
 }
 
-interface ConnectedAgentsProps extends React.ComponentPropsWithoutRef<'section'> {
+interface ConnectedAgentsProps extends React.ComponentPropsWithoutRef<'div'> {
   mcpServerUrl: string
   productName?: string
 }

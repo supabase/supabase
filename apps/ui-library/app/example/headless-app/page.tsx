@@ -36,10 +36,20 @@ const screens = {
     />
   ),
   connect: (
-    <ConnectedAgentsView mcpServerUrl={MCP_SERVER_URL} productName={PRODUCT_NAME} grants={[]} />
+    <ConnectedAgentsView
+      className="mx-auto max-w-lg"
+      mcpServerUrl={MCP_SERVER_URL}
+      productName={PRODUCT_NAME}
+      grants={[]}
+    />
   ),
   connected: (
-    <ConnectedAgentsView mcpServerUrl={MCP_SERVER_URL} productName={PRODUCT_NAME} grants={grants} />
+    <ConnectedAgentsView
+      className="mx-auto max-w-lg"
+      mcpServerUrl={MCP_SERVER_URL}
+      productName={PRODUCT_NAME}
+      grants={grants}
+    />
   ),
 }
 

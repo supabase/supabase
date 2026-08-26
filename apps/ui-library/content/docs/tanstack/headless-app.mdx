@@ -70,8 +70,7 @@ or run `supabase status` against a local stack.
 ## The agents route
 
 `routes/_protected/agents.tsx` sits under the `_protected` layout route, so
-signed-out visitors are redirected to `/login` before it renders and the
-signed-in user arrives through the layout's context.
+signed-out visitors are redirected to `/login` before it renders.
 
 The route reads the user's OAuth grants and renders one of two states. With no
 grants, it shows a prompt to paste into an agent. The prompt carries the MCP
