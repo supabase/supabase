@@ -35,21 +35,19 @@ import { WorkerSnippetTabs } from '../WorkerSnippetTabs'
 import { WorkerStatePill } from '../WorkerStatePill'
 import { WorkerLogsTab } from './WorkerLogsTab'
 import { WorkerOverviewTab } from './WorkerOverviewTab'
-import { WorkerSettingsTab } from './WorkerSettingsTab'
 import { AlertError } from '@/components/ui/AlertError'
 import type { WorkerLogStream } from '@/data/workers/worker-logs-query'
 import { workerQueryOptions } from '@/data/workers/worker-query'
 import { PRODUCT_NAME } from '@/lib/constants/workers'
 
-type WorkerTab = 'overview' | 'invocations' | 'logs' | 'activity' | 'settings'
-const WORKER_TABS: WorkerTab[] = ['overview', 'invocations', 'logs', 'activity', 'settings']
+type WorkerTab = 'overview' | 'invocations' | 'logs' | 'activity'
+const WORKER_TABS: WorkerTab[] = ['overview', 'invocations', 'logs', 'activity']
 
 const TAB_LABEL: Record<WorkerTab, string> = {
   overview: 'Overview',
   invocations: 'Invocations',
   logs: 'Logs',
   activity: 'Activity',
-  settings: 'Settings',
 }
 
 const TAB_STREAM: Partial<Record<WorkerTab, WorkerLogStream>> = {
@@ -171,7 +169,6 @@ export const WorkerDetail = () => {
           <WorkerLogsTab workerName={worker.name} stream={stream} />
         </div>
       )}
-      {tab === 'settings' && <WorkerSettingsTab worker={worker} />}
     </div>
   )
 }
