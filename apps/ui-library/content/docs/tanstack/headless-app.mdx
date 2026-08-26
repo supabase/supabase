@@ -1,117 +1,65 @@
 ---
 title: Headless App
-description: An agent-first TanStack Start app on Supabase
+description: Give your agents a backend
 ---
 
-Most of this product is used through an agent, not a browser. The app still needs
-a place for users to sign in, approve the agents that ask for access, and revoke
-them later. This block installs that app: password auth, an OAuth 2.1 consent
-screen, an MCP server, and an `/agents` route that manages the connections
-between them.
+A headless app has no interface of its own. Users sign in once, connect their
+agent, and everything after that happens inside their harness — Claude Code,
+Codex, ChatGPT — through MCP tool calls against your database.
+
+This block is the whole app: sign-in, the consent screen agents are sent to, the
+MCP server they call, and a page to connect and revoke them.
 
 <BlockPreview name="headless-app" />
-
-Everything the app serves is either an auth screen or a grant screen, so it runs
-on TanStack Start rather than a heavier framework. Supabase holds the state.
 
 ## Installation
 
 <BlockItem name="headless-app-tanstack" showOpenInV0={false} />
 
+It installs the [Password-Based Auth](/library/docs/tanstack/password-based-auth),
+[OAuth Consent](/library/docs/tanstack/oauth-consent), and
+[MCP Server](/library/docs/headless/mcp-server) blocks, and overwrites
+`supabase/config.toml`. Back up an existing one and merge your settings back in.
+
 ## Folder structure
 
 <RegistryBlock itemName="headless-app-tanstack" />
 
-## What it installs
+## Set up
 
-| Block                                                             | What it covers                                    |
-| ----------------------------------------------------------------- | ------------------------------------------------- |
-| [Password-Based Auth](/library/docs/tanstack/password-based-auth) | Sign-in, sign-up, and the `_protected` layout     |
-| [OAuth Consent](/library/docs/tanstack/oauth-consent)             | The `/oauth/consent` route agents are sent to     |
-| [MCP Server](/library/docs/headless/mcp-server)                   | The Edge Function agents call, scoped to the user |
+1. Add your project's URL and key to `.env.local`:
 
-On top of those, it adds `/agents` and a `supabase/config.toml` with the settings
-the three blocks need.
+   ```env
+   VITE_SUPABASE_URL=
+   VITE_SUPABASE_PUBLISHABLE_KEY=
+   ```
 
-## Configure the project
+   Find them in the [Connect modal](https://supabase.com/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=react&using=vite&with=supabasejs),
+   or run `supabase status` against a local stack.
 
-The block writes `supabase/config.toml`. Installing over an existing file
-replaces it, so merge your own settings back in afterwards. The parts that matter
-for this app:
+2. Name your product. Set `PRODUCT_NAME` in `routes/_protected/agents.tsx` and
+   the `productName` prop in `routes/oauth/consent.tsx`.
 
-```toml
-[auth]
-site_url = "http://localhost:3000"
+3. Set `site_url` in `supabase/config.toml` to the origin serving your app. Auth
+   sends users there to approve an agent, so it has to match.
 
-[auth.oauth_server]
-enabled = true
-authorization_url_path = "/oauth/consent"
-allow_dynamic_registration = true
+4. Start everything:
 
-[functions.mcp-server]
-verify_jwt = false
-```
+   ```bash
+   supabase start
+   supabase functions serve mcp-server --env-file supabase/functions/.env
+   npm run dev
+   ```
 
-`site_url` must be the origin that serves `/oauth/consent`, since that is where
-Auth sends users to approve a client. Use HTTPS in production.
-`allow_dynamic_registration` lets any compatible client register itself; set it
-to `false` to register clients yourself.
+5. Sign up, open `/agents`, and paste the prompt into an agent. It registers
+   itself, sends you to `/oauth/consent`, and appears in the list once approved.
 
-The app reads two environment variables from `.env.local`:
+## Add tools
 
-```env
-VITE_SUPABASE_URL=
-VITE_SUPABASE_PUBLISHABLE_KEY=
-```
-
-Find them in the [Connect modal](https://supabase.com/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=react&using=vite&with=supabasejs),
-or run `supabase status` against a local stack.
-
-## The agents route
-
-`routes/_protected/agents.tsx` sits under the `_protected` layout route, so
-signed-out visitors are redirected to `/login` before it renders.
-
-The route reads the user's OAuth grants and renders one of two states. With no
-grants, it shows a prompt to paste into an agent. The prompt carries the MCP
-server URL, which the route builds from `VITE_SUPABASE_URL`:
-
-```
-Connect to Your product using this MCP server:
-
-https://<project-ref>.supabase.co/functions/v1/mcp-server
-
-Then list the tools it gives you.
-```
-
-Once a grant exists, the same route lists each authorized client with the scopes
-it holds and when the user approved it, and offers **Revoke access**. Revoking
-deletes that client's sessions and invalidates its refresh tokens, so the agent
-loses access immediately.
-
-Set `PRODUCT_NAME` in `routes/_protected/agents.tsx` to your product's name. It
-appears in the prompt and in the page description. The consent screen takes the
-same name through the `productName` prop in `routes/oauth/consent.tsx`.
-
-Grants only cover external clients that went through OAuth. An agent that runs
-inside your own backend reuses the product session, so it never appears here.
-
-## Run it
-
-Start the stack, serve the function, and run the app:
-
-```bash
-supabase start
-supabase functions serve mcp-server --env-file supabase/functions/.env
-npm run dev
-```
-
-The route generator picks up `routes/_protected/agents.tsx` on the next dev
-server start and adds it to `routeTree.gen.ts`.
-
-Sign up at `/sign-up`, then open `/agents` and connect an agent with the prompt.
-The agent registers itself, sends you to `/oauth/consent`, and appears in the
-list once you approve it.
+Out of the box the server exposes one tool, `whoami`. Add the rest in
+`supabase/functions/mcp-server/tools/` — each tool runs as the signed-in user
+with Row Level Security applied. See the
+[MCP Server block](/library/docs/headless/mcp-server) for the tool template.
 
 ## Deploy
 
@@ -120,12 +68,10 @@ supabase config push
 supabase functions deploy mcp-server
 ```
 
-Then set the Auth **Site URL** to your deployed origin so consent requests reach
-the right app.
+Set the Auth **Site URL** to your deployed origin.
 
-This assumes the project signs JWTs with an asymmetric key. A project still using
-the legacy HS256 secret cannot issue ID tokens, so clients that request the
-`openid` scope fail. Switch to an ES256 or RS256 key in
+Your project must sign JWTs with an asymmetric key. On the legacy HS256 secret,
+clients that request the `openid` scope fail. Switch to ES256 or RS256 in
 [JWT Keys](https://supabase.com/dashboard/project/_/settings/jwt).
 
 ## Further reading
@@ -133,5 +79,4 @@ the legacy HS256 secret cannot issue ID tokens, so clients that request the
 - [MCP Server block](/library/docs/headless/mcp-server)
 - [OAuth Consent block](/library/docs/tanstack/oauth-consent)
 - [MCP authentication](https://supabase.com/docs/guides/auth/oauth-server/mcp-authentication)
-- [OAuth grant management](https://supabase.com/docs/guides/auth/oauth-server/oauth-flows#managing-user-grants)
 - [Token security and RLS](https://supabase.com/docs/guides/auth/oauth-server/token-security)

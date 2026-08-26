@@ -7,13 +7,6 @@ import {
   type OAuthGrant,
 } from '@/registry/default/blocks/headless-app-tanstack/hooks/use-oauth-grants'
 import { Button } from '@/registry/default/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/registry/default/components/ui/card'
 
 const buildPrompt = (productName: string, mcpServerUrl: string) =>
   `Connect to ${productName} using this MCP server:\n\n${mcpServerUrl}\n\nThen list the tools it gives you.`
@@ -96,45 +89,43 @@ export function ConnectedAgentsView({
 
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Connected agents</CardTitle>
-          <CardDescription>
-            {hasGrants
-              ? `Agents you authorized to use ${productName} on your behalf.`
-              : 'No agents yet. Paste this prompt into an agent to connect it.'}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {isLoading && (
-            <p role="status" className="text-sm text-muted-foreground">
-              Loading connected agents...
-            </p>
-          )}
+      {/* Typography matches CardTitle and CardDescription, without a card around it. */}
+      <div className="flex flex-col space-y-1.5">
+        <h1 className="text-2xl font-semibold leading-none tracking-tight">Connected agents</h1>
+        <p className="text-sm text-muted-foreground">
+          {hasGrants
+            ? `Agents you authorized to use ${productName} on your behalf.`
+            : 'No agents yet. Paste this prompt into an agent to connect it.'}
+        </p>
+      </div>
 
-          {grants &&
-            (hasGrants ? (
-              <ul className="divide-y rounded-lg border bg-muted text-sm">
-                {grants.map((grant) => (
-                  <GrantRow
-                    key={grant.client.id}
-                    grant={grant}
-                    isRevoking={revokingClientId === grant.client.id}
-                    onRevoke={() => onRevoke?.(grant.client.id)}
-                  />
-                ))}
-              </ul>
-            ) : (
-              <ConnectPrompt prompt={buildPrompt(productName, mcpServerUrl)} />
+      {isLoading && (
+        <p role="status" className="text-sm text-muted-foreground">
+          Loading connected agents...
+        </p>
+      )}
+
+      {grants &&
+        (hasGrants ? (
+          <ul className="divide-y rounded-lg border bg-muted text-sm">
+            {grants.map((grant) => (
+              <GrantRow
+                key={grant.client.id}
+                grant={grant}
+                isRevoking={revokingClientId === grant.client.id}
+                onRevoke={() => onRevoke?.(grant.client.id)}
+              />
             ))}
+          </ul>
+        ) : (
+          <ConnectPrompt prompt={buildPrompt(productName, mcpServerUrl)} />
+        ))}
 
-          {error && (
-            <p role="alert" className="text-sm text-destructive">
-              {error}
-            </p>
-          )}
-        </CardContent>
-      </Card>
+      {error && (
+        <p role="alert" className="text-sm text-destructive">
+          {error}
+        </p>
+      )}
     </div>
   )
 }
