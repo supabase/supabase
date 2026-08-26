@@ -1,8 +1,7 @@
-import { resolveEnv } from 'npm:@supabase/server@1.4.1/core'
+import { resolveEnv } from 'npm:@supabase/server@1.5.0-rc.114/core'
 
-// One resolved Supabase environment for the worker. Authentication, MCP
-// discovery, and toolsets all use it so the project URL and publishable key
-// cannot drift between layers.
+// One resolved Supabase environment for the worker. Authentication and
+// toolsets use it so the project URL and publishable key cannot drift.
 
 type SupabaseEnvironment = NonNullable<ReturnType<typeof resolveEnv>['data']>
 
@@ -32,45 +31,6 @@ export function getSupabaseEnvironment(): SupabaseEnvironment {
 
   cachedEnvironment = data
   return data
-}
-
-function isInternalGatewayUrl(url: URL): boolean {
-  const hostname = url.hostname.toLowerCase()
-
-  return hostname.endsWith('.internal') || /(^|[._-])(kong|envoy)([._-]|$)/.test(hostname)
-}
-
-/**
- * The project URL external MCP clients can reach.
- *
- * Hosted Edge Functions receive the public project URL from Supabase. A locally
- * served function can instead receive the Docker-only gateway URL (for example
- * `http://kong:8000`), so local development must supply the API URL printed by
- * `supabase status`.
- */
-export function getPublicSupabaseUrl(): string {
-  const configuredUrl = Deno.env.get('MCP_PUBLIC_SUPABASE_URL')?.trim()
-  const resolvedUrl = configuredUrl || getSupabaseEnvironment().url
-
-  let url: URL
-  try {
-    url = new URL(resolvedUrl)
-  } catch {
-    throw new Error('MCP_PUBLIC_SUPABASE_URL must be an absolute HTTP or HTTPS URL.')
-  }
-
-  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-    throw new Error('MCP_PUBLIC_SUPABASE_URL must use HTTP or HTTPS.')
-  }
-
-  if (!configuredUrl && isInternalGatewayUrl(url)) {
-    throw new Error(
-      `The resolved Supabase URL (${url.origin}) is only reachable inside the local Docker ` +
-        'network. Set MCP_PUBLIC_SUPABASE_URL to the API URL printed by "supabase status".'
-    )
-  }
-
-  return trimTrailingSlash(url.toString())
 }
 
 export function getDefaultPublishableKey(): string {
