@@ -1531,6 +1531,28 @@ export interface DatabaseConnectionsBannerCtaButtonClickedEvent {
 }
 
 /**
+ * User clicked the dismiss button on the Explorer feature preview banner in studio project pages.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ExplorerBannerDismissButtonClickedEvent {
+  action: 'explorer_banner_dismiss_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the CTA button on the Explorer feature preview banner in studio project pages.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ExplorerBannerCtaButtonClickedEvent {
+  action: 'explorer_banner_cta_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked a metric card PID in the Overview panel of the Database Connections observability page, selecting it in the activity table below.
  *
  * @group Events
@@ -3810,6 +3832,8 @@ export type TelemetryEvent =
   | DatabaseConnectionsBlockerViewClickedEvent
   | DatabaseConnectionsBannerDismissButtonClickedEvent
   | DatabaseConnectionsBannerCtaButtonClickedEvent
+  | ExplorerBannerDismissButtonClickedEvent
+  | ExplorerBannerCtaButtonClickedEvent
   | SessionTerminateButtonClickedEvent
   | SessionTerminateSubmittedEvent
   | QueryCancelButtonClickedEvent
