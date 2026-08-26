@@ -52,11 +52,15 @@ Rotation affects all new project tokens, so check other token consumers first.
 
 ## Authentication
 
-The block accepts only OAuth user tokens with:
+`withOAuthProtectedResource` from `@supabase/server` serves RFC 9728 metadata at
+`/functions/v1/mcp-server/oauth-protected-resource` and adds a
+`WWW-Authenticate` challenge to `401` responses so MCP clients can discover the
+authorization server.
+
+`withSupabase` verifies the user JWT. The block then accepts only OAuth user
+tokens with:
 
 - a non-empty `client_id`
-- the expected Supabase Auth issuer
-- `authenticated` in `aud`
 - a live Auth session for the token's subject
 
 Ordinary user JWTs are rejected. Each tool gets a user-scoped Supabase client.
@@ -122,11 +126,10 @@ without changing the server core. Duplicate toolset names fail at startup.
 
 ## Environment
 
-| Variable                  | Default            | Purpose                          |
-| ------------------------- | ------------------ | -------------------------------- |
-| `MCP_PUBLIC_SUPABASE_URL` | Hosted project URL | Public OAuth and MCP API origin  |
-| `MCP_SERVER_NAME`         | `supabase-mcp`     | Server name shown to MCP clients |
-| `MCP_SERVER_DESCRIPTION`  | Generic sentence   | Instructions shown to clients    |
+| Variable                 | Default          | Purpose                          |
+| ------------------------ | ---------------- | -------------------------------- |
+| `MCP_SERVER_NAME`        | `supabase-mcp`   | Server name shown to MCP clients |
+| `MCP_SERVER_DESCRIPTION` | Generic sentence | Instructions shown to clients    |
 
 ## Deploy
 
@@ -138,6 +141,7 @@ supabase functions deploy mcp-server
 ## Further reading
 
 - [OAuth Consent block](../nextjs/oauth-consent)
+- [OAuth protected resource middleware](https://supabase.com/docs/reference/server/middleware-withoauthprotectedresource)
 - [MCP authentication](https://supabase.com/docs/guides/auth/oauth-server/mcp-authentication)
 - [OAuth 2.1 server](https://supabase.com/docs/guides/auth/oauth-server/getting-started)
 - [Token security and RLS](https://supabase.com/docs/guides/auth/oauth-server/token-security)
