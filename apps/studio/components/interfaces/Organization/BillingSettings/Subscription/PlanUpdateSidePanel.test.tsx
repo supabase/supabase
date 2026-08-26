@@ -253,9 +253,10 @@ describe('PlanUpdateSidePanel', () => {
       expect(screen.getByText('1-day log retention')).toBeInTheDocument()
     })
 
-    it('renders the Not included label', () => {
+    it('renders the Not included label on Free and Pro cards', () => {
       render(<PlanUpdateSidePanel />)
-      expect(screen.getByText('Not included')).toBeInTheDocument()
+      // Free and Pro both have gap lists — Team does not
+      expect(screen.getAllByText('Not included')).toHaveLength(2)
     })
   })
 
