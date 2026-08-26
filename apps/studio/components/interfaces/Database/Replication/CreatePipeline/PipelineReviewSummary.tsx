@@ -121,10 +121,10 @@ export const PipelineReviewSummary = ({
         { label: 'Name', value: values.name?.trim() || 'Untitled pipeline' },
         ...getDestinationRows(type, values, namespace),
         {
-          label: 'Region',
-          value: `${PIPELINE_REGION.displayName} (${PIPELINE_REGION.code})`,
+          label: 'Pipeline region',
+          value: PIPELINE_REGION.displayName,
           description:
-            'Pipelines run in this region. In your destination provider, choose the closest available region.',
+            'Pipelines currently run in this region. Choose a nearby destination region where possible.',
         },
       ],
     },

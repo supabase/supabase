@@ -559,7 +559,7 @@ export const CreatePipelineWizard = () => {
                 />
                 <CardContent className="space-y-6">
                   <DestinationNameInput form={form} />
-                  <PipelineRegionField />
+                  <PipelineRegionField destinationType={selectedType} />
                 </CardContent>
                 <CardContent>
                   {selectedType === 'BigQuery' && etlEnableBigQuery && (
