@@ -4,11 +4,11 @@ import type { PricingInformation } from 'shared-data'
 import { Button, cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import type { GapFeature, PlanPresentationVariant } from './plan-presentation'
+import { FREE_PLAN_GAPS, PRO_PLAN_GAPS } from './plan-presentation'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { RequestUpgradeToBillingOwners } from '@/components/ui/RequestUpgradeToBillingOwners'
 import { formatCurrency } from '@/lib/helpers'
-import type { PlanPresentationVariant, GapFeature } from './plan-presentation'
-import { FREE_PLAN_GAPS, PRO_PLAN_GAPS } from './plan-presentation'
 
 export interface PlanCardProps {
   plan: PricingInformation
@@ -255,9 +255,7 @@ function ParityCard({
       <div className="w-full px-4 pt-4">
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 pb-2">
-            <h3 className="text-foreground text-xl font-normal uppercase font-mono">
-              {plan.name}
-            </h3>
+            <h3 className="text-foreground text-xl font-normal uppercase font-mono">{plan.name}</h3>
             {isCurrentPlan ? (
               <span className="text-xs bg-surface-300 text-foreground-light rounded-sm px-2 py-0.5">
                 Current plan
@@ -341,7 +339,6 @@ function ParityCard({
                         />
                       </div>
                       <span className="text-foreground-muted">{gap.label}</span>
-                      <span className="sr-only">Not included</span>
                     </>
                   ) : (
                     <>

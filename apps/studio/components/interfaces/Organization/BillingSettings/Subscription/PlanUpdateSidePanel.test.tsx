@@ -244,7 +244,8 @@ describe('PlanUpdateSidePanel', () => {
     it('renders gap rows on the Free plan', () => {
       render(<PlanUpdateSidePanel />)
       expect(screen.getByText('Daily backups')).toBeInTheDocument()
-      expect(screen.getByText('Email support')).toBeInTheDocument()
+      // "Email support" appears twice: once as a Pro plan feature (✓), once as a Free plan gap (✗)
+      expect(screen.getAllByText('Email support')).toHaveLength(2)
     })
 
     it('shows log retention as a lesser value, not a missing feature', () => {
@@ -268,9 +269,7 @@ describe('PlanUpdateSidePanel', () => {
 
     it('does not render preface or description', () => {
       render(<PlanUpdateSidePanel />)
-      expect(
-        screen.queryByText('Everything in the Free Plan, plus:')
-      ).not.toBeInTheDocument()
+      expect(screen.queryByText('Everything in the Free Plan, plus:')).not.toBeInTheDocument()
       expect(
         screen.queryByText('Perfect for passion projects & simple websites.')
       ).not.toBeInTheDocument()

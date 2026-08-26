@@ -1,17 +1,13 @@
 import { useRouter } from 'next/router'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 
-import { getPlanChangeType } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
-import { useTrack } from '@/lib/telemetry/track'
-import type { OrgPlan, PlanId } from '@/data/subscriptions/types'
-import type { Organization } from '@/types/base'
-
 import { EnterpriseCard } from './EnterpriseCard'
+import { isPlanChangeEligible, usePlanPresentationExperiment } from './plan-presentation'
 import { PlanCard } from './PlanCard'
-import {
-  isPlanChangeEligible,
-  usePlanPresentationExperiment,
-} from './plan-presentation'
+import { getPlanChangeType } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
+import type { OrgPlan, PlanId } from '@/data/subscriptions/types'
+import { useTrack } from '@/lib/telemetry/track'
+import type { Organization } from '@/types/base'
 
 export interface PlanCardsProps {
   availablePlans: OrgPlan[]
@@ -81,9 +77,7 @@ export function PlanCards({
             managedBy={selectedOrganization?.managed_by}
             shouldHighlight={shouldHighlight}
             variant={variant}
-            onSelectTier={() =>
-              onSelectTier(plan.id as 'tier_free' | 'tier_pro' | 'tier_team')
-            }
+            onSelectTier={() => onSelectTier(plan.id as 'tier_free' | 'tier_pro' | 'tier_team')}
             onTrackCtaClick={() =>
               track('studio_pricing_plan_cta_clicked', {
                 selectedPlan: plan.name,

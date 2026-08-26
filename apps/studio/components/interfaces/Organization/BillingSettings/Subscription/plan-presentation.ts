@@ -1,9 +1,10 @@
 import { useMemo } from 'react'
+
+import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-utils'
+import { useTrackExperimentExposure } from '@/hooks/misc/useTrackExperimentExposure'
+import { usePHFlag } from '@/hooks/ui/useFlag'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import type { ManagedBy } from '@/lib/constants/infrastructure'
-import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-utils'
-import { usePHFlag } from '@/hooks/ui/useFlag'
-import { useTrackExperimentExposure } from '@/hooks/misc/useTrackExperimentExposure'
 
 export type PlanPresentationVariant = 'control' | 'parity' | 'gaps'
 
@@ -36,8 +37,7 @@ export function usePlanPresentationExperiment({
 }): PlanPresentationVariant {
   const flag = usePHFlag<'control' | 'parity' | 'gaps'>(FLAG_KEY)
 
-  const isInExperiment =
-    flag === 'control' || flag === 'parity' || flag === 'gaps'
+  const isInExperiment = flag === 'control' || flag === 'parity' || flag === 'gaps'
 
   const variant: PlanPresentationVariant = useMemo(() => {
     if (!eligible || !isInExperiment) return 'control'

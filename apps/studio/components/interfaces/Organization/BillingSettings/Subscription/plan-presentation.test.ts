@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
+
+import { FREE_PLAN_GAPS, isPlanChangeEligible, PRO_PLAN_GAPS } from './plan-presentation'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
-import { isPlanChangeEligible, FREE_PLAN_GAPS, PRO_PLAN_GAPS } from './plan-presentation'
 
 describe('isPlanChangeEligible', () => {
   const baseArgs = {
@@ -15,21 +16,15 @@ describe('isPlanChangeEligible', () => {
   })
 
   it('returns false for Stripe-managed orgs', () => {
-    expect(
-      isPlanChangeEligible({ ...baseArgs, managedBy: MANAGED_BY.STRIPE_PROJECTS })
-    ).toBe(false)
+    expect(isPlanChangeEligible({ ...baseArgs, managedBy: MANAGED_BY.STRIPE_PROJECTS })).toBe(false)
   })
 
   it('returns false for AWS Marketplace orgs', () => {
-    expect(
-      isPlanChangeEligible({ ...baseArgs, managedBy: MANAGED_BY.AWS_MARKETPLACE })
-    ).toBe(false)
+    expect(isPlanChangeEligible({ ...baseArgs, managedBy: MANAGED_BY.AWS_MARKETPLACE })).toBe(false)
   })
 
   it('returns false for partner-billed orgs', () => {
-    expect(
-      isPlanChangeEligible({ ...baseArgs, billingPartner: 'aws_marketplace' })
-    ).toBe(false)
+    expect(isPlanChangeEligible({ ...baseArgs, billingPartner: 'aws_marketplace' })).toBe(false)
   })
 
   it('returns false for enterprise plan', () => {
@@ -41,9 +36,7 @@ describe('isPlanChangeEligible', () => {
   })
 
   it('returns false when user cannot update subscription', () => {
-    expect(
-      isPlanChangeEligible({ ...baseArgs, canUpdateSubscription: false })
-    ).toBe(false)
+    expect(isPlanChangeEligible({ ...baseArgs, canUpdateSubscription: false })).toBe(false)
   })
 
   it('returns true for pro-plan org with billing permissions', () => {
