@@ -530,8 +530,22 @@ export function ApiSchemaParamSubdetails({
       </CollapsibleTrigger>
       <CollapsibleContent>
         {'type' in schema && schema.type === 'object' ? (
-          <div className={cn('border-b border-x border-fault', 'rounded-b-lg', 'p-5')}>
-            <ApiSchema schema={schema} />
+          <div className={cn('border-b border-x border-default', 'rounded-b-lg')}>
+            <div className="p-5 border-b border-default">
+              <ApiSchema schema={schema} />
+            </div>
+            <ApiOperationRequestBodyDetailsInternal schema={schema} className="px-5" />
+          </div>
+        ) : 'type' in schema &&
+          schema.type === 'array' &&
+          'items' in schema &&
+          'type' in schema.items &&
+          schema.items.type === 'object' ? (
+          <div className={cn('border-b border-x border-default', 'rounded-b-lg')}>
+            <div className="p-5 border-b border-default">
+              <ApiSchema schema={schema} />
+            </div>
+            <ApiOperationRequestBodyDetailsInternal schema={schema.items} className="px-5" />
           </div>
         ) : (
           <ul className={cn('border-b border-x border-default', 'rounded-b-lg')}>
