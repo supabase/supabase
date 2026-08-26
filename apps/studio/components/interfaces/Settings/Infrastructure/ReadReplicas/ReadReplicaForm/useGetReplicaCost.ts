@@ -14,9 +14,31 @@ import { formatCurrency } from '@/lib/helpers'
 
 export const useGetReplicaCost = () => {
   const { ref: projectRef } = useParams()
-  const { data: addons } = useProjectAddonsQuery({ projectRef })
-  const { data: diskConfiguration } = useDiskAttributesQuery({ projectRef })
-  const isLoading = addons === undefined || diskConfiguration === undefined
+  const {
+    data: addons,
+    isError: isAddonsError,
+    isFetching: isAddonsFetching,
+    isPending: isAddonsPending,
+    refetch: refetchAddons,
+  } = useProjectAddonsQuery({ projectRef })
+  const {
+    data: diskConfiguration,
+    isError: isDiskConfigurationError,
+    isFetching: isDiskConfigurationFetching,
+    isPending: isDiskConfigurationPending,
+    refetch: refetchDiskConfiguration,
+  } = useDiskAttributesQuery({ projectRef })
+
+  const isLoading =
+    (addons === undefined && (isAddonsPending || isAddonsFetching)) ||
+    (diskConfiguration === undefined && (isDiskConfigurationPending || isDiskConfigurationFetching))
+  const isError =
+    (addons === undefined && isAddonsError) ||
+    (diskConfiguration === undefined && isDiskConfigurationError)
+
+  const retry = async () => {
+    await Promise.all([refetchAddons(), refetchDiskConfiguration()])
+  }
 
   const currentComputeAddon = addons?.selected_addons.find(
     (addon) => addon.type === 'compute_instance'
@@ -59,6 +81,8 @@ export const useGetReplicaCost = () => {
 
   return {
     isLoading,
+    isError,
+    retry,
     totalCost,
     compute: {
       label: selectedComputeMeta?.name,

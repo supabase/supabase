@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, test, vi } from 'vitest'
 
 import { ReadReplicaPricingDialog } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicaForm/ReadReplicaPricingDialog'
@@ -10,6 +11,8 @@ vi.mock('@/hooks/misc/useSelectedProject', () => ({
 
 const replicaCost = {
   isLoading: false,
+  isError: false,
+  retry: vi.fn(),
   totalCost: '$85.94',
   compute: { label: 'Small', cost: '$15.00', priceDescription: '$15/month' },
   disk: { type: 'gp3', label: '125 GB (gp3)', cost: '$15.63' },
@@ -31,5 +34,21 @@ describe('ReadReplicaPricingDialog', () => {
 
     expect(screen.getByText('Estimated additional cost of $85.94/month')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'View breakdown' })).toBeEnabled()
+  })
+
+  test('offers to retry when pricing data cannot be loaded', async () => {
+    const user = userEvent.setup()
+    const retry = vi.fn()
+
+    customRender(
+      <ReadReplicaPricingDialog replicaCost={{ ...replicaCost, isError: true, retry }} />
+    )
+
+    expect(screen.getByText('Unable to estimate additional cost')).toBeInTheDocument()
+    expect(screen.getByText('We couldn’t load the required pricing data.')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Retry' }))
+
+    expect(retry).toHaveBeenCalledOnce()
   })
 })

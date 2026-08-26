@@ -28,24 +28,38 @@ interface ReadReplicaPricingDialogProps {
 
 export const ReadReplicaPricingDialog = ({ replicaCost }: ReadReplicaPricingDialogProps) => {
   const { data: project } = useSelectedProjectQuery()
-  const { isLoading, totalCost, compute, disk, iops, throughput } = replicaCost
+  const { isLoading, isError, retry, totalCost, compute, disk, iops, throughput } = replicaCost
 
   const showNewDiskManagementUI = project?.cloud_provider === 'AWS'
 
   return (
     <Dialog>
       <Admonition
-        type="note"
+        type={isError ? 'warning' : 'note'}
         layout="responsive"
-        title={`Estimated additional cost${isLoading ? '' : ` of ${totalCost}/month`}`}
-        description="Based on your primary database configuration."
+        title={
+          isError
+            ? 'Unable to estimate additional cost'
+            : `Estimated additional cost${isLoading ? '' : ` of ${totalCost}/month`}`
+        }
+        description={
+          isError
+            ? 'We couldn’t load the required pricing data.'
+            : 'Based on your primary database configuration.'
+        }
         className="mb-0 rounded-none border-x-0"
         actions={
-          <DialogTrigger asChild>
-            <Button type="button" variant="default" size="tiny" disabled={isLoading}>
-              View breakdown
+          isError ? (
+            <Button type="button" variant="default" size="tiny" loading={isLoading} onClick={retry}>
+              Retry
             </Button>
-          </DialogTrigger>
+          ) : (
+            <DialogTrigger asChild>
+              <Button type="button" variant="default" size="tiny" disabled={isLoading}>
+                View breakdown
+              </Button>
+            </DialogTrigger>
+          )
         }
       />
       <DialogContent size="medium" aria-describedby={undefined}>
