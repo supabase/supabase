@@ -51,11 +51,6 @@ const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
   }
 }
 
-const planListVariants = {
-  hidden: {},
-  visible: { transition: { delayChildren: 0.35, staggerChildren: 0.08 } },
-}
-
 const planCardVariants = {
   hidden: { opacity: 0, y: 8 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } },
@@ -109,7 +104,14 @@ export const PlanUpdateSidePanel = () => {
   )
 
   const snap = useOrgSettingsPageStateSnapshot()
-  const visible = snap.panelKey === 'subscriptionPlan'
+  const isOpenedViaUrl = router.query.panel === 'subscriptionPlan'
+  const visible = snap.panelKey === 'subscriptionPlan' || isOpenedViaUrl
+
+  const contentDelay = isOpenedViaUrl ? 0.4 : 0.15
+  const planListVariants = {
+    hidden: {},
+    visible: { transition: { delayChildren: contentDelay + 0.2, staggerChildren: 0.08 } },
+  }
 
   const { data: orgProjectsData } = useOrgProjectsInfiniteQuery({ slug }, { enabled: visible })
   const orgProjects =
@@ -198,7 +200,7 @@ export const PlanUpdateSidePanel = () => {
       {visible && (
         <motion.div
           className="fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-studio"
-          initial={{ opacity: 0 }}
+          initial={isOpenedViaUrl ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
         >
@@ -214,7 +216,7 @@ export const PlanUpdateSidePanel = () => {
             className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 py-16"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15, duration: 0.3, ease: 'easeOut' }}
+            transition={{ delay: contentDelay, duration: 0.3, ease: 'easeOut' }}
           >
             <h1 className="text-2xl text-center">
               Change subscription plan for {selectedOrganization?.name}
