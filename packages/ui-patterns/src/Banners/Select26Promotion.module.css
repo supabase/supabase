@@ -38,10 +38,14 @@
 }
 
 .fieldAlignStart {
+  display: flex;
+  flex-direction: column;
   align-items: flex-start;
 }
 
 .fieldAlignEnd {
+  display: flex;
+  flex-direction: column;
   align-items: flex-end;
 }
 

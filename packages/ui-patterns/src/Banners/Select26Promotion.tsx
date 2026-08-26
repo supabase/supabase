@@ -133,6 +133,7 @@ export const Select26Field = ({
     if (rowWidths) return rowWidths
     return Array.from({ length: rows }, () => cols)
   }, [rowWidths, rows, cols])
+  const fieldRows = widths.length
 
   useEffect(() => {
     const node = rootRef.current
@@ -173,11 +174,11 @@ export const Select26Field = ({
     return widths.map((rowCols, y) => {
       const rowCells: FieldCell[] = []
       for (let x = 0; x < rowCols; x++) {
-        rowCells.push(cellAt(x, y, rowCols, rows, timeMs, mirror))
+        rowCells.push(cellAt(x, y, rowCols, fieldRows, timeMs, mirror))
       }
       return rowCells
     })
-  }, [widths, rows, timeMs, mirror])
+  }, [widths, fieldRows, timeMs, mirror])
 
   return (
     <div

@@ -16,7 +16,7 @@ export const Select26Banner = () => (
       rows={WWW_FIELD_ROW_WIDTHS.length}
       rowWidths={WWW_FIELD_ROW_WIDTHS}
       rowAlign="start"
-      className="absolute left-0 top-1/2 -z-10 hidden -translate-y-1/2 flex-col text-sm opacity-80 dark:opacity-70 sm:flex md:text-base xl:text-[0.95rem]"
+      className="absolute left-0 top-1/2 -z-10 !hidden -translate-y-1/2 text-sm opacity-80 dark:opacity-70 sm:!flex md:text-base xl:text-[0.95rem]"
     />
     <Select26Field
       cols={WWW_FIELD_BASE_COLS}
@@ -24,7 +24,7 @@ export const Select26Banner = () => (
       rowWidths={WWW_FIELD_ROW_WIDTHS}
       rowAlign="end"
       mirror
-      className="absolute right-0 top-1/2 -z-10 flex -translate-y-1/2 flex-col text-sm opacity-80 dark:opacity-70 md:text-base xl:text-[0.95rem]"
+      className="absolute right-0 top-1/2 -z-10 -translate-y-1/2 text-sm opacity-80 dark:opacity-70 md:text-base xl:text-[0.95rem]"
     />
     <div className="relative z-10 ml-0 mr-auto flex w-fit max-w-full flex-wrap items-center justify-start gap-x-2 gap-y-1.5 rounded-md bg-[#f8f3ef] px-2.5 py-1 sm:mx-auto sm:flex-nowrap sm:justify-center sm:gap-x-2.5 sm:px-3.5 dark:bg-[#0b0e0d]">
       <p className="text-left leading-5 sm:text-center">
