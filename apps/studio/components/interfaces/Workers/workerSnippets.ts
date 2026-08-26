@@ -7,20 +7,16 @@ export interface WorkerSnippetInput {
   name: string
   endpoint: string | undefined
   protocol?: string
-  projectRef?: string
   runtime: string | undefined
   size: string
   access: WorkerAccess
   instances: number
 }
 
-const MANAGEMENT_API_URL = 'https://api.supabase.com'
-
 export interface WorkerSnippets {
   aiPrompt: string
   configToml: string
   cli: string
-  curl: string
   javascript: string
   python: string
 }
@@ -47,11 +43,7 @@ export function buildWorkerSnippets(input: WorkerSnippetInput): WorkerSnippets {
     // size comes from config.toml — push has no flag for it. Same for access: the CLI
     // doesn't have a route to a private worker yet, so this always deploys as public.
     `supabase ${CLI_NAME} push ${name} --instances ${input.instances}`,
-    ...(input.access === 'private'
-      ? [
-          `# note: the CLI can only deploy public workers today — use the API (cURL tab) for private`,
-        ]
-      : []),
+    ...(input.access === 'private' ? [`# note: the CLI can only deploy public workers today`] : []),
   ].join('\n')
 
   const configBlock = [
@@ -81,42 +73,8 @@ export function buildWorkerSnippets(input: WorkerSnippetInput): WorkerSnippets {
     ``,
     `3. Run \`supabase ${CLI_NAME} push ${name}\` to deploy it.`,
     ...(input.access === 'private'
-      ? [
-          ``,
-          `Note: the CLI can only deploy public workers today. If this worker needs to be private, deploy it via the management API instead (see the cURL tab).`,
-        ]
+      ? [``, `Note: the CLI can only deploy public workers today.`]
       : []),
-  ].join('\n')
-
-  // Deploying is three calls against the management API — there's no single "create worker"
-  // endpoint. Unlike the CLI, this talks to the API directly, so exposure isn't limited to public.
-  const ref = input.projectRef ?? '[YOUR PROJECT REF]'
-  const workersApiUrl = (path: string) =>
-    `${MANAGEMENT_API_URL}/v2/projects/${ref}/workers/${name}${path}`
-  const deploySpec =
-    runtime === 'dockerfile'
-      ? { size: input.size, exposure: input.access, instances: input.instances }
-      : { runtime, size: input.size, exposure: input.access, instances: input.instances }
-
-  const curl = [
-    `# 1. Mint an upload slot for your build context`,
-    `curl -X POST '${workersApiUrl('/uploads')}' \\`,
-    `  -H 'Authorization: Bearer [YOUR ACCESS TOKEN]'`,
-    `# -> copy the "url" from the response`,
-    ``,
-    `# 2. Upload the gzipped build context (no Supabase auth on this request)`,
-    `curl -X PUT '[PRESIGNED UPLOAD URL]' --upload-file worker.tar.gz`,
-    ``,
-    `# 3. Deploy — this call creates the worker`,
-    `curl -X POST '${workersApiUrl('/deploy')}' \\`,
-    `  -H 'Authorization: Bearer [YOUR ACCESS TOKEN]' \\`,
-    `  -H 'Content-Type: application/json' \\`,
-    `  --data '${JSON.stringify({
-      data: {
-        type: 'project_worker',
-        attributes: { spec: deploySpec, context_upload_id: '[UPLOAD ID FROM STEP 1]' },
-      },
-    })}'`,
   ].join('\n')
 
   const keyPlaceholder = input.access === 'public' ? '[YOUR ANON KEY]' : '[YOUR SERVICE ROLE KEY]'
@@ -144,7 +102,7 @@ export function buildWorkerSnippets(input: WorkerSnippetInput): WorkerSnippets {
     `print(res.json())`,
   ].join('\n')
 
-  return { aiPrompt, configToml, cli, curl, javascript, python }
+  return { aiPrompt, configToml, cli, javascript, python }
 }
 
 export interface WorkerCliCommand {

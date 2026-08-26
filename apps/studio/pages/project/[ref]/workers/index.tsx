@@ -75,9 +75,9 @@ const WorkersPage: NextPageWithLayout = () => {
             )}
             {isMissingPermission && <NoPermission resourceText="view this project's workers" />}
             {isUnexpectedError && <AlertError error={error} subject="Failed to retrieve workers" />}
-            {/* {isSuccess && workers.length === 0 && ( */}
-            <WorkersEmptyState onDeploy={() => setIsDeployInstructionsOpen(true)} />
-            {/* )} */}
+            {isSuccess && workers.length === 0 && (
+              <WorkersEmptyState onDeploy={() => setIsDeployInstructionsOpen(true)} />
+            )}
             {isSuccess && workers.length > 0 && ref && (
               <WorkersList
                 projectRef={ref}

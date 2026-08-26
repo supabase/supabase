@@ -24,7 +24,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import { WORKER_SIZES, WORKERS_REGION_LABEL } from './Workers.constants'
+import { WORKER_SIZES, WORKERS_REGION } from './Workers.constants'
 import type { WorkerAccess } from './Workers.types'
 import { formatSize, generateWorkerName } from './Workers.utils'
 import { WorkerSnippetTabs } from './WorkerSnippetTabs'
@@ -72,13 +72,6 @@ export const DeployWorkerDialog = ({ open, onOpenChange }: DeployWorkerDialogPro
     resolver: zodResolver(DeployWorkerFormSchema),
     defaultValues: { ...DEFAULT_VALUES, name: generateWorkerName() },
   })
-  const { reset } = form
-
-  // Suggest a fresh name each time the dialog is opened, rather than keeping whatever
-  // was left over (typed or suggested) from the last time it was open.
-  useEffect(() => {
-    reset({ ...DEFAULT_VALUES, name: generateWorkerName() })
-  }, [reset, open])
 
   const [name, size, access, instances] = useWatch({
     control: form.control,
@@ -97,7 +90,7 @@ export const DeployWorkerDialog = ({ open, onOpenChange }: DeployWorkerDialogPro
         <Admonition
           type="note"
           title="This dashboard is read-only during the Private Alpha"
-          description={`Configure a worker below, then deploy it locally. Workers only deploy to ${WORKERS_REGION_LABEL} for this phase.`}
+          description={`Configure a worker below, then deploy it locally. Workers only deploy to ${WORKERS_REGION} during alpha.`}
           className="border-x-0 border-y-0 rounded-none"
         />
 
@@ -122,7 +115,7 @@ export const DeployWorkerDialog = ({ open, onOpenChange }: DeployWorkerDialogPro
                 control={form.control}
                 name="size"
                 render={({ field }) => (
-                  <FormItemLayout name="size" label="Size" description="Fixed at deploy time">
+                  <FormItemLayout name="size" label="Size">
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
@@ -148,7 +141,7 @@ export const DeployWorkerDialog = ({ open, onOpenChange }: DeployWorkerDialogPro
                   <FormItemLayout
                     name="access"
                     label="Access"
-                    description="Public workers accept requests with an anon key"
+                    description="Public workers accept requests with a publishable key"
                   >
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
@@ -204,7 +197,7 @@ export const DeployWorkerDialog = ({ open, onOpenChange }: DeployWorkerDialogPro
               access: access ?? DEFAULT_VALUES.access,
               instances: typeof instances === 'number' ? instances : DEFAULT_VALUES.instances,
             }}
-            tabs={['ai', 'cli', 'config', 'curl']}
+            tabs={['ai', 'cli', 'config']}
           />
         </DialogSection>
 

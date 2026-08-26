@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Code2, FileCode, Sparkles, Terminal, type LucideIcon } from 'lucide-react'
+import { FileCode, Sparkles, Terminal, type LucideIcon } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from 'ui'
 
@@ -7,13 +7,12 @@ import { buildWorkerSnippets, type WorkerSnippetInput } from './workerSnippets'
 import CopyButton from '@/components/ui/CopyButton'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 
-export type WorkerSnippetTab = 'ai' | 'config' | 'cli' | 'curl' | 'js' | 'python'
+export type WorkerSnippetTab = 'ai' | 'config' | 'cli' | 'js' | 'python'
 
 const TAB_LABEL: Record<WorkerSnippetTab, string> = {
   ai: 'AI Prompt',
   config: 'config.toml',
   cli: 'CLI',
-  curl: 'cURL',
   js: 'JavaScript',
   python: 'Python',
 }
@@ -22,7 +21,6 @@ const TAB_ICON: Record<WorkerSnippetTab, LucideIcon> = {
   ai: Sparkles,
   config: FileCode,
   cli: Terminal,
-  curl: Code2,
   js: FileCode,
   python: FileCode,
 }
@@ -33,11 +31,7 @@ interface WorkerSnippetTabsProps {
   className?: string
 }
 
-export const WorkerSnippetTabs = ({
-  input,
-  tabs = ['cli', 'curl'],
-  className,
-}: WorkerSnippetTabsProps) => {
+export const WorkerSnippetTabs = ({ input, tabs = ['cli'], className }: WorkerSnippetTabsProps) => {
   const { ref } = useParams()
   const [active, setActive] = useState<WorkerSnippetTab>(tabs[0])
 
@@ -46,13 +40,11 @@ export const WorkerSnippetTabs = ({
     ...input,
     endpoint: settings?.app_config?.endpoint,
     protocol: settings?.app_config?.protocol,
-    projectRef: ref,
   })
   const snippetByTab: Record<WorkerSnippetTab, string> = {
     ai: snippets.aiPrompt,
     config: snippets.configToml,
     cli: snippets.cli,
-    curl: snippets.curl,
     js: snippets.javascript,
     python: snippets.python,
   }
