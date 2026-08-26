@@ -550,6 +550,8 @@ export function ApiSchemaParamSubdetails({
         ) : 'type' in schema &&
           schema.type === 'array' &&
           'items' in schema &&
+          schema.items &&
+          typeof schema.items === 'object' &&
           'type' in schema.items &&
           schema.items.type === 'object' ? (
           <div className={cn('border-b border-x border-default', 'rounded-b-lg')}>
