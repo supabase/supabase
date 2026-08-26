@@ -137,7 +137,7 @@ vi.mock('./SubscriptionPlanUpdateDialog', () => ({
 }))
 
 vi.mock('@/hooks/ui/useFlag', () => ({
-  usePHFlag: (...args: any[]) => mockUsePHFlag(...args),
+  usePHFlag: mockUsePHFlag,
 }))
 
 vi.mock('@/hooks/misc/useTrackExperimentExposure', () => ({
@@ -253,10 +253,11 @@ describe('PlanUpdateSidePanel', () => {
       expect(screen.getByText('1-day log retention')).toBeInTheDocument()
     })
 
-    it('renders the Not included label on Free and Pro cards', () => {
+    it('renders the gap section heading on Free and Pro cards', () => {
       render(<PlanUpdateSidePanel />)
-      // Free and Pro both have gap lists — Team does not
-      expect(screen.getAllByText('Not included')).toHaveLength(2)
+      // Free has a `lesser` item, so its heading is "Plan limits"; Pro has only `missing` items → "Not included"
+      expect(screen.getByText('Plan limits')).toBeInTheDocument()
+      expect(screen.getByText('Not included')).toBeInTheDocument()
     })
   })
 
@@ -279,6 +280,7 @@ describe('PlanUpdateSidePanel', () => {
     it('does not render gap rows', () => {
       render(<PlanUpdateSidePanel />)
       expect(screen.queryByText('Not included')).not.toBeInTheDocument()
+      expect(screen.queryByText('Plan limits')).not.toBeInTheDocument()
     })
   })
 })

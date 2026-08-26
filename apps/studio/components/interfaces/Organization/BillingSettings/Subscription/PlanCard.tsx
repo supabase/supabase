@@ -8,7 +8,13 @@ import type { GapFeature, PlanPresentationVariant } from './plan-presentation'
 import { FREE_PLAN_GAPS, PRO_PLAN_GAPS } from './plan-presentation'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { RequestUpgradeToBillingOwners } from '@/components/ui/RequestUpgradeToBillingOwners'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { formatCurrency } from '@/lib/helpers'
+
+const GAPS_BY_PLAN_ID: Record<string, GapFeature[]> = {
+  tier_free: FREE_PLAN_GAPS,
+  tier_pro: PRO_PLAN_GAPS,
+}
 
 export interface PlanCardProps {
   plan: PricingInformation
@@ -26,8 +32,6 @@ export interface PlanCardProps {
   onSelectTier: () => void
   onTrackCtaClick: () => void
 }
-
-const MANAGED_BY_AWS = 'AWS_MARKETPLACE'
 
 export function PlanCard({
   plan,
@@ -49,21 +53,16 @@ export function PlanCard({
   const features = plan.features
   const footer = plan.footer
 
-  const gaps: GapFeature[] =
-    variant === 'gaps'
-      ? plan.id === 'tier_free'
-        ? FREE_PLAN_GAPS
-        : plan.id === 'tier_pro'
-          ? PRO_PLAN_GAPS
-          : []
-      : []
+  const gaps: GapFeature[] = variant === 'gaps' ? (GAPS_BY_PLAN_ID[plan.id] ?? []) : []
 
   const ctaButton = isCurrentPlan ? (
     <Button block disabled variant="default">
       Current plan
     </Button>
-  ) : !canUpdateSubscription && !isDowngradeOption ? (
-    <RequestUpgradeToBillingOwners block plan={plan.name as 'Pro' | 'Team'} />
+  ) : !canUpdateSubscription &&
+    !isDowngradeOption &&
+    (plan.name === 'Pro' || plan.name === 'Team') ? (
+    <RequestUpgradeToBillingOwners block plan={plan.name} />
   ) : (
     <ButtonTooltip
       block
@@ -73,7 +72,7 @@ export function PlanCard({
         currentSubscriptionPlanId === 'enterprise' ||
         currentSubscriptionPlanId === 'platform' ||
         (isPartnerBilledOrganization && plan.id !== 'tier_free') ||
-        managedBy === MANAGED_BY_AWS ||
+        managedBy === MANAGED_BY.AWS_MARKETPLACE ||
         hasOrioleProjects
       }
       onClick={() => {
@@ -92,7 +91,7 @@ export function PlanCard({
                 ? 'Reach out to us via support to update your plan'
                 : hasOrioleProjects
                   ? 'Your organization has projects that are using the OrioleDB extension which is only available on the Free plan. Remove all OrioleDB projects before changing your plan.'
-                  : managedBy === MANAGED_BY_AWS
+                  : managedBy === MANAGED_BY.AWS_MARKETPLACE
                     ? 'You cannot change the plan for an organization managed by AWS Marketplace'
                     : undefined,
         },
@@ -157,7 +156,7 @@ function ControlCard({
         'px-4 py-4 flex flex-col items-start justify-between',
         'border rounded-md col-span-12 md:col-span-4 bg-surface-200',
         shouldHighlight &&
-          'ring-4 ring-brand animate-[pulse_1.5s_ease-in-out_1] shadow-md shadow-brand/40'
+          'ring-4 ring-brand animate-[pulse_1.5s_ease-in-out_1] motion-reduce:animate-none shadow-md shadow-brand/40'
       )}
     >
       <div className="w-full">
@@ -249,7 +248,7 @@ function ParityCard({
         'flex flex-col items-start justify-between',
         'border rounded-md col-span-12 md:col-span-4 bg-surface-200',
         shouldHighlight &&
-          'ring-4 ring-brand animate-[pulse_1.5s_ease-in-out_1] shadow-md shadow-brand/40'
+          'ring-4 ring-brand animate-[pulse_1.5s_ease-in-out_1] motion-reduce:animate-none shadow-md shadow-brand/40'
       )}
     >
       <div className="w-full px-4 pt-4">
@@ -325,7 +324,9 @@ function ParityCard({
         {gaps.length > 0 && (
           <>
             <div className="border-t my-3" />
-            <p className="text-foreground-muted text-[13px] mb-3">Not included</p>
+            <p className="text-foreground-muted text-[13px] mb-3">
+              {gaps.some((g) => g.type === 'lesser') ? 'Plan limits' : 'Not included'}
+            </p>
             <ul className="text-[13px]">
               {gaps.map((gap) => (
                 <li key={gap.label} className="flex items-center py-1.5">
