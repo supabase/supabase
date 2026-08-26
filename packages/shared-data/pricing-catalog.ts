@@ -26,7 +26,6 @@ export interface DiskAllowance {
 }
 
 export interface DiskTypeEntry {
-  type: 'gp3' | 'io2'
   displayName: string
   tagline: string
   maxSizeTb: number
@@ -34,13 +33,6 @@ export interface DiskTypeEntry {
   includedPerProject: DiskAllowance | null
   perUnitMonth: { sizeGb: number; iops: number; throughputMBps: number | null }
   throughputNote?: string
-}
-
-export interface AddonAvailability {
-  free: boolean
-  pro: boolean
-  team: boolean
-  enterprise: boolean
 }
 
 export function usd(amount: number, decimals?: number): string {
@@ -72,9 +64,8 @@ export const PLAN_BILLING = {
   enterprise: { priceMonthly: null, computeCreditsMonthly: null, spendCapAvailable: false },
 } as const satisfies Record<PlanKey, PlanBillingEntry>
 
-export const DISK_PRICING: Record<'gp3' | 'io2', DiskTypeEntry> = {
+export const DISK_PRICING = {
   gp3: {
-    type: 'gp3',
     displayName: 'General Purpose',
     tagline: 'Balance between price and performance',
     maxSizeTb: 16,
@@ -83,7 +74,6 @@ export const DISK_PRICING: Record<'gp3' | 'io2', DiskTypeEntry> = {
     perUnitMonth: { sizeGb: GP3_PER_GB_MONTH, iops: 0.024, throughputMBps: 0.095 },
   },
   io2: {
-    type: 'io2',
     displayName: 'High Performance',
     tagline: 'For mission critical applications',
     maxSizeTb: 60,
@@ -92,7 +82,7 @@ export const DISK_PRICING: Record<'gp3' | 'io2', DiskTypeEntry> = {
     perUnitMonth: { sizeGb: 0.195, iops: 0.119, throughputMBps: null },
     throughputNote: 'Scales automatically with IOPS',
   },
-}
+} as const satisfies Record<'gp3' | 'io2', DiskTypeEntry>
 
 export const METERS = {
   egress: {

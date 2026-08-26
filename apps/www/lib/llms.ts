@@ -31,6 +31,16 @@ function pad(str: string, len: number): string {
   return str.padEnd(len)
 }
 
+function buildMarkdownTable(headers: string[], dataRows: string[][]): string[] {
+  const widths = headers.map((h, i) => Math.max(h.length, ...dataRows.map((r) => r[i].length)))
+  const headerRow = `| ${headers.map((h, i) => pad(h, widths[i])).join(' | ')} |`
+  const separator = `| ${widths.map((w) => '-'.repeat(w)).join(' | ')} |`
+  const bodyRows = dataRows.map(
+    (cells) => `| ${cells.map((c, i) => pad(c, widths[i])).join(' | ')} |`
+  )
+  return [headerRow, separator, ...bodyRows]
+}
+
 // ---------------------------------------------------------------------------
 // Plan Tiers
 // ---------------------------------------------------------------------------
@@ -97,22 +107,12 @@ function buildComputeSection(): string {
     })
   )
 
-  const widths = headers.map((h, i) => Math.max(h.length, ...dataRows.map((r) => r[i].length)))
-
-  const headerRow = `| ${headers.map((h, i) => pad(h, widths[i])).join(' | ')} |`
-  const separator = `| ${widths.map((w) => '-'.repeat(w)).join(' | ')} |`
-  const bodyRows = dataRows.map(
-    (cells) => `| ${cells.map((c, i) => pad(c, widths[i])).join(' | ')} |`
-  )
-
   return [
     '## Compute Add-Ons',
     '',
     'All projects run on a compute instance. Pro and Team plans include Micro compute in the base price.',
     '',
-    headerRow,
-    separator,
-    ...bodyRows,
+    ...buildMarkdownTable(headers, dataRows),
     '',
     `Compute is billed hourly. Each project runs its own instance. Pro and Team plans include ${usd(PLAN_BILLING.pro.computeCreditsMonthly)}/month in compute credits (covers one Micro instance). Additional projects add their full compute cost.`,
     '',
@@ -126,7 +126,7 @@ function buildComputeSection(): string {
 function buildDiskSection(): string {
   const headers = ['Disk type', 'Max size', 'Size', 'IOPS', 'Throughput', 'Durability']
 
-  const dataRows = Object.values(DISK_PRICING).map((disk) => {
+  const dataRows = Object.entries(DISK_PRICING).map(([type, disk]) => {
     const size = disk.includedPerProject
       ? `${disk.includedPerProject.sizeGb} GB included, then ${usd(disk.perUnitMonth.sizeGb)} per GB`
       : `${usd(disk.perUnitMonth.sizeGb)} per GB`
@@ -139,7 +139,7 @@ function buildDiskSection(): string {
         : (disk.throughputNote ?? '')
 
     return [
-      `${disk.displayName} (${disk.type})`,
+      `${disk.displayName} (${type})`,
       `${disk.maxSizeTb} TB`,
       size,
       iops,
@@ -148,14 +148,7 @@ function buildDiskSection(): string {
     ]
   })
 
-  const widths = headers.map((h, i) => Math.max(h.length, ...dataRows.map((r) => r[i].length)))
-  const headerRow = `| ${headers.map((h, i) => pad(h, widths[i])).join(' | ')} |`
-  const separator = `| ${widths.map((w) => '-'.repeat(w)).join(' | ')} |`
-  const bodyRows = dataRows.map(
-    (cells) => `| ${cells.map((c, i) => pad(c, widths[i])).join(' | ')} |`
-  )
-
-  return ['## Disk Storage', '', headerRow, separator, ...bodyRows, ''].join('\n')
+  return ['## Disk Storage', '', ...buildMarkdownTable(headers, dataRows), ''].join('\n')
 }
 
 // ---------------------------------------------------------------------------
@@ -192,16 +185,7 @@ function buildAddOnsSection(): string {
     ],
   ]
 
-  const nameWidth = Math.max('Add-on'.length, ...addOns.map(([n]) => n.length))
-  const priceWidth = Math.max('Price'.length, ...addOns.map(([, p]) => p.length))
-
-  const header = `| ${pad('Add-on', nameWidth)} | ${pad('Price', priceWidth)} |`
-  const separator = `| ${'-'.repeat(nameWidth)} | ${'-'.repeat(priceWidth)} |`
-  const rows = addOns.map(
-    ([name, price]) => `| ${pad(name, nameWidth)} | ${pad(price, priceWidth)} |`
-  )
-
-  return ['## Add-Ons', '', header, separator, ...rows, ''].join('\n')
+  return ['## Add-Ons', '', ...buildMarkdownTable(['Add-on', 'Price'], addOns), ''].join('\n')
 }
 
 // ---------------------------------------------------------------------------

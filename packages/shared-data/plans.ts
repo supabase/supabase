@@ -1,6 +1,7 @@
 import { ADDONS, gbDisplay, METERS, PLAN_BILLING, qty, usd, withUnit } from './pricing-catalog'
+import type { PlanKey } from './pricing-catalog'
 
-export type PlanId = 'free' | 'pro' | 'team' | 'enterprise'
+export type PlanId = PlanKey
 
 export interface PricingInformation {
   id: 'tier_free' | 'tier_pro' | 'tier_team' | 'tier_enterprise'

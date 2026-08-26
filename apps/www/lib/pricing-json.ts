@@ -87,8 +87,8 @@ export function buildPricingJson() {
     },
     disk: {
       scope: 'per-project',
-      types: Object.values(DISK_PRICING).map((disk) => ({
-        type: disk.type,
+      types: Object.entries(DISK_PRICING).map(([type, disk]) => ({
+        type,
         name: disk.displayName,
         maxSizeTb: disk.maxSizeTb,
         durabilityPercent: disk.durabilityPercent,
