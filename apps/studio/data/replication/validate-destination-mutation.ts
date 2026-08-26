@@ -22,7 +22,7 @@ type ValidateDestinationParams = {
   tableSyncCopy?: TableSyncCopyConfig
 }
 
-type ValidateDestinationResponse = components['schemas']['ValidateDestinationResponse_Output']
+type ValidateDestinationResponse = components['schemas']['ValidateDestinationResponse']
 export type ValidationFailure = ValidateDestinationResponse['validation_failures'][number]
 
 async function validateDestination(

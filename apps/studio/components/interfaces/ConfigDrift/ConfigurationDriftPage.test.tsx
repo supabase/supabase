@@ -120,6 +120,7 @@ function createProjectConfigResponse(auth: Record<string, unknown>): V2ProjectCo
         },
         auth,
         database: {
+          major_version: 17,
           network_restrictions: {
             allowed_cidrs: [],
             entitlement: 'disallowed',

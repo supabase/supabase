@@ -7,8 +7,8 @@ import { PipelineCostDialog } from './PipelineCostDialog'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type CostEstimateResponse = components['schemas']['CostEstimateResponse_Output']
-type ReplicationSourcesResponse = components['schemas']['SourcesResponse_Output']
+type CostEstimateResponse = components['schemas']['CostEstimateResponse']
+type ReplicationSourcesResponse = components['schemas']['SourcesResponse']
 
 const tables = [
   {

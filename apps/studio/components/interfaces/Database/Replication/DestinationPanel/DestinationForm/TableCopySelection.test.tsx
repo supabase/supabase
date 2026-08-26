@@ -10,7 +10,7 @@ import { TableCopySelection } from './TableCopySelection'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-type ReplicationSourcesResponse = components['schemas']['SourcesResponse_Output']
+type ReplicationSourcesResponse = components['schemas']['SourcesResponse']
 type ReadPublicationsV2Response = components['schemas']['ReadPublicationsResponse_Output']
 type PublicationDetailsResponse = components['schemas']['PublicationDetailsResponse_Output']
 

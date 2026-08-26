@@ -1,11 +1,14 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
 
 import { AssistantNotebookPreview } from './AssistantNotebookPreview'
+import type { components } from '@/data/api'
 import type { NotebookCellDiffEntry } from '@/data/content/notebooks/notebook-operations'
 import type { AgentCell, CellWire } from '@/data/content/notebooks/notebook-schema'
 import { customRender as render } from '@/tests/lib/custom-render'
+import { addAPIMock } from '@/tests/lib/msw'
 
 const wireMarkdownCell = (id: string, text: string): CellWire => ({
   _tag: 'markdown_cell',
@@ -64,22 +67,58 @@ describe('AssistantNotebookPreview', () => {
     expect(container.firstElementChild).toHaveClass('max-w-6xl')
   })
 
-  it('surfaces a metadata-only change on a replaced cell even when the sql is unchanged', () => {
+  it('surfaces a metadata-only database change after resolving the target', async () => {
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref/databases',
+      response: () =>
+        HttpResponse.json<components['schemas']['DatabaseDetailResponse'][]>([
+          {
+            identifier: 'default',
+            region: 'us-east-1',
+            status: 'ACTIVE_HEALTHY',
+            cloud_provider: 'AWS',
+            db_host: 'db.default.supabase.co',
+            db_name: 'postgres',
+            db_port: 5432,
+            db_user: 'postgres',
+            inserted_at: '2026-01-01T00:00:00.000Z',
+            restUrl: 'https://default.supabase.co/rest/v1',
+            size: 't4g.micro',
+          },
+          {
+            identifier: 'default-replica-3',
+            region: 'us-east-1',
+            status: 'ACTIVE_HEALTHY',
+            cloud_provider: 'AWS',
+            db_host: 'db.default-replica-3.supabase.co',
+            db_name: 'postgres',
+            db_port: 5432,
+            db_user: 'postgres',
+            inserted_at: '2026-01-01T00:00:00.000Z',
+            restUrl: 'https://default-replica-3.supabase.co/rest/v1',
+            size: 't4g.micro',
+          },
+        ]),
+    })
+
     const entries: NotebookCellDiffEntry[] = [
       {
         _tag: 'replaced',
-        before: wireDatabaseCell('cell-1', 'primary'),
-        after: agentDatabaseCell('replica-3'),
+        before: wireDatabaseCell('cell-1', 'default'),
+        after: agentDatabaseCell('default-replica-3'),
         operationIndex: 0,
       },
     ]
 
     render(<AssistantNotebookPreview entries={entries} mode="update" />)
 
-    expect(screen.getByText('Database: primary → Database: replica-3')).toBeInTheDocument()
+    expect(screen.getByText('Loading database…')).toBeInTheDocument()
+    const metadata = await screen.findByText('Database: Primary → Database: Replica')
+    expect(metadata).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: 'Replaced Query: Untitled query' })
-    ).toHaveTextContent('Database: primary → Database: replica-3')
+    ).toHaveTextContent('Database: Primary → Database: Replica')
   })
 
   it('hides entries past the limit behind a "Show N more" button', async () => {

@@ -7,7 +7,7 @@ import { RestartCostEstimate } from './RestartCostEstimate'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type CostEstimateResponse = components['schemas']['CostEstimateResponse_Output']
+type CostEstimateResponse = components['schemas']['CostEstimateResponse']
 
 describe('RestartCostEstimate', () => {
   it('does not request an estimate when every target skips initial sync', () => {
