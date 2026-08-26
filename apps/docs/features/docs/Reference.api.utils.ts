@@ -134,26 +134,37 @@ interface IFgaSecurity {
   fga_permissions: string[]
 }
 
+// Some specs have allOf/anyOf/oneOf as a single schema object instead of an
+// array. Wrap it so callers can treat both shapes the same way.
+export function asSchemaArray(value: unknown): Array<any> {
+  if (Array.isArray(value)) return value
+  if (value && typeof value === 'object') return [value]
+  return []
+}
+
 export function getTypeDisplayFromSchema(schema: ISchema) {
   if ('allOf' in schema) {
-    if (schema.allOf.length === 1) {
-      return getTypeDisplayFromSchema(schema.allOf[0])
+    const options = asSchemaArray(schema.allOf)
+    if (options.length === 1) {
+      return getTypeDisplayFromSchema(options[0])
     } else {
       return {
         displayName: 'all of the following options',
       }
     }
   } else if ('oneOf' in schema) {
-    if (schema.oneOf.length === 1) {
-      return getTypeDisplayFromSchema(schema.oneOf[0])
+    const options = asSchemaArray(schema.oneOf)
+    if (options.length === 1) {
+      return getTypeDisplayFromSchema(options[0])
     } else {
       return {
         displayName: 'one of the following options',
       }
     }
   } else if ('anyOf' in schema) {
-    if (schema.anyOf.length === 1) {
-      return getTypeDisplayFromSchema(schema.anyOf[0])
+    const options = asSchemaArray(schema.anyOf)
+    if (options.length === 1) {
+      return getTypeDisplayFromSchema(options[0])
     } else {
       return {
         displayName: 'any of the following options',

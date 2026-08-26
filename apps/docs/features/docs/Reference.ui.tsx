@@ -16,7 +16,12 @@ import type { HTMLAttributes, PropsWithChildren } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Badge, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
-import { getTypeDisplayFromSchema, IApiEndPoint, type ISchema } from './Reference.api.utils'
+import {
+  asSchemaArray,
+  getTypeDisplayFromSchema,
+  IApiEndPoint,
+  type ISchema,
+} from './Reference.api.utils'
 import { API_REFERENCE_REQUEST_BODY_SCHEMA_DATA_ATTRIBUTES } from './Reference.ui.shared'
 
 interface SectionProps extends PropsWithChildren {
@@ -379,14 +384,6 @@ export function ApiOperationRequestBodyDetails({
 
 interface ApiOperationRequestBodyDetailsInternalProps extends HTMLAttributes<HTMLUListElement> {
   schema: ISchema
-}
-
-// Some specs have allOf/anyOf/oneOf as a single schema object instead of an
-// array. Wrap it so it still renders instead of crashing or disappearing.
-function asSchemaArray(value: unknown): Array<any> {
-  if (Array.isArray(value)) return value
-  if (value && typeof value === 'object') return [value]
-  return []
 }
 
 function ApiOperationRequestBodyDetailsInternal({
