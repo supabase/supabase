@@ -7,10 +7,16 @@ import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { render } from '@/tests/helpers'
 
 const project = {
+  cloud_provider: 'AWS',
+  databases: [],
+  inserted_at: '2026-08-26T00:00:00.000Z',
+  integration_source: null,
+  is_branch: false,
   ref: 'project-ref',
   name: 'Project name',
+  region: 'ap-southeast-2',
   status: 'ACTIVE_HEALTHY',
-} as OrgProject
+} satisfies OrgProject
 
 describe('ProjectCommandItem', () => {
   it('wraps navigable command items in a link', () => {

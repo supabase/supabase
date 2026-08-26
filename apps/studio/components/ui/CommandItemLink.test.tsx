@@ -3,11 +3,11 @@ import { Command } from 'ui'
 import { describe, expect, it } from 'vitest'
 
 import { CommandItemLink } from './CommandItemLink'
-import { render } from '@/tests/helpers'
+import { customRender } from '@/tests/lib/custom-render'
 
 describe('CommandItemLink', () => {
   it('wraps the command item in a link', () => {
-    render(
+    customRender(
       <Command>
         <CommandItemLink href="/destination">Destination</CommandItemLink>
       </Command>
@@ -19,7 +19,7 @@ describe('CommandItemLink', () => {
   })
 
   it('does not render disabled command items as links', () => {
-    render(
+    customRender(
       <Command>
         <CommandItemLink href="/destination" disabled>
           Destination

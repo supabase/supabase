@@ -1,9 +1,13 @@
 import { screen } from '@testing-library/react'
+import type { ComponentProps } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ProjectDropdown } from './ProjectDropdown'
+import type { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { createMockOrganization, render } from '@/tests/helpers'
+
+type OrganizationProjectSelectorProps = ComponentProps<typeof OrganizationProjectSelector>
 
 const { mockSelectedOrganization, mockSelectedProject, mockSelectorProject, mockSelectorProps } =
   vi.hoisted(() => ({
@@ -56,11 +60,18 @@ vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
 }))
 
 vi.mock('@/components/ui/OrganizationProjectSelector', () => ({
-  OrganizationProjectSelector: (props: any) => {
+  OrganizationProjectSelector: (props: OrganizationProjectSelectorProps) => {
     mockSelectorProps(props)
     return (
       <div>
-        <div data-testid="project-selector-trigger">{props.renderTrigger?.({})}</div>
+        <div data-testid="project-selector-trigger">
+          {props.renderTrigger?.({
+            isLoading: false,
+            project: mockSelectorProject(),
+            listboxId: 'project-selector-listbox',
+            open: false,
+          })}
+        </div>
         <div data-testid="project-selector-row">{props.renderRow?.(mockSelectorProject())}</div>
       </div>
     )
