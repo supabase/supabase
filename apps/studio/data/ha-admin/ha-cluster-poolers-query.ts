@@ -28,6 +28,10 @@ const multipoolerSchema = z.object({
   // 'SERVING' | 'DISABLED' | 'DRAINING'
   servingStatus: z.string().optional(),
   hostname: z.string().optional(),
+  // 'ACTIVE' | 'STARTING' | 'STOPPING' | 'QUARANTINED' | 'SHUTDOWN', optionally
+  // prefixed with 'LIFECYCLE_' — these are the values `getPoolerStatus` handles.
+  // Anything else falls through to its `servingStatus` check, so a future
+  // failure state (a 'FAILED'-style value) reads as healthy until it is mapped.
   lifecycleStatus: z.object({ status: z.string().optional() }).optional(),
   routingState: z
     .object({
