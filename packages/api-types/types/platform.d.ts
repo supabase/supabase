@@ -900,6 +900,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/mcp-tools-permissions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * MCP tool → FGA permission map
+     * @description Returns each MCP tool and the FGA permission groups that gate it, as OR-of-AND alternatives (the token needs every permission of at least one group). Used by the dashboard to show what a scoped token can do.
+     */
+    get: operations['get-mcp-tools-permissions']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/notifications': {
     parameters: {
       query?: never
@@ -6130,9 +6150,31 @@ export interface components {
       workdir: string
     }
     CreateInvitationBody: {
-      emails: string[]
+      data?: {
+        attributes: {
+          /** Format: email */
+          email: string
+          /** @description The projects to limit a user to. If omitted, user will have org-wide access with the provided role. */
+          projects?: {
+            /**
+             * @description Project ref
+             * @example abcjuqabhgwjjutfvtpa
+             */
+            ref: string
+          }[]
+          require_sso?: boolean
+          /**
+           * @description Role name to assign. Must be on a Team or Enterprise plan to use the read-only role.
+           * @example developer
+           * @enum {string}
+           */
+          role?: 'administrator' | 'developer' | 'owner' | 'read-only'
+          role_id?: number
+        }
+      }[]
+      emails?: string[]
       require_sso?: boolean
-      role_id: number
+      role_id?: number
       role_scoped_projects?: string[]
     }
     CreateNamespaceBody: {
@@ -18474,6 +18516,28 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+    }
+  }
+  'get-mcp-tools-permissions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Map of MCP tool name to its FGA permission groups (OR-of-AND). */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            [key: string]: string[][]
+          }
+        }
       }
     }
   }

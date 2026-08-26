@@ -4,6 +4,7 @@ import type {
   CodexMcpConfig,
   CopilotMcpConfig,
   FactoryMcpConfig,
+  FxMcpConfig,
   GeminiMcpConfig,
   GooseMcpConfig,
   GrokMcpConfig,
@@ -342,6 +343,24 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
     },
   },
   {
+    key: 'fx',
+    label: 'fx',
+    icon: 'fx',
+    hasDistinctDarkIcon: true,
+    configFile: '~/.fx/mcp.json',
+    externalDocsUrl: 'https://fx.sh/docs/capabilities/mcp',
+    transformConfig: (config): FxMcpConfig => {
+      return {
+        mcp: {
+          supabase: {
+            type: 'http',
+            url: config.mcpServers.supabase.url,
+          },
+        },
+      }
+    },
+  },
+  {
     key: 'kiro',
     label: 'Kiro',
     icon: 'kiro',
@@ -413,12 +432,24 @@ export const MCP_CLI_COMMANDS: Record<string, McpCliCommands> = {
   opencode: {
     authenticate: 'opencode mcp auth supabase',
   },
+  fx: {
+    authenticate: '/mcp auth supabase --open',
+  },
 }
 
 export const MCP_CLIENT_GROUPS = [
   {
     heading: 'AI Agent CLI',
-    keys: ['claude-code', 'codex', 'grok', 'gemini-cli', 'copilot-cli', 'opencode', 'factory'],
+    keys: [
+      'claude-code',
+      'codex',
+      'grok',
+      'gemini-cli',
+      'copilot-cli',
+      'opencode',
+      'factory',
+      'fx',
+    ],
   },
   {
     heading: 'Web Clients',

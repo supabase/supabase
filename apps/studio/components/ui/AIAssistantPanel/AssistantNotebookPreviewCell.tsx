@@ -17,6 +17,12 @@ import {
   getCellSourceText,
   getEntryMetadataLine,
 } from './AssistantNotebookPreview.utils'
+import {
+  ExplorerQueryFooter,
+  ExplorerQueryResults,
+} from '@/components/interfaces/Explorer/ExplorerQuery'
+import { QueryResultRenderer } from '@/components/interfaces/Explorer/QueryEditor/QueryResultRenderer'
+import type { QueryResult } from '@/components/interfaces/Explorer/types'
 import { DiffEditor } from '@/components/ui/DiffEditor'
 import type { NotebookCellDiffEntry } from '@/data/content/notebooks/notebook-operations'
 import type { AgentCell, CellWire } from '@/data/content/notebooks/notebook-schema'
@@ -25,8 +31,9 @@ export interface AssistantNotebookPreviewCellProps {
   entry: NotebookCellDiffEntry
   isExpanded: boolean
   onExpandedChange: (isExpanded: boolean) => void
-  /** Create previews omit per-row change glyphs — every cell is an add. */
-  mode: 'create' | 'update'
+  /** Create and run previews omit per-row change glyphs. */
+  mode: 'create' | 'update' | 'run'
+  result?: QueryResult
 }
 
 /**
@@ -54,6 +61,7 @@ export const AssistantNotebookPreviewCell = ({
   isExpanded,
   onExpandedChange,
   mode,
+  result,
 }: AssistantNotebookPreviewCellProps) => {
   const marker = CHANGE_MARKERS[entry._tag]
   const isRemoved = entry._tag === 'removed'
@@ -92,7 +100,45 @@ export const AssistantNotebookPreviewCell = ({
           <CellBody entry={entry} />
         </div>
       </CollapsibleContent>
+      {result !== undefined && cell._tag !== 'markdown_cell' && (
+        <QueryCellResult cell={cell} result={result} />
+      )}
     </Collapsible>
+  )
+}
+
+const QueryCellResult = ({
+  cell,
+  result,
+}: {
+  cell: Extract<CellWire | AgentCell, { _tag: 'database_cell' | 'log_cell' }>
+  result: QueryResult
+}) => {
+  const rowCount = result.rows?.length ?? 0
+  const rowLimit = cell._tag === 'database_cell' ? cell.row_limit : undefined
+
+  return (
+    <>
+      <ExplorerQueryResults
+        className={cn(
+          'border-t',
+          rowCount === 0 ? 'min-h-20 items-center justify-center' : 'h-56 overflow-x-auto'
+        )}
+      >
+        <QueryResultRenderer view={cell.view ?? 'table'} result={result} chart={cell.chart} />
+      </ExplorerQueryResults>
+      <ExplorerQueryFooter className="flex items-center gap-x-2">
+        <p>
+          {rowCount.toLocaleString()} {rowCount === 1 ? 'row' : 'rows'}
+        </p>
+        {rowLimit !== undefined && (
+          <>
+            <p>·</p>
+            <p>{rowLimit < 0 ? 'No row limit' : `Limit ${rowLimit} rows`}</p>
+          </>
+        )}
+      </ExplorerQueryFooter>
+    </>
   )
 }
 

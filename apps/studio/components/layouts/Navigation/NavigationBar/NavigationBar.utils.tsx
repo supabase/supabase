@@ -148,6 +148,7 @@ export const generateProductRoutes = (
             disabled: !isProjectActive,
             icon: <Box size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/workers`),
+            isNew: true,
           },
         ]
       : []),
