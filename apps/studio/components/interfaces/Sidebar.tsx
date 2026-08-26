@@ -30,11 +30,12 @@ import {
 
 import { Shortcut } from '../ui/Shortcut'
 import { Route } from '../ui/ui.types'
+import { useIsExplorerEnabled } from './App/FeaturePreview/FeaturePreviewContext'
 import {
   generateProductRoutes,
   generateSettingsRoutes,
-  generateToolRoutes,
   useGenerateOtherRoutes,
+  useGenerateToolRoutes,
 } from '@/components/layouts/Navigation/NavigationBar/NavigationBar.utils'
 import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
 import { useHideSidebar } from '@/hooks/misc/useHideSidebar'
@@ -168,6 +169,7 @@ export function SideBarNavLink({
 } & ComponentPropsWithoutRef<typeof SidebarMenuButton>) {
   const router = useRouter()
   const { state: sidebarState } = useSidebar()
+
   const [sidebarBehaviour] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
     DEFAULT_SIDEBAR_BEHAVIOR
@@ -223,6 +225,7 @@ export function SideBarNavLink({
           onTrigger={() => router.push(route.link!)}
           side="right"
           delayDuration={shortcutPopoverDelay}
+          label={route.key === 'explorer' ? 'Go to Explorer' : undefined}
         >
           {button}
         </Shortcut>
@@ -278,7 +281,7 @@ const ProjectLinks = () => {
   const authOverviewPageEnabled = useFlag('authOverviewPage')
   const workersEnabled = useFlag('workers')
 
-  const toolRoutes = generateToolRoutes(ref, project)
+  const toolRoutes = useGenerateToolRoutes()
   const productRoutes = generateProductRoutes(ref, project, {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,
