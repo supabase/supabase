@@ -93,6 +93,7 @@ export async function GET() {
     '## Pricing',
     '',
     '- [Supabase Pricing](https://supabase.com/pricing.md)',
+    '- [Supabase Pricing (structured JSON)](https://supabase.com/pricing.json)',
   ].join('\n')
 
   return new Response(content, {

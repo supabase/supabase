@@ -1,8 +1,10 @@
 import { plans } from 'shared-data/plans'
 import { pricing } from 'shared-data/pricing'
+import { DISK_PRICING, PLAN_BILLING, qty, usd } from 'shared-data/pricing-catalog'
 
 import addOnTable from '@/data/PricingAddOnTable.json'
 import pricingFaq from '@/data/PricingFAQ.json'
+import { getColumnValue, parseUsdString } from '@/lib/pricing-json'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -27,12 +29,6 @@ function formatPlanValue(val: boolean | string | string[]): string {
 
 function pad(str: string, len: number): string {
   return str.padEnd(len)
-}
-
-function getColumnValue(row: { columns: { key: string; value: unknown }[] }, key: string): unknown {
-  const col = row.columns.find((c) => c.key === key)
-  if (!col) throw new Error(`Missing column "${key}"`)
-  return col.value
 }
 
 // ---------------------------------------------------------------------------
@@ -118,7 +114,7 @@ function buildComputeSection(): string {
     separator,
     ...bodyRows,
     '',
-    'Compute is billed hourly. Each project runs its own instance. Pro and Team plans include $10/month in compute credits (covers one Micro instance). Additional projects add their full compute cost.',
+    `Compute is billed hourly. Each project runs its own instance. Pro and Team plans include ${usd(PLAN_BILLING.pro.computeCreditsMonthly)}/month in compute credits (covers one Micro instance). Additional projects add their full compute cost.`,
     '',
   ].join('\n')
 }
@@ -127,39 +123,39 @@ function buildComputeSection(): string {
 // Disk Storage
 // ---------------------------------------------------------------------------
 
-const DISK_TYPES = [
-  {
-    name: 'General Purpose',
-    maxSize: '16 TB',
-    size: '8 GB included, then $0.125 per GB',
-    iops: '3,000 IOPS included, then $0.024 per IOPS',
-    throughput: '125 MB/s included, then $0.095 per MB/s',
-    durability: '99.9%',
-  },
-  {
-    name: 'High Performance',
-    maxSize: '60 TB',
-    size: '$0.195 per GB',
-    iops: '$0.119 per IOPS',
-    throughput: 'Scales automatically with IOPS',
-    durability: '99.999%',
-  },
-]
-
 function buildDiskSection(): string {
-  const lines: string[] = ['## Disk Storage', '']
+  const headers = ['Disk type', 'Max size', 'Size', 'IOPS', 'Throughput', 'Durability']
 
-  for (const disk of DISK_TYPES) {
-    lines.push(`### ${disk.name}`)
-    lines.push(`- Max size: ${disk.maxSize}`)
-    lines.push(`- Size: ${disk.size}`)
-    lines.push(`- IOPS: ${disk.iops}`)
-    lines.push(`- Throughput: ${disk.throughput}`)
-    lines.push(`- Durability: ${disk.durability}`)
-    lines.push('')
-  }
+  const dataRows = Object.values(DISK_PRICING).map((disk) => {
+    const size = disk.includedPerProject
+      ? `${disk.includedPerProject.sizeGb} GB included, then ${usd(disk.perUnitMonth.sizeGb)} per GB`
+      : `${usd(disk.perUnitMonth.sizeGb)} per GB`
+    const iops = disk.includedPerProject
+      ? `${qty(disk.includedPerProject.iops, 'comma')} IOPS included, then ${usd(disk.perUnitMonth.iops)} per IOPS`
+      : `${usd(disk.perUnitMonth.iops)} per IOPS`
+    const throughput =
+      disk.includedPerProject && disk.perUnitMonth.throughputMBps !== null
+        ? `${qty(disk.includedPerProject.throughputMBps)} MB/s included, then ${usd(disk.perUnitMonth.throughputMBps)} per MB/s`
+        : (disk.throughputNote ?? '')
 
-  return lines.join('\n')
+    return [
+      `${disk.displayName} (${disk.type})`,
+      `${disk.maxSizeTb} TB`,
+      size,
+      iops,
+      throughput,
+      `${disk.durabilityPercent}%`,
+    ]
+  })
+
+  const widths = headers.map((h, i) => Math.max(h.length, ...dataRows.map((r) => r[i].length)))
+  const headerRow = `| ${headers.map((h, i) => pad(h, widths[i])).join(' | ')} |`
+  const separator = `| ${widths.map((w) => '-'.repeat(w)).join(' | ')} |`
+  const bodyRows = dataRows.map(
+    (cells) => `| ${cells.map((c, i) => pad(c, widths[i])).join(' | ')} |`
+  )
+
+  return ['## Disk Storage', '', headerRow, separator, ...bodyRows, ''].join('\n')
 }
 
 // ---------------------------------------------------------------------------
@@ -259,6 +255,17 @@ function buildFAQSection(): string {
   return lines.join('\n')
 }
 
+function buildBillingExample(): string {
+  const proPrice = PLAN_BILLING.pro.priceMonthly
+  const credits = PLAN_BILLING.pro.computeCreditsMonthly
+  const microRow = addOnTable.database.rows.find((row) => getColumnValue(row, 'plan') === 'Micro')
+  if (!microRow) throw new Error('Missing Micro row in PricingAddOnTable')
+  const microPrice = parseUsdString(String(getColumnValue(microRow, 'pricing')))
+  const exampleTotal = proPrice + 2 * microPrice - credits
+
+  return `Pro and Team plans include ${usd(credits)}/month in compute credits, which covers one Micro instance. Additional projects each add their own compute cost. For example, a Pro org with 2 projects on Micro compute costs: ${usd(proPrice)} (plan) + ${usd(microPrice)} (project 1) + ${usd(microPrice)} (project 2) - ${usd(credits)} (credits) = ${usd(exampleTotal)}/month.`
+}
+
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
@@ -275,9 +282,11 @@ export function generatePricingContent(): string {
     '',
     'Supabase uses organization-based billing. You choose a plan (Pro, Team, or Enterprise) for your organization, then each project within it runs on its own compute instance. The plan subscription covers platform features and usage quotas. Compute is billed separately per project.',
     '',
-    'Pro and Team plans include $10/month in compute credits, which covers one Micro instance. Additional projects each add their own compute cost. For example, a Pro org with 2 projects on Micro compute costs: $25 (plan) + $10 (project 1) + $10 (project 2) - $10 (credits) = $35/month.',
+    buildBillingExample(),
     '',
     'For current pricing, visit https://supabase.com/pricing.',
+    '',
+    'Structured pricing data (JSON): https://supabase.com/pricing.json',
     '',
     buildPlanTiersSection(),
     buildComputeSection(),
