@@ -30,7 +30,6 @@ import {
 
 import { Shortcut } from '../ui/Shortcut'
 import { Route } from '../ui/ui.types'
-import { useIsExplorerEnabled } from './App/FeaturePreview/FeaturePreviewContext'
 import {
   generateProductRoutes,
   generateSettingsRoutes,
