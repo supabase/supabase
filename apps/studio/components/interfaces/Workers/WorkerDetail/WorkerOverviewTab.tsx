@@ -88,9 +88,9 @@ export const WorkerOverviewTab = ({ worker }: WorkerOverviewTabProps) => (
             </p>
             <div className="grid grid-cols-2 divide-x divide-y rounded-md border border-default bg-surface-100 sm:grid-cols-4 sm:divide-y-0">
               <InstanceCount
-                label="Declared"
+                label="Instances"
                 value={worker.instances.declared}
-                tooltip="Instances you configured for this worker."
+                tooltip="The number of instances you configured for this worker."
               />
               <InstanceCount
                 label="Live"
