@@ -243,7 +243,44 @@ To mitigate this issue:
    REINDEX INDEX CONCURRENTLY <schema_name>.<index_name>;
    ```
 
-Separately from the encoding case above, this release also fixes an integer overflow for `ltree` values with more than about 14,653 labels. If you store values that deep, reindex B-tree indexes on those `ltree` columns after upgrading, regardless of your database encoding.
+Separately from the encoding case above, this release also fixes an integer overflow in `ltree` comparisons: values with more than about 14,653 labels could compare incorrectly, which can corrupt B-tree indexes built over them, regardless of your database encoding. The following query lists only the B-tree indexes whose `ltree` column or expression actually contains such values, so they are the ones to reindex (an empty result means no action is needed):
+
+```sql
+SELECT s.schema_name || '.' || s.index_name AS index_to_reindex
+FROM (
+  SELECT
+    n.nspname AS schema_name,
+    c.relname AS table_name,
+    ic.relname AS index_name,
+    string_agg('nlevel(' || pg_get_indexdef(i.indexrelid, k.pos::int, true) || ') > 14653', ' OR ') AS cond
+  FROM pg_index i
+  JOIN pg_class ic ON ic.oid = i.indexrelid
+  JOIN pg_class c ON c.oid = i.indrelid
+  JOIN pg_namespace n ON n.oid = c.relnamespace
+  JOIN pg_am am ON am.oid = ic.relam
+  JOIN LATERAL generate_series(1, i.indnkeyatts) AS k(pos) ON true
+  JOIN pg_attribute ia ON ia.attrelid = i.indexrelid AND ia.attnum = k.pos
+  JOIN pg_type t ON t.oid = ia.atttypid
+  WHERE am.amname = 'btree'
+    AND t.typname = 'ltree'
+    AND n.nspname NOT IN ('pg_catalog', 'information_schema')
+  GROUP BY n.nspname, c.relname, ic.relname
+) s
+WHERE (xpath(
+         '/row/cnt/text()',
+         query_to_xml(
+           format('SELECT count(*) AS cnt FROM %I.%I WHERE %s', s.schema_name, s.table_name, s.cond),
+           false, true, ''
+         )
+       ))[1]::text::bigint > 0
+ORDER BY 1;
+```
+
+Reindex each index it returns, using the schema-qualified name. `REINDEX INDEX CONCURRENTLY` runs online with no downtime, but cannot run inside a transaction block:
+
+```sql
+REINDEX INDEX CONCURRENTLY <schema_name>.<index_name>;
+```
 
 ### Btree_gist indexes on float columns require reindexing after upgrade
 
