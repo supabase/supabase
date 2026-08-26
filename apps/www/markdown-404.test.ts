@@ -32,12 +32,11 @@ describe('md-404 route handler', () => {
     expect(await res.text()).toContain('`/foo.md` does not exist')
   })
 
-  it('serves a plain-text 404 when the client rejects markdown with q=0', async () => {
+  it('serves the markdown 404 regardless of q-values (the rewrite gate owns Accept matching)', async () => {
     const res = await getMd404('text/markdown;q=0, text/html', ['some-path'])
 
     expect(res.status).toBe(404)
-    expect(res.headers.get('Content-Type')).toBe('text/plain; charset=utf-8')
-    expect(await res.text()).toBe('Not found')
+    expect(res.headers.get('Content-Type')).toBe('text/markdown; charset=utf-8')
   })
 
   it('handles a missing path param and echoes the root path', async () => {

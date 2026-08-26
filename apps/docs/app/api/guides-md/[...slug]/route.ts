@@ -60,6 +60,7 @@ async function searchForSuggestions(baseUrl: string, query: string): Promise<Sea
   try {
     const response = await fetch(`${baseUrl}/api/graphql`, {
       method: 'POST',
+      signal: AbortSignal.timeout(1500),
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         query: `

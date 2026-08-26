@@ -71,7 +71,9 @@ describe('next.config.mjs', () => {
     const acceptRule = fallback.find((rule) => rule.destination === '/api-v2/md-404/:path*')
 
     expect(mdSuffixRule).toBeDefined()
-    expect(acceptRule?.has).toEqual([{ type: 'header', key: 'accept', value: '.*text/markdown.*' }])
+    expect(acceptRule?.has).toEqual([
+      { type: 'header', key: 'accept', value: '.*text/(markdown|\\*).*' },
+    ])
 
     expect(getPathMatch(mdSuffixRule!.source)('/definitely-not-a-page.md')).toBeTruthy()
     expect(getPathMatch(mdSuffixRule!.source)('/nested/definitely/not-a-page.md')).toBeTruthy()
@@ -81,6 +83,7 @@ describe('next.config.mjs', () => {
     const acceptHeaderRegex = new RegExp(`^${acceptRule!.has![0].value}$`)
     expect(acceptHeaderRegex.test('text/markdown')).toBe(true)
     expect(acceptHeaderRegex.test('text/html, text/markdown;q=0.9')).toBe(true)
+    expect(acceptHeaderRegex.test('text/*')).toBe(true)
     expect(
       acceptHeaderRegex.test('text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
     ).toBe(false)
