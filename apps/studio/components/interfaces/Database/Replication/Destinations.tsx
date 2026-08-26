@@ -29,6 +29,7 @@ import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
 import { DisablePipelinesDialog } from './DisablePipelinesDialog'
 import { EnablePipelinesModal } from './EnablePipelinesCallout'
+import { PIPELINES_FEEDBACK_URL } from './Replication.constants'
 import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLClickHousePrivateAlpha,
@@ -243,6 +244,11 @@ export const Destinations = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
+          <Button asChild variant="default" icon={<MessageSquare />}>
+            <a href={PIPELINES_FEEDBACK_URL} target="_blank" rel="noreferrer noopener">
+              Leave feedback
+            </a>
+          </Button>
           <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
 
           <Shortcut
