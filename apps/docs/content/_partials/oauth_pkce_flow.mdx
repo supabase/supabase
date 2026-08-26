@@ -31,13 +31,25 @@ await supabase.auth.signInWithOAuth({
 
 In the server, you need to handle the redirect to the OAuth provider's authentication endpoint. The `signInWithOAuth` method returns the endpoint URL, which you can redirect to.
 
-```js
-import { createClient, type Provider } from '@supabase/supabase-js'
-const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
-const provider = 'provider' as Provider
-const redirect = (url: string) => {}
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="nextjs"
+  queryGroup="framework"
+>
+<TabPanel id="nextjs" label="Next.js">
+
+```ts
+import { redirect } from 'next/navigation'
+import { createClient } from '@/utils/supabase/server'
+import { type Provider } from '@supabase/supabase-js'
+
+const provider = 'github' as Provider
 
 // ---cut---
+const supabase = await createClient()
+
 const { data, error } = await supabase.auth.signInWithOAuth({
   provider,
   options: {
@@ -49,6 +61,118 @@ if (data.url) {
   redirect(data.url) // use the redirect API for your server framework
 }
 ```
+
+</TabPanel>
+<TabPanel id="sveltekit" label="SvelteKit">
+
+```ts
+import { redirect } from '@sveltejs/kit'
+import { type Provider } from '@supabase/supabase-js'
+
+const provider = 'github' as Provider
+
+// ---cut---
+// `supabase` is the `locals.supabase` instance created in your `hooks.server.ts` or `+page.server.ts`
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider,
+  options: {
+    redirectTo: 'http://example.com/auth/callback',
+  },
+})
+
+if (data.url) {
+  redirect(303, data.url) // use the redirect API for your server framework
+}
+```
+
+</TabPanel>
+<TabPanel id="astro" label="Astro">
+
+```ts
+import { createServerClient, parseCookieHeader } from '@supabase/ssr'
+import { type Provider } from '@supabase/supabase-js'
+
+const provider = 'github' as Provider
+
+// ---cut---
+const supabase = createServerClient(
+  import.meta.env.PUBLIC_SUPABASE_URL,
+  import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+  {
+    cookies: {
+      getAll() {
+        return parseCookieHeader(Astro.request.headers.get('Cookie') ?? '')
+      },
+      setAll(cookiesToSet, headers) {
+        cookiesToSet.forEach(({ name, value, options }) =>
+          Astro.cookies.set(name, value, options)
+        )
+        if (headers) {
+          headers.forEach((value, key) => Astro.response.headers.append(key, value))
+        }
+      },
+    },
+  }
+)
+
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider,
+  options: {
+    redirectTo: 'http://example.com/auth/callback',
+  },
+})
+
+if (data.url) {
+  return Astro.redirect(data.url) // use the redirect API for your server framework
+}
+```
+
+</TabPanel>
+<TabPanel id="remix" label="Remix">
+
+```ts
+import { redirect } from '@remix-run/node'
+import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
+import { type Provider } from '@supabase/supabase-js'
+
+const provider = 'github' as Provider
+
+// ---cut---
+const responseHeaders = new Headers()
+const supabase = createServerClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_PUBLISHABLE_KEY!,
+  {
+    cookies: {
+      getAll() {
+        return parseCookieHeader(request.headers.get('Cookie') ?? '')
+      },
+      setAll(cookiesToSet, headers) {
+        cookiesToSet.forEach(({ name, value, options }) =>
+          responseHeaders.append('Set-Cookie', serializeCookieHeader(name, value, options))
+        )
+        if (headers) {
+          headers.forEach((value, key) => responseHeaders.append(key, value))
+        }
+      },
+    },
+  }
+)
+
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider,
+  options: {
+    redirectTo: 'http://example.com/auth/callback',
+  },
+})
+
+if (data.url) {
+  return redirect(data.url, { headers: responseHeaders }) // use the redirect API for your server framework
+}
+```
+
+</TabPanel>
+</Tabs>
 
 </TabPanel>
 
@@ -157,10 +281,13 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
           getAll() {
             return parseCookieHeader(Astro.request.headers.get('Cookie') ?? '')
           },
-          setAll(cookiesToSet, _headers) {
+          setAll(cookiesToSet, headers) {
             cookiesToSet.forEach(({ name, value, options }) =>
               Astro.cookies.set(name, value, options)
             )
+            if (headers) {
+              headers.forEach((value, key) => Astro.response.headers.append(key, value))
+            }
           },
         },
       }
@@ -203,11 +330,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
           getAll() {
             return parseCookieHeader(request.headers.get('Cookie') ?? '')
           },
-          setAll(cookiesToSet, cacheHeaders) {
+          setAll(cookiesToSet, headers) {
             cookiesToSet.forEach(({ name, value, options }) =>
               responseHeaders.append('Set-Cookie', serializeCookieHeader(name, value, options))
             )
-            Object.entries(cacheHeaders).forEach(([key, value]) => responseHeaders.set(key, value))
+            if (headers) {
+              headers.forEach((value, key) => responseHeaders.append(key, value))
+            }
           },
         },
       }
