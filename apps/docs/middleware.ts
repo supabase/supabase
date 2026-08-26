@@ -28,7 +28,8 @@ export function middleware(request: NextRequest) {
       })
     }
 
-    if (decision === 'markdown') {
+    const isUnknownMdRequest = isMdSuffix && !GUIDES_MARKDOWN_SLUGS.has(slug)
+    if (decision === 'markdown' || isUnknownMdRequest) {
       const rewriteUrl = new URL(url)
       rewriteUrl.pathname = `${BASE_PATH ?? ''}/api/guides-md/${slug}`
       return NextResponse.rewrite(rewriteUrl)

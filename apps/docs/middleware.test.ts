@@ -37,6 +37,20 @@ describe('docs middleware — /guides/* content negotiation', () => {
     }
   })
 
+  it('rewrites unknown /<slug>.md to /api/guides-md/<slug> so its markdown 404 serves', () => {
+    for (const accept of [undefined, 'text/html']) {
+      const req = makeRequest('/docs/guides/definitely-not-a-guide.md', accept ? { accept } : {})
+      expect(middleware(req).headers.get(REWRITE_HEADER)).toBe(
+        GUIDES_MD_REWRITE('definitely-not-a-guide')
+      )
+    }
+  })
+
+  it('does not rewrite unknown bare slugs even when Accept prefers markdown', () => {
+    const req = makeRequest('/docs/guides/definitely-not-a-guide', { accept: 'text/markdown' })
+    expect(middleware(req).headers.get(REWRITE_HEADER)).toBeNull()
+  })
+
   it('serves HTML for browser-style Accept', () => {
     const req = makeRequest('/docs/guides/auth', {
       accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
