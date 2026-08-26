@@ -209,7 +209,7 @@ export const PricingTableRowDesktop = (props: any) => {
                   <td
                     key={i}
                     className={[
-                      `pl-6 pr-2 tier-${planName}`,
+                      `pl-6 pr-2 py-5 tier-${planName}`,
                       typeof planValue === 'boolean' ? 'text-center' : '',
                     ].join(' ')}
                   >
@@ -235,7 +235,7 @@ export const PricingTableRowDesktop = (props: any) => {
                         </span>
                         {Array.isArray(planValue) &&
                           planValue.slice(1).map((val, idx) => (
-                            <span key={`planval_${i}_${idx}`} className="text-lighter leading-5">
+                            <span key={`planval_${i}_${idx}`} className="text-lighter leading-4">
                               {val}
                             </span>
                           ))}
