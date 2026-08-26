@@ -258,7 +258,10 @@ export const UserImpersonationSelector = ({
           selectedSource={selectedSource}
           displayName={displayName}
           isImpersonateLoading={isImpersonateLoading}
-          stopImpersonating={() => state.setRole(undefined)}
+          stopImpersonating={async () => {
+            await state.setRole(undefined)
+            onUserImpersonationCleared?.()
+          }}
           isUserComboboxOpen={isUserComboboxOpen}
           setIsUserComboboxOpen={setIsUserComboboxOpen}
           searchText={searchText}
