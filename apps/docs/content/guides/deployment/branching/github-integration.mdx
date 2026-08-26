@@ -83,19 +83,25 @@ Enable the **Automatic branching** option in your GitHub Integration configurati
 
 When a new branch is created in GitHub, a corresponding branch is created in Supabase. (You can enable the **Supabase changes only** option to only create Supabase branches when Supabase files change.)
 
+Every Supabase branch, preview or persistent, is created as a clone of your base project, the project that your production branch runs on. The branch starts with the schema, migration history, and configuration of that project rather than with an empty database.
+
+Your production data is the exception. It isn't cloned, so your branch starts with empty tables. See [Seeding](#seeding) to populate them with sample data.
+
 ### Configuration
 
 You can test configuration changes on your Preview Branch by configuring the `config.toml` file in your Supabase directory. See the [Configuration docs](/docs/guides/deployment/branching/configuration) for more information.
+
+Your branch starts with the configuration of your base project. The settings in your `config.toml` file are applied on top of that clone.
 
 A comment is added to your PR with the deployment status of your preview branch.
 
 ### Migrations
 
-The migrations in the `migrations` subdirectory of your Supabase directory are automatically run.
+The migrations in the `migrations` subdirectory of your Supabase directory are automatically run. Because your branch is a clone of your base project, it inherits that project's migration history, so only the migrations that haven't been applied yet are run.
 
 ### Seeding
 
-No production data is copied to your Preview branch. This is meant to protect your sensitive production data.
+Cloning your base project copies its schema and configuration, but not its data. This is meant to protect your sensitive production data. Your branch starts with the tables of your base project and no rows in them.
 
 You can seed your Preview Branch with sample data using the `seed.sql` file in your Supabase directory. See the [Seeding docs](/docs/guides/local-development/seeding-your-database) for more information.
 
