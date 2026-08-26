@@ -65,7 +65,7 @@ export const AdvancedSettings = ({
     <div className={cn('px-5', className)}>
       <Accordion type="single" collapsible>
         <AccordionItem value="item-1" className="border-none">
-          <AccordionTrigger className="font-normal gap-2 justify-between text-sm py-1 hover:no-underline">
+          <AccordionTrigger className="font-normal gap-2 justify-between text-sm py-3 hover:no-underline">
             <div className="flex flex-col items-start gap-0.5">
               <span className="text-sm font-medium">Advanced settings</span>
               <span className="text-sm text-foreground-lighter font-normal">{description}</span>
