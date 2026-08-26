@@ -185,7 +185,7 @@ begin
   with roles as (${ROLES_SQL})
   select * into old from roles where ${getIdentifierWhereClause(identifier)};
   if old is null then
-    raise exception 'Cannot find role with id %', id;
+    raise exception 'Cannot find role with: %', ${literal('id' in identifier ? identifier.id : identifier.name)};
   end if;
 
   execute(format('alter role %I
@@ -232,7 +232,7 @@ begin
   with roles as (${ROLES_SQL})
   select * into old from roles where ${getIdentifierWhereClause(identifier)};
   if old is null then
-    raise exception 'Cannot find role with id %', id;
+    raise exception 'Cannot find role with: %', ${literal('id' in identifier ? identifier.id : identifier.name)};
   end if;
 
   execute(format('drop role ${ifExists ? safeSql`if exists` : safeSql``} %I;', old.name));
