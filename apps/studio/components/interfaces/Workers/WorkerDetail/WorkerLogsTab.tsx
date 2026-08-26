@@ -3,8 +3,10 @@ import { useParams } from 'common'
 import { RefreshCw } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Button } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { WorkerCommandLine } from '../WorkerCommandLine'
+import WorkersLogsColumnRender from '@/components/interfaces/Settings/Logs/LogColumnRenderers/WorkersLogsColumnRender'
 import type { LogData } from '@/components/interfaces/Settings/Logs/Logs.types'
 import { otelTimestampToMicros } from '@/components/interfaces/Settings/Logs/Logs.utils.otel'
 import { LogTable } from '@/components/interfaces/Settings/Logs/LogTable'
@@ -60,16 +62,25 @@ export const WorkerLogsTab = ({ workerName, stream }: WorkerLogsTabProps) => {
         </Button>
       </div>
 
-      {isError ? (
+      {isError && (
         <div className="p-4">
           <AlertError error={error} subject="Failed to retrieve worker logs" />
         </div>
-      ) : (
+      )}
+
+      {!isError && isPending && (
+        <div className="p-4">
+          <GenericSkeletonLoader />
+        </div>
+      )}
+
+      {!isError && !isPending && (
         <div className="relative flex flex-1 flex-col grow overflow-auto">
           <LogTable
             projectRef={projectRef ?? ''}
+            columnRenderers={WorkersLogsColumnRender}
             data={rows}
-            isLoading={isPending}
+            isLoading={isFetching}
             showHeader={false}
             showHistogramToggle={false}
             selectedLog={selectedLog ?? undefined}
