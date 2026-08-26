@@ -164,7 +164,7 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
                 >
                   <MultiSelector.Trigger
                     badgeLimit={3}
-                    renderValue={(id) => tableLabelsById.get(id) ?? `Table ${id}`}
+                    renderValue={(id) => tableLabelsById.get(id) ?? 'Unavailable table'}
                     label={
                       isLoadingPublications
                         ? 'Loading publication tables...'

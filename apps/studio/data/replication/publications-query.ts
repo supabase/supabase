@@ -9,8 +9,8 @@ type ReplicationPublicationsParams = { projectRef?: string; sourceId?: number }
 
 export type ReplicationPublication = {
   name: string
-  tables: components['schemas']['PublicationDetailsResponse']['tables']
-  config: components['schemas']['PublicationDetailsResponse']['config']
+  tables: components['schemas']['PublicationDetailsResponse_Output']['tables']
+  config: components['schemas']['PublicationDetailsResponse_Output']['config']
 }
 
 async function fetchReplicationPublications(

@@ -273,7 +273,8 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
       }
     }, [values, badgeLimit])
 
-    const badgeClasses = 'rounded-sm shrink-0 px-1.5 bg-surface-75 dark:bg-white/5'
+    const badgeClasses =
+      'rounded-sm shrink-0 px-1.5 bg-surface-75 dark:bg-white/5 normal-case tracking-normal text-xs'
 
     const handleTriggerClick: React.MouseEventHandler<HTMLButtonElement> = React.useCallback(
       (event) => {
@@ -373,7 +374,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
                 ref={inlineInputRef}
                 showSearchIcon={false}
                 onValueChange={activeIndex === -1 ? setInputValue : undefined}
-                placeholder={label}
+                placeholder={values.length === 0 ? label : undefined}
                 autoFocus={false}
                 wrapperClassName={cn(
                   'px-0 flex-1 border-none truncate',

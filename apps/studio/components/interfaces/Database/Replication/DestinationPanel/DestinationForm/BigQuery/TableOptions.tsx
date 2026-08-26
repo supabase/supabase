@@ -186,7 +186,13 @@ const TableOptionRow = ({ control, index, tableId }: TableOptionRowProps) => {
         description="Selection order sets the clustering order."
       >
         <MultiSelector values={clusterByField.value ?? []} onValuesChange={clusterByField.onChange}>
-          <MultiSelector.Trigger badgeLimit="wrap" label="Select columns..." />
+          <MultiSelector.Trigger
+            badgeLimit="wrap"
+            label="Select columns..."
+            renderValue={(column) => (
+              <ColumnOption name={column} type={columnTypeByName.get(column)} />
+            )}
+          />
           <MultiSelector.Content>
             <MultiSelector.List>
               {columnNames.map((column) => (

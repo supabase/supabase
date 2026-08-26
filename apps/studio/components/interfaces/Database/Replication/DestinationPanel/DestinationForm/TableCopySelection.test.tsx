@@ -10,9 +10,9 @@ import { TableCopySelection } from './TableCopySelection'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-type ReplicationSourcesResponse = components['schemas']['SourcesResponse']
-type ReadPublicationsV2Response = components['schemas']['ReadPublicationsResponse']
-type PublicationDetailsResponse = components['schemas']['PublicationDetailsResponse']
+type ReplicationSourcesResponse = components['schemas']['SourcesResponse_Output']
+type ReadPublicationsV2Response = components['schemas']['ReadPublicationsResponse_Output']
+type PublicationDetailsResponse = components['schemas']['PublicationDetailsResponse_Output']
 
 const mockSources: ReplicationSourcesResponse = {
   sources: [
@@ -149,6 +149,11 @@ describe('TableCopySelection', () => {
         '1 of 2 publication tables will run initial sync. Ongoing replication will still include every publication table.'
       )
     ).toBeInTheDocument()
+    const trigger = screen
+      .getAllByRole('combobox')
+      .find((element) => element.textContent?.includes('public.orders'))!
+    expect(trigger).toHaveTextContent('public.orders')
+    expect(trigger).not.toHaveTextContent('101')
   })
 
   it('blocks selection and explains when publication tables cannot be loaded', async () => {
@@ -174,6 +179,7 @@ describe('TableCopySelection', () => {
     const loadingLabel = await screen.findByText('Loading publication tables...')
     expect(loadingLabel).toBeInTheDocument()
     expect(loadingLabel.closest('button')).toBeDisabled()
+    expect(loadingLabel.closest('button')).not.toHaveTextContent(/101|999/)
     expect(screen.queryByText(/previously selected table/)).not.toBeInTheDocument()
   })
 })

@@ -61,11 +61,13 @@ describe('multi-select', () => {
   it('renders selected values with a custom label', () => {
     render(
       <MultiSelector values={['101']} onValuesChange={() => undefined}>
-        <MultiSelectorTrigger renderValue={(value) => `public.table_${value}`} />
+        <MultiSelectorTrigger renderValue={(value) => `Public.MixedCase_${value}`} />
       </MultiSelector>
     )
 
-    expect(screen.getByRole('combobox')).toHaveTextContent('public.table_101')
+    const badge = screen.getByText('Public.MixedCase_101').closest('[class*=rounded]')
+    expect(screen.getByRole('combobox')).toHaveTextContent('Public.MixedCase_101')
+    expect(badge).toHaveClass('normal-case', 'tracking-normal')
   })
 
   it('opens the dropdown when the MultiSelectorTrigger is clicked', () => {

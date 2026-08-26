@@ -5464,7 +5464,7 @@ export interface components {
     CopyObjectResponse: {
       path: string
     }
-    CostEstimateResponse: {
+    CostEstimateResponse_Output: {
       /**
        * @description Currency of all amounts
        * @example usd
@@ -6108,7 +6108,7 @@ export interface components {
        */
       name: string
     }
-    CreateDestinationPipelineResponse: {
+    CreateDestinationPipelineResponse_Output: {
       /**
        * @description Destination id
        * @example 2001
@@ -6120,7 +6120,7 @@ export interface components {
        */
       pipeline_id: number
     }
-    CreateDestinationResponse: {
+    CreateDestinationResponse_Output: {
       /**
        * @description Destination id
        * @example 2001
@@ -6473,7 +6473,7 @@ export interface components {
        */
       source_id: number
     }
-    CreatePipelineResponse: {
+    CreatePipelineResponse_Output: {
       /**
        * @description Pipeline id
        * @example 1012
@@ -7533,7 +7533,7 @@ export interface components {
       token: string
       token_alias: string
     }
-    CreateSourceResponse: {
+    CreateSourceResponse_Output: {
       /** @description Source ID */
       id: number
     }
@@ -7561,7 +7561,7 @@ export interface components {
     CreateStorageVectorBucketBody: {
       bucketName: string
     }
-    CreateTenantSourceResponse: {
+    CreateTenantSourceResponse_Output: {
       /**
        * @description Source id
        * @example 3001
@@ -7787,7 +7787,7 @@ export interface components {
     DeclineAuthorizationResponse: {
       id: string
     }
-    DeleteDestinationPipelineResponse: {
+    DeleteDestinationPipelineResponse_Output: {
       /**
        * @description Whether the destination was deleted. True when no other pipelines remain attached to it.
        * @example true
@@ -7819,7 +7819,7 @@ export interface components {
     DeleteVercelConnectionResponse: {
       id: string
     }
-    DestinationResponse: {
+    DestinationResponse_Output: {
       /** @description Destination configuration */
       config:
         | {
@@ -8123,7 +8123,7 @@ export interface components {
        */
       tenant_id: string
     }
-    DestinationsResponse: {
+    DestinationsResponse_Output: {
       /** @description List of destinations */
       destinations: {
         /** @description Destination configuration */
@@ -10399,7 +10399,7 @@ export interface components {
     PgbouncerStatusResponse: {
       active: boolean
     }
-    PipelineReplicationStatusResponse: {
+    PipelineReplicationStatusResponse_Output: {
       /** @description Stats about apply worker lag */
       apply_lag?: {
         /**
@@ -10567,7 +10567,7 @@ export interface components {
       }[]
     }
     /** @description Pipeline */
-    PipelineResponse: {
+    PipelineResponse_Output: {
       /** @description Pipeline configuration */
       config: {
         /** @description Batch configuration */
@@ -10714,7 +10714,7 @@ export interface components {
        */
       tenant_id: string
     }
-    PipelinesResponse: {
+    PipelinesResponse_Output: {
       /** @description List of pipelines */
       pipelines: {
         /** @description Pipeline configuration */
@@ -10864,7 +10864,7 @@ export interface components {
         tenant_id: string
       }[]
     }
-    PipelineStatusResponse: {
+    PipelineStatusResponse_Output: {
       /**
        * @description Pipeline id
        * @example 1012
@@ -10879,7 +10879,7 @@ export interface components {
         name: 'failed' | 'started' | 'starting' | 'stopped' | 'stopping' | 'unknown'
       }
     }
-    PipelineVersionResponse: {
+    PipelineVersionResponse_Output: {
       /** @description New pipeline version */
       new_version?: {
         /**
@@ -11687,7 +11687,7 @@ export interface components {
       connection_string: string | null
       connection_string_read_only: string | null
     }
-    PublicationDetailsResponse: {
+    PublicationDetailsResponse_Output: {
       config:
         | ({
             /** @description Data-change operations to publish */
@@ -11792,7 +11792,7 @@ export interface components {
         [key: string]: unknown
       })[]
     }
-    PublicationsResponse: {
+    PublicationsResponse_Output: {
       /** @description List of publications */
       publications: {
         /**
@@ -11894,7 +11894,7 @@ export interface components {
           /** @enum {string} */
           type: 'tables'
         }
-    ReadColumnsResponse: {
+    ReadColumnsResponse_Output: {
       /** @description Table columns in ordinal position order */
       columns: ({
         /**
@@ -11915,7 +11915,7 @@ export interface components {
         [key: string]: unknown
       })[]
     }
-    ReadPublicationsResponse: {
+    ReadPublicationsResponse_Output: {
       /** @description List of publications */
       publications: ({
         /**
@@ -11927,7 +11927,7 @@ export interface components {
         [key: string]: unknown
       })[]
     }
-    ReadTablesResponse: {
+    ReadTablesResponse_Output: {
       /** @description List of tables */
       tables: ({
         /**
@@ -12158,7 +12158,7 @@ export interface components {
             type: 'all_tables'
           }
     }
-    RollbackTablesResponse: {
+    RollbackTablesResponse_Output: {
       /**
        * @description Pipeline id
        * @example 1012
@@ -12288,7 +12288,7 @@ export interface components {
       /** Format: uri */
       redirectTo?: string
     }
-    SourcesResponse: {
+    SourcesResponse_Output: {
       /** @description List of sources */
       sources: {
         /** @description Source configuration */
@@ -12513,7 +12513,7 @@ export interface components {
       /** @enum {string} */
       result: 'success'
     }
-    TablesResponse: {
+    TablesResponse_Output: {
       /** @description List of tables */
       tables: {
         /**
@@ -15477,7 +15477,7 @@ export interface components {
        */
       source_id?: number | null
     }
-    ValidateDestinationResponse: {
+    ValidateDestinationResponse_Output: {
       /** @description List of validation failures */
       validation_failures: {
         /**
@@ -15615,7 +15615,7 @@ export interface components {
        */
       source_id: number
     }
-    ValidatePipelineResponse: {
+    ValidatePipelineResponse_Output: {
       /** @description List of validation failures */
       validation_failures: {
         /**
@@ -29159,7 +29159,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['DestinationsResponse']
+          'application/json': components['schemas']['DestinationsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -29209,12 +29209,12 @@ export interface operations {
     }
     responses: {
       /** @description Destination created. */
-      200: {
+      201: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['CreateDestinationResponse']
+          'application/json': components['schemas']['CreateDestinationResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -29273,12 +29273,12 @@ export interface operations {
     }
     responses: {
       /** @description Destination and pipeline created. */
-      200: {
+      201: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['CreateDestinationPipelineResponse']
+          'application/json': components['schemas']['CreateDestinationPipelineResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -29408,7 +29408,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['DeleteDestinationPipelineResponse']
+          'application/json': components['schemas']['DeleteDestinationPipelineResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -29484,7 +29484,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['DestinationResponse']
+          'application/json': components['schemas']['DestinationResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -29672,12 +29672,12 @@ export interface operations {
     }
     responses: {
       /** @description Validation completed. */
-      200: {
+      201: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ValidateDestinationResponse']
+          'application/json': components['schemas']['ValidateDestinationResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -29728,7 +29728,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['PipelinesResponse']
+          'application/json': components['schemas']['PipelinesResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -29778,12 +29778,12 @@ export interface operations {
     }
     responses: {
       /** @description Pipeline created. */
-      200: {
+      201: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['CreatePipelineResponse']
+          'application/json': components['schemas']['CreatePipelineResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -29845,7 +29845,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['PipelineResponse']
+          'application/json': components['schemas']['PipelineResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -30036,7 +30036,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['PipelineReplicationStatusResponse']
+          'application/json': components['schemas']['PipelineReplicationStatusResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -30155,12 +30155,12 @@ export interface operations {
     }
     responses: {
       /** @description New table states after rollback. */
-      200: {
+      201: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['RollbackTablesResponse']
+          'application/json': components['schemas']['RollbackTablesResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -30282,7 +30282,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['PipelineStatusResponse']
+          'application/json': components['schemas']['PipelineStatusResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -30395,7 +30395,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['PipelineVersionResponse']
+          'application/json': components['schemas']['PipelineVersionResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -30509,12 +30509,12 @@ export interface operations {
     }
     responses: {
       /** @description Validation completed. */
-      200: {
+      201: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ValidatePipelineResponse']
+          'application/json': components['schemas']['ValidatePipelineResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -30565,7 +30565,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['SourcesResponse']
+          'application/json': components['schemas']['SourcesResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -30611,12 +30611,12 @@ export interface operations {
     requestBody?: never
     responses: {
       /** @description Source created. */
-      200: {
+      201: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['CreateSourceResponse']
+          'application/json': components['schemas']['CreateSourceResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -30678,7 +30678,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['PublicationsResponse']
+          'application/json': components['schemas']['PublicationsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -30932,7 +30932,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['CostEstimateResponse']
+          'application/json': components['schemas']['CostEstimateResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -30985,7 +30985,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['TablesResponse']
+          'application/json': components['schemas']['TablesResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -31103,12 +31103,12 @@ export interface operations {
     requestBody?: never
     responses: {
       /** @description Tenant and source created. */
-      200: {
+      201: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['CreateTenantSourceResponse']
+          'application/json': components['schemas']['CreateTenantSourceResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -31170,7 +31170,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ReadPublicationsResponse']
+          'application/json': components['schemas']['ReadPublicationsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -31225,7 +31225,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['PublicationDetailsResponse']
+          'application/json': components['schemas']['PublicationDetailsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -31291,7 +31291,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['PublicationDetailsResponse']
+          'application/json': components['schemas']['PublicationDetailsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -31379,7 +31379,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Source not found. */
+      /** @description Source or publication not found. */
       404: {
         headers: {
           [name: string]: unknown
@@ -31422,7 +31422,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ReadTablesResponse']
+          'application/json': components['schemas']['ReadTablesResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -31477,7 +31477,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ReadColumnsResponse']
+          'application/json': components['schemas']['ReadColumnsResponse_Output']
         }
       }
       /** @description Unauthorized */

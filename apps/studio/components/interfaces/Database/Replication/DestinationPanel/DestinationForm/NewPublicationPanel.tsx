@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
+import { useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -49,6 +50,13 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
   const sourceId = useReplicationSourceId({ projectRef })
 
   const { data: tables } = useReplicationTablesQuery({ projectRef, sourceId }, { enabled: visible })
+  const tableLabelsById = useMemo(
+    () =>
+      new Map(
+        (tables ?? []).map((table) => [String(table.id), `${table.schema}.${table.name}`] as const)
+      ),
+    [tables]
+  )
 
   const form = useForm<FormValues>({
     mode: 'onBlur',
@@ -125,7 +133,11 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
                       <FormItemLayout
                         label="Tables"
                         layout="horizontal"
-                        description="Select at least one table to include in the publication."
+                        description={
+                          field.value.length === 0
+                            ? 'Select at least one table to include in the publication.'
+                            : undefined
+                        }
                       >
                         <FormControl>
                           <MultiSelector
@@ -137,6 +149,7 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
                               badgeLimit="wrap"
                               label="Select tables..."
                               mode="inline-combobox"
+                              renderValue={(id) => tableLabelsById.get(id) ?? 'Unavailable table'}
                             />
                             <MultiSelector.Content>
                               <MultiSelector.List>
