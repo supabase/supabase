@@ -17,9 +17,9 @@ export const WORKER_LOG_SOURCES = {
 export type WorkerLogStream = keyof typeof WORKER_LOG_SOURCES
 
 export const WORKER_LOG_STREAM_LABEL: Record<WorkerLogStream, string> = {
-  requests: 'Requests',
+  requests: 'Invocations',
   output: 'Logs',
-  builds: 'Builds',
+  builds: 'Activity',
 }
 
 // Both are read from `log_attributes` rather than the endpoint's own `source` column:

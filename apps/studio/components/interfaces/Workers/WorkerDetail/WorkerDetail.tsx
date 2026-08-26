@@ -41,21 +41,21 @@ import type { WorkerLogStream } from '@/data/workers/worker-logs-query'
 import { workerQueryOptions } from '@/data/workers/worker-query'
 import { PRODUCT_NAME } from '@/lib/constants/workers'
 
-type WorkerTab = 'overview' | 'requests' | 'logs' | 'builds' | 'settings'
-const WORKER_TABS: WorkerTab[] = ['overview', 'requests', 'logs', 'builds', 'settings']
+type WorkerTab = 'overview' | 'invocations' | 'logs' | 'activity' | 'settings'
+const WORKER_TABS: WorkerTab[] = ['overview', 'invocations', 'logs', 'activity', 'settings']
 
 const TAB_LABEL: Record<WorkerTab, string> = {
   overview: 'Overview',
-  requests: 'Requests',
+  invocations: 'Invocations',
   logs: 'Logs',
-  builds: 'Builds',
+  activity: 'Activity',
   settings: 'Settings',
 }
 
 const TAB_STREAM: Partial<Record<WorkerTab, WorkerLogStream>> = {
-  requests: 'requests',
+  invocations: 'requests',
   logs: 'output',
-  builds: 'builds',
+  activity: 'builds',
 }
 
 export const WorkerDetail = () => {
