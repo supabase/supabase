@@ -16,7 +16,7 @@ import {
 } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { AddReadReplicaSheet } from './AddReadReplicaSheet'
+import { AddReadReplicaDialog } from './AddReadReplicaDialog'
 import { ReadReplicaRow } from './ReadReplicaRow'
 import { REPLICA_STATUS } from './ReadReplicas.constants'
 import type { RecommendedComputeForReadReplicas } from './recommendCompute'
@@ -33,7 +33,7 @@ interface ReadReplicasSectionProps {
 export const ReadReplicasSection = ({ onRecommendCompute }: ReadReplicasSectionProps) => {
   const { ref: projectRef } = useParams()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
-  const [, setAddReplica] = useQueryState(
+  const [isAddReplicaOpen, setAddReplica] = useQueryState(
     'addReplica',
     parseAsBoolean.withDefault(false).withOptions({
       history: 'push',
@@ -153,7 +153,9 @@ export const ReadReplicasSection = ({ onRecommendCompute }: ReadReplicasSectionP
         </PageSectionContent>
       </PageSection>
 
-      <AddReadReplicaSheet
+      <AddReadReplicaDialog
+        open={isAddReplicaOpen}
+        onOpenChange={setAddReplica}
         onSuccess={() => setStatusRefetchInterval(5000)}
         onRecommendCompute={onRecommendCompute}
       />
