@@ -50,13 +50,11 @@ export const AddReadReplicaDialog = ({
           </DialogHeader>
           <DialogSectionSeparator />
 
-          {open && (
-            <ReadReplicaForm
-              onClose={onClose}
-              onSuccess={() => onSuccess?.()}
-              onRecommendCompute={closeWithRecommendation}
-            />
-          )}
+          <ReadReplicaForm
+            onClose={onClose}
+            onSuccess={() => onSuccess?.()}
+            onRecommendCompute={closeWithRecommendation}
+          />
         </div>
       </DialogContent>
     </Dialog>
