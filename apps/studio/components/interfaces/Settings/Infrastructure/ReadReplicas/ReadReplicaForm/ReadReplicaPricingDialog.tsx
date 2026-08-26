@@ -28,7 +28,7 @@ interface ReadReplicaPricingDialogProps {
 
 export const ReadReplicaPricingDialog = ({ replicaCost }: ReadReplicaPricingDialogProps) => {
   const { data: project } = useSelectedProjectQuery()
-  const { totalCost, compute, disk, iops, throughput } = replicaCost
+  const { isLoading, totalCost, compute, disk, iops, throughput } = replicaCost
 
   const showNewDiskManagementUI = project?.cloud_provider === 'AWS'
 
@@ -37,12 +37,12 @@ export const ReadReplicaPricingDialog = ({ replicaCost }: ReadReplicaPricingDial
       <Admonition
         type="note"
         layout="responsive"
-        title={`Estimated additional cost of ${totalCost}/month`}
+        title={`Estimated additional cost${isLoading ? '' : ` of ${totalCost}/month`}`}
         description="Based on your primary database configuration."
         className="mb-0 rounded-none border-x-0"
         actions={
           <DialogTrigger asChild>
-            <Button type="button" variant="default" size="tiny">
+            <Button type="button" variant="default" size="tiny" disabled={isLoading}>
               View breakdown
             </Button>
           </DialogTrigger>

@@ -16,6 +16,7 @@ export const useGetReplicaCost = () => {
   const { ref: projectRef } = useParams()
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const { data: diskConfiguration } = useDiskAttributesQuery({ projectRef })
+  const isLoading = addons === undefined || diskConfiguration === undefined
 
   const currentComputeAddon = addons?.selected_addons.find(
     (addon) => addon.type === 'compute_instance'
@@ -57,6 +58,7 @@ export const useGetReplicaCost = () => {
   )
 
   return {
+    isLoading,
     totalCost,
     compute: {
       label: selectedComputeMeta?.name,
