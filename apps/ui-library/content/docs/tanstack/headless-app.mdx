@@ -58,34 +58,21 @@ It installs the [Password-Based Auth](/library/docs/tanstack/password-based-auth
 5. Sign up, open `/agents`, and paste the prompt into an agent. It registers
    itself, sends you to `/oauth/consent`, and appears in the list once approved.
 
-## Change the database
+## Shape the backend
 
-`supabase/schemas/public/tables/tasks.sql` declares an example `tasks` table with
-Row Level Security, so each user reaches only their own rows. It is the source of
-truth: edit the file, then generate and apply a migration.
+`supabase/schemas/` holds the database as declarative SQL. Edit these files to
+define whatever you want agents working within: tables, policies, triggers,
+functions. Then generate and apply the migration.
 
 ```bash
 supabase db diff -f add_task_due_date
 supabase db reset
 ```
 
-`supabase db diff` uses `pg-delta` to compare your schema files against a shadow
-database and writes the migration to `supabase/migrations/`. It reads the files,
-not the live database, so changes made in Studio or the SQL editor are not picked
-up.
-
-New objects go in the tree `pgdelta schema export` writes: one directory per
-schema, then one file per object. A table's indexes, triggers, and policies live
-in the table's own file. `schema_paths` in `supabase/config.toml` lists the
-patterns the CLI reads, in dependency order.
-
-```
-supabase/schemas/
-  public/
-    tables/tasks.sql
-    views/open_tasks.sql
-    functions/close_task.sql
-```
+The included `public/tables/tasks.sql` declares a `tasks` table with Row Level
+Security, so each user reaches only their own rows. Add new objects beside it,
+one file per object. Make every change here rather than in Studio or the SQL
+editor, since the diff reads these files and not the live database.
 
 ## Add tools
 

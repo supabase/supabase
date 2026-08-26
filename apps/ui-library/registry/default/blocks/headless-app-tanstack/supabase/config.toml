@@ -14,12 +14,11 @@ max_rows = 1000
 
 [db]
 port = 54322
-# pg-delta diffs the declarative schema against a shadow database on this port.
+# Used to diff ./schemas into a migration.
 shadow_port = 54320
 major_version = 17
 
-# One directory per schema, then one file per object, matching the tree
-# `pgdelta schema export` writes. Listed in dependency order.
+# One directory per schema, then one file per object, in dependency order.
 [db.migrations]
 schema_paths = [
     "./schemas/*/tables/*.sql",
