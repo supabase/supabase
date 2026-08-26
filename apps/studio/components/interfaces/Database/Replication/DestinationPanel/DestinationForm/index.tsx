@@ -5,25 +5,9 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
 import { RefObject, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
-import { AWS_REGIONS } from 'shared-data'
 import { toast } from 'sonner'
-import {
-  Button,
-  DialogSectionSeparator,
-  Form,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SheetFooter,
-  SheetSection,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
+import { Button, DialogSectionSeparator, Form, SheetFooter, SheetSection } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import {
@@ -54,6 +38,7 @@ import { DuckLakeFields } from './DuckLake/Fields'
 import { NewPublicationPanel } from './NewPublicationPanel'
 import { NoDestinationsAvailable } from './NoDestinationsAvailable'
 import { PipelineCostDialog } from './PipelineCostDialog'
+import { PipelineRegionField } from './PipelineRegionField'
 import { PublicationSelection } from './PublicationSelection'
 import { SnowflakeFields } from './Snowflake/Fields'
 import { getSnowflakeValidationIssues } from './Snowflake/Snowflake.utils'
@@ -62,8 +47,6 @@ import { useDestinationForm } from './useDestinationForm'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
 import { ValidationWarningsDialog } from './ValidationWarningsDialog'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
-import { InlineLinkClassName } from '@/components/ui/InlineLink'
-import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
@@ -71,13 +54,8 @@ import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-
 import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
 
 const formId = 'destination-editor'
-
-// Pipelines always run out of a single fixed region per environment, regardless of the source
-// project's region.
-const PIPELINE_REGION = IS_STAGING_OR_LOCAL ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.CENTRAL_EU
 
 interface DestinationFormProps {
   selectedType: DestinationType
@@ -469,42 +447,7 @@ export const DestinationForm = ({
                       onSelectNewPublication={() => setPublicationPanelVisible(true)}
                     />
                     <TableCopySelection form={form} editMode={editMode} />
-                    <FormItemLayout
-                      isReactForm={false}
-                      layout="horizontal"
-                      label="Region"
-                      description={
-                        <span className="text-foreground-lighter">
-                          Pipelines run in{' '}
-                          <Tooltip>
-                            <TooltipTrigger className={InlineLinkClassName}>
-                              {PIPELINE_REGION.displayName}
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom">{PIPELINE_REGION.code}</TooltipContent>
-                          </Tooltip>
-                          . In your destination provider, choose the closest available region.
-                        </span>
-                      }
-                    >
-                      <Select disabled value={PIPELINE_REGION.code}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a region" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value={PIPELINE_REGION.code}>
-                            <div className="flex gap-x-3 items-center">
-                              <RegionFlag className="w-5" region={PIPELINE_REGION.code} />
-                              <p className="flex items-center gap-x-2">
-                                <span>{PIPELINE_REGION.displayName}</span>
-                                <span className="text-xs text-foreground-lighter font-mono">
-                                  {PIPELINE_REGION.code}
-                                </span>
-                              </p>
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormItemLayout>
+                    <PipelineRegionField destinationType={selectedType} />
                   </div>
                 </div>
 
