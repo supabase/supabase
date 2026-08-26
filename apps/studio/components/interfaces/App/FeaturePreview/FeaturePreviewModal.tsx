@@ -153,9 +153,9 @@ export const FeaturePreviewModal = () => {
                         <AccordionItem
                           key={category}
                           value={category}
-                          className="data-[state=open]:border-b-0"
+                          // className="data-[state=open]:border-b-0"
                         >
-                          <AccordionTrigger className="text-xs font-mono uppercase tracking-tight px-4 text-foreground-lighter py-2">
+                          <AccordionTrigger className="text-xs font-mono uppercase tracking-tight px-4 text-foreground-lighter py-2 bg-tertiary dark:bg-transparent">
                             {category}
                           </AccordionTrigger>
                           <AccordionContent className="[&>div]:pb-0">
@@ -320,8 +320,10 @@ const FeaturePreviewItem = ({
       key={feature.key}
       onClick={() => selectFeaturePreview(feature.key)}
       className={cn(
-        'w-full! flex-1 flex items-center justify-between p-4 border-b cursor-pointer bg transition',
-        selectedFeature?.key === feature.key ? 'bg-accent' : 'bg-card',
+        'w-full! flex-1 flex items-center justify-between p-4 cursor-pointer bg transition',
+        selectedFeature?.key === feature.key
+          ? 'bg-accent text-foreground'
+          : 'bg-card text-foreground-light',
         className
       )}
     >
