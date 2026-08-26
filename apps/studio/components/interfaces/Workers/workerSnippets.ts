@@ -1,4 +1,4 @@
-import { WORKERS_REGION, workerUrl } from './Workers.constants'
+import { RUNTIMES, WORKERS_REGION, workerUrl } from './Workers.constants'
 import type { WorkerAccess } from './Workers.types'
 import { formatSize } from './Workers.utils'
 import { CLI_NAME } from '@/lib/constants/workers'
@@ -14,6 +14,7 @@ export interface WorkerSnippetInput {
 }
 
 export interface WorkerSnippets {
+  aiPrompt: string
   configToml: string
   cli: string
   curl: string
@@ -39,19 +40,36 @@ export function buildWorkerSnippets(input: WorkerSnippetInput): WorkerSnippets {
     workerUrl({ endpoint: input.endpoint, protocol: input.protocol, name }) ?? '[YOUR WORKER URL]'
 
   const cli = [
-    `supabase ${CLI_NAME} new ${name} --runtime ${runtime}`,
+    `supabase ${CLI_NAME} new ${name} --runtime ${runtime} --size ${input.size} --access ${input.access}`,
     `supabase ${CLI_NAME} push ${name}`,
   ].join('\n')
 
-  const configToml = [
-    `# supabase/config.toml`,
-    ``,
+  const configBlock = [
     `[${CLI_NAME}.${name}]`,
     `runtime   = "${runtime}"`,
     `size      = "${input.size}"    # ${formatSize(input.size)}`,
     `access    = "${input.access}"`,
     `instances = ${input.instances}`,
     `# region is locked to ${WORKERS_REGION} at alpha`,
+  ].join('\n')
+
+  const configToml = [`# supabase/config.toml`, ``, configBlock].join('\n')
+
+  const runtimeMeta = RUNTIMES[runtime] ?? RUNTIMES.node
+  // The entrypoint metadata is "<run command> <filename>" — the filename is the last token.
+  const entrypointFile = runtimeMeta.entrypoint.split(' ').pop()
+
+  const aiPrompt = [
+    `Scaffold and deploy a Supabase Workers worker named "${name}" using the ${runtimeMeta.label} runtime:`,
+    ``,
+    `1. Create a supabase/${CLI_NAME}/${name}/ directory with a ${runtimeMeta.label} entrypoint (${entrypointFile}) that responds with "Hello, world!".`,
+    ``,
+    `2. Add this block to supabase/config.toml:`,
+    '```toml',
+    configBlock,
+    '```',
+    ``,
+    `3. Run \`supabase ${CLI_NAME} push ${name}\` to deploy it.`,
   ].join('\n')
 
   const authHeader =
@@ -91,7 +109,7 @@ export function buildWorkerSnippets(input: WorkerSnippetInput): WorkerSnippets {
     `print(res.json())`,
   ].join('\n')
 
-  return { configToml, cli, curl, javascript, python }
+  return { aiPrompt, configToml, cli, curl, javascript, python }
 }
 
 export interface WorkerCliCommand {

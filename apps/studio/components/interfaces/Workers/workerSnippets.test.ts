@@ -46,6 +46,20 @@ describe('buildWorkerSnippets', () => {
     expect(buildWorkerSnippets(input({ runtime: undefined })).cli).toContain('--runtime node')
   })
 
+  it('passes size and access as flags on the new command', () => {
+    const { cli } = buildWorkerSnippets(input({ size: '4gb-2vcpu', access: 'private' }))
+    expect(cli).toContain('new my-worker --runtime node --size 4gb-2vcpu --access private')
+  })
+
+  it('tells the AI prompt to scaffold a directory for the worker runtime', () => {
+    const { aiPrompt } = buildWorkerSnippets(input({ name: 'embed', runtime: 'deno' }))
+
+    expect(aiPrompt).toContain('supabase/workers/embed/')
+    expect(aiPrompt).toContain('Deno 2')
+    expect(aiPrompt).toContain('[workers.embed]')
+    expect(aiPrompt).toContain('supabase workers push embed')
+  })
+
   it('writes the worker spec into the config.toml block', () => {
     const { configToml } = buildWorkerSnippets(
       input({
