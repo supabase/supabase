@@ -42,12 +42,12 @@ async function validateDestination(
   if (!projectRef) throw new Error('projectRef is required')
 
   // Build destination_config based on the type
-  let config: components['schemas']['ValidateReplicationDestinationBody']['config']
+  let config: components['schemas']['ValidateDestinationBody']['config']
 
   if ('bigQuery' in destinationConfig) {
     config = buildBigQueryApiConfig(
       destinationConfig.bigQuery
-    ) as components['schemas']['ValidateReplicationDestinationBody']['config']
+    ) as components['schemas']['ValidateDestinationBody']['config']
   } else if ('iceberg' in destinationConfig) {
     const {
       projectRef: icebergProjectRef,
@@ -75,7 +75,7 @@ async function validateDestination(
   } else if ('ducklake' in destinationConfig) {
     config = buildDucklakeApiConfig(
       destinationConfig.ducklake
-    ) as components['schemas']['ValidateReplicationDestinationBody']['config']
+    ) as components['schemas']['ValidateDestinationBody']['config']
   } else if ('snowflake' in destinationConfig) {
     const { accountId, user, privateKey, privateKeyPassphrase, database, schema, role } =
       destinationConfig.snowflake
@@ -90,7 +90,7 @@ async function validateDestination(
         schema,
         role,
       },
-    } as components['schemas']['ValidateReplicationDestinationBody']['config']
+    } as components['schemas']['ValidateDestinationBody']['config']
   } else if ('clickHouse' in destinationConfig) {
     const { url, user, password, database, engine } = destinationConfig.clickHouse
 
@@ -102,7 +102,7 @@ async function validateDestination(
         database,
         engine,
       },
-    } as components['schemas']['ValidateReplicationDestinationBody']['config']
+    } as components['schemas']['ValidateDestinationBody']['config']
   } else {
     throw new Error(
       'Invalid destination config: must specify bigQuery, iceberg, ducklake, snowflake, or clickHouse'

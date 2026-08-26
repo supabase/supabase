@@ -48,7 +48,7 @@ async function validatePipeline(
     params: { path: { ref: projectRef } },
     body: {
       source_id: sourceId,
-      config: config as components['schemas']['ValidateReplicationPipelineBody']['config'],
+      config: config as components['schemas']['ValidatePipelineBody']['config'],
     },
     signal,
   })

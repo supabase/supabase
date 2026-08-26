@@ -22,7 +22,7 @@ async function fetchReplicationPublications(
   if (!sourceId) throw new Error('sourceId is required')
 
   const { data: listData, error: listError } = await get(
-    '/platform/replication/{ref}/v2/sources/{source_id}/publications',
+    '/platform/replication/v2/{ref}/sources/{source_id}/publications',
     {
       params: { path: { ref: projectRef, source_id: sourceId } },
       signal,
@@ -40,7 +40,7 @@ async function fetchReplicationPublications(
   const publications = await Promise.all(
     names.map(async (name) => {
       const { data, error } = await get(
-        '/platform/replication/{ref}/v2/sources/{source_id}/publications/{publication_name}',
+        '/platform/replication/v2/{ref}/sources/{source_id}/publications/{publication_name}',
         {
           params: {
             path: { ref: projectRef, source_id: sourceId, publication_name: name },

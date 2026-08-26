@@ -3348,28 +3348,52 @@ export interface components {
       }
     }
     JitListAccessResponse: {
-      items: {
-        expires_at: null
-        invite_id: null
-        primary_email: string | null
-        /** Format: uuid */
-        user_id: string
-        user_roles: {
-          allowed_networks?: {
-            allowed_cidrs?: {
-              /** Format: cidrv4 */
-              cidr: string
-            }[]
-            allowed_cidrs_v6?: {
-              /** Format: cidrv6 */
-              cidr: string
+      items: (
+        | {
+            expires_at: null
+            invite_id: null
+            primary_email: string | null
+            /** Format: uuid */
+            user_id: string
+            user_roles: {
+              allowed_networks?: {
+                allowed_cidrs?: {
+                  /** Format: cidrv4 */
+                  cidr: string
+                }[]
+                allowed_cidrs_v6?: {
+                  /** Format: cidrv6 */
+                  cidr: string
+                }[]
+              }
+              branches_only?: boolean
+              expires_at?: number
+              role: string
             }[]
           }
-          branches_only?: boolean
-          expires_at?: number
-          role: string
-        }[]
-      }[]
+        | {
+            expires_at: string
+            /** Format: uuid */
+            invite_id: string
+            primary_email: string
+            user_id: null
+            user_roles: {
+              allowed_networks?: {
+                allowed_cidrs?: {
+                  /** Format: cidrv4 */
+                  cidr: string
+                }[]
+                allowed_cidrs_v6?: {
+                  /** Format: cidrv6 */
+                  cidr: string
+                }[]
+              }
+              branches_only?: boolean
+              expires_at?: number
+              role: string
+            }[]
+          }
+      )[]
     }
     LegacyApiKeysResponse: {
       enabled: boolean

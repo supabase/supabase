@@ -1729,6 +1729,8 @@ export interface components {
             [key: string]: unknown
           }
           database: {
+            /** @description The major Postgres version the database runs. `17` covers both Postgres 17 and Oriole on 17, since Oriole is a storage engine rather than a version. */
+            major_version: number
             network_restrictions: {
               allowed_cidrs: {
                 address: string

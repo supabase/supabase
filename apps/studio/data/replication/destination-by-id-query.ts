@@ -24,7 +24,7 @@ async function fetchReplicationDestinationById(
   return data
 }
 
-export type ReplicationDestinationByIdData = components['schemas']['ReplicationDestinationResponse']
+export type ReplicationDestinationByIdData = components['schemas']['DestinationResponse']
 
 export const useReplicationDestinationByIdQuery = <TData = ReplicationDestinationByIdData>(
   { projectRef, destinationId }: ReplicationDestinationByIdParams,

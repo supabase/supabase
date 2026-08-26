@@ -18,7 +18,7 @@ async function deletePublication(
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await del(
-    '/platform/replication/{ref}/v2/sources/{source_id}/publications/{publication_name}',
+    '/platform/replication/v2/{ref}/sources/{source_id}/publications/{publication_name}',
     {
       params: {
         path: {
