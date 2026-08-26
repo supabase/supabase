@@ -52,14 +52,14 @@ describe('ReadReplicaPricingDialog', () => {
     expect(retry).toHaveBeenCalledOnce()
   })
 
-  test('returns to the loading state while retrying', () => {
+  test('keeps the error state stable while retrying', () => {
     customRender(
       <ReadReplicaPricingDialog replicaCost={{ ...replicaCost, isError: true, isLoading: true }} />
     )
 
-    expect(screen.getByText('Estimated additional cost')).toBeInTheDocument()
-    expect(screen.queryByText('Unable to estimate additional cost')).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Retry' })).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'View breakdown' })).toBeDisabled()
+    expect(screen.getByText('Unable to estimate additional cost')).toBeInTheDocument()
+    expect(screen.queryByText('Estimated additional cost')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Retry' })).toBeDisabled()
+    expect(screen.queryByRole('button', { name: 'View breakdown' })).not.toBeInTheDocument()
   })
 })

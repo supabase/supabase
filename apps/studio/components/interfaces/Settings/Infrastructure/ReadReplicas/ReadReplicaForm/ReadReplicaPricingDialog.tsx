@@ -31,27 +31,32 @@ export const ReadReplicaPricingDialog = ({ replicaCost }: ReadReplicaPricingDial
   const { isLoading, isError, retry, totalCost, compute, disk, iops, throughput } = replicaCost
 
   const showNewDiskManagementUI = project?.cloud_provider === 'AWS'
-  const showError = isError && !isLoading
 
   return (
     <Dialog>
       <Admonition
-        type={showError ? 'warning' : 'note'}
+        type={isError ? 'warning' : 'note'}
         layout="responsive"
         title={
-          showError
+          isError
             ? 'Unable to estimate additional cost'
             : `Estimated additional cost${isLoading ? '' : ` of ${totalCost}/month`}`
         }
         description={
-          showError
+          isError
             ? 'We couldn’t load the required pricing data.'
             : 'Based on your primary database configuration.'
         }
         className="mb-0 rounded-none border-x-0"
         actions={
-          showError ? (
-            <Button type="button" variant="default" size="tiny" onClick={retry}>
+          isError ? (
+            <Button
+              type="button"
+              variant="default"
+              size="tiny"
+              disabled={isLoading}
+              onClick={retry}
+            >
               Retry
             </Button>
           ) : (
