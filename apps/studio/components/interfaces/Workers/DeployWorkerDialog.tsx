@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import {
   Button,
@@ -24,13 +23,11 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import { WORKER_SIZES, WORKERS_REGION } from './Workers.constants'
+import { RuntimeBadge } from './RuntimeBadge'
+import { WORKER_DEPLOYABLE_RUNTIMES, WORKER_SIZES, WORKERS_REGION } from './Workers.constants'
 import type { WorkerAccess } from './Workers.types'
 import { formatSize, generateWorkerName } from './Workers.utils'
 import { WorkerSnippetTabs } from './WorkerSnippetTabs'
-
-// The dashboard only scaffolds this runtime — anything else is picked when editing locally.
-const SCAFFOLD_RUNTIME = 'deno'
 
 const FORM_ID = 'deploy-worker-form'
 
@@ -40,6 +37,7 @@ const DeployWorkerFormSchema = z.object({
     .trim()
     .min(1, 'Name is required')
     .regex(/^[a-z0-9-]+$/, 'Lowercase letters, numbers, and hyphens only'),
+  runtime: z.enum(WORKER_DEPLOYABLE_RUNTIMES),
   size: z.enum(WORKER_SIZES),
   access: z.enum(['private', 'public']),
   instances: z
@@ -51,6 +49,7 @@ type DeployWorkerFormValues = z.infer<typeof DeployWorkerFormSchema>
 
 const DEFAULT_VALUES: DeployWorkerFormValues = {
   name: '',
+  runtime: 'deno',
   size: WORKER_SIZES[0],
   access: 'private',
   instances: 1,
@@ -73,9 +72,9 @@ export const DeployWorkerDialog = ({ open, onOpenChange }: DeployWorkerDialogPro
     defaultValues: { ...DEFAULT_VALUES, name: generateWorkerName() },
   })
 
-  const [name, size, access, instances] = useWatch({
+  const [name, runtime, size, access, instances] = useWatch({
     control: form.control,
-    name: ['name', 'size', 'access', 'instances'],
+    name: ['name', 'runtime', 'size', 'access', 'instances'],
   })
 
   return (
@@ -113,9 +112,36 @@ export const DeployWorkerDialog = ({ open, onOpenChange }: DeployWorkerDialogPro
 
               <FormField
                 control={form.control}
+                name="runtime"
+                render={({ field }) => (
+                  <FormItemLayout name="runtime" label="Runtime">
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {WORKER_DEPLOYABLE_RUNTIMES.map((value) => (
+                          <SelectItem key={value} value={value}>
+                            <RuntimeBadge runtime={value} />
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormItemLayout>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="size"
                 render={({ field }) => (
-                  <FormItemLayout name="size" label="Size">
+                  <FormItemLayout
+                    name="size"
+                    label="Size"
+                    description="Fixed at deploy time and cannot be changed later"
+                  >
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
@@ -192,7 +218,7 @@ export const DeployWorkerDialog = ({ open, onOpenChange }: DeployWorkerDialogPro
           <WorkerSnippetTabs
             input={{
               name: name ?? '',
-              runtime: SCAFFOLD_RUNTIME,
+              runtime: runtime ?? DEFAULT_VALUES.runtime,
               size: size ?? DEFAULT_VALUES.size,
               access: access ?? DEFAULT_VALUES.access,
               instances: typeof instances === 'number' ? instances : DEFAULT_VALUES.instances,
