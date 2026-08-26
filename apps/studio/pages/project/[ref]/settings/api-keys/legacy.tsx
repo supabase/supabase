@@ -15,6 +15,7 @@ const ApiKeysLegacyPage: NextPageWithLayout = () => {
   if (isHighAvailability) {
     return (
       <HighAvailabilityDisabledEmptyState
+        className="max-w-full"
         title="Legacy API keys are unavailable on High Availability projects"
         description="High Availability projects only support publishable and secret API keys."
       />
