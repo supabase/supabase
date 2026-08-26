@@ -50,7 +50,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
         enabled: isExplorerEnabled,
         isNew: true,
         isPlatformOnly: true,
-        isDefaultOptIn: true,
+        isDefaultOptIn: false,
         getRoute: (ref?: string) => `/project/${ref}/explorer`,
       },
       {
