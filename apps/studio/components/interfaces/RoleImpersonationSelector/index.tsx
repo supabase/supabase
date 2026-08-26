@@ -13,7 +13,6 @@ export interface RoleImpersonationSelectorProps {
   serviceRoleLabel?: string
   disallowAuthenticatedOption?: boolean
   title?: string
-  orientation?: 'horizontal' | 'vertical'
 }
 
 /**
