@@ -71,8 +71,7 @@ const page: GoPageInput = {
             <li>Load data into a Supabase database</li>
             <li>Fill out the entry form below</li>
             <li>
-              Complete these steps by the contest deadline, Monday October 12, 2026 at 12:00 PM
-              PDT
+              Complete these steps by the contest deadline, Monday October 12, 2026 at 12:00 PM PDT
             </li>
           </ol>
           <Button asChild variant="default" size="medium">
