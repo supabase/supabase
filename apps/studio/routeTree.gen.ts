@@ -100,6 +100,7 @@ import { Route as ApiPlatformProfileIndexRouteImport } from './routes/api/platfo
 import { Route as ApiPlatformOrganizationsIndexRouteImport } from './routes/api/platform/organizations/index'
 import { Route as AppOrgSlugIndexRouteImport } from './routes/_app/org/$slug/index'
 import { Route as AppAccountTokensIndexRouteImport } from './routes/_app/account/tokens/index'
+import { Route as ProjectRefWorkersSecretsRouteImport } from './routes/project/$ref/workers/secrets'
 import { Route as ProjectRefWorkersNameRouteImport } from './routes/project/$ref/workers/$name'
 import { Route as ProjectRefStorageS3RouteImport } from './routes/project/$ref/storage/s3'
 import { Route as ProjectRefSqlTemplatesRouteImport } from './routes/project/$ref/sql/templates'
@@ -794,6 +795,12 @@ const AppAccountTokensIndexRoute = AppAccountTokensIndexRouteImport.update({
   path: '/tokens/',
   getParentRoute: () => AppAccountRoute,
 } as any)
+const ProjectRefWorkersSecretsRoute =
+  ProjectRefWorkersSecretsRouteImport.update({
+    id: '/secrets',
+    path: '/secrets',
+    getParentRoute: () => ProjectRefWorkersRoute,
+  } as any)
 const ProjectRefWorkersNameRoute = ProjectRefWorkersNameRouteImport.update({
   id: '/$name',
   path: '/$name',
@@ -2277,6 +2284,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/sql/templates': typeof ProjectRefSqlTemplatesRoute
   '/project/$ref/storage/s3': typeof ProjectRefStorageS3Route
   '/project/$ref/workers/$name': typeof ProjectRefWorkersNameRoute
+  '/project/$ref/workers/secrets': typeof ProjectRefWorkersSecretsRoute
   '/account/tokens/': typeof AppAccountTokensIndexRoute
   '/org/$slug/': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
@@ -2580,6 +2588,7 @@ export interface FileRoutesByTo {
   '/project/$ref/sql/templates': typeof ProjectRefSqlTemplatesRoute
   '/project/$ref/storage/s3': typeof ProjectRefStorageS3Route
   '/project/$ref/workers/$name': typeof ProjectRefWorkersNameRoute
+  '/project/$ref/workers/secrets': typeof ProjectRefWorkersSecretsRoute
   '/account/tokens': typeof AppAccountTokensIndexRoute
   '/org/$slug': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations': typeof ApiPlatformOrganizationsIndexRoute
@@ -2900,6 +2909,7 @@ export interface FileRoutesById {
   '/project/$ref/sql/templates': typeof ProjectRefSqlTemplatesRoute
   '/project/$ref/storage/s3': typeof ProjectRefStorageS3Route
   '/project/$ref/workers/$name': typeof ProjectRefWorkersNameRoute
+  '/project/$ref/workers/secrets': typeof ProjectRefWorkersSecretsRoute
   '/_app/account/tokens/': typeof AppAccountTokensIndexRoute
   '/_app/org/$slug/': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
@@ -3219,6 +3229,7 @@ export interface FileRouteTypes {
     | '/project/$ref/sql/templates'
     | '/project/$ref/storage/s3'
     | '/project/$ref/workers/$name'
+    | '/project/$ref/workers/secrets'
     | '/account/tokens/'
     | '/org/$slug/'
     | '/api/platform/organizations/'
@@ -3522,6 +3533,7 @@ export interface FileRouteTypes {
     | '/project/$ref/sql/templates'
     | '/project/$ref/storage/s3'
     | '/project/$ref/workers/$name'
+    | '/project/$ref/workers/secrets'
     | '/account/tokens'
     | '/org/$slug'
     | '/api/platform/organizations'
@@ -3841,6 +3853,7 @@ export interface FileRouteTypes {
     | '/project/$ref/sql/templates'
     | '/project/$ref/storage/s3'
     | '/project/$ref/workers/$name'
+    | '/project/$ref/workers/secrets'
     | '/_app/account/tokens/'
     | '/_app/org/$slug/'
     | '/api/platform/organizations/'
@@ -4743,6 +4756,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/account/tokens/'
       preLoaderRoute: typeof AppAccountTokensIndexRouteImport
       parentRoute: typeof AppAccountRoute
+    }
+    '/project/$ref/workers/secrets': {
+      id: '/project/$ref/workers/secrets'
+      path: '/secrets'
+      fullPath: '/project/$ref/workers/secrets'
+      preLoaderRoute: typeof ProjectRefWorkersSecretsRouteImport
+      parentRoute: typeof ProjectRefWorkersRoute
     }
     '/project/$ref/workers/$name': {
       id: '/project/$ref/workers/$name'
@@ -6948,11 +6968,13 @@ const ProjectRefStorageRouteWithChildren =
 
 interface ProjectRefWorkersRouteChildren {
   ProjectRefWorkersNameRoute: typeof ProjectRefWorkersNameRoute
+  ProjectRefWorkersSecretsRoute: typeof ProjectRefWorkersSecretsRoute
   ProjectRefWorkersIndexRoute: typeof ProjectRefWorkersIndexRoute
 }
 
 const ProjectRefWorkersRouteChildren: ProjectRefWorkersRouteChildren = {
   ProjectRefWorkersNameRoute: ProjectRefWorkersNameRoute,
+  ProjectRefWorkersSecretsRoute: ProjectRefWorkersSecretsRoute,
   ProjectRefWorkersIndexRoute: ProjectRefWorkersIndexRoute,
 }
 
