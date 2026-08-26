@@ -21,6 +21,7 @@ import {
 } from '@/components/interfaces/Workers/Workers.utils'
 import { WorkersEmptyState } from '@/components/interfaces/Workers/WorkersEmptyState'
 import { WorkersList } from '@/components/interfaces/Workers/WorkersList'
+import { WorkerTestDeployButton } from '@/components/interfaces/Workers/WorkerTestDeployButton'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { WorkersLayout } from '@/components/layouts/WorkersLayout/WorkersLayout'
 import { AlertError } from '@/components/ui/AlertError'
@@ -67,6 +68,7 @@ const WorkersPage: NextPageWithLayout = () => {
               feedbackUrl="https://github.com/orgs/supabase/discussions"
             />
 
+            {ref && <WorkerTestDeployButton projectRef={ref} />}
             {isPending && <GenericSkeletonLoader />}
             {isNotEnrolled && (
               <Admonition
