@@ -18,7 +18,7 @@ export type WorkerLogStream = keyof typeof WORKER_LOG_SOURCES
 
 export const WORKER_LOG_STREAM_LABEL: Record<WorkerLogStream, string> = {
   requests: 'Requests',
-  output: 'Output',
+  output: 'Logs',
   builds: 'Builds',
 }
 

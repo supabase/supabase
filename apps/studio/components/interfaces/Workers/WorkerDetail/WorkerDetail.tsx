@@ -18,7 +18,6 @@ import {
   PopoverTrigger,
 } from 'ui'
 import { PageBreadcrumbs } from 'ui-patterns/PageBreadcrumbs'
-import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
   PageHeaderAside,
@@ -38,16 +37,25 @@ import { WorkerLogsTab } from './WorkerLogsTab'
 import { WorkerOverviewTab } from './WorkerOverviewTab'
 import { WorkerSettingsTab } from './WorkerSettingsTab'
 import { AlertError } from '@/components/ui/AlertError'
+import type { WorkerLogStream } from '@/data/workers/worker-logs-query'
 import { workerQueryOptions } from '@/data/workers/worker-query'
 import { PRODUCT_NAME } from '@/lib/constants/workers'
 
-type WorkerTab = 'overview' | 'logs' | 'settings'
-const WORKER_TABS: WorkerTab[] = ['overview', 'logs', 'settings']
+type WorkerTab = 'overview' | 'requests' | 'logs' | 'builds' | 'settings'
+const WORKER_TABS: WorkerTab[] = ['overview', 'requests', 'logs', 'builds', 'settings']
 
 const TAB_LABEL: Record<WorkerTab, string> = {
   overview: 'Overview',
+  requests: 'Requests',
   logs: 'Logs',
+  builds: 'Builds',
   settings: 'Settings',
+}
+
+const TAB_STREAM: Partial<Record<WorkerTab, WorkerLogStream>> = {
+  requests: 'requests',
+  logs: 'output',
+  builds: 'builds',
 }
 
 export const WorkerDetail = () => {
@@ -68,9 +76,7 @@ export const WorkerDetail = () => {
   } = useQuery(workerQueryOptions({ projectRef, name: workerName }))
 
   if (!projectRef) return null
-
   if (isPending) return <GenericSkeletonLoader className="p-6" />
-
   if (isError) return <AlertError error={error} subject="Failed to retrieve worker" />
 
   if (!worker) {
@@ -85,6 +91,8 @@ export const WorkerDetail = () => {
       </div>
     )
   }
+
+  const stream = TAB_STREAM[tab]
 
   return (
     <div className="w-full min-h-full flex flex-col items-stretch">
@@ -158,10 +166,10 @@ export const WorkerDetail = () => {
       </PageNav>
 
       {tab === 'overview' && <WorkerOverviewTab worker={worker} />}
-      {tab === 'logs' && (
-        <PageContainer size="full">
-          <WorkerLogsTab workerName={worker.name} />
-        </PageContainer>
+      {stream !== undefined && (
+        <div className="flex flex-1 flex-col min-h-0">
+          <WorkerLogsTab workerName={worker.name} stream={stream} />
+        </div>
       )}
       {tab === 'settings' && <WorkerSettingsTab worker={worker} />}
     </div>
