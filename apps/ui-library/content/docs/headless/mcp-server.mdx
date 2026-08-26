@@ -1,12 +1,12 @@
 ---
 title: MCP Server
-description: Add an OAuth-protected MCP server to your product
+description: Add a user-scoped MCP server to your product
 ---
 
-Give external agents such as Codex, Claude Code, and ChatGPT secure, user-scoped
-access to your product through composable MCP tools. This block runs as a
-Supabase Edge Function and pairs with the
-[OAuth Consent block](../nextjs/oauth-consent) to authorize signed-in users.
+Give embedded product agents and external clients such as Codex, Claude Code,
+and ChatGPT secure, user-scoped access to your product through MCP tools. This
+block runs as a Supabase Edge Function, verifies Supabase user access tokens,
+and gives every tool an RLS-scoped client.
 
 ## Installation
 
@@ -21,15 +21,29 @@ Installs Deno Edge Function files into a Supabase project or empty directory. No
 
 ## Configure the project
 
-The function verifies OAuth tokens, so disable the gateway JWT check:
+The function verifies access tokens itself, so disable the gateway JWT check:
 
 ```toml
 [functions.mcp-server]
 verify_jwt = false
 ```
 
-Install the [OAuth Consent block](../nextjs/oauth-consent), then enable OAuth and
-dynamic client registration:
+## Choose how agents authenticate
+
+### Embedded product agents
+
+A trusted product backend can forward its signed-in user's Supabase access
+token as `Authorization: Bearer <token>`. This reuses the product session, so
+the user does not need to authorize their own product again.
+
+Keep the token inside your backend or agent orchestrator. Never place it in a
+prompt or expose it directly to a model provider.
+
+### External MCP clients
+
+External clients should use OAuth so users can approve, identify, and revoke
+each client separately. Install the [OAuth Consent block](../nextjs/oauth-consent),
+then enable OAuth and dynamic client registration:
 
 ```toml
 [auth.oauth_server]
@@ -42,8 +56,9 @@ Set the Auth **Site URL** to the origin that hosts `/oauth/consent`. Use HTTPS i
 production. Run `supabase config push` or restart the local stack after changing
 `supabase/config.toml`.
 
-Dynamic registration lets any compatible client register. Review clients and
-let users revoke grants, or disable it if you register clients manually.
+Dynamic registration lets any compatible client register. Require explicit
+approval, review registered clients, and let users revoke grants. Disable it if
+you register clients manually.
 
 Use an ES256 or RS256 signing key when clients request `openid`; HS256 cannot
 issue ID tokens. Configure keys in the
@@ -58,68 +73,83 @@ Rotation affects all new project tokens, so check other token consumers first.
 authorization server.
 
 `withSupabase({ auth: 'user' })` verifies the JWT and provides an RLS-scoped
-client. The handler also requires `client_id`, so ordinary user JWTs are
-rejected and only OAuth access tokens can call tools. Each tool inherits that
-user-scoped client.
+client. It accepts both product session tokens and OAuth access tokens. OAuth
+tokens include `client_id`; ordinary product sessions do not. The included
+`whoami` tool exposes that difference.
 
-OAuth scopes control identity, not data or tools. Enforce every operation with
-Row Level Security (RLS). Use `client_id` for client-specific policies, and do
-not expose sensitive admin tools.
+Any holder of a valid user token can call this function directly. Treat its
+tools as an authenticated product API: keep RLS enabled, check authorization for
+business operations, and do not add admin clients to the shared tool context.
+
+OAuth scopes control identity, not database or tool access. Use `client_id` for
+client-specific policies when it is present, and define the intended behavior
+for product sessions where it is null. Never use user-editable metadata for
+authorization decisions.
 
 ## Add tools
 
-`tools/index.ts` is the only registry. Add each toolset to its array:
+Each tool module exports one registration function:
 
 ```ts
 // supabase/functions/mcp-server/tools/tasks.ts
+import type { McpServer } from 'npm:@modelcontextprotocol/server@2.0.0'
 import { z } from 'npm:zod@4.4.3'
 
 import { jsonResult, runtimeErrorResult } from './result.ts'
-import type { Toolset } from './types.ts'
+import type { ToolContext } from './types.ts'
 
-export const tasksToolset: Toolset = {
-  name: 'tasks',
-  register(server, { supabase }) {
-    server.registerTool(
-      'close_task',
-      {
-        description: 'Mark a task as closed.',
-        inputSchema: { id: z.string().uuid() },
-        annotations: { readOnlyHint: false, idempotentHint: true },
-      },
-      async ({ id }) => {
-        try {
-          const { data, error } = await supabase
-            .from('tasks')
-            .update({ closed: true })
-            .eq('id', id)
-            .select()
-          if (error) throw error
-          return jsonResult(data)
-        } catch (error) {
-          return runtimeErrorResult(error)
-        }
+export function registerTasksTools(server: McpServer, { supabase }: ToolContext): void {
+  server.registerTool(
+    'close_task',
+    {
+      description: 'Mark a task as closed.',
+      inputSchema: z.object({ id: z.string().uuid() }),
+      annotations: { readOnlyHint: false, idempotentHint: true },
+    },
+    async ({ id }) => {
+      try {
+        const { data, error } = await supabase
+          .from('tasks')
+          .update({ closed: true })
+          .eq('id', id)
+          .select()
+        if (error) throw error
+        return jsonResult(data)
+      } catch (error) {
+        return runtimeErrorResult(error)
       }
-    )
-  },
+    }
+  )
 }
 ```
 
-```ts
-import { tasksToolset } from './tasks.ts'
-import { whoamiToolset } from './whoami.ts'
+Then add one call in `tools/index.ts`, the server's composition point:
 
-const toolRegistry: readonly Toolset[] = [whoamiToolset, tasksToolset]
+```ts
+import type { McpServer } from 'npm:@modelcontextprotocol/server@2.0.0'
+
+import { registerTasksTools } from './tasks.ts'
+import type { ToolContext } from './types.ts'
+import { registerWhoamiTool } from './whoami.ts'
+
+export function registerTools(server: McpServer, context: ToolContext): void {
+  registerWhoamiTool(server, context)
+  registerTasksTools(server, context)
+}
 ```
 
-Each toolset receives:
+Each registration function receives:
 
 - `supabase`, a user-scoped client for Database, Auth, Storage, and Functions
-- `fetchSupabase(path, init)` calls project APIs without exposing the token
-- `claims` and `clientId` for the verified identity
+- `userClaims`, the normalized signed-in user identity
+- `jwtClaims`, including `client_id` when the caller used OAuth
 
-`register` can be async, so future schema-based toolsets can inspect project APIs
-without changing the server core. Duplicate toolset names fail at startup.
+The context deliberately excludes `supabaseAdmin`. The MCP SDK rejects duplicate
+tool names, and `jsonResult` returns both structured data and a text fallback for
+older clients.
+
+For typed table and column autocomplete, generate `database.types.ts` and make
+the `SupabaseClient` in `tools/types.ts` a `SupabaseClient<Database>`.
 
 ## Environment
 
@@ -129,6 +159,17 @@ without changing the server core. Duplicate toolset names fail at startup.
 | `MCP_SERVER_DESCRIPTION` | Generic sentence | Instructions shown to clients    |
 
 ## Deploy
+
+Check the function before serving or deploying it:
+
+```bash
+cd supabase/functions/mcp-server
+deno task check
+cd ../../..
+supabase functions serve mcp-server --env-file supabase/functions/.env
+```
+
+Then deploy:
 
 ```bash
 supabase config push
