@@ -46,6 +46,7 @@ export const WorkerSnippetTabs = ({
     ...input,
     endpoint: settings?.app_config?.endpoint,
     protocol: settings?.app_config?.protocol,
+    projectRef: ref,
   })
   const snippetByTab: Record<WorkerSnippetTab, string> = {
     ai: snippets.aiPrompt,

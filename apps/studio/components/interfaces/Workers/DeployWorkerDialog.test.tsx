@@ -125,6 +125,14 @@ describe('DeployWorkerDialog', () => {
     expect(screen.getByText(/supabase\/workers\/test-worker\//)).toBeInTheDocument()
   })
 
+  it('threads the project ref from the URL into the cURL deploy calls', async () => {
+    const user = userEvent.setup()
+    customRender(<DeployWorkerDialog open onOpenChange={vi.fn()} />)
+
+    await user.click(screen.getByRole('button', { name: 'cURL' }))
+    expect(screen.getByText(/\/projects\/default\/workers\//)).toBeInTheDocument()
+  })
+
   it('copies the active snippet to the clipboard', async () => {
     const user = userEvent.setup()
     customRender(<DeployWorkerDialog open onOpenChange={vi.fn()} />)
