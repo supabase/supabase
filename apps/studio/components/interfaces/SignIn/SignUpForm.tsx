@@ -137,11 +137,12 @@ export const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
         </motion.div>
       )}
       <div
+        inert={isSubmitted || undefined}
         className={cn(
-          'w-full py-1 transition-all duration-500',
+          'w-full transition-all duration-500',
           isSubmitted
-            ? 'max-h-0 overflow-hidden opacity-0 pointer-events-none'
-            : 'max-h-[1000px] opacity-100'
+            ? 'max-h-0 overflow-hidden opacity-0 pointer-events-none py-0'
+            : 'max-h-[1000px] opacity-100 py-1'
         )}
       >
         <Form {...form}>

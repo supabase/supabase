@@ -39,14 +39,16 @@ const SignUpPage: NextPageWithLayout = () => {
             <SignInWithExternalProvider key={provider.id} provider={provider} />
           ))}
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-strong" />
+          {providers.length > 0 && (
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-strong" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className={cn('px-2 text-sm text-foreground', dividerBgClass)}>or</span>
+              </div>
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className={cn('px-2 text-sm text-foreground', dividerBgClass)}>or</span>
-            </div>
-          </div>
+          )}
         </>
       )}
 
