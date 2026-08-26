@@ -52,18 +52,15 @@ Rotation affects all new project tokens, so check other token consumers first.
 
 ## Authentication
 
-`withOAuthProtectedResource` from `@supabase/server` serves RFC 9728 metadata at
+`withOAuthProtectedResource` serves RFC 9728 metadata at
 `/functions/v1/mcp-server/oauth-protected-resource` and adds a
 `WWW-Authenticate` challenge to `401` responses so MCP clients can discover the
 authorization server.
 
-`withSupabase` verifies the user JWT. The block then accepts only OAuth user
-tokens with:
-
-- a non-empty `client_id`
-- a live Auth session for the token's subject
-
-Ordinary user JWTs are rejected. Each tool gets a user-scoped Supabase client.
+`withSupabase({ auth: 'user' })` verifies the JWT and provides an RLS-scoped
+client. The handler also requires `client_id`, so ordinary user JWTs are
+rejected and only OAuth access tokens can call tools. Each tool inherits that
+user-scoped client.
 
 OAuth scopes control identity, not data or tools. Enforce every operation with
 Row Level Security (RLS). Use `client_id` for client-specific policies, and do

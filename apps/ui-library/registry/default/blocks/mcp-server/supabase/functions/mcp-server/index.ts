@@ -13,7 +13,7 @@ import {
   type SupabaseContext,
 } from 'npm:@supabase/server@1.5.0-rc.114'
 
-import { requireOAuthContext } from './auth.ts'
+import { createSupabaseFetch } from './supabase.ts'
 import { applyToolsets, toolsetNames } from './tools/index.ts'
 
 // An MCP server as a single Supabase Edge Function: transport, authentication,
@@ -21,8 +21,8 @@ import { applyToolsets, toolsetNames } from './tools/index.ts'
 // those are composed in ./tools/index.ts.
 //
 // withOAuthProtectedResource serves RFC 9728 metadata and points 401s at it.
-// withSupabase verifies the user JWT, builds an RLS-scoped client, and applies
-// CORS. The inner handler then requires an OAuth client token and a live session.
+// withSupabase verifies the user JWT and builds an RLS-scoped client. The
+// handler then requires `client_id` so only OAuth access tokens can call tools.
 
 function readTextEnv(name: string, fallback: string): string {
   return Deno.env.get(name)?.trim() || fallback
@@ -50,10 +50,17 @@ const CORS_HEADERS: Record<string, string> = {
 
 console.log(`MCP server "${SERVER_NAME}" with toolsets: ${toolsetNames.join(', ') || 'none'}`)
 
+function oauthClientId(claims: SupabaseContext['jwtClaims']): string | null {
+  return typeof claims?.client_id === 'string' && claims.client_id ? claims.client_id : null
+}
+
 async function handleMcp(request: Request, ctx: SupabaseContext): Promise<Response> {
-  const authentication = await requireOAuthContext(request, ctx)
-  if (!authentication.ok) {
-    return authentication.response
+  const clientId = oauthClientId(ctx.jwtClaims)
+  if (!clientId) {
+    return Response.json(
+      { error: 'unauthorized', error_description: 'An OAuth access token is required' },
+      { status: 401 }
+    )
   }
 
   // A fresh server per request, because its tools are bound to this caller.
@@ -63,7 +70,12 @@ async function handleMcp(request: Request, ctx: SupabaseContext): Promise<Respon
   )
 
   try {
-    await applyToolsets(server, authentication.context)
+    await applyToolsets(server, {
+      supabase: ctx.supabase,
+      claims: ctx.jwtClaims ?? {},
+      clientId,
+      fetchSupabase: createSupabaseFetch(request),
+    })
   } catch (error) {
     // A toolset that cannot describe itself (an unreachable schema, say) would
     // otherwise surface as a confusing empty tool list.

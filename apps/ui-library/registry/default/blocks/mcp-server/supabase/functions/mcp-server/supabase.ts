@@ -1,7 +1,7 @@
 import { resolveEnv } from 'npm:@supabase/server@1.5.0-rc.114/core'
 
-// One resolved Supabase environment for the worker. Authentication and
-// toolsets use it so the project URL and publishable key cannot drift.
+// Project URL and publishable key for toolsets that call Supabase HTTP APIs
+// the client library does not expose.
 
 type SupabaseEnvironment = NonNullable<ReturnType<typeof resolveEnv>['data']>
 
@@ -19,7 +19,7 @@ function legacyPublishableKeyOverrides(): Parameters<typeof resolveEnv>[0] {
   return legacyKey && !hasPublishableKey ? { publishableKeys: { default: legacyKey } } : undefined
 }
 
-export function getSupabaseEnvironment(): SupabaseEnvironment {
+function getSupabaseEnvironment(): SupabaseEnvironment {
   if (cachedEnvironment) return cachedEnvironment
 
   const { data, error } = resolveEnv(legacyPublishableKeyOverrides())
@@ -33,24 +33,20 @@ export function getSupabaseEnvironment(): SupabaseEnvironment {
   return data
 }
 
-export function getDefaultPublishableKey(): string {
-  const { publishableKeys } = getSupabaseEnvironment()
-  const key = publishableKeys.default ?? Object.values(publishableKeys)[0]
-  if (!key) throw new Error('No Supabase publishable key is available.')
-  return key
-}
-
 export type SupabaseFetch = (path: string, init?: RequestInit) => Promise<Response>
 
 /**
- * A project-scoped fetch helper for toolsets that need a Supabase API the
- * client library does not expose. The bearer token stays inside the framework,
+ * A project-scoped fetch helper. The bearer token stays inside the framework,
  * and redirects are rejected so it cannot be forwarded to another origin.
  */
-export function createSupabaseFetch(accessToken: string): SupabaseFetch {
+export function createSupabaseFetch(request: Request): SupabaseFetch {
   const environment = getSupabaseEnvironment()
   const baseUrl = new URL(`${trimTrailingSlash(environment.url)}/`)
-  const publishableKey = getDefaultPublishableKey()
+  const publishableKey =
+    environment.publishableKeys.default ?? Object.values(environment.publishableKeys)[0]
+  if (!publishableKey) throw new Error('No Supabase publishable key is available.')
+
+  const accessToken = request.headers.get('Authorization')?.replace(/^Bearer\s+/i, '') ?? ''
 
   return (path, init = {}) => {
     const url = new URL(path, baseUrl)

@@ -1759,11 +1759,6 @@
           "target": "supabase/functions/mcp-server/index.ts"
         },
         {
-          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/auth.ts",
-          "type": "registry:file",
-          "target": "supabase/functions/mcp-server/auth.ts"
-        },
-        {
           "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/supabase.ts",
           "type": "registry:file",
           "target": "supabase/functions/mcp-server/supabase.ts"
