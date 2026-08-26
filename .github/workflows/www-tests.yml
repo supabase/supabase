@@ -10,6 +10,8 @@ on:
       - 'apps/www/lib/**/*.js'
       - 'apps/www/content/md/**'
       - 'apps/www/scripts/**/*.mjs'
+      - 'apps/www/data/**'
+      - 'packages/shared-data/**'
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:

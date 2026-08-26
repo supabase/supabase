@@ -18,7 +18,9 @@ const diskTypes = Object.values(DISK_PRICING).map((disk) => ({
   throughput:
     disk.includedPerProject && disk.perUnitMonth.throughputMBps !== null
       ? `${disk.includedPerProject.throughputMBps} MB/s included\nthen ${usd(disk.perUnitMonth.throughputMBps)} per MB/s`
-      : (disk.throughputNote ?? ''),
+      : 'throughputNote' in disk
+        ? disk.throughputNote
+        : '',
   durability: `${disk.durabilityPercent}%`,
 }))
 

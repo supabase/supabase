@@ -136,7 +136,9 @@ function buildDiskSection(): string {
     const throughput =
       disk.includedPerProject && disk.perUnitMonth.throughputMBps !== null
         ? `${qty(disk.includedPerProject.throughputMBps)} MB/s included, then ${usd(disk.perUnitMonth.throughputMBps)} per MB/s`
-        : (disk.throughputNote ?? '')
+        : 'throughputNote' in disk
+          ? disk.throughputNote
+          : ''
 
     return [
       `${disk.displayName} (${type})`,

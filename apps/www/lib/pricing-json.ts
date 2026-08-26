@@ -65,7 +65,7 @@ function buildComputeTiers(): ComputeTier[] {
 export function buildPricingJson() {
   return {
     description:
-      'Machine-readable pricing for https://supabase.com/pricing. Informational, not a billing API. Monthly totals depend on plan quotas, compute credits, and the spend cap encoded below; metered prices apply only beyond includedByPlan quotas.',
+      "Machine-readable pricing for https://supabase.com/pricing. Informational, not a billing API. Monthly totals depend on plan quotas, compute credits, and the spend cap encoded below; metered prices apply only beyond includedByPlan quotas. In includedByPlan: null means the metric is not available on that plan, 0 means available with no included quota, 'custom' means negotiated.",
     source: 'https://supabase.com/pricing',
     docs: 'https://supabase.com/docs/guides/platform/org-based-billing',
     currency: 'USD',
@@ -94,7 +94,7 @@ export function buildPricingJson() {
         durabilityPercent: disk.durabilityPercent,
         includedPerProject: disk.includedPerProject,
         perUnitMonth: disk.perUnitMonth,
-        ...(disk.throughputNote ? { throughputNote: disk.throughputNote } : {}),
+        ...('throughputNote' in disk ? { throughputNote: disk.throughputNote } : {}),
       })),
     },
     meters: Object.entries(METERS).map(([id, meter]) => ({
