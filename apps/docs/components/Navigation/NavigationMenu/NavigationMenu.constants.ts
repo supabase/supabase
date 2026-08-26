@@ -212,7 +212,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
           {
             label: 'Observability',
             icon: 'telemetry',
-            href: '/guides/monitoring-and-debugging' as `/${string}`,
+            href: '/guides/observability' as `/${string}`,
             level: 'telemetry',
           },
           {
@@ -1161,7 +1161,7 @@ export const database: NavMenuConstant = {
         },
         {
           name: 'Database Advisors',
-          url: '/guides/monitoring-and-debugging/advisors' as `/${string}`,
+          url: '/guides/observability/advisors' as `/${string}`,
         },
         { name: 'Testing your database', url: '/guides/database/testing' },
         {
@@ -1180,7 +1180,7 @@ export const database: NavMenuConstant = {
         },
         {
           name: 'Inspect the database',
-          url: '/guides/monitoring-and-debugging/inspect' as `/${string}`,
+          url: '/guides/observability/inspect' as `/${string}`,
         },
         {
           name: 'Debugging performance issues',
@@ -3022,46 +3022,46 @@ export const platform: NavMenuConstant = {
 export const telemetry: NavMenuConstant = {
   icon: 'telemetry',
   title: 'Observability',
-  url: '/guides/monitoring-and-debugging',
+  url: '/guides/observability',
   items: [
-    { name: 'Overview', url: '/guides/monitoring-and-debugging' },
+    { name: 'Overview', url: '/guides/observability' },
     {
       name: 'Observe the data',
-      url: '/guides/monitoring-and-debugging/access-data' as `/${string}`,
+      url: '/guides/observability/access-data' as `/${string}`,
       items: [
         {
           name: 'Logs',
-          url: '/guides/monitoring-and-debugging/advanced-log-filtering' as `/${string}`,
+          url: '/guides/observability/advanced-log-filtering' as `/${string}`,
           items: [
             {
               name: 'Query and filter logs',
-              url: '/guides/monitoring-and-debugging/advanced-log-filtering' as `/${string}`,
+              url: '/guides/observability/advanced-log-filtering' as `/${string}`,
             },
             {
               name: 'Sources',
-              url: '/guides/monitoring-and-debugging/advanced-log-filtering#logs-explorer' as `/${string}`,
+              url: '/guides/observability/advanced-log-filtering#logs-explorer' as `/${string}`,
             },
             {
               name: 'Logs field reference',
-              url: '/guides/monitoring-and-debugging/log-field-reference' as `/${string}`,
+              url: '/guides/observability/log-field-reference' as `/${string}`,
             },
             {
               name: 'Logs in Studio',
-              url: '/guides/monitoring-and-debugging/logs' as `/${string}`,
+              url: '/guides/observability/logs' as `/${string}`,
             },
           ],
         },
         {
           name: 'Metrics API',
-          url: '/guides/monitoring-and-debugging/metrics' as `/${string}`,
+          url: '/guides/observability/metrics' as `/${string}`,
           items: [
             {
               name: 'Grafana Cloud',
-              url: '/guides/monitoring-and-debugging/metrics/grafana-cloud' as `/${string}`,
+              url: '/guides/observability/metrics/grafana-cloud' as `/${string}`,
             },
             {
               name: 'Grafana self-hosted',
-              url: '/guides/monitoring-and-debugging/metrics/grafana-self-hosted' as `/${string}`,
+              url: '/guides/observability/metrics/grafana-self-hosted' as `/${string}`,
             },
             {
               name: 'Datadog',
@@ -3073,31 +3073,31 @@ export const telemetry: NavMenuConstant = {
             },
             {
               name: 'Vendor-agnostic setup',
-              url: '/guides/monitoring-and-debugging/metrics/vendor-agnostic' as `/${string}`,
+              url: '/guides/observability/metrics/vendor-agnostic' as `/${string}`,
             },
           ],
         },
         {
           name: 'Database',
-          url: '/guides/monitoring-and-debugging/inspect' as `/${string}`,
+          url: '/guides/observability/inspect' as `/${string}`,
           items: [
             {
               name: 'CLI commands',
-              url: '/guides/monitoring-and-debugging/inspect#using-the-cli' as `/${string}`,
+              url: '/guides/observability/inspect#using-the-cli' as `/${string}`,
             },
             {
               name: 'SQL',
-              url: '/guides/monitoring-and-debugging/inspect#using-sql' as `/${string}`,
+              url: '/guides/observability/inspect#using-sql' as `/${string}`,
             },
           ],
         },
         {
           name: 'Advisors',
-          url: '/guides/monitoring-and-debugging/advisors' as `/${string}`,
+          url: '/guides/observability/advisors' as `/${string}`,
         },
         {
           name: 'Reports',
-          url: '/guides/monitoring-and-debugging/reports' as `/${string}`,
+          url: '/guides/observability/reports' as `/${string}`,
         },
       ],
     },
@@ -3107,7 +3107,7 @@ export const telemetry: NavMenuConstant = {
       items: [
         {
           name: 'Detecting',
-          url: '/guides/monitoring-and-debugging/debugging' as `/${string}`,
+          url: '/guides/observability/detecting' as `/${string}`,
         },
         {
           name: 'Diagnosing',
@@ -3117,7 +3117,7 @@ export const telemetry: NavMenuConstant = {
     },
     {
       name: 'Hire an agent',
-      url: '/guides/monitoring-and-debugging/automate-with-agents' as `/${string}`,
+      url: '/guides/observability/automate-with-agents' as `/${string}`,
       items: [
         {
           name: 'Generalist',
@@ -3125,19 +3125,19 @@ export const telemetry: NavMenuConstant = {
         },
         {
           name: 'Health monitor',
-          url: '/guides/monitoring-and-debugging/automate-with-agents/health' as `/${string}`,
+          url: '/guides/observability/automate-with-agents/health' as `/${string}`,
         },
         {
           name: 'Security monitor',
-          url: '/guides/monitoring-and-debugging/automate-with-agents/security' as `/${string}`,
+          url: '/guides/observability/automate-with-agents/security' as `/${string}`,
         },
         {
           name: 'Performance monitor',
-          url: '/guides/monitoring-and-debugging/automate-with-agents/performance' as `/${string}`,
+          url: '/guides/observability/automate-with-agents/performance' as `/${string}`,
         },
         {
           name: 'Capacity monitor',
-          url: '/guides/monitoring-and-debugging/automate-with-agents/usage' as `/${string}`,
+          url: '/guides/observability/automate-with-agents/usage' as `/${string}`,
         },
       ],
     },
@@ -3147,15 +3147,15 @@ export const telemetry: NavMenuConstant = {
       items: [
         {
           name: 'Log drains',
-          url: '/guides/monitoring-and-debugging/log-drains' as `/${string}`,
+          url: '/guides/observability/log-drains' as `/${string}`,
         },
         {
           name: 'Client-side tracing',
-          url: '/guides/monitoring-and-debugging/client-side-tracing' as `/${string}`,
+          url: '/guides/observability/client-side-tracing' as `/${string}`,
         },
         {
           name: 'Sentry integration',
-          url: '/guides/monitoring-and-debugging/sentry-monitoring' as `/${string}`,
+          url: '/guides/observability/sentry-monitoring' as `/${string}`,
         },
       ],
     },

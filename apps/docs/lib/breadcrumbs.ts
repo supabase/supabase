@@ -26,7 +26,7 @@ const SECTION_PATH_TO_KEY: Record<string, keyof typeof NavItems> = {
   security: 'security',
   'self-hosting': 'self_hosting',
   storage: 'storage',
-  'monitoring-and-debugging': 'telemetry',
+  observability: 'telemetry',
 }
 
 function getSectionMenu(pathname: string) {
@@ -58,7 +58,7 @@ export function resolveBreadcrumbs(pathname: string): BreadcrumbItem[] {
     return [
       {
         name: 'Observability',
-        url: '/guides/monitoring-and-debugging',
+        url: '/guides/observability',
       },
       { name: 'Detect and diagnose' },
       { name: 'Diagnosing', url: '/guides/troubleshooting' },

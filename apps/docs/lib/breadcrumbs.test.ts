@@ -7,7 +7,7 @@ describe('resolveBreadcrumbs', () => {
     expect(resolveBreadcrumbs('/guides/troubleshooting')).toEqual([
       {
         name: 'Observability',
-        url: '/guides/monitoring-and-debugging',
+        url: '/guides/observability',
       },
       { name: 'Detect and diagnose' },
       { name: 'Diagnosing', url: '/guides/troubleshooting' },

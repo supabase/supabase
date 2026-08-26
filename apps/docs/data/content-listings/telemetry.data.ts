@@ -9,28 +9,28 @@ export const telemetryAccessWhat: ContentListingGroup = {
   items: [
     {
       title: 'Logs',
-      href: '/guides/monitoring-and-debugging/advanced-log-filtering',
+      href: '/guides/observability/advanced-log-filtering',
       description:
         'Query ClickHouse logs from Studio, MCP, or the API. Filter events in the Logs UI.',
     },
     {
       title: 'Metrics API',
-      href: '/guides/monitoring-and-debugging/metrics',
+      href: '/guides/observability/metrics',
       description: 'Scrape Prometheus-compatible database metrics, or chart a subset in Reports.',
     },
     {
       title: 'Database',
-      href: '/guides/monitoring-and-debugging/inspect',
+      href: '/guides/observability/inspect',
       description: 'Inspect live Postgres stats from the CLI, the SQL Editor, or MCP.',
     },
     {
       title: 'Advisors',
-      href: '/guides/monitoring-and-debugging/advisors',
+      href: '/guides/observability/advisors',
       description: 'Pull security and performance findings from Studio, MCP, the CLI, or the API.',
     },
     {
       title: 'Reports',
-      href: '/guides/monitoring-and-debugging/reports',
+      href: '/guides/observability/reports',
       description: 'Studio dashboards for API, Auth, Storage, Realtime, and database signals.',
     },
   ],
@@ -43,7 +43,7 @@ export const telemetryDetectResolve: ContentListingGroup = {
   items: [
     {
       title: 'Detecting',
-      href: '/guides/monitoring-and-debugging/debugging',
+      href: '/guides/observability/detecting',
       description:
         'Use logs, metrics, inspect, and advisors to pick up a signal. If you already have an error, go to Diagnosing.',
     },
@@ -69,25 +69,25 @@ export const telemetryHireAgent: ContentListingGroup = {
     },
     {
       title: monitoringAgents.health.name,
-      href: '/guides/monitoring-and-debugging/automate-with-agents/health',
+      href: '/guides/observability/automate-with-agents/health',
       subtitle: getScheduleLabel(monitoringAgents.health),
       description: 'Watch logs for 5xx spikes and Auth failures.',
     },
     {
       title: monitoringAgents.security.name,
-      href: '/guides/monitoring-and-debugging/automate-with-agents/security',
+      href: '/guides/observability/automate-with-agents/security',
       subtitle: getScheduleLabel(monitoringAgents.security),
       description: 'Review advisor findings and authorization failures.',
     },
     {
       title: monitoringAgents.performance.name,
-      href: '/guides/monitoring-and-debugging/automate-with-agents/performance',
+      href: '/guides/observability/automate-with-agents/performance',
       subtitle: getScheduleLabel(monitoringAgents.performance),
       description: 'Find slow queries, lock waits, and missing indexes.',
     },
     {
       title: monitoringAgents.usage.name,
-      href: '/guides/monitoring-and-debugging/automate-with-agents/usage',
+      href: '/guides/observability/automate-with-agents/usage',
       subtitle: getScheduleLabel(monitoringAgents.usage),
       description: 'Track request growth, error rates, and approaching limits.',
     },
@@ -101,17 +101,17 @@ export const telemetryExport: ContentListingGroup = {
   items: [
     {
       title: 'Log drains',
-      href: '/guides/monitoring-and-debugging/log-drains',
+      href: '/guides/observability/log-drains',
       description: 'Send project logs to your own destination.',
     },
     {
       title: 'Client-side tracing',
-      href: '/guides/monitoring-and-debugging/client-side-tracing',
+      href: '/guides/observability/client-side-tracing',
       description: 'Propagate W3C trace context from the client through Supabase services.',
     },
     {
       title: 'Sentry integration',
-      href: '/guides/monitoring-and-debugging/sentry-monitoring',
+      href: '/guides/observability/sentry-monitoring',
       description: 'Capture supabase-js errors and spans in Sentry.',
     },
   ],

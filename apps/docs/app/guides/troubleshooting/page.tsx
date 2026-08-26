@@ -1,5 +1,3 @@
-import Link from 'next/link'
-import { Admonition } from 'ui-patterns/Admonition'
 import { TroubleshootingPreview } from '~/features/docs/Troubleshooting.ui'
 import {
   TroubleshootingFilter,
@@ -18,6 +16,8 @@ import { PROD_URL } from '~/lib/constants'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { mdAlternate } from '~/lib/md-alternates'
 import { type Metadata } from 'next'
+import Link from 'next/link'
+import { Admonition } from 'ui-patterns/Admonition'
 
 const { metadataTitle } = getCustomContent(['metadata:title'])
 
@@ -37,7 +37,7 @@ export default async function GlobalTroubleshootingPage() {
         <p className="text-foreground-light mt-4">
           Don&apos;t have a specific error yet? Start with{' '}
           <Link
-            href="/docs/guides/monitoring-and-debugging/debugging"
+            href="/docs/guides/observability/detecting"
             className="text-brand-link hover:underline"
           >
             Detecting
@@ -55,7 +55,7 @@ export default async function GlobalTroubleshootingPage() {
           <li>
             Query the{' '}
             <Link
-              href="/docs/guides/monitoring-and-debugging/advanced-log-filtering#logs-explorer"
+              href="/docs/guides/observability/advanced-log-filtering#logs-explorer"
               className="text-brand-link hover:underline"
             >
               log source
@@ -63,12 +63,12 @@ export default async function GlobalTroubleshootingPage() {
             for that layer. When two layers could fit, start closer to the database.
           </li>
           <li>
-            Search below for that error. Each article confirms one cause, applies one fix, and
-            tells you how to verify it.
+            Search below for that error. Each article confirms one cause, applies one fix, and tells
+            you how to verify it.
           </li>
           <li>
-            Re-run the failing operation. Keep the change only when the original symptom is gone.
-            If verification fails, reverse the change and look again.
+            Re-run the failing operation. Keep the change only when the original symptom is gone. If
+            verification fails, reverse the change and look again.
           </li>
         </ol>
         <p className="text-foreground-light mt-4">
@@ -96,19 +96,19 @@ export default async function GlobalTroubleshootingPage() {
           .
         </p>
         <Admonition type="danger" className="mt-4">
-          Deleting data, disabling row-level security, weakening a policy, or terminating a
-          database process can cause data loss or a security incident. Do not let an automated
-          routine perform these changes.
+          Deleting data, disabling row-level security, weakening a policy, or terminating a database
+          process can cause data loss or a security incident. Do not let an automated routine
+          perform these changes.
         </Admonition>
         <p className="text-foreground-light mt-4">
           Escalate to{' '}
           <Link href="/dashboard/support/new" className="text-brand-link hover:underline">
             Support
           </Link>{' '}
-          when you cannot access the diagnostic source, the evidence points to a platform
-          failure, or a safe fix needs a permission you do not have. Include the project
-          reference, timestamp with time zone, error code, request ID, and sanitized evidence. Do
-          not include passwords, API keys, or personal data.
+          when you cannot access the diagnostic source, the evidence points to a platform failure,
+          or a safe fix needs a permission you do not have. Include the project reference, timestamp
+          with time zone, error code, request ID, and sanitized evidence. Do not include passwords,
+          API keys, or personal data.
         </p>
         <hr className="my-7" aria-hidden />
         <TroubleshootingFilter
