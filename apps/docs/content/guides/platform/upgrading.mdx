@@ -237,11 +237,13 @@ To mitigate this issue:
      and ty.typname in ('ltree', '_ltree');
    ```
 
-3. Reindex each affected index. `REINDEX INDEX CONCURRENTLY` runs online with no downtime:
+3. Reindex each affected index using its schema-qualified name. `REINDEX INDEX CONCURRENTLY` runs online with no downtime, but cannot run inside a transaction block:
 
    ```sql
-   REINDEX INDEX CONCURRENTLY <index_name>;
+   REINDEX INDEX CONCURRENTLY <schema_name>.<index_name>;
    ```
+
+Separately from the encoding case above, this release also fixes an integer overflow for `ltree` values with more than about 14,653 labels. If you store values that deep, reindex B-tree indexes on those `ltree` columns after upgrading, regardless of your database encoding.
 
 ### Btree_gist indexes on float columns require reindexing after upgrade
 
@@ -278,10 +280,10 @@ To mitigate this issue:
      and ty.typname in ('float4', 'float8');
    ```
 
-2. If any indexes are returned and those columns may contain `NaN` values, reindex them. `REINDEX INDEX CONCURRENTLY` runs online with no downtime:
+2. If any indexes are returned and those columns may contain `NaN` values, reindex them using the schema-qualified name. `REINDEX INDEX CONCURRENTLY` runs online with no downtime, but cannot run inside a transaction block:
 
    ```sql
-   REINDEX INDEX CONCURRENTLY <index_name>;
+   REINDEX INDEX CONCURRENTLY <schema_name>.<index_name>;
    ```
 
 ### Custom operator selectivity estimators
