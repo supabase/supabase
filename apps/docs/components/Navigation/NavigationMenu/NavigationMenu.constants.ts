@@ -1948,6 +1948,10 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/examples/elevenlabs-generate-speech-stream' as `/${string}`,
         },
         {
+          name: 'Text to Speech with FlowSpeech',
+          url: '/guides/functions/examples/flowspeech-generate-speech' as `/${string}`,
+        },
+        {
           name: 'Speech Transcription with ElevenLabs',
           url: '/guides/functions/examples/elevenlabs-transcribe-speech' as `/${string}`,
         },
