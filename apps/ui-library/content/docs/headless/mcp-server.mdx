@@ -41,9 +41,9 @@ prompt or expose it directly to a model provider.
 
 ### External MCP clients
 
-External clients should use OAuth so users can approve, identify, and revoke
-each client separately. Install the [OAuth Consent block](../nextjs/oauth-consent),
-then enable OAuth and dynamic client registration:
+External clients authenticate with OAuth, so users approve and revoke each
+client separately. Install the [OAuth Consent block](../nextjs/oauth-consent),
+then enable OAuth in `supabase/config.toml`:
 
 ```toml
 [auth.oauth_server]
@@ -52,18 +52,17 @@ authorization_url_path = "/oauth/consent"
 allow_dynamic_registration = true
 ```
 
-Set the Auth **Site URL** to the origin that hosts `/oauth/consent`. Use HTTPS in
-production. Run `supabase config push` or restart the local stack after changing
-`supabase/config.toml`.
+Set the Auth **Site URL** to the origin that serves `/oauth/consent`. Use HTTPS
+in production. Run `supabase config push` or restart the local stack to apply the
+change.
 
-Dynamic registration lets any compatible client register. Require explicit
-approval, review registered clients, and let users revoke grants. Disable it if
-you register clients manually.
+`allow_dynamic_registration` lets any compatible client register itself. Set it
+to `false` if you register clients yourself.
 
-Use an ES256 or RS256 signing key when clients request `openid`; HS256 cannot
-issue ID tokens. Configure keys in the
-[JWT Signing Keys dashboard](https://supabase.com/dashboard/project/_/settings/jwt).
-Rotation affects all new project tokens, so check other token consumers first.
+This assumes the project signs JWTs with an asymmetric key. A project still using
+the legacy HS256 secret cannot issue ID tokens, so clients that request the
+`openid` scope fail. Switch to an ES256 or RS256 key in
+[JWT Keys](https://supabase.com/dashboard/project/_/settings/jwt).
 
 ## Authentication
 
