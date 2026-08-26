@@ -339,12 +339,12 @@ describe('/project/[ref]/settings/infrastructure', () => {
     })
   })
 
-  test('focuses the recommended compute option after closing the add replica sheet', async () => {
+  test('focuses the recommended compute option after closing the add replica dialog', async () => {
     const user = userEvent.setup()
     renderInfrastructurePage()
 
     await user.click(await screen.findByRole('button', { name: 'Add read replica' }))
-    await user.click(await screen.findByRole('button', { name: 'Change to Small compute' }))
+    await user.click(await screen.findByRole('button', { name: 'Change compute' }))
 
     const smallCompute = await screen.findByRole('radio', { name: /Small/ })
     await waitFor(() => expect(smallCompute).toHaveFocus())

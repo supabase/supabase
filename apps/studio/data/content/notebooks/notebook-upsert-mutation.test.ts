@@ -98,6 +98,33 @@ describe('createNotebook', () => {
       createNotebook({ projectRef: 'default', name: 'Bad notebook', content: INVALID_CONTENT })
     ).rejects.toThrow()
   })
+
+  it('strips an empty-string database_identifier before sending — a caller that skipped the agent schema is not trusted to have already normalized it', async () => {
+    let sentBody: Record<string, unknown> | undefined
+    addAPIMock({
+      method: 'put',
+      path: '/platform/projects/:ref/content',
+      response: async ({ request }) => {
+        sentBody = (await request.json()) as Record<string, unknown>
+        return HttpResponse.json(null)
+      },
+    })
+
+    await createNotebook({
+      projectRef: 'default',
+      name: 'Signup funnel',
+      content: {
+        schema_version: 1,
+        cells: [
+          { _tag: 'database_cell', sql: DATABASE_SQL, row_limit: 100, database_identifier: '' },
+        ],
+      },
+    })
+
+    const content = sentBody?.content as WritableNotebook
+    const [databaseCell] = content.cells as Array<Record<string, unknown>>
+    expect(databaseCell).not.toHaveProperty('database_identifier')
+  })
 })
 
 describe('upsertNotebook', () => {

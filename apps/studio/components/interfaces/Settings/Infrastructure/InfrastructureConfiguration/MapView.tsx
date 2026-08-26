@@ -295,7 +295,7 @@ const MapView = () => {
 
                             <DropdownMenuSeparator />
 
-                            <DropdownMenuItem className="gap-x-2">
+                            <DropdownMenuItem className="gap-x-2" asChild>
                               <Link href={getReadReplicaPath(ref, database.identifier)}>
                                 Manage replica
                               </Link>
