@@ -13,6 +13,7 @@ import extensions from './extensions.json'
 import logConstants from './log-constants'
 import { plans, PricingInformation } from './plans'
 import { pricing } from './pricing'
+import { ADDONS, DISK_PRICING, METERS, PLAN_BILLING } from './pricing-catalog'
 import { PRODUCT_MODULES, products } from './products'
 import questions from './questions'
 import type { AWS_REGIONS_KEYS, CloudProvider, Region } from './regions'
@@ -20,6 +21,7 @@ import { AWS_REGIONS } from './regions'
 import tweets, { topTweets } from './tweets'
 
 export {
+  ADDONS,
   AWS_REGIONS,
   COMPUTE_BASELINE_IOPS,
   COMPUTE_BASELINE_THROUGHPUT,
@@ -28,11 +30,14 @@ export {
   COMPUTE_MAX_THROUGHPUT,
   computeInstanceAddonVariantIdSchema,
   config,
+  DISK_PRICING,
   ERROR_CODE_DOCS_URLS,
   ERROR_CODES,
   HTTP_ERROR_CODES,
   extensions,
   logConstants,
+  METERS,
+  PLAN_BILLING,
   plans,
   pricing,
   PRODUCT_MODULES,
