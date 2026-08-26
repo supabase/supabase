@@ -1,22 +1,17 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { ChevronDown, ChevronsUpDown, User as IconUser, Loader2, Search, X } from 'lucide-react'
+import { ChevronsUpDown, User as IconUser, Loader2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
   cn,
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
   CommandList,
-  DropdownMenuSeparator,
   Input,
   InputGroup,
   InputGroupAddon,
@@ -25,65 +20,54 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-  ScrollArea,
-  Switch,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
   ToggleGroup,
   ToggleGroupItem,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
-import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
+import { getDisplayName } from '../Auth/Users/Users.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { User, useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
 import { useCustomAccessTokenHookDetails } from '@/hooks/misc/useCustomAccessTokenHookDetails'
-import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
-import { type RoleImpersonationController } from '@/state/role-impersonation-state'
+import type { RoleImpersonationController } from '@/state/role-impersonation-state'
 import type { ResponseError } from '@/types'
 
 type AuthenticatorAssuranceLevels = 'aal1' | 'aal2'
 type UserSource = 'user' | 'external'
 
+type UserImpersonationSelectorProps = {
+  state: RoleImpersonationController
+  disabled?: boolean
+}
+
 export const UserImpersonationSelector = ({
   state,
-  compact = false,
   disabled = false,
-}: {
-  state: RoleImpersonationController
-  compact?: boolean
-  disabled?: boolean
-}) => {
+}: UserImpersonationSelectorProps) => {
   const [searchText, setSearchText] = useState('')
-  const [aal, setAal] = useState<AuthenticatorAssuranceLevels>('aal1')
+  const [aal, setAal] = useState<AuthenticatorAssuranceLevels>(() =>
+    state.role?.type === 'postgrest' && state.role.role === 'authenticated'
+      ? (state.role.aal ?? 'aal1')
+      : 'aal1'
+  )
   const [externalUserId, setExternalUserId] = useState('')
   const [additionalClaims, setAdditionalClaims] = useState('')
   const [isUserComboboxOpen, setIsUserComboboxOpen] = useState(false)
-
-  const { id: tableId } = useParams()
-  const [selectedTab, setSelectedTab] = useState<UserSource>(() =>
+  const [selectedSource, setSelectedSource] = useState<UserSource>(() =>
     state.role?.type === 'postgrest' &&
     state.role.role === 'authenticated' &&
     state.role.userType === 'external'
       ? 'external'
       : 'user'
   )
-
-  const [previousSearches, setPreviousSearches] = useLocalStorage<User[]>(
-    LOCAL_STORAGE_KEYS.USER_IMPERSONATION_SELECTOR_PREVIOUS_SEARCHES(tableId!),
-    []
-  )
+  const [isImpersonateLoading, setIsImpersonateLoading] = useState(false)
 
   const debouncedSearchText = useDebounce(searchText, 300)
-
   const { data: project } = useSelectedProjectQuery()
-
   const {
     data,
     isSuccess,
@@ -98,10 +82,9 @@ export const UserImpersonationSelector = ({
       connectionString: project?.connectionString,
       keywords: debouncedSearchText.trim().toLocaleLowerCase(),
     },
-    {
-      placeholderData: keepPreviousData,
-    }
+    { placeholderData: keepPreviousData }
   )
+
   const users = useMemo(() => data?.pages.flatMap((page) => page.result) ?? [], [data?.pages])
   const isSearching = isPlaceholderData && isFetching
   const impersonatingUser =
@@ -109,29 +92,26 @@ export const UserImpersonationSelector = ({
     state.role.role === 'authenticated' &&
     state.role.userType === 'native' &&
     state.role.user
-
-  // Check if we're currently impersonating an external auth user (e.g. OAuth, SAML)
-  // This is used to show the correct UI state and impersonation details
-  const isExternalAuthImpersonating =
+      ? state.role.user
+      : undefined
+  const impersonatingExternalUser =
     state.role?.type === 'postgrest' &&
     state.role.role === 'authenticated' &&
     state.role.userType === 'external' &&
     state.role.externalAuth
-
+      ? state.role.externalAuth
+      : undefined
+  const displayName = impersonatingUser
+    ? getDisplayName(
+        impersonatingUser,
+        impersonatingUser.email ?? impersonatingUser.phone ?? impersonatingUser.id ?? 'Unknown'
+      )
+    : impersonatingExternalUser?.sub
+  const isUserSelected = Boolean(displayName)
   const customAccessTokenHookDetails = useCustomAccessTokenHookDetails(project?.ref)
-
-  const [isImpersonateLoading, setIsImpersonateLoading] = useState(false)
 
   async function impersonateUser(user: User) {
     setIsImpersonateLoading(true)
-    setPreviousSearches((prev) => {
-      // Remove if already present
-      const filtered = prev.filter((u) => u.id !== user.id)
-      // Add new user to the start of the list (last used first)
-      const updated = [user, ...filtered]
-      // Keep only the last 6
-      return updated.slice(0, 5)
-    })
 
     if (customAccessTokenHookDetails?.type === 'https') {
       toast.info(
@@ -152,401 +132,41 @@ export const UserImpersonationSelector = ({
       )
     } catch (error) {
       toast.error(`Failed to impersonate user: ${(error as ResponseError).message}`)
+    } finally {
+      setIsImpersonateLoading(false)
     }
-
-    setIsImpersonateLoading(false)
   }
 
-  // Impersonates an external auth user (e.g. OAuth, SAML) by setting the sub and any additional claims
-  // This allows testing RLS policies for external auth users without needing to set up the full OAuth/SAML flow
   async function impersonateExternalUser() {
     setIsImpersonateLoading(true)
 
     let parsedClaims = {}
     try {
       parsedClaims = additionalClaims ? JSON.parse(additionalClaims) : {}
-    } catch (e) {
+    } catch {
       toast.error('Invalid JSON in additional claims')
       setIsImpersonateLoading(false)
       return
     }
+
     try {
       await state.setRole(
         {
           type: 'postgrest',
           role: 'authenticated',
           userType: 'external',
-          externalAuth: {
-            sub: externalUserId,
-            additionalClaims: parsedClaims,
-          },
+          externalAuth: { sub: externalUserId, additionalClaims: parsedClaims },
           aal,
         },
         customAccessTokenHookDetails
       )
     } catch (error) {
       toast.error(`Failed to impersonate user: ${(error as ResponseError).message}`)
+    } finally {
+      setIsImpersonateLoading(false)
     }
-
-    setIsImpersonateLoading(false)
   }
 
-  function stopImpersonating() {
-    state.setRole(undefined)
-  }
-
-  function toggleAalState() {
-    setAal((prev) => (prev === 'aal2' ? 'aal1' : 'aal2'))
-  }
-
-  const displayName = impersonatingUser
-    ? getDisplayName(
-        impersonatingUser,
-        impersonatingUser.email ?? impersonatingUser.phone ?? impersonatingUser.id ?? 'Unknown'
-      )
-    : isExternalAuthImpersonating
-      ? isExternalAuthImpersonating.sub
-      : undefined
-
-  // Clear all search history
-  function clearSearchHistory() {
-    setPreviousSearches([])
-  }
-
-  if (compact) {
-    return (
-      <CompactUserImpersonationSelector
-        disabled={disabled}
-        selectedTab={selectedTab}
-        onSelectedTabChange={setSelectedTab}
-        displayName={displayName}
-        isImpersonateLoading={isImpersonateLoading}
-        stopImpersonating={stopImpersonating}
-        isUserComboboxOpen={isUserComboboxOpen}
-        setIsUserComboboxOpen={setIsUserComboboxOpen}
-        searchText={searchText}
-        setSearchText={setSearchText}
-        isLoading={isLoading}
-        isSearching={isSearching}
-        isError={isError}
-        error={error}
-        isSuccess={isSuccess}
-        users={users}
-        impersonateUser={impersonateUser}
-        externalUserId={externalUserId}
-        setExternalUserId={setExternalUserId}
-        impersonateExternalUser={impersonateExternalUser}
-        additionalClaims={additionalClaims}
-        setAdditionalClaims={setAdditionalClaims}
-        aal={aal}
-        setAal={setAal}
-      />
-    )
-  }
-
-  return (
-    <>
-      <div className="px-5 py-3">
-        <p className="text-foreground text-sm">
-          {displayName ? `Impersonating ${displayName}` : 'Impersonate a user'}
-        </p>
-        <p className="text-sm text-foreground-light mb-1">
-          {!impersonatingUser && !isExternalAuthImpersonating
-            ? "Select a user to respect your database's RLS policies for that particular user."
-            : "Results will respect your database's RLS policies for this user."}
-        </p>
-
-        {impersonatingUser && (
-          <UserImpersonatingRow
-            user={impersonatingUser}
-            onClick={stopImpersonating}
-            isImpersonating={true}
-            aal={aal}
-            isLoading={isImpersonateLoading}
-          />
-        )}
-        {isExternalAuthImpersonating && (
-          <ExternalAuthImpersonatingRow
-            sub={isExternalAuthImpersonating.sub}
-            onClick={stopImpersonating}
-            aal={aal}
-            isLoading={isImpersonateLoading}
-          />
-        )}
-
-        {!impersonatingUser && !isExternalAuthImpersonating && (
-          <Tabs value={selectedTab} onValueChange={(value: any) => setSelectedTab(value)}>
-            <TabsList className="gap-x-3">
-              <TabsTrigger value="user">Project user</TabsTrigger>
-              <TabsTrigger value="external" className="gap-x-1.5">
-                External user
-                <InfoTooltip side="bottom" className="flex flex-col gap-1 max-w-96">
-                  Test RLS policies with external auth providers like Clerk or Auth0 by providing a
-                  user ID and optional claims.
-                </InfoTooltip>
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="user">
-              <div className="flex flex-col gap-y-2">
-                <InputGroup>
-                  <InputGroupInput
-                    size="tiny"
-                    className="pr-10 border-none"
-                    placeholder="Search by id, email, phone, or name..."
-                    onChange={(e) => setSearchText(e.target.value)}
-                    value={searchText}
-                  />
-                  <InputGroupAddon>
-                    {isSearching ? (
-                      <Loader2
-                        className="animate-spin text-foreground-lighter"
-                        size={16}
-                        strokeWidth={1.5}
-                      />
-                    ) : (
-                      <Search className="text-foreground-lighter" size={16} strokeWidth={1.5} />
-                    )}
-                  </InputGroupAddon>
-                  <InputGroupAddon align="inline-end">
-                    {searchText && (
-                      <InputGroupButton
-                        size="tiny"
-                        variant="text"
-                        onClick={() => setSearchText('')}
-                      >
-                        <span className="sr-only">Clear search</span>
-                        <X size={12} />
-                      </InputGroupButton>
-                    )}
-                  </InputGroupAddon>
-                </InputGroup>
-                {isLoading && (
-                  <div className="flex flex-col gap-2 items-center justify-center h-24">
-                    <Loader2 className="animate-spin" size={24} />
-                    <span className="text-foreground-light">Loading users...</span>
-                  </div>
-                )}
-
-                {isError && <AlertError error={error} subject="Failed to retrieve users" />}
-
-                {isSuccess &&
-                  (users.length > 0 ? (
-                    <div>
-                      <ul className="divide-y max-h-[150px] overflow-y-scroll" role="list">
-                        {users.map((user) => (
-                          <li key={user.id} role="listitem">
-                            <UserRow
-                              user={user}
-                              onClick={impersonateUser}
-                              isLoading={isImpersonateLoading}
-                            />
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col gap-2 items-center justify-center h-24">
-                      <p className="text-foreground-light text-xs" role="status">
-                        No users found
-                      </p>
-                    </div>
-                  ))}
-
-                <>
-                  {previousSearches.length > 0 && (
-                    <div>
-                      {previousSearches.length > 0 ? (
-                        <>
-                          <Collapsible className="relative">
-                            <CollapsibleTrigger className="group font-normal p-0 [&[data-state=open]>div>svg]:-rotate-180!">
-                              <div className="flex items-center gap-x-1 w-full">
-                                <p className="text-xs text-foreground-light group-hover:text-foreground transition">
-                                  Recents
-                                </p>
-                                <ChevronDown
-                                  className="transition-transform duration-200"
-                                  strokeWidth={1.5}
-                                  size={14}
-                                />
-                              </div>
-                            </CollapsibleTrigger>
-
-                            <CollapsibleContent className="mt-1 flex flex-col gap-y-4">
-                              <Button
-                                size="tiny"
-                                variant="text"
-                                className="absolute right-0 top-0 py-2 hover:bg-muted flex items-center text"
-                                onClick={clearSearchHistory}
-                              >
-                                <span className="flex items-center">Clear</span>
-                              </Button>
-                              <ScrollArea
-                                className={cn(previousSearches.length > 3 ? 'h-36' : 'h-auto')}
-                              >
-                                <ul className="grid gap-2 ">
-                                  {previousSearches.map((search) => (
-                                    <li key={search.id}>
-                                      <UserRow user={search} onClick={impersonateUser} />
-                                    </li>
-                                  ))}
-                                </ul>
-                              </ScrollArea>
-                            </CollapsibleContent>
-                          </Collapsible>
-                        </>
-                      ) : (
-                        <div className="p-4 text-center text-muted-foreground">
-                          No recent searches
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="external">
-              <div className="flex flex-col gap-y-4">
-                <FormItemLayout
-                  layout="horizontal"
-                  label="External User ID"
-                  description="The user ID from your external auth provider"
-                  isReactForm={false}
-                >
-                  <Input
-                    size="small"
-                    placeholder="e.g. user_abc123"
-                    value={externalUserId}
-                    onChange={(e) => setExternalUserId(e.target.value)}
-                  />
-                </FormItemLayout>
-                <FormItemLayout
-                  layout="horizontal"
-                  label="Additional Claims (JSON)"
-                  description="Optional: Add custom claims like org_id or roles"
-                  isReactForm={false}
-                >
-                  <Input
-                    size="small"
-                    placeholder='e.g. {"app_metadata": {"org_id": "org_456"}}'
-                    value={additionalClaims}
-                    onChange={(e) => setAdditionalClaims(e.target.value)}
-                  />
-                </FormItemLayout>
-                <div className="flex items-center justify-end">
-                  <Button
-                    variant="default"
-                    disabled={!externalUserId}
-                    onClick={impersonateExternalUser}
-                  >
-                    Impersonate
-                  </Button>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-        )}
-      </div>
-
-      {/* Check for both regular user and external auth impersonation since they use different data structures but both need to be handled for displaying impersonation UI */}
-      {!impersonatingUser && !isExternalAuthImpersonating ? (
-        <>
-          <DropdownMenuSeparator className="m-0" />
-          <div className="px-5 py-2 flex flex-col gap-2 relative">
-            <Collapsible>
-              <CollapsibleTrigger className="group font-normal p-0 [&[data-state=open]>div>svg]:-rotate-180!">
-                <div className="flex items-center gap-x-1 w-full">
-                  <p className="text-xs text-foreground-light group-hover:text-foreground transition">
-                    Advanced options
-                  </p>
-                  <ChevronDown
-                    className="transition-transform duration-200"
-                    strokeWidth={1.5}
-                    size={14}
-                  />
-                </div>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="mt-1 flex flex-col gap-y-4">
-                <div className="flex flex-row items-center gap-x-4 text-sm text-foreground-light">
-                  <div className="flex items-center gap-x-1">
-                    <h3>MFA assurance level</h3>
-                    <InfoTooltip side="top" className="max-w-96">
-                      AAL1 verifies users via standard login methods, while AAL2 adds a second
-                      authentication factor. If you're not using MFA, you can leave this on AAL1.
-                      Learn more about MFA{' '}
-                      <InlineLink href={`${DOCS_URL}/guides/auth/auth-mfa`}>here</InlineLink>.
-                    </InfoTooltip>
-                  </div>
-
-                  <div className="flex flex-row items-center gap-x-2 text-xs font-bold">
-                    <p className={aal === 'aal1' ? undefined : 'text-foreground-lighter'}>AAL1</p>
-                    <Switch checked={aal === 'aal2'} onCheckedChange={toggleAalState} />
-                    <p className={aal === 'aal2' ? undefined : 'text-foreground-lighter'}>AAL2</p>
-                  </div>
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
-          </div>
-        </>
-      ) : null}
-    </>
-  )
-}
-
-type CompactUserImpersonationSelectorProps = {
-  disabled: boolean
-  selectedTab: UserSource
-  onSelectedTabChange: (value: UserSource) => void
-  displayName?: string
-  isImpersonateLoading: boolean
-  stopImpersonating: () => void
-  isUserComboboxOpen: boolean
-  setIsUserComboboxOpen: (open: boolean) => void
-  searchText: string
-  setSearchText: (value: string) => void
-  isLoading: boolean
-  isSearching: boolean
-  isError: boolean
-  error: ResponseError | null
-  isSuccess: boolean
-  users: User[]
-  impersonateUser: (user: User) => Promise<void>
-  externalUserId: string
-  setExternalUserId: (value: string) => void
-  impersonateExternalUser: () => Promise<void>
-  additionalClaims: string
-  setAdditionalClaims: (value: string) => void
-  aal: AuthenticatorAssuranceLevels
-  setAal: (value: AuthenticatorAssuranceLevels) => void
-}
-
-const CompactUserImpersonationSelector = ({
-  disabled,
-  selectedTab,
-  onSelectedTabChange,
-  displayName,
-  isImpersonateLoading,
-  stopImpersonating,
-  isUserComboboxOpen,
-  setIsUserComboboxOpen,
-  searchText,
-  setSearchText,
-  isLoading,
-  isSearching,
-  isError,
-  error,
-  isSuccess,
-  users,
-  impersonateUser,
-  externalUserId,
-  setExternalUserId,
-  impersonateExternalUser,
-  additionalClaims,
-  setAdditionalClaims,
-  aal,
-  setAal,
-}: CompactUserImpersonationSelectorProps) => {
   return (
     <fieldset
       disabled={disabled}
@@ -556,12 +176,26 @@ const CompactUserImpersonationSelector = ({
         disabled && 'opacity-40'
       )}
     >
-      <FormItemLayout isReactForm={false} layout="horizontal" size="tiny" label="Users">
+      <FormItemLayout
+        isReactForm={false}
+        layout="horizontal"
+        size="tiny"
+        label={
+          <span className="flex items-center gap-1">
+            Users
+            <InfoTooltip side="left" className="max-w-80">
+              Project users come from Supabase Auth. External users let you test RLS policies with
+              providers such as Clerk or Auth0.
+            </InfoTooltip>
+          </span>
+        }
+      >
         <ToggleGroup
           type="single"
-          value={selectedTab}
+          value={selectedSource}
+          disabled={isUserSelected}
           onValueChange={(value) => {
-            if (value === 'user' || value === 'external') onSelectedTabChange(value)
+            if (value === 'user' || value === 'external') setSelectedSource(value)
           }}
           variant="default"
           size="tiny"
@@ -584,11 +218,11 @@ const CompactUserImpersonationSelector = ({
         size="tiny"
         label="User"
       >
-        <CompactImpersonationControl
-          selectedTab={selectedTab}
+        <ImpersonationControl
+          selectedSource={selectedSource}
           displayName={displayName}
           isImpersonateLoading={isImpersonateLoading}
-          stopImpersonating={stopImpersonating}
+          stopImpersonating={() => state.setRole(undefined)}
           isUserComboboxOpen={isUserComboboxOpen}
           setIsUserComboboxOpen={setIsUserComboboxOpen}
           searchText={searchText}
@@ -606,7 +240,7 @@ const CompactUserImpersonationSelector = ({
         />
       </FormItemLayout>
 
-      {selectedTab === 'external' && !displayName && (
+      {selectedSource === 'external' && !isUserSelected && (
         <FormItemLayout
           id="run-as-user-claims"
           isReactForm={false}
@@ -617,18 +251,32 @@ const CompactUserImpersonationSelector = ({
           <Input
             id="run-as-user-claims"
             size="tiny"
-            placeholder="Additional claims (JSON)"
+            placeholder='e.g. {"app_metadata": {"org_id": "org_456"}}'
             value={additionalClaims}
             onChange={(event) => setAdditionalClaims(event.target.value)}
           />
         </FormItemLayout>
       )}
 
-      <FormItemLayout isReactForm={false} layout="horizontal" size="tiny" label="MFA level">
+      <FormItemLayout
+        isReactForm={false}
+        layout="horizontal"
+        size="tiny"
+        label={
+          <span className="flex items-center gap-1">
+            MFA level
+            <InfoTooltip side="left" className="max-w-96">
+              AAL1 verifies users via standard login methods, while AAL2 adds a second
+              authentication factor. If you are not using MFA, leave this on AAL1. Learn more in the{' '}
+              <InlineLink href={`${DOCS_URL}/guides/auth/auth-mfa`}>MFA guide</InlineLink>.
+            </InfoTooltip>
+          </span>
+        }
+      >
         <ToggleGroup
           type="single"
           value={aal}
-          disabled={Boolean(displayName)}
+          disabled={isUserSelected}
           onValueChange={(value) => {
             if (value === 'aal1' || value === 'aal2') setAal(value)
           }}
@@ -649,30 +297,29 @@ const CompactUserImpersonationSelector = ({
   )
 }
 
-type CompactImpersonationControlProps = Pick<
-  CompactUserImpersonationSelectorProps,
-  | 'selectedTab'
-  | 'displayName'
-  | 'isImpersonateLoading'
-  | 'stopImpersonating'
-  | 'isUserComboboxOpen'
-  | 'setIsUserComboboxOpen'
-  | 'searchText'
-  | 'setSearchText'
-  | 'isLoading'
-  | 'isSearching'
-  | 'isError'
-  | 'error'
-  | 'isSuccess'
-  | 'users'
-  | 'impersonateUser'
-  | 'externalUserId'
-  | 'setExternalUserId'
-  | 'impersonateExternalUser'
->
+type ImpersonationControlProps = {
+  selectedSource: UserSource
+  displayName?: string
+  isImpersonateLoading: boolean
+  stopImpersonating: () => void
+  isUserComboboxOpen: boolean
+  setIsUserComboboxOpen: (open: boolean) => void
+  searchText: string
+  setSearchText: (value: string) => void
+  isLoading: boolean
+  isSearching: boolean
+  isError: boolean
+  error: ResponseError | null
+  isSuccess: boolean
+  users: User[]
+  impersonateUser: (user: User) => Promise<void>
+  externalUserId: string
+  setExternalUserId: (value: string) => void
+  impersonateExternalUser: () => Promise<void>
+}
 
-const CompactImpersonationControl = ({
-  selectedTab,
+const ImpersonationControl = ({
+  selectedSource,
   displayName,
   isImpersonateLoading,
   stopImpersonating,
@@ -690,7 +337,7 @@ const CompactImpersonationControl = ({
   externalUserId,
   setExternalUserId,
   impersonateExternalUser,
-}: CompactImpersonationControlProps) => {
+}: ImpersonationControlProps) => {
   if (displayName) {
     return (
       <div className="flex min-w-0 items-center gap-2">
@@ -709,7 +356,7 @@ const CompactImpersonationControl = ({
     )
   }
 
-  if (selectedTab === 'external') {
+  if (selectedSource === 'external') {
     return (
       <InputGroup>
         <InputGroupInput
@@ -806,151 +453,5 @@ const CompactImpersonationControl = ({
         </Command>
       </PopoverContent>
     </Popover>
-  )
-}
-
-// Base interface for shared impersonation row props to reduce
-// duplication between user and external auth impersonation displays
-interface BaseImpersonatingRowProps {
-  onClick: () => void
-  aal: AuthenticatorAssuranceLevels
-  displayName: string
-  avatarUrl?: string
-  isImpersonating: boolean
-  isLoading?: boolean
-}
-
-const BaseImpersonatingRow = ({
-  onClick,
-  aal,
-  displayName,
-  avatarUrl,
-  isImpersonating = false,
-  isLoading = false,
-}: BaseImpersonatingRowProps) => {
-  return (
-    <div className="flex items-center gap-3 py-2 text-foreground">
-      <div className="flex items-center gap-4 bg-surface-200 pr-4 pl-0.5 py-0.5 border rounded-full max-w-l">
-        {avatarUrl ? (
-          <img className="rounded-full w-5 h-5" src={avatarUrl} alt={displayName} />
-        ) : (
-          <div className="rounded-full w-[21px] h-[21px] bg-surface-300 border border-strong flex items-center justify-center">
-            <IconUser size={12} strokeWidth={2} />
-          </div>
-        )}
-
-        <span className="text-sm truncate">
-          {displayName}{' '}
-          <span className="ml-2 text-foreground-lighter text-xs font-light">
-            {aal === 'aal2' ? 'AAL2' : 'AAL1'}
-          </span>
-        </span>
-      </div>
-
-      <Button variant="default" onClick={onClick} disabled={isLoading} loading={isLoading}>
-        {isImpersonating ? 'Stop' : 'Impersonate'}
-      </Button>
-    </div>
-  )
-}
-
-const UserImpersonatingRow = ({
-  user,
-  onClick,
-  isImpersonating = false,
-  isLoading = false,
-  aal,
-}: UserRowProps & { aal: AuthenticatorAssuranceLevels }) => {
-  const avatarUrl = getAvatarUrl(user)
-  const displayName =
-    getDisplayName(user, user.email ?? user.phone ?? user.id ?? 'Unknown') +
-    (user.is_anonymous ? ' (anonymous)' : '')
-
-  return (
-    <BaseImpersonatingRow
-      onClick={() => onClick(user)}
-      aal={aal}
-      displayName={displayName}
-      avatarUrl={avatarUrl}
-      isImpersonating={isImpersonating}
-      isLoading={isLoading}
-    />
-  )
-}
-
-interface ExternalAuthImpersonatingRowProps {
-  sub: string
-  onClick: () => void
-  aal: AuthenticatorAssuranceLevels
-  isLoading?: boolean
-}
-
-const ExternalAuthImpersonatingRow = ({
-  sub,
-  onClick,
-  aal,
-  isLoading = false,
-}: ExternalAuthImpersonatingRowProps) => {
-  return (
-    <BaseImpersonatingRow
-      onClick={onClick}
-      aal={aal}
-      displayName={sub}
-      isImpersonating={true}
-      isLoading={isLoading}
-    />
-  )
-}
-
-interface UserRowProps {
-  user: User
-  onClick: (user: User) => void
-  isImpersonating?: boolean
-  isLoading?: boolean
-}
-
-const UserRow = ({ user, onClick, isImpersonating = false, isLoading = false }: UserRowProps) => {
-  const avatarUrl = getAvatarUrl(user)
-  const emailOrPhone = user.email || user.phone
-  const displayName = getDisplayName(user, '')
-  const isAnonymous = user.is_anonymous
-  const showDisplayName = displayName && displayName !== emailOrPhone
-
-  return (
-    <div className="flex items-center justify-between py-1 text-foreground">
-      <div className="flex items-center gap-4">
-        {avatarUrl ? (
-          <img className="rounded-full w-5 h-5" src={avatarUrl} alt={displayName || emailOrPhone} />
-        ) : (
-          <div className="rounded-full w-[21px] h-[21px] bg-surface-300 border flex items-center justify-center text-foreground-lighter">
-            <IconUser size={12} strokeWidth={2} />
-          </div>
-        )}
-
-        <span className="text-sm flex items-center gap-4">
-          {emailOrPhone}
-          {showDisplayName && (
-            <>
-              <span className="text-foreground-lighter">
-                {displayName}
-                {isAnonymous ? ' (anonymous)' : ''}
-              </span>
-            </>
-          )}
-          <span className="text-foreground-light bg-surface-200 dark:bg-surface-400 rounded-md px-1 py-0.5 font-mono text-xs">
-            {user?.id?.slice(0, 8)}
-          </span>
-        </span>
-      </div>
-
-      <Button
-        variant="default"
-        onClick={() => onClick(user)}
-        disabled={isLoading}
-        loading={isLoading}
-      >
-        {isImpersonating ? 'Stop' : 'Impersonate'}
-      </Button>
-    </div>
   )
 }

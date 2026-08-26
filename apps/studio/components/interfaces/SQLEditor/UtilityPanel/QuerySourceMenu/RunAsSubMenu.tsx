@@ -1,6 +1,6 @@
 import { DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from 'ui'
 
-import { RunAsRoleImpersonationSelector } from '@/components/interfaces/RoleImpersonationSelector/RunAsRoleImpersonationSelector'
+import { RoleImpersonationSelectorInterface } from '@/components/interfaces/RoleImpersonationSelector'
 import {
   useRoleImpersonationStateSnapshot,
   type RoleImpersonationController,
@@ -33,7 +33,11 @@ export const RunAsSubMenu = (props: RunAsSubMenuProps) => {
       {/* Stops propagation so the authenticated-user search input isn't swallowed by the
       dropdown's typeahead. */}
       <DropdownMenuSubContent className="w-80 p-0" onKeyDown={(e) => e.stopPropagation()}>
-        <RunAsRoleImpersonationSelector state={state} />
+        <RoleImpersonationSelectorInterface
+          header="Run SQL query as a role"
+          serviceRoleLabel={SERVICE_ROLE_LABEL}
+          state={state}
+        />
       </DropdownMenuSubContent>
     </DropdownMenuSub>
   )

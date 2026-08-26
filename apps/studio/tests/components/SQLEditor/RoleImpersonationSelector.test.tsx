@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { toast } from 'sonner'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { RunAsRoleImpersonationSelector } from '@/components/interfaces/RoleImpersonationSelector/RunAsRoleImpersonationSelector'
+import { RoleImpersonationSelectorInterface } from '@/components/interfaces/RoleImpersonationSelector'
 import type { ImpersonationRole } from '@/lib/role-impersonation'
 import type { RoleImpersonationController } from '@/state/role-impersonation-state'
 import { customRender } from '@/tests/lib/custom-render'
@@ -20,7 +20,7 @@ vi.mock('@/components/interfaces/RoleImpersonationSelector/UserImpersonationSele
   ),
 }))
 
-describe('RunAsRoleImpersonationSelector', () => {
+describe('RoleImpersonationSelectorInterface', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
@@ -39,7 +39,7 @@ describe('RunAsRoleImpersonationSelector', () => {
       setRole,
     }
 
-    const { rerender } = customRender(<RunAsRoleImpersonationSelector state={state} />)
+    const { rerender } = customRender(<RoleImpersonationSelectorInterface state={state} />)
 
     expect(screen.getByRole('radio', { name: 'PostgresSuperuser' })).toBeChecked()
     expect(screen.getByText('Bypasses RLS and can return all rows.')).toBeVisible()
@@ -51,14 +51,14 @@ describe('RunAsRoleImpersonationSelector', () => {
     expect(screen.getByTestId('user-settings')).not.toBeDisabled()
 
     await user.click(screen.getByRole('radio', { name: 'AnonymousNot logged in' }))
-    rerender(<RunAsRoleImpersonationSelector state={state} />)
+    rerender(<RoleImpersonationSelectorInterface state={state} />)
 
     expect(screen.getByText('Returns rows available to anonymous users.')).toBeVisible()
     expect(setRole).toHaveBeenCalledWith({ type: 'postgrest', role: 'anon' })
     expect(screen.getByTestId('user-settings')).toBeDisabled()
 
     await user.click(screen.getByRole('radio', { name: 'PostgresSuperuser' }))
-    rerender(<RunAsRoleImpersonationSelector state={state} />)
+    rerender(<RoleImpersonationSelectorInterface state={state} />)
 
     expect(screen.getByText('Bypasses RLS and can return all rows.')).toBeVisible()
     expect(setRole).toHaveBeenCalledWith(undefined)
@@ -78,13 +78,13 @@ describe('RunAsRoleImpersonationSelector', () => {
       setRole: vi.fn(),
     }
 
-    const { rerender } = customRender(<RunAsRoleImpersonationSelector state={state} />)
+    const { rerender } = customRender(<RoleImpersonationSelectorInterface state={state} />)
 
     expect(screen.getByRole('radio', { name: 'AuthenticatedLogged-in user' })).toBeChecked()
     expect(screen.getByTestId('user-settings')).not.toBeDisabled()
 
     currentRole = undefined
-    rerender(<RunAsRoleImpersonationSelector state={state} />)
+    rerender(<RoleImpersonationSelectorInterface state={state} />)
 
     expect(screen.getByRole('radio', { name: 'PostgresSuperuser' })).toBeChecked()
     expect(screen.getByTestId('user-settings')).toBeDisabled()
@@ -98,7 +98,7 @@ describe('RunAsRoleImpersonationSelector', () => {
       setRole: vi.fn().mockRejectedValue({ message: 'Role switch failed' }),
     }
 
-    customRender(<RunAsRoleImpersonationSelector state={state} />)
+    customRender(<RoleImpersonationSelectorInterface state={state} />)
     await user.click(screen.getByRole('radio', { name: 'AnonymousNot logged in' }))
 
     expect(screen.getByRole('radio', { name: 'PostgresSuperuser' })).toBeChecked()
