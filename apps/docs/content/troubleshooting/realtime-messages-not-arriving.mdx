@@ -1,0 +1,55 @@
+---
+title = "Realtime: Messages Not Arriving Troubleshooting"
+topics = [
+  "realtime",
+]
+keywords = [ "broadcast", "presence", "postgres changes", "websocket", "connection", "subscribe" ] # any strings (topics are automatically added so no need to duplicate)
+---
+
+Your channel subscribes, something changes, and the client never hears about it. No error, silence. This guide is a quick-reference across the main causes: connection problems, Broadcast, `postgres_changes`, and Presence.
+
+Start with [Connection problems](#connection-problems) if your channel never subscribes. If it connects fine and the problem is that specific events aren't showing up, skip ahead to whichever feature you're using.
+
+## Connection problems
+
+Look for `CHANNEL_ERROR`, `TIMED_OUT`, or `CLOSED` right after you call `.subscribe()`.
+
+1. Check your project isn't paused and Realtime is enabled for it. That toggle ("Enable Realtime service") lives under **Realtime → Settings**. See [Realtime Settings](/docs/guides/realtime/settings).
+2. On a private channel, you need an RLS policy that allows the join for your role. Check **Realtime → Policies** on `realtime.messages` — see [Realtime Authorization](/docs/guides/realtime/authorization) for how the policies work.
+3. Bad JWTs are a common cause. Not expired, has `role` and `exp` claims, and if you're on a third-party auth provider, its JWKS endpoint needs to be reachable. Decode the token (jwt.io, or `atob(token.split('.')[1])`) to check the claims directly. Logging the second argument in `.subscribe((status, err) => ...)` will show you the actual rejection reason instead of leaving you guessing. More detail: [Channel-level system errors](/docs/guides/realtime/protocol#channel-level-system-errors).
+4. Reverse proxy or custom SSL termination in front of your app? Make sure it forwards the `Upgrade` and `Connection` headers, or the WebSocket handshake never completes in the first place.
+5. Clients need to heartbeat at least every 25 seconds or the connection times out ([Reconnection](/docs/guides/realtime/protocol#reconnection)). So reconnect on unexpected `CLOSED`/`TIMED_OUT` instead of treating either as a hard error — log the status callback so you can tell an expected disconnect apart from a real failure. One caveat: if you're seeing `TIMED_OUT` specifically, that's more often a Node.js version mismatch with your `realtime-js` version than an idle timeout. See [Realtime connections giving `TIMED_OUT` errors](./realtime-connections-timed_out-status).
+6. You might be hitting a connection or join-rate limit for your plan (`too_many_connections`, `too_many_joins`). Check the project's usage page in the dashboard, or look for the error code directly in `err`. Plan numbers: [Realtime Limits](/docs/guides/realtime/limits#limits-by-plan). Related: [Realtime: "Concurrent Peak Connections" Quota](./realtime-concurrent-peak-connections-quota-jdDqcp).
+
+## Broadcast — sent from the client
+
+This applies to messages sent with `channel.send({ type: 'broadcast', ... })`.
+
+1. Topic name has to match exactly on the sender and every listener (`supabase.channel('room-1')`). A typo, a casing difference, or an ID built differently on each side won't throw any error, it'll fail quietly. Log the topic string on both sides and diff them if you're stuck.
+2. Private channel? You'll need an `insert` RLS policy on `realtime.messages` scoped to `extension = 'broadcast'` for the connecting role. Check **Realtime → Policies**, and see [Realtime Authorization: Broadcast](/docs/guides/realtime/authorization#broadcast) for a working example.
+3. Same rate limits apply here as connections (message-per-second, channel limits) — same usage page, same [Realtime Limits](/docs/guides/realtime/limits#limits-by-plan) reference.
+
+## Broadcast — sent from the database
+
+This applies to `realtime.send()` and `realtime.broadcast_changes()`.
+
+1. Check your Postgres logs for a `WarnSendingBroadcastMessage` warning. `realtime.messages` is partitioned by day, and that partition only gets created once a client has connected over WebSocket. Broadcast before that happens, or after your clients stop connecting for a while, and the insert fails with this warning. Connecting a client first usually clears it up. Background: [Realtime: `WarnSendingBroadcastMessage`](./realtime-warn-sending-broadcast-message) and [Broadcast from Postgres](/docs/guides/realtime/architecture#broadcast-from-postgres).
+2. Is the trigger even firing? Add a `raise notice` inside it and check **Logs → Postgres Logs**. Nothing logged means the trigger isn't wired up right — wrong table, wrong event, or it was never created — and that's a problem upstream of Realtime entirely.
+
+## `postgres_changes`
+
+1. Row Level Security gates delivery here too. `postgres_changes` only sends rows the subscribing role could `select`. Run that same select as the subscribing role in the SQL editor; an empty result means RLS is the culprit. Add a permissive select policy for testing, then tighten it back up once you've confirmed that's the issue. Related reading: [Interaction with Postgres Changes](/docs/guides/realtime/authorization#interaction-with-postgres-changes).
+2. Double check your filter arguments against the actual row that changed: `schema`, `table`, `event` (`INSERT`/`UPDATE`/`DELETE`/`*`), and any `.eq()`/`.in()` filter. See [Available filters](/docs/guides/realtime/postgres-changes#available-filters) for the full list.
+3. The table needs to be in the `supabase_realtime` publication, regardless of schema — that's under **Database → Publications**. If it's not in `public`, there's a separate requirement too: `grant select on "your_schema"."your_table" to authenticated;`. There's no dashboard toggle for that part. Details: [Private schemas](/docs/guides/realtime/postgres-changes#private-schemas).
+4. When none of the above turns anything up, strip the subscription down to bare minimum: no filter, `event: '*'`. If that still never fires, you're looking at a publication or RLS problem, not a filter syntax issue.
+
+Once you've ruled out the basics, [Realtime: Postgres Changes Troubleshooting](./realtime-postgres-changes-troubleshooting) goes deeper into this exact scenario.
+
+## Presence
+
+1. Something in your codebase may have set `presence: { enabled: false }` on the channel config. Worth grepping for it. Config shape reference: [phx_join config](/docs/guides/realtime/protocol#phx_join).
+2. `channel.track()` needs to wait for `SUBSCRIBED` — every example in the Presence guide gates it this way, and calling it earlier won't reliably register. Log the status callback and confirm `track()` only fires after `SUBSCRIBED` shows up. See [Sending state](/docs/guides/realtime/presence#sending-state) for the canonical pattern.
+
+## Still stuck?
+
+The [Realtime troubleshooting entries](/docs/guides/troubleshooting) cover related issues too: `TIMED_OUT` connections, too many channels, rate limits, logger debugging.
