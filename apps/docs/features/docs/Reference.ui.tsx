@@ -389,7 +389,7 @@ function ApiOperationRequestBodyDetailsInternal({
     return (
       <>
         <span className="font-mono text-sm font-medium text-foreground">All of the following:</span>
-        {schema.allOf.map((option, index) => (
+        {(Array.isArray(schema.allOf) ? schema.allOf : []).map((option, index) => (
           <ApiSchemaParamSubdetails key={index} schema={option} />
         ))}
       </>
@@ -398,7 +398,7 @@ function ApiOperationRequestBodyDetailsInternal({
     return (
       <>
         <span className="font-mono text-sm font-medium text-foreground">Any of the following:</span>
-        {schema.anyOf.map((option, index) => (
+        {(Array.isArray(schema.anyOf) ? schema.anyOf : []).map((option, index) => (
           <ApiSchemaParamSubdetails key={index} schema={option} />
         ))}
       </>
@@ -407,7 +407,7 @@ function ApiOperationRequestBodyDetailsInternal({
     return (
       <>
         <span className="font-mono text-sm font-medium text-foreground">One of the following:</span>
-        {schema.oneOf.map((option, index) => (
+        {(Array.isArray(schema.oneOf) ? schema.oneOf : []).map((option, index) => (
           <ApiSchemaParamSubdetails key={index} schema={option} />
         ))}
       </>
@@ -476,7 +476,7 @@ export function ApiSchemaParamSubdetails({
     return null
   }
 
-  const subContent =
+  const rawSubContent =
     'enum' in schema
       ? schema.enum
       : 'anyOf' in schema
@@ -493,6 +493,9 @@ export function ApiSchemaParamSubdetails({
                     value: schema[key],
                   }))
               : []
+  // Some specs have allOf/anyOf/oneOf as a single object
+  // instead of an array. This is in place to prevent crashing.
+  const subContent = Array.isArray(rawSubContent) ? rawSubContent : []
 
   return (
     <Collapsible>
