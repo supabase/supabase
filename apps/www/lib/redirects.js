@@ -143,12 +143,22 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/telemetry/:match*',
-    destination: '/docs/guides/monitoring-and-debugging/:match*',
+    destination: '/docs/guides/observability/:match*',
   },
   {
     permanent: true,
     source: '/docs/guides/monitoring-and-debugging/resolve-issues',
-    destination: '/docs/guides/monitoring-and-debugging/debugging',
+    destination: '/docs/guides/observability/detecting',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-and-debugging/debugging',
+    destination: '/docs/guides/observability/detecting',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-and-debugging/:match*',
+    destination: '/docs/guides/observability/:match*',
   },
   {
     permanent: false,
@@ -2764,17 +2774,17 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/database/inspect',
-    destination: '/docs/guides/monitoring-and-debugging/inspect',
+    destination: '/docs/guides/observability/inspect',
   },
   {
     permanent: true,
     source: '/docs/guides/database/database-linter',
-    destination: '/docs/guides/monitoring-and-debugging/advisors',
+    destination: '/docs/guides/observability/advisors',
   },
   {
     permanent: true,
     source: '/docs/guides/database/database-advisors',
-    destination: '/docs/guides/monitoring-and-debugging/advisors',
+    destination: '/docs/guides/observability/advisors',
   },
   {
     permanent: true,

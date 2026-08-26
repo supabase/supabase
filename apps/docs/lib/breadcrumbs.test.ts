@@ -9,7 +9,7 @@ describe('resolveBreadcrumbs', () => {
         name: 'Observability',
         url: '/guides/monitoring-and-debugging',
       },
-      { name: 'Detect and resolve issues' },
+      { name: 'Detect and diagnose' },
       { name: 'Diagnosing', url: '/guides/troubleshooting' },
     ])
   })
