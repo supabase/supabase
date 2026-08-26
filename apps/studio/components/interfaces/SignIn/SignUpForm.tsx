@@ -131,7 +131,7 @@ export const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
         >
           <Admonition
             type="success"
-            title="Check your email to confirm"
+            title="Check your email"
             description="We sent you a link to finish signing up. It expires in 10 minutes."
           />
         </motion.div>

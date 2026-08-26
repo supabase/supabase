@@ -56,32 +56,33 @@ const SignUpPage: NextPageWithLayout = () => {
 
   // Inbound link focused us on a single provider — lead with that one (SignInLayout renders the
   // matching interstitial frame around it), but let the user reveal the rest of our options.
-  if (focusProvider) {
-    const otherProviders = signUpProviders.filter((provider) => provider.id !== focusProvider.id)
-
-    return (
-      <div className="flex flex-col gap-5">
-        {!isSubmitted && <SignInWithExternalProvider provider={focusProvider} />}
-        {showOtherOptions || isSubmitted ? (
-          renderAuthOptions(otherProviders, 'bg-surface-100')
-        ) : (
-          <Button
-            block
-            variant="text"
-            size="large"
-            className="-mt-2 text-foreground-light"
-            onClick={() => setShowOtherOptions(true)}
-          >
-            Show other options
-          </Button>
-        )}
-      </div>
-    )
-  }
+  const authContent = focusProvider ? (
+    <div className="flex flex-col gap-5">
+      {!isSubmitted && <SignInWithExternalProvider provider={focusProvider} />}
+      {showOtherOptions || isSubmitted ? (
+        renderAuthOptions(
+          signUpProviders.filter((provider) => provider.id !== focusProvider.id),
+          'bg-surface-100'
+        )
+      ) : (
+        <Button
+          block
+          variant="text"
+          size="large"
+          className="-mt-2 text-foreground-light"
+          onClick={() => setShowOtherOptions(true)}
+        >
+          Show other options
+        </Button>
+      )}
+    </div>
+  ) : (
+    <div className="flex flex-col gap-5">{renderAuthOptions(signUpProviders)}</div>
+  )
 
   return (
     <>
-      <div className="flex flex-col gap-5">{renderAuthOptions(signUpProviders)}</div>
+      {authContent}
 
       <div className={cn('self-center text-sm mb-8', isSubmitted ? 'mt-2' : 'mt-8')}>
         <span className="text-foreground-light">Have an account?</span>{' '}
