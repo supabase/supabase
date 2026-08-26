@@ -12,6 +12,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { acceptUntrustedSql } from '@supabase/pg-meta'
+import { useQueryClient } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   Check,
@@ -59,7 +60,10 @@ import { type QueryEditorHandle } from './QueryEditor'
 import { createMarkdownCellSkeleton, createQueryCellSkeleton } from './utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
-import { hasDiscardableChanges } from '@/data/content/notebooks/notebook-cache'
+import {
+  evictNotebookFromCaches,
+  hasDiscardableChanges,
+} from '@/data/content/notebooks/notebook-cache'
 import {
   isQueryCell,
   WritableCell,
@@ -80,6 +84,7 @@ export const ExplorerNotebookTab = () => {
   const { id, ref } = useParams()
   const tabs = useTabsStateSnapshot()
   const snap = useNotebooksStateSnapshot()
+  const queryClient = useQueryClient()
   const { createChat, isCreating } = useCreateChat()
 
   const [isIntellisenseEnabled, setIsIntellisenseEnabled] = useLocalStorageQuery(
@@ -96,6 +101,7 @@ export const ExplorerNotebookTab = () => {
   const [isRunningNotebook, setIsRunningNotebook] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isSaveBeforeAnalyzeOpen, setIsSaveBeforeAnalyzeOpen] = useState(false)
+  const [isSaveConflictOpen, setIsSaveConflictOpen] = useState(false)
   const [pendingMutationCells, setPendingMutationCells] = useState<
     { id: string; title: string }[] | null
   >(null)
@@ -199,7 +205,7 @@ export const ExplorerNotebookTab = () => {
     runNotebook({ cellIdsToRun, force: true })
   }
 
-  const handleSaveNotebook = () => {
+  const persistNotebook = () => {
     const notebookId = currentNotebook?.notebook.id
     if (!ref || !notebookId || !name || !content) return
 
@@ -231,6 +237,10 @@ export const ExplorerNotebookTab = () => {
       }),
     }
 
+    if (snap.serverDivergedWhileDirty.get(notebookId) === 'deleted') {
+      writableContent.cells = writableContent.cells.map(({ _id: _, ...cell }) => cell)
+    }
+
     // [Joshen] For tracking if a notebook is updated while being saved, so that we do not
     // incorrectly show the saved toast if it's subsequently then saved once again while
     // the initial save is midflight
@@ -243,6 +253,32 @@ export const ExplorerNotebookTab = () => {
       description: currentNotebook?.notebook.description,
       content: writableContent,
     })
+  }
+
+  const handleSaveNotebook = () => {
+    const notebookId = currentNotebook?.notebook.id
+    if (notebookId && snap.serverDivergedWhileDirty.get(notebookId)) {
+      setIsSaveConflictOpen(true)
+      return
+    }
+
+    persistNotebook()
+  }
+
+  const handleSaveAnyway = () => {
+    setIsSaveConflictOpen(false)
+    persistNotebook()
+  }
+
+  const handleDiscardNotebookChanges = async () => {
+    if (!ref || !id) return
+
+    const wasDeletedOnServer = snap.serverDivergedWhileDirty.get(id) === 'deleted'
+    setIsSaveConflictOpen(false)
+    const evicted = await evictNotebookFromCaches({ queryClient, projectRef: ref, id })
+    if (wasDeletedOnServer && evicted) {
+      tabs.removeTab(createTabId('notebook', { id }))
+    }
   }
 
   const handleAnalyze = () => {
@@ -460,6 +496,25 @@ export const ExplorerNotebookTab = () => {
         <p className="text-sm">
           This notebook has unsaved changes. Save it first so the assistant analyzes the latest
           content.
+        </p>
+      </ConfirmationModal>
+
+      <ConfirmationModal
+        size="small"
+        visible={isSaveConflictOpen}
+        title="Assistant changes detected"
+        additionalActionLabel="Discard changes"
+        confirmLabel={
+          id && snap.serverDivergedWhileDirty.get(id) === 'deleted' ? 'Recreate' : 'Save anyway'
+        }
+        onAdditionalAction={handleDiscardNotebookChanges}
+        onCancel={() => setIsSaveConflictOpen(false)}
+        onConfirm={handleSaveAnyway}
+      >
+        <p className="text-sm">
+          {id && snap.serverDivergedWhileDirty.get(id) === 'deleted'
+            ? 'An assistant deleted this notebook after your local changes. Saving will recreate it.'
+            : "An assistant updated this notebook after your local changes. Saving will overwrite the assistant's update."}
         </p>
       </ConfirmationModal>
 
