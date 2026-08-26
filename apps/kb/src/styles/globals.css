@@ -5,3 +5,42 @@
 @source '../layouts/**/*.astro';
 @source './../../../packages/ui/src/**/*.{tsx,ts,js}';
 @source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
+
+/* apps/docs loads Inter/Manrope via next/font, which injects these two
+ * variables as inline styles on <html>. kb loads the same fonts via the
+ * <link> tags in Layout.astro instead, so they're declared here as plain
+ * custom properties rather than next/font output. */
+:root {
+  --font-inter: 'Inter', system-ui, sans-serif;
+  --font-manrope: 'Manrope', system-ui, sans-serif;
+}
+
+/* Same @theme block as apps/docs/styles/globals.css. */
+@theme inline {
+  --font-sans:
+    var(--font-inter), Inter, Helvetica Neue, Helvetica, ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-manrope, var(--font-sans));
+  --font-mono: 'Source Code Pro', ui-monospace, Menlo, monospace;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Same rule as apps/docs/styles/globals.css: headings use font-heading
+ * (Manrope) by default instead of the body's font-sans (Inter). */
+h1:not(.font-mono),
+h2:not(.font-mono),
+h3:not(.font-mono),
+h4:not(.font-mono),
+h5:not(.font-mono),
+h6:not(.font-mono),
+.h1:not(.font-mono),
+.h2:not(.font-mono),
+.h3:not(.font-mono),
+.h4:not(.font-mono),
+.h5:not(.font-mono),
+.h6:not(.font-mono) {
+  @apply font-heading font-semibold;
+}
