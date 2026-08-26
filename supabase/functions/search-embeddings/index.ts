@@ -40,7 +40,10 @@ Deno.serve(async (req) => {
 
     const { query, useAlternateSearchIndex } = requestData
 
-    if (!query) {
+    // `typeof` as well as truthiness: this function is deployed with `verify_jwt = false`, so a
+    // caller can reach it directly rather than through the docs route that already checks this,
+    // and a non-string `query` would fall through to `query.trim()` below as a 500.
+    if (!query || typeof query !== 'string') {
       throw new UserError('Missing query in request data')
     }
 
