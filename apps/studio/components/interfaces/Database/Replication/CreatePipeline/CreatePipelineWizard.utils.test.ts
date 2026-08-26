@@ -4,13 +4,16 @@ import type { DestinationPanelSchemaType } from '../DestinationPanel/Destination
 import { DUCKLAKE_MODE_CUSTOM } from '../DestinationPanel/DestinationForm/DuckLake/DuckLake.constants'
 import {
   getCreatePipelineHref,
+  getCreatePipelineSubmitLabel,
   getDestinationSetupDocsUrl,
   getFirstEnabledPipelineType,
   getPipelineCreateConnectionStepFieldNames,
   getPipelineCreateStepDocsUrl,
   getPipelineCreateStepHeader,
+  hasCreatePipelineUnsavedChanges,
   hasValidConnection,
   hasValidDataStep,
+  isCreatePipelineSubmitDisabled,
   mergeFormValuesForDestinationTypeChange,
   PIPELINE_PUBLICATION_DOCS_URL,
 } from './CreatePipelineWizard.utils'
@@ -44,6 +47,75 @@ describe('getCreatePipelineHref', () => {
     expect(getCreatePipelineHref('abc', 'Analytics Bucket')).toBe(
       '/project/abc/database/replication/new?destinationType=Analytics%20Bucket'
     )
+  })
+})
+
+describe('hasCreatePipelineUnsavedChanges', () => {
+  it('is dirty when the form is dirty on the first step', () => {
+    expect(hasCreatePipelineUnsavedChanges({ isDirty: true, step: 'destination' })).toBe(true)
+  })
+
+  it('is dirty after leaving the first step even when the form is pristine', () => {
+    expect(hasCreatePipelineUnsavedChanges({ isDirty: false, step: 'connection' })).toBe(true)
+  })
+
+  it('is clean on the first step with a pristine form', () => {
+    expect(hasCreatePipelineUnsavedChanges({ isDirty: false, step: 'destination' })).toBe(false)
+  })
+})
+
+describe('getCreatePipelineSubmitLabel', () => {
+  it('asks to continue anyway when only warnings remain after validation', () => {
+    expect(
+      getCreatePipelineSubmitLabel({
+        hasRunValidation: true,
+        hasCriticalFailures: false,
+        warningCount: 2,
+      })
+    ).toBe('Create and start pipeline anyway')
+  })
+
+  it('uses the default create label otherwise', () => {
+    expect(
+      getCreatePipelineSubmitLabel({
+        hasRunValidation: false,
+        hasCriticalFailures: false,
+        warningCount: 0,
+      })
+    ).toBe('Create and start pipeline')
+  })
+})
+
+describe('isCreatePipelineSubmitDisabled', () => {
+  it('disables submit while publications are missing or unavailable', () => {
+    expect(
+      isCreatePipelineSubmitDisabled({
+        isSaving: false,
+        isSuccessPublications: false,
+        isSelectedPublicationMissing: false,
+        hasNoAvailableDestinations: false,
+      })
+    ).toBe(true)
+
+    expect(
+      isCreatePipelineSubmitDisabled({
+        isSaving: false,
+        isSuccessPublications: true,
+        isSelectedPublicationMissing: true,
+        hasNoAvailableDestinations: false,
+      })
+    ).toBe(true)
+  })
+
+  it('enables submit when publications are ready', () => {
+    expect(
+      isCreatePipelineSubmitDisabled({
+        isSaving: false,
+        isSuccessPublications: true,
+        isSelectedPublicationMissing: false,
+        hasNoAvailableDestinations: false,
+      })
+    ).toBe(false)
   })
 })
 

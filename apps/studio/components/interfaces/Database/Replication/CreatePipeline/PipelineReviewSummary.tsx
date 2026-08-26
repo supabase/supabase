@@ -11,7 +11,11 @@ import {
 } from '../DestinationPanel/DestinationForm/DuckLake/DuckLake.constants'
 import type { PipelineCreateStepId, PipelineDestinationType } from './CreatePipelineWizard.utils'
 import { PIPELINE_REGION } from './PipelineRegionField'
-import { PipelineValidationAdmonition } from './PipelineValidationAdmonition'
+import {
+  CONNECTION_VALIDATION_HINT,
+  DATA_VALIDATION_HINT,
+  PipelineValidationAdmonition,
+} from './PipelineValidationAdmonition'
 import type { ReplicationPublication } from '@/data/replication/publications-query'
 import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 
@@ -186,6 +190,13 @@ export const PipelineReviewSummary = ({
                   : undefined
               }
               failures={failures}
+              hint={
+                section.step === 'connection'
+                  ? CONNECTION_VALIDATION_HINT
+                  : section.step === 'data'
+                    ? DATA_VALIDATION_HINT
+                    : undefined
+              }
             />
           </Fragment>
         )

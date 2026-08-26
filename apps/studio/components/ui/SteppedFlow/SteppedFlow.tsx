@@ -51,6 +51,8 @@ export interface SteppedFlowProps {
   onNext?: () => void
   nextLoading?: boolean
   navigationDisabled?: boolean
+  onCancel?: () => void
+  cancelLabel?: string
   finalAction?: SteppedFlowFinalAction
   children: ReactNode
 }
@@ -64,6 +66,8 @@ export const SteppedFlow = ({
   onNext,
   nextLoading = false,
   navigationDisabled = false,
+  onCancel,
+  cancelLabel = 'Cancel',
   finalAction,
   children,
 }: SteppedFlowProps) => {
@@ -72,7 +76,9 @@ export const SteppedFlow = ({
     steps.findIndex((step) => step.id === currentStep)
   )
   const isLastStep = currentIndex === steps.length - 1
+  const isFirstStep = currentIndex === 0
   const currentStepLabel = steps[currentIndex]?.label
+  const showCancel = isFirstStep && !!onCancel
 
   return (
     <div className="flex min-h-full flex-col">
@@ -83,8 +89,10 @@ export const SteppedFlow = ({
         </p>
         <Card key={currentStep} className="animate-in fade-in-0 duration-200">
           {children}
-          <CardFooter className={cn(currentIndex > 0 ? 'justify-between' : 'justify-end')}>
-            {currentIndex > 0 && (
+          <CardFooter
+            className={cn(currentIndex > 0 || showCancel ? 'justify-between' : 'justify-end')}
+          >
+            {currentIndex > 0 ? (
               <Button
                 type="button"
                 variant="default"
@@ -93,7 +101,16 @@ export const SteppedFlow = ({
               >
                 Back
               </Button>
-            )}
+            ) : showCancel ? (
+              <Button
+                type="button"
+                variant="default"
+                disabled={navigationDisabled}
+                onClick={onCancel}
+              >
+                {cancelLabel}
+              </Button>
+            ) : null}
             <div className="flex items-center gap-2">
               {isLastStep && finalAction ? (
                 <Button

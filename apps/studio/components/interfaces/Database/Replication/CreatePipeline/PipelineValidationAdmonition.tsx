@@ -7,12 +7,18 @@ import type { ValidationFailure } from '@/data/replication/validate-destination-
 export const SANDWICHED_ADMONITION_CLASS =
   'mb-0 rounded-none border-x-0 border-t-0 border-b border-default'
 
+export const CONNECTION_VALIDATION_HINT =
+  'Check destination credentials and connection settings, including Advanced settings on this step.'
+
+export const DATA_VALIDATION_HINT =
+  'Some issues may need changes in Database settings for this project.'
+
 export const PipelineValidationAdmonition = forwardRef<
   React.ComponentRef<typeof Admonition>,
   {
     failures: ValidationFailure[]
     title?: string
-    hint?: React.ReactNode
+    hint?: string
   }
 >(function PipelineValidationAdmonition({ failures, title, hint }, ref) {
   if (failures.length === 0) return null
@@ -23,7 +29,7 @@ export const PipelineValidationAdmonition = forwardRef<
   return (
     <Admonition
       ref={ref}
-      type={hasCritical ? 'warning' : 'note'}
+      type={hasCritical ? 'danger' : 'warning'}
       title={heading}
       layout="responsive"
       className={SANDWICHED_ADMONITION_CLASS}
@@ -40,7 +46,7 @@ export const PipelineValidationAdmonition = forwardRef<
           </li>
         ))}
       </ul>
-      {hint}
+      {hint ? <p className="mt-2 mb-0! text-sm text-foreground-light">{hint}</p> : null}
     </Admonition>
   )
 })

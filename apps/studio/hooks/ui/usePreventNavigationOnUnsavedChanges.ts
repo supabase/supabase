@@ -1,7 +1,6 @@
-import { useRouter } from 'next/router'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-
-import { BASE_PATH } from '@/lib/constants'
+import { useBlocker } from '@tanstack/react-router'
+import { useCallback, useMemo, useState } from 'react'
+import { flushSync } from 'react-dom'
 
 interface UsePreventNavigationOnUnsavedChangesOptions {
   /*
@@ -17,9 +16,14 @@ interface UsePreventNavigationOnUnsavedChangesReturn {
    */
   handleCancelNavigation: () => void
   /*
-   * Confirm the navigation and lose the changes
+   * Confirm the blocked navigation and lose the changes
    */
   handleConfirmNavigation: () => void
+  /*
+   * Skip the guard for an intentional leave after the user already confirmed discard
+   * (for example the isolated-flow close button). Call before router.push.
+   */
+  bypassNavigationGuard: () => void
   /*
    * Boolean indicating whether UI to request users confirmation for the navigation should be
    * displayed
@@ -28,63 +32,48 @@ interface UsePreventNavigationOnUnsavedChangesReturn {
 }
 
 /*
- * Hook that prevents navigation when users could lose their changes.
- * It prevents both NextJS and browser navigation (such as when closing the tab)
+ * Prevents in-app navigation and tab close when users could lose changes.
+ *
+ * Studio's `next/router` is a TanStack shim: throwing from `routeChangeStart` does not cancel
+ * navigations. TanStack's `useBlocker` is the correct mechanism (see compat/next/_router-events.ts).
  */
 export const usePreventNavigationOnUnsavedChanges = ({
   hasChanges,
 }: UsePreventNavigationOnUnsavedChangesOptions): UsePreventNavigationOnUnsavedChangesReturn => {
-  const router = useRouter()
-  const [navigateUrl, setNavigateUrl] = useState<string>()
-  const [confirmNavigate, setConfirmNavigate] = useState(false)
+  const [allowNavigation, setAllowNavigation] = useState(false)
+  const shouldGuard = hasChanges && !allowNavigation
 
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasChanges) {
-        e.preventDefault()
-        e.returnValue = '' // deprecated, but older browsers still require this
-      }
-    }
-
-    const handleBrowseAway = (url: string) => {
-      if (hasChanges && !confirmNavigate) {
-        setNavigateUrl(url)
-        throw 'Route change declined' // Just to prevent the route change
-        return
-      }
-      setNavigateUrl(undefined)
-    }
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    router.events.on('routeChangeStart', handleBrowseAway)
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-      router.events.off('routeChangeStart', handleBrowseAway)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [confirmNavigate, hasChanges])
+  const blocker = useBlocker({
+    shouldBlockFn: () => shouldGuard,
+    withResolver: true,
+    enableBeforeUnload: shouldGuard,
+    disabled: !shouldGuard,
+  })
 
   const handleCancelNavigation = useCallback(() => {
-    setNavigateUrl(undefined)
-  }, [])
+    blocker.reset?.()
+  }, [blocker])
 
   const handleConfirmNavigation = useCallback(() => {
-    setConfirmNavigate(true)
-    let urlToNavigate = navigateUrl ?? '/'
-    if (BASE_PATH && urlToNavigate.startsWith(BASE_PATH)) {
-      urlToNavigate = urlToNavigate.slice(BASE_PATH.length) || '/'
-    }
-    if (!urlToNavigate.startsWith('/')) urlToNavigate = `/${urlToNavigate}`
-    setNavigateUrl(undefined)
-    router.push(urlToNavigate)
-  }, [navigateUrl, router])
+    flushSync(() => {
+      setAllowNavigation(true)
+    })
+    blocker.proceed?.()
+  }, [blocker])
+
+  const bypassNavigationGuard = useCallback(() => {
+    flushSync(() => {
+      setAllowNavigation(true)
+    })
+  }, [])
 
   return useMemo(
     () => ({
       handleCancelNavigation,
       handleConfirmNavigation,
-      shouldConfirmNavigation: !!navigateUrl,
+      bypassNavigationGuard,
+      shouldConfirmNavigation: blocker.status === 'blocked',
     }),
-    [navigateUrl, handleCancelNavigation, handleConfirmNavigation]
+    [blocker.status, handleCancelNavigation, handleConfirmNavigation, bypassNavigationGuard]
   )
 }

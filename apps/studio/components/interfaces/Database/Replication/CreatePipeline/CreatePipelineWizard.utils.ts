@@ -105,6 +105,42 @@ export const getCreatePipelineHref = (
   return `${path}?destinationType=${encodeURIComponent(destinationType)}`
 }
 
+export const hasCreatePipelineUnsavedChanges = ({
+  isDirty,
+  step,
+}: {
+  isDirty: boolean
+  step: PipelineCreateStepId
+}) => isDirty || step !== 'destination'
+
+export const getCreatePipelineSubmitLabel = ({
+  hasRunValidation,
+  hasCriticalFailures,
+  warningCount,
+}: {
+  hasRunValidation: boolean
+  hasCriticalFailures: boolean
+  warningCount: number
+}) => {
+  if (hasRunValidation && warningCount > 0 && !hasCriticalFailures) {
+    return 'Create and start pipeline anyway'
+  }
+  return 'Create and start pipeline'
+}
+
+export const isCreatePipelineSubmitDisabled = ({
+  isSaving,
+  isSuccessPublications,
+  isSelectedPublicationMissing,
+  hasNoAvailableDestinations,
+}: {
+  isSaving: boolean
+  isSuccessPublications: boolean
+  isSelectedPublicationMissing: boolean
+  hasNoAvailableDestinations: boolean
+}) =>
+  isSaving || !isSuccessPublications || isSelectedPublicationMissing || hasNoAvailableDestinations
+
 export const hasValidConnection = ({
   type,
   data,

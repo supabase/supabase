@@ -103,6 +103,11 @@ describe('PipelineReviewSummary', () => {
     )
 
     expect(screen.getByText('BigQuery Authentication Failed')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'Check destination credentials and connection settings, including Advanced settings on this step.'
+      )
+    ).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Edit connection' }))
     expect(onGoToStep).toHaveBeenCalledWith('connection')
   })

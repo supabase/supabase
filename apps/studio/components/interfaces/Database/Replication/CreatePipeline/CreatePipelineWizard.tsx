@@ -65,9 +65,12 @@ import {
 import { useRedirectLegacyReadReplicaDestination } from '../useRedirectLegacyReadReplicaDestination'
 import { CreatePipelineGate } from './CreatePipelineGate'
 import {
+  getCreatePipelineSubmitLabel,
   getPipelineCreateConnectionStepFieldNames,
   getPipelineCreateStepDocsUrl,
   getPipelineCreateStepHeader,
+  hasCreatePipelineUnsavedChanges,
+  isCreatePipelineSubmitDisabled,
   isPipelineDestinationType,
   mergeFormValuesForDestinationTypeChange,
   PIPELINE_CREATE_DATA_STEP_FIELD_NAMES,
@@ -78,7 +81,11 @@ import {
 import { PipelineCreateStepDescription } from './PipelineCreateStepDescription'
 import { PipelineRegionField } from './PipelineRegionField'
 import { PipelineReviewSummary } from './PipelineReviewSummary'
-import { PipelineValidationAdmonition } from './PipelineValidationAdmonition'
+import {
+  CONNECTION_VALIDATION_HINT,
+  DATA_VALIDATION_HINT,
+  PipelineValidationAdmonition,
+} from './PipelineValidationAdmonition'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
 import { useRegisterIsolatedStudioFlowClose } from '@/components/layouts/Navigation/LayoutHeader/IsolatedStudioFlowClose'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
@@ -95,6 +102,7 @@ import {
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { usePreventNavigationOnUnsavedChanges } from '@/hooks/ui/usePreventNavigationOnUnsavedChanges'
 import { DOCS_URL } from '@/lib/constants'
 
 const formId = 'create-pipeline'
@@ -301,33 +309,59 @@ export const CreatePipelineWizard = () => {
     router.push(listHref)
   }
 
+  const hasUnsavedChanges = hasCreatePipelineUnsavedChanges({ isDirty, step })
+
+  const {
+    handleCancelNavigation,
+    handleConfirmNavigation,
+    bypassNavigationGuard,
+    shouldConfirmNavigation,
+  } = usePreventNavigationOnUnsavedChanges({
+    hasChanges: hasUnsavedChanges,
+  })
+
+  const leaveWizard = () => {
+    bypassNavigationGuard()
+    goToList()
+  }
+
   const { confirmOnClose, modalProps } = useConfirmOnClose({
-    checkIsDirty: () => isDirty || step !== 'destination',
-    onClose: goToList,
+    checkIsDirty: () => hasUnsavedChanges,
+    onClose: leaveWizard,
   })
   useRegisterIsolatedStudioFlowClose(confirmOnClose)
 
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (isDirty || step !== 'destination') {
-        e.preventDefault()
-      }
-    }
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-  }, [isDirty, step])
+  const discardChangesDialog = (
+    <DiscardChangesConfirmationDialog
+      visible={modalProps.visible || shouldConfirmNavigation}
+      onCancel={() => {
+        modalProps.onCancel()
+        handleCancelNavigation()
+      }}
+      onClose={() => {
+        if (shouldConfirmNavigation) {
+          handleConfirmNavigation()
+          return
+        }
+        modalProps.onClose()
+      }}
+    />
+  )
 
   const canContinueFromDestination = selectedType !== null
 
-  const isSubmitDisabled =
-    isSaving || !isSuccessPublications || isSelectedPublicationMissing || hasNoAvailableDestinations
+  const isSubmitDisabled = isCreatePipelineSubmitDisabled({
+    isSaving,
+    isSuccessPublications,
+    isSelectedPublicationMissing,
+    hasNoAvailableDestinations,
+  })
 
-  const getSubmitButtonText = () => {
-    if (hasRunValidation && validationWarnings.length > 0 && !hasValidationFailures) {
-      return 'Create and start pipeline anyway'
-    }
-    return 'Create and start pipeline'
-  }
+  const submitLabel = getCreatePipelineSubmitLabel({
+    hasRunValidation,
+    hasCriticalFailures: hasValidationFailures,
+    warningCount: validationWarnings.length,
+  })
 
   const openCostDialog = (data: z.infer<typeof FormSchema>) => {
     setPendingFormValues(data)
@@ -450,63 +484,79 @@ export const CreatePipelineWizard = () => {
 
   if (isOrgLoading || !isFlagStoreLoaded) {
     return (
-      <div className="mx-auto w-full max-w-[760px] px-6 py-8">
-        <GenericSkeletonLoader />
-      </div>
+      <>
+        <div className="mx-auto w-full max-w-[760px] px-6 py-8">
+          <GenericSkeletonLoader />
+        </div>
+        {discardChangesDialog}
+      </>
     )
   }
 
   if (!enablePgReplicate) {
     return (
-      <CreatePipelineGate
-        title="Request Pipelines access"
-        description="Pipelines is in public alpha and being rolled out gradually. Request access to join the waitlist."
-      >
-        <div className={cn('flex max-w-xl flex-col gap-y-4 rounded-md border p-6')}>
-          <div className="flex flex-col gap-y-1">
-            <h4>Request Pipelines access</h4>
-            <p className="text-sm text-foreground-light">
-              Pipelines is in <span className="text-foreground">public alpha</span> and being rolled
-              out gradually. Request access below to join the waitlist.
-            </p>
+      <>
+        <CreatePipelineGate
+          title="Request Pipelines access"
+          description="Pipelines is in public alpha and being rolled out gradually. Request access to join the waitlist."
+        >
+          <div className={cn('flex max-w-xl flex-col gap-y-4 rounded-md border p-6')}>
+            <div className="flex flex-col gap-y-1">
+              <h4>Request Pipelines access</h4>
+              <p className="text-sm text-foreground-light">
+                Pipelines is in <span className="text-foreground">public alpha</span> and being
+                rolled out gradually. Request access below to join the waitlist.
+              </p>
+            </div>
+            <div className="flex gap-x-2">
+              <Button
+                asChild
+                variant="secondary"
+                iconRight={<ArrowUpRight size={16} strokeWidth={1.5} />}
+              >
+                <Link
+                  target="_blank"
+                  rel="noreferrer"
+                  href="https://forms.supabase.com/pg_replicate"
+                >
+                  Request Pipelines access
+                </Link>
+              </Button>
+              <DocsButton href={`${DOCS_URL}/guides/database/replication#pipelines`} />
+            </div>
           </div>
-          <div className="flex gap-x-2">
-            <Button
-              asChild
-              variant="secondary"
-              iconRight={<ArrowUpRight size={16} strokeWidth={1.5} />}
-            >
-              <Link target="_blank" rel="noreferrer" href="https://forms.supabase.com/pg_replicate">
-                Request Pipelines access
-              </Link>
-            </Button>
-            <DocsButton href={`${DOCS_URL}/guides/database/replication#pipelines`} />
-          </div>
-        </div>
-      </CreatePipelineGate>
+        </CreatePipelineGate>
+        {discardChangesDialog}
+      </>
     )
   }
 
   if (replicationNotEnabled) {
     return (
-      <EnablePipelinesAlertDialog
-        onEnable={() => {
-          if (projectRef) createTenantSource({ projectRef })
-        }}
-        isEnabling={isEnablingPipelines}
-        onCancel={goToList}
-      />
+      <>
+        <EnablePipelinesAlertDialog
+          onEnable={() => {
+            if (projectRef) createTenantSource({ projectRef })
+          }}
+          isEnabling={isEnablingPipelines}
+          onCancel={goToList}
+        />
+        {discardChangesDialog}
+      </>
     )
   }
 
   if (hasNoAvailableDestinations) {
     return (
-      <CreatePipelineGate
-        title="Create a pipeline"
-        description="Connect this Postgres database to an analytical destination."
-      >
-        <NoDestinationsAvailable />
-      </CreatePipelineGate>
+      <>
+        <CreatePipelineGate
+          title="Create a pipeline"
+          description="Connect this Postgres database to an analytical destination."
+        >
+          <NoDestinationsAvailable />
+        </CreatePipelineGate>
+        {discardChangesDialog}
+      </>
     )
   }
 
@@ -526,9 +576,10 @@ export const CreatePipelineWizard = () => {
             onStepChange={(nextStep) => setStep(nextStep as PipelineCreateStepId)}
             nextDisabled={nextDisabled}
             onNext={handleNext}
+            onCancel={confirmOnClose}
             navigationDisabled={isSaving || isValidating}
             finalAction={{
-              label: getSubmitButtonText(),
+              label: submitLabel,
               form: formId,
               loading: isSaving || isValidating,
               disabled: isSubmitDisabled,
@@ -592,7 +643,10 @@ export const CreatePipelineWizard = () => {
                   />
                 </CardContent>
                 {hasRunValidation && !isValidating && (
-                  <PipelineValidationAdmonition failures={destinationValidationFailures} />
+                  <PipelineValidationAdmonition
+                    failures={destinationValidationFailures}
+                    hint={CONNECTION_VALIDATION_HINT}
+                  />
                 )}
               </>
             )}
@@ -617,7 +671,10 @@ export const CreatePipelineWizard = () => {
                   <AdvancedSettings type={selectedType} form={form} group="data" className="px-0" />
                 </CardContent>
                 {hasRunValidation && !isValidating && (
-                  <PipelineValidationAdmonition failures={pipelineValidationFailures} />
+                  <PipelineValidationAdmonition
+                    failures={pipelineValidationFailures}
+                    hint={DATA_VALIDATION_HINT}
+                  />
                 )}
               </>
             )}
@@ -684,7 +741,7 @@ export const CreatePipelineWizard = () => {
         onConfirm={handleCostConfirm}
       />
 
-      <DiscardChangesConfirmationDialog {...modalProps} />
+      {discardChangesDialog}
     </>
   )
 }
