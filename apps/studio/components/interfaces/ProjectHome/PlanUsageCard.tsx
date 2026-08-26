@@ -251,7 +251,9 @@ export const PlanUsageCard = () => {
                   orgSlug={organization?.slug ?? '_'}
                 />
               ))
-            : METRICS.map((config) => <SkeletonMetricRow key={config.key} label={config.label} />)}
+            : metricsIncludingLogIngestion.map((config) => (
+                <SkeletonMetricRow key={config.key} label={config.label} />
+              ))}
         </div>
       </div>
     </li>
