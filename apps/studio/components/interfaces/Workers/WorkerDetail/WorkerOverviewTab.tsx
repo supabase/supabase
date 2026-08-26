@@ -5,6 +5,7 @@ import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageSection,
   PageSectionContent,
+  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
@@ -12,6 +13,7 @@ import {
 
 import { WorkerCommandLine } from '../WorkerCommandLine'
 import type { Worker } from '../Workers.types'
+import { WorkerSnippetTabs } from '../WorkerSnippetTabs'
 import { CLI_NAME } from '@/lib/constants/workers'
 
 interface WorkerOverviewTabProps {
@@ -108,6 +110,29 @@ export const WorkerOverviewTab = ({ worker }: WorkerOverviewTabProps) => (
             </div>
           </div>
         )}
+      </PageSectionContent>
+    </PageSection>
+
+    <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>How to call</PageSectionTitle>
+          <PageSectionDescription>
+            Call the worker over its gateway URL. Pass your project API key as a bearer token.
+          </PageSectionDescription>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
+        <WorkerSnippetTabs
+          input={{
+            name: worker.name,
+            runtime: worker.runtime,
+            size: worker.size,
+            access: worker.access,
+            instances: worker.declaredInstances,
+          }}
+          tabs={['curl', 'js', 'python']}
+        />
       </PageSectionContent>
     </PageSection>
   </PageContainer>
