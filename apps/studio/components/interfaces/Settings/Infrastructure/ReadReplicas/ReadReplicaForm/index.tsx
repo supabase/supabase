@@ -148,7 +148,7 @@ export const ReadReplicaForm = ({
           Cancel
         </Button>
         <Button disabled={!canDeployReplica} loading={isSettingUp} onClick={onSubmit}>
-          Add
+          Add replica
         </Button>
       </DialogFooter>
     </>
