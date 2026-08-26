@@ -36,15 +36,6 @@ export function usePlanPresentationExperiment({
 }): PlanPresentationVariant {
   const flag = usePHFlag<'control' | 'parity' | 'gaps'>(FLAG_KEY)
 
-  // TEMP debug — remove before merging
-  if (typeof window !== 'undefined') {
-    console.log('[pricingPanelPlanPresentation]', {
-      flag,
-      eligible,
-      typeofFlag: typeof flag,
-    })
-  }
-
   const isInExperiment =
     flag === 'control' || flag === 'parity' || flag === 'gaps'
 
