@@ -120,6 +120,7 @@ const AddPasswordForm = ({ email, onClose }: { email: string; onClose: () => voi
                     actions={
                       <Button
                         icon={passwordHidden ? <Eye /> : <EyeOff />}
+                        aria-label={passwordHidden ? 'Show password' : 'Hide Password'}
                         variant="default"
                         className="w-7"
                         onClick={() => setPasswordHidden((prev) => !prev)}

@@ -2,7 +2,7 @@
 
 > Build in a weekend. Scale to millions.
 
-Supabase is an open source Firebase alternative built on Postgres. It provides a complete backend platform for building web and mobile applications, with a suite of integrated tools that work together out of the box.
+Supabase is the Postgres development platform: an open source backend for building web and mobile applications, with a suite of integrated tools that work together out of the box.
 
 ## Products
 

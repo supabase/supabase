@@ -900,6 +900,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/mcp-tools-permissions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * MCP tool → FGA permission map
+     * @description Returns each MCP tool and the FGA permission groups that gate it, as OR-of-AND alternatives (the token needs every permission of at least one group). Used by the dashboard to show what a scoped token can do.
+     */
+    get: operations['get-mcp-tools-permissions']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/notifications': {
     parameters: {
       query?: never
@@ -1505,43 +1525,6 @@ export interface paths {
     get: operations['CustomerController_getCustomer']
     /** Updates the billing customer */
     put: operations['CustomerController_updateCustomer']
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/organizations/{slug}/documents/dpa': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Create DPA document using PandaDoc */
-    post: operations['OrgDocumentsController_createDpaDocument']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/organizations/{slug}/documents/dpa-signed': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Check if organization has signed any version of the DPA
-     * @description Results are cached per organization for up to 24 hours. Signed status may not reflect immediately after a document is completed.
-     */
-    get: operations['OrgDocumentsController_getDpaSignedStatus']
-    put?: never
     post?: never
     delete?: never
     options?: never
@@ -5241,6 +5224,14 @@ export interface components {
           oauth_app_name?: string
           /** @description Organization whose grant was used. Only present when token_type=oauth */
           organization_id?: string
+          /** @description Marketplace partner that authenticated the request. Only present when token_type=partner */
+          partner?: string
+          /** @description The partner's own integration-installation id. Only present when token_type=partner and the integration is already installed. Distinct from installation_id, which is a Supabase platform-app installation */
+          partner_installation_id?: string
+          /** @description Email of the partner user who triggered the action. Only present when token_type=partner and the partner acted on behalf of one of its users */
+          partner_user_email?: string
+          /** @description Opaque user identifier in the partner's namespace. Only present when token_type=partner and the partner acted on behalf of one of its users */
+          partner_user_id?: string
           /** @description GoTrue login session. Only present when token_type=jwt */
           session_id?: string
           /** @description Access token alias, as shown in the dashboard. Only present when token_type=v0, token_type=v1 or token_type=scoped_pat */
@@ -5293,6 +5284,8 @@ export interface components {
       /** @enum {boolean} */
       clear_tax_id?: true
       dry_run?: boolean
+      /** Format: email */
+      email?: string
       tax_id?: {
         country: string
         type: string
@@ -5593,17 +5586,6 @@ export interface components {
        */
       id: number
     }
-    CreateDpaDocumentRequest: {
-      /** Format: email */
-      recipient_email: string
-    }
-    CreateDpaDocumentResponse: {
-      date_created: string
-      document_id: string
-      download_url?: string
-      name: string
-      status: string
-    }
     CreateGitHubAuthorizationBody: {
       code: string
     }
@@ -5627,9 +5609,31 @@ export interface components {
       workdir: string
     }
     CreateInvitationBody: {
-      emails: string[]
+      data?: {
+        attributes: {
+          /** Format: email */
+          email: string
+          /** @description The projects to limit a user to. If omitted, user will have org-wide access with the provided role. */
+          projects?: {
+            /**
+             * @description Project ref
+             * @example abcjuqabhgwjjutfvtpa
+             */
+            ref: string
+          }[]
+          require_sso?: boolean
+          /**
+           * @description Role name to assign. Must be on a Team or Enterprise plan to use the read-only role.
+           * @example developer
+           * @enum {string}
+           */
+          role?: 'owner' | 'administrator' | 'developer' | 'read-only'
+          role_id?: number
+        }
+      }[]
+      emails?: string[]
       require_sso?: boolean
-      role_id: number
+      role_id?: number
       role_scoped_projects?: string[]
     }
     CreateInvitationResponse: {
@@ -6207,6 +6211,79 @@ export interface components {
               project_id: string
               /** @description BigQuery service account key */
               service_account_key: string
+              /** @description Per-table partitioning and clustering, applied only when the physical table is created or recreated */
+              table_options?: {
+                tables?: {
+                  cluster_by?: string[]
+                  partition_by?:
+                    | (
+                        | {
+                            /**
+                             * @description Source column name
+                             * @example created_at
+                             */
+                            column: string
+                            /**
+                             * @description Partition granularity
+                             * @example day
+                             * @enum {string}
+                             */
+                            granularity?: 'hour' | 'day' | 'month' | 'year'
+                            /**
+                             * @description Partition by a replicated `DATE`, `TIMESTAMP`, or `DATETIME` column
+                             * @enum {string}
+                             */
+                            kind: 'time_column'
+                          }
+                        | {
+                            /**
+                             * @description Source column name
+                             * @example created_at
+                             */
+                            column: string
+                            /**
+                             * @description Exclusive end of the last partition range
+                             * @example 100
+                             */
+                            end: number
+                            /**
+                             * @description Width of each partition range
+                             * @example 10
+                             */
+                            interval: number
+                            /**
+                             * @description Partition by ranges of a replicated integer column
+                             * @enum {string}
+                             */
+                            kind: 'integer_range'
+                            /**
+                             * @description Inclusive start of the first partition range
+                             * @example 0
+                             */
+                            start: number
+                          }
+                        | {
+                            /**
+                             * @description Partition granularity
+                             * @example day
+                             * @enum {string}
+                             */
+                            granularity?: 'hour' | 'day' | 'month' | 'year'
+                            /**
+                             * @description Partition by the time at which BigQuery ingests each row
+                             * @enum {string}
+                             */
+                            kind: 'ingestion_time'
+                          }
+                      )
+                    | null
+                  /**
+                   * @description Source PostgreSQL table OID, stable across renames for the relation lifetime
+                   * @example 16384
+                   */
+                  table_id: number
+                }[]
+              }
             }
           }
         | {
@@ -6519,6 +6596,79 @@ export interface components {
               project_id: string
               /** @description BigQuery service account key */
               service_account_key: string
+              /** @description Per-table partitioning and clustering, applied only when the physical table is created or recreated */
+              table_options?: {
+                tables?: {
+                  cluster_by?: string[]
+                  partition_by?:
+                    | (
+                        | {
+                            /**
+                             * @description Source column name
+                             * @example created_at
+                             */
+                            column: string
+                            /**
+                             * @description Partition granularity
+                             * @example day
+                             * @enum {string}
+                             */
+                            granularity?: 'hour' | 'day' | 'month' | 'year'
+                            /**
+                             * @description Partition by a replicated `DATE`, `TIMESTAMP`, or `DATETIME` column
+                             * @enum {string}
+                             */
+                            kind: 'time_column'
+                          }
+                        | {
+                            /**
+                             * @description Source column name
+                             * @example created_at
+                             */
+                            column: string
+                            /**
+                             * @description Exclusive end of the last partition range
+                             * @example 100
+                             */
+                            end: number
+                            /**
+                             * @description Width of each partition range
+                             * @example 10
+                             */
+                            interval: number
+                            /**
+                             * @description Partition by ranges of a replicated integer column
+                             * @enum {string}
+                             */
+                            kind: 'integer_range'
+                            /**
+                             * @description Inclusive start of the first partition range
+                             * @example 0
+                             */
+                            start: number
+                          }
+                        | {
+                            /**
+                             * @description Partition granularity
+                             * @example day
+                             * @enum {string}
+                             */
+                            granularity?: 'hour' | 'day' | 'month' | 'year'
+                            /**
+                             * @description Partition by the time at which BigQuery ingests each row
+                             * @enum {string}
+                             */
+                            kind: 'ingestion_time'
+                          }
+                      )
+                    | null
+                  /**
+                   * @description Source PostgreSQL table OID, stable across renames for the relation lifetime
+                   * @example 16384
+                   */
+                  table_id: number
+                }[]
+              }
             }
           }
         | {
@@ -7563,11 +7713,6 @@ export interface components {
         fs_used_bytes: number
       }
       timestamp: string
-    }
-    DocumentSignedStatusResponse: {
-      /** Format: date-time */
-      checked_at: string
-      signed: boolean
     }
     DownloadableBackupsResponse: {
       backups: {
@@ -10390,6 +10535,79 @@ export interface components {
                * @example my-gcp-project
                */
               project_id: string
+              /** @description Per-table partitioning and clustering, applied only when the physical table is created or recreated */
+              table_options?: {
+                tables?: {
+                  cluster_by?: string[]
+                  partition_by?:
+                    | (
+                        | {
+                            /**
+                             * @description Source column name
+                             * @example created_at
+                             */
+                            column: string
+                            /**
+                             * @description Partition granularity
+                             * @example day
+                             * @enum {string}
+                             */
+                            granularity?: 'hour' | 'day' | 'month' | 'year'
+                            /**
+                             * @description Partition by a replicated `DATE`, `TIMESTAMP`, or `DATETIME` column
+                             * @enum {string}
+                             */
+                            kind: 'time_column'
+                          }
+                        | {
+                            /**
+                             * @description Source column name
+                             * @example created_at
+                             */
+                            column: string
+                            /**
+                             * @description Exclusive end of the last partition range
+                             * @example 100
+                             */
+                            end: number
+                            /**
+                             * @description Width of each partition range
+                             * @example 10
+                             */
+                            interval: number
+                            /**
+                             * @description Partition by ranges of a replicated integer column
+                             * @enum {string}
+                             */
+                            kind: 'integer_range'
+                            /**
+                             * @description Inclusive start of the first partition range
+                             * @example 0
+                             */
+                            start: number
+                          }
+                        | {
+                            /**
+                             * @description Partition granularity
+                             * @example day
+                             * @enum {string}
+                             */
+                            granularity?: 'hour' | 'day' | 'month' | 'year'
+                            /**
+                             * @description Partition by the time at which BigQuery ingests each row
+                             * @enum {string}
+                             */
+                            kind: 'ingestion_time'
+                          }
+                      )
+                    | null
+                  /**
+                   * @description Source PostgreSQL table OID, stable across renames for the relation lifetime
+                   * @example 16384
+                   */
+                  table_id: number
+                }[]
+              }
             }
           }
         | {
@@ -10579,6 +10797,79 @@ export interface components {
                  * @example my-gcp-project
                  */
                 project_id: string
+                /** @description Per-table partitioning and clustering, applied only when the physical table is created or recreated */
+                table_options?: {
+                  tables?: {
+                    cluster_by?: string[]
+                    partition_by?:
+                      | (
+                          | {
+                              /**
+                               * @description Source column name
+                               * @example created_at
+                               */
+                              column: string
+                              /**
+                               * @description Partition granularity
+                               * @example day
+                               * @enum {string}
+                               */
+                              granularity?: 'hour' | 'day' | 'month' | 'year'
+                              /**
+                               * @description Partition by a replicated `DATE`, `TIMESTAMP`, or `DATETIME` column
+                               * @enum {string}
+                               */
+                              kind: 'time_column'
+                            }
+                          | {
+                              /**
+                               * @description Source column name
+                               * @example created_at
+                               */
+                              column: string
+                              /**
+                               * @description Exclusive end of the last partition range
+                               * @example 100
+                               */
+                              end: number
+                              /**
+                               * @description Width of each partition range
+                               * @example 10
+                               */
+                              interval: number
+                              /**
+                               * @description Partition by ranges of a replicated integer column
+                               * @enum {string}
+                               */
+                              kind: 'integer_range'
+                              /**
+                               * @description Inclusive start of the first partition range
+                               * @example 0
+                               */
+                              start: number
+                            }
+                          | {
+                              /**
+                               * @description Partition granularity
+                               * @example day
+                               * @enum {string}
+                               */
+                              granularity?: 'hour' | 'day' | 'month' | 'year'
+                              /**
+                               * @description Partition by the time at which BigQuery ingests each row
+                               * @enum {string}
+                               */
+                              kind: 'ingestion_time'
+                            }
+                        )
+                      | null
+                    /**
+                     * @description Source PostgreSQL table OID, stable across renames for the relation lifetime
+                     * @example 16384
+                     */
+                    table_id: number
+                  }[]
+                }
               }
             }
           | {
@@ -12677,6 +12968,79 @@ export interface components {
               project_id?: string | null
               /** @description BigQuery service account key */
               service_account_key?: string | null
+              /** @description Per-table partitioning and clustering, applied only when the physical table is created or recreated */
+              table_options?: {
+                tables?: {
+                  cluster_by?: string[]
+                  partition_by?:
+                    | (
+                        | {
+                            /**
+                             * @description Source column name
+                             * @example created_at
+                             */
+                            column: string
+                            /**
+                             * @description Partition granularity
+                             * @example day
+                             * @enum {string}
+                             */
+                            granularity?: 'hour' | 'day' | 'month' | 'year'
+                            /**
+                             * @description Partition by a replicated `DATE`, `TIMESTAMP`, or `DATETIME` column
+                             * @enum {string}
+                             */
+                            kind: 'time_column'
+                          }
+                        | {
+                            /**
+                             * @description Source column name
+                             * @example created_at
+                             */
+                            column: string
+                            /**
+                             * @description Exclusive end of the last partition range
+                             * @example 100
+                             */
+                            end: number
+                            /**
+                             * @description Width of each partition range
+                             * @example 10
+                             */
+                            interval: number
+                            /**
+                             * @description Partition by ranges of a replicated integer column
+                             * @enum {string}
+                             */
+                            kind: 'integer_range'
+                            /**
+                             * @description Inclusive start of the first partition range
+                             * @example 0
+                             */
+                            start: number
+                          }
+                        | {
+                            /**
+                             * @description Partition granularity
+                             * @example day
+                             * @enum {string}
+                             */
+                            granularity?: 'hour' | 'day' | 'month' | 'year'
+                            /**
+                             * @description Partition by the time at which BigQuery ingests each row
+                             * @enum {string}
+                             */
+                            kind: 'ingestion_time'
+                          }
+                      )
+                    | null
+                  /**
+                   * @description Source PostgreSQL table OID, stable across renames for the relation lifetime
+                   * @example 16384
+                   */
+                  table_id: number
+                }[]
+              } | null
             }
           }
         | {
@@ -12985,6 +13349,79 @@ export interface components {
               project_id?: string | null
               /** @description BigQuery service account key */
               service_account_key?: string | null
+              /** @description Per-table partitioning and clustering, applied only when the physical table is created or recreated */
+              table_options?: {
+                tables?: {
+                  cluster_by?: string[]
+                  partition_by?:
+                    | (
+                        | {
+                            /**
+                             * @description Source column name
+                             * @example created_at
+                             */
+                            column: string
+                            /**
+                             * @description Partition granularity
+                             * @example day
+                             * @enum {string}
+                             */
+                            granularity?: 'hour' | 'day' | 'month' | 'year'
+                            /**
+                             * @description Partition by a replicated `DATE`, `TIMESTAMP`, or `DATETIME` column
+                             * @enum {string}
+                             */
+                            kind: 'time_column'
+                          }
+                        | {
+                            /**
+                             * @description Source column name
+                             * @example created_at
+                             */
+                            column: string
+                            /**
+                             * @description Exclusive end of the last partition range
+                             * @example 100
+                             */
+                            end: number
+                            /**
+                             * @description Width of each partition range
+                             * @example 10
+                             */
+                            interval: number
+                            /**
+                             * @description Partition by ranges of a replicated integer column
+                             * @enum {string}
+                             */
+                            kind: 'integer_range'
+                            /**
+                             * @description Inclusive start of the first partition range
+                             * @example 0
+                             */
+                            start: number
+                          }
+                        | {
+                            /**
+                             * @description Partition granularity
+                             * @example day
+                             * @enum {string}
+                             */
+                            granularity?: 'hour' | 'day' | 'month' | 'year'
+                            /**
+                             * @description Partition by the time at which BigQuery ingests each row
+                             * @enum {string}
+                             */
+                            kind: 'ingestion_time'
+                          }
+                      )
+                    | null
+                  /**
+                   * @description Source PostgreSQL table OID, stable across renames for the relation lifetime
+                   * @example 16384
+                   */
+                  table_id: number
+                }[]
+              } | null
             }
           }
         | {
@@ -13708,6 +14145,7 @@ export interface components {
                     x_column: string
                     y_series: string[]
                   }
+                  database_identifier?: string
                   row_limit: number
                   sql: string
                   title?: string
@@ -13802,6 +14240,14 @@ export interface components {
           oauth_app_name?: string
           /** @description Organization whose grant was used. Only present when token_type=oauth */
           organization_id?: string
+          /** @description Marketplace partner that authenticated the request. Only present when token_type=partner */
+          partner?: string
+          /** @description The partner's own integration-installation id. Only present when token_type=partner and the integration is already installed. Distinct from installation_id, which is a Supabase platform-app installation */
+          partner_installation_id?: string
+          /** @description Email of the partner user who triggered the action. Only present when token_type=partner and the partner acted on behalf of one of its users */
+          partner_user_email?: string
+          /** @description Opaque user identifier in the partner's namespace. Only present when token_type=partner and the partner acted on behalf of one of its users */
+          partner_user_id?: string
           /** @description GoTrue login session. Only present when token_type=jwt */
           session_id?: string
           /** @description Access token alias, as shown in the dashboard. Only present when token_type=v0, token_type=v1 or token_type=scoped_pat */
@@ -13931,6 +14377,79 @@ export interface components {
               project_id: string
               /** @description BigQuery service account key */
               service_account_key: string
+              /** @description Per-table partitioning and clustering, applied only when the physical table is created or recreated */
+              table_options?: {
+                tables?: {
+                  cluster_by?: string[]
+                  partition_by?:
+                    | (
+                        | {
+                            /**
+                             * @description Source column name
+                             * @example created_at
+                             */
+                            column: string
+                            /**
+                             * @description Partition granularity
+                             * @example day
+                             * @enum {string}
+                             */
+                            granularity?: 'hour' | 'day' | 'month' | 'year'
+                            /**
+                             * @description Partition by a replicated `DATE`, `TIMESTAMP`, or `DATETIME` column
+                             * @enum {string}
+                             */
+                            kind: 'time_column'
+                          }
+                        | {
+                            /**
+                             * @description Source column name
+                             * @example created_at
+                             */
+                            column: string
+                            /**
+                             * @description Exclusive end of the last partition range
+                             * @example 100
+                             */
+                            end: number
+                            /**
+                             * @description Width of each partition range
+                             * @example 10
+                             */
+                            interval: number
+                            /**
+                             * @description Partition by ranges of a replicated integer column
+                             * @enum {string}
+                             */
+                            kind: 'integer_range'
+                            /**
+                             * @description Inclusive start of the first partition range
+                             * @example 0
+                             */
+                            start: number
+                          }
+                        | {
+                            /**
+                             * @description Partition granularity
+                             * @example day
+                             * @enum {string}
+                             */
+                            granularity?: 'hour' | 'day' | 'month' | 'year'
+                            /**
+                             * @description Partition by the time at which BigQuery ingests each row
+                             * @enum {string}
+                             */
+                            kind: 'ingestion_time'
+                          }
+                      )
+                    | null
+                  /**
+                   * @description Source PostgreSQL table OID, stable across renames for the relation lifetime
+                   * @example 16384
+                   */
+                  table_id: number
+                }[]
+              }
             }
           }
         | {
@@ -17322,6 +17841,28 @@ export interface operations {
       }
     }
   }
+  'get-mcp-tools-permissions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Map of MCP tool name to its FGA permission groups (OR-of-AND). */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            [key: string]: string[][]
+          }
+        }
+      }
+    }
+  }
   NotificationsController_getNotifications: {
     parameters: {
       query?: {
@@ -19754,96 +20295,6 @@ export interface operations {
       }
       /** @description Failed to update the billing customer */
       500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  OrgDocumentsController_createDpaDocument: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateDpaDocumentRequest']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['CreateDpaDocumentResponse']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  OrgDocumentsController_getDpaSignedStatus: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['DocumentSignedStatusResponse']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
         headers: {
           [name: string]: unknown
         }

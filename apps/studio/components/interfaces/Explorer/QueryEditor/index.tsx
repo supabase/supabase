@@ -104,7 +104,14 @@ export type ExplorerQueryModel =
     } & LogsSourceParameters)
 
 export type QueryEditorHandle = {
-  run: () => Promise<void>
+  /**
+   * `force` skips this query's own blocking-issue check (destructive op, unwhered
+   * update/delete, missing RLS, …) — for a caller that already gathered its own consent
+   * for this run, e.g. the notebook-wide mutation confirmation.
+   */
+  run: (force?: boolean) => Promise<void>
+  /** The editor's live text buffer, ahead of any blur-triggered commit to the store. */
+  getSql: () => string
 }
 
 type QueryEditorProps = {
@@ -175,6 +182,9 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   const columns = Object.keys(result?.rows?.[0] ?? {})
   const rowLimit = query._tag === 'database' ? query.rowLimit : undefined
   const databaseIdentifier = query._tag === 'database' ? query.database_identifier : undefined
+
+  const { x_column, y_series } = display?.chart ?? {}
+  const hasConfig = !!x_column && (y_series ?? []).length > 0
 
   const [promptInput, setPromptInput] = useState('')
   const [pendingRun, setPendingRun] = useState<{ sql: string; issues: PotentialIssues }>()
@@ -345,7 +355,10 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
 
   const Shell = variant === 'viewport' ? ExplorerQueryViewport : ExplorerQuery
 
-  useImperativeHandle(ref, () => ({ run: () => handleRunQuery() }))
+  useImperativeHandle(ref, () => ({
+    run: (force = false) => handleRunQuery({ shouldForce: force }),
+    getSql: () => sqlRef.current,
+  }))
 
   useEffect(() => {
     if (!promptState?.isOpen) return
@@ -514,7 +527,10 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
 
         <ExplorerQueryResults
           className={cn(
-            (result?.rows ?? []).length === 0 ? 'items-center justify-center' : 'overflow-x-auto'
+            variant === 'embedded' ? 'max-h-80' : '',
+            (result?.rows ?? []).length === 0 || (view === 'chart' && !hasConfig)
+              ? 'items-center justify-center'
+              : 'overflow-x-auto'
           )}
         >
           <QueryResultRenderer view={view} result={result} chart={display?.chart} />
