@@ -1,23 +1,14 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion } from 'framer-motion'
-import { CheckCircle, Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryStates } from 'nuqs'
 import { useRef, useState } from 'react'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-  Button,
-  cn,
-  Form,
-  FormControl,
-  FormField,
-  Input,
-} from 'ui'
+import { Button, cn, Form, FormControl, FormField, Input } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
@@ -52,7 +43,7 @@ const schema = z.object({
 
 const formId = 'sign-up-form'
 
-export const SignUpForm = () => {
+export const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   const captchaRef = useRef<HCaptcha>(null)
   const [showConditions, setShowConditions] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
@@ -76,6 +67,7 @@ export const SignUpForm = () => {
     onSuccess: () => {
       toast.success(`Signed up successfully!`)
       setIsSubmitted(true)
+      onSuccess?.()
     },
     onError: (error) => {
       setCaptchaToken(null)
@@ -135,22 +127,21 @@ export const SignUpForm = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="absolute top-0 w-full"
+          className="w-full"
         >
-          <Alert variant="default">
-            <CheckCircle />
-            <AlertTitle>Check your email to confirm</AlertTitle>
-            <AlertDescription className="text-xs">
-              You've successfully signed up. Please check your email to confirm your account before
-              signing in to the Supabase dashboard. The confirmation link expires in 10 minutes.
-            </AlertDescription>
-          </Alert>
+          <Admonition
+            type="success"
+            title="Check your email to confirm"
+            description="We sent you a link to finish signing up. It expires in 10 minutes."
+          />
         </motion.div>
       )}
       <div
         className={cn(
           'w-full py-1 transition-all duration-500',
-          isSubmitted ? 'max-h-[100px] opacity-0 pointer-events-none' : 'max-h-[1000px] opacity-100'
+          isSubmitted
+            ? 'max-h-0 overflow-hidden opacity-0 pointer-events-none'
+            : 'max-h-[1000px] opacity-100'
         )}
       >
         <Form {...form}>

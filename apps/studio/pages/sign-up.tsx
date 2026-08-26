@@ -14,6 +14,7 @@ import type { NextPageWithLayout } from '@/types'
 
 const SignUpPage: NextPageWithLayout = () => {
   const [showOtherOptions, setShowOtherOptions] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
   const { dashboardAuthSignUp: signUpEnabled } = useIsFeatureEnabled(['dashboard_auth:sign_up'])
 
   const { focusProvider } = useInboundBranding('sign-up')
@@ -32,20 +33,24 @@ const SignUpPage: NextPageWithLayout = () => {
     dividerBgClass = 'bg-studio'
   ) => (
     <>
-      {providers.map((provider) => (
-        <SignInWithExternalProvider key={provider.id} provider={provider} />
-      ))}
+      {!isSubmitted && (
+        <>
+          {providers.map((provider) => (
+            <SignInWithExternalProvider key={provider.id} provider={provider} />
+          ))}
 
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-strong" />
-        </div>
-        <div className="relative flex justify-center text-sm">
-          <span className={cn('px-2 text-sm text-foreground', dividerBgClass)}>or</span>
-        </div>
-      </div>
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-strong" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className={cn('px-2 text-sm text-foreground', dividerBgClass)}>or</span>
+            </div>
+          </div>
+        </>
+      )}
 
-      <SignUpForm />
+      <SignUpForm onSuccess={() => setIsSubmitted(true)} />
     </>
   )
 
@@ -56,8 +61,8 @@ const SignUpPage: NextPageWithLayout = () => {
 
     return (
       <div className="flex flex-col gap-5">
-        <SignInWithExternalProvider provider={focusProvider} />
-        {showOtherOptions ? (
+        {!isSubmitted && <SignInWithExternalProvider provider={focusProvider} />}
+        {showOtherOptions || isSubmitted ? (
           renderAuthOptions(otherProviders, 'bg-surface-100')
         ) : (
           <Button
@@ -78,7 +83,7 @@ const SignUpPage: NextPageWithLayout = () => {
     <>
       <div className="flex flex-col gap-5">{renderAuthOptions(signUpProviders)}</div>
 
-      <div className="my-8 self-center text-sm">
+      <div className={cn('self-center text-sm mb-8', isSubmitted ? 'mt-2' : 'mt-8')}>
         <span className="text-foreground-light">Have an account?</span>{' '}
         <Link
           href="/sign-in"
