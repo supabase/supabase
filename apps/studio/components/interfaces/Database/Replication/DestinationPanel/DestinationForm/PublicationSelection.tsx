@@ -7,7 +7,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 import { PublicationsComboBox } from './PublicationsComboBox'
-import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
+import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 
 type PublicationSelectionProps = {
@@ -24,10 +24,8 @@ export const PublicationSelection = ({
 
   const sourceId = useReplicationSourceId({ projectRef })
 
-  const { data: publications, isSuccess: isSuccessPublications } = useReplicationPublicationsQuery({
-    projectRef,
-    sourceId,
-  })
+  const { data: publications, isSuccess: isSuccessPublications } =
+    useReplicationPublicationNamesQuery({ projectRef, sourceId })
 
   const publicationNames = useMemo(() => publications?.map((pub) => pub.name) ?? [], [publications])
   const isSelectedPublicationMissing =
@@ -53,6 +51,10 @@ export const PublicationSelection = ({
                     // publication's table list, so none of it carries over cleanly to a
                     // different publication — reset it all rather than risk a stale or
                     // coincidentally-matching table id sticking around.
+                    form.setValue('tableSyncCopyMode', 'include_all_tables', {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
                     form.setValue('tableSyncCopyTableIds', [], {
                       shouldDirty: true,
                       shouldValidate: true,

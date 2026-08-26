@@ -7,7 +7,6 @@ import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 import { DestinationForm } from './index'
 
 const mocks = vi.hoisted(() => ({
-  refetchPublications: vi.fn(),
   resetValidation: vi.fn(),
   submitPipeline: vi.fn(),
   validateConfiguration: vi.fn(),
@@ -129,14 +128,15 @@ vi.mock('@/data/replication/sources-query', () => ({
   useReplicationSourceId: () => sourcesData.sources[0]?.id,
 }))
 
-vi.mock('@/data/replication/publications-query', () => ({
-  useReplicationPublicationsQuery: () => ({
-    data: publications,
-    isPending: false,
-    isError: false,
+vi.mock('@/data/replication/publication-names-query', () => ({
+  useReplicationPublicationNamesQuery: () => ({
+    data: publications.map(({ name }) => ({ name })),
     isSuccess: true,
-    refetch: mocks.refetchPublications,
   }),
+}))
+
+vi.mock('@/data/replication/publication-query', () => ({
+  useReplicationPublicationQuery: () => ({ data: publications[0], isSuccess: true }),
 }))
 
 vi.mock('@/data/replication/destination-by-id-query', () => ({

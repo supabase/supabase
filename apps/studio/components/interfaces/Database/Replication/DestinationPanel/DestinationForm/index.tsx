@@ -71,7 +71,11 @@ import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
-import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
+import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
+import {
+  useReplicationPublicationQuery,
+  type ReplicationPublicationData,
+} from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
@@ -143,11 +147,8 @@ export const DestinationForm = ({
 
   const sourceId = useReplicationSourceId({ projectRef })
 
-  const {
-    data: publications = [],
-    isSuccess: isSuccessPublications,
-    refetch: refetchPublications,
-  } = useReplicationPublicationsQuery({ projectRef, sourceId })
+  const { data: publicationNames = [], isSuccess: isSuccessPublicationNames } =
+    useReplicationPublicationNamesQuery({ projectRef, sourceId })
 
   const {
     data: destinationData,
@@ -204,6 +205,7 @@ export const DestinationForm = ({
       }),
     [destinationData, pipelineData, catalogToken, projectSettings, projectRef, editMode]
   )
+  const selectedPublicationRef = useRef<ReplicationPublicationData | undefined>(undefined)
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onChange',
@@ -218,15 +220,16 @@ export const DestinationForm = ({
           })
         }
 
-        const selectedPublicationTableIds = pruneStaleSelectedTableIds({
-          mode: data.tableSyncCopyMode,
-          selectedTableIds: data.tableSyncCopyTableIds,
-          publications,
-          publicationName: data.publicationName,
-        })
+        const selectedPublicationTableIds = selectedPublicationRef.current
+          ? pruneStaleSelectedTableIds({
+              mode: data.tableSyncCopyMode,
+              selectedTableIds: data.tableSyncCopyTableIds,
+              publications: [selectedPublicationRef.current],
+              publicationName: data.publicationName,
+            })
+          : data.tableSyncCopyTableIds
 
         if (
-          isSuccessPublications &&
           (data.tableSyncCopyMode === 'include_tables' ||
             data.tableSyncCopyMode === 'skip_tables') &&
           selectedPublicationTableIds.length === 0
@@ -279,10 +282,18 @@ export const DestinationForm = ({
   const { isDirty } = form.formState
 
   const publicationName = useWatch({ control: form.control, name: 'publicationName' })
+  const { data: selectedPublication, isSuccess: isSuccessPublication } =
+    useReplicationPublicationQuery({ projectRef, sourceId, publicationName })
 
-  const publicationNames = useMemo(() => publications?.map((pub) => pub.name) ?? [], [publications])
+  useEffect(() => {
+    selectedPublicationRef.current = selectedPublication
+    if (selectedPublication) void form.trigger('tableSyncCopyTableIds')
+  }, [form, selectedPublication])
+
   const isSelectedPublicationMissing =
-    isSuccessPublications && !!publicationName && !publicationNames.includes(publicationName)
+    isSuccessPublicationNames &&
+    !!publicationName &&
+    !publicationNames.some(({ name }) => name === publicationName)
 
   const allValidationFailures = [...destinationValidationFailures, ...pipelineValidationFailures]
   const hasValidationFailures = allValidationFailures.some((f) => f.failure_type === 'critical')
@@ -298,16 +309,16 @@ export const DestinationForm = ({
           }),
     [pendingFormValues]
   )
-  const pendingPublicationTables = useMemo(
-    () =>
-      publications.find(({ name }) => name === pendingFormValues?.publicationName)?.tables ?? [],
-    [pendingFormValues?.publicationName, publications]
-  )
+  const pendingPublicationTables =
+    selectedPublication && selectedPublication.name === pendingFormValues?.publicationName
+      ? selectedPublication.tables
+      : []
 
   const isSubmitDisabled =
     isSaving ||
     !isExistingConfigReady ||
-    !isSuccessPublications ||
+    !isSuccessPublicationNames ||
+    (!!publicationName && !isSuccessPublication) ||
     isSelectedPublicationMissing ||
     (!editMode && hasNoAvailableDestinations)
 
@@ -333,7 +344,7 @@ export const DestinationForm = ({
   }
 
   const onSubmit = async (rawData: z.infer<typeof FormSchema>) => {
-    if (!isSuccessPublications) {
+    if (!isSuccessPublication || !selectedPublication) {
       toast.error('Publication tables are unavailable. Refresh and try again.')
       return
     }
@@ -345,7 +356,7 @@ export const DestinationForm = ({
       tableSyncCopyTableIds: pruneStaleSelectedTableIds({
         mode: rawData.tableSyncCopyMode,
         selectedTableIds: rawData.tableSyncCopyTableIds,
-        publications,
+        publications: [selectedPublication],
         publicationName: rawData.publicationName,
       }),
     }
@@ -442,12 +453,6 @@ export const DestinationForm = ({
       resetValidation()
     }
   }, [visible, defaultValues, form, isDirty, resetValidation])
-
-  useEffect(() => {
-    if (visible && projectRef && sourceId) {
-      refetchPublications()
-    }
-  }, [visible, projectRef, sourceId, refetchPublications])
 
   return (
     <>
@@ -595,7 +600,15 @@ export const DestinationForm = ({
         visible={publicationPanelVisible}
         onClose={(newPublication?: string) => {
           if (newPublication) {
+            form.setValue('tableSyncCopyMode', 'include_all_tables', {
+              shouldDirty: true,
+              shouldValidate: true,
+            })
             form.setValue('tableSyncCopyTableIds', [], {
+              shouldDirty: true,
+              shouldValidate: true,
+            })
+            form.setValue('tableOptions', [], {
               shouldDirty: true,
               shouldValidate: true,
             })

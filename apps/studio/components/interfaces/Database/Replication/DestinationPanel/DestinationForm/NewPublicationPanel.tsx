@@ -49,12 +49,15 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
   const { ref: projectRef } = useParams()
   const sourceId = useReplicationSourceId({ projectRef })
 
-  const { data: tables } = useReplicationTablesQuery({ projectRef, sourceId }, { enabled: visible })
+  const {
+    data: tables = [],
+    isFetching,
+    refetch: refetchTables,
+  } = useReplicationTablesQuery({ projectRef, sourceId }, { enabled: false })
+  const isLoadingTables = isFetching && tables.length === 0
   const tableLabelsById = useMemo(
     () =>
-      new Map(
-        (tables ?? []).map((table) => [String(table.id), `${table.schema}.${table.name}`] as const)
-      ),
+      new Map(tables.map((table) => [String(table.id), `${table.schema}.${table.name}`] as const)),
     [tables]
   )
 
@@ -144,6 +147,9 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
                             values={field.value}
                             onValuesChange={field.onChange}
                             disabled={creatingPublication}
+                            onOpenChange={(open) => {
+                              if (open && visible) void refetchTables()
+                            }}
                           >
                             <MultiSelector.Trigger
                               badgeLimit="wrap"
@@ -152,8 +158,8 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
                               renderValue={(id) => tableLabelsById.get(id) ?? 'Unavailable table'}
                             />
                             <MultiSelector.Content>
-                              <MultiSelector.List>
-                                {tables?.map((table) => (
+                              <MultiSelector.List loading={isLoadingTables}>
+                                {tables.map((table) => (
                                   <MultiSelector.Item key={table.id} value={String(table.id)}>
                                     {`${table.schema}.${table.name}`}
                                   </MultiSelector.Item>

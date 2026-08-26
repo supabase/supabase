@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 import {
@@ -18,6 +18,7 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSelectionSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
   CREATE_NEW_KEY,
@@ -75,6 +76,7 @@ export const AnalyticsBucketFields = ({
     isSuccess: isSuccessKeys,
     isPending: isLoadingKeys,
     isError: isErrorKeys,
+    refetch: refetchKeys,
   } = useStorageCredentialsQuery({ projectRef })
   const s3Keys = keysData?.data ?? []
   const keyNoLongerExists =
@@ -86,6 +88,7 @@ export const AnalyticsBucketFields = ({
     data: analyticsBuckets = [],
     isPending: isLoadingBuckets,
     isError: isErrorBuckets,
+    refetch: refetchBuckets,
   } = useAnalyticsBucketsQuery({ projectRef })
 
   const canSelectNamespace = !!warehouseName
@@ -94,6 +97,7 @@ export const AnalyticsBucketFields = ({
     data: namespaces = [],
     isPending: isLoadingNamespaces,
     isError: isErrorNamespaces,
+    refetch: refetchNamespaces,
   } = useIcebergNamespacesQuery(
     { projectRef, warehouse: warehouseName },
     { enabled: !!warehouseName }
@@ -113,17 +117,7 @@ export const AnalyticsBucketFields = ({
               layout="horizontal"
               description="The Analytics Bucket where data will be stored"
             >
-              {isLoadingBuckets ? (
-                <Button
-                  disabled
-                  variant="default"
-                  className="w-full justify-between"
-                  size="small"
-                  iconRight={<Loader2 className="animate-spin" />}
-                >
-                  Retrieving buckets
-                </Button>
-              ) : isErrorBuckets ? (
+              {isErrorBuckets ? (
                 <Button
                   disabled
                   variant="default"
@@ -137,6 +131,9 @@ export const AnalyticsBucketFields = ({
                 <FormControl>
                   <Select
                     value={field.value}
+                    onOpenChange={(open) => {
+                      if (open) void refetchBuckets()
+                    }}
                     onValueChange={(value) => {
                       if (value === 'new-bucket') {
                         onSelectNewBucket()
@@ -150,7 +147,9 @@ export const AnalyticsBucketFields = ({
                     <SelectTrigger>{field.value || 'Select a bucket'}</SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {analyticsBuckets.length === 0 ? (
+                        {isLoadingBuckets && analyticsBuckets.length === 0 ? (
+                          <GenericSelectionSkeletonLoader className="w-full" variant="select" />
+                        ) : analyticsBuckets.length === 0 ? (
                           <SelectItem value="__no_buckets__" disabled>
                             No buckets available
                           </SelectItem>
@@ -181,17 +180,7 @@ export const AnalyticsBucketFields = ({
               layout="horizontal"
               description="The namespace within the bucket where tables will be organized"
             >
-              {isLoadingNamespaces && canSelectNamespace ? (
-                <Button
-                  disabled
-                  variant="default"
-                  className="w-full justify-between"
-                  size="small"
-                  iconRight={<Loader2 className="animate-spin" />}
-                >
-                  Retrieving namespaces
-                </Button>
-              ) : isErrorNamespaces ? (
+              {isErrorNamespaces ? (
                 <Button
                   disabled
                   variant="default"
@@ -207,6 +196,9 @@ export const AnalyticsBucketFields = ({
                     value={field.value}
                     onValueChange={field.onChange}
                     disabled={!canSelectNamespace}
+                    onOpenChange={(open) => {
+                      if (open && canSelectNamespace) void refetchNamespaces()
+                    }}
                   >
                     <SelectTrigger>
                       {!canSelectNamespace
@@ -217,7 +209,9 @@ export const AnalyticsBucketFields = ({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {namespaces.length === 0 ? (
+                        {isLoadingNamespaces && namespaces.length === 0 ? (
+                          <GenericSelectionSkeletonLoader className="w-full" variant="select" />
+                        ) : namespaces.length === 0 ? (
                           <SelectItem value="__no_namespaces__" disabled>
                             No namespaces available
                           </SelectItem>
@@ -341,17 +335,7 @@ export const AnalyticsBucketFields = ({
                 </div>
               }
             >
-              {isLoadingKeys ? (
-                <Button
-                  disabled
-                  variant="default"
-                  className="w-full justify-between"
-                  size="small"
-                  iconRight={<Loader2 className="animate-spin" />}
-                >
-                  Retrieving keys
-                </Button>
-              ) : isErrorKeys ? (
+              {isErrorKeys ? (
                 <Button
                   disabled
                   variant="default"
@@ -363,18 +347,28 @@ export const AnalyticsBucketFields = ({
                 </Button>
               ) : (
                 <FormControl>
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    onOpenChange={(open) => {
+                      if (open) void refetchKeys()
+                    }}
+                  >
                     <SelectTrigger>
                       {getS3AccessKeyTriggerLabel({ value: field.value, editMode })}
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {s3Keys.map((key) => (
-                          <SelectItem key={key.id} value={key.access_key}>
-                            {key.access_key}
-                            <p className="text-foreground-lighter">{key.description}</p>
-                          </SelectItem>
-                        ))}
+                        {isLoadingKeys && s3Keys.length === 0 ? (
+                          <GenericSelectionSkeletonLoader className="w-full" variant="select" />
+                        ) : (
+                          s3Keys.map((key) => (
+                            <SelectItem key={key.id} value={key.access_key}>
+                              {key.access_key}
+                              <p className="text-foreground-lighter">{key.description}</p>
+                            </SelectItem>
+                          ))
+                        )}
                         <SelectSeparator />
                         <SelectItem key={CREATE_NEW_KEY} value={CREATE_NEW_KEY}>
                           Create a new key

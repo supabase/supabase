@@ -1,9 +1,8 @@
 import { useParams } from 'common'
-import { Check, ChevronsUpDown, Loader2, Plus } from 'lucide-react'
+import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { ControllerRenderProps } from 'react-hook-form'
 import {
-  Badge,
   Button,
   cn,
   Command,
@@ -18,10 +17,10 @@ import {
   PopoverTrigger,
   ScrollArea,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { GenericSelectionSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
-import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
+import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
 
 interface PublicationsComboBoxProps {
   sourceId?: number
@@ -45,7 +44,7 @@ export const PublicationsComboBox = ({
     isPending,
     isFetching,
     refetch: refetchPublications,
-  } = useReplicationPublicationsQuery({ projectRef, sourceId })
+  } = useReplicationPublicationNamesQuery({ projectRef, sourceId })
   const isLoadingPublications = isPending || isFetching
   const showLoadingState = isLoadingPublications && publications.length === 0
 
@@ -84,7 +83,7 @@ export const PublicationsComboBox = ({
             'w-full [&>span]:w-full text-left',
             !selectedPublication && 'text-foreground-muted'
           )}
-          iconRight={showLoadingState ? <Loader2 className="animate-spin" /> : <ChevronsUpDown />}
+          iconRight={<ChevronsUpDown />}
           name={field.name}
           onBlur={field.onBlur}
         >
@@ -100,19 +99,18 @@ export const PublicationsComboBox = ({
             onValueChange={setSearchTerm}
           />
           <CommandList>
-            <CommandEmpty>No publications found</CommandEmpty>
+            {!showLoadingState && <CommandEmpty>No publications found</CommandEmpty>}
 
             {showLoadingState && (
-              <div className="flex items-center gap-2 p-2 pb-0 text-center justify-center">
-                <GenericSkeletonLoader className="w-full" />
+              <div className="p-1">
+                <GenericSelectionSkeletonLoader className="w-full" variant="command" />
               </div>
             )}
 
             <CommandGroup>
               {publications.length === 0 && !showLoadingState && (
-                <div className="text-foreground-lighter text-xs py-3 px-2 space-y-0.5">
+                <div className="text-foreground-lighter text-xs py-3 px-2">
                   <p>No publications available</p>
-                  <p className="text-foreground-muted">Publications with no tables are hidden</p>
                 </div>
               )}
               <ScrollArea
@@ -131,17 +129,9 @@ export const PublicationsComboBox = ({
                     }}
                   >
                     <span>{pub.name}</span>
-                    <div className="flex items-center gap-2">
-                      <Badge
-                        variant="default"
-                        className="rounded-full px-2 py-0.5 text-[10px] font-normal border border-border bg-surface-100"
-                      >
-                        {pub.tables.length} {pub.tables.length === 1 ? 'table' : 'tables'}
-                      </Badge>
-                      {selectedPublication === pub.name && (
-                        <Check className="text-brand" strokeWidth={2} size={13} />
-                      )}
-                    </div>
+                    {selectedPublication === pub.name && (
+                      <Check className="text-brand" strokeWidth={2} size={13} />
+                    )}
                   </CommandItem>
                 ))}
               </ScrollArea>

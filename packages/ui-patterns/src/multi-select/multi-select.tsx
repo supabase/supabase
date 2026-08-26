@@ -20,13 +20,15 @@ import {
 } from 'ui'
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
 
+import { GenericSelectionSkeletonLoader } from '../ShimmeringLoader'
+
 interface MultiSelectContextProps {
   id: string
   values: string[]
   onValuesChange: (value: string[]) => void
   toggleValue: (values: string) => void
   open: boolean
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setOpen: (open: boolean) => void
   inputValue: string
   setInputValue: React.Dispatch<React.SetStateAction<string>>
   activeIndex: number
@@ -72,6 +74,7 @@ type MultiSelectorProps = {
   mode?: MultiSelectorMode
   values: string[]
   onValuesChange: (value: string[]) => void
+  onOpenChange?: (open: boolean) => void
   disabled?: boolean
 } & React.ComponentPropsWithoutRef<typeof Command> &
   VariantProps<typeof MultiSelectorVariants>
@@ -79,6 +82,7 @@ type MultiSelectorProps = {
 function MultiSelector({
   values = [],
   onValuesChange,
+  onOpenChange,
   disabled,
   dir,
   size,
@@ -88,12 +92,23 @@ function MultiSelector({
   ...props
 }: MultiSelectorProps) {
   const ref = React.useRef(null)
-  const [open, setOpen] = React.useState<boolean>(false)
+  const [open, setOpenState] = React.useState<boolean>(false)
   const [inputValue, setInputValue] = React.useState<string>('')
   const [activeIndex, setActiveIndex] = React.useState<number>(-1)
   const [dropdownMaxHeight, setDropdownMaxHeight] = React.useState<number>(DROPDOWN_MAX_HEIGHT)
+  const openRef = React.useRef(false)
   const generatedId = React.useId()
   const id = idProp ?? generatedId
+
+  const handleOpenChange = React.useCallback(
+    (nextOpen: boolean) => {
+      if (openRef.current === nextOpen) return
+      openRef.current = nextOpen
+      setOpenState(nextOpen)
+      onOpenChange?.(nextOpen)
+    },
+    [onOpenChange]
+  )
 
   const toggleValue = React.useCallback(
     (toggledValue: string) => {
@@ -153,18 +168,18 @@ function MultiSelector({
           }
           break
         case 'Escape':
-          activeIndex !== -1 ? setActiveIndex(-1) : setOpen(false)
+          activeIndex !== -1 ? setActiveIndex(-1) : handleOpenChange(false)
           if (ref.current) {
             const button = (ref.current as HTMLDivElement).querySelector('button[role="combobox"]')
             button && (button as HTMLButtonElement).focus()
           }
           break
         case 'Enter':
-          setOpen(true)
+          handleOpenChange(true)
           break
       }
     },
-    [values, inputValue, activeIndex]
+    [values, inputValue, activeIndex, handleOpenChange]
   )
 
   return (
@@ -175,7 +190,7 @@ function MultiSelector({
         toggleValue,
         onValuesChange,
         open,
-        setOpen,
+        setOpen: handleOpenChange,
         inputValue,
         setInputValue,
         activeIndex,
@@ -185,7 +200,7 @@ function MultiSelector({
         dropdownMaxHeight,
       }}
     >
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover open={open} onOpenChange={handleOpenChange}>
         <Command
           id={id}
           ref={ref}
@@ -525,8 +540,9 @@ const MultiSelectorList = React.forwardRef<
   React.ElementRef<typeof CommandList>,
   React.ComponentPropsWithoutRef<typeof CommandList> & {
     creatable?: boolean
+    loading?: boolean
   }
->(({ className, children, creatable = false, ...props }, ref) => {
+>(({ className, children, creatable = false, loading = false, ...props }, ref) => {
   const { open, inputValue, setInputValue, toggleValue, dropdownMaxHeight } = useMultiSelect()
 
   const options = Children.toArray(children)
@@ -548,26 +564,32 @@ const MultiSelectorList = React.forwardRef<
       onWheel={(e) => e.stopPropagation()}
       {...props}
     >
-      {children}
-      {creatable && inputValue.length > 0 && !isOptionExists ? (
-        <CommandItem
-          role="option"
-          onSelect={() => {
-            open && toggleValue(inputValue)
-            setInputValue('')
-          }}
-          className={commandItemClass}
-        >
-          Create "{inputValue}"
-        </CommandItem>
-      ) : creatable && options.length === 0 ? (
-        <div className="p-2 py-1.5 text-xs text-foreground-lighter font-italic">
-          Type to add a value
-        </div>
+      {loading ? (
+        <GenericSelectionSkeletonLoader className="w-full" />
       ) : (
-        <CommandEmpty>
-          <span className="text-foreground-muted">No results found</span>
-        </CommandEmpty>
+        <>
+          {children}
+          {creatable && inputValue.length > 0 && !isOptionExists ? (
+            <CommandItem
+              role="option"
+              onSelect={() => {
+                open && toggleValue(inputValue)
+                setInputValue('')
+              }}
+              className={commandItemClass}
+            >
+              Create "{inputValue}"
+            </CommandItem>
+          ) : creatable && options.length === 0 ? (
+            <div className="p-2 py-1.5 text-xs text-foreground-lighter font-italic">
+              Type to add a value
+            </div>
+          ) : (
+            <CommandEmpty>
+              <span className="text-foreground-muted">No results found</span>
+            </CommandEmpty>
+          )}
+        </>
       )}
     </CommandList>
   )

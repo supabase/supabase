@@ -38,7 +38,15 @@ const mockPublication: PublicationDetailsResponse = {
   name: 'MixedCasePublication',
   config: {
     type: 'tables',
-    tables: [{ id: 17487, columns: null, row_filter: null }],
+    tables: [
+      {
+        id: 17487,
+        schema: 'CamelSchema',
+        name: 'MixedCaseTable',
+        columns: null,
+        row_filter: null,
+      },
+    ],
     operations: ['insert', 'update', 'delete', 'truncate'],
     publish_via_partition_root: true,
   },

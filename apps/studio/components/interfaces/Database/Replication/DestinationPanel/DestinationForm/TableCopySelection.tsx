@@ -7,8 +7,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
-import { getPublicationTableIds } from './DestinationForm.utils'
-import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
+import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 
 interface TableCopySelectionProps {
@@ -38,25 +37,30 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
   })
 
   const {
-    data: publications = [],
+    data: selectedPublication,
     isPending: isLoadingPublications,
+    isFetching: isRefreshingPublications,
     isError: isErrorPublications,
-  } = useReplicationPublicationsQuery({ projectRef, sourceId })
+    refetch: refetchPublication,
+  } = useReplicationPublicationQuery({ projectRef, sourceId, publicationName })
+  const isLoadingPublicationTables =
+    !!publicationName &&
+    (isLoadingPublications || isRefreshingPublications) &&
+    selectedPublication === undefined
 
   // Only publication tables are ever selectable or displayed by name. A table
   // id is never resolved outside of the publication response — there's no
   // other source for a name to come from without a separate, source-wide
   // catalog fetch, which selective table-copy doesn't need.
   const publicationTables = useMemo(() => {
-    const publication = publications.find(({ name }) => name === publicationName)
-    return [...(publication?.tables ?? [])].sort((a, b) =>
+    return [...(selectedPublication?.tables ?? [])].sort((a, b) =>
       tableLabel(a).localeCompare(tableLabel(b))
     )
-  }, [publicationName, publications])
+  }, [selectedPublication])
 
   const publicationTableIds = useMemo(
-    () => getPublicationTableIds(publications, publicationName),
-    [publications, publicationName]
+    () => new Set((selectedPublication?.tables ?? []).map(({ id }) => String(id))),
+    [selectedPublication]
   )
   const tableLabelsById = new Map(
     publicationTables.map((table) => [String(table.id), tableLabel(table)])
@@ -65,7 +69,7 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
     publicationTableIds.has(id)
   ).length
   const staleSelectedCount =
-    isLoadingPublications || isErrorPublications
+    isLoadingPublicationTables || isErrorPublications
       ? 0
       : tableSyncCopyTableIds.filter((id) => !publicationTableIds.has(id)).length
   const tableCount = publicationTables.length
@@ -156,25 +160,21 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
                     field.onChange(x)
                   }}
                   disabled={
-                    isLoadingPublications ||
                     isErrorPublications ||
                     !publicationName ||
-                    tableCount === 0
+                    (!isLoadingPublicationTables && tableCount === 0)
                   }
+                  onOpenChange={(open) => {
+                    if (open && publicationName) void refetchPublication()
+                  }}
                 >
                   <MultiSelector.Trigger
                     badgeLimit={3}
                     renderValue={(id) => tableLabelsById.get(id) ?? 'Unavailable table'}
-                    label={
-                      isLoadingPublications
-                        ? 'Loading publication tables...'
-                        : publicationName
-                          ? 'Select tables...'
-                          : 'Select a publication first'
-                    }
+                    label={publicationName ? 'Select tables...' : 'Select a publication first'}
                   />
                   <MultiSelector.Content>
-                    <MultiSelector.List>
+                    <MultiSelector.List loading={isLoadingPublicationTables}>
                       {publicationTables.map((table) => (
                         <MultiSelector.Item key={table.id} value={String(table.id)}>
                           {tableLabel(table)}

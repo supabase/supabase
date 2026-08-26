@@ -6,6 +6,24 @@ export const replicationKeys = {
     ['projects', projectRef, 'destinations', destinationId] as const,
   publications: (projectRef: string | undefined, source_id: number | undefined) =>
     ['projects', projectRef, 'sources', source_id, 'publications'] as const,
+  publicationNames: (projectRef: string | undefined, source_id: number | undefined) =>
+    ['projects', projectRef, 'sources', source_id, 'publications', 'list'] as const,
+  publication: (
+    projectRef: string | undefined,
+    source_id: number | undefined,
+    publicationName: string | undefined
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'sources',
+      source_id,
+      'publications',
+      'detail',
+      publicationName,
+    ] as const,
+  publicationsWithTables: (projectRef: string | undefined, source_id: number | undefined) =>
+    ['projects', projectRef, 'sources', source_id, 'publications', 'with-tables'] as const,
   tables: (projectRef: string | undefined, source_id: number | undefined) =>
     ['projects', projectRef, 'sources', source_id, 'tables'] as const,
   tableColumns: (

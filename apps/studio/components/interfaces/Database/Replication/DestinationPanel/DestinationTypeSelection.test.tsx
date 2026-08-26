@@ -8,9 +8,9 @@ import { DestinationTypeSelection } from './DestinationTypeSelection'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type ReplicationSourcesResponse = components['schemas']['SourcesResponse']
-type ReplicationPipelinesResponse = components['schemas']['PipelinesResponse']
-type ReplicationDestinationResponse = components['schemas']['DestinationResponse']
+type ReplicationSourcesResponse = components['schemas']['SourcesResponse_Output']
+type ReplicationPipelinesResponse = components['schemas']['PipelinesResponse_Output']
+type ReplicationDestinationResponse = components['schemas']['DestinationResponse_Output']
 
 mockAnimationsApi()
 

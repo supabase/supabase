@@ -8,13 +8,13 @@ import { DestinationRow } from './DestinationRow'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-type ReplicationPipelinesResponse = components['schemas']['PipelinesResponse']
-type ReplicationDestinationResponse = components['schemas']['DestinationResponse']
-type ReplicationSourcesResponse = components['schemas']['SourcesResponse']
-type ReplicationPipelineStatusResponse = components['schemas']['PipelineStatusResponse']
+type ReplicationPipelinesResponse = components['schemas']['PipelinesResponse_Output']
+type ReplicationDestinationResponse = components['schemas']['DestinationResponse_Output']
+type ReplicationSourcesResponse = components['schemas']['SourcesResponse_Output']
+type ReplicationPipelineStatusResponse = components['schemas']['PipelineStatusResponse_Output']
 type ReplicationPipelineReplicationStatusResponse =
-  components['schemas']['PipelineReplicationStatusResponse']
-type ReplicationPipelineVersionResponse = components['schemas']['PipelineVersionResponse']
+  components['schemas']['PipelineReplicationStatusResponse_Output']
+type ReplicationPipelineVersionResponse = components['schemas']['PipelineVersionResponse_Output']
 
 // Tooltip/Popover descendants use Web Animations
 mockAnimationsApi()

@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import type { components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { useForm } from 'react-hook-form'
@@ -10,7 +10,7 @@ import { TableCopySelection } from './TableCopySelection'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-type ReplicationSourcesResponse = components['schemas']['SourcesResponse']
+type ReplicationSourcesResponse = components['schemas']['SourcesResponse_Output']
 type ReadPublicationsV2Response = components['schemas']['ReadPublicationsResponse_Output']
 type PublicationDetailsResponse = components['schemas']['PublicationDetailsResponse_Output']
 
@@ -168,18 +168,20 @@ describe('TableCopySelection', () => {
     expect(screen.queryByText(/previously selected table/)).not.toBeInTheDocument()
   })
 
-  it('disables selective table choices while publication tables are loading', async () => {
+  it('shows a skeleton in the open selector while publication tables are loading', async () => {
     mockSourcesEndpoint()
     mockPublicationsPending()
 
-    customRender(
+    const { container } = customRender(
       <TableCopySelectionHarness editMode mode="include_tables" selectedTableIds={['101', '999']} />
     )
 
-    const loadingLabel = await screen.findByText('Loading publication tables...')
-    expect(loadingLabel).toBeInTheDocument()
-    expect(loadingLabel.closest('button')).toBeDisabled()
-    expect(loadingLabel.closest('button')).not.toHaveTextContent(/101|999/)
+    const trigger = screen.getByRole('combobox')
+    expect(trigger).toBeEnabled()
+    expect(trigger).not.toHaveTextContent(/loading/i)
+
+    fireEvent.click(trigger)
+    await waitFor(() => expect(container.querySelector('.shimmering-loader')).toBeInTheDocument())
     expect(screen.queryByText(/previously selected table/)).not.toBeInTheDocument()
   })
 })

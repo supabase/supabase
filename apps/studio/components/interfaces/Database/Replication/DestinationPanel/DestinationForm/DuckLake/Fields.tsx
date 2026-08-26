@@ -1,4 +1,4 @@
-import { Check, Database, Eye, EyeOff, Loader2, Plus, SlidersHorizontal } from 'lucide-react'
+import { Check, Database, Eye, EyeOff, Plus, SlidersHorizontal } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -25,6 +25,7 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSelectionSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DEFAULT_DUCKLAKE_POOL_SIZE, STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
@@ -692,6 +693,7 @@ const ProjectSelection = ({
     data: projectsData,
     isPending: isLoadingProjects,
     isError: isErrorProjects,
+    refetch: refetchProjects,
   } = useOrgProjectsInfiniteQuery(
     { slug: organization?.slug, statuses: [PROJECT_STATUS.ACTIVE_HEALTHY] },
     { enabled: !!organization?.slug }
@@ -716,19 +718,6 @@ const ProjectSelection = ({
     return project ? `${project.name} · ${project.ref}` : ref
   }
 
-  if (isLoadingProjects) {
-    return (
-      <Button
-        disabled
-        variant="default"
-        className="w-full justify-between"
-        size="small"
-        iconRight={<Loader2 className="animate-spin" />}
-      >
-        Retrieving projects
-      </Button>
-    )
-  }
   if (isErrorProjects) {
     return (
       <Button
@@ -743,11 +732,19 @@ const ProjectSelection = ({
     )
   }
   return (
-    <Select value={value || ''} onValueChange={onChange}>
+    <Select
+      value={value || ''}
+      onValueChange={onChange}
+      onOpenChange={(open) => {
+        if (open) void refetchProjects()
+      }}
+    >
       <SelectTrigger>{projectLabel(value) ?? placeholder}</SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          {projects.length === 0 ? (
+          {isLoadingProjects && projects.length === 0 ? (
+            <GenericSelectionSkeletonLoader className="w-full" variant="select" />
+          ) : projects.length === 0 ? (
             <SelectItem value="__no_projects__" disabled>
               No active projects available
             </SelectItem>
@@ -787,6 +784,7 @@ const BucketSelection = ({
     data: bucketsData,
     isPending: isLoadingBuckets,
     isError: isErrorBuckets,
+    refetch: refetchBuckets,
   } = usePaginatedBucketsQuery(
     { projectRef: ducklakeStorageProjectRef },
     { enabled: !!ducklakeStorageProjectRef }
@@ -807,19 +805,6 @@ const BucketSelection = ({
       </Button>
     )
   }
-  if (isLoadingBuckets) {
-    return (
-      <Button
-        disabled
-        variant="default"
-        className="w-full justify-between"
-        size="small"
-        iconRight={<Loader2 className="animate-spin" />}
-      >
-        Retrieving buckets
-      </Button>
-    )
-  }
   if (isErrorBuckets) {
     return (
       <Button
@@ -837,6 +822,9 @@ const BucketSelection = ({
   return (
     <Select
       value={value || ''}
+      onOpenChange={(open) => {
+        if (open) void refetchBuckets()
+      }}
       onValueChange={(e) => {
         if (e) onChange(e)
       }}
@@ -844,7 +832,9 @@ const BucketSelection = ({
       <SelectTrigger>{value || 'Select a bucket'}</SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          {buckets.length === 0 ? (
+          {isLoadingBuckets && buckets.length === 0 ? (
+            <GenericSelectionSkeletonLoader className="w-full" variant="select" />
+          ) : buckets.length === 0 ? (
             <SelectItem value="__no_buckets__" disabled>
               No buckets available
             </SelectItem>

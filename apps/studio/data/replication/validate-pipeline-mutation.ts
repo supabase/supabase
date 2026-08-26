@@ -15,7 +15,7 @@ type ValidatePipelineParams = {
   invalidatedSlotBehavior?: 'error' | 'recreate'
   tableSyncCopy: TableSyncCopyConfig
 }
-type ValidatePipelineResponse = components['schemas']['ValidatePipelineResponse']
+type ValidatePipelineResponse = components['schemas']['ValidatePipelineResponse_Output']
 
 async function validatePipeline(
   {

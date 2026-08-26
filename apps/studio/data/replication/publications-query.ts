@@ -72,7 +72,7 @@ export const useReplicationPublicationsQuery = <TData = ReplicationPublicationsD
   }: UseCustomQueryOptions<ReplicationPublicationsData, ResponseError, TData> = {}
 ) =>
   useQuery<ReplicationPublicationsData, ResponseError, TData>({
-    queryKey: replicationKeys.publications(projectRef, sourceId),
+    queryKey: replicationKeys.publicationsWithTables(projectRef, sourceId),
     queryFn: ({ signal }) => fetchReplicationPublications({ projectRef, sourceId }, signal),
     enabled: enabled && typeof projectRef !== 'undefined' && typeof sourceId !== 'undefined',
     ...options,
