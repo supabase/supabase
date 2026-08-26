@@ -381,6 +381,14 @@ interface ApiOperationRequestBodyDetailsInternalProps extends HTMLAttributes<HTM
   schema: ISchema
 }
 
+// Some specs have allOf/anyOf/oneOf as a single schema object instead of an
+// array. Wrap it so it still renders instead of crashing or disappearing.
+function asSchemaArray(value: unknown): Array<any> {
+  if (Array.isArray(value)) return value
+  if (value && typeof value === 'object') return [value]
+  return []
+}
+
 function ApiOperationRequestBodyDetailsInternal({
   schema,
   ...props
@@ -389,7 +397,7 @@ function ApiOperationRequestBodyDetailsInternal({
     return (
       <>
         <span className="font-mono text-sm font-medium text-foreground">All of the following:</span>
-        {(Array.isArray(schema.allOf) ? schema.allOf : []).map((option, index) => (
+        {asSchemaArray(schema.allOf).map((option, index) => (
           <ApiSchemaParamSubdetails key={index} schema={option} />
         ))}
       </>
@@ -398,7 +406,7 @@ function ApiOperationRequestBodyDetailsInternal({
     return (
       <>
         <span className="font-mono text-sm font-medium text-foreground">Any of the following:</span>
-        {(Array.isArray(schema.anyOf) ? schema.anyOf : []).map((option, index) => (
+        {asSchemaArray(schema.anyOf).map((option, index) => (
           <ApiSchemaParamSubdetails key={index} schema={option} />
         ))}
       </>
@@ -407,7 +415,7 @@ function ApiOperationRequestBodyDetailsInternal({
     return (
       <>
         <span className="font-mono text-sm font-medium text-foreground">One of the following:</span>
-        {(Array.isArray(schema.oneOf) ? schema.oneOf : []).map((option, index) => (
+        {asSchemaArray(schema.oneOf).map((option, index) => (
           <ApiSchemaParamSubdetails key={index} schema={option} />
         ))}
       </>
@@ -431,10 +439,11 @@ function ApiOperationRequestBodyDetailsInternal({
     return (
       <>
         <span className="font-mono text-sm font-medium text-foreground">{`Array of ${displayName}`}</span>
-        {!(
-          'type' in schema.items &&
-          ['string', 'boolean', 'number', 'integer'].includes(schema.items.type)
-        ) && <ApiSchemaParamSubdetails className="mt-4" schema={schema.items} />}
+        {schema.items &&
+          !(
+            'type' in schema.items &&
+            ['string', 'boolean', 'number', 'integer'].includes(schema.items.type)
+          ) && <ApiSchemaParamSubdetails className="mt-4" schema={schema.items} />}
       </>
     )
   } else if (schema.type === 'object') {
@@ -493,9 +502,7 @@ export function ApiSchemaParamSubdetails({
                     value: schema[key],
                   }))
               : []
-  // Some specs have allOf/anyOf/oneOf as a single object
-  // instead of an array. This is in place to prevent crashing.
-  const subContent = Array.isArray(rawSubContent) ? rawSubContent : []
+  const subContent = asSchemaArray(rawSubContent)
 
   return (
     <Collapsible>
