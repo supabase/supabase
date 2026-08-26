@@ -21,7 +21,10 @@ import { type DestinationType, type ExistingDestination } from '../DestinationPa
 import { AdvancedSettings } from './AdvancedSettings'
 import { getAnalyticsBucketValidationIssues } from './AnalyticsBucket/AnalyticsBucket.utils'
 import { AnalyticsBucketFields } from './AnalyticsBucket/Fields'
-import { getBigQueryValidationIssues } from './BigQuery/BigQuery.utils'
+import {
+  BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE,
+  getBigQueryValidationIssues,
+} from './BigQuery/BigQuery.utils'
 import { BigQueryFields } from './BigQuery/Fields'
 import { getClickHouseValidationIssues } from './ClickHouse/ClickHouse.utils'
 import { ClickHouseFields } from './ClickHouse/Fields'
@@ -210,11 +213,12 @@ export const DestinationForm = ({
         }
 
         if (selectedType === 'BigQuery') {
-          getBigQueryValidationIssues(data, { secretsOptional: editMode }).forEach(
-            ({ path, message }) => {
-              addRequiredFieldError(path, message)
-            }
-          )
+          getBigQueryValidationIssues(data, {
+            secretsOptional: editMode,
+            validateJson: false,
+          }).forEach(({ path, message }) => {
+            addRequiredFieldError(path, message)
+          })
         } else if (selectedType === 'Analytics Bucket') {
           getAnalyticsBucketValidationIssues(data, {
             secretsOptional: editMode,
@@ -318,6 +322,16 @@ export const DestinationForm = ({
         publications,
         publicationName: rawData.publicationName,
       }),
+    }
+
+    if (selectedType === 'BigQuery') {
+      const jsonIssue = getBigQueryValidationIssues(data, { secretsOptional: editMode }).find(
+        (issue) => issue.message === BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE
+      )
+      if (jsonIssue) {
+        form.setError(jsonIssue.path, { message: jsonIssue.message })
+        return
+      }
     }
 
     // Pipeline prerequisite validation models a new pipeline and cannot

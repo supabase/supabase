@@ -781,6 +781,19 @@ describe('DestinationForm.utils BigQuery', () => {
     ])
   })
 
+  it('skips JSON shape checks when validateJson is false', () => {
+    const issues = getBigQueryValidationIssues(
+      {
+        projectId: 'my-project',
+        datasetId: 'my_dataset',
+        serviceAccountKey: '{ "type": "service_account" ',
+      },
+      { validateJson: false }
+    )
+
+    expect(issues).toEqual([])
+  })
+
   it('rejects non-JSON text in the service account key', () => {
     const issues = getBigQueryValidationIssues({
       projectId: 'my-project',
