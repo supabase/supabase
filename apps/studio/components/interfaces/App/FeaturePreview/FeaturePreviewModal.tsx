@@ -150,11 +150,7 @@ export const FeaturePreviewModal = () => {
                           ? allFeaturePreviews.filter((x) => x.category === undefined)
                           : allFeaturePreviews.filter((x) => x.category === category)
                       return (
-                        <AccordionItem
-                          key={category}
-                          value={category}
-                          // className="data-[state=open]:border-b-0"
-                        >
+                        <AccordionItem key={category} value={category}>
                           <AccordionTrigger className="text-xs font-mono uppercase tracking-tight px-4 text-foreground-lighter py-2 bg-tertiary dark:bg-transparent">
                             {category}
                           </AccordionTrigger>
@@ -322,7 +318,7 @@ const FeaturePreviewItem = ({
       className={cn(
         'w-full! flex-1 flex items-center justify-between p-4 cursor-pointer bg transition',
         selectedFeature?.key === feature.key
-          ? 'bg-accent text-foreground'
+          ? 'bg-muted dark:bg-accent text-foreground'
           : 'bg-card text-foreground-light',
         className
       )}
