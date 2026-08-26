@@ -47,6 +47,20 @@ beforeAll(() => {
 
   vi.mock('next/compat/router', () => require('next-router-mock'))
 
+  // Tests mock next/router with next-router-mock (no TanStack RouterProvider).
+  // Hooks that call useBlocker need a no-op idle blocker so components still mount.
+  vi.mock('@tanstack/react-router', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@tanstack/react-router')>()
+    return {
+      ...actual,
+      useBlocker: () => ({
+        status: 'idle' as const,
+        proceed: undefined,
+        reset: undefined,
+      }),
+    }
+  })
+
   // Mock the useParams hook from common module globally
   vi.mock('common', async (importOriginal: any) => {
     const actual = await importOriginal()

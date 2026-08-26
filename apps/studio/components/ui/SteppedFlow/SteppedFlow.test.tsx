@@ -99,7 +99,11 @@ describe('SteppedFlow', () => {
         <SteppedFlowHeader
           title="Authorize the destination"
           description="Name this pipeline."
-          actions={<button type="button">Docs</button>}
+          actions={
+            <button type="button" tabIndex={0}>
+              Docs
+            </button>
+          }
         />
       </SteppedFlow>
     )
