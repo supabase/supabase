@@ -173,19 +173,12 @@ export const ProjectDropdown = ({
     open,
     setOpen: handleSetOpen,
     selectedRef: ref,
-    onSelect: (project: { ref: string }) => {
+    getItemHref: (project: { ref: string }) => {
       const sanitizedRoute = sanitizeRoute(router.route, router.query)
-      const href = sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
-      close()
-      router.push(href)
+      return sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
     },
     renderRow: (project: Pick<OrgProject, 'ref' | 'name' | 'status' | 'integration_source'>) => (
-      <ProjectRowLink
-        project={project}
-        selectedRef={ref}
-        route={router.route}
-        routerQueries={router.query}
-      />
+      <ProjectRowLink project={project} selectedRef={ref} />
     ),
     renderActions: (_setOpen: (value: boolean) => void, options?: { embedded?: boolean }) =>
       projectCreationEnabled ? (

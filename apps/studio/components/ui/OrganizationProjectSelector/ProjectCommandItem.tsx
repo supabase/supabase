@@ -1,4 +1,5 @@
 import { Check } from 'lucide-react'
+import Link from 'next/link'
 import { ReactNode } from 'react'
 import { cn, CommandItem } from 'ui'
 
@@ -9,6 +10,7 @@ export interface ProjectCommandItemProps {
   selectedRef: string | undefined
   onSelect?: (project: OrgProject) => void
   onClose: () => void
+  href?: string
   renderRow?: (project: OrgProject) => ReactNode
   checkPosition?: 'right' | 'left'
   isOptionDisabled?: (project: OrgProject) => boolean
@@ -19,6 +21,7 @@ export function ProjectCommandItem({
   selectedRef,
   onSelect,
   onClose,
+  href,
   renderRow,
   checkPosition = 'right',
   isOptionDisabled,
@@ -30,7 +33,7 @@ export function ProjectCommandItem({
 
   const disabled = isOptionDisabled?.(project) ?? false
 
-  return (
+  const item = (
     <CommandItem
       key={project.ref}
       value={`${project.name.replaceAll('"', '')}-${project.ref}`}
@@ -54,5 +57,13 @@ export function ProjectCommandItem({
         </div>
       )}
     </CommandItem>
+  )
+
+  return href && !disabled ? (
+    <Link passHref href={href}>
+      {item}
+    </Link>
+  ) : (
+    item
   )
 }

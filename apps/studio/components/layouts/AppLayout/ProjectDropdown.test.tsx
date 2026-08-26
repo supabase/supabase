@@ -5,11 +5,13 @@ import { ProjectDropdown } from './ProjectDropdown'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { createMockOrganization, render } from '@/tests/helpers'
 
-const { mockSelectedOrganization, mockSelectedProject, mockSelectorProject } = vi.hoisted(() => ({
-  mockSelectedOrganization: vi.fn(),
-  mockSelectedProject: vi.fn(),
-  mockSelectorProject: vi.fn(),
-}))
+const { mockSelectedOrganization, mockSelectedProject, mockSelectorProject, mockSelectorProps } =
+  vi.hoisted(() => ({
+    mockSelectedOrganization: vi.fn(),
+    mockSelectedProject: vi.fn(),
+    mockSelectorProject: vi.fn(),
+    mockSelectorProps: vi.fn(),
+  }))
 
 const mockPush = vi.hoisted(() => vi.fn())
 
@@ -54,12 +56,15 @@ vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
 }))
 
 vi.mock('@/components/ui/OrganizationProjectSelector', () => ({
-  OrganizationProjectSelector: ({ renderRow, renderTrigger }: any) => (
-    <div>
-      <div data-testid="project-selector-trigger">{renderTrigger?.({})}</div>
-      <div data-testid="project-selector-row">{renderRow?.(mockSelectorProject())}</div>
-    </div>
-  ),
+  OrganizationProjectSelector: (props: any) => {
+    mockSelectorProps(props)
+    return (
+      <div>
+        <div data-testid="project-selector-trigger">{props.renderTrigger?.({})}</div>
+        <div data-testid="project-selector-row">{props.renderRow?.(mockSelectorProject())}</div>
+      </div>
+    )
+  },
 }))
 
 vi.mock('@/components/ui/PartnerIcon', () => ({
@@ -165,5 +170,13 @@ describe('ProjectDropdown', () => {
       'data-managed-by',
       MANAGED_BY.VERCEL_MARKETPLACE
     )
+  })
+
+  it('provides project command items with links that preserve the current route', () => {
+    render(<ProjectDropdown />)
+
+    const selectorProps = mockSelectorProps.mock.lastCall?.[0]
+    expect(selectorProps.getItemHref({ ref: 'proj_2' })).toBe('/project/proj_2/settings')
+    expect(selectorProps.onSelect).toBeUndefined()
   })
 })

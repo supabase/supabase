@@ -25,25 +25,22 @@ export function OrgCommandItem({
   const href = hasRouteSlug ? routePathname.replace('[slug]', org.slug) : `/org/${org.slug}`
 
   return (
-    <CommandItem
-      key={org.slug}
-      value={`${org.name.replaceAll('"', '')} - ${org.slug}`}
-      className="cursor-pointer w-full"
-      onSelect={() => onClose()}
-    >
-      <Link
-        href={href}
+    <Link passHref href={href}>
+      <CommandItem
+        key={org.slug}
+        value={`${org.name.replaceAll('"', '')} - ${org.slug}`}
         className={cn(
-          'w-full flex items-center justify-between text-sm md:text-xs',
+          'cursor-pointer w-full flex items-center justify-between text-sm md:text-xs',
           !compactPadding && 'p-0.5'
         )}
+        onSelect={onClose}
       >
         <div className="flex items-center gap-2">
           <span>{org.name}</span>
           <PartnerIcon organization={org} />
         </div>
         {org.slug === selectedSlug && <Check size={16} />}
-      </Link>
-    </CommandItem>
+      </CommandItem>
+    </Link>
   )
 }
