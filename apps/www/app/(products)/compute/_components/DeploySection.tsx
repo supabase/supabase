@@ -7,13 +7,13 @@ import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 
 const TERMINAL_LINES = [
-  { text: '$ supabase compute deploy api', delay: 0 },
+  { text: '$ supabase compute deploy my-app', delay: 0 },
   { text: 'Building from Dockerfile...', delay: 0.3, dim: true },
   { text: "Provisioning 2 GB / 1 vCPU in your database's region...", delay: 0.6, dim: true },
   { text: 'Issuing scoped project credentials...', delay: 0.9, dim: true },
   { text: '', delay: 1.1 },
   { text: '✓ Service deployed:', delay: 1.2, accent: true },
-  { text: '  https://your-project.supabase.co/compute/api', delay: 1.3, accent: true },
+  { text: '  https://your-project.supabase.co/compute/my-app', delay: 1.3, accent: true },
 ]
 
 function TerminalAnimation() {
