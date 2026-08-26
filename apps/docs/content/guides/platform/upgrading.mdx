@@ -192,7 +192,7 @@ Existing projects on pg_graphql 1.5.x are not impacted unless they choose to upg
 
 ### Ltree indexes require reindexing after upgrade
 
-_Applies when upgrading to Postgres 15.18 or 17.10._
+_Applies when upgrading to Postgres 15.19 or 17.11._
 
 <Admonition type="caution">
 
@@ -241,9 +241,50 @@ To mitigate this issue:
    REINDEX INDEX CONCURRENTLY <index_name>;
    ```
 
+### btree_gist indexes on float columns require reindexing after upgrade
+
+_Applies when upgrading to Postgres 15.19 or 17.11._
+
+<Admonition type="caution">
+
+You are affected only if you have `btree_gist` indexes on `float4` or `float8` columns that may contain `NaN` values.
+
+</Admonition>
+
+This release fixes `NaN` handling in `btree_gist`'s `float4` and `float8` operator classes. Indexes on those columns built under the previous version can return wrong results for rows containing `NaN` until the index is rebuilt.
+
+To mitigate this issue:
+
+1. Find `btree_gist` indexes on float columns:
+
+   ```sql
+   select distinct
+     n.nspname as schema_name,
+     cls.relname as table_name,
+     ic.relname as index_name
+   from pg_index idx
+     join pg_class ic on idx.indexrelid = ic.oid
+     join pg_am am on ic.relam = am.oid
+     join pg_class cls on idx.indrelid = cls.oid
+     join pg_namespace n on ic.relnamespace = n.oid
+     join lateral unnest(idx.indclass::oid[]) with ordinality as k(opclass, pos) on true
+     join pg_opclass oc on oc.oid = k.opclass
+     join pg_type ty on ty.oid = oc.opcintype
+   where
+     am.amname = 'gist'
+     and k.pos <= idx.indnkeyatts
+     and ty.typname in ('float4', 'float8');
+   ```
+
+2. If any indexes are returned and those columns may contain `NaN` values, reindex them. `REINDEX INDEX CONCURRENTLY` runs online with no downtime:
+
+   ```sql
+   REINDEX INDEX CONCURRENTLY <index_name>;
+   ```
+
 ### Custom operator selectivity estimators
 
-_Applies when upgrading to Postgres 15.18 or 17.10._
+_Applies when upgrading to Postgres 15.19 or 17.11._
 
 Attaching a non-built-in (extension- or user-provided) selectivity estimator function to an operator now requires superuser. Existing operators continue to work — the check only fires when an operator is (re)created, most commonly during `pg_dump` / `pg_restore`, a logical restore, or a branch.
 
