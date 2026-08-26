@@ -1,7 +1,7 @@
 import { resolveEnv } from 'npm:@supabase/server@1.5.0-rc.114/core'
 
-// Project URL and publishable key for toolsets that call Supabase HTTP APIs
-// the client library does not expose.
+// Project URL and publishable key for Edge Functions that call Supabase HTTP
+// APIs the client library does not expose.
 
 type SupabaseEnvironment = NonNullable<ReturnType<typeof resolveEnv>['data']>
 

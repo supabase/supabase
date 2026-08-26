@@ -1,7 +1,7 @@
 import type { McpServer } from 'npm:@modelcontextprotocol/sdk@1.29.0/server/mcp'
 import type { SupabaseClient } from 'npm:@supabase/supabase-js@2.108.2'
 
-import type { SupabaseFetch } from '../supabase.ts'
+import type { SupabaseFetch } from '../../_shared/supabase.ts'
 
 // The context every toolset receives, built fresh for each request from the
 // caller's verified token.

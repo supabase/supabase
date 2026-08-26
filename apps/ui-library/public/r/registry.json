@@ -1759,9 +1759,9 @@
           "target": "supabase/functions/mcp-server/index.ts"
         },
         {
-          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/supabase.ts",
+          "path": "registry/default/blocks/mcp-server/supabase/functions/_shared/supabase.ts",
           "type": "registry:file",
-          "target": "supabase/functions/mcp-server/supabase.ts"
+          "target": "supabase/functions/_shared/supabase.ts"
         },
         {
           "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/deno.json",

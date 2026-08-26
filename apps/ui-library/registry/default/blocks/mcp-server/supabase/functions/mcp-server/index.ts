@@ -13,7 +13,7 @@ import {
   type SupabaseContext,
 } from 'npm:@supabase/server@1.5.0-rc.114'
 
-import { createSupabaseFetch } from './supabase.ts'
+import { createSupabaseFetch } from '../_shared/supabase.ts'
 import { applyToolsets, toolsetNames } from './tools/index.ts'
 
 // An MCP server as a single Supabase Edge Function: transport, authentication,
