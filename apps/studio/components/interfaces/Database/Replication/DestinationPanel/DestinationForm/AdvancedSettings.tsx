@@ -35,6 +35,12 @@ const CONNECTION_DESCRIPTION = 'Optional settings for how data is written to the
 const DATA_DESCRIPTION = 'Optional settings for initial sync and replication slots.'
 const ALL_DESCRIPTION = 'Optional settings to control the pipeline in more depth'
 
+const GROUP_DESCRIPTIONS: Record<AdvancedSettingsGroup, string> = {
+  all: ALL_DESCRIPTION,
+  connection: CONNECTION_DESCRIPTION,
+  data: DATA_DESCRIPTION,
+}
+
 export const AdvancedSettings = ({
   type,
   form,
@@ -48,12 +54,7 @@ export const AdvancedSettings = ({
 }) => {
   const showConnection = group === 'all' || group === 'connection'
   const showData = group === 'all' || group === 'data'
-  const description =
-    group === 'connection'
-      ? CONNECTION_DESCRIPTION
-      : group === 'data'
-        ? DATA_DESCRIPTION
-        : ALL_DESCRIPTION
+  const description = GROUP_DESCRIPTIONS[group]
 
   const handleNumberChange =
     (field: { onChange: (value?: number) => void }) => (e: ChangeEvent<HTMLInputElement>) => {
