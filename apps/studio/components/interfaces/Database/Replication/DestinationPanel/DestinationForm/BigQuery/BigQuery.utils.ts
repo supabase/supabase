@@ -28,9 +28,9 @@ export const getBigQueryValidationIssues = (
   data: Pick<DestinationPanelSchemaType, BigQueryFieldPath>,
   options: { secretsOptional?: boolean } = {}
 ): BigQueryValidationIssue[] => {
-  const issues = BIGQUERY_REQUIRED_FIELDS.filter(({ path }) => !data[path]?.trim().length).map(
-    ({ path, message }) => ({ path, message })
-  )
+  const issues: BigQueryValidationIssue[] = BIGQUERY_REQUIRED_FIELDS.filter(
+    ({ path }) => !data[path]?.trim().length
+  ).map(({ path, message }) => ({ path, message }))
 
   const serviceAccountKey = data.serviceAccountKey?.trim() ?? ''
 

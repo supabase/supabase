@@ -277,7 +277,7 @@ export const CreatePipelineWizard = () => {
 
   const { isDirty } = form.formState
   const formValues = useWatch({ control: form.control }) ?? defaultValues
-  const { publicationName, tableSyncCopyMode, tableSyncCopyTableIds } = formValues
+  const { publicationName } = formValues
 
   const publicationNames = useMemo(() => publications.map((pub) => pub.name), [publications])
   const isSelectedPublicationMissing =
