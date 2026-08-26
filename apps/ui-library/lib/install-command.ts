@@ -70,5 +70,5 @@ export function buildBlockInstallPrompt({
   name: string
   installCommand: string
 }): string {
-  return `Help me install the ${name} block. Do the following: 1. Read ${pageUrl}. 2. Install the block with \`${installCommand}\`. 3. Follow the remaining setup and configuration steps on that page.`
+  return `Help me install the ${name} block. Do the following: 1. Fetch ${pageUrl}. 2. Add the block with \`${installCommand}\`. If the CLI reports file conflicts, keep the existing files and merge the skipped files after install. 3. Follow any post-install instructions the CLI prints, then complete the remaining setup from the page.`
 }
