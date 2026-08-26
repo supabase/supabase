@@ -221,18 +221,20 @@ To mitigate this issue:
 2. If `reindex_required` is `true`, find the affected indexes:
 
    ```sql
-   select schemaname, tablename, indexname
-   from pg_indexes
+   select distinct
+     n.nspname as schema_name,
+     cls.relname as table_name,
+     ic.relname as index_name
+   from pg_index idx
+     join pg_class ic on idx.indexrelid = ic.oid
+     join pg_class cls on idx.indrelid = cls.oid
+     join pg_namespace n on ic.relnamespace = n.oid
+     join lateral unnest(idx.indclass::oid[]) with ordinality as k(opclass, pos) on true
+     join pg_opclass oc on oc.oid = k.opclass
+     join pg_type ty on ty.oid = oc.opcintype
    where
-     indexname in (
-       select c.relname
-       from
-         pg_index as i
-         join pg_class as c on i.indexrelid = c.oid
-         join pg_attribute as a on a.attrelid = i.indrelid and a.attnum = ANY(i.indkey)
-         join pg_type as t on a.atttypid = t.oid
-       where t.typname in ('ltree', '_ltree')
-     );
+     k.pos <= idx.indnkeyatts -- key columns only, excludes INCLUDE
+     and ty.typname in ('ltree', '_ltree');
    ```
 
 3. Reindex each affected index. `REINDEX INDEX CONCURRENTLY` runs online with no downtime:
