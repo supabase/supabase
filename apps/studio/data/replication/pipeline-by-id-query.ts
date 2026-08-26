@@ -24,7 +24,7 @@ async function fetchReplicationPipelineById(
   return data
 }
 
-export type ReplicationPipelineByIdData = components['schemas']['ReplicationPipelineResponse']
+export type ReplicationPipelineByIdData = components['schemas']['PipelineResponse']
 
 export const useReplicationPipelineByIdQuery = <TData = ReplicationPipelineByIdData>(
   { projectRef, pipelineId }: ReplicationPipelineByIdParams,

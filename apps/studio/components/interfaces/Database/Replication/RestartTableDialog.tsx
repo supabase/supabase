@@ -24,7 +24,7 @@ interface RestartTableDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   table: ReplicationTableIdentity
-  tableSyncCopy?: TableSyncCopyConfig
+  tableSyncCopy?: TableSyncCopyConfig | null
   sourceId?: number
   publicationName?: string
   pipelineStatusName?: PipelineStatusName

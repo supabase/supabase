@@ -167,12 +167,14 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
 
     try {
       setIsUpdatingReplication(true)
-      const currentTables: NonNullable<components['schemas']['PutPublicationBody']['tables']> =
-        publication.config.tables.map(({ id, columns, row_filter }) => ({
-          id,
-          columns,
-          row_filter,
-        }))
+      const currentTables: Extract<
+        components['schemas']['PutPublicationBody'],
+        { type: 'tables' }
+      >['tables'] = publication.config.tables.map(({ id, columns, row_filter }) => ({
+        id,
+        columns,
+        row_filter,
+      }))
       const updatedTables = currentTables.concat([{ id: pgTable.id }])
       await updatePublication({
         projectRef,

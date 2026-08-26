@@ -8,7 +8,7 @@ import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
 type CostEstimateResponse = components['schemas']['CostEstimateResponse']
-type ReplicationSourcesResponse = components['schemas']['ReplicationSourcesResponse']
+type ReplicationSourcesResponse = components['schemas']['SourcesResponse']
 
 const tables = [
   {

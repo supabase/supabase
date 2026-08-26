@@ -3705,13 +3705,13 @@ export interface paths {
      * List replication destinations
      * @description List all destinations for the project. Requires bearer auth and an active, healthy project.
      */
-    get: operations['ReplicationDestinationsController_getDestinations']
+    get: operations['DestinationsController_getDestinations']
     put?: never
     /**
      * Create replication destination
      * @description Create a destination for the project. Requires bearer auth and an active, healthy project.
      */
-    post: operations['ReplicationDestinationsController_createDestination']
+    post: operations['DestinationsController_createDestination']
     delete?: never
     options?: never
     head?: never
@@ -3731,7 +3731,7 @@ export interface paths {
      * Create destination and pipeline
      * @description Create a destination and pipeline in one call. Requires bearer auth and an active, healthy project.
      */
-    post: operations['ReplicationDestinationsPipelinesController_createDestinationPipeline']
+    post: operations['DestinationsPipelinesController_createDestinationPipeline']
     delete?: never
     options?: never
     head?: never
@@ -3751,12 +3751,12 @@ export interface paths {
      * Update destination and pipeline
      * @description Update a destination and pipeline in one call. Requires bearer auth and an active, healthy project.
      */
-    post: operations['ReplicationDestinationsPipelinesController_updateDestinationPipeline']
+    post: operations['DestinationsPipelinesController_updateDestinationPipeline']
     /**
      * Delete destination and pipeline
      * @description Delete a destination and pipeline. Requires bearer auth and an active, healthy project.
      */
-    delete: operations['ReplicationDestinationsPipelinesController_deleteDestinationPipeline']
+    delete: operations['DestinationsPipelinesController_deleteDestinationPipeline']
     options?: never
     head?: never
     patch?: never
@@ -3773,18 +3773,18 @@ export interface paths {
      * Get replication destination
      * @description Get a destination by id. Requires bearer auth and an active, healthy project.
      */
-    get: operations['ReplicationDestinationsController_getDestination']
+    get: operations['DestinationsController_getDestination']
     put?: never
     /**
      * Update replication destination
      * @description Update a destination for the project. Requires bearer auth and an active, healthy project.
      */
-    post: operations['ReplicationDestinationsController_updateDestination']
+    post: operations['DestinationsController_updateDestination']
     /**
      * Delete replication destination
      * @description Delete a destination from the project. Requires bearer auth and an active, healthy project.
      */
-    delete: operations['ReplicationDestinationsController_deleteDestination']
+    delete: operations['DestinationsController_deleteDestination']
     options?: never
     head?: never
     patch?: never
@@ -3803,7 +3803,7 @@ export interface paths {
      * Validate destination configuration
      * @description Validates that the destination is accessible and properly configured. Requires bearer auth and an active, healthy project.
      */
-    post: operations['ReplicationDestinationsController_validateDestination']
+    post: operations['DestinationsController_validateDestination']
     delete?: never
     options?: never
     head?: never
@@ -3821,13 +3821,13 @@ export interface paths {
      * List replication pipelines
      * @description List all pipelines for the project. Requires bearer auth and an active, healthy project.
      */
-    get: operations['ReplicationPipelinesController_getPipelines']
+    get: operations['PipelinesController_getPipelines']
     put?: never
     /**
      * Create replication pipeline
      * @description Create a pipeline for the project. Requires bearer auth and an active, healthy project.
      */
-    post: operations['ReplicationPipelinesController_createPipeline']
+    post: operations['PipelinesController_createPipeline']
     delete?: never
     options?: never
     head?: never
@@ -3845,18 +3845,18 @@ export interface paths {
      * Get replication pipeline
      * @description Get a pipeline by id. Requires bearer auth and an active, healthy project.
      */
-    get: operations['ReplicationPipelinesController_getPipeline']
+    get: operations['PipelinesController_getPipeline']
     put?: never
     /**
      * Update replication pipeline
      * @description Update a pipeline. Requires bearer auth and an active, healthy project.
      */
-    post: operations['ReplicationPipelinesController_updatePipeline']
+    post: operations['PipelinesController_updatePipeline']
     /**
      * Delete replication pipeline
      * @description Delete a pipeline from the project. Requires bearer auth and an active, healthy project.
      */
-    delete: operations['ReplicationPipelinesController_deletePipeline']
+    delete: operations['PipelinesController_deletePipeline']
     options?: never
     head?: never
     patch?: never
@@ -3873,7 +3873,7 @@ export interface paths {
      * Get pipeline replication status
      * @description Get the pipeline replication status. Requires bearer auth and an active, healthy project.
      */
-    get: operations['ReplicationPipelinesController_getPipelineReplicationStatus']
+    get: operations['PipelinesController_getPipelineReplicationStatus']
     put?: never
     post?: never
     delete?: never
@@ -3895,7 +3895,7 @@ export interface paths {
      * Restart pipeline
      * @description Restart the pipeline. Requires bearer auth and an active, healthy project. Fails with a conflict if the pipeline is not currently running.
      */
-    post: operations['ReplicationPipelinesController_restartPipeline']
+    post: operations['PipelinesController_restartPipeline']
     delete?: never
     options?: never
     head?: never
@@ -3915,7 +3915,7 @@ export interface paths {
      * Rollback pipeline tables
      * @description Rollback the replication state of tables in the pipeline. Supports rolling back a single table, all errored tables or all tables. Requires bearer auth and an active, healthy project.
      */
-    post: operations['ReplicationPipelinesController_rollbackTables']
+    post: operations['PipelinesController_rollbackTables']
     delete?: never
     options?: never
     head?: never
@@ -3935,7 +3935,7 @@ export interface paths {
      * Start pipeline
      * @description Start the pipeline. Requires bearer auth and an active, healthy project.
      */
-    post: operations['ReplicationPipelinesController_startPipeline']
+    post: operations['PipelinesController_startPipeline']
     delete?: never
     options?: never
     head?: never
@@ -3953,7 +3953,7 @@ export interface paths {
      * Get pipeline status
      * @description Get the current pipeline status. Requires bearer auth and an active, healthy project.
      */
-    get: operations['ReplicationPipelinesController_getPipelineStatus']
+    get: operations['PipelinesController_getPipelineStatus']
     put?: never
     post?: never
     delete?: never
@@ -3975,7 +3975,7 @@ export interface paths {
      * Stop pipeline
      * @description Stop the pipeline. Requires bearer auth and an active, healthy project.
      */
-    post: operations['ReplicationPipelinesController_stopPipeline']
+    post: operations['PipelinesController_stopPipeline']
     delete?: never
     options?: never
     head?: never
@@ -3993,13 +3993,13 @@ export interface paths {
      * Get pipeline version
      * @description Get the current pipeline version. Requires bearer auth and an active, healthy project.
      */
-    get: operations['ReplicationPipelinesController_getPipelineVersion']
+    get: operations['PipelinesController_getPipelineVersion']
     put?: never
     /**
      * Update pipeline version
      * @description Update the pipeline to a new version. Requires bearer auth and an active, healthy project.
      */
-    post: operations['ReplicationPipelinesController_updatePipelineVersion']
+    post: operations['PipelinesController_updatePipelineVersion']
     delete?: never
     options?: never
     head?: never
@@ -4019,7 +4019,7 @@ export interface paths {
      * Validate pipeline configuration
      * @description Validates pipeline prerequisites against the source database. Requires bearer auth and an active, healthy project.
      */
-    post: operations['ReplicationPipelinesController_validatePipeline']
+    post: operations['PipelinesController_validatePipeline']
     delete?: never
     options?: never
     head?: never
@@ -4037,13 +4037,13 @@ export interface paths {
      * List replication sources
      * @description List all sources for the project. Requires bearer auth and an active, healthy project.
      */
-    get: operations['ReplicationSourcesController_getSources']
+    get: operations['SourcesController_getSources']
     put?: never
     /**
      * Create replication source
      * @description Create a source for the project. Requires bearer auth and an active, healthy project.
      */
-    post: operations['ReplicationSourcesController_createSource']
+    post: operations['SourcesController_createSource']
     delete?: never
     options?: never
     head?: never
@@ -4061,13 +4061,13 @@ export interface paths {
      * List publications for source
      * @description List publications for a source. Requires bearer auth and an active, healthy project.
      */
-    get: operations['ReplicationSourcesController_getPublications']
+    get: operations['SourcesController_getPublications']
     put?: never
     /**
      * Create publication for source
      * @description Create a publication for a source. Requires bearer auth and an active, healthy project.
      */
-    post: operations['ReplicationSourcesController_createPublication']
+    post: operations['SourcesController_createPublication']
     delete?: never
     options?: never
     head?: never
@@ -4087,12 +4087,12 @@ export interface paths {
      * Update publication for source
      * @description Update a publication for a source. Requires bearer auth and an active, healthy project.
      */
-    post: operations['ReplicationSourcesController_updatePublication']
+    post: operations['SourcesController_updatePublication']
     /**
      * Delete publication for source
      * @description Delete a publication for a source. Requires bearer auth and an active, healthy project.
      */
-    delete: operations['ReplicationSourcesController_deletePublication']
+    delete: operations['SourcesController_deletePublication']
     options?: never
     head?: never
     patch?: never
@@ -4109,7 +4109,7 @@ export interface paths {
      * Estimate replication cost for a publication
      * @description Estimate the cost of replicating a publication's tables. Returns the hourly (and projected monthly) per-pipeline fee, a per-table breakdown of the one-time initial-copy cost derived from the tables’ on-disk size, and the usage-based streaming rate. Requires bearer auth and an active, healthy project.
      */
-    get: operations['ReplicationSourcesController_getCostEstimate']
+    get: operations['SourcesController_getCostEstimate']
     put?: never
     post?: never
     delete?: never
@@ -4129,7 +4129,7 @@ export interface paths {
      * List tables for source
      * @description List tables available for a source. Requires bearer auth and an active, healthy project.
      */
-    get: operations['ReplicationSourcesController_getTables']
+    get: operations['SourcesController_getTables']
     put?: never
     post?: never
     delete?: never
@@ -4152,7 +4152,7 @@ export interface paths {
      * Delete tenant
      * @description Delete the replication tenant for the project. Requires bearer auth.
      */
-    delete: operations['ReplicationTenantsController_deleteTenant']
+    delete: operations['TenantsController_deleteTenant']
     options?: never
     head?: never
     patch?: never
@@ -4171,14 +4171,14 @@ export interface paths {
      * Create tenant and source
      * @description Create a replication tenant and source. Requires bearer auth and an active, healthy project.
      */
-    post: operations['ReplicationTenantsSourcesController_createTenantSource']
+    post: operations['TenantsSourcesController_createTenantSource']
     delete?: never
     options?: never
     head?: never
     patch?: never
     trace?: never
   }
-  '/platform/replication/{ref}/v2/sources/{source_id}/publications': {
+  '/platform/replication/v2/{ref}/sources/{source_id}/publications': {
     parameters: {
       query?: never
       header?: never
@@ -4189,7 +4189,7 @@ export interface paths {
      * List publications for source (V2)
      * @description List publication names for a source. Requires bearer auth and an active, healthy project.
      */
-    get: operations['ReplicationSourcesV2Controller_getPublications']
+    get: operations['V2SourcesController_getPublications']
     put?: never
     post?: never
     delete?: never
@@ -4198,7 +4198,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/replication/{ref}/v2/sources/{source_id}/publications/{publication_name}': {
+  '/platform/replication/v2/{ref}/sources/{source_id}/publications/{publication_name}': {
     parameters: {
       query?: never
       header?: never
@@ -4209,24 +4209,24 @@ export interface paths {
      * Read a publication (V2)
      * @description Read a publication configuration and the tables it currently exposes. Requires bearer auth and an active, healthy project.
      */
-    get: operations['ReplicationSourcesV2Controller_getPublication']
+    get: operations['V2SourcesController_getPublication']
     /**
      * Create or replace a publication (V2)
      * @description Creates the named publication, or replaces the table configuration of an existing explicit-table publication. Table references use stable Postgres table ids (OIDs), and support optional per-table row filters and column lists. Requires bearer auth and an active, healthy project.
      */
-    put: operations['ReplicationSourcesV2Controller_putPublication']
+    put: operations['V2SourcesController_putPublication']
     post?: never
     /**
      * Delete a publication (V2)
      * @description Delete a publication for a source. Requires bearer auth and an active, healthy project.
      */
-    delete: operations['ReplicationSourcesV2Controller_deletePublication']
+    delete: operations['V2SourcesController_deletePublication']
     options?: never
     head?: never
     patch?: never
     trace?: never
   }
-  '/platform/replication/{ref}/v2/sources/{source_id}/tables': {
+  '/platform/replication/v2/{ref}/sources/{source_id}/tables': {
     parameters: {
       query?: never
       header?: never
@@ -4237,7 +4237,7 @@ export interface paths {
      * List replication-eligible source tables (V2)
      * @description List tables available for a source, including their partition hierarchy. Requires bearer auth and an active, healthy project.
      */
-    get: operations['ReplicationSourcesV2Controller_getTables']
+    get: operations['V2SourcesController_getTables']
     put?: never
     post?: never
     delete?: never
@@ -4246,7 +4246,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/replication/{ref}/v2/sources/{source_id}/tables/{table_id}/columns': {
+  '/platform/replication/v2/{ref}/sources/{source_id}/tables/{table_id}/columns': {
     parameters: {
       query?: never
       header?: never
@@ -4257,7 +4257,7 @@ export interface paths {
      * List columns for a source table
      * @description List columns for a table available to a source. Requires bearer auth and an active, healthy project.
      */
-    get: operations['ReplicationSourcesV2Controller_getTableColumns']
+    get: operations['V2SourcesController_getTableColumns']
     put?: never
     post?: never
     delete?: never
@@ -5251,7 +5251,7 @@ export interface components {
         slug: string
       }
       /** @enum {string} */
-      status: 'pending' | 'complete' | 'expired' | 'error'
+      status: 'complete' | 'error' | 'expired' | 'pending'
     }
     AddAwsAccountToPrivateLinkBody: {
       account_name?: string
@@ -5348,7 +5348,7 @@ export interface components {
         isPhysicalBackup: boolean
         project_id: number
         /** @enum {string} */
-        status: 'COMPLETED' | 'FAILED' | 'PENDING' | 'REMOVED' | 'ARCHIVED' | 'CANCELLED'
+        status: 'ARCHIVED' | 'CANCELLED' | 'COMPLETED' | 'FAILED' | 'PENDING' | 'REMOVED'
       }[]
       physicalBackupData: {
         earliestPhysicalBackupDateUnix?: number
@@ -5394,7 +5394,7 @@ export interface components {
         isPhysicalBackup: boolean
         project_id: number
         /** @enum {string} */
-        status: 'COMPLETED' | 'FAILED' | 'PENDING' | 'REMOVED' | 'ARCHIVED' | 'CANCELLED'
+        status: 'ARCHIVED' | 'CANCELLED' | 'COMPLETED' | 'FAILED' | 'PENDING' | 'REMOVED'
       }[]
       physicalBackupData: {
         earliestPhysicalBackupDateUnix?: number
@@ -5417,12 +5417,12 @@ export interface components {
         aws_agreement_id?: string
         is_eligible: boolean
         reasons: (
-          | 'AWS_ACTIVATE_CREDITS_DEAL'
           | 'AGREEMENT_BASED_OFFER'
-          | 'NO_CONTRACT_FOUND'
+          | 'AWS_ACTIVATE_CREDITS_DEAL'
           | 'CONTRACT_INACTIVE'
-          | 'CONTRACT_TERMINATED_EARLY'
           | 'CONTRACT_IN_SETTLING_WINDOW'
+          | 'CONTRACT_TERMINATED_EARLY'
+          | 'NO_CONTRACT_FOUND'
         )[]
       }
     }
@@ -5437,8 +5437,8 @@ export interface components {
         reasons: (
           | 'ALREADY_MANAGED_BY_PARTNER'
           | 'ALREADY_MANAGED_BY_PARTNER_AWS'
-          | 'OVERDUE_INVOICES'
           | 'IN_ARREARS_BILLING_MODE'
+          | 'OVERDUE_INVOICES'
         )[]
         slug: string
       }[]
@@ -5621,25 +5621,25 @@ export interface components {
       name: string
       /** @enum {string} */
       type:
-        | 'postgres'
+        | 'axiom'
         | 'bigquery'
         | 'clickhouse'
-        | 'webhook'
         | 'datadog'
-        | 'loki'
-        | 'sentry'
-        | 's3'
-        | 'axiom'
         | 'last9'
+        | 'loki'
         | 'otlp'
+        | 'postgres'
+        | 's3'
+        | 'sentry'
         | 'syslog'
+        | 'webhook'
     }
     CreateBucketIndexBody: {
       /** @enum {string} */
       dataType: 'float32'
       dimension: number
       /** @enum {string} */
-      distanceMetric: 'cosine' | 'euclidean' | 'dotproduct'
+      distanceMetric: 'cosine' | 'dotproduct' | 'euclidean'
       indexName: string
       /** @default [] */
       metadataKeys?: string[]
@@ -5654,6 +5654,459 @@ export interface components {
       name: string
       /** Format: uuid */
       parent_id?: string
+    }
+    CreateDestinationBody: {
+      /** @description Destination configuration */
+      config:
+        | {
+            big_query: {
+              /**
+               * @description Number of concurrent BigQuery Storage Write API connections.
+               * @example 8
+               */
+              connection_pool_size?: number | null
+              /**
+               * @description BigQuery dataset id
+               * @example analytics
+               */
+              dataset_id: string
+              /**
+               * @description Maximum data staleness in minutes
+               * @example 5
+               */
+              max_staleness_mins?: number | null
+              /**
+               * @description BigQuery project id
+               * @example my-gcp-project
+               */
+              project_id: string
+              /** @description BigQuery service account key */
+              service_account_key: string
+              /** @description Per-table partitioning and clustering, applied only when the physical table is created or recreated */
+              table_options?: {
+                tables?: {
+                  cluster_by?: string[]
+                  partition_by?:
+                    | (
+                        | {
+                            /**
+                             * @description Source column name
+                             * @example created_at
+                             */
+                            column: string
+                            /**
+                             * @description Partition granularity
+                             * @example day
+                             * @enum {string}
+                             */
+                            granularity?: 'day' | 'hour' | 'month' | 'year'
+                            /**
+                             * @description Partition by a replicated `DATE`, `TIMESTAMP`, or `DATETIME` column
+                             * @enum {string}
+                             */
+                            kind: 'time_column'
+                          }
+                        | {
+                            /**
+                             * @description Source column name
+                             * @example created_at
+                             */
+                            column: string
+                            /**
+                             * @description Exclusive end of the last partition range
+                             * @example 100
+                             */
+                            end: number
+                            /**
+                             * @description Width of each partition range
+                             * @example 10
+                             */
+                            interval: number
+                            /**
+                             * @description Partition by ranges of a replicated integer column
+                             * @enum {string}
+                             */
+                            kind: 'integer_range'
+                            /**
+                             * @description Inclusive start of the first partition range
+                             * @example 0
+                             */
+                            start: number
+                          }
+                        | {
+                            /**
+                             * @description Partition granularity
+                             * @example day
+                             * @enum {string}
+                             */
+                            granularity?: 'day' | 'hour' | 'month' | 'year'
+                            /**
+                             * @description Partition by the time at which BigQuery ingests each row
+                             * @enum {string}
+                             */
+                            kind: 'ingestion_time'
+                          }
+                      )
+                    | null
+                  /**
+                   * @description Source PostgreSQL table OID, stable across renames for the relation lifetime
+                   * @example 16384
+                   */
+                  table_id: number
+                }[]
+              }
+            }
+          }
+        | {
+            clickhouse: {
+              /**
+               * @description ClickHouse target database
+               * @example analytics
+               */
+              database: string
+              /**
+               * @description Table engine used for replicated tables. Defaults to `replacing_merge_tree` server-side when omitted.
+               * @example replacing_merge_tree
+               * @enum {string}
+               */
+              engine?: 'merge_tree' | 'replacing_merge_tree'
+              /** @description ClickHouse password. Omit for passwordless access. */
+              password?: string | null
+              /**
+               * @description ClickHouse HTTPS endpoint URL
+               * @example https://clickhouse.example.com:8443
+               */
+              url: string
+              /**
+               * @description ClickHouse user name
+               * @example default
+               */
+              user: string
+            }
+          }
+        | {
+            iceberg: {
+              supabase: {
+                /**
+                 * @description Catalog token
+                 * @example A jwt secret
+                 */
+                catalog_token: string
+                /**
+                 * @description Namespace
+                 * @example my-namespace
+                 */
+                namespace?: string | null
+                /**
+                 * @description Project ref
+                 * @example abcdefghijklmnopqrst
+                 */
+                project_ref: string
+                /**
+                 * @description S3 access key ID
+                 * @example 53383b1d0cdb16a3afa63152656aa3cc
+                 */
+                s3_access_key_id: string
+                /**
+                 * @description S3 region
+                 * @example ap-southeast-1
+                 */
+                s3_region: string
+                /**
+                 * @description S3 secret access key
+                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
+                 */
+                s3_secret_access_key: string
+                /**
+                 * @description Warehouse name
+                 * @example my-warehouse
+                 */
+                warehouse_name: string
+              }
+            }
+          }
+        | {
+            ducklake:
+              | {
+                  /**
+                   * @description DuckLake catalog URL
+                   * @example postgres://user:pass@localhost:5432/ducklake_catalog
+                   */
+                  catalog_url: string
+                  /**
+                   * @description DuckLake data path
+                   * @example s3://<bucket-name>/
+                   */
+                  data_path: string
+                  /**
+                   * @description Schema used for DuckLake metadata tables stored in PostgreSQL
+                   * @default ducklake
+                   * @example ducklake
+                   */
+                  metadata_schema?: string
+                  /**
+                   * @description Number of concurrent DuckDB connections.
+                   * @example 4
+                   */
+                  pool_size?: number | null
+                  /**
+                   * @description S3-compatible storage access key ID
+                   * @example my-access-key
+                   */
+                  s3_access_key_id?: string | null
+                  /**
+                   * @description S3-compatible storage endpoint
+                   * @example 127.0.0.1:5000/s3
+                   */
+                  s3_endpoint?: string | null
+                  /**
+                   * @description S3-compatible storage region
+                   * @example us-east-1
+                   */
+                  s3_region?: string | null
+                  /**
+                   * @description S3-compatible storage secret access key
+                   * @example my-secret-key
+                   */
+                  s3_secret_access_key?: string | null
+                  /**
+                   * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
+                   * @example path
+                   * @enum {string|null}
+                   */
+                  s3_url_style?: null | 'path' | 'vhost'
+                  /**
+                   * @description Whether to use SSL for S3-compatible storage
+                   * @default true
+                   * @example false
+                   */
+                  s3_use_ssl?: boolean
+                  table_sorting?: {
+                    tables?: {
+                      schema: string
+                      sort_by:
+                        | {
+                            columns: {
+                              /**
+                               * @description DuckLake sort direction
+                               * @example asc
+                               * @enum {string}
+                               */
+                              direction?: 'asc' | 'desc'
+                              /**
+                               * @description Source column name
+                               * @example created_at
+                               */
+                              name: string
+                              /**
+                               * @description Optional placement of null values in the DuckLake sort order
+                               * @example last
+                               * @enum {string|null}
+                               */
+                              nulls?: 'first' | 'last' | null
+                            }[]
+                            /** @enum {string} */
+                            kind: 'columns'
+                          }
+                        | {
+                            /** @enum {string} */
+                            kind: 'primary_key'
+                          }
+                      table: string
+                    }[]
+                  }
+                }
+              | {
+                  catalog:
+                    | {
+                        /**
+                         * @description DuckLake catalog URL
+                         * @example postgres://user:pass@localhost:5432/ducklake_catalog
+                         */
+                        catalog_url: string
+                        /**
+                         * @description Schema used for DuckLake metadata tables stored in this PostgreSQL catalog. Overrides `metadata_schema` when provided.
+                         * @example ducklake
+                         */
+                        metadata_schema?: string | null
+                        /**
+                         * @description Number of concurrent DuckDB connections.
+                         * @example 4
+                         */
+                        pool_size?: number | null
+                        /** @enum {string} */
+                        type: 'postgres_url'
+                      }
+                    | {
+                        /**
+                         * @description Schema used for DuckLake metadata tables stored in this PostgreSQL catalog. Overrides `metadata_schema` when provided.
+                         * @example ducklake
+                         */
+                        metadata_schema?: string | null
+                        /**
+                         * @description Number of concurrent DuckDB connections.
+                         * @example 4
+                         */
+                        pool_size?: number | null
+                        /**
+                         * @description Supabase project ref used as the DuckLake PostgreSQL catalog
+                         * @example abcjuqabhgwjjutfvtpa
+                         */
+                        project_ref: string
+                        /** @enum {string} */
+                        type: 'supabase_project'
+                      }
+                  /**
+                   * @description Schema used for DuckLake metadata tables stored in PostgreSQL
+                   * @default ducklake
+                   * @example ducklake
+                   */
+                  metadata_schema?: string
+                  /**
+                   * @description Number of concurrent DuckDB connections.
+                   * @example 4
+                   */
+                  pool_size?: number | null
+                  storage:
+                    | {
+                        /**
+                         * @description DuckLake data path
+                         * @example s3://<bucket-name>/
+                         */
+                        data_path: string
+                        /**
+                         * @description S3-compatible storage access key ID
+                         * @example my-access-key
+                         */
+                        s3_access_key_id: string
+                        /**
+                         * @description S3-compatible storage endpoint
+                         * @example 127.0.0.1:5000/s3
+                         */
+                        s3_endpoint: string
+                        /**
+                         * @description S3-compatible storage region
+                         * @example us-east-1
+                         */
+                        s3_region: string
+                        /**
+                         * @description S3-compatible storage secret access key
+                         * @example my-secret-key
+                         */
+                        s3_secret_access_key: string
+                        /**
+                         * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
+                         * @example path
+                         * @enum {string|null}
+                         */
+                        s3_url_style?: null | 'path' | 'vhost'
+                        /**
+                         * @description Whether to use SSL for S3-compatible storage
+                         * @default true
+                         * @example false
+                         */
+                        s3_use_ssl?: boolean
+                        /** @enum {string} */
+                        type: 's3'
+                      }
+                    | {
+                        /**
+                         * @description Storage bucket id used for DuckLake data files
+                         * @example ducklake
+                         */
+                        bucket: string
+                        /**
+                         * @description Optional description for the generated Supabase Storage S3 credential
+                         * @example DuckLake replication destination
+                         */
+                        credential_description?: string
+                        /**
+                         * @description Optional path prefix inside the bucket for DuckLake data files
+                         * @example replication
+                         */
+                        path?: string
+                        /**
+                         * @description Supabase project ref whose Object Storage S3 API stores DuckLake data files
+                         * @example abcjuqabhgwjjutfvtpa
+                         */
+                        project_ref: string
+                        /** @enum {string} */
+                        type: 'supabase_storage'
+                      }
+                  table_sorting?: {
+                    tables?: {
+                      schema: string
+                      sort_by:
+                        | {
+                            columns: {
+                              /**
+                               * @description DuckLake sort direction
+                               * @example asc
+                               * @enum {string}
+                               */
+                              direction?: 'asc' | 'desc'
+                              /**
+                               * @description Source column name
+                               * @example created_at
+                               */
+                              name: string
+                              /**
+                               * @description Optional placement of null values in the DuckLake sort order
+                               * @example last
+                               * @enum {string|null}
+                               */
+                              nulls?: 'first' | 'last' | null
+                            }[]
+                            /** @enum {string} */
+                            kind: 'columns'
+                          }
+                        | {
+                            /** @enum {string} */
+                            kind: 'primary_key'
+                          }
+                      table: string
+                    }[]
+                  }
+                }
+          }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /** @description Snowflake RSA private key PEM contents */
+              private_key: string
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string | null
+              /**
+               * @description Optional Snowflake role
+               * @example PIPELINES_ROLE
+               */
+              role?: string | null
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example PIPELINES_USER
+               */
+              user: string
+            }
+          }
+      /**
+       * @description Destination name
+       * @example bq-analytics
+       */
+      name: string
     }
     CreateDestinationPipelineResponse: {
       /**
@@ -5724,14 +6177,6 @@ export interface components {
       role_id?: number
       role_scoped_projects?: string[]
     }
-    CreateInvitationResponse: {
-      failed: {
-        /** Format: email */
-        email: string
-        error: string
-      }[]
-      succeeded: string[]
-    } | null
     CreateNamespaceBody: {
       namespace: string
     }
@@ -5742,18 +6187,18 @@ export interface components {
         required: boolean
         type:
           | (
+              | 'binary'
               | 'boolean'
+              | 'date'
+              | 'double'
+              | 'float'
               | 'int'
               | 'long'
-              | 'float'
-              | 'double'
               | 'string'
-              | 'timestamp'
-              | 'date'
               | 'time'
+              | 'timestamp'
               | 'timestamptz'
               | 'uuid'
-              | 'binary'
             )
           | string
       }[]
@@ -5771,33 +6216,33 @@ export interface components {
         }
         lint_name?:
           | (
-              | 'ssl_not_enforced'
-              | 'network_restrictions_not_set'
-              | 'pitr_not_enabled'
-              | 'password_requirements_min_length'
-              | 'unindexed_foreign_keys'
-              | 'auth_users_exposed'
-              | 'auth_rls_initplan'
-              | 'no_primary_key'
-              | 'unused_index'
-              | 'multiple_permissive_policies'
-              | 'policy_exists_rls_disabled'
-              | 'rls_enabled_no_policy'
-              | 'duplicate_index'
-              | 'security_definer_view'
-              | 'function_search_path_mutable'
-              | 'rls_disabled_in_public'
-              | 'extension_in_public'
-              | 'rls_references_user_metadata'
-              | 'materialized_view_in_api'
-              | 'foreign_table_in_api'
-              | 'unsupported_reg_types'
+              | 'auth_insufficient_mfa_options'
+              | 'auth_leaked_password_protection'
               | 'auth_otp_long_expiry'
               | 'auth_otp_short_length'
-              | 'auth_leaked_password_protection'
-              | 'auth_insufficient_mfa_options'
               | 'auth_password_policy_missing'
+              | 'auth_rls_initplan'
+              | 'auth_users_exposed'
+              | 'duplicate_index'
+              | 'extension_in_public'
+              | 'foreign_table_in_api'
+              | 'function_search_path_mutable'
+              | 'materialized_view_in_api'
+              | 'multiple_permissive_policies'
+              | 'network_restrictions_not_set'
               | 'no_backup_admin'
+              | 'no_primary_key'
+              | 'password_requirements_min_length'
+              | 'pitr_not_enabled'
+              | 'policy_exists_rls_disabled'
+              | 'rls_disabled_in_public'
+              | 'rls_enabled_no_policy'
+              | 'rls_references_user_metadata'
+              | 'security_definer_view'
+              | 'ssl_not_enforced'
+              | 'unindexed_foreign_keys'
+              | 'unsupported_reg_types'
+              | 'unused_index'
             )
           | string
         note?: string
@@ -5899,12 +6344,134 @@ export interface components {
       }
       /** @enum {string} */
       tier:
-        | 'tier_free'
-        | 'tier_pro'
-        | 'tier_payg'
-        | 'tier_team'
         | 'tier_enterprise'
+        | 'tier_free'
+        | 'tier_payg'
         | 'tier_platform'
+        | 'tier_pro'
+        | 'tier_team'
+    }
+    CreatePipelineBody: {
+      /** @description Pipeline configuration */
+      config: {
+        /** @description Batch configuration. Omit or use `null` for server defaults. */
+        batch?: {
+          /**
+           * @description Maximum preferred byte size for one source batch
+           * @example 8388608
+           */
+          max_bytes?: number
+          /**
+           * @description Maximum fill time in milliseconds
+           * @example 200
+           */
+          max_fill_ms?: number
+          /**
+           * @description Ratio of process memory reserved for incoming stream batch bytes, in (0, 1]
+           * @example 0.2
+           */
+          memory_budget_ratio?: number
+        } | null
+        /**
+         * @description Behavior when the replication slot is invalidated. `error` prevents pipeline startup and requires manual intervention. `recreate` automatically recreates the slot and restarts replication from scratch.
+         * @example error
+         * @enum {string|null}
+         */
+        invalidated_slot_behavior?: 'error' | null | 'recreate'
+        /**
+         * @description Replicator log level
+         * @example info
+         * @enum {string|null}
+         */
+        log_level?: 'debug' | 'error' | 'info' | null | 'trace' | 'warn'
+        /** @description Maximum number of copy connections per table */
+        max_copy_connections_per_table?: number | null
+        /** @description Maximum number of table sync workers */
+        max_table_sync_workers?: number | null
+        /** @description Memory-based backpressure configuration. Omission enables server defaults; `null` disables it. */
+        memory_backpressure?: {
+          /**
+           * @description Memory usage ratio above which backpressure is activated
+           * @example 0.85
+           */
+          activate_threshold: number
+          /**
+           * @description Memory usage ratio below which backpressure is released
+           * @example 0.75
+           */
+          resume_threshold: number
+        } | null
+        /**
+         * @description Milliseconds between one memory usage refresh and another
+         * @example 100
+         */
+        memory_refresh_interval_ms?: number | null
+        /**
+         * @description Publication name
+         * @example pub_orders
+         */
+        publication_name: string
+        /**
+         * @description Milliseconds between one replication lag refresh and another
+         * @example 10000
+         */
+        replication_lag_refresh_interval_ms?: number | null
+        /**
+         * @description Milliseconds between one retry and another for timed worker retries
+         * @example 10000
+         */
+        table_error_retry_delay_ms?: number | null
+        /**
+         * @description Maximum number of automatic timed retry attempts
+         * @example 5
+         */
+        table_error_retry_max_attempts?: number | null
+        /** @description Selection rules for tables participating in initial table copy. Omit or use `null` to copy all tables. */
+        table_sync_copy?:
+          | (
+              | {
+                  /** @enum {string} */
+                  type: 'include_all_tables'
+                }
+              | {
+                  /** @enum {string} */
+                  type: 'skip_all_tables'
+                }
+              | {
+                  /**
+                   * @description Table ids for which copy should be performed
+                   * @example [
+                   *       16408
+                   *     ]
+                   */
+                  table_ids: number[]
+                  /** @enum {string} */
+                  type: 'include_tables'
+                }
+              | {
+                  /**
+                   * @description Table ids for which copy should be skipped
+                   * @example [
+                   *       16408
+                   *     ]
+                   */
+                  table_ids: number[]
+                  /** @enum {string} */
+                  type: 'skip_tables'
+                }
+            )
+          | null
+      }
+      /**
+       * @description Destination id
+       * @example 2001
+       */
+      destination_id: number
+      /**
+       * @description Source id
+       * @example 3001
+       */
+      source_id: number
     }
     CreatePipelineResponse: {
       /**
@@ -5917,20 +6484,6 @@ export interface components {
       description?: string
       name: string
       permissions: (
-        | 'organizations_read'
-        | 'organizations_create'
-        | 'projects_read'
-        | 'snippets_read'
-        | 'organization_admin_read'
-        | 'organization_admin_write'
-        | 'members_read'
-        | 'members_write'
-        | 'organization_projects_read'
-        | 'organization_projects_create'
-        | 'platform_webhooks_organization_read'
-        | 'platform_webhooks_organization_write'
-        | 'project_admin_read'
-        | 'project_admin_write'
         | 'action_runs_read'
         | 'action_runs_write'
         | 'advisors_read'
@@ -5958,48 +6511,62 @@ export interface components {
         | 'custom_domain_write'
         | 'data_api_config_read'
         | 'data_api_config_write'
-        | 'database_read'
-        | 'database_write'
         | 'database_config_read'
         | 'database_config_write'
         | 'database_jit_read'
         | 'database_jit_write'
+        | 'database_migrations_read'
+        | 'database_migrations_write'
         | 'database_network_bans_read'
         | 'database_network_bans_write'
         | 'database_network_restrictions_read'
         | 'database_network_restrictions_write'
-        | 'database_migrations_read'
-        | 'database_migrations_write'
         | 'database_pooling_config_read'
         | 'database_pooling_config_write'
+        | 'database_read'
         | 'database_readonly_config_read'
         | 'database_readonly_config_write'
         | 'database_ssl_config_read'
         | 'database_ssl_config_write'
         | 'database_webhooks_config_read'
         | 'database_webhooks_config_write'
+        | 'database_write'
         | 'edge_functions_read'
-        | 'edge_functions_write'
         | 'edge_functions_secrets_read'
         | 'edge_functions_secrets_write'
+        | 'edge_functions_write'
         | 'infra_add_ons_read'
         | 'infra_add_ons_write'
         | 'infra_disk_config_read'
         | 'infra_disk_config_write'
         | 'infra_read_replicas_read'
         | 'infra_read_replicas_write'
-        | 'project_snippets_read'
-        | 'project_snippets_write'
-        | 'realtime_config_read'
-        | 'realtime_config_write'
-        | 'storage_read'
-        | 'storage_write'
-        | 'storage_config_read'
-        | 'storage_config_write'
-        | 'vanity_subdomain_read'
-        | 'vanity_subdomain_write'
+        | 'members_read'
+        | 'members_write'
+        | 'organization_admin_read'
+        | 'organization_admin_write'
+        | 'organization_projects_create'
+        | 'organization_projects_read'
+        | 'organizations_create'
+        | 'organizations_read'
+        | 'platform_webhooks_organization_read'
+        | 'platform_webhooks_organization_write'
         | 'platform_webhooks_projects_read'
         | 'platform_webhooks_projects_write'
+        | 'project_admin_read'
+        | 'project_admin_write'
+        | 'project_snippets_read'
+        | 'project_snippets_write'
+        | 'projects_read'
+        | 'realtime_config_read'
+        | 'realtime_config_write'
+        | 'snippets_read'
+        | 'storage_config_read'
+        | 'storage_config_write'
+        | 'storage_read'
+        | 'storage_write'
+        | 'vanity_subdomain_read'
+        | 'vanity_subdomain_write'
         | 'workers_read'
         | 'workers_write'
       )[]
@@ -6038,85 +6605,85 @@ export interface components {
            * @enum {string}
            */
           instance_type?:
-            | 't4g.nano'
-            | 't3a.nano'
-            | 't3.nano'
-            | 't4g.micro'
-            | 't3a.micro'
-            | 't3.micro'
-            | 't4g.small'
-            | 't3a.small'
-            | 't3.small'
-            | 't4g.medium'
-            | 't3a.medium'
-            | 't3.medium'
-            | 'm6g.medium'
-            | 'm7g.medium'
-            | 'm8g.medium'
-            | 'm9g.medium'
             | 'c6g.medium'
-            | 'm6g.large'
-            | 'm6a.large'
-            | 'm6i.large'
-            | 'm7i.large'
-            | 'm8i.large'
-            | 'm7a.large'
-            | 'm8a.large'
-            | 'm6g.xlarge'
-            | 'm6a.xlarge'
-            | 'm6i.xlarge'
-            | 'm7i.xlarge'
-            | 'm8i.xlarge'
-            | 'm7a.xlarge'
-            | 'm8a.xlarge'
-            | 'm6g.2xlarge'
-            | 'm6a.2xlarge'
-            | 'm6i.2xlarge'
-            | 'm7i.2xlarge'
-            | 'm8i.2xlarge'
-            | 'm7a.2xlarge'
-            | 'm8a.2xlarge'
-            | 'm6g.4xlarge'
-            | 'm6a.4xlarge'
-            | 'm6i.4xlarge'
-            | 'm7i.4xlarge'
-            | 'm8i.4xlarge'
-            | 'm7a.4xlarge'
-            | 'm8a.4xlarge'
-            | 'm6g.8xlarge'
-            | 'm6a.8xlarge'
-            | 'm6i.8xlarge'
-            | 'm7i.8xlarge'
-            | 'm8i.8xlarge'
-            | 'm7a.8xlarge'
-            | 'm8a.8xlarge'
-            | 'm6g.12xlarge'
-            | 'm6a.12xlarge'
-            | 'm6i.12xlarge'
-            | 'm7i.12xlarge'
-            | 'm8i.12xlarge'
-            | 'm7a.12xlarge'
-            | 'm8a.12xlarge'
-            | 'm6g.16xlarge'
-            | 'm6a.16xlarge'
-            | 'm6i.16xlarge'
-            | 'm7i.16xlarge'
-            | 'm8i.16xlarge'
-            | 'm7a.16xlarge'
-            | 'm8a.16xlarge'
-            | 'm8g.24xlarge'
             | 'c8g.24xlarge'
-            | 'r8g.24xlarge'
-            | 'x8g.24xlarge'
-            | 'm8g.48xlarge'
             | 'c8g.48xlarge'
+            | 'm6a.12xlarge'
+            | 'm6a.16xlarge'
+            | 'm6a.2xlarge'
+            | 'm6a.4xlarge'
+            | 'm6a.8xlarge'
+            | 'm6a.large'
+            | 'm6a.xlarge'
+            | 'm6g.12xlarge'
+            | 'm6g.16xlarge'
+            | 'm6g.2xlarge'
+            | 'm6g.4xlarge'
+            | 'm6g.8xlarge'
+            | 'm6g.large'
+            | 'm6g.medium'
+            | 'm6g.xlarge'
+            | 'm6i.12xlarge'
+            | 'm6i.16xlarge'
+            | 'm6i.2xlarge'
+            | 'm6i.4xlarge'
+            | 'm6i.8xlarge'
+            | 'm6i.large'
+            | 'm6i.xlarge'
+            | 'm7a.12xlarge'
+            | 'm7a.16xlarge'
+            | 'm7a.2xlarge'
+            | 'm7a.4xlarge'
+            | 'm7a.8xlarge'
+            | 'm7a.large'
+            | 'm7a.xlarge'
+            | 'm7g.medium'
+            | 'm7i.12xlarge'
+            | 'm7i.16xlarge'
+            | 'm7i.2xlarge'
+            | 'm7i.4xlarge'
+            | 'm7i.8xlarge'
+            | 'm7i.large'
+            | 'm7i.xlarge'
+            | 'm8a.12xlarge'
+            | 'm8a.16xlarge'
+            | 'm8a.2xlarge'
+            | 'm8a.4xlarge'
+            | 'm8a.8xlarge'
+            | 'm8a.large'
+            | 'm8a.xlarge'
+            | 'm8g.24xlarge'
+            | 'm8g.48xlarge'
+            | 'm8g.medium'
+            | 'm8i.12xlarge'
+            | 'm8i.16xlarge'
+            | 'm8i.2xlarge'
+            | 'm8i.4xlarge'
+            | 'm8i.8xlarge'
+            | 'm8i.large'
+            | 'm8i.xlarge'
+            | 'm9g.medium'
+            | 'r8g.24xlarge'
             | 'r8g.48xlarge'
+            | 't3.medium'
+            | 't3.micro'
+            | 't3.nano'
+            | 't3.small'
+            | 't3a.medium'
+            | 't3a.micro'
+            | 't3a.nano'
+            | 't3a.small'
+            | 't4g.medium'
+            | 't4g.micro'
+            | 't4g.nano'
+            | 't4g.small'
+            | 'x8g.24xlarge'
             | 'x8g.48xlarge'
           /**
            * @description Preferred architecture for WPP projects. Soft hint — the worker selects the cheapest region-available type for this arch and may cross to the other arch if no ODCR capacity is available. Cannot be set together with instance_type. Only for internal use.
            * @enum {string}
            */
-          preferred_arch?: 'x86_64' | 'arm64'
+          preferred_arch?: 'arm64' | 'x86_64'
           search_tags?: {
             [key: string]: string
           }
@@ -6155,24 +6722,24 @@ export interface components {
       db_sql?: string
       /** @enum {string} */
       desired_instance_size?:
-        | 'micro'
-        | 'small'
-        | 'medium'
-        | 'large'
-        | 'xlarge'
-        | '2xlarge'
-        | '4xlarge'
-        | '8xlarge'
         | '12xlarge'
         | '16xlarge'
         | '24xlarge'
-        | '24xlarge_optimized_memory'
-        | '24xlarge_optimized_cpu'
         | '24xlarge_high_memory'
+        | '24xlarge_optimized_cpu'
+        | '24xlarge_optimized_memory'
+        | '2xlarge'
         | '48xlarge'
-        | '48xlarge_optimized_memory'
-        | '48xlarge_optimized_cpu'
         | '48xlarge_high_memory'
+        | '48xlarge_optimized_cpu'
+        | '48xlarge_optimized_memory'
+        | '4xlarge'
+        | '8xlarge'
+        | 'large'
+        | 'medium'
+        | 'micro'
+        | 'small'
+        | 'xlarge'
       /** @description GitHub App installation ID. Must be provided together with github_repository_id to connect a GitHub repository during project creation. */
       github_installation_id?: number
       /** @description GitHub repository ID. Must be provided together with github_installation_id to connect a GitHub repository during project creation. */
@@ -6194,24 +6761,24 @@ export interface components {
              * @enum {string}
              */
             code:
+              | 'ap-east-1'
+              | 'ap-northeast-1'
+              | 'ap-northeast-2'
+              | 'ap-south-1'
+              | 'ap-southeast-1'
+              | 'ap-southeast-2'
+              | 'ca-central-1'
+              | 'eu-central-1'
+              | 'eu-central-2'
+              | 'eu-north-1'
+              | 'eu-west-1'
+              | 'eu-west-2'
+              | 'eu-west-3'
+              | 'sa-east-1'
               | 'us-east-1'
               | 'us-east-2'
               | 'us-west-1'
               | 'us-west-2'
-              | 'ap-east-1'
-              | 'ap-southeast-1'
-              | 'ap-northeast-1'
-              | 'ap-northeast-2'
-              | 'ap-southeast-2'
-              | 'eu-west-1'
-              | 'eu-west-2'
-              | 'eu-west-3'
-              | 'eu-north-1'
-              | 'eu-central-1'
-              | 'eu-central-2'
-              | 'ca-central-1'
-              | 'ap-south-1'
-              | 'sa-east-1'
             /** @enum {string} */
             type: 'specific'
           }
@@ -6221,7 +6788,7 @@ export interface components {
              * @example apac
              * @enum {string}
              */
-            code: 'americas' | 'emea' | 'apac'
+            code: 'americas' | 'apac' | 'emea'
             /** @enum {string} */
             type: 'smartGroup'
           }
@@ -6229,7 +6796,7 @@ export interface components {
        * @description Release channel. If not provided, GA will be used.
        * @enum {string}
        */
-      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
+      release_channel?: 'alpha' | 'beta' | 'ga' | 'internal' | 'preview' | 'withdrawn'
     }
     CreateProjectResponse: {
       anon_key: string
@@ -6239,26 +6806,26 @@ export interface components {
       id: number
       /** @enum {string} */
       infra_compute_size?:
-        | 'pico'
-        | 'nano'
-        | 'micro'
-        | 'small'
-        | 'medium'
-        | 'large'
-        | 'xlarge'
-        | '2xlarge'
-        | '4xlarge'
-        | '8xlarge'
         | '12xlarge'
         | '16xlarge'
         | '24xlarge'
-        | '24xlarge_optimized_memory'
-        | '24xlarge_optimized_cpu'
         | '24xlarge_high_memory'
+        | '24xlarge_optimized_cpu'
+        | '24xlarge_optimized_memory'
+        | '2xlarge'
         | '48xlarge'
-        | '48xlarge_optimized_memory'
-        | '48xlarge_optimized_cpu'
         | '48xlarge_high_memory'
+        | '48xlarge_optimized_cpu'
+        | '48xlarge_optimized_memory'
+        | '4xlarge'
+        | '8xlarge'
+        | 'large'
+        | 'medium'
+        | 'micro'
+        | 'nano'
+        | 'pico'
+        | 'small'
+        | 'xlarge'
       inserted_at: string | null
       is_branch_enabled: boolean
       is_physical_backups_enabled: boolean | null
@@ -6272,390 +6839,25 @@ export interface components {
       status: string
       subscription_id: string | null
     }
-    CreateReplicationDestinationBody: {
-      /** @description Destination configuration */
-      config:
-        | {
-            big_query: {
-              /**
-               * @description Number of concurrent BigQuery Storage Write API connections.
-               * @example 8
-               */
-              connection_pool_size?: number | null
-              /**
-               * @description BigQuery dataset id
-               * @example analytics
-               */
-              dataset_id: string
-              /**
-               * @description Maximum data staleness in minutes
-               * @example 5
-               */
-              max_staleness_mins?: number | null
-              /**
-               * @description BigQuery project id
-               * @example my-gcp-project
-               */
-              project_id: string
-              /** @description BigQuery service account key */
-              service_account_key: string
-              /** @description Per-table partitioning and clustering, applied only when the physical table is created or recreated */
-              table_options?: {
-                tables?: {
-                  cluster_by?: string[]
-                  partition_by?:
-                    | (
-                        | {
-                            /**
-                             * @description Source column name
-                             * @example created_at
-                             */
-                            column: string
-                            /**
-                             * @description Partition granularity
-                             * @example day
-                             * @enum {string}
-                             */
-                            granularity?: 'hour' | 'day' | 'month' | 'year'
-                            /**
-                             * @description Partition by a replicated `DATE`, `TIMESTAMP`, or `DATETIME` column
-                             * @enum {string}
-                             */
-                            kind: 'time_column'
-                          }
-                        | {
-                            /**
-                             * @description Source column name
-                             * @example created_at
-                             */
-                            column: string
-                            /**
-                             * @description Exclusive end of the last partition range
-                             * @example 100
-                             */
-                            end: number
-                            /**
-                             * @description Width of each partition range
-                             * @example 10
-                             */
-                            interval: number
-                            /**
-                             * @description Partition by ranges of a replicated integer column
-                             * @enum {string}
-                             */
-                            kind: 'integer_range'
-                            /**
-                             * @description Inclusive start of the first partition range
-                             * @example 0
-                             */
-                            start: number
-                          }
-                        | {
-                            /**
-                             * @description Partition granularity
-                             * @example day
-                             * @enum {string}
-                             */
-                            granularity?: 'hour' | 'day' | 'month' | 'year'
-                            /**
-                             * @description Partition by the time at which BigQuery ingests each row
-                             * @enum {string}
-                             */
-                            kind: 'ingestion_time'
-                          }
-                      )
-                    | null
-                  /**
-                   * @description Source PostgreSQL table OID, stable across renames for the relation lifetime
-                   * @example 16384
-                   */
-                  table_id: number
-                }[]
-              }
-            }
-          }
-        | {
-            clickhouse: {
-              /**
-               * @description ClickHouse target database
-               * @example analytics
-               */
-              database: string
-              /**
-               * @description Table engine used for replicated tables. Defaults to `replacing_merge_tree` server-side when omitted.
-               * @example replacing_merge_tree
-               * @enum {string}
-               */
-              engine?: 'merge_tree' | 'replacing_merge_tree'
-              /** @description ClickHouse password. Omit for passwordless access. */
-              password?: string | null
-              /**
-               * @description ClickHouse HTTPS endpoint URL
-               * @example https://clickhouse.example.com:8443
-               */
-              url: string
-              /**
-               * @description ClickHouse user name
-               * @example default
-               */
-              user: string
-            }
-          }
-        | {
-            iceberg: {
-              supabase: {
-                /**
-                 * @description Catalog token
-                 * @example A jwt secret
-                 */
-                catalog_token: string
-                /**
-                 * @description Namespace
-                 * @example my-namespace
-                 */
-                namespace?: string | null
-                /**
-                 * @description Project ref
-                 * @example abcdefghijklmnopqrst
-                 */
-                project_ref: string
-                /**
-                 * @description S3 access key ID
-                 * @example 53383b1d0cdb16a3afa63152656aa3cc
-                 */
-                s3_access_key_id: string
-                /**
-                 * @description S3 region
-                 * @example ap-southeast-1
-                 */
-                s3_region: string
-                /**
-                 * @description S3 secret access key
-                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
-                 */
-                s3_secret_access_key: string
-                /**
-                 * @description Warehouse name
-                 * @example my-warehouse
-                 */
-                warehouse_name: string
-              }
-            }
-          }
-        | {
-            ducklake:
-              | {
-                  /**
-                   * @description DuckLake catalog URL
-                   * @example postgres://user:pass@localhost:5432/ducklake_catalog
-                   */
-                  catalog_url: string
-                  /**
-                   * @description DuckLake data path
-                   * @example s3://<bucket-name>/
-                   */
-                  data_path: string
-                  /**
-                   * @description Schema used for DuckLake metadata tables stored in PostgreSQL
-                   * @default ducklake
-                   * @example ducklake
-                   */
-                  metadata_schema?: string
-                  /**
-                   * @description Number of concurrent DuckDB connections.
-                   * @example 4
-                   */
-                  pool_size?: number | null
-                  /**
-                   * @description S3-compatible storage access key ID
-                   * @example my-access-key
-                   */
-                  s3_access_key_id?: string | null
-                  /**
-                   * @description S3-compatible storage endpoint
-                   * @example 127.0.0.1:5000/s3
-                   */
-                  s3_endpoint?: string | null
-                  /**
-                   * @description S3-compatible storage region
-                   * @example us-east-1
-                   */
-                  s3_region?: string | null
-                  /**
-                   * @description S3-compatible storage secret access key
-                   * @example my-secret-key
-                   */
-                  s3_secret_access_key?: string | null
-                  /**
-                   * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
-                   * @example path
-                   * @enum {string|null}
-                   */
-                  s3_url_style?: 'path' | 'vhost' | null
-                  /**
-                   * @description Whether to use SSL for S3-compatible storage
-                   * @default true
-                   * @example false
-                   */
-                  s3_use_ssl?: boolean
-                }
-              | {
-                  catalog:
-                    | {
-                        /**
-                         * @description DuckLake catalog URL
-                         * @example postgres://user:pass@localhost:5432/ducklake_catalog
-                         */
-                        catalog_url: string
-                        /**
-                         * @description Schema used for DuckLake metadata tables stored in this PostgreSQL catalog. Overrides `metadata_schema` when provided.
-                         * @example ducklake
-                         */
-                        metadata_schema?: string | null
-                        /**
-                         * @description Number of concurrent DuckDB connections.
-                         * @example 4
-                         */
-                        pool_size?: number | null
-                        /** @enum {string} */
-                        type: 'postgres_url'
-                      }
-                    | {
-                        /**
-                         * @description Schema used for DuckLake metadata tables stored in this PostgreSQL catalog. Overrides `metadata_schema` when provided.
-                         * @example ducklake
-                         */
-                        metadata_schema?: string | null
-                        /**
-                         * @description Number of concurrent DuckDB connections.
-                         * @example 4
-                         */
-                        pool_size?: number | null
-                        /**
-                         * @description Supabase project ref used as the DuckLake PostgreSQL catalog
-                         * @example abcjuqabhgwjjutfvtpa
-                         */
-                        project_ref: string
-                        /** @enum {string} */
-                        type: 'supabase_project'
-                      }
-                  /**
-                   * @description Schema used for DuckLake metadata tables stored in PostgreSQL
-                   * @default ducklake
-                   * @example ducklake
-                   */
-                  metadata_schema?: string
-                  /**
-                   * @description Number of concurrent DuckDB connections.
-                   * @example 4
-                   */
-                  pool_size?: number | null
-                  storage:
-                    | {
-                        /**
-                         * @description DuckLake data path
-                         * @example s3://<bucket-name>/
-                         */
-                        data_path: string
-                        /**
-                         * @description S3-compatible storage access key ID
-                         * @example my-access-key
-                         */
-                        s3_access_key_id: string
-                        /**
-                         * @description S3-compatible storage endpoint
-                         * @example 127.0.0.1:5000/s3
-                         */
-                        s3_endpoint: string
-                        /**
-                         * @description S3-compatible storage region
-                         * @example us-east-1
-                         */
-                        s3_region: string
-                        /**
-                         * @description S3-compatible storage secret access key
-                         * @example my-secret-key
-                         */
-                        s3_secret_access_key: string
-                        /**
-                         * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
-                         * @example path
-                         * @enum {string|null}
-                         */
-                        s3_url_style?: 'path' | 'vhost' | null
-                        /**
-                         * @description Whether to use SSL for S3-compatible storage
-                         * @default true
-                         * @example false
-                         */
-                        s3_use_ssl?: boolean
-                        /** @enum {string} */
-                        type: 's3'
-                      }
-                    | {
-                        /**
-                         * @description Storage bucket id used for DuckLake data files
-                         * @example ducklake
-                         */
-                        bucket: string
-                        /**
-                         * @description Optional description for the generated Supabase Storage S3 credential
-                         * @example DuckLake replication destination
-                         */
-                        credential_description?: string
-                        /**
-                         * @description Optional path prefix inside the bucket for DuckLake data files
-                         * @example replication
-                         */
-                        path?: string
-                        /**
-                         * @description Supabase project ref whose Object Storage S3 API stores DuckLake data files
-                         * @example abcjuqabhgwjjutfvtpa
-                         */
-                        project_ref: string
-                        /** @enum {string} */
-                        type: 'supabase_storage'
-                      }
-                }
-          }
-        | {
-            snowflake: {
-              /**
-               * @description Snowflake account identifier
-               * @example MYORG-MYACCOUNT
-               */
-              account_id: string
-              /**
-               * @description Snowflake target database
-               * @example ANALYTICS
-               */
-              database: string
-              /** @description Snowflake RSA private key PEM contents */
-              private_key: string
-              /** @description Optional passphrase for encrypted private keys */
-              private_key_passphrase?: string | null
-              /**
-               * @description Optional Snowflake role
-               * @example PIPELINES_ROLE
-               */
-              role?: string | null
-              /**
-               * @description Snowflake target schema
-               * @example PUBLIC
-               */
-              schema: string
-              /**
-               * @description Snowflake user configured for key-pair authentication
-               * @example PIPELINES_USER
-               */
-              user: string
-            }
-          }
+    CreatePublicationBody: {
       /**
-       * @description Destination name
-       * @example bq-analytics
+       * @description Publication name
+       * @example pub_orders
        */
       name: string
+      /** @description Publication tables */
+      tables: {
+        /**
+         * @description Table name
+         * @example orders
+         */
+        name: string
+        /**
+         * @description Table schema
+         * @example public
+         */
+        schema: string
+      }[]
     }
     CreateReplicationDestinationPipelineBody: {
       /** @description Destination configuration */
@@ -6701,7 +6903,7 @@ export interface components {
                              * @example day
                              * @enum {string}
                              */
-                            granularity?: 'hour' | 'day' | 'month' | 'year'
+                            granularity?: 'day' | 'hour' | 'month' | 'year'
                             /**
                              * @description Partition by a replicated `DATE`, `TIMESTAMP`, or `DATETIME` column
                              * @enum {string}
@@ -6741,7 +6943,7 @@ export interface components {
                              * @example day
                              * @enum {string}
                              */
-                            granularity?: 'hour' | 'day' | 'month' | 'year'
+                            granularity?: 'day' | 'hour' | 'month' | 'year'
                             /**
                              * @description Partition by the time at which BigQuery ingests each row
                              * @enum {string}
@@ -6876,13 +7078,47 @@ export interface components {
                    * @example path
                    * @enum {string|null}
                    */
-                  s3_url_style?: 'path' | 'vhost' | null
+                  s3_url_style?: null | 'path' | 'vhost'
                   /**
                    * @description Whether to use SSL for S3-compatible storage
                    * @default true
                    * @example false
                    */
                   s3_use_ssl?: boolean
+                  table_sorting?: {
+                    tables?: {
+                      schema: string
+                      sort_by:
+                        | {
+                            columns: {
+                              /**
+                               * @description DuckLake sort direction
+                               * @example asc
+                               * @enum {string}
+                               */
+                              direction?: 'asc' | 'desc'
+                              /**
+                               * @description Source column name
+                               * @example created_at
+                               */
+                              name: string
+                              /**
+                               * @description Optional placement of null values in the DuckLake sort order
+                               * @example last
+                               * @enum {string|null}
+                               */
+                              nulls?: 'first' | 'last' | null
+                            }[]
+                            /** @enum {string} */
+                            kind: 'columns'
+                          }
+                        | {
+                            /** @enum {string} */
+                            kind: 'primary_key'
+                          }
+                      table: string
+                    }[]
+                  }
                 }
               | {
                   catalog:
@@ -6967,7 +7203,7 @@ export interface components {
                          * @example path
                          * @enum {string|null}
                          */
-                        s3_url_style?: 'path' | 'vhost' | null
+                        s3_url_style?: null | 'path' | 'vhost'
                         /**
                          * @description Whether to use SSL for S3-compatible storage
                          * @default true
@@ -7001,6 +7237,40 @@ export interface components {
                         /** @enum {string} */
                         type: 'supabase_storage'
                       }
+                  table_sorting?: {
+                    tables?: {
+                      schema: string
+                      sort_by:
+                        | {
+                            columns: {
+                              /**
+                               * @description DuckLake sort direction
+                               * @example asc
+                               * @enum {string}
+                               */
+                              direction?: 'asc' | 'desc'
+                              /**
+                               * @description Source column name
+                               * @example created_at
+                               */
+                              name: string
+                              /**
+                               * @description Optional placement of null values in the DuckLake sort order
+                               * @example last
+                               * @enum {string|null}
+                               */
+                              nulls?: 'first' | 'last' | null
+                            }[]
+                            /** @enum {string} */
+                            kind: 'columns'
+                          }
+                        | {
+                            /** @enum {string} */
+                            kind: 'primary_key'
+                          }
+                      table: string
+                    }[]
+                  }
                 }
           }
         | {
@@ -7066,13 +7336,13 @@ export interface components {
          * @example error
          * @enum {string|null}
          */
-        invalidated_slot_behavior?: 'error' | 'recreate' | null
+        invalidated_slot_behavior?: 'error' | null | 'recreate'
         /**
          * @description Replicator log level
          * @example info
          * @enum {string|null}
          */
-        log_level?: 'trace' | 'debug' | 'info' | 'warn' | 'error' | null
+        log_level?: 'debug' | 'error' | 'info' | null | 'trace' | 'warn'
         /** @description Maximum number of copy connections per table */
         max_copy_connections_per_table?: number | null
         /** @description Maximum number of table sync workers */
@@ -7117,37 +7387,39 @@ export interface components {
         table_error_retry_max_attempts?: number | null
         /** @description Selection rules for tables participating in initial table copy. Omit or use `null` to copy all tables. */
         table_sync_copy?:
-          | {
-              /** @enum {string} */
-              type: 'include_all_tables'
-            }
-          | {
-              /** @enum {string} */
-              type: 'skip_all_tables'
-            }
-          | {
-              /**
-               * @description Table ids for which copy should be performed
-               * @example [
-               *       16408
-               *     ]
-               */
-              table_ids: number[]
-              /** @enum {string} */
-              type: 'include_tables'
-            }
-          | {
-              /**
-               * @description Table ids for which copy should be skipped
-               * @example [
-               *       16408
-               *     ]
-               */
-              table_ids: number[]
-              /** @enum {string} */
-              type: 'skip_tables'
-            }
-          | never
+          | (
+              | {
+                  /** @enum {string} */
+                  type: 'include_all_tables'
+                }
+              | {
+                  /** @enum {string} */
+                  type: 'skip_all_tables'
+                }
+              | {
+                  /**
+                   * @description Table ids for which copy should be performed
+                   * @example [
+                   *       16408
+                   *     ]
+                   */
+                  table_ids: number[]
+                  /** @enum {string} */
+                  type: 'include_tables'
+                }
+              | {
+                  /**
+                   * @description Table ids for which copy should be skipped
+                   * @example [
+                   *       16408
+                   *     ]
+                   */
+                  table_ids: number[]
+                  /** @enum {string} */
+                  type: 'skip_tables'
+                }
+            )
+          | null
       }
       /**
        * @description Source id
@@ -7155,200 +7427,12 @@ export interface components {
        */
       source_id: number
     }
-    CreateReplicationPipelineBody: {
-      /** @description Pipeline configuration */
-      config: {
-        /** @description Batch configuration. Omit or use `null` for server defaults. */
-        batch?: {
-          /**
-           * @description Maximum preferred byte size for one source batch
-           * @example 8388608
-           */
-          max_bytes?: number
-          /**
-           * @description Maximum fill time in milliseconds
-           * @example 200
-           */
-          max_fill_ms?: number
-          /**
-           * @description Ratio of process memory reserved for incoming stream batch bytes, in (0, 1]
-           * @example 0.2
-           */
-          memory_budget_ratio?: number
-        } | null
-        /**
-         * @description Behavior when the replication slot is invalidated. `error` prevents pipeline startup and requires manual intervention. `recreate` automatically recreates the slot and restarts replication from scratch.
-         * @example error
-         * @enum {string|null}
-         */
-        invalidated_slot_behavior?: 'error' | 'recreate' | null
-        /**
-         * @description Replicator log level
-         * @example info
-         * @enum {string|null}
-         */
-        log_level?: 'trace' | 'debug' | 'info' | 'warn' | 'error' | null
-        /** @description Maximum number of copy connections per table */
-        max_copy_connections_per_table?: number | null
-        /** @description Maximum number of table sync workers */
-        max_table_sync_workers?: number | null
-        /** @description Memory-based backpressure configuration. Omission enables server defaults; `null` disables it. */
-        memory_backpressure?: {
-          /**
-           * @description Memory usage ratio above which backpressure is activated
-           * @example 0.85
-           */
-          activate_threshold: number
-          /**
-           * @description Memory usage ratio below which backpressure is released
-           * @example 0.75
-           */
-          resume_threshold: number
-        } | null
-        /**
-         * @description Milliseconds between one memory usage refresh and another
-         * @example 100
-         */
-        memory_refresh_interval_ms?: number | null
-        /**
-         * @description Publication name
-         * @example pub_orders
-         */
-        publication_name: string
-        /**
-         * @description Milliseconds between one replication lag refresh and another
-         * @example 10000
-         */
-        replication_lag_refresh_interval_ms?: number | null
-        /**
-         * @description Milliseconds between one retry and another for timed worker retries
-         * @example 10000
-         */
-        table_error_retry_delay_ms?: number | null
-        /**
-         * @description Maximum number of automatic timed retry attempts
-         * @example 5
-         */
-        table_error_retry_max_attempts?: number | null
-        /** @description Selection rules for tables participating in initial table copy. Omit or use `null` to copy all tables. */
-        table_sync_copy?:
-          | {
-              /** @enum {string} */
-              type: 'include_all_tables'
-            }
-          | {
-              /** @enum {string} */
-              type: 'skip_all_tables'
-            }
-          | {
-              /**
-               * @description Table ids for which copy should be performed
-               * @example [
-               *       16408
-               *     ]
-               */
-              table_ids: number[]
-              /** @enum {string} */
-              type: 'include_tables'
-            }
-          | {
-              /**
-               * @description Table ids for which copy should be skipped
-               * @example [
-               *       16408
-               *     ]
-               */
-              table_ids: number[]
-              /** @enum {string} */
-              type: 'skip_tables'
-            }
-          | never
-      }
-      /**
-       * @description Destination id
-       * @example 2001
-       */
-      destination_id: number
-      /**
-       * @description Source id
-       * @example 3001
-       */
-      source_id: number
-    }
-    CreateReplicationPublicationBody: {
-      /**
-       * @description Publication name
-       * @example pub_orders
-       */
-      name: string
-      /** @description Publication tables */
-      tables: {
-        /**
-         * @description Table name
-         * @example orders
-         */
-        name: string
-        /**
-         * @description Table schema
-         * @example public
-         */
-        schema: string
-      }[]
-    }
-    CreateSSOProviderBody:
-      | {
-          /** @default [] */
-          domains?: string[]
-          email_mapping: string[]
-          enabled: boolean
-          first_name_mapping?: string[]
-          /** Format: uri */
-          idjag_issuer_url?: string | null
-          join_org_on_signup_enabled: boolean
-          /** @enum {string} */
-          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
-          last_name_mapping?: string[]
-          metadata_xml_file: string
-          /** Format: uri */
-          metadata_xml_url?: string
-          user_name_mapping?: string[]
-        }
-      | {
-          /** @default [] */
-          domains?: string[]
-          email_mapping: string[]
-          enabled: boolean
-          first_name_mapping?: string[]
-          /** Format: uri */
-          idjag_issuer_url?: string | null
-          join_org_on_signup_enabled: boolean
-          /** @enum {string} */
-          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
-          last_name_mapping?: string[]
-          metadata_xml_file?: string
-          metadata_xml_url: string
-          user_name_mapping?: string[]
-        }
     CreateScopedAccessTokenBody: {
       /** Format: date-time */
       expires_at?: string
       name: string
       organization_slugs?: string[]
       permissions: (
-        | 'organizations_read'
-        | 'organizations_create'
-        | 'projects_read'
-        | 'snippets_read'
-        | 'organization_admin_read'
-        | 'organization_admin_write'
-        | 'members_read'
-        | 'members_write'
-        | 'organization_projects_read'
-        | 'organization_projects_create'
-        | 'platform_webhooks_organization_read'
-        | 'platform_webhooks_organization_write'
-        | 'project_admin_read'
-        | 'project_admin_write'
         | 'action_runs_read'
         | 'action_runs_write'
         | 'advisors_read'
@@ -7376,48 +7460,62 @@ export interface components {
         | 'custom_domain_write'
         | 'data_api_config_read'
         | 'data_api_config_write'
-        | 'database_read'
-        | 'database_write'
         | 'database_config_read'
         | 'database_config_write'
         | 'database_jit_read'
         | 'database_jit_write'
+        | 'database_migrations_read'
+        | 'database_migrations_write'
         | 'database_network_bans_read'
         | 'database_network_bans_write'
         | 'database_network_restrictions_read'
         | 'database_network_restrictions_write'
-        | 'database_migrations_read'
-        | 'database_migrations_write'
         | 'database_pooling_config_read'
         | 'database_pooling_config_write'
+        | 'database_read'
         | 'database_readonly_config_read'
         | 'database_readonly_config_write'
         | 'database_ssl_config_read'
         | 'database_ssl_config_write'
         | 'database_webhooks_config_read'
         | 'database_webhooks_config_write'
+        | 'database_write'
         | 'edge_functions_read'
-        | 'edge_functions_write'
         | 'edge_functions_secrets_read'
         | 'edge_functions_secrets_write'
+        | 'edge_functions_write'
         | 'infra_add_ons_read'
         | 'infra_add_ons_write'
         | 'infra_disk_config_read'
         | 'infra_disk_config_write'
         | 'infra_read_replicas_read'
         | 'infra_read_replicas_write'
-        | 'project_snippets_read'
-        | 'project_snippets_write'
-        | 'realtime_config_read'
-        | 'realtime_config_write'
-        | 'storage_read'
-        | 'storage_write'
-        | 'storage_config_read'
-        | 'storage_config_write'
-        | 'vanity_subdomain_read'
-        | 'vanity_subdomain_write'
+        | 'members_read'
+        | 'members_write'
+        | 'organization_admin_read'
+        | 'organization_admin_write'
+        | 'organization_projects_create'
+        | 'organization_projects_read'
+        | 'organizations_create'
+        | 'organizations_read'
+        | 'platform_webhooks_organization_read'
+        | 'platform_webhooks_organization_write'
         | 'platform_webhooks_projects_read'
         | 'platform_webhooks_projects_write'
+        | 'project_admin_read'
+        | 'project_admin_write'
+        | 'project_snippets_read'
+        | 'project_snippets_write'
+        | 'projects_read'
+        | 'realtime_config_read'
+        | 'realtime_config_write'
+        | 'snippets_read'
+        | 'storage_config_read'
+        | 'storage_config_write'
+        | 'storage_read'
+        | 'storage_write'
+        | 'vanity_subdomain_read'
+        | 'vanity_subdomain_write'
         | 'workers_read'
         | 'workers_write'
       )[]
@@ -7449,7 +7547,7 @@ export interface components {
       id: string
       public: boolean
       /** @enum {string} */
-      type?: 'STANDARD' | 'ANALYTICS'
+      type?: 'ANALYTICS' | 'STANDARD'
     }
     CreateStorageCredentialBody: {
       description: string
@@ -7642,13 +7740,13 @@ export interface components {
         | 'COMING_UP'
         | 'GOING_DOWN'
         | 'INIT_FAILED'
-        | 'REMOVED'
-        | 'RESTORING'
-        | 'UNKNOWN'
         | 'INIT_READ_REPLICA'
         | 'INIT_READ_REPLICA_FAILED'
-        | 'RESTARTING'
+        | 'REMOVED'
         | 'RESIZING'
+        | 'RESTARTING'
+        | 'RESTORING'
+        | 'UNKNOWN'
     }
     DatabaseStatusResponse: {
       identifier: string
@@ -7678,13 +7776,13 @@ export interface components {
         | 'COMING_UP'
         | 'GOING_DOWN'
         | 'INIT_FAILED'
-        | 'REMOVED'
-        | 'RESTORING'
-        | 'UNKNOWN'
         | 'INIT_READ_REPLICA'
         | 'INIT_READ_REPLICA_FAILED'
-        | 'RESTARTING'
+        | 'REMOVED'
         | 'RESIZING'
+        | 'RESTARTING'
+        | 'RESTORING'
+        | 'UNKNOWN'
     }
     DeclineAuthorizationResponse: {
       id: string
@@ -7720,6 +7818,617 @@ export interface components {
     }
     DeleteVercelConnectionResponse: {
       id: string
+    }
+    DestinationResponse: {
+      /** @description Destination configuration */
+      config:
+        | {
+            big_query: {
+              /**
+               * @description Number of concurrent BigQuery Storage Write API connections.
+               * @example 8
+               */
+              connection_pool_size?: number | null
+              /**
+               * @description BigQuery dataset id
+               * @example analytics
+               */
+              dataset_id: string
+              /**
+               * @description Maximum data staleness in minutes
+               * @example 5
+               */
+              max_staleness_mins?: number | null
+              /**
+               * @description BigQuery project id
+               * @example my-gcp-project
+               */
+              project_id: string
+              /** @description Per-table partitioning and clustering, applied only when the physical table is created or recreated */
+              table_options?: {
+                tables?: {
+                  cluster_by?: string[]
+                  partition_by?:
+                    | (
+                        | {
+                            /**
+                             * @description Source column name
+                             * @example created_at
+                             */
+                            column: string
+                            /**
+                             * @description Partition granularity
+                             * @example day
+                             * @enum {string}
+                             */
+                            granularity?: 'day' | 'hour' | 'month' | 'year'
+                            /**
+                             * @description Partition by a replicated `DATE`, `TIMESTAMP`, or `DATETIME` column
+                             * @enum {string}
+                             */
+                            kind: 'time_column'
+                          }
+                        | {
+                            /**
+                             * @description Source column name
+                             * @example created_at
+                             */
+                            column: string
+                            /**
+                             * @description Exclusive end of the last partition range
+                             * @example 100
+                             */
+                            end: number
+                            /**
+                             * @description Width of each partition range
+                             * @example 10
+                             */
+                            interval: number
+                            /**
+                             * @description Partition by ranges of a replicated integer column
+                             * @enum {string}
+                             */
+                            kind: 'integer_range'
+                            /**
+                             * @description Inclusive start of the first partition range
+                             * @example 0
+                             */
+                            start: number
+                          }
+                        | {
+                            /**
+                             * @description Partition granularity
+                             * @example day
+                             * @enum {string}
+                             */
+                            granularity?: 'day' | 'hour' | 'month' | 'year'
+                            /**
+                             * @description Partition by the time at which BigQuery ingests each row
+                             * @enum {string}
+                             */
+                            kind: 'ingestion_time'
+                          }
+                      )
+                    | null
+                  /**
+                   * @description Source PostgreSQL table OID, stable across renames for the relation lifetime
+                   * @example 16384
+                   */
+                  table_id: number
+                }[]
+              }
+            }
+          }
+        | {
+            clickhouse: {
+              /**
+               * @description ClickHouse target database
+               * @example analytics
+               */
+              database: string
+              /**
+               * @description Table engine used for replicated tables. Defaults to `replacing_merge_tree` server-side when omitted.
+               * @example replacing_merge_tree
+               * @enum {string}
+               */
+              engine: 'merge_tree' | 'replacing_merge_tree'
+              /**
+               * @description Persisted ClickHouse HTTP(S) endpoint URL
+               * @example http://clickhouse.example.com:8123
+               */
+              url: string
+              /**
+               * @description ClickHouse user name
+               * @example default
+               */
+              user: string
+            }
+          }
+        | {
+            iceberg:
+              | {
+                  supabase: {
+                    /**
+                     * @description Namespace
+                     * @example my-namespace
+                     */
+                    namespace?: string | null
+                    /**
+                     * @description Project ref
+                     * @example abcdefghijklmnopqrst
+                     */
+                    project_ref: string
+                    /**
+                     * @description S3 region
+                     * @example ap-southeast-1
+                     */
+                    s3_region: string
+                    /**
+                     * @description Warehouse name
+                     * @example my-warehouse
+                     */
+                    warehouse_name: string
+                  }
+                }
+              | {
+                  rest: {
+                    /**
+                     * @description Iceberg REST catalog URI
+                     * @example https://catalog.example.com
+                     */
+                    catalog_uri: string
+                    /**
+                     * @description Namespace
+                     * @example my-namespace
+                     */
+                    namespace?: string | null
+                    /**
+                     * @description S3-compatible storage endpoint
+                     * @example https://s3.example.com
+                     */
+                    s3_endpoint: string
+                    /**
+                     * @description Warehouse name
+                     * @example my-warehouse
+                     */
+                    warehouse_name: string
+                  }
+                }
+          }
+        | {
+            ducklake: {
+              /**
+               * @description Persisted DuckLake data path
+               * @example s3://<bucket-name>/
+               */
+              data_path: string
+              /**
+               * @description Persisted DuckLake metadata schema
+               * @example ducklake
+               */
+              metadata_schema?: string | null
+              /**
+               * @description Number of concurrent DuckDB connections.
+               * @example 4
+               */
+              pool_size?: number | null
+              /**
+               * @description Persisted S3-compatible storage endpoint
+               * @example 127.0.0.1:5000/s3
+               */
+              s3_endpoint?: string | null
+              /**
+               * @description S3-compatible storage region
+               * @example us-east-1
+               */
+              s3_region?: string | null
+              /**
+               * @description Persisted S3 URL style
+               * @example path
+               */
+              s3_url_style?: string | null
+              /**
+               * @description Whether to use SSL for S3-compatible storage
+               * @example false
+               */
+              s3_use_ssl?: boolean | null
+              table_sorting?: {
+                tables: ({
+                  schema: string
+                  sort_by:
+                    | ({
+                        columns: ({
+                          /**
+                           * @description DuckLake sort direction
+                           * @example asc
+                           * @enum {string}
+                           */
+                          direction: 'asc' | 'desc'
+                          /**
+                           * @description Source column name
+                           * @example created_at
+                           */
+                          name: string
+                          /**
+                           * @description Optional placement of null values in the DuckLake sort order
+                           * @example last
+                           * @enum {string|null}
+                           */
+                          nulls?: 'first' | 'last' | null
+                        } & {
+                          [key: string]: unknown
+                        })[]
+                        /** @enum {string} */
+                        kind: 'columns'
+                      } & {
+                        [key: string]: unknown
+                      })
+                    | ({
+                        /** @enum {string} */
+                        kind: 'primary_key'
+                      } & {
+                        [key: string]: unknown
+                      })
+                  table: string
+                } & {
+                  [key: string]: unknown
+                })[]
+              } & {
+                [key: string]: unknown
+              }
+            }
+          }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /**
+               * @description Optional Snowflake role
+               * @example PIPELINES_ROLE
+               */
+              role?: string | null
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example PIPELINES_USER
+               */
+              user: string
+            }
+          }
+      /**
+       * @description Destination id
+       * @example 2001
+       */
+      id: number
+      /**
+       * @description Destination name
+       * @example bq-analytics
+       */
+      name: string
+      /**
+       * @description Tenant id
+       * @example tenant_9f3a2c
+       */
+      tenant_id: string
+    }
+    DestinationsResponse: {
+      /** @description List of destinations */
+      destinations: {
+        /** @description Destination configuration */
+        config:
+          | {
+              big_query: {
+                /**
+                 * @description Number of concurrent BigQuery Storage Write API connections.
+                 * @example 8
+                 */
+                connection_pool_size?: number | null
+                /**
+                 * @description BigQuery dataset id
+                 * @example analytics
+                 */
+                dataset_id: string
+                /**
+                 * @description Maximum data staleness in minutes
+                 * @example 5
+                 */
+                max_staleness_mins?: number | null
+                /**
+                 * @description BigQuery project id
+                 * @example my-gcp-project
+                 */
+                project_id: string
+                /** @description Per-table partitioning and clustering, applied only when the physical table is created or recreated */
+                table_options?: {
+                  tables?: {
+                    cluster_by?: string[]
+                    partition_by?:
+                      | (
+                          | {
+                              /**
+                               * @description Source column name
+                               * @example created_at
+                               */
+                              column: string
+                              /**
+                               * @description Partition granularity
+                               * @example day
+                               * @enum {string}
+                               */
+                              granularity?: 'day' | 'hour' | 'month' | 'year'
+                              /**
+                               * @description Partition by a replicated `DATE`, `TIMESTAMP`, or `DATETIME` column
+                               * @enum {string}
+                               */
+                              kind: 'time_column'
+                            }
+                          | {
+                              /**
+                               * @description Source column name
+                               * @example created_at
+                               */
+                              column: string
+                              /**
+                               * @description Exclusive end of the last partition range
+                               * @example 100
+                               */
+                              end: number
+                              /**
+                               * @description Width of each partition range
+                               * @example 10
+                               */
+                              interval: number
+                              /**
+                               * @description Partition by ranges of a replicated integer column
+                               * @enum {string}
+                               */
+                              kind: 'integer_range'
+                              /**
+                               * @description Inclusive start of the first partition range
+                               * @example 0
+                               */
+                              start: number
+                            }
+                          | {
+                              /**
+                               * @description Partition granularity
+                               * @example day
+                               * @enum {string}
+                               */
+                              granularity?: 'day' | 'hour' | 'month' | 'year'
+                              /**
+                               * @description Partition by the time at which BigQuery ingests each row
+                               * @enum {string}
+                               */
+                              kind: 'ingestion_time'
+                            }
+                        )
+                      | null
+                    /**
+                     * @description Source PostgreSQL table OID, stable across renames for the relation lifetime
+                     * @example 16384
+                     */
+                    table_id: number
+                  }[]
+                }
+              }
+            }
+          | {
+              clickhouse: {
+                /**
+                 * @description ClickHouse target database
+                 * @example analytics
+                 */
+                database: string
+                /**
+                 * @description Table engine used for replicated tables. Defaults to `replacing_merge_tree` server-side when omitted.
+                 * @example replacing_merge_tree
+                 * @enum {string}
+                 */
+                engine: 'merge_tree' | 'replacing_merge_tree'
+                /**
+                 * @description Persisted ClickHouse HTTP(S) endpoint URL
+                 * @example http://clickhouse.example.com:8123
+                 */
+                url: string
+                /**
+                 * @description ClickHouse user name
+                 * @example default
+                 */
+                user: string
+              }
+            }
+          | {
+              iceberg:
+                | {
+                    supabase: {
+                      /**
+                       * @description Namespace
+                       * @example my-namespace
+                       */
+                      namespace?: string | null
+                      /**
+                       * @description Project ref
+                       * @example abcdefghijklmnopqrst
+                       */
+                      project_ref: string
+                      /**
+                       * @description S3 region
+                       * @example ap-southeast-1
+                       */
+                      s3_region: string
+                      /**
+                       * @description Warehouse name
+                       * @example my-warehouse
+                       */
+                      warehouse_name: string
+                    }
+                  }
+                | {
+                    rest: {
+                      /**
+                       * @description Iceberg REST catalog URI
+                       * @example https://catalog.example.com
+                       */
+                      catalog_uri: string
+                      /**
+                       * @description Namespace
+                       * @example my-namespace
+                       */
+                      namespace?: string | null
+                      /**
+                       * @description S3-compatible storage endpoint
+                       * @example https://s3.example.com
+                       */
+                      s3_endpoint: string
+                      /**
+                       * @description Warehouse name
+                       * @example my-warehouse
+                       */
+                      warehouse_name: string
+                    }
+                  }
+            }
+          | {
+              ducklake: {
+                /**
+                 * @description Persisted DuckLake data path
+                 * @example s3://<bucket-name>/
+                 */
+                data_path: string
+                /**
+                 * @description Persisted DuckLake metadata schema
+                 * @example ducklake
+                 */
+                metadata_schema?: string | null
+                /**
+                 * @description Number of concurrent DuckDB connections.
+                 * @example 4
+                 */
+                pool_size?: number | null
+                /**
+                 * @description Persisted S3-compatible storage endpoint
+                 * @example 127.0.0.1:5000/s3
+                 */
+                s3_endpoint?: string | null
+                /**
+                 * @description S3-compatible storage region
+                 * @example us-east-1
+                 */
+                s3_region?: string | null
+                /**
+                 * @description Persisted S3 URL style
+                 * @example path
+                 */
+                s3_url_style?: string | null
+                /**
+                 * @description Whether to use SSL for S3-compatible storage
+                 * @example false
+                 */
+                s3_use_ssl?: boolean | null
+                table_sorting?: {
+                  tables: ({
+                    schema: string
+                    sort_by:
+                      | ({
+                          columns: ({
+                            /**
+                             * @description DuckLake sort direction
+                             * @example asc
+                             * @enum {string}
+                             */
+                            direction: 'asc' | 'desc'
+                            /**
+                             * @description Source column name
+                             * @example created_at
+                             */
+                            name: string
+                            /**
+                             * @description Optional placement of null values in the DuckLake sort order
+                             * @example last
+                             * @enum {string|null}
+                             */
+                            nulls?: 'first' | 'last' | null
+                          } & {
+                            [key: string]: unknown
+                          })[]
+                          /** @enum {string} */
+                          kind: 'columns'
+                        } & {
+                          [key: string]: unknown
+                        })
+                      | ({
+                          /** @enum {string} */
+                          kind: 'primary_key'
+                        } & {
+                          [key: string]: unknown
+                        })
+                    table: string
+                  } & {
+                    [key: string]: unknown
+                  })[]
+                } & {
+                  [key: string]: unknown
+                }
+              }
+            }
+          | {
+              snowflake: {
+                /**
+                 * @description Snowflake account identifier
+                 * @example MYORG-MYACCOUNT
+                 */
+                account_id: string
+                /**
+                 * @description Snowflake target database
+                 * @example ANALYTICS
+                 */
+                database: string
+                /**
+                 * @description Optional Snowflake role
+                 * @example PIPELINES_ROLE
+                 */
+                role?: string | null
+                /**
+                 * @description Snowflake target schema
+                 * @example PUBLIC
+                 */
+                schema: string
+                /**
+                 * @description Snowflake user configured for key-pair authentication
+                 * @example PIPELINES_USER
+                 */
+                user: string
+              }
+            }
+        /**
+         * @description Destination id
+         * @example 2001
+         */
+        id: number
+        /**
+         * @description Destination name
+         * @example bq-analytics
+         */
+        name: string
+        /**
+         * @description Tenant id
+         * @example tenant_9f3a2c
+         */
+        tenant_id: string
+      }[]
     }
     DetachPaymentMethodBody: {
       card_id: string
@@ -7809,7 +8518,7 @@ export interface components {
         isPhysicalBackup: boolean
         project_id: number
         /** @enum {string} */
-        status: 'COMPLETED' | 'FAILED' | 'PENDING' | 'REMOVED' | 'ARCHIVED' | 'CANCELLED'
+        status: 'ARCHIVED' | 'CANCELLED' | 'COMPLETED' | 'FAILED' | 'PENDING' | 'REMOVED'
       }[]
       /** @enum {string} */
       status: 'ok' | 'physical-backups-enabled' | 'project-not-active'
@@ -7878,7 +8587,7 @@ export interface components {
       name: string
       redirect_uri: string
       /** @enum {string} */
-      registration_type: 'manual' | 'dynamic'
+      registration_type: 'dynamic' | 'manual'
       scopes?: (
         | 'analytics:read'
         | 'analytics:write'
@@ -7926,7 +8635,7 @@ export interface components {
       prefix?: string
       sortBy?: {
         /** @enum {string} */
-        column: 'name' | 'updated_at' | 'created_at'
+        column: 'created_at' | 'name' | 'updated_at'
         /** @enum {string} */
         order?: 'asc' | 'desc'
       }
@@ -8035,12 +8744,12 @@ export interface components {
          * @enum {string}
          */
         status:
-          | 'CREATING'
-          | 'READY'
-          | 'ASSOCIATION_REQUEST_EXPIRED'
           | 'ASSOCIATION_ACCEPTED'
+          | 'ASSOCIATION_REQUEST_EXPIRED'
+          | 'CREATING'
           | 'CREATION_FAILED'
           | 'DELETING'
+          | 'READY'
       }[]
     }
     GetProjectLintsResponse: {
@@ -8051,7 +8760,7 @@ export interface components {
       /** @enum {string} */
       facing: 'EXTERNAL'
       /** @enum {string} */
-      level: 'ERROR' | 'WARN' | 'INFO'
+      level: 'ERROR' | 'INFO' | 'WARN'
       metadata?: {
         entity?: string
         fkey_columns?: number[]
@@ -8059,38 +8768,38 @@ export interface components {
         name?: string
         schema?: string
         /** @enum {string} */
-        type?: 'table' | 'view' | 'auth' | 'function' | 'extension' | 'compliance'
+        type?: 'auth' | 'compliance' | 'extension' | 'function' | 'table' | 'view'
       }
       /** @enum {string} */
       name:
-        | 'unindexed_foreign_keys'
-        | 'auth_users_exposed'
-        | 'auth_rls_initplan'
-        | 'no_primary_key'
-        | 'unused_index'
-        | 'multiple_permissive_policies'
-        | 'policy_exists_rls_disabled'
-        | 'rls_enabled_no_policy'
-        | 'duplicate_index'
-        | 'security_definer_view'
-        | 'function_search_path_mutable'
-        | 'rls_disabled_in_public'
-        | 'extension_in_public'
-        | 'rls_references_user_metadata'
-        | 'materialized_view_in_api'
-        | 'foreign_table_in_api'
-        | 'unsupported_reg_types'
+        | 'auth_insufficient_mfa_options'
+        | 'auth_leaked_password_protection'
         | 'auth_otp_long_expiry'
         | 'auth_otp_short_length'
-        | 'ssl_not_enforced'
+        | 'auth_password_policy_missing'
+        | 'auth_rls_initplan'
+        | 'auth_users_exposed'
+        | 'duplicate_index'
+        | 'extension_in_public'
+        | 'foreign_table_in_api'
+        | 'function_search_path_mutable'
+        | 'leaked_service_key'
+        | 'materialized_view_in_api'
+        | 'multiple_permissive_policies'
         | 'network_restrictions_not_set'
+        | 'no_backup_admin'
+        | 'no_primary_key'
         | 'password_requirements_min_length'
         | 'pitr_not_enabled'
-        | 'auth_leaked_password_protection'
-        | 'auth_insufficient_mfa_options'
-        | 'auth_password_policy_missing'
-        | 'leaked_service_key'
-        | 'no_backup_admin'
+        | 'policy_exists_rls_disabled'
+        | 'rls_disabled_in_public'
+        | 'rls_enabled_no_policy'
+        | 'rls_references_user_metadata'
+        | 'security_definer_view'
+        | 'ssl_not_enforced'
+        | 'unindexed_foreign_keys'
+        | 'unsupported_reg_types'
+        | 'unused_index'
         | 'vulnerable_postgres_version'
       remediation: string
       title: string
@@ -8173,7 +8882,7 @@ export interface components {
           height?: number
           quality?: number
           /** @enum {string} */
-          resize?: 'cover' | 'contain' | 'fill'
+          resize?: 'contain' | 'cover' | 'fill'
           width?: number
         }
       }
@@ -8189,7 +8898,7 @@ export interface components {
       permissions: string[]
       project_refs?: string[]
       /** @enum {string} */
-      scope: 'user' | 'organization' | 'project'
+      scope: 'organization' | 'project' | 'user'
       token_alias: string
     }
     GetScopedAccessTokensResponse: {
@@ -8213,7 +8922,7 @@ export interface components {
           height?: number
           quality?: number
           /** @enum {string} */
-          resize?: 'cover' | 'contain' | 'fill'
+          resize?: 'contain' | 'cover' | 'fill'
           width?: number
         }
       }
@@ -8251,7 +8960,7 @@ export interface components {
       payment_method_type: string
       plan: {
         /** @enum {string} */
-        id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
+        id: 'enterprise' | 'free' | 'platform' | 'pro' | 'team'
         name: string
       }
       prepaid_credits_balance?: number
@@ -8259,50 +8968,50 @@ export interface components {
         addons: {
           /** @enum {string} */
           type:
-            | 'custom_domain'
-            | 'compute_instance'
-            | 'pitr'
-            | 'ipv4'
             | 'auth_mfa_phone'
             | 'auth_mfa_web_authn'
-            | 'log_drain'
+            | 'compute_instance'
+            | 'custom_domain'
             | 'etl_pipeline'
+            | 'ipv4'
+            | 'log_drain'
+            | 'pitr'
           variant: {
             /** @enum {string} */
             identifier:
-              | 'ci_micro'
-              | 'ci_small'
-              | 'ci_medium'
-              | 'ci_large'
-              | 'ci_xlarge'
-              | 'ci_2xlarge'
-              | 'ci_4xlarge'
-              | 'ci_8xlarge'
+              | 'auth_mfa_phone_default'
+              | 'auth_mfa_web_authn_default'
+              | 'cd_default'
               | 'ci_12xlarge'
               | 'ci_16xlarge'
               | 'ci_24xlarge'
+              | 'ci_24xlarge_high_memory'
               | 'ci_24xlarge_optimized_cpu'
               | 'ci_24xlarge_optimized_memory'
-              | 'ci_24xlarge_high_memory'
+              | 'ci_2xlarge'
               | 'ci_48xlarge'
+              | 'ci_48xlarge_high_memory'
               | 'ci_48xlarge_optimized_cpu'
               | 'ci_48xlarge_optimized_memory'
-              | 'ci_48xlarge_high_memory'
-              | 'cd_default'
-              | 'pitr_7'
+              | 'ci_4xlarge'
+              | 'ci_8xlarge'
+              | 'ci_large'
+              | 'ci_medium'
+              | 'ci_micro'
+              | 'ci_small'
+              | 'ci_xlarge'
+              | 'etl_pipeline_default'
+              | 'ipv4_default'
+              | 'log_drain_default'
               | 'pitr_14'
               | 'pitr_28'
-              | 'ipv4_default'
-              | 'auth_mfa_phone_default'
-              | 'auth_mfa_web_authn_default'
-              | 'log_drain_default'
-              | 'etl_pipeline_default'
+              | 'pitr_7'
             meta?: components['schemas']['GetSubscriptionResponseJsonValue']
             name: string
             price: number
             price_description: string
             /** @enum {string} */
-            price_interval: 'monthly' | 'hourly'
+            price_interval: 'hourly' | 'monthly'
             /** @enum {string} */
             price_type: 'fixed' | 'usage'
           }
@@ -8313,7 +9022,7 @@ export interface components {
       scheduled_plan_change: {
         at: string
         /** @enum {string} */
-        target_plan: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
+        target_plan: 'enterprise' | 'free' | 'platform' | 'pro' | 'team'
         usage_billing_enabled: boolean
       } | null
       usage_billing_enabled: boolean
@@ -8339,10 +9048,10 @@ export interface components {
       owner_id: number
       project_id: number
       /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql' | 'notebook'
+      type: 'log_sql' | 'notebook' | 'report' | 'sql'
       updated_at: string
       /** @enum {string} */
-      visibility: 'user' | 'project' | 'org' | 'public'
+      visibility: 'org' | 'project' | 'public' | 'user'
     }
     GetUserContentFolderResponse: {
       cursor?: string
@@ -8358,10 +9067,10 @@ export interface components {
           owner_id: number
           project_id: number
           /** @enum {string} */
-          type: 'sql' | 'report' | 'log_sql' | 'notebook'
+          type: 'log_sql' | 'notebook' | 'report' | 'sql'
           updated_at: string
           /** @enum {string} */
-          visibility: 'user' | 'project' | 'org' | 'public'
+          visibility: 'org' | 'project' | 'public' | 'user'
         }[]
         folders: {
           id: string
@@ -8392,14 +9101,14 @@ export interface components {
         owner_id: number
         project_id: number
         /** @enum {string} */
-        type: 'sql' | 'report' | 'log_sql' | 'notebook'
+        type: 'log_sql' | 'notebook' | 'report' | 'sql'
         updated_at: string
         updated_by: {
           id: number
           username: string
         }
         /** @enum {string} */
-        visibility: 'user' | 'project' | 'org' | 'public'
+        visibility: 'org' | 'project' | 'public' | 'user'
       }[]
     }
     GetUserOrganizationIntegrationResponse: {
@@ -8464,7 +9173,7 @@ export interface components {
       CUSTOM_OAUTH_MAX_PROVIDERS: number
       DB_MAX_POOL_SIZE: number | null
       /** @enum {string|null} */
-      DB_MAX_POOL_SIZE_UNIT: 'connections' | 'percent' | null
+      DB_MAX_POOL_SIZE_UNIT: 'connections' | null | 'percent'
       DISABLE_SIGNUP: boolean
       EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean
       EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS: string
@@ -8844,18 +9553,18 @@ export interface components {
       readonly token: string
       /** @enum {string} */
       type:
-        | 'postgres'
+        | 'axiom'
         | 'bigquery'
         | 'clickhouse'
-        | 'webhook'
         | 'datadog'
-        | 'loki'
-        | 'sentry'
-        | 's3'
-        | 'axiom'
         | 'last9'
+        | 'loki'
         | 'otlp'
+        | 'postgres'
+        | 's3'
+        | 'sentry'
         | 'syslog'
+        | 'webhook'
       readonly user_id: number
     }
     LinkClazarBuyerBody: {
@@ -8880,70 +9589,70 @@ export interface components {
         feature: {
           /** @enum {string} */
           key:
+            | 'api.members.invitations'
+            | 'api.members.roles'
+            | 'assistant.advance_model'
+            | 'audit_log_drains'
+            | 'auth.advanced_auth_settings'
+            | 'auth.custom_jwt_template'
+            | 'auth.custom_oauth.max_providers'
+            | 'auth.hooks'
+            | 'auth.leaked_password_protection'
+            | 'auth.mfa_enhanced_security'
+            | 'auth.mfa_phone'
+            | 'auth.mfa_web_authn'
+            | 'auth.password_hibp'
+            | 'auth.performance_settings'
+            | 'auth.platform.sso'
+            | 'auth.saml_2'
+            | 'auth.user_sessions'
+            | 'backup.restore_to_new_project'
+            | 'backup.retention_days'
+            | 'backup.schedule'
+            | 'branching_limit'
+            | 'branching_persistent'
+            | 'custom_domain'
+            | 'dedicated_pooler'
+            | 'function.max_count'
+            | 'function.size_limit_mb'
             | 'instances.compute_update_available_sizes'
-            | 'instances.read_replicas'
             | 'instances.disk_modifications'
             | 'instances.high_availability'
             | 'instances.orioledb'
-            | 'replication.etl'
-            | 'storage.max_file_size'
-            | 'storage.max_file_size.configurable'
-            | 'storage.image_transformations'
-            | 'storage.vector_buckets'
-            | 'storage.iceberg_catalog'
-            | 'storage.purge_cache'
-            | 'security.audit_logs_days'
-            | 'security.questionnaire'
-            | 'security.soc2_report'
-            | 'security.iso27001_certificate'
-            | 'security.private_link'
-            | 'security.enforce_mfa'
-            | 'log.retention_days'
-            | 'custom_domain'
-            | 'vanity_subdomain'
+            | 'instances.read_replicas'
+            | 'integrations.github_connections'
+            | 'integrations.github_push_webhooks_limit'
             | 'ipv4'
-            | 'pitr.available_variants'
+            | 'log.retention_days'
             | 'log_drains'
-            | 'audit_log_drains'
-            | 'branching_limit'
-            | 'branching_persistent'
-            | 'auth.mfa_phone'
-            | 'auth.mfa_web_authn'
-            | 'auth.mfa_enhanced_security'
-            | 'auth.hooks'
-            | 'auth.platform.sso'
-            | 'auth.custom_jwt_template'
-            | 'auth.saml_2'
-            | 'auth.user_sessions'
-            | 'auth.leaked_password_protection'
-            | 'auth.advanced_auth_settings'
-            | 'auth.performance_settings'
-            | 'auth.password_hibp'
-            | 'auth.custom_oauth.max_providers'
-            | 'backup.retention_days'
-            | 'backup.restore_to_new_project'
-            | 'backup.schedule'
-            | 'function.max_count'
-            | 'function.size_limit_mb'
+            | 'observability.dashboard_advanced_metrics'
+            | 'pitr.available_variants'
+            | 'project_cloning'
+            | 'project_pausing'
+            | 'project_restore_after_expiry'
+            | 'project_scoped_roles'
+            | 'realtime.max_bytes_per_second'
+            | 'realtime.max_channels_per_client'
             | 'realtime.max_concurrent_users'
             | 'realtime.max_events_per_second'
             | 'realtime.max_joins_per_second'
-            | 'realtime.max_channels_per_client'
-            | 'realtime.max_bytes_per_second'
-            | 'realtime.max_presence_events_per_second'
             | 'realtime.max_payload_size_in_kb'
-            | 'project_scoped_roles'
+            | 'realtime.max_presence_events_per_second'
+            | 'replication.etl'
+            | 'security.audit_logs_days'
+            | 'security.enforce_mfa'
+            | 'security.iso27001_certificate'
             | 'security.member_roles'
-            | 'project_pausing'
-            | 'project_cloning'
-            | 'project_restore_after_expiry'
-            | 'assistant.advance_model'
-            | 'integrations.github_connections'
-            | 'integrations.github_push_webhooks_limit'
-            | 'dedicated_pooler'
-            | 'observability.dashboard_advanced_metrics'
-            | 'api.members.invitations'
-            | 'api.members.roles'
+            | 'security.private_link'
+            | 'security.questionnaire'
+            | 'security.soc2_report'
+            | 'storage.iceberg_catalog'
+            | 'storage.image_transformations'
+            | 'storage.max_file_size'
+            | 'storage.max_file_size.configurable'
+            | 'storage.purge_cache'
+            | 'storage.vector_buckets'
+            | 'vanity_subdomain'
           /** @enum {string} */
           type: 'boolean' | 'numeric' | 'set'
         }
@@ -9084,26 +9793,26 @@ export interface components {
         id: number
         /** @enum {string} */
         infra_compute_size?:
-          | 'pico'
-          | 'nano'
-          | 'micro'
-          | 'small'
-          | 'medium'
-          | 'large'
-          | 'xlarge'
-          | '2xlarge'
-          | '4xlarge'
-          | '8xlarge'
           | '12xlarge'
           | '16xlarge'
           | '24xlarge'
-          | '24xlarge_optimized_memory'
-          | '24xlarge_optimized_cpu'
           | '24xlarge_high_memory'
+          | '24xlarge_optimized_cpu'
+          | '24xlarge_optimized_memory'
+          | '2xlarge'
           | '48xlarge'
-          | '48xlarge_optimized_memory'
-          | '48xlarge_optimized_cpu'
           | '48xlarge_high_memory'
+          | '48xlarge_optimized_cpu'
+          | '48xlarge_optimized_memory'
+          | '4xlarge'
+          | '8xlarge'
+          | 'large'
+          | 'medium'
+          | 'micro'
+          | 'nano'
+          | 'pico'
+          | 'small'
+          | 'xlarge'
         inserted_at: string | null
         is_branch_enabled: boolean
         is_physical_backups_enabled: boolean | null
@@ -9203,9 +9912,9 @@ export interface components {
       meta: components['schemas']['NotificationResponseJsonValue']
       name: string
       /** @enum {string} */
-      priority: 'Critical' | 'Warning' | 'Info'
+      priority: 'Critical' | 'Info' | 'Warning'
       /** @enum {string} */
-      status: 'new' | 'seen' | 'archived'
+      status: 'archived' | 'new' | 'seen'
     }
     /** @description Any JSON-serializable value */
     NotificationResponseJsonValue:
@@ -9230,7 +9939,7 @@ export interface components {
       name: string
       redirect_uris?: string[]
       /** @enum {string} */
-      registration_type: 'manual' | 'dynamic'
+      registration_type: 'dynamic' | 'manual'
       scopes?: (
         | 'analytics:read'
         | 'analytics:write'
@@ -9287,26 +9996,26 @@ export interface components {
           identifier: string
           /** @enum {string} */
           infra_compute_size?:
-            | 'pico'
-            | 'nano'
-            | 'micro'
-            | 'small'
-            | 'medium'
-            | 'large'
-            | 'xlarge'
-            | '2xlarge'
-            | '4xlarge'
-            | '8xlarge'
             | '12xlarge'
             | '16xlarge'
             | '24xlarge'
-            | '24xlarge_optimized_memory'
-            | '24xlarge_optimized_cpu'
             | '24xlarge_high_memory'
+            | '24xlarge_optimized_cpu'
+            | '24xlarge_optimized_memory'
+            | '2xlarge'
             | '48xlarge'
-            | '48xlarge_optimized_memory'
-            | '48xlarge_optimized_cpu'
             | '48xlarge_high_memory'
+            | '48xlarge_optimized_cpu'
+            | '48xlarge_optimized_memory'
+            | '4xlarge'
+            | '8xlarge'
+            | 'large'
+            | 'medium'
+            | 'micro'
+            | 'nano'
+            | 'pico'
+            | 'small'
+            | 'xlarge'
           region: string
           /** @enum {string} */
           status:
@@ -9315,13 +10024,13 @@ export interface components {
             | 'COMING_UP'
             | 'GOING_DOWN'
             | 'INIT_FAILED'
-            | 'REMOVED'
-            | 'RESTORING'
-            | 'UNKNOWN'
             | 'INIT_READ_REPLICA'
             | 'INIT_READ_REPLICA_FAILED'
-            | 'RESTARTING'
+            | 'REMOVED'
             | 'RESIZING'
+            | 'RESTARTING'
+            | 'RESTORING'
+            | 'UNKNOWN'
           /** @enum {string} */
           type: 'PRIMARY' | 'READ_REPLICA'
         }[]
@@ -9333,27 +10042,27 @@ export interface components {
         region: string
         /** @enum {string} */
         status:
-          | 'INACTIVE'
           | 'ACTIVE_HEALTHY'
           | 'ACTIVE_UNHEALTHY'
           | 'COMING_UP'
-          | 'UNKNOWN'
           | 'GOING_DOWN'
+          | 'INACTIVE'
           | 'INIT_FAILED'
-          | 'REMOVED'
-          | 'RESTORING'
-          | 'UPGRADING'
-          | 'PAUSING'
-          | 'RESTORE_FAILED'
-          | 'RESTARTING'
           | 'PAUSE_FAILED'
+          | 'PAUSING'
+          | 'REMOVED'
           | 'RESIZING'
+          | 'RESTARTING'
+          | 'RESTORE_FAILED'
+          | 'RESTORING'
+          | 'UNKNOWN'
+          | 'UPGRADING'
       }[]
     }
     OrganizationResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'aws_marketplace' | 'vercel_marketplace' | null
+      billing_partner: 'aws_marketplace' | null | 'vercel_marketplace'
       id: number
       integration_source: string | null
       is_owner: boolean
@@ -9364,14 +10073,14 @@ export interface components {
       organization_requires_mfa: boolean
       plan: {
         /** @enum {string} */
-        id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
+        id: 'enterprise' | 'free' | 'platform' | 'pro' | 'team'
         name: string
       }
       restriction_data: {
         [key: string]: string
       } | null
       /** @enum {string|null} */
-      restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
+      restriction_status: 'grace_period' | 'grace_period_over' | null | 'restricted'
       slug: string
       stripe_customer_id: string | null
       subscription_id: string | null
@@ -9417,14 +10126,14 @@ export interface components {
         /** @enum {string} */
         postgres_engine: '15' | '17' | '17-oriole'
         /** @enum {string} */
-        release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
+        release_channel: 'alpha' | 'beta' | 'ga' | 'internal' | 'preview' | 'withdrawn'
         version: string
       }[]
     }
     OrganizationSlugResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'aws_marketplace' | 'vercel_marketplace' | null
+      billing_partner: 'aws_marketplace' | null | 'vercel_marketplace'
       has_oriole_project: boolean
       id: number
       integration_source: string | null
@@ -9432,14 +10141,14 @@ export interface components {
       opt_in_tags: string[]
       plan: {
         /** @enum {string} */
-        id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
+        id: 'enterprise' | 'free' | 'platform' | 'pro' | 'team'
         name: string
       }
       restriction_data: {
         [key: string]: unknown
       } | null
       /** @enum {string|null} */
-      restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
+      restriction_status: 'grace_period' | 'grace_period_over' | null | 'restricted'
       slug: string
       usage_billing_enabled: boolean
     }
@@ -9458,58 +10167,58 @@ export interface components {
         date: string
         /** @enum {string} */
         metric:
-          | 'EGRESS'
-          | 'CACHED_EGRESS'
-          | 'DATABASE_SIZE'
-          | 'STORAGE_SIZE'
-          | 'MONTHLY_ACTIVE_USERS'
-          | 'MONTHLY_ACTIVE_SSO_USERS'
-          | 'FUNCTION_INVOCATIONS'
-          | 'FUNCTION_CPU_MILLISECONDS'
-          | 'STORAGE_IMAGES_TRANSFORMED'
-          | 'REALTIME_MESSAGE_COUNT'
-          | 'REALTIME_PEAK_CONNECTIONS'
-          | 'DISK_SIZE_GB_HOURS_GP3'
-          | 'DISK_SIZE_GB_HOURS_IO2'
+          | 'ACTIVE_COMPUTE_HOURS'
           | 'AUTH_MFA_PHONE'
           | 'AUTH_MFA_WEB_AUTHN'
-          | 'LOG_DRAIN_EVENTS'
-          | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
-          | 'DISK_THROUGHPUT_GP3'
-          | 'DISK_IOPS_GP3'
-          | 'DISK_IOPS_IO2'
-          | 'COMPUTE_HOURS_BRANCH'
-          | 'COMPUTE_HOURS_XS'
-          | 'COMPUTE_HOURS_SM'
-          | 'COMPUTE_HOURS_MD'
-          | 'COMPUTE_HOURS_L'
-          | 'COMPUTE_HOURS_XL'
-          | 'COMPUTE_HOURS_2XL'
-          | 'COMPUTE_HOURS_4XL'
-          | 'COMPUTE_HOURS_8XL'
+          | 'CACHED_EGRESS'
           | 'COMPUTE_HOURS_12XL'
           | 'COMPUTE_HOURS_16XL'
           | 'COMPUTE_HOURS_24XL'
+          | 'COMPUTE_HOURS_24XL_HIGH_MEMORY'
           | 'COMPUTE_HOURS_24XL_OPTIMIZED_CPU'
           | 'COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY'
-          | 'COMPUTE_HOURS_24XL_HIGH_MEMORY'
+          | 'COMPUTE_HOURS_2XL'
           | 'COMPUTE_HOURS_48XL'
+          | 'COMPUTE_HOURS_48XL_HIGH_MEMORY'
           | 'COMPUTE_HOURS_48XL_OPTIMIZED_CPU'
           | 'COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY'
-          | 'COMPUTE_HOURS_48XL_HIGH_MEMORY'
+          | 'COMPUTE_HOURS_4XL'
+          | 'COMPUTE_HOURS_8XL'
+          | 'COMPUTE_HOURS_BRANCH'
+          | 'COMPUTE_HOURS_L'
+          | 'COMPUTE_HOURS_MD'
+          | 'COMPUTE_HOURS_SM'
+          | 'COMPUTE_HOURS_XL'
+          | 'COMPUTE_HOURS_XS'
           | 'CUSTOM_DOMAIN'
-          | 'PITR_7'
-          | 'PITR_14'
-          | 'PITR_28'
-          | 'IPV4'
-          | 'LOG_DRAIN'
+          | 'DATABASE_SIZE'
+          | 'DISK_IOPS_GP3'
+          | 'DISK_IOPS_IO2'
+          | 'DISK_SIZE_GB_HOURS_GP3'
+          | 'DISK_SIZE_GB_HOURS_IO2'
+          | 'DISK_THROUGHPUT_GP3'
+          | 'EGRESS'
+          | 'ETL_COPY_BACKFILL_DATA'
           | 'ETL_PIPELINE'
           | 'ETL_REPLICATED_DATA'
-          | 'ETL_COPY_BACKFILL_DATA'
+          | 'FUNCTION_CPU_MILLISECONDS'
+          | 'FUNCTION_INVOCATIONS'
+          | 'IPV4'
+          | 'LOG_DRAIN'
+          | 'LOG_DRAIN_EVENTS'
           | 'LOG_INGESTION'
           | 'LOG_QUERYING'
           | 'LOG_STORAGE'
-          | 'ACTIVE_COMPUTE_HOURS'
+          | 'MONTHLY_ACTIVE_SSO_USERS'
+          | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+          | 'MONTHLY_ACTIVE_USERS'
+          | 'PITR_14'
+          | 'PITR_28'
+          | 'PITR_7'
+          | 'REALTIME_MESSAGE_COUNT'
+          | 'REALTIME_PEAK_CONNECTIONS'
+          | 'STORAGE_IMAGES_TRANSFORMED'
+          | 'STORAGE_SIZE'
         usage: number
         usage_original: number
       }[]
@@ -9525,64 +10234,64 @@ export interface components {
         cost: number
         /** @enum {string} */
         metric:
-          | 'EGRESS'
-          | 'CACHED_EGRESS'
-          | 'DATABASE_SIZE'
-          | 'STORAGE_SIZE'
-          | 'MONTHLY_ACTIVE_USERS'
-          | 'MONTHLY_ACTIVE_SSO_USERS'
-          | 'FUNCTION_INVOCATIONS'
-          | 'FUNCTION_CPU_MILLISECONDS'
-          | 'STORAGE_IMAGES_TRANSFORMED'
-          | 'REALTIME_MESSAGE_COUNT'
-          | 'REALTIME_PEAK_CONNECTIONS'
-          | 'DISK_SIZE_GB_HOURS_GP3'
-          | 'DISK_SIZE_GB_HOURS_IO2'
+          | 'ACTIVE_COMPUTE_HOURS'
           | 'AUTH_MFA_PHONE'
           | 'AUTH_MFA_WEB_AUTHN'
-          | 'LOG_DRAIN_EVENTS'
-          | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
-          | 'DISK_THROUGHPUT_GP3'
-          | 'DISK_IOPS_GP3'
-          | 'DISK_IOPS_IO2'
-          | 'COMPUTE_HOURS_BRANCH'
-          | 'COMPUTE_HOURS_XS'
-          | 'COMPUTE_HOURS_SM'
-          | 'COMPUTE_HOURS_MD'
-          | 'COMPUTE_HOURS_L'
-          | 'COMPUTE_HOURS_XL'
-          | 'COMPUTE_HOURS_2XL'
-          | 'COMPUTE_HOURS_4XL'
-          | 'COMPUTE_HOURS_8XL'
+          | 'CACHED_EGRESS'
           | 'COMPUTE_HOURS_12XL'
           | 'COMPUTE_HOURS_16XL'
           | 'COMPUTE_HOURS_24XL'
+          | 'COMPUTE_HOURS_24XL_HIGH_MEMORY'
           | 'COMPUTE_HOURS_24XL_OPTIMIZED_CPU'
           | 'COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY'
-          | 'COMPUTE_HOURS_24XL_HIGH_MEMORY'
+          | 'COMPUTE_HOURS_2XL'
           | 'COMPUTE_HOURS_48XL'
+          | 'COMPUTE_HOURS_48XL_HIGH_MEMORY'
           | 'COMPUTE_HOURS_48XL_OPTIMIZED_CPU'
           | 'COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY'
-          | 'COMPUTE_HOURS_48XL_HIGH_MEMORY'
+          | 'COMPUTE_HOURS_4XL'
+          | 'COMPUTE_HOURS_8XL'
+          | 'COMPUTE_HOURS_BRANCH'
+          | 'COMPUTE_HOURS_L'
+          | 'COMPUTE_HOURS_MD'
+          | 'COMPUTE_HOURS_SM'
+          | 'COMPUTE_HOURS_XL'
+          | 'COMPUTE_HOURS_XS'
           | 'CUSTOM_DOMAIN'
-          | 'PITR_7'
-          | 'PITR_14'
-          | 'PITR_28'
-          | 'IPV4'
-          | 'LOG_DRAIN'
+          | 'DATABASE_SIZE'
+          | 'DISK_IOPS_GP3'
+          | 'DISK_IOPS_IO2'
+          | 'DISK_SIZE_GB_HOURS_GP3'
+          | 'DISK_SIZE_GB_HOURS_IO2'
+          | 'DISK_THROUGHPUT_GP3'
+          | 'EGRESS'
+          | 'ETL_COPY_BACKFILL_DATA'
           | 'ETL_PIPELINE'
           | 'ETL_REPLICATED_DATA'
-          | 'ETL_COPY_BACKFILL_DATA'
+          | 'FUNCTION_CPU_MILLISECONDS'
+          | 'FUNCTION_INVOCATIONS'
+          | 'IPV4'
+          | 'LOG_DRAIN'
+          | 'LOG_DRAIN_EVENTS'
           | 'LOG_INGESTION'
           | 'LOG_QUERYING'
           | 'LOG_STORAGE'
-          | 'ACTIVE_COMPUTE_HOURS'
+          | 'MONTHLY_ACTIVE_SSO_USERS'
+          | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+          | 'MONTHLY_ACTIVE_USERS'
+          | 'PITR_14'
+          | 'PITR_28'
+          | 'PITR_7'
+          | 'REALTIME_MESSAGE_COUNT'
+          | 'REALTIME_PEAK_CONNECTIONS'
+          | 'STORAGE_IMAGES_TRANSFORMED'
+          | 'STORAGE_SIZE'
         pricing_free_units?: number
         pricing_package_price?: number
         pricing_package_size?: number
         pricing_per_unit_price?: number
         /** @enum {string} */
-        pricing_strategy: 'UNIT' | 'PACKAGE' | 'TIERED' | 'NONE'
+        pricing_strategy: 'NONE' | 'PACKAGE' | 'TIERED' | 'UNIT'
         project_allocations: {
           hours?: number
           name: string
@@ -9607,7 +10316,7 @@ export interface components {
           manage?: string
         }
         /** @enum {string} */
-        status: 'installing' | 'ready' | 'error'
+        status: 'error' | 'installing' | 'ready'
         user_alert?: {
           message: string
         }
@@ -9628,7 +10337,7 @@ export interface components {
           manage?: string
         }
         /** @enum {string} */
-        status: 'installing' | 'ready' | 'error'
+        status: 'error' | 'installing' | 'ready'
         user_alert?: {
           message: string
         }
@@ -9680,7 +10389,7 @@ export interface components {
       max_client_conn?: number
       pgbouncer_enabled: boolean
       /** @enum {string} */
-      pool_mode: 'transaction' | 'session' | 'statement'
+      pool_mode: 'session' | 'statement' | 'transaction'
       query_wait_timeout?: number
       reserve_pool_size?: number
       server_idle_timeout?: number
@@ -9690,1619 +10399,7 @@ export interface components {
     PgbouncerStatusResponse: {
       active: boolean
     }
-    PlanFeaturesResponse: {
-      [key: string]: {
-        [key: string]: {
-          config:
-            | {
-                enabled: boolean
-              }
-            | {
-                enabled: boolean
-                unit: string
-                unlimited: boolean
-                value: number
-              }
-            | {
-                enabled: boolean
-                set: string[]
-              }
-          /** @enum {string} */
-          type: 'boolean' | 'numeric' | 'set'
-        }
-      }
-    }
-    PlanGateErrorBody: {
-      /** @description Present on entitlement denials. Other errors with this status code (validation, billing state) carry only message. */
-      error?: {
-        /**
-         * @description Machine-readable marker for plan-gated denials
-         * @enum {string}
-         */
-        code: 'entitlement_required'
-        /** @description Entitlement feature key that failed the check */
-        feature: string
-        /** @description Billing page URL for the organization, present when the org is resolvable */
-        upgrade_url?: string
-      }
-      /** @description Human-readable explanation of the plan gate */
-      message: string
-    }
-    PlansResponse: {
-      plans: {
-        /** @enum {string} */
-        change_type: 'upgrade' | 'downgrade' | 'none'
-        /** @enum {string} */
-        effective_at?: 'now' | 'end_of_billing_period' | 'none'
-        /** @enum {string} */
-        id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
-        is_current: boolean
-        name: string
-        price: number
-      }[]
-    }
-    PointInTimeRestoreBody: {
-      recovery_time_target_unix: number
-    }
-    PostgresColumnPrivileges: {
-      column_id: string
-      column_name: string
-      privileges: {
-        grantee: string
-        grantor: string
-        is_grantable: boolean
-        /** @enum {string} */
-        privilege_type: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'REFERENCES'
-      }[]
-      relation_name: string
-      relation_schema: string
-    }
-    PostgresExtension: {
-      comment: string | null
-      default_version: string
-      installed_version: string | null
-      name: string
-      schema: string | null
-    }
-    PostgresForeignTable: {
-      columns?: {
-        check: string | null
-        comment: string | null
-        data_type: string
-        default_value: (string | number) | null
-        enums: string[]
-        format: string
-        id: string
-        /** @enum {string|null} */
-        identity_generation: 'BY DEFAULT' | 'ALWAYS' | null
-        is_generated: boolean
-        is_identity: boolean
-        is_nullable: boolean
-        is_unique: boolean
-        is_updatable: boolean
-        name: string
-        ordinal_position: number
-        schema: string
-        table: string
-        table_id: number
-      }[]
-      comment: string | null
-      id: number
-      name: string
-      schema: string
-    }
-    PostgresMaterializedView: {
-      columns?: {
-        check: string | null
-        comment: string | null
-        data_type: string
-        default_value: (string | number) | null
-        enums: string[]
-        format: string
-        id: string
-        /** @enum {string|null} */
-        identity_generation: 'BY DEFAULT' | 'ALWAYS' | null
-        is_generated: boolean
-        is_identity: boolean
-        is_nullable: boolean
-        is_unique: boolean
-        is_updatable: boolean
-        name: string
-        ordinal_position: number
-        schema: string
-        table: string
-        table_id: number
-      }[]
-      comment: string | null
-      id: number
-      is_populated: boolean
-      name: string
-      schema: string
-    }
-    PostgresPolicy: {
-      /** @enum {string} */
-      action: 'PERMISSIVE' | 'RESTRICTIVE'
-      check: string | null
-      /** @enum {string} */
-      command: 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE' | 'ALL'
-      definition: string | null
-      id: number
-      name: string
-      roles: string[]
-      schema: string
-      table: string
-      table_id: number
-    }
-    PostgresPublication: {
-      id: number
-      name: string
-      owner: string
-      publish_delete: boolean
-      publish_insert: boolean
-      publish_truncate: boolean
-      publish_update: boolean
-      tables:
-        | {
-            id: number
-            name: string
-            schema: string
-          }[]
-        | null
-    }
-    PostgresTable: {
-      bytes: number
-      columns?: {
-        check: string | null
-        comment: string | null
-        data_type: string
-        default_value: (string | number) | null
-        enums: string[]
-        format: string
-        id: string
-        /** @enum {string|null} */
-        identity_generation: 'BY DEFAULT' | 'ALWAYS' | null
-        is_generated: boolean
-        is_identity: boolean
-        is_nullable: boolean
-        is_unique: boolean
-        is_updatable: boolean
-        name: string
-        ordinal_position: number
-        schema: string
-        table: string
-        table_id: number
-      }[]
-      comment: string | null
-      dead_rows_estimate: number
-      id: number
-      live_rows_estimate: number
-      name: string
-      primary_keys: {
-        name: string
-        schema: string
-        table_id: number
-        table_name: string
-      }[]
-      relationships: {
-        constraint_name: string
-        id: number
-        source_column_name: string
-        source_schema: string
-        source_table_name: string
-        target_column_name: string
-        target_table_name: string
-        target_table_schema: string
-      }[]
-      /** @enum {string} */
-      replica_identity: 'DEFAULT' | 'INDEX' | 'FULL' | 'NOTHING'
-      rls_enabled: boolean
-      rls_forced: boolean
-      schema: string
-      size: string
-    }
-    PostgresTrigger: {
-      /** @enum {string} */
-      activation: 'AFTER' | 'BEFORE'
-      condition: string | null
-      /** @enum {string} */
-      enabled_mode: 'ORIGIN' | 'REPLICA' | 'ALWAYS' | 'DISABLED'
-      events: string[]
-      function_args: string[]
-      function_name: string
-      function_schema: string
-      id: number
-      name: string
-      /** @enum {string} */
-      orientation: 'ROW' | 'STATEMENT'
-      schema: string
-      table: string
-      table_id: number
-    }
-    PostgresType: {
-      comment: string | null
-      enums: string[]
-      format: string
-      id: number
-      name: string
-      schema: string
-    }
-    PostgresView: {
-      columns?: {
-        check: string | null
-        comment: string | null
-        data_type: string
-        default_value: (string | number) | null
-        enums: string[]
-        format: string
-        id: string
-        /** @enum {string|null} */
-        identity_generation: 'BY DEFAULT' | 'ALWAYS' | null
-        is_generated: boolean
-        is_identity: boolean
-        is_nullable: boolean
-        is_unique: boolean
-        is_updatable: boolean
-        name: string
-        ordinal_position: number
-        schema: string
-        table: string
-        table_id: number
-      }[]
-      comment: string | null
-      id: number
-      is_updatable: boolean
-      name: string
-      schema: string
-    }
-    PreviewCreditTopUpRequest: {
-      address?: {
-        city?: string | null
-        country: string
-        line1: string
-        line2?: string | null
-        postal_code?: string | null
-        state?: string | null
-      }
-      amount: number
-      tax_id?: {
-        country: string
-        type: string
-        value: string
-      }
-    }
-    PreviewCreditTopUpResponse: {
-      amount: number
-      currency: string
-      tax: {
-        currency: string
-        tax_amount: number
-        tax_rate_percentage: number
-        total_amount_excluding_tax: number
-        total_amount_including_tax: number
-      } | null
-      /** @enum {string} */
-      tax_status: 'calculated' | 'not_applicable' | 'failed'
-      total: number
-    }
-    PreviewOrganizationCreationBody: {
-      address?: {
-        city?: string | null
-        country: string
-        line1: string
-        line2?: string | null
-        postal_code?: string | null
-        state?: string | null
-      }
-      tax_id?: {
-        country: string
-        type: string
-        value: string
-      }
-      /** @enum {string} */
-      tier: 'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team'
-    }
-    PreviewOrganizationCreationResponse: {
-      currency: string
-      plan_price: number
-      tax: {
-        currency: string
-        tax_amount: number
-        tax_rate_percentage: number
-        total_amount_excluding_tax: number
-        total_amount_including_tax: number
-      } | null
-      /** @enum {string} */
-      tax_status: 'calculated' | 'not_applicable' | 'failed'
-      total: number
-    }
-    PreviewProjectTransferResponse: {
-      errors: {
-        key: string
-        message: string
-      }[]
-      has_access_to_target_organization: boolean
-      has_permissions_on_source_organization: boolean
-      info: {
-        key: string
-        message: string
-      }[]
-      members_exceeding_free_project_limit: {
-        limit: number
-        name: string
-      }[]
-      /** @enum {string} */
-      source_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
-      /** @enum {string|null} */
-      target_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | 'platform' | null
-      valid: boolean
-      warnings: {
-        key: string
-        message: string
-      }[]
-    }
-    PreviewSubscriptionChangeResponse: {
-      active_projects: {
-        /** @enum {string} */
-        instance_size:
-          | 'pico'
-          | 'nano'
-          | 'micro'
-          | 'small'
-          | 'medium'
-          | 'large'
-          | 'xlarge'
-          | '2xlarge'
-          | '4xlarge'
-          | '8xlarge'
-          | '12xlarge'
-          | '16xlarge'
-          | '24xlarge'
-          | '24xlarge_optimized_memory'
-          | '24xlarge_optimized_cpu'
-          | '24xlarge_high_memory'
-          | '48xlarge'
-          | '48xlarge_optimized_memory'
-          | '48xlarge_optimized_cpu'
-          | '48xlarge_high_memory'
-        name: string
-        ref: string
-        /** @enum {string} */
-        status:
-          | 'INACTIVE'
-          | 'ACTIVE_HEALTHY'
-          | 'ACTIVE_UNHEALTHY'
-          | 'COMING_UP'
-          | 'UNKNOWN'
-          | 'GOING_DOWN'
-          | 'INIT_FAILED'
-          | 'REMOVED'
-          | 'RESTORING'
-          | 'UPGRADING'
-          | 'PAUSING'
-          | 'RESTORE_FAILED'
-          | 'RESTARTING'
-          | 'PAUSE_FAILED'
-          | 'RESIZING'
-      }[]
-      billed_via_partner: boolean
-      breakdown: {
-        breakdown?: {
-          amount?: number
-          /** @enum {string} */
-          project_db_instance_size?:
-            | 'pico'
-            | 'nano'
-            | 'micro'
-            | 'small'
-            | 'medium'
-            | 'large'
-            | 'xlarge'
-            | '2xlarge'
-            | '4xlarge'
-            | '8xlarge'
-            | '12xlarge'
-            | '16xlarge'
-            | '24xlarge'
-            | '24xlarge_optimized_memory'
-            | '24xlarge_optimized_cpu'
-            | '24xlarge_high_memory'
-            | '48xlarge'
-            | '48xlarge_optimized_memory'
-            | '48xlarge_optimized_cpu'
-            | '48xlarge_high_memory'
-          project_name: string
-          project_ref: string
-          /** @enum {string} */
-          project_status?:
-            | 'INACTIVE'
-            | 'ACTIVE_HEALTHY'
-            | 'ACTIVE_UNHEALTHY'
-            | 'COMING_UP'
-            | 'UNKNOWN'
-            | 'GOING_DOWN'
-            | 'INIT_FAILED'
-            | 'REMOVED'
-            | 'RESTORING'
-            | 'UPGRADING'
-            | 'PAUSING'
-            | 'RESTORE_FAILED'
-            | 'RESTARTING'
-            | 'PAUSE_FAILED'
-            | 'RESIZING'
-          usage: number
-        }[]
-        description: string
-        quantity?: number
-        total_price: number
-        unit_price?: number
-        unit_price_desc?: string
-      }[]
-      /** @enum {string} */
-      monthly_invoice_tax_status: 'calculated' | 'not_applicable' | 'failed'
-      number_of_projects: number
-      /** @enum {boolean} */
-      pending_subscription_flow: true
-      /** @enum {string} */
-      plan_change_type: 'upgrade' | 'downgrade' | 'none'
-      slug: string
-      upfront_charge: {
-        customer_balance: number
-        prorated_credit: number
-        tax: {
-          currency: string
-          tax_amount: number
-          tax_rate_percentage: number
-          total_amount_excluding_tax: number
-          total_amount_including_tax: number
-        } | null
-        /** @enum {string} */
-        tax_status: 'calculated' | 'not_applicable' | 'failed'
-        taxable_amount: number
-        total: number
-      } | null
-    }
-    PrivateLinkResponse: {
-      appliedSuccessfully: boolean
-      currentConfig: {
-        enabled: boolean
-      }
-    }
-    ProfileResponse: {
-      auth0_id: string
-      disabled_features: string[]
-      first_name: string | null
-      free_project_limit: number | null
-      gotrue_id: string
-      id: number
-      is_alpha_user: boolean
-      is_sso_user: boolean
-      last_name: string | null
-      mobile: string | null
-      primary_email: string
-      username: string
-    }
-    ProjectAddonsResponse: {
-      available_addons: {
-        name: string
-        /** @enum {string} */
-        type:
-          | 'custom_domain'
-          | 'compute_instance'
-          | 'pitr'
-          | 'ipv4'
-          | 'auth_mfa_phone'
-          | 'auth_mfa_web_authn'
-          | 'log_drain'
-          | 'etl_pipeline'
-        variants: {
-          /** @enum {string} */
-          identifier:
-            | 'ci_micro'
-            | 'ci_small'
-            | 'ci_medium'
-            | 'ci_large'
-            | 'ci_xlarge'
-            | 'ci_2xlarge'
-            | 'ci_4xlarge'
-            | 'ci_8xlarge'
-            | 'ci_12xlarge'
-            | 'ci_16xlarge'
-            | 'ci_24xlarge'
-            | 'ci_24xlarge_optimized_cpu'
-            | 'ci_24xlarge_optimized_memory'
-            | 'ci_24xlarge_high_memory'
-            | 'ci_48xlarge'
-            | 'ci_48xlarge_optimized_cpu'
-            | 'ci_48xlarge_optimized_memory'
-            | 'ci_48xlarge_high_memory'
-            | 'cd_default'
-            | 'pitr_7'
-            | 'pitr_14'
-            | 'pitr_28'
-            | 'ipv4_default'
-            | 'auth_mfa_phone_default'
-            | 'auth_mfa_web_authn_default'
-            | 'log_drain_default'
-            | 'etl_pipeline_default'
-          meta?: components['schemas']['ProjectAddonsResponseJsonValue']
-          name: string
-          price: number
-          price_description: string
-          /** @enum {string} */
-          price_interval: 'monthly' | 'hourly'
-          /** @enum {string} */
-          price_type: 'fixed' | 'usage'
-        }[]
-      }[]
-      ref: string
-      selected_addons: {
-        /** @enum {string} */
-        type:
-          | 'custom_domain'
-          | 'compute_instance'
-          | 'pitr'
-          | 'ipv4'
-          | 'auth_mfa_phone'
-          | 'auth_mfa_web_authn'
-          | 'log_drain'
-          | 'etl_pipeline'
-        variant: {
-          /** @enum {string} */
-          identifier:
-            | 'ci_micro'
-            | 'ci_small'
-            | 'ci_medium'
-            | 'ci_large'
-            | 'ci_xlarge'
-            | 'ci_2xlarge'
-            | 'ci_4xlarge'
-            | 'ci_8xlarge'
-            | 'ci_12xlarge'
-            | 'ci_16xlarge'
-            | 'ci_24xlarge'
-            | 'ci_24xlarge_optimized_cpu'
-            | 'ci_24xlarge_optimized_memory'
-            | 'ci_24xlarge_high_memory'
-            | 'ci_48xlarge'
-            | 'ci_48xlarge_optimized_cpu'
-            | 'ci_48xlarge_optimized_memory'
-            | 'ci_48xlarge_high_memory'
-            | 'cd_default'
-            | 'pitr_7'
-            | 'pitr_14'
-            | 'pitr_28'
-            | 'ipv4_default'
-            | 'auth_mfa_phone_default'
-            | 'auth_mfa_web_authn_default'
-            | 'log_drain_default'
-            | 'etl_pipeline_default'
-          meta?: components['schemas']['ProjectAddonsResponseJsonValue']
-          name: string
-          price: number
-          price_description: string
-          /** @enum {string} */
-          price_interval: 'monthly' | 'hourly'
-          /** @enum {string} */
-          price_type: 'fixed' | 'usage'
-        }
-      }[]
-    }
-    /** @description Any JSON-serializable value */
-    ProjectAddonsResponseJsonValue:
-      | ((string | number | boolean) | null)
-      | components['schemas']['ProjectAddonsResponseJsonValue'][]
-      | {
-          [key: string]: components['schemas']['ProjectAddonsResponseJsonValue']
-        }
-    ProjectClonedResponse: {
-      source_project_ref: string
-      target_disk_size_gb: number
-      target_instance_size: string
-      target_project_ref: string
-    }
-    ProjectClonedStatusResponse: {
-      cloned_from?: {
-        project_id: number
-        source_project: {
-          name: string
-          ref: string
-        }
-      }
-      clones: {
-        inserted_at: string | null
-        project_id: number
-        /** @enum {string} */
-        status: 'COMPLETED' | 'IN_PROGRESS' | 'FAILED' | 'REMOVED'
-        target_project: {
-          name: string
-          ref: string
-        }
-        target_project_id: number
-        updated_at: string | null
-      }[]
-      id: number
-      ref: string
-    }
-    ProjectDetailResponse: {
-      cloud_provider: string
-      /** @default null */
-      connectionString?: string | null
-      db_host: string
-      dbVersion?: string
-      high_availability: boolean
-      id: number
-      /** @enum {string} */
-      infra_compute_size?:
-        | 'pico'
-        | 'nano'
-        | 'micro'
-        | 'small'
-        | 'medium'
-        | 'large'
-        | 'xlarge'
-        | '2xlarge'
-        | '4xlarge'
-        | '8xlarge'
-        | '12xlarge'
-        | '16xlarge'
-        | '24xlarge'
-        | '24xlarge_optimized_memory'
-        | '24xlarge_optimized_cpu'
-        | '24xlarge_high_memory'
-        | '48xlarge'
-        | '48xlarge_optimized_memory'
-        | '48xlarge_optimized_cpu'
-        | '48xlarge_high_memory'
-      inserted_at: string
-      integration_source: string | null
-      is_branch_enabled: boolean
-      is_hibernating?: boolean
-      is_physical_backups_enabled: boolean
-      lastDatabaseResizeAt?: string
-      maxDatabasePreprovisionGb?: number
-      name: string
-      organization_id: number
-      parent_project_ref?: string
-      ref: string
-      region: string
-      restUrl: string
-      /** @enum {string} */
-      status:
-        | 'INACTIVE'
-        | 'ACTIVE_HEALTHY'
-        | 'ACTIVE_UNHEALTHY'
-        | 'COMING_UP'
-        | 'UNKNOWN'
-        | 'GOING_DOWN'
-        | 'INIT_FAILED'
-        | 'REMOVED'
-        | 'RESTORING'
-        | 'UPGRADING'
-        | 'PAUSING'
-        | 'RESTORE_FAILED'
-        | 'RESTARTING'
-        | 'PAUSE_FAILED'
-        | 'RESIZING'
-      subscription_id: string
-      updated_at: string
-      volumeSizeGb?: number
-    }
-    ProjectMembersResponse: {
-      members: {
-        primary_email: string
-        user_id: string
-        username: string
-      }[]
-    }
-    ProjectRefResponse: {
-      id: number
-      name: string
-      ref: string
-    }
-    ProjectResourceWarningsResponse: {
-      /** @enum {string|null} */
-      auth_email_offender: 'critical' | 'warning' | null
-      /** @enum {string|null} */
-      auth_rate_limit_exhaustion: 'critical' | 'warning' | null
-      /** @enum {string|null} */
-      auth_restricted_email_sending: 'critical' | 'warning' | null
-      /** @enum {string|null} */
-      cpu_exhaustion: 'critical' | 'warning' | null
-      /** @enum {string|null} */
-      disk_io_exhaustion: 'critical' | 'warning' | null
-      /** @enum {string|null} */
-      disk_space_exhaustion: 'critical' | 'warning' | null
-      is_readonly_mode_enabled: boolean
-      /** @enum {string|null} */
-      memory_and_swap_exhaustion: 'critical' | 'warning' | null
-      /** @enum {string|null} */
-      need_pitr: 'critical' | 'warning' | null
-      project: string
-    }
-    ProjectSensitivityResponse: {
-      is_sensitive: boolean
-    }
-    ProjectServiceHealthResponse: {
-      /** @enum {string} */
-      granularity?: 'day' | 'hour' | 'minute'
-      /** @example 2025-03-01T23:59:59Z */
-      iso_timestamp_end: string
-      /** @example 2025-03-01T00:00:00Z */
-      iso_timestamp_start: string
-      /** @example s:edge_logs */
-      lql?: string
-      /** @example select timestamp, edge_logs from service_health */
-      sql?: string
-    }
-    ProjectSettingsResponse: {
-      app_config?: {
-        db_schema: string
-        endpoint: string
-        storage_endpoint: string
-      }
-      cloud_provider: string
-      db_dns_name: string
-      db_host: string
-      db_ip_addr_config: string
-      db_name: string
-      db_port: number
-      db_user: string
-      inserted_at: string
-      is_sensitive?: boolean
-      jwt_secret?: string
-      name: string
-      ref: string
-      region: string
-      service_api_keys?: {
-        api_key: string
-        name: string
-        tags: string
-      }[]
-      ssl_enforced: boolean
-      status: string
-    }
-    ProjectWakeResponse: {
-      connection_string: string | null
-      connection_string_read_only: string | null
-    }
-    PublicationDetailsResponse: {
-      config:
-        | {
-            /** @description Data-change operations to publish */
-            operations: ('insert' | 'update' | 'delete' | 'truncate')[]
-            /**
-             * @description PostgreSQL 18+ generated-column publication behavior
-             * @enum {string}
-             */
-            publish_generated_columns?: 'none' | 'stored'
-            /** @description Whether partition changes use the partition root identity */
-            publish_via_partition_root?: boolean
-            /** @enum {string} */
-            type: 'all_tables'
-          }
-        | {
-            /** @description Data-change operations to publish */
-            operations: ('insert' | 'update' | 'delete' | 'truncate')[]
-            /**
-             * @description PostgreSQL 18+ generated-column publication behavior
-             * @enum {string}
-             */
-            publish_generated_columns?: 'none' | 'stored'
-            /** @description Whether partition changes use the partition root identity */
-            publish_via_partition_root?: boolean
-            /** @description Schemas whose tables are published */
-            schemas: string[]
-            /** @enum {string} */
-            type: 'tables_in_schema'
-          }
-        | {
-            /** @description Data-change operations to publish */
-            operations: ('insert' | 'update' | 'delete' | 'truncate')[]
-            /**
-             * @description PostgreSQL 18+ generated-column publication behavior
-             * @enum {string}
-             */
-            publish_generated_columns?: 'none' | 'stored'
-            /** @description Whether partition changes use the partition root identity */
-            publish_via_partition_root?: boolean
-            tables: {
-              /** @description Columns to publish, or null for Postgres' default column set */
-              columns?: string[] | null
-              /**
-               * @description Table id (Postgres OID)
-               * @example 16408
-               */
-              id: number
-              /**
-               * @description Table name
-               * @example orders
-               */
-              name: string
-              /** @description A self-contained PostgreSQL row-filter expression, or null for none */
-              row_filter?: string | null
-              /**
-               * @description Table schema
-               * @example public
-               */
-              schema: string
-            }[]
-            /** @enum {string} */
-            type: 'tables'
-          }
-      /**
-       * @description Publication name
-       * @example pub_orders
-       */
-      name: string
-      /** @description Tables currently exposed by the publication */
-      tables: {
-        /**
-         * @description Table id (Postgres OID)
-         * @example 16408
-         */
-        id: number
-        /**
-         * @description Whether the table can own partitions
-         * @enum {string}
-         */
-        kind: 'table' | 'partitioned_table'
-        /**
-         * @description Table name
-         * @example orders
-         */
-        name: string
-        /** @description The direct partition parent's table id, if any */
-        partition_parent_id?: number | null
-        /**
-         * @description Table schema
-         * @example public
-         */
-        schema: string
-      }[]
-    }
-    PublicUrlResponse: {
-      publicUrl: string
-    }
-    PurgeBucketCacheBody: {
-      /** @description Storage bucket id */
-      bucket_id: string
-    }
-    PurgeObjectCacheBody: {
-      /** @description Storage bucket id */
-      bucket_id: string
-      path: string
-    }
-    PutOAuthAppResponse: {
-      client_id: string
-      created_at: string
-      icon?: string
-      id: string
-      name: string
-      redirect_uris: string[]
-      website: string
-    }
-    PutPublicationBody: {
-      /** @description Data-change operations to publish */
-      operations: ('insert' | 'update' | 'delete' | 'truncate')[]
-      /**
-       * @description PostgreSQL 18+ generated-column publication behavior
-       * @enum {string}
-       */
-      publish_generated_columns?: 'none' | 'stored'
-      /** @description Whether partition changes use the partition root identity */
-      publish_via_partition_root?: boolean
-      /** @description Schemas whose tables are published, when type is 'tables_in_schema' */
-      schemas?: string[]
-      /** @description Tables and their optional column and row filters, when type is 'tables' */
-      tables?: {
-        /** @description Columns to publish, or null for Postgres' default column set */
-        columns?: string[] | null
-        /**
-         * @description Table id (Postgres OID)
-         * @example 16408
-         */
-        id: number
-        /** @description A self-contained PostgreSQL row-filter expression, or null for none */
-        row_filter?: string | null
-      }[]
-      /**
-       * @description The table-selection strategy
-       * @enum {string}
-       */
-      type: 'all_tables' | 'tables_in_schema' | 'tables'
-    }
-    ReadColumnsResponse: {
-      /** @description Table columns in ordinal position order */
-      columns: {
-        /**
-         * @description Column name
-         * @example created_at
-         */
-        name: string
-        /** @description Whether the column accepts null values */
-        nullable: boolean
-        /** @description Whether the column belongs to the table's primary key */
-        primary_key: boolean
-        /**
-         * @description Postgres-formatted column type
-         * @example timestamptz
-         */
-        type: string
-      }[]
-    }
-    ReadPublicationsV2Response: {
-      /** @description List of publications */
-      publications: {
-        /**
-         * @description Publication name
-         * @example pub_orders
-         */
-        name: string
-      }[]
-    }
-    ReadTablesV2Response: {
-      /** @description List of tables */
-      tables: {
-        /**
-         * @description Table id (Postgres OID)
-         * @example 16408
-         */
-        id: number
-        /**
-         * @description Whether the table can own partitions
-         * @enum {string}
-         */
-        kind: 'table' | 'partitioned_table'
-        /**
-         * @description Table name
-         * @example orders
-         */
-        name: string
-        /** @description The direct partition parent's table id, if any */
-        partition_parent_id?: number | null
-        /**
-         * @description Table schema
-         * @example public
-         */
-        schema: string
-      }[]
-    }
-    RealtimeConfigResponse: {
-      /** @description Sets connection pool size for Realtime Authorization */
-      connection_pool: number | null
-      /** @description Sets maximum number of bytes per second rate per channel limit */
-      max_bytes_per_second: number | null
-      /** @description Sets maximum number of channels per client rate limit */
-      max_channels_per_client: number | null
-      /** @description Sets maximum number of concurrent users rate limit */
-      max_concurrent_users: number | null
-      /** @description Sets maximum number of events per second rate per channel limit */
-      max_events_per_second: number | null
-      /** @description Sets maximum number of joins per second rate limit */
-      max_joins_per_second: number | null
-      /** @description Sets maximum number of payload size in KB rate limit */
-      max_payload_size_in_kb: number | null
-      /** @description Sets maximum number of presence events per second rate limit */
-      max_presence_events_per_second: number | null
-      /** @description Sets connection pool size used to create Postgres Changes subscriptions */
-      postgres_changes_pool: number | null
-      /** @description Whether to enable presence */
-      presence_enabled: boolean
-      /** @description Whether to only allow private channels */
-      private_only: boolean | null
-      /** @description Disables the Realtime service for this project when true. Set to false to re-enable it. */
-      suspend: boolean | null
-    }
-    RegionsInfo: {
-      all: {
-        smartGroup: {
-          /** @enum {string} */
-          code: 'americas' | 'emea' | 'apac'
-          name: string
-          /** @enum {string} */
-          type: 'smartGroup'
-        }[]
-        specific: {
-          /** @enum {string} */
-          code:
-            | 'us-east-1'
-            | 'us-east-2'
-            | 'us-west-1'
-            | 'us-west-2'
-            | 'ap-southeast-1'
-            | 'ap-northeast-1'
-            | 'ap-northeast-2'
-            | 'ap-east-1'
-            | 'ap-southeast-2'
-            | 'eu-west-1'
-            | 'eu-west-2'
-            | 'eu-west-3'
-            | 'eu-north-1'
-            | 'eu-central-1'
-            | 'eu-central-2'
-            | 'ca-central-1'
-            | 'ap-south-1'
-            | 'sa-east-1'
-          name: string
-          /** @enum {string} */
-          provider: 'AWS' | 'AWS_K8S' | 'AWS_NIMBUS'
-          /** @enum {string} */
-          status?: 'capacity' | 'other'
-          /** @enum {string} */
-          type: 'specific'
-        }[]
-      }
-      recommendations: {
-        smartGroup: {
-          /** @enum {string} */
-          code: 'americas' | 'emea' | 'apac'
-          name: string
-          /** @enum {string} */
-          type: 'smartGroup'
-        }
-        specific: {
-          /** @enum {string} */
-          code:
-            | 'us-east-1'
-            | 'us-east-2'
-            | 'us-west-1'
-            | 'us-west-2'
-            | 'ap-southeast-1'
-            | 'ap-northeast-1'
-            | 'ap-northeast-2'
-            | 'ap-east-1'
-            | 'ap-southeast-2'
-            | 'eu-west-1'
-            | 'eu-west-2'
-            | 'eu-west-3'
-            | 'eu-north-1'
-            | 'eu-central-1'
-            | 'eu-central-2'
-            | 'ca-central-1'
-            | 'ap-south-1'
-            | 'sa-east-1'
-          name: string
-          /** @enum {string} */
-          provider: 'AWS' | 'AWS_K8S' | 'AWS_NIMBUS'
-          /** @enum {string} */
-          status?: 'capacity' | 'other'
-          /** @enum {string} */
-          type: 'specific'
-        }[]
-      }
-    }
-    RemoveProjectResponse: {
-      id: number
-      name: string
-      ref: string
-      vercel?: {
-        resourceUninstallFailure: boolean
-      }
-    }
-    ReplicationDestinationResponse: {
-      /** @description Destination configuration */
-      config:
-        | {
-            big_query: {
-              /**
-               * @description Number of concurrent BigQuery Storage Write API connections.
-               * @example 8
-               */
-              connection_pool_size: number
-              /**
-               * @description BigQuery dataset id
-               * @example analytics
-               */
-              dataset_id: string
-              /**
-               * @description Maximum data staleness in minutes
-               * @example 5
-               */
-              max_staleness_mins?: number
-              /**
-               * @description BigQuery project id
-               * @example my-gcp-project
-               */
-              project_id: string
-              /** @description Per-table partitioning and clustering, applied only when the physical table is created or recreated */
-              table_options?: {
-                tables?: {
-                  cluster_by?: string[]
-                  partition_by?:
-                    | (
-                        | {
-                            /**
-                             * @description Source column name
-                             * @example created_at
-                             */
-                            column: string
-                            /**
-                             * @description Partition granularity
-                             * @example day
-                             * @enum {string}
-                             */
-                            granularity?: 'hour' | 'day' | 'month' | 'year'
-                            /**
-                             * @description Partition by a replicated `DATE`, `TIMESTAMP`, or `DATETIME` column
-                             * @enum {string}
-                             */
-                            kind: 'time_column'
-                          }
-                        | {
-                            /**
-                             * @description Source column name
-                             * @example created_at
-                             */
-                            column: string
-                            /**
-                             * @description Exclusive end of the last partition range
-                             * @example 100
-                             */
-                            end: number
-                            /**
-                             * @description Width of each partition range
-                             * @example 10
-                             */
-                            interval: number
-                            /**
-                             * @description Partition by ranges of a replicated integer column
-                             * @enum {string}
-                             */
-                            kind: 'integer_range'
-                            /**
-                             * @description Inclusive start of the first partition range
-                             * @example 0
-                             */
-                            start: number
-                          }
-                        | {
-                            /**
-                             * @description Partition granularity
-                             * @example day
-                             * @enum {string}
-                             */
-                            granularity?: 'hour' | 'day' | 'month' | 'year'
-                            /**
-                             * @description Partition by the time at which BigQuery ingests each row
-                             * @enum {string}
-                             */
-                            kind: 'ingestion_time'
-                          }
-                      )
-                    | null
-                  /**
-                   * @description Source PostgreSQL table OID, stable across renames for the relation lifetime
-                   * @example 16384
-                   */
-                  table_id: number
-                }[]
-              }
-            }
-          }
-        | {
-            clickhouse: {
-              /**
-               * @description ClickHouse target database
-               * @example analytics
-               */
-              database: string
-              /**
-               * @description Table engine used for replicated tables. Defaults to `replacing_merge_tree` server-side when omitted.
-               * @example replacing_merge_tree
-               * @enum {string}
-               */
-              engine: 'merge_tree' | 'replacing_merge_tree'
-              /**
-               * @description Persisted ClickHouse HTTP(S) endpoint URL
-               * @example http://clickhouse.example.com:8123
-               */
-              url: string
-              /**
-               * @description ClickHouse user name
-               * @example default
-               */
-              user: string
-            }
-          }
-        | {
-            iceberg:
-              | {
-                  supabase: {
-                    /**
-                     * @description Namespace
-                     * @example my-namespace
-                     */
-                    namespace?: string
-                    /**
-                     * @description Project ref
-                     * @example abcdefghijklmnopqrst
-                     */
-                    project_ref: string
-                    /**
-                     * @description S3 region
-                     * @example ap-southeast-1
-                     */
-                    s3_region: string
-                    /**
-                     * @description Warehouse name
-                     * @example my-warehouse
-                     */
-                    warehouse_name: string
-                  }
-                }
-              | {
-                  rest: {
-                    /**
-                     * @description Iceberg REST catalog URI
-                     * @example https://catalog.example.com
-                     */
-                    catalog_uri: string
-                    /**
-                     * @description Namespace
-                     * @example my-namespace
-                     */
-                    namespace?: string
-                    /**
-                     * @description S3-compatible storage endpoint
-                     * @example https://s3.example.com
-                     */
-                    s3_endpoint: string
-                    /**
-                     * @description Warehouse name
-                     * @example my-warehouse
-                     */
-                    warehouse_name: string
-                  }
-                }
-          }
-        | {
-            ducklake: {
-              /**
-               * @description Persisted DuckLake data path
-               * @example s3://<bucket-name>/
-               */
-              data_path: string
-              /**
-               * @description Persisted DuckLake metadata schema
-               * @example ducklake
-               */
-              metadata_schema?: string
-              /**
-               * @description Number of concurrent DuckDB connections.
-               * @example 4
-               */
-              pool_size: number
-              /**
-               * @description Persisted S3-compatible storage endpoint
-               * @example 127.0.0.1:5000/s3
-               */
-              s3_endpoint?: string
-              /**
-               * @description S3-compatible storage region
-               * @example us-east-1
-               */
-              s3_region?: string
-              /**
-               * @description Persisted S3 URL style
-               * @example path
-               */
-              s3_url_style?: string
-              /**
-               * @description Whether to use SSL for S3-compatible storage
-               * @example false
-               */
-              s3_use_ssl?: boolean
-            }
-          }
-        | {
-            snowflake: {
-              /**
-               * @description Snowflake account identifier
-               * @example MYORG-MYACCOUNT
-               */
-              account_id: string
-              /**
-               * @description Snowflake target database
-               * @example ANALYTICS
-               */
-              database: string
-              /**
-               * @description Optional Snowflake role
-               * @example PIPELINES_ROLE
-               */
-              role?: string
-              /**
-               * @description Snowflake target schema
-               * @example PUBLIC
-               */
-              schema: string
-              /**
-               * @description Snowflake user configured for key-pair authentication
-               * @example PIPELINES_USER
-               */
-              user: string
-            }
-          }
-      /**
-       * @description Destination id
-       * @example 2001
-       */
-      id: number
-      /**
-       * @description Destination name
-       * @example bq-analytics
-       */
-      name: string
-      /**
-       * @description Tenant id
-       * @example tenant_9f3a2c
-       */
-      tenant_id: string
-    }
-    ReplicationDestinationsResponse: {
-      /** @description List of destinations */
-      destinations: {
-        /** @description Destination configuration */
-        config:
-          | {
-              big_query: {
-                /**
-                 * @description Number of concurrent BigQuery Storage Write API connections.
-                 * @example 8
-                 */
-                connection_pool_size: number
-                /**
-                 * @description BigQuery dataset id
-                 * @example analytics
-                 */
-                dataset_id: string
-                /**
-                 * @description Maximum data staleness in minutes
-                 * @example 5
-                 */
-                max_staleness_mins?: number
-                /**
-                 * @description BigQuery project id
-                 * @example my-gcp-project
-                 */
-                project_id: string
-                /** @description Per-table partitioning and clustering, applied only when the physical table is created or recreated */
-                table_options?: {
-                  tables?: {
-                    cluster_by?: string[]
-                    partition_by?:
-                      | (
-                          | {
-                              /**
-                               * @description Source column name
-                               * @example created_at
-                               */
-                              column: string
-                              /**
-                               * @description Partition granularity
-                               * @example day
-                               * @enum {string}
-                               */
-                              granularity?: 'hour' | 'day' | 'month' | 'year'
-                              /**
-                               * @description Partition by a replicated `DATE`, `TIMESTAMP`, or `DATETIME` column
-                               * @enum {string}
-                               */
-                              kind: 'time_column'
-                            }
-                          | {
-                              /**
-                               * @description Source column name
-                               * @example created_at
-                               */
-                              column: string
-                              /**
-                               * @description Exclusive end of the last partition range
-                               * @example 100
-                               */
-                              end: number
-                              /**
-                               * @description Width of each partition range
-                               * @example 10
-                               */
-                              interval: number
-                              /**
-                               * @description Partition by ranges of a replicated integer column
-                               * @enum {string}
-                               */
-                              kind: 'integer_range'
-                              /**
-                               * @description Inclusive start of the first partition range
-                               * @example 0
-                               */
-                              start: number
-                            }
-                          | {
-                              /**
-                               * @description Partition granularity
-                               * @example day
-                               * @enum {string}
-                               */
-                              granularity?: 'hour' | 'day' | 'month' | 'year'
-                              /**
-                               * @description Partition by the time at which BigQuery ingests each row
-                               * @enum {string}
-                               */
-                              kind: 'ingestion_time'
-                            }
-                        )
-                      | null
-                    /**
-                     * @description Source PostgreSQL table OID, stable across renames for the relation lifetime
-                     * @example 16384
-                     */
-                    table_id: number
-                  }[]
-                }
-              }
-            }
-          | {
-              clickhouse: {
-                /**
-                 * @description ClickHouse target database
-                 * @example analytics
-                 */
-                database: string
-                /**
-                 * @description Table engine used for replicated tables. Defaults to `replacing_merge_tree` server-side when omitted.
-                 * @example replacing_merge_tree
-                 * @enum {string}
-                 */
-                engine: 'merge_tree' | 'replacing_merge_tree'
-                /**
-                 * @description Persisted ClickHouse HTTP(S) endpoint URL
-                 * @example http://clickhouse.example.com:8123
-                 */
-                url: string
-                /**
-                 * @description ClickHouse user name
-                 * @example default
-                 */
-                user: string
-              }
-            }
-          | {
-              iceberg:
-                | {
-                    supabase: {
-                      /**
-                       * @description Namespace
-                       * @example my-namespace
-                       */
-                      namespace?: string
-                      /**
-                       * @description Project ref
-                       * @example abcdefghijklmnopqrst
-                       */
-                      project_ref: string
-                      /**
-                       * @description S3 region
-                       * @example ap-southeast-1
-                       */
-                      s3_region: string
-                      /**
-                       * @description Warehouse name
-                       * @example my-warehouse
-                       */
-                      warehouse_name: string
-                    }
-                  }
-                | {
-                    rest: {
-                      /**
-                       * @description Iceberg REST catalog URI
-                       * @example https://catalog.example.com
-                       */
-                      catalog_uri: string
-                      /**
-                       * @description Namespace
-                       * @example my-namespace
-                       */
-                      namespace?: string
-                      /**
-                       * @description S3-compatible storage endpoint
-                       * @example https://s3.example.com
-                       */
-                      s3_endpoint: string
-                      /**
-                       * @description Warehouse name
-                       * @example my-warehouse
-                       */
-                      warehouse_name: string
-                    }
-                  }
-            }
-          | {
-              ducklake: {
-                /**
-                 * @description Persisted DuckLake data path
-                 * @example s3://<bucket-name>/
-                 */
-                data_path: string
-                /**
-                 * @description Persisted DuckLake metadata schema
-                 * @example ducklake
-                 */
-                metadata_schema?: string
-                /**
-                 * @description Number of concurrent DuckDB connections.
-                 * @example 4
-                 */
-                pool_size: number
-                /**
-                 * @description Persisted S3-compatible storage endpoint
-                 * @example 127.0.0.1:5000/s3
-                 */
-                s3_endpoint?: string
-                /**
-                 * @description S3-compatible storage region
-                 * @example us-east-1
-                 */
-                s3_region?: string
-                /**
-                 * @description Persisted S3 URL style
-                 * @example path
-                 */
-                s3_url_style?: string
-                /**
-                 * @description Whether to use SSL for S3-compatible storage
-                 * @example false
-                 */
-                s3_use_ssl?: boolean
-              }
-            }
-          | {
-              snowflake: {
-                /**
-                 * @description Snowflake account identifier
-                 * @example MYORG-MYACCOUNT
-                 */
-                account_id: string
-                /**
-                 * @description Snowflake target database
-                 * @example ANALYTICS
-                 */
-                database: string
-                /**
-                 * @description Optional Snowflake role
-                 * @example PIPELINES_ROLE
-                 */
-                role?: string
-                /**
-                 * @description Snowflake target schema
-                 * @example PUBLIC
-                 */
-                schema: string
-                /**
-                 * @description Snowflake user configured for key-pair authentication
-                 * @example PIPELINES_USER
-                 */
-                user: string
-              }
-            }
-        /**
-         * @description Destination id
-         * @example 2001
-         */
-        id: number
-        /**
-         * @description Destination name
-         * @example bq-analytics
-         */
-        name: string
-        /**
-         * @description Tenant id
-         * @example tenant_9f3a2c
-         */
-        tenant_id: string
-      }[]
-    }
-    ReplicationPipelineReplicationStatusResponse: {
+    PipelineReplicationStatusResponse: {
       /** @description Stats about apply worker lag */
       apply_lag?: {
         /**
@@ -11319,12 +10416,12 @@ export interface components {
          * @description Flush lag expressed in milliseconds.
          * @example 1200
          */
-        flush_lag?: number
+        flush_lag?: number | null
         /**
          * @description Milliseconds elapsed since the walsender last received client feedback. This can be present even when write and flush lag are unavailable.
          * @example 5000
          */
-        reply_time_lag?: number
+        reply_time_lag?: number | null
         /**
          * @description Bytes between the current WAL location and the slot restart LSN.
          * @example 1024
@@ -11334,19 +10431,19 @@ export interface components {
          * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached. `null` means Postgres reports unlimited slot WAL retention.
          * @example 8192
          */
-        safe_wal_size_bytes: number | null
+        safe_wal_size_bytes?: number | null
         /**
          * @description WAL availability status reported by Postgres for the slot.
          * @example reserved
-         * @enum {string}
+         * @enum {string|null}
          */
-        wal_status?: 'reserved' | 'extended' | 'unreserved' | 'lost' | 'unknown'
+        wal_status?: 'extended' | 'lost' | null | 'reserved' | 'unknown' | 'unreserved'
         /**
          * @description Write lag expressed in milliseconds.
          * @example 1500
          */
-        write_lag?: number
-      }
+        write_lag?: number | null
+      } | null
       /**
        * @description Pipeline id
        * @example 1012
@@ -11409,7 +10506,7 @@ export interface components {
                     /** @enum {string} */
                     policy: 'timed_retry'
                   }
-              solution?: string
+              solution?: string | null
             }
         /**
          * @deprecated
@@ -11439,12 +10536,12 @@ export interface components {
            * @description Flush lag expressed in milliseconds.
            * @example 1200
            */
-          flush_lag?: number
+          flush_lag?: number | null
           /**
            * @description Milliseconds elapsed since the walsender last received client feedback. This can be present even when write and flush lag are unavailable.
            * @example 5000
            */
-          reply_time_lag?: number
+          reply_time_lag?: number | null
           /**
            * @description Bytes between the current WAL location and the slot restart LSN.
            * @example 1024
@@ -11454,23 +10551,23 @@ export interface components {
            * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached. `null` means Postgres reports unlimited slot WAL retention.
            * @example 8192
            */
-          safe_wal_size_bytes: number | null
+          safe_wal_size_bytes?: number | null
           /**
            * @description WAL availability status reported by Postgres for the slot.
            * @example reserved
-           * @enum {string}
+           * @enum {string|null}
            */
-          wal_status?: 'reserved' | 'extended' | 'unreserved' | 'lost' | 'unknown'
+          wal_status?: 'extended' | 'lost' | null | 'reserved' | 'unknown' | 'unreserved'
           /**
            * @description Write lag expressed in milliseconds.
            * @example 1500
            */
-          write_lag?: number
-        }
+          write_lag?: number | null
+        } | null
       }[]
     }
     /** @description Pipeline */
-    ReplicationPipelineResponse: {
+    PipelineResponse: {
       /** @description Pipeline configuration */
       config: {
         /** @description Batch configuration */
@@ -11490,23 +10587,23 @@ export interface components {
            * @example 0.2
            */
           memory_budget_ratio?: number
-        }
+        } | null
         /**
          * @description Behavior when the replication slot is invalidated. `error` prevents pipeline startup and requires manual intervention. `recreate` automatically recreates the slot and restarts replication from scratch.
          * @example error
-         * @enum {string}
+         * @enum {string|null}
          */
-        invalidated_slot_behavior?: 'error' | 'recreate'
+        invalidated_slot_behavior?: 'error' | null | 'recreate'
         /**
          * @description Replicator log level
          * @example info
-         * @enum {string}
+         * @enum {string|null}
          */
-        log_level?: 'trace' | 'debug' | 'info' | 'warn' | 'error'
+        log_level?: 'debug' | 'error' | 'info' | null | 'trace' | 'warn'
         /** @description Maximum number of copy connections per table */
-        max_copy_connections_per_table?: number
+        max_copy_connections_per_table?: number | null
         /** @description Maximum number of table sync workers */
-        max_table_sync_workers?: number
+        max_table_sync_workers?: number | null
         /** @description Memory-based backpressure configuration */
         memory_backpressure?: {
           /**
@@ -11519,12 +10616,12 @@ export interface components {
            * @example 0.75
            */
           resume_threshold: number
-        }
+        } | null
         /**
          * @description Milliseconds between one memory usage refresh and another
          * @example 100
          */
-        memory_refresh_interval_ms?: number
+        memory_refresh_interval_ms?: number | null
         /**
          * @description Publication name
          * @example pub_orders
@@ -11534,49 +10631,52 @@ export interface components {
          * @description Milliseconds between one replication lag refresh and another
          * @example 10000
          */
-        replication_lag_refresh_interval_ms?: number
+        replication_lag_refresh_interval_ms?: number | null
         /**
          * @description Milliseconds between one retry and another for timed worker retries
          * @example 10000
          */
-        table_error_retry_delay_ms?: number
+        table_error_retry_delay_ms?: number | null
         /**
          * @description Maximum number of automatic timed retry attempts
          * @example 5
          */
-        table_error_retry_max_attempts?: number
+        table_error_retry_max_attempts?: number | null
         /** @description Selection rules for tables participating in initial table copy */
         table_sync_copy?:
-          | {
-              /** @enum {string} */
-              type: 'include_all_tables'
-            }
-          | {
-              /** @enum {string} */
-              type: 'skip_all_tables'
-            }
-          | {
-              /**
-               * @description Table ids for which copy should be performed
-               * @example [
-               *       16408
-               *     ]
-               */
-              table_ids: number[]
-              /** @enum {string} */
-              type: 'include_tables'
-            }
-          | {
-              /**
-               * @description Table ids for which copy should be skipped
-               * @example [
-               *       16408
-               *     ]
-               */
-              table_ids: number[]
-              /** @enum {string} */
-              type: 'skip_tables'
-            }
+          | (
+              | {
+                  /** @enum {string} */
+                  type: 'include_all_tables'
+                }
+              | {
+                  /** @enum {string} */
+                  type: 'skip_all_tables'
+                }
+              | {
+                  /**
+                   * @description Table ids for which copy should be performed
+                   * @example [
+                   *       16408
+                   *     ]
+                   */
+                  table_ids: number[]
+                  /** @enum {string} */
+                  type: 'include_tables'
+                }
+              | {
+                  /**
+                   * @description Table ids for which copy should be skipped
+                   * @example [
+                   *       16408
+                   *     ]
+                   */
+                  table_ids: number[]
+                  /** @enum {string} */
+                  type: 'skip_tables'
+                }
+            )
+          | null
       }
       /**
        * @description Destination id
@@ -11614,7 +10714,7 @@ export interface components {
        */
       tenant_id: string
     }
-    ReplicationPipelinesResponse: {
+    PipelinesResponse: {
       /** @description List of pipelines */
       pipelines: {
         /** @description Pipeline configuration */
@@ -11636,23 +10736,23 @@ export interface components {
              * @example 0.2
              */
             memory_budget_ratio?: number
-          }
+          } | null
           /**
            * @description Behavior when the replication slot is invalidated. `error` prevents pipeline startup and requires manual intervention. `recreate` automatically recreates the slot and restarts replication from scratch.
            * @example error
-           * @enum {string}
+           * @enum {string|null}
            */
-          invalidated_slot_behavior?: 'error' | 'recreate'
+          invalidated_slot_behavior?: 'error' | null | 'recreate'
           /**
            * @description Replicator log level
            * @example info
-           * @enum {string}
+           * @enum {string|null}
            */
-          log_level?: 'trace' | 'debug' | 'info' | 'warn' | 'error'
+          log_level?: 'debug' | 'error' | 'info' | null | 'trace' | 'warn'
           /** @description Maximum number of copy connections per table */
-          max_copy_connections_per_table?: number
+          max_copy_connections_per_table?: number | null
           /** @description Maximum number of table sync workers */
-          max_table_sync_workers?: number
+          max_table_sync_workers?: number | null
           /** @description Memory-based backpressure configuration */
           memory_backpressure?: {
             /**
@@ -11665,12 +10765,12 @@ export interface components {
              * @example 0.75
              */
             resume_threshold: number
-          }
+          } | null
           /**
            * @description Milliseconds between one memory usage refresh and another
            * @example 100
            */
-          memory_refresh_interval_ms?: number
+          memory_refresh_interval_ms?: number | null
           /**
            * @description Publication name
            * @example pub_orders
@@ -11680,49 +10780,52 @@ export interface components {
            * @description Milliseconds between one replication lag refresh and another
            * @example 10000
            */
-          replication_lag_refresh_interval_ms?: number
+          replication_lag_refresh_interval_ms?: number | null
           /**
            * @description Milliseconds between one retry and another for timed worker retries
            * @example 10000
            */
-          table_error_retry_delay_ms?: number
+          table_error_retry_delay_ms?: number | null
           /**
            * @description Maximum number of automatic timed retry attempts
            * @example 5
            */
-          table_error_retry_max_attempts?: number
+          table_error_retry_max_attempts?: number | null
           /** @description Selection rules for tables participating in initial table copy */
           table_sync_copy?:
-            | {
-                /** @enum {string} */
-                type: 'include_all_tables'
-              }
-            | {
-                /** @enum {string} */
-                type: 'skip_all_tables'
-              }
-            | {
-                /**
-                 * @description Table ids for which copy should be performed
-                 * @example [
-                 *       16408
-                 *     ]
-                 */
-                table_ids: number[]
-                /** @enum {string} */
-                type: 'include_tables'
-              }
-            | {
-                /**
-                 * @description Table ids for which copy should be skipped
-                 * @example [
-                 *       16408
-                 *     ]
-                 */
-                table_ids: number[]
-                /** @enum {string} */
-                type: 'skip_tables'
-              }
+            | (
+                | {
+                    /** @enum {string} */
+                    type: 'include_all_tables'
+                  }
+                | {
+                    /** @enum {string} */
+                    type: 'skip_all_tables'
+                  }
+                | {
+                    /**
+                     * @description Table ids for which copy should be performed
+                     * @example [
+                     *       16408
+                     *     ]
+                     */
+                    table_ids: number[]
+                    /** @enum {string} */
+                    type: 'include_tables'
+                  }
+                | {
+                    /**
+                     * @description Table ids for which copy should be skipped
+                     * @example [
+                     *       16408
+                     *     ]
+                     */
+                    table_ids: number[]
+                    /** @enum {string} */
+                    type: 'skip_tables'
+                  }
+              )
+            | null
         }
         /**
          * @description Destination id
@@ -11761,7 +10864,7 @@ export interface components {
         tenant_id: string
       }[]
     }
-    ReplicationPipelineStatusResponse: {
+    PipelineStatusResponse: {
       /**
        * @description Pipeline id
        * @example 1012
@@ -11773,10 +10876,10 @@ export interface components {
          * @example started
          * @enum {string}
          */
-        name: 'stopped' | 'starting' | 'started' | 'stopping' | 'unknown' | 'failed'
+        name: 'failed' | 'started' | 'starting' | 'stopped' | 'stopping' | 'unknown'
       }
     }
-    ReplicationPipelineVersionResponse: {
+    PipelineVersionResponse: {
       /** @description New pipeline version */
       new_version?: {
         /**
@@ -11789,7 +10892,7 @@ export interface components {
          * @example v0.3.0
          */
         name: string
-      }
+      } | null
       /**
        * @description Pipeline id
        * @example 1012
@@ -11809,7 +10912,887 @@ export interface components {
         name: string
       }
     }
-    ReplicationPublicationsResponse: {
+    PlanFeaturesResponse: {
+      [key: string]: {
+        [key: string]: {
+          config:
+            | {
+                enabled: boolean
+              }
+            | {
+                enabled: boolean
+                unit: string
+                unlimited: boolean
+                value: number
+              }
+            | {
+                enabled: boolean
+                set: string[]
+              }
+          /** @enum {string} */
+          type: 'boolean' | 'numeric' | 'set'
+        }
+      }
+    }
+    PlanGateErrorBody: {
+      /** @description Present on entitlement denials. Other errors with this status code (validation, billing state) carry only message. */
+      error?: {
+        /**
+         * @description Machine-readable marker for plan-gated denials
+         * @enum {string}
+         */
+        code: 'entitlement_required'
+        /** @description Entitlement feature key that failed the check */
+        feature: string
+        /** @description Billing page URL for the organization, present when the org is resolvable */
+        upgrade_url?: string
+      }
+      /** @description Human-readable explanation of the plan gate */
+      message: string
+    }
+    PlansResponse: {
+      plans: {
+        /** @enum {string} */
+        change_type: 'downgrade' | 'none' | 'upgrade'
+        /** @enum {string} */
+        effective_at?: 'end_of_billing_period' | 'none' | 'now'
+        /** @enum {string} */
+        id: 'enterprise' | 'free' | 'platform' | 'pro' | 'team'
+        is_current: boolean
+        name: string
+        price: number
+      }[]
+    }
+    PointInTimeRestoreBody: {
+      recovery_time_target_unix: number
+    }
+    PostgresColumnPrivileges: {
+      column_id: string
+      column_name: string
+      privileges: {
+        grantee: string
+        grantor: string
+        is_grantable: boolean
+        /** @enum {string} */
+        privilege_type: 'ALL' | 'INSERT' | 'REFERENCES' | 'SELECT' | 'UPDATE'
+      }[]
+      relation_name: string
+      relation_schema: string
+    }
+    PostgresExtension: {
+      comment: string | null
+      default_version: string
+      installed_version: string | null
+      name: string
+      schema: string | null
+    }
+    PostgresForeignTable: {
+      columns?: {
+        check: string | null
+        comment: string | null
+        data_type: string
+        default_value: (string | number) | null
+        enums: string[]
+        format: string
+        id: string
+        /** @enum {string|null} */
+        identity_generation: 'ALWAYS' | 'BY DEFAULT' | null
+        is_generated: boolean
+        is_identity: boolean
+        is_nullable: boolean
+        is_unique: boolean
+        is_updatable: boolean
+        name: string
+        ordinal_position: number
+        schema: string
+        table: string
+        table_id: number
+      }[]
+      comment: string | null
+      id: number
+      name: string
+      schema: string
+    }
+    PostgresMaterializedView: {
+      columns?: {
+        check: string | null
+        comment: string | null
+        data_type: string
+        default_value: (string | number) | null
+        enums: string[]
+        format: string
+        id: string
+        /** @enum {string|null} */
+        identity_generation: 'ALWAYS' | 'BY DEFAULT' | null
+        is_generated: boolean
+        is_identity: boolean
+        is_nullable: boolean
+        is_unique: boolean
+        is_updatable: boolean
+        name: string
+        ordinal_position: number
+        schema: string
+        table: string
+        table_id: number
+      }[]
+      comment: string | null
+      id: number
+      is_populated: boolean
+      name: string
+      schema: string
+    }
+    PostgresPolicy: {
+      /** @enum {string} */
+      action: 'PERMISSIVE' | 'RESTRICTIVE'
+      check: string | null
+      /** @enum {string} */
+      command: 'ALL' | 'DELETE' | 'INSERT' | 'SELECT' | 'UPDATE'
+      definition: string | null
+      id: number
+      name: string
+      roles: string[]
+      schema: string
+      table: string
+      table_id: number
+    }
+    PostgresPublication: {
+      id: number
+      name: string
+      owner: string
+      publish_delete: boolean
+      publish_insert: boolean
+      publish_truncate: boolean
+      publish_update: boolean
+      tables:
+        | {
+            id: number
+            name: string
+            schema: string
+          }[]
+        | null
+    }
+    PostgresTable: {
+      bytes: number
+      columns?: {
+        check: string | null
+        comment: string | null
+        data_type: string
+        default_value: (string | number) | null
+        enums: string[]
+        format: string
+        id: string
+        /** @enum {string|null} */
+        identity_generation: 'ALWAYS' | 'BY DEFAULT' | null
+        is_generated: boolean
+        is_identity: boolean
+        is_nullable: boolean
+        is_unique: boolean
+        is_updatable: boolean
+        name: string
+        ordinal_position: number
+        schema: string
+        table: string
+        table_id: number
+      }[]
+      comment: string | null
+      dead_rows_estimate: number
+      id: number
+      live_rows_estimate: number
+      name: string
+      primary_keys: {
+        name: string
+        schema: string
+        table_id: number
+        table_name: string
+      }[]
+      relationships: {
+        constraint_name: string
+        id: number
+        source_column_name: string
+        source_schema: string
+        source_table_name: string
+        target_column_name: string
+        target_table_name: string
+        target_table_schema: string
+      }[]
+      /** @enum {string} */
+      replica_identity: 'DEFAULT' | 'FULL' | 'INDEX' | 'NOTHING'
+      rls_enabled: boolean
+      rls_forced: boolean
+      schema: string
+      size: string
+    }
+    PostgresTrigger: {
+      /** @enum {string} */
+      activation: 'AFTER' | 'BEFORE'
+      condition: string | null
+      /** @enum {string} */
+      enabled_mode: 'ALWAYS' | 'DISABLED' | 'ORIGIN' | 'REPLICA'
+      events: string[]
+      function_args: string[]
+      function_name: string
+      function_schema: string
+      id: number
+      name: string
+      /** @enum {string} */
+      orientation: 'ROW' | 'STATEMENT'
+      schema: string
+      table: string
+      table_id: number
+    }
+    PostgresType: {
+      comment: string | null
+      enums: string[]
+      format: string
+      id: number
+      name: string
+      schema: string
+    }
+    PostgresView: {
+      columns?: {
+        check: string | null
+        comment: string | null
+        data_type: string
+        default_value: (string | number) | null
+        enums: string[]
+        format: string
+        id: string
+        /** @enum {string|null} */
+        identity_generation: 'ALWAYS' | 'BY DEFAULT' | null
+        is_generated: boolean
+        is_identity: boolean
+        is_nullable: boolean
+        is_unique: boolean
+        is_updatable: boolean
+        name: string
+        ordinal_position: number
+        schema: string
+        table: string
+        table_id: number
+      }[]
+      comment: string | null
+      id: number
+      is_updatable: boolean
+      name: string
+      schema: string
+    }
+    PreviewCreditTopUpRequest: {
+      address?: {
+        city?: string | null
+        country: string
+        line1: string
+        line2?: string | null
+        postal_code?: string | null
+        state?: string | null
+      }
+      amount: number
+      tax_id?: {
+        country: string
+        type: string
+        value: string
+      }
+    }
+    PreviewCreditTopUpResponse: {
+      amount: number
+      currency: string
+      tax: {
+        currency: string
+        tax_amount: number
+        tax_rate_percentage: number
+        total_amount_excluding_tax: number
+        total_amount_including_tax: number
+      } | null
+      /** @enum {string} */
+      tax_status: 'calculated' | 'failed' | 'not_applicable'
+      total: number
+    }
+    PreviewOrganizationCreationBody: {
+      address?: {
+        city?: string | null
+        country: string
+        line1: string
+        line2?: string | null
+        postal_code?: string | null
+        state?: string | null
+      }
+      tax_id?: {
+        country: string
+        type: string
+        value: string
+      }
+      /** @enum {string} */
+      tier: 'tier_free' | 'tier_payg' | 'tier_pro' | 'tier_team'
+    }
+    PreviewOrganizationCreationResponse: {
+      currency: string
+      plan_price: number
+      tax: {
+        currency: string
+        tax_amount: number
+        tax_rate_percentage: number
+        total_amount_excluding_tax: number
+        total_amount_including_tax: number
+      } | null
+      /** @enum {string} */
+      tax_status: 'calculated' | 'failed' | 'not_applicable'
+      total: number
+    }
+    PreviewProjectTransferResponse: {
+      errors: {
+        key: string
+        message: string
+      }[]
+      has_access_to_target_organization: boolean
+      has_permissions_on_source_organization: boolean
+      info: {
+        key: string
+        message: string
+      }[]
+      members_exceeding_free_project_limit: {
+        limit: number
+        name: string
+      }[]
+      /** @enum {string} */
+      source_subscription_plan: 'enterprise' | 'free' | 'platform' | 'pro' | 'team'
+      /** @enum {string|null} */
+      target_subscription_plan: 'enterprise' | 'free' | null | 'platform' | 'pro' | 'team'
+      valid: boolean
+      warnings: {
+        key: string
+        message: string
+      }[]
+    }
+    PreviewSubscriptionChangeResponse: {
+      active_projects: {
+        /** @enum {string} */
+        instance_size:
+          | '12xlarge'
+          | '16xlarge'
+          | '24xlarge'
+          | '24xlarge_high_memory'
+          | '24xlarge_optimized_cpu'
+          | '24xlarge_optimized_memory'
+          | '2xlarge'
+          | '48xlarge'
+          | '48xlarge_high_memory'
+          | '48xlarge_optimized_cpu'
+          | '48xlarge_optimized_memory'
+          | '4xlarge'
+          | '8xlarge'
+          | 'large'
+          | 'medium'
+          | 'micro'
+          | 'nano'
+          | 'pico'
+          | 'small'
+          | 'xlarge'
+        name: string
+        ref: string
+        /** @enum {string} */
+        status:
+          | 'ACTIVE_HEALTHY'
+          | 'ACTIVE_UNHEALTHY'
+          | 'COMING_UP'
+          | 'GOING_DOWN'
+          | 'INACTIVE'
+          | 'INIT_FAILED'
+          | 'PAUSE_FAILED'
+          | 'PAUSING'
+          | 'REMOVED'
+          | 'RESIZING'
+          | 'RESTARTING'
+          | 'RESTORE_FAILED'
+          | 'RESTORING'
+          | 'UNKNOWN'
+          | 'UPGRADING'
+      }[]
+      billed_via_partner: boolean
+      breakdown: {
+        breakdown?: {
+          amount?: number
+          /** @enum {string} */
+          project_db_instance_size?:
+            | '12xlarge'
+            | '16xlarge'
+            | '24xlarge'
+            | '24xlarge_high_memory'
+            | '24xlarge_optimized_cpu'
+            | '24xlarge_optimized_memory'
+            | '2xlarge'
+            | '48xlarge'
+            | '48xlarge_high_memory'
+            | '48xlarge_optimized_cpu'
+            | '48xlarge_optimized_memory'
+            | '4xlarge'
+            | '8xlarge'
+            | 'large'
+            | 'medium'
+            | 'micro'
+            | 'nano'
+            | 'pico'
+            | 'small'
+            | 'xlarge'
+          project_name: string
+          project_ref: string
+          /** @enum {string} */
+          project_status?:
+            | 'ACTIVE_HEALTHY'
+            | 'ACTIVE_UNHEALTHY'
+            | 'COMING_UP'
+            | 'GOING_DOWN'
+            | 'INACTIVE'
+            | 'INIT_FAILED'
+            | 'PAUSE_FAILED'
+            | 'PAUSING'
+            | 'REMOVED'
+            | 'RESIZING'
+            | 'RESTARTING'
+            | 'RESTORE_FAILED'
+            | 'RESTORING'
+            | 'UNKNOWN'
+            | 'UPGRADING'
+          usage: number
+        }[]
+        description: string
+        quantity?: number
+        total_price: number
+        unit_price?: number
+        unit_price_desc?: string
+      }[]
+      /** @enum {string} */
+      monthly_invoice_tax_status: 'calculated' | 'failed' | 'not_applicable'
+      number_of_projects: number
+      /** @enum {boolean} */
+      pending_subscription_flow: true
+      /** @enum {string} */
+      plan_change_type: 'downgrade' | 'none' | 'upgrade'
+      slug: string
+      upfront_charge: {
+        customer_balance: number
+        prorated_credit: number
+        tax: {
+          currency: string
+          tax_amount: number
+          tax_rate_percentage: number
+          total_amount_excluding_tax: number
+          total_amount_including_tax: number
+        } | null
+        /** @enum {string} */
+        tax_status: 'calculated' | 'failed' | 'not_applicable'
+        taxable_amount: number
+        total: number
+      } | null
+    }
+    PrivateLinkResponse: {
+      appliedSuccessfully: boolean
+      currentConfig: {
+        enabled: boolean
+      }
+    }
+    ProfileResponse: {
+      auth0_id: string
+      disabled_features: string[]
+      first_name: string | null
+      free_project_limit: number | null
+      gotrue_id: string
+      id: number
+      is_alpha_user: boolean
+      is_sso_user: boolean
+      last_name: string | null
+      mobile: string | null
+      primary_email: string
+      username: string
+    }
+    ProjectAddonsResponse: {
+      available_addons: {
+        name: string
+        /** @enum {string} */
+        type:
+          | 'auth_mfa_phone'
+          | 'auth_mfa_web_authn'
+          | 'compute_instance'
+          | 'custom_domain'
+          | 'etl_pipeline'
+          | 'ipv4'
+          | 'log_drain'
+          | 'pitr'
+        variants: {
+          /** @enum {string} */
+          identifier:
+            | 'auth_mfa_phone_default'
+            | 'auth_mfa_web_authn_default'
+            | 'cd_default'
+            | 'ci_12xlarge'
+            | 'ci_16xlarge'
+            | 'ci_24xlarge'
+            | 'ci_24xlarge_high_memory'
+            | 'ci_24xlarge_optimized_cpu'
+            | 'ci_24xlarge_optimized_memory'
+            | 'ci_2xlarge'
+            | 'ci_48xlarge'
+            | 'ci_48xlarge_high_memory'
+            | 'ci_48xlarge_optimized_cpu'
+            | 'ci_48xlarge_optimized_memory'
+            | 'ci_4xlarge'
+            | 'ci_8xlarge'
+            | 'ci_large'
+            | 'ci_medium'
+            | 'ci_micro'
+            | 'ci_small'
+            | 'ci_xlarge'
+            | 'etl_pipeline_default'
+            | 'ipv4_default'
+            | 'log_drain_default'
+            | 'pitr_14'
+            | 'pitr_28'
+            | 'pitr_7'
+          meta?: components['schemas']['ProjectAddonsResponseJsonValue']
+          name: string
+          price: number
+          price_description: string
+          /** @enum {string} */
+          price_interval: 'hourly' | 'monthly'
+          /** @enum {string} */
+          price_type: 'fixed' | 'usage'
+        }[]
+      }[]
+      ref: string
+      selected_addons: {
+        /** @enum {string} */
+        type:
+          | 'auth_mfa_phone'
+          | 'auth_mfa_web_authn'
+          | 'compute_instance'
+          | 'custom_domain'
+          | 'etl_pipeline'
+          | 'ipv4'
+          | 'log_drain'
+          | 'pitr'
+        variant: {
+          /** @enum {string} */
+          identifier:
+            | 'auth_mfa_phone_default'
+            | 'auth_mfa_web_authn_default'
+            | 'cd_default'
+            | 'ci_12xlarge'
+            | 'ci_16xlarge'
+            | 'ci_24xlarge'
+            | 'ci_24xlarge_high_memory'
+            | 'ci_24xlarge_optimized_cpu'
+            | 'ci_24xlarge_optimized_memory'
+            | 'ci_2xlarge'
+            | 'ci_48xlarge'
+            | 'ci_48xlarge_high_memory'
+            | 'ci_48xlarge_optimized_cpu'
+            | 'ci_48xlarge_optimized_memory'
+            | 'ci_4xlarge'
+            | 'ci_8xlarge'
+            | 'ci_large'
+            | 'ci_medium'
+            | 'ci_micro'
+            | 'ci_small'
+            | 'ci_xlarge'
+            | 'etl_pipeline_default'
+            | 'ipv4_default'
+            | 'log_drain_default'
+            | 'pitr_14'
+            | 'pitr_28'
+            | 'pitr_7'
+          meta?: components['schemas']['ProjectAddonsResponseJsonValue']
+          name: string
+          price: number
+          price_description: string
+          /** @enum {string} */
+          price_interval: 'hourly' | 'monthly'
+          /** @enum {string} */
+          price_type: 'fixed' | 'usage'
+        }
+      }[]
+    }
+    /** @description Any JSON-serializable value */
+    ProjectAddonsResponseJsonValue:
+      | ((string | number | boolean) | null)
+      | components['schemas']['ProjectAddonsResponseJsonValue'][]
+      | {
+          [key: string]: components['schemas']['ProjectAddonsResponseJsonValue']
+        }
+    ProjectClonedResponse: {
+      source_project_ref: string
+      target_disk_size_gb: number
+      target_instance_size: string
+      target_project_ref: string
+    }
+    ProjectClonedStatusResponse: {
+      cloned_from?: {
+        project_id: number
+        source_project: {
+          name: string
+          ref: string
+        }
+      }
+      clones: {
+        inserted_at: string | null
+        project_id: number
+        /** @enum {string} */
+        status: 'COMPLETED' | 'FAILED' | 'IN_PROGRESS' | 'REMOVED'
+        target_project: {
+          name: string
+          ref: string
+        }
+        target_project_id: number
+        updated_at: string | null
+      }[]
+      id: number
+      ref: string
+    }
+    ProjectDetailResponse: {
+      cloud_provider: string
+      /** @default null */
+      connectionString?: string | null
+      db_host: string
+      dbVersion?: string
+      high_availability: boolean
+      id: number
+      /** @enum {string} */
+      infra_compute_size?:
+        | '12xlarge'
+        | '16xlarge'
+        | '24xlarge'
+        | '24xlarge_high_memory'
+        | '24xlarge_optimized_cpu'
+        | '24xlarge_optimized_memory'
+        | '2xlarge'
+        | '48xlarge'
+        | '48xlarge_high_memory'
+        | '48xlarge_optimized_cpu'
+        | '48xlarge_optimized_memory'
+        | '4xlarge'
+        | '8xlarge'
+        | 'large'
+        | 'medium'
+        | 'micro'
+        | 'nano'
+        | 'pico'
+        | 'small'
+        | 'xlarge'
+      inserted_at: string
+      integration_source: string | null
+      is_branch_enabled: boolean
+      is_hibernating?: boolean
+      is_physical_backups_enabled: boolean
+      lastDatabaseResizeAt?: string
+      maxDatabasePreprovisionGb?: number
+      name: string
+      organization_id: number
+      parent_project_ref?: string
+      ref: string
+      region: string
+      restUrl: string
+      /** @enum {string} */
+      status:
+        | 'ACTIVE_HEALTHY'
+        | 'ACTIVE_UNHEALTHY'
+        | 'COMING_UP'
+        | 'GOING_DOWN'
+        | 'INACTIVE'
+        | 'INIT_FAILED'
+        | 'PAUSE_FAILED'
+        | 'PAUSING'
+        | 'REMOVED'
+        | 'RESIZING'
+        | 'RESTARTING'
+        | 'RESTORE_FAILED'
+        | 'RESTORING'
+        | 'UNKNOWN'
+        | 'UPGRADING'
+      subscription_id: string
+      updated_at: string
+      volumeSizeGb?: number
+    }
+    ProjectMembersResponse: {
+      members: {
+        primary_email: string
+        user_id: string
+        username: string
+      }[]
+    }
+    ProjectRefResponse: {
+      id: number
+      name: string
+      ref: string
+    }
+    ProjectResourceWarningsResponse: {
+      /** @enum {string|null} */
+      auth_email_offender: 'critical' | null | 'warning'
+      /** @enum {string|null} */
+      auth_rate_limit_exhaustion: 'critical' | null | 'warning'
+      /** @enum {string|null} */
+      auth_restricted_email_sending: 'critical' | null | 'warning'
+      /** @enum {string|null} */
+      cpu_exhaustion: 'critical' | null | 'warning'
+      /** @enum {string|null} */
+      disk_io_exhaustion: 'critical' | null | 'warning'
+      /** @enum {string|null} */
+      disk_space_exhaustion: 'critical' | null | 'warning'
+      is_readonly_mode_enabled: boolean
+      /** @enum {string|null} */
+      memory_and_swap_exhaustion: 'critical' | null | 'warning'
+      /** @enum {string|null} */
+      need_pitr: 'critical' | null | 'warning'
+      project: string
+    }
+    ProjectSensitivityResponse: {
+      is_sensitive: boolean
+    }
+    ProjectServiceHealthResponse: {
+      /** @enum {string} */
+      granularity?: 'day' | 'hour' | 'minute'
+      /** @example 2025-03-01T23:59:59Z */
+      iso_timestamp_end: string
+      /** @example 2025-03-01T00:00:00Z */
+      iso_timestamp_start: string
+      /** @example s:edge_logs */
+      lql?: string
+      /** @example select timestamp, edge_logs from service_health */
+      sql?: string
+    }
+    ProjectSettingsResponse: {
+      app_config?: {
+        db_schema: string
+        endpoint: string
+        storage_endpoint: string
+      }
+      cloud_provider: string
+      db_dns_name: string
+      db_host: string
+      db_ip_addr_config: string
+      db_name: string
+      db_port: number
+      db_user: string
+      inserted_at: string
+      is_sensitive?: boolean
+      jwt_secret?: string
+      name: string
+      ref: string
+      region: string
+      service_api_keys?: {
+        api_key: string
+        name: string
+        tags: string
+      }[]
+      ssl_enforced: boolean
+      status: string
+    }
+    ProjectWakeResponse: {
+      connection_string: string | null
+      connection_string_read_only: string | null
+    }
+    PublicationDetailsResponse: {
+      config:
+        | ({
+            /** @description Data-change operations to publish */
+            operations: ('delete' | 'insert' | 'truncate' | 'update')[]
+            /**
+             * @description PostgreSQL 18+ generated-column publication behavior
+             * @enum {string|null}
+             */
+            publish_generated_columns?: 'none' | null | 'stored'
+            /** @description Whether partition changes use the partition root identity */
+            publish_via_partition_root: boolean
+            /** @enum {string} */
+            type: 'all_tables'
+          } & {
+            [key: string]: unknown
+          })
+        | ({
+            /** @description Data-change operations to publish */
+            operations: ('delete' | 'insert' | 'truncate' | 'update')[]
+            /**
+             * @description PostgreSQL 18+ generated-column publication behavior
+             * @enum {string|null}
+             */
+            publish_generated_columns?: 'none' | null | 'stored'
+            /** @description Whether partition changes use the partition root identity */
+            publish_via_partition_root: boolean
+            /** @description Schemas whose tables are published */
+            schemas: string[]
+            /** @enum {string} */
+            type: 'tables_in_schema'
+          } & {
+            [key: string]: unknown
+          })
+        | ({
+            /** @description Data-change operations to publish */
+            operations: ('delete' | 'insert' | 'truncate' | 'update')[]
+            /**
+             * @description PostgreSQL 18+ generated-column publication behavior
+             * @enum {string|null}
+             */
+            publish_generated_columns?: 'none' | null | 'stored'
+            /** @description Whether partition changes use the partition root identity */
+            publish_via_partition_root: boolean
+            tables: ({
+              /** @description Columns to publish, or null for Postgres' default column set */
+              columns?: string[] | null
+              /**
+               * @description Table id (Postgres OID)
+               * @example 16408
+               */
+              id: number
+              /**
+               * @description Table name
+               * @example orders
+               */
+              name: string
+              /** @description A self-contained PostgreSQL row-filter expression, or null for none */
+              row_filter?: string | null
+              /**
+               * @description Table schema
+               * @example public
+               */
+              schema: string
+            } & {
+              [key: string]: unknown
+            })[]
+            /** @enum {string} */
+            type: 'tables'
+          } & {
+            [key: string]: unknown
+          })
+      /**
+       * @description Publication name
+       * @example pub_orders
+       */
+      name: string
+      /** @description Tables currently exposed by the publication */
+      tables: ({
+        /**
+         * @description Table id (Postgres OID)
+         * @example 16408
+         */
+        id: number
+        /**
+         * @description Whether the table can own partitions
+         * @enum {string}
+         */
+        kind: 'partitioned_table' | 'table'
+        /**
+         * @description Table name
+         * @example orders
+         */
+        name: string
+        /** @description The direct partition parent's table id, if any */
+        partition_parent_id?: number | null
+        /**
+         * @description Table schema
+         * @example public
+         */
+        schema: string
+      } & {
+        [key: string]: unknown
+      })[]
+    }
+    PublicationsResponse: {
       /** @description List of publications */
       publications: {
         /**
@@ -11837,73 +11820,258 @@ export interface components {
         }[]
       }[]
     }
-    ReplicationSourcesResponse: {
-      /** @description List of sources */
-      sources: {
-        /** @description Source configuration */
-        config: {
+    PublicUrlResponse: {
+      publicUrl: string
+    }
+    PurgeBucketCacheBody: {
+      /** @description Storage bucket id */
+      bucket_id: string
+    }
+    PurgeObjectCacheBody: {
+      /** @description Storage bucket id */
+      bucket_id: string
+      path: string
+    }
+    PutOAuthAppResponse: {
+      client_id: string
+      created_at: string
+      icon?: string
+      id: string
+      name: string
+      redirect_uris: string[]
+      website: string
+    }
+    PutPublicationBody:
+      | {
+          /** @description Data-change operations to publish */
+          operations: ('delete' | 'insert' | 'truncate' | 'update')[]
           /**
-           * @description Source host
-           * @example db.internal
+           * @description PostgreSQL 18+ generated-column publication behavior
+           * @enum {string|null}
            */
-          host: string
-          /**
-           * @description Source name
-           * @example main-db
-           */
-          name: string
-          /**
-           * @description Source port
-           * @example 5432
-           */
-          port: number
-          /**
-           * @description Source username
-           * @example etl_user
-           */
-          username: string
+          publish_generated_columns?: 'none' | null | 'stored'
+          /** @description Whether partition changes use the partition root identity */
+          publish_via_partition_root?: boolean
+          /** @enum {string} */
+          type: 'all_tables'
         }
+      | {
+          /** @description Data-change operations to publish */
+          operations: ('delete' | 'insert' | 'truncate' | 'update')[]
+          /**
+           * @description PostgreSQL 18+ generated-column publication behavior
+           * @enum {string|null}
+           */
+          publish_generated_columns?: 'none' | null | 'stored'
+          /** @description Whether partition changes use the partition root identity */
+          publish_via_partition_root?: boolean
+          /** @description Schemas whose tables are published */
+          schemas: string[]
+          /** @enum {string} */
+          type: 'tables_in_schema'
+        }
+      | {
+          /** @description Data-change operations to publish */
+          operations: ('delete' | 'insert' | 'truncate' | 'update')[]
+          /**
+           * @description PostgreSQL 18+ generated-column publication behavior
+           * @enum {string|null}
+           */
+          publish_generated_columns?: 'none' | null | 'stored'
+          /** @description Whether partition changes use the partition root identity */
+          publish_via_partition_root?: boolean
+          tables: {
+            /** @description Columns to publish, or null for Postgres' default column set */
+            columns?: string[] | null
+            /**
+             * @description Table id (Postgres OID)
+             * @example 16408
+             */
+            id: number
+            /** @description A self-contained PostgreSQL row-filter expression, or null for none */
+            row_filter?: string | null
+          }[]
+          /** @enum {string} */
+          type: 'tables'
+        }
+    ReadColumnsResponse: {
+      /** @description Table columns in ordinal position order */
+      columns: ({
         /**
-         * @description Source id
-         * @example 3001
-         */
-        id: number
-        /**
-         * @description Source name
-         * @example main-db
+         * @description Column name
+         * @example created_at
          */
         name: string
+        /** @description Whether the column accepts null values */
+        nullable: boolean
+        /** @description Whether the column belongs to the table's primary key */
+        primary_key: boolean
         /**
-         * @description Tenant id
-         * @example tenant_9f3a2c
+         * @description Postgres-formatted column type
+         * @example timestamptz
          */
-        tenant_id: string
-      }[]
+        type: string
+      } & {
+        [key: string]: unknown
+      })[]
     }
-    ReplicationTablesResponse: {
+    ReadPublicationsResponse: {
+      /** @description List of publications */
+      publications: ({
+        /**
+         * @description Publication name
+         * @example pub_orders
+         */
+        name: string
+      } & {
+        [key: string]: unknown
+      })[]
+    }
+    ReadTablesResponse: {
       /** @description List of tables */
-      tables: {
+      tables: ({
         /**
          * @description Table id (Postgres OID)
          * @example 16408
          */
         id: number
         /**
+         * @description Whether the table can own partitions
+         * @enum {string}
+         */
+        kind: 'partitioned_table' | 'table'
+        /**
          * @description Table name
          * @example orders
          */
         name: string
+        /** @description The direct partition parent's table id, if any */
+        partition_parent_id?: number | null
         /**
          * @description Table schema
          * @example public
          */
         schema: string
-      }[]
+      } & {
+        [key: string]: unknown
+      })[]
+    }
+    RealtimeConfigResponse: {
+      /** @description Sets connection pool size for Realtime Authorization */
+      connection_pool: number | null
+      /** @description Sets maximum number of bytes per second rate per channel limit */
+      max_bytes_per_second: number | null
+      /** @description Sets maximum number of channels per client rate limit */
+      max_channels_per_client: number | null
+      /** @description Sets maximum number of concurrent users rate limit */
+      max_concurrent_users: number | null
+      /** @description Sets maximum number of events per second rate per channel limit */
+      max_events_per_second: number | null
+      /** @description Sets maximum number of joins per second rate limit */
+      max_joins_per_second: number | null
+      /** @description Sets maximum number of payload size in KB rate limit */
+      max_payload_size_in_kb: number | null
+      /** @description Sets maximum number of presence events per second rate limit */
+      max_presence_events_per_second: number | null
+      /** @description Sets connection pool size used to create Postgres Changes subscriptions */
+      postgres_changes_pool: number | null
+      /** @description Whether to enable presence */
+      presence_enabled: boolean
+      /** @description Whether to only allow private channels */
+      private_only: boolean | null
+      /** @description Disables the Realtime service for this project when true. Set to false to re-enable it. */
+      suspend: boolean | null
+    }
+    RegionsInfo: {
+      all: {
+        smartGroup: {
+          /** @enum {string} */
+          code: 'americas' | 'apac' | 'emea'
+          name: string
+          /** @enum {string} */
+          type: 'smartGroup'
+        }[]
+        specific: {
+          /** @enum {string} */
+          code:
+            | 'ap-east-1'
+            | 'ap-northeast-1'
+            | 'ap-northeast-2'
+            | 'ap-south-1'
+            | 'ap-southeast-1'
+            | 'ap-southeast-2'
+            | 'ca-central-1'
+            | 'eu-central-1'
+            | 'eu-central-2'
+            | 'eu-north-1'
+            | 'eu-west-1'
+            | 'eu-west-2'
+            | 'eu-west-3'
+            | 'sa-east-1'
+            | 'us-east-1'
+            | 'us-east-2'
+            | 'us-west-1'
+            | 'us-west-2'
+          name: string
+          /** @enum {string} */
+          provider: 'AWS' | 'AWS_K8S' | 'AWS_NIMBUS'
+          /** @enum {string} */
+          status?: 'capacity' | 'other'
+          /** @enum {string} */
+          type: 'specific'
+        }[]
+      }
+      recommendations: {
+        smartGroup: {
+          /** @enum {string} */
+          code: 'americas' | 'apac' | 'emea'
+          name: string
+          /** @enum {string} */
+          type: 'smartGroup'
+        }
+        specific: {
+          /** @enum {string} */
+          code:
+            | 'ap-east-1'
+            | 'ap-northeast-1'
+            | 'ap-northeast-2'
+            | 'ap-south-1'
+            | 'ap-southeast-1'
+            | 'ap-southeast-2'
+            | 'ca-central-1'
+            | 'eu-central-1'
+            | 'eu-central-2'
+            | 'eu-north-1'
+            | 'eu-west-1'
+            | 'eu-west-2'
+            | 'eu-west-3'
+            | 'sa-east-1'
+            | 'us-east-1'
+            | 'us-east-2'
+            | 'us-west-1'
+            | 'us-west-2'
+          name: string
+          /** @enum {string} */
+          provider: 'AWS' | 'AWS_K8S' | 'AWS_NIMBUS'
+          /** @enum {string} */
+          status?: 'capacity' | 'other'
+          /** @enum {string} */
+          type: 'specific'
+        }[]
+      }
+    }
+    RemoveProjectResponse: {
+      id: number
+      name: string
+      ref: string
+      vercel?: {
+        resourceUninstallFailure: boolean
+      }
     }
     RequestUpgradeBody: {
       note?: string
       /** @enum {string} */
-      requested_plan: 'Pro' | 'Team' | 'Enterprise'
+      requested_plan: 'Enterprise' | 'Pro' | 'Team'
     }
     RequestUpgradeResponse: {
       message: string
@@ -11919,7 +12087,7 @@ export interface components {
     }
     ResolveConversationBody: {
       /** @enum {string} */
-      aiSupportStatus: 'user_resolved' | 'bot_resolved'
+      aiSupportStatus: 'bot_resolved' | 'user_resolved'
       chatId: string
       conversationId: string
     }
@@ -11933,6 +12101,7 @@ export interface components {
         services: (
           | 'adminapi'
           | 'api-gateway'
+          | 'autoshutdown'
           | 'envoy'
           | 'functions'
           | 'gotrue'
@@ -11944,7 +12113,6 @@ export interface components {
           | 'realtime'
           | 'storage'
           | 'walg'
-          | 'autoshutdown'
         )[]
         source_notification_id?: string
       }
@@ -11969,7 +12137,7 @@ export interface components {
        * @example individual
        * @enum {string}
        */
-      rollback_type: 'individual' | 'full'
+      rollback_type: 'full' | 'individual'
       /** @description Rollback target */
       target:
         | {
@@ -12038,7 +12206,7 @@ export interface components {
                     /** @enum {string} */
                     policy: 'timed_retry'
                   }
-              solution?: string
+              solution?: string | null
             }
         /**
          * @description Table id (Postgres OID)
@@ -12120,6 +12288,49 @@ export interface components {
       /** Format: uri */
       redirectTo?: string
     }
+    SourcesResponse: {
+      /** @description List of sources */
+      sources: {
+        /** @description Source configuration */
+        config: {
+          /**
+           * @description Source host
+           * @example db.internal
+           */
+          host: string
+          /**
+           * @description Source name
+           * @example main-db
+           */
+          name: string
+          /**
+           * @description Source port
+           * @example 5432
+           */
+          port: number
+          /**
+           * @description Source username
+           * @example etl_user
+           */
+          username: string
+        }
+        /**
+         * @description Source id
+         * @example 3001
+         */
+        id: number
+        /**
+         * @description Source name
+         * @example main-db
+         */
+        name: string
+        /**
+         * @description Tenant id
+         * @example tenant_9f3a2c
+         */
+        tenant_id: string
+      }[]
+    }
     StorageAnalyticsBucketDeleteResponse: {
       message: string
     }
@@ -12149,7 +12360,7 @@ export interface components {
       name: string
       owner: string
       public: boolean
-      type?: ('STANDARD' | 'ANALYTICS') | string
+      type?: ('ANALYTICS' | 'STANDARD') | string
       updated_at: string
     }
     StorageConfigResponse: {
@@ -12160,7 +12371,7 @@ export interface components {
       databasePoolMode: string
       external: {
         /** @enum {string} */
-        upstreamTarget: 'main' | 'canary'
+        upstreamTarget: 'canary' | 'main'
       }
       features: {
         icebergCatalog: {
@@ -12223,7 +12434,7 @@ export interface components {
         name: string
         owner: string
         public: boolean
-        type?: ('STANDARD' | 'ANALYTICS') | string
+        type?: ('ANALYTICS' | 'STANDARD') | string
         updated_at: string
       }
       created_at: string | null
@@ -12241,7 +12452,7 @@ export interface components {
         creationTime?: number
         dataType: 'float32' | string
         dimension: number
-        distanceMetric: ('cosine' | 'euclidean' | 'dotproduct') | string
+        distanceMetric: ('cosine' | 'dotproduct' | 'euclidean') | string
         indexName: string
         metadataConfiguration?: {
           nonFilterableMetadataKeys?: string[]
@@ -12274,7 +12485,7 @@ export interface components {
       is_using_scram_auth: boolean
       max_client_conn: number | null
       /** @enum {string} */
-      pool_mode: 'transaction' | 'session'
+      pool_mode: 'session' | 'transaction'
     }
     SyncConversationMessagesBody: {
       affectedServices?: string
@@ -12290,7 +12501,7 @@ export interface components {
         content: string
         id: string
         /** @enum {string} */
-        role: 'user' | 'assistant'
+        role: 'assistant' | 'user'
       }[]
       organizationSlug?: string
       projectRef?: string
@@ -12301,6 +12512,26 @@ export interface components {
       conversationId?: string
       /** @enum {string} */
       result: 'success'
+    }
+    TablesResponse: {
+      /** @description List of tables */
+      tables: {
+        /**
+         * @description Table id (Postgres OID)
+         * @example 16408
+         */
+        id: number
+        /**
+         * @description Table name
+         * @example orders
+         */
+        name: string
+        /**
+         * @description Table schema
+         * @example public
+         */
+        schema: string
+      }[]
     }
     TaxIdResponse: {
       tax_id: {
@@ -12362,7 +12593,7 @@ export interface components {
         /** @enum {string} */
         postgres_engine: '13' | '14' | '15' | '17' | '17-oriole'
         /** @enum {string} */
-        release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
+        release_channel: 'alpha' | 'beta' | 'ga' | 'internal' | 'preview' | 'withdrawn'
         version: string
       }[]
     }
@@ -12376,7 +12607,7 @@ export interface components {
        * @description Release channel version. If not provided, GeneralAvailability will be used.
        * @enum {string}
        */
-      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
+      release_channel?: 'alpha' | 'beta' | 'ga' | 'internal' | 'preview' | 'withdrawn'
     }
     UnpauseProjectResponse: {
       back_ups: {
@@ -12404,45 +12635,45 @@ export interface components {
           amount?: number
           /** @enum {string} */
           project_db_instance_size?:
-            | 'pico'
-            | 'nano'
-            | 'micro'
-            | 'small'
-            | 'medium'
-            | 'large'
-            | 'xlarge'
-            | '2xlarge'
-            | '4xlarge'
-            | '8xlarge'
             | '12xlarge'
             | '16xlarge'
             | '24xlarge'
-            | '24xlarge_optimized_memory'
-            | '24xlarge_optimized_cpu'
             | '24xlarge_high_memory'
+            | '24xlarge_optimized_cpu'
+            | '24xlarge_optimized_memory'
+            | '2xlarge'
             | '48xlarge'
-            | '48xlarge_optimized_memory'
-            | '48xlarge_optimized_cpu'
             | '48xlarge_high_memory'
+            | '48xlarge_optimized_cpu'
+            | '48xlarge_optimized_memory'
+            | '4xlarge'
+            | '8xlarge'
+            | 'large'
+            | 'medium'
+            | 'micro'
+            | 'nano'
+            | 'pico'
+            | 'small'
+            | 'xlarge'
           project_name: string
           project_ref: string
           /** @enum {string} */
           project_status?:
-            | 'INACTIVE'
             | 'ACTIVE_HEALTHY'
             | 'ACTIVE_UNHEALTHY'
             | 'COMING_UP'
-            | 'UNKNOWN'
             | 'GOING_DOWN'
+            | 'INACTIVE'
             | 'INIT_FAILED'
-            | 'REMOVED'
-            | 'RESTORING'
-            | 'UPGRADING'
-            | 'PAUSING'
-            | 'RESTORE_FAILED'
-            | 'RESTARTING'
             | 'PAUSE_FAILED'
+            | 'PAUSING'
+            | 'REMOVED'
             | 'RESIZING'
+            | 'RESTARTING'
+            | 'RESTORE_FAILED'
+            | 'RESTORING'
+            | 'UNKNOWN'
+            | 'UPGRADING'
           usage: number
         }[]
         description: string
@@ -12462,58 +12693,58 @@ export interface components {
         usage_based: boolean
         /** @enum {string} */
         usage_metric?:
-          | 'EGRESS'
-          | 'CACHED_EGRESS'
-          | 'DATABASE_SIZE'
-          | 'STORAGE_SIZE'
-          | 'MONTHLY_ACTIVE_USERS'
-          | 'MONTHLY_ACTIVE_SSO_USERS'
-          | 'FUNCTION_INVOCATIONS'
-          | 'FUNCTION_CPU_MILLISECONDS'
-          | 'STORAGE_IMAGES_TRANSFORMED'
-          | 'REALTIME_MESSAGE_COUNT'
-          | 'REALTIME_PEAK_CONNECTIONS'
-          | 'DISK_SIZE_GB_HOURS_GP3'
-          | 'DISK_SIZE_GB_HOURS_IO2'
+          | 'ACTIVE_COMPUTE_HOURS'
           | 'AUTH_MFA_PHONE'
           | 'AUTH_MFA_WEB_AUTHN'
-          | 'LOG_DRAIN_EVENTS'
-          | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
-          | 'DISK_THROUGHPUT_GP3'
-          | 'DISK_IOPS_GP3'
-          | 'DISK_IOPS_IO2'
-          | 'COMPUTE_HOURS_BRANCH'
-          | 'COMPUTE_HOURS_XS'
-          | 'COMPUTE_HOURS_SM'
-          | 'COMPUTE_HOURS_MD'
-          | 'COMPUTE_HOURS_L'
-          | 'COMPUTE_HOURS_XL'
-          | 'COMPUTE_HOURS_2XL'
-          | 'COMPUTE_HOURS_4XL'
-          | 'COMPUTE_HOURS_8XL'
+          | 'CACHED_EGRESS'
           | 'COMPUTE_HOURS_12XL'
           | 'COMPUTE_HOURS_16XL'
           | 'COMPUTE_HOURS_24XL'
+          | 'COMPUTE_HOURS_24XL_HIGH_MEMORY'
           | 'COMPUTE_HOURS_24XL_OPTIMIZED_CPU'
           | 'COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY'
-          | 'COMPUTE_HOURS_24XL_HIGH_MEMORY'
+          | 'COMPUTE_HOURS_2XL'
           | 'COMPUTE_HOURS_48XL'
+          | 'COMPUTE_HOURS_48XL_HIGH_MEMORY'
           | 'COMPUTE_HOURS_48XL_OPTIMIZED_CPU'
           | 'COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY'
-          | 'COMPUTE_HOURS_48XL_HIGH_MEMORY'
+          | 'COMPUTE_HOURS_4XL'
+          | 'COMPUTE_HOURS_8XL'
+          | 'COMPUTE_HOURS_BRANCH'
+          | 'COMPUTE_HOURS_L'
+          | 'COMPUTE_HOURS_MD'
+          | 'COMPUTE_HOURS_SM'
+          | 'COMPUTE_HOURS_XL'
+          | 'COMPUTE_HOURS_XS'
           | 'CUSTOM_DOMAIN'
-          | 'PITR_7'
-          | 'PITR_14'
-          | 'PITR_28'
-          | 'IPV4'
-          | 'LOG_DRAIN'
+          | 'DATABASE_SIZE'
+          | 'DISK_IOPS_GP3'
+          | 'DISK_IOPS_IO2'
+          | 'DISK_SIZE_GB_HOURS_GP3'
+          | 'DISK_SIZE_GB_HOURS_IO2'
+          | 'DISK_THROUGHPUT_GP3'
+          | 'EGRESS'
+          | 'ETL_COPY_BACKFILL_DATA'
           | 'ETL_PIPELINE'
           | 'ETL_REPLICATED_DATA'
-          | 'ETL_COPY_BACKFILL_DATA'
+          | 'FUNCTION_CPU_MILLISECONDS'
+          | 'FUNCTION_INVOCATIONS'
+          | 'IPV4'
+          | 'LOG_DRAIN'
+          | 'LOG_DRAIN_EVENTS'
           | 'LOG_INGESTION'
           | 'LOG_QUERYING'
           | 'LOG_STORAGE'
-          | 'ACTIVE_COMPUTE_HOURS'
+          | 'MONTHLY_ACTIVE_SSO_USERS'
+          | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+          | 'MONTHLY_ACTIVE_USERS'
+          | 'PITR_14'
+          | 'PITR_28'
+          | 'PITR_7'
+          | 'REALTIME_MESSAGE_COUNT'
+          | 'REALTIME_PEAK_CONNECTIONS'
+          | 'STORAGE_IMAGES_TRANSFORMED'
+          | 'STORAGE_SIZE'
         usage_original?: number
       }[]
       subscription_id: string
@@ -12525,48 +12756,48 @@ export interface components {
         total_amount_including_tax: number
       } | null
       /** @enum {string} */
-      tax_status: 'calculated' | 'not_applicable' | 'failed'
+      tax_status: 'calculated' | 'failed' | 'not_applicable'
     }
     UpdateAddonBody: {
       /** @enum {string} */
       addon_type:
-        | 'custom_domain'
-        | 'compute_instance'
-        | 'pitr'
-        | 'ipv4'
         | 'auth_mfa_phone'
         | 'auth_mfa_web_authn'
-        | 'log_drain'
+        | 'compute_instance'
+        | 'custom_domain'
         | 'etl_pipeline'
+        | 'ipv4'
+        | 'log_drain'
+        | 'pitr'
       /** @enum {string} */
       addon_variant:
-        | 'ci_micro'
-        | 'ci_small'
-        | 'ci_medium'
-        | 'ci_large'
-        | 'ci_xlarge'
-        | 'ci_2xlarge'
-        | 'ci_4xlarge'
-        | 'ci_8xlarge'
+        | 'auth_mfa_phone_default'
+        | 'auth_mfa_web_authn_default'
+        | 'cd_default'
         | 'ci_12xlarge'
         | 'ci_16xlarge'
         | 'ci_24xlarge'
+        | 'ci_24xlarge_high_memory'
         | 'ci_24xlarge_optimized_cpu'
         | 'ci_24xlarge_optimized_memory'
-        | 'ci_24xlarge_high_memory'
+        | 'ci_2xlarge'
         | 'ci_48xlarge'
+        | 'ci_48xlarge_high_memory'
         | 'ci_48xlarge_optimized_cpu'
         | 'ci_48xlarge_optimized_memory'
-        | 'ci_48xlarge_high_memory'
-        | 'cd_default'
-        | 'pitr_7'
+        | 'ci_4xlarge'
+        | 'ci_8xlarge'
+        | 'ci_large'
+        | 'ci_medium'
+        | 'ci_micro'
+        | 'ci_small'
+        | 'ci_xlarge'
+        | 'etl_pipeline_default'
+        | 'ipv4_default'
+        | 'log_drain_default'
         | 'pitr_14'
         | 'pitr_28'
-        | 'ipv4_default'
-        | 'auth_mfa_phone_default'
-        | 'auth_mfa_web_authn_default'
-        | 'log_drain_default'
-        | 'etl_pipeline_default'
+        | 'pitr_7'
     }
     UpdateBackendParamsOpenapi: {
       config?:
@@ -12626,18 +12857,18 @@ export interface components {
       name?: string
       /** @enum {string} */
       type?:
-        | 'postgres'
+        | 'axiom'
         | 'bigquery'
         | 'clickhouse'
-        | 'webhook'
         | 'datadog'
-        | 'loki'
-        | 'sentry'
-        | 's3'
-        | 'axiom'
         | 'last9'
+        | 'loki'
         | 'otlp'
+        | 'postgres'
+        | 's3'
+        | 'sentry'
         | 'syslog'
+        | 'webhook'
     }
     UpdateContentFolderBody: {
       name: string
@@ -12656,10 +12887,459 @@ export interface components {
     }
     UpdateConversationLifecycleResponse: {
       /** @enum {string} */
-      aiSupportStatus: 'bot_active' | 'escalated' | 'user_resolved' | 'bot_resolved'
+      aiSupportStatus: 'bot_active' | 'bot_resolved' | 'escalated' | 'user_resolved'
       conversationId: string
       /** @enum {string} */
       result: 'success'
+    }
+    UpdateDestinationBody: {
+      /** @description Destination configuration */
+      config:
+        | {
+            big_query: {
+              /**
+               * @description Number of concurrent BigQuery Storage Write API connections.
+               * @example 8
+               */
+              connection_pool_size?: number | null
+              /**
+               * @description BigQuery dataset id
+               * @example analytics
+               */
+              dataset_id?: string | null
+              /**
+               * @description Maximum data staleness in minutes
+               * @example 5
+               */
+              max_staleness_mins?: number | null
+              /**
+               * @description BigQuery project id
+               * @example my-gcp-project
+               */
+              project_id?: string | null
+              /** @description BigQuery service account key */
+              service_account_key?: string | null
+              /** @description Per-table partitioning and clustering, applied only when the physical table is created or recreated */
+              table_options?: {
+                tables?: {
+                  cluster_by?: string[]
+                  partition_by?:
+                    | (
+                        | {
+                            /**
+                             * @description Source column name
+                             * @example created_at
+                             */
+                            column: string
+                            /**
+                             * @description Partition granularity
+                             * @example day
+                             * @enum {string}
+                             */
+                            granularity?: 'day' | 'hour' | 'month' | 'year'
+                            /**
+                             * @description Partition by a replicated `DATE`, `TIMESTAMP`, or `DATETIME` column
+                             * @enum {string}
+                             */
+                            kind: 'time_column'
+                          }
+                        | {
+                            /**
+                             * @description Source column name
+                             * @example created_at
+                             */
+                            column: string
+                            /**
+                             * @description Exclusive end of the last partition range
+                             * @example 100
+                             */
+                            end: number
+                            /**
+                             * @description Width of each partition range
+                             * @example 10
+                             */
+                            interval: number
+                            /**
+                             * @description Partition by ranges of a replicated integer column
+                             * @enum {string}
+                             */
+                            kind: 'integer_range'
+                            /**
+                             * @description Inclusive start of the first partition range
+                             * @example 0
+                             */
+                            start: number
+                          }
+                        | {
+                            /**
+                             * @description Partition granularity
+                             * @example day
+                             * @enum {string}
+                             */
+                            granularity?: 'day' | 'hour' | 'month' | 'year'
+                            /**
+                             * @description Partition by the time at which BigQuery ingests each row
+                             * @enum {string}
+                             */
+                            kind: 'ingestion_time'
+                          }
+                      )
+                    | null
+                  /**
+                   * @description Source PostgreSQL table OID, stable across renames for the relation lifetime
+                   * @example 16384
+                   */
+                  table_id: number
+                }[]
+              } | null
+            }
+          }
+        | {
+            clickhouse: {
+              /**
+               * @description ClickHouse target database
+               * @example analytics
+               */
+              database?: string | null
+              /**
+               * @description Table engine used for replicated tables. Defaults to `replacing_merge_tree` server-side when omitted.
+               * @example replacing_merge_tree
+               * @enum {string|null}
+               */
+              engine?: 'merge_tree' | null | 'replacing_merge_tree'
+              /** @description ClickHouse password. Omit for passwordless access. */
+              password?: string | null
+              /**
+               * @description ClickHouse HTTPS endpoint URL
+               * @example https://clickhouse.example.com:8443
+               */
+              url?: string | null
+              /**
+               * @description ClickHouse user name
+               * @example default
+               */
+              user?: string | null
+            }
+          }
+        | {
+            iceberg: {
+              supabase: {
+                /**
+                 * @description Catalog token
+                 * @example A jwt secret
+                 */
+                catalog_token?: string | null
+                /**
+                 * @description Namespace
+                 * @example my-namespace
+                 */
+                namespace?: string | null
+                /**
+                 * @description Project ref
+                 * @example abcdefghijklmnopqrst
+                 */
+                project_ref?: string | null
+                /**
+                 * @description S3 access key ID
+                 * @example 53383b1d0cdb16a3afa63152656aa3cc
+                 */
+                s3_access_key_id?: string | null
+                /**
+                 * @description S3 region
+                 * @example ap-southeast-1
+                 */
+                s3_region?: string | null
+                /**
+                 * @description S3 secret access key
+                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
+                 */
+                s3_secret_access_key?: string | null
+                /**
+                 * @description Warehouse name
+                 * @example my-warehouse
+                 */
+                warehouse_name?: string | null
+              }
+            }
+          }
+        | {
+            ducklake:
+              | {
+                  /**
+                   * @description DuckLake catalog URL
+                   * @example postgres://user:pass@localhost:5432/ducklake_catalog
+                   */
+                  catalog_url?: string | null
+                  /**
+                   * @description DuckLake data path
+                   * @example s3://<bucket-name>/
+                   */
+                  data_path?: string | null
+                  /**
+                   * @description Schema used for DuckLake metadata tables stored in PostgreSQL
+                   * @example ducklake
+                   */
+                  metadata_schema?: string | null
+                  /**
+                   * @description Number of concurrent DuckDB connections.
+                   * @example 4
+                   */
+                  pool_size?: number | null
+                  /**
+                   * @description S3-compatible storage access key ID
+                   * @example my-access-key
+                   */
+                  s3_access_key_id?: string | null
+                  /**
+                   * @description S3-compatible storage endpoint
+                   * @example 127.0.0.1:5000/s3
+                   */
+                  s3_endpoint?: string | null
+                  /**
+                   * @description S3-compatible storage region
+                   * @example us-east-1
+                   */
+                  s3_region?: string | null
+                  /**
+                   * @description S3-compatible storage secret access key
+                   * @example my-secret-key
+                   */
+                  s3_secret_access_key?: string | null
+                  /**
+                   * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
+                   * @example path
+                   * @enum {string|null}
+                   */
+                  s3_url_style?: null | 'path' | 'vhost'
+                  /**
+                   * @description Whether to use SSL for S3-compatible storage
+                   * @example false
+                   */
+                  s3_use_ssl?: boolean | null
+                  table_sorting?: {
+                    tables?: {
+                      schema: string
+                      sort_by:
+                        | {
+                            columns: {
+                              /**
+                               * @description DuckLake sort direction
+                               * @example asc
+                               * @enum {string}
+                               */
+                              direction?: 'asc' | 'desc'
+                              /**
+                               * @description Source column name
+                               * @example created_at
+                               */
+                              name: string
+                              /**
+                               * @description Optional placement of null values in the DuckLake sort order
+                               * @example last
+                               * @enum {string|null}
+                               */
+                              nulls?: 'first' | 'last' | null
+                            }[]
+                            /** @enum {string} */
+                            kind: 'columns'
+                          }
+                        | {
+                            /** @enum {string} */
+                            kind: 'primary_key'
+                          }
+                      table: string
+                    }[]
+                  } | null
+                }
+              | {
+                  catalog:
+                    | {
+                        /**
+                         * @description DuckLake catalog URL
+                         * @example postgres://user:pass@localhost:5432/ducklake_catalog
+                         */
+                        catalog_url: string
+                        /**
+                         * @description Schema used for DuckLake metadata tables stored in this PostgreSQL catalog. Overrides `metadata_schema` when provided.
+                         * @example ducklake
+                         */
+                        metadata_schema?: string | null
+                        /**
+                         * @description Number of concurrent DuckDB connections.
+                         * @example 4
+                         */
+                        pool_size?: number | null
+                        /** @enum {string} */
+                        type: 'postgres_url'
+                      }
+                    | {
+                        /**
+                         * @description Schema used for DuckLake metadata tables stored in this PostgreSQL catalog. Overrides `metadata_schema` when provided.
+                         * @example ducklake
+                         */
+                        metadata_schema?: string | null
+                        /**
+                         * @description Number of concurrent DuckDB connections.
+                         * @example 4
+                         */
+                        pool_size?: number | null
+                        /**
+                         * @description Supabase project ref used as the DuckLake PostgreSQL catalog
+                         * @example abcjuqabhgwjjutfvtpa
+                         */
+                        project_ref: string
+                        /** @enum {string} */
+                        type: 'supabase_project'
+                      }
+                  /**
+                   * @description Schema used for DuckLake metadata tables stored in PostgreSQL
+                   * @example ducklake
+                   */
+                  metadata_schema?: string | null
+                  /**
+                   * @description Number of concurrent DuckDB connections.
+                   * @example 4
+                   */
+                  pool_size?: number | null
+                  storage:
+                    | {
+                        /**
+                         * @description DuckLake data path
+                         * @example s3://<bucket-name>/
+                         */
+                        data_path: string
+                        /**
+                         * @description S3-compatible storage access key ID
+                         * @example my-access-key
+                         */
+                        s3_access_key_id: string
+                        /**
+                         * @description S3-compatible storage endpoint
+                         * @example 127.0.0.1:5000/s3
+                         */
+                        s3_endpoint: string
+                        /**
+                         * @description S3-compatible storage region
+                         * @example us-east-1
+                         */
+                        s3_region: string
+                        /**
+                         * @description S3-compatible storage secret access key
+                         * @example my-secret-key
+                         */
+                        s3_secret_access_key: string
+                        /**
+                         * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
+                         * @example path
+                         * @enum {string|null}
+                         */
+                        s3_url_style?: null | 'path' | 'vhost'
+                        /**
+                         * @description Whether to use SSL for S3-compatible storage
+                         * @example false
+                         */
+                        s3_use_ssl?: boolean | null
+                        /** @enum {string} */
+                        type: 's3'
+                      }
+                    | {
+                        /**
+                         * @description Storage bucket id used for DuckLake data files
+                         * @example ducklake
+                         */
+                        bucket: string
+                        /**
+                         * @description Optional description for the generated Supabase Storage S3 credential
+                         * @example DuckLake replication destination
+                         */
+                        credential_description?: string
+                        /**
+                         * @description Optional path prefix inside the bucket for DuckLake data files
+                         * @example replication
+                         */
+                        path?: string
+                        /**
+                         * @description Supabase project ref whose Object Storage S3 API stores DuckLake data files
+                         * @example abcjuqabhgwjjutfvtpa
+                         */
+                        project_ref: string
+                        /** @enum {string} */
+                        type: 'supabase_storage'
+                      }
+                  table_sorting?: {
+                    tables?: {
+                      schema: string
+                      sort_by:
+                        | {
+                            columns: {
+                              /**
+                               * @description DuckLake sort direction
+                               * @example asc
+                               * @enum {string}
+                               */
+                              direction?: 'asc' | 'desc'
+                              /**
+                               * @description Source column name
+                               * @example created_at
+                               */
+                              name: string
+                              /**
+                               * @description Optional placement of null values in the DuckLake sort order
+                               * @example last
+                               * @enum {string|null}
+                               */
+                              nulls?: 'first' | 'last' | null
+                            }[]
+                            /** @enum {string} */
+                            kind: 'columns'
+                          }
+                        | {
+                            /** @enum {string} */
+                            kind: 'primary_key'
+                          }
+                      table: string
+                    }[]
+                  } | null
+                }
+          }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id?: string | null
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database?: string | null
+              /** @description Snowflake RSA private key PEM contents */
+              private_key?: string | null
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string | null
+              /**
+               * @description Optional Snowflake role
+               * @example PIPELINES_ROLE
+               */
+              role?: string | null
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema?: string | null
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example PIPELINES_USER
+               */
+              user?: string | null
+            }
+          }
+      /**
+       * @description Destination name
+       * @example bq-analytics
+       */
+      name: string
     }
     UpdateDiskAutoscaleConfig: {
       /**
@@ -12693,7 +13373,7 @@ export interface components {
       CUSTOM_OAUTH_ENABLED?: boolean
       DB_MAX_POOL_SIZE?: number | null
       /** @enum {string|null} */
-      DB_MAX_POOL_SIZE_UNIT?: 'connections' | 'percent' | null
+      DB_MAX_POOL_SIZE_UNIT?: 'connections' | null | 'percent'
       DISABLE_SIGNUP?: boolean | null
       EXTERNAL_ANONYMOUS_USERS_ENABLED?: boolean | null
       EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS?: string | null
@@ -12872,10 +13552,10 @@ export interface components {
       PASSWORD_MIN_LENGTH?: number | null
       /** @enum {string|null} */
       PASSWORD_REQUIRED_CHARACTERS?:
-        | 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
+        | ''
         | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
         | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789:!@#$%^&*()_+-=[]{};\'\\\\:"|<>?,./`~'
-        | ''
+        | 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
         | null
       RATE_LIMIT_ANONYMOUS_USERS?: number | null
       RATE_LIMIT_EMAIL_SENT?: number | null
@@ -12890,7 +13570,7 @@ export interface components {
       SAML_EXTERNAL_URL?: string | null
       SECURITY_CAPTCHA_ENABLED?: boolean | null
       /** @enum {string|null} */
-      SECURITY_CAPTCHA_PROVIDER?: 'turnstile' | 'hcaptcha' | null
+      SECURITY_CAPTCHA_PROVIDER?: 'hcaptcha' | null | 'turnstile'
       SECURITY_CAPTCHA_SECRET?: string | null
       SECURITY_MANUAL_LINKING_ENABLED?: boolean | null
       SECURITY_REFRESH_TOKEN_REUSE_INTERVAL?: number | null
@@ -12909,7 +13589,7 @@ export interface components {
       SMS_OTP_EXP?: number | null
       SMS_OTP_LENGTH?: number
       /** @enum {string|null} */
-      SMS_PROVIDER?: 'messagebird' | 'textlocal' | 'twilio' | 'twilio_verify' | 'vonage' | null
+      SMS_PROVIDER?: 'messagebird' | null | 'textlocal' | 'twilio' | 'twilio_verify' | 'vonage'
       SMS_TEMPLATE?: string | null
       SMS_TEST_OTP?: string | null
       /** Format: date-time */
@@ -12974,7 +13654,7 @@ export interface components {
       /** Format: uuid */
       id: string
       /** @enum {string} */
-      status: 'new' | 'seen' | 'archived'
+      status: 'archived' | 'new' | 'seen'
     }[]
     UpdateNotificationExceptionBody: {
       /** Format: uuid */
@@ -12993,9 +13673,9 @@ export interface components {
       billing_email?: string
       name?: string
       opt_in_tags?: (
-        | 'AI_SQL_GENERATOR_OPT_IN'
         | 'AI_DATA_GENERATOR_OPT_IN'
         | 'AI_LOG_GENERATOR_OPT_IN'
+        | 'AI_SQL_GENERATOR_OPT_IN'
       )[]
     }
     UpdateOrganizationResponse: {
@@ -13026,30 +13706,145 @@ export interface components {
        * @deprecated
        * @enum {string}
        */
-      pool_mode?: 'transaction' | 'session' | 'statement'
+      pool_mode?: 'session' | 'statement' | 'transaction'
       query_wait_timeout?: number
       reserve_pool_size?: number
       server_idle_timeout?: number
       server_lifetime?: number
     }
+    UpdatePipelineBody: {
+      /** @description Pipeline configuration patch */
+      config: {
+        /** @description Complete batch configuration replacement. Omission preserves it; `null` resets server defaults. */
+        batch?: {
+          /**
+           * @description Maximum preferred byte size for one source batch
+           * @example 8388608
+           */
+          max_bytes?: number
+          /**
+           * @description Maximum fill time in milliseconds
+           * @example 200
+           */
+          max_fill_ms?: number
+          /**
+           * @description Ratio of process memory reserved for incoming stream batch bytes, in (0, 1]
+           * @example 0.2
+           */
+          memory_budget_ratio?: number
+        } | null
+        /**
+         * @description Behavior when the replication slot is invalidated. `error` prevents pipeline startup and requires manual intervention. `recreate` automatically recreates the slot and restarts replication from scratch.
+         * @example error
+         * @enum {string|null}
+         */
+        invalidated_slot_behavior?: 'error' | null | 'recreate'
+        /**
+         * @description Replicator log level
+         * @example info
+         * @enum {string|null}
+         */
+        log_level?: 'debug' | 'error' | 'info' | null | 'trace' | 'warn'
+        /** @description Maximum number of copy connections per table */
+        max_copy_connections_per_table?: number | null
+        /** @description Maximum number of table sync workers */
+        max_table_sync_workers?: number | null
+        /** @description Complete memory backpressure replacement. Omission preserves it; `null` resets server defaults. */
+        memory_backpressure?: {
+          /**
+           * @description Memory usage ratio above which backpressure is activated
+           * @example 0.85
+           */
+          activate_threshold: number
+          /**
+           * @description Memory usage ratio below which backpressure is released
+           * @example 0.75
+           */
+          resume_threshold: number
+        } | null
+        /**
+         * @description Milliseconds between one memory usage refresh and another
+         * @example 100
+         */
+        memory_refresh_interval_ms?: number | null
+        /**
+         * @description Publication name. Omission preserves the stored value; Pipelines rejects clearing it with `null`.
+         * @example pub_orders
+         */
+        publication_name?: string | null
+        /**
+         * @description Milliseconds between one replication lag refresh and another
+         * @example 10000
+         */
+        replication_lag_refresh_interval_ms?: number | null
+        /**
+         * @description Milliseconds between one retry and another for timed worker retries
+         * @example 10000
+         */
+        table_error_retry_delay_ms?: number | null
+        /**
+         * @description Maximum number of automatic timed retry attempts
+         * @example 5
+         */
+        table_error_retry_max_attempts?: number | null
+        /** @description Initial-copy selection. Omission preserves it; `null` resets to copying all tables. */
+        table_sync_copy?:
+          | (
+              | {
+                  /** @enum {string} */
+                  type: 'include_all_tables'
+                }
+              | {
+                  /** @enum {string} */
+                  type: 'skip_all_tables'
+                }
+              | {
+                  /**
+                   * @description Table ids for which copy should be performed
+                   * @example [
+                   *       16408
+                   *     ]
+                   */
+                  table_ids: number[]
+                  /** @enum {string} */
+                  type: 'include_tables'
+                }
+              | {
+                  /**
+                   * @description Table ids for which copy should be skipped
+                   * @example [
+                   *       16408
+                   *     ]
+                   */
+                  table_ids: number[]
+                  /** @enum {string} */
+                  type: 'skip_tables'
+                }
+            )
+          | null
+      }
+      /**
+       * @description Destination id
+       * @example 2001
+       */
+      destination_id: number
+      /**
+       * @description Source id
+       * @example 3001
+       */
+      source_id: number
+    }
+    UpdatePipelineVersionBody: {
+      /**
+       * @description Pipeline version id
+       * @example 4
+       */
+      version_id: number
+    }
     UpdatePlatformAppBody: {
       description?: string
       name: string
       permissions: (
-        | 'organizations_read'
-        | 'organizations_create'
-        | 'projects_read'
-        | 'snippets_read'
-        | 'organization_admin_read'
-        | 'organization_admin_write'
-        | 'members_read'
-        | 'members_write'
-        | 'organization_projects_read'
-        | 'organization_projects_create'
-        | 'platform_webhooks_organization_read'
-        | 'platform_webhooks_organization_write'
-        | 'project_admin_read'
-        | 'project_admin_write'
         | 'action_runs_read'
         | 'action_runs_write'
         | 'advisors_read'
@@ -13077,48 +13872,62 @@ export interface components {
         | 'custom_domain_write'
         | 'data_api_config_read'
         | 'data_api_config_write'
-        | 'database_read'
-        | 'database_write'
         | 'database_config_read'
         | 'database_config_write'
         | 'database_jit_read'
         | 'database_jit_write'
+        | 'database_migrations_read'
+        | 'database_migrations_write'
         | 'database_network_bans_read'
         | 'database_network_bans_write'
         | 'database_network_restrictions_read'
         | 'database_network_restrictions_write'
-        | 'database_migrations_read'
-        | 'database_migrations_write'
         | 'database_pooling_config_read'
         | 'database_pooling_config_write'
+        | 'database_read'
         | 'database_readonly_config_read'
         | 'database_readonly_config_write'
         | 'database_ssl_config_read'
         | 'database_ssl_config_write'
         | 'database_webhooks_config_read'
         | 'database_webhooks_config_write'
+        | 'database_write'
         | 'edge_functions_read'
-        | 'edge_functions_write'
         | 'edge_functions_secrets_read'
         | 'edge_functions_secrets_write'
+        | 'edge_functions_write'
         | 'infra_add_ons_read'
         | 'infra_add_ons_write'
         | 'infra_disk_config_read'
         | 'infra_disk_config_write'
         | 'infra_read_replicas_read'
         | 'infra_read_replicas_write'
-        | 'project_snippets_read'
-        | 'project_snippets_write'
-        | 'realtime_config_read'
-        | 'realtime_config_write'
-        | 'storage_read'
-        | 'storage_write'
-        | 'storage_config_read'
-        | 'storage_config_write'
-        | 'vanity_subdomain_read'
-        | 'vanity_subdomain_write'
+        | 'members_read'
+        | 'members_write'
+        | 'organization_admin_read'
+        | 'organization_admin_write'
+        | 'organization_projects_create'
+        | 'organization_projects_read'
+        | 'organizations_create'
+        | 'organizations_read'
+        | 'platform_webhooks_organization_read'
+        | 'platform_webhooks_organization_write'
         | 'platform_webhooks_projects_read'
         | 'platform_webhooks_projects_write'
+        | 'project_admin_read'
+        | 'project_admin_write'
+        | 'project_snippets_read'
+        | 'project_snippets_write'
+        | 'projects_read'
+        | 'realtime_config_read'
+        | 'realtime_config_write'
+        | 'snippets_read'
+        | 'storage_config_read'
+        | 'storage_config_write'
+        | 'storage_read'
+        | 'storage_write'
+        | 'vanity_subdomain_read'
+        | 'vanity_subdomain_write'
         | 'workers_read'
         | 'workers_write'
       )[]
@@ -13143,13 +13952,13 @@ export interface components {
       max_client_conn?: number
       pgbouncer_enabled: boolean
       /** @enum {string} */
-      pgbouncer_status: 'COMING_UP' | 'COMING_DOWN' | 'RELOADING' | 'ENABLED' | 'DISABLED'
+      pgbouncer_status: 'COMING_DOWN' | 'COMING_UP' | 'DISABLED' | 'ENABLED' | 'RELOADING'
       /**
        * @deprecated
        * @description Cannot be changed, this is ignored
        * @enum {string}
        */
-      pool_mode?: 'transaction' | 'session' | 'statement'
+      pool_mode?: 'session' | 'statement' | 'transaction'
       server_idle_timeout?: number
       server_lifetime?: number
     }
@@ -13184,6 +13993,21 @@ export interface components {
     UpdateProjectBody: {
       name: string
     }
+    UpdatePublicationBody: {
+      /** @description Publication tables */
+      tables: {
+        /**
+         * @description Table name
+         * @example orders
+         */
+        name: string
+        /**
+         * @description Table schema
+         * @example public
+         */
+        schema: string
+      }[]
+    }
     UpdateRealtimeConfigBody: {
       /** @description Sets connection pool size for Realtime Authorization */
       connection_pool?: number
@@ -13209,387 +14033,6 @@ export interface components {
       private_only?: boolean
       /** @description Disables the Realtime service for this project when true. Set to false to re-enable it. */
       suspend?: boolean
-    }
-    UpdateReplicationDestinationBody: {
-      /** @description Destination configuration */
-      config:
-        | {
-            big_query: {
-              /**
-               * @description Number of concurrent BigQuery Storage Write API connections.
-               * @example 8
-               */
-              connection_pool_size?: number | null
-              /**
-               * @description BigQuery dataset id
-               * @example analytics
-               */
-              dataset_id?: string | null
-              /**
-               * @description Maximum data staleness in minutes
-               * @example 5
-               */
-              max_staleness_mins?: number | null
-              /**
-               * @description BigQuery project id
-               * @example my-gcp-project
-               */
-              project_id?: string | null
-              /** @description BigQuery service account key */
-              service_account_key?: string | null
-              /** @description Per-table partitioning and clustering, applied only when the physical table is created or recreated */
-              table_options?: {
-                tables?: {
-                  cluster_by?: string[]
-                  partition_by?:
-                    | (
-                        | {
-                            /**
-                             * @description Source column name
-                             * @example created_at
-                             */
-                            column: string
-                            /**
-                             * @description Partition granularity
-                             * @example day
-                             * @enum {string}
-                             */
-                            granularity?: 'hour' | 'day' | 'month' | 'year'
-                            /**
-                             * @description Partition by a replicated `DATE`, `TIMESTAMP`, or `DATETIME` column
-                             * @enum {string}
-                             */
-                            kind: 'time_column'
-                          }
-                        | {
-                            /**
-                             * @description Source column name
-                             * @example created_at
-                             */
-                            column: string
-                            /**
-                             * @description Exclusive end of the last partition range
-                             * @example 100
-                             */
-                            end: number
-                            /**
-                             * @description Width of each partition range
-                             * @example 10
-                             */
-                            interval: number
-                            /**
-                             * @description Partition by ranges of a replicated integer column
-                             * @enum {string}
-                             */
-                            kind: 'integer_range'
-                            /**
-                             * @description Inclusive start of the first partition range
-                             * @example 0
-                             */
-                            start: number
-                          }
-                        | {
-                            /**
-                             * @description Partition granularity
-                             * @example day
-                             * @enum {string}
-                             */
-                            granularity?: 'hour' | 'day' | 'month' | 'year'
-                            /**
-                             * @description Partition by the time at which BigQuery ingests each row
-                             * @enum {string}
-                             */
-                            kind: 'ingestion_time'
-                          }
-                      )
-                    | null
-                  /**
-                   * @description Source PostgreSQL table OID, stable across renames for the relation lifetime
-                   * @example 16384
-                   */
-                  table_id: number
-                }[]
-              } | null
-            }
-          }
-        | {
-            clickhouse: {
-              /**
-               * @description ClickHouse target database
-               * @example analytics
-               */
-              database?: string | null
-              /**
-               * @description Table engine used for replicated tables. Defaults to `replacing_merge_tree` server-side when omitted.
-               * @example replacing_merge_tree
-               * @enum {string|null}
-               */
-              engine?: 'merge_tree' | 'replacing_merge_tree' | null
-              /** @description ClickHouse password. Omit for passwordless access. */
-              password?: string | null
-              /**
-               * @description ClickHouse HTTPS endpoint URL
-               * @example https://clickhouse.example.com:8443
-               */
-              url?: string | null
-              /**
-               * @description ClickHouse user name
-               * @example default
-               */
-              user?: string | null
-            }
-          }
-        | {
-            iceberg: {
-              supabase: {
-                /**
-                 * @description Catalog token
-                 * @example A jwt secret
-                 */
-                catalog_token?: string | null
-                /**
-                 * @description Namespace
-                 * @example my-namespace
-                 */
-                namespace?: string | null
-                /**
-                 * @description Project ref
-                 * @example abcdefghijklmnopqrst
-                 */
-                project_ref?: string | null
-                /**
-                 * @description S3 access key ID
-                 * @example 53383b1d0cdb16a3afa63152656aa3cc
-                 */
-                s3_access_key_id?: string | null
-                /**
-                 * @description S3 region
-                 * @example ap-southeast-1
-                 */
-                s3_region?: string | null
-                /**
-                 * @description S3 secret access key
-                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
-                 */
-                s3_secret_access_key?: string | null
-                /**
-                 * @description Warehouse name
-                 * @example my-warehouse
-                 */
-                warehouse_name?: string | null
-              }
-            }
-          }
-        | {
-            ducklake:
-              | {
-                  /**
-                   * @description DuckLake catalog URL
-                   * @example postgres://user:pass@localhost:5432/ducklake_catalog
-                   */
-                  catalog_url?: string | null
-                  /**
-                   * @description DuckLake data path
-                   * @example s3://<bucket-name>/
-                   */
-                  data_path?: string | null
-                  /**
-                   * @description Schema used for DuckLake metadata tables stored in PostgreSQL
-                   * @example ducklake
-                   */
-                  metadata_schema?: string | null
-                  /**
-                   * @description Number of concurrent DuckDB connections.
-                   * @example 4
-                   */
-                  pool_size?: number | null
-                  /**
-                   * @description S3-compatible storage access key ID
-                   * @example my-access-key
-                   */
-                  s3_access_key_id?: string | null
-                  /**
-                   * @description S3-compatible storage endpoint
-                   * @example 127.0.0.1:5000/s3
-                   */
-                  s3_endpoint?: string | null
-                  /**
-                   * @description S3-compatible storage region
-                   * @example us-east-1
-                   */
-                  s3_region?: string | null
-                  /**
-                   * @description S3-compatible storage secret access key
-                   * @example my-secret-key
-                   */
-                  s3_secret_access_key?: string | null
-                  /**
-                   * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
-                   * @example path
-                   * @enum {string|null}
-                   */
-                  s3_url_style?: 'path' | 'vhost' | null
-                  /**
-                   * @description Whether to use SSL for S3-compatible storage
-                   * @example false
-                   */
-                  s3_use_ssl?: boolean | null
-                }
-              | {
-                  catalog:
-                    | {
-                        /**
-                         * @description DuckLake catalog URL
-                         * @example postgres://user:pass@localhost:5432/ducklake_catalog
-                         */
-                        catalog_url: string
-                        /**
-                         * @description Schema used for DuckLake metadata tables stored in this PostgreSQL catalog. Overrides `metadata_schema` when provided.
-                         * @example ducklake
-                         */
-                        metadata_schema?: string | null
-                        /**
-                         * @description Number of concurrent DuckDB connections.
-                         * @example 4
-                         */
-                        pool_size?: number | null
-                        /** @enum {string} */
-                        type: 'postgres_url'
-                      }
-                    | {
-                        /**
-                         * @description Schema used for DuckLake metadata tables stored in this PostgreSQL catalog. Overrides `metadata_schema` when provided.
-                         * @example ducklake
-                         */
-                        metadata_schema?: string | null
-                        /**
-                         * @description Number of concurrent DuckDB connections.
-                         * @example 4
-                         */
-                        pool_size?: number | null
-                        /**
-                         * @description Supabase project ref used as the DuckLake PostgreSQL catalog
-                         * @example abcjuqabhgwjjutfvtpa
-                         */
-                        project_ref: string
-                        /** @enum {string} */
-                        type: 'supabase_project'
-                      }
-                  /**
-                   * @description Schema used for DuckLake metadata tables stored in PostgreSQL
-                   * @example ducklake
-                   */
-                  metadata_schema?: string | null
-                  /**
-                   * @description Number of concurrent DuckDB connections.
-                   * @example 4
-                   */
-                  pool_size?: number | null
-                  storage:
-                    | {
-                        /**
-                         * @description DuckLake data path
-                         * @example s3://<bucket-name>/
-                         */
-                        data_path: string
-                        /**
-                         * @description S3-compatible storage access key ID
-                         * @example my-access-key
-                         */
-                        s3_access_key_id: string
-                        /**
-                         * @description S3-compatible storage endpoint
-                         * @example 127.0.0.1:5000/s3
-                         */
-                        s3_endpoint: string
-                        /**
-                         * @description S3-compatible storage region
-                         * @example us-east-1
-                         */
-                        s3_region: string
-                        /**
-                         * @description S3-compatible storage secret access key
-                         * @example my-secret-key
-                         */
-                        s3_secret_access_key: string
-                        /**
-                         * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
-                         * @example path
-                         * @enum {string|null}
-                         */
-                        s3_url_style?: 'path' | 'vhost' | null
-                        /**
-                         * @description Whether to use SSL for S3-compatible storage
-                         * @example false
-                         */
-                        s3_use_ssl?: boolean | null
-                        /** @enum {string} */
-                        type: 's3'
-                      }
-                    | {
-                        /**
-                         * @description Storage bucket id used for DuckLake data files
-                         * @example ducklake
-                         */
-                        bucket: string
-                        /**
-                         * @description Optional description for the generated Supabase Storage S3 credential
-                         * @example DuckLake replication destination
-                         */
-                        credential_description?: string
-                        /**
-                         * @description Optional path prefix inside the bucket for DuckLake data files
-                         * @example replication
-                         */
-                        path?: string
-                        /**
-                         * @description Supabase project ref whose Object Storage S3 API stores DuckLake data files
-                         * @example abcjuqabhgwjjutfvtpa
-                         */
-                        project_ref: string
-                        /** @enum {string} */
-                        type: 'supabase_storage'
-                      }
-                }
-          }
-        | {
-            snowflake: {
-              /**
-               * @description Snowflake account identifier
-               * @example MYORG-MYACCOUNT
-               */
-              account_id?: string | null
-              /**
-               * @description Snowflake target database
-               * @example ANALYTICS
-               */
-              database?: string | null
-              /** @description Snowflake RSA private key PEM contents */
-              private_key?: string | null
-              /** @description Optional passphrase for encrypted private keys */
-              private_key_passphrase?: string | null
-              /**
-               * @description Optional Snowflake role
-               * @example PIPELINES_ROLE
-               */
-              role?: string | null
-              /**
-               * @description Snowflake target schema
-               * @example PUBLIC
-               */
-              schema?: string | null
-              /**
-               * @description Snowflake user configured for key-pair authentication
-               * @example PIPELINES_USER
-               */
-              user?: string | null
-            }
-          }
-      /**
-       * @description Destination name
-       * @example bq-analytics
-       */
-      name: string
     }
     UpdateReplicationDestinationPipelineBody: {
       /** @description Destination configuration */
@@ -13635,7 +14078,7 @@ export interface components {
                              * @example day
                              * @enum {string}
                              */
-                            granularity?: 'hour' | 'day' | 'month' | 'year'
+                            granularity?: 'day' | 'hour' | 'month' | 'year'
                             /**
                              * @description Partition by a replicated `DATE`, `TIMESTAMP`, or `DATETIME` column
                              * @enum {string}
@@ -13675,7 +14118,7 @@ export interface components {
                              * @example day
                              * @enum {string}
                              */
-                            granularity?: 'hour' | 'day' | 'month' | 'year'
+                            granularity?: 'day' | 'hour' | 'month' | 'year'
                             /**
                              * @description Partition by the time at which BigQuery ingests each row
                              * @enum {string}
@@ -13705,7 +14148,7 @@ export interface components {
                * @example replacing_merge_tree
                * @enum {string|null}
                */
-              engine?: 'merge_tree' | 'replacing_merge_tree' | null
+              engine?: 'merge_tree' | null | 'replacing_merge_tree'
               /** @description ClickHouse password. Omit for passwordless access. */
               password?: string | null
               /**
@@ -13809,12 +14252,46 @@ export interface components {
                    * @example path
                    * @enum {string|null}
                    */
-                  s3_url_style?: 'path' | 'vhost' | null
+                  s3_url_style?: null | 'path' | 'vhost'
                   /**
                    * @description Whether to use SSL for S3-compatible storage
                    * @example false
                    */
                   s3_use_ssl?: boolean | null
+                  table_sorting?: {
+                    tables?: {
+                      schema: string
+                      sort_by:
+                        | {
+                            columns: {
+                              /**
+                               * @description DuckLake sort direction
+                               * @example asc
+                               * @enum {string}
+                               */
+                              direction?: 'asc' | 'desc'
+                              /**
+                               * @description Source column name
+                               * @example created_at
+                               */
+                              name: string
+                              /**
+                               * @description Optional placement of null values in the DuckLake sort order
+                               * @example last
+                               * @enum {string|null}
+                               */
+                              nulls?: 'first' | 'last' | null
+                            }[]
+                            /** @enum {string} */
+                            kind: 'columns'
+                          }
+                        | {
+                            /** @enum {string} */
+                            kind: 'primary_key'
+                          }
+                      table: string
+                    }[]
+                  } | null
                 }
               | {
                   catalog:
@@ -13898,7 +14375,7 @@ export interface components {
                          * @example path
                          * @enum {string|null}
                          */
-                        s3_url_style?: 'path' | 'vhost' | null
+                        s3_url_style?: null | 'path' | 'vhost'
                         /**
                          * @description Whether to use SSL for S3-compatible storage
                          * @example false
@@ -13931,6 +14408,40 @@ export interface components {
                         /** @enum {string} */
                         type: 'supabase_storage'
                       }
+                  table_sorting?: {
+                    tables?: {
+                      schema: string
+                      sort_by:
+                        | {
+                            columns: {
+                              /**
+                               * @description DuckLake sort direction
+                               * @example asc
+                               * @enum {string}
+                               */
+                              direction?: 'asc' | 'desc'
+                              /**
+                               * @description Source column name
+                               * @example created_at
+                               */
+                              name: string
+                              /**
+                               * @description Optional placement of null values in the DuckLake sort order
+                               * @example last
+                               * @enum {string|null}
+                               */
+                              nulls?: 'first' | 'last' | null
+                            }[]
+                            /** @enum {string} */
+                            kind: 'columns'
+                          }
+                        | {
+                            /** @enum {string} */
+                            kind: 'primary_key'
+                          }
+                      table: string
+                    }[]
+                  } | null
                 }
           }
         | {
@@ -13996,13 +14507,13 @@ export interface components {
          * @example error
          * @enum {string|null}
          */
-        invalidated_slot_behavior?: 'error' | 'recreate' | null
+        invalidated_slot_behavior?: 'error' | null | 'recreate'
         /**
          * @description Replicator log level
          * @example info
          * @enum {string|null}
          */
-        log_level?: 'trace' | 'debug' | 'info' | 'warn' | 'error' | null
+        log_level?: 'debug' | 'error' | 'info' | null | 'trace' | 'warn'
         /** @description Maximum number of copy connections per table */
         max_copy_connections_per_table?: number | null
         /** @description Maximum number of table sync workers */
@@ -14047,37 +14558,39 @@ export interface components {
         table_error_retry_max_attempts?: number | null
         /** @description Initial-copy selection. Omission preserves it; `null` resets to copying all tables. */
         table_sync_copy?:
-          | {
-              /** @enum {string} */
-              type: 'include_all_tables'
-            }
-          | {
-              /** @enum {string} */
-              type: 'skip_all_tables'
-            }
-          | {
-              /**
-               * @description Table ids for which copy should be performed
-               * @example [
-               *       16408
-               *     ]
-               */
-              table_ids: number[]
-              /** @enum {string} */
-              type: 'include_tables'
-            }
-          | {
-              /**
-               * @description Table ids for which copy should be skipped
-               * @example [
-               *       16408
-               *     ]
-               */
-              table_ids: number[]
-              /** @enum {string} */
-              type: 'skip_tables'
-            }
-          | never
+          | (
+              | {
+                  /** @enum {string} */
+                  type: 'include_all_tables'
+                }
+              | {
+                  /** @enum {string} */
+                  type: 'skip_all_tables'
+                }
+              | {
+                  /**
+                   * @description Table ids for which copy should be performed
+                   * @example [
+                   *       16408
+                   *     ]
+                   */
+                  table_ids: number[]
+                  /** @enum {string} */
+                  type: 'include_tables'
+                }
+              | {
+                  /**
+                   * @description Table ids for which copy should be skipped
+                   * @example [
+                   *       16408
+                   *     ]
+                   */
+                  table_ids: number[]
+                  /** @enum {string} */
+                  type: 'skip_tables'
+                }
+            )
+          | null
       }
       /**
        * @description Source id
@@ -14085,182 +14598,6 @@ export interface components {
        */
       source_id: number
     }
-    UpdateReplicationPipelineBody: {
-      /** @description Pipeline configuration patch */
-      config: {
-        /** @description Complete batch configuration replacement. Omission preserves it; `null` resets server defaults. */
-        batch?: {
-          /**
-           * @description Maximum preferred byte size for one source batch
-           * @example 8388608
-           */
-          max_bytes?: number
-          /**
-           * @description Maximum fill time in milliseconds
-           * @example 200
-           */
-          max_fill_ms?: number
-          /**
-           * @description Ratio of process memory reserved for incoming stream batch bytes, in (0, 1]
-           * @example 0.2
-           */
-          memory_budget_ratio?: number
-        } | null
-        /**
-         * @description Behavior when the replication slot is invalidated. `error` prevents pipeline startup and requires manual intervention. `recreate` automatically recreates the slot and restarts replication from scratch.
-         * @example error
-         * @enum {string|null}
-         */
-        invalidated_slot_behavior?: 'error' | 'recreate' | null
-        /**
-         * @description Replicator log level
-         * @example info
-         * @enum {string|null}
-         */
-        log_level?: 'trace' | 'debug' | 'info' | 'warn' | 'error' | null
-        /** @description Maximum number of copy connections per table */
-        max_copy_connections_per_table?: number | null
-        /** @description Maximum number of table sync workers */
-        max_table_sync_workers?: number | null
-        /** @description Complete memory backpressure replacement. Omission preserves it; `null` resets server defaults. */
-        memory_backpressure?: {
-          /**
-           * @description Memory usage ratio above which backpressure is activated
-           * @example 0.85
-           */
-          activate_threshold: number
-          /**
-           * @description Memory usage ratio below which backpressure is released
-           * @example 0.75
-           */
-          resume_threshold: number
-        } | null
-        /**
-         * @description Milliseconds between one memory usage refresh and another
-         * @example 100
-         */
-        memory_refresh_interval_ms?: number | null
-        /**
-         * @description Publication name. Omission preserves the stored value; Pipelines rejects clearing it with `null`.
-         * @example pub_orders
-         */
-        publication_name?: string | null
-        /**
-         * @description Milliseconds between one replication lag refresh and another
-         * @example 10000
-         */
-        replication_lag_refresh_interval_ms?: number | null
-        /**
-         * @description Milliseconds between one retry and another for timed worker retries
-         * @example 10000
-         */
-        table_error_retry_delay_ms?: number | null
-        /**
-         * @description Maximum number of automatic timed retry attempts
-         * @example 5
-         */
-        table_error_retry_max_attempts?: number | null
-        /** @description Initial-copy selection. Omission preserves it; `null` resets to copying all tables. */
-        table_sync_copy?:
-          | {
-              /** @enum {string} */
-              type: 'include_all_tables'
-            }
-          | {
-              /** @enum {string} */
-              type: 'skip_all_tables'
-            }
-          | {
-              /**
-               * @description Table ids for which copy should be performed
-               * @example [
-               *       16408
-               *     ]
-               */
-              table_ids: number[]
-              /** @enum {string} */
-              type: 'include_tables'
-            }
-          | {
-              /**
-               * @description Table ids for which copy should be skipped
-               * @example [
-               *       16408
-               *     ]
-               */
-              table_ids: number[]
-              /** @enum {string} */
-              type: 'skip_tables'
-            }
-          | never
-      }
-      /**
-       * @description Destination id
-       * @example 2001
-       */
-      destination_id: number
-      /**
-       * @description Source id
-       * @example 3001
-       */
-      source_id: number
-    }
-    UpdateReplicationPipelineVersionBody: {
-      /**
-       * @description Pipeline version id
-       * @example 4
-       */
-      version_id: number
-    }
-    UpdateReplicationPublicationBody: {
-      /** @description Publication tables */
-      tables: {
-        /**
-         * @description Table name
-         * @example orders
-         */
-        name: string
-        /**
-         * @description Table schema
-         * @example public
-         */
-        schema: string
-      }[]
-    }
-    UpdateSSOProviderBody:
-      | {
-          /** @default [] */
-          domains?: string[]
-          email_mapping: string[]
-          enabled: boolean
-          first_name_mapping?: string[]
-          /** Format: uri */
-          idjag_issuer_url?: string | null
-          join_org_on_signup_enabled: boolean
-          /** @enum {string} */
-          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
-          last_name_mapping?: string[]
-          metadata_xml_file: string
-          /** Format: uri */
-          metadata_xml_url?: string
-          user_name_mapping?: string[]
-        }
-      | {
-          /** @default [] */
-          domains?: string[]
-          email_mapping: string[]
-          enabled: boolean
-          first_name_mapping?: string[]
-          /** Format: uri */
-          idjag_issuer_url?: string | null
-          join_org_on_signup_enabled: boolean
-          /** @enum {string} */
-          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
-          last_name_mapping?: string[]
-          metadata_xml_file?: string
-          metadata_xml_url: string
-          user_name_mapping?: string[]
-        }
     UpdateSecretsConfigBody: {
       change_tracking_id: string
       jwt_secret: string
@@ -14274,17 +14611,17 @@ export interface components {
       public: boolean
     }
     /** @example {
-     *       "fileSizeLimit": 10485760,
      *       "features": {
      *         "imageTransformation": {
      *           "enabled": true
      *         }
-     *       }
+     *       },
+     *       "fileSizeLimit": 10485760
      *     } */
     UpdateStorageConfigBody: {
       external?: {
         /** @enum {string} */
-        upstreamTarget: 'main' | 'canary'
+        upstreamTarget: 'canary' | 'main'
       }
       features?: {
         icebergCatalog?: {
@@ -14329,12 +14666,12 @@ export interface components {
       }
       /** @enum {string} */
       tier:
-        | 'tier_free'
-        | 'tier_pro'
-        | 'tier_payg'
-        | 'tier_team'
         | 'tier_enterprise'
+        | 'tier_free'
+        | 'tier_payg'
         | 'tier_platform'
+        | 'tier_pro'
+        | 'tier_team'
     }
     UpdateSubscriptionResponse: {
       pending_payment_intent_secret: string | null
@@ -14386,7 +14723,7 @@ export interface components {
       updated_at?: string
     }
     UpdateVercelConnectionsBody: {
-      env_sync_targets?: ('production' | 'preview' | 'development')[]
+      env_sync_targets?: ('development' | 'preview' | 'production')[]
       public_env_var_prefix?: string
     }
     UpdateWarehouseCatalogBody: {
@@ -14419,7 +14756,7 @@ export interface components {
                   sql: string
                   title?: string
                   /** @enum {string} */
-                  view?: 'table' | 'chart'
+                  view?: 'chart' | 'table'
                 }
               | {
                   _id?: string
@@ -14448,11 +14785,11 @@ export interface components {
                         _tag: 'relative_time_range'
                         amount: number
                         /** @enum {string} */
-                        unit: 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
+                        unit: 'day' | 'hour' | 'minute' | 'month' | 'week' | 'year'
                       }
                   title?: string
                   /** @enum {string} */
-                  view?: 'table' | 'chart'
+                  view?: 'chart' | 'table'
                 }
               | {
                   _id?: string
@@ -14476,9 +14813,9 @@ export interface components {
       owner_id?: number
       project_id?: number
       /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql' | 'notebook'
+      type: 'log_sql' | 'notebook' | 'report' | 'sql'
       /** @enum {string} */
-      visibility: 'user' | 'project' | 'org' | 'public'
+      visibility: 'org' | 'project' | 'public' | 'user'
     }
     UserAuditLogsResponse: {
       result: {
@@ -14577,49 +14914,7 @@ export interface components {
       role?: string
       updated_at?: string
     }
-    ValidateDestinationResponse: {
-      /** @description List of validation failures */
-      validation_failures: {
-        /**
-         * @description Failure type
-         * @example critical
-         * @enum {string}
-         */
-        failure_type: 'critical' | 'warning'
-        /**
-         * @description Validation failure name
-         * @example Validation Failed
-         */
-        name: string
-        /**
-         * @description Validation failure reason
-         * @example The configuration is invalid
-         */
-        reason: string
-      }[]
-    }
-    ValidatePipelineResponse: {
-      /** @description List of validation failures */
-      validation_failures: {
-        /**
-         * @description Failure type
-         * @example critical
-         * @enum {string}
-         */
-        failure_type: 'critical' | 'warning'
-        /**
-         * @description Validation failure name
-         * @example Validation Failed
-         */
-        name: string
-        /**
-         * @description Validation failure reason
-         * @example The configuration is invalid
-         */
-        reason: string
-      }[]
-    }
-    ValidateReplicationDestinationBody: {
+    ValidateDestinationBody: {
       /** @description Destination configuration */
       config:
         | {
@@ -14663,7 +14958,7 @@ export interface components {
                              * @example day
                              * @enum {string}
                              */
-                            granularity?: 'hour' | 'day' | 'month' | 'year'
+                            granularity?: 'day' | 'hour' | 'month' | 'year'
                             /**
                              * @description Partition by a replicated `DATE`, `TIMESTAMP`, or `DATETIME` column
                              * @enum {string}
@@ -14703,7 +14998,7 @@ export interface components {
                              * @example day
                              * @enum {string}
                              */
-                            granularity?: 'hour' | 'day' | 'month' | 'year'
+                            granularity?: 'day' | 'hour' | 'month' | 'year'
                             /**
                              * @description Partition by the time at which BigQuery ingests each row
                              * @enum {string}
@@ -14838,13 +15133,47 @@ export interface components {
                    * @example path
                    * @enum {string|null}
                    */
-                  s3_url_style?: 'path' | 'vhost' | null
+                  s3_url_style?: null | 'path' | 'vhost'
                   /**
                    * @description Whether to use SSL for S3-compatible storage
                    * @default true
                    * @example false
                    */
                   s3_use_ssl?: boolean
+                  table_sorting?: {
+                    tables?: {
+                      schema: string
+                      sort_by:
+                        | {
+                            columns: {
+                              /**
+                               * @description DuckLake sort direction
+                               * @example asc
+                               * @enum {string}
+                               */
+                              direction?: 'asc' | 'desc'
+                              /**
+                               * @description Source column name
+                               * @example created_at
+                               */
+                              name: string
+                              /**
+                               * @description Optional placement of null values in the DuckLake sort order
+                               * @example last
+                               * @enum {string|null}
+                               */
+                              nulls?: 'first' | 'last' | null
+                            }[]
+                            /** @enum {string} */
+                            kind: 'columns'
+                          }
+                        | {
+                            /** @enum {string} */
+                            kind: 'primary_key'
+                          }
+                      table: string
+                    }[]
+                  }
                 }
               | {
                   catalog:
@@ -14929,7 +15258,7 @@ export interface components {
                          * @example path
                          * @enum {string|null}
                          */
-                        s3_url_style?: 'path' | 'vhost' | null
+                        s3_url_style?: null | 'path' | 'vhost'
                         /**
                          * @description Whether to use SSL for S3-compatible storage
                          * @default true
@@ -14963,6 +15292,40 @@ export interface components {
                         /** @enum {string} */
                         type: 'supabase_storage'
                       }
+                  table_sorting?: {
+                    tables?: {
+                      schema: string
+                      sort_by:
+                        | {
+                            columns: {
+                              /**
+                               * @description DuckLake sort direction
+                               * @example asc
+                               * @enum {string}
+                               */
+                              direction?: 'asc' | 'desc'
+                              /**
+                               * @description Source column name
+                               * @example created_at
+                               */
+                              name: string
+                              /**
+                               * @description Optional placement of null values in the DuckLake sort order
+                               * @example last
+                               * @enum {string|null}
+                               */
+                              nulls?: 'first' | 'last' | null
+                            }[]
+                            /** @enum {string} */
+                            kind: 'columns'
+                          }
+                        | {
+                            /** @enum {string} */
+                            kind: 'primary_key'
+                          }
+                      table: string
+                    }[]
+                  }
                 }
           }
         | {
@@ -15023,13 +15386,13 @@ export interface components {
          * @example error
          * @enum {string|null}
          */
-        invalidated_slot_behavior?: 'error' | 'recreate' | null
+        invalidated_slot_behavior?: 'error' | null | 'recreate'
         /**
          * @description Replicator log level
          * @example info
          * @enum {string|null}
          */
-        log_level?: 'trace' | 'debug' | 'info' | 'warn' | 'error' | null
+        log_level?: 'debug' | 'error' | 'info' | null | 'trace' | 'warn'
         /** @description Maximum number of copy connections per table */
         max_copy_connections_per_table?: number | null
         /** @description Maximum number of table sync workers */
@@ -15074,45 +15437,68 @@ export interface components {
         table_error_retry_max_attempts?: number | null
         /** @description Selection rules for tables participating in initial table copy. Omit or use `null` to copy all tables. */
         table_sync_copy?:
-          | {
-              /** @enum {string} */
-              type: 'include_all_tables'
-            }
-          | {
-              /** @enum {string} */
-              type: 'skip_all_tables'
-            }
-          | {
-              /**
-               * @description Table ids for which copy should be performed
-               * @example [
-               *       16408
-               *     ]
-               */
-              table_ids: number[]
-              /** @enum {string} */
-              type: 'include_tables'
-            }
-          | {
-              /**
-               * @description Table ids for which copy should be skipped
-               * @example [
-               *       16408
-               *     ]
-               */
-              table_ids: number[]
-              /** @enum {string} */
-              type: 'skip_tables'
-            }
-          | never
-      }
+          | (
+              | {
+                  /** @enum {string} */
+                  type: 'include_all_tables'
+                }
+              | {
+                  /** @enum {string} */
+                  type: 'skip_all_tables'
+                }
+              | {
+                  /**
+                   * @description Table ids for which copy should be performed
+                   * @example [
+                   *       16408
+                   *     ]
+                   */
+                  table_ids: number[]
+                  /** @enum {string} */
+                  type: 'include_tables'
+                }
+              | {
+                  /**
+                   * @description Table ids for which copy should be skipped
+                   * @example [
+                   *       16408
+                   *     ]
+                   */
+                  table_ids: number[]
+                  /** @enum {string} */
+                  type: 'skip_tables'
+                }
+            )
+          | null
+      } | null
       /**
        * @description Source id
        * @example 1
        */
-      source_id?: number
+      source_id?: number | null
     }
-    ValidateReplicationPipelineBody: {
+    ValidateDestinationResponse: {
+      /** @description List of validation failures */
+      validation_failures: {
+        /**
+         * @description Failure type
+         * @example critical
+         * @enum {string}
+         */
+        failure_type: 'critical' | 'warning'
+        /**
+         * @description Validation failure name
+         * @example Validation Failed
+         */
+        name: string
+        /**
+         * @description Validation failure reason
+         * @example The configuration is invalid
+         */
+        reason: string
+      }[]
+    }
+    ValidatePipelineBody: {
       /** @description Pipeline configuration */
       config: {
         /** @description Batch configuration. Omit or use `null` for server defaults. */
@@ -15138,13 +15524,13 @@ export interface components {
          * @example error
          * @enum {string|null}
          */
-        invalidated_slot_behavior?: 'error' | 'recreate' | null
+        invalidated_slot_behavior?: 'error' | null | 'recreate'
         /**
          * @description Replicator log level
          * @example info
          * @enum {string|null}
          */
-        log_level?: 'trace' | 'debug' | 'info' | 'warn' | 'error' | null
+        log_level?: 'debug' | 'error' | 'info' | null | 'trace' | 'warn'
         /** @description Maximum number of copy connections per table */
         max_copy_connections_per_table?: number | null
         /** @description Maximum number of table sync workers */
@@ -15189,43 +15575,66 @@ export interface components {
         table_error_retry_max_attempts?: number | null
         /** @description Selection rules for tables participating in initial table copy. Omit or use `null` to copy all tables. */
         table_sync_copy?:
-          | {
-              /** @enum {string} */
-              type: 'include_all_tables'
-            }
-          | {
-              /** @enum {string} */
-              type: 'skip_all_tables'
-            }
-          | {
-              /**
-               * @description Table ids for which copy should be performed
-               * @example [
-               *       16408
-               *     ]
-               */
-              table_ids: number[]
-              /** @enum {string} */
-              type: 'include_tables'
-            }
-          | {
-              /**
-               * @description Table ids for which copy should be skipped
-               * @example [
-               *       16408
-               *     ]
-               */
-              table_ids: number[]
-              /** @enum {string} */
-              type: 'skip_tables'
-            }
-          | never
+          | (
+              | {
+                  /** @enum {string} */
+                  type: 'include_all_tables'
+                }
+              | {
+                  /** @enum {string} */
+                  type: 'skip_all_tables'
+                }
+              | {
+                  /**
+                   * @description Table ids for which copy should be performed
+                   * @example [
+                   *       16408
+                   *     ]
+                   */
+                  table_ids: number[]
+                  /** @enum {string} */
+                  type: 'include_tables'
+                }
+              | {
+                  /**
+                   * @description Table ids for which copy should be skipped
+                   * @example [
+                   *       16408
+                   *     ]
+                   */
+                  table_ids: number[]
+                  /** @enum {string} */
+                  type: 'skip_tables'
+                }
+            )
+          | null
       }
       /**
        * @description Source id
        * @example 3001
        */
       source_id: number
+    }
+    ValidatePipelineResponse: {
+      /** @description List of validation failures */
+      validation_failures: {
+        /**
+         * @description Failure type
+         * @example critical
+         * @enum {string}
+         */
+        failure_type: 'critical' | 'warning'
+        /**
+         * @description Validation failure name
+         * @example Validation Failed
+         */
+        name: string
+        /**
+         * @description Validation failure reason
+         * @example The configuration is invalid
+         */
+        reason: string
+      }[]
     }
     ValidateSpamBody: {
       content: string
@@ -15356,7 +15765,7 @@ export interface components {
          * @example live
          * @enum {string}
          */
-        state: 'syncing' | 'live' | 'error'
+        state: 'error' | 'live' | 'syncing'
         /**
          * @description Warehouse table size in bytes, when available
          * @example 197912092672
@@ -15408,7 +15817,7 @@ export interface components {
        * @example copying
        * @enum {string}
        */
-      setup_status: 'not_started' | 'setting_up' | 'copying' | 'complete' | 'error'
+      setup_status: 'complete' | 'copying' | 'error' | 'not_started' | 'setting_up'
       /** @description Warehouse setup phases in execution order */
       steps: {
         /**
@@ -15421,13 +15830,13 @@ export interface components {
          * @example warehouse_copy
          * @enum {string}
          */
-        name: 'warehouse_pipeline' | 'warehouse_copy' | 'warehouse_fdw'
+        name: 'warehouse_copy' | 'warehouse_fdw' | 'warehouse_pipeline'
         /**
          * @description Derived Warehouse setup step status
          * @example running
          * @enum {string}
          */
-        status: 'waiting' | 'running' | 'completed' | 'skipped' | 'error'
+        status: 'completed' | 'error' | 'running' | 'skipped' | 'waiting'
       }[]
       /** @description Warehouse linked tables and replication-derived sync state */
       tables: {
@@ -15462,7 +15871,7 @@ export interface components {
          * @example live
          * @enum {string}
          */
-        state: 'syncing' | 'live' | 'error'
+        state: 'error' | 'live' | 'syncing'
         /**
          * @description Warehouse table size in bytes, when available
          * @example 197912092672
@@ -15535,7 +15944,7 @@ export interface components {
          * @example live
          * @enum {string}
          */
-        state: 'syncing' | 'live' | 'error'
+        state: 'error' | 'live' | 'syncing'
         /**
          * @description Warehouse table size in bytes, when available
          * @example 197912092672
@@ -15552,11 +15961,11 @@ export interface components {
       /** @enum {string} */
       status:
         | 'CREATING_PROJECT'
-        | 'RUNNING_MIGRATIONS'
-        | 'MIGRATIONS_PASSED'
-        | 'MIGRATIONS_FAILED'
         | 'FUNCTIONS_DEPLOYED'
         | 'FUNCTIONS_FAILED'
+        | 'MIGRATIONS_FAILED'
+        | 'MIGRATIONS_PASSED'
+        | 'RUNNING_MIGRATIONS'
       updated_at: string
       workdir: string | null
     }
@@ -15944,17 +16353,17 @@ export interface operations {
         template:
           | 'confirmation'
           | 'email-change'
-          | 'invite'
-          | 'magic-link'
-          | 'recovery'
-          | 'reauthentication'
-          | 'password-changed-notification'
           | 'email-changed-notification'
-          | 'phone-changed-notification'
-          | 'mfa-factor-enrolled-notification'
-          | 'mfa-factor-unenrolled-notification'
           | 'identity-linked-notification'
           | 'identity-unlinked-notification'
+          | 'invite'
+          | 'magic-link'
+          | 'mfa-factor-enrolled-notification'
+          | 'mfa-factor-unenrolled-notification'
+          | 'password-changed-notification'
+          | 'phone-changed-notification'
+          | 'reauthentication'
+          | 'recovery'
       }
       cookie?: never
     }
@@ -15984,17 +16393,17 @@ export interface operations {
         template:
           | 'confirmation'
           | 'email-change'
-          | 'invite'
-          | 'magic-link'
-          | 'recovery'
-          | 'reauthentication'
-          | 'password-changed-notification'
           | 'email-changed-notification'
-          | 'phone-changed-notification'
-          | 'mfa-factor-enrolled-notification'
-          | 'mfa-factor-unenrolled-notification'
           | 'identity-linked-notification'
           | 'identity-unlinked-notification'
+          | 'invite'
+          | 'magic-link'
+          | 'mfa-factor-enrolled-notification'
+          | 'mfa-factor-unenrolled-notification'
+          | 'password-changed-notification'
+          | 'phone-changed-notification'
+          | 'reauthentication'
+          | 'recovery'
       }
       cookie?: never
     }
@@ -18344,7 +18753,7 @@ export interface operations {
                 organization_requires_mfa: boolean
                 plan: {
                   /** @enum {string} */
-                  id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
+                  id: 'enterprise' | 'free' | 'platform' | 'pro' | 'team'
                   name: string
                 }
                 restriction_data: {
@@ -21392,7 +21801,7 @@ export interface operations {
   OAuthAppsController_listOAuthApps: {
     parameters: {
       query: {
-        type: 'published' | 'authorized'
+        type: 'authorized' | 'published'
       }
       header?: never
       path: {
@@ -22052,7 +22461,7 @@ export interface operations {
         /** @description Search projects by name */
         search?: string
         /** @description Sort order for projects */
-        sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
+        sort?: 'created_asc' | 'created_desc' | 'name_asc' | 'name_desc'
         /** @description A comma-separated list of project statuses to filter by.
          *
          *     The following values are supported: `ACTIVE_HEALTHY`, `INACTIVE`. */
@@ -22218,11 +22627,7 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateSSOProviderBody']
-      }
-    }
+    requestBody?: never
     responses: {
       200: {
         headers: {
@@ -22296,11 +22701,7 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateSSOProviderBody']
-      }
-    }
+    requestBody?: never
     responses: {
       201: {
         headers: {
@@ -22639,7 +23040,7 @@ export interface operations {
                 organization_requires_mfa: boolean
                 plan: {
                   /** @enum {string} */
-                  id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
+                  id: 'enterprise' | 'free' | 'platform' | 'pro' | 'team'
                   name: string
                 }
                 restriction_data: {
@@ -23352,70 +23753,70 @@ export interface operations {
     parameters: {
       query?: {
         featureKey?:
+          | 'api.members.invitations'
+          | 'api.members.roles'
+          | 'assistant.advance_model'
+          | 'audit_log_drains'
+          | 'auth.advanced_auth_settings'
+          | 'auth.custom_jwt_template'
+          | 'auth.custom_oauth.max_providers'
+          | 'auth.hooks'
+          | 'auth.leaked_password_protection'
+          | 'auth.mfa_enhanced_security'
+          | 'auth.mfa_phone'
+          | 'auth.mfa_web_authn'
+          | 'auth.password_hibp'
+          | 'auth.performance_settings'
+          | 'auth.platform.sso'
+          | 'auth.saml_2'
+          | 'auth.user_sessions'
+          | 'backup.restore_to_new_project'
+          | 'backup.retention_days'
+          | 'backup.schedule'
+          | 'branching_limit'
+          | 'branching_persistent'
+          | 'custom_domain'
+          | 'dedicated_pooler'
+          | 'function.max_count'
+          | 'function.size_limit_mb'
           | 'instances.compute_update_available_sizes'
-          | 'instances.read_replicas'
           | 'instances.disk_modifications'
           | 'instances.high_availability'
           | 'instances.orioledb'
-          | 'replication.etl'
-          | 'storage.max_file_size'
-          | 'storage.max_file_size.configurable'
-          | 'storage.image_transformations'
-          | 'storage.vector_buckets'
-          | 'storage.iceberg_catalog'
-          | 'storage.purge_cache'
-          | 'security.audit_logs_days'
-          | 'security.questionnaire'
-          | 'security.soc2_report'
-          | 'security.iso27001_certificate'
-          | 'security.private_link'
-          | 'security.enforce_mfa'
-          | 'log.retention_days'
-          | 'custom_domain'
-          | 'vanity_subdomain'
+          | 'instances.read_replicas'
+          | 'integrations.github_connections'
+          | 'integrations.github_push_webhooks_limit'
           | 'ipv4'
-          | 'pitr.available_variants'
+          | 'log.retention_days'
           | 'log_drains'
-          | 'audit_log_drains'
-          | 'branching_limit'
-          | 'branching_persistent'
-          | 'auth.mfa_phone'
-          | 'auth.mfa_web_authn'
-          | 'auth.mfa_enhanced_security'
-          | 'auth.hooks'
-          | 'auth.platform.sso'
-          | 'auth.custom_jwt_template'
-          | 'auth.saml_2'
-          | 'auth.user_sessions'
-          | 'auth.leaked_password_protection'
-          | 'auth.advanced_auth_settings'
-          | 'auth.performance_settings'
-          | 'auth.password_hibp'
-          | 'auth.custom_oauth.max_providers'
-          | 'backup.retention_days'
-          | 'backup.restore_to_new_project'
-          | 'backup.schedule'
-          | 'function.max_count'
-          | 'function.size_limit_mb'
+          | 'observability.dashboard_advanced_metrics'
+          | 'pitr.available_variants'
+          | 'project_cloning'
+          | 'project_pausing'
+          | 'project_restore_after_expiry'
+          | 'project_scoped_roles'
+          | 'realtime.max_bytes_per_second'
+          | 'realtime.max_channels_per_client'
           | 'realtime.max_concurrent_users'
           | 'realtime.max_events_per_second'
           | 'realtime.max_joins_per_second'
-          | 'realtime.max_channels_per_client'
-          | 'realtime.max_bytes_per_second'
-          | 'realtime.max_presence_events_per_second'
           | 'realtime.max_payload_size_in_kb'
-          | 'project_scoped_roles'
+          | 'realtime.max_presence_events_per_second'
+          | 'replication.etl'
+          | 'security.audit_logs_days'
+          | 'security.enforce_mfa'
+          | 'security.iso27001_certificate'
           | 'security.member_roles'
-          | 'project_pausing'
-          | 'project_cloning'
-          | 'project_restore_after_expiry'
-          | 'assistant.advance_model'
-          | 'integrations.github_connections'
-          | 'integrations.github_push_webhooks_limit'
-          | 'dedicated_pooler'
-          | 'observability.dashboard_advanced_metrics'
-          | 'api.members.invitations'
-          | 'api.members.roles'
+          | 'security.private_link'
+          | 'security.questionnaire'
+          | 'security.soc2_report'
+          | 'storage.iceberg_catalog'
+          | 'storage.image_transformations'
+          | 'storage.max_file_size'
+          | 'storage.max_file_size.configurable'
+          | 'storage.purge_cache'
+          | 'storage.vector_buckets'
+          | 'vanity_subdomain'
       }
       header?: never
       path?: never
@@ -23821,7 +24222,7 @@ export interface operations {
         /** @description Search projects by name */
         search?: string
         /** @description Sort order for projects */
-        sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
+        sort?: 'created_asc' | 'created_desc' | 'name_asc' | 'name_desc'
       }
       header?: never
       path?: never
@@ -24083,7 +24484,7 @@ export interface operations {
   AuthMetricsController_getAuthMetrics: {
     parameters: {
       query: {
-        interval: '15min' | '1hr' | '3hr' | '1day' | '3day' | '7day'
+        interval: '15min' | '1day' | '1hr' | '3day' | '3hr' | '7day'
       }
       header?: never
       path: {
@@ -24136,7 +24537,7 @@ export interface operations {
     parameters: {
       query: {
         function_id: string
-        interval: '15min' | '1hr' | '3hr' | '1day'
+        interval: '15min' | '1day' | '1hr' | '3hr'
       }
       header?: never
       path: {
@@ -24189,7 +24590,7 @@ export interface operations {
     parameters: {
       query: {
         function_id: string
-        interval: '15min' | '1hr' | '3hr' | '1day'
+        interval: '15min' | '1day' | '1hr' | '3hr'
       }
       header?: never
       path: {
@@ -24242,7 +24643,7 @@ export interface operations {
     parameters: {
       query: {
         function_id: string
-        interval: '15min' | '1hr' | '3hr' | '1day'
+        interval: '15min' | '1day' | '1hr' | '3hr'
       }
       header?: never
       path: {
@@ -24621,7 +25022,7 @@ export interface operations {
   ProjectMetricsController_getProjectMetrics: {
     parameters: {
       query: {
-        interval: '15min' | '1hr' | '3hr' | '1day' | '3day' | '7day'
+        interval: '15min' | '1day' | '1hr' | '3day' | '3hr' | '7day'
       }
       header?: never
       path: {
@@ -24673,7 +25074,7 @@ export interface operations {
   ProjectMetricsOtelController_getProjectMetricsOtel: {
     parameters: {
       query: {
-        interval: '15min' | '1hr' | '3hr' | '1day' | '3day' | '7day'
+        interval: '15min' | '1day' | '1hr' | '3day' | '3hr' | '7day'
       }
       header?: never
       path: {
@@ -24781,7 +25182,7 @@ export interface operations {
   UsageApiController_getApiCounts: {
     parameters: {
       query?: {
-        interval?: '15min' | '30min' | '1hr' | '3hr' | '1day' | '3day' | '7day'
+        interval?: '15min' | '1day' | '1hr' | '30min' | '3day' | '3hr' | '7day'
       }
       header?: never
       path: {
@@ -25526,33 +25927,33 @@ export interface operations {
       header?: never
       path: {
         addon_variant:
-          | 'ci_micro'
-          | 'ci_small'
-          | 'ci_medium'
-          | 'ci_large'
-          | 'ci_xlarge'
-          | 'ci_2xlarge'
-          | 'ci_4xlarge'
-          | 'ci_8xlarge'
+          | 'auth_mfa_phone_default'
+          | 'auth_mfa_web_authn_default'
+          | 'cd_default'
           | 'ci_12xlarge'
           | 'ci_16xlarge'
           | 'ci_24xlarge'
+          | 'ci_24xlarge_high_memory'
           | 'ci_24xlarge_optimized_cpu'
           | 'ci_24xlarge_optimized_memory'
-          | 'ci_24xlarge_high_memory'
+          | 'ci_2xlarge'
           | 'ci_48xlarge'
+          | 'ci_48xlarge_high_memory'
           | 'ci_48xlarge_optimized_cpu'
           | 'ci_48xlarge_optimized_memory'
-          | 'ci_48xlarge_high_memory'
-          | 'cd_default'
-          | 'pitr_7'
+          | 'ci_4xlarge'
+          | 'ci_8xlarge'
+          | 'ci_large'
+          | 'ci_medium'
+          | 'ci_micro'
+          | 'ci_small'
+          | 'ci_xlarge'
+          | 'etl_pipeline_default'
+          | 'ipv4_default'
+          | 'log_drain_default'
           | 'pitr_14'
           | 'pitr_28'
-          | 'ipv4_default'
-          | 'auth_mfa_phone_default'
-          | 'auth_mfa_web_authn_default'
-          | 'log_drain_default'
-          | 'etl_pipeline_default'
+          | 'pitr_7'
         /** @description Project ref */
         ref: string
       }
@@ -26262,9 +26663,9 @@ export interface operations {
         favorite?: string
         limit?: string
         name?: string
-        sort_by?: 'name' | 'inserted_at'
+        sort_by?: 'inserted_at' | 'name'
         sort_order?: 'asc' | 'desc'
-        type?: 'sql' | 'report' | 'log_sql' | 'notebook'
+        type?: 'log_sql' | 'notebook' | 'report' | 'sql'
         visibility?: string
       }
       header?: never
@@ -26422,7 +26823,7 @@ export interface operations {
     parameters: {
       query?: {
         name?: string
-        type?: 'sql' | 'report' | 'log_sql' | 'notebook'
+        type?: 'log_sql' | 'notebook' | 'report' | 'sql'
       }
       header?: never
       path: {
@@ -26477,9 +26878,9 @@ export interface operations {
         cursor?: string
         limit?: string
         name?: string
-        sort_by?: 'name' | 'inserted_at'
+        sort_by?: 'inserted_at' | 'name'
         sort_order?: 'asc' | 'desc'
-        type?: 'sql' | 'report' | 'log_sql' | 'notebook'
+        type?: 'log_sql' | 'notebook' | 'report' | 'sql'
         visibility?: string
       }
       header?: never
@@ -26636,7 +27037,7 @@ export interface operations {
         cursor?: string
         limit?: string
         name?: string
-        sort_by?: 'name' | 'inserted_at'
+        sort_by?: 'inserted_at' | 'name'
         sort_order?: 'asc' | 'desc'
       }
       header?: never
@@ -26797,26 +27198,26 @@ export interface operations {
     parameters: {
       query: {
         attribute:
-          | 'total_realtime_requests'
-          | 'total_realtime_egress'
-          | 'total_egress'
-          | 'total_cached_egress'
-          | 'total_requests'
-          | 'total_delete_requests'
-          | 'total_supavisor_egress_bytes'
-          | 'total_rest_egress'
-          | 'total_rest_requests'
           | 'total_auth_billing_period_mau'
           | 'total_auth_billing_period_sso_mau'
           | 'total_auth_egress'
           | 'total_auth_requests'
-          | 'total_storage_ingress'
+          | 'total_cached_egress'
+          | 'total_delete_requests'
+          | 'total_egress'
+          | 'total_func_cpu_time_ms'
+          | 'total_func_invocations'
+          | 'total_logdrain_egress'
+          | 'total_realtime_egress'
+          | 'total_realtime_requests'
+          | 'total_requests'
+          | 'total_rest_egress'
+          | 'total_rest_requests'
           | 'total_storage_egress'
           | 'total_storage_image_render_count'
+          | 'total_storage_ingress'
           | 'total_storage_requests'
-          | 'total_logdrain_egress'
-          | 'total_func_invocations'
-          | 'total_func_cpu_time_ms'
+          | 'total_supavisor_egress_bytes'
         endDate: string
         startDate: string
       }
@@ -27270,128 +27671,128 @@ export interface operations {
     parameters: {
       query: {
         attribute?:
+          | 'avg_cpu_usage'
+          | 'client_connections_authenticator'
+          | 'client_connections_other'
+          | 'client_connections_pgbouncer'
+          | 'client_connections_postgres'
+          | 'client_connections_supabase_admin'
+          | 'client_connections_supabase_auth_admin'
+          | 'client_connections_supabase_storage_admin'
           | 'cpu_usage'
-          | 'cpu_usage_busy_system'
-          | 'cpu_usage_busy_user'
+          | 'cpu_usage_busy_idle'
           | 'cpu_usage_busy_iowait'
           | 'cpu_usage_busy_irqs'
           | 'cpu_usage_busy_other'
-          | 'cpu_usage_busy_idle'
-          | 'max_cpu_usage'
-          | 'avg_cpu_usage'
-          | 'ram_usage'
-          | 'ram_usage_total'
-          | 'ram_usage_available'
-          | 'ram_usage_used'
-          | 'ram_usage_free'
-          | 'ram_usage_cache_and_buffers'
-          | 'ram_usage_swap'
-          | 'ram_commit_used'
-          | 'ram_commit_limit'
-          | 'swap_usage'
-          | 'client_connections_pgbouncer'
-          | 'network_receive_bytes'
-          | 'network_transmit_bytes'
-          | 'pgbouncer_pools_client_active_connections'
-          | 'supavisor_connections_active'
-          | 'client_connections_postgres'
-          | 'client_connections_authenticator'
-          | 'client_connections_supabase_auth_admin'
-          | 'client_connections_supabase_storage_admin'
-          | 'client_connections_supabase_admin'
-          | 'client_connections_other'
-          | 'realtime_connections_connected'
-          | 'realtime_channel_joins'
-          | 'realtime_channel_events'
-          | 'realtime_channel_presence_events'
-          | 'realtime_channel_db_events'
-          | 'realtime_authorization_rls_execution_time'
-          | 'realtime_read_authorization_rls_execution_time'
-          | 'realtime_write_authorization_rls_execution_time'
-          | 'realtime_payload_size'
-          | 'realtime_replication_connection_lag'
-          | 'realtime_sum_connections_connected'
+          | 'cpu_usage_busy_system'
+          | 'cpu_usage_busy_user'
+          | 'disk_bytes_read'
+          | 'disk_bytes_written'
+          | 'disk_fs_avail'
+          | 'disk_fs_size'
+          | 'disk_fs_used'
+          | 'disk_fs_used_system'
+          | 'disk_fs_used_wal'
           | 'disk_io_budget'
           | 'disk_io_consumption'
           | 'disk_io_usage'
           | 'disk_iops_read'
           | 'disk_iops_write'
-          | 'disk_bytes_read'
-          | 'disk_bytes_written'
-          | 'pg_database_size'
-          | 'disk_fs_size'
-          | 'disk_fs_avail'
-          | 'disk_fs_used'
-          | 'disk_fs_used_wal'
-          | 'disk_fs_used_system'
-          | 'physical_replication_lag_physical_replication_lag_seconds'
-          | 'pg_stat_database_num_backends'
+          | 'max_cpu_usage'
           | 'max_db_connections'
+          | 'network_receive_bytes'
+          | 'network_transmit_bytes'
+          | 'pg_database_size'
+          | 'pg_stat_database_num_backends'
+          | 'pgbouncer_pools_client_active_connections'
+          | 'physical_replication_lag_physical_replication_lag_seconds'
+          | 'ram_commit_limit'
+          | 'ram_commit_used'
+          | 'ram_usage'
+          | 'ram_usage_available'
+          | 'ram_usage_cache_and_buffers'
+          | 'ram_usage_free'
+          | 'ram_usage_swap'
+          | 'ram_usage_total'
+          | 'ram_usage_used'
+          | 'realtime_authorization_rls_execution_time'
+          | 'realtime_channel_db_events'
+          | 'realtime_channel_events'
+          | 'realtime_channel_joins'
+          | 'realtime_channel_presence_events'
+          | 'realtime_connections_connected'
+          | 'realtime_payload_size'
+          | 'realtime_read_authorization_rls_execution_time'
+          | 'realtime_replication_connection_lag'
+          | 'realtime_sum_connections_connected'
+          | 'realtime_write_authorization_rls_execution_time'
+          | 'supavisor_connections_active'
+          | 'swap_usage'
         /** @description Comma-separated list of enums or array of enums. */
         attributes?:
           | string
           | (
+              | 'avg_cpu_usage'
+              | 'client_connections_authenticator'
+              | 'client_connections_other'
+              | 'client_connections_pgbouncer'
+              | 'client_connections_postgres'
+              | 'client_connections_supabase_admin'
+              | 'client_connections_supabase_auth_admin'
+              | 'client_connections_supabase_storage_admin'
               | 'cpu_usage'
-              | 'cpu_usage_busy_system'
-              | 'cpu_usage_busy_user'
+              | 'cpu_usage_busy_idle'
               | 'cpu_usage_busy_iowait'
               | 'cpu_usage_busy_irqs'
               | 'cpu_usage_busy_other'
-              | 'cpu_usage_busy_idle'
-              | 'max_cpu_usage'
-              | 'avg_cpu_usage'
-              | 'ram_usage'
-              | 'ram_usage_total'
-              | 'ram_usage_available'
-              | 'ram_usage_used'
-              | 'ram_usage_free'
-              | 'ram_usage_cache_and_buffers'
-              | 'ram_usage_swap'
-              | 'ram_commit_used'
-              | 'ram_commit_limit'
-              | 'swap_usage'
-              | 'client_connections_pgbouncer'
-              | 'network_receive_bytes'
-              | 'network_transmit_bytes'
-              | 'pgbouncer_pools_client_active_connections'
-              | 'supavisor_connections_active'
-              | 'client_connections_postgres'
-              | 'client_connections_authenticator'
-              | 'client_connections_supabase_auth_admin'
-              | 'client_connections_supabase_storage_admin'
-              | 'client_connections_supabase_admin'
-              | 'client_connections_other'
-              | 'realtime_connections_connected'
-              | 'realtime_channel_joins'
-              | 'realtime_channel_events'
-              | 'realtime_channel_presence_events'
-              | 'realtime_channel_db_events'
-              | 'realtime_authorization_rls_execution_time'
-              | 'realtime_read_authorization_rls_execution_time'
-              | 'realtime_write_authorization_rls_execution_time'
-              | 'realtime_payload_size'
-              | 'realtime_replication_connection_lag'
-              | 'realtime_sum_connections_connected'
+              | 'cpu_usage_busy_system'
+              | 'cpu_usage_busy_user'
+              | 'disk_bytes_read'
+              | 'disk_bytes_written'
+              | 'disk_fs_avail'
+              | 'disk_fs_size'
+              | 'disk_fs_used'
+              | 'disk_fs_used_system'
+              | 'disk_fs_used_wal'
               | 'disk_io_budget'
               | 'disk_io_consumption'
               | 'disk_io_usage'
               | 'disk_iops_read'
               | 'disk_iops_write'
-              | 'disk_bytes_read'
-              | 'disk_bytes_written'
-              | 'pg_database_size'
-              | 'disk_fs_size'
-              | 'disk_fs_avail'
-              | 'disk_fs_used'
-              | 'disk_fs_used_wal'
-              | 'disk_fs_used_system'
-              | 'physical_replication_lag_physical_replication_lag_seconds'
-              | 'pg_stat_database_num_backends'
+              | 'max_cpu_usage'
               | 'max_db_connections'
+              | 'network_receive_bytes'
+              | 'network_transmit_bytes'
+              | 'pg_database_size'
+              | 'pg_stat_database_num_backends'
+              | 'pgbouncer_pools_client_active_connections'
+              | 'physical_replication_lag_physical_replication_lag_seconds'
+              | 'ram_commit_limit'
+              | 'ram_commit_used'
+              | 'ram_usage'
+              | 'ram_usage_available'
+              | 'ram_usage_cache_and_buffers'
+              | 'ram_usage_free'
+              | 'ram_usage_swap'
+              | 'ram_usage_total'
+              | 'ram_usage_used'
+              | 'realtime_authorization_rls_execution_time'
+              | 'realtime_channel_db_events'
+              | 'realtime_channel_events'
+              | 'realtime_channel_joins'
+              | 'realtime_channel_presence_events'
+              | 'realtime_connections_connected'
+              | 'realtime_payload_size'
+              | 'realtime_read_authorization_rls_execution_time'
+              | 'realtime_replication_connection_lag'
+              | 'realtime_sum_connections_connected'
+              | 'realtime_write_authorization_rls_execution_time'
+              | 'supavisor_connections_active'
+              | 'swap_usage'
             )[]
         databaseIdentifier?: string
         endDate: string
-        interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
+        interval?: '10m' | '1d' | '1h' | '1m' | '30m' | '5m'
         startDate: string
       }
       header?: never
@@ -28704,24 +29105,24 @@ export interface operations {
       query: {
         cloud_provider: 'AWS' | 'AWS_K8S' | 'AWS_NIMBUS'
         desired_instance_size?:
-          | 'micro'
-          | 'small'
-          | 'medium'
-          | 'large'
-          | 'xlarge'
-          | '2xlarge'
-          | '4xlarge'
-          | '8xlarge'
           | '12xlarge'
           | '16xlarge'
           | '24xlarge'
-          | '24xlarge_optimized_memory'
-          | '24xlarge_optimized_cpu'
           | '24xlarge_high_memory'
+          | '24xlarge_optimized_cpu'
+          | '24xlarge_optimized_memory'
+          | '2xlarge'
           | '48xlarge'
-          | '48xlarge_optimized_memory'
-          | '48xlarge_optimized_cpu'
           | '48xlarge_high_memory'
+          | '48xlarge_optimized_cpu'
+          | '48xlarge_optimized_memory'
+          | '4xlarge'
+          | '8xlarge'
+          | 'large'
+          | 'medium'
+          | 'micro'
+          | 'small'
+          | 'xlarge'
         organization_slug: string
       }
       header?: never
@@ -28740,7 +29141,7 @@ export interface operations {
       }
     }
   }
-  ReplicationDestinationsController_getDestinations: {
+  DestinationsController_getDestinations: {
     parameters: {
       query?: never
       header?: never
@@ -28758,7 +29159,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ReplicationDestinationsResponse']
+          'application/json': components['schemas']['DestinationsResponse']
         }
       }
       /** @description Unauthorized */
@@ -28791,7 +29192,7 @@ export interface operations {
       }
     }
   }
-  ReplicationDestinationsController_createDestination: {
+  DestinationsController_createDestination: {
     parameters: {
       query?: never
       header?: never
@@ -28803,7 +29204,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateReplicationDestinationBody']
+        'application/json': components['schemas']['CreateDestinationBody']
       }
     }
     responses: {
@@ -28855,7 +29256,7 @@ export interface operations {
       }
     }
   }
-  ReplicationDestinationsPipelinesController_createDestinationPipeline: {
+  DestinationsPipelinesController_createDestinationPipeline: {
     parameters: {
       query?: never
       header?: never
@@ -28919,7 +29320,7 @@ export interface operations {
       }
     }
   }
-  ReplicationDestinationsPipelinesController_updateDestinationPipeline: {
+  DestinationsPipelinesController_updateDestinationPipeline: {
     parameters: {
       query?: never
       header?: never
@@ -28985,7 +29386,7 @@ export interface operations {
       }
     }
   }
-  ReplicationDestinationsPipelinesController_deleteDestinationPipeline: {
+  DestinationsPipelinesController_deleteDestinationPipeline: {
     parameters: {
       query?: never
       header?: never
@@ -29063,7 +29464,7 @@ export interface operations {
       }
     }
   }
-  ReplicationDestinationsController_getDestination: {
+  DestinationsController_getDestination: {
     parameters: {
       query?: never
       header?: never
@@ -29083,7 +29484,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ReplicationDestinationResponse']
+          'application/json': components['schemas']['DestinationResponse']
         }
       }
       /** @description Unauthorized */
@@ -29116,7 +29517,7 @@ export interface operations {
       }
     }
   }
-  ReplicationDestinationsController_updateDestination: {
+  DestinationsController_updateDestination: {
     parameters: {
       query?: never
       header?: never
@@ -29130,7 +29531,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateReplicationDestinationBody']
+        'application/json': components['schemas']['UpdateDestinationBody']
       }
     }
     responses: {
@@ -29180,7 +29581,7 @@ export interface operations {
       }
     }
   }
-  ReplicationDestinationsController_deleteDestination: {
+  DestinationsController_deleteDestination: {
     parameters: {
       query?: never
       header?: never
@@ -29254,7 +29655,7 @@ export interface operations {
       }
     }
   }
-  ReplicationDestinationsController_validateDestination: {
+  DestinationsController_validateDestination: {
     parameters: {
       query?: never
       header?: never
@@ -29266,7 +29667,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['ValidateReplicationDestinationBody']
+        'application/json': components['schemas']['ValidateDestinationBody']
       }
     }
     responses: {
@@ -29309,7 +29710,7 @@ export interface operations {
       }
     }
   }
-  ReplicationPipelinesController_getPipelines: {
+  PipelinesController_getPipelines: {
     parameters: {
       query?: never
       header?: never
@@ -29327,7 +29728,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ReplicationPipelinesResponse']
+          'application/json': components['schemas']['PipelinesResponse']
         }
       }
       /** @description Unauthorized */
@@ -29360,7 +29761,7 @@ export interface operations {
       }
     }
   }
-  ReplicationPipelinesController_createPipeline: {
+  PipelinesController_createPipeline: {
     parameters: {
       query?: never
       header?: never
@@ -29372,7 +29773,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateReplicationPipelineBody']
+        'application/json': components['schemas']['CreatePipelineBody']
       }
     }
     responses: {
@@ -29424,7 +29825,7 @@ export interface operations {
       }
     }
   }
-  ReplicationPipelinesController_getPipeline: {
+  PipelinesController_getPipeline: {
     parameters: {
       query?: never
       header?: never
@@ -29444,7 +29845,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ReplicationPipelineResponse']
+          'application/json': components['schemas']['PipelineResponse']
         }
       }
       /** @description Unauthorized */
@@ -29477,7 +29878,7 @@ export interface operations {
       }
     }
   }
-  ReplicationPipelinesController_updatePipeline: {
+  PipelinesController_updatePipeline: {
     parameters: {
       query?: never
       header?: never
@@ -29491,7 +29892,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateReplicationPipelineBody']
+        'application/json': components['schemas']['UpdatePipelineBody']
       }
     }
     responses: {
@@ -29541,7 +29942,7 @@ export interface operations {
       }
     }
   }
-  ReplicationPipelinesController_deletePipeline: {
+  PipelinesController_deletePipeline: {
     parameters: {
       query?: never
       header?: never
@@ -29615,7 +30016,7 @@ export interface operations {
       }
     }
   }
-  ReplicationPipelinesController_getPipelineReplicationStatus: {
+  PipelinesController_getPipelineReplicationStatus: {
     parameters: {
       query?: never
       header?: never
@@ -29635,7 +30036,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ReplicationPipelineReplicationStatusResponse']
+          'application/json': components['schemas']['PipelineReplicationStatusResponse']
         }
       }
       /** @description Unauthorized */
@@ -29668,7 +30069,7 @@ export interface operations {
       }
     }
   }
-  ReplicationPipelinesController_restartPipeline: {
+  PipelinesController_restartPipeline: {
     parameters: {
       query?: never
       header?: never
@@ -29735,7 +30136,7 @@ export interface operations {
       }
     }
   }
-  ReplicationPipelinesController_rollbackTables: {
+  PipelinesController_rollbackTables: {
     parameters: {
       query?: never
       header?: never
@@ -29801,7 +30202,7 @@ export interface operations {
       }
     }
   }
-  ReplicationPipelinesController_startPipeline: {
+  PipelinesController_startPipeline: {
     parameters: {
       query?: never
       header?: never
@@ -29861,7 +30262,7 @@ export interface operations {
       }
     }
   }
-  ReplicationPipelinesController_getPipelineStatus: {
+  PipelinesController_getPipelineStatus: {
     parameters: {
       query?: never
       header?: never
@@ -29881,7 +30282,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ReplicationPipelineStatusResponse']
+          'application/json': components['schemas']['PipelineStatusResponse']
         }
       }
       /** @description Unauthorized */
@@ -29914,7 +30315,7 @@ export interface operations {
       }
     }
   }
-  ReplicationPipelinesController_stopPipeline: {
+  PipelinesController_stopPipeline: {
     parameters: {
       query?: never
       header?: never
@@ -29974,7 +30375,7 @@ export interface operations {
       }
     }
   }
-  ReplicationPipelinesController_getPipelineVersion: {
+  PipelinesController_getPipelineVersion: {
     parameters: {
       query?: never
       header?: never
@@ -29994,7 +30395,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ReplicationPipelineVersionResponse']
+          'application/json': components['schemas']['PipelineVersionResponse']
         }
       }
       /** @description Unauthorized */
@@ -30027,7 +30428,7 @@ export interface operations {
       }
     }
   }
-  ReplicationPipelinesController_updatePipelineVersion: {
+  PipelinesController_updatePipelineVersion: {
     parameters: {
       query?: never
       header?: never
@@ -30041,7 +30442,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateReplicationPipelineVersionBody']
+        'application/json': components['schemas']['UpdatePipelineVersionBody']
       }
     }
     responses: {
@@ -30091,7 +30492,7 @@ export interface operations {
       }
     }
   }
-  ReplicationPipelinesController_validatePipeline: {
+  PipelinesController_validatePipeline: {
     parameters: {
       query?: never
       header?: never
@@ -30103,7 +30504,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['ValidateReplicationPipelineBody']
+        'application/json': components['schemas']['ValidatePipelineBody']
       }
     }
     responses: {
@@ -30146,7 +30547,7 @@ export interface operations {
       }
     }
   }
-  ReplicationSourcesController_getSources: {
+  SourcesController_getSources: {
     parameters: {
       query?: never
       header?: never
@@ -30164,7 +30565,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ReplicationSourcesResponse']
+          'application/json': components['schemas']['SourcesResponse']
         }
       }
       /** @description Unauthorized */
@@ -30197,7 +30598,7 @@ export interface operations {
       }
     }
   }
-  ReplicationSourcesController_createSource: {
+  SourcesController_createSource: {
     parameters: {
       query?: never
       header?: never
@@ -30257,7 +30658,7 @@ export interface operations {
       }
     }
   }
-  ReplicationSourcesController_getPublications: {
+  SourcesController_getPublications: {
     parameters: {
       query?: never
       header?: never
@@ -30277,7 +30678,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ReplicationPublicationsResponse']
+          'application/json': components['schemas']['PublicationsResponse']
         }
       }
       /** @description Unauthorized */
@@ -30310,7 +30711,7 @@ export interface operations {
       }
     }
   }
-  ReplicationSourcesController_createPublication: {
+  SourcesController_createPublication: {
     parameters: {
       query?: never
       header?: never
@@ -30324,7 +30725,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateReplicationPublicationBody']
+        'application/json': components['schemas']['CreatePublicationBody']
       }
     }
     responses: {
@@ -30374,7 +30775,7 @@ export interface operations {
       }
     }
   }
-  ReplicationSourcesController_updatePublication: {
+  SourcesController_updatePublication: {
     parameters: {
       query?: never
       header?: never
@@ -30390,7 +30791,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateReplicationPublicationBody']
+        'application/json': components['schemas']['UpdatePublicationBody']
       }
     }
     responses: {
@@ -30440,7 +30841,7 @@ export interface operations {
       }
     }
   }
-  ReplicationSourcesController_deletePublication: {
+  SourcesController_deletePublication: {
     parameters: {
       query?: never
       header?: never
@@ -30509,7 +30910,7 @@ export interface operations {
       }
     }
   }
-  ReplicationSourcesController_getCostEstimate: {
+  SourcesController_getCostEstimate: {
     parameters: {
       query?: never
       header?: never
@@ -30564,7 +30965,7 @@ export interface operations {
       }
     }
   }
-  ReplicationSourcesController_getTables: {
+  SourcesController_getTables: {
     parameters: {
       query?: never
       header?: never
@@ -30584,7 +30985,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ReplicationTablesResponse']
+          'application/json': components['schemas']['TablesResponse']
         }
       }
       /** @description Unauthorized */
@@ -30617,7 +31018,7 @@ export interface operations {
       }
     }
   }
-  ReplicationTenantsController_deleteTenant: {
+  TenantsController_deleteTenant: {
     parameters: {
       query?: never
       header?: never
@@ -30689,7 +31090,7 @@ export interface operations {
       }
     }
   }
-  ReplicationTenantsSourcesController_createTenantSource: {
+  TenantsSourcesController_createTenantSource: {
     parameters: {
       query?: never
       header?: never
@@ -30749,7 +31150,7 @@ export interface operations {
       }
     }
   }
-  ReplicationSourcesV2Controller_getPublications: {
+  V2SourcesController_getPublications: {
     parameters: {
       query?: never
       header?: never
@@ -30769,7 +31170,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ReadPublicationsV2Response']
+          'application/json': components['schemas']['ReadPublicationsResponse']
         }
       }
       /** @description Unauthorized */
@@ -30802,7 +31203,7 @@ export interface operations {
       }
     }
   }
-  ReplicationSourcesV2Controller_getPublication: {
+  V2SourcesController_getPublication: {
     parameters: {
       query?: never
       header?: never
@@ -30864,7 +31265,7 @@ export interface operations {
       }
     }
   }
-  ReplicationSourcesV2Controller_putPublication: {
+  V2SourcesController_putPublication: {
     parameters: {
       query?: never
       header?: never
@@ -30932,7 +31333,7 @@ export interface operations {
       }
     }
   }
-  ReplicationSourcesV2Controller_deletePublication: {
+  V2SourcesController_deletePublication: {
     parameters: {
       query?: never
       header?: never
@@ -31001,7 +31402,7 @@ export interface operations {
       }
     }
   }
-  ReplicationSourcesV2Controller_getTables: {
+  V2SourcesController_getTables: {
     parameters: {
       query?: never
       header?: never
@@ -31021,7 +31422,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ReadTablesV2Response']
+          'application/json': components['schemas']['ReadTablesResponse']
         }
       }
       /** @description Unauthorized */
@@ -31054,7 +31455,7 @@ export interface operations {
       }
     }
   }
-  ReplicationSourcesV2Controller_getTableColumns: {
+  V2SourcesController_getTableColumns: {
     parameters: {
       query?: never
       header?: never
@@ -31192,7 +31593,7 @@ export interface operations {
         /** @description Search buckets by name */
         search?: string
         /** @description Sort column for buckets */
-        sortColumn?: 'name' | 'created_at' | 'updated_at'
+        sortColumn?: 'created_at' | 'name' | 'updated_at'
         /** @description Sort order for buckets */
         sortOrder?: 'asc' | 'desc'
       }
@@ -31779,7 +32180,7 @@ export interface operations {
         limit?: number
         offset?: number
         search?: string
-        sortColumn?: 'id' | 'name' | 'updated_at' | 'created_at'
+        sortColumn?: 'created_at' | 'id' | 'name' | 'updated_at'
         sortOrder?: 'asc' | 'desc'
       }
       header?: never

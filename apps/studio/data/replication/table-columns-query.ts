@@ -15,7 +15,7 @@ async function fetchReplicationTableColumns(
   if (tableId === undefined) throw new Error('tableId is required')
 
   const { data, error } = await get(
-    '/platform/replication/{ref}/v2/sources/{source_id}/tables/{table_id}/columns',
+    '/platform/replication/v2/{ref}/sources/{source_id}/tables/{table_id}/columns',
     {
       params: { path: { ref: projectRef, source_id: sourceId, table_id: tableId } },
       signal,

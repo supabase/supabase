@@ -8,7 +8,7 @@ import type { ResponseError, UseCustomQueryOptions } from '@/types'
 type ReplicationPipelineReplicationStatusParams = { projectRef?: string; pipelineId?: number }
 
 export type ReplicationPipelineTableStatus =
-  components['schemas']['ReplicationPipelineReplicationStatusResponse']['table_statuses'][number]
+  components['schemas']['PipelineReplicationStatusResponse']['table_statuses'][number]
 
 async function fetchReplicationPipelineReplicationStatus(
   { projectRef, pipelineId }: ReplicationPipelineReplicationStatusParams,
