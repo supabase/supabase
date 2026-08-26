@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 
 import { MD_CONTENT } from '../content.generated'
 import { generatePricingContent } from '@/lib/llms'
-import { buildMarkdown404Body, MARKDOWN_404_HEADERS } from '@/lib/markdown-404'
 
 // Static .md files are bundled at build time, so they're safe to cache at the
 // edge for a day. Without s-maxage Vercel's CDN won't cache the response and
@@ -33,10 +32,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ slu
 
   const content = MD_CONTENT.get(slugPath)
   if (!content) {
-    return new NextResponse(buildMarkdown404Body(`/${slugPath}.md`), {
-      status: 404,
-      headers: MARKDOWN_404_HEADERS,
-    })
+    return new NextResponse('Not found', { status: 404 })
   }
 
   return new NextResponse(content, { headers: STATIC_HEADERS })
