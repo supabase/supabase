@@ -1,0 +1,7 @@
+@import 'config/tailwind.config.css';
+
+@source '../pages/**/*.astro';
+@source '../components/**/*.{astro,tsx}';
+@source '../layouts/**/*.astro';
+@source './../../../packages/ui/src/**/*.{tsx,ts,js}';
+@source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
