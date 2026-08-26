@@ -378,6 +378,7 @@ function createMockNotebookStore() {
   return {
     list: () => [...notebooks.values()],
     get: (id: string) => notebooks.get(id),
+    delete: (id: string) => notebooks.delete(id),
     create: ({
       name,
       description,
@@ -426,13 +427,20 @@ const MOCK_DATABASES_DATA = [
   },
 ]
 
-// All five notebook tools are real, locally-defined ai-SDK tools, so wrap them and
+// All notebook tools are real, locally-defined ai-SDK tools, so wrap them and
 // override only execute/needsApproval — evals must validate the model's arguments
 // against the exact schemas production uses (agentCellSchema's `.strict()` rejection of
 // agent-authored cell ids, update_notebook's real operations schema, etc).
 function createMockNotebookTools(store: MockNotebookStore) {
-  const { list_databases, list_notebooks, get_notebook, create_notebook, update_notebook } =
-    getNotebookTools()
+  const {
+    list_databases,
+    list_notebooks,
+    get_notebook,
+    run_notebook,
+    create_notebook,
+    update_notebook,
+    delete_notebook,
+  } = getNotebookTools({ aiOptInLevel: 'schema_and_log_and_data' })
 
   return {
     list_databases: {
@@ -475,6 +483,38 @@ function createMockNotebookTools(store: MockNotebookStore) {
           visibility: notebook.visibility,
           updated_at: notebook.updated_at,
           cells: notebook.content.cells,
+        }
+      },
+    },
+    run_notebook: {
+      ...run_notebook,
+      // The eval harness cannot answer approval gates. Nothing executes here; return a
+      // deterministic empty result for each query cell in notebook order.
+      needsApproval: false,
+      execute: async (
+        { id }: { id: string; expected_updated_at: string },
+        _options: ToolExecutionOptions<unknown>
+      ) => {
+        const notebook = store.get(id)
+        if (!notebook) throw new Error(`Notebook ${id} not found.`)
+
+        return {
+          id,
+          name: notebook.name,
+          updated_at: notebook.updated_at,
+          cells: notebook.content.cells.flatMap((cell) =>
+            cell._tag === 'markdown_cell'
+              ? []
+              : [
+                  {
+                    cell_id: cell._id,
+                    title: cell.title?.trim() || 'Untitled query',
+                    source: cell._tag === 'log_cell' ? ('logs' as const) : ('database' as const),
+                    status: 'success' as const,
+                    rows: [],
+                  },
+                ]
+          ),
         }
       },
     },
@@ -524,6 +564,18 @@ function createMockNotebookTools(store: MockNotebookStore) {
         if (!result.success) throw new Error(describeNotebookOperationError(result.error))
 
         store.replaceCells(id, result.notebook.cells)
+        return { id, name: notebook.name }
+      },
+    },
+    delete_notebook: {
+      ...delete_notebook,
+      // Same reasoning as create_notebook's override above.
+      needsApproval: false,
+      execute: async ({ id }: { id: string }, _options: ToolExecutionOptions<unknown>) => {
+        const notebook = store.get(id)
+        if (!notebook) throw new Error(`Notebook ${id} not found.`)
+
+        store.delete(id)
         return { id, name: notebook.name }
       },
     },
