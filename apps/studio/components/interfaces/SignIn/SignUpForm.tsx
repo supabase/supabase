@@ -142,7 +142,7 @@ export const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           'w-full transition-all duration-500',
           isSubmitted
             ? 'max-h-0 overflow-hidden opacity-0 pointer-events-none py-0'
-            : 'max-h-[1000px] opacity-100 py-1'
+            : 'max-h-[1000px] opacity-100'
         )}
       >
         <Form {...form}>
@@ -205,13 +205,16 @@ export const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
               )}
             />
 
-            <div
-              className={`${
-                showConditions ? 'max-h-[500px]' : 'max-h-0'
-              } transition-all duration-400 overflow-y-hidden`}
-            >
-              <PasswordConditionsHelper password={password} />
-            </div>
+            {showConditions && (
+              <motion.div
+                initial={{ maxHeight: '0px' }}
+                animate={{ maxHeight: '500px' }}
+                transition={{ duration: 0.8, delay: 0 }}
+                className="overflow-y-hidden"
+              >
+                <PasswordConditionsHelper password={password} />
+              </motion.div>
+            )}
 
             <div className="self-center">
               <HCaptcha
