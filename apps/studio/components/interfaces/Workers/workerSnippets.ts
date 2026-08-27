@@ -114,7 +114,6 @@ export function buildWorkerCliCommands(name: string): WorkerCliCommand[] {
   const slug = safeName(name)
   return [
     { comment: 'Recreate the source locally', command: `supabase ${CLI_NAME} pull ${slug}` },
-    { comment: 'Run it locally on a port', command: `supabase ${CLI_NAME} serve ${slug}` },
     { comment: 'Deploy a new version', command: `supabase ${CLI_NAME} push ${slug}` },
     { comment: 'Stream logs', command: `supabase ${CLI_NAME} logs ${slug} --follow` },
     { comment: 'Delete the worker', command: `supabase ${CLI_NAME} delete ${slug}` },
