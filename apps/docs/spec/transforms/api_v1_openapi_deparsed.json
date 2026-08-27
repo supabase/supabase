@@ -685,7 +685,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["projects_read"]],
         "x-oauth-scope": "projects:read"
       },
@@ -736,7 +736,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["organization_projects_create"]],
         "x-oauth-scope": "projects:write"
       }
@@ -871,7 +871,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organizations_read"]],
         "x-oauth-scope": "organizations:read"
       },
@@ -919,7 +919,7 @@
         ],
         "summary": "Create an organization",
         "tags": ["Organizations"],
-        "x-endpoint-owners": ["management-api", "billing"],
+        "x-endpoint-owners": ["control-plane", "billing"],
         "x-fga-permissions": [["organizations_create"]]
       }
     },
@@ -1041,7 +1041,7 @@
         },
         "summary": "[Beta] Authorize user through oauth",
         "tags": ["OAuth"],
-        "x-endpoint-owners": ["auth", "management-api"]
+        "x-endpoint-owners": ["auth", "control-plane"]
       }
     },
     "/v1/oauth/token": {
@@ -1073,7 +1073,7 @@
         },
         "summary": "[Beta] Exchange auth code for user's access and refresh token",
         "tags": ["OAuth"],
-        "x-endpoint-owners": ["auth", "management-api"]
+        "x-endpoint-owners": ["auth", "control-plane"]
       }
     },
     "/v1/oauth/revoke": {
@@ -1097,7 +1097,7 @@
         },
         "summary": "[Beta] Revoke oauth app authorization and it's corresponding tokens",
         "tags": ["OAuth"],
-        "x-endpoint-owners": ["auth", "management-api"]
+        "x-endpoint-owners": ["auth", "control-plane"]
       }
     },
     "/v1/oauth/authorize/project-claim": {
@@ -1207,7 +1207,7 @@
         ],
         "summary": "Authorize user through oauth and claim a project",
         "tags": ["OAuth"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_write", "project_admin_write"]]
       }
     },
@@ -1302,7 +1302,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["snippets_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -1360,7 +1360,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["snippets_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -1388,7 +1388,7 @@
         ],
         "summary": "Gets the user's profile",
         "tags": ["Profile"],
-        "x-endpoint-owners": ["management-api"]
+        "x-endpoint-owners": ["control-plane"]
       }
     },
     "/v1/projects/{ref}/actions": {
@@ -1821,7 +1821,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["auth", "management-api"],
+        "x-endpoint-owners": ["auth", "control-plane"],
         "x-fga-permissions": [["api_gateway_keys_read"]],
         "x-oauth-scope": "secrets:read"
       },
@@ -1896,7 +1896,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["auth", "management-api"],
+        "x-endpoint-owners": ["auth", "control-plane"],
         "x-fga-permissions": [["api_gateway_keys_write"]],
         "x-oauth-scope": "secrets:write"
       }
@@ -1953,7 +1953,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["auth", "management-api"],
+        "x-endpoint-owners": ["auth", "control-plane"],
         "x-fga-permissions": [["api_gateway_keys_read"]],
         "x-oauth-scope": "secrets:read"
       },
@@ -2018,7 +2018,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["auth", "management-api"],
+        "x-endpoint-owners": ["auth", "control-plane"],
         "x-fga-permissions": [["api_gateway_keys_write"]],
         "x-oauth-scope": "secrets:write"
       }
@@ -2106,7 +2106,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["auth", "management-api"],
+        "x-endpoint-owners": ["auth", "control-plane"],
         "x-fga-permissions": [["api_gateway_keys_write"]],
         "x-oauth-scope": "secrets:write"
       },
@@ -2182,7 +2182,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["auth", "management-api"],
+        "x-endpoint-owners": ["auth", "control-plane"],
         "x-fga-permissions": [["api_gateway_keys_read"]],
         "x-oauth-scope": "secrets:read"
       },
@@ -2277,7 +2277,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["auth", "management-api"],
+        "x-endpoint-owners": ["auth", "control-plane"],
         "x-fga-permissions": [["api_gateway_keys_write"]],
         "x-oauth-scope": "secrets:write"
       }
@@ -2565,7 +2565,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["custom_domain_read"]],
         "x-oauth-scope": "domains:read"
       },
@@ -2625,7 +2625,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["custom_domain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -2695,7 +2695,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["custom_domain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -2755,7 +2755,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["custom_domain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -2815,7 +2815,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["custom_domain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -2910,7 +2910,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["security", "management-api"],
+        "x-endpoint-owners": ["security", "control-plane"],
         "x-fga-permissions": [["project_admin_read"]],
         "x-oauth-scope": "database:read"
       },
@@ -3013,7 +3013,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["security", "management-api"],
+        "x-endpoint-owners": ["security", "control-plane"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -3073,7 +3073,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["database_network_bans_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -3133,7 +3133,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["database_network_bans_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -3196,7 +3196,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["database_network_bans_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -3256,7 +3256,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_network_restrictions_read"]],
         "x-oauth-scope": "projects:read"
       },
@@ -3324,7 +3324,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_network_restrictions_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -3394,7 +3394,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_network_restrictions_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -3582,7 +3582,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["data_api_config_read"]],
         "x-oauth-scope": "rest:read"
       },
@@ -3650,7 +3650,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["data_api_config_write"]],
         "x-oauth-scope": "rest:write"
       }
@@ -3710,7 +3710,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["project_admin_read"]],
         "x-oauth-scope": "projects:read"
       },
@@ -3765,7 +3765,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra", "dev-workflows"],
+        "x-endpoint-owners": ["control-plane", "infra", "dev-workflows"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "projects:write"
       },
@@ -3833,7 +3833,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -4081,7 +4081,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_ssl_config_read"]],
         "x-oauth-scope": "database:read"
       },
@@ -4149,7 +4149,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_ssl_config_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -4295,7 +4295,7 @@
             "position": "before"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["vanity_subdomain_read"]],
         "x-oauth-scope": "domains:read"
       },
@@ -4346,7 +4346,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["vanity_subdomain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -4431,7 +4431,7 @@
             "position": "before"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["vanity_subdomain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -4516,7 +4516,7 @@
             "position": "before"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["vanity_subdomain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -4586,7 +4586,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_write", "database_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -4646,7 +4646,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_read", "database_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -4715,7 +4715,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_read", "database_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -4775,7 +4775,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra", "support-tooling"],
+        "x-endpoint-owners": ["control-plane", "infra", "support-tooling"],
         "x-fga-permissions": [["database_readonly_config_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -4828,7 +4828,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra", "support-tooling"],
+        "x-endpoint-owners": ["control-plane", "infra", "support-tooling"],
         "x-fga-permissions": [["database_readonly_config_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -4902,7 +4902,7 @@
             "position": "before"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["infra_read_replicas_write"]]
       }
     },
@@ -4958,7 +4958,7 @@
         ],
         "summary": "[Beta] Remove a read replica",
         "tags": ["Database"],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["infra_read_replicas_write"]]
       }
     },
@@ -5065,7 +5065,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -5939,7 +5939,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -5989,7 +5989,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -6046,7 +6046,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_read"]],
         "x-oauth-scope": "projects:read"
       },
@@ -6094,7 +6094,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -6144,7 +6144,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -6396,7 +6396,7 @@
         ],
         "summary": "Gets project claim token",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["project_admin_read"]],
         "x-internal": true
       },
@@ -6445,7 +6445,7 @@
         ],
         "summary": "Creates project claim token",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_write", "project_admin_write"]],
         "x-internal": true
       },
@@ -6487,7 +6487,7 @@
         ],
         "summary": "Revokes project claim token",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_write", "project_admin_write"]],
         "x-internal": true
       }
@@ -6546,7 +6546,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["advisors_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -6615,7 +6615,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["advisors_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -6623,7 +6623,7 @@
     "/v1/projects/{ref}/analytics/endpoints/logs.all": {
       "get": {
         "deprecated": true,
-        "description": "Executes a SQL query on the project's logs.\n\nEither the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.\nIf both are not provided, only the last 1 minute of logs will be queried.\nThe timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.\n\nNote: Unless the `sql` parameter is provided, only edge_logs will be queried. See the [log query docs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer:~:text=logs%20from%20the-,Sources,-drop%2Ddown%3A) for all available sources.\n",
+        "description": "Executes a SQL query on the project's logs.\n\nEither the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.\nIf both are not provided, only the last 1 minute of logs will be queried.\nThe timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.\n\nNote: Unless the `sql` parameter is provided, only edge_logs will be queried. See the [log query docs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#logs-explorer) for all available sources.\n",
         "operationId": "v1-get-project-logs-all",
         "parameters": [
           {
@@ -6643,7 +6643,7 @@
             "name": "sql",
             "required": false,
             "in": "query",
-            "description": "Custom SQL query to execute on the logs. See [querying logs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer) for more details.",
+            "description": "Custom SQL query to execute on the logs. See [querying logs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#querying-with-the-logs-explorer) for more details.",
             "schema": {
               "example": "select event_message from edge_logs limit 10",
               "type": "string"
@@ -6737,7 +6737,7 @@
             "name": "sql",
             "required": false,
             "in": "query",
-            "description": "Custom SQL query to execute on the logs. See [querying logs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer) for more details.",
+            "description": "Custom SQL query to execute on the logs. See [querying logs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#querying-with-the-logs-explorer) for more details.",
             "schema": {
               "example": "select event_message from edge_logs limit 10",
               "type": "string"
@@ -7030,6 +7030,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Project must be active and healthy, or metrics are not available for this project"
           },
           "401": {
             "description": "Unauthorized"
@@ -7651,7 +7654,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["database_read"], ["database_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -7715,7 +7718,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["database_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -7768,7 +7771,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["database_webhooks_config_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -7827,7 +7830,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["database_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -7897,7 +7900,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["database_config_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -8448,7 +8451,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["database_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -9294,7 +9297,7 @@
         ],
         "summary": "Get database disk attributes",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["infra_disk_config_read"]]
       },
       "post": {
@@ -9348,7 +9351,7 @@
         ],
         "summary": "Modify database disk",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["infra_disk_config_write"]]
       }
     },
@@ -9401,7 +9404,7 @@
         ],
         "summary": "Get disk utilization",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["infra_disk_config_read"]]
       }
     },
@@ -9454,7 +9457,7 @@
         ],
         "summary": "Gets project disk autoscale config",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["infra_disk_config_read"]]
       }
     },
@@ -9615,7 +9618,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -9806,7 +9809,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_config_read"]],
         "x-oauth-scope": "database:read"
       },
@@ -9874,7 +9877,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_config_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -11019,7 +11022,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["members_read"]],
         "x-oauth-scope": "organizations:read"
       }
@@ -11074,7 +11077,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_read"]],
         "x-oauth-scope": "organizations:read"
       }
@@ -11132,7 +11135,7 @@
         ],
         "summary": "Gets project details for the specified organization and claim token",
         "tags": ["Organizations"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_write"]],
         "x-internal": true
       },
@@ -11181,7 +11184,7 @@
         ],
         "summary": "Claims project for the specified organization",
         "tags": ["Organizations"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_write"]],
         "x-internal": true
       }
@@ -11298,7 +11301,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_projects_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -19487,6 +19490,13 @@
             "description": "Sets connection pool size for Realtime Authorization",
             "nullable": true
           },
+          "postgres_changes_pool": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Sets connection pool size used to create Postgres Changes subscriptions",
+            "nullable": true
+          },
           "max_concurrent_users": {
             "type": "integer",
             "minimum": 1,
@@ -19549,6 +19559,7 @@
         "required": [
           "private_only",
           "connection_pool",
+          "postgres_changes_pool",
           "max_concurrent_users",
           "max_events_per_second",
           "max_bytes_per_second",
@@ -19572,6 +19583,12 @@
             "minimum": 1,
             "maximum": 100,
             "description": "Sets connection pool size for Realtime Authorization"
+          },
+          "postgres_changes_pool": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Sets connection pool size used to create Postgres Changes subscriptions"
           },
           "max_concurrent_users": {
             "type": "integer",
@@ -20536,6 +20553,7 @@
                         "project_restore_after_expiry",
                         "assistant.advance_model",
                         "integrations.github_connections",
+                        "integrations.github_push_webhooks_limit",
                         "dedicated_pooler",
                         "observability.dashboard_advanced_metrics",
                         "api.members.invitations",
