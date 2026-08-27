@@ -6,7 +6,12 @@ import { Button, cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { GapFeature, PlanPresentationVariant } from './plan-presentation'
-import { FREE_PLAN_GAPS, PRO_PLAN_GAPS } from './plan-presentation'
+import {
+  FREE_PLAN_GAPS,
+  hasPlanGaps,
+  isParityPresentation,
+  PRO_PLAN_GAPS,
+} from './plan-presentation'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { RequestUpgradeToBillingOwners } from '@/components/ui/RequestUpgradeToBillingOwners'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
@@ -52,11 +57,11 @@ export function PlanCard({
   onSelectTier,
   onTrackCtaClick,
 }: PlanCardProps) {
-  const isParity = variant === 'parity' || variant === 'gaps'
+  const isParity = isParityPresentation(variant)
   const features = plan.features
   const footer = plan.footer
 
-  const gaps: GapFeature[] = variant === 'gaps' ? (GAPS_BY_PLAN_ID[plan.id] ?? []) : []
+  const gaps: GapFeature[] = hasPlanGaps(variant) ? (GAPS_BY_PLAN_ID[plan.id] ?? []) : []
 
   const ctaButton = isCurrentPlan ? (
     <Button block disabled variant="default">

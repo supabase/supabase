@@ -1,6 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
-import { FREE_PLAN_GAPS, isPlanChangeEligible, PRO_PLAN_GAPS } from './plan-presentation'
+import {
+  FREE_PLAN_GAPS,
+  hasPlanGaps,
+  isFullScreenPresentation,
+  isParityPresentation,
+  isPlanChangeEligible,
+  parsePlanPresentationVariant,
+  PLAN_PRESENTATION_VARIANTS,
+  PRO_PLAN_GAPS,
+} from './plan-presentation'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 
 describe('isPlanChangeEligible', () => {
@@ -41,6 +50,38 @@ describe('isPlanChangeEligible', () => {
 
   it('returns true for pro-plan org with billing permissions', () => {
     expect(isPlanChangeEligible({ ...baseArgs, currentPlanId: 'pro' })).toBe(true)
+  })
+})
+
+describe('parsePlanPresentationVariant', () => {
+  it.each(PLAN_PRESENTATION_VARIANTS)('accepts %s', (variant) => {
+    expect(parsePlanPresentationVariant(variant)).toBe(variant)
+  })
+
+  it.each([undefined, false, '', 'Fullscreen', 'full-screen', 'fullscreen_gaps'])(
+    'rejects %o as not in the experiment',
+    (flag) => {
+      expect(parsePlanPresentationVariant(flag)).toBeUndefined()
+    }
+  )
+})
+
+describe('presentation matrix', () => {
+  // cards, shell, gaps — the three things a variant decides
+  it.each([
+    { variant: 'control', isParity: false, isFullScreen: false, showsGaps: false },
+    { variant: 'parity', isParity: true, isFullScreen: false, showsGaps: false },
+    { variant: 'gaps', isParity: true, isFullScreen: false, showsGaps: true },
+    { variant: 'fullscreen', isParity: true, isFullScreen: true, showsGaps: false },
+    { variant: 'fullscreen-gaps', isParity: true, isFullScreen: true, showsGaps: true },
+  ] as const)('$variant', ({ variant, isParity, isFullScreen, showsGaps }) => {
+    expect(isParityPresentation(variant)).toBe(isParity)
+    expect(isFullScreenPresentation(variant)).toBe(isFullScreen)
+    expect(hasPlanGaps(variant)).toBe(showsGaps)
+  })
+
+  it('covers every variant in the experiment', () => {
+    expect(PLAN_PRESENTATION_VARIANTS).toHaveLength(5)
   })
 })
 

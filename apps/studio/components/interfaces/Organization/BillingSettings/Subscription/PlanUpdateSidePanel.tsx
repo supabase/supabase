@@ -2,15 +2,18 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
-import { motion } from 'framer-motion'
-import { ArrowLeft, ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
-import { Button } from 'ui'
 
 import { CancellationFlow } from './CancellationFlow'
+import {
+  isFullScreenPresentation,
+  isPlanChangeEligible,
+  usePlanPresentationExperiment,
+} from './plan-presentation'
 import { PlanCards } from './PlanCards'
+import { PlanUpdateFullScreenShell, PlanUpdateSheetShell } from './PlanUpdatePanelShell'
 import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import UpgradeSurveyModal from './UpgradeModal'
 import { STRIPE_PROJECTS_DOCS_URL } from '@/components/interfaces/Billing/Payment/PaymentMethods/StripePaymentConnection'
@@ -43,6 +46,52 @@ const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
       organizationSlug: selectedOrganization?.slug,
     }
   }
+}
+
+const PartnerManagedPlanNotice = ({
+  organization,
+  isStripeManaged,
+  isPartnerBilled,
+  stripeProjectsUpgradeCommand,
+}: {
+  organization: Organization | undefined
+  isStripeManaged: boolean
+  isPartnerBilled: boolean
+  stripeProjectsUpgradeCommand: string
+}) => {
+  if (!organization) return null
+
+  if (isStripeManaged) {
+    return (
+      <PartnerManagedResource
+        managedBy={MANAGED_BY.STRIPE_PROJECTS}
+        resource="Organization plans"
+        title="Organization plans are managed through Stripe."
+        details={
+          <>
+            Run <code className="text-code-inline">{stripeProjectsUpgradeCommand}</code> in your
+            project directory.
+          </>
+        }
+        cta={{
+          overrideUrl: `${STRIPE_PROJECTS_DOCS_URL}#upgrade-a-service-tier`,
+          message: 'Stripe Projects docs',
+        }}
+      />
+    )
+  }
+
+  if (isPartnerBilled) {
+    return (
+      <PartnerManagedResource
+        managedBy={organization.managed_by}
+        resource="Organization plans"
+        cta={getPartnerManagedResourceCta(organization)}
+      />
+    )
+  }
+
+  return null
 }
 
 const getStripeProjectsUpgradeCommand = (planId: string | null | undefined) => {
@@ -133,6 +182,23 @@ export const PlanUpdateSidePanel = () => {
 
   const availablePlans: OrgPlan[] = plans?.plans ?? []
 
+  // Only orgs that can actually act on the panel enter the experiment, and only once it is open
+  const isPlanPresentationEligible =
+    visible &&
+    isPlanChangeEligible({
+      managedBy: selectedOrganization?.managed_by,
+      billingPartner: selectedOrganization?.billing_partner,
+      currentPlanId: subscription?.plan?.id,
+      canUpdateSubscription,
+    })
+
+  const { variant: presentation, isResolved: isPresentationResolved } =
+    usePlanPresentationExperiment({ eligible: isPlanPresentationEligible })
+  const isFullScreen = isFullScreenPresentation(presentation)
+
+  // The fullscreen variant swaps the shell, so hold the panel closed until the variant is known
+  const isPanelOpen = visible && isPresentationResolved
+
   const onPanelOpened = useEffectEvent(
     (properties: StudioPricingSidePanelOpenedEvent['properties']) => {
       track('studio_pricing_side_panel_opened', properties)
@@ -180,87 +246,54 @@ export const PlanUpdateSidePanel = () => {
     selectedOrganization?.plan?.id ?? subscription?.plan?.id
   )
 
+  const notice = (
+    <PartnerManagedPlanNotice
+      organization={selectedOrganization}
+      isStripeManaged={isStripeManagedOrganization}
+      isPartnerBilled={isPartnerBilledOrganization}
+      stripeProjectsUpgradeCommand={stripeProjectsUpgradeCommand}
+    />
+  )
+
+  const planCards = (
+    <PlanCards
+      availablePlans={availablePlans}
+      isLoadingPlans={isLoadingPlans}
+      currentSubscriptionPlanId={subscription?.plan?.id}
+      currentSubscriptionPlanName={subscription?.plan?.name}
+      canUpdateSubscription={canUpdateSubscription}
+      isPartnerBilledOrganization={isPartnerBilledOrganization}
+      hasOrioleProjects={hasOrioleProjects}
+      selectedOrganization={selectedOrganization}
+      variant={presentation}
+      entryDelay={isFullScreen ? contentDelay : undefined}
+      onSelectTier={setSelectedTier}
+    />
+  )
+
   return (
     <>
-      {visible && (
-        <motion.div
-          className="fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-studio"
-          initial={isOpenedViaUrl ? false : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
+      {isFullScreen && isPanelOpen && (
+        <PlanUpdateFullScreenShell
+          organizationName={selectedOrganization?.name}
+          notice={notice}
+          skipOverlayFade={isOpenedViaUrl}
+          contentDelay={contentDelay}
+          onClose={onClose}
         >
-          <Button
-            variant="text"
-            icon={<ArrowLeft />}
-            onClick={() => onClose()}
-            className="fixed top-4 left-4 z-10"
-          >
-            Go back to Studio
-          </Button>
-          <div className="fixed top-4 right-4 z-10 flex items-center gap-2">
-            <Button
-              asChild
-              variant="text"
-              iconRight={<ExternalLink />}
-              className="hidden sm:inline-flex"
-            >
-              <a href="https://supabase.com/pricing#faq" target="_blank" rel="noreferrer">
-                Pricing FAQ
-              </a>
-            </Button>
-            <Button asChild variant="default" iconRight={<ExternalLink />}>
-              <a href="https://supabase.com/pricing#compare-plans" target="_blank" rel="noreferrer">
-                Compare plans
-              </a>
-            </Button>
-          </div>
-          <motion.div
-            className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 py-16"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: contentDelay, duration: 0.3, ease: 'easeOut' }}
-          >
-            <h1 className="text-2xl text-center">
-              Change subscription plan for {selectedOrganization?.name}
-            </h1>
-            {selectedOrganization &&
-              (isStripeManagedOrganization ? (
-                <PartnerManagedResource
-                  managedBy={MANAGED_BY.STRIPE_PROJECTS}
-                  resource="Organization plans"
-                  title="Organization plans are managed through Stripe."
-                  details={
-                    <>
-                      Run <code className="text-code-inline">{stripeProjectsUpgradeCommand}</code>{' '}
-                      in your project directory.
-                    </>
-                  }
-                  cta={{
-                    overrideUrl: `${STRIPE_PROJECTS_DOCS_URL}#upgrade-a-service-tier`,
-                    message: 'Stripe Projects docs',
-                  }}
-                />
-              ) : isPartnerBilledOrganization ? (
-                <PartnerManagedResource
-                  managedBy={selectedOrganization.managed_by}
-                  resource="Organization plans"
-                  cta={getPartnerManagedResourceCta(selectedOrganization)}
-                />
-              ) : null)}
-            <PlanCards
-              availablePlans={availablePlans}
-              isLoadingPlans={isLoadingPlans}
-              currentSubscriptionPlanId={subscription?.plan?.id}
-              currentSubscriptionPlanName={subscription?.plan?.name}
-              canUpdateSubscription={canUpdateSubscription}
-              isPartnerBilledOrganization={isPartnerBilledOrganization}
-              hasOrioleProjects={hasOrioleProjects}
-              selectedOrganization={selectedOrganization}
-              onSelectTier={setSelectedTier}
-              contentDelay={contentDelay}
-            />
-          </motion.div>
-        </motion.div>
+          {planCards}
+        </PlanUpdateFullScreenShell>
+      )}
+
+      {!isFullScreen && (
+        <PlanUpdateSheetShell
+          visible={isPanelOpen}
+          organizationName={selectedOrganization?.name}
+          notice={notice}
+          onClose={onClose}
+        >
+          {planCards}
+        </PlanUpdateSheetShell>
       )}
 
       <CancellationFlow

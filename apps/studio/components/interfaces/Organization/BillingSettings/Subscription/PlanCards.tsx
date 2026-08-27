@@ -3,17 +3,13 @@ import { useRouter } from 'next/router'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 
 import { EnterpriseCard } from './EnterpriseCard'
-import { isPlanChangeEligible, usePlanPresentationExperiment } from './plan-presentation'
+import type { PlanPresentationVariant } from './plan-presentation'
 import { PlanCard } from './PlanCard'
+import { getPlanCardsEntryAnimation } from './PlanCards.utils'
 import { getPlanChangeType } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import type { OrgPlan, PlanId } from '@/data/subscriptions/types'
 import { useTrack } from '@/lib/telemetry/track'
 import type { Organization } from '@/types/base'
-
-const planCardVariants = {
-  hidden: { opacity: 0, y: 8 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } },
-}
 
 export interface PlanCardsProps {
   availablePlans: OrgPlan[]
@@ -24,8 +20,10 @@ export interface PlanCardsProps {
   isPartnerBilledOrganization: boolean
   hasOrioleProjects: boolean
   selectedOrganization: Organization | undefined
+  variant: PlanPresentationVariant
+  /** Seconds to wait before the cards stagger in. Omit to render them without an entry animation. */
+  entryDelay?: number
   onSelectTier: (tier: 'tier_free' | 'tier_pro' | 'tier_team') => void
-  contentDelay?: number
 }
 
 export function PlanCards({
@@ -37,33 +35,17 @@ export function PlanCards({
   isPartnerBilledOrganization,
   hasOrioleProjects,
   selectedOrganization,
+  variant,
+  entryDelay,
   onSelectTier,
-  contentDelay = 0,
 }: PlanCardsProps) {
   const router = useRouter()
   const track = useTrack()
 
-  const eligible = isPlanChangeEligible({
-    managedBy: selectedOrganization?.managed_by,
-    billingPartner: selectedOrganization?.billing_partner,
-    currentPlanId: currentSubscriptionPlanId,
-    canUpdateSubscription,
-  })
-
-  const variant = usePlanPresentationExperiment({ eligible })
-
-  const planListVariants = {
-    hidden: {},
-    visible: { transition: { delayChildren: contentDelay + 0.2, staggerChildren: 0.08 } },
-  }
+  const entryAnimation = getPlanCardsEntryAnimation(entryDelay)
 
   return (
-    <motion.div
-      className="py-6 grid grid-cols-12 gap-3"
-      variants={planListVariants}
-      initial="hidden"
-      animate="visible"
-    >
+    <motion.div className="py-6 grid grid-cols-12 gap-3" {...entryAnimation.container}>
       {subscriptionsPlans.map((plan) => {
         const planMeta = availablePlans.find((p) => p.id === plan.id.split('tier_')[1])
         const price = planMeta?.price ?? 0
@@ -82,7 +64,7 @@ export function PlanCards({
               key={plan.id}
               plan={plan}
               isCurrentPlan={isCurrentPlan}
-              variants={planCardVariants}
+              variants={entryAnimation.card}
             />
           )
         }
@@ -102,7 +84,7 @@ export function PlanCards({
             managedBy={selectedOrganization?.managed_by}
             shouldHighlight={shouldHighlight}
             variant={variant}
-            variants={planCardVariants}
+            variants={entryAnimation.card}
             onSelectTier={() => onSelectTier(plan.id as 'tier_free' | 'tier_pro' | 'tier_team')}
             onTrackCtaClick={() =>
               track('studio_pricing_plan_cta_clicked', {
