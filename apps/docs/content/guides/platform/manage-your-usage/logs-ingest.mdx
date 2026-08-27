@@ -21,14 +21,16 @@ Usage is shown as "Logs Ingest" on your invoice.
 
 ## Billing examples
 
+Ingest is billed per byte (bytes ÷ 1,000,000,000 × $0.50), not rounded up to the next GB. These examples use fractional GB to show that precision.
+
 | Plan | Monthly ingest | Included | Billable overage | Cost                    |
 | ---- | -------------- | -------- | ---------------- | ----------------------- |
-| Free | 1 GB           | 1 GB     | —                | <Price price="0" />     |
-| Paid | 5 GB           | 5 GB     | —                | <Price price="0" />     |
-| Paid | 6 GB           | 5 GB     | 1 GB             | <Price price="0.50" />  |
-| Paid | 10 GB          | 5 GB     | 5 GB             | <Price price="2.50" />  |
-| Paid | 25 GB          | 5 GB     | 20 GB            | <Price price="10.00" /> |
-| Paid | 100 GB         | 5 GB     | 95 GB            | <Price price="47.50" /> |
+| Free | 0.32 GB        | 1 GB     | —                | <Price price="0" />     |
+| Paid | 4.76 GB        | 5 GB     | —                | <Price price="0" />     |
+| Paid | 5.24 GB        | 5 GB     | 0.24 GB          | <Price price="0.12" />  |
+| Paid | 12.48 GB       | 5 GB     | 7.48 GB          | <Price price="3.74" />  |
+| Paid | 26.92 GB       | 5 GB     | 21.92 GB         | <Price price="10.96" /> |
+| Paid | 100.06 GB      | 5 GB     | 95.06 GB         | <Price price="47.53" /> |
 
 ## View usage
 
