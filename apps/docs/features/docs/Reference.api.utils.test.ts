@@ -5,20 +5,21 @@ import { getTypeDisplayFromSchema, type ISchema } from './Reference.api.utils'
 describe('getTypeDisplayFromSchema', () => {
   it('resolves a composite given as a single schema object', () => {
     // The shape analytics_v0 and functions_v0 actually ship, e.g.
-    // Notification.properties.team_user_ids_for_email
-    const schema = { allOf: { type: 'string' }, type: 'array' } as unknown as ISchema
+    // Notification.properties.team_user_ids_for_email. `type` sits alongside `allOf`
+    // there, which no single union member models, hence the assertion.
+    const schema = { allOf: { type: 'string' }, type: 'array' } as ISchema
 
     expect(getTypeDisplayFromSchema(schema)?.displayName).toBe('string')
   })
 
   it('resolves a composite given as a single element array', () => {
-    const schema = { allOf: [{ type: 'string' }] } as unknown as ISchema
+    const schema: ISchema = { allOf: [{ type: 'string' }] }
 
     expect(getTypeDisplayFromSchema(schema)?.displayName).toBe('string')
   })
 
   it('still reports a composite when there is more than one option', () => {
-    const schema = { allOf: [{ type: 'string' }, { type: 'integer' }] } as unknown as ISchema
+    const schema: ISchema = { allOf: [{ type: 'string' }, { type: 'integer' }] }
 
     expect(getTypeDisplayFromSchema(schema)?.displayName).toBe('all of the following options')
   })

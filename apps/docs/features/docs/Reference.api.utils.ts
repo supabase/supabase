@@ -95,15 +95,21 @@ interface ISchemaEnum extends ISchemaBase {
 }
 
 interface ISchemaAllOf extends ISchemaBase {
-  allOf: Array<ISchema>
+  // Object form as well as array: some specs write a single schema here rather than a
+  // one element list. Normalise with `asSchemaArray` before iterating.
+  allOf: ISchema | Array<ISchema>
 }
 
 interface ISchemaAnyOf extends ISchemaBase {
-  anyOf: Array<ISchema>
+  // Object form as well as array: some specs write a single schema here rather than a
+  // one element list. Normalise with `asSchemaArray` before iterating.
+  anyOf: ISchema | Array<ISchema>
 }
 
 interface ISchemaOneOf extends ISchemaBase {
-  oneOf: Array<ISchema>
+  // Object form as well as array: some specs write a single schema here rather than a
+  // one element list. Normalise with `asSchemaArray` before iterating.
+  oneOf: ISchema | Array<ISchema>
 }
 
 interface IApiRequestBody extends IApiJsonDTO, IApiFormUrlEncodedDTO {}
