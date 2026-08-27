@@ -24,7 +24,7 @@ export interface paths {
      *     `meta.idempotency_key` is used to ensure idempotency when retrying the requests and so it
      *     must always be provided.
      */
-    post: operations['postV1WebhooksEvents']
+    post: operations['v1-webhooks-events-post']
     delete?: never
     options?: never
     head?: never
@@ -174,7 +174,7 @@ export interface paths {
      * Get delivery
      * @description Get details of a specific delivery attempt.
      */
-    get: operations['allV2OrganizationsBySlugWebhooks']
+    get: operations['v2-organizations-slug-webhooks-deliveries-id-get']
     put?: never
     post?: never
     delete?: never
@@ -200,7 +200,7 @@ export interface paths {
      *
      *     This endpoint is heavy rate-limited to allow for 10 request within 60 seconds.
      */
-    post: operations['allV2OrganizationsBySlugWebhooks']
+    post: operations['v2-organizations-slug-webhooks-deliveries-id-retry-post']
     delete?: never
     options?: never
     head?: never
@@ -218,20 +218,20 @@ export interface paths {
      * List endpoints
      * @description List all Webhook endpoints based on a project's ref or an organization's slug.
      */
-    get: operations['allV2OrganizationsBySlugWebhooks']
+    get: operations['v2-organizations-slug-webhooks-endpoints-get']
     put?: never
     /**
      * Create endpoint
      * @description Create new endpoint configuration to subscribe to specific webhook events.
      */
-    post: operations['allV2OrganizationsBySlugWebhooks']
+    post: operations['v2-organizations-slug-webhooks-endpoints-post']
     /**
      * Delete all endpoints
      * @description Delete all endpoints including all events and deliveries.
      *
      *     Any in-flight webhooks will result in a no-op.
      */
-    delete: operations['allV2OrganizationsBySlugWebhooks']
+    delete: operations['v2-organizations-slug-webhooks-endpoints-delete']
     options?: never
     head?: never
     patch?: never
@@ -248,7 +248,7 @@ export interface paths {
      * Get endpoint
      * @description Get details of a specific endpoint.
      */
-    get: operations['allV2OrganizationsBySlugWebhooks']
+    get: operations['v2-organizations-slug-webhooks-endpoints-id-get']
     put?: never
     post?: never
     /**
@@ -257,14 +257,14 @@ export interface paths {
      *
      *     Any in-flight webhooks will result in a no-op.
      */
-    delete: operations['allV2OrganizationsBySlugWebhooks']
+    delete: operations['v2-organizations-slug-webhooks-endpoints-id-delete']
     options?: never
     head?: never
     /**
      * Update endpoint
      * @description Update endpoint's configuration.
      */
-    patch: operations['allV2OrganizationsBySlugWebhooks']
+    patch: operations['v2-organizations-slug-webhooks-endpoints-id-patch']
     trace?: never
   }
   '/v2/organizations/{slug}/webhooks/endpoints/{id}/deliveries': {
@@ -280,7 +280,7 @@ export interface paths {
      *
      *     Deliveries which has expired are no longer available and will not be listed.
      */
-    get: operations['allV2OrganizationsBySlugWebhooks']
+    get: operations['v2-organizations-slug-webhooks-endpoints-id-deliveries-get']
     put?: never
     post?: never
     delete?: never
@@ -309,7 +309,7 @@ export interface paths {
      *
      *     This endpoint is heavy rate-limited to allow for 10 request within 60 seconds.
      */
-    post: operations['allV2OrganizationsBySlugWebhooks']
+    post: operations['v2-organizations-slug-webhooks-endpoints-id-test-post']
     delete?: never
     options?: never
     head?: never
@@ -478,7 +478,7 @@ export interface paths {
      * Get delivery
      * @description Get details of a specific delivery attempt.
      */
-    get: operations['allV2ProjectsByRefWebhooks']
+    get: operations['v2-projects-ref-webhooks-deliveries-id-get']
     put?: never
     post?: never
     delete?: never
@@ -504,7 +504,7 @@ export interface paths {
      *
      *     This endpoint is heavy rate-limited to allow for 10 request within 60 seconds.
      */
-    post: operations['allV2ProjectsByRefWebhooks']
+    post: operations['v2-projects-ref-webhooks-deliveries-id-retry-post']
     delete?: never
     options?: never
     head?: never
@@ -522,20 +522,20 @@ export interface paths {
      * List endpoints
      * @description List all Webhook endpoints based on a project's ref or an organization's slug.
      */
-    get: operations['allV2ProjectsByRefWebhooks']
+    get: operations['v2-projects-ref-webhooks-endpoints-get']
     put?: never
     /**
      * Create endpoint
      * @description Create new endpoint configuration to subscribe to specific webhook events.
      */
-    post: operations['allV2ProjectsByRefWebhooks']
+    post: operations['v2-projects-ref-webhooks-endpoints-post']
     /**
      * Delete all endpoints
      * @description Delete all endpoints including all events and deliveries.
      *
      *     Any in-flight webhooks will result in a no-op.
      */
-    delete: operations['allV2ProjectsByRefWebhooks']
+    delete: operations['v2-projects-ref-webhooks-endpoints-delete']
     options?: never
     head?: never
     patch?: never
@@ -552,7 +552,7 @@ export interface paths {
      * Get endpoint
      * @description Get details of a specific endpoint.
      */
-    get: operations['allV2ProjectsByRefWebhooks']
+    get: operations['v2-projects-ref-webhooks-endpoints-id-get']
     put?: never
     post?: never
     /**
@@ -561,14 +561,14 @@ export interface paths {
      *
      *     Any in-flight webhooks will result in a no-op.
      */
-    delete: operations['allV2ProjectsByRefWebhooks']
+    delete: operations['v2-projects-ref-webhooks-endpoints-id-delete']
     options?: never
     head?: never
     /**
      * Update endpoint
      * @description Update endpoint's configuration.
      */
-    patch: operations['allV2ProjectsByRefWebhooks']
+    patch: operations['v2-projects-ref-webhooks-endpoints-id-patch']
     trace?: never
   }
   '/v2/projects/{ref}/webhooks/endpoints/{id}/deliveries': {
@@ -584,7 +584,7 @@ export interface paths {
      *
      *     Deliveries which has expired are no longer available and will not be listed.
      */
-    get: operations['allV2ProjectsByRefWebhooks']
+    get: operations['v2-projects-ref-webhooks-endpoints-id-deliveries-get']
     put?: never
     post?: never
     delete?: never
@@ -613,7 +613,7 @@ export interface paths {
      *
      *     This endpoint is heavy rate-limited to allow for 10 request within 60 seconds.
      */
-    post: operations['allV2ProjectsByRefWebhooks']
+    post: operations['v2-projects-ref-webhooks-endpoints-id-test-post']
     delete?: never
     options?: never
     head?: never
@@ -1131,7 +1131,11 @@ export interface components {
     V2CreateInvitationsRequest: {
       data: {
         attributes: {
-          /** Format: email */
+          /**
+           * Format: email
+           * @description Email address of the invitation receipient.
+           * @example hello@example.com
+           */
           email: string
           /** @description The projects to limit a user to. If omitted, user will have org-wide access with the provided role. */
           projects?: {
@@ -1159,7 +1163,11 @@ export interface components {
     V2CreateInvitationsResponse: {
       data: {
         attributes: {
-          /** Format: email */
+          /**
+           * Format: email
+           * @description Email address of the invitation receipient.
+           * @example hello@example.com
+           */
           email: string
         }
         /**
@@ -1190,7 +1198,11 @@ export interface components {
           }
           message: string
           meta: {
-            /** Format: email */
+            /**
+             * Format: email
+             * @description Email address of the invitation receipient.
+             * @example hello@example.com
+             */
             email: string
           }
         }[]
@@ -1232,7 +1244,11 @@ export interface components {
     V2DeleteInvitationsRequest: {
       data: {
         attributes: {
-          /** Format: email */
+          /**
+           * Format: email
+           * @description Email address of the invitation receipient.
+           * @example hello@example.com
+           */
           email: string
         }
         /**
@@ -1245,7 +1261,11 @@ export interface components {
     V2DeleteInvitationsResponse: {
       data: {
         attributes: {
-          /** Format: email */
+          /**
+           * Format: email
+           * @description Email address of the invitation receipient.
+           * @example hello@example.com
+           */
           email: string
         }
         /**
@@ -1261,7 +1281,6 @@ export interface components {
           /** @description Id of a build context staged through the uploads endpoint. Required unless `runtime` is set. */
           context_upload_id?: string
           spec: {
-            backend?: string
             /** @example public */
             exposure: string
             /** @example 1 */
@@ -1614,7 +1633,6 @@ export interface components {
           instances_error?: string
           secret_generation: string
           spec: {
-            backend?: string
             /** @example public */
             exposure: string
             /** @example 1 */
@@ -1731,6 +1749,8 @@ export interface components {
             [key: string]: unknown
           }
           database: {
+            /** @description The major Postgres version the database runs. `17` covers both Postgres 17 and Oriole on 17, since Oriole is a storage engine rather than a version. */
+            major_version: number
             network_restrictions: {
               allowed_cidrs: {
                 address: string
@@ -1899,7 +1919,6 @@ export interface components {
           instances_error?: string
           secret_generation: string
           spec: {
-            backend?: string
             /** @example public */
             exposure: string
             /** @example 1 */
@@ -1954,7 +1973,7 @@ export interface components {
 }
 export type $defs = Record<string, never>
 export interface operations {
-  postV1WebhooksEvents: {
+  'v1-webhooks-events-post': {
     parameters: {
       query?: never
       header?: never
@@ -2709,7 +2728,7 @@ export interface operations {
       }
     }
   }
-  allV2OrganizationsBySlugWebhooks: {
+  'v2-organizations-slug-webhooks-deliveries-id-get': {
     parameters: {
       query?: never
       header?: never
@@ -3156,7 +3175,7 @@ export interface operations {
       }
     }
   }
-  allV2OrganizationsBySlugWebhooks: {
+  'v2-organizations-slug-webhooks-deliveries-id-retry-post': {
     parameters: {
       query?: never
       header?: never
@@ -3499,7 +3518,7 @@ export interface operations {
       }
     }
   }
-  allV2OrganizationsBySlugWebhooks: {
+  'v2-organizations-slug-webhooks-endpoints-get': {
     parameters: {
       query?: {
         /** @description Up to how many records to return. */
@@ -3908,7 +3927,7 @@ export interface operations {
       }
     }
   }
-  allV2OrganizationsBySlugWebhooks: {
+  'v2-organizations-slug-webhooks-endpoints-post': {
     parameters: {
       query?: never
       header?: never
@@ -4362,7 +4381,7 @@ export interface operations {
       }
     }
   }
-  allV2OrganizationsBySlugWebhooks: {
+  'v2-organizations-slug-webhooks-endpoints-delete': {
     parameters: {
       query?: never
       header?: never
@@ -4742,7 +4761,7 @@ export interface operations {
       }
     }
   }
-  allV2OrganizationsBySlugWebhooks: {
+  'v2-organizations-slug-webhooks-endpoints-id-get': {
     parameters: {
       query?: never
       header?: never
@@ -5161,7 +5180,7 @@ export interface operations {
       }
     }
   }
-  allV2OrganizationsBySlugWebhooks: {
+  'v2-organizations-slug-webhooks-endpoints-id-delete': {
     parameters: {
       query?: never
       header?: never
@@ -5580,7 +5599,7 @@ export interface operations {
       }
     }
   }
-  allV2OrganizationsBySlugWebhooks: {
+  'v2-organizations-slug-webhooks-endpoints-id-patch': {
     parameters: {
       query?: never
       header?: never
@@ -6070,7 +6089,7 @@ export interface operations {
       }
     }
   }
-  allV2OrganizationsBySlugWebhooks: {
+  'v2-organizations-slug-webhooks-endpoints-id-deliveries-get': {
     parameters: {
       query?: {
         /** @description Cursor in cursor-based pagination to return up to `page[size]` records after (exclusive) the entry specified by this query param. */
@@ -6482,7 +6501,7 @@ export interface operations {
       }
     }
   }
-  allV2OrganizationsBySlugWebhooks: {
+  'v2-organizations-slug-webhooks-endpoints-id-test-post': {
     parameters: {
       query?: never
       header?: never
@@ -7584,7 +7603,7 @@ export interface operations {
       }
     }
   }
-  allV2ProjectsByRefWebhooks: {
+  'v2-projects-ref-webhooks-deliveries-id-get': {
     parameters: {
       query?: never
       header?: never
@@ -8031,7 +8050,7 @@ export interface operations {
       }
     }
   }
-  allV2ProjectsByRefWebhooks: {
+  'v2-projects-ref-webhooks-deliveries-id-retry-post': {
     parameters: {
       query?: never
       header?: never
@@ -8374,7 +8393,7 @@ export interface operations {
       }
     }
   }
-  allV2ProjectsByRefWebhooks: {
+  'v2-projects-ref-webhooks-endpoints-get': {
     parameters: {
       query?: {
         /** @description Up to how many records to return. */
@@ -8783,7 +8802,7 @@ export interface operations {
       }
     }
   }
-  allV2ProjectsByRefWebhooks: {
+  'v2-projects-ref-webhooks-endpoints-post': {
     parameters: {
       query?: never
       header?: never
@@ -9237,7 +9256,7 @@ export interface operations {
       }
     }
   }
-  allV2ProjectsByRefWebhooks: {
+  'v2-projects-ref-webhooks-endpoints-delete': {
     parameters: {
       query?: never
       header?: never
@@ -9617,7 +9636,7 @@ export interface operations {
       }
     }
   }
-  allV2ProjectsByRefWebhooks: {
+  'v2-projects-ref-webhooks-endpoints-id-get': {
     parameters: {
       query?: never
       header?: never
@@ -10036,7 +10055,7 @@ export interface operations {
       }
     }
   }
-  allV2ProjectsByRefWebhooks: {
+  'v2-projects-ref-webhooks-endpoints-id-delete': {
     parameters: {
       query?: never
       header?: never
@@ -10455,7 +10474,7 @@ export interface operations {
       }
     }
   }
-  allV2ProjectsByRefWebhooks: {
+  'v2-projects-ref-webhooks-endpoints-id-patch': {
     parameters: {
       query?: never
       header?: never
@@ -10945,7 +10964,7 @@ export interface operations {
       }
     }
   }
-  allV2ProjectsByRefWebhooks: {
+  'v2-projects-ref-webhooks-endpoints-id-deliveries-get': {
     parameters: {
       query?: {
         /** @description Cursor in cursor-based pagination to return up to `page[size]` records after (exclusive) the entry specified by this query param. */
@@ -11357,7 +11376,7 @@ export interface operations {
       }
     }
   }
-  allV2ProjectsByRefWebhooks: {
+  'v2-projects-ref-webhooks-endpoints-id-test-post': {
     parameters: {
       query?: never
       header?: never

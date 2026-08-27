@@ -13,7 +13,7 @@ const RadioGroupStacked = React.forwardRef<
 >(({ className, ...props }, ref) => {
   return (
     <RadioGroupPrimitive.Root
-      className={cn('flex flex-col -space-y-px w-full', className)}
+      className={cn('relative flex flex-col -space-y-px w-full', className)}
       {...props}
       ref={ref}
     />

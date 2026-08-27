@@ -26,6 +26,7 @@ import {
   type AssistantModelId,
 } from '@/lib/ai/model.utils'
 import { getTools } from '@/lib/ai/tools'
+import { encodeNotebookToolError } from '@/lib/ai/tools/notebook-tools'
 import { apiWrapper } from '@/lib/api/apiWrapper'
 import { executeQuery } from '@/lib/api/self-hosted/query'
 import { getURL } from '@/lib/helpers'
@@ -249,6 +250,9 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       sendReasoning: true,
       onError: (error) => {
         console.error('Assistant stream error:', error)
+
+        const encoded = encodeNotebookToolError(error)
+        if (encoded !== null) return encoded
 
         if (error == null) {
           return 'unknown error'

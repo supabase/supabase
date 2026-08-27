@@ -398,7 +398,6 @@ export const FormLayout = React.forwardRef<
                 <FormLabel
                   className="text-foreground flex gap-2 items-center wrap-break-word"
                   data-formlayout-id="formLabel"
-                  htmlFor={props.name || id}
                 >
                   <LabelContents />
                 </FormLabel>

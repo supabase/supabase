@@ -125,29 +125,27 @@ It is important to make sure you are running the latest release of pg_cron (1.6.
 
 <br />
 
-#### Check the log explorer for more information
+#### Check the logs for more information
 
-Although `pg_cron` records errors in the `cron.job_run_details` table, in rare cases, more information can be found in the general Postgres logs. You can check the [Log Explorer](/dashboard/project/_/logs/explorer) for failure events with the following query
+Although `pg_cron` records errors in the `cron.job_run_details` table, in rare cases, more information can be found in the general Postgres logs. You can check the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs), with the query source set to **Logs**, for failure events with the following query
 
 ```sql
 select
-  cast(postgres_logs.timestamp as datetime) as timestamp,
+  timestamp,
   event_message,
-  parsed.error_severity,
-  parsed.user_name,
-  parsed.query,
-  parsed.detail,
-  parsed.hint,
-  parsed.sql_state_code,
-  parsed.backend_type,
-  parsed.application_name
-from
-  postgres_logs
-  cross join unnest(metadata) as metadata
-  cross join unnest(metadata.parsed) as parsed
+  log_attributes['parsed.error_severity'] as error_severity,
+  log_attributes['parsed.user_name'] as user_name,
+  log_attributes['parsed.query'] as query,
+  log_attributes['parsed.detail'] as detail,
+  log_attributes['parsed.hint'] as hint,
+  log_attributes['parsed.sql_state_code'] as sql_state_code,
+  log_attributes['parsed.backend_type'] as backend_type,
+  log_attributes['parsed.application_name'] as application_name
+from logs
 where
-  regexp_contains(parsed.error_severity, 'ERROR|FATAL|PANIC')
-  and regexp_contains(parsed.application_name, 'pg_cron')
+  source = 'postgres_logs'
+  and log_attributes['parsed.error_severity'] in ('ERROR', 'FATAL', 'PANIC')
+  and match(log_attributes['parsed.application_name'], 'pg_cron')
 order by timestamp desc
 limit 100;
 ```
