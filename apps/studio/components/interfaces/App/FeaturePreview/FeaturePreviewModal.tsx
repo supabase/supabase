@@ -34,6 +34,7 @@ import {
 import { AdvisorRulesPreview } from './AdvisorRulesPreview'
 import { CLSPreview } from './CLSPreview'
 import { DatabaseConnectionsPreview } from './DatabaseConnectionsPreview'
+import { ExplorerPreview } from './ExplorerPreview'
 import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
 import { IntegrationsLayoutPreview } from './IntegrationsLayoutPreview'
 import { JitDbAccessPreview } from './JitDbAccessPreview'
@@ -59,6 +60,7 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]: <SqlEditorManualSavePreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]: <IntegrationsLayoutPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS]: <DatabaseConnectionsPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER]: <ExplorerPreview />,
 }
 
 export const FeaturePreviewModal = () => {
@@ -148,12 +150,8 @@ export const FeaturePreviewModal = () => {
                           ? allFeaturePreviews.filter((x) => x.category === undefined)
                           : allFeaturePreviews.filter((x) => x.category === category)
                       return (
-                        <AccordionItem
-                          key={category}
-                          value={category}
-                          className="data-[state=open]:border-b-0"
-                        >
-                          <AccordionTrigger className="text-xs font-mono uppercase tracking-tight px-4 text-foreground-lighter py-2">
+                        <AccordionItem key={category} value={category}>
+                          <AccordionTrigger className="text-xs font-mono uppercase tracking-tight px-4 text-foreground-lighter py-2 bg-tertiary dark:bg-transparent">
                             {category}
                           </AccordionTrigger>
                           <AccordionContent className="[&>div]:pb-0">
@@ -318,8 +316,10 @@ const FeaturePreviewItem = ({
       key={feature.key}
       onClick={() => selectFeaturePreview(feature.key)}
       className={cn(
-        'w-full! flex-1 flex items-center justify-between p-4 border-b cursor-pointer bg transition',
-        selectedFeature?.key === feature.key ? 'bg-accent' : 'bg-card',
+        'w-full! flex-1 flex items-center justify-between p-4 cursor-pointer bg transition',
+        selectedFeature?.key === feature.key
+          ? 'bg-muted dark:bg-accent text-foreground'
+          : 'bg-card text-foreground-light',
         className
       )}
     >
