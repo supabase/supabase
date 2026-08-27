@@ -56,10 +56,6 @@ const RegionsPage = () => {
         </SectionContainer>
 
         <SectionContainer className="flex flex-col gap-8 lg:gap-12">
-          <SectionHeading
-            title="Available regions"
-            description="Every region runs on AWS. You pick one when you create a project."
-          />
           <RegionsExplorer />
         </SectionContainer>
 

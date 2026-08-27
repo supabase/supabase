@@ -68,6 +68,9 @@ export const REGIONS: RegionDetails[] = (Object.keys(AWS_REGIONS) as AWS_REGIONS
 
 export const REGION_COUNT = REGIONS.length
 
+/** Valid values for the `region` query param */
+export const REGION_CODES = REGIONS.map((region) => region.code)
+
 export const GROUPED_REGIONS = REGION_GROUPS.map((group) => ({
   group,
   regions: REGIONS.filter((region) => region.group === group),
