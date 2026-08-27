@@ -1209,6 +1209,18 @@ export const database: NavMenuConstant = {
               url: '/guides/database/replication/bigquery' as `/${string}`,
             },
             {
+              name: 'ClickHouse',
+              url: '/guides/database/replication/clickhouse' as `/${string}`,
+            },
+            {
+              name: 'DuckLake',
+              url: '/guides/database/replication/ducklake' as `/${string}`,
+            },
+            {
+              name: 'Snowflake',
+              url: '/guides/database/replication/snowflake' as `/${string}`,
+            },
+            {
               name: 'Monitoring',
               url: '/guides/database/replication/pipelines-monitoring' as `/${string}`,
             },
@@ -3092,6 +3104,7 @@ export const self_hosting: NavMenuConstant = {
   items: [
     { name: 'Overview', url: '/guides/self-hosting' },
     { name: 'Deploy with Docker', url: '/guides/self-hosting/docker' },
+    { name: 'Accessing Postgres', url: '/guides/self-hosting/accessing-postgres' },
     { name: 'Configure new API keys', url: '/guides/self-hosting/self-hosted-auth-keys' },
     { name: 'Learn about API Gateway', url: '/guides/self-hosting/self-hosted-envoy' },
     {
@@ -3275,6 +3288,10 @@ export const integrations: NavMenuConstant = {
     {
       name: 'Vercel Marketplace',
       url: '/guides/integrations/vercel-marketplace',
+    },
+    {
+      name: 'Stripe Projects',
+      url: '/guides/integrations/stripe-projects',
     },
     {
       name: 'Build Your Own',

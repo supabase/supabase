@@ -1,23 +1,18 @@
-import { useFlag, useParams } from 'common'
-import Link from 'next/link'
-import { PropsWithChildren } from 'react'
-import { Button, cn } from 'ui'
+import { PropsWithChildren, ReactNode } from 'react'
+import { cn } from 'ui'
 
 interface ProductMenuBarProps {
   title: string
+  titleBadge?: ReactNode
   className?: string
 }
 
 export const ProductMenuBar = ({
   title,
+  titleBadge,
   children,
   className,
 }: PropsWithChildren<ProductMenuBarProps>) => {
-  // [Joshen] Temporary entry point into explorer
-  const { ref } = useParams()
-  const isExplorerEnabled = useFlag('explorer')
-  const showExplorerCTA = isExplorerEnabled && title === 'SQL Editor'
-
   return (
     <div
       /**
@@ -30,12 +25,10 @@ export const ProductMenuBar = ({
       )}
     >
       <div className="border-default flex min-h-(--header-height) items-center border-b px-6 justify-between">
-        <h4 className="text-lg">{title}</h4>
-        {showExplorerCTA && (
-          <Button asChild variant="default">
-            <Link href={`/project/${ref}/explorer`}>Explorer</Link>
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          <h4 className="text-lg">{title}</h4>
+          {titleBadge}
+        </div>
       </div>
       <div className={cn('grow overflow-y-auto', className)}>{children}</div>
     </div>

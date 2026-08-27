@@ -17,15 +17,13 @@ function buildNotebookUpsertPayload({
   description?: string
   content: WritableNotebook
 }): UpsertContentPayload {
-  writableNotebookSchema.parse(content)
-
   return {
     id,
     name,
     description,
     type: 'notebook',
     visibility: 'project',
-    content,
+    content: writableNotebookSchema.parse(content),
   }
 }
 
@@ -51,10 +49,16 @@ export async function createNotebook(
 
 export type CreateNotebookData = Awaited<ReturnType<typeof createNotebook>>
 
-export type UpdateNotebookVariables = CreateNotebookVariables & { id: string }
+export type UpsertNotebookVariables = {
+  id: string
+  projectRef: string
+  name: string
+  description?: string
+  content: WritableNotebook
+}
 
-export async function updateNotebook(
-  { projectRef, id, name, description, content }: UpdateNotebookVariables,
+export async function upsertNotebook(
+  { projectRef, id, name, description, content }: UpsertNotebookVariables,
   signal?: AbortSignal,
   headersInit?: HeadersInit
 ) {
@@ -63,51 +67,20 @@ export async function updateNotebook(
   return upsertContent({ projectRef, payload }, signal, headersInit)
 }
 
-export type UpdateNotebookData = Awaited<ReturnType<typeof updateNotebook>>
+export type UpdateNotebookData = Awaited<ReturnType<typeof upsertNotebook>>
 
-export const useCreateNotebookMutation = ({
+export const useUpsertNotebookMutation = ({
   onError,
   onSuccess,
   ...options
 }: Omit<
-  UseCustomMutationOptions<CreateNotebookData, ResponseError, CreateNotebookVariables>,
+  UseCustomMutationOptions<UpdateNotebookData, ResponseError, UpsertNotebookVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<CreateNotebookData, ResponseError, CreateNotebookVariables>({
-    mutationFn: (args) => createNotebook(args),
-    async onSuccess(data, variables, context) {
-      const { projectRef } = variables
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: contentKeys.allContentLists(projectRef) }),
-        queryClient.invalidateQueries({ queryKey: contentKeys.infiniteList(projectRef) }),
-      ])
-      await onSuccess?.(data, variables, context)
-    },
-    async onError(error, variables, context) {
-      if (onError === undefined) {
-        toast.error(`Failed to create notebook: ${error.message}`)
-      } else {
-        onError(error, variables, context)
-      }
-    },
-    ...options,
-  })
-}
-
-export const useUpdateNotebookMutation = ({
-  onError,
-  onSuccess,
-  ...options
-}: Omit<
-  UseCustomMutationOptions<UpdateNotebookData, ResponseError, UpdateNotebookVariables>,
-  'mutationFn'
-> = {}) => {
-  const queryClient = useQueryClient()
-
-  return useMutation<UpdateNotebookData, ResponseError, UpdateNotebookVariables>({
-    mutationFn: (args) => updateNotebook(args),
+  return useMutation<UpdateNotebookData, ResponseError, UpsertNotebookVariables>({
+    mutationFn: (args) => upsertNotebook(args),
     async onSuccess(data, variables, context) {
       const { projectRef, id } = variables
       await Promise.all([

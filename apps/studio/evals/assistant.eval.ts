@@ -26,6 +26,11 @@ assert(process.env.OPENAI_API_KEY, 'OPENAI_API_KEY is not set')
 Eval('Assistant', {
   projectId: process.env.BRAINTRUST_PROJECT_ID,
   trialCount: process.env.CI ? 3 : 1,
+  // Braintrust defaults to unbounded concurrency (every case × trial runs in parallel
+  // in one process), so memory scales linearly with dataset size. Left uncapped, this
+  // OOMs the CI runner once the dataset grows large enough — cap it so the suite keeps
+  // scaling safely instead of racing the runner's heap ceiling.
+  maxConcurrency: 10,
   data: () => dataset,
   task: async (input) => {
     const modelEntry = getAssistantModelEntry(DEFAULT_ASSISTANT_BASE_MODEL_ID)

@@ -31,6 +31,7 @@ interface ProjectCreationFooterProps {
   form: UseFormReturn<CreateProjectForm>
   canCreateProject: boolean
   instanceSize?: string
+  highAvailability?: boolean
   organizationProjects: OrgProject[]
   isCreatingNewProject: boolean
   isSuccessNewProject: boolean
@@ -41,6 +42,7 @@ export const ProjectCreationFooter = ({
   form,
   canCreateProject,
   instanceSize,
+  highAvailability = false,
   organizationProjects,
   isCreatingNewProject,
   isSuccessNewProject,
@@ -62,18 +64,26 @@ export const ProjectCreationFooter = ({
   const showAdditionalCosts =
     !isFreePlan && !projectCreationDisabled && canCreateProject && additionalMonthlySpend > 0
 
+  // High availability is free during Alpha, so the new project costs $0 and is excluded from
+  // the totals below — the tooltip table still shows the usual compute price struck through.
+  const displayedAdditionalMonthlySpend = highAvailability ? 0 : additionalMonthlySpend
+  const newProjectComputeCosts = highAvailability ? 0 : monthlyInstancePrice(instanceSize)
+
   // [kevin] This will eventually all be provided by a new API endpoint to preview and validate project creation, this is just for kaizen now
-  const monthlyComputeCosts =
+  // Clamped since a free HA project can leave the compute credits larger than the costs
+  const monthlyComputeCosts = Math.max(
+    0,
     // current project costs
     organizationProjects.reduce((prev, acc) => {
       const primaryDatabase = acc.databases.find((db) => db.identifier === acc.ref)
       const cost = !!primaryDatabase ? monthlyInstancePrice(primaryDatabase.infra_compute_size) : 0
       return prev + cost
     }, 0) +
-    // selected compute size
-    monthlyInstancePrice(instanceSize) -
-    // compute credits
-    10
+      // selected compute size
+      newProjectComputeCosts -
+      // compute credits
+      10
+  )
 
   const onCancel = () => {
     if (cancelAction === 'close') {
@@ -98,7 +108,7 @@ export const ProjectCreationFooter = ({
           <div className="flex justify-between text-sm">
             <span>Additional costs</span>
             <div className="text-brand flex gap-1 items-center font-mono font-medium">
-              <span>${additionalMonthlySpend}/m</span>
+              <span role="status">${displayedAdditionalMonthlySpend}/m</span>
               <InfoTooltip side="top" className="max-w-[450px] p-0">
                 <div className="p-4 text-sm text-foreground-light space-y-1">
                   <p>
@@ -109,6 +119,9 @@ export const ProjectCreationFooter = ({
                     </InlineLink>{' '}
                     of that server, independent of your database usage.
                   </p>
+                  {highAvailability && (
+                    <p>High availability projects are free during Alpha for up to 2 projects.</p>
+                  )}
                   {monthlyComputeCosts > 0 && (
                     <p>Compute costs are applied on top of your subscription plan costs.</p>
                   )}
@@ -149,7 +162,12 @@ export const ProjectCreationFooter = ({
                       </TableCell>
                       <TableCell className="text-center">{instanceLabel(instanceSize)}</TableCell>
                       <TableCell className="text-right">
-                        ${monthlyInstancePrice(instanceSize)}
+                        <span className={cn(highAvailability && 'line-through')}>
+                          ${monthlyInstancePrice(instanceSize)}
+                        </span>
+                        {highAvailability && (
+                          <p className="text-xs text-foreground-lighter">Free during Alpha</p>
+                        )}
                       </TableCell>
                     </TableRow>
                   </TableBody>

@@ -566,7 +566,7 @@ export interface paths {
      *     If both are not provided, only the last 1 minute of logs will be queried.
      *     The timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.
      *
-     *     Note: Unless the `sql` parameter is provided, only edge_logs will be queried. See the [log query docs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer:~:text=logs%20from%20the-,Sources,-drop%2Ddown%3A) for all available sources.
+     *     Note: Unless the `sql` parameter is provided, only edge_logs will be queried. See the [log query docs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#logs-explorer) for all available sources.
      *
      */
     get: operations['v1-get-project-logs-all']
@@ -4048,6 +4048,8 @@ export interface components {
       max_payload_size_in_kb: number | null
       /** @description Sets maximum number of presence events per second rate limit */
       max_presence_events_per_second: number | null
+      /** @description Sets connection pool size used to create Postgres Changes subscriptions */
+      postgres_changes_pool: number | null
       /** @description Whether to enable presence */
       presence_enabled: boolean
       /** @description Whether to only allow private channels */
@@ -4885,6 +4887,8 @@ export interface components {
       max_payload_size_in_kb?: number
       /** @description Sets maximum number of presence events per second rate limit */
       max_presence_events_per_second?: number
+      /** @description Sets connection pool size used to create Postgres Changes subscriptions */
+      postgres_changes_pool?: number
       /** @description Whether to enable presence */
       presence_enabled?: boolean
       /** @description Whether to only allow private channels */
@@ -5298,6 +5302,7 @@ export interface components {
             | 'project_restore_after_expiry'
             | 'assistant.advance_model'
             | 'integrations.github_connections'
+            | 'integrations.github_push_webhooks_limit'
             | 'dedicated_pooler'
             | 'observability.dashboard_advanced_metrics'
             | 'api.members.invitations'
@@ -7097,7 +7102,7 @@ export interface operations {
       query?: {
         iso_timestamp_end?: string
         iso_timestamp_start?: string
-        /** @description Custom SQL query to execute on the logs. See [querying logs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer) for more details. */
+        /** @description Custom SQL query to execute on the logs. See [querying logs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#querying-with-the-logs-explorer) for more details. */
         sql?: string
       }
       header?: never
@@ -7152,7 +7157,7 @@ export interface operations {
       query?: {
         iso_timestamp_end?: string
         iso_timestamp_start?: string
-        /** @description Custom SQL query to execute on the logs. See [querying logs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer) for more details. */
+        /** @description Custom SQL query to execute on the logs. See [querying logs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#querying-with-the-logs-explorer) for more details. */
         sql?: string
       }
       header?: never
@@ -7223,6 +7228,13 @@ export interface operations {
           'application/openmetrics-text': string
           'text/plain': string
         }
+      }
+      /** @description Project must be active and healthy, or metrics are not available for this project */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Unauthorized */
       401: {

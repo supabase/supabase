@@ -1,7 +1,7 @@
 import { Background, ColorMode, ReactFlow, ReactFlowProvider } from '@xyflow/react'
 import { useTheme } from 'next-themes'
 
-import { PrimaryDatabaseNode, ReadReplicaNode, ReplicationNode } from './Nodes'
+import { PrimaryDatabaseNode, ReplicationNode } from './Nodes'
 
 import '@xyflow/react/dist/style.css'
 
@@ -18,7 +18,6 @@ export const EmptyReplicationDiagram = () => {
 const nodeTypes = {
   primary: PrimaryDatabaseNode,
   replication: ReplicationNode,
-  readReplica: ReadReplicaNode,
 }
 
 const edgeTypes = { smoothstep: SmoothstepEdge }

@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { cn } from '@/lib/utils'
+import { safeNextPath } from '@/registry/default/blocks/safe-next-path/lib/safe-next-path'
 import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
 import { Button } from '@/registry/default/components/ui/button'
 import {
@@ -37,7 +38,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       })
       if (error) throw error
       // Update this route to redirect to an authenticated route. The user already has an active session.
-      router.push('/example/password-based-auth/protected')
+      const next = new URLSearchParams(window.location.search).get('next')
+      router.push(safeNextPath(next, '/example/password-based-auth/protected'))
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {

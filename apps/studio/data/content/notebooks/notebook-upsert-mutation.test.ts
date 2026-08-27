@@ -3,7 +3,7 @@ import { HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
 
 import type { WritableNotebook } from './notebook-schema'
-import { createNotebook, updateNotebook } from './notebook-upsert-mutation'
+import { createNotebook, upsertNotebook } from './notebook-upsert-mutation'
 import { safeSql as safeLogSql } from '@/data/logs/safe-analytics-sql'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -98,9 +98,36 @@ describe('createNotebook', () => {
       createNotebook({ projectRef: 'default', name: 'Bad notebook', content: INVALID_CONTENT })
     ).rejects.toThrow()
   })
+
+  it('strips an empty-string database_identifier before sending — a caller that skipped the agent schema is not trusted to have already normalized it', async () => {
+    let sentBody: Record<string, unknown> | undefined
+    addAPIMock({
+      method: 'put',
+      path: '/platform/projects/:ref/content',
+      response: async ({ request }) => {
+        sentBody = (await request.json()) as Record<string, unknown>
+        return HttpResponse.json(null)
+      },
+    })
+
+    await createNotebook({
+      projectRef: 'default',
+      name: 'Signup funnel',
+      content: {
+        schema_version: 1,
+        cells: [
+          { _tag: 'database_cell', sql: DATABASE_SQL, row_limit: 100, database_identifier: '' },
+        ],
+      },
+    })
+
+    const content = sentBody?.content as WritableNotebook
+    const [databaseCell] = content.cells as Array<Record<string, unknown>>
+    expect(databaseCell).not.toHaveProperty('database_identifier')
+  })
 })
 
-describe('updateNotebook', () => {
+describe('upsertNotebook', () => {
   const NOTEBOOK_ID = 'd3aadd77-7c3c-4de7-aa5c-5aa8ac270b44'
 
   it('PUTs with the given id, keeping the existing cell id and leaving the new cell without one', async () => {
@@ -114,7 +141,7 @@ describe('updateNotebook', () => {
       },
     })
 
-    await updateNotebook({
+    await upsertNotebook({
       projectRef: 'default',
       id: NOTEBOOK_ID,
       name: 'Signup funnel',
@@ -136,7 +163,7 @@ describe('updateNotebook', () => {
 
   it('rejects malformed content without making a network request', async () => {
     await expect(
-      updateNotebook({
+      upsertNotebook({
         projectRef: 'default',
         id: NOTEBOOK_ID,
         name: 'Bad notebook',
