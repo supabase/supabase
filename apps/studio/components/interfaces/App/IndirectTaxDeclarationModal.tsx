@@ -28,16 +28,16 @@ export const IndirectTaxDeclarationModal = () => {
   const { data: organization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
 
   const [response, setResponse] = useState<IndirectTaxDeclaration | ''>('')
-  const [hasSubmittedDeclaration, setHasSubmittedDeclaration] = useState(false)
+  const [hasSubmittedDuringCurrentVisit, setHasSubmittedDuringCurrentVisit] = useState(false)
 
-  const [submitIndirectTaxDeclaration, setSubmitIndirectTaxDeclaration] = useQueryState(
+  const [isDeclarationLinkVisit, setIsDeclarationLinkVisit] = useQueryState(
     'submit_indirect_tax_declaration',
     parseAsBoolean.withDefault(false)
   )
 
   useEffect(() => {
     setResponse('')
-    setHasSubmittedDeclaration(false)
+    setHasSubmittedDuringCurrentVisit(false)
   }, [organization?.slug])
 
   const { can: canUpdateBillingInfo, isSuccess: permissionsLoaded } = useAsyncCheckPermissions(
@@ -59,21 +59,21 @@ export const IndirectTaxDeclarationModal = () => {
   const canViewDeclaration =
     IS_PLATFORM && organization !== undefined && permissionsLoaded && canUpdateBillingInfo
 
-  let declarationModal: 'form' | 'submitted' | null = null
+  let declarationModal: 'declaration-form' | 'submitted-confirmation' | null = null
 
   if (canViewDeclaration) {
     if (organization.requires_indirect_tax_declaration) {
-      declarationModal = 'form'
-    } else if (submitIndirectTaxDeclaration && !hasSubmittedDeclaration) {
-      declarationModal = 'submitted'
+      declarationModal = 'declaration-form'
+    } else if (isDeclarationLinkVisit && !hasSubmittedDuringCurrentVisit) {
+      declarationModal = 'submitted-confirmation'
     }
   }
 
   const onSubmit = () => {
     if (organization?.slug === undefined || response === '') return
 
-    setHasSubmittedDeclaration(true)
-    setSubmitIndirectTaxDeclaration(null)
+    setHasSubmittedDuringCurrentVisit(true)
+    setIsDeclarationLinkVisit(null)
 
     updateCustomerProfile({
       slug: organization.slug,
@@ -83,7 +83,7 @@ export const IndirectTaxDeclarationModal = () => {
 
   return (
     <>
-      <Dialog open={declarationModal === 'form'}>
+      <Dialog open={declarationModal === 'declaration-form'}>
         <DialogContent
           size="medium"
           hideClose
@@ -138,9 +138,9 @@ export const IndirectTaxDeclarationModal = () => {
       </Dialog>
 
       <Dialog
-        open={declarationModal === 'submitted'}
+        open={declarationModal === 'submitted-confirmation'}
         onOpenChange={(open) => {
-          if (!open) setSubmitIndirectTaxDeclaration(null)
+          if (!open) setIsDeclarationLinkVisit(null)
         }}
       >
         <DialogContent size="small">
@@ -152,7 +152,7 @@ export const IndirectTaxDeclarationModal = () => {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button onClick={() => setSubmitIndirectTaxDeclaration(null)}>Close</Button>
+            <Button onClick={() => setIsDeclarationLinkVisit(null)}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
