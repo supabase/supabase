@@ -27,6 +27,7 @@ describe('notebooksState', () => {
     }
     notebooksState.needsSaving.clear()
     notebooksState.cellLocalState.clear()
+    notebooksState.serverDivergedWhileDirty.clear()
   })
 
   it('addNotebook marks a locally-created notebook as new', () => {
@@ -101,5 +102,35 @@ describe('notebooksState', () => {
     notebooksState.setNotebook({ projectRef: 'ref', notebook: makeNotebook('notebook-1') })
 
     expect(notebooksState.notebooks['notebook-1'].status).toBe('unsaved')
+  })
+
+  it('marks and explicitly clears server divergence', () => {
+    notebooksState.markServerDivergence({ id: 'notebook-1', type: 'updated' })
+
+    expect(notebooksState.serverDivergedWhileDirty.get('notebook-1')).toBe('updated')
+
+    notebooksState.clearServerDivergence({ id: 'notebook-1' })
+
+    expect(notebooksState.serverDivergedWhileDirty.has('notebook-1')).toBe(false)
+  })
+
+  it('clears server divergence after saving a notebook', () => {
+    notebooksState.addNotebook({ projectRef: 'ref', notebook: makeNotebook('notebook-1') })
+    notebooksState.markServerDivergence({ id: 'notebook-1', type: 'updated' })
+
+    notebooksState.markSaved({ id: 'notebook-1' })
+
+    expect(notebooksState.notebooks['notebook-1'].status).toBe('saved')
+    expect(notebooksState.serverDivergedWhileDirty.has('notebook-1')).toBe(false)
+  })
+
+  it('clears server divergence when removing a notebook', () => {
+    notebooksState.addNotebook({ projectRef: 'ref', notebook: makeNotebook('notebook-1') })
+    notebooksState.markServerDivergence({ id: 'notebook-1', type: 'deleted' })
+
+    notebooksState.removeNotebook({ id: 'notebook-1' })
+
+    expect(notebooksState.notebooks['notebook-1']).toBeUndefined()
+    expect(notebooksState.serverDivergedWhileDirty.has('notebook-1')).toBe(false)
   })
 })

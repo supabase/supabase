@@ -1131,7 +1131,11 @@ export interface components {
     V2CreateInvitationsRequest: {
       data: {
         attributes: {
-          /** Format: email */
+          /**
+           * Format: email
+           * @description Email address of the invitation receipient.
+           * @example hello@example.com
+           */
           email: string
           /** @description The projects to limit a user to. If omitted, user will have org-wide access with the provided role. */
           projects?: {
@@ -1159,7 +1163,11 @@ export interface components {
     V2CreateInvitationsResponse: {
       data: {
         attributes: {
-          /** Format: email */
+          /**
+           * Format: email
+           * @description Email address of the invitation receipient.
+           * @example hello@example.com
+           */
           email: string
         }
         /**
@@ -1190,7 +1198,11 @@ export interface components {
           }
           message: string
           meta: {
-            /** Format: email */
+            /**
+             * Format: email
+             * @description Email address of the invitation receipient.
+             * @example hello@example.com
+             */
             email: string
           }
         }[]
@@ -1232,7 +1244,11 @@ export interface components {
     V2DeleteInvitationsRequest: {
       data: {
         attributes: {
-          /** Format: email */
+          /**
+           * Format: email
+           * @description Email address of the invitation receipient.
+           * @example hello@example.com
+           */
           email: string
         }
         /**
@@ -1245,7 +1261,11 @@ export interface components {
     V2DeleteInvitationsResponse: {
       data: {
         attributes: {
-          /** Format: email */
+          /**
+           * Format: email
+           * @description Email address of the invitation receipient.
+           * @example hello@example.com
+           */
           email: string
         }
         /**
@@ -1729,6 +1749,8 @@ export interface components {
             [key: string]: unknown
           }
           database: {
+            /** @description The major Postgres version the database runs. `17` covers both Postgres 17 and Oriole on 17, since Oriole is a storage engine rather than a version. */
+            major_version: number
             network_restrictions: {
               allowed_cidrs: {
                 address: string

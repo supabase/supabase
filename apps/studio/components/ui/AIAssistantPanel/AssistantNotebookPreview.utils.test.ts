@@ -5,10 +5,13 @@ import {
   formatNotebookDiffSummary,
   formatTimeRange,
   getCellLabel,
-  getCellMetadataLine,
+  getCellMetadata,
   getEntryKey,
-  getEntryMetadataLine,
+  getEntryMetadata,
+  notebookEntriesNeedDatabaseLookup,
+  resolveNotebookDatabaseTarget,
   summarizeNotebookDiff,
+  type NotebookDatabaseContext,
 } from './AssistantNotebookPreview.utils'
 import type { NotebookCellDiffEntry } from '@/data/content/notebooks/notebook-operations'
 import type { AgentCell, CellWire } from '@/data/content/notebooks/notebook-schema'
@@ -43,6 +46,14 @@ const agentDatabaseCell = (database_identifier?: string): AgentCell => ({
   sql: 'select 1',
   row_limit: 100,
   database_identifier,
+})
+
+const successfulDatabaseContext = (
+  databases: Array<{ identifier: string; region: string }> = []
+): NotebookDatabaseContext => ({
+  status: 'success',
+  projectRef: 'project-1',
+  databasesByIdentifier: new Map(databases.map((database) => [database.identifier, database])),
 })
 
 describe('getEntryKey', () => {
@@ -116,56 +127,200 @@ describe('formatTimeRange', () => {
   })
 })
 
-describe('getCellMetadataLine', () => {
-  it('returns null for markdown cells', () => {
-    expect(getCellMetadataLine(wireMarkdownCell('cell-1'))).toBeNull()
+describe('resolveNotebookDatabaseTarget', () => {
+  it('resolves an omitted identifier as primary without waiting for databases', () => {
+    expect(
+      resolveNotebookDatabaseTarget(undefined, { status: 'loading', projectRef: 'project-1' })
+    ).toEqual({ status: 'primary' })
   })
 
-  it('returns null for a database cell with no database_identifier', () => {
-    expect(getCellMetadataLine(wireDatabaseCell('cell-1'))).toBeNull()
+  it('resolves the project ref as primary without waiting for databases', () => {
+    expect(
+      resolveNotebookDatabaseTarget('project-1', {
+        status: 'loading',
+        projectRef: 'project-1',
+      })
+    ).toEqual({ status: 'primary' })
   })
 
-  it('labels a database cell with a database_identifier', () => {
-    expect(getCellMetadataLine(wireDatabaseCell('cell-1', 'Signups', 'replica-3'))).toBe(
-      'Database: replica-3'
-    )
+  it('still resolves the loaded database matching the project ref as primary', () => {
+    expect(
+      resolveNotebookDatabaseTarget(
+        'project-1',
+        successfulDatabaseContext([{ identifier: 'project-1', region: 'us-east-1' }])
+      )
+    ).toEqual({ status: 'primary' })
   })
 
-  it('labels a log cell with its formatted time range', () => {
-    expect(getCellMetadataLine(wireLogCell('cell-1'))).toBe('Time range: Last 7 days')
+  it('keeps another identifier loading until databases resolve', () => {
+    expect(
+      resolveNotebookDatabaseTarget('replica-3', {
+        status: 'loading',
+        projectRef: 'project-1',
+      })
+    ).toEqual({ status: 'loading' })
+  })
+
+  it('resolves a matching loaded database as a replica', () => {
+    expect(
+      resolveNotebookDatabaseTarget(
+        'replica-3',
+        successfulDatabaseContext([{ identifier: 'replica-3', region: 'us-east-1' }])
+      )
+    ).toEqual({ status: 'replica' })
+  })
+
+  it('does not call an identifier absent from the loaded database list a replica', () => {
+    expect(resolveNotebookDatabaseTarget('replica-3', successfulDatabaseContext())).toEqual({
+      status: 'unknown',
+    })
+  })
+
+  it('preserves database lookup errors', () => {
+    expect(
+      resolveNotebookDatabaseTarget('replica-3', {
+        status: 'error',
+        projectRef: 'project-1',
+      })
+    ).toEqual({ status: 'error' })
   })
 })
 
-describe('getEntryMetadataLine', () => {
+describe('notebookEntriesNeedDatabaseLookup', () => {
+  it('skips lookup for implicit and explicit primary cells', () => {
+    const entries: NotebookCellDiffEntry[] = [
+      { _tag: 'unchanged', cell: wireDatabaseCell('cell-1') },
+      { _tag: 'unchanged', cell: wireDatabaseCell('cell-2', undefined, 'project-1') },
+    ]
+
+    expect(notebookEntriesNeedDatabaseLookup(entries, 'project-1')).toBe(false)
+  })
+
+  it('requires lookup when either side of a replacement has another identifier', () => {
+    const entries: NotebookCellDiffEntry[] = [
+      {
+        _tag: 'replaced',
+        before: wireDatabaseCell('cell-1'),
+        after: agentDatabaseCell('replica-3'),
+        operationIndex: 0,
+      },
+    ]
+
+    expect(notebookEntriesNeedDatabaseLookup(entries, 'project-1')).toBe(true)
+  })
+})
+
+describe('getCellMetadata', () => {
+  it('hides metadata for markdown cells', () => {
+    expect(getCellMetadata(wireMarkdownCell('cell-1'), successfulDatabaseContext())).toEqual({
+      status: 'hidden',
+    })
+  })
+
+  it('labels an implicit primary database', () => {
+    expect(getCellMetadata(wireDatabaseCell('cell-1'), successfulDatabaseContext())).toEqual({
+      status: 'ready',
+      text: 'Database: Primary',
+    })
+  })
+
+  it('labels a resolved replica descriptively', () => {
+    expect(
+      getCellMetadata(
+        wireDatabaseCell('cell-1', 'Signups', 'replica-3'),
+        successfulDatabaseContext([{ identifier: 'replica-3', region: 'us-east-1' }])
+      )
+    ).toEqual({
+      status: 'ready',
+      text: 'Database: Replica',
+    })
+  })
+
+  it('returns a loading state rather than guessing another identifier is a replica', () => {
+    expect(
+      getCellMetadata(wireDatabaseCell('cell-1', 'Signups', 'replica-3'), {
+        status: 'loading',
+        projectRef: 'project-1',
+      })
+    ).toEqual({ status: 'loading' })
+  })
+
+  it('labels a missing loaded identifier as unknown', () => {
+    expect(
+      getCellMetadata(
+        wireDatabaseCell('cell-1', 'Signups', 'missing-database'),
+        successfulDatabaseContext()
+      )
+    ).toEqual({ status: 'ready', text: 'Database: Unknown' })
+  })
+
+  it('labels a log cell with its formatted time range', () => {
+    expect(getCellMetadata(wireLogCell('cell-1'), successfulDatabaseContext())).toEqual({
+      status: 'ready',
+      text: 'Time range: Last 7 days',
+    })
+  })
+})
+
+describe('getEntryMetadata', () => {
   it('uses the cell metadata for non-replaced entries', () => {
     expect(
-      getEntryMetadataLine({
-        _tag: 'unchanged',
-        cell: wireDatabaseCell('cell-1', 'Signups', 'replica-3'),
-      })
-    ).toBe('Database: replica-3')
+      getEntryMetadata(
+        {
+          _tag: 'unchanged',
+          cell: wireDatabaseCell('cell-1', 'Signups', 'replica-3'),
+        },
+        successfulDatabaseContext([{ identifier: 'replica-3', region: 'us-east-1' }])
+      )
+    ).toEqual({
+      status: 'ready',
+      text: 'Database: Replica',
+    })
   })
 
   it('returns a before → after pair when a replacement changes only metadata', () => {
     expect(
-      getEntryMetadataLine({
-        _tag: 'replaced',
-        before: wireDatabaseCell('cell-1', 'Signups', 'primary'),
-        after: agentDatabaseCell('replica-3'),
-        operationIndex: 0,
-      })
-    ).toBe('Database: primary → Database: replica-3')
+      getEntryMetadata(
+        {
+          _tag: 'replaced',
+          before: wireDatabaseCell('cell-1', 'Signups'),
+          after: agentDatabaseCell('replica-3'),
+          operationIndex: 0,
+        },
+        successfulDatabaseContext([{ identifier: 'replica-3', region: 'us-east-1' }])
+      )
+    ).toEqual({
+      status: 'ready',
+      text: 'Database: Primary → Database: Replica',
+    })
+  })
+
+  it('returns a loading state when either side still needs database data', () => {
+    expect(
+      getEntryMetadata(
+        {
+          _tag: 'replaced',
+          before: wireDatabaseCell('cell-1', 'Signups'),
+          after: agentDatabaseCell('replica-3'),
+          operationIndex: 0,
+        },
+        { status: 'loading', projectRef: 'project-1' }
+      )
+    ).toEqual({ status: 'loading' })
   })
 
   it('returns a single line when replacement metadata is unchanged', () => {
     expect(
-      getEntryMetadataLine({
-        _tag: 'replaced',
-        before: wireDatabaseCell('cell-1', 'Signups', 'primary'),
-        after: agentDatabaseCell('primary'),
-        operationIndex: 0,
-      })
-    ).toBe('Database: primary')
+      getEntryMetadata(
+        {
+          _tag: 'replaced',
+          before: wireDatabaseCell('cell-1', 'Signups'),
+          after: agentDatabaseCell(),
+          operationIndex: 0,
+        },
+        successfulDatabaseContext()
+      )
+    ).toEqual({ status: 'ready', text: 'Database: Primary' })
   })
 })
 

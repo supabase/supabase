@@ -251,11 +251,7 @@ export const RegionSelector = ({
                           <div className="flex items-center gap-x-3">
                             {isLoading && <Loader2 size={14} className="animate-spin" />}
                             {selectedRegion?.code && (
-                              <RegionFlag
-                                role="presentation"
-                                className="w-5"
-                                region={selectedRegion.code}
-                              />
+                              <RegionFlag className="w-5" region={selectedRegion.code} />
                             )}
                             <span className="text-foreground">{triggerLabel}</span>
                           </div>

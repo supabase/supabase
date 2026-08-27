@@ -468,7 +468,7 @@
         "summary": "List all projects",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["projects_read"]],
         "x-oauth-scope": "projects:read"
       },
@@ -496,7 +496,7 @@
         "summary": "Create a project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["organization_projects_create"]],
         "x-oauth-scope": "projects:write"
       }
@@ -596,7 +596,7 @@
         "summary": "List all organizations",
         "tags": ["Organizations"],
         "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organizations_read"]],
         "x-oauth-scope": "organizations:read"
       },
@@ -628,7 +628,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Create an organization",
         "tags": ["Organizations"],
-        "x-endpoint-owners": ["management-api", "billing"],
+        "x-endpoint-owners": ["control-plane", "billing"],
         "x-fga-permissions": [["organizations_create"]]
       }
     },
@@ -725,7 +725,7 @@
         "responses": { "204": { "description": "" } },
         "summary": "[Beta] Authorize user through oauth",
         "tags": ["OAuth"],
-        "x-endpoint-owners": ["auth", "management-api"]
+        "x-endpoint-owners": ["auth", "control-plane"]
       }
     },
     "/v1/oauth/token": {
@@ -753,7 +753,7 @@
         },
         "summary": "[Beta] Exchange auth code for user's access and refresh token",
         "tags": ["OAuth"],
-        "x-endpoint-owners": ["auth", "management-api"]
+        "x-endpoint-owners": ["auth", "control-plane"]
       }
     },
     "/v1/oauth/revoke": {
@@ -771,7 +771,7 @@
         "responses": { "204": { "description": "" } },
         "summary": "[Beta] Revoke oauth app authorization and it's corresponding tokens",
         "tags": ["OAuth"],
-        "x-endpoint-owners": ["auth", "management-api"]
+        "x-endpoint-owners": ["auth", "control-plane"]
       }
     },
     "/v1/oauth/authorize/project-claim": {
@@ -853,7 +853,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Authorize user through oauth and claim a project",
         "tags": ["OAuth"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_write", "project_admin_write"]]
       }
     },
@@ -910,7 +910,7 @@
         "summary": "Lists SQL snippets for the logged in user",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["snippets_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -947,7 +947,7 @@
         "summary": "Gets a specific SQL snippet",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["snippets_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -967,7 +967,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Gets the user's profile",
         "tags": ["Profile"],
-        "x-endpoint-owners": ["management-api"]
+        "x-endpoint-owners": ["control-plane"]
       }
     },
     "/v1/projects/{ref}/actions": {
@@ -1256,7 +1256,7 @@
         "summary": "Get project api keys",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
-        "x-endpoint-owners": ["auth", "management-api"],
+        "x-endpoint-owners": ["auth", "control-plane"],
         "x-fga-permissions": [["api_gateway_keys_read"]],
         "x-oauth-scope": "secrets:read"
       },
@@ -1305,7 +1305,7 @@
         "summary": "Creates a new API key for the project",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
-        "x-endpoint-owners": ["auth", "management-api"],
+        "x-endpoint-owners": ["auth", "control-plane"],
         "x-fga-permissions": [["api_gateway_keys_write"]],
         "x-oauth-scope": "secrets:write"
       }
@@ -1345,7 +1345,7 @@
         "summary": "Check whether JWT based legacy (anon, service_role) API keys are enabled. This API endpoint will be removed in the future, check for HTTP 404 Not Found.",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
-        "x-endpoint-owners": ["auth", "management-api"],
+        "x-endpoint-owners": ["auth", "control-plane"],
         "x-fga-permissions": [["api_gateway_keys_read"]],
         "x-oauth-scope": "secrets:read"
       },
@@ -1390,7 +1390,7 @@
         "summary": "Disable or re-enable JWT based legacy (anon, service_role) API keys. This API endpoint will be removed in the future, check for HTTP 404 Not Found.",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
-        "x-endpoint-owners": ["auth", "management-api"],
+        "x-endpoint-owners": ["auth", "control-plane"],
         "x-fga-permissions": [["api_gateway_keys_write"]],
         "x-oauth-scope": "secrets:write"
       }
@@ -1452,7 +1452,7 @@
         "summary": "Updates an API key for the project",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
-        "x-endpoint-owners": ["auth", "management-api"],
+        "x-endpoint-owners": ["auth", "control-plane"],
         "x-fga-permissions": [["api_gateway_keys_write"]],
         "x-oauth-scope": "secrets:write"
       },
@@ -1506,7 +1506,7 @@
         "summary": "Get API key",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
-        "x-endpoint-owners": ["auth", "management-api"],
+        "x-endpoint-owners": ["auth", "control-plane"],
         "x-fga-permissions": [["api_gateway_keys_read"]],
         "x-oauth-scope": "secrets:read"
       },
@@ -1573,7 +1573,7 @@
         "summary": "Deletes an API key for the project",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
-        "x-endpoint-owners": ["auth", "management-api"],
+        "x-endpoint-owners": ["auth", "control-plane"],
         "x-fga-permissions": [["api_gateway_keys_write"]],
         "x-oauth-scope": "secrets:write"
       }
@@ -1773,7 +1773,7 @@
         "summary": "[Beta] Gets project's custom hostname config",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:read", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["custom_domain_read"]],
         "x-oauth-scope": "domains:read"
       },
@@ -1812,7 +1812,7 @@
         "summary": "[Beta] Deletes a project's custom hostname configuration",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["custom_domain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -1861,7 +1861,7 @@
         "summary": "[Beta] Updates project's custom hostname configuration",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["custom_domain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -1902,7 +1902,7 @@
         "summary": "[Beta] Attempts to verify the DNS configuration for project's custom hostname configuration",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["custom_domain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -1943,7 +1943,7 @@
         "summary": "[Beta] Activates a custom hostname for a project.",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["custom_domain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -2013,7 +2013,7 @@
         "summary": "[Beta] Get project's temporary access configuration.",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["security", "management-api"],
+        "x-endpoint-owners": ["security", "control-plane"],
         "x-fga-permissions": [["project_admin_read"]],
         "x-oauth-scope": "database:read"
       },
@@ -2089,7 +2089,7 @@
         "summary": "[Beta] Update project's temporary access configuration.",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["security", "management-api"],
+        "x-endpoint-owners": ["security", "control-plane"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -2130,7 +2130,7 @@
         "summary": "[Beta] Gets project's network bans",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["database_network_bans_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -2171,7 +2171,7 @@
         "summary": "[Beta] Gets project's network bans with additional information about which databases they affect",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["database_network_bans_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -2213,7 +2213,7 @@
         "summary": "[Beta] Remove network bans.",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["database_network_bans_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -2254,7 +2254,7 @@
         "summary": "[Beta] Gets project's network restrictions",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_network_restrictions_read"]],
         "x-oauth-scope": "projects:read"
       },
@@ -2301,7 +2301,7 @@
         "summary": "[Alpha] Updates project's network restrictions by adding or removing CIDRs",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_network_restrictions_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -2350,7 +2350,7 @@
         "summary": "[Beta] Updates project's network restrictions",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_network_restrictions_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -2479,7 +2479,7 @@
         "summary": "Gets project's postgrest config",
         "tags": ["Rest"],
         "x-badges": [{ "name": "OAuth scope: rest:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["data_api_config_read"]],
         "x-oauth-scope": "rest:read"
       },
@@ -2526,7 +2526,7 @@
         "summary": "Updates project's postgrest config",
         "tags": ["Rest"],
         "x-badges": [{ "name": "OAuth scope: rest:write", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["data_api_config_write"]],
         "x-oauth-scope": "rest:write"
       }
@@ -2567,7 +2567,7 @@
         "summary": "Gets a specific project that belongs to the authenticated user",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["project_admin_read"]],
         "x-oauth-scope": "projects:read"
       },
@@ -2605,7 +2605,7 @@
         "summary": "Deletes the given project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra", "dev-workflows"],
+        "x-endpoint-owners": ["control-plane", "infra", "dev-workflows"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "projects:write"
       },
@@ -2650,7 +2650,7 @@
         "summary": "Updates the given project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -2814,7 +2814,7 @@
         "summary": "[Beta] Get project's SSL enforcement configuration.",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_ssl_config_read"]],
         "x-oauth-scope": "database:read"
       },
@@ -2861,7 +2861,7 @@
         "summary": "[Beta] Update project's SSL enforcement configuration.",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_ssl_config_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -2960,7 +2960,7 @@
           { "name": "OAuth scope: domains:read", "position": "after" },
           { "name": "Only available on Pro, Team, Enterprise", "position": "before" }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["vanity_subdomain_read"]],
         "x-oauth-scope": "domains:read"
       },
@@ -2992,7 +2992,7 @@
         "summary": "[Beta] Deletes a project's vanity subdomain configuration",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["vanity_subdomain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -3049,7 +3049,7 @@
           { "name": "OAuth scope: domains:write", "position": "after" },
           { "name": "Only available on Pro, Team, Enterprise", "position": "before" }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["vanity_subdomain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -3106,7 +3106,7 @@
           { "name": "OAuth scope: domains:write", "position": "after" },
           { "name": "Only available on Pro, Team, Enterprise", "position": "before" }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["vanity_subdomain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -3153,7 +3153,7 @@
         "summary": "[Beta] Upgrades the project's Postgres version",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_write", "database_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -3194,7 +3194,7 @@
         "summary": "[Beta] Returns the project's eligibility for upgrades",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_read", "database_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -3241,7 +3241,7 @@
         "summary": "[Beta] Gets the latest status of the project's upgrade",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_read", "database_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -3282,7 +3282,7 @@
         "summary": "Returns project's readonly mode status",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra", "support-tooling"],
+        "x-endpoint-owners": ["control-plane", "infra", "support-tooling"],
         "x-fga-permissions": [["database_readonly_config_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -3316,7 +3316,7 @@
         "summary": "Disables project's readonly mode for the next 15 minutes",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra", "support-tooling"],
+        "x-endpoint-owners": ["control-plane", "infra", "support-tooling"],
         "x-fga-permissions": [["database_readonly_config_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -3365,7 +3365,7 @@
         "tags": ["Database"],
         "x-allowed-plans": ["Pro", "Team", "Enterprise"],
         "x-badges": [{ "name": "Only available on Pro, Team, Enterprise", "position": "before" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["infra_read_replicas_write"]]
       }
     },
@@ -3405,7 +3405,7 @@
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Remove a read replica",
         "tags": ["Database"],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["infra_read_replicas_write"]]
       }
     },
@@ -3488,7 +3488,7 @@
         "summary": "Gets project's service health status",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -4111,7 +4111,7 @@
         "summary": "Pauses the given project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -4144,7 +4144,7 @@
         "summary": "Restarts the given project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -4186,7 +4186,7 @@
         "summary": "Lists available restore versions for the given project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_read"]],
         "x-oauth-scope": "projects:read"
       },
@@ -4217,7 +4217,7 @@
         "summary": "Restores the given project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -4250,7 +4250,7 @@
         "summary": "Cancels the given project restoration",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -4437,7 +4437,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Gets project claim token",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["project_admin_read"]],
         "x-internal": true
       },
@@ -4474,7 +4474,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Creates project claim token",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_write", "project_admin_write"]],
         "x-internal": true
       },
@@ -4504,7 +4504,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Revokes project claim token",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_write", "project_admin_write"]],
         "x-internal": true
       }
@@ -4546,7 +4546,7 @@
         "summary": "Gets project performance advisors.",
         "tags": ["Advisors"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["advisors_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -4594,7 +4594,7 @@
         "summary": "Gets project security advisors.",
         "tags": ["Advisors"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["advisors_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -4602,7 +4602,7 @@
     "/v1/projects/{ref}/analytics/endpoints/logs.all": {
       "get": {
         "deprecated": true,
-        "description": "Executes a SQL query on the project's logs.\n\nEither the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.\nIf both are not provided, only the last 1 minute of logs will be queried.\nThe timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.\n\nNote: Unless the `sql` parameter is provided, only edge_logs will be queried. See the [log query docs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer:~:text=logs%20from%20the-,Sources,-drop%2Ddown%3A) for all available sources.\n",
+        "description": "Executes a SQL query on the project's logs.\n\nEither the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.\nIf both are not provided, only the last 1 minute of logs will be queried.\nThe timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.\n\nNote: Unless the `sql` parameter is provided, only edge_logs will be queried. See the [log query docs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#logs-explorer) for all available sources.\n",
         "operationId": "v1-get-project-logs-all",
         "parameters": [
           {
@@ -4622,7 +4622,7 @@
             "name": "sql",
             "required": false,
             "in": "query",
-            "description": "Custom SQL query to execute on the logs. See [querying logs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer) for more details.",
+            "description": "Custom SQL query to execute on the logs. See [querying logs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#querying-with-the-logs-explorer) for more details.",
             "schema": {
               "example": "select event_message from edge_logs limit 10",
               "type": "string"
@@ -4695,7 +4695,7 @@
             "name": "sql",
             "required": false,
             "in": "query",
-            "description": "Custom SQL query to execute on the logs. See [querying logs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer) for more details.",
+            "description": "Custom SQL query to execute on the logs. See [querying logs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#querying-with-the-logs-explorer) for more details.",
             "schema": {
               "example": "select event_message from edge_logs limit 10",
               "type": "string"
@@ -4912,6 +4912,9 @@
               "text/plain": { "schema": { "type": "string" } },
               "application/openmetrics-text": { "schema": { "type": "string" } }
             }
+          },
+          "400": {
+            "description": "Project must be active and healthy, or metrics are not available for this project"
           },
           "401": { "description": "Unauthorized" },
           "403": { "description": "Forbidden action" },
@@ -5315,7 +5318,7 @@
         "summary": "[Beta] Run sql query",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["database_read"], ["database_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -5356,7 +5359,7 @@
         "summary": "[Beta] Run a sql query as supabase_read_only_user",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["database_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -5390,7 +5393,7 @@
         "summary": "[Beta] Enables Database Webhooks on the project",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["database_webhooks_config_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -5432,7 +5435,7 @@
         "summary": "Gets database metadata for the given project.",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["database_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -5481,7 +5484,7 @@
         "summary": "Updates the database password",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["database_config_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -5874,7 +5877,7 @@
         "summary": "Get PostgREST OpenAPI spec",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["database_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -6450,7 +6453,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Get database disk attributes",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["infra_disk_config_read"]]
       },
       "post": {
@@ -6486,7 +6489,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Modify database disk",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["infra_disk_config_write"]]
       }
     },
@@ -6525,7 +6528,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Get disk utilization",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["infra_disk_config_read"]]
       }
     },
@@ -6564,7 +6567,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Gets project disk autoscale config",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["infra_disk_config_read"]]
       }
     },
@@ -6680,7 +6683,7 @@
         "summary": "Get project's pgbouncer config",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -6812,7 +6815,7 @@
         "summary": "Gets project's Postgres config",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_config_read"]],
         "x-oauth-scope": "database:read"
       },
@@ -6859,7 +6862,7 @@
         "summary": "Updates project's Postgres config",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_config_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -7658,7 +7661,7 @@
         "summary": "List members of an organization",
         "tags": ["Organizations"],
         "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["members_read"]],
         "x-oauth-scope": "organizations:read"
       }
@@ -7696,7 +7699,7 @@
         "summary": "Gets information about the organization",
         "tags": ["Organizations"],
         "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_read"]],
         "x-oauth-scope": "organizations:read"
       }
@@ -7739,7 +7742,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Gets project details for the specified organization and claim token",
         "tags": ["Organizations"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_write"]],
         "x-internal": true
       },
@@ -7773,7 +7776,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Claims project for the specified organization",
         "tags": ["Organizations"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_write"]],
         "x-internal": true
       }
@@ -7865,7 +7868,7 @@
         "summary": "Gets all projects for the given organization",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_projects_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -13106,6 +13109,13 @@
             "description": "Sets connection pool size for Realtime Authorization",
             "nullable": true
           },
+          "postgres_changes_pool": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Sets connection pool size used to create Postgres Changes subscriptions",
+            "nullable": true
+          },
           "max_concurrent_users": {
             "type": "integer",
             "minimum": 1,
@@ -13165,6 +13175,7 @@
         "required": [
           "private_only",
           "connection_pool",
+          "postgres_changes_pool",
           "max_concurrent_users",
           "max_events_per_second",
           "max_bytes_per_second",
@@ -13188,6 +13199,12 @@
             "minimum": 1,
             "maximum": 100,
             "description": "Sets connection pool size for Realtime Authorization"
+          },
+          "postgres_changes_pool": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Sets connection pool size used to create Postgres Changes subscriptions"
           },
           "max_concurrent_users": {
             "type": "integer",
@@ -13870,6 +13887,7 @@
                         "project_restore_after_expiry",
                         "assistant.advance_model",
                         "integrations.github_connections",
+                        "integrations.github_push_webhooks_limit",
                         "dedicated_pooler",
                         "observability.dashboard_advanced_metrics",
                         "api.members.invitations",
