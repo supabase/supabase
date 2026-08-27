@@ -2,7 +2,10 @@ import { useParams } from 'common'
 import { Auth, Database, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
 import { Blocks, Box, Lightbulb, List, Settings, Telescope } from 'lucide-react'
 
-import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import {
+  useIsExplorerEnabled,
+  useUnifiedLogsPreview,
+} from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from '@/components/interfaces/Sidebar'
 import type { Route } from '@/components/ui/ui.types'
 import { EditorIndexPageLink } from '@/data/prefetchers/project.$ref.editor'
@@ -45,8 +48,12 @@ function getRouteContext(ref?: string, project?: Project): RouteContext {
   }
 }
 
-export const generateToolRoutes = (ref?: string, project?: Project): Route[] => {
+export const useGenerateToolRoutes = (): Route[] => {
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+
   const { isProjectActive, isProjectBuilding, buildingUrl } = getRouteContext(ref, project)
+  const isExplorerEnabled = useIsExplorerEnabled()
 
   return [
     {
@@ -58,14 +65,27 @@ export const generateToolRoutes = (ref?: string, project?: Project): Route[] => 
       linkElement: <EditorIndexPageLink projectRef={ref} />,
       shortcutId: SHORTCUT_IDS.NAV_TABLE_EDITOR,
     },
-    {
-      key: 'sql',
-      label: 'SQL Editor',
-      disabled: !isProjectActive,
-      icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
-      shortcutId: SHORTCUT_IDS.NAV_SQL_EDITOR,
-    },
+    ...(isExplorerEnabled
+      ? [
+          {
+            key: 'explorer',
+            label: 'Explorer',
+            disabled: !isProjectActive,
+            icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/explorer`),
+            shortcutId: SHORTCUT_IDS.NAV_SQL_EDITOR,
+          },
+        ]
+      : [
+          {
+            key: 'sql',
+            label: 'SQL Editor',
+            disabled: !isProjectActive,
+            icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
+            shortcutId: SHORTCUT_IDS.NAV_SQL_EDITOR,
+          },
+        ]),
   ]
 }
 

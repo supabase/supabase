@@ -45,19 +45,35 @@ export type BigQueryValidationIssue = {
   message: string
 }
 
-const BIGQUERY_REQUIRED_FIELDS: { path: BigQueryFieldPath; message: string }[] = [
+export const BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE = 'Service account key must be valid JSON'
+
+const BIGQUERY_REQUIRED_FIELDS: {
+  path: Exclude<BigQueryFieldPath, 'serviceAccountKey'>
+  message: string
+}[] = [
   { path: 'projectId', message: 'Project ID is required' },
   { path: 'datasetId', message: 'Dataset ID is required' },
-  { path: 'serviceAccountKey', message: 'Service account key is required' },
 ]
+
+const isValidJsonString = (value: string) => {
+  try {
+    JSON.parse(value)
+    return true
+  } catch {
+    return false
+  }
+}
 
 export const getBigQueryValidationIssues = (
   data: Pick<DestinationPanelSchemaType, BigQueryFieldPath>,
-  options: { secretsOptional?: boolean } = {}
-): BigQueryValidationIssue[] =>
-  BIGQUERY_REQUIRED_FIELDS.filter(({ path }) => {
-    if (options.secretsOptional && path === 'serviceAccountKey') return false
+  options: { secretsOptional?: boolean; validateJson?: boolean } = {}
+): BigQueryValidationIssue[] => {
+  const { secretsOptional = false, validateJson = true } = options
+  const issues: BigQueryValidationIssue[] = BIGQUERY_REQUIRED_FIELDS.filter(
+    ({ path }) => !data[path]?.trim().length
+  ).map(({ path, message }) => ({ path, message }))
 
+<<<<<<< HEAD
     return !data[path]?.trim().length
   })
 
@@ -95,6 +111,25 @@ export const getBigQueryTableOptionsValidationIssues = (
       }
     }
   })
+=======
+  const serviceAccountKey = data.serviceAccountKey?.trim() ?? ''
+
+  if (!serviceAccountKey) {
+    if (!secretsOptional) {
+      issues.push({ path: 'serviceAccountKey', message: 'Service account key is required' })
+    }
+    return issues
+  }
+
+  // JSON shape is checked on submit only. Live onChange validation would fail on every
+  // keystroke while the user is still pasting or typing a key.
+  if (validateJson && !isValidJsonString(serviceAccountKey)) {
+    issues.push({
+      path: 'serviceAccountKey',
+      message: BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE,
+    })
+  }
+>>>>>>> origin/master
 
   return issues
 }

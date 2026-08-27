@@ -5,25 +5,9 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
 import { RefObject, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
-import { AWS_REGIONS } from 'shared-data'
 import { toast } from 'sonner'
-import {
-  Button,
-  DialogSectionSeparator,
-  Form,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SheetFooter,
-  SheetSection,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
+import { Button, DialogSectionSeparator, Form, SheetFooter, SheetSection } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import {
@@ -38,7 +22,11 @@ import { AdvancedSettings } from './AdvancedSettings'
 import { getAnalyticsBucketValidationIssues } from './AnalyticsBucket/AnalyticsBucket.utils'
 import { AnalyticsBucketFields } from './AnalyticsBucket/Fields'
 import {
+<<<<<<< HEAD
   getBigQueryTableOptionsValidationIssues,
+=======
+  BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE,
+>>>>>>> origin/master
   getBigQueryValidationIssues,
 } from './BigQuery/BigQuery.utils'
 import { BigQueryFields } from './BigQuery/Fields'
@@ -57,6 +45,7 @@ import { DuckLakeFields } from './DuckLake/Fields'
 import { NewPublicationPanel } from './NewPublicationPanel'
 import { NoDestinationsAvailable } from './NoDestinationsAvailable'
 import { PipelineCostDialog } from './PipelineCostDialog'
+import { PipelineRegionField } from './PipelineRegionField'
 import { PublicationSelection } from './PublicationSelection'
 import { SnowflakeFields } from './Snowflake/Fields'
 import { getSnowflakeValidationIssues } from './Snowflake/Snowflake.utils'
@@ -65,8 +54,6 @@ import { useDestinationForm } from './useDestinationForm'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
 import { ValidationWarningsDialog } from './ValidationWarningsDialog'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
-import { InlineLinkClassName } from '@/components/ui/InlineLink'
-import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
@@ -78,13 +65,8 @@ import {
 } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
 
 const formId = 'destination-editor'
-
-// Pipelines always run out of a single fixed region per environment, regardless of the source
-// project's region.
-const PIPELINE_REGION = IS_STAGING_OR_LOCAL ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.CENTRAL_EU
 
 interface DestinationFormProps {
   selectedType: DestinationType
@@ -238,6 +220,7 @@ export const DestinationForm = ({
         }
 
         if (selectedType === 'BigQuery') {
+<<<<<<< HEAD
           getBigQueryValidationIssues(data, { secretsOptional: editMode }).forEach(
             ({ path, message }) => {
               addRequiredFieldError(path, message)
@@ -248,6 +231,14 @@ export const DestinationForm = ({
               addRequiredFieldError(path, message)
             }
           )
+=======
+          getBigQueryValidationIssues(data, {
+            secretsOptional: editMode,
+            validateJson: false,
+          }).forEach(({ path, message }) => {
+            addRequiredFieldError(path, message)
+          })
+>>>>>>> origin/master
         } else if (selectedType === 'Analytics Bucket') {
           getAnalyticsBucketValidationIssues(data, {
             secretsOptional: editMode,
@@ -359,6 +350,16 @@ export const DestinationForm = ({
         publications: [selectedPublication],
         publicationName: rawData.publicationName,
       }),
+    }
+
+    if (selectedType === 'BigQuery') {
+      const jsonIssue = getBigQueryValidationIssues(data, { secretsOptional: editMode }).find(
+        (issue) => issue.message === BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE
+      )
+      if (jsonIssue) {
+        form.setError(jsonIssue.path, { message: jsonIssue.message })
+        return
+      }
     }
 
     // Pipeline prerequisite validation models a new pipeline and cannot
@@ -482,42 +483,7 @@ export const DestinationForm = ({
                       onSelectNewPublication={() => setPublicationPanelVisible(true)}
                     />
                     <TableCopySelection form={form} editMode={editMode} />
-                    <FormItemLayout
-                      isReactForm={false}
-                      layout="horizontal"
-                      label="Region"
-                      description={
-                        <span className="text-foreground-lighter">
-                          Pipelines run in{' '}
-                          <Tooltip>
-                            <TooltipTrigger className={InlineLinkClassName}>
-                              {PIPELINE_REGION.displayName}
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom">{PIPELINE_REGION.code}</TooltipContent>
-                          </Tooltip>
-                          . In your destination provider, choose the closest available region.
-                        </span>
-                      }
-                    >
-                      <Select disabled value={PIPELINE_REGION.code}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a region" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value={PIPELINE_REGION.code}>
-                            <div className="flex gap-x-3 items-center">
-                              <RegionFlag className="w-5" region={PIPELINE_REGION.code} />
-                              <p className="flex items-center gap-x-2">
-                                <span>{PIPELINE_REGION.displayName}</span>
-                                <span className="text-xs text-foreground-lighter font-mono">
-                                  {PIPELINE_REGION.code}
-                                </span>
-                              </p>
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormItemLayout>
+                    <PipelineRegionField destinationType={selectedType} />
                   </div>
                 </div>
 
