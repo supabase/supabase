@@ -121,9 +121,7 @@ export const DestinationTypeSelection = () => {
     Deprecated: 'This destination type is deprecated.',
   }
 
-  const stageDescription = selectedOption?.stage
-    ? STAGE_DESCRIPTIONS[selectedOption.stage]
-    : null
+  const stageDescription = selectedOption?.stage ? STAGE_DESCRIPTIONS[selectedOption.stage] : null
 
   const typeDescription =
     !editMode || stageDescription ? (
