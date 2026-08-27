@@ -69,11 +69,14 @@ const RegionsPage = () => {
               {RESIDENCY_ROWS.map((row) => (
                 <div
                   key={row.component}
-                  className="grid grid-cols-1 items-baseline gap-2 border-b border-muted py-4 md:grid-cols-3 md:gap-8"
+                  className="grid grid-cols-1 items-baseline gap-2 border-b border-muted py-4 md:grid-cols-[1.5fr_7rem_2fr] md:gap-6"
                 >
                   <span className="text-sm text-foreground">{row.component}</span>
-                  <div className="flex items-baseline gap-3 md:col-span-2">
-                    <Badge variant={RESIDENCY_BADGE_VARIANTS[row.status]} className="shrink-0">
+                  <div className="flex items-baseline gap-3 md:contents">
+                    <Badge
+                      variant={RESIDENCY_BADGE_VARIANTS[row.status]}
+                      className="shrink-0 justify-self-start"
+                    >
                       {row.status}
                     </Badge>
                     <span className="text-sm text-foreground-light">{row.detail}</span>
