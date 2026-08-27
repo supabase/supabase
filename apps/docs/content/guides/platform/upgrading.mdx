@@ -342,7 +342,9 @@ ERROR: must be superuser to specify a non-built-in restriction estimator functio
 Most projects are not affected. To check whether your database has any user-defined operators that reference a non-built-in estimator:
 
 ```sql
-SELECT n.nspname AS schema, o.oprname AS operator
+SELECT n.nspname AS schema, o.oprname AS operator,
+       o.oprrest::regproc AS restrict_estimator,
+       o.oprjoin::regproc AS join_estimator
 FROM pg_operator o
 JOIN pg_namespace n ON o.oprnamespace = n.oid
 WHERE n.nspname NOT IN ('pg_catalog', 'information_schema')
