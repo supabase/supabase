@@ -81,6 +81,7 @@ vi.mock('common', () => ({
       `project-integration-banner-dismissed-${ref}-${integrationSource}`,
   },
   isFeatureEnabled: () => false,
+  useFlag: () => false,
 }))
 
 vi.mock('framer-motion', () => ({

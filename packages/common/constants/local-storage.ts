@@ -28,6 +28,7 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE: 'supabase-ui-sql-editor-manual-save',
   UI_PREVIEW_MARKETPLACE: 'supabase-ui-marketplace',
   UI_PREVIEW_DATABASE_CONNECTIONS: 'preview-database-connections',
+  UI_PREVIEW_EXPLORER: 'preview-explorer',
 
   AI_ASSISTANT_MCP_OPT_IN: 'ai-assistant-mcp-opt-in',
 
@@ -115,6 +116,7 @@ export const LOCAL_STORAGE_KEYS = {
     `organization-marketplace-banner-dismissed-${orgSlug}-${managedBy}`,
   PROJECT_INTEGRATION_BANNER_DISMISSED: (ref: string, integrationSource: string) =>
     `project-integration-banner-dismissed-${ref}-${integrationSource}`,
+  EXPLORER_BANNER_DISMISSED: `explorer-banner-dismissed`,
 
   TABLE_EDITOR_QUEUE_OPERATIONS_BANNER_DISMISSED: (ref: string) =>
     `table-editor-queue-operations-banner-dismissed-${ref}`,
