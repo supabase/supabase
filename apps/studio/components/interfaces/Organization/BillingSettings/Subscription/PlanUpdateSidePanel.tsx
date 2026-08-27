@@ -193,10 +193,27 @@ export const PlanUpdateSidePanel = () => {
             variant="text"
             icon={<ArrowLeft />}
             onClick={() => onClose()}
-            className="fixed top-4 left-4"
+            className="fixed top-4 left-4 z-10"
           >
             Go back to Studio
           </Button>
+          <div className="fixed top-4 right-4 z-10 flex items-center gap-2">
+            <Button
+              asChild
+              variant="text"
+              iconRight={<ExternalLink />}
+              className="hidden sm:inline-flex"
+            >
+              <a href="https://supabase.com/pricing#faq" target="_blank" rel="noreferrer">
+                Pricing FAQ
+              </a>
+            </Button>
+            <Button asChild variant="default" iconRight={<ExternalLink />}>
+              <a href="https://supabase.com/pricing#compare-plans" target="_blank" rel="noreferrer">
+                Compare plans
+              </a>
+            </Button>
+          </div>
           <motion.div
             className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 py-16"
             initial={{ opacity: 0, y: 8 }}
@@ -206,13 +223,6 @@ export const PlanUpdateSidePanel = () => {
             <h1 className="text-2xl text-center">
               Change subscription plan for {selectedOrganization?.name}
             </h1>
-            <div className="flex justify-center">
-              <Button asChild variant="default" icon={<ExternalLink />}>
-                <a href="https://supabase.com/pricing" target="_blank" rel="noreferrer">
-                  Pricing
-                </a>
-              </Button>
-            </div>
             {selectedOrganization &&
               (isStripeManagedOrganization ? (
                 <PartnerManagedResource
