@@ -134,10 +134,10 @@ const DEFAULT_ENTITLEMENTS: Entitlement[] = [
     config: { enabled: false },
   } as Entitlement,
   {
-    feature: { key: 'instances.high_availability', type: 'boolean' },
+    feature: { key: 'instances.high_availability', type: 'numeric' },
     hasAccess: true,
-    type: 'boolean',
-    config: { enabled: true },
+    type: 'numeric',
+    config: { enabled: true, value: 1, unlimited: false, unit: 'projects' },
   } as Entitlement,
 ]
 
@@ -719,10 +719,10 @@ describe('project creation wizard', () => {
       mockWizardEndpoints({
         entitlements: [
           {
-            feature: { key: 'instances.high_availability', type: 'boolean' },
+            feature: { key: 'instances.high_availability', type: 'numeric' },
             hasAccess: false,
-            type: 'boolean',
-            config: { enabled: false },
+            type: 'numeric',
+            config: { enabled: false, value: 0, unlimited: false, unit: 'projects' },
           } as Entitlement,
         ],
       })
