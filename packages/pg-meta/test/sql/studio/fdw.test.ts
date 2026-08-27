@@ -91,8 +91,17 @@ test('server and wrapper names are passed as format() arguments, not embedded in
   // never interact with the outer E'...' string.
   expect(sql).toContain(`E'create server %s foreign data wrapper %s options (`)
 
-  const quotedServer = ident("serv'er")
-  const quotedWrapper = ident("wrap'per\\x")
-  expect(sql).toContain(quotedServer)
-  expect(sql).toContain(quotedWrapper)
+  // Assert the identifiers appear as the following format() arguments, in
+  // order, and that the format template itself embeds neither identifier.
+  const formatIndex = sql.indexOf(`E'create server %s foreign data wrapper %s options (`)
+  const formatSql = sql.slice(formatIndex)
+  const serverArg = formatSql.indexOf(ident("serv'er"))
+  const wrapperArg = formatSql.indexOf(ident("wrap'per\\x"))
+  expect(formatIndex).toBeGreaterThan(-1)
+  expect(serverArg).toBeGreaterThan(-1)
+  expect(wrapperArg).toBeGreaterThan(serverArg)
+  expect(formatSql.slice(0, serverArg)).not.toContain(ident("serv'er"))
+  expect(formatSql.slice(serverArg + ident("serv'er").length, wrapperArg)).not.toContain(
+    ident("wrap'per\\x")
+  )
 })
