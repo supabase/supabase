@@ -23,21 +23,20 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { IS_PLATFORM } from '@/lib/constants'
 
 type IndirectTaxDeclaration = 'yes' | 'no'
+type DeclarationModal = 'declaration-form' | 'submission-confirmation' | null
 
 export const IndirectTaxDeclarationModal = () => {
   const { data: organization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
 
   const [response, setResponse] = useState<IndirectTaxDeclaration | ''>('')
-  const [hasSubmittedDuringCurrentVisit, setHasSubmittedDuringCurrentVisit] = useState(false)
 
-  const [isDeclarationLinkVisit, setIsDeclarationLinkVisit] = useQueryState(
+  const [isDeclarationFlowActive, setDeclarationFlowParam] = useQueryState(
     'submit_indirect_tax_declaration',
     parseAsBoolean.withDefault(false)
   )
 
   useEffect(() => {
     setResponse('')
-    setHasSubmittedDuringCurrentVisit(false)
   }, [organization?.slug])
 
   const { can: canUpdateBillingInfo, isSuccess: permissionsLoaded } = useAsyncCheckPermissions(
@@ -48,7 +47,9 @@ export const IndirectTaxDeclarationModal = () => {
   const { mutate: updateCustomerProfile, isPending } = useOrganizationCustomerProfileUpdateMutation(
     {
       onSuccess: () => {
-        toast.success('GST declaration submitted')
+        if (!isDeclarationFlowActive) {
+          toast.success('GST declaration submitted')
+        }
       },
       onError: (error) => {
         toast.error(`Failed to submit GST declaration: ${error.message}`)
@@ -59,26 +60,27 @@ export const IndirectTaxDeclarationModal = () => {
   const canViewDeclaration =
     IS_PLATFORM && organization !== undefined && permissionsLoaded && canUpdateBillingInfo
 
-  let declarationModal: 'declaration-form' | 'submitted-confirmation' | null = null
+  let declarationModal: DeclarationModal = null
 
   if (canViewDeclaration) {
     if (organization.requires_indirect_tax_declaration) {
       declarationModal = 'declaration-form'
-    } else if (isDeclarationLinkVisit && !hasSubmittedDuringCurrentVisit) {
-      declarationModal = 'submitted-confirmation'
+    } else if (isDeclarationFlowActive) {
+      declarationModal = 'submission-confirmation'
     }
   }
 
   const onSubmit = () => {
     if (organization?.slug === undefined || response === '') return
 
-    setHasSubmittedDuringCurrentVisit(true)
-    setIsDeclarationLinkVisit(null)
-
     updateCustomerProfile({
       slug: organization.slug,
       indirect_tax_registration_declaration: response,
     })
+  }
+
+  const closeDeclarationFlow = () => {
+    setDeclarationFlowParam(null)
   }
 
   return (
@@ -138,21 +140,21 @@ export const IndirectTaxDeclarationModal = () => {
       </Dialog>
 
       <Dialog
-        open={declarationModal === 'submitted-confirmation'}
+        open={declarationModal === 'submission-confirmation'}
         onOpenChange={(open) => {
-          if (!open) setIsDeclarationLinkVisit(null)
+          if (!open) closeDeclarationFlow()
         }}
       >
         <DialogContent size="small">
           <DialogHeader>
-            <DialogTitle>GST declaration already submitted</DialogTitle>
+            <DialogTitle>GST declaration submitted</DialogTitle>
             <DialogDescription>
-              The GST declaration for {organization?.name} has already been submitted. No further
-              action is required.
+              The GST declaration for {organization?.name} has been submitted. No further action is
+              required.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button onClick={() => setIsDeclarationLinkVisit(null)}>Close</Button>
+            <Button onClick={closeDeclarationFlow}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
