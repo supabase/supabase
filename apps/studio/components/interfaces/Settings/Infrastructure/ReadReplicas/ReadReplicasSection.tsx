@@ -21,9 +21,11 @@ import { ReadReplicaRow } from './ReadReplicaRow'
 import { REPLICA_STATUS } from './ReadReplicas.constants'
 import type { RecommendedComputeForReadReplicas } from './recommendCompute'
 import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
 interface ReadReplicasSectionProps {
@@ -32,6 +34,8 @@ interface ReadReplicasSectionProps {
 
 export const ReadReplicasSection = ({ onRecommendCompute }: ReadReplicasSectionProps) => {
   const { ref: projectRef } = useParams()
+  const isHighAvailability = useIsHighAvailability()
+
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
   const [isAddReplicaOpen, setAddReplica] = useQueryState(
     'addReplica',
@@ -89,14 +93,21 @@ export const ReadReplicasSection = ({ onRecommendCompute }: ReadReplicasSectionP
           </PageSectionSummary>
           <PageSectionAside>
             <DocsButton href={`${DOCS_URL}/guides/platform/read-replicas`} />
-            <Button
+            <ButtonTooltip
               type="button"
               variant="primary"
+              disabled={isHighAvailability}
               icon={<Plus />}
               onClick={() => setAddReplica(true)}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: 'Creation of read replicas is unavailable on High Availability projects',
+                },
+              }}
             >
               Add read replica
-            </Button>
+            </ButtonTooltip>
           </PageSectionAside>
         </PageSectionMeta>
 
@@ -140,14 +151,16 @@ export const ReadReplicasSection = ({ onRecommendCompute }: ReadReplicasSectionP
               title="No read replicas"
               description="All reads and writes currently go to the primary."
             >
-              <Button
-                type="button"
-                variant="default"
-                icon={<Plus />}
-                onClick={() => setAddReplica(true)}
-              >
-                Add read replica
-              </Button>
+              {!isHighAvailability && (
+                <Button
+                  type="button"
+                  variant="default"
+                  icon={<Plus />}
+                  onClick={() => setAddReplica(true)}
+                >
+                  Add read replica
+                </Button>
+              )}
             </EmptyStatePresentational>
           )}
         </PageSectionContent>

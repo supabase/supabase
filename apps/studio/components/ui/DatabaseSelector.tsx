@@ -30,6 +30,7 @@ import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from '@/data/read-replicas/replicas.utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
@@ -55,6 +56,8 @@ export const DatabaseSelector = ({
   isForm = false,
 }: DatabaseSelectorProps) => {
   const { ref: projectRef } = useParams()
+  const isHighAvailability = useIsHighAvailability()
+
   const [open, setOpen] = useState(false)
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
@@ -216,7 +219,7 @@ export const DatabaseSelector = ({
               </ScrollArea>
             </CommandGroup>
 
-            {IS_PLATFORM && infrastructureReadReplicas && (
+            {IS_PLATFORM && infrastructureReadReplicas && isHighAvailability && (
               <CommandGroup className="border-t">
                 <CommandItemLink
                   href={newReplicaURL}
