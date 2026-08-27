@@ -219,7 +219,7 @@ export const DatabaseSelector = ({
               </ScrollArea>
             </CommandGroup>
 
-            {IS_PLATFORM && infrastructureReadReplicas && isHighAvailability && (
+            {IS_PLATFORM && infrastructureReadReplicas && !isHighAvailability && (
               <CommandGroup className="border-t">
                 <CommandItemLink
                   href={newReplicaURL}
