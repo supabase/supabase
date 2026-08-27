@@ -13,7 +13,7 @@ export const BASE_MONACO_EDITOR_OPTIONS: editor.IStandaloneEditorConstructionOpt
   fontSize: 13,
   minimap: { enabled: false },
   wordWrap: 'on',
-  fixedOverflowWidgets: true,
+  fixedOverflowWidgets: false,
   contextmenu: true,
   scrollBeyondLastLine: false,
 }

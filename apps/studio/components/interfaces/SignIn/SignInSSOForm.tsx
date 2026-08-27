@@ -1,6 +1,9 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
+import { Lock } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -8,6 +11,7 @@ import { Button, Form, FormControl, FormField, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
+import { LastSignInWrapper } from './LastSignInWrapper'
 import { useLastSignIn } from '@/hooks/misc/useLastSignIn'
 import { BASE_PATH } from '@/lib/constants'
 import { captureCriticalError } from '@/lib/error-reporting'
@@ -117,5 +121,17 @@ export const SignInSSOForm = () => {
         </Button>
       </form>
     </Form>
+  )
+}
+
+export const SignInWithSSOButton = () => {
+  const router = useRouter()
+
+  return (
+    <LastSignInWrapper type="sso">
+      <Button asChild block size="large" variant="outline" icon={<Lock />}>
+        <Link href={{ pathname: '/sign-in-sso', query: router.query }}>Continue with SSO</Link>
+      </Button>
+    </LastSignInWrapper>
   )
 }
