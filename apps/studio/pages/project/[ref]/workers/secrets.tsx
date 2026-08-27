@@ -68,6 +68,10 @@ const WorkerSecretsPage: NextPageWithLayout = () => {
     <PageContainer size="large">
       <PageSection>
         <PageSectionContent className="space-y-4 md:space-y-8">
+          <Admonition
+            type="default"
+            title="Secrets are shared between Edge Functions and Workers"
+          />
           <EdgeFunctionSecrets />
         </PageSectionContent>
       </PageSection>
