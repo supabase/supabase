@@ -26,6 +26,7 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
   useIsAwsNimbusCloudProvider,
+  useIsHighAvailability,
   useSelectedProjectQuery,
 } from '@/hooks/misc/useSelectedProject'
 import { useUrlState } from '@/hooks/ui/useUrlState'
@@ -42,6 +43,7 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
   const { data: organization } = useSelectedOrganizationQuery()
 
   const isAwsNimbus = useIsAwsNimbusCloudProvider()
+  const isHighAvailability = useIsHighAvailability()
   const { reportsAll } = useIsFeatureEnabled(['reports:all'])
 
   const [{ show_increase_disk_size_modal }, setUrlParams] = useUrlState()
@@ -110,14 +112,16 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
                           <ButtonTooltip
                             variant="default"
                             className="w-min ml-auto"
-                            disabled={!canUpdateDiskSizeConfig || disabled}
+                            disabled={!canUpdateDiskSizeConfig || isHighAvailability || disabled}
                             onClick={() => setShowIncreaseDiskSizeModal(true)}
                             tooltip={{
                               content: {
                                 side: 'bottom',
                                 text: !canUpdateDiskSizeConfig
                                   ? 'You need additional permissions to increase the disk size'
-                                  : undefined,
+                                  : isHighAvailability
+                                    ? 'Disk size management is unavailable for High Availability projects'
+                                    : undefined,
                               },
                             }}
                           >

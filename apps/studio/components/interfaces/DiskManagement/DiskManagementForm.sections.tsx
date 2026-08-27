@@ -31,6 +31,7 @@ import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { HighAvailabilityDisabledSectionNotice } from '@/components/ui/HighAvailability/HighAvailabilityDisabledSectionNotice'
 import { RequestUpgradeToBillingOwners } from '@/components/ui/RequestUpgradeToBillingOwners'
+import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
 interface ComputeSectionProps {
@@ -150,6 +151,9 @@ export function DiskSection({
           <DocsButton href={`${DOCS_URL}/guides/platform/database-size`} />
         </PageSectionAside>
       </PageSectionMeta>
+
+      <HighAvailabilityDisabledSectionNotice title="Disk management is unavailable for High Availability projects" />
+
       <PageSectionContent ref={settingsRef} className="flex flex-col gap-4 scroll-mt-24">
         {isAws && <DiskSpaceBar form={form} />}
 
@@ -255,7 +259,7 @@ export function AdvancedSection({
       <PageSectionContent className="flex flex-col gap-4">
         <Card ref={autoscaleSettingsRef} className="scroll-mt-24">
           <CardContent className="flex flex-col gap-y-8">
-            <AutoScaleFields form={form} />
+            <AutoScaleFields form={form} disableInput={disableDiskInputs && disableDiskSizeInput} />
           </CardContent>
         </Card>
 
@@ -263,7 +267,9 @@ export function AdvancedSection({
           <CardContent className="flex flex-col gap-y-8">
             <NoticeBar
               type="default"
-              visible={!!disableIopsThroughputConfig}
+              visible={
+                !!disableIopsThroughputConfig && !disableIopsThroughputConfig && !disableDiskInputs
+              }
               title="Adjusting disk configuration requires LARGE Compute size or above"
               description={`Increase your compute size to adjust your disk's storage type, ${form.getValues('storageType') === 'gp3' ? 'IOPS, ' : ''} and throughput`}
               actions={

@@ -61,6 +61,7 @@ import {
   useIsAwsCloudProvider,
   useIsAwsK8sCloudProvider,
   useIsAwsNimbusCloudProvider,
+  useIsHighAvailability,
   useSelectedProjectQuery,
 } from '@/hooks/misc/useSelectedProject'
 import { GB, PROJECT_STATUS } from '@/lib/constants'
@@ -102,7 +103,7 @@ export function DiskManagementForm({
   const isAws = useIsAwsCloudProvider()
   const isAwsK8s = useIsAwsK8sCloudProvider()
   const isAwsNimbus = useIsAwsNimbusCloudProvider()
-  const { isHighAvailability } = useHighAvailability()
+  const isHighAvailability = useIsHighAvailability()
 
   const { can: canUpdateDiskConfiguration, isSuccess: isPermissionsLoaded } =
     useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
@@ -209,9 +210,10 @@ export function DiskManagementForm({
   const usedPercentage = (usedSize / totalSize) * 100
 
   const disableIopsThroughputConfig =
-    modifiedComputeSize &&
-    !isSpendCapEnabled &&
-    RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(modifiedComputeSize)
+    isHighAvailability ||
+    (modifiedComputeSize &&
+      !isSpendCapEnabled &&
+      RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(modifiedComputeSize))
 
   const watchedTotalSize = useWatch({ control: form.control, name: 'totalSize' }) ?? 0
   const watchedStorageType = useWatch({ control: form.control, name: 'storageType' })
@@ -231,10 +233,11 @@ export function DiskManagementForm({
     isRequestingChanges ||
     isPlanUpgradeRequired ||
     isWithinCooldownWindow ||
+    isHighAvailability ||
     !canUpdateDiskConfiguration ||
     !isAws
 
-  const disableDiskInputs = disableDiskSizeInput || isSpendCapEnabled
+  const disableDiskInputs = disableDiskSizeInput || isSpendCapEnabled || isHighAvailability
 
   // Compute resizing is not supported for High Availability projects during Alpha
   const disableComputeInputs = isPlanUpgradeRequired || isHighAvailability
