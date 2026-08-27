@@ -10,6 +10,7 @@
  *
  * @module telemetry-frontend
  */
+import type { components } from 'api-types'
 
 export type TelemetryGroups = {
   project: string
@@ -2921,7 +2922,8 @@ export interface AuditLogDrainRemovedEvent {
   groups: Omit<TelemetryGroups, 'project'>
 }
 
-type AdvisorCategory = 'PERFORMANCE' | 'SECURITY'
+type AdvisorCategory =
+  components['schemas']['GetProjectLintsResponse'][number]['categories'][number]
 type AdvisorLevel = 'ERROR' | 'WARN' | 'INFO'
 
 /**

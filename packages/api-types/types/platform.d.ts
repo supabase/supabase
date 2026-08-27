@@ -5288,6 +5288,8 @@ export interface components {
       dry_run?: boolean
       /** Format: email */
       email?: string
+      /** @enum {string} */
+      indirect_tax_registration_declaration?: 'yes' | 'no'
       tax_id?: {
         country: string
         type: string
@@ -5480,14 +5482,6 @@ export interface components {
     CreateBackendParamsOpenapi: {
       config:
         | {
-            hostname?: string
-            password?: string | null
-            port?: number | null
-            schema?: string
-            url?: string | null
-            username?: string | null
-          }
-        | {
             gzip?: boolean
             headers?: {
               [key: string]: string
@@ -5495,10 +5489,6 @@ export interface components {
             /** @enum {string} */
             http?: 'http1' | 'http2'
             url?: string
-          }
-        | {
-            dataset_id?: string
-            project_id?: string
           }
         | {
             api_key?: string
@@ -5530,6 +5520,29 @@ export interface components {
             structured_data?: string
             /** @default false */
             tls?: boolean
+          }
+        | {
+            access_key_id?: string
+            batch_timeout?: number
+            s3_bucket?: string
+            secret_access_key?: string
+            storage_region?: string
+          }
+        | {
+            password?: string
+            region?: string
+            username?: string
+          }
+        | {
+            endpoint?: string
+            /** @default true */
+            gzip?: boolean
+            /** @default {} */
+            headers?: {
+              [key: string]: string
+            }
+            /** @default http/protobuf */
+            protocol?: string
           }
       description?: string
       name: string
@@ -5638,14 +5651,6 @@ export interface components {
       role_id?: number
       role_scoped_projects?: string[]
     }
-    CreateInvitationResponse: {
-      failed: {
-        /** Format: email */
-        email: string
-        error: string
-      }[]
-      succeeded: string[]
-    } | null
     CreateNamespaceBody: {
       namespace: string
     }
@@ -7319,40 +7324,6 @@ export interface components {
       /** @description Source ID */
       id: number
     }
-    CreateSSOProviderBody:
-      | {
-          /** @default [] */
-          domains?: string[]
-          email_mapping: string[]
-          enabled: boolean
-          first_name_mapping?: string[]
-          /** Format: uri */
-          idjag_issuer_url?: string | null
-          join_org_on_signup_enabled: boolean
-          /** @enum {string} */
-          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
-          last_name_mapping?: string[]
-          metadata_xml_file: string
-          /** Format: uri */
-          metadata_xml_url?: string
-          user_name_mapping?: string[]
-        }
-      | {
-          /** @default [] */
-          domains?: string[]
-          email_mapping: string[]
-          enabled: boolean
-          first_name_mapping?: string[]
-          /** Format: uri */
-          idjag_issuer_url?: string | null
-          join_org_on_signup_enabled: boolean
-          /** @enum {string} */
-          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
-          last_name_mapping?: string[]
-          metadata_xml_file?: string
-          metadata_xml_url: string
-          user_name_mapping?: string[]
-        }
     CreateStorageAnalyticsBucketBody: {
       bucketName: string
     }
@@ -7957,9 +7928,9 @@ export interface components {
           | 'DELETING'
       }[]
     }
-    GetProjectLintsResponse: {
+    GetProjectLintsResponse: ({
       cache_key: string
-      categories: ('PERFORMANCE' | 'SECURITY')[]
+      categories: ('PERFORMANCE' | 'SECURITY' | 'HEALTH')[]
       description: string
       detail: string
       /** @enum {string} */
@@ -7973,7 +7944,18 @@ export interface components {
         name?: string
         schema?: string
         /** @enum {string} */
-        type?: 'table' | 'view' | 'auth' | 'function' | 'extension' | 'compliance'
+        type?:
+          | 'table'
+          | 'view'
+          | 'materialized view'
+          | 'foreign table'
+          | 'auth'
+          | 'function'
+          | 'extension'
+          | 'compliance'
+          | 'health'
+      } & {
+        [key: string]: unknown
       }
       /** @enum {string} */
       name:
@@ -7997,6 +7979,7 @@ export interface components {
         | 'auth_otp_long_expiry'
         | 'auth_otp_short_length'
         | 'ssl_not_enforced'
+        | 'log_connections_not_enabled'
         | 'network_restrictions_not_set'
         | 'password_requirements_min_length'
         | 'pitr_not_enabled'
@@ -8006,9 +7989,22 @@ export interface components {
         | 'leaked_service_key'
         | 'no_backup_admin'
         | 'vulnerable_postgres_version'
+        | 'db_not_reachable'
+        | 'db_connection_failing'
+        | 'db_connection_limit_reached'
+        | 'instance_telemetry_lost'
+        | 'instance_db_down'
+        | 'instance_alert_firing'
+        | 'log_service_error_rate_high'
+        | 'project_not_active'
+        | 'advisor_check_unavailable'
+      /** Format: date-time */
+      observed_at?: string
       remediation: string
       title: string
-    }[]
+    } & {
+      [key: string]: unknown
+    })[]
     GetProjectLogsBody: {
       iso_timestamp_end?: string
       iso_timestamp_start?: string
@@ -8696,14 +8692,6 @@ export interface components {
     LFBackend: {
       config:
         | {
-            hostname?: string
-            password?: string | null
-            port?: number | null
-            schema?: string
-            url?: string | null
-            username?: string | null
-          }
-        | {
             gzip?: boolean
             headers?: {
               [key: string]: string
@@ -8711,10 +8699,6 @@ export interface components {
             /** @enum {string} */
             http?: 'http1' | 'http2'
             url?: string
-          }
-        | {
-            dataset_id?: string
-            project_id?: string
           }
         | {
             api_key?: string
@@ -8746,6 +8730,29 @@ export interface components {
             structured_data?: string
             /** @default false */
             tls?: boolean
+          }
+        | {
+            access_key_id?: string
+            batch_timeout?: number
+            s3_bucket?: string
+            secret_access_key?: string
+            storage_region?: string
+          }
+        | {
+            password?: string
+            region?: string
+            username?: string
+          }
+        | {
+            endpoint?: string
+            /** @default true */
+            gzip?: boolean
+            /** @default {} */
+            headers?: {
+              [key: string]: string
+            }
+            /** @default http/protobuf */
+            protocol?: string
           }
       description?: string
       readonly id: number
@@ -9281,6 +9288,7 @@ export interface components {
         id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
         name: string
       }
+      requires_indirect_tax_declaration: boolean
       restriction_data: {
         [key: string]: string
       } | null
@@ -12305,14 +12313,6 @@ export interface components {
     UpdateBackendParamsOpenapi: {
       config?:
         | {
-            hostname?: string
-            password?: string | null
-            port?: number | null
-            schema?: string
-            url?: string | null
-            username?: string | null
-          }
-        | {
             gzip?: boolean
             headers?: {
               [key: string]: string
@@ -12320,10 +12320,6 @@ export interface components {
             /** @enum {string} */
             http?: 'http1' | 'http2'
             url?: string
-          }
-        | {
-            dataset_id?: string
-            project_id?: string
           }
         | {
             api_key?: string
@@ -12355,6 +12351,29 @@ export interface components {
             structured_data?: string
             /** @default false */
             tls?: boolean
+          }
+        | {
+            access_key_id?: string
+            batch_timeout?: number
+            s3_bucket?: string
+            secret_access_key?: string
+            storage_region?: string
+          }
+        | {
+            password?: string
+            region?: string
+            username?: string
+          }
+        | {
+            endpoint?: string
+            /** @default true */
+            gzip?: boolean
+            /** @default {} */
+            headers?: {
+              [key: string]: string
+            }
+            /** @default http/protobuf */
+            protocol?: string
           }
       description?: string
       name?: string
@@ -13968,40 +13987,6 @@ export interface components {
     UpdateSecretsResponse: {
       message: string
     }
-    UpdateSSOProviderBody:
-      | {
-          /** @default [] */
-          domains?: string[]
-          email_mapping: string[]
-          enabled: boolean
-          first_name_mapping?: string[]
-          /** Format: uri */
-          idjag_issuer_url?: string | null
-          join_org_on_signup_enabled: boolean
-          /** @enum {string} */
-          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
-          last_name_mapping?: string[]
-          metadata_xml_file: string
-          /** Format: uri */
-          metadata_xml_url?: string
-          user_name_mapping?: string[]
-        }
-      | {
-          /** @default [] */
-          domains?: string[]
-          email_mapping: string[]
-          enabled: boolean
-          first_name_mapping?: string[]
-          /** Format: uri */
-          idjag_issuer_url?: string | null
-          join_org_on_signup_enabled: boolean
-          /** @enum {string} */
-          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
-          last_name_mapping?: string[]
-          metadata_xml_file?: string
-          metadata_xml_url: string
-          user_name_mapping?: string[]
-        }
     UpdateStorageBucketBody: {
       allowed_mime_types?: string[] | null
       file_size_limit?: number | null
@@ -18081,6 +18066,7 @@ export interface operations {
                   id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
                   name: string
                 }
+                requires_indirect_tax_declaration: boolean
                 restriction_data: {
                   [key: string]: string
                 } | null
@@ -21955,7 +21941,38 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateSSOProviderBody']
+        'application/json':
+          | {
+              /** @default [] */
+              domains: string[]
+              email_mapping: string[]
+              enabled: boolean
+              first_name_mapping?: string[]
+              idjag_issuer_url?: string | null
+              join_org_on_signup_enabled: boolean
+              /** @enum {string} */
+              join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+              last_name_mapping?: string[]
+              metadata_xml_file: string
+              /** Format: uri */
+              metadata_xml_url?: string
+              user_name_mapping?: string[]
+            }
+          | {
+              /** @default [] */
+              domains: string[]
+              email_mapping: string[]
+              enabled: boolean
+              first_name_mapping?: string[]
+              idjag_issuer_url?: string | null
+              join_org_on_signup_enabled: boolean
+              /** @enum {string} */
+              join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+              last_name_mapping?: string[]
+              metadata_xml_file?: string
+              metadata_xml_url: string
+              user_name_mapping?: string[]
+            }
       }
     }
     responses: {
@@ -22033,7 +22050,38 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateSSOProviderBody']
+        'application/json':
+          | {
+              /** @default [] */
+              domains: string[]
+              email_mapping: string[]
+              enabled: boolean
+              first_name_mapping?: string[]
+              idjag_issuer_url?: string | null
+              join_org_on_signup_enabled: boolean
+              /** @enum {string} */
+              join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+              last_name_mapping?: string[]
+              metadata_xml_file: string
+              /** Format: uri */
+              metadata_xml_url?: string
+              user_name_mapping?: string[]
+            }
+          | {
+              /** @default [] */
+              domains: string[]
+              email_mapping: string[]
+              enabled: boolean
+              first_name_mapping?: string[]
+              idjag_issuer_url?: string | null
+              join_org_on_signup_enabled: boolean
+              /** @enum {string} */
+              join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+              last_name_mapping?: string[]
+              metadata_xml_file?: string
+              metadata_xml_url: string
+              user_name_mapping?: string[]
+            }
       }
     }
     responses: {
@@ -22377,6 +22425,7 @@ export interface operations {
                   id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
                   name: string
                 }
+                requires_indirect_tax_declaration: boolean
                 restriction_data: {
                   [key: string]: string
                 } | null
