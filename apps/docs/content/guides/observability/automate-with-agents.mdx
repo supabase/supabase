@@ -11,12 +11,12 @@ This guide explains how to run a Supabase monitoring agent in your own harness. 
 
 Start with one monitor. Add another only when the project needs a different source or cadence.
 
-| Monitor                                                                                       | What it watches                                                               | Default cadence | Use it when                                                    |
-| --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | --------------- | -------------------------------------------------------------- |
-| [Health monitor](/docs/guides/monitoring-and-debugging/automate-with-agents/health)           | API and Auth server errors, error-rate spikes, connection pressure            | Hourly          | You need incident detection and regular feedback loops         |
-| [Security monitor](/docs/guides/monitoring-and-debugging/automate-with-agents/security)       | Security Advisor findings, authentication and authorization failures          | Daily           | You need a regular access-control and configuration review     |
-| [Performance monitor](/docs/guides/monitoring-and-debugging/automate-with-agents/performance) | Slow queries, lock waits, long-running sessions, Performance Advisor findings | Hourly          | You need query and database performance checks                 |
-| [Capacity monitor](/docs/guides/monitoring-and-debugging/automate-with-agents/usage)          | Request, error, storage, table, and connection growth                         | Daily           | You need to identify growth before it reaches a resource limit |
+| Monitor                                                                                       | What it watches                                                               | Default cadence  | Use it when                                                    |
+| --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ---------------- | -------------------------------------------------------------- |
+| [Health monitor](/docs/guides/observability/automate-with-agents/health)           | API and Auth server errors, error-rate spikes, connection pressure            | Hourly           | You need incident detection and regular feedback loops         |
+| [Security monitor](/docs/guides/observability/automate-with-agents/security)       | Security Advisor findings, authentication and authorization failures          | Daily            | You need a regular access-control and configuration review     |
+| [Performance monitor](/docs/guides/observability/automate-with-agents/performance) | Slow queries, lock waits, long-running sessions, Performance Advisor findings | Hourly           | You need query and database performance checks                 |
+| [Capacity monitor](/docs/guides/observability/automate-with-agents/usage)          | Request, error, storage, table, and connection growth                         | Daily            | You need to identify growth before it reaches a resource limit |
 
 For a small project, run the most relevant routine daily or weekly and include the other categories in its prompt. Split it into specialized monitors only when you need different owners, schedules, or alert thresholds.
 

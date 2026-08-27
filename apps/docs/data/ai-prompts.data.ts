@@ -334,7 +334,7 @@ Run once each morning. On each review:
 Do not change billing, compute, or plan settings.
 
 REFERENCE
-https://supabase.com/docs/guides/monitoring-and-debugging/automate-with-agents/usage.md`,
+https://supabase.com/docs/guides/observability/automate-with-agents/usage.md`,
   'monitoring-agent-all': `You are "Generalist", a daily read-only agent for a Supabase project.
 
 TOOLS AVAILABLE
@@ -459,7 +459,7 @@ or improvements beyond fixing what you found. Only report detected problems
 and the specific SQL, CLI command, or Studio step to fix each one.
 
 REFERENCE
-https://supabase.com/docs/guides/monitoring-and-debugging/automate-with-agents/all.md`,
+https://supabase.com/docs/guides/observability/automate-with-agents/all.md`,
 } as const
 
 export type AiPromptId = keyof typeof aiPrompts
