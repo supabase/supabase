@@ -76,7 +76,11 @@ describe('IndirectTaxDeclarationModal', () => {
     await userEvent.keyboard('{Escape}')
     expect(screen.getByRole('dialog')).toBeInTheDocument()
 
-    expect(screen.getByRole('button', { name: 'Submit declaration' })).toBeDisabled()
+    const submitButton = screen.getByRole('button', { name: 'Submit declaration' })
+    expect(submitButton).toBeDisabled()
+
+    await userEvent.hover(submitButton)
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Select Yes or No to continue')
   })
 
   test('submits the declaration', async () => {

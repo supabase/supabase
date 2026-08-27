@@ -16,6 +16,7 @@ import {
   RadioGroupStackedItem,
 } from 'ui'
 
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizations/organization-customer-profile-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -73,7 +74,7 @@ export const IndirectTaxDeclarationModal = () => {
 
     setHasSubmittedDeclaration(true)
     setSubmitIndirectTaxDeclaration(null)
-    
+
     updateCustomerProfile({
       slug: organization.slug,
       indirect_tax_registration_declaration: response,
@@ -119,9 +120,19 @@ export const IndirectTaxDeclarationModal = () => {
           </DialogSection>
 
           <DialogFooter>
-            <Button onClick={onSubmit} disabled={response === ''} loading={isPending}>
+            <ButtonTooltip
+              onClick={onSubmit}
+              disabled={response === ''}
+              loading={isPending}
+              tooltip={{
+                content: {
+                  side: 'top',
+                  text: response === '' ? 'Select Yes or No to continue' : undefined,
+                },
+              }}
+            >
               Submit declaration
-            </Button>
+            </ButtonTooltip>
           </DialogFooter>
         </DialogContent>
       </Dialog>
