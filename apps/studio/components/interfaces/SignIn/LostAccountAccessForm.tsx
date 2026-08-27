@@ -209,7 +209,6 @@ const LostAccountAccessForm = ({ onSuccess }: { onSuccess: (email: string) => vo
                         {...field}
                         type="email"
                         placeholder="you@example.com"
-                        disabled={isPending}
                         autoComplete="email"
                       />
                     </FormControl>
@@ -230,7 +229,6 @@ const LostAccountAccessForm = ({ onSuccess }: { onSuccess: (email: string) => vo
                         {...field}
                         type="text"
                         placeholder="Acme"
-                        disabled={isPending}
                         autoComplete="off"
                         data-1p-ignore
                         data-lpignore="true"
@@ -274,18 +272,8 @@ const LostAccountAccessForm = ({ onSuccess }: { onSuccess: (email: string) => vo
                 description="Paid plans only."
               >
                 <div className="flex flex-col gap-y-8">
-                  <InvoiceFields
-                    index={0}
-                    label="Most recent invoice"
-                    control={form.control}
-                    disabled={isPending}
-                  />
-                  <InvoiceFields
-                    index={1}
-                    label="Previous invoice"
-                    control={form.control}
-                    disabled={isPending}
-                  />
+                  <InvoiceFields index={0} label="Most recent invoice" control={form.control} />
+                  <InvoiceFields index={1} label="Previous invoice" control={form.control} />
                 </div>
               </FormItemLayout>
             </div>
@@ -340,7 +328,7 @@ const LostAccountAccessForm = ({ onSuccess }: { onSuccess: (email: string) => vo
           </StandaloneFormCardContent>
 
           <StandaloneFormCardFooter>
-            <Button block type="submit" size="medium" disabled={isPending} loading={isPending}>
+            <Button block type="submit" size="medium" loading={isPending}>
               Submit recovery request
             </Button>
           </StandaloneFormCardFooter>
@@ -359,12 +347,10 @@ const InvoiceFields = ({
   index,
   label,
   control,
-  disabled,
 }: {
   index: number
   label: string
   control: ReturnType<typeof useForm<LostAccountAccessFormData>>['control']
-  disabled: boolean
 }) => {
   return (
     <div className="flex flex-col gap-y-2">
@@ -376,7 +362,7 @@ const InvoiceFields = ({
           render={({ field }) => (
             <FormItemLayout label="Invoice number">
               <FormControl>
-                <Input {...field} type="text" placeholder="INV-001" disabled={disabled} />
+                <Input {...field} type="text" placeholder="INV-001" />
               </FormControl>
             </FormItemLayout>
           )}
@@ -387,7 +373,7 @@ const InvoiceFields = ({
           render={({ field }) => (
             <FormItemLayout label="Amount">
               <FormControl>
-                <Input {...field} type="number" placeholder="25.00" disabled={disabled} />
+                <Input {...field} type="number" placeholder="25.00" />
               </FormControl>
             </FormItemLayout>
           )}
