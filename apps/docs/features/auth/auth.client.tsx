@@ -1,9 +1,8 @@
 'use client'
 
 import { useQueryClient } from '@tanstack/react-query'
-import { AuthProvider, LOCAL_STORAGE_KEYS } from 'common'
+import { AuthProvider, clearLocalStorage } from 'common'
 import { type PropsWithChildren, useCallback } from 'react'
-import { remove } from '~/lib/storage'
 import { useOnLogout } from '~/lib/userAuth'
 
 /**
@@ -19,9 +18,7 @@ const SignOutHandler = ({ children }: PropsWithChildren) => {
     queryClient.cancelQueries()
     queryClient.clear()
 
-    Object.keys(LOCAL_STORAGE_KEYS).forEach((key) => {
-      remove('local', LOCAL_STORAGE_KEYS[key])
-    })
+    clearLocalStorage()
   }, [queryClient])
 
   useOnLogout(cleanUp)
