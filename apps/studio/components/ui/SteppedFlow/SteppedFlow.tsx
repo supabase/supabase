@@ -75,7 +75,8 @@ export const SteppedFlow = ({
     0,
     steps.findIndex((step) => step.id === currentStep)
   )
-  const isLastStep = currentIndex === steps.length - 1
+  const stepCount = steps.length
+  const isLastStep = stepCount > 0 && currentIndex === stepCount - 1
   const isFirstStep = currentIndex === 0
   const currentStepLabel = steps[currentIndex]?.label
   const showCancel = isFirstStep && !!onCancel
@@ -92,11 +93,15 @@ export const SteppedFlow = ({
     }
   }
 
+  if (stepCount === 0) {
+    return null
+  }
+
   return (
     <div className="flex min-h-full flex-col">
       <div className="mx-auto w-full max-w-[760px] flex-1 px-6 pt-8 pb-10">
         <p className="mb-4 text-xs text-foreground-lighter" role="status">
-          Step {currentIndex + 1} of {steps.length}
+          Step {currentIndex + 1} of {stepCount}
           {currentStepLabel ? ` · ${currentStepLabel}` : ''}
         </p>
         <Card
@@ -134,7 +139,7 @@ export const SteppedFlow = ({
                   form={finalAction.form}
                   variant="primary"
                   loading={finalAction.loading}
-                  disabled={finalAction.disabled}
+                  disabled={navigationDisabled || finalAction.disabled}
                   onClick={finalAction.onClick}
                 >
                   {finalAction.label}
@@ -143,7 +148,7 @@ export const SteppedFlow = ({
                 <Button
                   type="button"
                   variant="primary"
-                  disabled={nextDisabled || !nextStepId}
+                  disabled={navigationDisabled || nextDisabled || !nextStepId}
                   loading={nextLoading}
                   onClick={handleNext}
                 >

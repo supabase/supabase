@@ -139,4 +139,35 @@ describe('SteppedFlow', () => {
 
     expect(screen.getByRole('button', { name: 'Back' })).toBeDisabled()
   })
+
+  test('disables Next while navigation is locked', () => {
+    customRender(
+      <SteppedFlow
+        steps={steps}
+        currentStep="destination"
+        onStepChange={vi.fn()}
+        navigationDisabled
+      >
+        Step body
+      </SteppedFlow>
+    )
+
+    expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled()
+  })
+
+  test('disables the final action while navigation is locked', () => {
+    customRender(
+      <SteppedFlow
+        steps={steps}
+        currentStep="review"
+        onStepChange={vi.fn()}
+        navigationDisabled
+        finalAction={{ label: 'Create and start pipeline' }}
+      >
+        Step body
+      </SteppedFlow>
+    )
+
+    expect(screen.getByRole('button', { name: 'Create and start pipeline' })).toBeDisabled()
+  })
 })
