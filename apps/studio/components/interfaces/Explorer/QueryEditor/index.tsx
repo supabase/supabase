@@ -2,7 +2,7 @@ import { useMonaco } from '@monaco-editor/react'
 import { acceptUntrustedSql, untrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { useFlag } from 'common'
 import { CodeSquare, Eye, EyeOff, Play } from 'lucide-react'
-import type { editor as monacoEditor } from 'monaco-editor'
+import type { editor as monacoEditor, Selection } from 'monaco-editor'
 import {
   forwardRef,
   useEffect,
@@ -239,13 +239,6 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   const isExecuting = isExecutingSql || isExecutingLogs
   const isBusy = isLoadingProject || isResolvingDatabase || isExecuting
 
-  /**
-   * The user's run gesture, and therefore the promotion point for this query's SQL. The
-   * raw text comes straight off the editor, so it is (re)branded untrusted here — the
-   * editor boundary — and promoted in the same handler. Which pair of helpers applies is
-   * decided by `query._tag`, the same discriminant that picks the execution endpoint, so
-   * Postgres SQL cannot reach the analytics wire or vice versa.
-   */
   const handleRunQuery = async ({
     rawSql = sql,
     shouldForce = false,
@@ -467,12 +460,22 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
                   editor.onDidBlurEditorWidget(() => onSqlCommitRef.current?.(sqlRef.current))
                   editorInstanceRef.current = editor
 
-                  editor.onDidChangeCursorSelection(({ selection }) => {
+                  const updateHasSelection = (selection: Selection | null | undefined) => {
                     const noSelection =
-                      selection.startLineNumber === selection.endLineNumber &&
-                      selection.startColumn === selection.endColumn
+                      !selection ||
+                      (selection.startLineNumber === selection.endLineNumber &&
+                        selection.startColumn === selection.endColumn)
                     setHasSelection(!noSelection)
-                  })
+                  }
+
+                  // A remount (e.g. toggling "Show query" off then on) creates a fresh
+                  // editor with no listener history, so `hasSelection` must be read from
+                  // this instance directly rather than left at whatever the previous
+                  // editor instance last reported.
+                  updateHasSelection(editor.getSelection())
+                  editor.onDidChangeCursorSelection(({ selection }) =>
+                    updateHasSelection(selection)
+                  )
 
                   editor.addAction({
                     id: 'generate-sql',

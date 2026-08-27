@@ -46,22 +46,23 @@ vi.mock('@/components/ui/CodeEditor/CodeEditor', () => ({
 
     useEffect(() => {
       const hasSelection = testContext.selectedText !== undefined
+      // Matches this instance's selection at the moment it mounts — a fresh editor
+      // instance (e.g. after "Show query" remounts it) has no memory of a prior
+      // instance's selection, so this must be read fresh rather than carried over.
+      const selection = hasSelection
+        ? { startLineNumber: 1, endLineNumber: 2, startColumn: 1, endColumn: 5 }
+        : null
+
       onMount?.(
         {
           getValue: () => valueRef.current,
-          getSelection: () => (hasSelection ? {} : null),
+          getSelection: () => selection,
           getModel: () => ({ getValueInRange: () => testContext.selectedText }),
           onDidBlurEditorWidget: () => () => {},
-          // Fires once on mount with the test's simulated selection state, mirroring
-          // the real editor's callback shape closely enough for QueryEditor's handler.
-          onDidChangeCursorSelection: (callback: (e: { selection: any }) => void) => {
-            callback({
-              selection: hasSelection
-                ? { startLineNumber: 1, endLineNumber: 2, startColumn: 1, endColumn: 5 }
-                : { startLineNumber: 1, endLineNumber: 1, startColumn: 1, endColumn: 1 },
-            })
-            return { dispose: () => {} }
-          },
+          // Intentionally never invoked here — the real editor only fires this on a
+          // subsequent user-driven selection change, not eagerly on mount. Tests that
+          // need to simulate a live selection change should call this directly.
+          onDidChangeCursorSelection: () => ({ dispose: () => {} }),
           addAction: () => {},
         },
         { KeyMod: { CtrlCmd: 1, Shift: 2 }, KeyCode: { KeyK: 3, Enter: 4 } }
@@ -456,5 +457,46 @@ describe('QueryTab execution', () => {
     await waitFor(() => expect(executedQueries).toHaveLength(1))
     expect(executedQueries[0]).toContain('select 2')
     expect(executedQueries[0]).not.toContain('select 1')
+  })
+
+  it('drops the stale "Run selected" state once the query panel is hidden and shown again', async () => {
+    createDraft({ _tag: 'database' }, 'select 1;\nselect 2;')
+    testContext.selectedText = 'select 2;'
+
+    const executedQueries: string[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: async ({ request }) => {
+        const key = new URL(request.url).searchParams.get('key')
+        if (key !== '') return HttpResponse.json([])
+        const { query } = (await request.json()) as { query: string }
+        executedQueries.push(query)
+        return HttpResponse.json([])
+      },
+    })
+
+    renderQueryTab()
+    expect(await screen.findByRole('button', { name: 'Run selected' })).toBeInTheDocument()
+
+    // Hiding the query panel unmounts CodeEditor entirely. Simulate the selection being
+    // gone by the time it's shown again (a fresh editor instance has no selection yet).
+    const hideQueryButton = document.querySelector('.lucide-eye-off')?.closest('button')
+    expect(hideQueryButton).toBeInstanceOf(HTMLButtonElement)
+    await userEvent.click(hideQueryButton as HTMLButtonElement)
+    testContext.selectedText = undefined
+
+    const showQueryButton = document.querySelector('.lucide-eye')?.closest('button')
+    expect(showQueryButton).toBeInstanceOf(HTMLButtonElement)
+    await userEvent.click(showQueryButton as HTMLButtonElement)
+
+    const runButton = await screen.findByRole('button', { name: 'Run' })
+    expect(screen.queryByRole('button', { name: 'Run selected' })).not.toBeInTheDocument()
+
+    await userEvent.click(runButton)
+
+    await waitFor(() => expect(executedQueries).toHaveLength(1))
+    expect(executedQueries[0]).toContain('select 1')
+    expect(executedQueries[0]).toContain('select 2')
   })
 })
