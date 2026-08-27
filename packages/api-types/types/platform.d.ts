@@ -6177,14 +6177,6 @@ export interface components {
       role_id?: number
       role_scoped_projects?: string[]
     }
-    CreateInvitationResponse: {
-      failed: {
-        /** Format: email */
-        email: string
-        error: string
-      }[]
-      succeeded: string[]
-    } | null
     CreateNamespaceBody: {
       namespace: string
     }
@@ -7545,40 +7537,6 @@ export interface components {
       /** @description Source ID */
       id: number
     }
-    CreateSSOProviderBody:
-      | {
-          /** @default [] */
-          domains?: string[]
-          email_mapping: string[]
-          enabled: boolean
-          first_name_mapping?: string[]
-          /** Format: uri */
-          idjag_issuer_url?: string | null
-          join_org_on_signup_enabled: boolean
-          /** @enum {string} */
-          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
-          last_name_mapping?: string[]
-          metadata_xml_file: string
-          /** Format: uri */
-          metadata_xml_url?: string
-          user_name_mapping?: string[]
-        }
-      | {
-          /** @default [] */
-          domains?: string[]
-          email_mapping: string[]
-          enabled: boolean
-          first_name_mapping?: string[]
-          /** Format: uri */
-          idjag_issuer_url?: string | null
-          join_org_on_signup_enabled: boolean
-          /** @enum {string} */
-          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
-          last_name_mapping?: string[]
-          metadata_xml_file?: string
-          metadata_xml_url: string
-          user_name_mapping?: string[]
-        }
     CreateStorageAnalyticsBucketBody: {
       bucketName: string
     }
@@ -14647,40 +14605,6 @@ export interface components {
     UpdateSecretsResponse: {
       message: string
     }
-    UpdateSSOProviderBody:
-      | {
-          /** @default [] */
-          domains?: string[]
-          email_mapping: string[]
-          enabled: boolean
-          first_name_mapping?: string[]
-          /** Format: uri */
-          idjag_issuer_url?: string | null
-          join_org_on_signup_enabled: boolean
-          /** @enum {string} */
-          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
-          last_name_mapping?: string[]
-          metadata_xml_file: string
-          /** Format: uri */
-          metadata_xml_url?: string
-          user_name_mapping?: string[]
-        }
-      | {
-          /** @default [] */
-          domains?: string[]
-          email_mapping: string[]
-          enabled: boolean
-          first_name_mapping?: string[]
-          /** Format: uri */
-          idjag_issuer_url?: string | null
-          join_org_on_signup_enabled: boolean
-          /** @enum {string} */
-          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
-          last_name_mapping?: string[]
-          metadata_xml_file?: string
-          metadata_xml_url: string
-          user_name_mapping?: string[]
-        }
     UpdateStorageBucketBody: {
       allowed_mime_types?: string[] | null
       file_size_limit?: number | null
@@ -22705,7 +22629,38 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateSSOProviderBody']
+        'application/json':
+          | {
+              /** @default [] */
+              domains: string[]
+              email_mapping: string[]
+              enabled: boolean
+              first_name_mapping?: string[]
+              idjag_issuer_url?: string | null
+              join_org_on_signup_enabled: boolean
+              /** @enum {string} */
+              join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+              last_name_mapping?: string[]
+              metadata_xml_file: string
+              /** Format: uri */
+              metadata_xml_url?: string
+              user_name_mapping?: string[]
+            }
+          | {
+              /** @default [] */
+              domains: string[]
+              email_mapping: string[]
+              enabled: boolean
+              first_name_mapping?: string[]
+              idjag_issuer_url?: string | null
+              join_org_on_signup_enabled: boolean
+              /** @enum {string} */
+              join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+              last_name_mapping?: string[]
+              metadata_xml_file?: string
+              metadata_xml_url: string
+              user_name_mapping?: string[]
+            }
       }
     }
     responses: {
@@ -22783,7 +22738,38 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateSSOProviderBody']
+        'application/json':
+          | {
+              /** @default [] */
+              domains: string[]
+              email_mapping: string[]
+              enabled: boolean
+              first_name_mapping?: string[]
+              idjag_issuer_url?: string | null
+              join_org_on_signup_enabled: boolean
+              /** @enum {string} */
+              join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+              last_name_mapping?: string[]
+              metadata_xml_file: string
+              /** Format: uri */
+              metadata_xml_url?: string
+              user_name_mapping?: string[]
+            }
+          | {
+              /** @default [] */
+              domains: string[]
+              email_mapping: string[]
+              enabled: boolean
+              first_name_mapping?: string[]
+              idjag_issuer_url?: string | null
+              join_org_on_signup_enabled: boolean
+              /** @enum {string} */
+              join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+              last_name_mapping?: string[]
+              metadata_xml_file?: string
+              metadata_xml_url: string
+              user_name_mapping?: string[]
+            }
       }
     }
     responses: {

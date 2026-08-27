@@ -73,6 +73,7 @@ const TableOptionRow = ({ control, index, tableId }: TableOptionRowProps) => {
     data: columns = [],
     isPending,
     isFetching,
+    isError,
     refetch: refetchColumns,
   } = useReplicationTableColumnsQuery(
     { projectRef, sourceId, tableId },
@@ -84,7 +85,7 @@ const TableOptionRow = ({ control, index, tableId }: TableOptionRowProps) => {
 
   const refreshColumns = () => {
     setShouldLoadColumns(true)
-    void refetchColumns()
+    if (!isFetching) void refetchColumns()
   }
 
   return (
@@ -127,6 +128,11 @@ const TableOptionRow = ({ control, index, tableId }: TableOptionRowProps) => {
             <SelectContent>
               {isLoadingColumns && (
                 <GenericSelectionSkeletonLoader className="w-full" variant="select" />
+              )}
+              {isError && columns.length === 0 && (
+                <div className="px-2 py-3 text-xs text-foreground-lighter">
+                  Unable to load columns
+                </div>
               )}
               {columnNames.map((column) => (
                 <SelectItem key={column} value={column}>
@@ -214,6 +220,7 @@ const TableOptionRow = ({ control, index, tableId }: TableOptionRowProps) => {
           }}
         >
           <MultiSelector.Trigger
+            aria-label="Select clustering columns"
             badgeLimit="wrap"
             label="Select columns..."
             renderValue={(column) => (
@@ -221,7 +228,11 @@ const TableOptionRow = ({ control, index, tableId }: TableOptionRowProps) => {
             )}
           />
           <MultiSelector.Content>
-            <MultiSelector.List loading={isLoadingColumns}>
+            <MultiSelector.List
+              error={isError && columns.length === 0}
+              errorLabel="Unable to load columns"
+              loading={isLoadingColumns}
+            >
               {columnNames.map((column) => (
                 <MultiSelector.Item key={column} value={column}>
                   <ColumnOption name={column} type={columnTypeByName.get(column)} />

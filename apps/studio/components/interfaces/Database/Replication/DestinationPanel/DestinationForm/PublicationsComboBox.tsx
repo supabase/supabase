@@ -43,10 +43,12 @@ export const PublicationsComboBox = ({
     data: publications = [],
     isPending,
     isFetching,
+    isError,
     refetch: refetchPublications,
   } = useReplicationPublicationNamesQuery({ projectRef, sourceId })
   const isLoadingPublications = isPending || isFetching
   const showLoadingState = isLoadingPublications && publications.length === 0
+  const showErrorState = isError && publications.length === 0
 
   function handlePublicationSelect(pub: string) {
     setSelectedPublication(pub)
@@ -66,7 +68,7 @@ export const PublicationsComboBox = ({
         setDropdownOpen(open)
         if (open) {
           if (typeof projectRef !== 'undefined' && typeof sourceId !== 'undefined') {
-            refetchPublications()
+            if (!isFetching) void refetchPublications()
           }
         }
 
@@ -99,7 +101,9 @@ export const PublicationsComboBox = ({
             onValueChange={setSearchTerm}
           />
           <CommandList>
-            {!showLoadingState && <CommandEmpty>No publications found</CommandEmpty>}
+            {!showLoadingState && !showErrorState && (
+              <CommandEmpty>No publications found</CommandEmpty>
+            )}
 
             {showLoadingState && (
               <div className="p-1">
@@ -107,8 +111,14 @@ export const PublicationsComboBox = ({
               </div>
             )}
 
+            {showErrorState && (
+              <div className="px-3 py-4 text-xs text-foreground-lighter">
+                Unable to load publications
+              </div>
+            )}
+
             <CommandGroup>
-              {publications.length === 0 && !showLoadingState && (
+              {publications.length === 0 && !showLoadingState && !showErrorState && (
                 <div className="text-foreground-lighter text-xs py-3 px-2">
                   <p>No publications available</p>
                 </div>

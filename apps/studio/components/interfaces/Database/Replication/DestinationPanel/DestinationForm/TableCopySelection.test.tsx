@@ -11,7 +11,6 @@ import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 type ReplicationSourcesResponse = components['schemas']['SourcesResponse_Output']
-type ReadPublicationsV2Response = components['schemas']['ReadPublicationsResponse_Output']
 type PublicationDetailsResponse = components['schemas']['PublicationDetailsResponse_Output']
 
 const mockSources: ReplicationSourcesResponse = {
@@ -23,10 +22,6 @@ const mockSources: ReplicationSourcesResponse = {
       config: { host: 'db.internal', name: 'main-db', port: 5432, username: 'etl_user' },
     },
   ],
-}
-
-const mockPublicationNames: ReadPublicationsV2Response = {
-  publications: [{ name: 'analytics' }],
 }
 
 const mockPublicationDetails: PublicationDetailsResponse = {
@@ -57,11 +52,6 @@ const mockSourcesEndpoint = () => {
 const mockPublicationsSuccess = () => {
   addAPIMock({
     method: 'get',
-    path: '/platform/replication/v2/:ref/sources/:source_id/publications',
-    response: () => HttpResponse.json<ReadPublicationsV2Response>(mockPublicationNames),
-  })
-  addAPIMock({
-    method: 'get',
     path: '/platform/replication/v2/:ref/sources/:source_id/publications/:publication_name',
     response: () => HttpResponse.json<PublicationDetailsResponse>(mockPublicationDetails),
   })
@@ -70,7 +60,7 @@ const mockPublicationsSuccess = () => {
 const mockPublicationsError = () => {
   addAPIMock({
     method: 'get',
-    path: '/platform/replication/v2/:ref/sources/:source_id/publications',
+    path: '/platform/replication/v2/:ref/sources/:source_id/publications/:publication_name',
     response: () => HttpResponse.json<APIErrorBody>({ message: 'Boom' }, { status: 500 }),
   })
 }
@@ -78,7 +68,7 @@ const mockPublicationsError = () => {
 const mockPublicationsPending = () => {
   addAPIMock({
     method: 'get',
-    path: '/platform/replication/v2/:ref/sources/:source_id/publications',
+    path: '/platform/replication/v2/:ref/sources/:source_id/publications/:publication_name',
     response: () => new Promise<never>(() => {}),
   })
 }
@@ -172,16 +162,16 @@ describe('TableCopySelection', () => {
     mockSourcesEndpoint()
     mockPublicationsPending()
 
-    const { container } = customRender(
+    customRender(
       <TableCopySelectionHarness editMode mode="include_tables" selectedTableIds={['101', '999']} />
     )
 
-    const trigger = screen.getByRole('combobox')
+    const trigger = screen.getByRole('combobox', { name: 'Select initial sync tables' })
     expect(trigger).toBeEnabled()
     expect(trigger).not.toHaveTextContent(/loading/i)
 
     fireEvent.click(trigger)
-    await waitFor(() => expect(container.querySelector('.shimmering-loader')).toBeInTheDocument())
+    await waitFor(() => expect(document.querySelector('.shimmering-loader')).toBeInTheDocument())
     expect(screen.queryByText(/previously selected table/)).not.toBeInTheDocument()
   })
 })

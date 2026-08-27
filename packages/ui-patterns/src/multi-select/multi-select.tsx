@@ -118,7 +118,7 @@ function MultiSelector({
         onValuesChange([...values, toggledValue])
       }
     },
-    [values]
+    [onValuesChange, values]
   )
 
   useEffect(() => {
@@ -540,60 +540,79 @@ const MultiSelectorList = React.forwardRef<
   React.ElementRef<typeof CommandList>,
   React.ComponentPropsWithoutRef<typeof CommandList> & {
     creatable?: boolean
+    error?: boolean
+    errorLabel?: string
     loading?: boolean
   }
->(({ className, children, creatable = false, loading = false, ...props }, ref) => {
-  const { open, inputValue, setInputValue, toggleValue, dropdownMaxHeight } = useMultiSelect()
+>(
+  (
+    {
+      className,
+      children,
+      creatable = false,
+      error = false,
+      errorLabel,
+      loading = false,
+      ...props
+    },
+    ref
+  ) => {
+    const { open, inputValue, setInputValue, toggleValue, dropdownMaxHeight } = useMultiSelect()
 
-  const options = Children.toArray(children)
-  const availableOptions = options
-    .filter((x: any) => !!x.props.value)
-    .map((x: any) => x.props.value.toLowerCase())
-  const isOptionExists = availableOptions.some((x: string) => x === inputValue.toLowerCase())
+    const options = Children.toArray(children)
+    const availableOptions = options
+      .filter((x: any) => !!x.props.value)
+      .map((x: any) => x.props.value.toLowerCase())
+    const isOptionExists = availableOptions.some((x: string) => x === inputValue.toLowerCase())
 
-  return (
-    <CommandList
-      ref={ref}
-      className={cn(
-        'p-1 flex flex-col scrollbar-thin scrollbar-track-transparent transition-colors',
-        'scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted',
-        'scrollbar-thumb-rounded-lg w-full overflow-y-auto',
-        className
-      )}
-      style={{ maxHeight: dropdownMaxHeight }}
-      onWheel={(e) => e.stopPropagation()}
-      {...props}
-    >
-      {loading ? (
-        <GenericSelectionSkeletonLoader className="w-full" />
-      ) : (
-        <>
-          {children}
-          {creatable && inputValue.length > 0 && !isOptionExists ? (
-            <CommandItem
-              role="option"
-              onSelect={() => {
-                open && toggleValue(inputValue)
-                setInputValue('')
-              }}
-              className={commandItemClass}
-            >
-              Create "{inputValue}"
-            </CommandItem>
-          ) : creatable && options.length === 0 ? (
-            <div className="p-2 py-1.5 text-xs text-foreground-lighter font-italic">
-              Type to add a value
-            </div>
-          ) : (
-            <CommandEmpty>
-              <span className="text-foreground-muted">No results found</span>
-            </CommandEmpty>
-          )}
-        </>
-      )}
-    </CommandList>
-  )
-})
+    return (
+      <CommandList
+        ref={ref}
+        className={cn(
+          'p-1 flex flex-col scrollbar-thin scrollbar-track-transparent transition-colors',
+          'scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted',
+          'scrollbar-thumb-rounded-lg w-full overflow-y-auto',
+          className
+        )}
+        style={{ maxHeight: dropdownMaxHeight }}
+        onWheel={(e) => e.stopPropagation()}
+        {...props}
+      >
+        {loading ? (
+          <GenericSelectionSkeletonLoader className="w-full" />
+        ) : error ? (
+          <div className="px-2 py-3 text-xs text-foreground-lighter">
+            {errorLabel ?? 'Unable to load options'}
+          </div>
+        ) : (
+          <>
+            {children}
+            {creatable && inputValue.length > 0 && !isOptionExists ? (
+              <CommandItem
+                role="option"
+                onSelect={() => {
+                  open && toggleValue(inputValue)
+                  setInputValue('')
+                }}
+                className={commandItemClass}
+              >
+                Create "{inputValue}"
+              </CommandItem>
+            ) : creatable && options.length === 0 ? (
+              <div className="p-2 py-1.5 text-xs text-foreground-lighter font-italic">
+                Type to add a value
+              </div>
+            ) : (
+              <CommandEmpty>
+                <span className="text-foreground-muted">No results found</span>
+              </CommandEmpty>
+            )}
+          </>
+        )}
+      </CommandList>
+    )
+  }
+)
 
 MultiSelectorList.displayName = 'MultiSelectorList'
 MultiSelector.List = MultiSelectorList

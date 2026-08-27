@@ -380,18 +380,18 @@ export interface components {
         attributes: {
           /** @enum {string} */
           backend_type:
-            | 'axiom'
+            | 'postgres'
             | 'bigquery'
             | 'clickhouse'
-            | 'datadog'
-            | 'last9'
-            | 'loki'
-            | 'otlp'
-            | 'postgres'
-            | 's3'
-            | 'sentry'
-            | 'syslog'
             | 'webhook'
+            | 'datadog'
+            | 'loki'
+            | 'sentry'
+            | 's3'
+            | 'axiom'
+            | 'last9'
+            | 'otlp'
+            | 'syslog'
           config:
             | {
                 hostname?: string
@@ -485,18 +485,18 @@ export interface components {
         attributes: {
           /** @enum {string} */
           backend_type:
-            | 'axiom'
+            | 'postgres'
             | 'bigquery'
             | 'clickhouse'
-            | 'datadog'
-            | 'last9'
-            | 'loki'
-            | 'otlp'
-            | 'postgres'
-            | 's3'
-            | 'sentry'
-            | 'syslog'
             | 'webhook'
+            | 'datadog'
+            | 'loki'
+            | 'sentry'
+            | 's3'
+            | 'axiom'
+            | 'last9'
+            | 'otlp'
+            | 'syslog'
           config:
             | {
                 hostname?: string
@@ -566,18 +566,18 @@ export interface components {
         attributes: {
           /** @enum {string} */
           backend_type:
-            | 'axiom'
+            | 'postgres'
             | 'bigquery'
             | 'clickhouse'
-            | 'datadog'
-            | 'last9'
-            | 'loki'
-            | 'otlp'
-            | 'postgres'
-            | 's3'
-            | 'sentry'
-            | 'syslog'
             | 'webhook'
+            | 'datadog'
+            | 'loki'
+            | 'sentry'
+            | 's3'
+            | 'axiom'
+            | 'last9'
+            | 'otlp'
+            | 'syslog'
           config:
             | {
                 hostname?: string
@@ -673,18 +673,18 @@ export interface components {
         attributes: {
           /** @enum {string} */
           backend_type:
-            | 'axiom'
+            | 'postgres'
             | 'bigquery'
             | 'clickhouse'
-            | 'datadog'
-            | 'last9'
-            | 'loki'
-            | 'otlp'
-            | 'postgres'
-            | 's3'
-            | 'sentry'
-            | 'syslog'
             | 'webhook'
+            | 'datadog'
+            | 'loki'
+            | 'sentry'
+            | 's3'
+            | 'axiom'
+            | 'last9'
+            | 'otlp'
+            | 'syslog'
           config?:
             | {
                 hostname?: string
@@ -764,7 +764,7 @@ export interface components {
            * @example developer
            * @enum {string}
            */
-          role: 'administrator' | 'developer' | 'owner' | 'read-only'
+          role: 'owner' | 'administrator' | 'developer' | 'read-only'
         }
         /**
          * @description Resource type.
@@ -796,7 +796,7 @@ export interface components {
            * @example developer
            * @enum {string}
            */
-          role: 'administrator' | 'developer' | 'owner' | 'read-only'
+          role: 'owner' | 'administrator' | 'developer' | 'read-only'
         }
         /**
          * @description Resource type.
@@ -1116,12 +1116,12 @@ export interface components {
            * @enum {string}
            */
           status:
-            | 'ASSOCIATION_ACCEPTED'
-            | 'ASSOCIATION_REQUEST_EXPIRED'
             | 'CREATING'
+            | 'READY'
+            | 'ASSOCIATION_REQUEST_EXPIRED'
+            | 'ASSOCIATION_ACCEPTED'
             | 'CREATION_FAILED'
             | 'DELETING'
-            | 'READY'
         }
         id: string
         /**
@@ -1147,26 +1147,26 @@ export interface components {
             identifier: string
             /** @enum {string} */
             infra_compute_size?:
+              | 'pico'
+              | 'nano'
+              | 'micro'
+              | 'small'
+              | 'medium'
+              | 'large'
+              | 'xlarge'
+              | '2xlarge'
+              | '4xlarge'
+              | '8xlarge'
               | '12xlarge'
               | '16xlarge'
               | '24xlarge'
-              | '24xlarge_high_memory'
-              | '24xlarge_optimized_cpu'
               | '24xlarge_optimized_memory'
-              | '2xlarge'
+              | '24xlarge_optimized_cpu'
+              | '24xlarge_high_memory'
               | '48xlarge'
-              | '48xlarge_high_memory'
-              | '48xlarge_optimized_cpu'
               | '48xlarge_optimized_memory'
-              | '4xlarge'
-              | '8xlarge'
-              | 'large'
-              | 'medium'
-              | 'micro'
-              | 'nano'
-              | 'pico'
-              | 'small'
-              | 'xlarge'
+              | '48xlarge_optimized_cpu'
+              | '48xlarge_high_memory'
             region: string | null
             /** @enum {string} */
             status:
@@ -1175,13 +1175,13 @@ export interface components {
               | 'COMING_UP'
               | 'GOING_DOWN'
               | 'INIT_FAILED'
-              | 'INIT_READ_REPLICA'
-              | 'INIT_READ_REPLICA_FAILED'
               | 'REMOVED'
-              | 'RESIZING'
-              | 'RESTARTING'
               | 'RESTORING'
               | 'UNKNOWN'
+              | 'INIT_READ_REPLICA'
+              | 'INIT_READ_REPLICA_FAILED'
+              | 'RESTARTING'
+              | 'RESIZING'
             /** @enum {string} */
             type: 'PRIMARY' | 'READ_REPLICA'
           }[]
@@ -1196,21 +1196,21 @@ export interface components {
            * @enum {string}
            */
           status:
+            | 'INACTIVE'
             | 'ACTIVE_HEALTHY'
             | 'ACTIVE_UNHEALTHY'
             | 'COMING_UP'
-            | 'GOING_DOWN'
-            | 'INACTIVE'
-            | 'INIT_FAILED'
-            | 'PAUSE_FAILED'
-            | 'PAUSING'
-            | 'REMOVED'
-            | 'RESIZING'
-            | 'RESTARTING'
-            | 'RESTORE_FAILED'
-            | 'RESTORING'
             | 'UNKNOWN'
+            | 'GOING_DOWN'
+            | 'INIT_FAILED'
+            | 'REMOVED'
+            | 'RESTORING'
             | 'UPGRADING'
+            | 'PAUSING'
+            | 'RESTORE_FAILED'
+            | 'RESTARTING'
+            | 'PAUSE_FAILED'
+            | 'RESIZING'
         }
         /**
          * @description Project ref
@@ -1266,7 +1266,7 @@ export interface components {
       data: {
         attributes: {
           /** @enum {string} */
-          build_state: 'active' | 'building' | 'failed'
+          build_state: 'building' | 'active' | 'failed'
           deleting?: boolean
           image_version?: string
           instances?: {
@@ -1362,12 +1362,12 @@ export interface components {
            * @enum {string}
            */
           status:
-            | 'ASSOCIATION_ACCEPTED'
-            | 'ASSOCIATION_REQUEST_EXPIRED'
             | 'CREATING'
+            | 'READY'
+            | 'ASSOCIATION_REQUEST_EXPIRED'
+            | 'ASSOCIATION_ACCEPTED'
             | 'CREATION_FAILED'
             | 'DELETING'
-            | 'READY'
         }
         id: string
         /**
@@ -1404,12 +1404,12 @@ export interface components {
               }[]
               applied_at?: string
               /** @enum {string} */
-              entitlement: 'allowed' | 'disallowed'
+              entitlement: 'disallowed' | 'allowed'
               /**
                * @description Whether the allowlist below is applied to the project or only stored.
                * @enum {string}
                */
-              status: 'applied' | 'stored'
+              status: 'stored' | 'applied'
               updated_at?: string
             }
             /** @description Postgres parameter overrides. Empty when the project runs entirely on defaults. */
@@ -1448,7 +1448,7 @@ export interface components {
               max_wal_size?: string
               max_worker_processes?: number
               /** @enum {string} */
-              session_replication_role?: 'local' | 'origin' | 'replica'
+              session_replication_role?: 'origin' | 'replica' | 'local'
               shared_buffers?: string
               /** @description Default unit: ms */
               statement_timeout?: string
@@ -1469,7 +1469,7 @@ export interface components {
             /** @description Defaults to the pooler's size for the project's compute when not overridden. */
             max_client_conn: number
             /** @enum {string} */
-            pool_mode: 'session' | 'statement' | 'transaction'
+            pool_mode: 'transaction' | 'session' | 'statement'
             query_wait_timeout: number
             reserve_pool_size: number
             server_idle_timeout: number
@@ -1524,7 +1524,7 @@ export interface components {
             file_size_limit: number
             migration_version: string
             /** @enum {string} */
-            upstream_target: 'canary' | 'main'
+            upstream_target: 'main' | 'canary'
           }
         }
         /** @description Project ref. */
@@ -1552,7 +1552,7 @@ export interface components {
       data: {
         attributes: {
           /** @enum {string} */
-          build_state: 'active' | 'building' | 'failed'
+          build_state: 'building' | 'active' | 'failed'
           deleting?: boolean
           image_version?: string
           instances?: {
@@ -1957,7 +1957,7 @@ export interface operations {
         /** @description Case-insensitive substring match on the project name. */
         search?: string
         /** @description Sort order by creation time: `inserted_at` (oldest first) or `-inserted_at` (newest first). Defaults to `inserted_at`. */
-        sort?: '-inserted_at' | 'inserted_at'
+        sort?: 'inserted_at' | '-inserted_at'
       }
       header?: never
       path: {

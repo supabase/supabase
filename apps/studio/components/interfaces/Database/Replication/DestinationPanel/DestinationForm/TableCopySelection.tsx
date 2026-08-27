@@ -165,10 +165,13 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
                     (!isLoadingPublicationTables && tableCount === 0)
                   }
                   onOpenChange={(open) => {
-                    if (open && publicationName) void refetchPublication()
+                    if (open && publicationName && !isRefreshingPublications) {
+                      void refetchPublication()
+                    }
                   }}
                 >
                   <MultiSelector.Trigger
+                    aria-label="Select initial sync tables"
                     badgeLimit={3}
                     renderValue={(id) => tableLabelsById.get(id) ?? 'Unavailable table'}
                     label={publicationName ? 'Select tables...' : 'Select a publication first'}

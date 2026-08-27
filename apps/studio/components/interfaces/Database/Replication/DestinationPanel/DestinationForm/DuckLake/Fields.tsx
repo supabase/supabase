@@ -692,6 +692,7 @@ const ProjectSelection = ({
   const {
     data: projectsData,
     isPending: isLoadingProjects,
+    isFetching: isFetchingProjects,
     isError: isErrorProjects,
     refetch: refetchProjects,
   } = useOrgProjectsInfiniteQuery(
@@ -706,6 +707,7 @@ const ProjectSelection = ({
       ),
     [projectsData]
   )
+  const showProjectsError = isErrorProjects && projects.length === 0
 
   const projectsByRef = useMemo(
     () => new Map(projects.map((project) => [project.ref, project])),
@@ -718,7 +720,7 @@ const ProjectSelection = ({
     return project ? `${project.name} · ${project.ref}` : ref
   }
 
-  if (isErrorProjects) {
+  if (showProjectsError) {
     return (
       <Button
         disabled
@@ -736,7 +738,7 @@ const ProjectSelection = ({
       value={value || ''}
       onValueChange={onChange}
       onOpenChange={(open) => {
-        if (open) void refetchProjects()
+        if (open && !isFetchingProjects) void refetchProjects()
       }}
     >
       <SelectTrigger>{projectLabel(value) ?? placeholder}</SelectTrigger>
@@ -783,6 +785,7 @@ const BucketSelection = ({
   const {
     data: bucketsData,
     isPending: isLoadingBuckets,
+    isFetching: isFetchingBuckets,
     isError: isErrorBuckets,
     refetch: refetchBuckets,
   } = usePaginatedBucketsQuery(
@@ -797,6 +800,7 @@ const BucketSelection = ({
       ),
     [bucketsData]
   )
+  const showBucketsError = isErrorBuckets && buckets.length === 0
 
   if (!ducklakeStorageProjectRef) {
     return (
@@ -805,7 +809,7 @@ const BucketSelection = ({
       </Button>
     )
   }
-  if (isErrorBuckets) {
+  if (showBucketsError) {
     return (
       <Button
         disabled
@@ -823,7 +827,7 @@ const BucketSelection = ({
     <Select
       value={value || ''}
       onOpenChange={(open) => {
-        if (open) void refetchBuckets()
+        if (open && !isFetchingBuckets) void refetchBuckets()
       }}
       onValueChange={(e) => {
         if (e) onChange(e)

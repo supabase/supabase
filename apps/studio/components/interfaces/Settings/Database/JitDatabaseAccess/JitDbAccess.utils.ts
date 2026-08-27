@@ -257,52 +257,54 @@ export function mapJitMembersToUserRules(
   const memberMap = new Map((projectMembers ?? []).map((member) => [member.user_id, member]))
   const baseRoleIds = roleOptions.map((role) => role.id)
 
-  return (jitMembers ?? []).map((item) => {
-    const mappedMember = memberMap.get(item.user_id)
-    const assignedRoles: JitRoleGrantDraft[] = (item.user_roles ?? []).map((roleObj) => {
-      const roleWithBranchRestriction = roleObj as typeof roleObj & { branches_only?: boolean }
-      const expiresAt = typeof roleObj.expires_at === 'number' ? roleObj.expires_at : undefined
-      const hasExpiry = typeof expiresAt === 'number'
-      const allowedNetworks = serializeAllowedNetworks(roleObj)
+  return (jitMembers ?? [])
+    .filter((item): item is typeof item & { user_id: string } => item.user_id !== null)
+    .map((item) => {
+      const mappedMember = memberMap.get(item.user_id)
+      const assignedRoles: JitRoleGrantDraft[] = (item.user_roles ?? []).map((roleObj) => {
+        const roleWithBranchRestriction = roleObj as typeof roleObj & { branches_only?: boolean }
+        const expiresAt = typeof roleObj.expires_at === 'number' ? roleObj.expires_at : undefined
+        const hasExpiry = typeof expiresAt === 'number'
+        const allowedNetworks = serializeAllowedNetworks(roleObj)
+
+        return {
+          ...createEmptyGrant(roleObj.role),
+          roleId: roleObj.role,
+          enabled: true,
+          branchesOnly: roleWithBranchRestriction.branches_only ?? false,
+          hasExpiry,
+          expiryMode: hasExpiry ? 'custom' : 'never',
+          expiry: hasExpiry ? new Date(expiresAt * 1000).toISOString() : '',
+          ipRanges:
+            allowedNetworks.length > 0
+              ? allowedNetworks.map((cidr) => ({ value: cidr }))
+              : [createEmptyIpRange()],
+        }
+      })
+
+      const assignedByRoleId = new Map(assignedRoles.map((grant) => [grant.roleId, grant]))
+      const allRoleIds = mergeRoleIds(
+        baseRoleIds,
+        assignedRoles.map((grant) => grant.roleId)
+      )
+      const grants = allRoleIds.map((roleId) => ({
+        ...createEmptyGrant(roleId),
+        ...(assignedByRoleId.get(roleId) ?? {}),
+        roleId,
+      }))
+
+      const email = mappedMember?.primary_email ?? item.user_id
+      const name = mappedMember?.username ?? undefined
 
       return {
-        ...createEmptyGrant(roleObj.role),
-        roleId: roleObj.role,
-        enabled: true,
-        branchesOnly: roleWithBranchRestriction.branches_only ?? false,
-        hasExpiry,
-        expiryMode: hasExpiry ? 'custom' : 'never',
-        expiry: hasExpiry ? new Date(expiresAt * 1000).toISOString() : '',
-        ipRanges:
-          allowedNetworks.length > 0
-            ? allowedNetworks.map((cidr) => ({ value: cidr }))
-            : [createEmptyIpRange()],
+        id: item.user_id,
+        memberId: item.user_id,
+        email,
+        name,
+        grants: cloneGrants(grants),
+        status: computeStatusFromGrants(grants),
       }
     })
-
-    const assignedByRoleId = new Map(assignedRoles.map((grant) => [grant.roleId, grant]))
-    const allRoleIds = mergeRoleIds(
-      baseRoleIds,
-      assignedRoles.map((grant) => grant.roleId)
-    )
-    const grants = allRoleIds.map((roleId) => ({
-      ...createEmptyGrant(roleId),
-      ...(assignedByRoleId.get(roleId) ?? {}),
-      roleId,
-    }))
-
-    const email = mappedMember?.primary_email ?? item.user_id
-    const name = mappedMember?.username ?? undefined
-
-    return {
-      id: item.user_id,
-      memberId: item.user_id,
-      email,
-      name,
-      grants: cloneGrants(grants),
-      status: computeStatusFromGrants(grants),
-    }
-  })
 }
 
 export function serializeDraftRolesForGrantMutation(draft: JitUserRuleDraft) {

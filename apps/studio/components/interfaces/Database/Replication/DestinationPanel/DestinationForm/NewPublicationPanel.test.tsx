@@ -7,7 +7,7 @@ import { NewPublicationPanel } from './NewPublicationPanel'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type ReplicationSourcesResponse = components['schemas']['SourcesResponse']
+type ReplicationSourcesResponse = components['schemas']['SourcesResponse_Output']
 type ReadTablesResponse = components['schemas']['ReadTablesResponse_Output']
 type PublicationDetailsResponse = components['schemas']['PublicationDetailsResponse_Output']
 

@@ -52,6 +52,7 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
   const {
     data: tables = [],
     isFetching,
+    isError,
     refetch: refetchTables,
   } = useReplicationTablesQuery({ projectRef, sourceId }, { enabled: false })
   const isLoadingTables = isFetching && tables.length === 0
@@ -148,17 +149,22 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
                             onValuesChange={field.onChange}
                             disabled={creatingPublication}
                             onOpenChange={(open) => {
-                              if (open && visible) void refetchTables()
+                              if (open && visible && !isFetching) void refetchTables()
                             }}
                           >
                             <MultiSelector.Trigger
+                              aria-label="Select publication tables"
                               badgeLimit="wrap"
                               label="Select tables..."
                               mode="inline-combobox"
                               renderValue={(id) => tableLabelsById.get(id) ?? 'Unavailable table'}
                             />
                             <MultiSelector.Content>
-                              <MultiSelector.List loading={isLoadingTables}>
+                              <MultiSelector.List
+                                error={isError && tables.length === 0}
+                                errorLabel="Unable to load tables"
+                                loading={isLoadingTables}
+                              >
                                 {tables.map((table) => (
                                   <MultiSelector.Item key={table.id} value={String(table.id)}>
                                     {`${table.schema}.${table.name}`}

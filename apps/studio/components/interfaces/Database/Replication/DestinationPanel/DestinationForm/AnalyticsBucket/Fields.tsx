@@ -75,10 +75,12 @@ export const AnalyticsBucketFields = ({
     data: keysData,
     isSuccess: isSuccessKeys,
     isPending: isLoadingKeys,
+    isFetching: isFetchingKeys,
     isError: isErrorKeys,
     refetch: refetchKeys,
   } = useStorageCredentialsQuery({ projectRef })
   const s3Keys = keysData?.data ?? []
+  const showKeysError = isErrorKeys && s3Keys.length === 0
   const keyNoLongerExists =
     (s3AccessKeyId ?? '').length > 0 &&
     s3AccessKeyId !== CREATE_NEW_KEY &&
@@ -87,21 +89,25 @@ export const AnalyticsBucketFields = ({
   const {
     data: analyticsBuckets = [],
     isPending: isLoadingBuckets,
+    isFetching: isFetchingBuckets,
     isError: isErrorBuckets,
     refetch: refetchBuckets,
   } = useAnalyticsBucketsQuery({ projectRef })
+  const showBucketsError = isErrorBuckets && analyticsBuckets.length === 0
 
   const canSelectNamespace = !!warehouseName
 
   const {
     data: namespaces = [],
     isPending: isLoadingNamespaces,
+    isFetching: isFetchingNamespaces,
     isError: isErrorNamespaces,
     refetch: refetchNamespaces,
   } = useIcebergNamespacesQuery(
     { projectRef, warehouse: warehouseName },
     { enabled: !!warehouseName }
   )
+  const showNamespacesError = isErrorNamespaces && namespaces.length === 0
 
   return (
     <div className="flex flex-col gap-y-6 p-5">
@@ -117,7 +123,7 @@ export const AnalyticsBucketFields = ({
               layout="horizontal"
               description="The Analytics Bucket where data will be stored"
             >
-              {isErrorBuckets ? (
+              {showBucketsError ? (
                 <Button
                   disabled
                   variant="default"
@@ -132,7 +138,7 @@ export const AnalyticsBucketFields = ({
                   <Select
                     value={field.value}
                     onOpenChange={(open) => {
-                      if (open) void refetchBuckets()
+                      if (open && !isFetchingBuckets) void refetchBuckets()
                     }}
                     onValueChange={(value) => {
                       if (value === 'new-bucket') {
@@ -180,7 +186,7 @@ export const AnalyticsBucketFields = ({
               layout="horizontal"
               description="The namespace within the bucket where tables will be organized"
             >
-              {isErrorNamespaces ? (
+              {showNamespacesError ? (
                 <Button
                   disabled
                   variant="default"
@@ -197,7 +203,9 @@ export const AnalyticsBucketFields = ({
                     onValueChange={field.onChange}
                     disabled={!canSelectNamespace}
                     onOpenChange={(open) => {
-                      if (open && canSelectNamespace) void refetchNamespaces()
+                      if (open && canSelectNamespace && !isFetchingNamespaces) {
+                        void refetchNamespaces()
+                      }
                     }}
                   >
                     <SelectTrigger>
@@ -335,7 +343,7 @@ export const AnalyticsBucketFields = ({
                 </div>
               }
             >
-              {isErrorKeys ? (
+              {showKeysError ? (
                 <Button
                   disabled
                   variant="default"
@@ -351,7 +359,7 @@ export const AnalyticsBucketFields = ({
                     value={field.value}
                     onValueChange={field.onChange}
                     onOpenChange={(open) => {
-                      if (open) void refetchKeys()
+                      if (open && !isFetchingKeys) void refetchKeys()
                     }}
                   >
                     <SelectTrigger>
