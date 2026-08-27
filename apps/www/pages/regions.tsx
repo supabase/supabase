@@ -63,7 +63,7 @@ const RegionsPage = () => {
           <div className="flex flex-col gap-8">
             <SectionHeading
               title="What stays in your region"
-              description="Choosing a region is a data-location control. It does not make your app GDPR compliant on its own."
+              description="How region choice affects your data residency."
             />
             <div className="border-t border-muted">
               {RESIDENCY_ROWS.map((row) => (
@@ -94,7 +94,7 @@ const RegionsPage = () => {
         <SectionContainer className="pt-0! flex flex-col gap-8 lg:gap-12">
           <SectionHeading
             title="Documents"
-            description="The paperwork that goes with your region choice."
+            description="Additional information about Supabase regions."
           />
           <div className="grid grid-cols-1 gap-px overflow-hidden rounded-lg border bg-border sm:grid-cols-2">
             {DOCUMENTS.map((doc) => {
@@ -126,7 +126,7 @@ const RegionsPage = () => {
           <p className="text-sm text-foreground-light">
             Need the database in your own cloud?{' '}
             <Link
-              href="/go/pre-release/byoc-early-access"
+              href="/go/byoc-early-access"
               className="text-brand-link hover:underline"
             >
               Ask about early access to BYOC
