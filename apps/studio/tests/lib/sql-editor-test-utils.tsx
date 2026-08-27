@@ -229,7 +229,6 @@ export function setupSqlEditorMocks({
         organization_requires_mfa: false,
         requires_indirect_tax_declaration: false,
         plan: { id: 'free', name: 'Free' },
-        requires_indirect_tax_declaration: false,
         restriction_data: null,
         restriction_status: null,
         stripe_customer_id: null,

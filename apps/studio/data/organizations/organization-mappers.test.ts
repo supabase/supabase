@@ -22,7 +22,6 @@ const baseOrganizationResponse = {
   organization_requires_mfa: false,
   requires_indirect_tax_declaration: false,
   plan: { id: 'pro' as const, name: 'Pro' },
-  requires_indirect_tax_declaration: false,
   restriction_data: null,
   restriction_status: null,
   slug: 'toolshed',
