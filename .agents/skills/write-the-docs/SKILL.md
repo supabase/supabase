@@ -57,6 +57,8 @@ When in doubt, ask `ask-the-docs` rather than guessing — this classification i
 - **Keep it concise and avoid redundancy.** If you're restating the same point in multiple ways (e.g. "It's free" + "You won't be billed" + "No charge during Alpha"), consolidate. If a caution admonition already stated a risk, don't restate it verbatim later in the body.
 - **Prefer paragraphs over single-item lists.** If there's only one resource or example, default to paragraph format unless there's a specific reason for list formatting (future expansion expected, layout consistency with other sections, or special emphasis needed).
 - **Strip internal business context before the final draft.** HTML comments flagging PRD intent, roadmap speculation, internal ticket discussions, or "gap-fill" notes must be removed from MDX before handoff. Open-source docs shouldn't expose internal planning. Flag assumptions and open questions for reviewers in the PR description instead, not in the shipped content.
+- Search [`apps/docs/WORD_LIST.md`](../../../apps/docs/WORD_LIST.md) when introducing or reviewing technical terms, UI actions, abbreviations, and potentially ambiguous language during drafting. This targeted search supplements, but does not replace, the full-file compliance check in Phase 2.5.
+- Reuse repeated content through `apps/docs/content/_partials/` instead of copying it. For nav wiring, partials, and file placement, see [`ask-the-docs`](../ask-the-docs/SKILL.md)'s `app-map.md` and `federated-docs.md`.
 
 ## Phase 2.5 — Review checklist
 
@@ -74,17 +76,29 @@ Before handing off, confirm:
 - [ ] Single-item lists avoided unless there's a specific reason
 - [ ] Internal gap-fill and business context comments removed from MDX (keep only in PR description if needed for review)
 
+### Compliance checklist
+
+Re-read [`apps/docs/CONTRIBUTING.md`](../../../apps/docs/CONTRIBUTING.md) and [`apps/docs/WORD_LIST.md`](../../../apps/docs/WORD_LIST.md) in full before handoff, not just the sections searched during drafting. When a dedicated style guide lands in the repo, extend this checklist to cover it too.
+
+- [ ] Parentheses used only for acronyms or `(Optional)`, not prose asides
+- [ ] Bold, italics, and code used only for their distinct purposes (UI labels, must-not-miss terms), not for visual emphasis alone
+- [ ] No dash-based asides where a direct sentence reads better
+- [ ] Terminology matches `WORD_LIST.md` (including any terms flagged as imprecise, not just spelling/capitalization)
+- [ ] Headings, admonitions, and links follow CONTRIBUTING.md's "Styling, formatting, and grammar" and "Components and elements" sections
+
 ## Phase 3 — Handoff
 
 This skill stops at a reviewable draft. It does not open worktrees or PRs itself:
 
 - Hand off to [`create-pull-request`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/create-pull-request/SKILL.md) (and [`work-linear-issue`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/work-linear-issue/SKILL.md) if the ticket needs a full worktree+PR flow) for the actual PR mechanics. Carry the Phase 1/2 flagged-assumptions list forward explicitly into that handoff — it belongs in the PR description (e.g. a "needs review" section) so a reviewer sees it, not just as an inline comment buried in the draft.
 - If the feature is UI-driven and the PR will need screenshots/GIFs, flag [`proof-it-works`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/proof-it-works/SKILL.md) as the next step rather than capturing evidence here.
+- Before opening the PR, run [`review-the-docs`](../review-the-docs/SKILL.md) local self-review: `pnpm lint:mdx`, `pnpm build:guides-markdown` where applicable, and anchor checks per [reference/drafting-mechanics.md](reference/drafting-mechanics.md).
 
 ## Additional resources
 
 - Style / terminology: [`apps/docs/CONTRIBUTING.md`](../../../apps/docs/CONTRIBUTING.md), [`apps/docs/WORD_LIST.md`](../../../apps/docs/WORD_LIST.md), [reference/style-fallback.md](reference/style-fallback.md)
 - Common pitfalls to avoid: [reference/common-pitfalls.md](reference/common-pitfalls.md)
+- Drafting mechanics: [reference/drafting-mechanics.md](reference/drafting-mechanics.md)
 - Content-type gate detail: [reference/content-type-gate.md](reference/content-type-gate.md)
 - "Write the docs" checklist (Draft stage): [`pm-the-docs`](../pm-the-docs/SKILL.md)'s [reference/write-the-docs-checklist.md](../pm-the-docs/reference/write-the-docs-checklist.md)
 - Docs-app architecture/placement: [`ask-the-docs`](../ask-the-docs/SKILL.md), [`audit-docs-ia`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/audit-docs-ia/SKILL.md)
