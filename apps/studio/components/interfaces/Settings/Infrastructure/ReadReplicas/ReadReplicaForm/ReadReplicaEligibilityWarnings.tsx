@@ -47,6 +47,7 @@ export const ReadReplicaEligibilityWarnings = ({
     isBelowSmallCompute,
     isWalgNotEnabled,
     isProWithSpendCapEnabled,
+    isHighAvailability,
     isReachedMaxReplicas,
     maxNumberOfReplicas,
   } = eligibility
@@ -84,6 +85,20 @@ export const ReadReplicaEligibilityWarnings = ({
         <Button asChild variant="default" className="mt-2">
           <Link href={`/org/${org?.slug}/billing#invoices`}>View invoices</Link>
         </Button>
+      </Admonition>
+    )
+  }
+
+  if (isHighAvailability) {
+    return (
+      <Admonition
+        type="warning"
+        title="Read replicas are unavailable for High Availability projects"
+      >
+        <p>
+          We're working to bring this feature to High Availability projects. Contact support if this
+          is blocking your work.
+        </p>
       </Admonition>
     )
   }
