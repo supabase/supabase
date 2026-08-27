@@ -40,8 +40,8 @@ export const parseIntegerInput = (value: string, previous: number) => {
   return value.trim().length > 0 && Number.isFinite(parsed) ? parsed : previous
 }
 
-export type BigQueryValidationIssue = {
-  path: string
+export type BigQueryValidationIssue<Path extends string = string> = {
+  path: Path
   message: string
 }
 
@@ -67,15 +67,32 @@ const isValidJsonString = (value: string) => {
 export const getBigQueryValidationIssues = (
   data: Pick<DestinationPanelSchemaType, BigQueryFieldPath>,
   options: { secretsOptional?: boolean; validateJson?: boolean } = {}
-): BigQueryValidationIssue[] => {
+): BigQueryValidationIssue<BigQueryFieldPath>[] => {
   const { secretsOptional = false, validateJson = true } = options
-  const issues: BigQueryValidationIssue[] = BIGQUERY_REQUIRED_FIELDS.filter(
+  const issues: BigQueryValidationIssue<BigQueryFieldPath>[] = BIGQUERY_REQUIRED_FIELDS.filter(
     ({ path }) => !data[path]?.trim().length
   ).map(({ path, message }) => ({ path, message }))
 
-<<<<<<< HEAD
-    return !data[path]?.trim().length
-  })
+  const serviceAccountKey = data.serviceAccountKey?.trim() ?? ''
+
+  if (!serviceAccountKey) {
+    if (!secretsOptional) {
+      issues.push({ path: 'serviceAccountKey', message: 'Service account key is required' })
+    }
+    return issues
+  }
+
+  // JSON shape is checked on submit only. Live onChange validation would fail on every
+  // keystroke while the user is still pasting or typing a key.
+  if (validateJson && !isValidJsonString(serviceAccountKey)) {
+    issues.push({
+      path: 'serviceAccountKey',
+      message: BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE,
+    })
+  }
+
+  return issues
+}
 
 // Cross-field checks for per-table partitioning/clustering, mirroring the validation etl
 // applies server-side (integer-range bounds, and that a configured table sets at least one
@@ -111,25 +128,6 @@ export const getBigQueryTableOptionsValidationIssues = (
       }
     }
   })
-=======
-  const serviceAccountKey = data.serviceAccountKey?.trim() ?? ''
-
-  if (!serviceAccountKey) {
-    if (!secretsOptional) {
-      issues.push({ path: 'serviceAccountKey', message: 'Service account key is required' })
-    }
-    return issues
-  }
-
-  // JSON shape is checked on submit only. Live onChange validation would fail on every
-  // keystroke while the user is still pasting or typing a key.
-  if (validateJson && !isValidJsonString(serviceAccountKey)) {
-    issues.push({
-      path: 'serviceAccountKey',
-      message: BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE,
-    })
-  }
->>>>>>> origin/master
 
   return issues
 }

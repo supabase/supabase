@@ -5398,9 +5398,9 @@ export interface components {
       username: string
     }
     V1ProjectAdvisorsResponse: {
-      lints: {
+      lints: ({
         cache_key: string
-        categories: ('PERFORMANCE' | 'SECURITY')[]
+        categories: ('PERFORMANCE' | 'SECURITY' | 'HEALTH')[]
         description: string
         detail: string
         /** @enum {string} */
@@ -5414,7 +5414,16 @@ export interface components {
           name?: string
           schema?: string
           /** @enum {string} */
-          type?: 'table' | 'view' | 'auth' | 'function' | 'extension' | 'compliance'
+          type?:
+            | 'table'
+            | 'view'
+            | 'materialized view'
+            | 'foreign table'
+            | 'auth'
+            | 'function'
+            | 'extension'
+            | 'compliance'
+            | 'health'
         }
         /** @enum {string} */
         name:
@@ -5438,6 +5447,7 @@ export interface components {
           | 'auth_otp_long_expiry'
           | 'auth_otp_short_length'
           | 'ssl_not_enforced'
+          | 'log_connections_not_enabled'
           | 'network_restrictions_not_set'
           | 'password_requirements_min_length'
           | 'pitr_not_enabled'
@@ -5447,9 +5457,22 @@ export interface components {
           | 'leaked_service_key'
           | 'no_backup_admin'
           | 'vulnerable_postgres_version'
+          | 'db_not_reachable'
+          | 'db_connection_failing'
+          | 'db_connection_limit_reached'
+          | 'instance_telemetry_lost'
+          | 'instance_db_down'
+          | 'instance_alert_firing'
+          | 'log_service_error_rate_high'
+          | 'project_not_active'
+          | 'advisor_check_unavailable'
+        /** Format: date-time */
+        observed_at?: string
         remediation: string
         title: string
-      }[]
+      } & {
+        [key: string]: unknown
+      })[]
     }
     V1ProjectRefResponse: {
       id: number

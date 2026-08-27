@@ -22,11 +22,8 @@ import { AdvancedSettings } from './AdvancedSettings'
 import { getAnalyticsBucketValidationIssues } from './AnalyticsBucket/AnalyticsBucket.utils'
 import { AnalyticsBucketFields } from './AnalyticsBucket/Fields'
 import {
-<<<<<<< HEAD
-  getBigQueryTableOptionsValidationIssues,
-=======
   BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE,
->>>>>>> origin/master
+  getBigQueryTableOptionsValidationIssues,
   getBigQueryValidationIssues,
 } from './BigQuery/BigQuery.utils'
 import { BigQueryFields } from './BigQuery/Fields'
@@ -220,25 +217,17 @@ export const DestinationForm = ({
         }
 
         if (selectedType === 'BigQuery') {
-<<<<<<< HEAD
-          getBigQueryValidationIssues(data, { secretsOptional: editMode }).forEach(
-            ({ path, message }) => {
-              addRequiredFieldError(path, message)
-            }
-          )
-          getBigQueryTableOptionsValidationIssues(data.tableOptions).forEach(
-            ({ path, message }) => {
-              addRequiredFieldError(path, message)
-            }
-          )
-=======
           getBigQueryValidationIssues(data, {
             secretsOptional: editMode,
             validateJson: false,
           }).forEach(({ path, message }) => {
             addRequiredFieldError(path, message)
           })
->>>>>>> origin/master
+          getBigQueryTableOptionsValidationIssues(data.tableOptions).forEach(
+            ({ path, message }) => {
+              addRequiredFieldError(path, message)
+            }
+          )
         } else if (selectedType === 'Analytics Bucket') {
           getAnalyticsBucketValidationIssues(data, {
             secretsOptional: editMode,

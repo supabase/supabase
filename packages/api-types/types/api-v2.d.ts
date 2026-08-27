@@ -136,6 +136,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v2/projects/{ref}/advisors/run': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Runs the project advisors with the given names */
+    post: operations['v2-run-project-advisors']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v2/projects/{ref}/analytics/log-drains': {
     parameters: {
       query?: never
@@ -1377,6 +1394,94 @@ export interface components {
         type: 'private_link_association'
       }
     }
+    V2ProjectAdvisorsResponse_Output: {
+      data: {
+        attributes: {
+          lints: ({
+            cache_key: string
+            categories: ('PERFORMANCE' | 'SECURITY' | 'HEALTH')[]
+            description: string
+            detail: string
+            /** @enum {string} */
+            facing: 'EXTERNAL'
+            /** @enum {string} */
+            level: 'ERROR' | 'WARN' | 'INFO'
+            metadata?: {
+              entity?: string
+              fkey_columns?: number[]
+              fkey_name?: string
+              name?: string
+              schema?: string
+              /** @enum {string} */
+              type?:
+                | 'table'
+                | 'view'
+                | 'materialized view'
+                | 'foreign table'
+                | 'auth'
+                | 'function'
+                | 'extension'
+                | 'compliance'
+                | 'health'
+            }
+            /** @enum {string} */
+            name:
+              | 'unindexed_foreign_keys'
+              | 'auth_users_exposed'
+              | 'auth_rls_initplan'
+              | 'no_primary_key'
+              | 'unused_index'
+              | 'multiple_permissive_policies'
+              | 'policy_exists_rls_disabled'
+              | 'rls_enabled_no_policy'
+              | 'duplicate_index'
+              | 'security_definer_view'
+              | 'function_search_path_mutable'
+              | 'rls_disabled_in_public'
+              | 'extension_in_public'
+              | 'rls_references_user_metadata'
+              | 'materialized_view_in_api'
+              | 'foreign_table_in_api'
+              | 'unsupported_reg_types'
+              | 'auth_otp_long_expiry'
+              | 'auth_otp_short_length'
+              | 'ssl_not_enforced'
+              | 'log_connections_not_enabled'
+              | 'network_restrictions_not_set'
+              | 'password_requirements_min_length'
+              | 'pitr_not_enabled'
+              | 'auth_leaked_password_protection'
+              | 'auth_insufficient_mfa_options'
+              | 'auth_password_policy_missing'
+              | 'leaked_service_key'
+              | 'no_backup_admin'
+              | 'vulnerable_postgres_version'
+              | 'db_not_reachable'
+              | 'db_connection_failing'
+              | 'db_connection_limit_reached'
+              | 'instance_telemetry_lost'
+              | 'instance_db_down'
+              | 'instance_alert_firing'
+              | 'log_service_error_rate_high'
+              | 'project_not_active'
+              | 'advisor_check_unavailable'
+            /** Format: date-time */
+            observed_at?: string
+            remediation: string
+            title: string
+          } & {
+            [key: string]: unknown
+          })[]
+        } & {
+          [key: string]: unknown
+        }
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'project_advisors'
+      }
+    }
     V2ProjectConfigResponse: {
       data: {
         attributes: {
@@ -1534,6 +1639,58 @@ export interface components {
          * @enum {string}
          */
         type: 'project_config'
+      }
+    }
+    V2RunProjectAdvisorsBody: {
+      data: {
+        attributes: {
+          lints: {
+            /** @enum {string} */
+            name:
+              | 'unindexed_foreign_keys'
+              | 'auth_users_exposed'
+              | 'auth_rls_initplan'
+              | 'no_primary_key'
+              | 'unused_index'
+              | 'multiple_permissive_policies'
+              | 'policy_exists_rls_disabled'
+              | 'rls_enabled_no_policy'
+              | 'duplicate_index'
+              | 'security_definer_view'
+              | 'function_search_path_mutable'
+              | 'rls_disabled_in_public'
+              | 'extension_in_public'
+              | 'rls_references_user_metadata'
+              | 'materialized_view_in_api'
+              | 'foreign_table_in_api'
+              | 'unsupported_reg_types'
+              | 'auth_otp_long_expiry'
+              | 'auth_otp_short_length'
+              | 'ssl_not_enforced'
+              | 'log_connections_not_enabled'
+              | 'network_restrictions_not_set'
+              | 'password_requirements_min_length'
+              | 'pitr_not_enabled'
+              | 'auth_leaked_password_protection'
+              | 'auth_insufficient_mfa_options'
+              | 'auth_password_policy_missing'
+              | 'leaked_service_key'
+              | 'no_backup_admin'
+              | 'vulnerable_postgres_version'
+              | 'db_not_reachable'
+              | 'db_connection_failing'
+              | 'db_connection_limit_reached'
+              | 'instance_telemetry_lost'
+              | 'instance_db_down'
+              | 'instance_alert_firing'
+              | 'log_service_error_rate_high'
+          }[]
+        }
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'project_advisors'
       }
     }
     V2TransferProjectBody: {
@@ -2023,6 +2180,59 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['V2ListRolesResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-run-project-advisors': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V2RunProjectAdvisorsBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2ProjectAdvisorsResponse_Output']
         }
       }
       /** @description Unauthorized */
