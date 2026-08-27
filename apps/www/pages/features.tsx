@@ -38,7 +38,7 @@ type ViewMode = 'grid' | 'matrix'
 // query surfaces above features where the term only appears in the description.
 // Title weights are deliberately larger than the maximum combined body score
 // (SUBTITLE_INCLUDES + DESCRIPTION_INCLUDES), so any title match always ranks
-// above a feature that only matches in its subtitle and/or description.
+// above a feature that only matches in its subtitle and/or description
 const SEARCH_WEIGHT = {
   TITLE_STARTS_WITH: 5,
   TITLE_INCLUDES: 4,
