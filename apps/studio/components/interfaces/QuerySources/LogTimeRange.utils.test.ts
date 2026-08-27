@@ -9,10 +9,12 @@ import {
   resolveLogTimeRange,
 } from './LogTimeRange.utils'
 import { generateDynamicHelper } from '@/components/interfaces/Settings/Logs/Logs.datePickerHelpers'
-import {
-  DEFAULT_LOG_TIME_RANGE,
-  type LogTimeRange,
-} from '@/data/query-sources/query-source-registry'
+import { timeRangeSchema, type TimeRange } from '@/data/content/notebooks/notebook-schema'
+import { DEFAULT_LOG_TIME_RANGE } from '@/data/query-sources/query-source-registry'
+
+/** Absolute bounds are branded ISO strings, so build them through the schema. */
+const absolute = (start: string, end: string): TimeRange =>
+  timeRangeSchema.parse({ _tag: 'absolute_time_range', start, end })
 
 describe('LogTimeRange.utils', () => {
   beforeEach(() => {
@@ -34,10 +36,20 @@ describe('LogTimeRange.utils', () => {
       isHelper: true,
       text: helper.text,
     }
-    const range: LogTimeRange = { type: 'relative', amount, unit }
+    const range: TimeRange = { _tag: 'relative_time_range', amount, unit }
 
     expect(datePickerValueToLogTimeRange(pickerValue)).toEqual(range)
     expect(logTimeRangeToDatePickerValue(range)).toEqual(pickerValue)
+  })
+
+  it('renders a relative unit the picker has no preset for as a resolved absolute range', () => {
+    expect(
+      logTimeRangeToDatePickerValue({ _tag: 'relative_time_range', amount: 2, unit: 'month' })
+    ).toEqual({
+      from: dayjs().subtract(2, 'month').toISOString(),
+      to: dayjs().toISOString(),
+      isHelper: false,
+    })
   })
 
   it('falls back to the default when a custom value has no valid start', () => {
@@ -55,47 +67,46 @@ describe('LogTimeRange.utils', () => {
         text: 'Custom',
       })
     ).toEqual({
-      type: 'absolute',
-      from: '2025-01-01T00:00:00.000Z',
-      to: '2025-01-08T12:00:00.000Z',
+      _tag: 'absolute_time_range',
+      start: '2025-01-01T00:00:00.000Z',
+      end: '2025-01-08T12:00:00.000Z',
     })
   })
 
   it('compares relative and absolute ranges structurally', () => {
     expect(
       logTimeRangesEqual(
-        { type: 'relative', amount: 1, unit: 'hour' },
-        { type: 'relative', amount: 1, unit: 'hour' }
+        { _tag: 'relative_time_range', amount: 1, unit: 'hour' },
+        { _tag: 'relative_time_range', amount: 1, unit: 'hour' }
       )
     ).toBe(true)
     expect(
       logTimeRangesEqual(
-        { type: 'relative', amount: 1, unit: 'hour' },
-        { type: 'relative', amount: 1, unit: 'day' }
+        { _tag: 'relative_time_range', amount: 1, unit: 'hour' },
+        { _tag: 'relative_time_range', amount: 1, unit: 'day' }
       )
     ).toBe(false)
     expect(
       logTimeRangesEqual(
-        { type: 'absolute', from: '2025-01-01T00:00:00.000Z', to: '2025-01-02T00:00:00.000Z' },
-        { type: 'absolute', from: '2025-01-01T00:00:00.000Z', to: '2025-01-02T00:00:00.000Z' }
+        absolute('2025-01-01T00:00:00.000Z', '2025-01-02T00:00:00.000Z'),
+        absolute('2025-01-01T00:00:00.000Z', '2025-01-02T00:00:00.000Z')
       )
     ).toBe(true)
   })
 
   it('resolves a relative range against the current time', () => {
-    expect(resolveLogTimeRange({ type: 'relative', amount: 2, unit: 'day' })).toEqual({
+    expect(resolveLogTimeRange({ _tag: 'relative_time_range', amount: 2, unit: 'day' })).toEqual({
       from: dayjs().subtract(2, 'day').toISOString(),
       to: dayjs().toISOString(),
     })
   })
 
   it('passes an absolute range through unchanged', () => {
-    const range: LogTimeRange = {
-      type: 'absolute',
+    const range = absolute('2025-01-01T00:00:00.000Z', '2025-01-02T00:00:00.000Z')
+    expect(resolveLogTimeRange(range)).toEqual({
       from: '2025-01-01T00:00:00.000Z',
       to: '2025-01-02T00:00:00.000Z',
-    }
-    expect(resolveLogTimeRange(range)).toEqual({ from: range.from, to: range.to })
+    })
   })
 
   it('clamps a custom range ending today to now', () => {
@@ -106,9 +117,9 @@ describe('LogTimeRange.utils', () => {
         to: new Date('2025-01-08T09:00:00.000Z'),
       })
     ).toEqual({
-      type: 'absolute',
-      from: dayjs(from).startOf('day').toISOString(),
-      to: '2025-01-08T12:00:00.000Z',
+      _tag: 'absolute_time_range',
+      start: dayjs(from).startOf('day').toISOString(),
+      end: '2025-01-08T12:00:00.000Z',
     })
   })
 })

@@ -566,7 +566,7 @@ export interface paths {
      *     If both are not provided, only the last 1 minute of logs will be queried.
      *     The timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.
      *
-     *     Note: Unless the `sql` parameter is provided, only edge_logs will be queried. See the [log query docs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer:~:text=logs%20from%20the-,Sources,-drop%2Ddown%3A) for all available sources.
+     *     Note: Unless the `sql` parameter is provided, only edge_logs will be queried. See the [log query docs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#logs-explorer) for all available sources.
      *
      */
     get: operations['v1-get-project-logs-all']
@@ -3348,28 +3348,52 @@ export interface components {
       }
     }
     JitListAccessResponse: {
-      items: {
-        expires_at: null
-        invite_id: null
-        primary_email: string | null
-        /** Format: uuid */
-        user_id: string
-        user_roles: {
-          allowed_networks?: {
-            allowed_cidrs?: {
-              /** Format: cidrv4 */
-              cidr: string
-            }[]
-            allowed_cidrs_v6?: {
-              /** Format: cidrv6 */
-              cidr: string
+      items: (
+        | {
+            expires_at: null
+            invite_id: null
+            primary_email: string | null
+            /** Format: uuid */
+            user_id: string
+            user_roles: {
+              allowed_networks?: {
+                allowed_cidrs?: {
+                  /** Format: cidrv4 */
+                  cidr: string
+                }[]
+                allowed_cidrs_v6?: {
+                  /** Format: cidrv6 */
+                  cidr: string
+                }[]
+              }
+              branches_only?: boolean
+              expires_at?: number
+              role: string
             }[]
           }
-          branches_only?: boolean
-          expires_at?: number
-          role: string
-        }[]
-      }[]
+        | {
+            expires_at: string
+            /** Format: uuid */
+            invite_id: string
+            primary_email: string
+            user_id: null
+            user_roles: {
+              allowed_networks?: {
+                allowed_cidrs?: {
+                  /** Format: cidrv4 */
+                  cidr: string
+                }[]
+                allowed_cidrs_v6?: {
+                  /** Format: cidrv6 */
+                  cidr: string
+                }[]
+              }
+              branches_only?: boolean
+              expires_at?: number
+              role: string
+            }[]
+          }
+      )[]
     }
     LegacyApiKeysResponse: {
       enabled: boolean
@@ -4048,6 +4072,8 @@ export interface components {
       max_payload_size_in_kb: number | null
       /** @description Sets maximum number of presence events per second rate limit */
       max_presence_events_per_second: number | null
+      /** @description Sets connection pool size used to create Postgres Changes subscriptions */
+      postgres_changes_pool: number | null
       /** @description Whether to enable presence */
       presence_enabled: boolean
       /** @description Whether to only allow private channels */
@@ -4885,6 +4911,8 @@ export interface components {
       max_payload_size_in_kb?: number
       /** @description Sets maximum number of presence events per second rate limit */
       max_presence_events_per_second?: number
+      /** @description Sets connection pool size used to create Postgres Changes subscriptions */
+      postgres_changes_pool?: number
       /** @description Whether to enable presence */
       presence_enabled?: boolean
       /** @description Whether to only allow private channels */
@@ -5298,6 +5326,7 @@ export interface components {
             | 'project_restore_after_expiry'
             | 'assistant.advance_model'
             | 'integrations.github_connections'
+            | 'integrations.github_push_webhooks_limit'
             | 'dedicated_pooler'
             | 'observability.dashboard_advanced_metrics'
             | 'api.members.invitations'
@@ -5369,9 +5398,9 @@ export interface components {
       username: string
     }
     V1ProjectAdvisorsResponse: {
-      lints: {
+      lints: ({
         cache_key: string
-        categories: ('PERFORMANCE' | 'SECURITY')[]
+        categories: ('PERFORMANCE' | 'SECURITY' | 'HEALTH')[]
         description: string
         detail: string
         /** @enum {string} */
@@ -5385,7 +5414,18 @@ export interface components {
           name?: string
           schema?: string
           /** @enum {string} */
-          type?: 'table' | 'view' | 'auth' | 'function' | 'extension' | 'compliance'
+          type?:
+            | 'table'
+            | 'view'
+            | 'materialized view'
+            | 'foreign table'
+            | 'auth'
+            | 'function'
+            | 'extension'
+            | 'compliance'
+            | 'health'
+        } & {
+          [key: string]: unknown
         }
         /** @enum {string} */
         name:
@@ -5409,6 +5449,7 @@ export interface components {
           | 'auth_otp_long_expiry'
           | 'auth_otp_short_length'
           | 'ssl_not_enforced'
+          | 'log_connections_not_enabled'
           | 'network_restrictions_not_set'
           | 'password_requirements_min_length'
           | 'pitr_not_enabled'
@@ -5418,9 +5459,22 @@ export interface components {
           | 'leaked_service_key'
           | 'no_backup_admin'
           | 'vulnerable_postgres_version'
+          | 'db_not_reachable'
+          | 'db_connection_failing'
+          | 'db_connection_limit_reached'
+          | 'instance_telemetry_lost'
+          | 'instance_db_down'
+          | 'instance_alert_firing'
+          | 'log_service_error_rate_high'
+          | 'project_not_active'
+          | 'advisor_check_unavailable'
+        /** Format: date-time */
+        observed_at?: string
         remediation: string
         title: string
-      }[]
+      } & {
+        [key: string]: unknown
+      })[]
     }
     V1ProjectRefResponse: {
       id: number
@@ -7097,7 +7151,7 @@ export interface operations {
       query?: {
         iso_timestamp_end?: string
         iso_timestamp_start?: string
-        /** @description Custom SQL query to execute on the logs. See [querying logs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer) for more details. */
+        /** @description Custom SQL query to execute on the logs. See [querying logs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#querying-with-the-logs-explorer) for more details. */
         sql?: string
       }
       header?: never
@@ -7152,7 +7206,7 @@ export interface operations {
       query?: {
         iso_timestamp_end?: string
         iso_timestamp_start?: string
-        /** @description Custom SQL query to execute on the logs. See [querying logs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer) for more details. */
+        /** @description Custom SQL query to execute on the logs. See [querying logs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#querying-with-the-logs-explorer) for more details. */
         sql?: string
       }
       header?: never
@@ -7223,6 +7277,13 @@ export interface operations {
           'application/openmetrics-text': string
           'text/plain': string
         }
+      }
+      /** @description Project must be active and healthy, or metrics are not available for this project */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Unauthorized */
       401: {

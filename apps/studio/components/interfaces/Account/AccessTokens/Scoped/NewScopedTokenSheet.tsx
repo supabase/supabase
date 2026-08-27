@@ -63,6 +63,7 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
             track('access_token_created', {
               tokenType: 'classic',
               expiryPreset: values.expiresAt,
+              resourceAccess: 'account',
             })
             showCreatedToken(data)
           },
@@ -109,7 +110,10 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
       <div className="flex items-center">
         <SheetTrigger asChild>
-          <Button variant="primary" className="rounded-r-none px-3 hover:z-10 focus-visible:z-10">
+          <Button
+            variant="primary"
+            className="rounded-r-none px-3 hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
+          >
             Generate new token
           </Button>
         </SheetTrigger>

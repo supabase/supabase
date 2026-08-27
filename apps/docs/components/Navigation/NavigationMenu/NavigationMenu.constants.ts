@@ -1118,6 +1118,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/postgres/row-level-security' as `/${string}`,
         },
         {
+          name: 'Row Level Security Performance',
+          url: '/guides/database/postgres/row-level-security-performance' as `/${string}`,
+        },
+        {
           name: 'Column Level Security',
           url: '/guides/database/postgres/column-level-security' as `/${string}`,
         },
@@ -1203,6 +1207,18 @@ export const database: NavMenuConstant = {
             {
               name: 'BigQuery',
               url: '/guides/database/replication/bigquery' as `/${string}`,
+            },
+            {
+              name: 'ClickHouse',
+              url: '/guides/database/replication/clickhouse' as `/${string}`,
+            },
+            {
+              name: 'DuckLake',
+              url: '/guides/database/replication/ducklake' as `/${string}`,
+            },
+            {
+              name: 'Snowflake',
+              url: '/guides/database/replication/snowflake' as `/${string}`,
             },
             {
               name: 'Monitoring',
@@ -2772,6 +2788,10 @@ export const platform: NavMenuConstant = {
               name: 'Testing and Best Practices',
               url: '/guides/platform/sso/testing-best-practices' as `/${string}`,
             },
+            {
+              name: 'Enterprise-Managed Authentication for MCP',
+              url: '/guides/platform/sso/enterprise-mcp-authentication' as `/${string}`,
+            },
           ],
         },
       ],
@@ -3084,6 +3104,7 @@ export const self_hosting: NavMenuConstant = {
   items: [
     { name: 'Overview', url: '/guides/self-hosting' },
     { name: 'Deploy with Docker', url: '/guides/self-hosting/docker' },
+    { name: 'Accessing Postgres', url: '/guides/self-hosting/accessing-postgres' },
     { name: 'Configure new API keys', url: '/guides/self-hosting/self-hosted-auth-keys' },
     { name: 'Learn about API Gateway', url: '/guides/self-hosting/self-hosted-envoy' },
     {
@@ -3269,6 +3290,10 @@ export const integrations: NavMenuConstant = {
       url: '/guides/integrations/vercel-marketplace',
     },
     {
+      name: 'Stripe Projects',
+      url: '/guides/integrations/stripe-projects',
+    },
+    {
       name: 'Build Your Own',
       items: [
         {
@@ -3361,7 +3386,7 @@ export const reference = {
         },
         {
           name: 'Management API',
-          url: '/reference/javascript',
+          url: '/reference/api/introduction',
           icon: '/img/icons/menu/reference-api' as `/${string}`,
         },
       ],

@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, cn } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
 import {
   countConfiguredInCategory,
@@ -7,47 +9,61 @@ import {
   type PermissionMode,
   type PermissionSelection,
 } from '../../AccessToken.permissions'
+import { getActivePreset, type PermissionPreset } from '../../AccessToken.presets'
 import type { TokenAccessEvaluation } from '../../AccessToken.roles'
+import { PermissionPresetSelect } from './PermissionPresetSelect'
 import { PermissionRow } from './PermissionRow'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { PermissionScopeMap } from '@/data/scoped-access-tokens/permission-scope-map-query'
 import { DOCS_URL } from '@/lib/constants'
 
 interface PermissionsAccordionProps {
   selection: PermissionSelection
   onChange: (key: string, mode: PermissionMode) => void
-  permissionScopeMap: PermissionScopeMap | undefined
+  onApplyPreset: (preset: PermissionPreset) => void
   access?: TokenAccessEvaluation
 }
 
 export const PermissionsAccordion = ({
   selection,
   onChange,
-  permissionScopeMap,
+  onApplyPreset,
   access,
 }: PermissionsAccordionProps) => {
   const [openCategories, setOpenCategories] = useState<string[]>([])
+  const activePreset = getActivePreset(selection)
+  // Derived, so editing any row back off the preset clears the warning with it.
+  const riskyPreset = activePreset?.isRisky === true ? activePreset : undefined
 
   return (
-    <div className="space-y-3 px-5 sm:px-6 py-6">
-      <div>
-        <h3 className="text-sm text-foreground">Permissions</h3>
-        <p className="text-foreground-lighter text-sm">
-          Grant the minimum access this token needs. Everything defaults to None. Permissions follow
-          your role in the organizations and projects you're a member of — see{' '}
-          <InlineLink href={`${DOCS_URL}/guides/platform/access-control`}>
-            access control
-          </InlineLink>{' '}
-          for how roles work.
-        </p>
-      </div>
-
-      <Accordion
-        type="multiple"
-        value={openCategories}
-        onValueChange={setOpenCategories}
-        className="mt-2"
+    <section className="space-y-4 px-5 sm:px-6 py-6">
+      <FormLayout
+        layout="flex-row-reverse"
+        label="Permissions"
+        description={
+          <p className="text-foreground-lighter text-sm">
+            Grant the minimum access this token needs. Everything defaults to None. Permissions
+            follow your role in the organizations and projects you're a member of — see{' '}
+            <InlineLink href={`${DOCS_URL}/guides/platform/access-control`}>
+              access control
+            </InlineLink>{' '}
+            for how roles work.
+          </p>
+        }
       >
+        <PermissionPresetSelect selection={selection} onApplyPreset={onApplyPreset} />
+      </FormLayout>
+
+      {riskyPreset !== undefined && (
+        <Admonition
+          type="warning"
+          // Groups the warning with the header above it, rather than the list it sits on top of.
+          className="mb-4"
+          title={riskyPreset.label}
+          description={riskyPreset.description}
+        />
+      )}
+
+      <Accordion type="multiple" value={openCategories} onValueChange={setOpenCategories}>
         {PERMISSION_CATALOG_BY_CATEGORY.map((category, index) => {
           const configuredCount = countConfiguredInCategory(selection, category.key)
           return (
@@ -81,7 +97,6 @@ export const PermissionsAccordion = ({
                         entry={entry}
                         mode={selection[entry.key] ?? 'none'}
                         onChange={(mode) => onChange(entry.key, mode)}
-                        permissionScopeMap={permissionScopeMap}
                         entryAccess={access?.entries[entry.key]}
                       />
                     </div>
@@ -92,6 +107,6 @@ export const PermissionsAccordion = ({
           )
         })}
       </Accordion>
-    </div>
+    </section>
   )
 }
