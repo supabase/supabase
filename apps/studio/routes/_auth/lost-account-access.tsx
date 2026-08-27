@@ -1,7 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { ForgotPasswordLayout } from '@/components/layouts/SignInLayout/ForgotPasswordLayout'
-import LostAccountAccessForm from '@/pages/lost-account-access'
+import { ACCOUNT_RECOVERY_HEADER_TITLE } from '@/components/interfaces/SignIn/AccountRecovery.constants'
+import { StandaloneFormPageLayout } from '@/components/layouts/StandaloneFormPageLayout'
+import LostAccountAccessPage from '@/pages/lost-account-access'
 
 export const Route = createFileRoute('/_auth/lost-account-access')({
   component: LostAccountAccess,
@@ -9,8 +10,8 @@ export const Route = createFileRoute('/_auth/lost-account-access')({
 
 function LostAccountAccess() {
   return (
-    <ForgotPasswordLayout heading="Recover your account">
-      <LostAccountAccessForm dehydratedState={undefined} />
-    </ForgotPasswordLayout>
+    <StandaloneFormPageLayout title={ACCOUNT_RECOVERY_HEADER_TITLE}>
+      <LostAccountAccessPage dehydratedState={undefined} />
+    </StandaloneFormPageLayout>
   )
 }
