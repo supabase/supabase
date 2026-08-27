@@ -3,49 +3,56 @@ id: 'manage-usage-logs-query'
 title: 'Manage Logs Query usage'
 ---
 
-<Admonition type="caution" title="Coming soon">
-
-Logs pricing is being rolled out. Pricing details and included quotas on this page are subject to change. This page will be updated when billing enforcement goes live.
-
-</Admonition>
-
 ## What you are charged for
 
-You are charged for the volume of log data scanned when you read logs via the Studio UI, the Management API, the CLI, or any other interface, measured in GB.
+Logs Query usage isn't billed directly. Instead, your organization gets a log query allowance that scales with how much log data you ingest. The allowance covers the volume of log data scanned when you read logs through the Studio UI, the Management API, the CLI, or any other interface.
 
-## How charges are calculated
-
-Logs Query is charged per GB of log data scanned during the billing cycle.
-
-### Usage on your invoice
-
-Usage is shown as "Logs Query" on your invoice.
-
-## Pricing
+## How your allowance is calculated
 
 <$Partial path="billing/pricing/pricing_logs_query.mdx" />
 
-## Billing examples
+| Monthly ingest | Ingest overage (billed) | Query allowance |
+| --- | --- | --- |
+| 5 GB | — (included) | 500 GB |
+| 6 GB | 1 GB | 600 GB |
+| 10 GB | 5 GB | 1,000 GB |
+| 25 GB | 20 GB | 2,500 GB |
+| 100 GB | 95 GB | 10,000 GB |
 
-Billing examples will be published here when pricing is finalized.
+There's no separate per-GB price for Logs Query. Your allowance is always 100 times your ingest usage for the same month.
+
+### Usage on your invoice
+
+Logs Query doesn't appear as a line item on your invoice, because it isn't billed directly.
 
 ## View usage
 
 You can view Logs Query usage on the [organization's usage page](/dashboard/org/_/usage) of the Dashboard. The page shows the usage of all projects by default. To view the usage for a specific project, select it from the dropdown. You can also select a different time period.
 
-{/* TODO: Add screenshots once Studio surfaces are live */}
-
 ## Optimize usage
 
-Logs Query usage scales directly with the time range and data volume you scan. Keep usage low by:
+Two people asking similar-sounding questions can generate very different amounts of usage, depending on how they ask. These tips help you avoid scanning more data than a question actually requires — they're habits, not restrictions, and none of them ask you to give up visibility you need.
 
-- **Using the Logs Explorer** in the [Dashboard](/dashboard/project/_/logs-explorer) for ad-hoc queries — it surfaces the most relevant log data without over-scanning.
-- **Keeping time ranges narrow.** A 1-day window scans 7× less data than a 7-day window.
-- **Applying service and endpoint filters early** to reduce the volume scanned per query.
-- **Avoiding frequent programmatic polling.** Repeated API or CLI log queries accumulate GB rapidly. For continuous log streaming, [Log Drains](/docs/guides/platform/manage-your-usage/log-drains) are more cost-effective.
+- **Narrow your time range to what the question needs.** Query cost scales with how much data a query scans, and time range is usually the biggest factor: a 1-day window scans about 7 times less data than a 7-day window. Start with the smallest window that could contain the answer, and widen only if you don't find it. Keep a wide window when you're doing genuine historical or trend analysis on purpose — that's a real use case, only a more expensive one by nature.
+- **Filter as part of the query, not after you've pulled the data.** Add filters for source, service, status code, or project before you run a search. A broad, unfiltered query scans everything in its time range, even if you only look at a fraction of the results afterward. Filtering after the fact doesn't reduce what was already scanned.
+- **Use the [Logs Explorer](/dashboard/project/_/logs-explorer) for ad-hoc digging, not scripted polling.** Every query scans data again — there's no caching benefit from asking the same question repeatedly. A script that polls the query endpoint on a schedule re-scans on every run, so it can use far more allowance than a person checking manually, even if it usually finds nothing new.
+- **Use [Log Drains](/docs/guides/platform/manage-your-usage/log-drains) for anything continuous.** If you need an ongoing feed of your logs — for your own monitoring stack, alerting, or archiving — repeatedly querying for what's new since you last checked is one of the most expensive ways to get it, because each check re-scans. Drains stream logs to a destination as they arrive instead.
 
-{/* TODO: add MCP/skill guidance link when available */}
+After you change how you query, check your usage trend over the following few days rather than a single day. Usage varies with how much debugging or investigation you happen to do, so a single day's change isn't a reliable signal on its own.
 
-## Exceeding Quotas
+## When you exceed your allowance
 
-<$Partial path="billing/exceeding_usage_quotas.mdx" />
+If you scan more log data than your allowance covers in a given month, the following month enters a degraded state:
+
+- Queries are rate limited to 10 per minute.
+- Log retention shrinks to 24 hours (Pro, Team, and Enterprise) or 1 hour (Free).
+
+If you exceed your allowance again the next month, while still in that degraded state, logs access is cut off entirely for the month after. Access returns to normal at your next billing cycle.
+
+For example: if you exceed your allowance in January, February is degraded. If February also exceeds its allowance, March is a full cutoff, and April starts clean again. If you get back under your allowance in February, March starts clean too — only consecutive months of exceeding your allowance count toward a cutoff.
+
+## Migrate from the logs.all endpoint
+
+Supabase's `logs.all` Management API endpoint is being retired on September 23, 2026, in favor of the `logs` endpoint. If you have scripts or integrations that call `logs.all` directly, update them to use the new endpoint — see the [migration changelog](https://supabase.com/changelog/48235-migration-of-supabase-management-api-logs-all-analytics-endpoint-to-logs-endpoint) for the syntax changes.
+
+While you're updating those queries, check whether they filter on structured fields such as source or service. Filtered queries scan less data than broad searches, so this is a good checkpoint to review whether an existing query scans more than it needs to.
