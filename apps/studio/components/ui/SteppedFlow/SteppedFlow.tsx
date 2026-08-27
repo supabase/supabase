@@ -79,15 +79,30 @@ export const SteppedFlow = ({
   const isFirstStep = currentIndex === 0
   const currentStepLabel = steps[currentIndex]?.label
   const showCancel = isFirstStep && !!onCancel
+  const nextStepId = steps[currentIndex + 1]?.id
+
+  const handleNext = () => {
+    if (onNext) {
+      onNext()
+      return
+    }
+
+    if (nextStepId) {
+      onStepChange(nextStepId)
+    }
+  }
 
   return (
     <div className="flex min-h-full flex-col">
       <div className="mx-auto w-full max-w-[760px] flex-1 px-6 pt-8 pb-10">
-        <p className="mb-4 text-xs text-foreground-lighter">
+        <p className="mb-4 text-xs text-foreground-lighter" role="status">
           Step {currentIndex + 1} of {steps.length}
           {currentStepLabel ? ` · ${currentStepLabel}` : ''}
         </p>
-        <Card key={currentStep} className="animate-in fade-in-0 duration-200">
+        <Card
+          key={currentStep}
+          className="animate-in fade-in-0 duration-200 motion-reduce:animate-none"
+        >
           {children}
           <CardFooter
             className={cn(currentIndex > 0 || showCancel ? 'justify-between' : 'justify-end')}
@@ -101,7 +116,8 @@ export const SteppedFlow = ({
               >
                 Back
               </Button>
-            ) : showCancel ? (
+            ) : null}
+            {currentIndex === 0 && showCancel ? (
               <Button
                 type="button"
                 variant="default"
@@ -127,9 +143,9 @@ export const SteppedFlow = ({
                 <Button
                   type="button"
                   variant="primary"
-                  disabled={nextDisabled}
+                  disabled={nextDisabled || !nextStepId}
                   loading={nextLoading}
-                  onClick={onNext}
+                  onClick={handleNext}
                 >
                   {nextLabel}
                 </Button>

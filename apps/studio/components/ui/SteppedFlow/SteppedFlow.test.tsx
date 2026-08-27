@@ -62,6 +62,19 @@ describe('SteppedFlow', () => {
     expect(onStepChange).toHaveBeenCalledWith('destination')
   })
 
+  test('advances to the next step when onNext is omitted', () => {
+    const onStepChange = vi.fn()
+
+    customRender(
+      <SteppedFlow steps={steps} currentStep="destination" onStepChange={onStepChange}>
+        Step body
+      </SteppedFlow>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+    expect(onStepChange).toHaveBeenCalledWith('connection')
+  })
+
   test('shows the final action on the last step instead of Next', () => {
     const onFinal = vi.fn()
 
