@@ -83,9 +83,9 @@ Enable the **Automatic branching** option in your GitHub Integration configurati
 
 When a new branch is created in GitHub, a corresponding branch is created in Supabase. (You can enable the **Supabase changes only** option to only create Supabase branches when Supabase files change.)
 
-Every Supabase branch, preview or persistent, is created as a clone of your base project, the project that your production branch runs on. The branch starts with the schema, migration history, and configuration of that project rather than with an empty database.
+Every Supabase branch, preview or persistent, is created as a clone of your base project. The new branch starts with the schema, migration history, and configuration of that project rather than with an empty database.
 
-Your production data is the exception. It isn't cloned, so your branch starts with empty tables. See [Seeding](#seeding) to populate them with sample data.
+Your production data and storage objects are not cloned. See [Seeding](#seeding) to populate them with sample data.
 
 ### Configuration
 
@@ -99,9 +99,11 @@ A comment is added to your PR with the deployment status of your preview branch.
 
 The migrations in the `migrations` subdirectory of your Supabase directory are automatically run. Because your branch is a clone of your base project, it inherits that project's migration history, so only the migrations that haven't been applied yet are run.
 
+If you want to rerun existing migrations, reset the branch from the Supabase dashboard to start from scratch. Note that existing data on your branch will also be dropped by a reset.
+
 ### Seeding
 
-Cloning your base project copies its schema and configuration, but not its data. This is meant to protect your sensitive production data. Your branch starts with the tables of your base project and no rows in them.
+Cloning your base project copies its schema and configuration, but not its data or storage objects. This is meant to protect your sensitive production data. Your branch starts with the tables of your base project and no rows in them.
 
 You can seed your Preview Branch with sample data using the `seed.sql` file in your Supabase directory. See the [Seeding docs](/docs/guides/local-development/seeding-your-database) for more information.
 
