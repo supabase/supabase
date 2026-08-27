@@ -113,7 +113,7 @@ describe('IndirectTaxDeclarationModal', () => {
     addAPIMock({
       method: 'put',
       path: '/platform/organizations/:slug/customer',
-      response: new HttpResponse(null, { status: 204 }),
+      response: () => new HttpResponse(null, { status: 204 }),
     })
 
     customRender(<IndirectTaxDeclarationModal />, {
