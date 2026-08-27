@@ -203,10 +203,11 @@ const LostAccountAccessForm = ({ onSuccess }: { onSuccess: (email: string) => vo
                 control={form.control}
                 name="email"
                 render={({ field }) => (
-                  <FormItemLayout label="Email" description="How we find your account.">
+                  <FormItemLayout id="email" label="Email" description="How we find your account.">
                     <FormControl>
                       <Input
                         {...field}
+                        id="email"
                         type="email"
                         placeholder="you@example.com"
                         autoComplete="email"
@@ -220,6 +221,7 @@ const LostAccountAccessForm = ({ onSuccess }: { onSuccess: (email: string) => vo
                 name="organization"
                 render={({ field }) => (
                   <FormItemLayout
+                    id="organization"
                     label="Organization name or slug"
                     labelOptional="Optional"
                     description="From your organization settings. Either is fine."
@@ -227,6 +229,7 @@ const LostAccountAccessForm = ({ onSuccess }: { onSuccess: (email: string) => vo
                     <FormControl>
                       <Input
                         {...field}
+                        id="organization"
                         type="text"
                         placeholder="Acme"
                         autoComplete="off"
@@ -314,12 +317,13 @@ const LostAccountAccessForm = ({ onSuccess }: { onSuccess: (email: string) => vo
                 name="notes"
                 render={({ field }) => (
                   <FormItemLayout
+                    id="notes"
                     label="Notes"
                     labelOptional="Optional"
                     description="Include any other information that can help us recover your account."
                   >
                     <FormControl>
-                      <Textarea {...field} rows={4} className="max-h-48 resize-y" />
+                      <Textarea {...field} id="notes" rows={4} className="max-h-48 resize-y" />
                     </FormControl>
                   </FormItemLayout>
                 )}
