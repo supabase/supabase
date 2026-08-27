@@ -1,7 +1,10 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
+import { getAccessToken } from 'common'
 import { format } from 'date-fns'
-import { useRef, useState } from 'react'
+import { useRouter } from 'next/router'
+import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -35,6 +38,7 @@ import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialo
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useCreateAccountRecoveryRequestMutation } from '@/data/account-recovery/create-account-recovery-request-mutation'
 import { usePreventNavigationOnUnsavedChanges } from '@/hooks/ui/usePreventNavigationOnUnsavedChanges'
+import { auth, getReturnToPath } from '@/lib/gotrue'
 
 const lostAccountSchema = z.object({
   email: z
@@ -66,6 +70,22 @@ type LostAccountAccessFormData = z.infer<typeof lostAccountSchema>
 
 export const LostAccountAccessFormWizard = () => {
   const [email, setEmail] = useState('')
+
+  const router = useRouter()
+  const queryClient = useQueryClient()
+  useEffect(() => {
+    auth.initialize().then(async ({ error }) => {
+      if (error) {
+        // if there was a problem signing in via the url, don't redirect
+        return
+      }
+      const token = await getAccessToken()
+      if (token) {
+        await queryClient.resetQueries()
+        router.push(getReturnToPath())
+      }
+    })
+  }, [queryClient, router])
 
   if (email) {
     return (
@@ -121,6 +141,11 @@ const LostAccountAccessForm = ({ onSuccess }: { onSuccess: (email: string) => vo
       organization: '',
       projectRefs: [{ value: '' }],
       members: [{ value: '' }],
+      invoices: [
+        { amount: '', issueDate: undefined, number: '' },
+        { amount: '', issueDate: undefined, number: '' },
+      ],
+      notes: '',
     },
   })
 
