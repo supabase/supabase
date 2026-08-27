@@ -83,27 +83,27 @@ Enable the **Automatic branching** option in your GitHub Integration configurati
 
 When a new branch is created in GitHub, a corresponding branch is created in Supabase. (You can enable the **Supabase changes only** option to only create Supabase branches when Supabase files change.)
 
-Every Supabase branch, preview or persistent, is created as a clone of your base project. The new branch starts with the schema, migration history, and configuration of that project rather than with an empty database.
+Every Supabase branch, preview or persistent, starts from your base project rather than from a blank slate. Supabase creates a fresh database for the branch and replays the migration history of your base project against it, so the branch ends up with the same schema and configuration. Schema changes that were never captured as migration files, such as edits made directly in the SQL Editor, are not reproduced. See [Troubleshooting MIGRATIONS_FAILED](/docs/guides/troubleshooting/branch-in-migrations-failed-status) if the replay fails.
 
-Your production data and storage objects are not cloned. See [Seeding](#seeding) to populate them with sample data.
+Your production data and storage objects are not copied by default. See [Seeding](#seeding) to populate the branch with sample data.
 
 ### Configuration
 
 You can test configuration changes on your Preview Branch by configuring the `config.toml` file in your Supabase directory. See the [Configuration docs](/docs/guides/deployment/branching/configuration) for more information.
 
-Your branch starts with the configuration of your base project. The settings in your `config.toml` file are applied on top of that clone.
+Your branch starts with the configuration of your base project. The settings in your `config.toml` file are applied on top of it.
 
 A comment is added to your PR with the deployment status of your preview branch.
 
 ### Migrations
 
-The migrations in the `migrations` subdirectory of your Supabase directory are automatically run. Because your branch is a clone of your base project, it inherits that project's migration history, so only the migrations that haven't been applied yet are run.
+The migrations in the `migrations` subdirectory of your Supabase directory are automatically run. Your base project's migration history is replayed when the branch is created, so each later commit runs only the migrations that haven't been applied yet.
 
 If you want to rerun existing migrations, reset the branch from the Supabase dashboard to start from scratch. Note that existing data on your branch will also be dropped by a reset.
 
 ### Seeding
 
-Cloning your base project copies its schema and configuration, but not its data or storage objects. This is meant to protect your sensitive production data. Your branch starts with the tables of your base project, and the only rows in them are the ones your seed files add.
+Replaying your migration history reproduces the schema and configuration of your base project, but not its data or storage objects. This is meant to protect your sensitive production data. Your branch starts with the tables of your base project, and the only rows in them are the ones your seed files add.
 
 You can seed your Preview Branch with sample data using the `seed.sql` file in your Supabase directory. See the [Seeding docs](/docs/guides/local-development/seeding-your-database) for more information.
 
