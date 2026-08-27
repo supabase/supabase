@@ -17,8 +17,8 @@ import { RegionTooltip } from './RegionTooltip'
 const MAP_SCALE = 155
 const MAP_WIDTH = 800
 const MAP_HEIGHT = 349
-const MAP_ZOOM = 0.9659
-const MAP_CENTER: [number, number] = [1.06, 6.89]
+const MAP_ZOOM = 0.9658
+const MAP_CENTER: [number, number] = [1.08, 6.9]
 
 const projection = geoEqualEarth()
   .scale(MAP_SCALE)
