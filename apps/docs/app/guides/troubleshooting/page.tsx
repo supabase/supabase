@@ -36,10 +36,7 @@ export default async function GlobalTroubleshootingPage() {
         </p>
         <p className="text-foreground-light mt-4">
           Don&apos;t have a specific error yet? Start with{' '}
-          <Link
-            href="/docs/guides/observability/detecting"
-            className="text-brand-link hover:underline"
-          >
+          <Link href="/guides/observability/detecting" className="text-brand-link hover:underline">
             Detecting
           </Link>{' '}
           to pick up a signal first. If you already have one, confirm one cause before you change
@@ -55,7 +52,7 @@ export default async function GlobalTroubleshootingPage() {
           <li>
             Query the{' '}
             <Link
-              href="/docs/guides/observability/advanced-log-filtering#logs-explorer"
+              href="/guides/observability/advanced-log-filtering#logs-explorer"
               className="text-brand-link hover:underline"
             >
               log source
@@ -74,21 +71,18 @@ export default async function GlobalTroubleshootingPage() {
         <p className="text-foreground-light mt-4">
           For client-side or local debugging, see{' '}
           <Link
-            href="/docs/guides/auth/debugging/error-codes"
+            href="/guides/auth/debugging/error-codes"
             className="text-brand-link hover:underline"
           >
             Auth error codes
           </Link>
           ,{' '}
-          <Link
-            href="/docs/guides/storage/debugging/logs"
-            className="text-brand-link hover:underline"
-          >
+          <Link href="/guides/storage/debugging/logs" className="text-brand-link hover:underline">
             Storage logs
           </Link>
           , and{' '}
           <Link
-            href="/docs/guides/functions/debugging-tools"
+            href="/guides/functions/debugging-tools"
             className="text-brand-link hover:underline"
           >
             Edge Functions debugging tools
