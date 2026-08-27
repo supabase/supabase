@@ -68,6 +68,7 @@ export const createMockOrganization = (details: Partial<Organization>): Organiza
     restriction_data: null,
     organization_missing_address: false,
     organization_missing_tax_id: false,
+    requires_indirect_tax_declaration: false,
   }
 
   return Object.assign(base, details)
@@ -102,6 +103,7 @@ export const createMockOrganizationResponse = (
     restriction_data: null,
     organization_missing_address: false,
     organization_missing_tax_id: false,
+    requires_indirect_tax_declaration: false,
   }
 
   return Object.assign(base, details)

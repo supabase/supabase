@@ -20,6 +20,7 @@ const baseOrganizationResponse = {
   organization_missing_address: false,
   organization_missing_tax_id: false,
   organization_requires_mfa: false,
+  requires_indirect_tax_declaration: false,
   plan: { id: 'pro' as const, name: 'Pro' },
   restriction_data: null,
   restriction_status: null,

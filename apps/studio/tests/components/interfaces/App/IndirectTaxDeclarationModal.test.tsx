@@ -1,0 +1,112 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { HttpResponse } from 'msw'
+import { describe, expect, test, vi } from 'vitest'
+
+import { IndirectTaxDeclarationModal } from '@/components/interfaces/App/IndirectTaxDeclarationModal'
+import { createMockOrganizationResponse } from '@/tests/helpers'
+import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock } from '@/tests/lib/msw'
+import { createMockProfileContext } from '@/tests/lib/profile-helpers'
+
+const ORG_SLUG = 'test-org'
+const PROFILE_CONTEXT = createMockProfileContext()
+
+vi.mock('common', async (importOriginal) => {
+  const actual = (await importOriginal()) as typeof import('common')
+  return {
+    ...actual,
+    useParams: () => ({ slug: ORG_SLUG }),
+    useIsLoggedIn: () => true,
+  }
+})
+
+vi.mock('@/lib/constants', async (importOriginal) => {
+  const actual = await importOriginal<Record<string, unknown>>()
+  return { ...actual, IS_PLATFORM: true }
+})
+
+const billingWritePermission = {
+  actions: [PermissionAction.BILLING_WRITE],
+  condition: null,
+  organization_id: 1,
+  organization_slug: ORG_SLUG,
+  project_ids: [],
+  project_refs: [],
+  resources: ['stripe.customer'],
+  restrictive: false,
+}
+
+function setupMocks({
+  canUpdateBilling = true,
+}: {
+  canUpdateBilling?: boolean
+} = {}) {
+  addAPIMock({
+    method: 'get',
+    path: '/platform/organizations',
+    response: [
+      createMockOrganizationResponse({
+        slug: ORG_SLUG,
+        name: 'Test Org',
+        requires_indirect_tax_declaration: true,
+      }),
+    ],
+  })
+
+  addAPIMock({
+    method: 'get',
+    path: '/platform/profile/permissions',
+    response: canUpdateBilling ? [billingWritePermission] : [],
+  })
+}
+
+describe('IndirectTaxDeclarationModal', () => {
+  test('is non-dismissible and requires an explicit response', async () => {
+    setupMocks()
+    customRender(<IndirectTaxDeclarationModal />, { profileContext: PROFILE_CONTEXT })
+
+    const dialog = await screen.findByRole('dialog')
+    expect(dialog).toHaveTextContent('Confirm your Australian GST status')
+    expect(screen.queryByRole('button', { name: /close/i })).not.toBeInTheDocument()
+
+    await userEvent.keyboard('{Escape}')
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+
+    expect(screen.getByRole('button', { name: 'Submit declaration' })).toBeDisabled()
+  })
+
+  test('submits the declaration', async () => {
+    setupMocks()
+    const requestBodies: unknown[] = []
+
+    addAPIMock({
+      method: 'put',
+      path: '/platform/organizations/:slug/customer',
+      response: async ({ request }) => {
+        requestBodies.push(await request.json())
+        return new HttpResponse(null, { status: 204 })
+      },
+    })
+
+    customRender(<IndirectTaxDeclarationModal />, { profileContext: PROFILE_CONTEXT })
+
+    await userEvent.click(await screen.findByRole('radio', { name: /Yes, I confirm/i }))
+    await userEvent.click(screen.getByRole('button', { name: 'Submit declaration' }))
+
+    await waitFor(() => {
+      expect(requestBodies).toEqual([{ indirect_tax_registration_declaration: 'yes' }])
+    })
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  })
+
+  test('does not show for members without billing write permission', async () => {
+    setupMocks({ canUpdateBilling: false })
+    customRender(<IndirectTaxDeclarationModal />, { profileContext: PROFILE_CONTEXT })
+
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    })
+  })
+})
