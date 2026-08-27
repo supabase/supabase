@@ -45,7 +45,11 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { findMutatingQueryCells } from './ExplorerNotebookTab.utils'
+import {
+  findDestructiveQueryCells,
+  findMutatingQueryCells,
+  type QueryCellSummary,
+} from './ExplorerNotebookTab.utils'
 import {
   ExplorerToolbar,
   ExplorerToolbarAction,
@@ -102,9 +106,11 @@ export const ExplorerNotebookTab = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isSaveBeforeAnalyzeOpen, setIsSaveBeforeAnalyzeOpen] = useState(false)
   const [isSaveConflictOpen, setIsSaveConflictOpen] = useState(false)
-  const [pendingMutationCells, setPendingMutationCells] = useState<
-    { id: string; title: string }[] | null
-  >(null)
+  const [pendingMutationCells, setPendingMutationCells] = useState<QueryCellSummary[] | null>(null)
+  const [pendingDestructiveCells, setPendingDestructiveCells] = useState<QueryCellSummary[] | null>(
+    null
+  )
+  const [pendingRunCellIds, setPendingRunCellIds] = useState<string[] | null>(null)
   const [skipMutatingCells, setSkipMutatingCells] = useState(false)
   const queryCellRefs = useRef(new Map<string, QueryEditorHandle>())
   const savedContentRef = useRef<typeof content>(undefined)
@@ -197,12 +203,39 @@ export const ExplorerNotebookTab = () => {
 
   const handleConfirmRunNotebook = () => {
     const mutatingCellIds = new Set((pendingMutationCells ?? []).map((cell) => cell.id))
+    const freshCells = getFreshCells()
+    const freshQueryCellIds = freshCells.filter(isQueryCell).map((cell) => cell._id)
     const cellIdsToRun = skipMutatingCells
-      ? queryCellIds.filter((id) => !mutatingCellIds.has(id))
-      : queryCellIds
+      ? freshQueryCellIds.filter((id) => !mutatingCellIds.has(id))
+      : freshQueryCellIds
 
     setPendingMutationCells(null)
+
+    if (!skipMutatingCells) {
+      const destructiveCells = findDestructiveQueryCells({
+        cells: freshCells,
+        getLiveSql: (cellId) => queryCellRefs.current.get(cellId)?.getSql(),
+      })
+      if (destructiveCells.length > 0) {
+        setPendingRunCellIds(cellIdsToRun)
+        setPendingDestructiveCells(destructiveCells)
+        return
+      }
+    }
+
     runNotebook({ cellIdsToRun, force: true })
+  }
+
+  const handleConfirmDestructiveRun = () => {
+    const cellIdsToRun = pendingRunCellIds
+    setPendingDestructiveCells(null)
+    setPendingRunCellIds(null)
+    if (cellIdsToRun) runNotebook({ cellIdsToRun, force: true })
+  }
+
+  const handleCancelDestructiveRun = () => {
+    setPendingDestructiveCells(null)
+    setPendingRunCellIds(null)
   }
 
   const persistNotebook = () => {
@@ -552,6 +585,27 @@ export const ExplorerNotebookTab = () => {
             onCheckedChange={(value) => setSkipMutatingCells(!!value)}
           />
         </FormItemLayout>
+      </ConfirmationModal>
+
+      <ConfirmationModal
+        size="small"
+        visible={pendingDestructiveCells !== null}
+        title="Confirm destructive queries"
+        confirmLabel="Run all cells"
+        variant="warning"
+        onCancel={handleCancelDestructiveRun}
+        onConfirm={handleConfirmDestructiveRun}
+      >
+        <p className="text-sm">
+          This notebook has {pendingDestructiveCells?.length ?? 0}{' '}
+          {pendingDestructiveCells?.length === 1 ? 'query' : 'queries'} with destructive operations
+          that may permanently change or remove data, tables, schemas, or other objects:
+        </p>
+        <ul className="text-sm list-disc pl-4 mt-2">
+          {pendingDestructiveCells?.map((cell) => (
+            <li key={cell.id}>{cell.title}</li>
+          ))}
+        </ul>
       </ConfirmationModal>
     </div>
   )

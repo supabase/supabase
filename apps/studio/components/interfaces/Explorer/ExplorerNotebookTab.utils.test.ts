@@ -1,7 +1,11 @@
 import { untrustedSql } from '@supabase/pg-meta'
 import { describe, expect, it } from 'vitest'
 
-import { findMutatingQueryCells, isMutatingSql } from './ExplorerNotebookTab.utils'
+import {
+  findDestructiveQueryCells,
+  findMutatingQueryCells,
+  isMutatingSql,
+} from './ExplorerNotebookTab.utils'
 import { type Cell } from '@/data/content/notebooks/notebook-schema'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 
@@ -123,5 +127,48 @@ describe('findMutatingQueryCells', () => {
     expect(
       findMutatingQueryCells({ cells: [readOnlyDatabaseCell, mutatingDatabaseCell], getLiveSql })
     ).toEqual([{ id: 'cell-2', title: 'Cleanup' }])
+  })
+})
+
+describe('findDestructiveQueryCells', () => {
+  const readOnlyCell: Cell = {
+    _tag: 'database_cell',
+    _id: 'cell-1',
+    title: 'Signups',
+    view: 'table',
+    unchecked_sql: untrustedSql('select * from auth.users'),
+    row_limit: 50,
+  }
+  const destructiveCell: Cell = {
+    _tag: 'database_cell',
+    _id: 'cell-2',
+    title: 'Drop users',
+    view: 'table',
+    unchecked_sql: untrustedSql('select 1; drop table users'),
+    row_limit: 50,
+  }
+
+  it('returns only cells containing destructive SQL', () => {
+    expect(findDestructiveQueryCells({ cells: [readOnlyCell, destructiveCell] })).toEqual([
+      { id: 'cell-2', title: 'Drop users' },
+    ])
+  })
+
+  it('ignores destructive SQL inside comments', () => {
+    const commentedCell: Cell = {
+      ...readOnlyCell,
+      unchecked_sql: untrustedSql('-- drop table users\nselect 1'),
+    }
+
+    expect(findDestructiveQueryCells({ cells: [commentedCell] })).toEqual([])
+  })
+
+  it('uses live SQL when it adds a destructive operation', () => {
+    expect(
+      findDestructiveQueryCells({
+        cells: [readOnlyCell],
+        getLiveSql: () => 'truncate table users',
+      })
+    ).toEqual([{ id: 'cell-1', title: 'Signups' }])
   })
 })
