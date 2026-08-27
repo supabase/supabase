@@ -5,11 +5,11 @@ title: 'Manage Logs Ingest usage'
 
 ## What you are charged for
 
-You are charged for the total volume of log data that Supabase ingests across all your project's services (Postgres, API gateway, Auth, Storage, Realtime, Edge Functions, and others) during the billing cycle, measured in GB.
+You are charged for the total volume of log data that Supabase ingests across all your project's services (Postgres, API gateway, Auth, Storage, Realtime, Edge Functions, and others) during the billing cycle.
 
 ## How charges are calculated
 
-Logs Ingest is charged per GB of log data ingested during the billing cycle.
+Logs Ingest is charged per byte of log data ingested during the billing cycle.
 
 ### Usage on your invoice
 
@@ -21,14 +21,14 @@ Usage is shown as "Logs Ingest" on your invoice.
 
 ## Billing examples
 
-| Monthly ingest | Included | Billable overage | Cost |
-| --- | --- | --- | --- |
-| 1 GB | 1 GB (Free Plan) | — | <Price price="0" /> |
-| 5 GB | 5 GB (paid plans) | — | <Price price="0" /> |
-| 6 GB | 5 GB | 1 GB | <Price price="0.50" /> |
-| 10 GB | 5 GB | 5 GB | <Price price="2.50" /> |
-| 25 GB | 5 GB | 20 GB | <Price price="10.00" /> |
-| 100 GB | 5 GB | 95 GB | <Price price="47.50" /> |
+| Plan | Monthly ingest | Included | Billable overage | Cost |
+| --- | --- | --- | --- | --- |
+| Free | 1 GB | 1 GB | — | <Price price="0" /> |
+| Paid | 5 GB | 5 GB | — | <Price price="0" /> |
+| Paid | 6 GB | 5 GB | 1 GB | <Price price="0.50" /> |
+| Paid | 10 GB | 5 GB | 5 GB | <Price price="2.50" /> |
+| Paid | 25 GB | 5 GB | 20 GB | <Price price="10.00" /> |
+| Paid | 100 GB | 5 GB | 95 GB | <Price price="47.50" /> |
 
 ## View usage
 
@@ -36,17 +36,17 @@ You can view Logs Ingest usage on the [organization's usage page](/dashboard/org
 
 ## Optimize usage
 
-Every service in your Supabase project generates logs automatically — you don't write them directly. Log volume scales with your application's traffic and behavior. Your project's database (Postgres) can also be configured to record different kinds of activity, such as every query it runs, every time an app connects, and how long things take. Each recorded event is a "log line," and log lines are what count toward your ingest usage.
+Every service in your Supabase project generates logs automatically — you don't write them directly. Log volume scales with your application's traffic and behavior. Your project's database (Postgres) can also be configured to record different kinds of activity, such as every query it runs, every time an app connects, and how long things take. 
 
-Most projects don't need to log everything, all the time. Turning off a log type means you won't have that information if something goes wrong later, for example a slow query, a security incident, or a connection storm. If your team relies on these logs for debugging, security audits, or compliance requirements, check with them before you change a setting. When in doubt, reduce the volume of a log type rather than turning it off completely — for example, raise a threshold rather than disabling logging outright.
+Most projects don't need to log everything, all the time. However, turning off a log type means you won't have that information if something goes wrong later, for example a slow query, a security incident, or a connection storm. If your team relies on these logs for debugging, security audits, or compliance requirements, check with them before you change a setting. When in doubt, reduce the volume of a log type rather than turning it off completely — for example, raise a threshold rather than disabling logging outright.
 
 You change all of the Postgres settings below through [Custom Postgres Configuration](/docs/guides/database/custom-postgres-config), either from the SQL Editor or the Supabase CLI. Some changes take effect immediately; others require a database restart. The CLI has a `--no-restart` option if you want to batch several changes together before restarting.
 
 ### Start with the two biggest levers
 
-If you only change two things, change these first — they're responsible for most log volume on most projects.
+Consider these options first. They are responsible for most log volume on most projects.
 
-- **`log_statement`.** When set to `all` or `mod`, Postgres writes out the actual text of every query your application runs. On an active project, this produces high log volume in a short time, since it logs once per query rather than once per problem. Set it to `none` if you don't manually read through raw query logs to debug your application, for example if your team relies on an AI coding assistant, an APM tool, or the Query Performance dashboard instead. Keep it on if you routinely read query text in the Logs Explorer to debug issues, or you have a compliance requirement to retain a full statement audit trail.
+- **`log_statement`.** When set to `all`, Postgres writes out the actual text of every statement your application runs, including every `SELECT`. Set to `mod`, it only logs DDL and data-modifying statements (`INSERT`, `UPDATE`, `DELETE`, `TRUNCATE`), not reads. On an active project, `all` produces high log volume in a short time, since it logs once per statement rather than once per problem. Set it to `none` if you don't manually read through raw query logs to debug your application, for example if your team relies on an AI coding assistant, an APM tool, or the Query Performance dashboard instead. Keep `all` on if you routinely read query text in the Logs Explorer to debug issues, or you have a compliance requirement to retain a full statement audit trail; `mod` is a lighter-volume option if you only need a record of data changes.
 - **`log_min_duration_statement`.** Logs the duration, and optionally the text, of any query that takes longer than a threshold you set, in milliseconds. A threshold of `0` logs every query's duration and generates volume similar to `log_statement`. Raise the threshold (for example, from a few milliseconds to 1-2 seconds) if you only care about queries that are slow enough to notice. Keep it low only while you're actively in a performance-tuning phase, and raise it back up once that investigation is done.
 
 ### Check these often-overlooked settings

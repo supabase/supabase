@@ -3,10 +3,10 @@ id: 'manage-usage-logs'
 title: 'Manage Logs usage'
 ---
 
-Logs usage has two metrics, and only one of them is billed:
+Logs usage has two components, and only one of them is billed:
 
 - **Logs Ingest** — the total GB of log data Supabase ingests across all your project's services (Postgres, API gateway, Auth, Storage, Realtime, Edge Functions, and others) during the billing cycle. Each plan includes a free quota, and usage beyond the quota is billed per GB.
-- **Logs Query** — the total GB of log data scanned when you read logs through the Studio UI, the Management API, the CLI, or any other interface. Logs Query isn't billed. Instead, it's enforced through a query allowance scaled to your log ingest usage: 100 GB of allowance for every 1 GB you ingest. Scanning more than your allowance in a month leads to a degraded state — rate-limited queries and shorter retention — rather than a charge.
+- **Logs Query** — the total GB of log data scanned when you read logs through the Studio UI, the Management API, the CLI, or any other interface. Logs Query isn't billed. Instead, you get a query allowance scaled to your log ingest usage: 100 GB of allowance for every 1 GB you ingest. Once enforcement goes live, scanning more than your allowance in a month will lead to a degraded state — rate-limited queries and shorter retention — rather than a charge.
 
 For optimization tips and billing details, see:
 
