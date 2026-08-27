@@ -620,7 +620,7 @@ export const LogTable = ({
                 'data-grid--logs-explorer': !queryType,
               })}
               rowHeight={40}
-              headerRowHeight={queryType ? 0 : 28}
+              headerRowHeight={queryType || columnRenderers ? 0 : 28}
               columns={columns}
               rowClass={(row: LogData) => {
                 const key = getRowKey(row)

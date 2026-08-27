@@ -1,13 +1,15 @@
 import { queryOptions } from '@tanstack/react-query'
+import dayjs from 'dayjs'
+import { z } from 'zod'
 
 import { workersKeys } from './keys'
+import type { LogData } from '@/components/interfaces/Settings/Logs/Logs.types'
+import { otelTimestampToMicros } from '@/components/interfaces/Settings/Logs/Logs.utils.otel'
 import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
 import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
 import { analyticsLiteral, safeSql } from '@/data/logs/safe-analytics-sql'
 import { IS_PLATFORM } from '@/lib/constants'
 
-// The three streams the workers pipeline emits, as they appear in the `source`
-// attribute of every row.
 export const WORKER_LOG_SOURCES = {
   requests: 'worker_ingress_logs',
   output: 'worker_guest_logs',
@@ -23,21 +25,19 @@ export const WORKER_LOG_STREAM_LABEL: Record<WorkerLogStream, string> = {
 }
 
 // Both are read from `log_attributes` rather than the endpoint's own `source` column:
-// that column is derived from a mapping which does not currently classify worker rows,
-// and these attributes are on every row either way.
+// that column is derived from a mapping which does not currently classify worker rows.
 const WORKER_NAME_KEY = 'worker'
 const STREAM_KEY = 'source'
 
 const LOOKBACK_HOURS = 24
-
 const LOG_LIMIT = 100
 
-export interface WorkerLogEntry {
-  id: string
-  timestamp: string
-  severity: string
-  message: string
-}
+const workerLogRowSchema = z.object({
+  id: z.string(),
+  timestamp: z.union([z.string(), z.number()]),
+  severity: z.string().nullish(),
+  message: z.string().nullish(),
+})
 
 export type WorkerLogsVariables = {
   projectRef?: string
@@ -48,15 +48,26 @@ export type WorkerLogsVariables = {
 export const workerLogsSql = (name: string, stream: WorkerLogStream) =>
   safeSql`select id, timestamp, severity_text as severity, event_message as message from logs where log_attributes[${analyticsLiteral(WORKER_NAME_KEY)}] = ${analyticsLiteral(name)} and log_attributes[${analyticsLiteral(STREAM_KEY)}] = ${analyticsLiteral(WORKER_LOG_SOURCES[stream])} order by timestamp desc limit ${analyticsLiteral(LOG_LIMIT)}`
 
+export const parseWorkerLogRows = (result: unknown): LogData[] =>
+  z
+    .array(workerLogRowSchema)
+    .parse(result ?? [])
+    .map((row) => ({
+      id: row.id,
+      timestamp: otelTimestampToMicros(row.timestamp),
+      event_message: row.message ?? '',
+      severity_text: row.severity ?? '',
+    }))
+
 async function getWorkerLogs(
   { projectRef, name, stream }: WorkerLogsVariables,
   signal?: AbortSignal
-): Promise<WorkerLogEntry[]> {
+): Promise<LogData[]> {
   if (!projectRef) throw new Error('projectRef is required')
   if (!name) throw new Error('name is required')
 
-  const end = new Date()
-  const start = new Date(end.getTime() - LOOKBACK_HOURS * 60 * 60 * 1000)
+  const end = dayjs()
+  const start = end.subtract(LOOKBACK_HOURS, 'hour')
 
   const data = await executeAnalyticsSql({
     projectRef,
@@ -67,7 +78,7 @@ async function getWorkerLogs(
     signal,
   })
 
-  return (data?.result ?? []) as WorkerLogEntry[]
+  return parseWorkerLogRows(data?.result)
 }
 
 export const workerLogsQueryOptions = ({ projectRef, name, stream }: WorkerLogsVariables) =>

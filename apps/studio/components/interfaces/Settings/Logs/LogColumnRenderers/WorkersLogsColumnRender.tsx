@@ -4,7 +4,7 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import type { LogData } from '../Logs.types'
 import { RowLayout, SeverityFormatter, TextFormatter } from '../LogsFormatters'
 
-const columns: Column<LogData>[] = [
+export const WorkersLogsColumnRender: Column<LogData>[] = [
   {
     name: 'workers-logs-first-column',
     key: 'workers-logs-first-column',
@@ -20,5 +20,3 @@ const columns: Column<LogData>[] = [
     ),
   },
 ]
-
-export default columns

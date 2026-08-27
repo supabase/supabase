@@ -1,14 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { RefreshCw } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { WorkerCommandLine } from '../WorkerCommandLine'
-import WorkersLogsColumnRender from '@/components/interfaces/Settings/Logs/LogColumnRenderers/WorkersLogsColumnRender'
+import { WorkersLogsColumnRender } from '@/components/interfaces/Settings/Logs/LogColumnRenderers/WorkersLogsColumnRender'
 import type { LogData } from '@/components/interfaces/Settings/Logs/Logs.types'
-import { otelTimestampToMicros } from '@/components/interfaces/Settings/Logs/Logs.utils.otel'
 import { LogTable } from '@/components/interfaces/Settings/Logs/LogTable'
 import { AlertError } from '@/components/ui/AlertError'
 import {
@@ -35,17 +34,6 @@ export const WorkerLogsTab = ({ workerName, stream }: WorkerLogsTabProps) => {
     isFetching,
     refetch,
   } = useQuery(workerLogsQueryOptions({ projectRef, name: workerName, stream }))
-
-  const rows = useMemo<LogData[]>(
-    () =>
-      (logs ?? []).map((log) => ({
-        id: log.id,
-        timestamp: otelTimestampToMicros(log.timestamp),
-        event_message: log.message,
-        severity_text: log.severity,
-      })),
-    [logs]
-  )
 
   const label = WORKER_LOG_STREAM_LABEL[stream].toLowerCase()
 
@@ -79,8 +67,8 @@ export const WorkerLogsTab = ({ workerName, stream }: WorkerLogsTabProps) => {
           <LogTable
             projectRef={projectRef ?? ''}
             columnRenderers={WorkersLogsColumnRender}
-            data={rows}
-            isLoading={isFetching}
+            data={logs ?? []}
+            isLoading={isPending}
             showHeader={false}
             showHistogramToggle={false}
             selectedLog={selectedLog ?? undefined}

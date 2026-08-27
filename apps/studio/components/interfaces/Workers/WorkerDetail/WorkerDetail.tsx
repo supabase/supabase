@@ -140,7 +140,7 @@ export const WorkerDetail = () => {
       {tab === 'overview' && <WorkerOverviewTab worker={worker} />}
       {stream !== undefined && (
         <div className="flex flex-1 flex-col min-h-0">
-          <WorkerLogsTab workerName={worker.name} stream={stream} />
+          <WorkerLogsTab key={stream} workerName={worker.name} stream={stream} />
         </div>
       )}
     </div>
