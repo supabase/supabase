@@ -176,6 +176,19 @@ const LostAccountAccessForm = ({ onSuccess }: { onSuccess: (email: string) => vo
         className="flex flex-col"
         onSubmit={form.handleSubmit(onRequestAccountRecovery)}
       >
+        <div className="h-0 overflow-hidden" aria-hidden="true">
+          <HCaptcha
+            ref={captchaRef}
+            sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+            size="invisible"
+            onVerify={(token) => {
+              setCaptchaToken(token)
+            }}
+            onExpire={() => {
+              setCaptchaToken(null)
+            }}
+          />
+        </div>
         <StandaloneFormCard>
           <StandaloneFormCardContent className="flex flex-col gap-y-6">
             <div className="px-6 flex flex-col gap-y-2">
@@ -327,19 +340,6 @@ const LostAccountAccessForm = ({ onSuccess }: { onSuccess: (email: string) => vo
           </StandaloneFormCardContent>
 
           <StandaloneFormCardFooter>
-            <div className="hidden" aria-hidden="true">
-              <HCaptcha
-                ref={captchaRef}
-                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
-                size="invisible"
-                onVerify={(token) => {
-                  setCaptchaToken(token)
-                }}
-                onExpire={() => {
-                  setCaptchaToken(null)
-                }}
-              />
-            </div>
             <Button block type="submit" size="medium" disabled={isPending} loading={isPending}>
               Submit recovery request
             </Button>
