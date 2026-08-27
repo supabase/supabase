@@ -42,7 +42,7 @@ const RegionsPage = () => {
       <DefaultLayout>
         <SectionContainer className="pb-0! md:pb-0! lg:pb-0!">
           <ProductHeaderCentered
-            title="Regions"
+            title="Available Regions"
             h1={
               <>
                 {REGION_COUNT} regions.
