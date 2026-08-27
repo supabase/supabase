@@ -10,16 +10,16 @@ import { addAPIMock } from '@/tests/lib/msw'
 describe('LostAccountAccessForm', () => {
   beforeAll(() => {
     vi.stubGlobal('hcaptcha', {
-      execute: async (options?: unknown) => {
+      execute: async () => {
         // Return HCaptcha's official test token
         return { response: '10000000-aaaa-bbbb-cccc-000000000001', key: 'mock' }
       },
-      render: (container: unknown, options: unknown) => {
+      render: () => {
         return 'mock-widget-id'
       },
-      reset: (widgetId?: unknown) => {},
-      remove: (widgetId?: unknown) => {},
-      getResponse: (widgetId?: unknown) => {
+      reset: () => {},
+      remove: () => {},
+      getResponse: () => {
         return '10000000-aaaa-bbbb-cccc-000000000001'
       },
     })
