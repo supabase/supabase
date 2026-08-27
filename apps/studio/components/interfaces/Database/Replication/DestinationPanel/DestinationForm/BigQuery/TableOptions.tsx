@@ -10,6 +10,7 @@ import { GenericSelectionSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
 import { defaultPartitionByForKind, parseIntegerInput, shortenPgType } from './BigQuery.utils'
 import type { BigQueryPartitionKind } from './BigQuery.utils'
+import { REPLICATION_METADATA_FRESHNESS_MS } from '@/data/replication/constants'
 import {
   useReplicationPublicationQuery,
   type ReplicationPublicationData,
@@ -147,7 +148,7 @@ const TableOptionRow = ({
     refetch: refetchColumns,
   } = useReplicationTableColumnsQuery(
     { projectRef, sourceId, tableId },
-    { enabled: shouldLoadColumns, staleTime: 5 * 60 * 1000 }
+    { enabled: shouldLoadColumns, staleTime: REPLICATION_METADATA_FRESHNESS_MS }
   )
   const isLoadingColumns = shouldLoadColumns && (isPending || publicationColumnsPending)
   const sourceColumnNames = columns.map((column) => column.name)
@@ -418,7 +419,7 @@ export const TableOptions = ({ control }: TableOptionsProps) => {
     { projectRef, sourceId },
     {
       enabled: unavailableTableOptions.length > 0 || needsPartitionAncestry,
-      staleTime: 5 * 60 * 1000,
+      staleTime: REPLICATION_METADATA_FRESHNESS_MS,
     }
   )
   const sourceTablesById = new Map(sourceTables.map((table) => [table.id, table]))

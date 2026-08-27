@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 
+import { REPLICATION_METADATA_FRESHNESS_MS } from './constants'
 import { replicationKeys } from './keys'
 import type { ReplicationPublication } from './publications-query'
 import { get, handleError } from '@/data/fetchers'
@@ -52,7 +53,7 @@ export const useReplicationPublicationQuery = <TData = ReplicationPublicationDat
       typeof sourceId !== 'undefined' &&
       typeof publicationName !== 'undefined' &&
       publicationName.length > 0,
-    staleTime: 5 * 60 * 1000,
-    refetchInterval: 5 * 60 * 1000,
+    staleTime: REPLICATION_METADATA_FRESHNESS_MS,
+    refetchInterval: REPLICATION_METADATA_FRESHNESS_MS,
     ...options,
   })

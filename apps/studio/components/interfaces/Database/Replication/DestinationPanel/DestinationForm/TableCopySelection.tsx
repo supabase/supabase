@@ -8,6 +8,7 @@ import { MultiSelector } from 'ui-patterns/multi-select'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 import { useRefreshOnOpen } from './useRefreshOnOpen'
+import { REPLICATION_METADATA_FRESHNESS_MS } from '@/data/replication/constants'
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useReplicationTablesQuery } from '@/data/replication/tables-query'
@@ -77,7 +78,7 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
       : tableSyncCopyTableIds.filter((id) => !publicationTableIds.has(id)).length
   const { data: sourceTables = [] } = useReplicationTablesQuery(
     { projectRef, sourceId },
-    { enabled: staleSelectedCount > 0, staleTime: 5 * 60 * 1000 }
+    { enabled: staleSelectedCount > 0, staleTime: REPLICATION_METADATA_FRESHNESS_MS }
   )
   const sourceTableLabelsById = new Map(
     sourceTables.map((table) => [String(table.id), tableLabel(table)])

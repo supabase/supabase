@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 
+import { REPLICATION_METADATA_FRESHNESS_MS } from './constants'
 import { replicationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
@@ -42,6 +43,6 @@ export const useReplicationPublicationNamesQuery = <TData = ReplicationPublicati
     queryKey: replicationKeys.publicationNames(projectRef, sourceId),
     queryFn: ({ signal }) => fetchReplicationPublicationNames({ projectRef, sourceId }, signal),
     enabled: enabled && typeof projectRef !== 'undefined' && typeof sourceId !== 'undefined',
-    staleTime: 5 * 60 * 1000,
+    staleTime: REPLICATION_METADATA_FRESHNESS_MS,
     ...options,
   })
