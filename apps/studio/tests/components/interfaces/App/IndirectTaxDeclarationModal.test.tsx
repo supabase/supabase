@@ -14,7 +14,7 @@ const ORG_SLUG = 'test-org'
 const PROFILE_CONTEXT = createMockProfileContext()
 
 vi.mock('common', async (importOriginal) => {
-  const actual = (await importOriginal()) as typeof import('common')
+  const actual = await importOriginal<typeof import('common')>()
   return {
     ...actual,
     useParams: () => ({ slug: ORG_SLUG }),
