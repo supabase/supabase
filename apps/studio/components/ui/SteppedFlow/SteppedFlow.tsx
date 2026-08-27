@@ -75,19 +75,39 @@ export const SteppedFlow = ({
     0,
     steps.findIndex((step) => step.id === currentStep)
   )
-  const isLastStep = currentIndex === steps.length - 1
+  const stepCount = steps.length
+  const isLastStep = stepCount > 0 && currentIndex === stepCount - 1
   const isFirstStep = currentIndex === 0
   const currentStepLabel = steps[currentIndex]?.label
   const showCancel = isFirstStep && !!onCancel
+  const nextStepId = steps[currentIndex + 1]?.id
+
+  const handleNext = () => {
+    if (onNext) {
+      onNext()
+      return
+    }
+
+    if (nextStepId) {
+      onStepChange(nextStepId)
+    }
+  }
+
+  if (stepCount === 0) {
+    return null
+  }
 
   return (
     <div className="flex min-h-full flex-col">
       <div className="mx-auto w-full max-w-[760px] flex-1 px-6 pt-8 pb-10">
-        <p className="mb-4 text-xs text-foreground-lighter">
-          Step {currentIndex + 1} of {steps.length}
+        <p className="mb-4 text-xs text-foreground-lighter" role="status">
+          Step {currentIndex + 1} of {stepCount}
           {currentStepLabel ? ` · ${currentStepLabel}` : ''}
         </p>
-        <Card key={currentStep} className="animate-in fade-in-0 duration-200">
+        <Card
+          key={currentStep}
+          className="animate-in fade-in-0 duration-200 motion-reduce:animate-none"
+        >
           {children}
           <CardFooter
             className={cn(currentIndex > 0 || showCancel ? 'justify-between' : 'justify-end')}
@@ -101,7 +121,8 @@ export const SteppedFlow = ({
               >
                 Back
               </Button>
-            ) : showCancel ? (
+            ) : null}
+            {currentIndex === 0 && showCancel ? (
               <Button
                 type="button"
                 variant="default"
@@ -118,7 +139,7 @@ export const SteppedFlow = ({
                   form={finalAction.form}
                   variant="primary"
                   loading={finalAction.loading}
-                  disabled={finalAction.disabled}
+                  disabled={navigationDisabled || finalAction.disabled}
                   onClick={finalAction.onClick}
                 >
                   {finalAction.label}
@@ -127,9 +148,9 @@ export const SteppedFlow = ({
                 <Button
                   type="button"
                   variant="primary"
-                  disabled={nextDisabled}
+                  disabled={navigationDisabled || nextDisabled || !nextStepId}
                   loading={nextLoading}
-                  onClick={onNext}
+                  onClick={handleNext}
                 >
                   {nextLabel}
                 </Button>

@@ -62,6 +62,19 @@ describe('SteppedFlow', () => {
     expect(onStepChange).toHaveBeenCalledWith('destination')
   })
 
+  test('advances to the next step when onNext is omitted', () => {
+    const onStepChange = vi.fn()
+
+    customRender(
+      <SteppedFlow steps={steps} currentStep="destination" onStepChange={onStepChange}>
+        Step body
+      </SteppedFlow>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+    expect(onStepChange).toHaveBeenCalledWith('connection')
+  })
+
   test('shows the final action on the last step instead of Next', () => {
     const onFinal = vi.fn()
 
@@ -125,5 +138,36 @@ describe('SteppedFlow', () => {
     )
 
     expect(screen.getByRole('button', { name: 'Back' })).toBeDisabled()
+  })
+
+  test('disables Next while navigation is locked', () => {
+    customRender(
+      <SteppedFlow
+        steps={steps}
+        currentStep="destination"
+        onStepChange={vi.fn()}
+        navigationDisabled
+      >
+        Step body
+      </SteppedFlow>
+    )
+
+    expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled()
+  })
+
+  test('disables the final action while navigation is locked', () => {
+    customRender(
+      <SteppedFlow
+        steps={steps}
+        currentStep="review"
+        onStepChange={vi.fn()}
+        navigationDisabled
+        finalAction={{ label: 'Create and start pipeline' }}
+      >
+        Step body
+      </SteppedFlow>
+    )
+
+    expect(screen.getByRole('button', { name: 'Create and start pipeline' })).toBeDisabled()
   })
 })

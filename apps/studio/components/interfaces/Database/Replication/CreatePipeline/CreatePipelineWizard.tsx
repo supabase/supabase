@@ -28,7 +28,10 @@ import * as z from 'zod'
 import { AdvancedSettings } from '../DestinationPanel/DestinationForm/AdvancedSettings'
 import { getAnalyticsBucketValidationIssues } from '../DestinationPanel/DestinationForm/AnalyticsBucket/AnalyticsBucket.utils'
 import { AnalyticsBucketFields } from '../DestinationPanel/DestinationForm/AnalyticsBucket/Fields'
-import { getBigQueryValidationIssues } from '../DestinationPanel/DestinationForm/BigQuery/BigQuery.utils'
+import {
+  BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE,
+  getBigQueryValidationIssues,
+} from '../DestinationPanel/DestinationForm/BigQuery/BigQuery.utils'
 import { BigQueryFields } from '../DestinationPanel/DestinationForm/BigQuery/Fields'
 import { getClickHouseValidationIssues } from '../DestinationPanel/DestinationForm/ClickHouse/ClickHouse.utils'
 import { ClickHouseFields } from '../DestinationPanel/DestinationForm/ClickHouse/Fields'
@@ -250,9 +253,11 @@ export const CreatePipelineWizard = () => {
         }
 
         if (selectedType === 'BigQuery') {
-          getBigQueryValidationIssues(data).forEach(({ path, message }) => {
-            addRequiredFieldError(path, message)
-          })
+          getBigQueryValidationIssues(data, { validateJson: false }).forEach(
+            ({ path, message }) => {
+              addRequiredFieldError(path, message)
+            }
+          )
         } else if (selectedType === 'Analytics Bucket') {
           getAnalyticsBucketValidationIssues(data).forEach(({ path, message }) => {
             addRequiredFieldError(path, message)
@@ -384,6 +389,17 @@ export const CreatePipelineWizard = () => {
       }),
     }
 
+    if (selectedType === 'BigQuery') {
+      const jsonIssue = getBigQueryValidationIssues(data).find(
+        (issue) => issue.message === BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE
+      )
+      if (jsonIssue) {
+        form.setError(jsonIssue.path, { message: jsonIssue.message })
+        setStep('connection')
+        return
+      }
+    }
+
     const previousValidationFailures = allValidationFailures
     const previousWarnings = previousValidationFailures.filter((f) => f.failure_type === 'warning')
     const previousFailuresAreOnlyWarnings =
@@ -444,7 +460,19 @@ export const CreatePipelineWizard = () => {
 
     if (step === 'connection' && selectedType) {
       const valid = await form.trigger(getPipelineCreateConnectionStepFieldNames(selectedType))
-      if (valid) setStep('data')
+      if (!valid) return
+
+      if (selectedType === 'BigQuery') {
+        const jsonIssue = getBigQueryValidationIssues(form.getValues()).find(
+          (issue) => issue.message === BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE
+        )
+        if (jsonIssue) {
+          form.setError(jsonIssue.path, { message: jsonIssue.message })
+          return
+        }
+      }
+
+      setStep('data')
       return
     }
 
