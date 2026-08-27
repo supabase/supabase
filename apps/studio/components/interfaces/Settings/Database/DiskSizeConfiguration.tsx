@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { ExternalLink, Info } from 'lucide-react'
 import Link from 'next/link'
-import { SetStateAction } from 'react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { toast } from 'sonner'
 import { Alert, AlertDescription, AlertTitle, Button, InfoIcon } from 'ui'
 import {
@@ -29,7 +29,6 @@ import {
   useIsHighAvailability,
   useSelectedProjectQuery,
 } from '@/hooks/misc/useSelectedProject'
-import { useUrlState } from '@/hooks/ui/useUrlState'
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
 
@@ -46,12 +45,10 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
   const isHighAvailability = useIsHighAvailability()
   const { reportsAll } = useIsFeatureEnabled(['reports:all'])
 
-  const [{ show_increase_disk_size_modal }, setUrlParams] = useUrlState()
-  const showIncreaseDiskSizeModal = show_increase_disk_size_modal === 'true'
-  const setShowIncreaseDiskSizeModal = (value: SetStateAction<boolean>) => {
-    const show = typeof value === 'function' ? value(showIncreaseDiskSizeModal) : value
-    setUrlParams({ show_increase_disk_size_modal: show ? 'true' : undefined })
-  }
+  const [showIncreaseDiskSizeModal, setShowIncreaseDiskSizeModal] = useQueryState(
+    'show_increase_disk_size_modal',
+    parseAsBoolean.withDefault(false)
+  )
 
   const { can: canUpdateDiskSizeConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
@@ -223,11 +220,13 @@ Read more about [disk management](${DOCS_URL}/guides/platform/database-size#disk
         </PageSectionContent>
       </PageSection>
 
-      <DiskSizeConfigurationModal
-        visible={showIncreaseDiskSizeModal}
-        loading={isUpdatingDiskSize}
-        hideModal={setShowIncreaseDiskSizeModal}
-      />
+      {!isHighAvailability && (
+        <DiskSizeConfigurationModal
+          visible={showIncreaseDiskSizeModal}
+          loading={isUpdatingDiskSize}
+          hideModal={setShowIncreaseDiskSizeModal}
+        />
+      )}
     </>
   )
 }

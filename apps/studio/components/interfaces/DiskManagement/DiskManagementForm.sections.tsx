@@ -266,9 +266,7 @@ export function AdvancedSection({
           <CardContent className="flex flex-col gap-y-8">
             <NoticeBar
               type="default"
-              visible={
-                !!disableIopsThroughputConfig && !disableIopsThroughputConfig && !disableDiskInputs
-              }
+              visible={!!disableIopsThroughputConfig}
               title="Adjusting disk configuration requires LARGE Compute size or above"
               description={`Increase your compute size to adjust your disk's storage type, ${form.getValues('storageType') === 'gp3' ? 'IOPS, ' : ''} and throughput`}
               actions={
