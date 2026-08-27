@@ -124,7 +124,7 @@ const LostAccountAccessForm = ({ onSuccess }: { onSuccess: (email: string) => vo
     },
   })
 
-  const { mutate: createAccountRecoveryRequest, isPending } =
+  const { mutateAsync: createAccountRecoveryRequest, isPending } =
     useCreateAccountRecoveryRequestMutation({
       onSuccess: (_, variables) => {
         onSuccess(variables.email)
@@ -154,7 +154,7 @@ const LostAccountAccessForm = ({ onSuccess }: { onSuccess: (email: string) => vo
     const projectRefs = data.projectRefs.map((p) => p.value).filter((p) => isNotEmpty(p))
     const memberEmails = data.members.map((m) => m.value).filter((p) => isNotEmpty(p))
 
-    createAccountRecoveryRequest({
+    return createAccountRecoveryRequest({
       email: data.email,
       organization: data.organization,
       projectRefs,
