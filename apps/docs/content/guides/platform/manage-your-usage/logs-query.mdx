@@ -59,6 +59,6 @@ For example: if you exceed your allowance in January, February is degraded. If F
 
 ## Migrate from the logs.all endpoint
 
-Supabase's `logs.all` Management API endpoint is being retired on September 23, 2026, in favor of the `logs` endpoint. If you have scripts or integrations that call `logs.all` directly, update them to use the new endpoint — see the [migration changelog](https://supabase.com/changelog/48235-migration-of-supabase-management-api-logs-all-analytics-endpoint-to-logs-endpoint) for the syntax changes.
+Supabase's `logs.all` Management API endpoint is being retired on September 23, 2026, in favor of the `logs` endpoint. If you have scripts or integrations that call `logs.all` directly, update them to use the new endpoint — see the [migration changelog](/changelog/48235-migration-of-supabase-management-api-logs-all-analytics-endpoint-to-logs-endpoint) for the syntax changes.
 
 While you're updating those queries, check whether they filter on structured fields such as source or service. Filtered queries scan less data than broad searches, so this is a good checkpoint to review whether an existing query scans more than it needs to.
