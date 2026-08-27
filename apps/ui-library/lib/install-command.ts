@@ -42,33 +42,3 @@ export function getInstallCommands(
     bun: `bunx --bun ${cli} add ${specifier}`,
   }
 }
-
-export function getPageBaseUrl(env = process.env.NEXT_PUBLIC_VERCEL_TARGET_ENV): string {
-  if (env === 'production') {
-    return 'https://supabase.com'
-  }
-  return getRegistryBaseUrl(env)
-}
-
-export function getPageUrl(pathname: string): string {
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
-  const currentPath = pathname.startsWith(basePath) ? pathname : `${basePath}${pathname}`
-  return `${getPageBaseUrl()}${currentPath}`
-}
-
-export function getMarkdownPageUrl(pathname: string): string {
-  const url = getPageUrl(pathname)
-  return url.endsWith('.md') ? url : `${url}.md`
-}
-
-export function buildBlockInstallPrompt({
-  pageUrl,
-  name,
-  installCommand,
-}: {
-  pageUrl: string
-  name: string
-  installCommand: string
-}): string {
-  return `Help me install the ${name} block. Do the following: 1. Read ${pageUrl}. 2. Install the block with \`${installCommand}\`. 3. Follow the remaining setup and configuration steps on that page.`
-}

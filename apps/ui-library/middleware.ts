@@ -1,7 +1,7 @@
 import { negotiateMarkdown } from 'common/markdown-negotiation'
 import { NextResponse, type NextRequest } from 'next/server'
 
-import MARKDOWN_SLUGS from './public/markdown/manifest.json'
+import MARKDOWN_SLUGS from '@/public/markdown/manifest.json'
 
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? '/library'
 const DOCS_PATH = `${BASE_PATH}/docs`
