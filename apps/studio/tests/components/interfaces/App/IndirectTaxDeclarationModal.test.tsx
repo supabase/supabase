@@ -40,8 +40,10 @@ const billingWritePermission = {
 
 function setupMocks({
   canUpdateBilling = true,
+  requiresDeclaration = true,
 }: {
   canUpdateBilling?: boolean
+  requiresDeclaration?: boolean
 } = {}) {
   addAPIMock({
     method: 'get',
@@ -50,7 +52,7 @@ function setupMocks({
       createMockOrganizationResponse({
         slug: ORG_SLUG,
         name: 'Test Org',
-        requires_indirect_tax_declaration: true,
+        requires_indirect_tax_declaration: requiresDeclaration,
       }),
     ],
   })
@@ -90,7 +92,10 @@ describe('IndirectTaxDeclarationModal', () => {
       },
     })
 
-    customRender(<IndirectTaxDeclarationModal />, { profileContext: PROFILE_CONTEXT })
+    customRender(<IndirectTaxDeclarationModal />, {
+      profileContext: PROFILE_CONTEXT,
+      nuqs: { searchParams: { submit_indirect_tax_declaration: 'true' } },
+    })
 
     await userEvent.click(await screen.findByRole('radio', { name: /Yes, I confirm/i }))
     await userEvent.click(screen.getByRole('button', { name: 'Submit declaration' }))
@@ -103,6 +108,32 @@ describe('IndirectTaxDeclarationModal', () => {
 
   test('does not show for members without billing write permission', async () => {
     setupMocks({ canUpdateBilling: false })
+    customRender(<IndirectTaxDeclarationModal />, { profileContext: PROFILE_CONTEXT })
+
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    })
+  })
+
+  test('shows a dismissible confirmation when linked after submitting', async () => {
+    setupMocks({ requiresDeclaration: false })
+    customRender(<IndirectTaxDeclarationModal />, {
+      profileContext: PROFILE_CONTEXT,
+      nuqs: { searchParams: { submit_indirect_tax_declaration: 'true' } },
+    })
+
+    const dialog = await screen.findByRole('dialog')
+    expect(dialog).toHaveTextContent('GST declaration already submitted')
+    expect(dialog).toHaveTextContent(
+      'The GST declaration for Test Org has already been submitted. No further action is required.'
+    )
+
+    await userEvent.click(screen.getAllByRole('button', { name: 'Close' })[0])
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  })
+
+  test('does not show the submitted confirmation without the URL parameter', async () => {
+    setupMocks({ requiresDeclaration: false })
     customRender(<IndirectTaxDeclarationModal />, { profileContext: PROFILE_CONTEXT })
 
     await waitFor(() => {
