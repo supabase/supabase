@@ -4,6 +4,7 @@ import { useController, useFieldArray, useFormState, useWatch, type Control } fr
 import { Checkbox, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
+import { SelectionListState } from 'ui-patterns/SelectionListState'
 import { GenericSelectionSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
@@ -87,6 +88,9 @@ const TableOptionRow = ({ control, index, tableId }: TableOptionRowProps) => {
     setShouldLoadColumns(true)
     if (!isFetching) void refetchColumns()
   }
+  const refreshColumnsOnOpen = (open: boolean) => {
+    if (open) refreshColumns()
+  }
 
   return (
     <div className="flex flex-col gap-y-3 rounded-md border p-3 ml-6">
@@ -115,9 +119,7 @@ const TableOptionRow = ({ control, index, tableId }: TableOptionRowProps) => {
         <FormItemLayout label="Partition column" layout="horizontal">
           <Select
             value={partitionBy.column}
-            onOpenChange={(open) => {
-              if (open) refreshColumns()
-            }}
+            onOpenChange={refreshColumnsOnOpen}
             onValueChange={(column: string) =>
               partitionByField.onChange({ ...partitionBy, column })
             }
@@ -126,14 +128,13 @@ const TableOptionRow = ({ control, index, tableId }: TableOptionRowProps) => {
               <SelectValue placeholder="Select a column" />
             </SelectTrigger>
             <SelectContent>
-              {isLoadingColumns && (
-                <GenericSelectionSkeletonLoader className="w-full" variant="select" />
-              )}
-              {isError && columns.length === 0 && (
-                <div className="px-2 py-3 text-xs text-foreground-lighter">
-                  Unable to load columns
-                </div>
-              )}
+              <SelectionListState
+                loading={isLoadingColumns}
+                error={isError && columns.length === 0}
+                empty={!isLoadingColumns && !isError && columns.length === 0}
+                emptyLabel="No columns available"
+                errorLabel="Unable to load columns"
+              />
               {columnNames.map((column) => (
                 <SelectItem key={column} value={column}>
                   <ColumnOption name={column} type={columnTypeByName.get(column)} />
@@ -215,9 +216,7 @@ const TableOptionRow = ({ control, index, tableId }: TableOptionRowProps) => {
         <MultiSelector
           values={clusterByField.value ?? []}
           onValuesChange={clusterByField.onChange}
-          onOpenChange={(open) => {
-            if (open) refreshColumns()
-          }}
+          onOpenChange={refreshColumnsOnOpen}
         >
           <MultiSelector.Trigger
             aria-label="Select clustering columns"
@@ -229,6 +228,7 @@ const TableOptionRow = ({ control, index, tableId }: TableOptionRowProps) => {
           />
           <MultiSelector.Content>
             <MultiSelector.List
+              emptyLabel="No columns available"
               error={isError && columns.length === 0}
               errorLabel="Unable to load columns"
               loading={isLoadingColumns}

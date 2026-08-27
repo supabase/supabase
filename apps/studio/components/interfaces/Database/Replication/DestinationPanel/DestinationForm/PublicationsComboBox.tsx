@@ -17,9 +17,10 @@ import {
   PopoverTrigger,
   ScrollArea,
 } from 'ui'
-import { GenericSelectionSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { SelectionListState } from 'ui-patterns/SelectionListState'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
+import { useRefreshOnOpen } from './useRefreshOnOpen'
 import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
 
 interface PublicationsComboBoxProps {
@@ -49,6 +50,10 @@ export const PublicationsComboBox = ({
   const isLoadingPublications = isPending || isFetching
   const showLoadingState = isLoadingPublications && publications.length === 0
   const showErrorState = isError && publications.length === 0
+  const refreshPublicationsOnOpen = useRefreshOnOpen({
+    enabled: projectRef !== undefined && sourceId !== undefined,
+    refetch: refetchPublications,
+  })
 
   function handlePublicationSelect(pub: string) {
     setSelectedPublication(pub)
@@ -66,13 +71,10 @@ export const PublicationsComboBox = ({
       open={dropdownOpen}
       onOpenChange={(open) => {
         setDropdownOpen(open)
-        if (open) {
-          if (typeof projectRef !== 'undefined' && typeof sourceId !== 'undefined') {
-            if (!isFetching) void refetchPublications()
-          }
-        }
+        refreshPublicationsOnOpen(open)
 
         if (!open && field?.onBlur) {
+          setSearchTerm('')
           field.onBlur()
         }
       }}
@@ -80,7 +82,7 @@ export const PublicationsComboBox = ({
       <PopoverTrigger asChild>
         <Button
           variant="default"
-          size="medium"
+          size="small"
           className={cn(
             'w-full [&>span]:w-full text-left',
             !selectedPublication && 'text-foreground-muted'
@@ -101,51 +103,41 @@ export const PublicationsComboBox = ({
             onValueChange={setSearchTerm}
           />
           <CommandList>
-            {!showLoadingState && !showErrorState && (
+            {!showLoadingState && !showErrorState && publications.length > 0 && (
               <CommandEmpty>No publications found</CommandEmpty>
             )}
 
-            {showLoadingState && (
-              <div className="p-1">
-                <GenericSelectionSkeletonLoader className="w-full" variant="command" />
-              </div>
-            )}
+            <SelectionListState
+              loading={showLoadingState}
+              error={showErrorState}
+              empty={!showLoadingState && !showErrorState && publications.length === 0}
+              emptyLabel="No publications available"
+              errorLabel="Unable to load publications"
+              skeletonVariant="command"
+            />
 
-            {showErrorState && (
-              <div className="px-3 py-4 text-xs text-foreground-lighter">
-                Unable to load publications
-              </div>
+            {publications.length > 0 && (
+              <CommandGroup>
+                <ScrollArea
+                  className={publications.length > 7 ? 'h-[210px]' : ''}
+                  onWheel={(e) => e.stopPropagation()}
+                >
+                  {publications.map((pub) => (
+                    <CommandItem
+                      key={pub.name}
+                      className="cursor-pointer flex items-center justify-between space-x-2 w-full"
+                      onSelect={() => handlePublicationSelect(pub.name)}
+                      onClick={() => handlePublicationSelect(pub.name)}
+                    >
+                      <span>{pub.name}</span>
+                      {selectedPublication === pub.name && (
+                        <Check className="text-brand" strokeWidth={2} size={13} />
+                      )}
+                    </CommandItem>
+                  ))}
+                </ScrollArea>
+              </CommandGroup>
             )}
-
-            <CommandGroup>
-              {publications.length === 0 && !showLoadingState && !showErrorState && (
-                <div className="text-foreground-lighter text-xs py-3 px-2">
-                  <p>No publications available</p>
-                </div>
-              )}
-              <ScrollArea
-                className={publications.length > 7 ? 'h-[210px]' : ''}
-                onWheel={(e) => e.stopPropagation()}
-              >
-                {publications.map((pub) => (
-                  <CommandItem
-                    key={pub.name}
-                    className="cursor-pointer flex items-center justify-between space-x-2 w-full"
-                    onSelect={() => {
-                      handlePublicationSelect(pub.name)
-                    }}
-                    onClick={() => {
-                      handlePublicationSelect(pub.name)
-                    }}
-                  >
-                    <span>{pub.name}</span>
-                    {selectedPublication === pub.name && (
-                      <Check className="text-brand" strokeWidth={2} size={13} />
-                    )}
-                  </CommandItem>
-                ))}
-              </ScrollArea>
-            </CommandGroup>
 
             <CommandSeparator />
 

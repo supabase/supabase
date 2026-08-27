@@ -7,6 +7,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
+import { useRefreshOnOpen } from './useRefreshOnOpen'
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 
@@ -47,6 +48,10 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
     !!publicationName &&
     (isLoadingPublications || isRefreshingPublications) &&
     selectedPublication === undefined
+  const refreshPublicationOnOpen = useRefreshOnOpen({
+    enabled: !!publicationName,
+    refetch: refetchPublication,
+  })
 
   // Only publication tables are ever selectable or displayed by name. A table
   // id is never resolved outside of the publication response — there's no
@@ -160,15 +165,10 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
                     field.onChange(x)
                   }}
                   disabled={
-                    isErrorPublications ||
                     !publicationName ||
-                    (!isLoadingPublicationTables && tableCount === 0)
+                    (!isLoadingPublicationTables && !isErrorPublications && tableCount === 0)
                   }
-                  onOpenChange={(open) => {
-                    if (open && publicationName && !isRefreshingPublications) {
-                      void refetchPublication()
-                    }
-                  }}
+                  onOpenChange={refreshPublicationOnOpen}
                 >
                   <MultiSelector.Trigger
                     aria-label="Select initial sync tables"
@@ -177,7 +177,12 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
                     label={publicationName ? 'Select tables...' : 'Select a publication first'}
                   />
                   <MultiSelector.Content>
-                    <MultiSelector.List loading={isLoadingPublicationTables}>
+                    <MultiSelector.List
+                      emptyLabel="No tables available"
+                      error={isErrorPublications && publicationTables.length === 0}
+                      errorLabel="Unable to load tables"
+                      loading={isLoadingPublicationTables}
+                    >
                       {publicationTables.map((table) => (
                         <MultiSelector.Item key={table.id} value={String(table.id)}>
                           {tableLabel(table)}

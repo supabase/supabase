@@ -21,6 +21,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
 import { z } from 'zod'
 
+import { useRefreshOnOpen } from './useRefreshOnOpen'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useCreatePublicationMutation } from '@/data/replication/publication-create-mutation'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
@@ -61,6 +62,11 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
       new Map(tables.map((table) => [String(table.id), `${table.schema}.${table.name}`] as const)),
     [tables]
   )
+
+  const refreshTablesOnOpen = useRefreshOnOpen({
+    enabled: visible && sourceId !== undefined,
+    refetch: refetchTables,
+  })
 
   const form = useForm<FormValues>({
     mode: 'onBlur',
@@ -148,19 +154,18 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
                             values={field.value}
                             onValuesChange={field.onChange}
                             disabled={creatingPublication}
-                            onOpenChange={(open) => {
-                              if (open && visible && !isFetching) void refetchTables()
-                            }}
+                            onOpenChange={refreshTablesOnOpen}
                           >
                             <MultiSelector.Trigger
                               aria-label="Select publication tables"
                               badgeLimit="wrap"
                               label="Select tables..."
-                              mode="inline-combobox"
                               renderValue={(id) => tableLabelsById.get(id) ?? 'Unavailable table'}
                             />
                             <MultiSelector.Content>
+                              <MultiSelector.Input placeholder="Search tables..." />
                               <MultiSelector.List
+                                emptyLabel="No tables available"
                                 error={isError && tables.length === 0}
                                 errorLabel="Unable to load tables"
                                 loading={isLoadingTables}

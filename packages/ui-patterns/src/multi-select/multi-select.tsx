@@ -20,7 +20,7 @@ import {
 } from 'ui'
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
 
-import { GenericSelectionSkeletonLoader } from '../ShimmeringLoader'
+import { SelectionListState } from '../SelectionListState'
 
 interface MultiSelectContextProps {
   id: string
@@ -42,6 +42,7 @@ const MultiSelectContext = React.createContext<MultiSelectContextProps | null>(n
 
 const DROPDOWN_MAX_HEIGHT = 300
 const DROPDOWN_GAP = 8
+const DROPDOWN_BORDER_HEIGHT = 2
 
 const commandItemClass = cn(
   'relative text-foreground-light text-left px-2 py-1.5 rounded-xs',
@@ -512,7 +513,9 @@ const MultiSelectorContent = React.forwardRef<HTMLDivElement, PopoverContentProp
     return (
       <PopoverContent
         align="start"
+        collisionPadding={DROPDOWN_GAP}
         ref={ref}
+        sideOffset={DROPDOWN_GAP}
         className={cn(
           'bg-overlay shadow-md z-50 border rounded-md p-0',
           'w-(--radix-popper-anchor-width)',
@@ -540,6 +543,7 @@ const MultiSelectorList = React.forwardRef<
   React.ElementRef<typeof CommandList>,
   React.ComponentPropsWithoutRef<typeof CommandList> & {
     creatable?: boolean
+    emptyLabel?: string
     error?: boolean
     errorLabel?: string
     loading?: boolean
@@ -550,6 +554,7 @@ const MultiSelectorList = React.forwardRef<
       className,
       children,
       creatable = false,
+      emptyLabel = 'No results found',
       error = false,
       errorLabel,
       loading = false,
@@ -574,16 +579,19 @@ const MultiSelectorList = React.forwardRef<
           'scrollbar-thumb-rounded-lg w-full overflow-y-auto',
           className
         )}
-        style={{ maxHeight: dropdownMaxHeight }}
+        style={{
+          maxHeight: `min(${dropdownMaxHeight}px, calc(var(--radix-popover-content-available-height) - ${DROPDOWN_BORDER_HEIGHT}px))`,
+        }}
         onWheel={(e) => e.stopPropagation()}
         {...props}
       >
-        {loading ? (
-          <GenericSelectionSkeletonLoader className="w-full" />
-        ) : error ? (
-          <div className="px-2 py-3 text-xs text-foreground-lighter">
-            {errorLabel ?? 'Unable to load options'}
-          </div>
+        {loading || error ? (
+          <SelectionListState
+            loading={loading}
+            error={error}
+            errorLabel={errorLabel}
+            skeletonVariant="multi-select"
+          />
         ) : (
           <>
             {children}
@@ -604,7 +612,7 @@ const MultiSelectorList = React.forwardRef<
               </div>
             ) : (
               <CommandEmpty>
-                <span className="text-foreground-muted">No results found</span>
+                <span className="text-foreground-muted">{emptyLabel}</span>
               </CommandEmpty>
             )}
           </>

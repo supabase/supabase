@@ -20,15 +20,15 @@ import {
   SelectGroup,
   SelectItem,
   SelectTrigger,
-  WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { GenericSelectionSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { SelectionListState } from 'ui-patterns/SelectionListState'
 
 import { DEFAULT_DUCKLAKE_POOL_SIZE, STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
+import { useRefreshOnOpen } from '../useRefreshOnOpen'
 import {
   DUCKLAKE_MODE_CUSTOM,
   DUCKLAKE_MODE_SUPABASE,
@@ -719,49 +719,38 @@ const ProjectSelection = ({
     const project = projectsByRef.get(ref)
     return project ? `${project.name} · ${project.ref}` : ref
   }
+  const refreshProjectsOnOpen = useRefreshOnOpen({
+    enabled: !!organization?.slug,
+    refetch: refetchProjects,
+  })
 
-  if (showProjectsError) {
-    return (
-      <Button
-        disabled
-        variant="default"
-        className="w-full justify-start"
-        size="small"
-        icon={<WarningIcon />}
-      >
-        Failed to retrieve projects
-      </Button>
-    )
-  }
   return (
-    <Select
-      value={value || ''}
-      onValueChange={onChange}
-      onOpenChange={(open) => {
-        if (open && !isFetchingProjects) void refetchProjects()
-      }}
-    >
+    <Select value={value || ''} onValueChange={onChange} onOpenChange={refreshProjectsOnOpen}>
       <SelectTrigger>{projectLabel(value) ?? placeholder}</SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          {isLoadingProjects && projects.length === 0 ? (
-            <GenericSelectionSkeletonLoader className="w-full" variant="select" />
-          ) : projects.length === 0 ? (
-            <SelectItem value="__no_projects__" disabled>
-              No active projects available
+          <SelectionListState
+            loading={(isLoadingProjects || isFetchingProjects) && projects.length === 0}
+            error={showProjectsError}
+            empty={
+              !isLoadingProjects &&
+              !isFetchingProjects &&
+              !showProjectsError &&
+              projects.length === 0
+            }
+            emptyLabel="No active projects available"
+            errorLabel="Unable to load projects"
+          />
+          {projects.map((project) => (
+            <SelectItem key={project.ref} value={project.ref}>
+              <div className="flex flex-col">
+                <span>{project.name}</span>
+                <span className="text-foreground-lighter">
+                  {project.ref} · {project.region}
+                </span>
+              </div>
             </SelectItem>
-          ) : (
-            projects.map((project) => (
-              <SelectItem key={project.ref} value={project.ref}>
-                <div className="flex flex-col">
-                  <span>{project.name}</span>
-                  <span className="text-foreground-lighter">
-                    {project.ref} · {project.region}
-                  </span>
-                </div>
-              </SelectItem>
-            ))
-          )}
+          ))}
         </SelectGroup>
       </SelectContent>
     </Select>
@@ -801,34 +790,23 @@ const BucketSelection = ({
     [bucketsData]
   )
   const showBucketsError = isErrorBuckets && buckets.length === 0
+  const refreshBucketsOnOpen = useRefreshOnOpen({
+    enabled: !!ducklakeStorageProjectRef,
+    refetch: refetchBuckets,
+  })
 
   if (!ducklakeStorageProjectRef) {
     return (
-      <Button disabled variant="default" className="w-full justify-start" size="small">
-        Select a storage project first
-      </Button>
-    )
-  }
-  if (showBucketsError) {
-    return (
-      <Button
-        disabled
-        variant="default"
-        className="w-full justify-start"
-        size="small"
-        icon={<WarningIcon />}
-      >
-        Failed to retrieve buckets
-      </Button>
+      <Select disabled>
+        <SelectTrigger>Select a storage project first</SelectTrigger>
+      </Select>
     )
   }
 
   return (
     <Select
       value={value || ''}
-      onOpenChange={(open) => {
-        if (open && !isFetchingBuckets) void refetchBuckets()
-      }}
+      onOpenChange={refreshBucketsOnOpen}
       onValueChange={(e) => {
         if (e) onChange(e)
       }}
@@ -836,19 +814,20 @@ const BucketSelection = ({
       <SelectTrigger>{value || 'Select a bucket'}</SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          {isLoadingBuckets && buckets.length === 0 ? (
-            <GenericSelectionSkeletonLoader className="w-full" variant="select" />
-          ) : buckets.length === 0 ? (
-            <SelectItem value="__no_buckets__" disabled>
-              No buckets available
+          <SelectionListState
+            loading={(isLoadingBuckets || isFetchingBuckets) && buckets.length === 0}
+            error={showBucketsError}
+            empty={
+              !isLoadingBuckets && !isFetchingBuckets && !showBucketsError && buckets.length === 0
+            }
+            emptyLabel="No buckets available"
+            errorLabel="Unable to load buckets"
+          />
+          {buckets.map((bucket) => (
+            <SelectItem key={bucket.id} value={bucket.id}>
+              {bucket.name}
             </SelectItem>
-          ) : (
-            buckets.map((bucket) => (
-              <SelectItem key={bucket.id} value={bucket.id}>
-                {bucket.name}
-              </SelectItem>
-            ))
-          )}
+          ))}
         </SelectGroup>
       </SelectContent>
     </Select>
