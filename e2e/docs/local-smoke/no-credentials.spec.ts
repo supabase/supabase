@@ -28,7 +28,7 @@ test.describe('docs dev runs locally without credentials', () => {
   test('advisors page renders (full content or graceful fallback, never a crash)', async ({
     page,
   }) => {
-    const response = await page.goto('/docs/guides/monitoring-and-debugging/advisors')
+    const response = await page.goto('/docs/guides/observability/advisors')
     expect(response?.ok(), `expected 200, got ${response?.status()}`).toBeTruthy()
 
     await expect(page.getByRole('heading', { name: 'Advisors' })).toBeVisible()
