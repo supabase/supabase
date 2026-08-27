@@ -23,6 +23,7 @@ import type { RecommendedComputeForReadReplicas } from './recommendCompute'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { HighAvailabilityDisabledSectionNotice } from '@/components/ui/HighAvailability/HighAvailabilityDisabledSectionNotice'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
@@ -91,25 +92,23 @@ export const ReadReplicasSection = ({ onRecommendCompute }: ReadReplicasSectionP
               Scale reads or serve queries closer to users.
             </PageSectionDescription>
           </PageSectionSummary>
+
           <PageSectionAside>
             <DocsButton href={`${DOCS_URL}/guides/platform/read-replicas`} />
-            <ButtonTooltip
-              type="button"
-              variant="primary"
-              disabled={isHighAvailability}
-              icon={<Plus />}
-              onClick={() => setAddReplica(true)}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text: 'Creation of read replicas is unavailable on High Availability projects',
-                },
-              }}
-            >
-              Add read replica
-            </ButtonTooltip>
+            {!isHighAvailability && (
+              <Button
+                type="button"
+                variant="primary"
+                icon={<Plus />}
+                onClick={() => setAddReplica(true)}
+              >
+                Add read replica
+              </Button>
+            )}
           </PageSectionAside>
         </PageSectionMeta>
+
+        <HighAvailabilityDisabledSectionNotice title="Read replicas are unavailable on High Availability projects" />
 
         <PageSectionContent className="flex flex-col gap-y-4">
           {isDatabasesError && (
