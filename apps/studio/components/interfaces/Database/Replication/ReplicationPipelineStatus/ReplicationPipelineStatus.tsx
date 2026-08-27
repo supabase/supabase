@@ -1,22 +1,7 @@
 import { useParams } from 'common'
-import {
-  Activity,
-  ArrowUpCircle,
-  Ban,
-  ChevronDown,
-  ChevronLeft,
-  Info,
-  Pause,
-  Play,
-  RotateCcw,
-  Search,
-  WifiOff,
-  X,
-} from 'lucide-react'
-import Link from 'next/link'
+import { Activity, ChevronDown, Info, RotateCcw, Search, WifiOff, X } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
 import {
   Button,
   Card,
@@ -31,19 +16,14 @@ import {
   TableRow,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { PageContainer } from 'ui-patterns/PageContainer'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { BatchRestartDialog } from '../BatchRestartDialog'
 import { ErrorDetailsDialog } from '../ErrorDetailsDialog'
-import {
-  getPipelineDisplayState,
-  getStatusName,
-  PIPELINE_ACTIONABLE_STATES,
-} from '../Pipeline.utils'
-import { PipelineStatus } from '../PipelineStatus'
+import { getStatusName, PIPELINE_ACTIONABLE_STATES } from '../Pipeline.utils'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
 import { RestartTableDialog } from '../RestartTableDialog'
-import { UpdateVersionModal } from '../UpdateVersionModal'
 import { SlotLagMetrics } from './ReplicationPipelineStatus.types'
 import { getDisabledStateConfig } from './ReplicationPipelineStatus.utils'
 import { SlotLagMetricsInline, SlotLagMetricsList } from './SlotLagMetrics'
@@ -54,15 +34,10 @@ import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
 import { useReplicationPipelineReplicationStatusQuery } from '@/data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
-import { useReplicationPipelineVersionQuery } from '@/data/replication/pipeline-version-query'
-import { useRestartPipelineMutation } from '@/data/replication/restart-pipeline-mutation'
-import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
-import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
-import { type ResponseError } from '@/types'
 
 /**
  * Component for displaying replication pipeline status and table replication details.
@@ -72,7 +47,6 @@ export const ReplicationPipelineStatus = () => {
   const { ref: projectRef, pipelineId: _pipelineId } = useParams()
   const [searchString, setSearchString] = useQueryState('search', parseAsString.withDefault(''))
 
-  const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
   const [showErrorDialog, setShowErrorDialog] = useState(false)
   const [selectedTableError, setSelectedTableError] = useState<{
     tableName: string
@@ -90,7 +64,7 @@ export const ReplicationPipelineStatus = () => {
   const [restartingTableIds, setRestartingTableIds] = useState<Set<number>>(new Set())
 
   const pipelineId = Number(_pipelineId)
-  const { getRequestStatus, updatePipelineStatus, setRequestStatus } = usePipelineRequestStatus()
+  const { getRequestStatus, updatePipelineStatus } = usePipelineRequestStatus()
   const requestStatus = getRequestStatus(pipelineId)
 
   const {
@@ -103,13 +77,7 @@ export const ReplicationPipelineStatus = () => {
     pipelineId,
   })
 
-  const {
-    data: pipelineStatusData,
-    error: pipelineStatusError,
-    isLoading: isPipelineStatusLoading,
-    isError: isPipelineStatusError,
-    isSuccess: isPipelineStatusSuccess,
-  } = useReplicationPipelineStatusQuery(
+  const { data: pipelineStatusData } = useReplicationPipelineStatusQuery(
     { projectRef, pipelineId },
     {
       enabled: !!pipelineId,
@@ -129,19 +97,7 @@ export const ReplicationPipelineStatus = () => {
     }
   )
 
-  const { data: versionData } = useReplicationPipelineVersionQuery({
-    projectRef,
-    pipelineId: pipeline?.id,
-  })
-  const hasUpdate = Boolean(versionData?.new_version)
-
-  const { mutateAsync: startPipeline, isPending: isStartingPipeline } = useStartPipelineMutation()
-  const { mutateAsync: stopPipeline, isPending: isStoppingPipeline } = useStopPipelineMutation()
-  const { mutateAsync: restartPipeline } = useRestartPipelineMutation()
-
-  const destinationName = pipeline?.destination_name
   const statusName = getStatusName(pipelineStatusData?.status)
-  const displayState = getPipelineDisplayState(requestStatus, statusName)
   const config = getDisabledStateConfig({ requestStatus, statusName })
 
   // Sort tables by schema and name for consistent ordering (memoized)
@@ -180,16 +136,12 @@ export const ReplicationPipelineStatus = () => {
   const isAnyRestartInProgress = restartingTableIds.size > 0
 
   const hasTableData = tableStatuses.length > 0
-  const isPipelineActionable =
-    statusName === PipelineStatusName.STARTED ||
-    statusName === PipelineStatusName.STOPPED ||
-    statusName === PipelineStatusName.FAILED
+  const isPipelineActionable = PIPELINE_ACTIONABLE_STATES.includes(statusName as PipelineStatusName)
   const isEnablingDisabling =
     requestStatus === PipelineStatusRequestStatus.StartRequested ||
     requestStatus === PipelineStatusRequestStatus.StopRequested ||
     requestStatus === PipelineStatusRequestStatus.RestartRequested
-  const isPipelineBusy = isEnablingDisabling || isAnyRestartInProgress
-  const showDisabledState = isPipelineBusy || !isPipelineActionable
+  const showDisabledState = isEnablingDisabling || isAnyRestartInProgress || !isPipelineActionable
   const lastKnownStateMessage =
     statusName === PipelineStatusName.STOPPED
       ? 'Showing the last known table state before the pipeline was stopped.'
@@ -201,121 +153,13 @@ export const ReplicationPipelineStatus = () => {
       ? `${Math.round(STATUS_REFRESH_FREQUENCY_MS / 1000)}s`
       : `${STATUS_REFRESH_FREQUENCY_MS}ms`
 
-  const logsUrl = `/project/${projectRef}/logs/replication-logs${
-    pipelineId ? `?f=${encodeURIComponent(JSON.stringify({ pipeline_id: pipelineId }))}` : ''
-  }`
-
-  const label = isEnablingDisabling
-    ? displayState.label
-    : statusName === PipelineStatusName.STOPPED
-      ? 'Start'
-      : statusName === PipelineStatusName.STARTED
-        ? 'Stop'
-        : statusName === PipelineStatusName.FAILED
-          ? 'Restart'
-          : displayState.label
-
-  const icon =
-    statusName === PipelineStatusName.STOPPED ? (
-      <Play />
-    ) : statusName === PipelineStatusName.STARTED ? (
-      <Pause />
-    ) : statusName === PipelineStatusName.FAILED ? (
-      <RotateCcw />
-    ) : (
-      <Ban />
-    )
-
-  const onPrimaryAction = async () => {
-    if (!projectRef) return console.error('Project ref is required')
-    if (!pipeline) return toast.error('No pipeline found')
-
-    const action =
-      statusName === PipelineStatusName.STOPPED
-        ? 'start'
-        : statusName === PipelineStatusName.STARTED
-          ? 'stop'
-          : 'restart'
-    try {
-      if (statusName === PipelineStatusName.STOPPED) {
-        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.StartRequested, statusName)
-        await startPipeline({ projectRef, pipelineId: pipeline.id })
-      } else if (statusName === PipelineStatusName.STARTED) {
-        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.StopRequested, statusName)
-        await stopPipeline({ projectRef, pipelineId: pipeline.id })
-      } else if (statusName === PipelineStatusName.FAILED) {
-        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.RestartRequested, statusName)
-        await restartPipeline({ projectRef, pipelineId: pipeline.id })
-      }
-    } catch (error) {
-      setRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
-      toast.error(`Failed to ${action} pipeline: ${(error as ResponseError).message}`)
-    }
-  }
-
   useEffect(() => {
     updatePipelineStatus(pipelineId, statusName)
   }, [pipelineId, statusName, updatePipelineStatus])
 
   return (
-    <>
+    <PageContainer size="large">
       <div className="flex flex-col gap-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-x-3">
-            <Button asChild variant="outline" icon={<ChevronLeft />} style={{ padding: '5px' }}>
-              <Link href={`/project/${projectRef}/database/replication`} />
-            </Button>
-            <div className="flex items-center gap-x-3">
-              <h3 className="text-xl font-semibold">{destinationName || 'Pipeline'}</h3>
-              <PipelineStatus
-                pipelineStatus={pipelineStatusData?.status}
-                error={pipelineStatusError}
-                isLoading={isPipelineStatusLoading}
-                isError={isPipelineStatusError}
-                isSuccess={isPipelineStatusSuccess}
-                requestStatus={requestStatus}
-                pipelineId={pipelineId}
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-x-2">
-            {hasUpdate && (
-              <Button
-                variant="primary"
-                icon={<ArrowUpCircle />}
-                onClick={() => setShowUpdateVersionModal(true)}
-              >
-                Update available
-              </Button>
-            )}
-
-            <Button asChild variant="default">
-              <Link href={logsUrl}>View logs</Link>
-            </Button>
-
-            <Button
-              variant={statusName === PipelineStatusName.STOPPED ? 'primary' : 'default'}
-              onClick={onPrimaryAction}
-              loading={
-                isPipelineError ||
-                displayState.type === 'loading' ||
-                isEnablingDisabling ||
-                isStartingPipeline ||
-                isStoppingPipeline ||
-                isAnyRestartInProgress
-              }
-              disabled={
-                isPipelineBusy ||
-                !PIPELINE_ACTIONABLE_STATES.includes(statusName as PipelineStatusName)
-              }
-              icon={icon}
-              className="capitalize"
-            >
-              {label}
-            </Button>
-          </div>
-        </div>
         {isPipelineError && (
           <AlertError error={pipelineError} subject="Failed to retrieve pipeline information" />
         )}
@@ -330,10 +174,6 @@ export const ReplicationPipelineStatus = () => {
 
         {(isPipelineLoading || isStatusLoading) && (
           <div className="space-y-3">
-            <div className="flex items-center gap-x-3">
-              <div className="h-6 w-40 rounded-sm bg-surface-200" />
-              <div className="h-5 w-24 rounded-sm bg-surface-200" />
-            </div>
             <GenericSkeletonLoader />
           </div>
         )}
@@ -562,17 +402,6 @@ export const ReplicationPipelineStatus = () => {
         )}
       </div>
 
-      <UpdateVersionModal
-        visible={showUpdateVersionModal}
-        pipeline={pipeline}
-        onClose={() => setShowUpdateVersionModal(false)}
-        confirmLabel={
-          statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED
-            ? 'Update and restart'
-            : 'Update version'
-        }
-      />
-
       {/* Restart Table Confirmation Dialog */}
       {selectedTableForRestart && (
         <RestartTableDialog
@@ -630,6 +459,6 @@ export const ReplicationPipelineStatus = () => {
           }}
         />
       )}
-    </>
+    </PageContainer>
   )
 }

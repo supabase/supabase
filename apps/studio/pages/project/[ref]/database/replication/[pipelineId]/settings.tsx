@@ -1,8 +1,8 @@
 import { FeatureFlagContext, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
+import { PageContainer } from 'ui-patterns/PageContainer'
 
-import { ReplicationPipelineStatus } from '@/components/interfaces/Database/Replication/ReplicationPipelineStatus/ReplicationPipelineStatus'
 import { ReplicationPipelineLayout } from '@/components/interfaces/Database/Replication/ReplicationPipelineLayout'
 import { useIsETLPrivateAlpha } from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
 import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
@@ -10,7 +10,7 @@ import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import type { NextPageWithLayout } from '@/types'
 
-const DatabaseReplicationPage: NextPageWithLayout = () => {
+const DatabaseReplicationSettingsPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { hasLoaded } = useContext(FeatureFlagContext)
@@ -27,7 +27,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
       {enablePgReplicate && (
         <PipelineRequestStatusProvider>
           <ReplicationPipelineLayout>
-            <ReplicationPipelineStatus />
+            <PageContainer size="small" />
           </ReplicationPipelineLayout>
         </PipelineRequestStatusProvider>
       )}
@@ -35,10 +35,10 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
   )
 }
 
-DatabaseReplicationPage.getLayout = (page) => (
+DatabaseReplicationSettingsPage.getLayout = (page) => (
   <DefaultLayout>
     <DatabaseLayout title="Replication">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 
-export default DatabaseReplicationPage
+export default DatabaseReplicationSettingsPage

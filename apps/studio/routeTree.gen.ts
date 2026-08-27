@@ -275,6 +275,7 @@ import { Route as ApiPlatformAuthRefInviteRouteImport } from './routes/api/platf
 import { Route as AuthPartnersStripeProjectsLoginRouteImport } from './routes/_auth/partners/stripe/projects/login'
 import { Route as AppOrgSlugWebhooksEndpointIdRouteImport } from './routes/_app/org/$slug/webhooks/$endpointId'
 import { Route as ProjectRefIntegrationsIdPageIdIndexRouteImport } from './routes/project/$ref/integrations/$id/$pageId/index'
+import { Route as ProjectRefDatabaseReplicationPipelineIdIndexRouteImport } from './routes/project/$ref/database/replication/$pipelineId/index'
 import { Route as ApiV1ProjectsRefFunctionsIndexRouteImport } from './routes/api/v1/projects/$ref/functions/index'
 import { Route as ApiPlatformStorageRefVectorBucketsIndexRouteImport } from './routes/api/platform/storage/$ref/vector-buckets/index'
 import { Route as ApiPlatformStorageRefBucketsIndexRouteImport } from './routes/api/platform/storage/$ref/buckets/index'
@@ -288,6 +289,7 @@ import { Route as ProjectRefStorageFilesBucketsBucketIdRouteImport } from './rou
 import { Route as ProjectRefStorageAnalyticsBucketsBucketIdRouteImport } from './routes/project/$ref/storage/analytics/buckets/$bucketId'
 import { Route as ProjectRefSettingsInfrastructureReplicaReplicaIdRouteImport } from './routes/project/$ref/settings/infrastructure/replica/$replicaId'
 import { Route as ProjectRefDatabaseReplicationReplicaReplicaIdRouteImport } from './routes/project/$ref/database/replication/replica/$replicaId'
+import { Route as ProjectRefDatabaseReplicationPipelineIdSettingsRouteImport } from './routes/project/$ref/database/replication/$pipelineId/settings'
 import { Route as ApiV1ProjectsRefTypesTypescriptRouteImport } from './routes/api/v1/projects/$ref/types/typescript'
 import { Route as ApiV1ProjectsRefDatabaseMigrationsRouteImport } from './routes/api/v1/projects/$ref/database/migrations'
 import { Route as ApiV1ProjectsRefApiKeysIdRouteImport } from './routes/api/v1/projects/$ref/api-keys/$id'
@@ -1793,6 +1795,12 @@ const ProjectRefIntegrationsIdPageIdIndexRoute =
     path: '/$id/$pageId/',
     getParentRoute: () => ProjectRefIntegrationsRoute,
   } as any)
+const ProjectRefDatabaseReplicationPipelineIdIndexRoute =
+  ProjectRefDatabaseReplicationPipelineIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ProjectRefDatabaseReplicationPipelineIdRoute,
+  } as any)
 const ApiV1ProjectsRefFunctionsIndexRoute =
   ApiV1ProjectsRefFunctionsIndexRouteImport.update({
     id: '/api/v1/projects/$ref/functions/',
@@ -1870,6 +1878,12 @@ const ProjectRefDatabaseReplicationReplicaReplicaIdRoute =
     id: '/replication/replica/$replicaId',
     path: '/replication/replica/$replicaId',
     getParentRoute: () => ProjectRefDatabaseRoute,
+  } as any)
+const ProjectRefDatabaseReplicationPipelineIdSettingsRoute =
+  ProjectRefDatabaseReplicationPipelineIdSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => ProjectRefDatabaseReplicationPipelineIdRoute,
   } as any)
 const ApiV1ProjectsRefTypesTypescriptRoute =
   ApiV1ProjectsRefTypesTypescriptRouteImport.update({
@@ -2320,7 +2334,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database/backups/restore-to-new-project': typeof ProjectRefDatabaseBackupsRestoreToNewProjectRoute
   '/project/$ref/database/backups/scheduled': typeof ProjectRefDatabaseBackupsScheduledRoute
   '/project/$ref/database/publications/$id': typeof ProjectRefDatabasePublicationsIdRoute
-  '/project/$ref/database/replication/$pipelineId': typeof ProjectRefDatabaseReplicationPipelineIdRoute
+  '/project/$ref/database/replication/$pipelineId': typeof ProjectRefDatabaseReplicationPipelineIdRouteWithChildren
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
   '/project/$ref/database/triggers/event': typeof ProjectRefDatabaseTriggersEventRoute
@@ -2370,6 +2384,7 @@ export interface FileRoutesByFullPath {
   '/api/v1/projects/$ref/api-keys/$id': typeof ApiV1ProjectsRefApiKeysIdRoute
   '/api/v1/projects/$ref/database/migrations': typeof ApiV1ProjectsRefDatabaseMigrationsRoute
   '/api/v1/projects/$ref/types/typescript': typeof ApiV1ProjectsRefTypesTypescriptRoute
+  '/project/$ref/database/replication/$pipelineId/settings': typeof ProjectRefDatabaseReplicationPipelineIdSettingsRoute
   '/project/$ref/database/replication/replica/$replicaId': typeof ProjectRefDatabaseReplicationReplicaReplicaIdRoute
   '/project/$ref/settings/infrastructure/replica/$replicaId': typeof ProjectRefSettingsInfrastructureReplicaReplicaIdRoute
   '/project/$ref/storage/analytics/buckets/$bucketId': typeof ProjectRefStorageAnalyticsBucketsBucketIdRoute
@@ -2383,6 +2398,7 @@ export interface FileRoutesByFullPath {
   '/api/platform/storage/$ref/buckets/': typeof ApiPlatformStorageRefBucketsIndexRoute
   '/api/platform/storage/$ref/vector-buckets/': typeof ApiPlatformStorageRefVectorBucketsIndexRoute
   '/api/v1/projects/$ref/functions/': typeof ApiV1ProjectsRefFunctionsIndexRoute
+  '/project/$ref/database/replication/$pipelineId/': typeof ProjectRefDatabaseReplicationPipelineIdIndexRoute
   '/project/$ref/integrations/$id/$pageId/': typeof ProjectRefIntegrationsIdPageIdIndexRoute
   '/api/platform/auth/$ref/users/$id/factors': typeof ApiPlatformAuthRefUsersIdFactorsRoute
   '/api/platform/projects/$ref/analytics/endpoints/$name': typeof ApiPlatformProjectsRefAnalyticsEndpointsNameRoute
@@ -2622,7 +2638,6 @@ export interface FileRoutesByTo {
   '/project/$ref/database/backups/restore-to-new-project': typeof ProjectRefDatabaseBackupsRestoreToNewProjectRoute
   '/project/$ref/database/backups/scheduled': typeof ProjectRefDatabaseBackupsScheduledRoute
   '/project/$ref/database/publications/$id': typeof ProjectRefDatabasePublicationsIdRoute
-  '/project/$ref/database/replication/$pipelineId': typeof ProjectRefDatabaseReplicationPipelineIdRoute
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
   '/project/$ref/database/triggers/event': typeof ProjectRefDatabaseTriggersEventRoute
@@ -2672,6 +2687,7 @@ export interface FileRoutesByTo {
   '/api/v1/projects/$ref/api-keys/$id': typeof ApiV1ProjectsRefApiKeysIdRoute
   '/api/v1/projects/$ref/database/migrations': typeof ApiV1ProjectsRefDatabaseMigrationsRoute
   '/api/v1/projects/$ref/types/typescript': typeof ApiV1ProjectsRefTypesTypescriptRoute
+  '/project/$ref/database/replication/$pipelineId/settings': typeof ProjectRefDatabaseReplicationPipelineIdSettingsRoute
   '/project/$ref/database/replication/replica/$replicaId': typeof ProjectRefDatabaseReplicationReplicaReplicaIdRoute
   '/project/$ref/settings/infrastructure/replica/$replicaId': typeof ProjectRefSettingsInfrastructureReplicaReplicaIdRoute
   '/project/$ref/storage/analytics/buckets/$bucketId': typeof ProjectRefStorageAnalyticsBucketsBucketIdRoute
@@ -2685,6 +2701,7 @@ export interface FileRoutesByTo {
   '/api/platform/storage/$ref/buckets': typeof ApiPlatformStorageRefBucketsIndexRoute
   '/api/platform/storage/$ref/vector-buckets': typeof ApiPlatformStorageRefVectorBucketsIndexRoute
   '/api/v1/projects/$ref/functions': typeof ApiV1ProjectsRefFunctionsIndexRoute
+  '/project/$ref/database/replication/$pipelineId': typeof ProjectRefDatabaseReplicationPipelineIdIndexRoute
   '/project/$ref/integrations/$id/$pageId': typeof ProjectRefIntegrationsIdPageIdIndexRoute
   '/api/platform/auth/$ref/users/$id/factors': typeof ApiPlatformAuthRefUsersIdFactorsRoute
   '/api/platform/projects/$ref/analytics/endpoints/$name': typeof ApiPlatformProjectsRefAnalyticsEndpointsNameRoute
@@ -2941,7 +2958,7 @@ export interface FileRoutesById {
   '/project/$ref/database/backups/restore-to-new-project': typeof ProjectRefDatabaseBackupsRestoreToNewProjectRoute
   '/project/$ref/database/backups/scheduled': typeof ProjectRefDatabaseBackupsScheduledRoute
   '/project/$ref/database/publications/$id': typeof ProjectRefDatabasePublicationsIdRoute
-  '/project/$ref/database/replication/$pipelineId': typeof ProjectRefDatabaseReplicationPipelineIdRoute
+  '/project/$ref/database/replication/$pipelineId': typeof ProjectRefDatabaseReplicationPipelineIdRouteWithChildren
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
   '/project/$ref/database/triggers/event': typeof ProjectRefDatabaseTriggersEventRoute
@@ -2991,6 +3008,7 @@ export interface FileRoutesById {
   '/api/v1/projects/$ref/api-keys/$id': typeof ApiV1ProjectsRefApiKeysIdRoute
   '/api/v1/projects/$ref/database/migrations': typeof ApiV1ProjectsRefDatabaseMigrationsRoute
   '/api/v1/projects/$ref/types/typescript': typeof ApiV1ProjectsRefTypesTypescriptRoute
+  '/project/$ref/database/replication/$pipelineId/settings': typeof ProjectRefDatabaseReplicationPipelineIdSettingsRoute
   '/project/$ref/database/replication/replica/$replicaId': typeof ProjectRefDatabaseReplicationReplicaReplicaIdRoute
   '/project/$ref/settings/infrastructure/replica/$replicaId': typeof ProjectRefSettingsInfrastructureReplicaReplicaIdRoute
   '/project/$ref/storage/analytics/buckets/$bucketId': typeof ProjectRefStorageAnalyticsBucketsBucketIdRoute
@@ -3004,6 +3022,7 @@ export interface FileRoutesById {
   '/api/platform/storage/$ref/buckets/': typeof ApiPlatformStorageRefBucketsIndexRoute
   '/api/platform/storage/$ref/vector-buckets/': typeof ApiPlatformStorageRefVectorBucketsIndexRoute
   '/api/v1/projects/$ref/functions/': typeof ApiV1ProjectsRefFunctionsIndexRoute
+  '/project/$ref/database/replication/$pipelineId/': typeof ProjectRefDatabaseReplicationPipelineIdIndexRoute
   '/project/$ref/integrations/$id/$pageId/': typeof ProjectRefIntegrationsIdPageIdIndexRoute
   '/api/platform/auth/$ref/users/$id/factors': typeof ApiPlatformAuthRefUsersIdFactorsRoute
   '/api/platform/projects/$ref/analytics/endpoints/$name': typeof ApiPlatformProjectsRefAnalyticsEndpointsNameRoute
@@ -3309,6 +3328,7 @@ export interface FileRouteTypes {
     | '/api/v1/projects/$ref/api-keys/$id'
     | '/api/v1/projects/$ref/database/migrations'
     | '/api/v1/projects/$ref/types/typescript'
+    | '/project/$ref/database/replication/$pipelineId/settings'
     | '/project/$ref/database/replication/replica/$replicaId'
     | '/project/$ref/settings/infrastructure/replica/$replicaId'
     | '/project/$ref/storage/analytics/buckets/$bucketId'
@@ -3322,6 +3342,7 @@ export interface FileRouteTypes {
     | '/api/platform/storage/$ref/buckets/'
     | '/api/platform/storage/$ref/vector-buckets/'
     | '/api/v1/projects/$ref/functions/'
+    | '/project/$ref/database/replication/$pipelineId/'
     | '/project/$ref/integrations/$id/$pageId/'
     | '/api/platform/auth/$ref/users/$id/factors'
     | '/api/platform/projects/$ref/analytics/endpoints/$name'
@@ -3561,7 +3582,6 @@ export interface FileRouteTypes {
     | '/project/$ref/database/backups/restore-to-new-project'
     | '/project/$ref/database/backups/scheduled'
     | '/project/$ref/database/publications/$id'
-    | '/project/$ref/database/replication/$pipelineId'
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
     | '/project/$ref/database/triggers/event'
@@ -3611,6 +3631,7 @@ export interface FileRouteTypes {
     | '/api/v1/projects/$ref/api-keys/$id'
     | '/api/v1/projects/$ref/database/migrations'
     | '/api/v1/projects/$ref/types/typescript'
+    | '/project/$ref/database/replication/$pipelineId/settings'
     | '/project/$ref/database/replication/replica/$replicaId'
     | '/project/$ref/settings/infrastructure/replica/$replicaId'
     | '/project/$ref/storage/analytics/buckets/$bucketId'
@@ -3624,6 +3645,7 @@ export interface FileRouteTypes {
     | '/api/platform/storage/$ref/buckets'
     | '/api/platform/storage/$ref/vector-buckets'
     | '/api/v1/projects/$ref/functions'
+    | '/project/$ref/database/replication/$pipelineId'
     | '/project/$ref/integrations/$id/$pageId'
     | '/api/platform/auth/$ref/users/$id/factors'
     | '/api/platform/projects/$ref/analytics/endpoints/$name'
@@ -3929,6 +3951,7 @@ export interface FileRouteTypes {
     | '/api/v1/projects/$ref/api-keys/$id'
     | '/api/v1/projects/$ref/database/migrations'
     | '/api/v1/projects/$ref/types/typescript'
+    | '/project/$ref/database/replication/$pipelineId/settings'
     | '/project/$ref/database/replication/replica/$replicaId'
     | '/project/$ref/settings/infrastructure/replica/$replicaId'
     | '/project/$ref/storage/analytics/buckets/$bucketId'
@@ -3942,6 +3965,7 @@ export interface FileRouteTypes {
     | '/api/platform/storage/$ref/buckets/'
     | '/api/platform/storage/$ref/vector-buckets/'
     | '/api/v1/projects/$ref/functions/'
+    | '/project/$ref/database/replication/$pipelineId/'
     | '/project/$ref/integrations/$id/$pageId/'
     | '/api/platform/auth/$ref/users/$id/factors'
     | '/api/platform/projects/$ref/analytics/endpoints/$name'
@@ -5957,6 +5981,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefIntegrationsIdPageIdIndexRouteImport
       parentRoute: typeof ProjectRefIntegrationsRoute
     }
+    '/project/$ref/database/replication/$pipelineId/': {
+      id: '/project/$ref/database/replication/$pipelineId/'
+      path: '/'
+      fullPath: '/project/$ref/database/replication/$pipelineId/'
+      preLoaderRoute: typeof ProjectRefDatabaseReplicationPipelineIdIndexRouteImport
+      parentRoute: typeof ProjectRefDatabaseReplicationPipelineIdRoute
+    }
     '/api/v1/projects/$ref/functions/': {
       id: '/api/v1/projects/$ref/functions/'
       path: '/api/v1/projects/$ref/functions'
@@ -6047,6 +6078,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$ref/database/replication/replica/$replicaId'
       preLoaderRoute: typeof ProjectRefDatabaseReplicationReplicaReplicaIdRouteImport
       parentRoute: typeof ProjectRefDatabaseRoute
+    }
+    '/project/$ref/database/replication/$pipelineId/settings': {
+      id: '/project/$ref/database/replication/$pipelineId/settings'
+      path: '/settings'
+      fullPath: '/project/$ref/database/replication/$pipelineId/settings'
+      preLoaderRoute: typeof ProjectRefDatabaseReplicationPipelineIdSettingsRouteImport
+      parentRoute: typeof ProjectRefDatabaseReplicationPipelineIdRoute
     }
     '/api/v1/projects/$ref/types/typescript': {
       id: '/api/v1/projects/$ref/types/typescript'
@@ -6557,6 +6595,24 @@ const ProjectRefDatabaseTriggersRouteWithChildren =
     ProjectRefDatabaseTriggersRouteChildren,
   )
 
+interface ProjectRefDatabaseReplicationPipelineIdRouteChildren {
+  ProjectRefDatabaseReplicationPipelineIdSettingsRoute: typeof ProjectRefDatabaseReplicationPipelineIdSettingsRoute
+  ProjectRefDatabaseReplicationPipelineIdIndexRoute: typeof ProjectRefDatabaseReplicationPipelineIdIndexRoute
+}
+
+const ProjectRefDatabaseReplicationPipelineIdRouteChildren: ProjectRefDatabaseReplicationPipelineIdRouteChildren =
+  {
+    ProjectRefDatabaseReplicationPipelineIdSettingsRoute:
+      ProjectRefDatabaseReplicationPipelineIdSettingsRoute,
+    ProjectRefDatabaseReplicationPipelineIdIndexRoute:
+      ProjectRefDatabaseReplicationPipelineIdIndexRoute,
+  }
+
+const ProjectRefDatabaseReplicationPipelineIdRouteWithChildren =
+  ProjectRefDatabaseReplicationPipelineIdRoute._addFileChildren(
+    ProjectRefDatabaseReplicationPipelineIdRouteChildren,
+  )
+
 interface ProjectRefDatabaseRouteChildren {
   ProjectRefDatabaseColumnPrivilegesRoute: typeof ProjectRefDatabaseColumnPrivilegesRoute
   ProjectRefDatabaseExtensionsRoute: typeof ProjectRefDatabaseExtensionsRoute
@@ -6573,7 +6629,7 @@ interface ProjectRefDatabaseRouteChildren {
   ProjectRefDatabaseBackupsRestoreToNewProjectRoute: typeof ProjectRefDatabaseBackupsRestoreToNewProjectRoute
   ProjectRefDatabaseBackupsScheduledRoute: typeof ProjectRefDatabaseBackupsScheduledRoute
   ProjectRefDatabasePublicationsIdRoute: typeof ProjectRefDatabasePublicationsIdRoute
-  ProjectRefDatabaseReplicationPipelineIdRoute: typeof ProjectRefDatabaseReplicationPipelineIdRoute
+  ProjectRefDatabaseReplicationPipelineIdRoute: typeof ProjectRefDatabaseReplicationPipelineIdRouteWithChildren
   ProjectRefDatabaseTablesIdRoute: typeof ProjectRefDatabaseTablesIdRoute
   ProjectRefDatabasePublicationsIndexRoute: typeof ProjectRefDatabasePublicationsIndexRoute
   ProjectRefDatabaseReplicationIndexRoute: typeof ProjectRefDatabaseReplicationIndexRoute
@@ -6601,7 +6657,7 @@ const ProjectRefDatabaseRouteChildren: ProjectRefDatabaseRouteChildren = {
     ProjectRefDatabaseBackupsScheduledRoute,
   ProjectRefDatabasePublicationsIdRoute: ProjectRefDatabasePublicationsIdRoute,
   ProjectRefDatabaseReplicationPipelineIdRoute:
-    ProjectRefDatabaseReplicationPipelineIdRoute,
+    ProjectRefDatabaseReplicationPipelineIdRouteWithChildren,
   ProjectRefDatabaseTablesIdRoute: ProjectRefDatabaseTablesIdRoute,
   ProjectRefDatabasePublicationsIndexRoute:
     ProjectRefDatabasePublicationsIndexRoute,

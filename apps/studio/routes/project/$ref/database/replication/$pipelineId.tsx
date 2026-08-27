@@ -1,14 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router'
-
-import DatabaseReplicationPage from '@/pages/project/[ref]/database/replication/[pipelineId]'
+import { createFileRoute, Outlet } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/project/$ref/database/replication/$pipelineId')({
-  component: DatabaseReplicationPipelineRoute,
+  component: Outlet,
   staticData: {
     databaseLayoutTitle: 'Replication',
   },
 })
-
-function DatabaseReplicationPipelineRoute() {
-  return <DatabaseReplicationPage dehydratedState={undefined} />
-}
