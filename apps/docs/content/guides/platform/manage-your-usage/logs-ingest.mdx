@@ -21,14 +21,14 @@ Usage is shown as "Logs Ingest" on your invoice.
 
 ## Billing examples
 
-| Plan | Monthly ingest | Included | Billable overage | Cost |
-| --- | --- | --- | --- | --- |
-| Free | 1 GB | 1 GB | — | <Price price="0" /> |
-| Paid | 5 GB | 5 GB | — | <Price price="0" /> |
-| Paid | 6 GB | 5 GB | 1 GB | <Price price="0.50" /> |
-| Paid | 10 GB | 5 GB | 5 GB | <Price price="2.50" /> |
-| Paid | 25 GB | 5 GB | 20 GB | <Price price="10.00" /> |
-| Paid | 100 GB | 5 GB | 95 GB | <Price price="47.50" /> |
+| Plan | Monthly ingest | Included | Billable overage | Cost                    |
+| ---- | -------------- | -------- | ---------------- | ----------------------- |
+| Free | 1 GB           | 1 GB     | —                | <Price price="0" />     |
+| Paid | 5 GB           | 5 GB     | —                | <Price price="0" />     |
+| Paid | 6 GB           | 5 GB     | 1 GB             | <Price price="0.50" />  |
+| Paid | 10 GB          | 5 GB     | 5 GB             | <Price price="2.50" />  |
+| Paid | 25 GB          | 5 GB     | 20 GB            | <Price price="10.00" /> |
+| Paid | 100 GB         | 5 GB     | 95 GB            | <Price price="47.50" /> |
 
 ## View usage
 
@@ -36,7 +36,7 @@ You can view Logs Ingest usage on the [organization's usage page](/dashboard/org
 
 ## Optimize usage
 
-Every service in your Supabase project generates logs automatically — you don't write them directly. Log volume scales with your application's traffic and behavior. Your project's database (Postgres) can also be configured to record different kinds of activity, such as every query it runs, every time an app connects, and how long things take. 
+Every service in your Supabase project generates logs automatically — you don't write them directly. Log volume scales with your application's traffic and behavior. Your project's database (Postgres) can also be configured to record different kinds of activity, such as every query it runs, every time an app connects, and how long things take.
 
 Most projects don't need to log everything, all the time. However, turning off a log type means you won't have that information if something goes wrong later, for example a slow query, a security incident, or a connection storm. If your team relies on these logs for debugging, security audits, or compliance requirements, check with them before you change a setting. When in doubt, reduce the volume of a log type rather than turning it off completely — for example, raise a threshold rather than disabling logging outright.
 
