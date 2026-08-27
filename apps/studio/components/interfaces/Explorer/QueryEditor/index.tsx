@@ -46,6 +46,7 @@ import { useAddDefinitions } from '@/components/interfaces/SQLEditor/useAddDefin
 import { ResizableAIWidget } from '@/components/ui/AIEditor/ResizableAIWidget'
 import { getEditorSelectionParts, type EditorSelection } from '@/components/ui/AIEditor/utils'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+import { getEditorValueOrSelection } from '@/components/ui/CodeEditor/CodeEditor.utils'
 import { DiffEditor } from '@/components/ui/DiffEditor'
 import {
   type DatabaseSourceParameters,
@@ -195,6 +196,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   const [promptState, setPromptState] = useState<(EditorSelection & { isOpen: boolean }) | null>(
     null
   )
+  const [hasSelection, setHasSelection] = useState(false)
 
   const dialect = query._tag === 'logs' ? 'clickhouse' : 'postgres'
   const { requestCompletion, isCompletionLoading } = useQueryEditorAi({ dialect })
@@ -409,13 +411,17 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
             <ExplorerToolbarAction
               loading={isExecuting}
               icon={<Play />}
-              tooltip="Run query"
+              tooltip={hasSelection ? 'Run selected query' : 'Run query'}
               disabled={
                 isBusy || pendingProposal !== null || isRunDisabled || sql.trim().length === 0
               }
-              onClick={() => handleRunQuery()}
+              onClick={() => {
+                const editorInstance = editorInstanceRef.current
+                const rawSql = editorInstance ? getEditorValueOrSelection(editorInstance) : sql
+                handleRunQuery({ rawSql })
+              }}
             >
-              Run
+              {hasSelection ? 'Run selected' : 'Run'}
             </ExplorerToolbarAction>
           </ExplorerToolbarActions>
         </ExplorerToolbar>
@@ -447,7 +453,10 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
                 placeholderClassName="top-[13px]"
                 className={variant === 'embedded' ? 'h-44' : undefined}
                 actions={{
-                  runQuery: { enabled: !isRunDisabled, callback: handleRunQuery },
+                  runQuery: {
+                    enabled: !isRunDisabled,
+                    callback: (rawSql: string) => handleRunQuery({ rawSql }),
+                  },
                 }}
                 options={{
                   minimap: { enabled: false },
@@ -457,6 +466,13 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
                 onMount={(editor, monaco) => {
                   editor.onDidBlurEditorWidget(() => onSqlCommitRef.current?.(sqlRef.current))
                   editorInstanceRef.current = editor
+
+                  editor.onDidChangeCursorSelection(({ selection }) => {
+                    const noSelection =
+                      selection.startLineNumber === selection.endLineNumber &&
+                      selection.startColumn === selection.endColumn
+                    setHasSelection(!noSelection)
+                  })
 
                   editor.addAction({
                     id: 'generate-sql',
