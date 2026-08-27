@@ -2,11 +2,12 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
-import { ExternalLink } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { ArrowLeft, ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
-import { Button, SidePanel } from 'ui'
+import { Button } from 'ui'
 
 import { CancellationFlow } from './CancellationFlow'
 import { PlanCards } from './PlanCards'
@@ -92,7 +93,10 @@ export const PlanUpdateSidePanel = () => {
   )
 
   const snap = useOrgSettingsPageStateSnapshot()
-  const visible = snap.panelKey === 'subscriptionPlan'
+  const isOpenedViaUrl = router.query.panel === 'subscriptionPlan'
+  const visible = snap.panelKey === 'subscriptionPlan' || isOpenedViaUrl
+
+  const contentDelay = isOpenedViaUrl ? 0.4 : 0.15
 
   const { data: orgProjectsData } = useOrgProjectsInfiniteQuery({ slug }, { enabled: visible })
   const orgProjects =
@@ -178,60 +182,76 @@ export const PlanUpdateSidePanel = () => {
 
   return (
     <>
-      <SidePanel
-        hideFooter
-        size="xxlarge"
-        visible={visible}
-        onCancel={() => onClose()}
-        header={
-          <div className="flex items-center justify-between w-full">
-            <h4>Change subscription plan for {selectedOrganization?.name}</h4>
-            <Button asChild variant="default" icon={<ExternalLink />}>
-              <a href="https://supabase.com/pricing" target="_blank" rel="noreferrer">
-                Pricing
-              </a>
-            </Button>
-          </div>
-        }
-      >
-        {selectedOrganization &&
-          (isStripeManagedOrganization ? (
-            <PartnerManagedResource
-              managedBy={MANAGED_BY.STRIPE_PROJECTS}
-              resource="Organization plans"
-              title="Organization plans are managed through Stripe."
-              details={
-                <>
-                  Run <code className="text-code-inline">{stripeProjectsUpgradeCommand}</code> in
-                  your project directory.
-                </>
-              }
-              cta={{
-                overrideUrl: `${STRIPE_PROJECTS_DOCS_URL}#upgrade-a-service-tier`,
-                message: 'Stripe Projects docs',
-              }}
+      {visible && (
+        <motion.div
+          className="fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-studio"
+          initial={isOpenedViaUrl ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+        >
+          <Button
+            variant="text"
+            icon={<ArrowLeft />}
+            onClick={() => onClose()}
+            className="fixed top-4 left-4"
+          >
+            Go back to Studio
+          </Button>
+          <motion.div
+            className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 py-16"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: contentDelay, duration: 0.3, ease: 'easeOut' }}
+          >
+            <h1 className="text-2xl text-center">
+              Change subscription plan for {selectedOrganization?.name}
+            </h1>
+            <div className="flex justify-center">
+              <Button asChild variant="default" icon={<ExternalLink />}>
+                <a href="https://supabase.com/pricing" target="_blank" rel="noreferrer">
+                  Pricing
+                </a>
+              </Button>
+            </div>
+            {selectedOrganization &&
+              (isStripeManagedOrganization ? (
+                <PartnerManagedResource
+                  managedBy={MANAGED_BY.STRIPE_PROJECTS}
+                  resource="Organization plans"
+                  title="Organization plans are managed through Stripe."
+                  details={
+                    <>
+                      Run <code className="text-code-inline">{stripeProjectsUpgradeCommand}</code>{' '}
+                      in your project directory.
+                    </>
+                  }
+                  cta={{
+                    overrideUrl: `${STRIPE_PROJECTS_DOCS_URL}#upgrade-a-service-tier`,
+                    message: 'Stripe Projects docs',
+                  }}
+                />
+              ) : isPartnerBilledOrganization ? (
+                <PartnerManagedResource
+                  managedBy={selectedOrganization.managed_by}
+                  resource="Organization plans"
+                  cta={getPartnerManagedResourceCta(selectedOrganization)}
+                />
+              ) : null)}
+            <PlanCards
+              availablePlans={availablePlans}
+              isLoadingPlans={isLoadingPlans}
+              currentSubscriptionPlanId={subscription?.plan?.id}
+              currentSubscriptionPlanName={subscription?.plan?.name}
+              canUpdateSubscription={canUpdateSubscription}
+              isPartnerBilledOrganization={isPartnerBilledOrganization}
+              hasOrioleProjects={hasOrioleProjects}
+              selectedOrganization={selectedOrganization}
+              onSelectTier={setSelectedTier}
+              contentDelay={contentDelay}
             />
-          ) : isPartnerBilledOrganization ? (
-            <PartnerManagedResource
-              managedBy={selectedOrganization.managed_by}
-              resource="Organization plans"
-              cta={getPartnerManagedResourceCta(selectedOrganization)}
-            />
-          ) : null)}
-        <SidePanel.Content>
-          <PlanCards
-            availablePlans={availablePlans}
-            isLoadingPlans={isLoadingPlans}
-            currentSubscriptionPlanId={subscription?.plan?.id}
-            currentSubscriptionPlanName={subscription?.plan?.name}
-            canUpdateSubscription={canUpdateSubscription}
-            isPartnerBilledOrganization={isPartnerBilledOrganization}
-            hasOrioleProjects={hasOrioleProjects}
-            selectedOrganization={selectedOrganization}
-            onSelectTier={setSelectedTier}
-          />
-        </SidePanel.Content>
-      </SidePanel>
+          </motion.div>
+        </motion.div>
+      )}
 
       <CancellationFlow
         visible={selectedTier === 'tier_free'}

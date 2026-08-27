@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import { useRouter } from 'next/router'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 
@@ -9,6 +10,11 @@ import type { OrgPlan, PlanId } from '@/data/subscriptions/types'
 import { useTrack } from '@/lib/telemetry/track'
 import type { Organization } from '@/types/base'
 
+const planCardVariants = {
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } },
+}
+
 export interface PlanCardsProps {
   availablePlans: OrgPlan[]
   isLoadingPlans: boolean
@@ -19,6 +25,7 @@ export interface PlanCardsProps {
   hasOrioleProjects: boolean
   selectedOrganization: Organization | undefined
   onSelectTier: (tier: 'tier_free' | 'tier_pro' | 'tier_team') => void
+  contentDelay?: number
 }
 
 export function PlanCards({
@@ -31,6 +38,7 @@ export function PlanCards({
   hasOrioleProjects,
   selectedOrganization,
   onSelectTier,
+  contentDelay = 0,
 }: PlanCardsProps) {
   const router = useRouter()
   const track = useTrack()
@@ -44,8 +52,18 @@ export function PlanCards({
 
   const variant = usePlanPresentationExperiment({ eligible })
 
+  const planListVariants = {
+    hidden: {},
+    visible: { transition: { delayChildren: contentDelay + 0.2, staggerChildren: 0.08 } },
+  }
+
   return (
-    <div className="py-6 grid grid-cols-12 gap-3">
+    <motion.div
+      className="py-6 grid grid-cols-12 gap-3"
+      variants={planListVariants}
+      initial="hidden"
+      animate="visible"
+    >
       {subscriptionsPlans.map((plan) => {
         const planMeta = availablePlans.find((p) => p.id === plan.id.split('tier_')[1])
         const price = planMeta?.price ?? 0
@@ -59,7 +77,14 @@ export function PlanCards({
         const shouldHighlight = source === 'log-drains-empty-state' && plan.id === 'tier_pro'
 
         if (plan.id === 'tier_enterprise') {
-          return <EnterpriseCard key={plan.id} plan={plan} isCurrentPlan={isCurrentPlan} />
+          return (
+            <EnterpriseCard
+              key={plan.id}
+              plan={plan}
+              isCurrentPlan={isCurrentPlan}
+              variants={planCardVariants}
+            />
+          )
         }
 
         return (
@@ -77,6 +102,7 @@ export function PlanCards({
             managedBy={selectedOrganization?.managed_by}
             shouldHighlight={shouldHighlight}
             variant={variant}
+            variants={planCardVariants}
             onSelectTier={() => onSelectTier(plan.id as 'tier_free' | 'tier_pro' | 'tier_team')}
             onTrackCtaClick={() =>
               track('studio_pricing_plan_cta_clicked', {
@@ -87,6 +113,6 @@ export function PlanCards({
           />
         )
       })}
-    </div>
+    </motion.div>
   )
 }

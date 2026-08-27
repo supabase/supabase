@@ -1,3 +1,4 @@
+import { motion, type Variants } from 'framer-motion'
 import { isArray } from 'lodash'
 import { Check, X } from 'lucide-react'
 import type { PricingInformation } from 'shared-data'
@@ -29,6 +30,7 @@ export interface PlanCardProps {
   managedBy: string | undefined
   shouldHighlight: boolean
   variant: PlanPresentationVariant
+  variants?: Variants
   onSelectTier: () => void
   onTrackCtaClick: () => void
 }
@@ -46,6 +48,7 @@ export function PlanCard({
   managedBy,
   shouldHighlight,
   variant,
+  variants,
   onSelectTier,
   onTrackCtaClick,
 }: PlanCardProps) {
@@ -112,6 +115,7 @@ export function PlanCard({
         features={features}
         footer={footer}
         ctaButton={ctaButton}
+        variants={variants}
       />
     )
   }
@@ -127,6 +131,7 @@ export function PlanCard({
       footer={footer}
       gaps={gaps}
       ctaButton={ctaButton}
+      variants={variants}
     />
   )
 }
@@ -140,6 +145,7 @@ function ControlCard({
   features,
   footer,
   ctaButton,
+  variants,
 }: {
   plan: PricingInformation
   price: number
@@ -149,9 +155,11 @@ function ControlCard({
   features: (string | string[])[]
   footer: string | undefined
   ctaButton: React.ReactNode
+  variants?: Variants
 }) {
   return (
-    <div
+    <motion.div
+      variants={variants}
       className={cn(
         'px-4 py-4 flex flex-col items-start justify-between',
         'border rounded-md col-span-12 md:col-span-4 bg-surface-200',
@@ -217,7 +225,7 @@ function ControlCard({
           <p className="text-foreground-light text-xs">{footer}</p>
         </div>
       )}
-    </div>
+    </motion.div>
   )
 }
 
@@ -231,6 +239,7 @@ function ParityCard({
   footer,
   gaps,
   ctaButton,
+  variants,
 }: {
   plan: PricingInformation
   price: number
@@ -241,9 +250,11 @@ function ParityCard({
   footer: string | undefined
   gaps: GapFeature[]
   ctaButton: React.ReactNode
+  variants?: Variants
 }) {
   return (
-    <div
+    <motion.div
+      variants={variants}
       className={cn(
         'flex flex-col items-start justify-between',
         'border rounded-md col-span-12 md:col-span-4 bg-surface-200',
@@ -365,6 +376,6 @@ function ParityCard({
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   )
 }
