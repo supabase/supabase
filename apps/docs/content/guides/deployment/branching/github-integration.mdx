@@ -103,7 +103,7 @@ If you want to rerun existing migrations, reset the branch from the Supabase das
 
 ### Seeding
 
-Cloning your base project copies its schema and configuration, but not its data or storage objects. This is meant to protect your sensitive production data. Your branch starts with the tables of your base project and no rows in them.
+Cloning your base project copies its schema and configuration, but not its data or storage objects. This is meant to protect your sensitive production data. Your branch starts with the tables of your base project, and the only rows in them are the ones your seed files add.
 
 You can seed your Preview Branch with sample data using the `seed.sql` file in your Supabase directory. See the [Seeding docs](/docs/guides/local-development/seeding-your-database) for more information.
 
