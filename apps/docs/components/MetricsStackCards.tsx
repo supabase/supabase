@@ -3,13 +3,14 @@ import { Flame } from 'lucide-react'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 
-import { ElasticLogo } from './icons/ElasticLogo'
 import { metricsStackOptions, type MetricsStackOption } from './MetricsStackCards.data'
 
+// Elastic's brand mark is multi-color, so it's kept as a static asset rather
+// than a `icons` package component, which assumes a single `currentColor`.
 const ICONS: Record<MetricsStackOption['iconKind'], ReactNode> = {
   grafana: <Grafana className="h-5 w-5" />,
   datadog: <Datadog className="h-5 w-5" />,
-  elastic: <ElasticLogo className="h-5 w-5" />,
+  elastic: <img src="/docs/img/icons/elastic-icon.svg" alt="" className="h-5 w-5" />,
   flame: <Flame className="h-5 w-5" strokeWidth={1.5} />,
 }
 
