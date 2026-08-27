@@ -1,9 +1,9 @@
 import { FeatureFlagContext, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
-import { PageContainer } from 'ui-patterns/PageContainer'
 
 import { ReplicationPipelineLayout } from '@/components/interfaces/Database/Replication/ReplicationPipelineLayout'
+import { ReplicationPipelineSettings } from '@/components/interfaces/Database/Replication/ReplicationPipelineSettings'
 import { useIsETLPrivateAlpha } from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
 import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
@@ -27,7 +27,7 @@ const DatabaseReplicationSettingsPage: NextPageWithLayout = () => {
       {enablePgReplicate && (
         <PipelineRequestStatusProvider>
           <ReplicationPipelineLayout>
-            <PageContainer size="small" />
+            <ReplicationPipelineSettings />
           </ReplicationPipelineLayout>
         </PipelineRequestStatusProvider>
       )}
