@@ -182,7 +182,19 @@ const nextConfig = {
         : []),
     ],
   },
-  transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'api-types', 'icons'],
+  transpilePackages: [
+    'ui',
+    'ui-patterns',
+    'common',
+    'shared-data',
+    'api-types',
+    'icons',
+    '@mdxeditor/editor',
+  ],
+  webpack(config) {
+    config.experiments = { ...config.experiments, topLevelAwait: true }
+    return config
+  },
   serverExternalPackages: ['libpg-query'],
   turbopack: {
     rules: {

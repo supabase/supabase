@@ -47,6 +47,31 @@ vi.mock('@/components/ui/CodeEditor/CodeEditor', () => ({
   ),
 }))
 
+vi.mock('../MarkdownEditor', async () => {
+  const { forwardRef } = await import('react')
+
+  return {
+    MarkdownEditor: forwardRef<
+      HTMLTextAreaElement,
+      {
+        markdown: string
+        onChange?: (markdown: string, initialMarkdownNormalize: boolean) => void
+        placeholder?: React.ReactNode
+        contentEditableClassName?: string
+      }
+    >(({ markdown, onChange, placeholder, contentEditableClassName }, ref) => (
+      <textarea
+        ref={ref}
+        aria-label="Markdown editor"
+        className={contentEditableClassName}
+        defaultValue={markdown}
+        placeholder={typeof placeholder === 'string' ? placeholder : undefined}
+        onChange={(event) => onChange?.(event.target.value, false)}
+      />
+    )),
+  }
+})
+
 vi.mock('../QueryEditor/QuerySourceMenu', () => ({
   QuerySourceMenu: () => null,
 }))
@@ -131,6 +156,28 @@ afterEach(() => {
 })
 
 describe('ExplorerNotebookTab', () => {
+  it('edits markdown inline and leaves persistence to the notebook save action', async () => {
+    const cell = createMarkdownCellSkeleton({ content: 'Original note' })
+    seedNotebook([cell])
+
+    renderNotebookTab()
+
+    const editor = await screen.findByRole('textbox', { name: 'Markdown editor' })
+    expect(editor).toHaveValue('Original note')
+    expect(editor).toHaveClass('focus:outline-none')
+    expect(screen.queryByRole('button', { name: 'Done' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeInTheDocument()
+
+    await userEvent.clear(editor)
+    await userEvent.type(editor, '# Updated note')
+
+    expect(notebooksState.notebooks[NOTEBOOK_ID].notebook.content?.cells[0]).toEqual(
+      expect.objectContaining({ _id: cell._id, text: '# Updated note' })
+    )
+    expect(notebooksState.notebooks[NOTEBOOK_ID].status).toBe('unsaved')
+  })
+
   it('hides SQL by default for saved notebooks and caps query cells at 6xl', () => {
     renderNotebookTab()
 
