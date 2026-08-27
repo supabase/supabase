@@ -116,6 +116,7 @@ export type QueryEditorHandle = {
 
 type QueryEditorProps = {
   id: string
+  hideRunLabel?: boolean
   isReadOnly?: boolean
   variant: 'embedded' | 'viewport'
   title: string
@@ -147,6 +148,7 @@ type QueryEditorProps = {
 export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(function QueryEditor(
   {
     id,
+    hideRunLabel = false,
     isReadOnly = false,
     variant,
     title,
@@ -371,13 +373,12 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   return (
     <>
       <Shell className={cn(variant === 'embedded' && 'mx-auto max-w-6xl', className)}>
-        <ExplorerToolbar>
+        <ExplorerToolbar className={cn(variant === 'viewport' && 'px-4')}>
           <ExplorerToolbarIcon>
             <CodeSquare size={14} />
           </ExplorerToolbarIcon>
           <ExplorerToolbarTitle onSaveTitle={onTitleChange}>{title}</ExplorerToolbarTitle>
           <ExplorerToolbarActions>
-            {toolbarActions}
             {onSourceChange && (
               <QuerySourceMenu
                 disabled={pendingProposal !== null}
@@ -415,8 +416,10 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
               }
               onClick={() => handleRunQuery()}
             >
-              Run
+              {hideRunLabel ? undefined : 'Run'}
             </ExplorerToolbarAction>
+
+            {toolbarActions}
           </ExplorerToolbarActions>
         </ExplorerToolbar>
 

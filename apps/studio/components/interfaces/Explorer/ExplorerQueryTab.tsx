@@ -1,12 +1,23 @@
-import { useParams } from 'common'
-import { Loader2, SquareCode } from 'lucide-react'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { Check, Keyboard, Loader2, MoreVertical, Save, SquareCode } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useContext, useEffect, useState } from 'react'
-import { Button } from 'ui'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from 'ui'
 
+import { ExplorerToolbarAction } from './ExplorerToolbar'
 import { QueryEditor, type ExplorerQueryModel } from './QueryEditor'
 import { type QueryDisplay, type QueryResult } from './types'
 import { toQuerySourceBinding } from '@/data/query-sources/query-source-registry'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { explorerQueryState, useExplorerQueryStateSnapshot } from '@/state/explorer-query'
 import { useControlledRoleImpersonationState } from '@/state/role-impersonation-state'
 import { createTabId, TabsStateContext } from '@/state/tabs'
@@ -17,6 +28,11 @@ export const ExplorerQueryTab = () => {
   const router = useRouter()
   const tabs = useContext(TabsStateContext)
   const querySnap = useExplorerQueryStateSnapshot()
+
+  const [isIntellisenseEnabled, setIsIntellisenseEnabled] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
+    true
+  )
 
   const [restoredQueryKey, setRestoredQueryKey] = useState<string>()
   const [showQuery, setShowQuery] = useState(true)
@@ -96,6 +112,7 @@ export const ExplorerQueryTab = () => {
 
   return (
     <QueryEditor
+      hideRunLabel
       id={id}
       variant="viewport"
       title={draft.name}
@@ -128,6 +145,41 @@ export const ExplorerQueryTab = () => {
         persistTab()
         explorerQueryState.setDisplay({ id, display })
       }}
+      toolbarActions={
+        <>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <ExplorerToolbarAction icon={<Save />} tooltip="Save query" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-52" align="end">
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>Add to existing notebook</DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem>asd</DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+              <DropdownMenuItem>Create a new notebook</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <ExplorerToolbarAction icon={<MoreVertical />} />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem
+                className="justify-between"
+                onClick={() => setIsIntellisenseEnabled(!isIntellisenseEnabled)}
+              >
+                <div className="flex items-center gap-x-2">
+                  <Keyboard size={14} />
+                  <span>Intellisense enabled</span>
+                </div>
+                {isIntellisenseEnabled && <Check className="text-brand" size={16} />}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </>
+      }
     />
   )
 }
