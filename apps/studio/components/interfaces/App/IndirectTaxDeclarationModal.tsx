@@ -30,7 +30,7 @@ export const IndirectTaxDeclarationModal = () => {
 
   const [response, setResponse] = useState<IndirectTaxDeclaration | ''>('')
 
-  const [isDeclarationFlowActive, setDeclarationFlowParam] = useQueryState(
+  const [shouldShowDeclarationConfirmation, setShouldShowDeclarationConfirmation] = useQueryState(
     'submit_indirect_tax_declaration',
     parseAsBoolean.withDefault(false)
   )
@@ -47,7 +47,7 @@ export const IndirectTaxDeclarationModal = () => {
   const { mutate: updateCustomerProfile, isPending } = useOrganizationCustomerProfileUpdateMutation(
     {
       onSuccess: () => {
-        if (!isDeclarationFlowActive) {
+        if (!shouldShowDeclarationConfirmation) {
           toast.success('GST declaration submitted')
         }
       },
@@ -65,7 +65,7 @@ export const IndirectTaxDeclarationModal = () => {
   if (canViewDeclaration) {
     if (organization.requires_indirect_tax_declaration) {
       declarationModal = 'declaration-form'
-    } else if (isDeclarationFlowActive) {
+    } else if (shouldShowDeclarationConfirmation) {
       declarationModal = 'submission-confirmation'
     }
   }
@@ -79,8 +79,8 @@ export const IndirectTaxDeclarationModal = () => {
     })
   }
 
-  const closeDeclarationFlow = () => {
-    setDeclarationFlowParam(null)
+  const closeSubmissionConfirmation = () => {
+    setShouldShowDeclarationConfirmation(null)
   }
 
   return (
@@ -142,7 +142,7 @@ export const IndirectTaxDeclarationModal = () => {
       <Dialog
         open={declarationModal === 'submission-confirmation'}
         onOpenChange={(open) => {
-          if (!open) closeDeclarationFlow()
+          if (!open) closeSubmissionConfirmation()
         }}
       >
         <DialogContent size="small">
@@ -154,7 +154,7 @@ export const IndirectTaxDeclarationModal = () => {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button onClick={closeDeclarationFlow}>Close</Button>
+            <Button onClick={closeSubmissionConfirmation}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
