@@ -28,10 +28,14 @@ const multipoolerSchema = z.object({
   // 'SERVING' | 'DISABLED' | 'DRAINING'
   servingStatus: z.string().optional(),
   hostname: z.string().optional(),
-  // 'ACTIVE' | 'STARTING' | 'STOPPING' | 'QUARANTINED' | 'SHUTDOWN', optionally
-  // prefixed with 'LIFECYCLE_' — these are the values `getPoolerStatus` handles.
-  // Anything else falls through to its `servingStatus` check, so a future
-  // failure state (a 'FAILED'-style value) reads as healthy until it is mapped.
+  // `PoolerLifecycleStatus` (multigres proto/clustermetadata.proto):
+  // 'STARTING' | 'ACTIVE' | 'STOPPING' | 'SHUTDOWN' | 'QUARANTINED', optionally
+  // prefixed with 'LIFECYCLE_'. 'LIFECYCLE_UNKNOWN' is the zero value, so it is
+  // omitted from JSON. There is no dedicated failure member — QUARANTINED is the
+  // terminal failure state (the pooler gave up recovering, e.g. a failed
+  // pg_rewind or backup restore, and is kept alive for forensics) and SHUTDOWN is
+  // "durably down". `getPoolerStatus` maps every member; an unrecognized value
+  // falls through to the `servingStatus` check.
   lifecycleStatus: z.object({ status: z.string().optional() }).optional(),
   routingState: z
     .object({
