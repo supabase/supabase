@@ -12,6 +12,7 @@ import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 type ReplicationSourcesResponse = components['schemas']['SourcesResponse_Output']
 type PublicationDetailsResponse = components['schemas']['PublicationDetailsResponse_Output']
+type ReadTablesResponse = components['schemas']['ReadTablesResponse_Output']
 
 const mockSources: ReplicationSourcesResponse = {
   sources: [
@@ -73,6 +74,14 @@ const mockPublicationsPending = () => {
   })
 }
 
+const mockTables = (tables: ReadTablesResponse['tables']) => {
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/v2/:ref/sources/:source_id/tables',
+    response: () => HttpResponse.json<ReadTablesResponse>({ tables }),
+  })
+}
+
 const TableCopySelectionHarness = ({
   editMode,
   mode = 'include_all_tables',
@@ -103,11 +112,14 @@ describe('TableCopySelection', () => {
     mockSourcesEndpoint()
     mockPublicationsSuccess()
 
-    customRender(<TableCopySelectionHarness editMode />)
+    customRender(
+      <TableCopySelectionHarness editMode mode="include_tables" selectedTableIds={['101']} />
+    )
 
     expect(
-      await screen.findByText(/will not sync existing rows again unless you restart them/)
+      await screen.findByText(/Changes only affect tables whose initial sync/)
     ).toBeInTheDocument()
+    expect(screen.getByText('Tables to include*')).toBeInTheDocument()
   })
 
   it('does not show the edit-mode explanation while creating a pipeline', async () => {
@@ -118,7 +130,7 @@ describe('TableCopySelection', () => {
 
     await screen.findByText('All tables')
     expect(
-      screen.queryByText(/will not sync existing rows again unless you restart them/)
+      screen.queryByText(/Changes only affect tables whose initial sync/)
     ).not.toBeInTheDocument()
   })
 
@@ -144,6 +156,33 @@ describe('TableCopySelection', () => {
       .find((element) => element.textContent?.includes('public.orders'))!
     expect(trigger).toHaveTextContent('public.orders')
     expect(trigger).not.toHaveTextContent('101')
+  })
+
+  it('highlights configured initial-sync tables that left the publication without showing ids', async () => {
+    mockSourcesEndpoint()
+    mockPublicationsSuccess()
+    mockTables([
+      ...mockPublicationDetails.tables,
+      {
+        id: 999,
+        schema: 'Legacy',
+        name: 'ArchivedOrders',
+        kind: 'table',
+        partition_parent_id: null,
+      },
+    ])
+
+    customRender(
+      <TableCopySelectionHarness editMode mode="include_tables" selectedTableIds={['101', '999']} />
+    )
+
+    expect(await screen.findByText('Legacy.ArchivedOrders')).toBeInTheDocument()
+    expect(screen.getByText('Legacy.ArchivedOrders')).toHaveClass('text-destructive-600')
+    expect(screen.getByText('Some tables are no longer in the publication.')).toHaveClass(
+      'text-destructive-600'
+    )
+    expect(screen.queryByText('No longer in publication')).not.toBeInTheDocument()
+    expect(document.body).not.toHaveTextContent('999')
   })
 
   it('blocks selection and explains when publication tables cannot be loaded', async () => {

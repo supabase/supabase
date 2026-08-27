@@ -259,8 +259,7 @@ export const AdvancedSettings = ({
                 </FormItemLayout>
 
                 <p className="text-sm text-foreground-lighter leading-normal">
-                  * Only applied when a table is first created. For a table that already exists,
-                  restart its initial sync to apply the new settings.
+                  * Applied when a destination table is first created or after you use Reset table.
                 </p>
               </>
             )}

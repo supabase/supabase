@@ -10,6 +10,7 @@ import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 import { useRefreshOnOpen } from './useRefreshOnOpen'
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
+import { useReplicationTablesQuery } from '@/data/replication/tables-query'
 
 interface TableCopySelectionProps {
   form: UseFormReturn<DestinationPanelSchemaType>
@@ -42,6 +43,7 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
     isPending: isLoadingPublications,
     isFetching: isRefreshingPublications,
     isError: isErrorPublications,
+    isSuccess: isSuccessPublication,
     refetch: refetchPublication,
   } = useReplicationPublicationQuery({ projectRef, sourceId, publicationName })
   const isLoadingPublicationTables =
@@ -53,10 +55,6 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
     refetch: refetchPublication,
   })
 
-  // Only publication tables are ever selectable or displayed by name. A table
-  // id is never resolved outside of the publication response — there's no
-  // other source for a name to come from without a separate, source-wide
-  // catalog fetch, which selective table-copy doesn't need.
   const publicationTables = useMemo(() => {
     return [...(selectedPublication?.tables ?? [])].sort((a, b) =>
       tableLabel(a).localeCompare(tableLabel(b))
@@ -74,9 +72,16 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
     publicationTableIds.has(id)
   ).length
   const staleSelectedCount =
-    isLoadingPublicationTables || isErrorPublications
+    !isSuccessPublication || isLoadingPublicationTables || isErrorPublications
       ? 0
       : tableSyncCopyTableIds.filter((id) => !publicationTableIds.has(id)).length
+  const { data: sourceTables = [] } = useReplicationTablesQuery(
+    { projectRef, sourceId },
+    { enabled: staleSelectedCount > 0, staleTime: 5 * 60 * 1000 }
+  )
+  const sourceTableLabelsById = new Map(
+    sourceTables.map((table) => [String(table.id), tableLabel(table)])
+  )
   const tableCount = publicationTables.length
 
   return (
@@ -125,15 +130,6 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
         )}
       />
 
-      {editMode && (
-        <Admonition type="note" title="Changes apply only before initial sync completes">
-          <p className="leading-normal!">
-            Tables that have completed initial sync will not sync existing rows again unless you
-            restart them.
-          </p>
-        </Admonition>
-      )}
-
       {isErrorPublications && (
         <Admonition type="warning" title="Publication tables could not be loaded">
           <p className="leading-normal!">
@@ -149,9 +145,9 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label={
-                tableSyncCopyMode === 'skip_tables' ? 'Tables to exclude' : 'Tables to include'
-              }
+              label={`${tableSyncCopyMode === 'skip_tables' ? 'Tables to exclude' : 'Tables to include'}${
+                editMode ? '*' : ''
+              }`}
               description={
                 tableSyncCopyMode === 'skip_tables'
                   ? `${selectedPublicationCount} of ${tableCount} publication tables will skip initial sync. Ongoing replication will still include every publication table.`
@@ -173,7 +169,13 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
                   <MultiSelector.Trigger
                     aria-label="Select initial sync tables"
                     badgeLimit={3}
-                    renderValue={(id) => tableLabelsById.get(id) ?? 'Unavailable table'}
+                    renderValue={(id) =>
+                      tableLabelsById.get(id) ?? (
+                        <span className="text-destructive-600">
+                          {sourceTableLabelsById.get(id) ?? 'Previously selected table'}
+                        </span>
+                      )
+                    }
                     label={publicationName ? 'Select tables...' : 'Select a publication first'}
                   />
                   <MultiSelector.Content>
@@ -194,25 +196,20 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
               </FormControl>
 
               {staleSelectedCount > 0 && (
-                <Admonition
-                  type="warning"
-                  className="mt-2"
-                  title={`${
-                    staleSelectedCount === 1
-                      ? 'A previously selected table is'
-                      : `${staleSelectedCount} previously selected tables are`
-                  }{' '}
-                    no longer in this publication.`}
-                >
-                  <p className="leading-normal!">
-                    {staleSelectedCount === 1 ? 'It' : 'They'} will be excluded from this pipeline's
-                    initial sync settings when you save.
-                  </p>
-                </Admonition>
+                <p className="mt-2 text-sm text-destructive-600">
+                  Some tables are no longer in the publication.
+                </p>
               )}
             </FormItemLayout>
           )}
         />
+      )}
+
+      {editMode && isSelectiveMode(tableSyncCopyMode) && (
+        <p className="text-sm text-foreground-lighter leading-normal">
+          * Changes only affect tables whose initial sync has not completed. Use Reset table to sync
+          existing rows again.
+        </p>
       )}
     </div>
   )

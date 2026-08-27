@@ -206,9 +206,9 @@ export const buildBatchConfig = ({
 }
 
 // The set of table ids (as strings, matching form state) currently in the
-// selected publication. Selective table-copy only ever offers/keeps ids that
-// are in this set; ids selected previously that fall out of it are dropped at
-// submit time rather than resolved or displayed.
+// selected publication. Selective table-copy only ever offers ids in this set;
+// previously selected ids that fall out of it are highlighted in the form and
+// dropped at submit time.
 export const getPublicationTableIds = (
   publications: ReplicationPublication[],
   publicationName: string

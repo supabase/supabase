@@ -10,9 +10,13 @@ import { GenericSelectionSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
 import { defaultPartitionByForKind, parseIntegerInput, shortenPgType } from './BigQuery.utils'
 import type { BigQueryPartitionKind } from './BigQuery.utils'
-import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
+import {
+  useReplicationPublicationQuery,
+  type ReplicationPublicationData,
+} from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useReplicationTableColumnsQuery } from '@/data/replication/table-columns-query'
+import { useReplicationTablesQuery } from '@/data/replication/tables-query'
 
 const PARTITION_KIND_LABELS: Record<BigQueryPartitionKind, string> = {
   none: 'No partitioning',
@@ -32,11 +36,65 @@ const GRANULARITY_LABELS: Record<Granularity, string> = {
 
 const tableLabel = (table: { schema: string; name: string }) => `${table.schema}.${table.name}`
 
-const ColumnOption = ({ name, type }: { name: string; type?: string }) => (
-  <span className="flex items-center gap-x-2 min-w-0">
+type SourceTable = ReplicationPublicationData['tables'][number]
+type PublicationTableConfig = Extract<
+  ReplicationPublicationData['config'],
+  { type: 'tables' }
+>['tables'][number]
+
+// `undefined` means the matched publication entry includes every column; `null` means the
+// ancestry could not be matched reliably and the UI must not claim that the columns are valid.
+const resolvePublishedColumnNames = (
+  tableId: number,
+  configuredTablesById: Map<number, PublicationTableConfig>,
+  sourceTablesById: Map<number, SourceTable>
+): Set<string> | null | undefined => {
+  const visitedTableIds = new Set<number>()
+  let currentTableId: number | null | undefined = tableId
+
+  while (currentTableId !== null && currentTableId !== undefined) {
+    if (visitedTableIds.has(currentTableId)) return null
+    visitedTableIds.add(currentTableId)
+
+    const configuredTable = configuredTablesById.get(currentTableId)
+    if (configuredTable) {
+      return configuredTable.columns === null || configuredTable.columns === undefined
+        ? undefined
+        : new Set(configuredTable.columns)
+    }
+    const sourceTable = sourceTablesById.get(currentTableId)
+    if (!sourceTable) return null
+    currentTableId = sourceTable.partition_parent_id
+  }
+
+  return null
+}
+
+const ColumnOption = ({
+  name,
+  type,
+  unavailable,
+}: {
+  name: string
+  type?: string
+  unavailable?: boolean
+}) => (
+  <span
+    className={
+      unavailable
+        ? 'flex items-center gap-x-2 min-w-0 text-destructive-600'
+        : 'flex items-center gap-x-2 min-w-0'
+    }
+  >
     <span className="truncate min-w-0">{name}</span>
     {type && (
-      <span className="text-foreground-lighter font-mono text-xs shrink-0">
+      <span
+        className={
+          unavailable
+            ? 'font-mono text-xs shrink-0 text-destructive-600'
+            : 'font-mono text-xs shrink-0 text-foreground-lighter'
+        }
+      >
         {shortenPgType(type)}
       </span>
     )}
@@ -46,10 +104,20 @@ const ColumnOption = ({ name, type }: { name: string; type?: string }) => (
 interface TableOptionRowProps {
   control: Control<DestinationPanelSchemaType>
   index: number
+  publicationColumnsError?: boolean
+  publicationColumnsPending?: boolean
+  publishedColumnNames?: Set<string>
   tableId: number
 }
 
-const TableOptionRow = ({ control, index, tableId }: TableOptionRowProps) => {
+const TableOptionRow = ({
+  control,
+  index,
+  publicationColumnsError = false,
+  publicationColumnsPending = false,
+  publishedColumnNames,
+  tableId,
+}: TableOptionRowProps) => {
   const { ref: projectRef } = useParams()
   const sourceId = useReplicationSourceId({ projectRef })
   const { errors } = useFormState({ control, name: 'tableOptions' })
@@ -75,14 +143,35 @@ const TableOptionRow = ({ control, index, tableId }: TableOptionRowProps) => {
     isPending,
     isFetching,
     isError,
+    isSuccess,
     refetch: refetchColumns,
   } = useReplicationTableColumnsQuery(
     { projectRef, sourceId, tableId },
     { enabled: shouldLoadColumns, staleTime: 5 * 60 * 1000 }
   )
-  const isLoadingColumns = shouldLoadColumns && (isPending || isFetching) && columns.length === 0
-  const columnNames = columns.map((column) => column.name)
+  const isLoadingColumns = shouldLoadColumns && (isPending || publicationColumnsPending)
+  const sourceColumnNames = columns.map((column) => column.name)
+  const sourceColumnNameSet = new Set(sourceColumnNames)
+  const canUseColumns = !publicationColumnsPending && !publicationColumnsError
+  const availableColumnNames = canUseColumns
+    ? sourceColumnNames.filter(
+        (column) => publishedColumnNames === undefined || publishedColumnNames.has(column)
+      )
+    : []
   const columnTypeByName = new Map(columns.map((column) => [column.name, column.type]))
+  const columnsVerified = isSuccess && canUseColumns
+  const partitionColumn = partitionBy && 'column' in partitionBy ? partitionBy.column : undefined
+  const configuredColumns = [partitionColumn, ...(clusterByField.value ?? [])].filter(
+    (column, index, configuredColumns): column is string =>
+      column !== undefined && configuredColumns.indexOf(column) === index
+  )
+  const unavailableColumns = configuredColumns.filter(
+    (column) =>
+      columnsVerified &&
+      (!sourceColumnNameSet.has(column) ||
+        (publishedColumnNames !== undefined && !publishedColumnNames.has(column)))
+  )
+  const unavailableColumnSet = new Set(unavailableColumns)
 
   const refreshColumns = () => {
     setShouldLoadColumns(true)
@@ -124,18 +213,31 @@ const TableOptionRow = ({ control, index, tableId }: TableOptionRowProps) => {
               partitionByField.onChange({ ...partitionBy, column })
             }
           >
-            <SelectTrigger>
-              <SelectValue placeholder="Select a column" />
+            <SelectTrigger
+              className={
+                unavailableColumnSet.has(partitionBy.column) ? 'border-destructive-600' : undefined
+              }
+            >
+              <ColumnOption
+                name={partitionBy.column}
+                type={columnTypeByName.get(partitionBy.column)}
+                unavailable={unavailableColumnSet.has(partitionBy.column)}
+              />
             </SelectTrigger>
             <SelectContent>
               <SelectionListState
                 loading={isLoadingColumns}
-                error={isError && columns.length === 0}
-                empty={!isLoadingColumns && !isError && columns.length === 0}
-                emptyLabel="No columns available"
+                error={publicationColumnsError || (isError && columns.length === 0)}
+                empty={
+                  !isLoadingColumns &&
+                  !publicationColumnsError &&
+                  !isError &&
+                  availableColumnNames.length === 0
+                }
+                emptyLabel="No published columns available"
                 errorLabel="Unable to load columns"
               />
-              {columnNames.map((column) => (
+              {availableColumnNames.map((column) => (
                 <SelectItem key={column} value={column}>
                   <ColumnOption name={column} type={columnTypeByName.get(column)} />
                 </SelectItem>
@@ -223,17 +325,21 @@ const TableOptionRow = ({ control, index, tableId }: TableOptionRowProps) => {
             badgeLimit="wrap"
             label="Select columns..."
             renderValue={(column) => (
-              <ColumnOption name={column} type={columnTypeByName.get(column)} />
+              <ColumnOption
+                name={column}
+                type={columnTypeByName.get(column)}
+                unavailable={unavailableColumnSet.has(column)}
+              />
             )}
           />
           <MultiSelector.Content>
             <MultiSelector.List
-              emptyLabel="No columns available"
-              error={isError && columns.length === 0}
+              emptyLabel="No published columns available"
+              error={publicationColumnsError || (isError && columns.length === 0)}
               errorLabel="Unable to load columns"
               loading={isLoadingColumns}
             >
-              {columnNames.map((column) => (
+              {availableColumnNames.map((column) => (
                 <MultiSelector.Item key={column} value={column}>
                   <ColumnOption name={column} type={columnTypeByName.get(column)} />
                 </MultiSelector.Item>
@@ -245,6 +351,18 @@ const TableOptionRow = ({ control, index, tableId }: TableOptionRowProps) => {
 
       {partitionByErrorMessage && (
         <p className="text-sm text-destructive-600">{partitionByErrorMessage}</p>
+      )}
+
+      {shouldLoadColumns && (publicationColumnsError || (isError && columns.length === 0)) && (
+        <p className="text-sm text-warning-600">
+          The configured columns could not be verified against the source and publication.
+        </p>
+      )}
+
+      {unavailableColumns.length > 0 && (
+        <p className="text-sm text-destructive-600 leading-normal">
+          Some columns are no longer available.
+        </p>
       )}
     </div>
   )
@@ -263,6 +381,8 @@ export const TableOptions = ({ control }: TableOptionsProps) => {
     data: selectedPublication,
     isPending,
     isFetching,
+    isError: isPublicationError,
+    isSuccess: isPublicationSuccess,
   } = useReplicationPublicationQuery({
     projectRef,
     sourceId,
@@ -274,6 +394,37 @@ export const TableOptions = ({ control }: TableOptionsProps) => {
   )
 
   const { fields, append, remove } = useFieldArray({ control, name: 'tableOptions' })
+  const publicationTableIds = new Set(publicationTables.map(({ id }) => id))
+  const publicationTablesById = new Map(publicationTables.map((table) => [table.id, table]))
+  const configuredTables =
+    selectedPublication?.config.type === 'tables' ? selectedPublication.config.tables : []
+  const configuredTablesById = new Map(configuredTables.map((table) => [table.id, table]))
+  const unavailableTableOptions = isPublicationSuccess
+    ? fields
+        .map((field, index) => ({ field, index }))
+        .filter(({ field }) => !publicationTableIds.has(field.tableId))
+    : []
+  const tablesNeedingPartitionAncestry = new Set(
+    fields.flatMap(({ tableId }) => {
+      if (!publicationTableIds.has(tableId) || configuredTablesById.has(tableId)) return []
+      const parentId = publicationTablesById.get(tableId)?.partition_parent_id
+      return parentId !== null && parentId !== undefined && !configuredTablesById.has(parentId)
+        ? [tableId]
+        : []
+    })
+  )
+  const needsPartitionAncestry = tablesNeedingPartitionAncestry.size > 0
+  const { data: sourceTables = [], isPending: isSourceTablesPending } = useReplicationTablesQuery(
+    { projectRef, sourceId },
+    {
+      enabled: unavailableTableOptions.length > 0 || needsPartitionAncestry,
+      staleTime: 5 * 60 * 1000,
+    }
+  )
+  const sourceTablesById = new Map(sourceTables.map((table) => [table.id, table]))
+  const knownSourceTablesById = new Map(
+    [...publicationTables, ...sourceTables].map((table) => [table.id, table])
+  )
 
   if (!publicationName) {
     return <p className="text-sm text-foreground-lighter">Select a publication first.</p>
@@ -283,11 +434,25 @@ export const TableOptions = ({ control }: TableOptionsProps) => {
     return <GenericSelectionSkeletonLoader className="-mx-2 w-auto" />
   }
 
+  if (isPublicationError) {
+    return (
+      <p className="text-sm text-warning-600">
+        The configured table settings could not be verified against the publication.
+      </p>
+    )
+  }
+
   return (
     <div className="flex flex-col gap-y-3">
       {publicationTables.map((table) => {
         const index = fields.findIndex((field) => field.tableId === table.id)
         const isChecked = index !== -1
+        const publishedColumnNames =
+          selectedPublication?.config.type === 'tables'
+            ? resolvePublishedColumnNames(table.id, configuredTablesById, knownSourceTablesById)
+            : undefined
+        const publicationColumnsPending =
+          tablesNeedingPartitionAncestry.has(table.id) && isSourceTablesPending
 
         return (
           <div key={table.id} className="flex flex-col gap-y-3">
@@ -304,10 +469,44 @@ export const TableOptions = ({ control }: TableOptionsProps) => {
               />
               {tableLabel(table)}
             </label>
-            {isChecked && <TableOptionRow control={control} index={index} tableId={table.id} />}
+            {isChecked && (
+              <TableOptionRow
+                control={control}
+                index={index}
+                publicationColumnsError={
+                  selectedPublication?.config.type === 'tables' &&
+                  publishedColumnNames === null &&
+                  !publicationColumnsPending
+                }
+                publicationColumnsPending={publicationColumnsPending}
+                publishedColumnNames={publishedColumnNames ?? undefined}
+                tableId={table.id}
+              />
+            )}
           </div>
         )
       })}
+
+      {unavailableTableOptions.map(({ field, index }) => {
+        const sourceTable = sourceTablesById.get(field.tableId)
+
+        return (
+          <div key={field.id} className="flex flex-col gap-y-3">
+            <label className="flex items-center gap-x-2 text-sm">
+              <Checkbox checked onCheckedChange={(checked) => !checked && remove(index)} />
+              <span className="text-destructive-600">
+                {sourceTable ? tableLabel(sourceTable) : 'Previously configured table'}
+              </span>
+            </label>
+          </div>
+        )
+      })}
+
+      {unavailableTableOptions.length > 0 && (
+        <p className="text-sm text-destructive-600">
+          Some tables are no longer in the publication.
+        </p>
+      )}
     </div>
   )
 }
