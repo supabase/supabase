@@ -34,8 +34,9 @@ const multipoolerSchema = z.object({
   // omitted from JSON. There is no dedicated failure member — QUARANTINED is the
   // terminal failure state (the pooler gave up recovering, e.g. a failed
   // pg_rewind or backup restore, and is kept alive for forensics) and SHUTDOWN is
-  // "durably down". `getPoolerStatus` maps every member; an unrecognized value
-  // falls through to the `servingStatus` check.
+  // "durably down". `getPoolerStatus` maps every member. An unrecognized value
+  // (a future enum member) falls through to the `servingStatus` check, and since
+  // SERVING is that enum's zero value it usually renders as Healthy until mapped.
   lifecycleStatus: z.object({ status: z.string().optional() }).optional(),
   routingState: z
     .object({

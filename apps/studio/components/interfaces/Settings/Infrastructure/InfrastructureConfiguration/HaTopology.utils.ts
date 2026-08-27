@@ -71,8 +71,8 @@ export const getPoolerStatus = (pooler: Multipooler): HaPoolerStatus => {
 // Labels are drawn from the read replica status vocabulary (`getStatusLabel` in
 // ReadReplicas.utils.ts) so both surfaces read the same way, but they are only a
 // subset of it. The read replica labels also cover 'Failed', 'Restarting',
-// 'Resizing' and 'Restoring'; the multipooler lifecycle enum has no equivalents —
-// its only failure state, QUARANTINED, is surfaced as 'Unhealthy' alongside
+// 'Resizing' and 'Restoring', which have no one-to-one lifecycle equivalents;
+// the closest to 'Failed' is QUARANTINED, surfaced as 'Unhealthy' alongside
 // SHUTDOWN.
 export const HA_POOLER_STATUS_LABELS: Record<HaPoolerStatus, string> = {
   healthy: 'Healthy',
