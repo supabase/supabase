@@ -28,6 +28,7 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE: 'supabase-ui-sql-editor-manual-save',
   UI_PREVIEW_MARKETPLACE: 'supabase-ui-marketplace',
   UI_PREVIEW_DATABASE_CONNECTIONS: 'preview-database-connections',
+  UI_PREVIEW_EXPLORER: 'preview-explorer',
 
   AI_ASSISTANT_MCP_OPT_IN: 'ai-assistant-mcp-opt-in',
 

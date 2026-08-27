@@ -1,11 +1,14 @@
 import { BaseEdge, EdgeLabelRenderer, getSmoothStepPath, type EdgeProps } from '@xyflow/react'
-import { useParams } from 'common'
-import { ArrowRight, Loader2, Square, X, type LucideIcon } from 'lucide-react'
+import { useParams, useReducedMotion } from 'common'
 import { useMemo } from 'react'
-import { cn } from 'ui'
 
 import { getStatusName } from '../Pipeline.utils'
 import { STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
+import {
+  EdgeVisualChip,
+  getEdgeVisual,
+  type ReplicationState,
+} from '@/components/ui/ReactFlow/EdgeVisual'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import {
@@ -17,67 +20,6 @@ type EdgeData = {
   type: string
   identifier: string
   shiftEdgeEnd: boolean
-}
-
-interface ReplicationState {
-  isComingUp: boolean
-  isReplicating: boolean
-  isFailed: boolean
-}
-
-interface EdgeVisual {
-  Icon: LucideIcon
-  // CSS color shared by the icon and the connecting line so they always match.
-  color: string
-  opacity: number
-  dashArray: string
-  shouldAnimate: boolean
-  shouldSpin?: boolean
-  isFilled?: boolean
-  strokeWidth?: number
-}
-
-// Picks the icon + line appearance for a replication state. Both the icon and the line are derived
-// here from the same state so they always stay in sync. We deliberately don't surface lag: the line
-// just communicates whether data is moving, stopped, starting, or broken.
-const getEdgeVisual = ({ isComingUp, isReplicating, isFailed }: ReplicationState): EdgeVisual => {
-  if (isFailed) {
-    return {
-      Icon: X,
-      color: 'hsl(var(--destructive-default))',
-      opacity: 1,
-      dashArray: '5 5',
-      shouldAnimate: false,
-      strokeWidth: 4,
-    }
-  }
-  if (isComingUp) {
-    return {
-      Icon: Loader2,
-      color: 'var(--foreground-light)',
-      opacity: 1,
-      dashArray: '5',
-      shouldAnimate: true,
-      shouldSpin: true,
-    }
-  }
-  if (isReplicating) {
-    return {
-      Icon: ArrowRight,
-      color: 'hsl(var(--brand-default))',
-      opacity: 1,
-      dashArray: '5',
-      shouldAnimate: true,
-    }
-  }
-  return {
-    Icon: Square,
-    color: 'var(--foreground-lighter)',
-    opacity: 0.5,
-    dashArray: '5 5',
-    shouldAnimate: false,
-    isFilled: true,
-  }
 }
 
 export const SmoothstepEdge = ({
@@ -92,6 +34,7 @@ export const SmoothstepEdge = ({
   data,
 }: EdgeProps) => {
   const { ref: projectRef = 'default' } = useParams()
+  const prefersReducedMotion = useReducedMotion()
   const { identifier, shiftEdgeEnd } = (data || {}) as EdgeData
 
   const { data: pipelinesData } = useReplicationPipelinesQuery({ projectRef })
@@ -126,16 +69,7 @@ export const SmoothstepEdge = ({
     targetPosition,
   })
 
-  const {
-    Icon,
-    color,
-    opacity,
-    dashArray,
-    shouldAnimate,
-    shouldSpin,
-    isFilled,
-    strokeWidth = 2,
-  } = getEdgeVisual(replicationState)
+  const visual = getEdgeVisual(replicationState)
 
   return (
     <>
@@ -144,11 +78,14 @@ export const SmoothstepEdge = ({
         markerEnd={markerEnd}
         style={{
           ...style,
-          stroke: color,
-          strokeWidth,
-          opacity,
-          strokeDasharray: dashArray,
-          animation: shouldAnimate ? 'dashdraw 0.5s linear infinite' : undefined,
+          stroke: visual.color,
+          strokeWidth: visual.strokeWidth,
+          opacity: visual.opacity,
+          strokeDasharray: visual.dashArray,
+          animation:
+            visual.shouldAnimate && !prefersReducedMotion
+              ? 'dashdraw 0.5s linear infinite'
+              : undefined,
         }}
       />
       <EdgeLabelRenderer>
@@ -160,18 +97,7 @@ export const SmoothstepEdge = ({
           }}
           className="nodrag nopan"
         >
-          <div
-            className={cn(
-              'w-6 h-6 rounded-full flex items-center justify-center border bg-surface-100'
-            )}
-            style={{ borderColor: color }}
-          >
-            <Icon
-              size={14}
-              className={cn(shouldSpin && 'animate-spin')}
-              style={{ color, fill: isFilled ? color : undefined }}
-            />
-          </div>
+          <EdgeVisualChip visual={visual} />
         </div>
       </EdgeLabelRenderer>
     </>

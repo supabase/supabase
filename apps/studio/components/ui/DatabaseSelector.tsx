@@ -1,8 +1,6 @@
 import { useParams } from 'common'
 import { noop } from 'lodash'
 import { Check, ChevronDown, Loader2, Plus } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import {
@@ -28,6 +26,7 @@ import {
   getInfrastructurePath,
 } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'
+import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from '@/data/read-replicas/replicas.utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -55,7 +54,6 @@ export const DatabaseSelector = ({
   className,
   isForm = false,
 }: DatabaseSelectorProps) => {
-  const router = useRouter()
   const { ref: projectRef } = useParams()
   const [open, setOpen] = useState(false)
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
@@ -220,27 +218,17 @@ export const DatabaseSelector = ({
 
             {IS_PLATFORM && infrastructureReadReplicas && (
               <CommandGroup className="border-t">
-                <CommandItem
-                  className="cursor-pointer w-full"
+                <CommandItemLink
+                  href={newReplicaURL}
+                  className="cursor-pointer w-full gap-2"
                   onSelect={() => {
                     setOpen(false)
-                    router.push(newReplicaURL)
+                    setShowConnect(false)
                   }}
-                  onClick={() => setOpen(false)}
                 >
-                  <Link
-                    href={newReplicaURL}
-                    onClick={async () => {
-                      setOpen(false)
-                      // [Joshen] This is used in the Connect UI which is available across all pages
-                      setShowConnect(false)
-                    }}
-                    className="w-full flex items-center gap-2"
-                  >
-                    <Plus size={14} strokeWidth={1.5} />
-                    <p>Create a new read replica</p>
-                  </Link>
-                </CommandItem>
+                  <Plus size={14} strokeWidth={1.5} />
+                  <p>Create a new read replica</p>
+                </CommandItemLink>
               </CommandGroup>
             )}
           </CommandList>
