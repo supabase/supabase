@@ -229,7 +229,7 @@ export const WorkerOverviewTab = ({ worker }: WorkerOverviewTabProps) => {
               access: worker.access,
               instances: worker.declaredInstances,
             }}
-            tabs={['curl', 'js', 'python']}
+            tabs={['cli', 'js', 'python']}
           />
         </PageSectionContent>
       </PageSection>
