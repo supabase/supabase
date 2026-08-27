@@ -1,6 +1,7 @@
 export type ExposedEntityStatus = 'granted' | 'revoked' | 'custom'
 
 type ExposedEntityStatusItem = {
+  schema?: string
   name: string
   status: ExposedEntityStatus
 }
@@ -22,7 +23,13 @@ export type FilteredDocsEntities<T> = {
  * Fails open: when the grant statuses haven't loaded (or errored), all spec
  * entities are returned so the docs are never blanked out.
  */
-export function partitionExposedDocsEntities<T extends { name: string }>(
+function getQualifiedEntityKey(entity: { schema?: string; name: string }) {
+  return entity.schema && entity.schema !== 'public'
+    ? `${entity.schema}.${entity.name}`
+    : entity.name
+}
+
+export function partitionExposedDocsEntities<T extends { name: string; schema?: string }>(
   specEntities: T[],
   exposedStatuses: ExposedEntityStatusItem[] | undefined
 ): FilteredDocsEntities<T> {
@@ -32,18 +39,20 @@ export function partitionExposedDocsEntities<T extends { name: string }>(
 
   const accessibleNames = new Set<string>()
   const revokedNames = new Set<string>()
-  for (const { name, status } of exposedStatuses) {
-    if (status === 'revoked') {
-      revokedNames.add(name)
+  for (const item of exposedStatuses) {
+    const key = getQualifiedEntityKey(item)
+    if (item.status === 'revoked') {
+      revokedNames.add(key)
     } else {
-      accessibleNames.add(name)
+      accessibleNames.add(key)
     }
   }
 
   const visibleEntities: T[] = []
   let excludedCount = 0
   for (const entity of specEntities) {
-    const isExcluded = revokedNames.has(entity.name) && !accessibleNames.has(entity.name)
+    const key = getQualifiedEntityKey(entity)
+    const isExcluded = revokedNames.has(key) && !accessibleNames.has(key)
     if (isExcluded) {
       excludedCount += 1
     } else {
