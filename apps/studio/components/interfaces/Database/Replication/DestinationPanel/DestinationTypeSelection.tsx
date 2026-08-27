@@ -21,7 +21,6 @@ import {
 } from '../useIsETLPrivateAlpha'
 import { DestinationType } from './DestinationPanel.types'
 import { ReadReplicasMovedCallout } from './ReadReplicasMovedCallout'
-import { InlineLink } from '@/components/ui/InlineLink'
 
 interface DestinationTypeOption {
   value: DestinationType
@@ -117,23 +116,13 @@ export const DestinationTypeSelection = () => {
   const selectedOption = options.find((option) => option.value === destinationType)
 
   const stageDescription =
-    selectedOption?.stage === 'Public Alpha' ? (
-      <>
-        In public alpha and may change.{' '}
-        <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
-          Leave feedback
-        </InlineLink>
-      </>
-    ) : selectedOption?.stage === 'Early Access' ? (
-      <>
-        In early access and may change.{' '}
-        <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
-          Leave feedback
-        </InlineLink>
-      </>
-    ) : selectedOption?.stage === 'Deprecated' ? (
-      'This destination type is deprecated.'
-    ) : null
+    selectedOption?.stage === 'Public Alpha'
+      ? 'In public alpha and may change.'
+      : selectedOption?.stage === 'Early Access'
+        ? 'In early access and may change.'
+        : selectedOption?.stage === 'Deprecated'
+          ? 'This destination type is deprecated.'
+          : null
 
   const typeDescription =
     !editMode || stageDescription ? (
