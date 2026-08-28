@@ -96,7 +96,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     messages: rawMessages,
     projectRef,
     connectionString,
-    orgSlug,
+    orgSlug: rawOrgSlug,
     chatId,
     chatName,
     model: rawRequestedModel,
@@ -126,6 +126,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
   let projectIsSensitive: boolean | null | undefined
   let projectRegion: string | undefined
   let orgId: number | undefined
+  let orgSlug: string | undefined
   let planId: string | undefined
 
   if (!IS_PLATFORM) {
@@ -133,14 +134,15 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     hasAccessToAdvanceModel = true
   }
 
-  if (IS_PLATFORM && orgSlug && authorization && projectRef) {
+  if (IS_PLATFORM && rawOrgSlug && authorization && projectRef) {
     try {
-      const aiDetails = await getAIDetails({ orgSlug, projectRef, authorization })
+      const aiDetails = await getAIDetails({ orgSlug: rawOrgSlug, projectRef, authorization })
 
       aiOptInLevel = aiDetails.aiOptInLevel
       hasAccessToAdvanceModel = aiDetails.hasAccessToAdvanceModel
       orgHasHipaaAddon = aiDetails.hasHipaaAddon
       orgId = aiDetails.orgId
+      orgSlug = aiDetails.orgSlug
       planId = aiDetails.planId
       projectIsSensitive = aiDetails.isSensitive
       projectRegion = aiDetails.region
@@ -234,6 +236,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       supportMode,
       userId,
       orgId,
+      orgSlug,
       planId,
       includesLogsSnippets,
       isExplorerEnabled: explorerEnabled,
