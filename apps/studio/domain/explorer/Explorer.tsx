@@ -1,7 +1,10 @@
 import { ExplorerSidebar } from './ExplorerSidebar'
 import { ExplorerTabs } from './ExplorerTabs'
+import { useSyncProjectRef } from '@/domain/project/project.hooks'
 
 export const Explorer = () => {
+  useSyncProjectRef()
+
   return (
     <div className="flex h-full">
       <ExplorerSidebar />

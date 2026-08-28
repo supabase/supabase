@@ -10,7 +10,7 @@ import type { NotebookSummary } from '../notebooks/notebook.schema'
 import { notebooksAtoms } from '../notebooks/notebooks.atoms'
 import { explorerTabs } from './explorer.tabs'
 import { useLoadMoreOnIntersect } from './useLoadMoreOnIntersect'
-import { useProjectRef } from '@/domain/project/project.hooks'
+import { withProjectRef } from '@/domain/project/withProjectRef'
 
 const NotebooksSkeleton = () => (
   <div className="flex flex-col gap-y-2 px-2 py-1" data-testid="notebooks-skeleton">
@@ -41,8 +41,7 @@ const NotebookListItem = ({ notebook }: { notebook: NotebookSummary }) => {
   )
 }
 
-export const ExplorerSidebar = () => {
-  const projectRef = useProjectRef()
+const ExplorerSidebarInner = ({ projectRef }: { projectRef: string }) => {
   const registry = useContext(RegistryContext)
 
   const scrollRootRef = useRef<HTMLDivElement | null>(null)
@@ -98,3 +97,14 @@ export const ExplorerSidebar = () => {
     </aside>
   )
 }
+
+const ExplorerSidebarFallback = (
+  <aside
+    aria-label="Notebooks"
+    className="flex h-full w-64 shrink-0 flex-col items-center justify-center border-r bg-surface-100 p-4"
+  >
+    <p className="text-center text-xs text-foreground-lighter">No active project</p>
+  </aside>
+)
+
+export const ExplorerSidebar = withProjectRef(ExplorerSidebarInner, ExplorerSidebarFallback)
