@@ -5280,8 +5280,6 @@ export interface components {
         postal_code?: string | null
         state?: string | null
       }
-      /** @enum {string} */
-      indirect_tax_registration_declaration?: 'yes' | 'no'
       billing_name?: string
       /** @enum {boolean} */
       clear_tax_id?: true
@@ -9294,7 +9292,6 @@ export interface components {
       } | null
       /** @enum {string|null} */
       restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
-      requires_indirect_tax_declaration: boolean
       slug: string
       stripe_customer_id: string | null
       subscription_id: string | null
@@ -18071,7 +18068,6 @@ export interface operations {
                   [key: string]: string
                 } | null
                 restriction_status: ('grace_period' | 'grace_period_over' | 'restricted') | null
-                requires_indirect_tax_declaration: boolean
                 slug: string
                 stripe_customer_id: string | null
                 subscription_id: string | null
@@ -22430,7 +22426,6 @@ export interface operations {
                   [key: string]: string
                 } | null
                 restriction_status: ('grace_period' | 'grace_period_over' | 'restricted') | null
-                requires_indirect_tax_declaration: boolean
                 slug: string
                 stripe_customer_id: string | null
                 subscription_id: string | null
