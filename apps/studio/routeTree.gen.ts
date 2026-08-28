@@ -65,6 +65,7 @@ import { Route as ProjectRefMergeRouteImport } from './routes/project/$ref/merge
 import { Route as ProjectRefLogsRouteImport } from './routes/project/$ref/logs'
 import { Route as ProjectRefIntegrationsRouteImport } from './routes/project/$ref/integrations'
 import { Route as ProjectRefFunctionsRouteImport } from './routes/project/$ref/functions'
+import { Route as ProjectRefExplorerTestRouteImport } from './routes/project/$ref/explorer-test'
 import { Route as ProjectRefExplorerRouteImport } from './routes/project/$ref/explorer'
 import { Route as ProjectRefEditorRouteImport } from './routes/project/$ref/editor'
 import { Route as ProjectRefDatabaseRouteImport } from './routes/project/$ref/database'
@@ -607,6 +608,11 @@ const ProjectRefIntegrationsRoute = ProjectRefIntegrationsRouteImport.update({
 const ProjectRefFunctionsRoute = ProjectRefFunctionsRouteImport.update({
   id: '/functions',
   path: '/functions',
+  getParentRoute: () => ProjectRefRoute,
+} as any)
+const ProjectRefExplorerTestRoute = ProjectRefExplorerTestRouteImport.update({
+  id: '/explorer-test',
+  path: '/explorer-test',
   getParentRoute: () => ProjectRefRoute,
 } as any)
 const ProjectRefExplorerRoute = ProjectRefExplorerRouteImport.update({
@@ -2153,6 +2159,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
   '/project/$ref/editor': typeof ProjectRefEditorRouteWithChildren
   '/project/$ref/explorer': typeof ProjectRefExplorerRouteWithChildren
+  '/project/$ref/explorer-test': typeof ProjectRefExplorerTestRoute
   '/project/$ref/functions': typeof ProjectRefFunctionsRouteWithChildren
   '/project/$ref/integrations': typeof ProjectRefIntegrationsRouteWithChildren
   '/project/$ref/logs': typeof ProjectRefLogsRouteWithChildren
@@ -2464,6 +2471,7 @@ export interface FileRoutesByTo {
   '/project/$ref/advisors': typeof ProjectRefAdvisorsRouteWithChildren
   '/project/$ref/auth': typeof ProjectRefAuthRouteWithChildren
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
+  '/project/$ref/explorer-test': typeof ProjectRefExplorerTestRoute
   '/project/$ref/merge': typeof ProjectRefMergeRoute
   '/project/$ref/realtime': typeof ProjectRefRealtimeRouteWithChildren
   '/project/$ref/settings': typeof ProjectRefSettingsRouteWithChildren
@@ -2774,6 +2782,7 @@ export interface FileRoutesById {
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
   '/project/$ref/editor': typeof ProjectRefEditorRouteWithChildren
   '/project/$ref/explorer': typeof ProjectRefExplorerRouteWithChildren
+  '/project/$ref/explorer-test': typeof ProjectRefExplorerTestRoute
   '/project/$ref/functions': typeof ProjectRefFunctionsRouteWithChildren
   '/project/$ref/integrations': typeof ProjectRefIntegrationsRouteWithChildren
   '/project/$ref/logs': typeof ProjectRefLogsRouteWithChildren
@@ -3092,6 +3101,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database'
     | '/project/$ref/editor'
     | '/project/$ref/explorer'
+    | '/project/$ref/explorer-test'
     | '/project/$ref/functions'
     | '/project/$ref/integrations'
     | '/project/$ref/logs'
@@ -3403,6 +3413,7 @@ export interface FileRouteTypes {
     | '/project/$ref/advisors'
     | '/project/$ref/auth'
     | '/project/$ref/database'
+    | '/project/$ref/explorer-test'
     | '/project/$ref/merge'
     | '/project/$ref/realtime'
     | '/project/$ref/settings'
@@ -3712,6 +3723,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database'
     | '/project/$ref/editor'
     | '/project/$ref/explorer'
+    | '/project/$ref/explorer-test'
     | '/project/$ref/functions'
     | '/project/$ref/integrations'
     | '/project/$ref/logs'
@@ -4485,6 +4497,13 @@ declare module '@tanstack/react-router' {
       path: '/functions'
       fullPath: '/project/$ref/functions'
       preLoaderRoute: typeof ProjectRefFunctionsRouteImport
+      parentRoute: typeof ProjectRefRoute
+    }
+    '/project/$ref/explorer-test': {
+      id: '/project/$ref/explorer-test'
+      path: '/explorer-test'
+      fullPath: '/project/$ref/explorer-test'
+      preLoaderRoute: typeof ProjectRefExplorerTestRouteImport
       parentRoute: typeof ProjectRefRoute
     }
     '/project/$ref/explorer': {
@@ -6945,6 +6964,7 @@ interface ProjectRefRouteChildren {
   ProjectRefDatabaseRoute: typeof ProjectRefDatabaseRouteWithChildren
   ProjectRefEditorRoute: typeof ProjectRefEditorRouteWithChildren
   ProjectRefExplorerRoute: typeof ProjectRefExplorerRouteWithChildren
+  ProjectRefExplorerTestRoute: typeof ProjectRefExplorerTestRoute
   ProjectRefFunctionsRoute: typeof ProjectRefFunctionsRouteWithChildren
   ProjectRefIntegrationsRoute: typeof ProjectRefIntegrationsRouteWithChildren
   ProjectRefLogsRoute: typeof ProjectRefLogsRouteWithChildren
@@ -6966,6 +6986,7 @@ const ProjectRefRouteChildren: ProjectRefRouteChildren = {
   ProjectRefDatabaseRoute: ProjectRefDatabaseRouteWithChildren,
   ProjectRefEditorRoute: ProjectRefEditorRouteWithChildren,
   ProjectRefExplorerRoute: ProjectRefExplorerRouteWithChildren,
+  ProjectRefExplorerTestRoute: ProjectRefExplorerTestRoute,
   ProjectRefFunctionsRoute: ProjectRefFunctionsRouteWithChildren,
   ProjectRefIntegrationsRoute: ProjectRefIntegrationsRouteWithChildren,
   ProjectRefLogsRoute: ProjectRefLogsRouteWithChildren,
