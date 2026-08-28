@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS, safeLocalStorage, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { SqlEditor } from 'icons'
 import { usePathname, useRouter } from 'next/navigation'
 import { ComponentProps, ReactNode } from 'react'
@@ -87,12 +87,12 @@ export const EditorBaseLayout = ({
 const BackToExplorerButton = () => {
   const { ref } = useParams()
   const router = useRouter()
-  const [isTemporary] = useLocalStorageQuery(
+  const [isTemporary, setIsTemporary] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_TEMPORARY_FROM_EXPLORER(ref ?? ''),
     false
   )
 
-  if (!isTemporary) return null
+  if (!ref || !isTemporary) return null
 
   return (
     <ButtonTooltip
@@ -102,9 +102,7 @@ const BackToExplorerButton = () => {
       icon={<SqlEditor size={14} strokeWidth={1.5} />}
       tooltip={{ content: { side: 'bottom', text: 'Back to Explorer' } }}
       onClick={() => {
-        safeLocalStorage.removeItem(
-          LOCAL_STORAGE_KEYS.SQL_EDITOR_TEMPORARY_FROM_EXPLORER(ref ?? '')
-        )
+        setIsTemporary(false)
         router.push(`/project/${ref}/explorer`)
       }}
     />

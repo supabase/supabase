@@ -42,9 +42,19 @@ export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayout
 }
 
 export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayoutProps) => {
+  const { ref } = useParams()
   const tabs = useTabsStateSnapshot()
 
   const [section, setSection] = useState<ExplorerResourceType>()
+
+  const [, setIsTemporarySqlEditorVisit] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_TEMPORARY_FROM_EXPLORER(ref ?? ''),
+    false
+  )
+
+  useEffect(() => {
+    if (ref) setIsTemporarySqlEditorVisit(false)
+  }, [ref, setIsTemporarySqlEditorVisit])
 
   const activeTab = tabs.activeTab ? tabs.tabsMap[tabs.activeTab] : undefined
   const isActiveExplorerTab =
@@ -100,6 +110,8 @@ const BackToSqlEditorButton = () => {
     LOCAL_STORAGE_KEYS.SQL_EDITOR_TEMPORARY_FROM_EXPLORER(ref ?? ''),
     false
   )
+
+  if (!ref) return null
 
   return (
     <ButtonTooltip
