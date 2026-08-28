@@ -73,11 +73,11 @@ Enabling `log_statement=all`, or setting `log_min_duration_statement` to a low o
 - **`NOTICE`** — informational messages that might be helpful to a user, such as a notice that a long identifier got truncated.
 - **`WARNING`** — a warning about a likely problem, such as running COMMIT outside a transaction block.
 - **`ERROR`** — reports an error that aborted the current command, but the session keeps running.
-- **`LOG`** — information of interest to administrators, such as checkpoint activity (note: ranked between ERROR and FATAL for log_min_messages, unlike its position for client_min_messages).
-- **`FATAL`** — reports an error serious enough to abort the entire session, not just the current command.
-- **`PANIC`** — reports an error serious enough to abort every session on the database, i.e., a crash.
+- **`LOG`** — information of interest to administrators, such as checkpoint activity. It's ranked between `ERROR` and `FATAL` for `log_min_messages`, unlike its position for `client_min_messages`.
+- **`FATAL`** — reports an error serious enough to abort the entire session, not only the current command.
+- **`PANIC`** — reports an error serious enough to abort every session on the database, that is, a crash.
 
-Note: Each level includes everything after it in the above list, so setting log_min_messages to `WARNING` also logs `ERROR`, `LOG`, `FATAL`, and `PANIC` — just not `NOTICE` or anything above it in the list.
+Each level includes everything that comes after it in this list, so setting `log_min_messages` to `WARNING` also logs `ERROR`, `LOG`, `FATAL`, and `PANIC`, but not `NOTICE` or anything earlier in the list.
 
 ### Settings you can generally leave alone
 
