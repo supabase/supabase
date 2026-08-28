@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { Check, ChevronsUpDown, Loader2, Plus } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useId, useState } from 'react'
 import { ControllerRenderProps } from 'react-hook-form'
 import {
   Badge,
@@ -35,10 +35,8 @@ export const PublicationsComboBox = ({
   onNewPublicationClick,
 }: PublicationsComboBoxProps) => {
   const { ref: projectRef } = useParams()
-
-  const [searchTerm, setSearchTerm] = useState('')
+  const listboxId = useId()
   const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [selectedPublication, setSelectedPublication] = useState<string>(field?.value || '')
 
   const {
     data: publications = [],
@@ -48,16 +46,12 @@ export const PublicationsComboBox = ({
   } = useReplicationPublicationsQuery({ projectRef, sourceId })
   const isLoadingPublications = isPending || isFetching
   const showLoadingState = isLoadingPublications && publications.length === 0
+  const selectedPublication = field.value ?? ''
 
-  function handlePublicationSelect(pub: string) {
-    setSelectedPublication(pub)
+  const handlePublicationSelect = (publicationName: string) => {
     setDropdownOpen(false)
-    field.onChange(pub)
+    field.onChange(publicationName)
   }
-
-  useEffect(() => {
-    setSelectedPublication(field?.value || '')
-  }, [field?.value])
 
   return (
     <Popover
@@ -71,7 +65,7 @@ export const PublicationsComboBox = ({
           }
         }
 
-        if (!open && field?.onBlur) {
+        if (!open) {
           field.onBlur()
         }
       }}
@@ -79,26 +73,30 @@ export const PublicationsComboBox = ({
       <PopoverTrigger asChild>
         <Button
           variant="default"
-          size="medium"
+          size="small"
+          role="combobox"
+          aria-expanded={dropdownOpen}
+          aria-controls={listboxId}
           className={cn(
-            'w-full [&>span]:w-full text-left',
+            'w-full justify-between [&>span]:w-full text-left',
             !selectedPublication && 'text-foreground-muted'
           )}
-          iconRight={showLoadingState ? <Loader2 className="animate-spin" /> : <ChevronsUpDown />}
           name={field.name}
           onBlur={field.onBlur}
+          iconRight={
+            showLoadingState ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" strokeWidth={1} />
+            )
+          }
         >
           {selectedPublication || 'Select publication'}
         </Button>
       </PopoverTrigger>
-      <PopoverContent sameWidthAsTrigger className="p-0" align="start">
+      <PopoverContent id={listboxId} sameWidthAsTrigger className="p-0" align="start">
         <Command>
-          <CommandInput
-            placeholder="Find publication..."
-            className="text-xs"
-            value={searchTerm}
-            onValueChange={setSearchTerm}
-          />
+          <CommandInput placeholder="Find publication..." className="text-xs" />
           <CommandList>
             <CommandEmpty>No publications found</CommandEmpty>
 
@@ -122,11 +120,9 @@ export const PublicationsComboBox = ({
                 {publications.map((pub) => (
                   <CommandItem
                     key={pub.name}
+                    value={pub.name}
                     className="cursor-pointer flex items-center justify-between space-x-2 w-full"
                     onSelect={() => {
-                      handlePublicationSelect(pub.name)
-                    }}
-                    onClick={() => {
                       handlePublicationSelect(pub.name)
                     }}
                   >
@@ -138,9 +134,14 @@ export const PublicationsComboBox = ({
                       >
                         {pub.tables.length} {pub.tables.length === 1 ? 'table' : 'tables'}
                       </Badge>
-                      {selectedPublication === pub.name && (
-                        <Check className="text-brand" strokeWidth={2} size={13} />
-                      )}
+                      <Check
+                        className={cn(
+                          'text-brand',
+                          selectedPublication === pub.name ? 'opacity-100' : 'opacity-0'
+                        )}
+                        strokeWidth={2}
+                        size={13}
+                      />
                     </div>
                   </CommandItem>
                 ))}
@@ -152,8 +153,11 @@ export const PublicationsComboBox = ({
             <CommandGroup>
               <CommandItem
                 className="cursor-pointer w-full"
-                onSelect={onNewPublicationClick}
-                onClick={onNewPublicationClick}
+                value="new-publication"
+                onSelect={() => {
+                  setDropdownOpen(false)
+                  onNewPublicationClick()
+                }}
               >
                 <Plus size={14} strokeWidth={1.5} className="mr-2" />
                 <p>New publication</p>
