@@ -1,13 +1,26 @@
 import { useParams } from 'common'
-import { Loader2, Plus } from 'lucide-react'
+import { Check, Loader2, Plus } from 'lucide-react'
+import { useId, useState } from 'react'
 import { ControllerRenderProps } from 'react-hook-form'
-import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger } from 'ui'
+import {
+  cn,
+  ComboboxTrigger,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  ScrollArea,
+} from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
-
-const CREATE_PUBLICATION_VALUE = '__create_publication__'
 
 interface PublicationSelectProps {
   sourceId?: number
@@ -21,6 +34,8 @@ export const PublicationSelect = ({
   onNewPublicationClick,
 }: PublicationSelectProps) => {
   const { ref: projectRef } = useParams()
+  const listboxId = useId()
+  const [open, setOpen] = useState(false)
   const selectedPublication = field.value ?? ''
 
   const {
@@ -32,73 +47,121 @@ export const PublicationSelect = ({
   const isLoadingPublications = isPending || isFetching
   const showLoadingState = isLoadingPublications && publications.length === 0
 
-  return (
-    <Select
-      value={selectedPublication || undefined}
-      onValueChange={(value) => {
-        if (value === CREATE_PUBLICATION_VALUE) {
-          onNewPublicationClick()
-          return
-        }
+  const handlePublicationSelect = (publicationName: string) => {
+    setOpen(false)
+    field.onChange(publicationName)
+  }
 
-        field.onChange(value)
-      }}
-      onOpenChange={(open) => {
-        if (open) {
+  return (
+    <Popover
+      modal={false}
+      open={open}
+      onOpenChange={(nextOpen) => {
+        setOpen(nextOpen)
+        if (nextOpen) {
           if (typeof projectRef !== 'undefined' && typeof sourceId !== 'undefined') {
             refetchPublications()
           }
         }
 
-        if (!open) {
+        if (!nextOpen) {
           field.onBlur()
         }
       }}
     >
-      <SelectTrigger name={field.name} disabled={showLoadingState}>
-        {showLoadingState ? (
-          <span className="flex items-center gap-2 text-foreground-lighter">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Loading publications...
-          </span>
-        ) : (
-          selectedPublication || 'Select publication'
-        )}
-      </SelectTrigger>
-      <SelectContent>
-        {showLoadingState ? (
-          <div className="p-2">
-            <GenericSkeletonLoader className="w-full" />
-          </div>
-        ) : (
-          <>
-            {publications.length === 0 ? (
-              <div className="text-foreground-lighter text-xs py-3 px-2 space-y-0.5">
-                <p>No publications available</p>
-                <p className="text-foreground-muted">Publications with no tables are hidden</p>
+      <PopoverTrigger asChild>
+        <ComboboxTrigger
+          aria-expanded={open}
+          aria-controls={listboxId}
+          data-state={open ? 'open' : 'closed'}
+          disabled={showLoadingState}
+          name={field.name}
+          onBlur={field.onBlur}
+          className={cn(!selectedPublication && !showLoadingState && 'text-foreground-lighter')}
+          icon={
+            showLoadingState ? (
+              <Loader2 className="h-4 w-4 shrink-0 animate-spin text-foreground-lighter" />
+            ) : undefined
+          }
+        >
+          {showLoadingState
+            ? 'Loading publications...'
+            : selectedPublication || 'Select publication'}
+        </ComboboxTrigger>
+      </PopoverTrigger>
+      <PopoverContent id={listboxId} sameWidthAsTrigger className="p-0" align="start">
+        <Command>
+          <CommandInput placeholder="Find publication..." className="text-xs" />
+          <CommandList>
+            <CommandEmpty>No publications found</CommandEmpty>
+
+            {showLoadingState ? (
+              <div className="p-2">
+                <GenericSkeletonLoader className="w-full" />
               </div>
             ) : (
-              publications.map((pub) => (
-                <SelectItem key={pub.name} value={pub.name} className="[&>span]:top-2.5">
-                  <p>{pub.name}</p>
-                  <p className="text-foreground-lighter">
-                    {pub.tables.length} {pub.tables.length === 1 ? 'table' : 'tables'}
-                  </p>
-                </SelectItem>
-              ))
+              <>
+                {publications.length === 0 ? (
+                  <div className="text-foreground-lighter text-xs py-3 px-2 space-y-0.5">
+                    <p>No publications available</p>
+                    <p className="text-foreground-muted">Publications with no tables are hidden</p>
+                  </div>
+                ) : (
+                  <CommandGroup>
+                    <ScrollArea
+                      className={publications.length > 7 ? 'h-[210px]' : ''}
+                      onWheel={(event) => event.stopPropagation()}
+                    >
+                      {publications.map((pub) => (
+                        <CommandItem
+                          key={pub.name}
+                          value={pub.name}
+                          className="cursor-pointer [&>span]:top-2.5"
+                          onSelect={() => {
+                            handlePublicationSelect(pub.name)
+                          }}
+                        >
+                          <div className="flex w-full items-start justify-between gap-2">
+                            <div className="min-w-0">
+                              <p>{pub.name}</p>
+                              <p className="text-foreground-lighter">
+                                {pub.tables.length} {pub.tables.length === 1 ? 'table' : 'tables'}
+                              </p>
+                            </div>
+                            <Check
+                              className={cn(
+                                'mt-0.5 h-4 w-4 shrink-0 text-brand',
+                                selectedPublication === pub.name ? 'opacity-100' : 'opacity-0'
+                              )}
+                              strokeWidth={2}
+                            />
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </ScrollArea>
+                  </CommandGroup>
+                )}
+
+                <CommandSeparator />
+
+                <CommandGroup>
+                  <CommandItem
+                    value="new-publication"
+                    className="cursor-pointer"
+                    onSelect={() => {
+                      setOpen(false)
+                      onNewPublicationClick()
+                    }}
+                  >
+                    <Plus size={14} strokeWidth={1.5} className="mr-2" />
+                    New publication
+                  </CommandItem>
+                </CommandGroup>
+              </>
             )}
-
-            <SelectSeparator />
-
-            <SelectItem value={CREATE_PUBLICATION_VALUE} className="[&>span]:top-2.5">
-              <p className="flex items-center gap-2">
-                <Plus size={14} strokeWidth={1.5} />
-                New publication
-              </p>
-            </SelectItem>
-          </>
-        )}
-      </SelectContent>
-    </Select>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }
