@@ -8,19 +8,17 @@ import { MultiSelector } from 'ui-patterns/multi-select'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 import { getPublicationTableIds } from './DestinationForm.utils'
+import {
+  getTableSyncSelectionDescription,
+  INITIAL_SYNC_FIELD_COPY,
+  INITIAL_SYNC_LABELS,
+} from './DestinationFormFieldCopy'
 import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 
 interface TableCopySelectionProps {
   form: UseFormReturn<DestinationPanelSchemaType>
   editMode: boolean
-}
-
-const INITIAL_SYNC_LABELS = {
-  include_all_tables: 'All tables',
-  skip_all_tables: 'No tables',
-  include_tables: 'Selected tables only',
-  skip_tables: 'All except selected tables',
 }
 
 const isSelectiveMode = (mode: DestinationPanelSchemaType['tableSyncCopyMode']) =>
@@ -78,8 +76,8 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
         render={({ field }) => (
           <FormItemLayout
             layout="horizontal"
-            label="Initial sync"
-            description="Choose which publication tables sync their existing rows. Ongoing replication includes new changes from every publication table, even when initial sync is skipped."
+            label={INITIAL_SYNC_FIELD_COPY.label}
+            description={INITIAL_SYNC_FIELD_COPY.description}
           >
             <FormControl>
               <Select value={field.value} onValueChange={field.onChange}>
@@ -143,11 +141,11 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
               label={
                 tableSyncCopyMode === 'skip_tables' ? 'Tables to exclude' : 'Tables to include'
               }
-              description={
-                tableSyncCopyMode === 'skip_tables'
-                  ? `${selectedPublicationCount} of ${tableCount} publication tables will skip initial sync. Ongoing replication will still include every publication table.`
-                  : `${selectedPublicationCount} of ${tableCount} publication tables will run initial sync. Ongoing replication will still include every publication table.`
-              }
+              description={getTableSyncSelectionDescription({
+                mode: tableSyncCopyMode,
+                selectedCount: selectedPublicationCount,
+                tableCount,
+              })}
             >
               <FormControl>
                 <MultiSelector

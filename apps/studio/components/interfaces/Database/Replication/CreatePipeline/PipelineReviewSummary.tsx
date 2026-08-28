@@ -1,12 +1,38 @@
 import { Pencil } from 'lucide-react'
-import { Fragment } from 'react'
+import { Fragment, type ReactNode } from 'react'
 import { Button, CardContent, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import { DestinationTypeReadonly } from '../DestinationIcon'
 import { CREATE_NEW_NAMESPACE } from '../DestinationPanel/DestinationForm/DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationPanel/DestinationForm/DestinationForm.schema'
+import {
+  ANALYTICS_BUCKET_BUCKET_FIELD_COPY,
+  ANALYTICS_BUCKET_NAMESPACE_FIELD_COPY,
+  BIGQUERY_DATASET_ID_FIELD_COPY,
+  BIGQUERY_PROJECT_ID_FIELD_COPY,
+  CLICKHOUSE_DATABASE_FIELD_COPY,
+  CLICKHOUSE_ENGINE_FIELD_COPY,
+  CLICKHOUSE_URL_FIELD_COPY,
+  DUCKLAKE_BUCKET_FIELD_COPY,
+  DUCKLAKE_CATALOG_PROJECT_FIELD_COPY,
+  DUCKLAKE_CATALOG_URL_FIELD_COPY,
+  DUCKLAKE_DATA_PATH_FIELD_COPY,
+  DUCKLAKE_STORAGE_PROJECT_FIELD_COPY,
+  getDestinationTypeCreateDescription,
+  INITIAL_SYNC_FIELD_COPY,
+  INITIAL_SYNC_LABELS,
+  PIPELINE_NAME_FIELD_COPY,
+  PUBLICATION_FIELD_COPY,
+  SNOWFLAKE_ACCOUNT_ID_FIELD_COPY,
+  SNOWFLAKE_DATABASE_FIELD_COPY,
+  SNOWFLAKE_SCHEMA_FIELD_COPY,
+} from '../DestinationPanel/DestinationForm/DestinationFormFieldCopy'
 import { DUCKLAKE_MODE_CUSTOM } from '../DestinationPanel/DestinationForm/DuckLake/DuckLake.constants'
-import { PIPELINE_REGION } from '../DestinationPanel/DestinationForm/PipelineRegionField'
+import {
+  getPipelineRegionDescription,
+  PipelineRegionReadonly,
+} from '../DestinationPanel/DestinationForm/PipelineRegionField'
 import type { PipelineCreateStepId, PipelineDestinationType } from './CreatePipelineWizard.utils'
 import {
   CONNECTION_VALIDATION_HINT,
@@ -16,19 +42,13 @@ import {
 import type { ReplicationPublication } from '@/data/replication/publications-query'
 import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 
-const INITIAL_SYNC_LABELS: Record<DestinationPanelSchemaType['tableSyncCopyMode'], string> = {
-  include_all_tables: 'All tables',
-  skip_all_tables: 'No tables',
-  include_tables: 'Selected tables only',
-  skip_tables: 'All except selected tables',
-}
-
 const tableLabel = ({ schema, name }: { schema: string; name: string }) => `${schema}.${name}`
 
 type ReviewRow = {
   label: string
-  value: string
+  value?: string
   description?: string
+  content?: ReactNode
 }
 
 type ReviewSection = {
@@ -70,9 +90,9 @@ export const PipelineReviewSummary = ({
 
   const dataRows: ReviewRow[] = [
     {
-      label: 'Publication',
+      label: PUBLICATION_FIELD_COPY.label,
       value: values.publicationName || 'None selected',
-      description: 'Tables in the selected publication will be replicated to this destination.',
+      description: PUBLICATION_FIELD_COPY.description,
     },
     {
       label: 'Publication tables',
@@ -82,13 +102,11 @@ export const PipelineReviewSummary = ({
           : publicationTables.length === 1
             ? '1 table'
             : `${publicationTables.length} tables`,
-      description: 'Tables included in the selected publication.',
     },
     {
-      label: 'Initial sync',
+      label: INITIAL_SYNC_FIELD_COPY.label,
       value: INITIAL_SYNC_LABELS[values.tableSyncCopyMode],
-      description:
-        'Choose which publication tables sync their existing rows. Ongoing replication includes new changes from every publication table, even when initial sync is skipped.',
+      description: INITIAL_SYNC_FIELD_COPY.description,
     },
   ]
 
@@ -110,8 +128,8 @@ export const PipelineReviewSummary = ({
       rows: [
         {
           label: 'Type',
-          value: type,
-          description: 'Destination type cannot be changed after creation.',
+          description: getDestinationTypeCreateDescription(type),
+          content: <DestinationTypeReadonly type={type} />,
         },
       ],
     },
@@ -119,13 +137,16 @@ export const PipelineReviewSummary = ({
       title: 'Connection',
       step: 'connection',
       rows: [
-        { label: 'Name', value: values.name?.trim() || 'Untitled pipeline' },
+        {
+          label: PIPELINE_NAME_FIELD_COPY.label,
+          value: values.name?.trim() || 'Untitled pipeline',
+          description: PIPELINE_NAME_FIELD_COPY.description,
+        },
         ...getDestinationRows(type, values, namespace),
         {
           label: 'Pipeline region',
-          value: PIPELINE_REGION.displayName,
-          description:
-            'Pipelines currently run in this region. Choose a nearby destination region where possible.',
+          description: getPipelineRegionDescription(type),
+          content: <PipelineRegionReadonly />,
         },
       ],
     },
@@ -176,7 +197,7 @@ export const PipelineReviewSummary = ({
                   label={row.label}
                   description={row.description}
                 >
-                  <Input readOnly value={row.value} />
+                  {row.content ?? <Input readOnly value={row.value ?? ''} />}
                 </FormItemLayout>
               ))}
             </CardContent>
@@ -210,14 +231,14 @@ const getDestinationRows = (
   if (type === 'BigQuery') {
     return [
       {
-        label: 'Project ID',
+        label: BIGQUERY_PROJECT_ID_FIELD_COPY.label,
         value: values.projectId || '—',
-        description: 'The Google Cloud project ID where data will be sent.',
+        description: BIGQUERY_PROJECT_ID_FIELD_COPY.description,
       },
       {
-        label: 'Dataset ID',
+        label: BIGQUERY_DATASET_ID_FIELD_COPY.label,
         value: values.datasetId || '—',
-        description: 'The BigQuery dataset where replicated tables will be created.',
+        description: BIGQUERY_DATASET_ID_FIELD_COPY.description,
       },
     ]
   }
@@ -225,14 +246,14 @@ const getDestinationRows = (
   if (type === 'Analytics Bucket') {
     return [
       {
-        label: 'Bucket',
+        label: ANALYTICS_BUCKET_BUCKET_FIELD_COPY.label,
         value: values.warehouseName || '—',
-        description: 'The Analytics Bucket where data will be stored',
+        description: ANALYTICS_BUCKET_BUCKET_FIELD_COPY.description,
       },
       {
-        label: 'Namespace',
+        label: ANALYTICS_BUCKET_NAMESPACE_FIELD_COPY.label,
         value: namespace || '—',
-        description: 'The namespace within the bucket where tables will be organized',
+        description: ANALYTICS_BUCKET_NAMESPACE_FIELD_COPY.description,
       },
     ]
   }
@@ -241,34 +262,33 @@ const getDestinationRows = (
     if (values.ducklakeMode === DUCKLAKE_MODE_CUSTOM) {
       return [
         {
-          label: 'Catalog URL',
+          label: DUCKLAKE_CATALOG_URL_FIELD_COPY.label,
           value: values.ducklakeCatalogUrl || '—',
-          description: 'A PostgreSQL connection string for the DuckLake catalog',
+          description: DUCKLAKE_CATALOG_URL_FIELD_COPY.createDescription,
         },
         {
-          label: 'Data path',
+          label: DUCKLAKE_DATA_PATH_FIELD_COPY.label,
           value: values.ducklakeDataPath || '—',
-          description: 'An S3 path where DuckLake data files will be written',
+          description: DUCKLAKE_DATA_PATH_FIELD_COPY.description,
         },
       ]
     }
 
     return [
       {
-        label: 'Catalog project',
+        label: DUCKLAKE_CATALOG_PROJECT_FIELD_COPY.label,
         value: values.ducklakeCatalogProjectRef || '—',
-        description:
-          "Warehouse connects to this project's Postgres instance to store the DuckLake catalog",
+        description: DUCKLAKE_CATALOG_PROJECT_FIELD_COPY.description,
       },
       {
-        label: 'Storage project',
+        label: DUCKLAKE_STORAGE_PROJECT_FIELD_COPY.label,
         value: values.ducklakeStorageProjectRef || '—',
-        description: 'The project whose object storage holds the DuckLake data files',
+        description: DUCKLAKE_STORAGE_PROJECT_FIELD_COPY.description,
       },
       {
-        label: 'Bucket',
+        label: DUCKLAKE_BUCKET_FIELD_COPY.label,
         value: values.ducklakeStorageBucket || '—',
-        description: 'The bucket in which DuckLake data files will be stored.',
+        description: DUCKLAKE_BUCKET_FIELD_COPY.description,
       },
     ]
   }
@@ -276,19 +296,19 @@ const getDestinationRows = (
   if (type === 'Snowflake') {
     return [
       {
-        label: 'Account ID',
+        label: SNOWFLAKE_ACCOUNT_ID_FIELD_COPY.label,
         value: values.snowflakeAccountId || '—',
-        description: 'Snowflake account identifier, for example ORGNAME-ACCOUNTNAME',
+        description: SNOWFLAKE_ACCOUNT_ID_FIELD_COPY.description,
       },
       {
-        label: 'Database',
+        label: SNOWFLAKE_DATABASE_FIELD_COPY.label,
         value: values.snowflakeDatabase || '—',
-        description: 'Snowflake database where replicated tables will be created',
+        description: SNOWFLAKE_DATABASE_FIELD_COPY.description,
       },
       {
-        label: 'Schema',
+        label: SNOWFLAKE_SCHEMA_FIELD_COPY.label,
         value: values.snowflakeSchema || '—',
-        description: 'Snowflake schema where replicated tables will be created',
+        description: SNOWFLAKE_SCHEMA_FIELD_COPY.description,
       },
     ]
   }
@@ -296,19 +316,19 @@ const getDestinationRows = (
   if (type === 'ClickHouse') {
     return [
       {
-        label: 'URL',
+        label: CLICKHOUSE_URL_FIELD_COPY.label,
         value: values.clickhouseUrl || '—',
-        description: 'HTTPS endpoint for your ClickHouse server, including port',
+        description: CLICKHOUSE_URL_FIELD_COPY.description,
       },
       {
-        label: 'Database',
+        label: CLICKHOUSE_DATABASE_FIELD_COPY.label,
         value: values.clickhouseDatabase || '—',
-        description: 'The ClickHouse database where replicated tables will be created',
+        description: CLICKHOUSE_DATABASE_FIELD_COPY.description,
       },
       {
-        label: 'Table engine',
+        label: CLICKHOUSE_ENGINE_FIELD_COPY.label,
         value: values.clickhouseEngine || 'replacing_merge_tree',
-        description: 'Server defaults to replacing_merge_tree when unset',
+        description: CLICKHOUSE_ENGINE_FIELD_COPY.description,
       },
     ]
   }

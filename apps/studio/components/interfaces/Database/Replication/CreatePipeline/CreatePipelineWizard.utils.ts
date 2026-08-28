@@ -1,6 +1,10 @@
 import { getAnalyticsBucketValidationIssues } from '../DestinationPanel/DestinationForm/AnalyticsBucket/AnalyticsBucket.utils'
 import { getBigQueryValidationIssues } from '../DestinationPanel/DestinationForm/BigQuery/BigQuery.utils'
 import { getClickHouseValidationIssues } from '../DestinationPanel/DestinationForm/ClickHouse/ClickHouse.utils'
+import {
+  START_PIPELINE_ANYWAY_LABEL,
+  START_PIPELINE_LABEL,
+} from '../DestinationPanel/DestinationForm/DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationPanel/DestinationForm/DestinationForm.schema'
 import { pruneStaleSelectedTableIds } from '../DestinationPanel/DestinationForm/DestinationForm.utils'
 import { getDucklakeValidationIssues } from '../DestinationPanel/DestinationForm/DuckLake/DuckLake.utils'
@@ -51,11 +55,16 @@ export const PIPELINE_CREATE_STEPS = [
     id: 'review',
     label: 'Review',
     title: 'Review and create',
-    description: 'Check these details, then create and start the pipeline.',
+    description: 'Check these details, then start the pipeline.',
   },
 ] as const
 
 export type PipelineCreateStepId = (typeof PIPELINE_CREATE_STEPS)[number]['id']
+
+export {
+  START_PIPELINE_ANYWAY_LABEL,
+  START_PIPELINE_LABEL,
+} from '../DestinationPanel/DestinationForm/DestinationForm.constants'
 
 export const getPipelineCreateStepDocsUrl = (
   step: PipelineCreateStepId,
@@ -123,9 +132,9 @@ export const getCreatePipelineSubmitLabel = ({
   warningCount: number
 }) => {
   if (hasRunValidation && warningCount > 0 && !hasCriticalFailures) {
-    return 'Create and start pipeline anyway'
+    return START_PIPELINE_ANYWAY_LABEL
   }
-  return 'Create and start pipeline'
+  return START_PIPELINE_LABEL
 }
 
 export const isCreatePipelineSubmitDisabled = ({

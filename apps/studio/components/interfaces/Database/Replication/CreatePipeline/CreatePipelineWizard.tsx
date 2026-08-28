@@ -383,6 +383,10 @@ export const CreatePipelineWizard = () => {
     hasCriticalFailures: hasValidationFailures,
     warningCount: validationWarnings.length,
   })
+  const submitVariant =
+    hasRunValidation && validationWarnings.length > 0 && !hasValidationFailures
+      ? 'warning'
+      : 'primary'
 
   const openCostDialog = (data: z.infer<typeof FormSchema>) => {
     setPendingFormValues(data)
@@ -653,6 +657,7 @@ export const CreatePipelineWizard = () => {
               form: formId,
               loading: isSaving || isValidating,
               disabled: isSubmitDisabled,
+              variant: submitVariant,
             }}
           >
             {step === 'destination' && (

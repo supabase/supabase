@@ -21,6 +21,7 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { START_PIPELINE_LABEL } from './DestinationForm.constants'
 import {
   getTableCopyTargets,
   summarizeTableCopyEstimate,
@@ -102,9 +103,9 @@ export const PipelineCostDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent size="large">
         <DialogHeader>
-          <DialogTitle>Confirm to create and start pipeline</DialogTitle>
+          <DialogTitle>Confirm to start pipeline</DialogTitle>
           <DialogDescription>
-            Review the estimated costs before you create and start the pipeline.
+            Review the estimated costs before you start the pipeline.
           </DialogDescription>
         </DialogHeader>
 
@@ -278,7 +279,7 @@ export const PipelineCostDialog = ({
             disabled={isConfirming || isLoading || isError}
             onClick={onConfirm}
           >
-            Create and start pipeline
+            {START_PIPELINE_LABEL}
           </Button>
         </DialogFooter>
       </DialogContent>

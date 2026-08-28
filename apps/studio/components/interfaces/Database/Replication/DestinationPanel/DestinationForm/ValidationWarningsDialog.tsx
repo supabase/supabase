@@ -9,6 +9,8 @@ import {
   AlertDialogTitle,
 } from 'ui'
 
+import { START_PIPELINE_ANYWAY_LABEL, START_PIPELINE_LABEL } from './DestinationForm.constants'
+
 interface ValidationWarningsDialogProps {
   open: boolean
   isLoading: boolean
@@ -25,7 +27,6 @@ export const ValidationWarningsDialog = ({
   onConfirm,
 }: ValidationWarningsDialogProps) => {
   const hasWarnings = warningCount > 0
-  const action = 'Create and start pipeline'
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -33,8 +34,8 @@ export const ValidationWarningsDialog = ({
         <AlertDialogHeader>
           <AlertDialogTitle>
             {hasWarnings
-              ? `${action} with ${warningCount} ${warningCount === 1 ? 'warning' : 'warnings'}?`
-              : `${action}?`}
+              ? `${START_PIPELINE_LABEL} with ${warningCount} ${warningCount === 1 ? 'warning' : 'warnings'}?`
+              : `${START_PIPELINE_LABEL}?`}
           </AlertDialogTitle>
           <AlertDialogDescription>
             {hasWarnings
@@ -50,7 +51,7 @@ export const ValidationWarningsDialog = ({
             loading={isLoading}
             onClick={onConfirm}
           >
-            {hasWarnings ? `${action} anyway` : action}
+            {hasWarnings ? START_PIPELINE_ANYWAY_LABEL : START_PIPELINE_LABEL}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

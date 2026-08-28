@@ -13,6 +13,7 @@ export type SteppedFlowFinalAction = {
   disabled?: boolean
   form?: string
   type?: 'button' | 'submit'
+  variant?: 'primary' | 'warning'
 }
 
 export const SteppedFlowHeader = ({
@@ -137,7 +138,7 @@ export const SteppedFlow = ({
                 <Button
                   type={finalAction.type ?? (finalAction.form ? 'submit' : 'button')}
                   form={finalAction.form}
-                  variant="primary"
+                  variant={finalAction.variant ?? 'primary'}
                   loading={finalAction.loading}
                   disabled={navigationDisabled || finalAction.disabled}
                   onClick={finalAction.onClick}

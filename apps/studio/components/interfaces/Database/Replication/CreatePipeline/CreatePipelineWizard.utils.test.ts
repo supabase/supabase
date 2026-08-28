@@ -72,7 +72,7 @@ describe('getCreatePipelineSubmitLabel', () => {
         hasCriticalFailures: false,
         warningCount: 2,
       })
-    ).toBe('Create and start pipeline anyway')
+    ).toBe('Start pipeline anyway')
   })
 
   it('uses the default create label otherwise', () => {
@@ -82,7 +82,7 @@ describe('getCreatePipelineSubmitLabel', () => {
         hasCriticalFailures: false,
         warningCount: 0,
       })
-    ).toBe('Create and start pipeline')
+    ).toBe('Start pipeline')
   })
 })
 
@@ -172,7 +172,7 @@ describe('getPipelineCreateStepHeader', () => {
   it('returns static copy for other steps', () => {
     expect(getPipelineCreateStepHeader('review')).toEqual({
       title: 'Review and create',
-      description: 'Check these details, then create and start the pipeline.',
+      description: 'Check these details, then start the pipeline.',
     })
   })
 })

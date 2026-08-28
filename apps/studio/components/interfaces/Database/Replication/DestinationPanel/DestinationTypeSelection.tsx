@@ -22,6 +22,10 @@ import {
   useIsETLIcebergPrivateAlpha,
   useIsETLSnowflakePrivateAlpha,
 } from '../useIsETLPrivateAlpha'
+import {
+  DESTINATION_TYPE_FIELD_COPY,
+  DESTINATION_TYPE_STAGE_DESCRIPTIONS,
+} from './DestinationForm/DestinationFormFieldCopy'
 import { DestinationType } from './DestinationPanel.types'
 import { ReadReplicasMovedCallout } from './ReadReplicasMovedCallout'
 
@@ -141,11 +145,7 @@ export const DestinationTypeSelection = ({
   const allVisibleOptions = visibleGroups.flatMap((group) => group.options)
   const selectedOption = allVisibleOptions.find((option) => option.value === destinationType)
 
-  const STAGE_DESCRIPTIONS: Record<NonNullable<DestinationTypeOption['stage']>, string> = {
-    'Public Alpha': 'In public alpha and may change.',
-    'Early Access': 'In early access and may change.',
-    Deprecated: 'This destination type is deprecated.',
-  }
+  const STAGE_DESCRIPTIONS = DESTINATION_TYPE_STAGE_DESCRIPTIONS
 
   const stageDescription = selectedOption?.stage ? STAGE_DESCRIPTIONS[selectedOption.stage] : null
 
@@ -192,7 +192,7 @@ export const DestinationTypeSelection = ({
   const typeDescription =
     !editMode || stageDescription ? (
       <span>
-        {!editMode && 'Cannot be changed after creation.'}
+        {!editMode && DESTINATION_TYPE_FIELD_COPY.cannotChangeAfterCreation}
         {!editMode && stageDescription ? ' ' : null}
         {stageDescription}
       </span>

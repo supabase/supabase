@@ -2,6 +2,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
 import type { DestinationPanelSchemaType } from '../DestinationPanel/DestinationForm/DestinationForm.schema'
+import { PIPELINE_REGION } from '../DestinationPanel/DestinationForm/PipelineRegionField'
 import { PipelineReviewSummary } from './PipelineReviewSummary'
 import { customRender } from '@/tests/lib/custom-render'
 
@@ -63,8 +64,21 @@ describe('PipelineReviewSummary', () => {
     )
 
     expect(
-      screen.getByText('Destination type cannot be changed after creation.')
+      screen.getByText('Cannot be changed after creation. In public alpha and may change.')
     ).toBeInTheDocument()
+  })
+
+  test('shows the pipeline name field description from the connection step', () => {
+    customRender(
+      <PipelineReviewSummary
+        type="BigQuery"
+        values={values}
+        publications={[]}
+        onGoToStep={vi.fn()}
+      />
+    )
+
+    expect(screen.getByText('Used to identify this pipeline in Supabase.')).toBeInTheDocument()
   })
 
   test('disables Edit while the pipeline is being created', () => {
@@ -81,6 +95,34 @@ describe('PipelineReviewSummary', () => {
     expect(screen.getByRole('button', { name: 'Edit destination' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Edit connection' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Edit data' })).toBeDisabled()
+  })
+
+  test('shows destination type with icon on the destination section', () => {
+    const { container } = customRender(
+      <PipelineReviewSummary
+        type="BigQuery"
+        values={values}
+        publications={[]}
+        onGoToStep={vi.fn()}
+      />
+    )
+
+    expect(screen.getByText('BigQuery')).toBeInTheDocument()
+    expect(container.querySelector('svg')).toBeInTheDocument()
+  })
+
+  test('shows pipeline region with flag and AWS code on the connection section', () => {
+    customRender(
+      <PipelineReviewSummary
+        type="BigQuery"
+        values={values}
+        publications={[]}
+        onGoToStep={vi.fn()}
+      />
+    )
+
+    expect(screen.getByText(PIPELINE_REGION.displayName)).toBeInTheDocument()
+    expect(screen.getByText(PIPELINE_REGION.code)).toBeInTheDocument()
   })
 
   test('shows connection failures in the connection section', () => {

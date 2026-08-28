@@ -353,7 +353,7 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
         ? existingDestination?.enabled
           ? 'apply changes and restart pipeline'
           : 'apply changes and start pipeline'
-        : 'create and start pipeline'
+        : 'start pipeline'
       toast.error(`Failed to ${action}: ${(error as ResponseError).message}`)
     }
   }

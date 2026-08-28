@@ -6,6 +6,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
+import { PUBLICATION_FIELD_COPY } from './DestinationFormFieldCopy'
 import { PublicationSelect } from './PublicationSelect'
 import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
@@ -40,8 +41,8 @@ export const PublicationSelection = ({
       render={({ field }) => (
         <FormItemLayout
           layout="horizontal"
-          label="Publication"
-          description="Tables in the selected publication will be replicated to this destination."
+          label={PUBLICATION_FIELD_COPY.label}
+          description={PUBLICATION_FIELD_COPY.description}
         >
           <FormControl>
             <PublicationSelect

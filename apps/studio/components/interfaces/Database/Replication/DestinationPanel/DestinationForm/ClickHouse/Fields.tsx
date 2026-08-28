@@ -17,6 +17,11 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
+import {
+  CLICKHOUSE_DATABASE_FIELD_COPY,
+  CLICKHOUSE_ENGINE_FIELD_COPY,
+  CLICKHOUSE_URL_FIELD_COPY,
+} from '../DestinationFormFieldCopy'
 
 export const ClickHouseFields = ({
   form,
@@ -40,8 +45,8 @@ export const ClickHouseFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="URL"
-              description="HTTPS endpoint for your ClickHouse server, including port"
+              label={CLICKHOUSE_URL_FIELD_COPY.label}
+              description={CLICKHOUSE_URL_FIELD_COPY.description}
             >
               <FormControl>
                 <Input
@@ -113,8 +118,8 @@ export const ClickHouseFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="Database"
-              description="The ClickHouse database where replicated tables will be created"
+              label={CLICKHOUSE_DATABASE_FIELD_COPY.label}
+              description={CLICKHOUSE_DATABASE_FIELD_COPY.description}
             >
               <FormControl>
                 <Input {...field} value={field.value ?? ''} placeholder="default" />
@@ -129,8 +134,8 @@ export const ClickHouseFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="Table engine"
-              description="Server defaults to replacing_merge_tree when unset"
+              label={CLICKHOUSE_ENGINE_FIELD_COPY.label}
+              description={CLICKHOUSE_ENGINE_FIELD_COPY.description}
             >
               <FormControl>
                 <Select

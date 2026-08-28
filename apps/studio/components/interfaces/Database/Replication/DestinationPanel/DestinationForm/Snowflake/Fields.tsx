@@ -7,6 +7,11 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
+import {
+  SNOWFLAKE_ACCOUNT_ID_FIELD_COPY,
+  SNOWFLAKE_DATABASE_FIELD_COPY,
+  SNOWFLAKE_SCHEMA_FIELD_COPY,
+} from '../DestinationFormFieldCopy'
 
 export const SnowflakeFields = ({
   form,
@@ -37,8 +42,8 @@ export const SnowflakeFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="Account ID"
-              description="Snowflake account identifier, for example ORGNAME-ACCOUNTNAME"
+              label={SNOWFLAKE_ACCOUNT_ID_FIELD_COPY.label}
+              description={SNOWFLAKE_ACCOUNT_ID_FIELD_COPY.description}
             >
               <FormControl>
                 <Input {...field} placeholder="MYORG-MYACCOUNT" value={field.value ?? ''} />
@@ -69,8 +74,8 @@ export const SnowflakeFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="Database"
-              description="Snowflake database where replicated tables will be created"
+              label={SNOWFLAKE_DATABASE_FIELD_COPY.label}
+              description={SNOWFLAKE_DATABASE_FIELD_COPY.description}
             >
               <FormControl>
                 <Input {...field} placeholder="ANALYTICS" value={field.value ?? ''} />
@@ -85,8 +90,8 @@ export const SnowflakeFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="Schema"
-              description="Snowflake schema where replicated tables will be created"
+              label={SNOWFLAKE_SCHEMA_FIELD_COPY.label}
+              description={SNOWFLAKE_SCHEMA_FIELD_COPY.description}
             >
               <FormControl>
                 <Input {...field} placeholder="PUBLIC" value={field.value ?? ''} />
