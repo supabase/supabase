@@ -1,4 +1,4 @@
-// End of third-party imports
+﻿// End of third-party imports
 
 import { isFeatureEnabled } from 'common/enabled-features'
 
@@ -388,6 +388,10 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/expo-react-native',
         },
         {
+          name: 'React Native CLI',
+          url: '/guides/getting-started/quickstarts/react-native-cli',
+        },
+        {
           name: 'Flutter',
           url: '/guides/getting-started/quickstarts/flutter',
         },
@@ -659,7 +663,7 @@ export const PhoneLoginsItems = [
   {
     name: 'MessageBird',
     icon: '/docs/img/icons/messagebird-icon',
-    linkDescription: 'Communication between businesses and their customers — across any channel.',
+    linkDescription: 'Communication between businesses and their customers â€” across any channel.',
     url: '/guides/auth/phone-login/messagebird',
   },
   {
@@ -3692,3 +3696,4 @@ export const navDataForMdx = {
   ormQuickstarts,
   guiQuickstarts,
 }
+
