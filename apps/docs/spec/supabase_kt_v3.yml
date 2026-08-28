@@ -3243,6 +3243,41 @@ functions:
               nonce = "nonce"
           }
           ```
+  - id: sign-in-with-passkey
+    title: 'signInWithPasskey()'
+    notes: |
+      supabase-kt currently does not provide a built-in way to sign in via passkeys, 
+      until then you can use the API methods the library provides to manage the flow yourself.
+    examples:
+      - id: start-passkey-flow
+        name: Start passkey authentication
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val authOptions = supabase.auth.passkeys.startAuthentication { 
+            // additional configuration e.g. captcha
+          }
+          authOptions.options // raw json object for the passkey provider
+          // insert the credential received from the provider
+          val session = supabase.auth.passkeys.verifyAuthentication(authOptions.challengeId, credential)
+          // the session is also automatically imported in supabase-kt
+          ```
+  - id: register-passkey
+    title: 'registerPasskey()'
+    notes: |
+      supabase-kt currently does not provide a built-in way to register passkeys via an built-in flow, until then you can use the API methods
+      the library provides to register a new passkey (WebAuthn credential) for the signed-in user.
+    examples:
+      - id: register-passkey
+        name: Register a passkey for the current user
+        isSpotlight: true
+        code: |
+          ```kotlin
+        val response = supabase.auth.passkeys.startRegistration()
+        response.options // raw options for the passkey provider
+        // insert the credential received from the provider
+        val verifyResponse = supabase.auth.passkeys.verifyRegistration(response.challengeId, credential)
+          ```
   - id: sign-in-with-otp
     title: 'signInWith(OTP)'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOtp'
@@ -4937,9 +4972,10 @@ functions:
         code: |
           ```kotlin
           val flow: Flow<List<Country>> = supabase.from("countries").selectAsFlow(
-              Country::id,
-              filter = FilterOperation("name", FilterOperator.ILIKE, "a%")
-          )
+              Country::id
+          ) {
+              eq("id", 256)
+          }
           flow.collect {
               for (country in it) {
                   println(country.name)
@@ -5021,6 +5057,25 @@ functions:
           You have two methods you can use to listen for presence updates:
           - `presenceDataFlow` takes care of caching presences based on their id and automatically emits the updated list.
           - `presenceChangeFlow` emits the raw data received by realtime. Can be used if more control is required.
+      - id: listen-to-system-updates
+        name: Listen to system updates
+        code: |
+          ```kotlin
+          val channel = supabase.channel("channelId") {
+              //optional config
+              broadcast {
+                  replicationReady = true // send a system message when the client can expect postgres changes
+              }
+          }
+
+          val systemFlow = channel.systemFlow()
+
+          //Collect the flow
+          systemFlow.onEach {
+              println(it.status)
+          }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
+
+          channel.subscribe(blockUntilSubscribed = true)
       - id: listen-to-all-database-changes
         name: Listen to all database changes
         code: |
@@ -5052,11 +5107,18 @@ functions:
 
           //This flow will automatically emit the initial data of all messages (which can be restricted by specifying a filter) and then listens for updates.
           //The data is cached automatically by the primary key you specify
-          val users: Flow<List<User>> = channel.postgresListDataFlow(schema = "public", table = "users", primaryKey = User::id)
+          val users: Flow<List<User>> = channel.postgresListDataFlow(schema = "public", table = "users", primaryKey = User::id) {
+             // optional filter
+             eq("id", 256)
+          }
 
           //If you want more control and want to receive the raw data use the `postgresChangeFlow` method:
           val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema = "public") {
               table = "users"
+              // optional filter
+              filter {
+                  eq("id", 256)
+              }
           }
 
           //Collect the flow
