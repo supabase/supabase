@@ -6,7 +6,7 @@
       "Edit(**/__generated__/**)",
       "Edit(apps/docs/features/docs/generated/**)",
       "Edit(apps/www/.generated/**)",
-      "Edit(supabase/functions/common/database-types.ts)"
+      "Edit(packages/common/database-types.ts)"
     ]
   },
   "hooks": {

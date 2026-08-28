@@ -33,7 +33,7 @@ pnpm build --filter=studio   # build Studio
 pnpm lint --filter=studio    # lint Studio
 pnpm typecheck               # typecheck all packages
 pnpm format                  # Prettier write (check: pnpm test:prettier)
-pnpm generate:types          # local DB types → supabase/functions/common/database-types.ts
+pnpm generate:types          # local DB types → packages/common/database-types.ts
 pnpm api:codegen             # platform Management API types → packages/api-types
 ```
 
@@ -41,7 +41,7 @@ pnpm api:codegen             # platform Management API types → packages/api-ty
 
 Every PR must pass typecheck + lint (one workflow), Prettier, and a typos check. Other checks are path-filtered: Studio unit tests/build and the lint ratchet (ESLint warning count must not increase) run on `apps/studio/**` changes; app-specific test suites run on their own paths.
 
-Never hand-edit generated files: `packages/api-types/types/**`, `**/routeTree.gen.ts`, `**/__generated__/**`, `apps/docs/features/docs/generated/**`, `apps/www/.generated/**`, `supabase/functions/common/database-types.ts`.
+Never hand-edit generated files: `packages/api-types/types/**`, `**/routeTree.gen.ts`, `**/__generated__/**`, `apps/docs/features/docs/generated/**`, `apps/www/.generated/**`, `packages/common/database-types.ts`.
 
 ## Conventions
 
