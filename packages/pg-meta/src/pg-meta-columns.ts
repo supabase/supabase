@@ -5,6 +5,27 @@ import { filterByList } from './helpers'
 import { ident, keyword, literal, rawSql, safeSql, type SafeSqlFragment } from './pg-format'
 import { COLUMNS_SQL } from './sql/columns'
 
+// Pick a `$$…$$` delimiter for a `DO` block that is absent from every
+// string in `values`. See the matching helper in `pg-meta-tables.ts`
+// for the full rationale; the same dollar-quote-collision bug exists
+// in the two DO blocks below (the UNIQUE-constraint drop path and the
+// CHECK-constraint replace path), both of which embed `old.schema` /
+// `old.table` / `old.name` via `ident()` inside strings that are then
+// passed to `EXECUTE` or `format()`.
+function getDoBlockDelimiter(values: string[]): SafeSqlFragment {
+  let suffix = 0
+  while (true) {
+    const delimiter =
+      suffix === 0
+        ? (safeSql`$pg_meta$` as SafeSqlFragment)
+        : (safeSql`$pg_meta_${literal(suffix)}$` as SafeSqlFragment)
+    if (values.every((value) => !value.includes(delimiter))) {
+      return delimiter
+    }
+    suffix += 1
+  }
+}
+
 const pgColumnZod = z.object({
   id: z.string(),
   table_id: z.number(),
@@ -299,8 +320,16 @@ function update(
   }
   let isUniqueSql: SafeSqlFragment = safeSql``
   if (old.is_unique === true && is_unique === false) {
+    // The body of this DO block embeds `old.schema` and `old.table` via
+    // `ident()` inside a string passed to EXECUTE. PostgreSQL's
+    // dollar-quote parser treats the first `$$` after the opening
+    // `DO $$` as the closing delimiter, so if either name contains
+    // the literal sequence `$$` the body is parsed as truncated and
+    // the statement fails with a syntax error. Pick a delimiter that
+    // is absent from the names that flow into the body.
+    const doBlockDelimiter = getDoBlockDelimiter([old.schema, old.table])
     isUniqueSql = safeSql`
-DO $$
+DO ${doBlockDelimiter}
 DECLARE
   r record;
 BEGIN
@@ -314,7 +343,7 @@ BEGIN
     EXECUTE ${literal(`ALTER TABLE ${ident(old.schema)}.${ident(old.table)} DROP CONSTRAINT `)} || quote_ident(r.conname);
   END LOOP;
 END
-$$;`
+${doBlockDelimiter};`
   } else if (old.is_unique === false && is_unique === true) {
     isUniqueSql = safeSql`ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ADD UNIQUE (${ident(old.name)});`
   }
@@ -325,6 +354,16 @@ $$;`
 
   let checkSql: SafeSqlFragment = safeSql``
   if (check !== undefined) {
+    // The body of this DO block embeds `old.schema` and `old.table` via
+    // `ident()` (and additionally flows `old.table` / `old.name` through
+    // the default constraint name when `addCheckSql` is non-empty)
+    // inside strings that are then assembled by `format()` / `EXECUTE`.
+    // PostgreSQL's dollar-quote parser treats the first `$$` after the
+    // opening `DO $$` as the closing delimiter, so if any of those
+    // names contains the literal sequence `$$` the body is parsed as
+    // truncated and the statement fails with a syntax error. Pick a
+    // delimiter that is absent from the names that flow into the body.
+    const doBlockDelimiter = getDoBlockDelimiter([old.schema, old.table, old.name])
     const addCheckSql: SafeSqlFragment =
       check !== null
         ? safeSql`
@@ -337,7 +376,7 @@ $$;`
   ASSERT v_conkey[1] = ${literal(old.ordinal_position)}, 'error creating column constraint: check condition cannot refer to other columns';`
         : safeSql``
     checkSql = safeSql`
-DO $$
+DO ${doBlockDelimiter}
 DECLARE
   v_conname name;
   v_conkey int2[];
@@ -355,7 +394,7 @@ BEGIN
   END IF;
   ${addCheckSql}
 END
-$$;`
+${doBlockDelimiter};`
   }
 
   // TODO: Can't set default if column is previously identity even if
