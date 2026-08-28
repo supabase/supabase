@@ -3,6 +3,7 @@ import { useCallback } from 'react'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { STORAGE_ROW_TYPES } from '../Storage.constants'
+import { ArchivedFilePreviewPane } from './ArchivedFilePreviewPane'
 import { useArchivedFilesContext } from './ArchivedFilesContext'
 import { ConfirmDeleteModal } from './ConfirmDeleteModal'
 import { ConfirmPurgeModal } from './ConfirmPurgeModal'
@@ -42,7 +43,8 @@ export const StorageExplorerContent = ({
     setIsSearching,
   } = useStorageExplorerStateSnapshot()
   const { truncateToColumn } = useStorageExplorerNavigation()
-  const { isOverlayEnabled, isListingTruncated } = useArchivedFilesContext()
+  const { isOverlayEnabled, isListingTruncated, selectedArchivedObject } =
+    useArchivedFilesContext()
 
   const handleClearSearch = useCallback(() => {
     setIsSearching(false)
@@ -125,7 +127,7 @@ export const StorageExplorerContent = ({
             fetchMoreFolderContents({ index, column, searchString: itemSearchString })
           }
         />
-        <PreviewPane />
+        {selectedArchivedObject !== undefined ? <ArchivedFilePreviewPane /> : <PreviewPane />}
       </div>
 
       <ConfirmDeleteModal />
