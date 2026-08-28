@@ -29,7 +29,7 @@ import {
   Trash,
 } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   AiIconAnimation,
@@ -108,6 +108,7 @@ export const ExplorerNotebookTab = () => {
   const [skipMutatingCells, setSkipMutatingCells] = useState(false)
   const queryCellRefs = useRef(new Map<string, QueryEditorHandle>())
   const savedContentRef = useRef<typeof content>(undefined)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   const { mutate: updateNotebook, isPending: isUpdating } = useUpsertNotebookMutation({
     onSuccess: () => {
@@ -322,6 +323,17 @@ export const ExplorerNotebookTab = () => {
     snap.insertCellAfter({ id: notebookId, cellId: lastCellId, cell })
   }
 
+  const scrollToBottomIfPending = useEffectEvent(() => {
+    if (!id || snap.pendingScrollToBottom !== id || !scrollContainerRef.current) return
+
+    scrollContainerRef.current.scrollTo({
+      top: scrollContainerRef.current.scrollHeight,
+    })
+    snap.clearPendingScrollToBottom()
+  })
+
+  useEffect(() => scrollToBottomIfPending(), [id, snap.pendingScrollToBottom, content])
+
   if (isNotFound) {
     return (
       <div className="p-4 h-full bg-surface-100">
@@ -359,14 +371,6 @@ export const ExplorerNotebookTab = () => {
             Analyze
           </ExplorerToolbarAction>
           <ExplorerToolbarAction
-            aria-label="Run notebook"
-            icon={<Play />}
-            tooltip="Run notebook"
-            loading={isRunningNotebook}
-            disabled={queryCellIds.length === 0}
-            onClick={handleRunNotebook}
-          />
-          <ExplorerToolbarAction
             aria-label="Save changes"
             icon={<Save />}
             tooltip="Save changes"
@@ -397,10 +401,20 @@ export const ExplorerNotebookTab = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           </ExplorerToolbarActions>
+          <ExplorerToolbarAction
+            aria-label="Run notebook"
+            icon={<Play />}
+            tooltip="Run notebook"
+            loading={isRunningNotebook}
+            disabled={queryCellIds.length === 0}
+            onClick={handleRunNotebook}
+          >
+            Run
+          </ExplorerToolbarAction>
         </ExplorerToolbarActions>
       </ExplorerToolbar>
 
-      <div className="w-full mx-auto flex-grow min-h-0 overflow-y-auto">
+      <div ref={scrollContainerRef} className="w-full mx-auto flex-grow min-h-0 overflow-y-auto">
         <div className="p-4 pb-10">
           {cells.length === 0 && (
             <EmptyStatePresentational

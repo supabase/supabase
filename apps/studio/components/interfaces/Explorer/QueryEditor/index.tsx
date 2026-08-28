@@ -366,13 +366,12 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   return (
     <>
       <Shell className={cn(variant === 'embedded' && 'mx-auto max-w-6xl', className)}>
-        <ExplorerToolbar>
+        <ExplorerToolbar className={cn(variant === 'viewport' && 'px-4')}>
           <ExplorerToolbarIcon>
             <CodeSquare size={14} />
           </ExplorerToolbarIcon>
           <ExplorerToolbarTitle onSaveTitle={onTitleChange}>{title}</ExplorerToolbarTitle>
           <ExplorerToolbarActions>
-            {toolbarActions}
             {onSourceChange && (
               <QuerySourceMenu
                 disabled={pendingProposal !== null}
@@ -386,6 +385,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
                 roleImpersonationState={roleImpersonationState}
               />
             )}
+
             {display && onDisplayChange && (
               <DisplaySettingsButton
                 result={result}
@@ -401,9 +401,12 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
               tooltip={showQuery ? 'Hide query' : 'Show query'}
               onClick={() => onShowQueryChange(!showQuery)}
             />
+
+            {toolbarActions}
+
             <ExplorerToolbarAction
-              loading={isExecuting}
               icon={<Play />}
+              loading={isExecuting}
               tooltip={hasSelection ? 'Run selected query' : 'Run query'}
               disabled={
                 isBusy || pendingProposal !== null || isRunDisabled || sql.trim().length === 0
