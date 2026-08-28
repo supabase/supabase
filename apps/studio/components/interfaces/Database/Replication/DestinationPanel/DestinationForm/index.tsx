@@ -210,7 +210,7 @@ export const DestinationForm = ({
             data.tableSyncCopyMode === 'skip_tables') &&
           selectedPublicationTableIds.length === 0
         ) {
-          addRequiredFieldError('tableSyncCopyTableIds', 'Select at least one table')
+          addRequiredFieldError('tableSyncCopyTableIds', 'Select at least one table.')
         }
 
         if (selectedType === 'BigQuery') {

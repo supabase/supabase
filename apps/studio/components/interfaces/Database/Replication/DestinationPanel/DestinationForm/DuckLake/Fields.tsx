@@ -161,7 +161,7 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
     const name = newBucketName.trim()
     if (!name || !ducklakeStorageProjectRef) return
     if (name.includes('/')) {
-      return toast.error('Bucket name cannot contain "/"')
+      return toast.error('Bucket name cannot contain "/".')
     }
 
     createBucket({

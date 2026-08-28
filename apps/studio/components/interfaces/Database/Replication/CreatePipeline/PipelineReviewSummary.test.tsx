@@ -150,7 +150,32 @@ describe('PipelineReviewSummary', () => {
         'Check destination credentials and connection settings, including Advanced settings on this step.'
       )
     ).toBeInTheDocument()
+    expect(
+      screen.getByText('1 issue must be resolved above before you can start the pipeline.')
+    ).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Edit connection' }))
     expect(onGoToStep).toHaveBeenCalledWith('connection')
+  })
+
+  test('repeats warning status beside the final action', () => {
+    customRender(
+      <PipelineReviewSummary
+        type="BigQuery"
+        values={values}
+        publications={[]}
+        dataFailures={[
+          {
+            name: 'Low Slot WAL Retention',
+            reason: 'Increase max_slot_wal_keep_size.',
+            failure_type: 'warning',
+          },
+        ]}
+        onGoToStep={vi.fn()}
+      />
+    )
+
+    expect(
+      screen.getByText('Review the warning above before starting the pipeline.')
+    ).toBeInTheDocument()
   })
 })

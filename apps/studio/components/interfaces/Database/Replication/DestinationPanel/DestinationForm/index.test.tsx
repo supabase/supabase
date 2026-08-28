@@ -229,7 +229,7 @@ describe('DestinationForm edit submission', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Apply and restart pipeline' }))
 
-    expect(await screen.findByText('Select at least one table')).toBeInTheDocument()
+    expect(await screen.findByText('Select at least one table.')).toBeInTheDocument()
     expect(mocks.validateConfiguration).not.toHaveBeenCalled()
     expect(mocks.submitPipeline).not.toHaveBeenCalled()
   })

@@ -48,14 +48,12 @@ import { getDucklakeValidationIssues } from '../DestinationPanel/DestinationForm
 import { DuckLakeFields } from '../DestinationPanel/DestinationForm/DuckLake/Fields'
 import { NewPublicationPanel } from '../DestinationPanel/DestinationForm/NewPublicationPanel'
 import { NoDestinationsAvailable } from '../DestinationPanel/DestinationForm/NoDestinationsAvailable'
-import { PipelineCostDialog } from '../DestinationPanel/DestinationForm/PipelineCostDialog'
 import { PipelineRegionField } from '../DestinationPanel/DestinationForm/PipelineRegionField'
 import { PublicationSelection } from '../DestinationPanel/DestinationForm/PublicationSelection'
 import { SnowflakeFields } from '../DestinationPanel/DestinationForm/Snowflake/Fields'
 import { getSnowflakeValidationIssues } from '../DestinationPanel/DestinationForm/Snowflake/Snowflake.utils'
 import { TableCopySelection } from '../DestinationPanel/DestinationForm/TableCopySelection'
 import { useDestinationForm } from '../DestinationPanel/DestinationForm/useDestinationForm'
-import { ValidationWarningsDialog } from '../DestinationPanel/DestinationForm/ValidationWarningsDialog'
 import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
 import { DestinationTypeSelection } from '../DestinationPanel/DestinationTypeSelection'
 import { LocalReplicationUnavailableAdmonition } from '../LocalReplicationUnavailableAdmonition'
@@ -98,6 +96,7 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { SteppedFlow, SteppedFlowHeader } from '@/components/ui/SteppedFlow/SteppedFlow'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useReplicationCostEstimateQuery } from '@/data/replication/cost-estimate-query'
 import { useCreateTenantSourceMutation } from '@/data/replication/create-tenant-source-mutation'
 import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
 import {
@@ -127,8 +126,6 @@ export const CreatePipelineWizard = () => {
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
 
   const [step, setStep] = useState<PipelineCreateStepId>('destination')
-  const [showValidationWarningsDialog, setShowValidationWarningsDialog] = useState(false)
-  const [showCostDialog, setShowCostDialog] = useState(false)
   const [validatedConnectionSignature, setValidatedConnectionSignature] = useState<string | null>(
     null
   )
@@ -137,9 +134,6 @@ export const CreatePipelineWizard = () => {
   )
   const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
   const [newBucketSheetVisible, setNewBucketSheetVisible] = useState(false)
-  const [pendingFormValues, setPendingFormValues] = useState<z.infer<typeof FormSchema> | null>(
-    null
-  )
   const validationSectionRef = useRef<React.ComponentRef<typeof PipelineValidationAdmonition>>(null)
 
   useRedirectLegacyReadReplicaDestination()
@@ -258,7 +252,7 @@ export const CreatePipelineWizard = () => {
             data.tableSyncCopyMode === 'skip_tables') &&
           selectedPublicationTableIds.length === 0
         ) {
-          addRequiredFieldError('tableSyncCopyTableIds', 'Select at least one table')
+          addRequiredFieldError('tableSyncCopyTableIds', 'Select at least one table.')
         }
 
         if (selectedType === 'BigQuery') {
@@ -291,6 +285,7 @@ export const CreatePipelineWizard = () => {
 
   const { isDirty } = form.formState
   const formValues = useWatch({ control: form.control }) ?? defaultValues
+  const reviewValues = { ...defaultValues, ...formValues }
   const { publicationName } = formValues
   const connectionSignature = JSON.stringify([
     selectedType,
@@ -308,21 +303,21 @@ export const CreatePipelineWizard = () => {
   const hasValidationFailures = allValidationFailures.some((f) => f.failure_type === 'critical')
   const validationWarnings = allValidationFailures.filter((f) => f.failure_type === 'warning')
 
-  const pendingTableSyncCopy = useMemo(
+  const tableSyncCopy = useMemo(
     () =>
-      pendingFormValues === null
-        ? undefined
-        : buildTableSyncCopyConfig({
-            mode: pendingFormValues.tableSyncCopyMode,
-            selectedTableIds: pendingFormValues.tableSyncCopyTableIds,
-          }),
-    [pendingFormValues]
+      buildTableSyncCopyConfig({
+        mode: reviewValues.tableSyncCopyMode,
+        selectedTableIds: reviewValues.tableSyncCopyTableIds,
+      }),
+    [reviewValues.tableSyncCopyMode, reviewValues.tableSyncCopyTableIds]
   )
-  const pendingPublicationTables = useMemo(
-    () =>
-      publications.find(({ name: pubName }) => pubName === pendingFormValues?.publicationName)
-        ?.tables ?? [],
-    [pendingFormValues?.publicationName, publications]
+  const {
+    data: costEstimate,
+    isLoading: isCostEstimateLoading,
+    isError: isCostEstimateError,
+  } = useReplicationCostEstimateQuery(
+    { projectRef, sourceId, publicationName },
+    { enabled: step === 'review' }
   )
 
   const goToList = () => {
@@ -388,11 +383,6 @@ export const CreatePipelineWizard = () => {
       ? 'warning'
       : 'primary'
 
-  const openCostDialog = (data: z.infer<typeof FormSchema>) => {
-    setPendingFormValues(data)
-    setShowCostDialog(true)
-  }
-
   const onSubmit = async (rawData: z.infer<typeof FormSchema>) => {
     if (!isSuccessPublications) {
       toast.error('Publication tables are unavailable. Refresh and try again.')
@@ -446,30 +436,11 @@ export const CreatePipelineWizard = () => {
       areValidationFailuresEqual(previousWarnings, validationResult.warnings)
 
     if (hasWarnings) {
-      if (warningsUnchanged) {
-        setPendingFormValues(data)
-        setShowValidationWarningsDialog(true)
-      }
-      return
+      if (!warningsUnchanged) return
     }
 
-    openCostDialog(data)
-  }
-
-  const handleValidationWarningsConfirm = () => {
-    if (!pendingFormValues) return
-    setShowValidationWarningsDialog(false)
-    openCostDialog(pendingFormValues)
-  }
-
-  const handleCostConfirm = async () => {
-    if (!pendingFormValues) return
-
-    const values = pendingFormValues
-    setShowCostDialog(false)
-
     await submitPipeline({
-      data: values,
+      data,
       onSuccess: () => form.reset(defaultValues),
       onClose: goToList,
     })
@@ -656,7 +627,7 @@ export const CreatePipelineWizard = () => {
               label: submitLabel,
               form: formId,
               loading: isSaving || isValidating,
-              disabled: isSubmitDisabled,
+              disabled: isSubmitDisabled || isCostEstimateLoading,
               variant: submitVariant,
             }}
           >
@@ -765,12 +736,16 @@ export const CreatePipelineWizard = () => {
                 />
                 <PipelineReviewSummary
                   type={selectedType}
-                  values={{ ...defaultValues, ...formValues }}
+                  values={reviewValues}
                   publications={publications}
                   connectionFailures={destinationValidationFailures}
                   dataFailures={pipelineValidationFailures}
                   editDisabled={isSaving || isValidating}
                   validationScrollRef={validationSectionRef}
+                  costEstimate={costEstimate}
+                  isCostEstimateLoading={isCostEstimateLoading}
+                  isCostEstimateError={isCostEstimateError}
+                  tableSyncCopy={tableSyncCopy}
                   onGoToStep={setStep}
                 />
               </>
@@ -799,24 +774,6 @@ export const CreatePipelineWizard = () => {
       <CreateAnalyticsBucketSheet
         open={newBucketSheetVisible}
         onOpenChange={setNewBucketSheetVisible}
-      />
-
-      <ValidationWarningsDialog
-        open={showValidationWarningsDialog}
-        onOpenChange={setShowValidationWarningsDialog}
-        isLoading={isSaving}
-        warningCount={validationWarnings.length}
-        onConfirm={handleValidationWarningsConfirm}
-      />
-
-      <PipelineCostDialog
-        open={showCostDialog}
-        isConfirming={isSaving}
-        publicationName={pendingFormValues?.publicationName}
-        publicationTables={pendingPublicationTables}
-        tableSyncCopy={pendingTableSyncCopy}
-        onOpenChange={setShowCostDialog}
-        onConfirm={handleCostConfirm}
       />
 
       {discardChangesDialog}

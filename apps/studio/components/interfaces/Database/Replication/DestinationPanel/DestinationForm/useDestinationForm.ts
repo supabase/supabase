@@ -85,7 +85,7 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
   // Helper function to handle namespace creation if needed
   const resolveNamespace = async (data: z.infer<typeof FormSchema>) => {
     if (data.namespace === CREATE_NEW_NAMESPACE) {
-      if (!data.newNamespaceName) throw new Error('New namespace name is required')
+      if (!data.newNamespaceName) throw new Error('New namespace name is required.')
 
       await createNamespace({
         projectRef,

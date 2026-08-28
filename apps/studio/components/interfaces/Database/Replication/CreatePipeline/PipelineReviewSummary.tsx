@@ -1,6 +1,6 @@
-import { Pencil } from 'lucide-react'
+import { Pencil, TriangleAlert } from 'lucide-react'
 import { Fragment, type ReactNode } from 'react'
-import { Button, CardContent, Input } from 'ui'
+import { Button, CardContent, cn, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DestinationTypeReadonly } from '../DestinationIcon'
@@ -34,11 +34,14 @@ import {
   PipelineRegionReadonly,
 } from '../DestinationPanel/DestinationForm/PipelineRegionField'
 import type { PipelineCreateStepId, PipelineDestinationType } from './CreatePipelineWizard.utils'
+import { PipelineCostEstimate } from './PipelineCostEstimate'
 import {
   CONNECTION_VALIDATION_HINT,
   DATA_VALIDATION_HINT,
   PipelineValidationAdmonition,
 } from './PipelineValidationAdmonition'
+import type { TableSyncCopyConfig } from '@/components/interfaces/Database/Replication/TableSyncCopy.utils'
+import type { ReplicationCostEstimateData } from '@/data/replication/cost-estimate-query'
 import type { ReplicationPublication } from '@/data/replication/publications-query'
 import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 
@@ -65,6 +68,10 @@ export const PipelineReviewSummary = ({
   dataFailures = [],
   editDisabled = false,
   validationScrollRef,
+  costEstimate,
+  isCostEstimateLoading = false,
+  isCostEstimateError = false,
+  tableSyncCopy,
   onGoToStep,
 }: {
   type: PipelineDestinationType
@@ -76,6 +83,10 @@ export const PipelineReviewSummary = ({
   validationScrollRef?: React.RefObject<React.ComponentRef<
     typeof PipelineValidationAdmonition
   > | null>
+  costEstimate?: ReplicationCostEstimateData
+  isCostEstimateLoading?: boolean
+  isCostEstimateError?: boolean
+  tableSyncCopy?: TableSyncCopyConfig
   onGoToStep: (step: PipelineCreateStepId) => void
 }) => {
   const publication = publications.find(({ name }) => name === values.publicationName)
@@ -159,6 +170,9 @@ export const PipelineReviewSummary = ({
 
   const scrollTargetStep: PipelineCreateStepId | null =
     connectionFailures.length > 0 ? 'connection' : dataFailures.length > 0 ? 'data' : null
+  const failures = [...connectionFailures, ...dataFailures]
+  const criticalCount = failures.filter(({ failure_type }) => failure_type === 'critical').length
+  const warningCount = failures.filter(({ failure_type }) => failure_type === 'warning').length
 
   return (
     <>
@@ -219,6 +233,29 @@ export const PipelineReviewSummary = ({
           </Fragment>
         )
       })}
+      <PipelineCostEstimate
+        estimate={costEstimate}
+        isLoading={isCostEstimateLoading}
+        isError={isCostEstimateError}
+        publicationTables={publicationTables}
+        tableSyncCopy={tableSyncCopy}
+      />
+      {(criticalCount > 0 || warningCount > 0) && (
+        <CardContent
+          role={criticalCount > 0 ? 'alert' : 'status'}
+          className={cn(
+            'flex items-start gap-2 py-3 text-sm',
+            criticalCount > 0 ? 'text-destructive' : 'text-warning'
+          )}
+        >
+          <TriangleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
+          <p>
+            {criticalCount > 0
+              ? `${criticalCount} ${criticalCount === 1 ? 'issue must' : 'issues must'} be resolved above before you can start the pipeline.`
+              : `Review the ${warningCount === 1 ? 'warning' : `${warningCount} warnings`} above before starting the pipeline.`}
+          </p>
+        </CardContent>
+      )}
     </>
   )
 }
