@@ -6,6 +6,27 @@ import type {
   OperationResultCell,
 } from '@/data/content/notebooks/notebook-operations'
 import type { TimeRange } from '@/data/content/notebooks/notebook-schema'
+import type { Database } from '@/data/read-replicas/replicas-query'
+
+type DatabaseDetails = Pick<Database, 'identifier'>
+
+export type NotebookDatabaseContext = { projectRef?: string } & (
+  | { status: 'loading' }
+  | { status: 'error' }
+  | { status: 'success'; databasesByIdentifier: ReadonlyMap<string, DatabaseDetails> }
+)
+
+export type NotebookDatabaseTarget =
+  | { status: 'primary' }
+  | { status: 'loading' }
+  | { status: 'replica' }
+  | { status: 'unknown' }
+  | { status: 'error' }
+
+export type NotebookCellMetadata =
+  | { status: 'hidden' }
+  | { status: 'loading' }
+  | { status: 'ready'; text: string }
 
 /** React key for a diff entry. Added/replaced cells have no `_id`, so they key off the operation. */
 export function getEntryKey(entry: NotebookCellDiffEntry): string {
@@ -18,6 +39,22 @@ export function getEntryKey(entry: NotebookCellDiffEntry): string {
     case 'replaced':
       return `op-${entry.operationIndex}`
   }
+}
+
+/** Whether any cell needs the database list before its target can be classified. */
+export function notebookEntriesNeedDatabaseLookup(
+  entries: NotebookCellDiffEntry[],
+  projectRef?: string
+): boolean {
+  return entries.some((entry) => {
+    const cells = entry._tag === 'replaced' ? [entry.before, entry.after] : [entry.cell]
+    return cells.some(
+      (cell) =>
+        cell._tag === 'database_cell' &&
+        cell.database_identifier !== undefined &&
+        cell.database_identifier !== projectRef
+    )
+  })
 }
 
 /** Human label for a collapsed/badge row. */
@@ -74,45 +111,91 @@ export function formatTimeRange(range: TimeRange): string {
   return `${format(range.start)} → ${format(range.end)}`
 }
 
-/**
- * Plain-text metadata line for a query cell (its source parameters, not its SQL) — `null`
- * when the cell has none. A `replace_cell` can change only this and leave `sql` identical,
- * so it's compared independently of the source text rather than folded into it.
- */
-export function getCellMetadataLine(cell: OperationResultCell): string | null {
+export function resolveNotebookDatabaseTarget(
+  identifier: string | undefined,
+  context: NotebookDatabaseContext
+): NotebookDatabaseTarget {
+  if (identifier === undefined || identifier === context.projectRef) return { status: 'primary' }
+  if (context.status === 'loading') return { status: 'loading' }
+  if (context.status === 'error') return { status: 'error' }
+
+  const database = context.databasesByIdentifier.get(identifier)
+  if (database === undefined) return { status: 'unknown' }
+  if (database.identifier === context.projectRef) return { status: 'primary' }
+
+  return { status: 'replica' }
+}
+
+function formatDatabaseTarget(target: Exclude<NotebookDatabaseTarget, { status: 'loading' }>) {
+  switch (target.status) {
+    case 'primary':
+      return 'Database: Primary'
+    case 'replica':
+      return 'Database: Replica'
+    case 'unknown':
+      return 'Database: Unknown'
+    case 'error':
+      return 'Database unavailable'
+  }
+}
+
+/** Metadata for a query cell's source parameters, kept separate from its SQL diff. */
+export function getCellMetadata(
+  cell: OperationResultCell,
+  databaseContext: NotebookDatabaseContext
+): NotebookCellMetadata {
   switch (cell._tag) {
     case 'markdown_cell':
-      return null
-    case 'database_cell':
-      return cell.database_identifier ? `Database: ${cell.database_identifier}` : null
+      return { status: 'hidden' }
+    case 'database_cell': {
+      const target = resolveNotebookDatabaseTarget(cell.database_identifier, databaseContext)
+      return target.status === 'loading'
+        ? { status: 'loading' }
+        : { status: 'ready', text: formatDatabaseTarget(target) }
+    }
     case 'log_cell':
-      return `Time range: ${formatTimeRange(cell.time_range)}`
+      return { status: 'ready', text: `Time range: ${formatTimeRange(cell.time_range)}` }
   }
 }
 
 /** Header metadata for a diff row, including a before → after pair on replacements. */
-export function getEntryMetadataLine(entry: NotebookCellDiffEntry): string | null {
+export function getEntryMetadata(
+  entry: NotebookCellDiffEntry,
+  databaseContext: NotebookDatabaseContext
+): NotebookCellMetadata {
   if (entry._tag !== 'replaced') {
-    return getCellMetadataLine(entry.cell)
+    return getCellMetadata(entry.cell, databaseContext)
   }
 
-  const beforeMetadata = getCellMetadataLine(entry.before)
-  const afterMetadata = getCellMetadataLine(entry.after)
-  if (beforeMetadata === afterMetadata) return afterMetadata
-  return `${beforeMetadata ?? 'No metadata'} → ${afterMetadata ?? 'No metadata'}`
+  const beforeMetadata = getCellMetadata(entry.before, databaseContext)
+  const afterMetadata = getCellMetadata(entry.after, databaseContext)
+  if (beforeMetadata.status === 'loading' || afterMetadata.status === 'loading') {
+    return { status: 'loading' }
+  }
+
+  const beforeText = beforeMetadata.status === 'ready' ? beforeMetadata.text : null
+  const afterText = afterMetadata.status === 'ready' ? afterMetadata.text : null
+  if (beforeText === null && afterText === null) return { status: 'hidden' }
+  if (beforeText === afterText) return { status: 'ready', text: afterText ?? 'No metadata' }
+
+  return {
+    status: 'ready',
+    text: `${beforeText ?? 'No metadata'} → ${afterText ?? 'No metadata'}`,
+  }
 }
 
 export type NotebookDiffSummary =
   | { mode: 'create'; cellCount: number }
+  | { mode: 'run'; cellCount: number }
   | { mode: 'update'; counts: { added: number; removed: number; replaced: number; moved: number } }
 
 /** Summarizes a set of diff entries into counts suitable for a header line. */
 export function summarizeNotebookDiff(
   entries: NotebookCellDiffEntry[],
-  mode: 'create' | 'update'
+  mode: 'create' | 'update' | 'run'
 ): NotebookDiffSummary {
-  if (mode === 'create') {
-    return { mode: 'create', cellCount: entries.length }
+  if (mode === 'create' || mode === 'run') {
+    return { mode, cellCount: entries.length }
   }
 
   const counts = { added: 0, removed: 0, replaced: 0, moved: 0 }
@@ -140,7 +223,7 @@ export function summarizeNotebookDiff(
 
 /** Formats a `NotebookDiffSummary` into the header string. */
 export function formatNotebookDiffSummary(summary: NotebookDiffSummary): string {
-  if (summary.mode === 'create') {
+  if (summary.mode === 'create' || summary.mode === 'run') {
     const { cellCount } = summary
     return `${cellCount} cell${cellCount === 1 ? '' : 's'}`
   }

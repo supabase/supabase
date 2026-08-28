@@ -11,6 +11,7 @@ import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
 import { Button, buttonVariants, cn } from 'ui'
 import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
+import { AnnouncementBanner } from 'ui-patterns/Banners/AnnouncementBanner'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -78,6 +79,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
 
   return (
     <>
+      <AnnouncementBanner />
       <div
         className={cn(
           'sticky top-0 z-40 transform',

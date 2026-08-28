@@ -434,6 +434,18 @@ FROM "selected_table_rows";
 
 More examples can be seen on the [Extension's GitHub page](https://github.com/supabase/pg_net/)
 
+## Permissions
+
+By default, the `net` schema grants `USAGE` to `PUBLIC`. As a result, `anon` and `authenticated`
+inherit direct object-level access (for example, `SELECT`) on `net.http_request_queue`,
+`net._http_response`, and their associated sequences.
+
+This doesn't expose request data to unauthenticated or client-side users, for two reasons:
+
+- `net` isn't exposed through the [Data API](/docs/guides/api), so anon/publishable keys can't
+  access or modify its objects through the API.
+- `anon` and `authenticated` are `NOLOGIN` roles, so they can't establish a direct database connection.
+
 ## Limitations
 
 - To improve speed and performance, the requests and responses are stored in [unlogged tables](https://pgpedia.info/u/unlogged-table.html), which are not preserved during a crash or unclean shutdown.
