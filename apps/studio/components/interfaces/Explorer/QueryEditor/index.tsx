@@ -502,6 +502,16 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
                       if (selectionParts) setPromptState({ isOpen: true, ...selectionParts })
                     },
                   })
+
+                  editor.addAction({
+                    id: 'prettify-query',
+                    label: 'Prettify SQL',
+                    keybindings: [monaco.KeyMod.Alt | monaco.KeyMod.Shift | monaco.KeyCode.KeyF],
+                    contextMenuGroupId: 'operation',
+                    run: () => {
+                      handlePrettify()
+                    },
+                  })
                 }}
               />
 
