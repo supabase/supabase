@@ -116,11 +116,13 @@ Individual options inside of a group can be reached by arrow keys (↑ ↓ ← �
 
 ### Jumping ahead
 
-Some keyboard-navigable content may be contain hundreds or thousands of items. Help users jump to specific content with the following mitigation strategies:
+Some keyboard-navigable content may contain hundreds or thousands of items. Help users jump to specific content with:
 
 - Search and filtering
 - Pagination or virtualization
-- “Jump to” shortcuts to skip ahead
+- Skip links and “jump to” shortcuts
+
+Apps with persistent header and sidebar chrome should expose a skip link as the first focusable element. Use the shared [Skip to Content](fragments/skip-to-content) fragment which owns the component API, usage sample, and target landmark contract.
 
 ## Screen readers
 

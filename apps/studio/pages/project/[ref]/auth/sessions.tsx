@@ -34,7 +34,7 @@ const SessionsPage: NextPageWithLayout = () => {
           <PageHeaderSummary>
             <PageHeaderTitle>User Sessions</PageHeaderTitle>
             <PageHeaderDescription>
-              Configure settings for user sessions and refresh tokens
+              Configure settings for access tokens, refresh tokens, and user sessions
             </PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>

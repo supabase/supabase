@@ -139,7 +139,7 @@ export function useSqlEditorExecution({
         },
       })
 
-      track('sql_editor_query_run_button_clicked')
+      track('sql_editor_query_run_button_clicked', { source: 'database' })
     },
     [
       editor,

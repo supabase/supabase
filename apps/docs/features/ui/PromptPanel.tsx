@@ -124,7 +124,7 @@ function ExpandableContent({ children }: { children: ReactNode }) {
   return (
     <div>
       <div className="relative">
-        <div className={cn(!isExpanded && 'max-h-30 overflow-hidden')}>{children}</div>
+        <div className={cn(!isExpanded && 'max-h-28 overflow-hidden')}>{children}</div>
         {!isExpanded && (
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-background to-transparent" />
         )}
@@ -133,7 +133,7 @@ function ExpandableContent({ children }: { children: ReactNode }) {
         tabIndex={0}
         type="button"
         onClick={() => setIsExpanded((expanded) => !expanded)}
-        className="mt-2 text-sm text-brand-link transition-colors hover:text-brand focus-ring"
+        className="mt-2 cursor-pointer text-sm text-brand-link transition-colors hover:text-foreground focus-ring"
         aria-expanded={isExpanded}
       >
         {isExpanded ? 'Show less' : 'Show more'}
@@ -167,7 +167,7 @@ function PromptBody({
   )
 
   return (
-    <div className="px-4 py-3.5 text-sm leading-6 text-foreground-light">
+    <div className="px-4 py-3.5 text-sm leading-6 text-foreground-light font-normal">
       {prompt.expandable ? <ExpandableContent>{content}</ExpandableContent> : content}
     </div>
   )
@@ -192,7 +192,7 @@ function CopyButton({ label, value }: { label: string; value: string }) {
           setCopied(true)
         })
       }}
-      className="rounded-sm p-1.5 text-foreground-muted transition-colors hover:bg-surface-200 hover:text-foreground focus-ring"
+      className="cursor-pointer rounded-sm p-1.5 text-foreground-muted transition-colors hover:bg-surface-200 hover:text-foreground focus-ring"
       aria-label={copied ? `${label} copied` : `Copy ${label}`}
       title={copied ? 'Copied' : 'Copy to clipboard'}
     >
@@ -204,7 +204,11 @@ function CopyButton({ label, value }: { label: string; value: string }) {
 function TabLabel({ icon, children }: { icon?: ReactNode; children: ReactNode }) {
   return (
     <span className="inline-flex items-center gap-1.5">
-      {icon && <span className="text-tertiary-foreground [&_svg]:size-3.5">{icon}</span>}
+      {icon && (
+        <span aria-hidden="true" className="text-tertiary-foreground [&_svg]:size-3.5">
+          {icon}
+        </span>
+      )}
       {children}
     </span>
   )
@@ -230,6 +234,7 @@ const tabTriggerClassName = 'h-full px-0 py-0 text-xs shadow-none data-[state=ac
  */
 function PromptPanel({ children, className }: PromptPanelProps) {
   const fallbackId = useId()
+  const titleId = useId()
   const prompts = collectPrompts(children)
   const [activeTab, setActiveTab] = useState(prompts[0]?.value ?? fallbackId)
   const [shimmerEnabled, setShimmerEnabled] = useState(true)
@@ -252,6 +257,7 @@ function PromptPanel({ children, className }: PromptPanelProps) {
         </TabsList>
       ) : (
         <span
+          id={titleId}
           className={cn(
             'inline-flex items-center justify-center whitespace-nowrap border-b-2 border-transparent text-foreground-lighter',
             tabTriggerClassName
@@ -271,6 +277,8 @@ function PromptPanel({ children, className }: PromptPanelProps) {
   if (!hasTabs) {
     return (
       <div
+        role="region"
+        aria-labelledby={titleId}
         onFocusCapture={dismissShimmer}
         onPointerEnter={dismissShimmer}
         className={cn(
@@ -288,16 +296,32 @@ function PromptPanel({ children, className }: PromptPanelProps) {
     <Tabs
       value={activeTab}
       onValueChange={setActiveTab}
+      // Manual activation keeps VoiceOver focus from switching tabs before Copy is reached.
+      activationMode="manual"
       onFocusCapture={dismissShimmer}
       onPointerEnter={dismissShimmer}
       className={cn('w-full overflow-hidden rounded-lg border bg-background shadow-sm', className)}
     >
       {header}
-      {prompts.map((prompt) => (
-        <TabsContent key={prompt.value} value={prompt.value} className="m-0">
-          <PromptBody prompt={prompt} shimmerEnabled={shimmerEnabled} />
-        </TabsContent>
-      ))}
+      {/* Stack panes in one grid cell so the panel keeps the tallest tab's height. */}
+      <div className="grid">
+        {prompts.map((prompt) => {
+          const isActive = prompt.value === activeTab
+
+          return (
+            <TabsContent
+              key={prompt.value}
+              value={prompt.value}
+              forceMount
+              inert={!isActive}
+              aria-hidden={!isActive}
+              className="col-start-1 row-start-1 m-0 data-[state=inactive]:invisible data-[state=inactive]:pointer-events-none"
+            >
+              <PromptBody prompt={prompt} shimmerEnabled={shimmerEnabled} />
+            </TabsContent>
+          )
+        })}
+      </div>
     </Tabs>
   )
 }

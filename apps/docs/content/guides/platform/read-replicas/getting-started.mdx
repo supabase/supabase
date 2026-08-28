@@ -15,18 +15,18 @@ Read Replicas are available for all projects on the Pro, Team and Enterprise pla
 Projects must meet these requirements to use Read Replicas:
 
 1. Running on AWS.
-2. Running on at least a [Small compute add-on](/docs/guides/platform/compute-add-ons).
+2. Running on at least a [Small compute add-on](/docs/guides/platform/compute-and-disk).
    - Read Replicas are started on the same compute instance as the Primary to keep up with changes.
 
 3. Running on Postgres 15+.
-   - For projects running on older versions of Postgres, you need to [upgrade to the latest platform version](/docs/guides/platform/migrating-and-upgrading-projects#pgupgrade).
+   - For projects running on older versions of Postgres, you need to [upgrade to the latest platform version](/docs/guides/platform/upgrading).
 
 4. Not using [legacy logical backups](/docs/guides/platform/backups#point-in-time-recovery)
    - Physical backups are automatically enabled if using [Point in time recovery (PITR)](/docs/guides/platform/backups#point-in-time-recovery)
 
 ## Creating a Read Replica
 
-To add a Read Replica, go to the [Database Replication page](/dashboard/project/_/database/replication) in your project dashboard.
+To add a Read Replica, go to the [Infrastructure](/dashboard/project/_/settings/infrastructure) settings page in your project dashboard.
 
 You can also manage Read Replicas using the Management API (beta functionality):
 
@@ -110,7 +110,7 @@ Once the Primary database has completed restarting (or resizing, in case of a co
 
 The following procedures require all Read Replicas for a project to be brought down before performing them:
 
-1. [Project upgrades](/docs/guides/platform/migrating-and-upgrading-projects#pgupgrade)
+1. [Project upgrades](/docs/guides/platform/upgrading)
 2. [Data restorations](/docs/guides/platform/backups#pitr-restoration-process)
 
 These operations need to complete before you can re-deploy Read Replicas.
@@ -127,9 +127,9 @@ There is no single threshold to indicate when you should address replication lag
 
 </Admonition>
 
-<Admonition type="tip">
+<Admonition type="note">
 
-If you are already ingesting your [project's metrics](/docs/guides/telemetry/metrics) into your own environment, you can also keep track of replication lag and set alarms with the `physical_replication_lag_physical_replica_lag_seconds` metric.
+If you are already ingesting your [project's metrics](/docs/guides/monitoring-and-debugging/metrics) into your own environment, you can also keep track of replication lag and set alarms with the `physical_replication_lag_physical_replica_lag_seconds` metric.
 
 </Admonition>
 
@@ -142,7 +142,7 @@ Some common sources of high replication lag include:
 3. **Long-running transactions on the Primary**: Transactions that run for a long-time on the primary can also result in high replication lag. You can use the `pg_stat_activity` view to identify and terminate such transactions if needed. `pg_stat_activity` is a live view, and does not offer historical data on transactions that might have been active for a long time in the past.
    High replication lag can result in stale data returned for queries executed against the affected read replicas.
 
-<Admonition type="tip" >
+<Admonition type="note" >
 
 You can find additional resources on replication lag in [the Google documentation](https://cloud.google.com/sql/docs/postgres/replication/replication-lag), [the AWS documentation](https://repost.aws/knowledge-center/rds-postgresql-replication-lag), and [the several nines blog](https://severalnines.com/blog/what-look-if-your-postgresql-replication-lagging/).
 

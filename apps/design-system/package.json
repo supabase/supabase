@@ -5,22 +5,23 @@
   "type": "module",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "dev": "run-p --race dev:*",
+    "dev": "pnpm run generate:registry && run-p --race dev:*",
     "dev:next": "next dev --turbopack --port 3003",
     "dev:content": "contentlayer2 dev",
-    "build": "pnpm run content:build && pnpm run build:registry && next build --turbopack",
-    "build:registry": "tsx ./scripts/build-registry.mts && prettier --log-level silent --write \"registry/**/*.{ts,tsx,mdx}\" --cache",
+    "build": "pnpm run build:registry && pnpm run content:build && next build --turbopack",
+    "generate:registry": "tsx ./scripts/build-registry.mts",
+    "build:registry": "pnpm run generate:registry && prettier --log-level silent --write \"registry/**/*.{ts,tsx,mdx}\" --cache",
     "start": "next start",
     "lint": "eslint .",
     "content:build": "contentlayer2 build",
-    "clean": "rimraf .next .turbo tsconfig.tsbuildinfo",
-    "typecheck": "contentlayer2 build && tsc --noEmit -p tsconfig.json"
+    "clean": "rimraf .next .turbo tsconfig.tsbuildinfo __registry__",
+    "typecheck": "pnpm run generate:registry && contentlayer2 build && tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
     "@tanstack/react-table": "catalog:",
-    "contentlayer2": "0.4.6",
     "common": "workspace:*",
+    "contentlayer2": "0.4.6",
     "date-fns": "^2.30.0",
     "dayjs": "1.11.13",
     "eslint-config-supabase": "workspace:*",
@@ -57,6 +58,7 @@
     "@types/lodash.template": "4.5.0",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "@typescript/native": "catalog:",
     "config": "workspace:*",
     "mdast-util-toc": "^6.1.1",
     "npm-run-all": "^4.1.5",
@@ -66,7 +68,6 @@
     "tailwindcss": "catalog:",
     "tsconfig": "workspace:*",
     "tsx": "catalog:",
-    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "unist-builder": "3.0.0"
   }

@@ -1,11 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useFlag } from 'common'
 import { Trash } from 'lucide-react'
 import { useEffect, useEffectEvent, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
@@ -103,13 +102,6 @@ export const SSOConfig = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const { hasAccess: hasAccessToSso, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('auth.platform.sso')
-  const enterpriseMcpAuthOrgs = useFlag<string>('enableEnterpriseMcpAuth')
-  const showIdjagSettings =
-    typeof enterpriseMcpAuthOrgs === 'string' &&
-    enterpriseMcpAuthOrgs
-      .split(',')
-      .map((s) => s.trim())
-      .includes(organization?.slug ?? '')
 
   const {
     data: ssoConfig,
@@ -129,8 +121,8 @@ export const SSOConfig = () => {
     defaultValues,
   })
 
-  const isSSOEnabled = form.watch('enabled')
-  const enableSpInitiated = form.watch('enableSpInitiated')
+  const isSSOEnabled = useWatch({ control: form.control, name: 'enabled' })
+  const enableSpInitiated = useWatch({ control: form.control, name: 'enableSpInitiated' })
 
   const { mutate: createSSOConfig, isPending: isCreating } = useSSOConfigCreateMutation({
     onSuccess: () => {
@@ -226,7 +218,6 @@ export const SSOConfig = () => {
 
   useEffect(() => {
     syncFormFromConfig()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
   }, [ssoConfig, organization?.slug])
 
   // Automatically add an empty domain field when SP-initiated is enabled
@@ -239,7 +230,6 @@ export const SSOConfig = () => {
 
   useEffect(() => {
     ensureDomainField()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
   }, [enableSpInitiated])
 
   return (
@@ -314,7 +304,7 @@ export const SSOConfig = () => {
                           )}
                         />
 
-                        {form.watch('enableSpInitiated') && (
+                        {enableSpInitiated && (
                           <Admonition
                             type="note"
                             title="Understanding SSO login flows"
@@ -346,7 +336,7 @@ export const SSOConfig = () => {
                         )}
                       </CardContent>
 
-                      {form.watch('enableSpInitiated') && (
+                      {enableSpInitiated && (
                         <CardContent>
                           <SSODomains form={form} />
                         </CardContent>
@@ -370,11 +360,9 @@ export const SSOConfig = () => {
                         <JoinOrganizationOnSignup form={form} />
                       </CardContent>
 
-                      {showIdjagSettings && (
-                        <CardContent>
-                          <SSOAdvancedSettings form={form} />
-                        </CardContent>
-                      )}
+                      <CardContent>
+                        <SSOAdvancedSettings form={form} />
+                      </CardContent>
                     </>
                   )}
 

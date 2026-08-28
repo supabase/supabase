@@ -4,6 +4,8 @@ subtitle: 'Learn how to create a Supabase project, add sample data, and query fr
 breadcrumb: 'Framework Quickstarts'
 ---
 
+<AiPrompt id="astrojs" />
+
 <$Partial path="quickstart_db_setup.mdx" />
 
 ## 3. Create an Astro app
@@ -15,15 +17,9 @@ npm create astro@latest my-app
 cd my-app
 ```
 
-## 4. Install Agent Skills (optional)
+## 4. Set up AI tooling (optional)
 
-Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
-
-To install, run the following command in the root of your project:
-
-```bash
-npx skills add supabase/agent-skills
-```
+<$Partial path="quickstart_ai_tooling.mdx" />
 
 ## 5. Install Supabase client library and Node adapter
 
@@ -51,7 +47,7 @@ export default defineConfig({
 
 ## 7. Declare Supabase environment variables
 
-Create a `.env.local` file and populate with your Supabase connection variables that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=astro&tab=frameworks):
+Create a `.env.local` file and populate with your Supabase connection variables that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=astro&connectTab=frameworks):
 
 <Button variant="primary" asChild>
   <a href="/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=astro">
@@ -92,7 +88,7 @@ This queries all rows from the `instruments` table you created earlier and rende
 import { createServerClient } from "../lib/supabase";
 
 const supabase = createServerClient();
-const { data: instruments } = await supabase.from("instruments").select();
+const { data: instruments, error } = await supabase.from("instruments").select();
 ---
 
 <html>
@@ -100,11 +96,15 @@ const { data: instruments } = await supabase.from("instruments").select();
     <title>Instruments</title>
   </head>
   <body>
-    <ul>
-      {instruments?.map((instrument) => (
-        <li>{instrument.name}</li>
-      ))}
-    </ul>
+    {error ? (
+      <p>Error loading instruments: {error.message}</p>
+    ) : (
+      <ul>
+        {instruments?.map((instrument) => (
+          <li>{instrument.name}</li>
+        ))}
+      </ul>
+    )}
   </body>
 </html>
 ```
@@ -117,9 +117,10 @@ Run the development server, go to http://localhost:4321/instruments in your brow
 npm run dev
 ```
 
+<$Partial path="quickstart_going_to_production.mdx" />
+
 ## Next steps
 
-- Explore [drop-in UI components](/ui) for your Supabase app
 - Set up [Auth](/docs/guides/auth) for your app
 - [Insert more data](/docs/guides/database/import-data) into your database
 - Upload and serve static files using [Storage](/docs/guides/storage)

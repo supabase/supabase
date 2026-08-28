@@ -113,12 +113,14 @@ export function CodeCopyButton({ className, content }: { className?: string; con
             onClick={handleCopy}
             onBlur={resetStatus}
             className={cn(
-              'border rounded-md p-1',
+              'cursor-pointer border rounded-md p-1',
               copied && 'bg-selection',
               'hover:bg-selection transition',
               className
             )}
             aria-label="Copy code"
+            // Tooltip repeats the label; the description would read the name twice
+            aria-describedby={undefined}
           >
             {copied ? (
               <Check size={14} className="text-lighter" />
@@ -135,36 +137,42 @@ export function CodeCopyButton({ className, content }: { className?: string; con
 
 export function CodeBlockControls({ content }: { content: string }) {
   const [isWrapped, setIsWrapped] = useState(false)
+  // Empty until the first toggle, so nothing is announced on mount
+  const [wrapStatus, setWrapStatus] = useState('')
   const wrapperRef = useRef<HTMLDivElement>(null)
 
   const toggleWrap = useCallback(() => {
-    setIsWrapped((prev) => {
-      const newValue = !prev
-      // Find the parent code block and toggle the wrap data attribute
-      const codeBlock = wrapperRef.current?.closest('.shiki')
-      if (codeBlock) {
-        if (newValue) {
-          codeBlock.setAttribute('data-wrapped', 'true')
-        } else {
-          codeBlock.removeAttribute('data-wrapped')
-        }
+    const newValue = !isWrapped
+    setIsWrapped(newValue)
+    setWrapStatus(newValue ? 'Word wrap enabled' : 'Word wrap disabled')
+
+    const codeBlock = wrapperRef.current?.closest('.shiki')
+    if (codeBlock) {
+      if (newValue) {
+        codeBlock.setAttribute('data-wrapped', 'true')
+      } else {
+        codeBlock.removeAttribute('data-wrapped')
       }
-      return newValue
-    })
-  }, [])
+    }
+  }, [isWrapped])
 
   return (
     <div
       ref={wrapperRef}
-      className="opacity-0 flex group-hover:opacity-100 focus-within:opacity-100 absolute top-2 right-2 gap-1"
+      className="opacity-0 flex group-hover:opacity-100 group-focus-within:opacity-100 absolute top-2 right-2 gap-1"
     >
+      <span className="sr-only" aria-live="polite">
+        {wrapStatus}
+      </span>
       <Tooltip>
         <TooltipTrigger asChild>
           <button
             tabIndex={0}
             onClick={toggleWrap}
-            className={cn('border rounded-md p-1', 'hover:bg-selection transition')}
+            className={cn('cursor-pointer border rounded-md p-1', 'hover:bg-selection transition')}
             aria-label={isWrapped ? 'Disable word wrap' : 'Enable word wrap'}
+            // Tooltip repeats the label; the description would read the name twice
+            aria-describedby={undefined}
           >
             {isWrapped ? (
               <ArrowRightFromLine size={14} className="text-lighter" />

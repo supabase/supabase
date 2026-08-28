@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { http, HttpResponse } from 'msw'
+import { toast } from 'sonner'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { AwsMarketplaceOnboardingScreen } from '@/components/interfaces/Organization/CloudMarketplace/AwsMarketplaceOnboarding'
@@ -16,6 +17,10 @@ import type { ProfileContextType } from '@/lib/profile'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer } from '@/tests/lib/msw'
+
+vi.mock('sonner', () => ({
+  toast: { error: vi.fn() },
+}))
 
 type OrganizationResponse = components['schemas']['OrganizationResponse']
 
@@ -168,6 +173,28 @@ describe('AwsMarketplaceOnboardingScreen', () => {
       })
     })
     await screen.findByText('Organization linked')
+  })
+
+  test('renders a link failure inline and keeps the action available', async () => {
+    const user = userEvent.setup()
+    mockAwsEndpoints()
+    mswServer.use(
+      http.put(`${API_URL}/platform/organizations/:slug/cloud-marketplace/link`, () =>
+        HttpResponse.json({ message: 'Marketplace link failed' }, { status: 500 })
+      )
+    )
+
+    renderScreen()
+
+    await user.click(await screen.findByRole('button', { name: /Acme Production/ }))
+    await user.click(screen.getByRole('button', { name: 'Link organization' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Failed to link organization: Marketplace link failed'
+    )
+    expect(toast.error).not.toHaveBeenCalled()
+    expect(screen.queryByText(/Learn more/)).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Link organization' })).toBeEnabled()
   })
 
   test('creates an AWS-managed organization with buyerId and returns to linked state', async () => {

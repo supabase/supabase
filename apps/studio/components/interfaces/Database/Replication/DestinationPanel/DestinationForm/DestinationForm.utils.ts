@@ -172,7 +172,7 @@ export const buildTableSyncCopyConfig = ({
   if (mode === 'include_all_tables' || mode === 'skip_all_tables') return { type: mode }
 
   if (selectedTableIds.length === 0) {
-    throw new Error('Select at least one table for the initial copy')
+    throw new Error('Select at least one table for the initial sync.')
   }
 
   const tableIds = selectedTableIds.map(Number)
@@ -343,7 +343,7 @@ export const buildDestinationConfigForValidation = ({
   } else if (selectedType === 'ClickHouse') {
     return { clickHouse: buildClickHouseConfig(data) }
   } else {
-    throw new Error('Invalid destination type')
+    throw new Error('Invalid destination type.')
   }
 }
 

@@ -8,6 +8,7 @@ import {
   SupabaseProjectSelector,
 } from './ProjectLinkerComponents'
 import { Project, ProjectLinkerProps } from './VercelGithub.types'
+import { InterstitialActionError } from '@/components/layouts/InterstitialLayout'
 import ShimmerLine from '@/components/ui/ShimmerLine'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -31,6 +32,8 @@ export const ProjectLinker = ({
   defaultForeignProjectId,
   mode,
   variant = 'default',
+  actionError,
+  onSelectionChange,
 }: ProjectLinkerProps) => {
   const [openProjectsDropdown, setOpenProjectsDropdown] = useState(false)
   const [openForeignProjectsComboBox, setOpenForeignProjectsComboBox] = useState(false)
@@ -38,6 +41,7 @@ export const ProjectLinker = ({
     defaultForeignProjectId
   )
   const [selectedSupabaseProject, setSelectedSupabaseProject] = useState<Project>()
+  const [validationError, setValidationError] = useState<string>()
 
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: orgProjects, isPending: loadingSupabaseProjects } = useOrgProjectsInfiniteQuery({
@@ -60,11 +64,15 @@ export const ProjectLinker = ({
 
     const alreadyInstalled = flatInstalledConnectionsIds.has(foreignProjectId ?? '')
     if (alreadyInstalled) {
-      return toast.error(
-        `Unable to connect to ${selectedForeignProject.name}: Selected repository already has an installed connection to a project`
-      )
+      const message = `Unable to connect to ${selectedForeignProject.name}: Selected repository already has an installed connection to a project`
+      if (variant === 'interstitial') {
+        setValidationError(message)
+        return
+      }
+      return toast.error(message)
     }
 
+    setValidationError(undefined)
     _onCreateConnections({
       organizationIntegrationId: organizationIntegrationId!,
       connection: {
@@ -95,6 +103,17 @@ export const ProjectLinker = ({
     isLoading ||
     !selectedSupabaseProject ||
     !selectedForeignProject
+  const displayedActionError = actionError ?? validationError
+  const setForeignProjectSelection: typeof setForeignProjectId = (value) => {
+    setForeignProjectId(value)
+    setValidationError(undefined)
+    onSelectionChange?.()
+  }
+  const setSupabaseProjectSelection: typeof setSelectedSupabaseProject = (value) => {
+    setSelectedSupabaseProject(value)
+    setValidationError(undefined)
+    onSelectionChange?.()
+  }
 
   useEffect(() => {
     if (defaultSupabaseProject !== undefined && selectedSupabaseProject === undefined)
@@ -117,7 +136,8 @@ export const ProjectLinker = ({
         ) : showNoEntitiesState && (noSupabaseProjects || noForeignProjects) ? (
           <div className="text-sm text-foreground-lighter text-balance">
             No {missingEntity} projects found. Create a {missingEntity} project to link to a{' '}
-            {oppositeMissingEntity} project, or skip and connect later.
+            {oppositeMissingEntity} project
+            {onSkip !== undefined ? ', or skip and connect later.' : '.'}
           </div>
         ) : (
           <>
@@ -133,7 +153,7 @@ export const ProjectLinker = ({
                 selectedSupabaseProject={selectedSupabaseProject}
                 loadingSupabaseProjects={loadingSupabaseProjects}
                 setOpen={setOpenProjectsDropdown}
-                setSelectedSupabaseProject={setSelectedSupabaseProject}
+                setSelectedSupabaseProject={setSupabaseProjectSelection}
               />
             </section>
 
@@ -150,7 +170,7 @@ export const ProjectLinker = ({
                 loadingForeignProjects={loadingForeignProjects}
                 foreignProjects={foreignProjects}
                 integrationIcon={integrationIcon}
-                setForeignProjectId={setForeignProjectId}
+                setForeignProjectId={setForeignProjectSelection}
                 onOpenChange={setOpenForeignProjectsComboBox}
                 getForeignProjectIcon={getForeignProjectIcon}
               />
@@ -158,17 +178,20 @@ export const ProjectLinker = ({
           </>
         )}
 
-        <ActionButtons
-          slug={slug}
-          mode={mode}
-          variant={variant}
-          showCreateProject={showNoEntitiesState && noSupabaseProjects}
-          connectDisabled={connectDisabled}
-          foreignProjectId={foreignProjectId}
-          isLoading={isLoading}
-          onCreateConnections={onCreateConnections}
-          onSkip={onSkip}
-        />
+        <div className="flex flex-col gap-2">
+          <ActionButtons
+            slug={slug}
+            mode={mode}
+            variant={variant}
+            showCreateProject={showNoEntitiesState && noSupabaseProjects}
+            connectDisabled={connectDisabled}
+            foreignProjectId={foreignProjectId}
+            isLoading={isLoading}
+            onCreateConnections={onCreateConnections}
+            onSkip={onSkip}
+          />
+          <InterstitialActionError error={displayedActionError} />
+        </div>
       </div>
     )
   }
@@ -192,8 +215,12 @@ export const ProjectLinker = ({
             <p className="text-foreground-light text-sm">
               You will need to create a {missingEntity} Project to link to a {oppositeMissingEntity}{' '}
               Project.
-              <br />
-              You can skip this and create a Project Connection later.
+              {onSkip !== undefined && (
+                <>
+                  <br />
+                  You can skip this and create a Project Connection later.
+                </>
+              )}
             </p>
           </div>
         ) : (
@@ -211,7 +238,7 @@ export const ProjectLinker = ({
                 selectedSupabaseProject={selectedSupabaseProject}
                 loadingSupabaseProjects={loadingSupabaseProjects}
                 setOpen={setOpenProjectsDropdown}
-                setSelectedSupabaseProject={setSelectedSupabaseProject}
+                setSelectedSupabaseProject={setSupabaseProjectSelection}
               />
             </Panel>
 
@@ -231,7 +258,7 @@ export const ProjectLinker = ({
                 loadingForeignProjects={loadingForeignProjects}
                 foreignProjects={foreignProjects}
                 integrationIcon={integrationIcon}
-                setForeignProjectId={setForeignProjectId}
+                setForeignProjectId={setForeignProjectSelection}
                 onOpenChange={setOpenForeignProjectsComboBox}
                 getForeignProjectIcon={getForeignProjectIcon}
               />

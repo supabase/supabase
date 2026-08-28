@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
-import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
+import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 
 const DEFAULT_TITLE = 'This feature is unavailable on High Availability projects'
 const DEFAULT_DESCRIPTION =
@@ -16,7 +16,7 @@ export function HighAvailabilityDisabledSectionNotice({
   title = DEFAULT_TITLE,
   description = DEFAULT_DESCRIPTION,
 }: HighAvailabilityDisabledSectionNoticeProps) {
-  const { isHighAvailability } = useHighAvailability()
+  const isHighAvailability = useIsHighAvailability()
 
   if (!isHighAvailability) return null
 

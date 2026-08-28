@@ -3,27 +3,11 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { AWS_REGIONS } from 'shared-data'
+import { RefObject, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Button,
-  DialogSectionSeparator,
-  Form,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SheetFooter,
-  SheetSection,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { Button, DialogSectionSeparator, Form, SheetFooter, SheetSection } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import * as z from 'zod'
 
 import {
@@ -37,7 +21,10 @@ import { type DestinationType, type ExistingDestination } from '../DestinationPa
 import { AdvancedSettings } from './AdvancedSettings'
 import { getAnalyticsBucketValidationIssues } from './AnalyticsBucket/AnalyticsBucket.utils'
 import { AnalyticsBucketFields } from './AnalyticsBucket/Fields'
-import { getBigQueryValidationIssues } from './BigQuery/BigQuery.utils'
+import {
+  BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE,
+  getBigQueryValidationIssues,
+} from './BigQuery/BigQuery.utils'
 import { BigQueryFields } from './BigQuery/Fields'
 import { getClickHouseValidationIssues } from './ClickHouse/ClickHouse.utils'
 import { ClickHouseFields } from './ClickHouse/Fields'
@@ -54,6 +41,7 @@ import { DuckLakeFields } from './DuckLake/Fields'
 import { NewPublicationPanel } from './NewPublicationPanel'
 import { NoDestinationsAvailable } from './NoDestinationsAvailable'
 import { PipelineCostDialog } from './PipelineCostDialog'
+import { PipelineRegionField } from './PipelineRegionField'
 import { PublicationSelection } from './PublicationSelection'
 import { SnowflakeFields } from './Snowflake/Fields'
 import { getSnowflakeValidationIssues } from './Snowflake/Snowflake.utils'
@@ -62,7 +50,6 @@ import { useDestinationForm } from './useDestinationForm'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
 import { ValidationWarningsDialog } from './ValidationWarningsDialog'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
-import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
@@ -70,26 +57,27 @@ import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-
 import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { BASE_PATH, IS_STAGING_OR_LOCAL } from '@/lib/constants'
 
 const formId = 'destination-editor'
-
-// Pipelines always run out of a single fixed region per environment, regardless of the source
-// project's region.
-const PIPELINE_REGION = IS_STAGING_OR_LOCAL ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.CENTRAL_EU
 
 interface DestinationFormProps {
   selectedType: DestinationType
   visible: boolean
   existingDestination?: ExistingDestination
+  typeSelection?: ReactNode
+  checkIsDirtyRef?: RefObject<() => boolean>
   onClose: () => void
+  onCancel?: () => void
 }
 
 export const DestinationForm = ({
   selectedType,
   visible,
   existingDestination,
+  typeSelection,
+  checkIsDirtyRef,
   onClose,
+  onCancel = onClose,
 }: DestinationFormProps) => {
   const { ref: projectRef } = useParams()
 
@@ -225,11 +213,12 @@ export const DestinationForm = ({
         }
 
         if (selectedType === 'BigQuery') {
-          getBigQueryValidationIssues(data, { secretsOptional: editMode }).forEach(
-            ({ path, message }) => {
-              addRequiredFieldError(path, message)
-            }
-          )
+          getBigQueryValidationIssues(data, {
+            secretsOptional: editMode,
+            validateJson: false,
+          }).forEach(({ path, message }) => {
+            addRequiredFieldError(path, message)
+          })
         } else if (selectedType === 'Analytics Bucket') {
           getAnalyticsBucketValidationIssues(data, {
             secretsOptional: editMode,
@@ -259,7 +248,11 @@ export const DestinationForm = ({
     defaultValues,
   })
 
-  const { publicationName } = form.watch()
+  // Always destructure formState values otherwise they won't be updated
+  // See https://react-hook-form.com/docs/useform/formstate
+  const { isDirty } = form.formState
+
+  const publicationName = useWatch({ control: form.control, name: 'publicationName' })
 
   const publicationNames = useMemo(() => publications?.map((pub) => pub.name) ?? [], [publications])
   const isSelectedPublicationMissing =
@@ -329,6 +322,16 @@ export const DestinationForm = ({
         publications,
         publicationName: rawData.publicationName,
       }),
+    }
+
+    if (selectedType === 'BigQuery') {
+      const jsonIssue = getBigQueryValidationIssues(data, { secretsOptional: editMode }).find(
+        (issue) => issue.message === BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE
+      )
+      if (jsonIssue) {
+        form.setError(jsonIssue.path, { message: jsonIssue.message })
+        return
+      }
     }
 
     // Pipeline prerequisite validation models a new pipeline and cannot
@@ -407,11 +410,22 @@ export const DestinationForm = ({
   }
 
   useEffect(() => {
-    if (visible && !form.formState.isDirty) {
+    if (!checkIsDirtyRef) return
+
+    checkIsDirtyRef.current = () => isDirty
+    return () => {
+      checkIsDirtyRef.current = () => false
+    }
+  }, [checkIsDirtyRef, isDirty])
+
+  useEffect(() => {
+    // Reset when closed (including after discard) so reopening does not restore
+    // discarded values, and when open but pristine so async defaults can apply.
+    if (!visible || !isDirty) {
       form.reset(defaultValues)
       resetValidation()
     }
-  }, [visible, defaultValues, form, resetValidation])
+  }, [visible, defaultValues, form, isDirty, resetValidation])
 
   useEffect(() => {
     if (visible && projectRef && sourceId) {
@@ -422,6 +436,7 @@ export const DestinationForm = ({
   return (
     <>
       <SheetSection className="grow overflow-auto px-0 py-0">
+        {typeSelection}
         {hasNoAvailableDestinations && !editMode ? (
           <NoDestinationsAvailable />
         ) : (
@@ -446,46 +461,7 @@ export const DestinationForm = ({
                       onSelectNewPublication={() => setPublicationPanelVisible(true)}
                     />
                     <TableCopySelection form={form} editMode={editMode} />
-                    <FormItemLayout
-                      isReactForm={false}
-                      layout="horizontal"
-                      label="Region"
-                      description={
-                        <span className="text-foreground-lighter">
-                          Pipelines run in{' '}
-                          <Tooltip>
-                            <TooltipTrigger className={InlineLinkClassName}>
-                              {PIPELINE_REGION.displayName}
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom">{PIPELINE_REGION.code}</TooltipContent>
-                          </Tooltip>
-                          . In your destination provider, choose the closest available region.
-                        </span>
-                      }
-                    >
-                      <Select disabled value={PIPELINE_REGION.code}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a region" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value={PIPELINE_REGION.code}>
-                            <div className="flex gap-x-3 items-center">
-                              <img
-                                alt="region icon"
-                                className="w-5 rounded-xs"
-                                src={`${BASE_PATH}/img/regions/${PIPELINE_REGION.code}.svg`}
-                              />
-                              <p className="flex items-center gap-x-2">
-                                <span>{PIPELINE_REGION.displayName}</span>
-                                <span className="text-xs text-foreground-lighter font-mono">
-                                  {PIPELINE_REGION.code}
-                                </span>
-                              </p>
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormItemLayout>
+                    <PipelineRegionField destinationType={selectedType} />
                   </div>
                 </div>
 
@@ -502,18 +478,9 @@ export const DestinationForm = ({
                 ) : selectedType === 'DuckLake' && etlEnableDucklake ? (
                   <DuckLakeFields form={form} editMode={editMode} />
                 ) : selectedType === 'Snowflake' && etlEnableSnowflake ? (
-                  <SnowflakeFields
-                    form={form}
-                    editMode={editMode}
-                    hasStoredPrivateKeyPassphrase={
-                      editMode && !!defaultValues.snowflakePrivateKeyPassphrase
-                    }
-                  />
+                  <SnowflakeFields form={form} editMode={editMode} />
                 ) : selectedType === 'ClickHouse' && etlEnableClickHouse ? (
-                  <ClickHouseFields
-                    form={form}
-                    hasStoredPassword={editMode && !!defaultValues.clickhousePassword}
-                  />
+                  <ClickHouseFields form={form} editMode={editMode} />
                 ) : null}
 
                 <DialogSectionSeparator />
@@ -564,7 +531,7 @@ export const DestinationForm = ({
           )}
         </AnimatePresence>
         <div className="flex items-center gap-x-2">
-          <Button disabled={isSaving} variant="default" onClick={onClose}>
+          <Button disabled={isSaving} variant="default" onClick={onCancel}>
             Cancel
           </Button>
           <Button disabled={isSubmitDisabled} loading={isSaving} form={formId} type="submit">

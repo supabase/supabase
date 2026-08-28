@@ -30,6 +30,7 @@ import {
   Outlet,
   redirect,
   Scripts,
+  type AnyRouter,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import {
@@ -76,6 +77,7 @@ import { AuthProvider } from '@/lib/auth'
 import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
 import { TimezoneProvider, useTimezone } from '@/lib/datetime'
+import { splitInternalUrl } from '@/lib/internal-url'
 // Custom adapter instead of `nuqs/adapters/tanstack-router` — the stock one
 // injects a trailing slash before the query on every nuqs write (see module).
 import { NuqsAdapter } from '@/lib/nuqs-tanstack-adapter'
@@ -330,8 +332,21 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       hash: location.hash,
     })
     if (!match) return
-    const href = BASE_PATH ? `${BASE_PATH}${match.destination}` : match.destination
-    throw redirect({ href, statusCode: match.permanent ? 308 : 307 })
+    // `to`/`search`/`hash`, never `href`: the router treats `href` as an
+    // opaque (external) target, and preloading a Link whose beforeLoad
+    // throws `redirect({ href })` recurses forever — the preload retry
+    // rebuilds the origin location and re-runs this beforeLoad
+    // (https://github.com/TanStack/router/issues/7141). `to` is also
+    // basepath-relative, so no manual BASE_PATH prefix. The explicit
+    // `search`/`hash` fallbacks clear the incoming values rather than
+    // inherit them — `preserveQueryAndHash` already merged what carries over.
+    const { to, search, hash } = splitInternalUrl(match.destination)
+    throw redirect<AnyRouter, string>({
+      to,
+      search: search ?? {},
+      hash: hash ?? '',
+      statusCode: match.permanent ? 308 : 307,
+    })
   },
   component: RootComponent,
   shellComponent: RootDocument,

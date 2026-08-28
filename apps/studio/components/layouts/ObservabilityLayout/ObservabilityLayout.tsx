@@ -1,12 +1,13 @@
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { usePathname } from 'next/navigation'
 import { PropsWithChildren, useEffect, useRef } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
 import { ObservabilityMenu } from './ObservabilityMenu'
+import { useIsDatabaseConnectionsEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useIndexAdvisorStatus } from '@/components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
+import { BannerDatabaseConnections } from '@/components/ui/BannerStack/Banners/BannerDatabaseConnections'
 import { BannerIndexAdvisor } from '@/components/ui/BannerStack/Banners/BannerIndexAdvisor'
-import { BannerMetricsAPI } from '@/components/ui/BannerStack/Banners/BannerMetricsAPI'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -26,30 +27,40 @@ const ObservabilityLayoutContent = ({
   const { addBanner, dismissBanner } = useBannerStack()
   const { isIndexAdvisorAvailable, isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
-  const [isMetricsBannerDismissed] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.OBSERVABILITY_BANNER_DISMISSED(ref ?? ''),
-    false
-  )
-
   const [isIndexAdvisorBannerDismissed] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.INDEX_ADVISOR_NOTICE_DISMISSED(ref ?? ''),
     false
   )
 
-  useEffect(() => {
-    if (!isMetricsBannerDismissed && IS_PLATFORM) {
-      addBanner({
-        id: 'metrics-api-banner',
-        isDismissed: false,
-        content: <BannerMetricsAPI />,
-        priority: 1,
-      })
-    } else {
-      dismissBanner('metrics-api-banner')
-    }
-  }, [isMetricsBannerDismissed, addBanner, dismissBanner])
+  const { isInitialized, previouslyToggled } = useIsDatabaseConnectionsEnabled()
+
+  const [isDatabaseConnectionsBannerDismissed, , { isSuccess: isLocalStorageReady }] =
+    useLocalStorageQuery(LOCAL_STORAGE_KEYS.DATABASE_CONNECTIONS_BANNER_DISMISSED(ref ?? ''), false)
 
   const prevPathnameRef = useRef(pathname)
+
+  useEffect(() => {
+    if (
+      !isInitialized ||
+      !isLocalStorageReady ||
+      isDatabaseConnectionsBannerDismissed ||
+      previouslyToggled
+    )
+      return
+
+    addBanner({
+      id: 'database-connections-banner',
+      priority: 2,
+      isDismissed: false,
+      content: <BannerDatabaseConnections />,
+    })
+  }, [
+    addBanner,
+    isInitialized,
+    isDatabaseConnectionsBannerDismissed,
+    previouslyToggled,
+    isLocalStorageReady,
+  ])
 
   useEffect(() => {
     const isQueryPerformancePage = pathname?.includes('/query-performance')

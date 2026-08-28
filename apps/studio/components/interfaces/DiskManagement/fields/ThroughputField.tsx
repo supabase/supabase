@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect } from 'react'
-import { UseFormReturn } from 'react-hook-form'
+import { UseFormReturn, useWatch } from 'react-hook-form'
 import {
   FormControl,
   FormField,
@@ -13,8 +13,6 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
-import { calculateThroughputPrice } from '../DiskManagement.utils'
-import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import {
   DISK_LIMITS,
   DiskType,
@@ -31,20 +29,14 @@ type ThroughputFieldProps = {
 export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
   const { ref: projectRef } = useParams()
 
-  const { control, formState, setValue, getValues, watch } = form
+  const { control, formState, setValue, getValues } = form
 
-  const watchedStorageType = watch('storageType')
-  const watchedTotalSize = watch('totalSize')
-  const watchedComputeSize = watch('computeSize')
+  const watchedStorageType = useWatch({ control, name: 'storageType' })
+  const watchedTotalSize = useWatch({ control, name: 'totalSize' })
+  const watchedComputeSize = useWatch({ control, name: 'computeSize' })
   const throughput_mbps = formState.defaultValues?.throughput
 
   useDiskAttributesQuery({ projectRef })
-
-  const throughputPrice = calculateThroughputPrice({
-    storageType: form.getValues('storageType') as DiskType,
-    newThroughput: form.getValues('throughput') || 0,
-    oldThroughput: form.formState.defaultValues?.throughput || 0,
-  })
 
   const disableIopsInput =
     RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3.includes(watchedComputeSize) && watchedStorageType === 'gp3'
@@ -84,7 +76,8 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
             render={({ field }) => (
               <FormItemLayout
                 label="Throughput"
-                layout="horizontal"
+                layout="flex-row-reverse"
+                id={field.name}
                 description={
                   <span className="flex flex-col gap-y-2">
                     <p>Higher throughput suits applications with high data transfer needs.</p>
@@ -100,21 +93,7 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
                   </span>
                 }
                 labelOptional={
-                  <>
-                    <BillingChangeBadge
-                      show={
-                        formState.isDirty &&
-                        formState.dirtyFields.throughput &&
-                        !formState.errors.throughput
-                      }
-                      beforePrice={Number(throughputPrice.oldPrice)}
-                      afterPrice={Number(throughputPrice.newPrice)}
-                      className="mb-2"
-                    />
-                    <p className="text-foreground-lighter">
-                      Amount of data read/written per second.
-                    </p>
-                  </>
+                  <p className="text-foreground-lighter">Amount of data read/written per second.</p>
                 }
               >
                 <FormControl className="max-w-32">
@@ -122,6 +101,7 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
                     <FormInputGroupInput
                       type="number"
                       {...field}
+                      id={field.name}
                       value={field.value}
                       onChange={(e) => {
                         setValue('throughput', e.target.valueAsNumber, {
