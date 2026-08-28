@@ -4,6 +4,7 @@ import { Atom, AtomRegistry } from 'effect/unstable/reactivity'
 import { afterEach, describe, expect, it } from 'vitest'
 
 import { tabsFactory } from './tabs.factory'
+import { waitFor } from '@/tests/lib/atom-test-utils'
 
 const DataSchema = Schema.Struct({ label: Schema.String })
 
@@ -44,25 +45,6 @@ const setup = (
   const factory = tabsFactory(runtime, 'test-tabs', DataSchema)
   return { registry, factory, layer }
 }
-
-const waitFor = <A>(
-  registry: AtomRegistry.AtomRegistry,
-  atom: Atom.Atom<A>,
-  predicate: (value: A) => boolean
-): Promise<A> =>
-  new Promise((resolve) => {
-    const current = registry.get(atom)
-    if (predicate(current)) {
-      resolve(current)
-      return
-    }
-    const unsubscribe = registry.subscribe(atom, (value) => {
-      if (predicate(value)) {
-        unsubscribe()
-        resolve(value)
-      }
-    })
-  })
 
 const labelsOf = (tabs: ReadonlyArray<{ data: { label: string } }>) =>
   tabs.map((tab) => tab.data.label)
