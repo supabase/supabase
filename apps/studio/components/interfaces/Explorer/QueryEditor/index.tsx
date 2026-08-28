@@ -12,7 +12,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import { Button, cn } from 'ui'
+import { Button, cn, KeyboardShortcut } from 'ui'
 
 import { resolveLogTimeRange } from '../../QuerySources/LogTimeRange.utils'
 import {
@@ -76,6 +76,8 @@ import {
   isRoleImpersonationEnabled,
   type RoleImpersonationController,
 } from '@/state/role-impersonation-state'
+import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
+import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const generatePlaceholder = (os: string | undefined) =>
   `Hit ${os === 'macos' ? 'CMD+SHIFT+K' : 'CTRL+SHIFT+K'} to generate query or just start typing`
@@ -417,7 +419,12 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
             <ExplorerToolbarAction
               icon={<Play />}
               loading={isExecuting}
-              tooltip={hasSelection ? 'Run selected query' : 'Run query'}
+              tooltip={
+                <div className="flex items-center gap-2.5">
+                  <span>{hasSelection ? 'Run selected query' : 'Run query'}</span>
+                  <KeyboardShortcut keys={['Meta', 'Enter']} />
+                </div>
+              }
               disabled={
                 isBusy || pendingProposal !== null || isRunDisabled || sql.trim().length === 0
               }

@@ -133,7 +133,7 @@ export type ExplorerToolbarActionProps = Omit<
   React.ComponentPropsWithRef<typeof Button>,
   'size' | 'variant'
 > & {
-  tooltip?: string
+  tooltip?: React.ReactNode
 }
 
 /**
