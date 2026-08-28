@@ -41,7 +41,7 @@ Once you've enabled the feature, you can create a new branch:
 1. Click the arrows next to the branch name in the top menu bar. (The top menu bar has the format `YOUR_ORGANIZATION / YOUR_PROJECT / CURRENT_BRANCH_NAME`.)
 2. Click `Create branch`.
 
-The new branch is created as a clone of your base project, so it starts with that project's schema, migration history, and configuration rather than with an empty database.
+The new branch is a clone of your base project. It starts with the project's schema, Edge Functions, and the configuration set.
 
 ### Include production data
 
@@ -49,7 +49,7 @@ By default, a branch starts without any of your production data or storage objec
 
 <Admonition type="caution">
 
-A branch created with **Include data** holds a copy of your production data, so treat it with the same care as production. The branch also uses a larger disk and matches the compute size of your project, which increases its cost.
+A branch created with **Include data** holds a copy of your production data, treat it with the same care as production.
 
 </Admonition>
 
