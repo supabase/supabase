@@ -1,4 +1,4 @@
-import { Cache, Context, Effect, Option } from 'effect'
+import { Cache, Data, Effect, Option } from 'effect'
 import { AsyncResult, Atom, type AtomRegistry } from 'effect/unstable/reactivity'
 
 import * as Cells from './notebook.cells'
@@ -12,10 +12,14 @@ export const notebookFavoritesOnlyAtom = Atom.make(false)
 
 export type NotebookStatus = 'new' | 'unsaved' | 'saved'
 
-/** Carries `projectRef` into the notebook-fetch cache's `lookup`, since a cache key is only `NotebookId`. */
-class ProjectRef extends Context.Service<ProjectRef, string>()(
-  'studio/domain/notebooks/ProjectRef'
-) {}
+/**
+ * `Data.Class` gives it structural equality so two calls for the same
+ * `(projectRef, id)` are recognized as the same lookup.
+ */
+class NotebookCacheKey extends Data.Class<{
+  readonly projectRef: string
+  readonly id: NotebookId
+}> {}
 
 /**
  * Runs an effect that needs `NotebooksApi` against the runtime's resolved
@@ -76,27 +80,6 @@ export const makeNotebooksAtoms = (runtime: Atom.AtomRuntime<NotebooksApi>) => {
   const hasBeenPersistedAtom = Atom.family((_id: NotebookId) => Atom.make(false))
   const dirtyAtom = Atom.family((_id: NotebookId) => Atom.make(false))
 
-  /**
-   * Dedupes concurrent `loadNotebook` calls for the same id: per `Cache.get`'s
-   * contract, overlapping callers for a missing key share one pending lookup
-   * instead of each firing their own request. Entries never expire (no
-   * `timeToLive`), matching `contentAtom`'s own "loaded once, kept forever"
-   * semantics; a failed lookup is invalidated instead, so it can be retried
-   * rather than staying cached as a permanent failure.
-   */
-  const notebookCache = Effect.runSync(
-    Cache.make({
-      capacity: 1000,
-      requireServicesAt: 'lookup',
-      lookup: (id: NotebookId) =>
-        Effect.gen(function* () {
-          const api = yield* NotebooksApi
-          const projectRef = yield* ProjectRef
-          return yield* api.get({ projectRef, id })
-        }),
-    })
-  )
-
   const statusAtom = Atom.family((id: NotebookId) =>
     Atom.readable(
       (get): NotebookStatus =>
@@ -111,6 +94,26 @@ export const makeNotebooksAtoms = (runtime: Atom.AtomRuntime<NotebooksApi>) => {
     return id
   }
 
+  /**
+   * Dedupes concurrent `loadNotebook` calls for the same `(projectRef, id)`:
+   * per `Cache.get`'s contract, overlapping callers for a missing key share
+   * one pending lookup instead of each firing their own request. Entries
+   * never expire (no `timeToLive`), matching `contentAtom`'s own "loaded
+   * once, kept forever" semantics; a failed lookup is invalidated instead,
+   * so it can be retried rather than staying cached as a permanent failure.
+   */
+  const notebookCache = Effect.runSync(
+    Cache.make({
+      capacity: 1000,
+      requireServicesAt: 'lookup',
+      lookup: ({ projectRef, id }: NotebookCacheKey) =>
+        Effect.gen(function* () {
+          const api = yield* NotebooksApi
+          return yield* api.get({ projectRef, id })
+        }),
+    })
+  )
+
   /** Fetches a notebook known to exist server-side. No-ops if already loaded. */
   const loadNotebook = (
     registry: AtomRegistry.AtomRegistry,
@@ -119,12 +122,12 @@ export const makeNotebooksAtoms = (runtime: Atom.AtomRuntime<NotebooksApi>) => {
   ): Promise<void> => {
     if (registry.get(contentAtom(id)) !== undefined) return Promise.resolve()
 
+    const key = new NotebookCacheKey({ projectRef, id })
     return runWithRuntime(
       runtime,
       registry,
-      Cache.get(notebookCache, id).pipe(
-        Effect.provideService(ProjectRef, projectRef),
-        Effect.tapError(() => Cache.invalidate(notebookCache, id))
+      Cache.get(notebookCache, key).pipe(
+        Effect.tapError(() => Cache.invalidate(notebookCache, key))
       )
     ).then(({ name, content }) => {
       registry.set(contentAtom(id), content)
