@@ -1,6 +1,7 @@
-import { Pencil, TriangleAlert } from 'lucide-react'
+import { Pencil } from 'lucide-react'
 import { Fragment, type ReactNode } from 'react'
-import { Button, CardContent, cn, Input } from 'ui'
+import { Button, CardContent, Input } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DestinationTypeReadonly } from '../DestinationIcon'
@@ -39,6 +40,7 @@ import {
   CONNECTION_VALIDATION_HINT,
   DATA_VALIDATION_HINT,
   PipelineValidationAdmonition,
+  SANDWICHED_ADMONITION_CLASS,
 } from './PipelineValidationAdmonition'
 import type { TableSyncCopyConfig } from '@/components/interfaces/Database/Replication/TableSyncCopy.utils'
 import type { ReplicationCostEstimateData } from '@/data/replication/cost-estimate-query'
@@ -241,20 +243,15 @@ export const PipelineReviewSummary = ({
         tableSyncCopy={tableSyncCopy}
       />
       {(criticalCount > 0 || warningCount > 0) && (
-        <CardContent
-          role={criticalCount > 0 ? 'alert' : 'status'}
-          className={cn(
-            'flex items-start gap-2 py-3 text-sm',
-            criticalCount > 0 ? 'text-destructive' : 'text-warning'
-          )}
-        >
-          <TriangleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
-          <p>
-            {criticalCount > 0
+        <Admonition
+          type={criticalCount > 0 ? 'danger' : 'warning'}
+          description={
+            criticalCount > 0
               ? `${criticalCount} ${criticalCount === 1 ? 'issue must' : 'issues must'} be resolved above before you can start the pipeline.`
-              : `Review the ${warningCount === 1 ? 'warning' : `${warningCount} warnings`} above before starting the pipeline.`}
-          </p>
-        </CardContent>
+              : `Review the ${warningCount === 1 ? 'warning' : `${warningCount} warnings`} above before starting the pipeline.`
+          }
+          className={SANDWICHED_ADMONITION_CLASS}
+        />
       )}
     </>
   )

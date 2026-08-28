@@ -153,6 +153,7 @@ describe('PipelineReviewSummary', () => {
     expect(
       screen.getByText('1 issue must be resolved above before you can start the pipeline.')
     ).toBeInTheDocument()
+    expect(screen.getAllByLabelText('Danger')).toHaveLength(2)
     fireEvent.click(screen.getByRole('button', { name: 'Edit connection' }))
     expect(onGoToStep).toHaveBeenCalledWith('connection')
   })
@@ -177,5 +178,6 @@ describe('PipelineReviewSummary', () => {
     expect(
       screen.getByText('Review the warning above before starting the pipeline.')
     ).toBeInTheDocument()
+    expect(screen.getAllByLabelText('Warning')).toHaveLength(2)
   })
 })
