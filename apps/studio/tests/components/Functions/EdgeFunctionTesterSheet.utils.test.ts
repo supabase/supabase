@@ -46,11 +46,11 @@ describe('buildEdgeFunctionTestHeaders', () => {
     })
   })
 
-  it('keeps the Authorization row that role impersonation prefills alongside the apikey', () => {
+  it('keeps the apikey alongside several user rows', () => {
     const headers = buildEdgeFunctionTestHeaders({
       apiKey: PUBLISHABLE_KEY,
       customHeaders: [
-        { key: 'Authorization', value: 'Bearer impersonated-role-token' },
+        { key: 'Authorization', value: 'Bearer user-token' },
         { key: 'x-custom', value: 'kept' },
       ],
     })
@@ -58,7 +58,7 @@ describe('buildEdgeFunctionTestHeaders', () => {
     expect(headers).toEqual({
       'Content-Type': 'application/json',
       apikey: PUBLISHABLE_KEY,
-      Authorization: 'Bearer impersonated-role-token',
+      Authorization: 'Bearer user-token',
       'x-custom': 'kept',
     })
   })

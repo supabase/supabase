@@ -2,9 +2,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { BookOpen, Loader2, Send } from 'lucide-react'
-import { useCallback, useRef, useState } from 'react'
+import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
-import { toast } from 'sonner'
 import {
   Badge,
   Button,
@@ -41,20 +40,13 @@ import { ErrorWithStatus, ResponseData } from './EdgeFunctionDetails.types'
 import { getEdgeFunctionErrorDocs } from './EdgeFunctionDetails.utils'
 import { buildEdgeFunctionTestHeaders } from './EdgeFunctionTesterSheet.utils'
 import { buildEdgeFunctionHeaderAddActions } from '@/components/interfaces/Functions/httpHeaderAddActions'
-import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
-import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useEdgeFunctionTestMutation } from '@/data/edge-functions/edge-function-test-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { prettifyJSON } from '@/lib/helpers'
-import { getRoleImpersonationJWT, type ImpersonationRole } from '@/lib/role-impersonation'
 import { useTrack } from '@/lib/telemetry/track'
-import {
-  RoleImpersonationStateContextProvider,
-  useSubscribeToImpersonatedRole,
-} from '@/state/role-impersonation-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -85,18 +77,7 @@ const FormSchema = z.object({
 
 type FormValues = z.infer<typeof FormSchema>
 
-export const EdgeFunctionTesterSheet = (props: EdgeFunctionTesterSheetProps) => {
-  const { ref: projectRef } = useParams()
-
-  // [Alaister]: We're using a fresh context here as edge functions don't allow impersonating users.
-  return (
-    <RoleImpersonationStateContextProvider key={`role-impersonation-state-${projectRef}`}>
-      <EdgeFunctionTesterSheetContent {...props} />
-    </RoleImpersonationStateContextProvider>
-  )
-}
-
-const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTesterSheetProps) => {
+export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTesterSheetProps) => {
   const { ref: projectRef, functionSlug } = useParams()
 
   const [response, setResponse] = useState<ResponseData | null>(null)
@@ -109,18 +90,20 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
     { enabled: canReadAPIKeys }
   )
   const { anonKey, publishableKey, secretKey, serviceKey } = apiKeysData ?? {}
-  const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
 
   // Sent on the `apikey` header. Defaults to the least privileged key available, matching what the
-  // function details page shows in its example snippets. The "Add secret key" action below lets the
-  // user opt into a secret key when the function requires one.
-  const apiKey = publishableKey?.api_key ?? anonKey?.api_key
-  // Only the auth action is relevant here, the other actions the helper builds are webhook specific
+  // function details page shows in its example snippets.
+  const clientApiKey = publishableKey?.api_key ?? anonKey?.api_key
+  const secretApiKey = secretKey?.api_key ?? serviceKey?.api_key
+
+  // Both keys are offered so the user can swap the request's credential without looking one up.
+  // The webhook specific action the helper also builds is not relevant here.
   const headerAddActions = buildEdgeFunctionHeaderAddActions({
-    apiKey: secretKey?.api_key ?? serviceKey?.api_key ?? '[YOUR API KEY]',
+    apiKey: secretApiKey ?? '[YOUR API KEY]',
+    publishableKey: clientApiKey,
     createRow: (key: string, value: string) => ({ key, value }),
-  }).filter(({ key }) => key === 'add-auth-header')
+  }).filter(({ key }) => key !== 'add-source-header')
 
   const track = useTrack()
   const { mutate: testEdgeFunction, isPending } = useEdgeFunctionTestMutation({
@@ -152,59 +135,6 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
     },
   })
   const method = useWatch({ control: form.control, name: 'method' })
-
-  // Picking a role prefills a visible, editable `Authorization` row rather than injecting a hidden
-  // header, so every credential the request carries is the one shown in the Headers section.
-  //
-  // The value last written by the selector is tracked so that clearing the role removes only that
-  // row, leaving an `Authorization` row the user typed by hand untouched. The request counter
-  // guards against an older JWT resolving after a newer role has already been picked.
-  const prefilledAuthorization = useRef<string | undefined>(undefined)
-  const impersonationRequestId = useRef(0)
-
-  const applyImpersonationHeader = useCallback(
-    async (role: ImpersonationRole | undefined) => {
-      const requestId = ++impersonationRequestId.current
-      const isAuthorization = (key: string) => key.trim().toLowerCase() === 'authorization'
-
-      const dropPrefilledRow = (rows: FormValues['headers']) => {
-        const previous = prefilledAuthorization.current
-        return previous === undefined
-          ? rows
-          : rows.filter(({ key, value }) => !(isAuthorization(key) && value === previous))
-      }
-
-      const jwtSecret = config?.jwt_secret
-      if (role?.type !== 'postgrest' || projectRef === undefined || jwtSecret === undefined) {
-        const rows = dropPrefilledRow(form.getValues('headers'))
-        prefilledAuthorization.current = undefined
-        form.setValue('headers', rows.length > 0 ? rows : [{ key: '', value: '' }])
-        return
-      }
-
-      try {
-        const token = await getRoleImpersonationJWT(projectRef, jwtSecret, role)
-        if (requestId !== impersonationRequestId.current) return
-
-        const value = `Bearer ${token}`
-        const rows = dropPrefilledRow(form.getValues('headers')).filter(
-          ({ key, value: rowValue }) =>
-            !isAuthorization(key) && (key.trim() !== '' || rowValue !== '')
-        )
-        prefilledAuthorization.current = value
-        form.setValue('headers', [...rows, { key: 'Authorization', value }])
-      } catch (err) {
-        if (requestId !== impersonationRequestId.current) return
-        const message = err instanceof Error ? err.message : 'An unknown error occurred'
-        toast.error(`Failed to generate a JWT for the selected role: ${message}`)
-      }
-    },
-    [config?.jwt_secret, form, projectRef]
-  )
-
-  useSubscribeToImpersonatedRole((role) => {
-    void applyImpersonationHeader(role)
-  })
 
   useShortcut(
     SHORTCUT_IDS.FUNCTION_DETAIL_SUBMIT_TEST,
@@ -238,7 +168,10 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
       url: finalUrl,
       method: values.method,
       body: values.body,
-      headers: buildEdgeFunctionTestHeaders({ apiKey, customHeaders: values.headers }),
+      headers: buildEdgeFunctionTestHeaders({
+        apiKey: clientApiKey,
+        customHeaders: values.headers,
+      }),
     })
   }
 
@@ -444,10 +377,6 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
 
             <SheetFooter className="px-5 py-3 border-t">
               <div className="flex items-center gap-2">
-                <RoleImpersonationPopover
-                  disallowAuthenticatedOption
-                  header="Run edge function as a role"
-                />
                 <ShortcutTooltip shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_SUBMIT_TEST} side="top">
                   <Button
                     variant="primary"
