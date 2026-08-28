@@ -8,6 +8,8 @@ on:
     branches: [master, studio]
     paths:
       - 'apps/studio/**'
+      - 'packages/ui/**'
+      - 'packages/ui-patterns/**'
       - 'pnpm-lock.yaml'
   pull_request:
     branches: [master, studio]
