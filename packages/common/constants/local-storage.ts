@@ -53,6 +53,7 @@ export const LOCAL_STORAGE_KEYS = {
   SQL_EDITOR_MANUAL_SAVE_NOTICE_DISMISSED: 'sql-editor-manual-save-notice-dismissed',
 
   EXPLORER_QUERY_DRAFTS: (ref: string) => `explorer-query-drafts-${ref}`,
+  NOTEBOOK_DRAFTS: (ref: string) => `notebook-drafts-${ref}`,
 
   LOG_EXPLORER_SPLIT_SIZE: 'supabase_log-explorer-split-size',
   GRAPHQL_INTROSPECTION_NOTICE_COLLAPSED: (ref: string) =>
