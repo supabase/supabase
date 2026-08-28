@@ -1,6 +1,7 @@
 import { act, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { HttpResponse } from 'msw'
+import { useEffect, useRef } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ExplorerQueryTab } from '../ExplorerQueryTab'
@@ -14,6 +15,8 @@ import { setupSqlEditorMocks } from '@/tests/lib/sql-editor-test-utils'
 const testContext = vi.hoisted(() => ({
   flags: { otelLegacyLogs: true } as Record<string, boolean>,
   params: { ref: 'default', id: 'query-test' } as { ref?: string; id?: string },
+  /** Simulated editor selection — the mocked CodeEditor's fake editor reads this. */
+  selectedText: undefined as string | undefined,
 }))
 
 vi.mock('common', async (importOriginal) => {
@@ -30,16 +33,51 @@ vi.mock('@/components/ui/CodeEditor/CodeEditor', () => ({
   CodeEditor: ({
     value,
     onInputChange,
+    onMount,
   }: {
     value: string
     onInputChange?: (value: string | undefined) => void
-  }) => (
-    <textarea
-      aria-label="SQL editor"
-      value={value}
-      onChange={(e) => onInputChange?.(e.target.value)}
-    />
-  ),
+    onMount?: (editor: any, monaco: any) => void
+  }) => {
+    // Kept fresh via a ref (rather than closed over) so the fake editor's
+    // `getValue` reflects edits made after mount, same as the real editor would.
+    const valueRef = useRef(value)
+    valueRef.current = value
+
+    useEffect(() => {
+      const hasSelection = testContext.selectedText !== undefined
+      // Matches this instance's selection at the moment it mounts — a fresh editor
+      // instance (e.g. after "Show query" remounts it) has no memory of a prior
+      // instance's selection, so this must be read fresh rather than carried over.
+      const selection = hasSelection
+        ? { startLineNumber: 1, endLineNumber: 2, startColumn: 1, endColumn: 5 }
+        : null
+
+      onMount?.(
+        {
+          getValue: () => valueRef.current,
+          getSelection: () => selection,
+          getModel: () => ({ getValueInRange: () => testContext.selectedText }),
+          onDidBlurEditorWidget: () => () => {},
+          // Intentionally never invoked here — the real editor only fires this on a
+          // subsequent user-driven selection change, not eagerly on mount. Tests that
+          // need to simulate a live selection change should call this directly.
+          onDidChangeCursorSelection: () => ({ dispose: () => {} }),
+          addAction: () => {},
+        },
+        { KeyMod: { CtrlCmd: 1, Shift: 2 }, KeyCode: { KeyK: 3, Enter: 4 } }
+      )
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    return (
+      <textarea
+        aria-label="SQL editor"
+        value={value}
+        onChange={(e) => onInputChange?.(e.target.value)}
+      />
+    )
+  },
 }))
 
 vi.mock('../QueryEditor/QuerySourceMenu', () => ({
@@ -132,6 +170,7 @@ beforeEach(() => {
   setupSqlEditorMocks()
   testContext.flags.otelLegacyLogs = true
   testContext.params = { ref: 'default', id: 'query-test' }
+  testContext.selectedText = undefined
   explorerQueryState.removeDraft({ id: 'query-test', projectRef: 'default' })
 })
 
@@ -388,5 +427,76 @@ describe('QueryTab execution', () => {
     await waitFor(() => expect(executedQueries).toHaveLength(1))
     expect(executedQueries[0]).toContain('create table foo (id int)')
     expect(executedQueries[0]).toContain('ALTER TABLE foo ENABLE ROW LEVEL SECURITY;')
+  })
+
+  it('runs only the selected text, not the full editor content, when there is an active selection', async () => {
+    createDraft({ _tag: 'database' }, 'select 1;\nselect 2;')
+    testContext.selectedText = 'select 2;'
+
+    // Background prefetches (intellisense keywords/functions/schemas/table-columns, event
+    // triggers) hit this same generic pg-meta query endpoint, distinguished from an actual
+    // run by their non-empty `key` search param — an executed query's `key` is `''`.
+    const executedQueries: string[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: async ({ request }) => {
+        const key = new URL(request.url).searchParams.get('key')
+        if (key !== '') return HttpResponse.json([])
+        const { query } = (await request.json()) as { query: string }
+        executedQueries.push(query)
+        return HttpResponse.json([])
+      },
+    })
+
+    renderQueryTab()
+    const runButton = await screen.findByRole('button', { name: 'Run selected' })
+    await waitFor(() => expect(runButton).toBeEnabled())
+    await userEvent.click(runButton)
+
+    await waitFor(() => expect(executedQueries).toHaveLength(1))
+    expect(executedQueries[0]).toContain('select 2')
+    expect(executedQueries[0]).not.toContain('select 1')
+  })
+
+  it('drops the stale "Run selected" state once the query panel is hidden and shown again', async () => {
+    createDraft({ _tag: 'database' }, 'select 1;\nselect 2;')
+    testContext.selectedText = 'select 2;'
+
+    const executedQueries: string[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: async ({ request }) => {
+        const key = new URL(request.url).searchParams.get('key')
+        if (key !== '') return HttpResponse.json([])
+        const { query } = (await request.json()) as { query: string }
+        executedQueries.push(query)
+        return HttpResponse.json([])
+      },
+    })
+
+    renderQueryTab()
+    expect(await screen.findByRole('button', { name: 'Run selected' })).toBeInTheDocument()
+
+    // Hiding the query panel unmounts CodeEditor entirely. Simulate the selection being
+    // gone by the time it's shown again (a fresh editor instance has no selection yet).
+    const hideQueryButton = document.querySelector('.lucide-eye-off')?.closest('button')
+    expect(hideQueryButton).toBeInstanceOf(HTMLButtonElement)
+    await userEvent.click(hideQueryButton as HTMLButtonElement)
+    testContext.selectedText = undefined
+
+    const showQueryButton = document.querySelector('.lucide-eye')?.closest('button')
+    expect(showQueryButton).toBeInstanceOf(HTMLButtonElement)
+    await userEvent.click(showQueryButton as HTMLButtonElement)
+
+    const runButton = await screen.findByRole('button', { name: 'Run' })
+    expect(screen.queryByRole('button', { name: 'Run selected' })).not.toBeInTheDocument()
+
+    await userEvent.click(runButton)
+
+    await waitFor(() => expect(executedQueries).toHaveLength(1))
+    expect(executedQueries[0]).toContain('select 1')
+    expect(executedQueries[0]).toContain('select 2')
   })
 })
