@@ -1,7 +1,5 @@
-import { useFlag, useParams } from 'common'
-import Link from 'next/link'
 import { PropsWithChildren, ReactNode } from 'react'
-import { Button, cn } from 'ui'
+import { cn } from 'ui'
 
 interface ProductMenuBarProps {
   title: string
@@ -15,11 +13,6 @@ export const ProductMenuBar = ({
   children,
   className,
 }: PropsWithChildren<ProductMenuBarProps>) => {
-  // [Joshen] Temporary entry point into explorer
-  const { ref } = useParams()
-  const isExplorerEnabled = useFlag('explorer')
-  const showExplorerCTA = isExplorerEnabled && title === 'SQL Editor'
-
   return (
     <div
       /**
@@ -36,11 +29,6 @@ export const ProductMenuBar = ({
           <h4 className="text-lg">{title}</h4>
           {titleBadge}
         </div>
-        {showExplorerCTA && (
-          <Button asChild variant="default">
-            <Link href={`/project/${ref}/explorer`}>Explorer</Link>
-          </Button>
-        )}
       </div>
       <div className={cn('grow overflow-y-auto', className)}>{children}</div>
     </div>

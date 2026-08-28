@@ -23,6 +23,15 @@ export const notebooksState = proxy({
   needsSaving: proxyMap<string, boolean>([]),
   /** Session-only UI state keyed by cell ID; never persisted with notebook content. */
   cellLocalState: proxyMap<string, NotebookCellLocalState>([]),
+  /** Session-only conflicts where an assistant changed the server while local edits remain. */
+  serverDivergedWhileDirty: proxyMap<string, 'updated' | 'deleted'>([]),
+  /**
+   * Id of the notebook the tab should scroll to the bottom of once rendered —
+   * set by a surface that adds a cell to a notebook it's about to navigate to
+   * (e.g. "Add to existing notebook" from a query tab), so the newly added
+   * cell lands in view.
+   */
+  pendingScrollToBottom: undefined as string | undefined,
 
   /**
    * Load notebook into the Valtio store. No-ops if already present.
@@ -62,7 +71,14 @@ export const notebooksState = proxy({
   markSaved: ({ id }: { id: string }) => {
     const stateNotebook = notebooksState.notebooks[id]
     if (stateNotebook) stateNotebook.status = 'saved'
+    notebooksState.clearServerDivergence({ id })
   },
+
+  markServerDivergence: ({ id, type }: { id: string; type: 'updated' | 'deleted' }) =>
+    notebooksState.serverDivergedWhileDirty.set(id, type),
+
+  clearServerDivergence: ({ id }: { id: string }) =>
+    notebooksState.serverDivergedWhileDirty.delete(id),
 
   /**
    * Rename follows its own async save directly at the call site rather than going
@@ -86,6 +102,7 @@ export const notebooksState = proxy({
     )
     notebooksState.notebooks = otherNotebooks
     if (!skipSave) notebooksState.needsSaving.delete(id)
+    notebooksState.clearServerDivergence({ id })
   },
 
   /**
@@ -232,6 +249,14 @@ export const notebooksState = proxy({
   },
 
   addNeedsSaving: (id: string) => notebooksState.needsSaving.set(id, true),
+
+  requestScrollToBottom: (id: string) => {
+    notebooksState.pendingScrollToBottom = id
+  },
+
+  clearPendingScrollToBottom: () => {
+    notebooksState.pendingScrollToBottom = undefined
+  },
 })
 
 export const getNotebooksStateSnapshot = () => snapshot(notebooksState)

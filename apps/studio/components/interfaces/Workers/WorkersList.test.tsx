@@ -1,6 +1,6 @@
 import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { Worker } from './Workers.types'
 import { WorkersList } from './WorkersList'
@@ -19,7 +19,7 @@ const worker = (name: string, overrides: Partial<Worker> = {}): Worker => ({
 })
 
 const renderList = (workers: Worker[]) =>
-  customRender(<WorkersList projectRef="default" workers={workers} />)
+  customRender(<WorkersList projectRef="default" workers={workers} onDeploy={vi.fn()} />)
 
 const rowNames = () =>
   screen
