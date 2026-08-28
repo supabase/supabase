@@ -11,13 +11,14 @@ import { createLintSummaryPrompt } from '@/components/interfaces/Linter/Linter.u
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import type { AdvisorItem } from '@/components/ui/AdvisorPanel/AdvisorPanel.types'
 import {
+  advisorCategoryIcons,
   createAdvisorLintItems,
   getAdvisorItemDisplayTitle,
+  getAdvisorItemTelemetryCategory,
   MAX_HOMEPAGE_ADVISOR_ITEMS,
   severityBadgeVariants,
   severityColorClasses,
   sortAdvisorItems,
-  tabIconMap,
 } from '@/components/ui/AdvisorPanel/AdvisorPanel.utils'
 import { useAdvisorSignals } from '@/components/ui/AdvisorPanel/useAdvisorSignals'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
@@ -88,12 +89,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
       setSelectedItem(item.id, item.source)
       openSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)
 
-      const advisorCategory =
-        item.source === 'lint'
-          ? item.original.categories[0]
-          : item.source === 'signal'
-            ? 'SECURITY'
-            : undefined
+      const advisorCategory = getAdvisorItemTelemetryCategory(item)
       const advisorType =
         item.source === 'signal'
           ? item.type
@@ -144,8 +140,9 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
           <Row maxColumns={4} minWidth={280}>
             {visibleAdvisorItems.map((item) => {
               const isLint = item.source === 'lint'
-              const categoryLabel = item.tab.toUpperCase()
-              const CategoryIcon = tabIconMap[item.tab]
+              // Only security, performance and health items reach the homepage row
+              const categoryLabel = item.category.toUpperCase()
+              const CategoryIcon = advisorCategoryIcons[item.category]
               const title = getAdvisorItemDisplayTitle(item)
               const description =
                 item.source === 'signal' ? item.summary : isLint ? item.original.detail : ''
@@ -200,7 +197,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
                               })
                               track('advisor_assistant_button_clicked', {
                                 origin: 'homepage',
-                                advisorCategory: item.original.categories[0],
+                                advisorCategory: getAdvisorItemTelemetryCategory(item),
                                 advisorType: item.original.name,
                                 advisorLevel: item.original.level,
                               })
@@ -244,7 +241,7 @@ function EmptyState() {
       <CardContent className="flex flex-col items-center justify-center gap-2 p-16 h-full">
         <Shield size={20} strokeWidth={1.5} className="text-foreground-muted" />
         <p className="text-sm text-foreground-light text-center">
-          No security or performance issues found
+          No security, performance or health issues found
         </p>
       </CardContent>
     </Card>

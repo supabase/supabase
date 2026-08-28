@@ -6,12 +6,14 @@ import type { AdvisorItem } from './AdvisorPanel.types'
 import {
   createAdvisorLintItems,
   createAdvisorNotificationItems,
+  getAdvisorItemTelemetryCategory,
   sortAdvisorItems,
 } from './AdvisorPanel.utils'
 import { AdvisorPanelBody } from './AdvisorPanelBody'
 import { AdvisorPanelHeader } from './AdvisorPanelHeader'
 import { useAdvisorSignals } from './useAdvisorSignals'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useProjectHealthLintsQuery } from '@/data/lint/health-lints-query'
 import { useProjectLintsQuery } from '@/data/lint/lint-query'
 import { Notification, useNotificationsV2Query } from '@/data/notifications/notifications-v2-query'
 import { useNotificationsV2UpdateMutation } from '@/data/notifications/notifications-v2-update-mutation'
@@ -19,24 +21,24 @@ import { useProjectsInfiniteQuery } from '@/data/projects/projects-infinite-quer
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
-import { AdvisorTab, useAdvisorStateSnapshot } from '@/state/advisor-state'
+import { AdvisorCategory, useAdvisorStateSnapshot } from '@/state/advisor-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const AdvisorPanel = () => {
   const track = useTrack()
   const {
-    activeTab,
+    categoryFilters,
     severityFilters,
     selectedItemId,
     selectedItemSource,
-    setActiveTab,
+    setCategoryFilters,
     setSeverityFilters,
-    clearSeverityFilters,
     setSelectedItem,
     notificationFilterStatuses,
     notificationFilterPriorities,
     setNotificationFilters,
-    resetNotificationFilters,
+    clearFilters,
+    clearNarrowingFilters,
   } = useAdvisorStateSnapshot()
   const { data: project } = useSelectedProjectQuery()
   const { activeSidebar, closeSidebar } = useSidebarManagerSnapshot()
@@ -44,13 +46,28 @@ export const AdvisorPanel = () => {
   const isSidebarOpen = activeSidebar?.id === SIDEBAR_KEYS.ADVISOR_PANEL
   const markedRead = useRef<string[]>([])
   const hasProjectRef = !!project?.ref
-  const shouldLoadProjectAdvisorData = isSidebarOpen && hasProjectRef && activeTab !== 'messages'
+  const isCategorySelected = (category: AdvisorCategory) =>
+    categoryFilters.length === 0 || categoryFilters.includes(category)
+  const isShowingProjectAdvisors =
+    isCategorySelected('security') ||
+    isCategorySelected('performance') ||
+    isCategorySelected('health')
+  const shouldLoadProjectAdvisorData = isSidebarOpen && hasProjectRef && isShowingProjectAdvisors
 
   const {
     data: lintData,
     isPending: isLintsLoading,
     isError: isLintsError,
   } = useProjectLintsQuery({ projectRef: project?.ref }, { enabled: shouldLoadProjectAdvisorData })
+
+  const {
+    data: healthLintData,
+    isPending: isHealthLintsLoading,
+    isError: isHealthLintsError,
+  } = useProjectHealthLintsQuery(
+    { projectRef: project?.ref },
+    { enabled: shouldLoadProjectAdvisorData }
+  )
 
   const { data: signalItems } = useAdvisorSignals({
     projectRef: project?.ref,
@@ -115,8 +132,8 @@ export const AdvisorPanel = () => {
   }
 
   const lintItems = useMemo<AdvisorItem[]>(() => {
-    return createAdvisorLintItems(lintData ?? [])
-  }, [lintData])
+    return createAdvisorLintItems([...(lintData ?? []), ...(healthLintData ?? [])])
+  }, [lintData, healthLintData])
 
   const notificationItems = useMemo<AdvisorItem[]>(() => {
     if (!IS_PLATFORM) return []
@@ -127,40 +144,21 @@ export const AdvisorPanel = () => {
     return sortAdvisorItems([...lintItems, ...signalItems, ...notificationItems])
   }, [lintItems, signalItems, notificationItems])
 
+  const itemsFilteredByCategory = useMemo<AdvisorItem[]>(() => {
+    return combinedItems.filter((item) => {
+      // Notifications are the only items that exist without a project
+      if (!hasProjectRef && item.source !== 'notification') return false
+
+      return categoryFilters.length === 0 || categoryFilters.includes(item.category)
+    })
+  }, [combinedItems, categoryFilters, hasProjectRef])
+
   const filteredItems = useMemo<AdvisorItem[]>(() => {
-    return combinedItems.filter((item) => {
-      // Filter by severity
-      if (severityFilters.length > 0 && !severityFilters.includes(item.severity)) {
-        return false
-      }
+    if (severityFilters.length === 0) return itemsFilteredByCategory
+    return itemsFilteredByCategory.filter((item) => severityFilters.includes(item.severity))
+  }, [itemsFilteredByCategory, severityFilters])
 
-      // Filter by tab
-      if (activeTab === 'all') {
-        // When no projectRef, only show notifications in 'all' tab
-        if (!hasProjectRef && item.source !== 'notification') {
-          return false
-        }
-        return true
-      }
-
-      return item.tab === activeTab
-    })
-  }, [combinedItems, severityFilters, activeTab, hasProjectRef])
-
-  const itemsFilteredByTabOnly = useMemo<AdvisorItem[]>(() => {
-    return combinedItems.filter((item) => {
-      if (activeTab === 'all') {
-        // When no projectRef, only show notifications in 'all' tab
-        if (!hasProjectRef && item.source !== 'notification') {
-          return false
-        }
-        return true
-      }
-      return item.tab === activeTab
-    })
-  }, [combinedItems, activeTab, hasProjectRef])
-
-  const hiddenItemsCount = itemsFilteredByTabOnly.length - filteredItems.length
+  const hiddenItemsCount = itemsFilteredByCategory.length - filteredItems.length
 
   const selectedItem = combinedItems.find(
     (item) => item.id === selectedItemId && item.source === selectedItemSource
@@ -170,15 +168,18 @@ export const AdvisorPanel = () => {
   // Only show loading state if the query is actually enabled
   const isLintsActuallyLoading = shouldLoadProjectAdvisorData && isLintsLoading
   const isNotificationsActuallyLoading = shouldLoadNotifications && isNotificationsLoading
+  // Health checks hit live infrastructure and are the slowest of the three. They only block
+  // the list when health is all the user asked for — otherwise health items just fill in
+  // once they arrive, rather than holding up everything else.
+  const isShowingHealthOnly = categoryFilters.length === 1 && categoryFilters[0] === 'health'
+  const isHealthLintsActuallyLoading =
+    shouldLoadProjectAdvisorData && isHealthLintsLoading && isShowingHealthOnly
 
   // [Joshen] Opting to ignore loading and error state of advisor signals - render lints irregardless of banned ips
-  const isLoading = isLintsActuallyLoading || isNotificationsActuallyLoading
-  const isError = isLintsError || isNotificationsError
-
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab as AdvisorTab)
-    setSelectedItem(undefined)
-  }
+  const isLoading =
+    isLintsActuallyLoading || isNotificationsActuallyLoading || isHealthLintsActuallyLoading
+  const isError =
+    isLintsError || isNotificationsError || (isHealthLintsError && isShowingHealthOnly)
 
   const handleBackToList = () => {
     setSelectedItem(undefined)
@@ -200,12 +201,7 @@ export const AdvisorPanel = () => {
       }
     }
 
-    const advisorCategory =
-      item.source === 'lint'
-        ? item.original.categories[0]
-        : item.source === 'signal'
-          ? 'SECURITY'
-          : undefined
+    const advisorCategory = getAdvisorItemTelemetryCategory(item)
     const advisorType =
       item.source === 'signal'
         ? item.type
@@ -227,12 +223,9 @@ export const AdvisorPanel = () => {
     updateNotifications({ ids: [id], status })
   }
 
-  const handleClearAllFilters = () => {
-    clearSeverityFilters()
-    resetNotificationFilters()
-  }
-
-  const hasAnyFilters = severityFilters.length > 0 || notificationFilterStatuses.length > 0
+  // Category selection changes which kinds of item are listed; severity and status hide
+  // items within them, which is what the empty state and "show more" need to know about.
+  const hasNarrowingFilters = severityFilters.length > 0 || notificationFilterStatuses.length > 0
 
   return (
     <div className="flex h-full flex-col bg-background">
@@ -263,8 +256,11 @@ export const AdvisorPanel = () => {
       ) : (
         <>
           <AdvisorFilters
-            activeTab={activeTab}
-            onTabChange={handleTabChange}
+            categoryFilters={[...categoryFilters]}
+            onCategoryFiltersChange={(categories) => {
+              setCategoryFilters(categories)
+              setSelectedItem(undefined)
+            }}
             severityFilters={[...severityFilters]}
             onSeverityFiltersChange={setSeverityFilters}
             statusFilters={[...notificationFilterStatuses]}
@@ -284,12 +280,13 @@ export const AdvisorPanel = () => {
               isLoading={isLoading}
               isError={isError}
               filteredItems={filteredItems}
-              activeTab={activeTab}
+              categoryFilters={[...categoryFilters]}
               severityFilters={[...severityFilters]}
               onItemClick={handleItemClick}
-              onClearFilters={handleClearAllFilters}
+              onClearFilters={clearFilters}
+              onShowHiddenItems={clearNarrowingFilters}
               hiddenItemsCount={hiddenItemsCount}
-              hasAnyFilters={hasAnyFilters}
+              hasAnyFilters={hasNarrowingFilters}
               hasProjectRef={hasProjectRef}
               projectNameByRef={projectNameByRef}
             />
