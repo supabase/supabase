@@ -228,55 +228,42 @@ describe('ExplorerNotebookTab', () => {
       expect(queries).toHaveLength(0)
     })
 
-    it('requires destructive-query confirmation before running all cells', async () => {
+    it('labels destructive queries and runs all cells after one confirmation', async () => {
       const queries = mockDatabaseQueryRequests()
 
       renderNotebookTab()
 
       await userEvent.click(await screen.findByRole('button', { name: 'Run notebook' }))
-      await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
-
-      await userEvent.click(screen.getByRole('button', { name: 'Run all cells' }))
-
-      const destructiveDialog = await screen.findByRole('dialog', {
-        name: 'Confirm destructive queries',
-      })
-      expect(within(destructiveDialog).getByText('Mutating query')).toBeInTheDocument()
+      const dialog = await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
+      expect(within(dialog).getByText('Mutating query')).toBeInTheDocument()
+      expect(within(dialog).getByText('Destructive')).toBeInTheDocument()
       expect(queries).toHaveLength(0)
 
-      await userEvent.click(
-        within(destructiveDialog).getByRole('button', { name: 'Run all cells' })
-      )
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Run all cells' }))
 
       await waitFor(() => expect(queries).toHaveLength(2))
       expect(queries.some((query) => query.includes('select 1'))).toBe(true)
       expect(queries.some((query) => query.includes('delete from foo'))).toBe(true)
     })
 
-    it('runs no cells when destructive-query confirmation is cancelled', async () => {
+    it('runs no cells when the combined confirmation is cancelled', async () => {
       const queries = mockDatabaseQueryRequests()
 
       renderNotebookTab()
 
       await userEvent.click(await screen.findByRole('button', { name: 'Run notebook' }))
-      await userEvent.click(screen.getByRole('button', { name: 'Run all cells' }))
-
-      const destructiveDialog = await screen.findByRole('dialog', {
-        name: 'Confirm destructive queries',
-      })
-      await userEvent.click(within(destructiveDialog).getByRole('button', { name: 'Cancel' }))
+      const dialog = await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }))
 
       await waitFor(() =>
         expect(
-          screen.queryByRole('dialog', { name: 'Confirm destructive queries' })
+          screen.queryByRole('dialog', { name: 'Confirm to run notebook' })
         ).not.toBeInTheDocument()
       )
-      // Give any execution accidentally scheduled by dismissal an opportunity to reach MSW.
-      await new Promise((resolve) => setTimeout(resolve, 50))
       expect(queries).toHaveLength(0)
     })
 
-    it('does not show destructive confirmation for non-destructive mutations', async () => {
+    it('does not label non-destructive mutations', async () => {
       seedNotebook([
         readOnlyCell,
         createQueryCellSkeleton({
@@ -289,12 +276,12 @@ describe('ExplorerNotebookTab', () => {
       renderNotebookTab()
 
       await userEvent.click(await screen.findByRole('button', { name: 'Run notebook' }))
-      await userEvent.click(screen.getByRole('button', { name: 'Run all cells' }))
+      const dialog = await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
+      expect(within(dialog).queryByText('Destructive')).not.toBeInTheDocument()
+
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Run all cells' }))
 
       await waitFor(() => expect(queries).toHaveLength(2))
-      expect(
-        screen.queryByRole('dialog', { name: 'Confirm destructive queries' })
-      ).not.toBeInTheDocument()
     })
 
     it('picks up a SQL commit that lands after this render but before the click handler runs', async () => {
@@ -346,10 +333,7 @@ describe('ExplorerNotebookTab', () => {
       expect(within(dialog).getByText('Read-only query')).toBeInTheDocument()
       expect(queries).toHaveLength(0)
 
-      await userEvent.click(within(dialog).getByRole('button', { name: 'Run all cells' }))
-      expect(
-        await screen.findByRole('dialog', { name: 'Confirm destructive queries' })
-      ).toBeInTheDocument()
+      expect(within(dialog).getByText('Destructive')).toBeInTheDocument()
     })
 
     it('runs only the read-only cells when "Skip these queries" is checked', async () => {

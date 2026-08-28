@@ -1,7 +1,6 @@
 import { type Snapshot } from 'valtio'
 
-import { checkDestructiveQuery } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
-import { type Cell, type DatabaseCell } from '@/data/content/notebooks/notebook-schema'
+import { type Cell } from '@/data/content/notebooks/notebook-schema'
 import { removeCommentsFromSql } from '@/lib/helpers'
 
 const MUTATING_STATEMENT_REGEX =
@@ -19,17 +18,38 @@ type FindQueryCellsArgs = {
   getLiveSql?: (cellId: string) => string | undefined
 }
 
-const findDatabaseCellsMatchingSql = (
-  { cells, getLiveSql }: FindQueryCellsArgs,
-  matches: (sql: string) => boolean
-): QueryCellSummary[] =>
-  cells
-    .filter((cell): cell is Snapshot<DatabaseCell> => cell._tag === 'database_cell')
-    .filter((cell) => {
-      const liveSql = getLiveSql?.(cell._id)
-      return matches(cell.unchecked_sql) || (liveSql !== undefined && matches(liveSql))
-    })
-    .map((cell) => ({ id: cell._id, title: cell.title ?? 'Untitled query' }))
+type SqlMatchers = Record<string, (sql: string) => boolean>
+
+/**
+ * Finds database cells that match one or more SQL predicates in a single pass.
+ */
+export function findQueryCellsMatchingSql<T extends SqlMatchers>({
+  cells,
+  getLiveSql,
+  matchers,
+}: FindQueryCellsArgs & {
+  matchers: T
+}): Record<keyof T, QueryCellSummary[]> {
+  const matchingCells = {} as Record<keyof T, QueryCellSummary[]>
+  for (const name of Object.keys(matchers) as (keyof T)[]) {
+    matchingCells[name] = []
+  }
+
+  cells.forEach((cell) => {
+    if (cell._tag !== 'database_cell') return
+
+    const sql = [cell.unchecked_sql, getLiveSql?.(cell._id)].filter(
+      (value): value is string => value !== undefined
+    )
+    const summary = { id: cell._id, title: cell.title ?? 'Untitled query' }
+
+    for (const [name, matches] of Object.entries(matchers) as [keyof T, T[keyof T]][]) {
+      if (sql.some(matches)) matchingCells[name].push(summary)
+    }
+  })
+
+  return matchingCells
+}
 
 /**
  * Whether `sql` contains any statement that writes to data or schema, as opposed to a
@@ -39,25 +59,4 @@ const findDatabaseCellsMatchingSql = (
 export function isMutatingSql(sql: string): boolean {
   const cleanedSql = removeCommentsFromSql(sql)
   return cleanedSql.split(';').some((statement) => MUTATING_STATEMENT_REGEX.test(statement))
-}
-
-/**
- * The database cells whose SQL mutates data or schema, for flagging before a notebook-wide run.
- */
-export function findMutatingQueryCells({
-  cells,
-  getLiveSql,
-}: FindQueryCellsArgs): QueryCellSummary[] {
-  return findDatabaseCellsMatchingSql({ cells, getLiveSql }, isMutatingSql)
-}
-
-/**
- * The database cells whose SQL includes an operation that the shared SQL editor considers
- * destructive. Checked after the notebook-wide mutation consent, before a forced batch run.
- */
-export function findDestructiveQueryCells({
-  cells,
-  getLiveSql,
-}: FindQueryCellsArgs): QueryCellSummary[] {
-  return findDatabaseCellsMatchingSql({ cells, getLiveSql }, checkDestructiveQuery)
 }
