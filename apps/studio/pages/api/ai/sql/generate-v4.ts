@@ -126,6 +126,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
   let projectIsSensitive: boolean | null | undefined
   let projectRegion: string | undefined
   let orgId: number | undefined
+  // Verified against the project by getAIDetails, unlike the orgSlug from the request body
   let verifiedOrgSlug: string | undefined
   let planId: string | undefined
 
