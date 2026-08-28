@@ -137,15 +137,21 @@ export const MonacoEditor = ({
       contextMenuGroupId: 'operation',
       contextMenuOrder: 1,
       run: () => {
-        const selection = editorRef?.current?.getSelection()
-        if (!selection) return
+        const currentEditor = editorRef?.current
+        if (!currentEditor) return
 
-        const selectedValue = editorRef?.current?.getModel()?.getValueInRange(selection)
+        const selection = currentEditor.getSelection()
+        const selectedValue = selection
+          ? currentEditor.getModel()?.getValueInRange(selection)
+          : undefined
+        // A collapsed cursor is still a Selection, so `getValueInRange` returns ''. Fall back to
+        // the whole editor the way `getEditorSql` does for run and explain actions.
+        const valueToExplain = selectedValue || currentEditor.getValue()
 
         openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
         aiSnap.newChat({
           name: 'Explain code section',
-          sqlSnippets: [selectedValue ?? ''],
+          sqlSnippets: [valueToExplain],
           initialInput: 'Can you explain this section to me in more detail?',
         })
       },
