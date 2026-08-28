@@ -267,7 +267,9 @@ function ParityCard({
           </div>
         </div>
 
-        <p className="text-foreground-light text-[13px] mb-4">{plan.description}</p>
+        <p className="text-foreground-light text-[13px] leading-4 mb-4 min-h-12 line-clamp-3">
+          {plan.description}
+        </p>
 
         {ctaButton}
 
@@ -275,9 +277,14 @@ function ParityCard({
 
         <div className="flex items-end gap-1 pb-4">
           <div>
-            {(price ?? 0) > 0 && (
-              <p className="text-foreground-lighter text-[13px] leading-4">From</p>
-            )}
+            <p
+              className={cn(
+                'text-foreground-lighter text-[13px] leading-4',
+                (price ?? 0) <= 0 && 'invisible'
+              )}
+            >
+              From
+            </p>
             <div className="flex items-end">
               {isLoadingPlans ? (
                 <div className="h-[40px] flex items-center justify-center">
