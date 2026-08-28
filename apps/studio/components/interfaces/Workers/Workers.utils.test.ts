@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-import { getWorkerStateMeta, workerUrl } from './Workers.constants'
+import { getWorkerStateMeta, WORKER_NAME_WORDS, workerUrl } from './Workers.constants'
 import type { Worker } from './Workers.types'
 import {
   filterWorkers,
   formatResources,
   formatRuntime,
   formatSize,
+  generateWorkerName,
   getPage,
   isWorkersForbidden,
   isWorkersUnavailable,
@@ -160,6 +161,19 @@ describe('workerUrl', () => {
 
   it('has no url until the project settings resolve', () => {
     expect(workerUrl({ endpoint: undefined, name: 'embed' })).toBeUndefined()
+  })
+})
+
+describe('generateWorkerName', () => {
+  it('produces a name that already passes the CLI naming rules', () => {
+    const name = generateWorkerName()
+    expect(name).toMatch(/^worker-[a-z]+-\d{6}$/)
+    expect(WORKER_NAME_WORDS).toContain(name.split('-')[1])
+  })
+
+  it('varies across calls', () => {
+    const names = new Set(Array.from({ length: 20 }, () => generateWorkerName()))
+    expect(names.size).toBeGreaterThan(1)
   })
 })
 
