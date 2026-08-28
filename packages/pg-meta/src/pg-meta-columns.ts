@@ -358,12 +358,21 @@ ${doBlockDelimiter};`
     // `ident()` (and additionally flows `old.table` / `old.name` through
     // the default constraint name when `addCheckSql` is non-empty)
     // inside strings that are then assembled by `format()` / `EXECUTE`.
-    // PostgreSQL's dollar-quote parser treats the first `$$` after the
-    // opening `DO $$` as the closing delimiter, so if any of those
-    // names contains the literal sequence `$$` the body is parsed as
+    // It also embeds the user-supplied `check` SQL fragment inside
+    // `CHECK (${check})`, so any `$tag$` substring in that expression
+    // would also collide with the chosen delimiter. PostgreSQL's
+    // dollar-quote parser treats the first `$$` after the opening
+    // `DO $$` as the closing delimiter, so if any of those values
+    // contains the literal sequence `$$` the body is parsed as
     // truncated and the statement fails with a syntax error. Pick a
-    // delimiter that is absent from the names that flow into the body.
-    const doBlockDelimiter = getDoBlockDelimiter([old.schema, old.table, old.name])
+    // delimiter that is absent from every value that flows into the
+    // body.
+    const doBlockDelimiter = getDoBlockDelimiter([
+      old.schema,
+      old.table,
+      old.name,
+      ...(check !== null ? [check] : []),
+    ])
     const addCheckSql: SafeSqlFragment =
       check !== null
         ? safeSql`

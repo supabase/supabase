@@ -153,3 +153,38 @@ withTestDatabase(
     expect(def).toContain("'-1000'")
   }
 )
+
+withTestDatabase(
+  'columns.update: CHECK expression containing $$ does not collide with DO-block delimiter',
+  async ({ executeQuery }) => {
+    // The CHECK expression itself embeds a `$pg_meta$` literal. The base
+    // delimiter is `$pg_meta$`, so the helper must pick `$pg_meta_1$`
+    // (or higher) to avoid having the body's own string close the outer
+    // DO block early. Pre-fix this fails with `syntax error at or near
+    // ...` because the body contains the same delimiter it was opened
+    // with.
+    await executeQuery(`create table public.check_dollar (id int, c int);`)
+
+    const { sql: retrieveSql, zod } = await pgMeta.columns.retrieve({
+      table: 'check_dollar',
+      schema: 'public',
+      name: 'c',
+    })
+    const column = zod.parse((await executeQuery(retrieveSql))[0])
+
+    const { sql: updateSql } = await pgMeta.columns.update(column!, {
+      // The expression embeds the literal `$pg_meta$` so the helper must
+      // skip past the colliding delimiter on its way to `$pg_meta_1$`
+      // or higher. We use a benign expression that just exercises the
+      // collision path: c > 0 AND a literal-string constant containing
+      // the marker text.
+      check: safeSql`(c > 0 or '$pg_meta$ marker' is not null)`,
+    })
+    await executeQuery(updateSql)
+
+    const [{ def }] = await executeQuery<{ def: string }[]>(
+      `select pg_get_constraintdef(oid) as def from pg_constraint where conrelid = 'public.check_dollar'::regclass and contype = 'c';`
+    )
+    expect(def).toContain('$pg_meta$ marker')
+  }
+)
