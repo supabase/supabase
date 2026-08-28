@@ -1,7 +1,9 @@
+import { AlignLeft } from 'lucide-react'
 import { forwardRef, useState } from 'react'
 import { type Snapshot } from 'valtio'
 
 import { AddCellDropdown } from '../AddCellDropdown'
+import { ExplorerToolbarAction } from '../ExplorerToolbar'
 import { MoveCellDropdownContent } from '../MoveCellDropdownContent'
 import { QueryEditor, type QueryEditorHandle } from '../QueryEditor'
 import { type QueryDisplay, type QueryResult } from '../types'
@@ -26,11 +28,12 @@ import { useLocalRoleImpersonationState } from '@/state/role-impersonation-state
 interface QueryCellProps {
   cell: Snapshot<QueryCellSchema>
   onEdit?: () => void
+  onPrettifyQuery?: () => void
 }
 
 /** Notebook adapter around the shared QueryEditor. */
 export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function QueryCell(
-  { cell, onEdit },
+  { cell, onEdit, onPrettifyQuery },
   ref
 ) {
   const snap = useNotebooksStateSnapshot()
@@ -124,6 +127,13 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
         onResultChange={setResult}
         onRowLimitChange={handleRowLimitChange}
         onDisplayChange={handleDisplayChange}
+        toolbarActions={
+          <ExplorerToolbarAction
+            icon={<AlignLeft />}
+            tooltip="Prettify SQL"
+            onClick={onPrettifyQuery}
+          />
+        }
       />
     </SortableSection>
   )

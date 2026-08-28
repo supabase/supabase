@@ -447,6 +447,7 @@ export const ExplorerNotebookTab = () => {
                           key={cell._id}
                           cell={cell}
                           onEdit={persistNotebookTab}
+                          onPrettifyQuery={() => queryCellRefs.current.get(cell._id)?.prettify()}
                           ref={(instance) => {
                             if (instance) queryCellRefs.current.set(cell._id, instance)
                             else queryCellRefs.current.delete(cell._id)

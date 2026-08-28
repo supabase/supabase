@@ -113,6 +113,8 @@ export type QueryEditorHandle = {
   run: (force?: boolean) => Promise<void>
   /** The editor's live text buffer, ahead of any blur-triggered commit to the store. */
   getSql: () => string
+  /** Formats the editor's SQL in place and commits the result, same as the SQL Editor's Prettify SQL action. */
+  prettify: () => Promise<void>
 }
 
 type QueryEditorProps = {
@@ -350,9 +352,17 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
 
   const Shell = variant === 'viewport' ? ExplorerQueryViewport : ExplorerQuery
 
+  const handlePrettify = async () => {
+    const editor = editorInstanceRef.current
+    if (!editor) return
+    await editor.getAction('editor.action.formatDocument')?.run()
+    onSqlCommitRef.current?.(editor.getValue())
+  }
+
   useImperativeHandle(ref, () => ({
     run: (force = false) => handleRunQuery({ shouldForce: force }),
     getSql: () => sqlRef.current,
+    prettify: handlePrettify,
   }))
 
   useEffect(() => {
