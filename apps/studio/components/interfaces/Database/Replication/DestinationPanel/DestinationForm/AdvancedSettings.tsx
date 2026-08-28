@@ -37,6 +37,11 @@ const ALL_DESCRIPTION = 'Optional settings to control the pipeline in more depth
 const getConnectionDescription = (type: DestinationType) =>
   `Optional settings for how data is written to ${type}.`
 
+const INVALIDATED_SLOT_BEHAVIOR_LABELS = {
+  error: 'Block startup',
+  recreate: 'Recreate slot',
+} as const
+
 export const AdvancedSettings = ({
   type,
   form,
@@ -188,18 +193,18 @@ export const AdvancedSettings = ({
                     >
                       <FormControl>
                         <Select value={field.value ?? 'error'} onValueChange={field.onChange}>
-                          <SelectTrigger className="capitalize">
-                            {field.value ?? 'error'}
+                          <SelectTrigger>
+                            {INVALIDATED_SLOT_BEHAVIOR_LABELS[field.value ?? 'error']}
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="error" className="[&>span]:top-2.5">
-                              <p>Error</p>
+                              <p>Block startup</p>
                               <p className="text-foreground-lighter">
                                 Blocks startup for manual recovery.
                               </p>
                             </SelectItem>
                             <SelectItem value="recreate" className="[&>span]:top-2.5">
-                              <p>Recreate</p>
+                              <p>Recreate slot</p>
                               <p className="text-foreground-lighter">
                                 Replaces destination tables and runs a new, billable initial sync.
                               </p>
