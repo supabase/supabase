@@ -1,4 +1,4 @@
----
+﻿---
 title: 'Stripe-To-Postgres Sync Engine as standalone Library'
 description: 'Sync Stripe webhook data directly to Postgres using standalone TypeScript library.'
 categories:
@@ -15,11 +15,11 @@ imgThumb: launch-week-15/day-2-stripe-engine/thumb.png
 launchweek: '15'
 ---
 
-> **Update — April 14, 2026:** The Stripe Sync Engine repository has been transferred to Stripe and now lives at [`stripe/sync-engine`](https://github.com/stripe/sync-engine). See [We're Transferring the Stripe Sync Engine to Stripe](/blog/stripe-sync-engine-transfer) for the latest information.
+> **Update ÔÇö April 14, 2026:** The Stripe Sync Engine repository has been transferred to Stripe and now lives at [`stripe/sync-engine`](https://github.com/stripe/sync-engine). See [We're Transferring the Stripe Sync Engine to Stripe](/blog/stripe-sync-engine-transfer) for the latest information.
 
 We're excited to announce that [`stripe-sync-engine`](https://github.com/supabase/stripe-sync-engine) is now available as a standalone npm package: [`@supabase/stripe-sync-engine`](https://www.npmjs.com/package/@supabase/stripe-sync-engine)!
 
-Previously distributed only as a Docker image (`supabase/stripe-sync-engine`), you can now plug this into any backend project—whether you're using Node.js, running Express on a server, or even deploying on Supabase Edge Functions.
+Previously distributed only as a Docker image (`supabase/stripe-sync-engine`), you can now plug this into any backend projectÔÇöwhether you're using Node.js, running Express on a server, or even deploying on Supabase Edge Functions.
 
 Stripe-Sync-Engine is a webhook listener that transforms Stripe webhooks into structured Postgres inserts/updates. It listens to Stripe webhook events (like `invoice.payment_failed`, `customer.subscription.updated`, etc), normalizes and stores them in a relational format in Postgres.
 
@@ -119,7 +119,7 @@ Deno.serve(async (req) => {
 
 1. Deploy your Edge Function initially using `supabase functions deploy`
 2. Set up a Stripe webhook with the newly deployed Supabase Edge Function url
-3. Create a new .env file in the `supabase` directory
+3. Create a new .env file in the┬á`supabase`┬ádirectory
 
 ```
 # Use Dedicated pooler if available
@@ -134,4 +134,4 @@ As webhooks come in, the data is automatically persisted in the `stripe` schema.
 
 ## Final thoughts
 
-If you're building with Stripe and Supabase, [`stripe-sync-engine`](https://github.com/supabase/stripe-sync-engine) gives you a reliable, scalable way to bring your billing data closer to your database and application. Whether you want better analytics, faster dunning workflows, or simpler integrations—this package is built to make that seamless.
+If you're building with Stripe and Supabase, [`stripe-sync-engine`](https://github.com/supabase/stripe-sync-engine) gives you a reliable, scalable way to bring your billing data closer to your database and application. Whether you want better analytics, faster dunning workflows, or simpler integrationsÔÇöthis package is built to make that seamless.
