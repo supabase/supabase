@@ -11,10 +11,22 @@ const MAX_SERVICE_ACCOUNT_KEY_LENGTH = 5000
 
 const readServiceAccountFile = async (
   file: File,
-  form: UseFormReturn<DestinationPanelSchemaType>
+  form: UseFormReturn<DestinationPanelSchemaType>,
+  isCurrentRequest: () => boolean
 ) => {
+  if (file.size > MAX_SERVICE_ACCOUNT_KEY_LENGTH) {
+    if (isCurrentRequest()) {
+      form.setError('serviceAccountKey', {
+        message: 'Service account key must be 5,000 characters or fewer.',
+      })
+    }
+    return
+  }
+
   try {
     const contents = await file.text()
+    if (!isCurrentRequest()) return
+
     if (contents.length > MAX_SERVICE_ACCOUNT_KEY_LENGTH) {
       form.setError('serviceAccountKey', {
         message: 'Service account key must be 5,000 characters or fewer.',
@@ -29,9 +41,11 @@ const readServiceAccountFile = async (
     })
     form.clearErrors('serviceAccountKey')
   } catch {
-    form.setError('serviceAccountKey', {
-      message: 'Could not read the selected JSON file.',
-    })
+    if (isCurrentRequest()) {
+      form.setError('serviceAccountKey', {
+        message: 'Could not read the selected JSON file.',
+      })
+    }
   }
 }
 
@@ -43,11 +57,13 @@ export const BigQueryFields = ({
   editMode: boolean
 }) => {
   const serviceAccountFileInputRef = useRef<HTMLInputElement>(null)
+  const fileReadRequestIdRef = useRef(0)
   const [isDraggingFile, setIsDraggingFile] = useState(false)
 
   const handleServiceAccountFile = async (file: File | undefined) => {
     if (!file) return
-    await readServiceAccountFile(file, form)
+    const requestId = ++fileReadRequestIdRef.current
+    await readServiceAccountFile(file, form, () => requestId === fileReadRequestIdRef.current)
   }
 
   const handleServiceAccountFileInputChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -134,6 +150,10 @@ export const BigQueryFields = ({
                   <FormControl>
                     <TextArea
                       {...field}
+                      onChange={(event) => {
+                        fileReadRequestIdRef.current += 1
+                        field.onChange(event)
+                      }}
                       rows={5}
                       maxLength={MAX_SERVICE_ACCOUNT_KEY_LENGTH}
                       placeholder={
