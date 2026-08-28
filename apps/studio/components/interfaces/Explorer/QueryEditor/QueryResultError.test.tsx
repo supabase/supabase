@@ -19,6 +19,13 @@ vi.mock('common', async (importOriginal) => {
   return { ...actual, useParams: () => mocks.useParams() }
 })
 
+// This file covers the platform-mode HIPAA eligibility gate; the self-hosted bypass is
+// covered separately in QueryResultError.selfhosted.test.tsx.
+vi.mock('@/lib/constants', async () => {
+  const actual = await vi.importActual<Record<string, unknown>>('@/lib/constants')
+  return { ...actual, IS_PLATFORM: true }
+})
+
 // CopyButton and AiAssistantDropdown write via copyToClipboard from 'ui'. Stub just that
 // export so we can assert the value handed to the clipboard without depending on jsdom's
 // document.hasFocus() / navigator.clipboard. Everything else in 'ui' stays real.
@@ -47,8 +54,8 @@ describe('QueryResultError', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mocks.useParams.mockReturnValue({ ref: 'default' })
-    mocks.useOrgSubscriptionQuery.mockReturnValue({ data: undefined, isLoading: false })
-    mocks.useProjectSettingsV2Query.mockReturnValue({ data: undefined, isLoading: false })
+    mocks.useOrgSubscriptionQuery.mockReturnValue({ data: undefined, isSuccess: true })
+    mocks.useProjectSettingsV2Query.mockReturnValue({ data: undefined, isSuccess: true })
     // useTrack() (invoked by AiAssistantDropdown) reads the selected project to attach
     // telemetry context, so the platform project fetch needs a handler even though this
     // component doesn't read project data itself.
@@ -123,7 +130,23 @@ describe('QueryResultError', () => {
   })
 
   it('does not render the assistant dropdown while HIPAA eligibility is still resolving', () => {
-    mocks.useOrgSubscriptionQuery.mockReturnValue({ data: undefined, isLoading: true })
+    mocks.useOrgSubscriptionQuery.mockReturnValue({ data: undefined, isSuccess: false })
+
+    customRender(
+      <QueryResultError
+        error={{ message: 'relation "foo" does not exist' }}
+        sql="select * from foo;"
+        source="database"
+      />
+    )
+
+    expect(screen.queryByRole('button', { name: 'Debug with Assistant' })).not.toBeInTheDocument()
+  })
+
+  it('does not render the assistant dropdown when an eligibility query is disabled or failed', () => {
+    // A disabled or failed query also settles with isSuccess: false forever - same as
+    // still-loading from this component's point of view, so it stays denied.
+    mocks.useProjectSettingsV2Query.mockReturnValue({ data: undefined, isSuccess: false })
 
     customRender(
       <QueryResultError

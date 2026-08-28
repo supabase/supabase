@@ -224,25 +224,12 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     { enabled: query._tag === 'database' && isValidConnString(connectionString) }
   )
 
-  // The sql/source actually submitted for the in-flight run, snapshotted at submission
-  // time so a result that arrives after the user has kept editing (or ran only a
-  // selection) is still paired with the query that produced it, not the live buffer.
-  const submittedQueryRef = useRef<{ sql: string; source: ExplorerQueryModel['_tag'] } | undefined>(
-    undefined
-  )
-
   const { mutateAsync: executeSql, isPending: isExecutingSql } = useExecuteSqlMutation({
-    onSuccess: (data) => onResultChange({ rows: data.result, ...submittedQueryRef.current }),
-    onError: (error) => onResultChange({ error, ...submittedQueryRef.current }),
+    onError: () => {},
   })
 
   const { mutateAsync: executeLogsSql, isPending: isExecutingLogs } = useExecuteLogsSqlMutation({
-    onSuccess: (data) =>
-      onResultChange({
-        rows: data.rows as readonly Record<string, unknown>[],
-        ...submittedQueryRef.current,
-      }),
-    onError: (error) => onResultChange({ error, ...submittedQueryRef.current }),
+    onError: () => {},
   })
 
   const isResolvingDatabase =
@@ -268,7 +255,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     }
 
     onRun?.()
-    submittedQueryRef.current = { sql: rawSql, source: query._tag }
+    const querySnapshot = { sql: rawSql, source: query._tag }
     // [Joshen] This is deliberate to commit the sql, rather than the passed rawSql
     // As we want to save the cell's content into the store, rather than what's getting run
     onSqlCommit?.(sql)
@@ -277,7 +264,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       if (!isOtelLogsEnabled) {
         onResultChange({
           error: { message: "Querying logs isn't available for this project yet." },
-          ...submittedQueryRef.current,
+          ...querySnapshot,
         })
         return
       }
@@ -287,7 +274,14 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
         sql: acceptUntrustedLogsSql(untrustedLogSql(rawSql)),
         range: resolveLogTimeRange(query.time_range),
         endpoint: QUERY_SOURCE_REGISTRY.logs.endpoint,
-      }).catch(() => {})
+      }).then(
+        (data) =>
+          onResultChange({
+            rows: data.rows as readonly Record<string, unknown>[],
+            ...querySnapshot,
+          }),
+        (error) => onResultChange({ error, ...querySnapshot })
+      )
       return
     }
 
@@ -297,7 +291,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     if (!isValidConnString(connectionString)) {
       onResultChange({
         error: { message: 'Unable to run query: Connection string is missing' },
-        ...submittedQueryRef.current,
+        ...querySnapshot,
       })
       return
     }
@@ -310,7 +304,10 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       contextualInvalidation: true,
       isStatementTimeoutDisabled: true,
       isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
-    }).catch(() => {})
+    }).then(
+      (data) => onResultChange({ rows: data.result, ...querySnapshot }),
+      (error) => onResultChange({ error, ...querySnapshot })
+    )
   }
 
   const handleConfirmPendingRun = () => {
