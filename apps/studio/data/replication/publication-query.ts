@@ -56,7 +56,6 @@ export const replicationPublicationQueryOptions = <TData = ReplicationPublicatio
       typeof publicationName !== 'undefined' &&
       publicationName.length > 0,
     staleTime: REPLICATION_METADATA_FRESHNESS_MS,
-    refetchInterval: REPLICATION_METADATA_FRESHNESS_MS,
     ...options,
   })
 

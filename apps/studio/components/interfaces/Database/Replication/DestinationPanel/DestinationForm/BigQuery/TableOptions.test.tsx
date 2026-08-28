@@ -146,8 +146,8 @@ describe('TableOptions source reconciliation', () => {
 
     await screen.findByText('public.Orders')
     fireEvent.click(screen.getByRole('button', { name: 'Validate form' }))
-    expect(await screen.findByText('End must be greater than start')).toBeInTheDocument()
-    expect(await screen.findByText('Interval must be greater than 0')).toBeInTheDocument()
+    expect(await screen.findByText('End must be greater than start.')).toBeInTheDocument()
+    expect(await screen.findByText('Interval must be greater than 0.')).toBeInTheDocument()
   })
 
   it('marks configured columns that no longer exist while preserving valid names and types', async () => {
@@ -170,9 +170,9 @@ describe('TableOptions source reconciliation', () => {
       />
     )
 
-    expect(await screen.findByText('Some columns are no longer available.')).toHaveClass(
-      'text-destructive-600'
-    )
+    expect(
+      await screen.findByText(/Some columns are no longer in the source or publication/)
+    ).toHaveClass('text-destructive-600')
     expect(screen.getAllByText('region')[0]).toBeInTheDocument()
     expect(screen.getByText('text')).toBeInTheDocument()
     expect(screen.getByText('DroppedAt').parentElement).toHaveClass('text-destructive-600')
@@ -207,9 +207,9 @@ describe('TableOptions source reconciliation', () => {
       <TableOptionsHarness tableOptions={[{ tableId: 101, clusterBy: ['PrivateNote'] }]} />
     )
 
-    expect(await screen.findByText('Some columns are no longer available.')).toHaveClass(
-      'text-destructive-600'
-    )
+    expect(
+      await screen.findByText(/Some columns are no longer in the source or publication/)
+    ).toHaveClass('text-destructive-600')
     expect(screen.getByText('PrivateNote').parentElement).toHaveClass('text-destructive-600')
   })
 
@@ -273,7 +273,9 @@ describe('TableOptions source reconciliation', () => {
       <TableOptionsHarness tableOptions={[{ tableId: 12, clusterBy: ['ExcludedColumn'] }]} />
     )
 
-    expect(await screen.findByText('Some columns are no longer available.')).toBeInTheDocument()
+    expect(
+      await screen.findByText(/Some columns are no longer in the source or publication/)
+    ).toBeInTheDocument()
     expect(screen.getByText('ExcludedColumn').parentElement).toHaveClass('text-destructive-600')
   })
 
@@ -325,10 +327,12 @@ describe('TableOptions source reconciliation', () => {
 
     expect(
       await screen.findByText(
-        'The configured columns could not be verified against the source and publication.'
+        'Unable to verify columns against the source and publication. Refresh and try again.'
       )
     ).toBeInTheDocument()
-    expect(screen.queryByText('Some columns are no longer available.')).not.toBeInTheDocument()
+    expect(
+      screen.queryByText(/Some columns are no longer in the source or publication/)
+    ).not.toBeInTheDocument()
   })
 
   it('hides settings for a table removed from the publication without exposing its id', async () => {
@@ -348,9 +352,9 @@ describe('TableOptions source reconciliation', () => {
 
     expect(await screen.findByText('Billing.Invoices')).toBeInTheDocument()
     expect(screen.getByText('Billing.Invoices')).toHaveClass('text-destructive-600')
-    expect(screen.getByText('Some tables are no longer in the publication.')).toHaveClass(
-      'text-destructive-600'
-    )
+    expect(
+      screen.getByText('Some tables are no longer in the publication.')
+    ).toHaveClass('text-destructive-600')
     expect(screen.queryByText('No longer in this publication')).not.toBeInTheDocument()
     expect(screen.queryByText('Region')).not.toBeInTheDocument()
     expect(document.body).not.toHaveTextContent('202')
@@ -383,7 +387,9 @@ describe('TableOptions source reconciliation', () => {
 
     expect(await screen.findByText('Previously configured table')).toBeInTheDocument()
     expect(screen.queryByText('OccurredAt')).not.toBeInTheDocument()
-    expect(screen.getByText('Some tables are no longer in the publication.')).toBeInTheDocument()
+    expect(
+      screen.getByText('Some tables are no longer in the publication.')
+    ).toBeInTheDocument()
     expect(document.body).not.toHaveTextContent('999')
   })
 })

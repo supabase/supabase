@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
+  Checkbox,
   Form,
   FormControl,
   FormField,
@@ -21,6 +22,11 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
 import { z } from 'zod'
 
+import {
+  isMetadataListErrorVisible,
+  isMetadataListLoading,
+  useRefreshOnOpen,
+} from './useRefreshOnOpen'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useCreatePublicationMutation } from '@/data/replication/publication-create-mutation'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
@@ -37,28 +43,33 @@ const FORM_ID = 'publication-editor'
 const FormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   tableIds: z.array(z.string()).min(1, 'At least one table is required'),
+  publishViaPartitionRoot: z.boolean(),
 })
 type FormValues = z.infer<typeof FormSchema>
 
 const defaultValues: FormValues = {
   name: '',
   tableIds: [],
+  publishViaPartitionRoot: true,
 }
 
 export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelProps) => {
   const { ref: projectRef } = useParams()
   const sourceId = useReplicationSourceId({ projectRef })
-  const [isTableSelectorOpen, setIsTableSelectorOpen] = useState(false)
+  const [shouldLoadTables, setShouldLoadTables] = useState(false)
 
   const {
     data: tables = [],
+    isPending,
     isFetching,
     isError,
-  } = useReplicationTablesQuery(
-    { projectRef, sourceId },
-    { enabled: visible && isTableSelectorOpen }
-  )
-  const isLoadingTables = isFetching && tables.length === 0
+    refetch: refetchTables,
+  } = useReplicationTablesQuery({ projectRef, sourceId }, { enabled: visible && shouldLoadTables })
+  const isLoadingTables = isMetadataListLoading(isPending || isFetching, tables.length)
+  const { handleOpenChange: handleRefreshTablesOnOpen } = useRefreshOnOpen({
+    isEnabled: shouldLoadTables,
+    refetch: refetchTables,
+  })
   const tableLabelsById = new Map(
     tables.map((table) => [String(table.id), `${table.schema}.${table.name}`] as const)
   )
@@ -75,7 +86,7 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
   const { isDirty } = form.formState
 
   const closePanel = (newPublication?: string) => {
-    setIsTableSelectorOpen(false)
+    setShouldLoadTables(false)
     form.reset(defaultValues)
     onClose(newPublication)
   }
@@ -102,6 +113,7 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
       sourceId,
       name: data.name,
       tableIds: data.tableIds.map(Number),
+      publishViaPartitionRoot: data.publishViaPartitionRoot,
     })
   }
 
@@ -150,7 +162,13 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
                             values={field.value}
                             onValuesChange={field.onChange}
                             disabled={isCreatingPublication}
-                            onOpenChange={setIsTableSelectorOpen}
+                            onOpenChange={(isOpen) => {
+                              if (isOpen && !shouldLoadTables) {
+                                setShouldLoadTables(true)
+                                return
+                              }
+                              handleRefreshTablesOnOpen(isOpen)
+                            }}
                           >
                             <MultiSelector.Trigger
                               aria-label="Select publication tables"
@@ -162,7 +180,7 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
                               <MultiSelector.Input placeholder="Search tables..." />
                               <MultiSelector.List
                                 emptyLabel="No tables available"
-                                error={isError && tables.length === 0}
+                                error={isMetadataListErrorVisible(isError, tables.length)}
                                 errorLabel="Unable to load tables"
                                 loading={isLoadingTables}
                               >
@@ -174,6 +192,26 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
                               </MultiSelector.List>
                             </MultiSelector.Content>
                           </MultiSelector>
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="publishViaPartitionRoot"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        hideMessage
+                        label="Publish partitions as the parent table"
+                        description="Changes from partitioned tables appear in one destination table. Turn off to create a table for each partition."
+                        layout="flex"
+                      >
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            aria-label="Publish partitions as the parent table"
+                            onCheckedChange={(checked) => field.onChange(checked === true)}
+                          />
                         </FormControl>
                       </FormItemLayout>
                     )}

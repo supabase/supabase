@@ -237,6 +237,21 @@ export const pruneStaleSelectedTableIds = ({
   return selectedTableIds.filter((id) => publicationTableIds.has(id))
 }
 
+export const pruneStaleTableOptions = ({
+  tableOptions,
+  publication,
+  publicationName,
+}: {
+  tableOptions?: BigQueryTableOption[]
+  publication: ReplicationPublicationData
+  publicationName: string
+}): BigQueryTableOption[] | undefined => {
+  if (tableOptions === undefined) return undefined
+
+  const publicationTableIds = getPublicationTableIds(publication, publicationName)
+  return tableOptions.filter((option) => publicationTableIds.has(String(option.tableId)))
+}
+
 // Derived from the generated response type rather than hand-typed, so `granularity` stays the
 // same literal union the API actually returns instead of a widened `string` needing a cast.
 type BigQueryConfigResponse = Extract<
@@ -256,14 +271,14 @@ const parseBigQueryPartitionBy = (
       return {
         kind: 'time_column',
         column: partitionBy.column,
-        granularity: partitionBy.granularity ?? undefined,
+        granularity: partitionBy.granularity ?? 'day',
       }
     case 'integer_range':
       return { ...partitionBy }
     case 'ingestion_time':
       return {
         kind: 'ingestion_time',
-        granularity: partitionBy.granularity ?? undefined,
+        granularity: partitionBy.granularity ?? 'day',
       }
   }
 }
@@ -271,7 +286,7 @@ const parseBigQueryPartitionBy = (
 const parseBigQueryTableOption = (option: BigQueryTableOptionResponse): BigQueryTableOption => ({
   tableId: option.table_id,
   partitionBy: option.partition_by ? parseBigQueryPartitionBy(option.partition_by) : undefined,
-  clusterBy: option.cluster_by,
+  clusterBy: option.cluster_by ?? [],
 })
 
 const buildBigQueryConfig = (

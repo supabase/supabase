@@ -6,8 +6,12 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
-import { useRefreshOnOpen } from './useRefreshOnOpen'
-import { REPLICATION_METADATA_FRESHNESS_MS } from '@/data/replication/constants'
+import {
+  isMetadataListErrorVisible,
+  isMetadataListLoading,
+  isMetadataValueLoading,
+  useRefreshOnOpen,
+} from './useRefreshOnOpen'
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useReplicationTablesQuery } from '@/data/replication/tables-query'
@@ -40,16 +44,14 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
 
   const {
     data: selectedPublication,
-    isPending: isLoadingPublications,
-    isFetching: isRefreshingPublications,
+    isPending,
+    isFetching,
     isError: isErrorPublications,
     isSuccess: isSuccessPublication,
     refetch: refetchPublication,
   } = useReplicationPublicationQuery({ projectRef, sourceId, publicationName })
   const isLoadingPublicationTables =
-    !!publicationName &&
-    (isLoadingPublications || isRefreshingPublications) &&
-    selectedPublication === undefined
+    !!publicationName && isMetadataValueLoading(isPending || isFetching, selectedPublication)
   const { handleOpenChange: handleRefreshPublicationOnOpen } = useRefreshOnOpen({
     isEnabled: !!publicationName,
     refetch: refetchPublication,
@@ -73,7 +75,7 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
       : tableSyncCopyTableIds.filter((id) => !publicationTableIds.has(id)).length
   const { data: sourceTables = [] } = useReplicationTablesQuery(
     { projectRef, sourceId },
-    { enabled: staleSelectedCount > 0, staleTime: REPLICATION_METADATA_FRESHNESS_MS }
+    { enabled: staleSelectedCount > 0 }
   )
   const sourceTableLabelsById = new Map(
     sourceTables.map((table) => [String(table.id), tableLabel(table)])
@@ -94,7 +96,7 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
             <FormControl>
               <Select value={field.value} onValueChange={field.onChange}>
                 <SelectTrigger>{INITIAL_SYNC_LABELS[field.value]}</SelectTrigger>
-                <SelectContent>
+                <SelectContent side="bottom" collisionPadding={16}>
                   <SelectItem value="include_all_tables" className="[&>span]:top-2.5">
                     <p>All tables</p>
                     <p className="text-foreground-lighter">
@@ -177,9 +179,15 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
                   <MultiSelector.Content>
                     <MultiSelector.List
                       emptyLabel="No tables available"
-                      error={isErrorPublications && publicationTables.length === 0}
+                      error={isMetadataListErrorVisible(
+                        isErrorPublications,
+                        publicationTables.length
+                      )}
                       errorLabel="Unable to load tables"
-                      loading={isLoadingPublicationTables}
+                      loading={isMetadataListLoading(
+                        isPending || isFetching,
+                        publicationTables.length
+                      )}
                     >
                       {publicationTables.map((table) => (
                         <MultiSelector.Item key={table.id} value={String(table.id)}>

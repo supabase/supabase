@@ -1,11 +1,12 @@
 import type { ChangeEvent } from 'react'
 import { Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'ui'
-import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
 import { SelectionListState } from 'ui-patterns/SelectionListState'
 
 import { defaultPartitionByForKind, parseIntegerInput, shortenPgType } from './BigQuery.utils'
 import type { BigQueryPartitionKind } from './BigQuery.utils'
+import { isPartitionColumnTypeCompatible } from './TableOptions.utils'
 import {
   BIGQUERY_MAX_CLUSTERING_COLUMNS,
   BIGQUERY_TIME_PARTITION_GRANULARITIES,
@@ -90,9 +91,19 @@ export const PartitioningFields = ({
 }: PartitioningFieldsProps) => {
   const partitionKind: BigQueryPartitionKind = partitionBy?.kind ?? 'none'
 
+  const compatibleColumnNames =
+    partitionBy && (partitionBy.kind === 'time_column' || partitionBy.kind === 'integer_range')
+      ? columnSelection.availableColumnNames.filter((column) =>
+          isPartitionColumnTypeCompatible(
+            partitionBy.kind,
+            columnSelection.columnTypeByName.get(column)
+          )
+        )
+      : columnSelection.availableColumnNames
+
   return (
     <>
-      <FormLayout label="Partitioning" layout="horizontal">
+      <FormItemLayout isReactForm={false} label="Partitioning" layout="vertical">
         <Select
           value={partitionKind}
           onValueChange={(kind: BigQueryPartitionKind) => {
@@ -103,7 +114,7 @@ export const PartitioningFields = ({
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent side="bottom" collisionPadding={16}>
             {Object.entries(PARTITION_KIND_LABELS).map(([kind, label]) => (
               <SelectItem key={kind} value={kind}>
                 {label}
@@ -111,12 +122,17 @@ export const PartitioningFields = ({
             ))}
           </SelectContent>
         </Select>
-      </FormLayout>
+      </FormItemLayout>
 
       {partitionBy && 'column' in partitionBy && (
-        <FormLayout label="Partition column" layout="horizontal" error={errors.column}>
+        <FormItemLayout
+          isReactForm={false}
+          label="Partition column"
+          layout="vertical"
+          error={errors.column}
+        >
           <Select
-            value={partitionBy.column}
+            value={partitionBy.column || undefined}
             onOpenChange={columnSelection.onOpenChange}
             onValueChange={(column: string) => onChange({ ...partitionBy, column })}
           >
@@ -127,36 +143,40 @@ export const PartitioningFields = ({
                   : undefined
               }
             >
-              <ColumnOption
-                name={partitionBy.column}
-                type={columnSelection.columnTypeByName.get(partitionBy.column)}
-                isUnavailable={columnSelection.unavailableColumnSet.has(partitionBy.column)}
-              />
+              {partitionBy.column ? (
+                <ColumnOption
+                  name={partitionBy.column}
+                  type={columnSelection.columnTypeByName.get(partitionBy.column)}
+                  isUnavailable={columnSelection.unavailableColumnSet.has(partitionBy.column)}
+                />
+              ) : (
+                <SelectValue placeholder="Select a column" />
+              )}
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent side="bottom" collisionPadding={16}>
               <SelectionListState
-                loading={columnSelection.isLoading}
-                error={columnSelection.isError}
-                empty={
+                isLoading={columnSelection.isLoading}
+                isError={columnSelection.isError}
+                isEmpty={
                   !columnSelection.isLoading &&
                   !columnSelection.isError &&
-                  columnSelection.availableColumnNames.length === 0
+                  compatibleColumnNames.length === 0
                 }
-                emptyLabel="No published columns available"
-                errorLabel="Unable to load columns"
+                emptyLabel="No compatible published columns available"
+                errorLabel="Unable to load columns. Open the list again to retry."
               />
-              {columnSelection.availableColumnNames.map((column) => (
+              {compatibleColumnNames.map((column) => (
                 <SelectItem key={column} value={column}>
                   <ColumnOption name={column} type={columnSelection.columnTypeByName.get(column)} />
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-        </FormLayout>
+        </FormItemLayout>
       )}
 
       {partitionBy && 'granularity' in partitionBy && (
-        <FormLayout label="Granularity" layout="horizontal">
+        <FormItemLayout isReactForm={false} label="Granularity" layout="vertical">
           <Select
             value={partitionBy.granularity ?? 'day'}
             onValueChange={(granularity: BigQueryTimePartitionGranularity) =>
@@ -166,7 +186,7 @@ export const PartitioningFields = ({
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent side="bottom" collisionPadding={16}>
               {BIGQUERY_TIME_PARTITION_GRANULARITIES.map((granularity) => (
                 <SelectItem key={granularity} value={granularity}>
                   {GRANULARITY_LABELS[granularity]}
@@ -174,14 +194,21 @@ export const PartitioningFields = ({
               ))}
             </SelectContent>
           </Select>
-        </FormLayout>
+        </FormItemLayout>
       )}
 
       {partitionBy?.kind === 'integer_range' && (
         <div className="grid grid-cols-3 gap-x-2">
-          <FormLayout label="Start" error={errors.start}>
+          <FormItemLayout
+            isReactForm={false}
+            label="Start"
+            layout="vertical"
+            description="Inclusive"
+            error={errors.start}
+          >
             <Input
-              type="number"
+              type="text"
+              inputMode="numeric"
               value={partitionBy.start}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 onChange({
@@ -190,10 +217,17 @@ export const PartitioningFields = ({
                 })
               }
             />
-          </FormLayout>
-          <FormLayout label="End" error={errors.end}>
+          </FormItemLayout>
+          <FormItemLayout
+            isReactForm={false}
+            label="End"
+            layout="vertical"
+            description="Exclusive"
+            error={errors.end}
+          >
             <Input
-              type="number"
+              type="text"
+              inputMode="numeric"
               value={partitionBy.end}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 onChange({
@@ -202,10 +236,17 @@ export const PartitioningFields = ({
                 })
               }
             />
-          </FormLayout>
-          <FormLayout label="Interval" error={errors.interval}>
+          </FormItemLayout>
+          <FormItemLayout
+            isReactForm={false}
+            label="Interval"
+            layout="vertical"
+            description="Range width"
+            error={errors.interval}
+          >
             <Input
-              type="number"
+              type="text"
+              inputMode="numeric"
               value={partitionBy.interval}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 onChange({
@@ -214,7 +255,7 @@ export const PartitioningFields = ({
                 })
               }
             />
-          </FormLayout>
+          </FormItemLayout>
         </div>
       )}
     </>
@@ -237,9 +278,10 @@ export const ClusteringFields = ({
   const hasReachedColumnLimit = clusterBy.length >= BIGQUERY_MAX_CLUSTERING_COLUMNS
 
   return (
-    <FormLayout
+    <FormItemLayout
+      isReactForm={false}
       label="Clustering columns"
-      layout="horizontal"
+      layout="vertical"
       description={`Selection order sets the clustering order. Maximum ${BIGQUERY_MAX_CLUSTERING_COLUMNS} columns.`}
       error={error}
     >
@@ -266,7 +308,7 @@ export const ClusteringFields = ({
           <MultiSelector.List
             emptyLabel="No published columns available"
             error={columnSelection.isError}
-            errorLabel="Unable to load columns"
+            errorLabel="Unable to load columns. Open the list again to retry."
             loading={columnSelection.isLoading}
           >
             {columnSelection.availableColumnNames.map((column) => (
@@ -281,6 +323,6 @@ export const ClusteringFields = ({
           </MultiSelector.List>
         </MultiSelector.Content>
       </MultiSelector>
-    </FormLayout>
+    </FormItemLayout>
   )
 }

@@ -1,5 +1,6 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
+import { REPLICATION_METADATA_FRESHNESS_MS } from './constants'
 import { replicationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
@@ -39,6 +40,7 @@ export const replicationTablesQueryOptions = <TData = ReplicationTablesData>(
     queryKey: replicationKeys.tables(projectRef, sourceId),
     queryFn: ({ signal }) => fetchReplicationTables({ projectRef, sourceId }, signal),
     enabled: enabled && typeof projectRef !== 'undefined' && typeof sourceId !== 'undefined',
+    staleTime: REPLICATION_METADATA_FRESHNESS_MS,
     ...options,
   })
 

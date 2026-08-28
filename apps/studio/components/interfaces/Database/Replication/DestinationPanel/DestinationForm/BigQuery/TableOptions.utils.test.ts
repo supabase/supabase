@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { resolvePublishedColumnNames } from './TableOptions.utils'
+import {
+  isIntegerPartitionColumnType,
+  isPartitionColumnTypeCompatible,
+  isTimePartitionColumnType,
+  resolvePublishedColumnNames,
+} from './TableOptions.utils'
 
 describe('resolvePublishedColumnNames', () => {
   it('returns the columns from the nearest configured partition ancestor', () => {
@@ -52,5 +57,25 @@ describe('resolvePublishedColumnNames', () => {
     const sourceTables = new Map([[1, { id: 1, partition_parent_id: null }]])
 
     expect(resolvePublishedColumnNames(1, new Map(), sourceTables)).toBeNull()
+  })
+})
+
+describe('partition column type compatibility', () => {
+  it('accepts Postgres date and timestamp types for time-column partitioning', () => {
+    expect(isTimePartitionColumnType('date')).toBe(true)
+    expect(isTimePartitionColumnType('timestamp with time zone')).toBe(true)
+    expect(isTimePartitionColumnType('timestamptz')).toBe(true)
+    expect(isTimePartitionColumnType('integer')).toBe(false)
+  })
+
+  it('accepts integer family types for integer-range partitioning', () => {
+    expect(isIntegerPartitionColumnType('bigint')).toBe(true)
+    expect(isIntegerPartitionColumnType('int4')).toBe(true)
+    expect(isIntegerPartitionColumnType('date')).toBe(false)
+  })
+
+  it('treats an unknown type as compatible so columns can still be chosen while loading', () => {
+    expect(isPartitionColumnTypeCompatible('time_column')).toBe(true)
+    expect(isPartitionColumnTypeCompatible('integer_range', 'text')).toBe(false)
   })
 })

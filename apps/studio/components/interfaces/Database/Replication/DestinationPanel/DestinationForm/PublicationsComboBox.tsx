@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { Check, ChevronsUpDown, Plus } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { ControllerRenderProps } from 'react-hook-form'
 import {
   Button,
@@ -20,7 +20,11 @@ import {
 import { SelectionListState } from 'ui-patterns/SelectionListState'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
-import { useRefreshOnOpen } from './useRefreshOnOpen'
+import {
+  isMetadataListErrorVisible,
+  isMetadataListLoading,
+  useRefreshOnOpen,
+} from './useRefreshOnOpen'
 import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
 
 interface PublicationsComboBoxProps {
@@ -37,8 +41,8 @@ export const PublicationsComboBox = ({
   const { ref: projectRef } = useParams()
 
   const [searchTerm, setSearchTerm] = useState('')
-  const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [selectedPublication, setSelectedPublication] = useState<string>(field?.value || '')
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const selectedPublication = field.value || ''
 
   const {
     data: publications = [],
@@ -47,30 +51,24 @@ export const PublicationsComboBox = ({
     isError,
     refetch: refetchPublications,
   } = useReplicationPublicationNamesQuery({ projectRef, sourceId })
-  const isLoadingPublications = isPending || isFetching
-  const isLoadingStateVisible = isLoadingPublications && publications.length === 0
-  const isErrorStateVisible = isError && publications.length === 0
+  const isLoadingStateVisible = isMetadataListLoading(isPending || isFetching, publications.length)
+  const isErrorStateVisible = isMetadataListErrorVisible(isError, publications.length)
   const { handleOpenChange: handleRefreshPublicationsOnOpen } = useRefreshOnOpen({
     isEnabled: projectRef !== undefined && sourceId !== undefined,
     refetch: refetchPublications,
   })
 
   function handlePublicationSelect(pub: string) {
-    setSelectedPublication(pub)
-    setDropdownOpen(false)
+    setIsDropdownOpen(false)
     field.onChange(pub)
   }
-
-  useEffect(() => {
-    setSelectedPublication(field?.value || '')
-  }, [field?.value])
 
   return (
     <Popover
       modal={false}
-      open={dropdownOpen}
+      open={isDropdownOpen}
       onOpenChange={(open) => {
-        setDropdownOpen(open)
+        setIsDropdownOpen(open)
         handleRefreshPublicationsOnOpen(open)
 
         if (!open && field?.onBlur) {
@@ -94,7 +92,13 @@ export const PublicationsComboBox = ({
           {selectedPublication || 'Select publication'}
         </Button>
       </PopoverTrigger>
-      <PopoverContent sameWidthAsTrigger className="p-0" align="start">
+      <PopoverContent
+        sameWidthAsTrigger
+        className="p-0"
+        align="start"
+        side="bottom"
+        collisionPadding={16}
+      >
         <Command>
           <CommandInput
             placeholder="Find publication..."
@@ -108,9 +112,9 @@ export const PublicationsComboBox = ({
             )}
 
             <SelectionListState
-              loading={isLoadingStateVisible}
-              error={isErrorStateVisible}
-              empty={!isLoadingStateVisible && !isErrorStateVisible && publications.length === 0}
+              isLoading={isLoadingStateVisible}
+              isError={isErrorStateVisible}
+              isEmpty={!isLoadingStateVisible && !isErrorStateVisible && publications.length === 0}
               emptyLabel="No publications available"
               errorLabel="Unable to load publications"
               skeletonVariant="command"

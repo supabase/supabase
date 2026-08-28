@@ -28,7 +28,11 @@ import { SelectionListState } from 'ui-patterns/SelectionListState'
 
 import { DEFAULT_DUCKLAKE_POOL_SIZE, STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
-import { useRefreshOnOpen } from '../useRefreshOnOpen'
+import {
+  isMetadataListErrorVisible,
+  isMetadataListLoading,
+  useRefreshOnOpen,
+} from '../useRefreshOnOpen'
 import {
   DUCKLAKE_MODE_CUSTOM,
   DUCKLAKE_MODE_SUPABASE,
@@ -691,7 +695,7 @@ const ProjectSelection = ({
 
   const {
     data: projectsData,
-    isPending: isLoadingProjects,
+    isPending: isPendingProjects,
     isFetching: isFetchingProjects,
     isError: isErrorProjects,
     refetch: refetchProjects,
@@ -707,7 +711,7 @@ const ProjectSelection = ({
       ),
     [projectsData]
   )
-  const isProjectsErrorVisible = isErrorProjects && projects.length === 0
+  const isProjectsErrorVisible = isMetadataListErrorVisible(isErrorProjects, projects.length)
 
   const projectsByRef = useMemo(
     () => new Map(projects.map((project) => [project.ref, project])),
@@ -730,11 +734,13 @@ const ProjectSelection = ({
       <SelectContent>
         <SelectGroup>
           <SelectionListState
-            loading={(isLoadingProjects || isFetchingProjects) && projects.length === 0}
-            error={isProjectsErrorVisible}
-            empty={
-              !isLoadingProjects &&
-              !isFetchingProjects &&
+            isLoading={isMetadataListLoading(
+              isPendingProjects || isFetchingProjects,
+              projects.length
+            )}
+            isError={isProjectsErrorVisible}
+            isEmpty={
+              !isMetadataListLoading(isPendingProjects || isFetchingProjects, projects.length) &&
               !isProjectsErrorVisible &&
               projects.length === 0
             }
@@ -773,7 +779,7 @@ const BucketSelection = ({
 
   const {
     data: bucketsData,
-    isPending: isLoadingBuckets,
+    isPending: isPendingBuckets,
     isFetching: isFetchingBuckets,
     isError: isErrorBuckets,
     refetch: refetchBuckets,
@@ -789,7 +795,7 @@ const BucketSelection = ({
       ),
     [bucketsData]
   )
-  const isBucketsErrorVisible = isErrorBuckets && buckets.length === 0
+  const isBucketsErrorVisible = isMetadataListErrorVisible(isErrorBuckets, buckets.length)
   const { handleOpenChange: handleRefreshBucketsOnOpen } = useRefreshOnOpen({
     isEnabled: !!ducklakeStorageProjectRef,
     refetch: refetchBuckets,
@@ -815,11 +821,10 @@ const BucketSelection = ({
       <SelectContent>
         <SelectGroup>
           <SelectionListState
-            loading={(isLoadingBuckets || isFetchingBuckets) && buckets.length === 0}
-            error={isBucketsErrorVisible}
-            empty={
-              !isLoadingBuckets &&
-              !isFetchingBuckets &&
+            isLoading={isMetadataListLoading(isPendingBuckets || isFetchingBuckets, buckets.length)}
+            isError={isBucketsErrorVisible}
+            isEmpty={
+              !isMetadataListLoading(isPendingBuckets || isFetchingBuckets, buckets.length) &&
               !isBucketsErrorVisible &&
               buckets.length === 0
             }

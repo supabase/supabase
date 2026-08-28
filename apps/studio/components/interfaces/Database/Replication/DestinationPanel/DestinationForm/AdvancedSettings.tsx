@@ -43,8 +43,8 @@ export const AdvancedSettings = ({
 }) => {
   const handleNumberChange =
     (field: { onChange: (value?: number) => void }) => (e: ChangeEvent<HTMLInputElement>) => {
-      const val = e.target.value
-      field.onChange(val === '' ? undefined : Number(val))
+      const parsed = e.target.valueAsNumber
+      field.onChange(e.target.value === '' || Number.isNaN(parsed) ? undefined : parsed)
     }
 
   return (
@@ -162,7 +162,7 @@ export const AdvancedSettings = ({
                       <SelectTrigger>
                         {INVALIDATED_SLOT_BEHAVIOR_LABELS[field.value ?? 'error']}
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent side="bottom" collisionPadding={16}>
                         <SelectItem value="error" className="[&>span]:top-2.5">
                           <p>Block startup</p>
                           <p className="text-foreground-lighter">
@@ -251,18 +251,21 @@ export const AdvancedSettings = ({
                   )}
                 />
 
-                <FormItemLayout
-                  label={
-                    <div className="flex flex-col gap-y-2">
-                      <span>Table partitioning &amp; clustering*</span>
+                <div className="flex flex-col gap-y-3">
+                  <div className="flex flex-col gap-y-1">
+                    <div className="flex items-center gap-x-2">
+                      <span className="text-sm text-foreground">
+                        Table partitioning and clustering*
+                      </span>
                       <Badge className="w-min">BigQuery only</Badge>
                     </div>
-                  }
-                  layout="horizontal"
-                  description="Configure partitioning and clustering for individual tables in the selected publication."
-                >
+                    <p className="text-sm text-foreground-lighter">
+                      Configure partitioning and clustering for individual tables in the selected
+                      publication.
+                    </p>
+                  </div>
                   <TableOptions control={form.control} />
-                </FormItemLayout>
+                </div>
 
                 <p className="text-sm text-foreground-lighter leading-normal">
                   * Applied when a destination table is first created or after you use Reset table.

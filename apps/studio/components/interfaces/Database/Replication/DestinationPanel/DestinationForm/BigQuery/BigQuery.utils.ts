@@ -33,11 +33,15 @@ export const defaultPartitionByForKind = (
   }
 }
 
-// Parses a partition start/end/interval input, keeping the previous value for anything that
-// isn't yet a finite number (e.g. while the user is still typing "-" or has cleared the field).
-export const parseIntegerInput = (value: string, previous: number) => {
-  const parsed = Number(value)
-  return value.trim().length > 0 && Number.isFinite(parsed) ? parsed : previous
+// Parses a partition start/end/interval input. Empty and a lone minus stay as the empty
+// sentinel so the field remains controlled while the user is still typing. Other invalid
+// drafts keep the previous committed value.
+export const parseIntegerInput = (value: string, previous: number | ''): number | '' => {
+  const trimmed = value.trim()
+  if (trimmed === '' || trimmed === '-') return ''
+  if (!/^-?\d+$/.test(trimmed)) return previous
+  const parsed = Number(trimmed)
+  return Number.isSafeInteger(parsed) ? parsed : previous
 }
 
 export type BigQueryValidationIssue<Path extends string = string> = {

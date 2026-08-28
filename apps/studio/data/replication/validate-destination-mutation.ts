@@ -3,6 +3,7 @@ import type { components } from 'api-types'
 
 import {
   buildCreateDestinationApiConfig,
+  buildPipelineApiConfig,
   DestinationConfig,
   TableSyncCopyConfig,
 } from './create-destination-pipeline-mutation'
@@ -40,27 +41,22 @@ async function validateDestination(
 ): Promise<ValidateDestinationResponse> {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const config: components['schemas']['ValidateDestinationBody']['config'] =
-    buildCreateDestinationApiConfig(destinationConfig)
-
-  const pipelineConfig: components['schemas']['ValidateDestinationBody']['pipeline_config'] =
-    publicationName === undefined
-      ? undefined
-      : {
-          publication_name: publicationName,
-          max_table_sync_workers: maxTableSyncWorkers,
-          max_copy_connections_per_table: maxCopyConnectionsPerTable,
-          invalidated_slot_behavior: invalidatedSlotBehavior,
-          table_sync_copy: tableSyncCopy,
-          batch: maxFillMs === undefined ? undefined : { max_fill_ms: maxFillMs },
-        }
-
   const { data, error } = await post('/platform/replication/{ref}/destinations/validate', {
     params: { path: { ref: projectRef } },
     body: {
-      config,
+      config: buildCreateDestinationApiConfig(destinationConfig),
       source_id: sourceId,
-      pipeline_config: pipelineConfig,
+      pipeline_config:
+        publicationName === undefined
+          ? undefined
+          : buildPipelineApiConfig({
+              publicationName,
+              maxTableSyncWorkers,
+              maxCopyConnectionsPerTable,
+              invalidatedSlotBehavior,
+              tableSyncCopy: tableSyncCopy ?? { type: 'include_all_tables' },
+              batch: maxFillMs === undefined ? undefined : { maxFillMs },
+            }),
     },
     signal,
   })

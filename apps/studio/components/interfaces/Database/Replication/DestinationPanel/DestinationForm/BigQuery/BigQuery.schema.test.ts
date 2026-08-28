@@ -31,15 +31,17 @@ describe('BigQuery replication schemas', () => {
     expect(BigQueryTableOptionSchema.safeParse({ tableId: 4_294_967_296 }).success).toBe(false)
   })
 
-  it('requires partitioning or clustering for a selected table', () => {
-    const result = BigQueryTableOptionSchema.safeParse({ tableId: 1 })
+  it('allows a selected table with no partitioning or clustering', () => {
+    expect(BigQueryTableOptionSchema.safeParse({ tableId: 1 }).success).toBe(true)
+  })
 
-    expect(result.error?.issues).toContainEqual(
-      expect.objectContaining({
-        path: ['partitionBy'],
-        message: 'Set a partitioning or clustering option, or remove this table',
-      })
-    )
+  it('allows an unfinished time-column partition so save can omit it', () => {
+    expect(
+      BigQueryTableOptionSchema.safeParse({
+        tableId: 1,
+        partitionBy: { kind: 'time_column', column: '', granularity: 'day' },
+      }).success
+    ).toBe(true)
   })
 
   it('requires the integer range end to be greater than the start', () => {
@@ -51,7 +53,7 @@ describe('BigQuery replication schemas', () => {
     expect(result.error?.issues).toContainEqual(
       expect.objectContaining({
         path: ['partitionBy', 'end'],
-        message: 'End must be greater than start',
+        message: 'End must be greater than start.',
       })
     )
   })
@@ -65,7 +67,7 @@ describe('BigQuery replication schemas', () => {
     expect(result.error?.issues).toContainEqual(
       expect.objectContaining({
         path: ['partitionBy', 'interval'],
-        message: 'Interval must be greater than 0',
+        message: 'Interval must be greater than 0.',
       })
     )
   })

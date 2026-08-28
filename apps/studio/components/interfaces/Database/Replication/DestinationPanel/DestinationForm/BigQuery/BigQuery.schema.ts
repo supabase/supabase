@@ -7,21 +7,26 @@ import {
 
 const BigQueryTimePartitionGranularitySchema = z.enum(BIGQUERY_TIME_PARTITION_GRANULARITIES)
 
+const integerRangeValue = (label: string) =>
+  z
+    .union([
+      z.literal(''),
+      z.number().int(`${label} must be a whole number`).safe(`${label} must be a safe integer`),
+    ])
+    .refine((value) => value !== '', `${label} is required`)
+
 export const BigQueryPartitionBySchema = z.discriminatedUnion('kind', [
   z.object({
     kind: z.literal('time_column'),
-    column: z.string().min(1, 'Column is required'),
+    column: z.string(),
     granularity: BigQueryTimePartitionGranularitySchema.optional(),
   }),
   z.object({
     kind: z.literal('integer_range'),
-    column: z.string().min(1, 'Column is required'),
-    start: z.number().int('Start must be a whole number').safe('Start must be a safe integer'),
-    end: z.number().int('End must be a whole number').safe('End must be a safe integer'),
-    interval: z
-      .number()
-      .int('Interval must be a whole number')
-      .safe('Interval must be a safe integer'),
+    column: z.string(),
+    start: integerRangeValue('Start'),
+    end: integerRangeValue('End'),
+    interval: integerRangeValue('Interval'),
   }),
   z.object({
     kind: z.literal('ingestion_time'),
@@ -42,29 +47,27 @@ export const BigQueryTableOptionSchema = z
       .optional(),
   })
   .superRefine((option, ctx) => {
-    if (!option.partitionBy && !(option.clusterBy && option.clusterBy.length > 0)) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['partitionBy'],
-        message: 'Set a partitioning or clustering option, or remove this table',
-      })
+    if (option.partitionBy?.kind !== 'integer_range') return
+    if (option.partitionBy.column.trim().length === 0) return
+
+    const { start, end, interval } = option.partitionBy
+    if (typeof start !== 'number' || typeof end !== 'number' || typeof interval !== 'number') {
+      return
     }
 
-    if (option.partitionBy?.kind !== 'integer_range') return
-
-    if (option.partitionBy.start >= option.partitionBy.end) {
+    if (start >= end) {
       ctx.addIssue({
         code: 'custom',
         path: ['partitionBy', 'end'],
-        message: 'End must be greater than start',
+        message: 'End must be greater than start.',
       })
     }
 
-    if (option.partitionBy.interval <= 0) {
+    if (interval <= 0) {
       ctx.addIssue({
         code: 'custom',
         path: ['partitionBy', 'interval'],
-        message: 'Interval must be greater than 0',
+        message: 'Interval must be greater than 0.',
       })
     }
   })

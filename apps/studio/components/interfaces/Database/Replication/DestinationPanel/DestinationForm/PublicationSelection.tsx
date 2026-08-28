@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { useMemo } from 'react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 import { FormControl, FormField } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -27,9 +26,10 @@ export const PublicationSelection = ({
   const { data: publications, isSuccess: isSuccessPublications } =
     useReplicationPublicationNamesQuery({ projectRef, sourceId })
 
-  const publicationNames = useMemo(() => publications?.map((pub) => pub.name) ?? [], [publications])
   const isSelectedPublicationMissing =
-    isSuccessPublications && !!publicationName && !publicationNames.includes(publicationName)
+    isSuccessPublications &&
+    !!publicationName &&
+    !(publications ?? []).some((publication) => publication.name === publicationName)
 
   return (
     <FormField

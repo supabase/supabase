@@ -4,11 +4,8 @@ import { toast } from 'sonner'
 
 import { optionalSecret } from './destination-secret-utils'
 import { replicationKeys } from './keys'
-import type { TableSyncCopyConfig } from '@/components/interfaces/Database/Replication/TableSyncCopy.utils'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
-
-export type { TableSyncCopyConfig } from '@/components/interfaces/Database/Replication/TableSyncCopy.utils'
 
 type CreateDestinationPipelineBody =
   components['schemas']['CreateReplicationDestinationPipelineBody']
@@ -47,7 +44,13 @@ export type BigQueryTimePartitionGranularity =
 
 export type BigQueryPartitionBy =
   | { kind: 'time_column'; column: string; granularity?: BigQueryTimePartitionGranularity }
-  | { kind: 'integer_range'; column: string; start: number; end: number; interval: number }
+  | {
+      kind: 'integer_range'
+      column: string
+      start: number | ''
+      end: number | ''
+      interval: number | ''
+    }
   | { kind: 'ingestion_time'; granularity?: BigQueryTimePartitionGranularity }
 
 // A single source table's BigQuery partitioning/clustering configuration. `tableId` is the
@@ -105,6 +108,20 @@ function isDucklakeSupabaseConfig(
   return 'catalogProjectRef' in config
 }
 
+const hasClusteringColumns = (clusterBy: string[] | undefined) => (clusterBy?.length ?? 0) > 0
+
+const isCompleteBigQueryPartition = (partitionBy: BigQueryPartitionBy | undefined) => {
+  if (!partitionBy) return false
+  if (partitionBy.kind === 'ingestion_time') return true
+  if (!('column' in partitionBy) || partitionBy.column.trim().length === 0) return false
+  if (partitionBy.kind !== 'integer_range') return true
+  return (
+    typeof partitionBy.start === 'number' &&
+    typeof partitionBy.end === 'number' &&
+    typeof partitionBy.interval === 'number'
+  )
+}
+
 const buildBigQueryPartitionByApiConfig = (partitionBy: BigQueryPartitionBy) => {
   switch (partitionBy.kind) {
     case 'time_column':
@@ -117,9 +134,9 @@ const buildBigQueryPartitionByApiConfig = (partitionBy: BigQueryPartitionBy) => 
       return {
         kind: partitionBy.kind,
         column: partitionBy.column,
-        start: partitionBy.start,
-        end: partitionBy.end,
-        interval: partitionBy.interval,
+        start: Number(partitionBy.start),
+        end: Number(partitionBy.end),
+        interval: Number(partitionBy.interval),
       }
     case 'ingestion_time':
       return { kind: partitionBy.kind, granularity: partitionBy.granularity }
@@ -128,12 +145,14 @@ const buildBigQueryPartitionByApiConfig = (partitionBy: BigQueryPartitionBy) => 
 
 const buildBigQueryTableOptionApiConfig = (option: BigQueryTableOption) => ({
   table_id: option.tableId,
-  partition_by: option.partitionBy && buildBigQueryPartitionByApiConfig(option.partitionBy),
-  cluster_by: option.clusterBy,
+  partition_by: isCompleteBigQueryPartition(option.partitionBy)
+    ? buildBigQueryPartitionByApiConfig(option.partitionBy)
+    : undefined,
+  cluster_by: hasClusteringColumns(option.clusterBy) ? option.clusterBy : undefined,
 })
 
 const isBigQueryTableOptionConfigured = (option: BigQueryTableOption) =>
-  option.partitionBy !== undefined || (option.clusterBy?.length ?? 0) > 0
+  isCompleteBigQueryPartition(option.partitionBy) || hasClusteringColumns(option.clusterBy)
 
 const getConfiguredBigQueryTableOptions = (tableOptions: BigQueryTableOption[] | undefined) =>
   (tableOptions ?? []).filter(isBigQueryTableOptionConfigured)
@@ -195,13 +214,13 @@ export function buildDucklakeApiConfig(config: DucklakeDestinationConfig): Creat
         // pool_size / metadata_schema live on the catalog so they apply to the selected
         // Supabase Postgres catalog (the API resolves catalog-level values over top-level).
         catalog: {
-          type: 'supabase_project' as const,
+          type: 'supabase_project',
           project_ref: config.catalogProjectRef,
           pool_size: config.poolSize,
           metadata_schema: config.metadataSchema,
         },
         storage: {
-          type: 'supabase_storage' as const,
+          type: 'supabase_storage',
           project_ref: config.storageProjectRef,
           bucket: config.bucket,
           ...(config.path ? { path: config.path } : {}),
@@ -287,6 +306,8 @@ export type BatchConfig = {
   maxBytes?: number
   memoryBudgetRatio?: number
 }
+
+export type TableSyncCopyConfig = NonNullable<CreatePipelineApiConfig['table_sync_copy']>
 
 export type PipelineConfig = {
   publicationName: string

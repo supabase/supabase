@@ -91,19 +91,19 @@ describe('parseIntegerInput', () => {
     expect(parseIntegerInput('-5', 0)).toBe(-5)
   })
 
-  it('keeps the previous value for an empty string', () => {
-    expect(parseIntegerInput('', 7)).toBe(7)
+  it('uses the empty sentinel for an empty string', () => {
+    expect(parseIntegerInput('', 7)).toBe('')
   })
 
-  it('keeps the previous value for whitespace-only input', () => {
-    expect(parseIntegerInput('   ', 7)).toBe(7)
+  it('uses the empty sentinel for whitespace-only input', () => {
+    expect(parseIntegerInput('   ', 7)).toBe('')
   })
 
   it('keeps the previous value for non-numeric input', () => {
     expect(parseIntegerInput('abc', 7)).toBe(7)
   })
 
-  it('keeps the previous value while a negative sign is typed alone', () => {
-    expect(parseIntegerInput('-', 7)).toBe(7)
+  it('uses the empty sentinel while a negative sign is typed alone', () => {
+    expect(parseIntegerInput('-', 7)).toBe('')
   })
 })

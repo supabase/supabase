@@ -34,6 +34,7 @@ import {
   buildTableSyncCopyConfig,
   generateDefaultValues,
   pruneStaleSelectedTableIds,
+  pruneStaleTableOptions,
 } from './DestinationForm.utils'
 import { DestinationNameInput } from './DestinationNameInput'
 import { getDucklakeValidationIssues } from './DuckLake/DuckLake.utils'
@@ -181,7 +182,7 @@ export const DestinationForm = ({
     [destinationData, pipelineData, catalogToken, projectSettings, projectRef, editMode]
   )
   const form = useForm<z.infer<typeof FormSchema>>({
-    mode: 'onChange',
+    mode: 'onSubmit',
     reValidateMode: 'onChange',
     resolver: zodResolver(
       FormSchema.superRefine((data, ctx) => {
@@ -239,7 +240,7 @@ export const DestinationForm = ({
 
   // Always destructure formState values otherwise they won't be updated
   // See https://react-hook-form.com/docs/useform/formstate
-  const { isDirty, isValid } = form.formState
+  const { isDirty } = form.formState
 
   const publicationName = useWatch({ control: form.control, name: 'publicationName' })
   const { data: selectedPublication, isSuccess: isSuccessPublication } =
@@ -272,7 +273,6 @@ export const DestinationForm = ({
   const isSubmitDisabled =
     isSaving ||
     !isExistingConfigReady ||
-    !isValid ||
     !isSuccessPublicationNames ||
     (!!publicationName && !isSuccessPublication) ||
     isSelectedPublicationMissing ||
@@ -312,6 +312,11 @@ export const DestinationForm = ({
       tableSyncCopyTableIds: pruneStaleSelectedTableIds({
         mode: rawData.tableSyncCopyMode,
         selectedTableIds: rawData.tableSyncCopyTableIds,
+        publication: selectedPublication,
+        publicationName: rawData.publicationName,
+      }),
+      tableOptions: pruneStaleTableOptions({
+        tableOptions: rawData.tableOptions,
         publication: selectedPublication,
         publicationName: rawData.publicationName,
       }),
@@ -424,7 +429,6 @@ export const DestinationForm = ({
     // discarded values, and when open but pristine so async defaults can apply.
     if (!visible || !isDirty) {
       form.reset(defaultValues)
-      if (visible) void form.trigger()
       resetValidation()
     }
   }, [visible, defaultValues, form, isDirty, resetValidation])
@@ -463,21 +467,25 @@ export const DestinationForm = ({
 
                 <DialogSectionSeparator />
 
-                {selectedType === 'BigQuery' && etlEnableBigQuery ? (
+                {selectedType === 'BigQuery' && etlEnableBigQuery && (
                   <BigQueryFields form={form} editMode={editMode} />
-                ) : selectedType === 'Analytics Bucket' && etlEnableIceberg ? (
+                )}
+                {selectedType === 'Analytics Bucket' && etlEnableIceberg && (
                   <AnalyticsBucketFields
                     form={form}
                     editMode={editMode}
                     onSelectNewBucket={() => setNewBucketSheetVisible(true)}
                   />
-                ) : selectedType === 'DuckLake' && etlEnableDucklake ? (
+                )}
+                {selectedType === 'DuckLake' && etlEnableDucklake && (
                   <DuckLakeFields form={form} editMode={editMode} />
-                ) : selectedType === 'Snowflake' && etlEnableSnowflake ? (
+                )}
+                {selectedType === 'Snowflake' && etlEnableSnowflake && (
                   <SnowflakeFields form={form} editMode={editMode} />
-                ) : selectedType === 'ClickHouse' && etlEnableClickHouse ? (
+                )}
+                {selectedType === 'ClickHouse' && etlEnableClickHouse && (
                   <ClickHouseFields form={form} editMode={editMode} />
-                ) : null}
+                )}
 
                 <DialogSectionSeparator />
 

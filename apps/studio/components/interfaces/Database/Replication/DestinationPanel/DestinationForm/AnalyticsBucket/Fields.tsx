@@ -25,7 +25,11 @@ import {
   STORED_SECRET_PLACEHOLDER,
 } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
-import { useRefreshOnOpen } from '../useRefreshOnOpen'
+import {
+  isMetadataListErrorVisible,
+  isMetadataListLoading,
+  useRefreshOnOpen,
+} from '../useRefreshOnOpen'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useAnalyticsBucketsQuery } from '@/data/storage/analytics-buckets-query'
 import { useIcebergNamespacesQuery } from '@/data/storage/iceberg-namespaces-query'
@@ -93,8 +97,8 @@ export const AnalyticsBucketFields = ({
     refetch: refetchKeys,
   } = useStorageCredentialsQuery({ projectRef })
   const s3Keys = keysData?.data ?? []
-  const isLoadingKeys = (isPendingKeys || isFetchingKeys) && s3Keys.length === 0
-  const isKeysErrorVisible = isErrorKeys && s3Keys.length === 0
+  const isLoadingKeys = isMetadataListLoading(isPendingKeys || isFetchingKeys, s3Keys.length)
+  const isKeysErrorVisible = isMetadataListErrorVisible(isErrorKeys, s3Keys.length)
   const keyNoLongerExists =
     (s3AccessKeyId ?? '').length > 0 &&
     s3AccessKeyId !== CREATE_NEW_KEY &&
@@ -107,8 +111,11 @@ export const AnalyticsBucketFields = ({
     isError: isErrorBuckets,
     refetch: refetchBuckets,
   } = useAnalyticsBucketsQuery({ projectRef })
-  const isLoadingBuckets = (isPendingBuckets || isFetchingBuckets) && analyticsBuckets.length === 0
-  const isBucketsErrorVisible = isErrorBuckets && analyticsBuckets.length === 0
+  const isLoadingBuckets = isMetadataListLoading(
+    isPendingBuckets || isFetchingBuckets,
+    analyticsBuckets.length
+  )
+  const isBucketsErrorVisible = isMetadataListErrorVisible(isErrorBuckets, analyticsBuckets.length)
 
   const canSelectNamespace = !!warehouseName
 
@@ -122,9 +129,11 @@ export const AnalyticsBucketFields = ({
     { projectRef, warehouse: warehouseName },
     { enabled: !!warehouseName }
   )
-  const isLoadingNamespaces =
-    (isPendingNamespaces || isFetchingNamespaces) && namespaces.length === 0
-  const isNamespacesErrorVisible = isErrorNamespaces && namespaces.length === 0
+  const isLoadingNamespaces = isMetadataListLoading(
+    isPendingNamespaces || isFetchingNamespaces,
+    namespaces.length
+  )
+  const isNamespacesErrorVisible = isMetadataListErrorVisible(isErrorNamespaces, namespaces.length)
   const { handleOpenChange: handleRefreshBucketsOnOpen } = useRefreshOnOpen({
     refetch: refetchBuckets,
   })
@@ -168,9 +177,9 @@ export const AnalyticsBucketFields = ({
                   <SelectContent>
                     <SelectGroup>
                       <SelectionListState
-                        loading={isLoadingBuckets}
-                        error={isBucketsErrorVisible}
-                        empty={
+                        isLoading={isLoadingBuckets}
+                        isError={isBucketsErrorVisible}
+                        isEmpty={
                           !isLoadingBuckets &&
                           !isBucketsErrorVisible &&
                           analyticsBuckets.length === 0
@@ -215,9 +224,9 @@ export const AnalyticsBucketFields = ({
                   <SelectContent>
                     <SelectGroup>
                       <SelectionListState
-                        loading={isLoadingNamespaces}
-                        error={isNamespacesErrorVisible}
-                        empty={
+                        isLoading={isLoadingNamespaces}
+                        isError={isNamespacesErrorVisible}
+                        isEmpty={
                           !isLoadingNamespaces &&
                           !isNamespacesErrorVisible &&
                           namespaces.length === 0
@@ -354,9 +363,9 @@ export const AnalyticsBucketFields = ({
                   <SelectContent>
                     <SelectGroup>
                       <SelectionListState
-                        loading={isLoadingKeys}
-                        error={isKeysErrorVisible}
-                        empty={!isLoadingKeys && !isKeysErrorVisible && s3Keys.length === 0}
+                        isLoading={isLoadingKeys}
+                        isError={isKeysErrorVisible}
+                        isEmpty={!isLoadingKeys && !isKeysErrorVisible && s3Keys.length === 0}
                         emptyLabel="No access keys available"
                         errorLabel="Unable to load access keys"
                       />

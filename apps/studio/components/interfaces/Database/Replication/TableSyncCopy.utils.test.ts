@@ -4,8 +4,8 @@ import {
   getTableCopyTargets,
   shouldCopyTable,
   summarizeTableCopyEstimate,
-  type TableSyncCopyConfig,
 } from './TableSyncCopy.utils'
+import type { TableSyncCopyConfig } from '@/data/replication/create-destination-pipeline-mutation'
 
 const tables = [
   { id: 101, schema: 'public', name: 'orders' },

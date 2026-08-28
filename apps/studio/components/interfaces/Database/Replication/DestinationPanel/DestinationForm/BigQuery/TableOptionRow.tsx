@@ -4,11 +4,15 @@ import { get, useController, useFormState, type Control, type FieldErrors } from
 
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
 import {
+  isMetadataListErrorVisible,
+  isMetadataListLoading,
+  useRefreshOnOpen,
+} from '../useRefreshOnOpen'
+import {
   ClusteringFields,
   PartitioningFields,
   type ColumnSelectionState,
 } from './TableOptionFields'
-import { REPLICATION_METADATA_FRESHNESS_MS } from '@/data/replication/constants'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useReplicationTableColumnsQuery } from '@/data/replication/table-columns-query'
 
@@ -22,7 +26,7 @@ interface TableOptionRowProps {
   index: number
   isPublicationColumnsError?: boolean
   isPublicationColumnsPending?: boolean
-  publishedColumnNames?: ReadonlySet<string>
+  publishedColumnNames?: ReadonlySet<string> | null
   tableId: number
 }
 
@@ -62,17 +66,20 @@ export const TableOptionRow = ({
     refetch: refetchColumns,
   } = useReplicationTableColumnsQuery(
     { projectRef, sourceId, tableId },
-    { enabled: shouldLoadColumns, staleTime: REPLICATION_METADATA_FRESHNESS_MS }
+    { enabled: shouldLoadColumns }
   )
 
   const isLoadingColumns =
-    shouldLoadColumns && ((isPending && columns.length === 0) || isPublicationColumnsPending)
+    (shouldLoadColumns && isMetadataListLoading(isPending || isFetching, columns.length)) ||
+    isPublicationColumnsPending
   const sourceColumnNames = columns.map((column) => column.name)
   const sourceColumnNameSet = new Set(sourceColumnNames)
   const canUseColumns = !isPublicationColumnsPending && !isPublicationColumnsError
   const availableColumnNames = canUseColumns
     ? sourceColumnNames.filter(
-        (column) => publishedColumnNames === undefined || publishedColumnNames.has(column)
+        (column) =>
+          publishedColumnNames === undefined ||
+          (publishedColumnNames !== null && publishedColumnNames.has(column))
       )
     : []
   const columnTypeByName = new Map(columns.map((column) => [column.name, column.type]))
@@ -80,24 +87,30 @@ export const TableOptionRow = ({
   const partitionColumn = partitionBy && 'column' in partitionBy ? partitionBy.column : undefined
   const configuredColumns = [partitionColumn, ...(clusterByField.value ?? [])].filter(
     (column, columnIndex, allConfiguredColumns): column is string =>
-      column !== undefined && allConfiguredColumns.indexOf(column) === columnIndex
+      typeof column === 'string' &&
+      column.trim().length > 0 &&
+      allConfiguredColumns.indexOf(column) === columnIndex
   )
   const unavailableColumns = configuredColumns.filter(
     (column) =>
       areColumnsVerified &&
       (!sourceColumnNameSet.has(column) ||
-        (publishedColumnNames !== undefined && !publishedColumnNames.has(column)))
+        (publishedColumnNames != null && !publishedColumnNames.has(column)))
   )
   const unavailableColumnSet = new Set(unavailableColumns)
-  const isColumnSelectionError = isPublicationColumnsError || (isError && columns.length === 0)
+  const isColumnSelectionError =
+    isPublicationColumnsError || isMetadataListErrorVisible(isError, columns.length)
 
-  const handleRefreshColumnsOnOpen = (isOpen: boolean) => {
-    if (!isOpen) return
-    if (!shouldLoadColumns) {
+  const { handleOpenChange: handleRefreshColumnsOnOpen } = useRefreshOnOpen({
+    isEnabled: shouldLoadColumns,
+    refetch: refetchColumns,
+  })
+  const handleColumnPickerOpenChange = (isOpen: boolean) => {
+    if (isOpen && !shouldLoadColumns) {
       setShouldLoadColumns(true)
       return
     }
-    if (!isFetching) void refetchColumns()
+    handleRefreshColumnsOnOpen(isOpen)
   }
 
   const fieldPath = `tableOptions.${index}`
@@ -114,7 +127,7 @@ export const TableOptionRow = ({
     columnTypeByName,
     isError: isColumnSelectionError,
     isLoading: isLoadingColumns,
-    onOpenChange: handleRefreshColumnsOnOpen,
+    onOpenChange: handleColumnPickerOpenChange,
     unavailableColumnSet,
   }
 
@@ -139,13 +152,14 @@ export const TableOptionRow = ({
 
       {shouldLoadColumns && isColumnSelectionError && (
         <p className="text-sm text-warning-600">
-          The configured columns could not be verified against the source and publication.
+          Unable to verify columns against the source and publication. Refresh and try again.
         </p>
       )}
 
       {unavailableColumns.length > 0 && (
         <p className="text-sm text-destructive-600 leading-normal">
-          Some columns are no longer available.
+          Some columns are no longer in the source or publication. Choose different columns or
+          remove them.
         </p>
       )}
     </div>

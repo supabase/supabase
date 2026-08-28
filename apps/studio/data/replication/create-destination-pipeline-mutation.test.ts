@@ -98,6 +98,34 @@ describe('buildBigQueryApiConfig', () => {
     })
   })
 
+  it('omits a time-column partition that has no column selected', () => {
+    expect(
+      buildBigQueryApiConfig({
+        ...baseConfig,
+        tableOptions: [
+          { tableId: 16_408, partitionBy: { kind: 'time_column', column: '', granularity: 'day' } },
+          {
+            tableId: 16_409,
+            partitionBy: { kind: 'time_column', column: '', granularity: 'day' },
+            clusterBy: ['customer_id'],
+          },
+        ],
+      })
+    ).toMatchObject({
+      big_query: {
+        table_options: {
+          tables: [
+            {
+              table_id: 16_409,
+              partition_by: undefined,
+              cluster_by: ['customer_id'],
+            },
+          ],
+        },
+      },
+    })
+  })
+
   it('omits a table entry that has neither partitioning nor clustering set', () => {
     expect(
       buildBigQueryApiConfig({

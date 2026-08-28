@@ -585,14 +585,15 @@ const MultiSelectorList = React.forwardRef<
         onWheel={(e) => e.stopPropagation()}
         {...props}
       >
-        {loading || error ? (
-          <SelectionListState
-            loading={loading}
-            error={error}
-            errorLabel={errorLabel}
-            skeletonVariant="multi-select"
-          />
-        ) : (
+        <SelectionListState
+          isLoading={loading}
+          isError={error}
+          isEmpty={!loading && !error && options.length === 0 && !creatable}
+          emptyLabel={emptyLabel}
+          errorLabel={errorLabel}
+          skeletonVariant="multi-select"
+        />
+        {!loading && !error && (options.length > 0 || creatable) && (
           <>
             {children}
             {creatable && inputValue.length > 0 && !isOptionExists ? (

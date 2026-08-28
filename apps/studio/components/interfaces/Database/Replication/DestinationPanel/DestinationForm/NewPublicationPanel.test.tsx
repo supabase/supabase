@@ -111,6 +111,38 @@ describe('NewPublicationPanel', () => {
     await waitFor(() =>
       expect(requestBody).toMatchObject({
         tables: [{ id: 17487 }],
+        publish_via_partition_root: true,
+      })
+    )
+  })
+
+  it('sends publish_via_partition_root as false when the option is turned off', async () => {
+    mockQueries()
+    let requestBody: unknown
+    addAPIMock({
+      method: 'put',
+      path: '/platform/replication/v2/:ref/sources/:source_id/publications/:publication_name',
+      response: async ({ request }) => {
+        requestBody = await request.json()
+        return HttpResponse.json<PublicationDetailsResponse>(mockPublication)
+      },
+    })
+
+    customRender(<NewPublicationPanel visible onClose={vi.fn()} />)
+
+    const trigger = screen.getAllByRole('combobox').find((element) => element.tagName === 'BUTTON')!
+    fireEvent.click(trigger)
+    fireEvent.click(await screen.findByText('CamelSchema.MixedCaseTable'))
+    fireEvent.change(screen.getByPlaceholderText('Name'), {
+      target: { value: 'MixedCasePublication' },
+    })
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Publish partitions as the parent table' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Create publication' }))
+
+    await waitFor(() =>
+      expect(requestBody).toMatchObject({
+        tables: [{ id: 17487 }],
+        publish_via_partition_root: false,
       })
     )
   })

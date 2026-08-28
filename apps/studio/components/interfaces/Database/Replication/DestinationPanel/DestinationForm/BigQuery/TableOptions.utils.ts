@@ -1,3 +1,42 @@
+const TIME_PARTITION_COLUMN_TYPES = new Set([
+  'date',
+  'timestamp',
+  'timestamptz',
+  'timestamp with time zone',
+  'timestamp without time zone',
+])
+
+const INTEGER_PARTITION_COLUMN_TYPES = new Set([
+  'smallint',
+  'integer',
+  'bigint',
+  'int2',
+  'int4',
+  'int8',
+  'serial',
+  'serial2',
+  'serial4',
+  'serial8',
+  'smallserial',
+  'bigserial',
+])
+
+export const isTimePartitionColumnType = (type?: string) =>
+  type !== undefined && TIME_PARTITION_COLUMN_TYPES.has(type.toLowerCase())
+
+export const isIntegerPartitionColumnType = (type?: string) =>
+  type !== undefined && INTEGER_PARTITION_COLUMN_TYPES.has(type.toLowerCase())
+
+export const isPartitionColumnTypeCompatible = (
+  kind: 'time_column' | 'integer_range',
+  type?: string
+) => {
+  if (type === undefined) return true
+  return kind === 'time_column'
+    ? isTimePartitionColumnType(type)
+    : isIntegerPartitionColumnType(type)
+}
+
 export type PublicationTableConfig = {
   id: number
   columns?: string[] | null

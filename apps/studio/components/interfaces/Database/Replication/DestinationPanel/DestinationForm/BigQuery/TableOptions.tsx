@@ -4,9 +4,9 @@ import { Checkbox } from 'ui'
 import { GenericSelectionSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
+import { isMetadataValueLoading } from '../useRefreshOnOpen'
 import { TableOptionRow } from './TableOptionRow'
 import { resolvePublishedColumnNames } from './TableOptions.utils'
-import { REPLICATION_METADATA_FRESHNESS_MS } from '@/data/replication/constants'
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useReplicationTablesQuery } from '@/data/replication/tables-query'
@@ -33,7 +33,10 @@ export const TableOptions = ({ control }: TableOptionsProps) => {
     sourceId,
     publicationName,
   })
-  const isLoadingPublicationTables = (isPending || isFetching) && selectedPublication === undefined
+  const isLoadingPublicationTables = isMetadataValueLoading(
+    isPending || isFetching,
+    selectedPublication
+  )
   const publicationTables = [...(selectedPublication?.tables ?? [])].sort((a, b) =>
     tableLabel(a).localeCompare(tableLabel(b))
   )
@@ -59,12 +62,12 @@ export const TableOptions = ({ control }: TableOptionsProps) => {
         : []
     })
   )
-  const shouldResolvePartitionAncestry = tablesNeedingPartitionAncestry.size > 0
+  const shouldResolvePartitionAncestry =
+    selectedPublication?.config.type === 'tables' && tablesNeedingPartitionAncestry.size > 0
   const { data: sourceTables = [], isPending: isSourceTablesPending } = useReplicationTablesQuery(
     { projectRef, sourceId },
     {
       enabled: unavailableTableOptions.length > 0 || shouldResolvePartitionAncestry,
-      staleTime: REPLICATION_METADATA_FRESHNESS_MS,
     }
   )
   const sourceTablesById = new Map(sourceTables.map((table) => [table.id, table]))
@@ -76,16 +79,20 @@ export const TableOptions = ({ control }: TableOptionsProps) => {
     return <p className="text-sm text-foreground-lighter">Select a publication first.</p>
   }
 
-  if (isLoadingPublicationTables && publicationTables.length === 0) {
+  if (isLoadingPublicationTables) {
     return <GenericSelectionSkeletonLoader className="-mx-2 w-auto" />
   }
 
   if (isPublicationError) {
     return (
       <p className="text-sm text-warning-600">
-        The configured table settings could not be verified against the publication.
+        Unable to verify table settings against the publication. Refresh and try again.
       </p>
     )
+  }
+
+  if (publicationTables.length === 0 && unavailableTableOptions.length === 0) {
+    return <p className="text-sm text-foreground-lighter">This publication has no tables.</p>
   }
 
   return (
@@ -106,7 +113,7 @@ export const TableOptions = ({ control }: TableOptionsProps) => {
               <Checkbox
                 checked={isChecked}
                 onCheckedChange={(checked) => {
-                  if (checked) {
+                  if (checked === true) {
                     append({ tableId: table.id, partitionBy: undefined, clusterBy: [] })
                   } else if (index !== -1) {
                     remove(index)
@@ -125,7 +132,7 @@ export const TableOptions = ({ control }: TableOptionsProps) => {
                   !isPublicationColumnsPending
                 }
                 isPublicationColumnsPending={isPublicationColumnsPending}
-                publishedColumnNames={publishedColumnNames ?? undefined}
+                publishedColumnNames={publishedColumnNames}
                 tableId={table.id}
               />
             )}
@@ -139,7 +146,12 @@ export const TableOptions = ({ control }: TableOptionsProps) => {
         return (
           <div key={field.id} className="flex flex-col gap-y-3">
             <label className="flex items-center gap-x-2 text-sm">
-              <Checkbox checked onCheckedChange={(checked) => !checked && remove(index)} />
+              <Checkbox
+                checked
+                onCheckedChange={(checked) => {
+                  if (checked === false) remove(index)
+                }}
+              />
               <span className="text-destructive-600">
                 {sourceTable ? tableLabel(sourceTable) : 'Previously configured table'}
                 <span className="sr-only"> (no longer in publication)</span>
