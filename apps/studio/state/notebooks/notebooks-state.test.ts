@@ -88,6 +88,22 @@ describe('notebooksState', () => {
     expect(notebooksState.needsSaving.get('notebook-1')).toBe(false)
   })
 
+  it('renaming a loaded (saved) notebook transitions it to unsaved and persists a draft', () => {
+    notebooksState.setNotebook({
+      projectRef: 'ref',
+      notebook: makeNotebook('notebook-1', { updated_at: '2024-01-01T00:00:00.000Z' }),
+    })
+
+    notebooksState.renameNotebook({ id: 'notebook-1', name: 'Renamed notebook' })
+
+    expect(notebooksState.notebooks['notebook-1'].status).toBe('unsaved')
+    expect(notebooksState.notebooks['notebook-1'].notebook.name).toBe('Renamed notebook')
+
+    const draft = readNotebookDraft({ projectRef: 'ref', id: 'notebook-1' })
+    expect(draft?.name).toBe('Renamed notebook')
+    expect(draft?.baseUpdatedAt).toBe('2024-01-01T00:00:00.000Z')
+  })
+
   it('editing a notebook that has never been saved keeps it as new', () => {
     notebooksState.addNotebook({ projectRef: 'ref', notebook: makeNotebook('notebook-1') })
 

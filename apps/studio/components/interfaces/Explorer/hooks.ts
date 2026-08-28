@@ -19,10 +19,9 @@ import { Notebooks } from '@/types'
  * a notebook any way other than creating it in this session (direct link, hard refresh,
  * clicking it from the nav list) still hydrates `notebooksState`.
  *
- * A notebook that isn't in the store yet (the fresh-load case, e.g. after a refresh) is
- * also checked for a locally-persisted draft of unsaved edits: if the notebook loaded from
- * the server, the draft is restored on top of it (see `notebooksState.restoreDraft`); if
- * the notebook was never saved at all (a 404), the draft — if present — is the only copy
+ * A notebook that isn't in the store yet is also checked for a locally-persisted draft of unsaved edits
+ * If the notebook loaded from the server, the draft is restored on top of it, otherwise if
+ * the notebook was never saved at all, the draft — if present — is the only copy
  * that ever existed, so it's restored as a new local-only notebook instead.
  */
 export const useLoadNotebook = ({ id, projectRef }: { id?: string; projectRef?: string }) => {

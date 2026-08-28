@@ -29,10 +29,6 @@ export const notebooksState = proxy({
 
   /**
    * Load notebook into the Valtio store. No-ops if already present.
-   *
-   * Persists a draft immediately, even for a still-empty notebook — otherwise a notebook
-   * created but refreshed before its first cell edit (the next time anything would persist
-   * a draft, in `updateCells`) has nothing to restore and 404s as if it never existed.
    */
   addNotebook: ({ projectRef, notebook }: { projectRef: string; notebook: Notebook }) => {
     if (notebooksState.notebooks[notebook.id]) return
@@ -97,13 +93,25 @@ export const notebooksState = proxy({
     notebooksState.serverDivergedWhileDirty.delete(id),
 
   /**
-   * Rename follows its own async save directly at the call site rather than going
-   * through needsSaving/the debounced scheduler.
+   * Rename is bundled into the same "Save changes" action as cell edits, rather than its
+   * own immediate save — so it needs the same dirty-tracking and draft persistence as
+   * `updateCells`, or a rename with no cell changes would look clean and never get saved.
    */
   renameNotebook: ({ id, name }: { id: string; name: string }) => {
     const stateNotebook = notebooksState.notebooks[id]
-    if (stateNotebook) {
-      stateNotebook.notebook.name = name
+    if (!stateNotebook) return
+
+    stateNotebook.notebook.name = name
+    stateNotebook.status = statusOnEdit(stateNotebook.status)
+
+    if (stateNotebook.notebook.content) {
+      persistNotebookDraft({
+        projectRef: stateNotebook.projectRef,
+        id,
+        name,
+        content: stateNotebook.notebook.content,
+        baseUpdatedAt: stateNotebook.notebook.updated_at ?? null,
+      })
     }
   },
 
