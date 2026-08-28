@@ -353,6 +353,8 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   const Shell = variant === 'viewport' ? ExplorerQueryViewport : ExplorerQuery
 
   const handlePrettify = async () => {
+    if (pendingProposalRef.current) return
+
     const editor = editorInstanceRef.current
     if (!editor) return
     await editor.getAction('editor.action.formatDocument')?.run()
