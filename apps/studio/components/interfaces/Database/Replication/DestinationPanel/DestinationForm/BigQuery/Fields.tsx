@@ -127,43 +127,48 @@ export const BigQueryFields = ({
               }
             >
               <div
-                className={cn(
-                  'space-y-2 rounded-md',
-                  isDraggingFile && 'bg-surface-200 ring-2 ring-brand'
-                )}
+                className="relative"
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
               >
-                <FormControl>
-                  <TextArea
-                    {...field}
-                    rows={5}
-                    maxLength={MAX_SERVICE_ACCOUNT_KEY_LENGTH}
-                    placeholder={
-                      editMode
-                        ? STORED_SECRET_PLACEHOLDER
-                        : '{"type": "service_account", "project_id": "...", ...}'
-                    }
-                    className="max-h-[calc(13lh+1rem)] font-mono text-xs"
+                <div className={cn('space-y-2 transition-opacity', isDraggingFile && 'opacity-40')}>
+                  <FormControl>
+                    <TextArea
+                      {...field}
+                      rows={5}
+                      maxLength={MAX_SERVICE_ACCOUNT_KEY_LENGTH}
+                      placeholder={
+                        editMode
+                          ? STORED_SECRET_PLACEHOLDER
+                          : '{"type": "service_account", "project_id": "...", ...}'
+                      }
+                      className="max-h-[calc(13lh+1rem)] font-mono text-xs"
+                    />
+                  </FormControl>
+                  <input
+                    ref={serviceAccountFileInputRef}
+                    type="file"
+                    accept="application/json,.json"
+                    className="hidden"
+                    onChange={handleServiceAccountFileInputChange}
                   />
-                </FormControl>
-                <input
-                  ref={serviceAccountFileInputRef}
-                  type="file"
-                  accept="application/json,.json"
-                  className="hidden"
-                  onChange={handleServiceAccountFileInputChange}
-                />
-                <Button
-                  type="button"
-                  variant="default"
-                  size="tiny"
-                  icon={<Upload size={14} />}
-                  onClick={() => serviceAccountFileInputRef.current?.click()}
-                >
-                  Upload JSON file
-                </Button>
+                  <Button
+                    type="button"
+                    variant="default"
+                    size="tiny"
+                    icon={<Upload size={14} />}
+                    onClick={() => serviceAccountFileInputRef.current?.click()}
+                  >
+                    Upload JSON file
+                  </Button>
+                </div>
+                {isDraggingFile ? (
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-0 rounded-md ring-2 ring-brand ring-offset-2 ring-offset-background"
+                  />
+                ) : null}
               </div>
             </FormItemLayout>
           )}
