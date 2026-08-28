@@ -71,6 +71,7 @@ vi.mock('ui', () => ({
       {children}
     </button>
   ),
+  cn: (...args: unknown[]) => args.filter(Boolean).join(' '),
   DialogSectionSeparator: () => null,
   Form: ({ children }: PropsWithChildren) => children,
   Select: ({ children }: PropsWithChildren) => <div>{children}</div>,

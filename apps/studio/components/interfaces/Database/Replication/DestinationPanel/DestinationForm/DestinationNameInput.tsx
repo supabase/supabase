@@ -16,7 +16,15 @@ export const DestinationNameInput = ({ form }: DestinationNameInputProps) => {
       render={({ field }) => (
         <FormItemLayout label="Name" layout="horizontal">
           <FormControl>
-            <Input {...field} placeholder="My destination" />
+            <Input
+              {...field}
+              autoFocus
+              placeholder="My destination"
+              data-1p-ignore
+              data-lpignore="true"
+              data-form-type="other"
+              data-bwignore
+            />
           </FormControl>
         </FormItemLayout>
       )}

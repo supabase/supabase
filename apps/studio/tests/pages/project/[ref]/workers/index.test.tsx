@@ -11,7 +11,7 @@ import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { routerMock } from '@/tests/lib/route-mock'
 
-type ListWorkersResponse = components['schemas']['V2ListWorkersResponse']
+type ListWorkersResponse = components['schemas']['V2ListWorkersResponse_Output']
 type WorkerDatum = ListWorkersResponse['data'][number]
 
 // `tests/vitestSetup.ts` mocks `common`'s useParams to always answer with this ref, so the page
