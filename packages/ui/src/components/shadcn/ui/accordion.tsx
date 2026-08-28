@@ -38,9 +38,9 @@ const AccordionTrigger = React.forwardRef<
             className={cn(
               'cursor-pointer flex flex-1 gap-2 items-center justify-between rounded-md px-2 py-4 text-left',
               'font-medium hover:underline',
-              focusVariant === 'ring' ? 'focus-ring' : 'relative focus-inset',
               '[&[data-state=open]>svg]:rotate-180',
-              className
+              className,
+              focusVariant === 'ring' ? 'focus-ring' : 'relative focus-inset'
             )}
             {...props}
             disabled={disabled}
