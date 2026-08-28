@@ -9,6 +9,21 @@ import type { Notification, NotificationData } from '@/data/notifications/notifi
 import type { AdvisorSeverity, AdvisorTab } from '@/state/advisor-state'
 
 export const MAX_HOMEPAGE_ADVISOR_ITEMS = 4
+const ADVISOR_CATEGORIES = ['SECURITY', 'PERFORMANCE', 'HEALTH'] as const
+
+export const getAdvisorTelemetryCategory = (item: AdvisorItem) => {
+  if (item.source === 'signal') return 'SECURITY'
+  if (item.source !== 'lint') return undefined
+
+  return ADVISOR_CATEGORIES.find((category) => item.original.categories.includes(category))
+}
+
+const getAdvisorLintTab = (categories: Lint['categories']) => {
+  if (categories.includes('SECURITY')) return 'security'
+  if (categories.includes('PERFORMANCE') || categories.includes('HEALTH')) return 'performance'
+
+  return undefined
+}
 
 export const severityOrder: Record<AdvisorSeverity, number> = {
   critical: 0,
@@ -46,11 +61,7 @@ export const createAdvisorLintItems = (lintData?: Lint[]): AdvisorLintItem[] => 
   return lintData
     .map((lint): AdvisorLintItem | null => {
       const categories = lint.categories || []
-      const tab = categories.includes('SECURITY')
-        ? ('security' as const)
-        : categories.includes('PERFORMANCE')
-          ? ('performance' as const)
-          : undefined
+      const tab = getAdvisorLintTab(categories)
 
       if (!tab) return null
 

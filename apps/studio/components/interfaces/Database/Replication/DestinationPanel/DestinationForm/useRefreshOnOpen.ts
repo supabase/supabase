@@ -1,16 +1,12 @@
-import { useEffect, useState } from 'react'
-
 interface UseRefreshOnOpenProps {
-  enabled?: boolean
+  isEnabled?: boolean
   refetch: () => unknown
 }
 
-export const useRefreshOnOpen = ({ enabled = true, refetch }: UseRefreshOnOpenProps) => {
-  const [open, setOpen] = useState(false)
+export const useRefreshOnOpen = ({ isEnabled = true, refetch }: UseRefreshOnOpenProps) => {
+  const handleOpenChange = (isOpen: boolean) => {
+    if (isOpen && isEnabled) void refetch()
+  }
 
-  useEffect(() => {
-    if (open && enabled) void refetch()
-  }, [enabled, open, refetch])
-
-  return setOpen
+  return { handleOpenChange }
 }

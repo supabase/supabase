@@ -38,6 +38,8 @@ export const GenericSkeletonLoader = ({ className }: GenericSkeletonLoaderProps)
 )
 
 interface GenericSelectionSkeletonLoaderProps extends GenericSkeletonLoaderProps {
+  // Selection primitives have different row indicators: command lists have none, Select uses
+  // radio circles, and MultiSelector uses checkboxes.
   variant?: 'command' | 'multi-select' | 'select'
 }
 

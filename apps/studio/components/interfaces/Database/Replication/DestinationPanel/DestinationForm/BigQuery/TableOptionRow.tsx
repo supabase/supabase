@@ -1,0 +1,153 @@
+import { useParams } from 'common'
+import { useState } from 'react'
+import { get, useController, useFormState, type Control, type FieldErrors } from 'react-hook-form'
+
+import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
+import {
+  ClusteringFields,
+  PartitioningFields,
+  type ColumnSelectionState,
+} from './TableOptionFields'
+import { REPLICATION_METADATA_FRESHNESS_MS } from '@/data/replication/constants'
+import { useReplicationSourceId } from '@/data/replication/sources-query'
+import { useReplicationTableColumnsQuery } from '@/data/replication/table-columns-query'
+
+const getFieldErrorMessage = (errors: FieldErrors<DestinationPanelSchemaType>, path: string) => {
+  const error = get(errors, path)
+  return typeof error?.message === 'string' ? error.message : undefined
+}
+
+interface TableOptionRowProps {
+  control: Control<DestinationPanelSchemaType>
+  index: number
+  isPublicationColumnsError?: boolean
+  isPublicationColumnsPending?: boolean
+  publishedColumnNames?: ReadonlySet<string>
+  tableId: number
+}
+
+export const TableOptionRow = ({
+  control,
+  index,
+  isPublicationColumnsError = false,
+  isPublicationColumnsPending = false,
+  publishedColumnNames,
+  tableId,
+}: TableOptionRowProps) => {
+  const { ref: projectRef } = useParams()
+  const sourceId = useReplicationSourceId({ projectRef })
+  const { errors } = useFormState({ control })
+
+  const { field: partitionByField } = useController({
+    control,
+    name: `tableOptions.${index}.partitionBy`,
+  })
+  const { field: clusterByField } = useController({
+    control,
+    name: `tableOptions.${index}.clusterBy`,
+  })
+
+  const partitionBy = partitionByField.value
+  const shouldInitiallyLoadColumns =
+    partitionBy?.kind === 'time_column' ||
+    partitionBy?.kind === 'integer_range' ||
+    (clusterByField.value?.length ?? 0) > 0
+  const [shouldLoadColumns, setShouldLoadColumns] = useState(shouldInitiallyLoadColumns)
+  const {
+    data: columns = [],
+    isPending,
+    isFetching,
+    isError,
+    isSuccess,
+    refetch: refetchColumns,
+  } = useReplicationTableColumnsQuery(
+    { projectRef, sourceId, tableId },
+    { enabled: shouldLoadColumns, staleTime: REPLICATION_METADATA_FRESHNESS_MS }
+  )
+
+  const isLoadingColumns =
+    shouldLoadColumns && ((isPending && columns.length === 0) || isPublicationColumnsPending)
+  const sourceColumnNames = columns.map((column) => column.name)
+  const sourceColumnNameSet = new Set(sourceColumnNames)
+  const canUseColumns = !isPublicationColumnsPending && !isPublicationColumnsError
+  const availableColumnNames = canUseColumns
+    ? sourceColumnNames.filter(
+        (column) => publishedColumnNames === undefined || publishedColumnNames.has(column)
+      )
+    : []
+  const columnTypeByName = new Map(columns.map((column) => [column.name, column.type]))
+  const areColumnsVerified = isSuccess && canUseColumns
+  const partitionColumn = partitionBy && 'column' in partitionBy ? partitionBy.column : undefined
+  const configuredColumns = [partitionColumn, ...(clusterByField.value ?? [])].filter(
+    (column, columnIndex, allConfiguredColumns): column is string =>
+      column !== undefined && allConfiguredColumns.indexOf(column) === columnIndex
+  )
+  const unavailableColumns = configuredColumns.filter(
+    (column) =>
+      areColumnsVerified &&
+      (!sourceColumnNameSet.has(column) ||
+        (publishedColumnNames !== undefined && !publishedColumnNames.has(column)))
+  )
+  const unavailableColumnSet = new Set(unavailableColumns)
+  const isColumnSelectionError = isPublicationColumnsError || (isError && columns.length === 0)
+
+  const handleRefreshColumnsOnOpen = (isOpen: boolean) => {
+    if (!isOpen) return
+    if (!shouldLoadColumns) {
+      setShouldLoadColumns(true)
+      return
+    }
+    if (!isFetching) void refetchColumns()
+  }
+
+  const fieldPath = `tableOptions.${index}`
+  const partitionByError = getFieldErrorMessage(errors, `${fieldPath}.partitionBy`)
+  const partitionErrors = {
+    column: getFieldErrorMessage(errors, `${fieldPath}.partitionBy.column`),
+    start: getFieldErrorMessage(errors, `${fieldPath}.partitionBy.start`),
+    end: getFieldErrorMessage(errors, `${fieldPath}.partitionBy.end`),
+    interval: getFieldErrorMessage(errors, `${fieldPath}.partitionBy.interval`),
+  }
+  const clusterByError = getFieldErrorMessage(errors, `${fieldPath}.clusterBy`)
+  const columnSelection: ColumnSelectionState = {
+    availableColumnNames,
+    columnTypeByName,
+    isError: isColumnSelectionError,
+    isLoading: isLoadingColumns,
+    onOpenChange: handleRefreshColumnsOnOpen,
+    unavailableColumnSet,
+  }
+
+  return (
+    <div className="flex flex-col gap-y-3 rounded-md border p-3 ml-6">
+      <PartitioningFields
+        partitionBy={partitionBy}
+        onChange={partitionByField.onChange}
+        onNeedsColumns={() => setShouldLoadColumns(true)}
+        columnSelection={columnSelection}
+        errors={partitionErrors}
+      />
+
+      <ClusteringFields
+        clusterBy={clusterByField.value ?? []}
+        onChange={clusterByField.onChange}
+        columnSelection={columnSelection}
+        error={clusterByError}
+      />
+
+      {partitionByError && <p className="text-sm text-destructive-600">{partitionByError}</p>}
+
+      {shouldLoadColumns && isColumnSelectionError && (
+        <p className="text-sm text-warning-600">
+          The configured columns could not be verified against the source and publication.
+        </p>
+      )}
+
+      {unavailableColumns.length > 0 && (
+        <p className="text-sm text-destructive-600 leading-normal">
+          Some columns are no longer available.
+        </p>
+      )}
+    </div>
+  )
+}

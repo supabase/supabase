@@ -53,6 +53,19 @@ const getS3AccessKeyTriggerLabel = ({
   return value
 }
 
+const getNamespaceTriggerLabel = ({
+  canSelectNamespace,
+  value,
+}: {
+  canSelectNamespace: boolean
+  value: string | undefined
+}) => {
+  if (!canSelectNamespace) return 'Select a bucket first'
+  if (value === CREATE_NEW_NAMESPACE) return 'Create a new namespace'
+
+  return value || 'Select a namespace'
+}
+
 export const AnalyticsBucketFields = ({
   form,
   editMode,
@@ -81,7 +94,7 @@ export const AnalyticsBucketFields = ({
   } = useStorageCredentialsQuery({ projectRef })
   const s3Keys = keysData?.data ?? []
   const isLoadingKeys = (isPendingKeys || isFetchingKeys) && s3Keys.length === 0
-  const showKeysError = isErrorKeys && s3Keys.length === 0
+  const isKeysErrorVisible = isErrorKeys && s3Keys.length === 0
   const keyNoLongerExists =
     (s3AccessKeyId ?? '').length > 0 &&
     s3AccessKeyId !== CREATE_NEW_KEY &&
@@ -95,7 +108,7 @@ export const AnalyticsBucketFields = ({
     refetch: refetchBuckets,
   } = useAnalyticsBucketsQuery({ projectRef })
   const isLoadingBuckets = (isPendingBuckets || isFetchingBuckets) && analyticsBuckets.length === 0
-  const showBucketsError = isErrorBuckets && analyticsBuckets.length === 0
+  const isBucketsErrorVisible = isErrorBuckets && analyticsBuckets.length === 0
 
   const canSelectNamespace = !!warehouseName
 
@@ -111,13 +124,17 @@ export const AnalyticsBucketFields = ({
   )
   const isLoadingNamespaces =
     (isPendingNamespaces || isFetchingNamespaces) && namespaces.length === 0
-  const showNamespacesError = isErrorNamespaces && namespaces.length === 0
-  const refreshBucketsOnOpen = useRefreshOnOpen({ refetch: refetchBuckets })
-  const refreshNamespacesOnOpen = useRefreshOnOpen({
-    enabled: canSelectNamespace,
+  const isNamespacesErrorVisible = isErrorNamespaces && namespaces.length === 0
+  const { handleOpenChange: handleRefreshBucketsOnOpen } = useRefreshOnOpen({
+    refetch: refetchBuckets,
+  })
+  const { handleOpenChange: handleRefreshNamespacesOnOpen } = useRefreshOnOpen({
+    isEnabled: canSelectNamespace,
     refetch: refetchNamespaces,
   })
-  const refreshKeysOnOpen = useRefreshOnOpen({ refetch: refetchKeys })
+  const { handleOpenChange: handleRefreshKeysOnOpen } = useRefreshOnOpen({
+    refetch: refetchKeys,
+  })
 
   return (
     <div className="flex flex-col gap-y-6 p-5">
@@ -136,7 +153,7 @@ export const AnalyticsBucketFields = ({
               <FormControl>
                 <Select
                   value={field.value}
-                  onOpenChange={refreshBucketsOnOpen}
+                  onOpenChange={handleRefreshBucketsOnOpen}
                   onValueChange={(value) => {
                     if (value === 'new-bucket') {
                       onSelectNewBucket()
@@ -152,9 +169,11 @@ export const AnalyticsBucketFields = ({
                     <SelectGroup>
                       <SelectionListState
                         loading={isLoadingBuckets}
-                        error={showBucketsError}
+                        error={isBucketsErrorVisible}
                         empty={
-                          !isLoadingBuckets && !showBucketsError && analyticsBuckets.length === 0
+                          !isLoadingBuckets &&
+                          !isBucketsErrorVisible &&
+                          analyticsBuckets.length === 0
                         }
                         emptyLabel="No buckets available"
                         errorLabel="Unable to load buckets"
@@ -188,22 +207,20 @@ export const AnalyticsBucketFields = ({
                   value={field.value}
                   onValueChange={field.onChange}
                   disabled={!canSelectNamespace}
-                  onOpenChange={refreshNamespacesOnOpen}
+                  onOpenChange={handleRefreshNamespacesOnOpen}
                 >
                   <SelectTrigger>
-                    {!canSelectNamespace
-                      ? 'Select a bucket first'
-                      : field.value === CREATE_NEW_NAMESPACE
-                        ? 'Create a new namespace'
-                        : field.value || 'Select a namespace'}
+                    {getNamespaceTriggerLabel({ canSelectNamespace, value: field.value })}
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
                       <SelectionListState
                         loading={isLoadingNamespaces}
-                        error={showNamespacesError}
+                        error={isNamespacesErrorVisible}
                         empty={
-                          !isLoadingNamespaces && !showNamespacesError && namespaces.length === 0
+                          !isLoadingNamespaces &&
+                          !isNamespacesErrorVisible &&
+                          namespaces.length === 0
                         }
                         emptyLabel="No namespaces available"
                         errorLabel="Unable to load namespaces"
@@ -329,7 +346,7 @@ export const AnalyticsBucketFields = ({
                 <Select
                   value={field.value}
                   onValueChange={field.onChange}
-                  onOpenChange={refreshKeysOnOpen}
+                  onOpenChange={handleRefreshKeysOnOpen}
                 >
                   <SelectTrigger>
                     {getS3AccessKeyTriggerLabel({ value: field.value, editMode })}
@@ -338,8 +355,8 @@ export const AnalyticsBucketFields = ({
                     <SelectGroup>
                       <SelectionListState
                         loading={isLoadingKeys}
-                        error={showKeysError}
-                        empty={!isLoadingKeys && !showKeysError && s3Keys.length === 0}
+                        error={isKeysErrorVisible}
+                        empty={!isLoadingKeys && !isKeysErrorVisible && s3Keys.length === 0}
                         emptyLabel="No access keys available"
                         errorLabel="Unable to load access keys"
                       />

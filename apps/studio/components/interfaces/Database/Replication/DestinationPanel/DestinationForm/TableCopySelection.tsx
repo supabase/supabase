@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { useMemo } from 'react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 import { FormControl, FormField, Select, SelectContent, SelectItem, SelectTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -51,20 +50,16 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
     !!publicationName &&
     (isLoadingPublications || isRefreshingPublications) &&
     selectedPublication === undefined
-  const refreshPublicationOnOpen = useRefreshOnOpen({
-    enabled: !!publicationName,
+  const { handleOpenChange: handleRefreshPublicationOnOpen } = useRefreshOnOpen({
+    isEnabled: !!publicationName,
     refetch: refetchPublication,
   })
 
-  const publicationTables = useMemo(() => {
-    return [...(selectedPublication?.tables ?? [])].sort((a, b) =>
-      tableLabel(a).localeCompare(tableLabel(b))
-    )
-  }, [selectedPublication])
-
-  const publicationTableIds = useMemo(
-    () => new Set((selectedPublication?.tables ?? []).map(({ id }) => String(id))),
-    [selectedPublication]
+  const publicationTables = [...(selectedPublication?.tables ?? [])].sort((a, b) =>
+    tableLabel(a).localeCompare(tableLabel(b))
+  )
+  const publicationTableIds = new Set(
+    (selectedPublication?.tables ?? []).map(({ id }) => String(id))
   )
   const tableLabelsById = new Map(
     publicationTables.map((table) => [String(table.id), tableLabel(table)])
@@ -165,7 +160,7 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
                     !publicationName ||
                     (!isLoadingPublicationTables && !isErrorPublications && tableCount === 0)
                   }
-                  onOpenChange={refreshPublicationOnOpen}
+                  onOpenChange={handleRefreshPublicationOnOpen}
                 >
                   <MultiSelector.Trigger
                     aria-label="Select initial sync tables"

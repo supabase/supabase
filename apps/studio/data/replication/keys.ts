@@ -22,8 +22,6 @@ export const replicationKeys = {
       'detail',
       publicationName,
     ] as const,
-  publicationsWithTables: (projectRef: string | undefined, source_id: number | undefined) =>
-    ['projects', projectRef, 'sources', source_id, 'publications', 'with-tables'] as const,
   tables: (projectRef: string | undefined, source_id: number | undefined) =>
     ['projects', projectRef, 'sources', source_id, 'tables'] as const,
   tableColumns: (

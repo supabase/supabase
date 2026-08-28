@@ -5,6 +5,7 @@ import {
   createAdvisorLintItems,
   createAdvisorNotificationItems,
   getAdvisorItemSecondaryText,
+  getAdvisorTelemetryCategory,
   sortAdvisorItems,
 } from './AdvisorPanel.utils'
 import type { Lint } from '@/data/lint/lint-query'
@@ -70,6 +71,15 @@ describe('AdvisorPanel.utils', () => {
   it('uses database surface-area metadata and the IP address for banned IP signals', () => {
     const bannedIpSignal = createBannedIPSignalItem('203.0.113.10')
     expect(getAdvisorItemSecondaryText(bannedIpSignal)).toBe('Database · 203.0.113.10')
+  })
+
+  it('preserves health-only lint categories for telemetry', () => {
+    const [healthOnlyLint] = createAdvisorLintItems([
+      createLint({ categories: ['HEALTH'], detail: 'Health lint' }),
+    ])
+
+    expect(healthOnlyLint.tab).toBe('performance')
+    expect(getAdvisorTelemetryCategory(healthOnlyLint)).toBe('HEALTH')
   })
 
   describe('notification secondary text', () => {

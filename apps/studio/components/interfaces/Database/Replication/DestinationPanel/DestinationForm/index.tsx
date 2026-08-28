@@ -23,7 +23,6 @@ import { getAnalyticsBucketValidationIssues } from './AnalyticsBucket/AnalyticsB
 import { AnalyticsBucketFields } from './AnalyticsBucket/Fields'
 import {
   BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE,
-  getBigQueryTableOptionsValidationIssues,
   getBigQueryValidationIssues,
 } from './BigQuery/BigQuery.utils'
 import { BigQueryFields } from './BigQuery/Fields'
@@ -56,10 +55,7 @@ import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-que
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
 import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
-import {
-  useReplicationPublicationQuery,
-  type ReplicationPublicationData,
-} from '@/data/replication/publication-query'
+import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
@@ -184,8 +180,6 @@ export const DestinationForm = ({
       }),
     [destinationData, pipelineData, catalogToken, projectSettings, projectRef, editMode]
   )
-  const selectedPublicationRef = useRef<ReplicationPublicationData | undefined>(undefined)
-
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onChange',
     reValidateMode: 'onChange',
@@ -199,19 +193,10 @@ export const DestinationForm = ({
           })
         }
 
-        const selectedPublicationTableIds = selectedPublicationRef.current
-          ? pruneStaleSelectedTableIds({
-              mode: data.tableSyncCopyMode,
-              selectedTableIds: data.tableSyncCopyTableIds,
-              publications: [selectedPublicationRef.current],
-              publicationName: data.publicationName,
-            })
-          : data.tableSyncCopyTableIds
-
         if (
           (data.tableSyncCopyMode === 'include_tables' ||
             data.tableSyncCopyMode === 'skip_tables') &&
-          selectedPublicationTableIds.length === 0
+          data.tableSyncCopyTableIds.length === 0
         ) {
           addRequiredFieldError('tableSyncCopyTableIds', 'Select at least one table')
         }
@@ -223,11 +208,6 @@ export const DestinationForm = ({
           }).forEach(({ path, message }) => {
             addRequiredFieldError(path, message)
           })
-          getBigQueryTableOptionsValidationIssues(data.tableOptions).forEach(
-            ({ path, message }) => {
-              addRequiredFieldError(path, message)
-            }
-          )
         } else if (selectedType === 'Analytics Bucket') {
           getAnalyticsBucketValidationIssues(data, {
             secretsOptional: editMode,
@@ -259,16 +239,11 @@ export const DestinationForm = ({
 
   // Always destructure formState values otherwise they won't be updated
   // See https://react-hook-form.com/docs/useform/formstate
-  const { isDirty } = form.formState
+  const { isDirty, isValid } = form.formState
 
   const publicationName = useWatch({ control: form.control, name: 'publicationName' })
   const { data: selectedPublication, isSuccess: isSuccessPublication } =
     useReplicationPublicationQuery({ projectRef, sourceId, publicationName })
-
-  useEffect(() => {
-    selectedPublicationRef.current = selectedPublication
-    if (selectedPublication) void form.trigger('tableSyncCopyTableIds')
-  }, [form, selectedPublication])
 
   const isSelectedPublicationMissing =
     isSuccessPublicationNames &&
@@ -297,6 +272,7 @@ export const DestinationForm = ({
   const isSubmitDisabled =
     isSaving ||
     !isExistingConfigReady ||
+    !isValid ||
     !isSuccessPublicationNames ||
     (!!publicationName && !isSuccessPublication) ||
     isSelectedPublicationMissing ||
@@ -336,9 +312,17 @@ export const DestinationForm = ({
       tableSyncCopyTableIds: pruneStaleSelectedTableIds({
         mode: rawData.tableSyncCopyMode,
         selectedTableIds: rawData.tableSyncCopyTableIds,
-        publications: [selectedPublication],
+        publication: selectedPublication,
         publicationName: rawData.publicationName,
       }),
+    }
+
+    if (
+      (data.tableSyncCopyMode === 'include_tables' || data.tableSyncCopyMode === 'skip_tables') &&
+      data.tableSyncCopyTableIds.length === 0
+    ) {
+      form.setError('tableSyncCopyTableIds', { message: 'Select at least one table' })
+      return
     }
 
     if (selectedType === 'BigQuery') {
@@ -440,6 +424,7 @@ export const DestinationForm = ({
     // discarded values, and when open but pristine so async defaults can apply.
     if (!visible || !isDirty) {
       form.reset(defaultValues)
+      if (visible) void form.trigger()
       resetValidation()
     }
   }, [visible, defaultValues, form, isDirty, resetValidation])

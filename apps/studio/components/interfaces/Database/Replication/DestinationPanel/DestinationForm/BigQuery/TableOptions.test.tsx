@@ -1,11 +1,15 @@
-import { screen } from '@testing-library/react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { fireEvent, screen } from '@testing-library/react'
 import type { components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { useForm } from 'react-hook-form'
 import { Form } from 'ui'
 import { describe, expect, it } from 'vitest'
 
-import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
+import {
+  DestinationPanelFormSchema,
+  type DestinationPanelSchemaType,
+} from '../DestinationForm.schema'
 import { TableOptions } from './TableOptions'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
@@ -96,6 +100,8 @@ const TableOptionsHarness = ({
   tableOptions: NonNullable<DestinationPanelSchemaType['tableOptions']>
 }) => {
   const form = useForm<DestinationPanelSchemaType>({
+    mode: 'onChange',
+    resolver: zodResolver(DestinationPanelFormSchema),
     defaultValues: {
       name: 'Warehouse',
       publicationName: 'analytics',
@@ -108,11 +114,42 @@ const TableOptionsHarness = ({
   return (
     <Form {...form}>
       <TableOptions control={form.control} />
+      <button type="button" tabIndex={0} onClick={() => void form.trigger()}>
+        Validate form
+      </button>
     </Form>
   )
 }
 
 describe('TableOptions source reconciliation', () => {
+  it('shows integer range validation errors beside the invalid fields', async () => {
+    mockSources()
+    mockPublication()
+    mockColumns(101, [{ name: 'id', type: 'int8', nullable: false, primary_key: true }])
+
+    customRender(
+      <TableOptionsHarness
+        tableOptions={[
+          {
+            tableId: 101,
+            partitionBy: {
+              kind: 'integer_range',
+              column: 'id',
+              start: 0,
+              end: 0,
+              interval: 0,
+            },
+          },
+        ]}
+      />
+    )
+
+    await screen.findByText('public.Orders')
+    fireEvent.click(screen.getByRole('button', { name: 'Validate form' }))
+    expect(await screen.findByText('End must be greater than start')).toBeInTheDocument()
+    expect(await screen.findByText('Interval must be greater than 0')).toBeInTheDocument()
+  })
+
   it('marks configured columns that no longer exist while preserving valid names and types', async () => {
     mockSources()
     mockPublication()

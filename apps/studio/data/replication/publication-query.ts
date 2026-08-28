@@ -1,8 +1,8 @@
-import { useQuery } from '@tanstack/react-query'
+import { queryOptions, useQuery } from '@tanstack/react-query'
+import type { components } from 'api-types'
 
 import { REPLICATION_METADATA_FRESHNESS_MS } from './constants'
 import { replicationKeys } from './keys'
-import type { ReplicationPublication } from './publications-query'
 import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -15,7 +15,7 @@ type ReplicationPublicationParams = {
 async function fetchReplicationPublication(
   { projectRef, sourceId, publicationName }: ReplicationPublicationParams,
   signal?: AbortSignal
-): Promise<ReplicationPublication> {
+): Promise<components['schemas']['PublicationDetailsResponse_Output']> {
   if (!projectRef) throw new Error('projectRef is required')
   if (!sourceId) throw new Error('sourceId is required')
   if (!publicationName) throw new Error('publicationName is required')
@@ -31,19 +31,21 @@ async function fetchReplicationPublication(
   )
   if (error) handleError(error)
 
-  return { name: data.name, tables: data.tables, config: data.config }
+  return data
 }
 
 export type ReplicationPublicationData = Awaited<ReturnType<typeof fetchReplicationPublication>>
 
-export const useReplicationPublicationQuery = <TData = ReplicationPublicationData>(
+type ReplicationPublicationQueryOptions<TData> = Omit<
+  UseCustomQueryOptions<ReplicationPublicationData, ResponseError, TData>,
+  'enabled'
+> & { enabled?: boolean }
+
+export const replicationPublicationQueryOptions = <TData = ReplicationPublicationData>(
   { projectRef, sourceId, publicationName }: ReplicationPublicationParams,
-  {
-    enabled = true,
-    ...options
-  }: UseCustomQueryOptions<ReplicationPublicationData, ResponseError, TData> = {}
+  { enabled = true, ...options }: ReplicationPublicationQueryOptions<TData> = {}
 ) =>
-  useQuery<ReplicationPublicationData, ResponseError, TData>({
+  queryOptions<ReplicationPublicationData, ResponseError, TData>({
     queryKey: replicationKeys.publication(projectRef, sourceId, publicationName),
     queryFn: ({ signal }) =>
       fetchReplicationPublication({ projectRef, sourceId, publicationName }, signal),
@@ -57,3 +59,9 @@ export const useReplicationPublicationQuery = <TData = ReplicationPublicationDat
     refetchInterval: REPLICATION_METADATA_FRESHNESS_MS,
     ...options,
   })
+
+export const useReplicationPublicationQuery = <TData = ReplicationPublicationData>(
+  { projectRef, sourceId, publicationName }: ReplicationPublicationParams,
+  options: ReplicationPublicationQueryOptions<TData> = {}
+) =>
+  useQuery(replicationPublicationQueryOptions({ projectRef, sourceId, publicationName }, options))

@@ -40,7 +40,7 @@ import {
 } from '@/data/replication/create-destination-pipeline-mutation'
 import { type ReplicationDestinationByIdData } from '@/data/replication/destination-by-id-query'
 import { type ReplicationPipelineByIdData } from '@/data/replication/pipeline-by-id-query'
-import { type ReplicationPublication } from '@/data/replication/publications-query'
+import { type ReplicationPublicationData } from '@/data/replication/publication-query'
 import { type ValidationFailure } from '@/data/replication/validate-destination-mutation'
 import {
   type CreateS3AccessKeyCredentialVariables,
@@ -175,7 +175,7 @@ export const buildTableSyncCopyConfig = ({
   if (mode === 'include_all_tables' || mode === 'skip_all_tables') return { type: mode }
 
   if (selectedTableIds.length === 0) {
-    throw new Error('Select at least one table for the initial sync')
+    throw new Error('Select at least one table for the initial sync.')
   }
 
   const tableIds = selectedTableIds.map(Number)
@@ -210,11 +210,11 @@ export const buildBatchConfig = ({
 // previously selected ids that fall out of it are highlighted in the form and
 // dropped at submit time.
 export const getPublicationTableIds = (
-  publications: ReplicationPublication[],
+  publication: ReplicationPublicationData,
   publicationName: string
 ): Set<string> => {
-  const publication = publications.find(({ name }) => name === publicationName)
-  return new Set((publication?.tables ?? []).map(({ id }) => String(id)))
+  if (publication.name !== publicationName) return new Set()
+  return new Set(publication.tables.map(({ id }) => String(id)))
 }
 
 // Drops selected table ids that are no longer in the current publication.
@@ -223,17 +223,17 @@ export const getPublicationTableIds = (
 export const pruneStaleSelectedTableIds = ({
   mode,
   selectedTableIds,
-  publications,
+  publication,
   publicationName,
 }: {
   mode: DestinationPanelSchemaType['tableSyncCopyMode']
   selectedTableIds: string[]
-  publications: ReplicationPublication[]
+  publication: ReplicationPublicationData
   publicationName: string
 }): string[] => {
   if (mode === 'include_all_tables' || mode === 'skip_all_tables') return selectedTableIds
 
-  const publicationTableIds = getPublicationTableIds(publications, publicationName)
+  const publicationTableIds = getPublicationTableIds(publication, publicationName)
   return selectedTableIds.filter((id) => publicationTableIds.has(id))
 }
 
@@ -384,7 +384,7 @@ export const buildDestinationConfigForValidation = ({
   } else if (selectedType === 'ClickHouse') {
     return { clickHouse: buildClickHouseConfig(data) }
   } else {
-    throw new Error('Invalid destination type')
+    throw new Error('Invalid destination type.')
   }
 }
 

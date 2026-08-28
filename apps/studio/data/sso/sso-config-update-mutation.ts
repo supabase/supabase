@@ -11,13 +11,13 @@ type UpdateSSOProviderBody =
 
 export type SSOConfigUpdateVariables = {
   slug: string
-  config: UpdateSSOProviderBody
+  config: Partial<UpdateSSOProviderBody>
 }
 
 export async function updateSSOConfig({ slug, config }: SSOConfigUpdateVariables) {
   const { data, error } = await put('/platform/organizations/{slug}/sso', {
     params: { path: { slug } },
-    body: config,
+    body: config as UpdateSSOProviderBody,
   })
 
   if (error) handleError(error)

@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { queryOptions, useQuery } from '@tanstack/react-query'
 
 import { replicationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
@@ -26,16 +26,23 @@ async function fetchReplicationTables(
 
 export type ReplicationTablesData = Awaited<ReturnType<typeof fetchReplicationTables>>
 
-export const useReplicationTablesQuery = <TData = ReplicationTablesData>(
+type ReplicationTablesQueryOptions<TData> = Omit<
+  UseCustomQueryOptions<ReplicationTablesData, ResponseError, TData>,
+  'enabled'
+> & { enabled?: boolean }
+
+export const replicationTablesQueryOptions = <TData = ReplicationTablesData>(
   { projectRef, sourceId }: ReplicationTablesParams,
-  {
-    enabled = true,
-    ...options
-  }: UseCustomQueryOptions<ReplicationTablesData, ResponseError, TData> = {}
+  { enabled = true, ...options }: ReplicationTablesQueryOptions<TData> = {}
 ) =>
-  useQuery<ReplicationTablesData, ResponseError, TData>({
+  queryOptions<ReplicationTablesData, ResponseError, TData>({
     queryKey: replicationKeys.tables(projectRef, sourceId),
     queryFn: ({ signal }) => fetchReplicationTables({ projectRef, sourceId }, signal),
     enabled: enabled && typeof projectRef !== 'undefined' && typeof sourceId !== 'undefined',
     ...options,
   })
+
+export const useReplicationTablesQuery = <TData = ReplicationTablesData>(
+  { projectRef, sourceId }: ReplicationTablesParams,
+  options: ReplicationTablesQueryOptions<TData> = {}
+) => useQuery(replicationTablesQueryOptions({ projectRef, sourceId }, options))

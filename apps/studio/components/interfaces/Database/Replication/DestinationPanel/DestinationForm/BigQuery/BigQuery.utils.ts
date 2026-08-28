@@ -45,14 +45,14 @@ export type BigQueryValidationIssue<Path extends string = string> = {
   message: string
 }
 
-export const BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE = 'Service account key must be valid JSON'
+export const BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE = 'Service account key must be valid JSON.'
 
 const BIGQUERY_REQUIRED_FIELDS: {
   path: Exclude<BigQueryFieldPath, 'serviceAccountKey'>
   message: string
 }[] = [
-  { path: 'projectId', message: 'Project ID is required' },
-  { path: 'datasetId', message: 'Dataset ID is required' },
+  { path: 'projectId', message: 'Project ID is required.' },
+  { path: 'datasetId', message: 'Dataset ID is required.' },
 ]
 
 const isValidJsonString = (value: string) => {
@@ -77,7 +77,7 @@ export const getBigQueryValidationIssues = (
 
   if (!serviceAccountKey) {
     if (!secretsOptional) {
-      issues.push({ path: 'serviceAccountKey', message: 'Service account key is required' })
+      issues.push({ path: 'serviceAccountKey', message: 'Service account key is required.' })
     }
     return issues
   }
@@ -90,44 +90,6 @@ export const getBigQueryValidationIssues = (
       message: BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE,
     })
   }
-
-  return issues
-}
-
-// Cross-field checks for per-table partitioning/clustering, mirroring the validation etl
-// applies server-side (integer-range bounds, and that a configured table sets at least one
-// of partitioning/clustering) so the form surfaces the same problems before submitting.
-export const getBigQueryTableOptionsValidationIssues = (
-  tableOptions: DestinationPanelSchemaType['tableOptions']
-): BigQueryValidationIssue[] => {
-  const issues: BigQueryValidationIssue[] = []
-
-  ;(tableOptions ?? []).forEach((option, index) => {
-    if (!option.partitionBy && !(option.clusterBy && option.clusterBy.length > 0)) {
-      issues.push({
-        path: `tableOptions.${index}.partitionBy`,
-        message: 'Set a partitioning or clustering option, or remove this table',
-      })
-    }
-
-    if (option.partitionBy?.kind === 'integer_range') {
-      const { start, end, interval } = option.partitionBy
-
-      if (start >= end) {
-        issues.push({
-          path: `tableOptions.${index}.partitionBy.end`,
-          message: 'End must be greater than start',
-        })
-      }
-
-      if (interval <= 0) {
-        issues.push({
-          path: `tableOptions.${index}.partitionBy.interval`,
-          message: 'Interval must be greater than 0',
-        })
-      }
-    }
-  })
 
   return issues
 }

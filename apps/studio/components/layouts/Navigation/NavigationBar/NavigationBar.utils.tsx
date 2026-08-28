@@ -1,6 +1,15 @@
 import { useParams } from 'common'
-import { Auth, Database, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
-import { Blocks, Box, Lightbulb, List, Settings, Telescope } from 'lucide-react'
+import {
+  Auth,
+  Database,
+  EdgeFunctions,
+  Realtime,
+  SqlEditor,
+  Storage,
+  TableEditor,
+  Workers,
+} from 'icons'
+import { Blocks, Lightbulb, List, Settings, Telescope } from 'lucide-react'
 
 import {
   useIsExplorerEnabled,
@@ -166,7 +175,7 @@ export const generateProductRoutes = (
             key: 'workers',
             label: PRODUCT_NAME,
             disabled: !isProjectActive,
-            icon: <Box size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            icon: <Workers size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/workers`),
             isNew: true,
           },

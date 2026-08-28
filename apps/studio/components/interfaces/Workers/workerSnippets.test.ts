@@ -10,25 +10,21 @@ const input = (overrides: Partial<Parameters<typeof buildWorkerSnippets>[0]> = {
 })
 
 describe('buildWorkerSnippets', () => {
-  it('points every call snippet at the worker URL', () => {
-    const { curl, javascript, python } = buildWorkerSnippets(input({ name: 'embed' }))
+  it('points the invoke examples at the worker URL', () => {
+    const { javascript, python } = buildWorkerSnippets(input({ name: 'embed' }))
     const url = 'https://abcdefgh.supabase.co/workers/v1/embed'
 
-    expect(curl).toContain(`'${url}'`)
     expect(javascript).toContain(`'${url}'`)
     expect(python).toContain(`"${url}"`)
   })
 
-  it('leaves a placeholder URL until the project settings resolve', () => {
-    const { curl } = buildWorkerSnippets(input({ endpoint: undefined }))
-    expect(curl).toContain('[YOUR WORKER URL]')
+  it('leaves a placeholder invoke URL until the project settings resolve', () => {
+    const { javascript } = buildWorkerSnippets(input({ endpoint: undefined }))
+    expect(javascript).toContain('[YOUR WORKER URL]')
   })
 
-  it('asks for the anon key on a public worker and the service role key on a private one', () => {
-    expect(buildWorkerSnippets(input({ access: 'public' })).curl).toContain('[YOUR ANON KEY]')
-    expect(buildWorkerSnippets(input({ access: 'private' })).curl).toContain(
-      '[YOUR SERVICE ROLE KEY]'
-    )
+  it('asks for the anon key to invoke a public worker and the service role key for a private one', () => {
+    expect(buildWorkerSnippets(input({ access: 'public' })).javascript).toContain('[YOUR ANON KEY]')
     expect(buildWorkerSnippets(input({ access: 'private' })).javascript).toContain(
       '[YOUR SERVICE ROLE KEY]'
     )

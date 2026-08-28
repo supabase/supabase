@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import {
   defaultPartitionByForKind,
-  getBigQueryTableOptionsValidationIssues,
   getBigQueryValidationIssues,
   parseIntegerInput,
   shortenPgType,
@@ -23,8 +22,8 @@ describe('getBigQueryValidationIssues', () => {
     expect(
       getBigQueryValidationIssues({ projectId: '', datasetId: '  ', serviceAccountKey: '{}' })
     ).toEqual([
-      { path: 'projectId', message: 'Project ID is required' },
-      { path: 'datasetId', message: 'Dataset ID is required' },
+      { path: 'projectId', message: 'Project ID is required.' },
+      { path: 'datasetId', message: 'Dataset ID is required.' },
     ])
   })
 
@@ -34,62 +33,6 @@ describe('getBigQueryValidationIssues', () => {
         { ...validData, serviceAccountKey: '' },
         { secretsOptional: true }
       )
-    ).toEqual([])
-  })
-})
-
-describe('getBigQueryTableOptionsValidationIssues', () => {
-  it('returns no issues for an empty or undefined list', () => {
-    expect(getBigQueryTableOptionsValidationIssues(undefined)).toEqual([])
-    expect(getBigQueryTableOptionsValidationIssues([])).toEqual([])
-  })
-
-  it('flags a table with neither partitioning nor clustering configured', () => {
-    expect(getBigQueryTableOptionsValidationIssues([{ tableId: 1 }])).toEqual([
-      {
-        path: 'tableOptions.0.partitionBy',
-        message: 'Set a partitioning or clustering option, or remove this table',
-      },
-    ])
-  })
-
-  it('accepts a table with only clustering configured', () => {
-    expect(
-      getBigQueryTableOptionsValidationIssues([{ tableId: 1, clusterBy: ['region'] }])
-    ).toEqual([])
-  })
-
-  it('flags an integer_range partition where end is not greater than start', () => {
-    expect(
-      getBigQueryTableOptionsValidationIssues([
-        {
-          tableId: 1,
-          partitionBy: { kind: 'integer_range', column: 'shard', start: 10, end: 10, interval: 1 },
-        },
-      ])
-    ).toEqual([
-      { path: 'tableOptions.0.partitionBy.end', message: 'End must be greater than start' },
-    ])
-  })
-
-  it('flags an integer_range partition with a non-positive interval', () => {
-    expect(
-      getBigQueryTableOptionsValidationIssues([
-        {
-          tableId: 1,
-          partitionBy: { kind: 'integer_range', column: 'shard', start: 0, end: 100, interval: 0 },
-        },
-      ])
-    ).toEqual([
-      { path: 'tableOptions.0.partitionBy.interval', message: 'Interval must be greater than 0' },
-    ])
-  })
-
-  it('accepts a valid time_column partition', () => {
-    expect(
-      getBigQueryTableOptionsValidationIssues([
-        { tableId: 1, partitionBy: { kind: 'time_column', column: 'created_at' } },
-      ])
     ).toEqual([])
   })
 })

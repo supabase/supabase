@@ -155,7 +155,7 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
     const name = newBucketName.trim()
     if (!name || !ducklakeStorageProjectRef) return
     if (name.includes('/')) {
-      return toast.error('Bucket name cannot contain "/"')
+      return toast.error('Bucket name cannot contain "/".')
     }
 
     createBucket({
@@ -707,7 +707,7 @@ const ProjectSelection = ({
       ),
     [projectsData]
   )
-  const showProjectsError = isErrorProjects && projects.length === 0
+  const isProjectsErrorVisible = isErrorProjects && projects.length === 0
 
   const projectsByRef = useMemo(
     () => new Map(projects.map((project) => [project.ref, project])),
@@ -719,23 +719,23 @@ const ProjectSelection = ({
     const project = projectsByRef.get(ref)
     return project ? `${project.name} · ${project.ref}` : ref
   }
-  const refreshProjectsOnOpen = useRefreshOnOpen({
-    enabled: !!organization?.slug,
+  const { handleOpenChange: handleRefreshProjectsOnOpen } = useRefreshOnOpen({
+    isEnabled: !!organization?.slug,
     refetch: refetchProjects,
   })
 
   return (
-    <Select value={value || ''} onValueChange={onChange} onOpenChange={refreshProjectsOnOpen}>
+    <Select value={value || ''} onValueChange={onChange} onOpenChange={handleRefreshProjectsOnOpen}>
       <SelectTrigger>{projectLabel(value) ?? placeholder}</SelectTrigger>
       <SelectContent>
         <SelectGroup>
           <SelectionListState
             loading={(isLoadingProjects || isFetchingProjects) && projects.length === 0}
-            error={showProjectsError}
+            error={isProjectsErrorVisible}
             empty={
               !isLoadingProjects &&
               !isFetchingProjects &&
-              !showProjectsError &&
+              !isProjectsErrorVisible &&
               projects.length === 0
             }
             emptyLabel="No active projects available"
@@ -789,9 +789,9 @@ const BucketSelection = ({
       ),
     [bucketsData]
   )
-  const showBucketsError = isErrorBuckets && buckets.length === 0
-  const refreshBucketsOnOpen = useRefreshOnOpen({
-    enabled: !!ducklakeStorageProjectRef,
+  const isBucketsErrorVisible = isErrorBuckets && buckets.length === 0
+  const { handleOpenChange: handleRefreshBucketsOnOpen } = useRefreshOnOpen({
+    isEnabled: !!ducklakeStorageProjectRef,
     refetch: refetchBuckets,
   })
 
@@ -806,7 +806,7 @@ const BucketSelection = ({
   return (
     <Select
       value={value || ''}
-      onOpenChange={refreshBucketsOnOpen}
+      onOpenChange={handleRefreshBucketsOnOpen}
       onValueChange={(e) => {
         if (e) onChange(e)
       }}
@@ -816,9 +816,12 @@ const BucketSelection = ({
         <SelectGroup>
           <SelectionListState
             loading={(isLoadingBuckets || isFetchingBuckets) && buckets.length === 0}
-            error={showBucketsError}
+            error={isBucketsErrorVisible}
             empty={
-              !isLoadingBuckets && !isFetchingBuckets && !showBucketsError && buckets.length === 0
+              !isLoadingBuckets &&
+              !isFetchingBuckets &&
+              !isBucketsErrorVisible &&
+              buckets.length === 0
             }
             emptyLabel="No buckets available"
             errorLabel="Unable to load buckets"

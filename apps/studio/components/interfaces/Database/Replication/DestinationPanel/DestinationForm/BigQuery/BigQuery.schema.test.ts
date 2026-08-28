@@ -30,4 +30,64 @@ describe('BigQuery replication schemas', () => {
   it('rejects table ids outside the PostgreSQL OID range', () => {
     expect(BigQueryTableOptionSchema.safeParse({ tableId: 4_294_967_296 }).success).toBe(false)
   })
+
+  it('requires partitioning or clustering for a selected table', () => {
+    const result = BigQueryTableOptionSchema.safeParse({ tableId: 1 })
+
+    expect(result.error?.issues).toContainEqual(
+      expect.objectContaining({
+        path: ['partitionBy'],
+        message: 'Set a partitioning or clustering option, or remove this table',
+      })
+    )
+  })
+
+  it('requires the integer range end to be greater than the start', () => {
+    const result = BigQueryTableOptionSchema.safeParse({
+      tableId: 1,
+      partitionBy: { kind: 'integer_range', column: 'shard', start: 10, end: 10, interval: 1 },
+    })
+
+    expect(result.error?.issues).toContainEqual(
+      expect.objectContaining({
+        path: ['partitionBy', 'end'],
+        message: 'End must be greater than start',
+      })
+    )
+  })
+
+  it('requires a positive integer range interval', () => {
+    const result = BigQueryTableOptionSchema.safeParse({
+      tableId: 1,
+      partitionBy: { kind: 'integer_range', column: 'shard', start: 0, end: 100, interval: 0 },
+    })
+
+    expect(result.error?.issues).toContainEqual(
+      expect.objectContaining({
+        path: ['partitionBy', 'interval'],
+        message: 'Interval must be greater than 0',
+      })
+    )
+  })
+
+  it('allows at most four clustering columns', () => {
+    expect(
+      BigQueryTableOptionSchema.safeParse({
+        tableId: 1,
+        clusterBy: ['one', 'two', 'three', 'four'],
+      }).success
+    ).toBe(true)
+
+    const result = BigQueryTableOptionSchema.safeParse({
+      tableId: 1,
+      clusterBy: ['one', 'two', 'three', 'four', 'five'],
+    })
+
+    expect(result.error?.issues).toContainEqual(
+      expect.objectContaining({
+        path: ['clusterBy'],
+        message: 'Select up to 4 clustering columns',
+      })
+    )
+  })
 })

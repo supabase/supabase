@@ -4,6 +4,33 @@
  */
 
 export interface paths {
+  '/v1/webhooks/events': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Publish event
+     * @description Ingests and schedules a new webhook event to be published out to all subscribed endpoints.
+     *
+     *     In case of non-successful response status codes, early termination, networking issues,
+     *     requests to this endpoint should be retried until it succeeds, otherwise there is a risk of
+     *     loosing events.
+     *
+     *     `meta.idempotency_key` is used to ensure idempotency when retrying the requests and so it
+     *     must always be provided.
+     */
+    post: operations['v1-webhooks-events-post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v2/organizations/{slug}/integrations/github/connections': {
     parameters: {
       query?: never
@@ -130,6 +157,159 @@ export interface paths {
     get: operations['v2-list-organization-roles']
     put?: never
     post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/organizations/{slug}/webhooks/deliveries/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get delivery
+     * @description Get details of a specific delivery attempt.
+     */
+    get: operations['v2-organizations-slug-webhooks-deliveries-id-get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/organizations/{slug}/webhooks/deliveries/{id}/retry': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Retry delivery
+     * @description Retry delivering the same event again.
+     *
+     *     Automatic retries are not applicable to manual retries - if the delivery fails, there won't be any automatic retries attempted.
+     *
+     *     This endpoint is heavy rate-limited to allow for 10 request within 60 seconds.
+     */
+    post: operations['v2-organizations-slug-webhooks-deliveries-id-retry-post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/organizations/{slug}/webhooks/endpoints': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List endpoints
+     * @description List all Webhook endpoints based on a project's ref or an organization's slug.
+     */
+    get: operations['v2-organizations-slug-webhooks-endpoints-get']
+    put?: never
+    /**
+     * Create endpoint
+     * @description Create new endpoint configuration to subscribe to specific webhook events.
+     */
+    post: operations['v2-organizations-slug-webhooks-endpoints-post']
+    /**
+     * Delete all endpoints
+     * @description Delete all endpoints including all events and deliveries.
+     *
+     *     Any in-flight webhooks will result in a no-op.
+     */
+    delete: operations['v2-organizations-slug-webhooks-endpoints-delete']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/organizations/{slug}/webhooks/endpoints/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get endpoint
+     * @description Get details of a specific endpoint.
+     */
+    get: operations['v2-organizations-slug-webhooks-endpoints-id-get']
+    put?: never
+    post?: never
+    /**
+     * Delete endpoint
+     * @description Delete the endpoint including all events and deliveries
+     *
+     *     Any in-flight webhooks will result in a no-op.
+     */
+    delete: operations['v2-organizations-slug-webhooks-endpoints-id-delete']
+    options?: never
+    head?: never
+    /**
+     * Update endpoint
+     * @description Update endpoint's configuration.
+     */
+    patch: operations['v2-organizations-slug-webhooks-endpoints-id-patch']
+    trace?: never
+  }
+  '/v2/organizations/{slug}/webhooks/endpoints/{id}/deliveries': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List deliveries
+     * @description List all deliveries for a specific endpoint in descending order (newest first).
+     *
+     *     Deliveries which has expired are no longer available and will not be listed.
+     */
+    get: operations['v2-organizations-slug-webhooks-endpoints-id-deliveries-get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/organizations/{slug}/webhooks/endpoints/{id}/test': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Send test event
+     * @description Ingests and schedules a test webhook event to be published out this endpoints.
+     *
+     *     Which event type to use can be specified in the request body, otherwise
+     *     it will use any matching type the endpoint is listening for.
+     *
+     *     The event will contain `is_test: true` in it's payload.
+     *
+     *     This endpoint is heavy rate-limited to allow for 10 request within 60 seconds.
+     */
+    post: operations['v2-organizations-slug-webhooks-endpoints-id-test-post']
     delete?: never
     options?: never
     head?: never
@@ -304,6 +484,159 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v2/projects/{ref}/webhooks/deliveries/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get delivery
+     * @description Get details of a specific delivery attempt.
+     */
+    get: operations['v2-projects-ref-webhooks-deliveries-id-get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/webhooks/deliveries/{id}/retry': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Retry delivery
+     * @description Retry delivering the same event again.
+     *
+     *     Automatic retries are not applicable to manual retries - if the delivery fails, there won't be any automatic retries attempted.
+     *
+     *     This endpoint is heavy rate-limited to allow for 10 request within 60 seconds.
+     */
+    post: operations['v2-projects-ref-webhooks-deliveries-id-retry-post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/webhooks/endpoints': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List endpoints
+     * @description List all Webhook endpoints based on a project's ref or an organization's slug.
+     */
+    get: operations['v2-projects-ref-webhooks-endpoints-get']
+    put?: never
+    /**
+     * Create endpoint
+     * @description Create new endpoint configuration to subscribe to specific webhook events.
+     */
+    post: operations['v2-projects-ref-webhooks-endpoints-post']
+    /**
+     * Delete all endpoints
+     * @description Delete all endpoints including all events and deliveries.
+     *
+     *     Any in-flight webhooks will result in a no-op.
+     */
+    delete: operations['v2-projects-ref-webhooks-endpoints-delete']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/webhooks/endpoints/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get endpoint
+     * @description Get details of a specific endpoint.
+     */
+    get: operations['v2-projects-ref-webhooks-endpoints-id-get']
+    put?: never
+    post?: never
+    /**
+     * Delete endpoint
+     * @description Delete the endpoint including all events and deliveries
+     *
+     *     Any in-flight webhooks will result in a no-op.
+     */
+    delete: operations['v2-projects-ref-webhooks-endpoints-id-delete']
+    options?: never
+    head?: never
+    /**
+     * Update endpoint
+     * @description Update endpoint's configuration.
+     */
+    patch: operations['v2-projects-ref-webhooks-endpoints-id-patch']
+    trace?: never
+  }
+  '/v2/projects/{ref}/webhooks/endpoints/{id}/deliveries': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List deliveries
+     * @description List all deliveries for a specific endpoint in descending order (newest first).
+     *
+     *     Deliveries which has expired are no longer available and will not be listed.
+     */
+    get: operations['v2-projects-ref-webhooks-endpoints-id-deliveries-get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/webhooks/endpoints/{id}/test': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Send test event
+     * @description Ingests and schedules a test webhook event to be published out this endpoints.
+     *
+     *     Which event type to use can be specified in the request body, otherwise
+     *     it will use any matching type the endpoint is listening for.
+     *
+     *     The event will contain `is_test: true` in it's payload.
+     *
+     *     This endpoint is heavy rate-limited to allow for 10 request within 60 seconds.
+     */
+    post: operations['v2-projects-ref-webhooks-endpoints-id-test-post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v2/projects/{ref}/workers': {
     parameters: {
       query?: never
@@ -392,6 +725,28 @@ export interface paths {
 export type webhooks = Record<string, never>
 export interface components {
   schemas: {
+    APIErrorObject: {
+      code: string
+      description?: string
+      id?: string
+      issues?: components['schemas']['APIErrorObject'][]
+      links?: {
+        [key: string]: {
+          describedby?: string
+          href: string
+          meta?: {
+            [key: string]: unknown
+          }
+          rel?: string
+          title?: string
+          type?: string
+        }
+      }
+      message: string
+      meta?: {
+        [key: string]: unknown
+      }
+    }
     CreateLogDrainRequestOpenApi: {
       data: {
         attributes: {
@@ -411,14 +766,6 @@ export interface components {
             | 'syslog'
           config:
             | {
-                hostname?: string
-                password?: string | null
-                port?: number | null
-                schema?: string
-                url?: string | null
-                username?: string | null
-              }
-            | {
                 gzip?: boolean
                 headers?: {
                   [key: string]: string
@@ -426,10 +773,6 @@ export interface components {
                 /** @enum {string} */
                 http?: 'http1' | 'http2'
                 url?: string
-              }
-            | {
-                dataset_id?: string
-                project_id?: string
               }
             | {
                 api_key?: string
@@ -462,8 +805,33 @@ export interface components {
                 /** @default false */
                 tls?: boolean
               }
+            | {
+                access_key_id?: string
+                batch_timeout?: number
+                s3_bucket?: string
+                secret_access_key?: string
+                storage_region?: string
+              }
+            | {
+                password?: string
+                region?: string
+                username?: string
+              }
+            | {
+                endpoint?: string
+                /** @default true */
+                gzip?: boolean
+                /** @default {} */
+                headers?: {
+                  [key: string]: string
+                }
+                /** @default http/protobuf */
+                protocol?: string
+              }
           description?: string
           name: string
+        } & {
+          [key: string]: unknown
         }
         /**
          * @description Resource type.
@@ -497,7 +865,7 @@ export interface components {
         [key: string]: unknown
       }
     }
-    ListLogDrainsResponse: {
+    ListLogDrainsResponse_Output: {
       data: {
         attributes: {
           /** @enum {string} */
@@ -516,14 +884,6 @@ export interface components {
             | 'syslog'
           config:
             | {
-                hostname?: string
-                password?: string | null
-                port?: number | null
-                schema?: string
-                url?: string | null
-                username?: string | null
-              }
-            | {
                 gzip?: boolean
                 headers?: {
                   [key: string]: string
@@ -531,10 +891,6 @@ export interface components {
                 /** @enum {string} */
                 http?: 'http1' | 'http2'
                 url?: string
-              }
-            | {
-                dataset_id?: string
-                project_id?: string
               }
             | {
                 api_key?: string
@@ -566,6 +922,29 @@ export interface components {
                 structured_data?: string
                 /** @default false */
                 tls?: boolean
+              }
+            | {
+                access_key_id?: string
+                batch_timeout?: number
+                s3_bucket?: string
+                secret_access_key?: string
+                storage_region?: string
+              }
+            | {
+                password?: string
+                region?: string
+                username?: string
+              }
+            | {
+                endpoint?: string
+                /** @default true */
+                gzip?: boolean
+                /** @default {} */
+                headers?: {
+                  [key: string]: string
+                }
+                /** @default http/protobuf */
+                protocol?: string
               }
           description?: string
           name: string
@@ -578,7 +957,7 @@ export interface components {
         type: 'log_drain'
       }[]
     }
-    LogDrainResponse: {
+    LogDrainResponse_Output: {
       data: {
         attributes: {
           /** @enum {string} */
@@ -597,14 +976,6 @@ export interface components {
             | 'syslog'
           config:
             | {
-                hostname?: string
-                password?: string | null
-                port?: number | null
-                schema?: string
-                url?: string | null
-                username?: string | null
-              }
-            | {
                 gzip?: boolean
                 headers?: {
                   [key: string]: string
@@ -612,10 +983,6 @@ export interface components {
                 /** @enum {string} */
                 http?: 'http1' | 'http2'
                 url?: string
-              }
-            | {
-                dataset_id?: string
-                project_id?: string
               }
             | {
                 api_key?: string
@@ -648,6 +1015,29 @@ export interface components {
                 /** @default false */
                 tls?: boolean
               }
+            | {
+                access_key_id?: string
+                batch_timeout?: number
+                s3_bucket?: string
+                secret_access_key?: string
+                storage_region?: string
+              }
+            | {
+                password?: string
+                region?: string
+                username?: string
+              }
+            | {
+                endpoint?: string
+                /** @default true */
+                gzip?: boolean
+                /** @default {} */
+                headers?: {
+                  [key: string]: string
+                }
+                /** @default http/protobuf */
+                protocol?: string
+              }
           description?: string
           name: string
         }
@@ -659,7 +1049,7 @@ export interface components {
         type: 'log_drain'
       }
     }
-    OrganizationMemberRoleResponse: {
+    OrganizationMemberRoleResponse_Output: {
       data: {
         attributes: {
           /**
@@ -704,14 +1094,6 @@ export interface components {
             | 'syslog'
           config?:
             | {
-                hostname?: string
-                password?: string | null
-                port?: number | null
-                schema?: string
-                url?: string | null
-                username?: string | null
-              }
-            | {
                 gzip?: boolean
                 headers?: {
                   [key: string]: string
@@ -719,10 +1101,6 @@ export interface components {
                 /** @enum {string} */
                 http?: 'http1' | 'http2'
                 url?: string
-              }
-            | {
-                dataset_id?: string
-                project_id?: string
               }
             | {
                 api_key?: string
@@ -755,8 +1133,33 @@ export interface components {
                 /** @default false */
                 tls?: boolean
               }
+            | {
+                access_key_id?: string
+                batch_timeout?: number
+                s3_bucket?: string
+                secret_access_key?: string
+                storage_region?: string
+              }
+            | {
+                password?: string
+                region?: string
+                username?: string
+              }
+            | {
+                endpoint?: string
+                /** @default true */
+                gzip?: boolean
+                /** @default {} */
+                headers?: {
+                  [key: string]: string
+                }
+                /** @default http/protobuf */
+                protocol?: string
+              }
           description?: string
           name?: string
+        } & {
+          [key: string]: unknown
         }
         /**
          * @description Resource type.
@@ -822,7 +1225,7 @@ export interface components {
         type: 'organization_invitation'
       }[]
     }
-    V2CreateInvitationsResponse: {
+    V2CreateInvitationsResponse_Output: {
       data: {
         attributes: {
           /**
@@ -920,7 +1323,7 @@ export interface components {
         type: 'organization_invitation'
       }[]
     }
-    V2DeleteInvitationsResponse: {
+    V2DeleteInvitationsResponse_Output: {
       data: {
         attributes: {
           /**
@@ -960,7 +1363,7 @@ export interface components {
         type: 'project_worker'
       }
     }
-    V2ListGitHubConnectionsResponse: {
+    V2ListGitHubConnectionsResponse_Output: {
       data: {
         attributes: {
           /** @description Maximum number of preview branches */
@@ -1033,7 +1436,7 @@ export interface components {
         prev: string | null
       }
     }
-    V2ListMembersResponse: {
+    V2ListMembersResponse_Output: {
       data: {
         attributes: {
           /** @description Member's avatar URL */
@@ -1096,7 +1499,7 @@ export interface components {
         prev: string | null
       }
     }
-    V2ListPrivateLinkAssociationsResponse: {
+    V2ListPrivateLinkAssociationsResponse_Output: {
       data: {
         attributes: {
           /** @description Human-readable name for the AWS account. */
@@ -1148,7 +1551,7 @@ export interface components {
         type: 'private_link_association'
       }[]
     }
-    V2ListProjectsResponse: {
+    V2ListProjectsResponse_Output: {
       data: {
         attributes: {
           /** @description Cloud provider hosting the project */
@@ -1263,7 +1666,7 @@ export interface components {
         prev: string | null
       }
     }
-    V2ListRolesResponse: {
+    V2ListRolesResponse_Output: {
       data: {
         attributes: {
           /**
@@ -1279,7 +1682,7 @@ export interface components {
         type: 'organization_role'
       }[]
     }
-    V2ListWorkersResponse: {
+    V2ListWorkersResponse_Output: {
       data: {
         attributes: {
           /** @enum {string} */
@@ -1318,7 +1721,7 @@ export interface components {
         type: 'project_worker'
       }[]
     }
-    V2PreviewProjectTransferResponse: {
+    V2PreviewProjectTransferResponse_Output: {
       data: {
         attributes: {
           errors: {
@@ -1342,7 +1745,7 @@ export interface components {
         type: 'project_transfer_result'
       }
     }
-    V2PrivateLinkAssociationResponse: {
+    V2PrivateLinkAssociationResponse_Output: {
       data: {
         attributes: {
           /** @description Human-readable name for the AWS account. */
@@ -1397,7 +1800,7 @@ export interface components {
     V2ProjectAdvisorsResponse_Output: {
       data: {
         attributes: {
-          lints: ({
+          lints: {
             cache_key: string
             categories: ('PERFORMANCE' | 'SECURITY' | 'HEALTH')[]
             description: string
@@ -1469,11 +1872,7 @@ export interface components {
             observed_at?: string
             remediation: string
             title: string
-          } & {
-            [key: string]: unknown
-          })[]
-        } & {
-          [key: string]: unknown
+          }[]
         }
         /**
          * @description Resource type.
@@ -1482,7 +1881,7 @@ export interface components {
         type: 'project_advisors'
       }
     }
-    V2ProjectConfigResponse: {
+    V2ProjectConfigResponse_Output: {
       data: {
         attributes: {
           api: {
@@ -1691,6 +2090,8 @@ export interface components {
          * @enum {string}
          */
         type: 'project_advisors'
+      } & {
+        [key: string]: unknown
       }
     }
     V2TransferProjectBody: {
@@ -1705,7 +2106,7 @@ export interface components {
         type: 'project_transfer_input'
       }
     }
-    V2WorkerResponse: {
+    V2WorkerResponse_Output: {
       data: {
         attributes: {
           /** @enum {string} */
@@ -1744,7 +2145,7 @@ export interface components {
         type: 'project_worker'
       }
     }
-    V2WorkerUploadResponse: {
+    V2WorkerUploadResponse_Output: {
       data: {
         attributes: {
           /** @description When the slot stops accepting the upload. */
@@ -1775,6 +2176,325 @@ export interface components {
 }
 export type $defs = Record<string, never>
 export interface operations {
+  'v1-webhooks-events-post': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          data: {
+            attributes: {
+              /**
+               * @description Organization slug
+               * @example tsrqponmlkjihgfedcba
+               */
+              organization_slug: string
+              /** @description Extra data to pass to consumers. `organization_slug` and `project_ref` (if applicable) are always provided by default. */
+              payload?: {
+                [key: string]: unknown
+              }
+              /** @description Project's ref. If left unspecified or `null`, the event will published as organization-wide, only to organization-wide endpoints. */
+              project_ref?: string | null
+              /**
+               * Format: date-time
+               * @description Optional timestamp of event publication.
+               */
+              timestamp?: string
+              /**
+               * @description Webhook event type.
+               * @enum {string}
+               */
+              type:
+                | 'v1.project.paused'
+                | 'v1.project.created'
+                | 'v1.project.restored'
+                | 'v1.project.transferred'
+                | 'v1.project.removed'
+                | 'v1.project.restarted'
+                | 'v1.project.status.changed'
+                | 'v1.project.backup.started'
+                | 'v1.project.branch.created'
+                | 'v1.project.branch.updated'
+                | 'v1.project.branch.removed'
+                | 'v1.organization.member.invitation.created'
+                | 'v1.organization.member.invitation.canceled'
+                | 'v1.organization.member.added'
+                | 'v1.organization.member.removed'
+                | 'v1.organization.member.role.assigned'
+                | 'v1.organization.member.role.removed'
+                | 'v1.organization.member.role.updated'
+                | 'v1.organization.billing.plan.upgraded'
+                | 'v1.organization.billing.plan.downgraded'
+                | 'project.v1.paused'
+                | 'project.v1.created'
+                | 'project.v1.restored'
+                | 'project.v1.transferred'
+                | 'project.v1.removed'
+                | 'project.v1.restarted'
+                | 'project.v1.status.changed'
+                | 'project.v1.backup.started'
+                | 'project.v1.branch.created'
+                | 'project.v1.branch.updated'
+                | 'project.v1.branch.removed'
+                | 'organization.v1.member.invitation.created'
+                | 'organization.v1.member.invitation.canceled'
+                | 'organization.v1.member.added'
+                | 'organization.v1.member.removed'
+                | 'organization.v1.member.role.assigned'
+                | 'organization.v1.member.role.removed'
+                | 'organization.v1.member.role.updated'
+                | 'organization.v1.billing.plan.upgraded'
+                | 'organization.v1.billing.plan.downgraded'
+                | 'project.v1.branch.deleted'
+            }
+            /**
+             * @description Resource type.
+             * @constant
+             */
+            type: 'event'
+          }
+          meta: {
+            /** @description Idempotency key. */
+            idempotency_key: string
+          }
+        }
+      }
+    }
+    responses: {
+      /** @description Events published */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data: {
+              id: string
+              /**
+               * @description Resource type.
+               * @constant
+               */
+              type: 'ingress'
+            }
+          }
+        }
+      }
+      /** @description PermissionDenied */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'forbidden.permission_denied'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Forbidden: Permission denied'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericRequestTimeout */
+      408: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'request_timeout'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Request Timeout'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericTooManyRequests */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'too_many_requests'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Too Many Requests'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'internal_server_error'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Internal Server Error'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'internal_server_error.event.ingress_failed'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Internal Server Error: Failed to ingress the event'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description TemporarilyDisabled */
+      503: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'service_unavailable.temporarily_disabled'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Service Unavailable: Temporarily disabled'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+    }
+  }
   'v2-list-organization-github-connections': {
     parameters: {
       query?: {
@@ -1813,7 +2533,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V2ListGitHubConnectionsResponse']
+          'application/json': components['schemas']['V2ListGitHubConnectionsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -1875,7 +2595,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V2ListMembersResponse']
+          'application/json': components['schemas']['V2ListMembersResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -1929,7 +2649,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['OrganizationMemberRoleResponse']
+          'application/json': components['schemas']['OrganizationMemberRoleResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -2000,7 +2720,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V2CreateInvitationsResponse']
+          'application/json': components['schemas']['V2CreateInvitationsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -2062,7 +2782,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V2DeleteInvitationsResponse']
+          'application/json': components['schemas']['V2DeleteInvitationsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -2130,7 +2850,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V2ListProjectsResponse']
+          'application/json': components['schemas']['V2ListProjectsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -2179,7 +2899,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V2ListRolesResponse']
+          'application/json': components['schemas']['V2ListRolesResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -2207,6 +2927,4228 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-organizations-slug-webhooks-deliveries-id-get': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Identifier of a delivery (UUID v7). */
+        id: string
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Delivery details */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data: {
+              attributes: {
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the attempt.
+                 */
+                attempt_timestamp: string
+                event: {
+                  /** @description Final data sent to the consumer. */
+                  payload: {
+                    /**
+                     * @description Organization slug
+                     * @example tsrqponmlkjihgfedcba
+                     */
+                    organization_slug: string
+                    project_ref: string | null
+                  }
+                  /**
+                   * Format: date-time
+                   * @description Timestamp of event publication.
+                   */
+                  timestamp: string
+                  /**
+                   * @description Webhook event type.
+                   * @enum {string}
+                   */
+                  type:
+                    | 'v1.project.paused'
+                    | 'v1.project.created'
+                    | 'v1.project.restored'
+                    | 'v1.project.transferred'
+                    | 'v1.project.removed'
+                    | 'v1.project.restarted'
+                    | 'v1.project.status.changed'
+                    | 'v1.project.backup.started'
+                    | 'v1.project.branch.created'
+                    | 'v1.project.branch.updated'
+                    | 'v1.project.branch.removed'
+                    | 'v1.organization.member.invitation.created'
+                    | 'v1.organization.member.invitation.canceled'
+                    | 'v1.organization.member.added'
+                    | 'v1.organization.member.removed'
+                    | 'v1.organization.member.role.assigned'
+                    | 'v1.organization.member.role.removed'
+                    | 'v1.organization.member.role.updated'
+                    | 'v1.organization.billing.plan.upgraded'
+                    | 'v1.organization.billing.plan.downgraded'
+                    | 'project.v1.paused'
+                    | 'project.v1.created'
+                    | 'project.v1.restored'
+                    | 'project.v1.transferred'
+                    | 'project.v1.removed'
+                    | 'project.v1.restarted'
+                    | 'project.v1.status.changed'
+                    | 'project.v1.backup.started'
+                    | 'project.v1.branch.created'
+                    | 'project.v1.branch.updated'
+                    | 'project.v1.branch.removed'
+                    | 'organization.v1.member.invitation.created'
+                    | 'organization.v1.member.invitation.canceled'
+                    | 'organization.v1.member.added'
+                    | 'organization.v1.member.removed'
+                    | 'organization.v1.member.role.assigned'
+                    | 'organization.v1.member.role.removed'
+                    | 'organization.v1.member.role.updated'
+                    | 'organization.v1.billing.plan.upgraded'
+                    | 'organization.v1.billing.plan.downgraded'
+                    | 'project.v1.branch.deleted'
+                }
+                /**
+                 * Format: uuid
+                 * @description Identifier of the event, which triggered the delivery (UUID v7).
+                 */
+                event_id: string
+                /**
+                 * Format: uuid
+                 * @description Identifier of a delivery (UUID v7).
+                 */
+                id: string
+                response_body:
+                  | (
+                      | {
+                          [key: string]: string
+                        }
+                      | string
+                    )
+                  | null
+                /** @description HTTP status code of the response, `0` if unavailable. */
+                response_code: number
+                /** @description HTTP headers of the response, `{}` if unavailable. */
+                response_headers: {
+                  [key: string]: string
+                } | null
+                /**
+                 * @description Status of the delivery attempt.
+                 * @enum {string}
+                 */
+                status: 'pending' | 'success' | 'failure' | 'skipped'
+              }
+              /**
+               * Format: uuid
+               * @description Identifier of a delivery (UUID v7).
+               */
+              id: string
+              /**
+               * @description Resource type.
+               * @constant
+               */
+              type: 'delivery'
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_slug'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid organization slug'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_ref'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid project ref'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericUnauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'unauthorized'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Unauthorized'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'forbidden.permission_denied'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Permission denied'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'forbidden.access_disabled'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Access disabled'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description DeliveryNotFound */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'not_found.delivery'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Not Found: Delivery not found'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericRequestTimeout */
+      408: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'request_timeout'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Request Timeout'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericTooManyRequests */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'too_many_requests'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Too Many Requests'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericInternalServerError */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'internal_server_error'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Internal Server Error'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+    }
+  }
+  'v2-organizations-slug-webhooks-deliveries-id-retry-post': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Identifier of a delivery (UUID v7). */
+        id: string
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Delivery details */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data: {
+              id: string
+              /**
+               * @description Resource type.
+               * @constant
+               */
+              type: 'ingress'
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_slug'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid organization slug'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_ref'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid project ref'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericUnauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'unauthorized'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Unauthorized'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'forbidden.permission_denied'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Permission denied'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'forbidden.access_disabled'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Access disabled'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description DeliveryNotFound */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'not_found.delivery'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Not Found: Delivery not found'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericRequestTimeout */
+      408: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'request_timeout'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Request Timeout'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericTooManyRequests */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'too_many_requests'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Too Many Requests'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericInternalServerError */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'internal_server_error'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Internal Server Error'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+    }
+  }
+  'v2-organizations-slug-webhooks-endpoints-get': {
+    parameters: {
+      query?: {
+        /** @description Up to how many records to return. */
+        'page[limit]'?: string
+        /** @description Offset for offset-based pagination.
+         *
+         *     Offset should be dividable by `page[limit]` without a reminder (`offset % limit === 0`), otherwise it will cause weird behavior when used on a frontend. */
+        'page[offset]'?: string
+      }
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Collection of endpoints */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data: {
+              attributes: {
+                /**
+                 * Format: date-time
+                 * @description Timestamp of endpoint's creation.
+                 */
+                created_at: string
+                /**
+                 * Format: uuid
+                 * @description ID of the user who created the endpoint.
+                 */
+                created_by: string
+                /**
+                 * @description Additional request headers to pass when performing HTTP request location defined by `url`. Both keys and values must be strings and a valid HTTP headers.
+                 * @example {
+                 *       "Authorization": "Bearer example_token"
+                 *     }
+                 */
+                custom_headers?: {
+                  [key: string]: string
+                } | null
+                /** @description Optional description for the endpoint. */
+                description: string | null
+                /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
+                enabled: boolean
+                /**
+                 * @description List of subscribed events for which to receive the webhook event.
+                 * @example [
+                 *       {
+                 *         "type": "v1.project.paused"
+                 *       }
+                 *     ]
+                 */
+                event_types: {
+                  /**
+                   * @description Webhook event type.
+                   * @enum {string}
+                   */
+                  type:
+                    | 'v1.project.paused'
+                    | 'v1.project.created'
+                    | 'v1.project.restored'
+                    | 'v1.project.transferred'
+                    | 'v1.project.removed'
+                    | 'v1.project.restarted'
+                    | 'v1.project.status.changed'
+                    | 'v1.project.backup.started'
+                    | 'v1.project.branch.created'
+                    | 'v1.project.branch.updated'
+                    | 'v1.project.branch.removed'
+                    | 'v1.organization.member.invitation.created'
+                    | 'v1.organization.member.invitation.canceled'
+                    | 'v1.organization.member.added'
+                    | 'v1.organization.member.removed'
+                    | 'v1.organization.member.role.assigned'
+                    | 'v1.organization.member.role.removed'
+                    | 'v1.organization.member.role.updated'
+                    | 'v1.organization.billing.plan.upgraded'
+                    | 'v1.organization.billing.plan.downgraded'
+                    | '*'
+                }[]
+                /**
+                 * Format: uuid
+                 * @description Identifier of an endpoint (UUID v7).
+                 */
+                id: string
+                /**
+                 * Format: uri
+                 * @description Publicly available URL where to send the events, must use a domain and be resolvable to a non-reserved IP address.
+                 * @example https://mydomain.com/path/to/handler
+                 */
+                url: string
+              }
+              /**
+               * Format: uuid
+               * @description Identifier of an endpoint (UUID v7).
+               */
+              id: string
+              /**
+               * @description Resource type.
+               * @constant
+               */
+              type: 'endpoint'
+            }[]
+            links: {
+              /**
+               * @description URL path to the first page if available.
+               * @example /v2/organization/slug/webhooks/endpoints?page[limit]=10&page[offset]=0
+               */
+              first?: string | null
+              /**
+               * @description URL path to the last page if available.
+               * @example /v2/organization/slug/webhooks/endpoints?page[limit]=10&page[offset]=30
+               */
+              last?: string | null
+              /**
+               * @description URL path to the next page.
+               * @example /v2/organization/slug/webhooks/endpoints?page[limit]=10&page[offset]=20
+               */
+              next: string | null
+              /**
+               * @description URL path to the previous page.
+               * @example /v2/organization/slug/webhooks/endpoints?page[limit]=10&page[offset]=0
+               */
+              prev: string | null
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_slug'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid organization slug'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_ref'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid project ref'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericUnauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'unauthorized'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Unauthorized'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'forbidden.permission_denied'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Permission denied'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'forbidden.access_disabled'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Access disabled'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericRequestTimeout */
+      408: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'request_timeout'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Request Timeout'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericTooManyRequests */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'too_many_requests'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Too Many Requests'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericInternalServerError */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'internal_server_error'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Internal Server Error'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+    }
+  }
+  'v2-organizations-slug-webhooks-endpoints-post': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          data: {
+            attributes: {
+              /**
+               * @description Additional request headers to pass when performing HTTP request location defined by `url`. Both keys and values must be strings and a valid HTTP headers.
+               * @example {
+               *       "Authorization": "Bearer example_token"
+               *     }
+               */
+              custom_headers?: {
+                [key: string]: string
+              } | null
+              /** @description Optional description for the endpoint. */
+              description?: string | null
+              /**
+               * @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events.
+               * @default true
+               */
+              enabled?: boolean
+              /**
+               * @description List of subscribed events for which to receive the webhook event.
+               * @example [
+               *       {
+               *         "type": "v1.project.paused"
+               *       }
+               *     ]
+               */
+              event_types: {
+                /**
+                 * @description Webhook event type.
+                 * @enum {string}
+                 */
+                type:
+                  | 'v1.project.paused'
+                  | 'v1.project.created'
+                  | 'v1.project.restored'
+                  | 'v1.project.transferred'
+                  | 'v1.project.removed'
+                  | 'v1.project.restarted'
+                  | 'v1.project.status.changed'
+                  | 'v1.project.backup.started'
+                  | 'v1.project.branch.created'
+                  | 'v1.project.branch.updated'
+                  | 'v1.project.branch.removed'
+                  | 'v1.organization.member.invitation.created'
+                  | 'v1.organization.member.invitation.canceled'
+                  | 'v1.organization.member.added'
+                  | 'v1.organization.member.removed'
+                  | 'v1.organization.member.role.assigned'
+                  | 'v1.organization.member.role.removed'
+                  | 'v1.organization.member.role.updated'
+                  | 'v1.organization.billing.plan.upgraded'
+                  | 'v1.organization.billing.plan.downgraded'
+                  | '*'
+              }[]
+              /** @description Secret key to use when signing. All events will be signed according to the [Standard Webhooks](https://www.standardwebhooks.com/) specification. */
+              signing_secret: string
+              /**
+               * Format: uri
+               * @description Publicly available URL where to send the events, must use a domain and be resolvable to a non-reserved IP address.
+               * @example https://mydomain.com/path/to/handler
+               */
+              url: string
+            }
+            /**
+             * @description Resource type.
+             * @constant
+             */
+            type: 'endpoint'
+          }
+        }
+      }
+    }
+    responses: {
+      /** @description Created endpoint */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data: {
+              attributes: {
+                /**
+                 * Format: date-time
+                 * @description Timestamp of endpoint's creation.
+                 */
+                created_at: string
+                /**
+                 * Format: uuid
+                 * @description ID of the user who created the endpoint.
+                 */
+                created_by: string
+                /**
+                 * @description Additional request headers to pass when performing HTTP request location defined by `url`. Both keys and values must be strings and a valid HTTP headers.
+                 * @example {
+                 *       "Authorization": "Bearer example_token"
+                 *     }
+                 */
+                custom_headers?: {
+                  [key: string]: string
+                } | null
+                /** @description Optional description for the endpoint. */
+                description: string | null
+                /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
+                enabled: boolean
+                /**
+                 * @description List of subscribed events for which to receive the webhook event.
+                 * @example [
+                 *       {
+                 *         "type": "v1.project.paused"
+                 *       }
+                 *     ]
+                 */
+                event_types: {
+                  /**
+                   * @description Webhook event type.
+                   * @enum {string}
+                   */
+                  type:
+                    | 'v1.project.paused'
+                    | 'v1.project.created'
+                    | 'v1.project.restored'
+                    | 'v1.project.transferred'
+                    | 'v1.project.removed'
+                    | 'v1.project.restarted'
+                    | 'v1.project.status.changed'
+                    | 'v1.project.backup.started'
+                    | 'v1.project.branch.created'
+                    | 'v1.project.branch.updated'
+                    | 'v1.project.branch.removed'
+                    | 'v1.organization.member.invitation.created'
+                    | 'v1.organization.member.invitation.canceled'
+                    | 'v1.organization.member.added'
+                    | 'v1.organization.member.removed'
+                    | 'v1.organization.member.role.assigned'
+                    | 'v1.organization.member.role.removed'
+                    | 'v1.organization.member.role.updated'
+                    | 'v1.organization.billing.plan.upgraded'
+                    | 'v1.organization.billing.plan.downgraded'
+                    | '*'
+                }[]
+                /**
+                 * Format: uuid
+                 * @description Identifier of an endpoint (UUID v7).
+                 */
+                id: string
+                /**
+                 * Format: uri
+                 * @description Publicly available URL where to send the events, must use a domain and be resolvable to a non-reserved IP address.
+                 * @example https://mydomain.com/path/to/handler
+                 */
+                url: string
+              }
+              /**
+               * Format: uuid
+               * @description Identifier of an endpoint (UUID v7).
+               */
+              id: string
+              /**
+               * @description Resource type.
+               * @constant
+               */
+              type: 'endpoint'
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_slug'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid organization slug'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_ref'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid project ref'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericUnauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'unauthorized'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Unauthorized'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'forbidden.permission_denied'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Permission denied'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'forbidden.access_disabled'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Access disabled'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericRequestTimeout */
+      408: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'request_timeout'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Request Timeout'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericTooManyRequests */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'too_many_requests'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Too Many Requests'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericInternalServerError */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'internal_server_error'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Internal Server Error'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+    }
+  }
+  'v2-organizations-slug-webhooks-endpoints-delete': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Deleted endpoints */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data: {
+              attributes: {
+                /**
+                 * Format: date-time
+                 * @description Timestamp of endpoint's creation.
+                 */
+                created_at: string
+                /**
+                 * Format: uuid
+                 * @description ID of the user who created the endpoint.
+                 */
+                created_by: string
+                /**
+                 * @description Additional request headers to pass when performing HTTP request location defined by `url`. Both keys and values must be strings and a valid HTTP headers.
+                 * @example {
+                 *       "Authorization": "Bearer example_token"
+                 *     }
+                 */
+                custom_headers?: {
+                  [key: string]: string
+                } | null
+                /** @description Optional description for the endpoint. */
+                description: string | null
+                /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
+                enabled: boolean
+                /**
+                 * @description List of subscribed events for which to receive the webhook event.
+                 * @example [
+                 *       {
+                 *         "type": "v1.project.paused"
+                 *       }
+                 *     ]
+                 */
+                event_types: {
+                  /**
+                   * @description Webhook event type.
+                   * @enum {string}
+                   */
+                  type:
+                    | 'v1.project.paused'
+                    | 'v1.project.created'
+                    | 'v1.project.restored'
+                    | 'v1.project.transferred'
+                    | 'v1.project.removed'
+                    | 'v1.project.restarted'
+                    | 'v1.project.status.changed'
+                    | 'v1.project.backup.started'
+                    | 'v1.project.branch.created'
+                    | 'v1.project.branch.updated'
+                    | 'v1.project.branch.removed'
+                    | 'v1.organization.member.invitation.created'
+                    | 'v1.organization.member.invitation.canceled'
+                    | 'v1.organization.member.added'
+                    | 'v1.organization.member.removed'
+                    | 'v1.organization.member.role.assigned'
+                    | 'v1.organization.member.role.removed'
+                    | 'v1.organization.member.role.updated'
+                    | 'v1.organization.billing.plan.upgraded'
+                    | 'v1.organization.billing.plan.downgraded'
+                    | '*'
+                }[]
+                /**
+                 * Format: uuid
+                 * @description Identifier of an endpoint (UUID v7).
+                 */
+                id: string
+                /**
+                 * Format: uri
+                 * @description Publicly available URL where to send the events, must use a domain and be resolvable to a non-reserved IP address.
+                 * @example https://mydomain.com/path/to/handler
+                 */
+                url: string
+              }
+              /**
+               * Format: uuid
+               * @description Identifier of an endpoint (UUID v7).
+               */
+              id: string
+              /**
+               * @description Resource type.
+               * @constant
+               */
+              type: 'endpoint'
+            }[]
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_slug'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid organization slug'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_ref'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid project ref'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericUnauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'unauthorized'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Unauthorized'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'forbidden.permission_denied'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Permission denied'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'forbidden.access_disabled'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Access disabled'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericRequestTimeout */
+      408: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'request_timeout'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Request Timeout'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericTooManyRequests */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'too_many_requests'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Too Many Requests'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericInternalServerError */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'internal_server_error'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Internal Server Error'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+    }
+  }
+  'v2-organizations-slug-webhooks-endpoints-id-get': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Identifier of an endpoint (UUID v7). */
+        id: string
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Endpoint details */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data: {
+              attributes: {
+                /**
+                 * Format: date-time
+                 * @description Timestamp of endpoint's creation.
+                 */
+                created_at: string
+                /**
+                 * Format: uuid
+                 * @description ID of the user who created the endpoint.
+                 */
+                created_by: string
+                /**
+                 * @description Additional request headers to pass when performing HTTP request location defined by `url`. Both keys and values must be strings and a valid HTTP headers.
+                 * @example {
+                 *       "Authorization": "Bearer example_token"
+                 *     }
+                 */
+                custom_headers?: {
+                  [key: string]: string
+                } | null
+                /** @description Optional description for the endpoint. */
+                description: string | null
+                /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
+                enabled: boolean
+                /**
+                 * @description List of subscribed events for which to receive the webhook event.
+                 * @example [
+                 *       {
+                 *         "type": "v1.project.paused"
+                 *       }
+                 *     ]
+                 */
+                event_types: {
+                  /**
+                   * @description Webhook event type.
+                   * @enum {string}
+                   */
+                  type:
+                    | 'v1.project.paused'
+                    | 'v1.project.created'
+                    | 'v1.project.restored'
+                    | 'v1.project.transferred'
+                    | 'v1.project.removed'
+                    | 'v1.project.restarted'
+                    | 'v1.project.status.changed'
+                    | 'v1.project.backup.started'
+                    | 'v1.project.branch.created'
+                    | 'v1.project.branch.updated'
+                    | 'v1.project.branch.removed'
+                    | 'v1.organization.member.invitation.created'
+                    | 'v1.organization.member.invitation.canceled'
+                    | 'v1.organization.member.added'
+                    | 'v1.organization.member.removed'
+                    | 'v1.organization.member.role.assigned'
+                    | 'v1.organization.member.role.removed'
+                    | 'v1.organization.member.role.updated'
+                    | 'v1.organization.billing.plan.upgraded'
+                    | 'v1.organization.billing.plan.downgraded'
+                    | '*'
+                }[]
+                /**
+                 * Format: uuid
+                 * @description Identifier of an endpoint (UUID v7).
+                 */
+                id: string
+                /**
+                 * Format: uri
+                 * @description Publicly available URL where to send the events, must use a domain and be resolvable to a non-reserved IP address.
+                 * @example https://mydomain.com/path/to/handler
+                 */
+                url: string
+              }
+              /**
+               * Format: uuid
+               * @description Identifier of an endpoint (UUID v7).
+               */
+              id: string
+              /**
+               * @description Resource type.
+               * @constant
+               */
+              type: 'endpoint'
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_slug'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid organization slug'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_ref'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid project ref'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericUnauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'unauthorized'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Unauthorized'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'forbidden.permission_denied'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Permission denied'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'forbidden.access_disabled'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Access disabled'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description EndpointNotFound */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'not_found.endpoint'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Not Found: Endpoint not found'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericRequestTimeout */
+      408: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'request_timeout'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Request Timeout'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericTooManyRequests */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'too_many_requests'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Too Many Requests'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericInternalServerError */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'internal_server_error'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Internal Server Error'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+    }
+  }
+  'v2-organizations-slug-webhooks-endpoints-id-delete': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Identifier of an endpoint (UUID v7). */
+        id: string
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Deleted endpoint details */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data: {
+              attributes: {
+                /**
+                 * Format: date-time
+                 * @description Timestamp of endpoint's creation.
+                 */
+                created_at: string
+                /**
+                 * Format: uuid
+                 * @description ID of the user who created the endpoint.
+                 */
+                created_by: string
+                /**
+                 * @description Additional request headers to pass when performing HTTP request location defined by `url`. Both keys and values must be strings and a valid HTTP headers.
+                 * @example {
+                 *       "Authorization": "Bearer example_token"
+                 *     }
+                 */
+                custom_headers?: {
+                  [key: string]: string
+                } | null
+                /** @description Optional description for the endpoint. */
+                description: string | null
+                /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
+                enabled: boolean
+                /**
+                 * @description List of subscribed events for which to receive the webhook event.
+                 * @example [
+                 *       {
+                 *         "type": "v1.project.paused"
+                 *       }
+                 *     ]
+                 */
+                event_types: {
+                  /**
+                   * @description Webhook event type.
+                   * @enum {string}
+                   */
+                  type:
+                    | 'v1.project.paused'
+                    | 'v1.project.created'
+                    | 'v1.project.restored'
+                    | 'v1.project.transferred'
+                    | 'v1.project.removed'
+                    | 'v1.project.restarted'
+                    | 'v1.project.status.changed'
+                    | 'v1.project.backup.started'
+                    | 'v1.project.branch.created'
+                    | 'v1.project.branch.updated'
+                    | 'v1.project.branch.removed'
+                    | 'v1.organization.member.invitation.created'
+                    | 'v1.organization.member.invitation.canceled'
+                    | 'v1.organization.member.added'
+                    | 'v1.organization.member.removed'
+                    | 'v1.organization.member.role.assigned'
+                    | 'v1.organization.member.role.removed'
+                    | 'v1.organization.member.role.updated'
+                    | 'v1.organization.billing.plan.upgraded'
+                    | 'v1.organization.billing.plan.downgraded'
+                    | '*'
+                }[]
+                /**
+                 * Format: uuid
+                 * @description Identifier of an endpoint (UUID v7).
+                 */
+                id: string
+                /**
+                 * Format: uri
+                 * @description Publicly available URL where to send the events, must use a domain and be resolvable to a non-reserved IP address.
+                 * @example https://mydomain.com/path/to/handler
+                 */
+                url: string
+              }
+              /**
+               * Format: uuid
+               * @description Identifier of an endpoint (UUID v7).
+               */
+              id: string
+              /**
+               * @description Resource type.
+               * @constant
+               */
+              type: 'endpoint'
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_slug'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid organization slug'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_ref'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid project ref'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericUnauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'unauthorized'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Unauthorized'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'forbidden.permission_denied'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Permission denied'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'forbidden.access_disabled'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Access disabled'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description EndpointNotFound */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'not_found.endpoint'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Not Found: Endpoint not found'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericRequestTimeout */
+      408: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'request_timeout'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Request Timeout'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericTooManyRequests */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'too_many_requests'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Too Many Requests'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericInternalServerError */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'internal_server_error'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Internal Server Error'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+    }
+  }
+  'v2-organizations-slug-webhooks-endpoints-id-patch': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Identifier of an endpoint (UUID v7). */
+        id: string
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          data: {
+            attributes: {
+              /**
+               * @description Additional request headers to pass when performing HTTP request location defined by `url`. Both keys and values must be strings and a valid HTTP headers.
+               * @example {
+               *       "Authorization": "Bearer example_token"
+               *     }
+               */
+              custom_headers?: {
+                [key: string]: string
+              } | null
+              /** @description Optional description for the endpoint. */
+              description?: string | null
+              /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
+              enabled?: boolean
+              /**
+               * @description List of subscribed events for which to receive the webhook event.
+               * @example [
+               *       {
+               *         "type": "v1.project.paused"
+               *       }
+               *     ]
+               */
+              event_types?: {
+                /**
+                 * @description Webhook event type.
+                 * @enum {string}
+                 */
+                type:
+                  | 'v1.project.paused'
+                  | 'v1.project.created'
+                  | 'v1.project.restored'
+                  | 'v1.project.transferred'
+                  | 'v1.project.removed'
+                  | 'v1.project.restarted'
+                  | 'v1.project.status.changed'
+                  | 'v1.project.backup.started'
+                  | 'v1.project.branch.created'
+                  | 'v1.project.branch.updated'
+                  | 'v1.project.branch.removed'
+                  | 'v1.organization.member.invitation.created'
+                  | 'v1.organization.member.invitation.canceled'
+                  | 'v1.organization.member.added'
+                  | 'v1.organization.member.removed'
+                  | 'v1.organization.member.role.assigned'
+                  | 'v1.organization.member.role.removed'
+                  | 'v1.organization.member.role.updated'
+                  | 'v1.organization.billing.plan.upgraded'
+                  | 'v1.organization.billing.plan.downgraded'
+                  | '*'
+              }[]
+              /** @description Secret key to use when signing. All events will be signed according to the [Standard Webhooks](https://www.standardwebhooks.com/) specification. */
+              signing_secret?: string
+              /**
+               * Format: uri
+               * @description Publicly available URL where to send the events, must use a domain and be resolvable to a non-reserved IP address.
+               * @example https://mydomain.com/path/to/handler
+               */
+              url?: string
+            }
+            /**
+             * @description Resource type.
+             * @constant
+             */
+            type: 'endpoint'
+          }
+        }
+      }
+    }
+    responses: {
+      /** @description Updated endpoint details */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data: {
+              attributes: {
+                /**
+                 * Format: date-time
+                 * @description Timestamp of endpoint's creation.
+                 */
+                created_at: string
+                /**
+                 * Format: uuid
+                 * @description ID of the user who created the endpoint.
+                 */
+                created_by: string
+                /**
+                 * @description Additional request headers to pass when performing HTTP request location defined by `url`. Both keys and values must be strings and a valid HTTP headers.
+                 * @example {
+                 *       "Authorization": "Bearer example_token"
+                 *     }
+                 */
+                custom_headers?: {
+                  [key: string]: string
+                } | null
+                /** @description Optional description for the endpoint. */
+                description: string | null
+                /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
+                enabled: boolean
+                /**
+                 * @description List of subscribed events for which to receive the webhook event.
+                 * @example [
+                 *       {
+                 *         "type": "v1.project.paused"
+                 *       }
+                 *     ]
+                 */
+                event_types: {
+                  /**
+                   * @description Webhook event type.
+                   * @enum {string}
+                   */
+                  type:
+                    | 'v1.project.paused'
+                    | 'v1.project.created'
+                    | 'v1.project.restored'
+                    | 'v1.project.transferred'
+                    | 'v1.project.removed'
+                    | 'v1.project.restarted'
+                    | 'v1.project.status.changed'
+                    | 'v1.project.backup.started'
+                    | 'v1.project.branch.created'
+                    | 'v1.project.branch.updated'
+                    | 'v1.project.branch.removed'
+                    | 'v1.organization.member.invitation.created'
+                    | 'v1.organization.member.invitation.canceled'
+                    | 'v1.organization.member.added'
+                    | 'v1.organization.member.removed'
+                    | 'v1.organization.member.role.assigned'
+                    | 'v1.organization.member.role.removed'
+                    | 'v1.organization.member.role.updated'
+                    | 'v1.organization.billing.plan.upgraded'
+                    | 'v1.organization.billing.plan.downgraded'
+                    | '*'
+                }[]
+                /**
+                 * Format: uuid
+                 * @description Identifier of an endpoint (UUID v7).
+                 */
+                id: string
+                /**
+                 * Format: uri
+                 * @description Publicly available URL where to send the events, must use a domain and be resolvable to a non-reserved IP address.
+                 * @example https://mydomain.com/path/to/handler
+                 */
+                url: string
+              }
+              /**
+               * Format: uuid
+               * @description Identifier of an endpoint (UUID v7).
+               */
+              id: string
+              /**
+               * @description Resource type.
+               * @constant
+               */
+              type: 'endpoint'
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_slug'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid organization slug'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_ref'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid project ref'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericUnauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'unauthorized'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Unauthorized'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'forbidden.permission_denied'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Permission denied'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'forbidden.access_disabled'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Access disabled'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description EndpointNotFound */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'not_found.endpoint'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Not Found: Endpoint not found'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericRequestTimeout */
+      408: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'request_timeout'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Request Timeout'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericTooManyRequests */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'too_many_requests'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Too Many Requests'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericInternalServerError */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'internal_server_error'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Internal Server Error'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+    }
+  }
+  'v2-organizations-slug-webhooks-endpoints-id-deliveries-get': {
+    parameters: {
+      query?: {
+        /** @description Cursor in cursor-based pagination to return up to `page[size]` records after (exclusive) the entry specified by this query param. */
+        'page[after]'?: string
+        /** @description Cursor in cursor-based pagination to return up to `page[size]` records before (exclusive) the entry specified by this query param. */
+        'page[before]'?: string
+        /** @description Up to how many records to return. */
+        'page[size]'?: string
+      }
+      header?: never
+      path: {
+        /** @description Identifier of an endpoint (UUID v7). */
+        id: string
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description List of deliveries */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data: {
+              attributes: {
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the attempt.
+                 */
+                attempt_timestamp: string
+                /**
+                 * Format: uuid
+                 * @description Identifier of the event, which triggered the delivery (UUID v7).
+                 */
+                event_id: string
+                /**
+                 * Format: uuid
+                 * @description Identifier of a delivery (UUID v7).
+                 */
+                id: string
+                response_body:
+                  | (
+                      | {
+                          [key: string]: string
+                        }
+                      | string
+                    )
+                  | null
+                /** @description HTTP status code of the response, `0` if unavailable. */
+                response_code: number
+                /** @description HTTP headers of the response, `{}` if unavailable. */
+                response_headers: {
+                  [key: string]: string
+                } | null
+                /**
+                 * @description Status of the delivery attempt.
+                 * @enum {string}
+                 */
+                status: 'pending' | 'success' | 'failure' | 'skipped'
+              }
+              /**
+               * Format: uuid
+               * @description Identifier of a delivery (UUID v7).
+               */
+              id: string
+              /**
+               * @description Resource type.
+               * @constant
+               */
+              type: 'delivery'
+            }[]
+            links: {
+              /**
+               * @description URL path to the first page if available.
+               * @example /v2/organizations/slug/webhooks/endpoints/{id}/deliveries?page[size]=10
+               */
+              first?: string | null
+              /**
+               * @description URL path to the last page if available.
+               * @example /v2/organizations/slug/webhooks/endpoints/{id}/deliveries?page[size]=10&page[after]=019adf7d-4513-71ba-b264-21900edb4295
+               */
+              last?: string | null
+              /**
+               * @description URL path to the next page.
+               * @example /v2/organizations/slug/webhooks/endpoints/{id}/deliveries?page[size]=10&page[after]=019adf7d-4513-7062-b292-78b86cc470a4
+               */
+              next: string | null
+              /**
+               * @description URL path to the previous page.
+               * @example /v2/organizations/slug/webhooks/endpoints/{id}/deliveries?page[size]=10&page[before]=019adf7d-4513-74c5-bb9a-f1bc0f7a95d7
+               */
+              prev: string | null
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_slug'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid organization slug'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_ref'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid project ref'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericUnauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'unauthorized'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Unauthorized'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'forbidden.permission_denied'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Permission denied'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'forbidden.access_disabled'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Access disabled'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description EndpointNotFound */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'not_found.endpoint'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Not Found: Endpoint not found'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericRequestTimeout */
+      408: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'request_timeout'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Request Timeout'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericTooManyRequests */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'too_many_requests'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Too Many Requests'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericInternalServerError */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'internal_server_error'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Internal Server Error'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+    }
+  }
+  'v2-organizations-slug-webhooks-endpoints-id-test-post': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Identifier of an endpoint (UUID v7). */
+        id: string
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          data?: {
+            attributes: {
+              /**
+               * @description Webhook event type.
+               * @enum {string}
+               */
+              type:
+                | 'v1.project.paused'
+                | 'v1.project.created'
+                | 'v1.project.restored'
+                | 'v1.project.transferred'
+                | 'v1.project.removed'
+                | 'v1.project.restarted'
+                | 'v1.project.status.changed'
+                | 'v1.project.backup.started'
+                | 'v1.project.branch.created'
+                | 'v1.project.branch.updated'
+                | 'v1.project.branch.removed'
+                | 'v1.organization.member.invitation.created'
+                | 'v1.organization.member.invitation.canceled'
+                | 'v1.organization.member.added'
+                | 'v1.organization.member.removed'
+                | 'v1.organization.member.role.assigned'
+                | 'v1.organization.member.role.removed'
+                | 'v1.organization.member.role.updated'
+                | 'v1.organization.billing.plan.upgraded'
+                | 'v1.organization.billing.plan.downgraded'
+                | 'project.v1.paused'
+                | 'project.v1.created'
+                | 'project.v1.restored'
+                | 'project.v1.transferred'
+                | 'project.v1.removed'
+                | 'project.v1.restarted'
+                | 'project.v1.status.changed'
+                | 'project.v1.backup.started'
+                | 'project.v1.branch.created'
+                | 'project.v1.branch.updated'
+                | 'project.v1.branch.removed'
+                | 'organization.v1.member.invitation.created'
+                | 'organization.v1.member.invitation.canceled'
+                | 'organization.v1.member.added'
+                | 'organization.v1.member.removed'
+                | 'organization.v1.member.role.assigned'
+                | 'organization.v1.member.role.removed'
+                | 'organization.v1.member.role.updated'
+                | 'organization.v1.billing.plan.upgraded'
+                | 'organization.v1.billing.plan.downgraded'
+                | 'project.v1.branch.deleted'
+            }
+            /**
+             * @description Resource type.
+             * @constant
+             */
+            type: 'event'
+          }
+        }
+      }
+    }
+    responses: {
+      /** @description Event published */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data: {
+              id: string
+              /**
+               * @description Resource type.
+               * @constant
+               */
+              type: 'ingress'
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'bad_request.endpoint.test.disabled'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Endpoint is disabled'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'bad_request.endpoint.test.wrong_event_type'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Provided event type is not subscribed to by the endpoint'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_slug'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid organization slug'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_ref'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid project ref'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericUnauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'unauthorized'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Unauthorized'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'forbidden.permission_denied'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Permission denied'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'forbidden.access_disabled'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Access disabled'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description EndpointNotFound */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'not_found.endpoint'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Not Found: Endpoint not found'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericRequestTimeout */
+      408: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'request_timeout'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Request Timeout'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericTooManyRequests */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'too_many_requests'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Too Many Requests'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericInternalServerError */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'internal_server_error'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Internal Server Error'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
         }
       }
     }
@@ -2281,7 +7223,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ListLogDrainsResponse']
+          'application/json': components['schemas']['ListLogDrainsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -2343,7 +7285,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['LogDrainResponse']
+          'application/json': components['schemas']['LogDrainResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -2416,7 +7358,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['LogDrainResponse']
+          'application/json': components['schemas']['LogDrainResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -2532,7 +7474,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V2ProjectConfigResponse']
+          'application/json': components['schemas']['V2ProjectConfigResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -2581,7 +7523,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V2ListPrivateLinkAssociationsResponse']
+          'application/json': components['schemas']['V2ListPrivateLinkAssociationsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -2643,7 +7585,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V2PrivateLinkAssociationResponse']
+          'application/json': components['schemas']['V2PrivateLinkAssociationResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -2883,7 +7825,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V2PreviewProjectTransferResponse']
+          'application/json': components['schemas']['V2PreviewProjectTransferResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -2915,6 +7857,4228 @@ export interface operations {
       }
     }
   }
+  'v2-projects-ref-webhooks-deliveries-id-get': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Identifier of a delivery (UUID v7). */
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Delivery details */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data: {
+              attributes: {
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the attempt.
+                 */
+                attempt_timestamp: string
+                event: {
+                  /** @description Final data sent to the consumer. */
+                  payload: {
+                    /**
+                     * @description Organization slug
+                     * @example tsrqponmlkjihgfedcba
+                     */
+                    organization_slug: string
+                    project_ref: string | null
+                  }
+                  /**
+                   * Format: date-time
+                   * @description Timestamp of event publication.
+                   */
+                  timestamp: string
+                  /**
+                   * @description Webhook event type.
+                   * @enum {string}
+                   */
+                  type:
+                    | 'v1.project.paused'
+                    | 'v1.project.created'
+                    | 'v1.project.restored'
+                    | 'v1.project.transferred'
+                    | 'v1.project.removed'
+                    | 'v1.project.restarted'
+                    | 'v1.project.status.changed'
+                    | 'v1.project.backup.started'
+                    | 'v1.project.branch.created'
+                    | 'v1.project.branch.updated'
+                    | 'v1.project.branch.removed'
+                    | 'v1.organization.member.invitation.created'
+                    | 'v1.organization.member.invitation.canceled'
+                    | 'v1.organization.member.added'
+                    | 'v1.organization.member.removed'
+                    | 'v1.organization.member.role.assigned'
+                    | 'v1.organization.member.role.removed'
+                    | 'v1.organization.member.role.updated'
+                    | 'v1.organization.billing.plan.upgraded'
+                    | 'v1.organization.billing.plan.downgraded'
+                    | 'project.v1.paused'
+                    | 'project.v1.created'
+                    | 'project.v1.restored'
+                    | 'project.v1.transferred'
+                    | 'project.v1.removed'
+                    | 'project.v1.restarted'
+                    | 'project.v1.status.changed'
+                    | 'project.v1.backup.started'
+                    | 'project.v1.branch.created'
+                    | 'project.v1.branch.updated'
+                    | 'project.v1.branch.removed'
+                    | 'organization.v1.member.invitation.created'
+                    | 'organization.v1.member.invitation.canceled'
+                    | 'organization.v1.member.added'
+                    | 'organization.v1.member.removed'
+                    | 'organization.v1.member.role.assigned'
+                    | 'organization.v1.member.role.removed'
+                    | 'organization.v1.member.role.updated'
+                    | 'organization.v1.billing.plan.upgraded'
+                    | 'organization.v1.billing.plan.downgraded'
+                    | 'project.v1.branch.deleted'
+                }
+                /**
+                 * Format: uuid
+                 * @description Identifier of the event, which triggered the delivery (UUID v7).
+                 */
+                event_id: string
+                /**
+                 * Format: uuid
+                 * @description Identifier of a delivery (UUID v7).
+                 */
+                id: string
+                response_body:
+                  | (
+                      | {
+                          [key: string]: string
+                        }
+                      | string
+                    )
+                  | null
+                /** @description HTTP status code of the response, `0` if unavailable. */
+                response_code: number
+                /** @description HTTP headers of the response, `{}` if unavailable. */
+                response_headers: {
+                  [key: string]: string
+                } | null
+                /**
+                 * @description Status of the delivery attempt.
+                 * @enum {string}
+                 */
+                status: 'pending' | 'success' | 'failure' | 'skipped'
+              }
+              /**
+               * Format: uuid
+               * @description Identifier of a delivery (UUID v7).
+               */
+              id: string
+              /**
+               * @description Resource type.
+               * @constant
+               */
+              type: 'delivery'
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_slug'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid organization slug'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_ref'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid project ref'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericUnauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'unauthorized'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Unauthorized'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'forbidden.permission_denied'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Permission denied'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'forbidden.access_disabled'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Access disabled'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description DeliveryNotFound */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'not_found.delivery'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Not Found: Delivery not found'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericRequestTimeout */
+      408: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'request_timeout'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Request Timeout'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericTooManyRequests */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'too_many_requests'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Too Many Requests'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericInternalServerError */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'internal_server_error'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Internal Server Error'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+    }
+  }
+  'v2-projects-ref-webhooks-deliveries-id-retry-post': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Identifier of a delivery (UUID v7). */
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Delivery details */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data: {
+              id: string
+              /**
+               * @description Resource type.
+               * @constant
+               */
+              type: 'ingress'
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_slug'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid organization slug'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_ref'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid project ref'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericUnauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'unauthorized'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Unauthorized'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'forbidden.permission_denied'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Permission denied'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'forbidden.access_disabled'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Access disabled'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description DeliveryNotFound */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'not_found.delivery'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Not Found: Delivery not found'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericRequestTimeout */
+      408: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'request_timeout'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Request Timeout'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericTooManyRequests */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'too_many_requests'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Too Many Requests'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericInternalServerError */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'internal_server_error'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Internal Server Error'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+    }
+  }
+  'v2-projects-ref-webhooks-endpoints-get': {
+    parameters: {
+      query?: {
+        /** @description Up to how many records to return. */
+        'page[limit]'?: string
+        /** @description Offset for offset-based pagination.
+         *
+         *     Offset should be dividable by `page[limit]` without a reminder (`offset % limit === 0`), otherwise it will cause weird behavior when used on a frontend. */
+        'page[offset]'?: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Collection of endpoints */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data: {
+              attributes: {
+                /**
+                 * Format: date-time
+                 * @description Timestamp of endpoint's creation.
+                 */
+                created_at: string
+                /**
+                 * Format: uuid
+                 * @description ID of the user who created the endpoint.
+                 */
+                created_by: string
+                /**
+                 * @description Additional request headers to pass when performing HTTP request location defined by `url`. Both keys and values must be strings and a valid HTTP headers.
+                 * @example {
+                 *       "Authorization": "Bearer example_token"
+                 *     }
+                 */
+                custom_headers?: {
+                  [key: string]: string
+                } | null
+                /** @description Optional description for the endpoint. */
+                description: string | null
+                /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
+                enabled: boolean
+                /**
+                 * @description List of subscribed events for which to receive the webhook event.
+                 * @example [
+                 *       {
+                 *         "type": "v1.project.paused"
+                 *       }
+                 *     ]
+                 */
+                event_types: {
+                  /**
+                   * @description Webhook event type.
+                   * @enum {string}
+                   */
+                  type:
+                    | 'v1.project.paused'
+                    | 'v1.project.created'
+                    | 'v1.project.restored'
+                    | 'v1.project.transferred'
+                    | 'v1.project.removed'
+                    | 'v1.project.restarted'
+                    | 'v1.project.status.changed'
+                    | 'v1.project.backup.started'
+                    | 'v1.project.branch.created'
+                    | 'v1.project.branch.updated'
+                    | 'v1.project.branch.removed'
+                    | 'v1.organization.member.invitation.created'
+                    | 'v1.organization.member.invitation.canceled'
+                    | 'v1.organization.member.added'
+                    | 'v1.organization.member.removed'
+                    | 'v1.organization.member.role.assigned'
+                    | 'v1.organization.member.role.removed'
+                    | 'v1.organization.member.role.updated'
+                    | 'v1.organization.billing.plan.upgraded'
+                    | 'v1.organization.billing.plan.downgraded'
+                    | '*'
+                }[]
+                /**
+                 * Format: uuid
+                 * @description Identifier of an endpoint (UUID v7).
+                 */
+                id: string
+                /**
+                 * Format: uri
+                 * @description Publicly available URL where to send the events, must use a domain and be resolvable to a non-reserved IP address.
+                 * @example https://mydomain.com/path/to/handler
+                 */
+                url: string
+              }
+              /**
+               * Format: uuid
+               * @description Identifier of an endpoint (UUID v7).
+               */
+              id: string
+              /**
+               * @description Resource type.
+               * @constant
+               */
+              type: 'endpoint'
+            }[]
+            links: {
+              /**
+               * @description URL path to the first page if available.
+               * @example /v2/organization/slug/webhooks/endpoints?page[limit]=10&page[offset]=0
+               */
+              first?: string | null
+              /**
+               * @description URL path to the last page if available.
+               * @example /v2/organization/slug/webhooks/endpoints?page[limit]=10&page[offset]=30
+               */
+              last?: string | null
+              /**
+               * @description URL path to the next page.
+               * @example /v2/organization/slug/webhooks/endpoints?page[limit]=10&page[offset]=20
+               */
+              next: string | null
+              /**
+               * @description URL path to the previous page.
+               * @example /v2/organization/slug/webhooks/endpoints?page[limit]=10&page[offset]=0
+               */
+              prev: string | null
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_slug'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid organization slug'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_ref'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid project ref'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericUnauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'unauthorized'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Unauthorized'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'forbidden.permission_denied'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Permission denied'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'forbidden.access_disabled'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Access disabled'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericRequestTimeout */
+      408: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'request_timeout'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Request Timeout'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericTooManyRequests */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'too_many_requests'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Too Many Requests'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericInternalServerError */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'internal_server_error'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Internal Server Error'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+    }
+  }
+  'v2-projects-ref-webhooks-endpoints-post': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          data: {
+            attributes: {
+              /**
+               * @description Additional request headers to pass when performing HTTP request location defined by `url`. Both keys and values must be strings and a valid HTTP headers.
+               * @example {
+               *       "Authorization": "Bearer example_token"
+               *     }
+               */
+              custom_headers?: {
+                [key: string]: string
+              } | null
+              /** @description Optional description for the endpoint. */
+              description?: string | null
+              /**
+               * @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events.
+               * @default true
+               */
+              enabled?: boolean
+              /**
+               * @description List of subscribed events for which to receive the webhook event.
+               * @example [
+               *       {
+               *         "type": "v1.project.paused"
+               *       }
+               *     ]
+               */
+              event_types: {
+                /**
+                 * @description Webhook event type.
+                 * @enum {string}
+                 */
+                type:
+                  | 'v1.project.paused'
+                  | 'v1.project.created'
+                  | 'v1.project.restored'
+                  | 'v1.project.transferred'
+                  | 'v1.project.removed'
+                  | 'v1.project.restarted'
+                  | 'v1.project.status.changed'
+                  | 'v1.project.backup.started'
+                  | 'v1.project.branch.created'
+                  | 'v1.project.branch.updated'
+                  | 'v1.project.branch.removed'
+                  | 'v1.organization.member.invitation.created'
+                  | 'v1.organization.member.invitation.canceled'
+                  | 'v1.organization.member.added'
+                  | 'v1.organization.member.removed'
+                  | 'v1.organization.member.role.assigned'
+                  | 'v1.organization.member.role.removed'
+                  | 'v1.organization.member.role.updated'
+                  | 'v1.organization.billing.plan.upgraded'
+                  | 'v1.organization.billing.plan.downgraded'
+                  | '*'
+              }[]
+              /** @description Secret key to use when signing. All events will be signed according to the [Standard Webhooks](https://www.standardwebhooks.com/) specification. */
+              signing_secret: string
+              /**
+               * Format: uri
+               * @description Publicly available URL where to send the events, must use a domain and be resolvable to a non-reserved IP address.
+               * @example https://mydomain.com/path/to/handler
+               */
+              url: string
+            }
+            /**
+             * @description Resource type.
+             * @constant
+             */
+            type: 'endpoint'
+          }
+        }
+      }
+    }
+    responses: {
+      /** @description Created endpoint */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data: {
+              attributes: {
+                /**
+                 * Format: date-time
+                 * @description Timestamp of endpoint's creation.
+                 */
+                created_at: string
+                /**
+                 * Format: uuid
+                 * @description ID of the user who created the endpoint.
+                 */
+                created_by: string
+                /**
+                 * @description Additional request headers to pass when performing HTTP request location defined by `url`. Both keys and values must be strings and a valid HTTP headers.
+                 * @example {
+                 *       "Authorization": "Bearer example_token"
+                 *     }
+                 */
+                custom_headers?: {
+                  [key: string]: string
+                } | null
+                /** @description Optional description for the endpoint. */
+                description: string | null
+                /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
+                enabled: boolean
+                /**
+                 * @description List of subscribed events for which to receive the webhook event.
+                 * @example [
+                 *       {
+                 *         "type": "v1.project.paused"
+                 *       }
+                 *     ]
+                 */
+                event_types: {
+                  /**
+                   * @description Webhook event type.
+                   * @enum {string}
+                   */
+                  type:
+                    | 'v1.project.paused'
+                    | 'v1.project.created'
+                    | 'v1.project.restored'
+                    | 'v1.project.transferred'
+                    | 'v1.project.removed'
+                    | 'v1.project.restarted'
+                    | 'v1.project.status.changed'
+                    | 'v1.project.backup.started'
+                    | 'v1.project.branch.created'
+                    | 'v1.project.branch.updated'
+                    | 'v1.project.branch.removed'
+                    | 'v1.organization.member.invitation.created'
+                    | 'v1.organization.member.invitation.canceled'
+                    | 'v1.organization.member.added'
+                    | 'v1.organization.member.removed'
+                    | 'v1.organization.member.role.assigned'
+                    | 'v1.organization.member.role.removed'
+                    | 'v1.organization.member.role.updated'
+                    | 'v1.organization.billing.plan.upgraded'
+                    | 'v1.organization.billing.plan.downgraded'
+                    | '*'
+                }[]
+                /**
+                 * Format: uuid
+                 * @description Identifier of an endpoint (UUID v7).
+                 */
+                id: string
+                /**
+                 * Format: uri
+                 * @description Publicly available URL where to send the events, must use a domain and be resolvable to a non-reserved IP address.
+                 * @example https://mydomain.com/path/to/handler
+                 */
+                url: string
+              }
+              /**
+               * Format: uuid
+               * @description Identifier of an endpoint (UUID v7).
+               */
+              id: string
+              /**
+               * @description Resource type.
+               * @constant
+               */
+              type: 'endpoint'
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_slug'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid organization slug'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_ref'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid project ref'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericUnauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'unauthorized'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Unauthorized'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'forbidden.permission_denied'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Permission denied'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'forbidden.access_disabled'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Access disabled'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericRequestTimeout */
+      408: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'request_timeout'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Request Timeout'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericTooManyRequests */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'too_many_requests'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Too Many Requests'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericInternalServerError */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'internal_server_error'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Internal Server Error'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+    }
+  }
+  'v2-projects-ref-webhooks-endpoints-delete': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Deleted endpoints */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data: {
+              attributes: {
+                /**
+                 * Format: date-time
+                 * @description Timestamp of endpoint's creation.
+                 */
+                created_at: string
+                /**
+                 * Format: uuid
+                 * @description ID of the user who created the endpoint.
+                 */
+                created_by: string
+                /**
+                 * @description Additional request headers to pass when performing HTTP request location defined by `url`. Both keys and values must be strings and a valid HTTP headers.
+                 * @example {
+                 *       "Authorization": "Bearer example_token"
+                 *     }
+                 */
+                custom_headers?: {
+                  [key: string]: string
+                } | null
+                /** @description Optional description for the endpoint. */
+                description: string | null
+                /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
+                enabled: boolean
+                /**
+                 * @description List of subscribed events for which to receive the webhook event.
+                 * @example [
+                 *       {
+                 *         "type": "v1.project.paused"
+                 *       }
+                 *     ]
+                 */
+                event_types: {
+                  /**
+                   * @description Webhook event type.
+                   * @enum {string}
+                   */
+                  type:
+                    | 'v1.project.paused'
+                    | 'v1.project.created'
+                    | 'v1.project.restored'
+                    | 'v1.project.transferred'
+                    | 'v1.project.removed'
+                    | 'v1.project.restarted'
+                    | 'v1.project.status.changed'
+                    | 'v1.project.backup.started'
+                    | 'v1.project.branch.created'
+                    | 'v1.project.branch.updated'
+                    | 'v1.project.branch.removed'
+                    | 'v1.organization.member.invitation.created'
+                    | 'v1.organization.member.invitation.canceled'
+                    | 'v1.organization.member.added'
+                    | 'v1.organization.member.removed'
+                    | 'v1.organization.member.role.assigned'
+                    | 'v1.organization.member.role.removed'
+                    | 'v1.organization.member.role.updated'
+                    | 'v1.organization.billing.plan.upgraded'
+                    | 'v1.organization.billing.plan.downgraded'
+                    | '*'
+                }[]
+                /**
+                 * Format: uuid
+                 * @description Identifier of an endpoint (UUID v7).
+                 */
+                id: string
+                /**
+                 * Format: uri
+                 * @description Publicly available URL where to send the events, must use a domain and be resolvable to a non-reserved IP address.
+                 * @example https://mydomain.com/path/to/handler
+                 */
+                url: string
+              }
+              /**
+               * Format: uuid
+               * @description Identifier of an endpoint (UUID v7).
+               */
+              id: string
+              /**
+               * @description Resource type.
+               * @constant
+               */
+              type: 'endpoint'
+            }[]
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_slug'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid organization slug'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_ref'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid project ref'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericUnauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'unauthorized'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Unauthorized'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'forbidden.permission_denied'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Permission denied'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'forbidden.access_disabled'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Access disabled'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericRequestTimeout */
+      408: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'request_timeout'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Request Timeout'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericTooManyRequests */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'too_many_requests'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Too Many Requests'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericInternalServerError */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'internal_server_error'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Internal Server Error'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+    }
+  }
+  'v2-projects-ref-webhooks-endpoints-id-get': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Identifier of an endpoint (UUID v7). */
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Endpoint details */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data: {
+              attributes: {
+                /**
+                 * Format: date-time
+                 * @description Timestamp of endpoint's creation.
+                 */
+                created_at: string
+                /**
+                 * Format: uuid
+                 * @description ID of the user who created the endpoint.
+                 */
+                created_by: string
+                /**
+                 * @description Additional request headers to pass when performing HTTP request location defined by `url`. Both keys and values must be strings and a valid HTTP headers.
+                 * @example {
+                 *       "Authorization": "Bearer example_token"
+                 *     }
+                 */
+                custom_headers?: {
+                  [key: string]: string
+                } | null
+                /** @description Optional description for the endpoint. */
+                description: string | null
+                /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
+                enabled: boolean
+                /**
+                 * @description List of subscribed events for which to receive the webhook event.
+                 * @example [
+                 *       {
+                 *         "type": "v1.project.paused"
+                 *       }
+                 *     ]
+                 */
+                event_types: {
+                  /**
+                   * @description Webhook event type.
+                   * @enum {string}
+                   */
+                  type:
+                    | 'v1.project.paused'
+                    | 'v1.project.created'
+                    | 'v1.project.restored'
+                    | 'v1.project.transferred'
+                    | 'v1.project.removed'
+                    | 'v1.project.restarted'
+                    | 'v1.project.status.changed'
+                    | 'v1.project.backup.started'
+                    | 'v1.project.branch.created'
+                    | 'v1.project.branch.updated'
+                    | 'v1.project.branch.removed'
+                    | 'v1.organization.member.invitation.created'
+                    | 'v1.organization.member.invitation.canceled'
+                    | 'v1.organization.member.added'
+                    | 'v1.organization.member.removed'
+                    | 'v1.organization.member.role.assigned'
+                    | 'v1.organization.member.role.removed'
+                    | 'v1.organization.member.role.updated'
+                    | 'v1.organization.billing.plan.upgraded'
+                    | 'v1.organization.billing.plan.downgraded'
+                    | '*'
+                }[]
+                /**
+                 * Format: uuid
+                 * @description Identifier of an endpoint (UUID v7).
+                 */
+                id: string
+                /**
+                 * Format: uri
+                 * @description Publicly available URL where to send the events, must use a domain and be resolvable to a non-reserved IP address.
+                 * @example https://mydomain.com/path/to/handler
+                 */
+                url: string
+              }
+              /**
+               * Format: uuid
+               * @description Identifier of an endpoint (UUID v7).
+               */
+              id: string
+              /**
+               * @description Resource type.
+               * @constant
+               */
+              type: 'endpoint'
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_slug'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid organization slug'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_ref'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid project ref'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericUnauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'unauthorized'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Unauthorized'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'forbidden.permission_denied'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Permission denied'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'forbidden.access_disabled'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Access disabled'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description EndpointNotFound */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'not_found.endpoint'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Not Found: Endpoint not found'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericRequestTimeout */
+      408: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'request_timeout'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Request Timeout'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericTooManyRequests */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'too_many_requests'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Too Many Requests'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericInternalServerError */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'internal_server_error'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Internal Server Error'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+    }
+  }
+  'v2-projects-ref-webhooks-endpoints-id-delete': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Identifier of an endpoint (UUID v7). */
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Deleted endpoint details */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data: {
+              attributes: {
+                /**
+                 * Format: date-time
+                 * @description Timestamp of endpoint's creation.
+                 */
+                created_at: string
+                /**
+                 * Format: uuid
+                 * @description ID of the user who created the endpoint.
+                 */
+                created_by: string
+                /**
+                 * @description Additional request headers to pass when performing HTTP request location defined by `url`. Both keys and values must be strings and a valid HTTP headers.
+                 * @example {
+                 *       "Authorization": "Bearer example_token"
+                 *     }
+                 */
+                custom_headers?: {
+                  [key: string]: string
+                } | null
+                /** @description Optional description for the endpoint. */
+                description: string | null
+                /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
+                enabled: boolean
+                /**
+                 * @description List of subscribed events for which to receive the webhook event.
+                 * @example [
+                 *       {
+                 *         "type": "v1.project.paused"
+                 *       }
+                 *     ]
+                 */
+                event_types: {
+                  /**
+                   * @description Webhook event type.
+                   * @enum {string}
+                   */
+                  type:
+                    | 'v1.project.paused'
+                    | 'v1.project.created'
+                    | 'v1.project.restored'
+                    | 'v1.project.transferred'
+                    | 'v1.project.removed'
+                    | 'v1.project.restarted'
+                    | 'v1.project.status.changed'
+                    | 'v1.project.backup.started'
+                    | 'v1.project.branch.created'
+                    | 'v1.project.branch.updated'
+                    | 'v1.project.branch.removed'
+                    | 'v1.organization.member.invitation.created'
+                    | 'v1.organization.member.invitation.canceled'
+                    | 'v1.organization.member.added'
+                    | 'v1.organization.member.removed'
+                    | 'v1.organization.member.role.assigned'
+                    | 'v1.organization.member.role.removed'
+                    | 'v1.organization.member.role.updated'
+                    | 'v1.organization.billing.plan.upgraded'
+                    | 'v1.organization.billing.plan.downgraded'
+                    | '*'
+                }[]
+                /**
+                 * Format: uuid
+                 * @description Identifier of an endpoint (UUID v7).
+                 */
+                id: string
+                /**
+                 * Format: uri
+                 * @description Publicly available URL where to send the events, must use a domain and be resolvable to a non-reserved IP address.
+                 * @example https://mydomain.com/path/to/handler
+                 */
+                url: string
+              }
+              /**
+               * Format: uuid
+               * @description Identifier of an endpoint (UUID v7).
+               */
+              id: string
+              /**
+               * @description Resource type.
+               * @constant
+               */
+              type: 'endpoint'
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_slug'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid organization slug'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_ref'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid project ref'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericUnauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'unauthorized'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Unauthorized'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'forbidden.permission_denied'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Permission denied'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'forbidden.access_disabled'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Access disabled'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description EndpointNotFound */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'not_found.endpoint'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Not Found: Endpoint not found'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericRequestTimeout */
+      408: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'request_timeout'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Request Timeout'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericTooManyRequests */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'too_many_requests'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Too Many Requests'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericInternalServerError */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'internal_server_error'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Internal Server Error'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+    }
+  }
+  'v2-projects-ref-webhooks-endpoints-id-patch': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Identifier of an endpoint (UUID v7). */
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          data: {
+            attributes: {
+              /**
+               * @description Additional request headers to pass when performing HTTP request location defined by `url`. Both keys and values must be strings and a valid HTTP headers.
+               * @example {
+               *       "Authorization": "Bearer example_token"
+               *     }
+               */
+              custom_headers?: {
+                [key: string]: string
+              } | null
+              /** @description Optional description for the endpoint. */
+              description?: string | null
+              /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
+              enabled?: boolean
+              /**
+               * @description List of subscribed events for which to receive the webhook event.
+               * @example [
+               *       {
+               *         "type": "v1.project.paused"
+               *       }
+               *     ]
+               */
+              event_types?: {
+                /**
+                 * @description Webhook event type.
+                 * @enum {string}
+                 */
+                type:
+                  | 'v1.project.paused'
+                  | 'v1.project.created'
+                  | 'v1.project.restored'
+                  | 'v1.project.transferred'
+                  | 'v1.project.removed'
+                  | 'v1.project.restarted'
+                  | 'v1.project.status.changed'
+                  | 'v1.project.backup.started'
+                  | 'v1.project.branch.created'
+                  | 'v1.project.branch.updated'
+                  | 'v1.project.branch.removed'
+                  | 'v1.organization.member.invitation.created'
+                  | 'v1.organization.member.invitation.canceled'
+                  | 'v1.organization.member.added'
+                  | 'v1.organization.member.removed'
+                  | 'v1.organization.member.role.assigned'
+                  | 'v1.organization.member.role.removed'
+                  | 'v1.organization.member.role.updated'
+                  | 'v1.organization.billing.plan.upgraded'
+                  | 'v1.organization.billing.plan.downgraded'
+                  | '*'
+              }[]
+              /** @description Secret key to use when signing. All events will be signed according to the [Standard Webhooks](https://www.standardwebhooks.com/) specification. */
+              signing_secret?: string
+              /**
+               * Format: uri
+               * @description Publicly available URL where to send the events, must use a domain and be resolvable to a non-reserved IP address.
+               * @example https://mydomain.com/path/to/handler
+               */
+              url?: string
+            }
+            /**
+             * @description Resource type.
+             * @constant
+             */
+            type: 'endpoint'
+          }
+        }
+      }
+    }
+    responses: {
+      /** @description Updated endpoint details */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data: {
+              attributes: {
+                /**
+                 * Format: date-time
+                 * @description Timestamp of endpoint's creation.
+                 */
+                created_at: string
+                /**
+                 * Format: uuid
+                 * @description ID of the user who created the endpoint.
+                 */
+                created_by: string
+                /**
+                 * @description Additional request headers to pass when performing HTTP request location defined by `url`. Both keys and values must be strings and a valid HTTP headers.
+                 * @example {
+                 *       "Authorization": "Bearer example_token"
+                 *     }
+                 */
+                custom_headers?: {
+                  [key: string]: string
+                } | null
+                /** @description Optional description for the endpoint. */
+                description: string | null
+                /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
+                enabled: boolean
+                /**
+                 * @description List of subscribed events for which to receive the webhook event.
+                 * @example [
+                 *       {
+                 *         "type": "v1.project.paused"
+                 *       }
+                 *     ]
+                 */
+                event_types: {
+                  /**
+                   * @description Webhook event type.
+                   * @enum {string}
+                   */
+                  type:
+                    | 'v1.project.paused'
+                    | 'v1.project.created'
+                    | 'v1.project.restored'
+                    | 'v1.project.transferred'
+                    | 'v1.project.removed'
+                    | 'v1.project.restarted'
+                    | 'v1.project.status.changed'
+                    | 'v1.project.backup.started'
+                    | 'v1.project.branch.created'
+                    | 'v1.project.branch.updated'
+                    | 'v1.project.branch.removed'
+                    | 'v1.organization.member.invitation.created'
+                    | 'v1.organization.member.invitation.canceled'
+                    | 'v1.organization.member.added'
+                    | 'v1.organization.member.removed'
+                    | 'v1.organization.member.role.assigned'
+                    | 'v1.organization.member.role.removed'
+                    | 'v1.organization.member.role.updated'
+                    | 'v1.organization.billing.plan.upgraded'
+                    | 'v1.organization.billing.plan.downgraded'
+                    | '*'
+                }[]
+                /**
+                 * Format: uuid
+                 * @description Identifier of an endpoint (UUID v7).
+                 */
+                id: string
+                /**
+                 * Format: uri
+                 * @description Publicly available URL where to send the events, must use a domain and be resolvable to a non-reserved IP address.
+                 * @example https://mydomain.com/path/to/handler
+                 */
+                url: string
+              }
+              /**
+               * Format: uuid
+               * @description Identifier of an endpoint (UUID v7).
+               */
+              id: string
+              /**
+               * @description Resource type.
+               * @constant
+               */
+              type: 'endpoint'
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_slug'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid organization slug'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_ref'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid project ref'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericUnauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'unauthorized'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Unauthorized'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'forbidden.permission_denied'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Permission denied'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'forbidden.access_disabled'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Access disabled'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description EndpointNotFound */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'not_found.endpoint'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Not Found: Endpoint not found'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericRequestTimeout */
+      408: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'request_timeout'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Request Timeout'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericTooManyRequests */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'too_many_requests'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Too Many Requests'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericInternalServerError */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'internal_server_error'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Internal Server Error'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+    }
+  }
+  'v2-projects-ref-webhooks-endpoints-id-deliveries-get': {
+    parameters: {
+      query?: {
+        /** @description Cursor in cursor-based pagination to return up to `page[size]` records after (exclusive) the entry specified by this query param. */
+        'page[after]'?: string
+        /** @description Cursor in cursor-based pagination to return up to `page[size]` records before (exclusive) the entry specified by this query param. */
+        'page[before]'?: string
+        /** @description Up to how many records to return. */
+        'page[size]'?: string
+      }
+      header?: never
+      path: {
+        /** @description Identifier of an endpoint (UUID v7). */
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description List of deliveries */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data: {
+              attributes: {
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the attempt.
+                 */
+                attempt_timestamp: string
+                /**
+                 * Format: uuid
+                 * @description Identifier of the event, which triggered the delivery (UUID v7).
+                 */
+                event_id: string
+                /**
+                 * Format: uuid
+                 * @description Identifier of a delivery (UUID v7).
+                 */
+                id: string
+                response_body:
+                  | (
+                      | {
+                          [key: string]: string
+                        }
+                      | string
+                    )
+                  | null
+                /** @description HTTP status code of the response, `0` if unavailable. */
+                response_code: number
+                /** @description HTTP headers of the response, `{}` if unavailable. */
+                response_headers: {
+                  [key: string]: string
+                } | null
+                /**
+                 * @description Status of the delivery attempt.
+                 * @enum {string}
+                 */
+                status: 'pending' | 'success' | 'failure' | 'skipped'
+              }
+              /**
+               * Format: uuid
+               * @description Identifier of a delivery (UUID v7).
+               */
+              id: string
+              /**
+               * @description Resource type.
+               * @constant
+               */
+              type: 'delivery'
+            }[]
+            links: {
+              /**
+               * @description URL path to the first page if available.
+               * @example /v2/organizations/slug/webhooks/endpoints/{id}/deliveries?page[size]=10
+               */
+              first?: string | null
+              /**
+               * @description URL path to the last page if available.
+               * @example /v2/organizations/slug/webhooks/endpoints/{id}/deliveries?page[size]=10&page[after]=019adf7d-4513-71ba-b264-21900edb4295
+               */
+              last?: string | null
+              /**
+               * @description URL path to the next page.
+               * @example /v2/organizations/slug/webhooks/endpoints/{id}/deliveries?page[size]=10&page[after]=019adf7d-4513-7062-b292-78b86cc470a4
+               */
+              next: string | null
+              /**
+               * @description URL path to the previous page.
+               * @example /v2/organizations/slug/webhooks/endpoints/{id}/deliveries?page[size]=10&page[before]=019adf7d-4513-74c5-bb9a-f1bc0f7a95d7
+               */
+              prev: string | null
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_slug'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid organization slug'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_ref'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid project ref'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericUnauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'unauthorized'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Unauthorized'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'forbidden.permission_denied'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Permission denied'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'forbidden.access_disabled'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Access disabled'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description EndpointNotFound */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'not_found.endpoint'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Not Found: Endpoint not found'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericRequestTimeout */
+      408: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'request_timeout'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Request Timeout'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericTooManyRequests */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'too_many_requests'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Too Many Requests'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericInternalServerError */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'internal_server_error'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Internal Server Error'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+    }
+  }
+  'v2-projects-ref-webhooks-endpoints-id-test-post': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Identifier of an endpoint (UUID v7). */
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          data?: {
+            attributes: {
+              /**
+               * @description Webhook event type.
+               * @enum {string}
+               */
+              type:
+                | 'v1.project.paused'
+                | 'v1.project.created'
+                | 'v1.project.restored'
+                | 'v1.project.transferred'
+                | 'v1.project.removed'
+                | 'v1.project.restarted'
+                | 'v1.project.status.changed'
+                | 'v1.project.backup.started'
+                | 'v1.project.branch.created'
+                | 'v1.project.branch.updated'
+                | 'v1.project.branch.removed'
+                | 'v1.organization.member.invitation.created'
+                | 'v1.organization.member.invitation.canceled'
+                | 'v1.organization.member.added'
+                | 'v1.organization.member.removed'
+                | 'v1.organization.member.role.assigned'
+                | 'v1.organization.member.role.removed'
+                | 'v1.organization.member.role.updated'
+                | 'v1.organization.billing.plan.upgraded'
+                | 'v1.organization.billing.plan.downgraded'
+                | 'project.v1.paused'
+                | 'project.v1.created'
+                | 'project.v1.restored'
+                | 'project.v1.transferred'
+                | 'project.v1.removed'
+                | 'project.v1.restarted'
+                | 'project.v1.status.changed'
+                | 'project.v1.backup.started'
+                | 'project.v1.branch.created'
+                | 'project.v1.branch.updated'
+                | 'project.v1.branch.removed'
+                | 'organization.v1.member.invitation.created'
+                | 'organization.v1.member.invitation.canceled'
+                | 'organization.v1.member.added'
+                | 'organization.v1.member.removed'
+                | 'organization.v1.member.role.assigned'
+                | 'organization.v1.member.role.removed'
+                | 'organization.v1.member.role.updated'
+                | 'organization.v1.billing.plan.upgraded'
+                | 'organization.v1.billing.plan.downgraded'
+                | 'project.v1.branch.deleted'
+            }
+            /**
+             * @description Resource type.
+             * @constant
+             */
+            type: 'event'
+          }
+        }
+      }
+    }
+    responses: {
+      /** @description Event published */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data: {
+              id: string
+              /**
+               * @description Resource type.
+               * @constant
+               */
+              type: 'ingress'
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'bad_request.endpoint.test.disabled'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Endpoint is disabled'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'bad_request.endpoint.test.wrong_event_type'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Provided event type is not subscribed to by the endpoint'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_slug'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid organization slug'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'bad_request.invalid_ref'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Bad Request: Invalid project ref'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericUnauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'unauthorized'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Unauthorized'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'forbidden.permission_denied'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Permission denied'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'forbidden.access_disabled'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Forbidden: Access disabled'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description EndpointNotFound */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'not_found.endpoint'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Not Found: Endpoint not found'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericRequestTimeout */
+      408: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'request_timeout'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Request Timeout'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericTooManyRequests */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'too_many_requests'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Too Many Requests'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericInternalServerError */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'internal_server_error'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Internal Server Error'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+    }
+  }
   'v2-list-all-workers': {
     parameters: {
       query?: never
@@ -2932,7 +12096,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V2ListWorkersResponse']
+          'application/json': components['schemas']['V2ListWorkersResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -2982,7 +12146,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V2WorkerResponse']
+          'application/json': components['schemas']['V2WorkerResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -3084,7 +12248,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V2WorkerResponse']
+          'application/json': components['schemas']['V2WorkerResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -3134,7 +12298,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V2WorkerUploadResponse']
+          'application/json': components['schemas']['V2WorkerUploadResponse_Output']
         }
       }
       /** @description Unauthorized */

@@ -2,8 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import type { components } from 'api-types'
 
 import {
-  buildBigQueryApiConfig,
-  buildDucklakeApiConfig,
+  buildCreateDestinationApiConfig,
   DestinationConfig,
   TableSyncCopyConfig,
 } from './create-destination-pipeline-mutation'
@@ -41,76 +40,10 @@ async function validateDestination(
 ): Promise<ValidateDestinationResponse> {
   if (!projectRef) throw new Error('projectRef is required')
 
-  // Build destination_config based on the type
-  let config: components['schemas']['ValidateDestinationBody']['config']
+  const config: components['schemas']['ValidateDestinationBody']['config'] =
+    buildCreateDestinationApiConfig(destinationConfig)
 
-  if ('bigQuery' in destinationConfig) {
-    config = buildBigQueryApiConfig(
-      destinationConfig.bigQuery
-    ) as components['schemas']['ValidateDestinationBody']['config']
-  } else if ('iceberg' in destinationConfig) {
-    const {
-      projectRef: icebergProjectRef,
-      namespace,
-      warehouseName,
-      catalogToken,
-      s3AccessKeyId,
-      s3SecretAccessKey,
-      s3Region,
-    } = destinationConfig.iceberg
-
-    config = {
-      iceberg: {
-        supabase: {
-          namespace,
-          project_ref: icebergProjectRef,
-          warehouse_name: warehouseName,
-          catalog_token: catalogToken,
-          s3_access_key_id: s3AccessKeyId,
-          s3_secret_access_key: s3SecretAccessKey,
-          s3_region: s3Region,
-        },
-      },
-    }
-  } else if ('ducklake' in destinationConfig) {
-    config = buildDucklakeApiConfig(
-      destinationConfig.ducklake
-    ) as components['schemas']['ValidateDestinationBody']['config']
-  } else if ('snowflake' in destinationConfig) {
-    const { accountId, user, privateKey, privateKeyPassphrase, database, schema, role } =
-      destinationConfig.snowflake
-
-    config = {
-      snowflake: {
-        account_id: accountId,
-        user,
-        private_key: privateKey,
-        private_key_passphrase: privateKeyPassphrase,
-        database,
-        schema,
-        role,
-      },
-    } as components['schemas']['ValidateDestinationBody']['config']
-  } else if ('clickHouse' in destinationConfig) {
-    const { url, user, password, database, engine } = destinationConfig.clickHouse
-
-    config = {
-      clickhouse: {
-        url,
-        user,
-        password,
-        database,
-        engine,
-      },
-    } as components['schemas']['ValidateDestinationBody']['config']
-  } else {
-    throw new Error(
-      'Invalid destination config: must specify bigQuery, iceberg, ducklake, snowflake, or clickHouse'
-    )
-  }
-
-  const batchConfig = maxFillMs !== undefined ? { max_fill_ms: maxFillMs } : undefined
-  const pipelineConfig =
+  const pipelineConfig: components['schemas']['ValidateDestinationBody']['pipeline_config'] =
     publicationName === undefined
       ? undefined
       : {
@@ -119,7 +52,7 @@ async function validateDestination(
           max_copy_connections_per_table: maxCopyConnectionsPerTable,
           invalidated_slot_behavior: invalidatedSlotBehavior,
           table_sync_copy: tableSyncCopy,
-          batch: batchConfig,
+          batch: maxFillMs === undefined ? undefined : { max_fill_ms: maxFillMs },
         }
 
   const { data, error } = await post('/platform/replication/{ref}/destinations/validate', {
@@ -133,7 +66,7 @@ async function validateDestination(
   })
 
   if (error) handleError(error)
-  return data as ValidateDestinationResponse
+  return data
 }
 
 type ValidateDestinationData = Awaited<ReturnType<typeof validateDestination>>

@@ -5424,6 +5424,8 @@ export interface components {
             | 'extension'
             | 'compliance'
             | 'health'
+        } & {
+          [key: string]: unknown
         }
         /** @enum {string} */
         name:

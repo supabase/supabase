@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { queryOptions, useQuery } from '@tanstack/react-query'
 
 import { REPLICATION_METADATA_FRESHNESS_MS } from './constants'
 import { replicationKeys } from './keys'
@@ -32,17 +32,24 @@ export type ReplicationPublicationNamesData = Awaited<
   ReturnType<typeof fetchReplicationPublicationNames>
 >
 
-export const useReplicationPublicationNamesQuery = <TData = ReplicationPublicationNamesData>(
+type ReplicationPublicationNamesQueryOptions<TData> = Omit<
+  UseCustomQueryOptions<ReplicationPublicationNamesData, ResponseError, TData>,
+  'enabled'
+> & { enabled?: boolean }
+
+export const replicationPublicationNamesQueryOptions = <TData = ReplicationPublicationNamesData>(
   { projectRef, sourceId }: ReplicationPublicationNamesParams,
-  {
-    enabled = true,
-    ...options
-  }: UseCustomQueryOptions<ReplicationPublicationNamesData, ResponseError, TData> = {}
+  { enabled = true, ...options }: ReplicationPublicationNamesQueryOptions<TData> = {}
 ) =>
-  useQuery<ReplicationPublicationNamesData, ResponseError, TData>({
+  queryOptions<ReplicationPublicationNamesData, ResponseError, TData>({
     queryKey: replicationKeys.publicationNames(projectRef, sourceId),
     queryFn: ({ signal }) => fetchReplicationPublicationNames({ projectRef, sourceId }, signal),
     enabled: enabled && typeof projectRef !== 'undefined' && typeof sourceId !== 'undefined',
     staleTime: REPLICATION_METADATA_FRESHNESS_MS,
     ...options,
   })
+
+export const useReplicationPublicationNamesQuery = <TData = ReplicationPublicationNamesData>(
+  { projectRef, sourceId }: ReplicationPublicationNamesParams,
+  options: ReplicationPublicationNamesQueryOptions<TData> = {}
+) => useQuery(replicationPublicationNamesQueryOptions({ projectRef, sourceId }, options))

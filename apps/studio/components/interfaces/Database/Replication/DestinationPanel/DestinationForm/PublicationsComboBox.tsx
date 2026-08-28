@@ -48,10 +48,10 @@ export const PublicationsComboBox = ({
     refetch: refetchPublications,
   } = useReplicationPublicationNamesQuery({ projectRef, sourceId })
   const isLoadingPublications = isPending || isFetching
-  const showLoadingState = isLoadingPublications && publications.length === 0
-  const showErrorState = isError && publications.length === 0
-  const refreshPublicationsOnOpen = useRefreshOnOpen({
-    enabled: projectRef !== undefined && sourceId !== undefined,
+  const isLoadingStateVisible = isLoadingPublications && publications.length === 0
+  const isErrorStateVisible = isError && publications.length === 0
+  const { handleOpenChange: handleRefreshPublicationsOnOpen } = useRefreshOnOpen({
+    isEnabled: projectRef !== undefined && sourceId !== undefined,
     refetch: refetchPublications,
   })
 
@@ -71,7 +71,7 @@ export const PublicationsComboBox = ({
       open={dropdownOpen}
       onOpenChange={(open) => {
         setDropdownOpen(open)
-        refreshPublicationsOnOpen(open)
+        handleRefreshPublicationsOnOpen(open)
 
         if (!open && field?.onBlur) {
           setSearchTerm('')
@@ -103,14 +103,14 @@ export const PublicationsComboBox = ({
             onValueChange={setSearchTerm}
           />
           <CommandList>
-            {!showLoadingState && !showErrorState && publications.length > 0 && (
+            {!isLoadingStateVisible && !isErrorStateVisible && publications.length > 0 && (
               <CommandEmpty>No publications found</CommandEmpty>
             )}
 
             <SelectionListState
-              loading={showLoadingState}
-              error={showErrorState}
-              empty={!showLoadingState && !showErrorState && publications.length === 0}
+              loading={isLoadingStateVisible}
+              error={isErrorStateVisible}
+              empty={!isLoadingStateVisible && !isErrorStateVisible && publications.length === 0}
               emptyLabel="No publications available"
               errorLabel="Unable to load publications"
               skeletonVariant="command"

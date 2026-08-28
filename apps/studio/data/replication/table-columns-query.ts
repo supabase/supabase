@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { queryOptions, useQuery } from '@tanstack/react-query'
 
 import { replicationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
@@ -30,14 +30,16 @@ async function fetchReplicationTableColumns(
 
 export type ReplicationTableColumnsData = Awaited<ReturnType<typeof fetchReplicationTableColumns>>
 
-export const useReplicationTableColumnsQuery = <TData = ReplicationTableColumnsData>(
+type ReplicationTableColumnsQueryOptions<TData> = Omit<
+  UseCustomQueryOptions<ReplicationTableColumnsData, ResponseError, TData>,
+  'enabled'
+> & { enabled?: boolean }
+
+export const replicationTableColumnsQueryOptions = <TData = ReplicationTableColumnsData>(
   { projectRef, sourceId, tableId }: ReplicationTableColumnsParams,
-  {
-    enabled = true,
-    ...options
-  }: UseCustomQueryOptions<ReplicationTableColumnsData, ResponseError, TData> = {}
+  { enabled = true, ...options }: ReplicationTableColumnsQueryOptions<TData> = {}
 ) =>
-  useQuery<ReplicationTableColumnsData, ResponseError, TData>({
+  queryOptions<ReplicationTableColumnsData, ResponseError, TData>({
     queryKey: replicationKeys.tableColumns(projectRef, sourceId, tableId),
     queryFn: ({ signal }) =>
       fetchReplicationTableColumns({ projectRef, sourceId, tableId }, signal),
@@ -48,3 +50,8 @@ export const useReplicationTableColumnsQuery = <TData = ReplicationTableColumnsD
       typeof tableId !== 'undefined',
     ...options,
   })
+
+export const useReplicationTableColumnsQuery = <TData = ReplicationTableColumnsData>(
+  { projectRef, sourceId, tableId }: ReplicationTableColumnsParams,
+  options: ReplicationTableColumnsQueryOptions<TData> = {}
+) => useQuery(replicationTableColumnsQueryOptions({ projectRef, sourceId, tableId }, options))

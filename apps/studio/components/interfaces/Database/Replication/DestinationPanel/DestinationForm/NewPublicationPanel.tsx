@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { useMemo } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -21,7 +21,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
 import { z } from 'zod'
 
-import { useRefreshOnOpen } from './useRefreshOnOpen'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useCreatePublicationMutation } from '@/data/replication/publication-create-mutation'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
@@ -49,24 +48,20 @@ const defaultValues: FormValues = {
 export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelProps) => {
   const { ref: projectRef } = useParams()
   const sourceId = useReplicationSourceId({ projectRef })
+  const [isTableSelectorOpen, setIsTableSelectorOpen] = useState(false)
 
   const {
     data: tables = [],
     isFetching,
     isError,
-    refetch: refetchTables,
-  } = useReplicationTablesQuery({ projectRef, sourceId }, { enabled: false })
-  const isLoadingTables = isFetching && tables.length === 0
-  const tableLabelsById = useMemo(
-    () =>
-      new Map(tables.map((table) => [String(table.id), `${table.schema}.${table.name}`] as const)),
-    [tables]
+  } = useReplicationTablesQuery(
+    { projectRef, sourceId },
+    { enabled: visible && isTableSelectorOpen }
   )
-
-  const refreshTablesOnOpen = useRefreshOnOpen({
-    enabled: visible && sourceId !== undefined,
-    refetch: refetchTables,
-  })
+  const isLoadingTables = isFetching && tables.length === 0
+  const tableLabelsById = new Map(
+    tables.map((table) => [String(table.id), `${table.schema}.${table.name}`] as const)
+  )
 
   const form = useForm<FormValues>({
     mode: 'onBlur',
@@ -80,6 +75,7 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
   const { isDirty } = form.formState
 
   const closePanel = (newPublication?: string) => {
+    setIsTableSelectorOpen(false)
     form.reset(defaultValues)
     onClose(newPublication)
   }
@@ -89,7 +85,7 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
     onClose: () => closePanel(),
   })
 
-  const { mutate: createPublication, isPending: creatingPublication } =
+  const { mutate: createPublication, isPending: isCreatingPublication } =
     useCreatePublicationMutation({
       onSuccess: (_, vars) => {
         toast.success('Successfully created publication')
@@ -153,8 +149,8 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
                           <MultiSelector
                             values={field.value}
                             onValuesChange={field.onChange}
-                            disabled={creatingPublication}
-                            onOpenChange={refreshTablesOnOpen}
+                            disabled={isCreatingPublication}
+                            onOpenChange={setIsTableSelectorOpen}
                           >
                             <MultiSelector.Trigger
                               aria-label="Select publication tables"
@@ -186,10 +182,15 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
               </Form>
             </SheetSection>
             <SheetFooter>
-              <Button variant="default" disabled={creatingPublication} onClick={confirmOnClose}>
+              <Button variant="default" disabled={isCreatingPublication} onClick={confirmOnClose}>
                 Cancel
               </Button>
-              <Button variant="primary" loading={creatingPublication} form={FORM_ID} type="submit">
+              <Button
+                variant="primary"
+                loading={isCreatingPublication}
+                form={FORM_ID}
+                type="submit"
+              >
                 Create publication
               </Button>
             </SheetFooter>

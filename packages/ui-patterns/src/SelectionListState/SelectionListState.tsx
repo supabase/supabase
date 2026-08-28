@@ -21,20 +21,28 @@ export const SelectionListState = ({
   loading = false,
   skeletonVariant = 'select',
 }: SelectionListStateProps) => {
-  if (loading) {
-    return (
-      <GenericSelectionSkeletonLoader
-        className={cn('w-full', className)}
-        variant={skeletonVariant}
-      />
-    )
-  }
-
-  if (!error && !empty) return null
+  let statusLabel: string | undefined
+  if (!loading && error) statusLabel = errorLabel
+  if (!loading && !error && empty) statusLabel = emptyLabel
 
   return (
-    <div className={cn('px-2 py-3 text-xs text-foreground-lighter', className)}>
-      {error ? errorLabel : emptyLabel}
-    </div>
+    <>
+      {loading && (
+        <GenericSelectionSkeletonLoader
+          className={cn('w-full', className)}
+          variant={skeletonVariant}
+        />
+      )}
+      <div
+        aria-live="polite"
+        className={cn(
+          'px-2 py-3 text-xs text-foreground-lighter',
+          statusLabel === undefined && 'sr-only',
+          className
+        )}
+      >
+        {statusLabel}
+      </div>
+    </>
   )
 }

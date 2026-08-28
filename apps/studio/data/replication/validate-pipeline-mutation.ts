@@ -35,7 +35,7 @@ async function validatePipeline(
 
   const batchConfig = maxFillMs !== undefined ? { max_fill_ms: maxFillMs } : undefined
 
-  const config = {
+  const config: components['schemas']['ValidatePipelineBody']['config'] = {
     publication_name: publicationName,
     max_table_sync_workers: maxTableSyncWorkers,
     max_copy_connections_per_table: maxCopyConnectionsPerTable,
@@ -48,13 +48,13 @@ async function validatePipeline(
     params: { path: { ref: projectRef } },
     body: {
       source_id: sourceId,
-      config: config as components['schemas']['ValidatePipelineBody']['config'],
+      config,
     },
     signal,
   })
 
   if (error) handleError(error)
-  return data as ValidatePipelineResponse
+  return data
 }
 
 type ValidatePipelineData = Awaited<ReturnType<typeof validatePipeline>>
