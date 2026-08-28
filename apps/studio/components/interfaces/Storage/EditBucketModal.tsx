@@ -108,6 +108,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
 
   const { mutate: updateBucket, isPending: isUpdating } = useBucketUpdateMutation({
     onSuccess: () => {
+      setPendingSuspendValues(null)
       if (enabledVersioningRef.current !== null) {
         track('storage_bucket_versioning_enabled', enabledVersioningRef.current)
         enabledVersioningRef.current = null
@@ -116,6 +117,9 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
       onClose()
     },
     onError: (error) => {
+      // Release the suspend dialog too, so a failed save doesn't trap the user in it.
+      setPendingSuspendValues(null)
+
       // Handle specific error cases for inline display
       const errorMessage = error.message?.toLowerCase() || ''
 
@@ -518,15 +522,17 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
       </Dialog>
 
       <ConfirmationModal
+        variant="warning"
         visible={pendingSuspendValues !== null}
         title="Suspend object versioning?"
         confirmLabel="Suspend versioning"
+        confirmLabelLoading="Suspending versioning..."
         loading={isUpdating}
         onCancel={() => setPendingSuspendValues(null)}
+        // Cleared by the mutation's `onSuccess`/`onError` rather than here, so the
+        // dialog stays up showing its loading state while the save is in flight.
         onConfirm={() => {
-          if (pendingSuspendValues === null) return
-          persistChanges(pendingSuspendValues)
-          setPendingSuspendValues(null)
+          if (pendingSuspendValues !== null) persistChanges(pendingSuspendValues)
         }}
       >
         <p className="text-sm text-foreground-light">
