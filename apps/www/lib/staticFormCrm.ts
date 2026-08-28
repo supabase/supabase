@@ -10,10 +10,6 @@ import type { GoFormCrmConfig } from 'marketing'
 export const staticFormCrmRegistry: Record<string, GoFormCrmConfig> = {
   'partners/become-a-partner': {
     hubspot: {
-      // TODO: set HUBSPOT_PARTNER_INTAKE_FORM_GUID to
-      // '652a3eed-8d06-45fb-9376-f5aeb0e3f5dc' (portal 19953346) — the real
-      // "Become a Partner" form, confirmed against the live HubSpot schema.
-      // This env var is currently unset, so the HubSpot leg no-ops today.
       formGuid: process.env.HUBSPOT_PARTNER_INTAKE_FORM_GUID ?? '',
       fieldMap: {
         first_name: 'firstname',
@@ -39,12 +35,7 @@ export const staticFormCrmRegistry: Record<string, GoFormCrmConfig> = {
         startup_capital_deployment:
           'do_you_deploy_capital_into_your_portfoliocohort_if_so_how_much',
         additional_details: 'any_other_details_youd_like_us_to_know',
-        // `email` and `integration_readiness` are omitted — their app field
-        // name already matches the HubSpot property name exactly.
       },
     },
-    // TODO(DEBR-271): add Notion once a real Tech Partner Intake database_id
-    // exists and NOTION_FORMS_API_KEY is set — gate to Technology partners only,
-    // e.g. sendWhen: { field: 'partner_type', equals: 'Tech Partner' }.
   },
 }
