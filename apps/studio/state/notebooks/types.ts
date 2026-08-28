@@ -11,6 +11,7 @@ export interface Notebook {
   owner_id: number
   project_id: number
   content?: Notebooks.Content // Undefined until loaded
+  updated_at?: string // Absent for a notebook that's never been saved
 }
 
 export interface StateNotebook {

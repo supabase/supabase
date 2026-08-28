@@ -6,6 +6,7 @@ import {
   evictNotebookFromCaches,
   hasDiscardableChanges,
 } from '@/data/content/notebooks/notebook-cache'
+import { hasNotebookDraft } from '@/state/notebooks/notebook-drafts'
 import { notebooksState, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { TabsStateContext, type Tab } from '@/state/tabs'
 
@@ -36,19 +37,6 @@ export const ExplorerNotebookTabCoordinator = () => {
   const tabs = useContext(TabsStateContext)
 
   useEffect(() => {
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      const hasUnsaved = Object.values(notebooksState.notebooks).some(hasDiscardableChanges)
-      if (hasUnsaved) {
-        event.preventDefault()
-        event.returnValue = true
-      }
-    }
-
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-  }, [])
-
-  useEffect(() => {
     return tabs.registerTabTypeHandler('notebook', {
       onClose: (tab) => {
         const notebookId = tab.metadata?.notebookId
@@ -61,7 +49,13 @@ export const ExplorerNotebookTabCoordinator = () => {
           const notebookId = tab.metadata?.notebookId
           if (!notebookId) return false
 
-          return hasDiscardableChanges(notebooksState.notebooks[notebookId])
+          const stateNotebook = notebooksState.notebooks[notebookId]
+          if (stateNotebook) return hasDiscardableChanges(stateNotebook)
+
+          // The notebook was never loaded into the store this session (e.g. a background
+          // tab left over from before a refresh), so there's no status to check — fall
+          // back to whether a local draft for it exists at all.
+          return !!ref && hasNotebookDraft({ projectRef: ref, id: notebookId })
         }).length
 
         if (dirtyCount === 0) return null

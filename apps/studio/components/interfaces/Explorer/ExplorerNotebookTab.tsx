@@ -110,9 +110,9 @@ export const ExplorerNotebookTab = () => {
   const savedContentRef = useRef<typeof content>(undefined)
 
   const { mutate: updateNotebook, isPending: isUpdating } = useUpsertNotebookMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
       if (id && content === savedContentRef.current) {
-        snap.markSaved({ id })
+        snap.markSaved({ id, updatedAt: data?.updated_at })
         toast.success('Successfully saved notebook!')
         if (isSaveBeforeAnalyzeOpen) {
           setIsSaveBeforeAnalyzeOpen(false)
