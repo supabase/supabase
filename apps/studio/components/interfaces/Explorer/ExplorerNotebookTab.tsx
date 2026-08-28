@@ -366,6 +366,8 @@ export const ExplorerNotebookTab = () => {
           <ExplorerToolbarAction
             icon={<AiIconAnimation size={16} />}
             loading={isCreating}
+            disabled={cells.length === 0}
+            tooltip={cells.length === 0 ? 'Add a cell to the notebook to analyze it' : undefined}
             onClick={handleClickAnalyze}
           >
             Analyze
