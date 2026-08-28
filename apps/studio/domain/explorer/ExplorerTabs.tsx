@@ -1,21 +1,57 @@
 import { RegistryContext, useAtom, useAtomValue } from '@effect/atom-react'
 import { Match, Option } from 'effect'
 import { Plus, X } from 'lucide-react'
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import { Button } from 'ui'
 
+import type { NotebookId } from '../notebooks/notebook.schema'
+import { notebooksAtoms } from '../notebooks/notebooks.atoms'
 import { explorerTabs, type ExplorerTab } from './explorer.tabs'
+import { withProjectRef } from '@/domain/project/withProjectRef'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 
-const getTabLabel = (tab: ExplorerTab) =>
-  Match.value(tab).pipe(
+const LOADING_LABEL = 'Loading…'
+
+const useChatTabLabel = (chatId: string) =>
+  useAiAssistantStateSnapshot().chats[chatId]?.name ?? LOADING_LABEL
+
+const TabLabel = ({ tab, projectRef }: { tab: ExplorerTab; projectRef: string }) => {
+  return Match.value(tab).pipe(
     Match.tagsExhaustive({
       QueryTab: () => 'Query',
-      NotebookTab: (tab) => tab.label,
-      ChatTab: (tab) => tab.label,
+      NotebookTab: (data) => (
+        <NotebookTabLabel notebookId={data.notebookId} projectRef={projectRef} />
+      ),
+      ChatTab: (data) => <ChatTabLabel chatId={data.chatId} />,
     })
   )
+}
 
-export const ExplorerTabs = () => {
+/**
+ * Every notebook tab renders one of these regardless of whether it's the
+ * current tab, so this is what guarantees its name eventually loads.
+ */
+const NotebookTabLabel = ({
+  notebookId,
+  projectRef,
+}: {
+  notebookId: NotebookId
+  projectRef: string
+}) => {
+  const registry = useContext(RegistryContext)
+  const name = useAtomValue(notebooksAtoms.nameAtom(notebookId))
+
+  useEffect(() => {
+    if (name !== undefined) return
+    notebooksAtoms.loadNotebook(registry, projectRef, notebookId)
+  }, [name, projectRef, registry, notebookId])
+
+  return <>{name ?? LOADING_LABEL}</>
+}
+
+const ChatTabLabel = ({ chatId }: { chatId: string }) => <>{useChatTabLabel(chatId)}</>
+
+const ExplorerTabsInner = ({ projectRef }: { projectRef: string }) => {
   const tabs = useAtomValue(explorerTabs.tabsAtom)
   const [currentTabId, setCurrentTabId] = useAtom(explorerTabs.currentTabAtom)
   const registry = useContext(RegistryContext)
@@ -31,12 +67,12 @@ export const ExplorerTabs = () => {
           onClick={() => setCurrentTabId(tab.id)}
           onDoubleClick={() => explorerTabs.persistTab(registry, tab.id)}
         >
-          {getTabLabel(tab.data)}
+          <TabLabel tab={tab.data} projectRef={projectRef} />
           <Button
             variant="text"
             size="tiny"
             icon={<X size={12} />}
-            aria-label={`Close ${getTabLabel(tab.data)}`}
+            aria-label="Close tab"
             onClick={(e) => {
               e.stopPropagation()
               explorerTabs.closeTab(registry, tab.id)
@@ -54,3 +90,5 @@ export const ExplorerTabs = () => {
     </div>
   )
 }
+
+export const ExplorerTabs = withProjectRef(ExplorerTabsInner, null)

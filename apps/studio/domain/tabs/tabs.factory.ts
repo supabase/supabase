@@ -7,12 +7,12 @@ type RuntimeWithStorage = Atom.AtomRuntime<KeyValueStore>
 const TabId = Schema.String.pipe(Schema.brand('TabId'))
 type TabId = typeof TabId.Type
 
-const createTabSchema = <T>(schema: Schema.Codec<T>) =>
+const createTabSchema = <T, E = unknown>(schema: Schema.Codec<T, E>) =>
   Schema.Struct({
     id: TabId,
     data: schema,
   })
-type Tab<T> = { readonly id: TabId; readonly data: T }
+export type Tab<T> = { readonly id: TabId; readonly data: T }
 
 const findTab = <T>(tabs: ReadonlyArray<Tab<T>>, id: TabId) =>
   Array.findFirst(tabs, (tab) => tab.id === id)
@@ -24,10 +24,10 @@ const insertAt = <A>(items: ReadonlyArray<A>, index: number, item: A) => {
   )
 }
 
-const makePersistedTabsAtom = <T>(
+const makePersistedTabsAtom = <T, E = unknown>(
   runtime: RuntimeWithStorage,
   key: string,
-  schema: Schema.Codec<T>
+  schema: Schema.Codec<T, E>
 ) =>
   Atom.kvs({
     runtime,
@@ -106,16 +106,24 @@ const makeCurrentTabAtom = <T>(tabsAtom: TabsAtom<T>) => {
   )
 }
 
-export const tabsFactory = <T>(
+type CurrentTabAtom<T> = ReturnType<typeof makeCurrentTabAtom<T>>
+
+const makeCurrentTabDataAtom = <T>(tabsAtom: TabsAtom<T>, currentTabAtom: CurrentTabAtom<T>) =>
+  Atom.readable((get) =>
+    get(currentTabAtom).pipe(Option.flatMap((id) => findTab(get(tabsAtom), id)))
+  )
+
+export const tabsFactory = <T, E = unknown>(
   runtime: RuntimeWithStorage,
   key: string,
-  schema: Schema.Codec<T>
+  schema: Schema.Codec<T, E>
 ) => {
   const persistedTabsAtom = makePersistedTabsAtom(runtime, key, schema)
   const previewTabAtom = makePreviewTabAtom<T>()
   const orderAtom = makeOrderAtom(persistedTabsAtom, previewTabAtom)
   const tabsAtom = makeTabsAtom(orderAtom, persistedTabsAtom, previewTabAtom)
   const currentTabAtom = makeCurrentTabAtom(tabsAtom)
+  const currentTabDataAtom = makeCurrentTabDataAtom(tabsAtom, currentTabAtom)
 
   const addTab = (registry: AtomRegistry.AtomRegistry, data: T, index?: number) => {
     const id = TabId.make(crypto.randomUUID())
@@ -175,6 +183,7 @@ export const tabsFactory = <T>(
   return {
     tabsAtom,
     currentTabAtom,
+    currentTabDataAtom,
     addTab,
     persistTab,
     closeTab,

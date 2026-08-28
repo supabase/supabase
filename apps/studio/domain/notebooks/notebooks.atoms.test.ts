@@ -2,14 +2,15 @@ import { Effect, Layer, Option } from 'effect'
 import { Atom, AtomRegistry } from 'effect/unstable/reactivity'
 import { afterEach, describe, expect, it } from 'vitest'
 
-import { CellId, NotebookId, type NotebookContent } from './notebook.schema'
+import { CellId, NotebookId } from './notebook.schema'
 import {
+  GetNotebookError,
   ListNotebooksError,
   NotebooksApi,
-  type GetNotebookError,
   type GetNotebookParams,
   type ListNotebooksPage,
   type ListNotebooksParams,
+  type NotebookRecord,
   type SaveNotebookError,
   type SaveNotebookParams,
 } from './notebooks.api'
@@ -27,7 +28,7 @@ afterEach(() => {
 const setup = (
   overrides: Partial<{
     list: (params: ListNotebooksParams) => Effect.Effect<ListNotebooksPage, ListNotebooksError>
-    get: (params: GetNotebookParams) => Effect.Effect<NotebookContent, GetNotebookError>
+    get: (params: GetNotebookParams) => Effect.Effect<NotebookRecord, GetNotebookError>
     save: (params: SaveNotebookParams) => Effect.Effect<void, SaveNotebookError>
   }> = {}
 ) => {
@@ -116,15 +117,16 @@ describe('saveNotebook', () => {
 })
 
 describe('loadNotebook', () => {
-  it('loads content from the API and marks the notebook persisted', async () => {
+  it('loads content and name from the API and marks the notebook persisted', async () => {
     const { registry, atoms } = setup({
-      get: () => Effect.succeed({ cells: [] }),
+      get: () => Effect.succeed({ name: 'My notebook', content: { cells: [] } }),
     })
     const id = NotebookId.make('server-id')
 
     await atoms.loadNotebook(registry, 'project-ref', id)
 
     expect(registry.get(atoms.contentAtom(id))).toEqual({ cells: [] })
+    expect(registry.get(atoms.nameAtom(id))).toBe('My notebook')
     expect(registry.get(atoms.statusAtom(id))).toBe('saved')
   })
 
@@ -133,7 +135,7 @@ describe('loadNotebook', () => {
     const { registry, atoms } = setup({
       get: () => {
         calls += 1
-        return Effect.succeed({ cells: [] })
+        return Effect.succeed({ name: 'My notebook', content: { cells: [] } })
       },
     })
     const id = NotebookId.make('server-id')
@@ -142,6 +144,44 @@ describe('loadNotebook', () => {
     await atoms.loadNotebook(registry, 'project-ref', id)
 
     expect(calls).toBe(1)
+  })
+
+  it('shares one request across overlapping calls instead of firing one each', async () => {
+    let calls = 0
+    const { registry, atoms } = setup({
+      get: () => {
+        calls += 1
+        return Effect.succeed({ name: 'My notebook', content: { cells: [] } })
+      },
+    })
+    const id = NotebookId.make('server-id')
+
+    await Promise.all([
+      atoms.loadNotebook(registry, 'project-ref', id),
+      atoms.loadNotebook(registry, 'project-ref', id),
+    ])
+
+    expect(calls).toBe(1)
+    expect(registry.get(atoms.nameAtom(id))).toBe('My notebook')
+  })
+
+  it('retries after a failed load instead of caching the failure forever', async () => {
+    let calls = 0
+    const { registry, atoms } = setup({
+      get: () => {
+        calls += 1
+        return calls === 1
+          ? Effect.fail(new GetNotebookError({ cause: 'boom' }))
+          : Effect.succeed({ name: 'My notebook', content: { cells: [] } })
+      },
+    })
+    const id = NotebookId.make('server-id')
+
+    await expect(atoms.loadNotebook(registry, 'project-ref', id)).rejects.toThrow()
+    await atoms.loadNotebook(registry, 'project-ref', id)
+
+    expect(calls).toBe(2)
+    expect(registry.get(atoms.nameAtom(id))).toBe('My notebook')
   })
 })
 

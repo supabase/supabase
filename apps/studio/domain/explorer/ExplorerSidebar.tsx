@@ -8,7 +8,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { NotebookSummary } from '../notebooks/notebook.schema'
 import { notebooksAtoms } from '../notebooks/notebooks.atoms'
-import { explorerTabs } from './explorer.tabs'
+import { openNotebookTab } from './explorer.open-tab'
 import { useLoadMoreOnIntersect } from './useLoadMoreOnIntersect'
 import { withProjectRef } from '@/domain/project/withProjectRef'
 
@@ -19,7 +19,13 @@ const NotebooksSkeleton = () => (
   </div>
 )
 
-const NotebookListItem = ({ notebook }: { notebook: NotebookSummary }) => {
+const NotebookListItem = ({
+  notebook,
+  projectRef,
+}: {
+  notebook: NotebookSummary
+  projectRef: string
+}) => {
   const registry = useContext(RegistryContext)
 
   return (
@@ -27,13 +33,7 @@ const NotebookListItem = ({ notebook }: { notebook: NotebookSummary }) => {
       type="button"
       tabIndex={0}
       className="flex items-center gap-2 rounded px-2 py-1.5 text-left text-sm text-foreground-light hover:bg-surface-200 hover:text-foreground"
-      onClick={() =>
-        explorerTabs.addTab(registry, {
-          _tag: 'NotebookTab',
-          notebookId: notebook.id,
-          label: notebook.name,
-        })
-      }
+      onClick={() => openNotebookTab(registry, projectRef, notebook.id)}
     >
       <NotebookText size={14} className="shrink-0 text-foreground-muted" />
       <span className="truncate">{notebook.name}</span>
@@ -85,7 +85,7 @@ const ExplorerSidebarInner = ({ projectRef }: { projectRef: string }) => {
             .onSuccess((value, success) => (
               <>
                 {value.items.map((notebook) => (
-                  <NotebookListItem key={notebook.id} notebook={notebook} />
+                  <NotebookListItem key={notebook.id} notebook={notebook} projectRef={projectRef} />
                 ))}
                 {!value.done && <div ref={sentinelRef} className="h-1 shrink-0" />}
                 {success.waiting && <NotebooksSkeleton />}

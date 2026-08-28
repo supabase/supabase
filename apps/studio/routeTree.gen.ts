@@ -93,6 +93,7 @@ import { Route as ProjectRefLogsIndexRouteImport } from './routes/project/$ref/l
 import { Route as ProjectRefIntegrationsIndexRouteImport } from './routes/project/$ref/integrations/index'
 import { Route as ProjectRefFunctionsIndexRouteImport } from './routes/project/$ref/functions/index'
 import { Route as ProjectRefExplorerIndexRouteImport } from './routes/project/$ref/explorer/index'
+import { Route as ProjectRefExplorerTestIndexRouteImport } from './routes/project/$ref/explorer-test/index'
 import { Route as ProjectRefEditorIndexRouteImport } from './routes/project/$ref/editor/index'
 import { Route as ProjectRefBranchesIndexRouteImport } from './routes/project/$ref/branches/index'
 import { Route as ProjectRefApiIndexRouteImport } from './routes/project/$ref/api/index'
@@ -236,6 +237,9 @@ import { Route as ProjectRefFunctionsFunctionSlugCodeRouteImport } from './route
 import { Route as ProjectRefExplorerQueryIdRouteImport } from './routes/project/$ref/explorer/query/$id'
 import { Route as ProjectRefExplorerNotebookIdRouteImport } from './routes/project/$ref/explorer/notebook/$id'
 import { Route as ProjectRefExplorerChatIdRouteImport } from './routes/project/$ref/explorer/chat/$id'
+import { Route as ProjectRefExplorerTestQueryIdRouteImport } from './routes/project/$ref/explorer-test/query/$id'
+import { Route as ProjectRefExplorerTestNotebookIdRouteImport } from './routes/project/$ref/explorer-test/notebook/$id'
+import { Route as ProjectRefExplorerTestChatIdRouteImport } from './routes/project/$ref/explorer-test/chat/$id'
 import { Route as ProjectRefDatabaseTriggersEventRouteImport } from './routes/project/$ref/database/triggers/event'
 import { Route as ProjectRefDatabaseTriggersDataRouteImport } from './routes/project/$ref/database/triggers/data'
 import { Route as ProjectRefDatabaseTablesIdRouteImport } from './routes/project/$ref/database/tables/$id'
@@ -757,6 +761,12 @@ const ProjectRefExplorerIndexRoute = ProjectRefExplorerIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ProjectRefExplorerRoute,
 } as any)
+const ProjectRefExplorerTestIndexRoute =
+  ProjectRefExplorerTestIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ProjectRefExplorerTestRoute,
+  } as any)
 const ProjectRefEditorIndexRoute = ProjectRefEditorIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -1562,6 +1572,24 @@ const ProjectRefExplorerChatIdRoute =
     path: '/chat/$id',
     getParentRoute: () => ProjectRefExplorerRoute,
   } as any)
+const ProjectRefExplorerTestQueryIdRoute =
+  ProjectRefExplorerTestQueryIdRouteImport.update({
+    id: '/query/$id',
+    path: '/query/$id',
+    getParentRoute: () => ProjectRefExplorerTestRoute,
+  } as any)
+const ProjectRefExplorerTestNotebookIdRoute =
+  ProjectRefExplorerTestNotebookIdRouteImport.update({
+    id: '/notebook/$id',
+    path: '/notebook/$id',
+    getParentRoute: () => ProjectRefExplorerTestRoute,
+  } as any)
+const ProjectRefExplorerTestChatIdRoute =
+  ProjectRefExplorerTestChatIdRouteImport.update({
+    id: '/chat/$id',
+    path: '/chat/$id',
+    getParentRoute: () => ProjectRefExplorerTestRoute,
+  } as any)
 const ProjectRefDatabaseTriggersEventRoute =
   ProjectRefDatabaseTriggersEventRouteImport.update({
     id: '/event',
@@ -2159,7 +2187,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
   '/project/$ref/editor': typeof ProjectRefEditorRouteWithChildren
   '/project/$ref/explorer': typeof ProjectRefExplorerRouteWithChildren
-  '/project/$ref/explorer-test': typeof ProjectRefExplorerTestRoute
+  '/project/$ref/explorer-test': typeof ProjectRefExplorerTestRouteWithChildren
   '/project/$ref/functions': typeof ProjectRefFunctionsRouteWithChildren
   '/project/$ref/integrations': typeof ProjectRefIntegrationsRouteWithChildren
   '/project/$ref/logs': typeof ProjectRefLogsRouteWithChildren
@@ -2285,6 +2313,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/api/': typeof ProjectRefApiIndexRoute
   '/project/$ref/branches/': typeof ProjectRefBranchesIndexRoute
   '/project/$ref/editor/': typeof ProjectRefEditorIndexRoute
+  '/project/$ref/explorer-test/': typeof ProjectRefExplorerTestIndexRoute
   '/project/$ref/explorer/': typeof ProjectRefExplorerIndexRoute
   '/project/$ref/functions/': typeof ProjectRefFunctionsIndexRoute
   '/project/$ref/integrations/': typeof ProjectRefIntegrationsIndexRoute
@@ -2331,6 +2360,9 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
   '/project/$ref/database/triggers/event': typeof ProjectRefDatabaseTriggersEventRoute
+  '/project/$ref/explorer-test/chat/$id': typeof ProjectRefExplorerTestChatIdRoute
+  '/project/$ref/explorer-test/notebook/$id': typeof ProjectRefExplorerTestNotebookIdRoute
+  '/project/$ref/explorer-test/query/$id': typeof ProjectRefExplorerTestQueryIdRoute
   '/project/$ref/explorer/chat/$id': typeof ProjectRefExplorerChatIdRoute
   '/project/$ref/explorer/notebook/$id': typeof ProjectRefExplorerNotebookIdRoute
   '/project/$ref/explorer/query/$id': typeof ProjectRefExplorerQueryIdRoute
@@ -2471,7 +2503,6 @@ export interface FileRoutesByTo {
   '/project/$ref/advisors': typeof ProjectRefAdvisorsRouteWithChildren
   '/project/$ref/auth': typeof ProjectRefAuthRouteWithChildren
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
-  '/project/$ref/explorer-test': typeof ProjectRefExplorerTestRoute
   '/project/$ref/merge': typeof ProjectRefMergeRoute
   '/project/$ref/realtime': typeof ProjectRefRealtimeRouteWithChildren
   '/project/$ref/settings': typeof ProjectRefSettingsRouteWithChildren
@@ -2588,6 +2619,7 @@ export interface FileRoutesByTo {
   '/project/$ref/api': typeof ProjectRefApiIndexRoute
   '/project/$ref/branches': typeof ProjectRefBranchesIndexRoute
   '/project/$ref/editor': typeof ProjectRefEditorIndexRoute
+  '/project/$ref/explorer-test': typeof ProjectRefExplorerTestIndexRoute
   '/project/$ref/explorer': typeof ProjectRefExplorerIndexRoute
   '/project/$ref/functions': typeof ProjectRefFunctionsIndexRoute
   '/project/$ref/integrations': typeof ProjectRefIntegrationsIndexRoute
@@ -2634,6 +2666,9 @@ export interface FileRoutesByTo {
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
   '/project/$ref/database/triggers/event': typeof ProjectRefDatabaseTriggersEventRoute
+  '/project/$ref/explorer-test/chat/$id': typeof ProjectRefExplorerTestChatIdRoute
+  '/project/$ref/explorer-test/notebook/$id': typeof ProjectRefExplorerTestNotebookIdRoute
+  '/project/$ref/explorer-test/query/$id': typeof ProjectRefExplorerTestQueryIdRoute
   '/project/$ref/explorer/chat/$id': typeof ProjectRefExplorerChatIdRoute
   '/project/$ref/explorer/notebook/$id': typeof ProjectRefExplorerNotebookIdRoute
   '/project/$ref/explorer/query/$id': typeof ProjectRefExplorerQueryIdRoute
@@ -2782,7 +2817,7 @@ export interface FileRoutesById {
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
   '/project/$ref/editor': typeof ProjectRefEditorRouteWithChildren
   '/project/$ref/explorer': typeof ProjectRefExplorerRouteWithChildren
-  '/project/$ref/explorer-test': typeof ProjectRefExplorerTestRoute
+  '/project/$ref/explorer-test': typeof ProjectRefExplorerTestRouteWithChildren
   '/project/$ref/functions': typeof ProjectRefFunctionsRouteWithChildren
   '/project/$ref/integrations': typeof ProjectRefIntegrationsRouteWithChildren
   '/project/$ref/logs': typeof ProjectRefLogsRouteWithChildren
@@ -2908,6 +2943,7 @@ export interface FileRoutesById {
   '/project/$ref/api/': typeof ProjectRefApiIndexRoute
   '/project/$ref/branches/': typeof ProjectRefBranchesIndexRoute
   '/project/$ref/editor/': typeof ProjectRefEditorIndexRoute
+  '/project/$ref/explorer-test/': typeof ProjectRefExplorerTestIndexRoute
   '/project/$ref/explorer/': typeof ProjectRefExplorerIndexRoute
   '/project/$ref/functions/': typeof ProjectRefFunctionsIndexRoute
   '/project/$ref/integrations/': typeof ProjectRefIntegrationsIndexRoute
@@ -2954,6 +2990,9 @@ export interface FileRoutesById {
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
   '/project/$ref/database/triggers/event': typeof ProjectRefDatabaseTriggersEventRoute
+  '/project/$ref/explorer-test/chat/$id': typeof ProjectRefExplorerTestChatIdRoute
+  '/project/$ref/explorer-test/notebook/$id': typeof ProjectRefExplorerTestNotebookIdRoute
+  '/project/$ref/explorer-test/query/$id': typeof ProjectRefExplorerTestQueryIdRoute
   '/project/$ref/explorer/chat/$id': typeof ProjectRefExplorerChatIdRoute
   '/project/$ref/explorer/notebook/$id': typeof ProjectRefExplorerNotebookIdRoute
   '/project/$ref/explorer/query/$id': typeof ProjectRefExplorerQueryIdRoute
@@ -3227,6 +3266,7 @@ export interface FileRouteTypes {
     | '/project/$ref/api/'
     | '/project/$ref/branches/'
     | '/project/$ref/editor/'
+    | '/project/$ref/explorer-test/'
     | '/project/$ref/explorer/'
     | '/project/$ref/functions/'
     | '/project/$ref/integrations/'
@@ -3273,6 +3313,9 @@ export interface FileRouteTypes {
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
     | '/project/$ref/database/triggers/event'
+    | '/project/$ref/explorer-test/chat/$id'
+    | '/project/$ref/explorer-test/notebook/$id'
+    | '/project/$ref/explorer-test/query/$id'
     | '/project/$ref/explorer/chat/$id'
     | '/project/$ref/explorer/notebook/$id'
     | '/project/$ref/explorer/query/$id'
@@ -3413,7 +3456,6 @@ export interface FileRouteTypes {
     | '/project/$ref/advisors'
     | '/project/$ref/auth'
     | '/project/$ref/database'
-    | '/project/$ref/explorer-test'
     | '/project/$ref/merge'
     | '/project/$ref/realtime'
     | '/project/$ref/settings'
@@ -3530,6 +3572,7 @@ export interface FileRouteTypes {
     | '/project/$ref/api'
     | '/project/$ref/branches'
     | '/project/$ref/editor'
+    | '/project/$ref/explorer-test'
     | '/project/$ref/explorer'
     | '/project/$ref/functions'
     | '/project/$ref/integrations'
@@ -3576,6 +3619,9 @@ export interface FileRouteTypes {
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
     | '/project/$ref/database/triggers/event'
+    | '/project/$ref/explorer-test/chat/$id'
+    | '/project/$ref/explorer-test/notebook/$id'
+    | '/project/$ref/explorer-test/query/$id'
     | '/project/$ref/explorer/chat/$id'
     | '/project/$ref/explorer/notebook/$id'
     | '/project/$ref/explorer/query/$id'
@@ -3849,6 +3895,7 @@ export interface FileRouteTypes {
     | '/project/$ref/api/'
     | '/project/$ref/branches/'
     | '/project/$ref/editor/'
+    | '/project/$ref/explorer-test/'
     | '/project/$ref/explorer/'
     | '/project/$ref/functions/'
     | '/project/$ref/integrations/'
@@ -3895,6 +3942,9 @@ export interface FileRouteTypes {
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
     | '/project/$ref/database/triggers/event'
+    | '/project/$ref/explorer-test/chat/$id'
+    | '/project/$ref/explorer-test/notebook/$id'
+    | '/project/$ref/explorer-test/query/$id'
     | '/project/$ref/explorer/chat/$id'
     | '/project/$ref/explorer/notebook/$id'
     | '/project/$ref/explorer/query/$id'
@@ -4694,6 +4744,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$ref/explorer/'
       preLoaderRoute: typeof ProjectRefExplorerIndexRouteImport
       parentRoute: typeof ProjectRefExplorerRoute
+    }
+    '/project/$ref/explorer-test/': {
+      id: '/project/$ref/explorer-test/'
+      path: '/'
+      fullPath: '/project/$ref/explorer-test/'
+      preLoaderRoute: typeof ProjectRefExplorerTestIndexRouteImport
+      parentRoute: typeof ProjectRefExplorerTestRoute
     }
     '/project/$ref/editor/': {
       id: '/project/$ref/editor/'
@@ -5696,6 +5753,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefExplorerChatIdRouteImport
       parentRoute: typeof ProjectRefExplorerRoute
     }
+    '/project/$ref/explorer-test/query/$id': {
+      id: '/project/$ref/explorer-test/query/$id'
+      path: '/query/$id'
+      fullPath: '/project/$ref/explorer-test/query/$id'
+      preLoaderRoute: typeof ProjectRefExplorerTestQueryIdRouteImport
+      parentRoute: typeof ProjectRefExplorerTestRoute
+    }
+    '/project/$ref/explorer-test/notebook/$id': {
+      id: '/project/$ref/explorer-test/notebook/$id'
+      path: '/notebook/$id'
+      fullPath: '/project/$ref/explorer-test/notebook/$id'
+      preLoaderRoute: typeof ProjectRefExplorerTestNotebookIdRouteImport
+      parentRoute: typeof ProjectRefExplorerTestRoute
+    }
+    '/project/$ref/explorer-test/chat/$id': {
+      id: '/project/$ref/explorer-test/chat/$id'
+      path: '/chat/$id'
+      fullPath: '/project/$ref/explorer-test/chat/$id'
+      preLoaderRoute: typeof ProjectRefExplorerTestChatIdRouteImport
+      parentRoute: typeof ProjectRefExplorerTestRoute
+    }
     '/project/$ref/database/triggers/event': {
       id: '/project/$ref/database/triggers/event'
       path: '/event'
@@ -6666,6 +6744,27 @@ const ProjectRefExplorerRouteChildren: ProjectRefExplorerRouteChildren = {
 const ProjectRefExplorerRouteWithChildren =
   ProjectRefExplorerRoute._addFileChildren(ProjectRefExplorerRouteChildren)
 
+interface ProjectRefExplorerTestRouteChildren {
+  ProjectRefExplorerTestIndexRoute: typeof ProjectRefExplorerTestIndexRoute
+  ProjectRefExplorerTestChatIdRoute: typeof ProjectRefExplorerTestChatIdRoute
+  ProjectRefExplorerTestNotebookIdRoute: typeof ProjectRefExplorerTestNotebookIdRoute
+  ProjectRefExplorerTestQueryIdRoute: typeof ProjectRefExplorerTestQueryIdRoute
+}
+
+const ProjectRefExplorerTestRouteChildren: ProjectRefExplorerTestRouteChildren =
+  {
+    ProjectRefExplorerTestIndexRoute: ProjectRefExplorerTestIndexRoute,
+    ProjectRefExplorerTestChatIdRoute: ProjectRefExplorerTestChatIdRoute,
+    ProjectRefExplorerTestNotebookIdRoute:
+      ProjectRefExplorerTestNotebookIdRoute,
+    ProjectRefExplorerTestQueryIdRoute: ProjectRefExplorerTestQueryIdRoute,
+  }
+
+const ProjectRefExplorerTestRouteWithChildren =
+  ProjectRefExplorerTestRoute._addFileChildren(
+    ProjectRefExplorerTestRouteChildren,
+  )
+
 interface ProjectRefFunctionsFunctionSlugRouteChildren {
   ProjectRefFunctionsFunctionSlugCodeRoute: typeof ProjectRefFunctionsFunctionSlugCodeRoute
   ProjectRefFunctionsFunctionSlugDetailsRoute: typeof ProjectRefFunctionsFunctionSlugDetailsRoute
@@ -6964,7 +7063,7 @@ interface ProjectRefRouteChildren {
   ProjectRefDatabaseRoute: typeof ProjectRefDatabaseRouteWithChildren
   ProjectRefEditorRoute: typeof ProjectRefEditorRouteWithChildren
   ProjectRefExplorerRoute: typeof ProjectRefExplorerRouteWithChildren
-  ProjectRefExplorerTestRoute: typeof ProjectRefExplorerTestRoute
+  ProjectRefExplorerTestRoute: typeof ProjectRefExplorerTestRouteWithChildren
   ProjectRefFunctionsRoute: typeof ProjectRefFunctionsRouteWithChildren
   ProjectRefIntegrationsRoute: typeof ProjectRefIntegrationsRouteWithChildren
   ProjectRefLogsRoute: typeof ProjectRefLogsRouteWithChildren
@@ -6986,7 +7085,7 @@ const ProjectRefRouteChildren: ProjectRefRouteChildren = {
   ProjectRefDatabaseRoute: ProjectRefDatabaseRouteWithChildren,
   ProjectRefEditorRoute: ProjectRefEditorRouteWithChildren,
   ProjectRefExplorerRoute: ProjectRefExplorerRouteWithChildren,
-  ProjectRefExplorerTestRoute: ProjectRefExplorerTestRoute,
+  ProjectRefExplorerTestRoute: ProjectRefExplorerTestRouteWithChildren,
   ProjectRefFunctionsRoute: ProjectRefFunctionsRouteWithChildren,
   ProjectRefIntegrationsRoute: ProjectRefIntegrationsRouteWithChildren,
   ProjectRefLogsRoute: ProjectRefLogsRouteWithChildren,

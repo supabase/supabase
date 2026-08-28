@@ -168,6 +168,25 @@ describe('ExplorerSidebar', () => {
 
   it('opens a tab for a notebook when it is clicked', async () => {
     mockNotebooksPage([notebookRow({ id: 'a', name: 'Signup funnel' })])
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref/content/item/:id',
+      response: () =>
+        HttpResponse.json<components['schemas']['GetUserContentByIdResponse']>({
+          id: 'a',
+          type: 'notebook',
+          name: 'Signup funnel',
+          description: '',
+          favorite: false,
+          folder_id: null,
+          inserted_at: '2024-01-01T00:00:00.000Z',
+          updated_at: '2024-01-01T00:00:00.000Z',
+          visibility: 'project',
+          owner_id: 1,
+          project_id: 1,
+          content: { schema_version: 1, cells: [] },
+        }),
+    })
 
     renderExplorer()
 
@@ -176,6 +195,6 @@ describe('ExplorerSidebar', () => {
 
     await userEvent.click(await within(sidebar).findByText('Signup funnel'))
 
-    expect(within(tablist).getByRole('tab', { name: /Signup funnel/ })).toBeInTheDocument()
+    expect(await within(tablist).findByRole('tab', { name: /Signup funnel/ })).toBeInTheDocument()
   })
 })

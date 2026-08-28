@@ -33,6 +33,11 @@ export interface GetNotebookParams {
   readonly id: NotebookId
 }
 
+export interface NotebookRecord {
+  readonly name: string
+  readonly content: NotebookContent
+}
+
 export interface SaveNotebookParams {
   readonly projectRef: string
   readonly id: NotebookId
@@ -46,13 +51,14 @@ export class NotebooksApi extends Context.Service<
     readonly list: (
       params: ListNotebooksParams
     ) => Effect.Effect<ListNotebooksPage, ListNotebooksError>
-    readonly get: (params: GetNotebookParams) => Effect.Effect<NotebookContent, GetNotebookError>
+    readonly get: (params: GetNotebookParams) => Effect.Effect<NotebookRecord, GetNotebookError>
     readonly save: (params: SaveNotebookParams) => Effect.Effect<void, SaveNotebookError>
   }
 >()('studio/domain/notebooks/NotebooksApi') {}
 
 const decodeNotebookSummary = Schema.decodeUnknownSync(NotebookSummary)
 const decodeNotebookContent = Schema.decodeUnknownSync(NotebookContent)
+const decodeNotebookName = Schema.decodeUnknownSync(Schema.String)
 
 export const NotebooksApiLive = Layer.succeed(NotebooksApi, {
   list: ({ projectRef, search, favoritesOnly, cursor, limit }) =>
@@ -90,7 +96,10 @@ export const NotebooksApiLive = Layer.succeed(NotebooksApi, {
         })
         if (error) handleError(error)
 
-        return decodeNotebookContent(data.content)
+        return {
+          name: decodeNotebookName(data.name),
+          content: decodeNotebookContent(data.content),
+        }
       },
       catch: (cause) => new GetNotebookError({ cause }),
     }),
