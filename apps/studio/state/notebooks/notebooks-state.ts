@@ -29,10 +29,24 @@ export const notebooksState = proxy({
 
   /**
    * Load notebook into the Valtio store. No-ops if already present.
+   *
+   * Persists a draft immediately, even for a still-empty notebook — otherwise a notebook
+   * created but refreshed before its first cell edit (the next time anything would persist
+   * a draft, in `updateCells`) has nothing to restore and 404s as if it never existed.
    */
   addNotebook: ({ projectRef, notebook }: { projectRef: string; notebook: Notebook }) => {
     if (notebooksState.notebooks[notebook.id]) return
     notebooksState.notebooks[notebook.id] = { projectRef, notebook, status: 'new' }
+
+    if (notebook.content) {
+      persistNotebookDraft({
+        projectRef,
+        id: notebook.id,
+        name: notebook.name,
+        content: notebook.content,
+        baseUpdatedAt: null,
+      })
+    }
   },
 
   /**

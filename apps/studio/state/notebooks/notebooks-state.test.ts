@@ -38,6 +38,14 @@ describe('notebooksState', () => {
     expect(notebooksState.notebooks['notebook-1'].status).toBe('new')
   })
 
+  it('addNotebook persists a local draft immediately, even for a still-empty notebook', () => {
+    notebooksState.addNotebook({ projectRef: 'ref', notebook: makeNotebook('notebook-1') })
+
+    const draft = readNotebookDraft({ projectRef: 'ref', id: 'notebook-1' })
+    expect(draft?.name).toBe('My Notebook')
+    expect(draft?.content.cells).toEqual([])
+  })
+
   it('setNotebook marks a notebook not yet in the store as saved', () => {
     notebooksState.setNotebook({ projectRef: 'ref', notebook: makeNotebook('notebook-1') })
 

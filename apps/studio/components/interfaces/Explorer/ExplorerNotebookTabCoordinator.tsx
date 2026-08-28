@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useContext, useEffect } from 'react'
+import type { Snapshot } from 'valtio'
 
 import {
   evictNotebookFromCaches,
@@ -8,13 +9,31 @@ import {
 } from '@/data/content/notebooks/notebook-cache'
 import { hasNotebookDraft } from '@/state/notebooks/notebook-drafts'
 import { notebooksState, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
+import type { StateNotebook } from '@/state/notebooks/types'
 import { TabsStateContext, type Tab } from '@/state/tabs'
 
+function isNotebookTabDirty({
+  stateNotebook,
+  ref,
+  notebookId,
+}: {
+  stateNotebook: StateNotebook | Snapshot<StateNotebook> | undefined
+  ref: string | undefined
+  notebookId: string | undefined
+}): boolean {
+  if (!notebookId) return false
+  if (stateNotebook) return hasDiscardableChanges(stateNotebook)
+
+  return !!ref && hasNotebookDraft({ projectRef: ref, id: notebookId })
+}
+
 const NotebookTabStatusIndicator = ({ tab }: { tab: Tab }) => {
+  const { ref } = useParams()
   const notebooksSnap = useNotebooksStateSnapshot()
   const notebookId = tab.metadata?.notebookId
   const stateNotebook = notebookId ? notebooksSnap.notebooks[notebookId] : undefined
-  if (!hasDiscardableChanges(stateNotebook)) return null
+
+  if (!isNotebookTabDirty({ stateNotebook, ref, notebookId })) return null
 
   return (
     <span
@@ -25,12 +44,6 @@ const NotebookTabStatusIndicator = ({ tab }: { tab: Tab }) => {
   )
 }
 
-/**
- * Evicts a notebook's content from the valtio store and the React Query cache
- * when its tab closes, so reopening it always refetches instead of showing
- * whatever was last loaded. Unsaved edits are discarded the same way — safe
- * because `confirmClose` below has already asked the user to confirm.
- */
 export const ExplorerNotebookTabCoordinator = () => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
@@ -47,15 +60,11 @@ export const ExplorerNotebookTabCoordinator = () => {
       confirmClose: (notebookTabs) => {
         const dirtyCount = notebookTabs.filter((tab) => {
           const notebookId = tab.metadata?.notebookId
-          if (!notebookId) return false
-
-          const stateNotebook = notebooksState.notebooks[notebookId]
-          if (stateNotebook) return hasDiscardableChanges(stateNotebook)
-
-          // The notebook was never loaded into the store this session (e.g. a background
-          // tab left over from before a refresh), so there's no status to check — fall
-          // back to whether a local draft for it exists at all.
-          return !!ref && hasNotebookDraft({ projectRef: ref, id: notebookId })
+          return isNotebookTabDirty({
+            stateNotebook: notebookId ? notebooksState.notebooks[notebookId] : undefined,
+            ref,
+            notebookId,
+          })
         }).length
 
         if (dirtyCount === 0) return null

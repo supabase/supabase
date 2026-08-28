@@ -1,4 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
+import { screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { ExplorerNotebookTabCoordinator } from '../ExplorerNotebookTabCoordinator'
@@ -136,5 +137,58 @@ describe('ExplorerNotebookTabCoordinator', () => {
     tabsState.closeTabs([tabId])
 
     expect(readNotebookDraft({ projectRef: 'default', id: NOTEBOOK_ID })).toBeUndefined()
+  })
+
+  it('shows the status dot for a notebook with only a local draft, never loaded this session', () => {
+    persistNotebookDraft({
+      projectRef: 'default',
+      id: NOTEBOOK_ID,
+      name: 'Test notebook',
+      content: { schema_version: 1, cells: [createQueryCellSkeleton()] },
+      baseUpdatedAt: null,
+    })
+    const { tabsState, tabId } = renderCoordinator(new QueryClient())
+    const StatusIndicator = tabsState.getTabStatusIndicator('notebook')!
+
+    customRender(
+      <StatusIndicator
+        tab={{ id: tabId, type: 'notebook', metadata: { notebookId: NOTEBOOK_ID } }}
+      />
+    )
+
+    expect(screen.getByRole('img', { name: 'Unsaved changes' })).toBeInTheDocument()
+  })
+
+  it('does not show the status dot when there is no draft and the notebook is not loaded', () => {
+    const { tabsState, tabId } = renderCoordinator(new QueryClient())
+    const StatusIndicator = tabsState.getTabStatusIndicator('notebook')!
+
+    customRender(
+      <StatusIndicator
+        tab={{ id: tabId, type: 'notebook', metadata: { notebookId: NOTEBOOK_ID } }}
+      />
+    )
+
+    expect(screen.queryByRole('img', { name: 'Unsaved changes' })).not.toBeInTheDocument()
+  })
+
+  it('updates the status dot live when a loaded notebook is edited, without remounting', async () => {
+    seedNotebook('saved')
+    const { tabsState, tabId } = renderCoordinator(new QueryClient())
+    const StatusIndicator = tabsState.getTabStatusIndicator('notebook')!
+
+    customRender(
+      <StatusIndicator
+        tab={{ id: tabId, type: 'notebook', metadata: { notebookId: NOTEBOOK_ID } }}
+      />
+    )
+    expect(screen.queryByRole('img', { name: 'Unsaved changes' })).not.toBeInTheDocument()
+
+    notebooksState.updateCells({
+      id: NOTEBOOK_ID,
+      cells: [{ _tag: 'markdown_cell', _id: 'cell-1', text: 'hello' }],
+    })
+
+    expect(await screen.findByRole('img', { name: 'Unsaved changes' })).toBeInTheDocument()
   })
 })
