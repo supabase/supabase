@@ -132,11 +132,29 @@ function findTargetCell(
   return undefined
 }
 
+function getOriginalIndex(
+  entry: NotebookCellDiffEntry,
+  originalIndexById: Map<string, number>
+): number | undefined {
+  switch (entry._tag) {
+    case 'unchanged':
+    case 'moved':
+    case 'removed':
+      return originalIndexById.get(entry.cell._id)
+    case 'replaced':
+      return originalIndexById.get(entry.before._id)
+    case 'added':
+      return undefined
+  }
+}
+
 function downgradeNoOpMoves(
   entries: NotebookCellDiffEntry[],
   notebook: NotebookWire
 ): NotebookCellDiffEntry[] {
   if (!entries.some((entry) => entry._tag === 'moved')) return entries
+
+  const originalIndexById = new Map(notebook.cells.map((cell, index) => [cell._id, index]))
 
   const finalOrder = entries.flatMap((entry) =>
     entry._tag === 'unchanged' || entry._tag === 'moved' ? [entry.cell._id] : []
@@ -155,11 +173,39 @@ function downgradeNoOpMoves(
     )
   }
 
-  return entries.map((entry) =>
-    entry._tag === 'moved' && hasSamePredecessors(entry.cell._id)
-      ? { _tag: 'unchanged', cell: entry.cell }
-      : entry
-  )
+  let hasDowngraded = false
+  const downgradedEntries = entries.map((entry) => {
+    if (entry._tag === 'moved' && hasSamePredecessors(entry.cell._id)) {
+      hasDowngraded = true
+      return { _tag: 'unchanged' as const, cell: entry.cell }
+    }
+    return entry
+  })
+
+  if (!hasDowngraded) return downgradedEntries
+
+  const stationaryIndices: number[] = []
+  const stationaryEntries: NotebookCellDiffEntry[] = []
+
+  downgradedEntries.forEach((entry, idx) => {
+    if (entry._tag !== 'moved' && entry._tag !== 'added') {
+      stationaryIndices.push(idx)
+      stationaryEntries.push(entry)
+    }
+  })
+
+  stationaryEntries.sort((a, b) => {
+    const idxA = getOriginalIndex(a, originalIndexById) ?? 0
+    const idxB = getOriginalIndex(b, originalIndexById) ?? 0
+    return idxA - idxB
+  })
+
+  const result = [...downgradedEntries]
+  stationaryIndices.forEach((targetIdx, i) => {
+    result[targetIdx] = stationaryEntries[i]
+  })
+
+  return result
 }
 
 export function deriveNotebookDiff(
@@ -256,6 +302,7 @@ export function deriveNotebookDiff(
         }
 
         entries.splice(found.index, 1)
+        insertedAfter.delete(operation.cell_id)
         const error = insertAfter(operation.after_cell_id, {
           _tag: 'moved',
           cell: found.cell,
