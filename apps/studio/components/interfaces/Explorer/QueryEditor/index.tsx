@@ -555,7 +555,13 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
               : 'overflow-x-auto'
           )}
         >
-          <QueryResultRenderer view={view} result={result} chart={display?.chart} />
+          <QueryResultRenderer
+            view={view}
+            result={result}
+            chart={display?.chart}
+            sql={sql}
+            source={query._tag}
+          />
         </ExplorerQueryResults>
 
         <ExplorerQueryFooter className="flex items-center gap-x-2">

@@ -1,9 +1,13 @@
 import { useParams } from 'common'
 import { ExternalLink } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useCallback } from 'react'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { subscriptionHasHipaaAddon } from '../../Billing/Subscription/Subscription.utils'
+import { type SqlSnippetSource } from '../../SQLEditor/querySource'
+import { buildDebugPromptText } from '../../SQLEditor/SQLEditor.utils'
+import { useCreateChat } from '../hooks'
 import { type QueryResult } from '../types'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import CopyButton from '@/components/ui/CopyButton'
@@ -17,9 +21,13 @@ import { DOCS_URL } from '@/lib/constants'
 export const QueryResultError = ({
   error,
   autoLimit,
+  sql,
+  source,
 }: {
   error: NonNullable<QueryResult['error']>
   autoLimit?: QueryResult['autoLimit']
+  sql?: string
+  source?: SqlSnippetSource
 }) => {
   const { ref } = useParams()
 
@@ -28,7 +36,19 @@ export const QueryResultError = ({
   const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: ref })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
 
+  const { createChat, isCreating } = useCreateChat()
+
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+
+  const canDebug = sql !== undefined && source !== undefined
+
+  const buildDebugPrompt = useCallback(
+    () => (canDebug ? buildDebugPromptText(sql, error.message, source) : ''),
+    [canDebug, sql, error.message, source]
+  )
+
+  const handleDebug = () =>
+    createChat({ name: 'Debug SQL snippet', initialMessage: buildDebugPrompt() })
 
   const isTimeout =
     error.message?.includes('canceling statement due to statement timeout') ||
@@ -136,15 +156,14 @@ export const QueryResultError = ({
               </TooltipContent>
             </Tooltip>
           )}
-          {!hasHipaaAddon && (
-            // [Joshen] TODO
+          {!hasHipaaAddon && canDebug && (
             <AiAssistantDropdown
               telemetrySource="sql_debug"
               label="Debug with Assistant"
-              buildPrompt={() => ''}
-              onOpenAssistant={() => {}}
-              disabled={false}
-              loading={false}
+              buildPrompt={buildDebugPrompt}
+              onOpenAssistant={handleDebug}
+              disabled={isCreating}
+              loading={isCreating}
             />
           )}
         </div>
