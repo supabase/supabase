@@ -5,6 +5,7 @@ import * as Cells from './notebook.cells'
 import { Cell, CellId, NotebookContent, NotebookId } from './notebook.schema'
 import { NotebooksApi } from './notebooks.api'
 import { notebookPageStream } from './notebooks.list'
+import { notebooksRuntime } from './notebooks.runtime'
 
 export const notebookSearchAtom = Atom.make('')
 export const notebookFavoritesOnlyAtom = Atom.make(false)
@@ -52,6 +53,14 @@ export const makeNotebooksAtoms = (runtime: Atom.AtomRuntime<NotebooksApi>) => {
    */
   const loadMoreNotebooks = (registry: AtomRegistry.AtomRegistry, projectRef: string) =>
     registry.set(notebooksAtom(projectRef), void 0)
+
+  /** Whether another page can be requested right now — not already loading, not exhausted. */
+  const canLoadMoreAtom = Atom.family((projectRef: string) =>
+    Atom.readable((get) => {
+      const result = get(notebooksAtom(projectRef))
+      return AsyncResult.isSuccess(result) && !result.value.done && !result.waiting
+    })
+  )
 
   /** `undefined` means "not yet created locally or loaded from the server". */
   const contentAtom = Atom.family((_id: NotebookId) =>
@@ -163,6 +172,7 @@ export const makeNotebooksAtoms = (runtime: Atom.AtomRuntime<NotebooksApi>) => {
   return {
     notebooksAtom,
     loadMoreNotebooks,
+    canLoadMoreAtom,
     contentAtom,
     dirtyAtom,
     statusAtom,
@@ -176,3 +186,5 @@ export const makeNotebooksAtoms = (runtime: Atom.AtomRuntime<NotebooksApi>) => {
     saveNotebook,
   } as const
 }
+
+export const notebooksAtoms = makeNotebooksAtoms(notebooksRuntime)

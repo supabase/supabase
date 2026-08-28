@@ -21,7 +21,7 @@ export const ExplorerTabs = () => {
   const registry = useContext(RegistryContext)
 
   return (
-    <div className="flex items-center border-b">
+    <div role="tablist" aria-label="Explorer tabs" className="flex items-center border-b">
       {tabs.map((tab) => (
         <div
           key={tab.id}

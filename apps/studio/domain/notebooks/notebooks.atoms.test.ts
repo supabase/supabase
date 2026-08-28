@@ -252,3 +252,84 @@ describe('notebooksAtom', () => {
     expect(previousItems).toEqual(['a'])
   })
 })
+
+describe('canLoadMoreAtom', () => {
+  it('is false before the first page resolves', () => {
+    const { registry, atoms } = setup({
+      list: () => Effect.promise(() => new Promise<ListNotebooksPage>(() => {})),
+    })
+
+    expect(registry.get(atoms.canLoadMoreAtom('project-ref'))).toBe(false)
+  })
+
+  it('is true once a page resolves with more to load', async () => {
+    const { registry, atoms } = setup({
+      list: () => Effect.succeed({ items: [summary('a')], nextCursor: 'page-2' }),
+    })
+
+    await waitFor(registry, atoms.notebooksAtom('project-ref'), (r) => r._tag === 'Success')
+
+    expect(registry.get(atoms.canLoadMoreAtom('project-ref'))).toBe(true)
+  })
+
+  it('is still true right after the last page loads — exhaustion is only confirmed by the next pull', async () => {
+    const { registry, atoms } = setup({
+      list: () => Effect.succeed({ items: [summary('a')], nextCursor: undefined }),
+    })
+
+    await waitFor(registry, atoms.notebooksAtom('project-ref'), (r) => r._tag === 'Success')
+
+    expect(registry.get(atoms.canLoadMoreAtom('project-ref'))).toBe(true)
+  })
+
+  it('becomes false once a further load confirms exhaustion, without losing items or refetching', async () => {
+    let calls = 0
+    const { registry, atoms } = setup({
+      list: () => {
+        calls++
+        return Effect.succeed({ items: [summary('a')], nextCursor: undefined })
+      },
+    })
+
+    const results: Array<unknown> = []
+    const unsubscribe = registry.subscribe(atoms.notebooksAtom('project-ref'), (r) =>
+      results.push(r)
+    )
+
+    await waitFor(registry, atoms.notebooksAtom('project-ref'), (r) => r._tag === 'Success')
+    atoms.loadMoreNotebooks(registry, 'project-ref')
+
+    const exhausted = await waitFor(
+      registry,
+      atoms.notebooksAtom('project-ref'),
+      (r) => r._tag === 'Success' && r.value.done
+    )
+
+    expect(exhausted._tag === 'Success' && exhausted.value.items.map((i) => i.id)).toEqual(['a'])
+    expect(registry.get(atoms.canLoadMoreAtom('project-ref'))).toBe(false)
+    expect(calls).toBe(1)
+
+    unsubscribe()
+  })
+
+  it('is false while the next page is still loading', async () => {
+    let resolveSecondPage!: (page: ListNotebooksPage) => void
+    const secondPage = new Promise<ListNotebooksPage>((resolve) => {
+      resolveSecondPage = resolve
+    })
+    let call = 0
+    const { registry, atoms } = setup({
+      list: () =>
+        call++ === 0
+          ? Effect.succeed({ items: [summary('a')], nextCursor: 'page-2' })
+          : Effect.promise(() => secondPage),
+    })
+
+    await waitFor(registry, atoms.notebooksAtom('project-ref'), (r) => r._tag === 'Success')
+    atoms.loadMoreNotebooks(registry, 'project-ref')
+
+    expect(registry.get(atoms.canLoadMoreAtom('project-ref'))).toBe(false)
+
+    resolveSecondPage({ items: [summary('b')], nextCursor: undefined })
+  })
+})
