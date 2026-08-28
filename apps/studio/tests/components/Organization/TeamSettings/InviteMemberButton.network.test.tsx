@@ -1,6 +1,6 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { platformComponents as components } from 'api-types'
+import { platformComponents as components, operations } from 'api-types'
 import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
@@ -15,7 +15,8 @@ type Member = components['schemas']['Member']
 type InvitationResponse = components['schemas']['InvitationResponse']
 type OrganizationRoleResponse = components['schemas']['OrganizationRoleResponse']
 type ListEntitlementsResponse = components['schemas']['ListEntitlementsResponse']
-type CreateInvitationResponse = components['schemas']['CreateInvitationResponse']
+type CreateInvitationResponse =
+  operations['InvitationsController_createInvitation']['responses']['201']['content']['application/json']
 type AccessControlPermission = components['schemas']['AccessControlPermission']
 
 const ORG_SLUG = 'test-org'

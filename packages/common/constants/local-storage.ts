@@ -116,6 +116,7 @@ export const LOCAL_STORAGE_KEYS = {
     `organization-marketplace-banner-dismissed-${orgSlug}-${managedBy}`,
   PROJECT_INTEGRATION_BANNER_DISMISSED: (ref: string, integrationSource: string) =>
     `project-integration-banner-dismissed-${ref}-${integrationSource}`,
+  EXPLORER_BANNER_DISMISSED: `explorer-banner-dismissed`,
 
   TABLE_EDITOR_QUEUE_OPERATIONS_BANNER_DISMISSED: (ref: string) =>
     `table-editor-queue-operations-banner-dismissed-${ref}`,

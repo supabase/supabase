@@ -1,4 +1,4 @@
-import { RUNTIMES, type RuntimeMeta } from './Workers.constants'
+import { RUNTIMES, WORKER_NAME_WORDS, type RuntimeMeta } from './Workers.constants'
 import type { Worker, WorkerAccess, WorkerBuildState } from './Workers.types'
 import { ResponseError } from '@/types'
 
@@ -53,6 +53,13 @@ export const formatSize = (size: string): string => {
 
 export const formatResources = (worker: Worker): string =>
   `${formatSize(worker.size)} · ${worker.declaredInstances} inst`
+
+// Suggests a friendly, already-valid starting name so the deploy dialog isn't blank.
+export const generateWorkerName = (): string => {
+  const word = WORKER_NAME_WORDS[Math.floor(Math.random() * WORKER_NAME_WORDS.length)]
+  const number = Math.floor(Math.random() * 900000) + 100000
+  return `worker-${word}-${number}`
+}
 
 // A project outside the alpha allow-list gets a 404, not a 403.
 export const isWorkersUnavailable = (error: Error | null): boolean =>

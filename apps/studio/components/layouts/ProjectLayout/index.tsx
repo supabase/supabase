@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS, mergeRefs, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, mergeRefs, useFlag, useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { XIcon } from 'lucide-react'
 import Head from 'next/head'
@@ -42,6 +42,7 @@ import { UnhealthyState } from './UnhealthyState'
 import { UpgradingState } from './UpgradingState'
 import { CreateBranchModal } from '@/components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from '@/components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
+import { BannerExplorer } from '@/components/ui/BannerStack/Banners/BannerExplorer'
 import { BannerFreeMicroUpgrade } from '@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade'
 import { BANNER_ID, useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -152,6 +153,9 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       !!projectResourceWarnings?.disk_io_exhaustion
     const isNanoCompute = selectedProject?.infra_compute_size === 'nano'
     const showUpgradeBanner = isNanoCompute && isComputeNearExhaustion
+
+    const isExplorerEnabled = useFlag('explorer')
+
     const [isFreeMicroUpgradeBannerDismissed] = useLocalStorageQuery(
       LOCAL_STORAGE_KEYS.FREE_MICRO_UPGRADE_BANNER_DISMISSED(selectedProject?.ref ?? ''),
       false
@@ -164,6 +168,11 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
         }),
         false
       )
+    const [isExplorerBannerDismissed, , { isSuccess: isLocalStorageReady }] = useLocalStorageQuery(
+      LOCAL_STORAGE_KEYS.EXPLORER_BANNER_DISMISSED,
+      false
+    )
+
     const { showSidebar } = useAppStateSnapshot()
     const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
 
@@ -232,6 +241,17 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       addBanner,
       dismissBanner,
     ])
+
+    useEffect(() => {
+      if (!isExplorerEnabled || !isLocalStorageReady || isExplorerBannerDismissed) return
+
+      addBanner({
+        id: 'explorer-banner',
+        priority: 2,
+        isDismissed: false,
+        content: <BannerExplorer />,
+      })
+    }, [addBanner, isExplorerEnabled, isExplorerBannerDismissed, isLocalStorageReady])
 
     useLayoutEffect(() => {
       const unregister = registerOpenMenu(() => {

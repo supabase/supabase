@@ -2283,6 +2283,11 @@ module.exports = [
     source: '/customers/mendableai',
     destination: '/customers/firecrawl',
   },
+  {
+    permanent: true,
+    source: '/customers/lingo-dev',
+    destination: '/customers/lingodotdev',
+  },
 
   {
     permanent: true,

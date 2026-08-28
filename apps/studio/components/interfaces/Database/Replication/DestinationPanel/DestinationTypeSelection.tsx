@@ -141,14 +141,13 @@ export const DestinationTypeSelection = ({
   const allVisibleOptions = visibleGroups.flatMap((group) => group.options)
   const selectedOption = allVisibleOptions.find((option) => option.value === destinationType)
 
-  const stageDescription =
-    selectedOption?.stage === 'Public Alpha'
-      ? 'In public alpha and may change.'
-      : selectedOption?.stage === 'Early Access'
-        ? 'In early access and may change.'
-        : selectedOption?.stage === 'Deprecated'
-          ? 'This destination type is deprecated.'
-          : null
+  const STAGE_DESCRIPTIONS: Record<NonNullable<DestinationTypeOption['stage']>, string> = {
+    'Public Alpha': 'In public alpha and may change.',
+    'Early Access': 'In early access and may change.',
+    Deprecated: 'This destination type is deprecated.',
+  }
+
+  const stageDescription = selectedOption?.stage ? STAGE_DESCRIPTIONS[selectedOption.stage] : null
 
   if (variant === 'radio') {
     return (
