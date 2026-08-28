@@ -2,6 +2,8 @@ import { compact, get, isEmpty, uniqBy } from 'lodash'
 import { useCallback } from 'react'
 
 import { STORAGE_ROW_TYPES } from '../Storage.constants'
+import { ArchivedFilePreviewPane } from './ArchivedFilePreviewPane'
+import { useArchivedFilesContext } from './ArchivedFilesContext'
 import { ConfirmDeleteModal } from './ConfirmDeleteModal'
 import { ConfirmPurgeModal } from './ConfirmPurgeModal'
 import { CustomExpiryModal } from './CustomExpiryModal'
@@ -40,6 +42,7 @@ export const StorageExplorerContent = ({
     setIsSearching,
   } = useStorageExplorerStateSnapshot()
   const { truncateToColumn } = useStorageExplorerNavigation()
+  const { selectedArchivedObject } = useArchivedFilesContext()
 
   const handleClearSearch = useCallback(() => {
     setIsSearching(false)
@@ -113,7 +116,7 @@ export const StorageExplorerContent = ({
             fetchMoreFolderContents({ index, column, searchString: itemSearchString })
           }
         />
-        <PreviewPane />
+        {selectedArchivedObject !== undefined ? <ArchivedFilePreviewPane /> : <PreviewPane />}
       </div>
 
       <ConfirmDeleteModal />
