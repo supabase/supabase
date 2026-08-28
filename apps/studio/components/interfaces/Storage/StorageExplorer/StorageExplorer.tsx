@@ -5,7 +5,8 @@ import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 
 import { useSelectedBucket } from '../FilesBuckets/useSelectedBucket'
 import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
-import { ArchivedFilesProvider } from './ArchivedFilesContext'
+import { ArchivedFilePreviewPane } from './ArchivedFilePreviewPane'
+import { ArchivedFilesProvider, useArchivedFilesContext } from './ArchivedFilesContext'
 import { ConfirmDeleteModal } from './ConfirmDeleteModal'
 import { CustomExpiryModal } from './CustomExpiryModal'
 import { FileExplorer } from './FileExplorer'
@@ -51,6 +52,7 @@ const StorageExplorerContent = () => {
     setIsSearching,
   } = useStorageExplorerStateSnapshot()
   const { view } = useStoragePreference(projectRef)
+  const { selectedArchivedObject } = useArchivedFilesContext()
 
   useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { data: bucket, isLoading: isBucketQueryLoading } = useSelectedBucket()
@@ -184,7 +186,7 @@ const StorageExplorerContent = () => {
             fetchMoreFolderContents({ index, column, searchString: itemSearchString })
           }
         />
-        <PreviewPane />
+        {selectedArchivedObject !== undefined ? <ArchivedFilePreviewPane /> : <PreviewPane />}
       </div>
 
       <ConfirmDeleteModal />
