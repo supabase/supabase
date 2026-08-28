@@ -1,5 +1,6 @@
-import { useParams } from 'common'
-import { usePathname } from 'next/navigation'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage, useParams } from 'common'
+import { SqlEditor } from 'icons'
+import { usePathname, useRouter } from 'next/navigation'
 import { ComponentProps, ReactNode } from 'react'
 import { cn } from 'ui'
 
@@ -7,6 +8,8 @@ import { ProjectLayoutWithAuth } from '../ProjectLayout'
 import { CollapseButton } from '../Tabs/CollapseButton'
 import { EditorTabs } from '../Tabs/Tabs'
 import { useEditorType } from './EditorsLayout.hooks'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useTabsStateSnapshot } from '@/state/tabs'
 
 export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayoutWithAuth> {
@@ -62,6 +65,7 @@ export const EditorBaseLayout = ({
       resizableSidebar
       product={product}
       browserTitle={mergedBrowserTitle}
+      productMenuBadge={editor === 'sql' ? <BackToExplorerButton /> : undefined}
       productMenuClassName={productMenuClassName}
       productMenu={productMenu}
     >
@@ -77,5 +81,32 @@ export const EditorBaseLayout = ({
         <div className="h-full">{children}</div>
       </div>
     </ProjectLayoutWithAuth>
+  )
+}
+
+const BackToExplorerButton = () => {
+  const { ref } = useParams()
+  const router = useRouter()
+  const [isTemporary] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_TEMPORARY_FROM_EXPLORER(ref ?? ''),
+    false
+  )
+
+  if (!isTemporary) return null
+
+  return (
+    <ButtonTooltip
+      size="tiny"
+      variant="outline"
+      className="size-7 shrink-0 px-0"
+      icon={<SqlEditor size={14} strokeWidth={1.5} />}
+      tooltip={{ content: { side: 'bottom', text: 'Back to Explorer' } }}
+      onClick={() => {
+        safeLocalStorage.removeItem(
+          LOCAL_STORAGE_KEYS.SQL_EDITOR_TEMPORARY_FROM_EXPLORER(ref ?? '')
+        )
+        router.push(`/project/${ref}/explorer`)
+      }}
+    />
   )
 }

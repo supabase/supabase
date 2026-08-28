@@ -1,5 +1,8 @@
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
+import { SqlEditor } from 'icons'
 import { Home, MessageCirclePlus, NotebookText, Plus, SquareCode } from 'lucide-react'
+import Link from 'next/link'
 import { ComponentProps, ReactNode, useEffect, useEffectEvent, useState } from 'react'
 import {
   cn,
@@ -23,6 +26,8 @@ import {
   useCreateNotebook,
   useCreateQuery,
 } from '@/components/interfaces/Explorer/hooks'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import {
   editorEntityTypes,
   EXPLORER_HOME_TAB,
@@ -56,6 +61,7 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
     <ProjectLayoutWithAuth
       product="Explorer"
       browserTitle={mergedBrowserTitle}
+      productMenuBadge={<BackToSqlEditorButton />}
       productMenu={
         <div className="relative h-full overflow-hidden">
           <AnimatePresence mode="wait">
@@ -85,6 +91,36 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
         <div className="flex-grow min-h-0">{children}</div>
       </div>
     </ProjectLayoutWithAuth>
+  )
+}
+
+const BackToSqlEditorButton = () => {
+  const { ref } = useParams()
+  const [, setIsTemporary] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_TEMPORARY_FROM_EXPLORER(ref ?? ''),
+    false
+  )
+
+  return (
+    <ButtonTooltip
+      asChild
+      size="tiny"
+      variant="outline"
+      className="size-7 shrink-0 px-0"
+      icon={<SqlEditor size={14} strokeWidth={1.5} />}
+      tooltip={{
+        content: {
+          side: 'bottom',
+          text: 'Temporarily switch to SQL Editor to access your snippets',
+        },
+      }}
+    >
+      <Link
+        href={`/project/${ref}/sql`}
+        aria-label="Switch to SQL Editor"
+        onClick={() => setIsTemporary(true)}
+      />
+    </ButtonTooltip>
   )
 }
 
