@@ -43,6 +43,8 @@ Reference these guidelines when:
 
 - `testing-exhaustive-permutations` - Test every permutation of utility functions:
   happy path, malformed input, empty values, edge cases
+- `testing-skip-change-detectors` - Test logic, not static data. Skip tests whose
+  only failure mode is someone re-typing the exact literal you changed
 
 ### 3. Component Tests (HIGH)
 
@@ -131,6 +133,47 @@ test('rejects malformed filter with missing parts', () => { ... })
 test('rejects unrecognized operator', () => { ... })
 test('allows empty filter value', () => { ... })
 ```
+
+## 2b. Don't Write Change-Detector Tests (CRITICAL)
+
+"Test every permutation" applies to **logic**: branches, parsing, formatting,
+validation, computation. It does **not** mean pinning down static data or config
+that contains no logic. Exhaustive coverage of a hardcoded list is not coverage;
+it's noise.
+
+A test earns its place only if there is a realistic bug it would catch. If the
+only way it can fail is someone re-typing the exact literal you just changed, it's
+a change-detector: it breaks on every intentional edit, verifies nothing a reader
+can't already see in the source, and gives false confidence. This is the most
+common form of test slop, and it slips through precisely because "more tests"
+feels safe. It isn't.
+
+```ts
+// ❌ Change-detector: only fails if someone re-adds the line you just removed.
+// The command list is static; there is no logic to protect.
+it('does not offer a serve command', () => {
+  const commands = buildWorkerCliCommands('embed')
+  expect(commands.some(({ command }) => command.includes('serve'))).toBe(false)
+})
+
+// ❌ Tautology: asserts the implementation against a copy of itself.
+it('labels the output tab', () => {
+  expect(TAB_LABEL.output).toBe('Logs')
+})
+
+// ✅ Real coverage: the function has logic (slug fallback, name interpolation)
+// and inputs that can genuinely be wrong.
+it('falls back to a placeholder name when the worker has none', () => {
+  expect(buildWorkerCliCommands('  ')[0].command).toContain('my-worker')
+})
+```
+
+Before adding any test, answer in one sentence: **what real bug does this catch?**
+If the answer is "someone deletes or edits this exact static value on purpose,"
+delete the test. Removing a hardcoded list item, renaming a label, or dropping a
+branch does not need a test asserting the change happened; the diff, typecheck,
+and code review already cover that. When a reviewer would call a test pointless,
+they're right; don't add it in the first place.
 
 ## 3. Component Tests for Complex UI Only (HIGH)
 
