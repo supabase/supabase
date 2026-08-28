@@ -36,6 +36,7 @@ import {
 } from '../Storage.constants'
 import { StorageItemWithColumn, type StorageItem } from '../Storage.types'
 import { StorageRowIcon } from '../StorageRowIcon'
+import { useArchivedFilesContext } from './ArchivedFilesContext'
 import { useFileExplorerContextMenu } from './FileExplorerRowContextMenu'
 import { FileExplorerRowEditing } from './FileExplorerRowEditing'
 import { copyPathToFolder } from './StorageExplorer.utils'
@@ -43,6 +44,12 @@ import { useCopyUrl } from './useCopyUrl'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { formatBytes } from '@/lib/helpers'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
+
+/** Built from `currentColor` so the stripes track the row's text color. */
+const ARCHIVED_STRIPES_STYLE: CSSProperties = {
+  backgroundImage:
+    'repeating-linear-gradient(-45deg, color-mix(in srgb, currentColor 8%, transparent) 0 1px, transparent 1px 7px)',
+}
 
 interface FileExplorerRowProps {
   index: number
@@ -82,18 +89,32 @@ export const FileExplorerRow = ({
   const { onCopyUrl } = useCopyUrl()
   const ctx = useFileExplorerContextMenu()
 
+  const { selectedArchivedObject, selectArchivedObject, clearArchivedSelection } =
+    useArchivedFilesContext()
+  const isArchived = item.archived !== undefined
+  const archivedObjectId = item.archived?.archivedObjectId
+  const isArchivedFile = archivedObjectId !== undefined && item.type === STORAGE_ROW_TYPES.FILE
+
   const isPublic = selectedBucket.public
   const itemWithColumnIndex = { ...item, columnIndex }
   const isSelected = !!selectedItems.find((i) => i.id === item.id)
   const isOpened =
     openedFolders.length > columnIndex ? openedFolders[columnIndex].name === item.name : false
-  const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview?.id, item.id)
+  const isPreviewed =
+    (!isEmpty(selectedFilePreview) && isEqual(selectedFilePreview?.id, item.id)) ||
+    (isArchivedFile && selectedArchivedObject?.id === archivedObjectId)
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const onSelectFile = async (columnIndex: number) => {
     popColumnAtIndex(columnIndex)
     popOpenedFoldersAtIndex(columnIndex - 1)
-    setSelectedFilePreview(itemWithColumnIndex)
+    if (isArchivedFile) {
+      setSelectedFilePreview(undefined)
+      selectArchivedObject(archivedObjectId)
+    } else {
+      clearArchivedSelection()
+      setSelectedFilePreview(itemWithColumnIndex)
+    }
     clearSelectedItems()
   }
 
@@ -245,9 +266,10 @@ export const FileExplorerRow = ({
     <div
       style={style}
       className="h-full border-b border-default"
-      onContextMenu={(e) => ctx?.onRowContextMenu(e, rowOptions)}
+      onContextMenu={(e) => (isArchived ? undefined : ctx?.onRowContextMenu(e, rowOptions))}
     >
       <div
+        style={isArchived ? ARCHIVED_STRIPES_STYLE : undefined}
         className={cn(
           'storage-row group flex h-full items-center px-2.5 rounded-sm',
           'hover:bg-panel-footer-light in-data-[theme*=dark]:hover:bg-panel-footer-dark',
@@ -255,6 +277,8 @@ export const FileExplorerRow = ({
           isSelected && 'bg-selection',
           isPreviewed && 'bg-selection hover:bg-selection',
           item.status !== STORAGE_ROW_STATUS.LOADING && 'cursor-pointer',
+          // Also drives the stripe color via `currentColor`.
+          isArchived && 'text-foreground-lighter [&_p]:text-foreground-lighter',
           // Keyboard focus on the checkbox: ring the whole row
           'has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-[-2px] has-[:focus-visible]:outline-[var(--ring)]'
         )}
@@ -262,9 +286,12 @@ export const FileExplorerRow = ({
           event.stopPropagation()
           event.preventDefault()
           if (item.status !== STORAGE_ROW_STATUS.LOADING && !isOpened && !isPreviewed) {
-            item.type === STORAGE_ROW_TYPES.FOLDER
-              ? openFolder(columnIndex, item)
-              : onSelectFile(columnIndex)
+            if (item.type === STORAGE_ROW_TYPES.FOLDER) {
+              clearArchivedSelection()
+              openFolder(columnIndex, item)
+            } else {
+              onSelectFile(columnIndex)
+            }
           }
         }}
       >
@@ -293,7 +320,7 @@ export const FileExplorerRow = ({
                 />
               </div>
             )}
-            {isFile ? (
+            {isFile && !isArchived ? (
               <Checkbox
                 className={
                   isSelected
@@ -351,6 +378,24 @@ export const FileExplorerRow = ({
               className={`animate-spin text-foreground-lighter ${view === STORAGE_VIEWS.LIST ? 'invisible' : ''}`}
               size={14}
             />
+          ) : isArchived ? (
+            // Archived rows have no checkbox or context menu, so without this
+            // button they'd have nothing keyboard-reachable.
+            isArchivedFile ? (
+              <button
+                type="button"
+                tabIndex={0}
+                aria-label={`View archived file ${item.name}`}
+                onClick={() => onSelectFile(columnIndex)}
+                className="focus-ring rounded-sm border border-strong px-1 font-mono text-[10px] uppercase text-foreground-lighter"
+              >
+                Archived
+              </button>
+            ) : (
+              <span className="rounded-sm border border-strong px-1 font-mono text-[10px] uppercase text-foreground-lighter">
+                Archived
+              </span>
+            )
           ) : (
             <DropdownMenu>
               <DropdownMenuTrigger className="focus-ring rounded-sm">

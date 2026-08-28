@@ -5,6 +5,7 @@ import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 
 import { useSelectedBucket } from '../FilesBuckets/useSelectedBucket'
 import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
+import { ArchivedFilesProvider } from './ArchivedFilesContext'
 import { ConfirmDeleteModal } from './ConfirmDeleteModal'
 import { CustomExpiryModal } from './CustomExpiryModal'
 import { FileExplorer } from './FileExplorer'
@@ -19,7 +20,14 @@ import type { Bucket } from '@/data/storage/buckets-query'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
-export const StorageExplorer = () => {
+/** Mounted here rather than on the page so the bucket page keeps its shape. */
+export const StorageExplorer = () => (
+  <ArchivedFilesProvider>
+    <StorageExplorerContent />
+  </ArchivedFilesProvider>
+)
+
+const StorageExplorerContent = () => {
   const { ref, bucketId } = useParams()
   const storageExplorerRef = useRef(null)
   const {
