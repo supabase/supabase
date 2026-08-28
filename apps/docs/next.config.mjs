@@ -188,6 +188,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/guides/database/inspect',
+        destination: '/guides/monitoring-and-debugging/inspect',
+        permanent: true,
+      },
+      {
         source: '/guides/database/database-advisors',
         destination: '/guides/monitoring-and-debugging/advisors',
         permanent: true,
