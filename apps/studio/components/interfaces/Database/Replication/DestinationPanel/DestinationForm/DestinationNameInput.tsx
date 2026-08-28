@@ -14,7 +14,11 @@ export const DestinationNameInput = ({ form }: DestinationNameInputProps) => {
       control={form.control}
       name="name"
       render={({ field }) => (
-        <FormItemLayout label="Name" layout="horizontal">
+        <FormItemLayout
+          label="Name"
+          layout="horizontal"
+          description="Used to identify this pipeline in Supabase."
+        >
           <FormControl>
             <Input
               {...field}

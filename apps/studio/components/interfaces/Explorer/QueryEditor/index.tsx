@@ -2,7 +2,7 @@ import { useMonaco } from '@monaco-editor/react'
 import { acceptUntrustedSql, untrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { useFlag } from 'common'
 import { CodeSquare, Eye, EyeOff, Play } from 'lucide-react'
-import type { editor as monacoEditor } from 'monaco-editor'
+import type { editor as monacoEditor, Selection } from 'monaco-editor'
 import {
   forwardRef,
   useEffect,
@@ -46,6 +46,7 @@ import { useAddDefinitions } from '@/components/interfaces/SQLEditor/useAddDefin
 import { ResizableAIWidget } from '@/components/ui/AIEditor/ResizableAIWidget'
 import { getEditorSelectionParts, type EditorSelection } from '@/components/ui/AIEditor/utils'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+import { getEditorValueOrSelection } from '@/components/ui/CodeEditor/CodeEditor.utils'
 import { DiffEditor } from '@/components/ui/DiffEditor'
 import {
   type DatabaseSourceParameters,
@@ -195,6 +196,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   const [promptState, setPromptState] = useState<(EditorSelection & { isOpen: boolean }) | null>(
     null
   )
+  const [hasSelection, setHasSelection] = useState(false)
 
   const dialect = query._tag === 'logs' ? 'clickhouse' : 'postgres'
   const { requestCompletion, isCompletionLoading } = useQueryEditorAi({ dialect })
@@ -237,13 +239,6 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   const isExecuting = isExecutingSql || isExecutingLogs
   const isBusy = isLoadingProject || isResolvingDatabase || isExecuting
 
-  /**
-   * The user's run gesture, and therefore the promotion point for this query's SQL. The
-   * raw text comes straight off the editor, so it is (re)branded untrusted here — the
-   * editor boundary — and promoted in the same handler. Which pair of helpers applies is
-   * decided by `query._tag`, the same discriminant that picks the execution endpoint, so
-   * Postgres SQL cannot reach the analytics wire or vice versa.
-   */
   const handleRunQuery = async ({
     rawSql = sql,
     shouldForce = false,
@@ -409,13 +404,17 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
             <ExplorerToolbarAction
               loading={isExecuting}
               icon={<Play />}
-              tooltip="Run query"
+              tooltip={hasSelection ? 'Run selected query' : 'Run query'}
               disabled={
                 isBusy || pendingProposal !== null || isRunDisabled || sql.trim().length === 0
               }
-              onClick={() => handleRunQuery()}
+              onClick={() => {
+                const editorInstance = editorInstanceRef.current
+                const rawSql = editorInstance ? getEditorValueOrSelection(editorInstance) : sql
+                handleRunQuery({ rawSql })
+              }}
             >
-              Run
+              {hasSelection ? 'Run selected' : 'Run'}
             </ExplorerToolbarAction>
           </ExplorerToolbarActions>
         </ExplorerToolbar>
@@ -447,7 +446,10 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
                 placeholderClassName="top-[13px]"
                 className={variant === 'embedded' ? 'h-44' : undefined}
                 actions={{
-                  runQuery: { enabled: !isRunDisabled, callback: handleRunQuery },
+                  runQuery: {
+                    enabled: !isRunDisabled,
+                    callback: (rawSql: string) => handleRunQuery({ rawSql }),
+                  },
                 }}
                 options={{
                   minimap: { enabled: false },
@@ -457,6 +459,23 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
                 onMount={(editor, monaco) => {
                   editor.onDidBlurEditorWidget(() => onSqlCommitRef.current?.(sqlRef.current))
                   editorInstanceRef.current = editor
+
+                  const updateHasSelection = (selection: Selection | null | undefined) => {
+                    const noSelection =
+                      !selection ||
+                      (selection.startLineNumber === selection.endLineNumber &&
+                        selection.startColumn === selection.endColumn)
+                    setHasSelection(!noSelection)
+                  }
+
+                  // A remount (e.g. toggling "Show query" off then on) creates a fresh
+                  // editor with no listener history, so `hasSelection` must be read from
+                  // this instance directly rather than left at whatever the previous
+                  // editor instance last reported.
+                  updateHasSelection(editor.getSelection())
+                  editor.onDidChangeCursorSelection(({ selection }) =>
+                    updateHasSelection(selection)
+                  )
 
                   editor.addAction({
                     id: 'generate-sql',
