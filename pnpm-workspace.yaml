@@ -69,6 +69,7 @@ allowBuilds:
   esbuild: false
   icons@file:packages/icons: set this to true or false
   libpg-query: false
+  msgpackr-extract: false
   msw: false
   node-pty: true
   protobufjs: false
