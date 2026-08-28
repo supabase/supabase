@@ -45,7 +45,6 @@ import {
 import { useAddDefinitions } from '@/components/interfaces/SQLEditor/useAddDefinitions'
 import { ResizableAIWidget } from '@/components/ui/AIEditor/ResizableAIWidget'
 import { getEditorSelectionParts, type EditorSelection } from '@/components/ui/AIEditor/utils'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { getEditorValueOrSelection } from '@/components/ui/CodeEditor/CodeEditor.utils'
 import { DiffEditor } from '@/components/ui/DiffEditor'

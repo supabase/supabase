@@ -1,9 +1,16 @@
+import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { Check, Keyboard, Loader2, MoreVertical, Save, SquareCode } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useCallback, useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
+  Command,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -12,15 +19,19 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ExplorerToolbarAction } from './ExplorerToolbar'
 import { useCreateNotebook } from './hooks'
 import { QueryEditor, type ExplorerQueryModel } from './QueryEditor'
 import { type QueryDisplay, type QueryResult } from './types'
 import { createQueryCellSkeleton } from './utils'
+import { getNotebook } from '@/data/content/notebooks/notebook-query'
+import { useNotebooksInfiniteQuery } from '@/data/content/notebooks/notebooks-infinite-query'
 import { toQuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { explorerQueryState, useExplorerQueryStateSnapshot } from '@/state/explorer-query'
+import { useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { useControlledRoleImpersonationState } from '@/state/role-impersonation-state'
 import { createTabId, TabsStateContext } from '@/state/tabs'
 
@@ -32,6 +43,7 @@ export const ExplorerQueryTab = () => {
   const querySnap = useExplorerQueryStateSnapshot()
 
   const { createNotebook } = useCreateNotebook()
+  const notebooksSnap = useNotebooksStateSnapshot()
 
   const [isIntellisenseEnabled, setIsIntellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
@@ -40,6 +52,18 @@ export const ExplorerQueryTab = () => {
 
   const [restoredQueryKey, setRestoredQueryKey] = useState<string>()
   const [showQuery, setShowQuery] = useState(true)
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search, 500)
+
+  const { data: notebooksData, isPending } = useNotebooksInfiniteQuery({
+    projectRef: ref,
+    limit: 100,
+    name: search.length === 0 ? search : debouncedSearch,
+  })
+  const notebooks = useMemo(() => {
+    const items = notebooksData?.pages.flatMap((page) => page.content) ?? []
+    return items
+  }, [notebooksData?.pages])
 
   const stateDraft = id ? querySnap.drafts[id] : undefined
   const draft = stateDraft?.projectRef === ref ? stateDraft : undefined
@@ -114,6 +138,32 @@ export const ExplorerQueryTab = () => {
     })
   }
 
+  const onAddToNewNotebook = () => {
+    createNotebook({
+      cells: [createQueryCellSkeleton({ title: draft.name, sql: draft.uncheckedSql })],
+    })
+  }
+
+  const onAddToExistingNotebook = async (notebookId: string) => {
+    if (!ref) return
+    try {
+      if (!notebooksSnap.notebooks[notebookId]?.notebook.content) {
+        const notebook = await getNotebook({ projectRef: ref, id: notebookId })
+        notebooksSnap.setNotebook({ projectRef: ref, notebook })
+      }
+
+      notebooksSnap.insertCellAfter({
+        id: notebookId,
+        cell: createQueryCellSkeleton({ title: draft.name, sql: draft.uncheckedSql }),
+      })
+      notebooksSnap.requestScrollToBottom(notebookId)
+
+      router.push(`/project/${ref}/explorer/notebook/${notebookId}`)
+    } catch (error) {
+      toast.error('Failed to add query to notebook')
+    }
+  }
+
   return (
     <QueryEditor
       id={id}
@@ -157,19 +207,43 @@ export const ExplorerQueryTab = () => {
             <DropdownMenuContent className="w-52" align="end">
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>Add to existing notebook</DropdownMenuSubTrigger>
-                <DropdownMenuSubContent>
-                  <DropdownMenuItem>asd</DropdownMenuItem>
+                <DropdownMenuSubContent className="p-0">
+                  <Command shouldFilter={false}>
+                    <CommandInput
+                      autoFocus
+                      placeholder="Search notebooks..."
+                      className="text-xs"
+                      value={search}
+                      onValueChange={setSearch}
+                    />
+                    <CommandList>
+                      <CommandGroup>
+                        {isPending ? (
+                          <div className="flex flex-col p-1 gap-y-1">
+                            <ShimmeringLoader />
+                            <ShimmeringLoader className="w-3/4" />
+                          </div>
+                        ) : !notebooks?.length ? (
+                          <p className="text-xs text-center text-foreground-lighter py-3">
+                            No notebooks found
+                          </p>
+                        ) : null}
+                        {notebooks?.map((notebook) => (
+                          <CommandItem
+                            key={notebook.id}
+                            value={notebook.id}
+                            className="cursor-pointer"
+                            onSelect={() => onAddToExistingNotebook(notebook.id)}
+                          >
+                            {notebook.name}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
-              <DropdownMenuItem
-                onClick={() =>
-                  createNotebook({
-                    cells: [
-                      createQueryCellSkeleton({ title: draft.name, sql: draft.uncheckedSql }),
-                    ],
-                  })
-                }
-              >
+              <DropdownMenuItem onClick={onAddToNewNotebook}>
                 Create a new notebook
               </DropdownMenuItem>
             </DropdownMenuContent>
