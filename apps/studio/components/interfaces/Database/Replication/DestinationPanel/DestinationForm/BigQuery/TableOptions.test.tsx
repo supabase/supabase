@@ -352,9 +352,9 @@ describe('TableOptions source reconciliation', () => {
 
     expect(await screen.findByText('Billing.Invoices')).toBeInTheDocument()
     expect(screen.getByText('Billing.Invoices')).toHaveClass('text-destructive-600')
-    expect(
-      screen.getByText('Some tables are no longer in the publication.')
-    ).toHaveClass('text-destructive-600')
+    expect(screen.getByText('Some tables are no longer in the publication.')).toHaveClass(
+      'text-destructive-600'
+    )
     expect(screen.queryByText('No longer in this publication')).not.toBeInTheDocument()
     expect(screen.queryByText('Region')).not.toBeInTheDocument()
     expect(document.body).not.toHaveTextContent('202')
@@ -387,9 +387,7 @@ describe('TableOptions source reconciliation', () => {
 
     expect(await screen.findByText('Previously configured table')).toBeInTheDocument()
     expect(screen.queryByText('OccurredAt')).not.toBeInTheDocument()
-    expect(
-      screen.getByText('Some tables are no longer in the publication.')
-    ).toBeInTheDocument()
+    expect(screen.getByText('Some tables are no longer in the publication.')).toBeInTheDocument()
     expect(document.body).not.toHaveTextContent('999')
   })
 })

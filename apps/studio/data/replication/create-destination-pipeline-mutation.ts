@@ -53,6 +53,16 @@ export type BigQueryPartitionBy =
     }
   | { kind: 'ingestion_time'; granularity?: BigQueryTimePartitionGranularity }
 
+type CompleteBigQueryPartitionBy =
+  | Exclude<BigQueryPartitionBy, { kind: 'integer_range' }>
+  | {
+      kind: 'integer_range'
+      column: string
+      start: number
+      end: number
+      interval: number
+    }
+
 // A single source table's BigQuery partitioning/clustering configuration. `tableId` is the
 // source Postgres table OID, stable across renames, matching the id used by the replication
 // tables/columns endpoints.
@@ -110,7 +120,9 @@ function isDucklakeSupabaseConfig(
 
 const hasClusteringColumns = (clusterBy: string[] | undefined) => (clusterBy?.length ?? 0) > 0
 
-const isCompleteBigQueryPartition = (partitionBy: BigQueryPartitionBy | undefined) => {
+const isCompleteBigQueryPartition = (
+  partitionBy: BigQueryPartitionBy | undefined
+): partitionBy is CompleteBigQueryPartitionBy => {
   if (!partitionBy) return false
   if (partitionBy.kind === 'ingestion_time') return true
   if (!('column' in partitionBy) || partitionBy.column.trim().length === 0) return false
@@ -122,7 +134,7 @@ const isCompleteBigQueryPartition = (partitionBy: BigQueryPartitionBy | undefine
   )
 }
 
-const buildBigQueryPartitionByApiConfig = (partitionBy: BigQueryPartitionBy) => {
+const buildBigQueryPartitionByApiConfig = (partitionBy: CompleteBigQueryPartitionBy) => {
   switch (partitionBy.kind) {
     case 'time_column':
       return {
@@ -134,9 +146,9 @@ const buildBigQueryPartitionByApiConfig = (partitionBy: BigQueryPartitionBy) => 
       return {
         kind: partitionBy.kind,
         column: partitionBy.column,
-        start: Number(partitionBy.start),
-        end: Number(partitionBy.end),
-        interval: Number(partitionBy.interval),
+        start: partitionBy.start,
+        end: partitionBy.end,
+        interval: partitionBy.interval,
       }
     case 'ingestion_time':
       return { kind: partitionBy.kind, granularity: partitionBy.granularity }

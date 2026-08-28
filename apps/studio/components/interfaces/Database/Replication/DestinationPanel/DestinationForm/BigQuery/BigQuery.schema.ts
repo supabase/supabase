@@ -13,7 +13,7 @@ const integerRangeValue = (label: string) =>
       z.literal(''),
       z.number().int(`${label} must be a whole number`).safe(`${label} must be a safe integer`),
     ])
-    .refine((value) => value !== '', `${label} is required`)
+    .refine((value): boolean => value !== '', `${label} is required`)
 
 export const BigQueryPartitionBySchema = z.discriminatedUnion('kind', [
   z.object({

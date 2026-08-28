@@ -136,7 +136,9 @@ describe('NewPublicationPanel', () => {
     fireEvent.change(screen.getByPlaceholderText('Name'), {
       target: { value: 'MixedCasePublication' },
     })
-    fireEvent.click(screen.getByRole('checkbox', { name: 'Publish partitions as the parent table' }))
+    fireEvent.click(
+      screen.getByRole('checkbox', { name: 'Publish partitions as the parent table' })
+    )
     fireEvent.click(screen.getByRole('button', { name: 'Create publication' }))
 
     await waitFor(() =>
