@@ -359,14 +359,6 @@ export const ExplorerNotebookTab = () => {
             Analyze
           </ExplorerToolbarAction>
           <ExplorerToolbarAction
-            aria-label="Run notebook"
-            icon={<Play />}
-            tooltip="Run notebook"
-            loading={isRunningNotebook}
-            disabled={queryCellIds.length === 0}
-            onClick={handleRunNotebook}
-          />
-          <ExplorerToolbarAction
             aria-label="Save changes"
             icon={<Save />}
             tooltip="Save changes"
@@ -397,6 +389,16 @@ export const ExplorerNotebookTab = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           </ExplorerToolbarActions>
+          <ExplorerToolbarAction
+            aria-label="Run notebook"
+            icon={<Play />}
+            tooltip="Run notebook"
+            loading={isRunningNotebook}
+            disabled={queryCellIds.length === 0}
+            onClick={handleRunNotebook}
+          >
+            Run
+          </ExplorerToolbarAction>
         </ExplorerToolbarActions>
       </ExplorerToolbar>
 

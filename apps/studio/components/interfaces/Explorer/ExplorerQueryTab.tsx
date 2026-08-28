@@ -14,8 +14,10 @@ import {
 } from 'ui'
 
 import { ExplorerToolbarAction } from './ExplorerToolbar'
+import { useCreateNotebook } from './hooks'
 import { QueryEditor, type ExplorerQueryModel } from './QueryEditor'
 import { type QueryDisplay, type QueryResult } from './types'
+import { createQueryCellSkeleton } from './utils'
 import { toQuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { explorerQueryState, useExplorerQueryStateSnapshot } from '@/state/explorer-query'
@@ -24,10 +26,12 @@ import { createTabId, TabsStateContext } from '@/state/tabs'
 
 /** Query-tab lifecycle adapter around the shared QueryEditor. */
 export const ExplorerQueryTab = () => {
-  const { id, ref } = useParams()
   const router = useRouter()
+  const { id, ref } = useParams()
   const tabs = useContext(TabsStateContext)
   const querySnap = useExplorerQueryStateSnapshot()
+
+  const { createNotebook } = useCreateNotebook()
 
   const [isIntellisenseEnabled, setIsIntellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
@@ -112,7 +116,6 @@ export const ExplorerQueryTab = () => {
 
   return (
     <QueryEditor
-      hideRunLabel
       id={id}
       variant="viewport"
       title={draft.name}
@@ -158,7 +161,17 @@ export const ExplorerQueryTab = () => {
                   <DropdownMenuItem>asd</DropdownMenuItem>
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
-              <DropdownMenuItem>Create a new notebook</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() =>
+                  createNotebook({
+                    cells: [
+                      createQueryCellSkeleton({ title: draft.name, sql: draft.uncheckedSql }),
+                    ],
+                  })
+                }
+              >
+                Create a new notebook
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <DropdownMenu>
