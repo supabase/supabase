@@ -30,6 +30,7 @@ import {
 
 import { getSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
 import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
+import { LogsSnippetIcon } from '@/components/ui/EntityTypeIcon'
 import { getContentById, getSqlSnippetById } from '@/data/content/content-id-query'
 import { useSQLSnippetFolderContentsQuery } from '@/data/content/sql-folder-contents-query'
 import { Snippet } from '@/data/content/sql-folders-query'
@@ -110,6 +111,8 @@ export const SQLEditorTreeViewItem = ({
   const isOwner = profile?.id === element?.metadata.owner_id
   const isSharedSnippet = element.metadata.visibility === 'project'
   const isFavorite = element.metadata.favorite
+
+  const isLogsSnippet = getSnippetSource(element.metadata) === 'logs'
 
   const isEditing = isFolderEditing(status)
   const isSaving = isFolderSaving(status)
@@ -247,6 +250,14 @@ export const SQLEditorTreeViewItem = ({
             isPreview={props.isPreview}
             isEditing={isEditing}
             isLoading={(isEnabled && isLoading) || isSaving}
+            icon={
+              isLogsSnippet ? (
+                <LogsSnippetIcon
+                  size={16}
+                  className="w-5 h-5 shrink-0 text-foreground-muted group-aria-selected:text-foreground"
+                />
+              ) : undefined
+            }
             onEditSubmit={(value) => {
               if (onEditSave !== undefined) onEditSave(value)
             }}

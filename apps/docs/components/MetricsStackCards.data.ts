@@ -2,7 +2,7 @@ export type MetricsStackOption = {
   title: string
   description: string
   href: string
-  iconKind: 'grafana' | 'datadog' | 'flame'
+  iconKind: 'grafana' | 'datadog' | 'elastic' | 'flame'
   iconColor: string
   iconBg: string
   badges: { label: string; variant: 'default' | 'community' }[]
@@ -37,6 +37,16 @@ export const metricsStackOptions: MetricsStackOption[] = [
     iconKind: 'datadog',
     iconColor: '#632CA6',
     iconBg: 'rgba(99,44,166,0.1)',
+    badges: [{ label: 'Community', variant: 'community' }],
+  },
+  {
+    title: 'Elastic',
+    description:
+      "Use Elastic's managed Supabase integration to scrape metrics. The integration automatically installs dashboards, alert templates, and SLO templates as data arrives.",
+    href: 'https://www.elastic.co/docs/reference/integrations/supabase',
+    iconKind: 'elastic',
+    iconColor: '#00BFB3',
+    iconBg: 'rgba(0,191,179,0.1)',
     badges: [{ label: 'Community', variant: 'community' }],
   },
   {

@@ -21,14 +21,10 @@ export const generateNodes = ({
   primary,
   replicas,
   loadBalancers,
-  onSelectRestartReplica,
-  onSelectDropReplica,
 }: {
   primary: Database
   replicas: Database[]
   loadBalancers: LoadBalancer[]
-  onSelectRestartReplica: (database: Database) => void
-  onSelectDropReplica: (database: Database) => void
 }): Node[] => {
   const position = { x: 0, y: 0 }
   const regions = groupBy(replicas, (d) => {
@@ -107,8 +103,6 @@ export const generateNodes = ({
           inserted_at: database.inserted_at,
           computeSize: database.size,
           status: database.status,
-          onSelectRestartReplica: () => onSelectRestartReplica(database),
-          onSelectDropReplica: () => onSelectDropReplica(database),
         },
       }
     })
@@ -120,15 +114,19 @@ export const generateNodes = ({
   ]
 }
 
-const getDagreNodeHeight = (node: Node) => {
+export const getDagreNodeHeight = (node: Node) => {
   if (node.measured?.height) return node.measured.height
   return NODE_HEIGHT_FALLBACKS[node.type ?? ''] ?? 100
 }
 
-export const getDagreGraphLayout = (nodes: Node[], edges: Edge[]) => {
+export const getDagreGraphLayout = (
+  nodes: Node[],
+  edges: Edge[],
+  { ranksep = 60 }: { ranksep?: number } = {}
+) => {
   const dagreGraph = new dagre.graphlib.Graph()
   dagreGraph.setDefaultEdgeLabel(() => ({}))
-  dagreGraph.setGraph({ rankdir: 'TB', ranksep: 60, nodesep: NODE_SEP })
+  dagreGraph.setGraph({ rankdir: 'TB', ranksep, nodesep: NODE_SEP })
 
   nodes.forEach((node) => {
     dagreGraph.setNode(node.id, {

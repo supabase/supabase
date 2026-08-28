@@ -6,6 +6,17 @@ description: 'Isolate and fix Supabase issues by reading the error, isolating th
 
 Debug by evidence, not by guessing. A Supabase error almost always surfaces at one layer but originates at another, so the fastest path to a fix is finding _where_ the problem is, not pattern-matching the symptom. Retrying a failed request rarely helps; isolating the layer does.
 
+## Debug with AI tools
+
+An AI agent can work through this loop for you, but only if it can read your project's evidence instead of guessing from the error message.
+
+Debugging with an agent needs two things:
+
+- The [Supabase MCP server](/docs/guides/ai-tools/mcp) provides the tools this guide relies on: `get_logs` for a per-service log dump, `query_logs` to run read-only SQL against your logs for filtering and aggregation (see [Querying with the Logs Explorer](/docs/guides/monitoring-and-debugging/logs#querying-with-the-logs-explorer) for the ClickHouse SQL syntax it accepts), `get_advisors` for security and performance findings, and `execute_sql` to inspect your schema and policies.
+- The [Supabase agent skill](/docs/guides/ai-tools/ai-skills) teaches the agent this workflow: locate the failing layer, gather evidence from the matching log source, and verify the fix by re-running the operation that failed.
+
+Install both in one step with the [Supabase plugin for AI coding agents](/docs/guides/ai-tools/plugins). Connecting an agent to your project carries security risks, so read the [MCP security best practices](/docs/guides/ai-tools/mcp#security-risks) first.
+
 ## Follow these debugging steps
 
 Work through these steps in order, skipping straight to a fix before you have evidence for the cause is the most common way to waste time on a bug.

@@ -7,7 +7,6 @@ import { DiffType, type IStandaloneCodeEditor } from './SQLEditor.types'
 import {
   analyzeQueryIssues,
   appendEnableRLSStatements,
-  applyAutoLimit,
   assembleCompletionDiff,
   buildCompletionRequestBody,
   buildDebugChatArgs,
@@ -29,7 +28,7 @@ import {
   resolveConnectionString,
   resolveDiffKeyAction,
   shouldAutoGenerateTitle,
-  trimTrailingSemicolons,
+  sqlSourceToDialect,
 } from './SQLEditor.utils'
 import type { DatabaseEventTrigger } from '@/data/database-event-triggers/database-event-triggers-query'
 import type { Database } from '@/data/read-replicas/replicas-query'
@@ -46,166 +45,6 @@ const buildTrigger = (overrides: Partial<DatabaseEventTrigger> = {}): DatabaseEv
   owner: 'postgres',
   function_definition: null,
   ...overrides,
-})
-
-describe('SQLEditor.utils.ts:trimTrailingSemicolons', () => {
-  test('removes a single trailing semicolon', () => {
-    const sql = safeSql`select * from countries;`
-    expect(trimTrailingSemicolons(sql)).toBe('select * from countries')
-  })
-  test('removes multiple trailing semicolons', () => {
-    const sql = safeSql`select * from countries;;;;;;;`
-    expect(trimTrailingSemicolons(sql)).toBe('select * from countries')
-  })
-  test('leaves a fragment with no trailing semicolon unchanged', () => {
-    const sql = safeSql`select * from countries`
-    expect(trimTrailingSemicolons(sql)).toBe('select * from countries')
-  })
-  test('does not touch semicolons that are not trailing', () => {
-    const sql = safeSql`select 1; select 2`
-    expect(trimTrailingSemicolons(sql)).toBe('select 1; select 2')
-  })
-})
-
-describe('SQLEditor.utils.ts:applyAutoLimit', () => {
-  test('Should return false if limit passed is <= 0', () => {
-    const sql = safeSql`select * from countries;`
-    const limit = -1
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return true if limit passed is > 0', () => {
-    const sql = safeSql`select * from countries;`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(true)
-  })
-  test('Should return false if query already has a limit', () => {
-    const sql = safeSql`select * from countries limit 10;`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query already has a limit (check for case-insensitiveness)', () => {
-    const sql = safeSql`SELECT * FROM countries LIMIT 10;`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query already has a limit with whitespace before the semi colon', () => {
-    const sql = safeSql`select * from countries limit 10 ;`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query already has a limit and offset', () => {
-    const sql = safeSql`select * from countries limit 10 offset 0;`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query already has a limit and offset with whitespace before the semi colon', () => {
-    const sql = safeSql`select * from countries limit 10 offset 0 ;`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query already has a limit and offset (flip order of limit and offset)', () => {
-    const sql = safeSql`select * from countries offset 0 limit 1;`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query already has a limit, even if no value provided for limit', () => {
-    const sql = safeSql`select * from countries limit`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query uses `FETCH FIRST` instead of limit ', () => {
-    const sql = safeSql`select * from countries FETCH FIRST 5 rows only`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query uses `fetch first` instead of limit ', () => {
-    const sql = safeSql`select * from countries fetch first 5 rows only`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query uses `fetch   first` (with random spaces) instead of limit ', () => {
-    const sql = safeSql`select * from countries FETCH FIRST 5 rows only`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query is not a select statement', () => {
-    const sql = safeSql`create table test (id int8 primary key, name varchar);`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if there are multiple queries I', () => {
-    const sql1 = safeSql`select * from countries;
-select * from cities;`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql1, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if there are multiple queries II', () => {
-    const sql1 = safeSql`select * from countries;
-select * from cities`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql1, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  // [Joshen] Opting to just avoid appending in this case to prevent making the logic overly complex atm
-  test('Should return false if query has with a comment I', () => {
-    const sql = safeSql`-- This is a comment
-select * from cities`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query has with a comment II', () => {
-    const sql = safeSql`select * from cities
--- This is a comment`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-
-  // [Joshen] These will just need to test the cases when appendAutoLimit returns true then
-  test('Should add the limit param properly if query ends without a semi colon', () => {
-    const sql = safeSql`select * from countries`
-    const limit = 100
-    const { sql: formattedSql } = applyAutoLimit(sql, limit)
-    expect(formattedSql).toBe('select * from countries limit 100;')
-  })
-  test('Should add the limit param properly if query ends with a semi colon', () => {
-    const sql = safeSql`select * from countries;`
-    const limit = 100
-    const { sql: formattedSql } = applyAutoLimit(sql, limit)
-    expect(formattedSql).toBe('select * from countries limit 100;')
-  })
-  test('Should add the limit param properly if query ends with multiple semi colon', () => {
-    const sql = safeSql`select * from countries;;;;;;;`
-    const limit = 100
-    const { sql: formattedSql } = applyAutoLimit(sql, limit)
-    expect(formattedSql).toBe('select * from countries limit 100;')
-  })
-  test('Should not append a limit if query already has one with whitespace before the semi colon', () => {
-    const sql = safeSql`select * from countries limit 10 ;`
-    const limit = 100
-    const { sql: formattedSql } = applyAutoLimit(sql, limit)
-    expect(formattedSql).toBe('select * from countries limit 10 ;')
-  })
-  test('returns the SafeSqlFragment result unchanged when no limit is appended', () => {
-    const sql = safeSql`select * from countries limit 10;`
-    const { sql: formattedSql } = applyAutoLimit(sql, 100)
-    expect(formattedSql).toBe(sql)
-  })
 })
 
 describe('SQLEditor.utils.ts:shouldAutoGenerateTitle', () => {
@@ -346,6 +185,22 @@ describe('SQLEditor.utils.ts:deriveSnippetIdentity', () => {
     })
     expect(result).toEqual({ id: 'existing-id', isLoading: false })
   })
+  test('is loading when the snippets map itself is missing', () => {
+    const result = deriveSnippetIdentity({
+      urlId: 'existing-id',
+      generatedId: 'generated-id',
+      snippets: undefined as unknown as Record<string, { snippet: { content?: unknown } }>,
+    })
+    expect(result).toEqual({ id: 'existing-id', isLoading: true })
+  })
+  test('is loading when the snippets entry has no snippet on it', () => {
+    const result = deriveSnippetIdentity({
+      urlId: 'existing-id',
+      generatedId: 'generated-id',
+      snippets: { 'existing-id': {} as { snippet: { content?: unknown } } },
+    })
+    expect(result).toEqual({ id: 'existing-id', isLoading: true })
+  })
 })
 
 const buildDebugSnippet = (uncheckedSql: string) => ({
@@ -392,12 +247,25 @@ describe('SQLEditor.utils.ts:buildDebugChatArgs', () => {
   test('builds the newChat payload from the snippet sql and error message', () => {
     const snippet = buildDebugSnippet('select 1;')
     const result = { error: { message: 'relation does not exist' } }
-    expect(buildDebugChatArgs(snippet, result)).toEqual({
+    expect(buildDebugChatArgs(snippet, result, 'database')).toEqual({
       name: 'Debug SQL snippet',
-      sqlSnippets: ['select 1;'],
+      sqlSnippets: [{ label: 'Current Query', content: 'select 1;', source: 'database' }],
       initialInput:
         'Help me to debug the attached sql snippet which gives the following error: \n\nrelation does not exist',
     })
+  })
+
+  // The attachment is what puts sqlSource on the message the user then submits, so
+  // the debug flow has to attach a sourced snippet, not a bare string.
+  test('attaches the query with its source and names the dialect', () => {
+    const snippet = buildDebugSnippet('select count(*) from logs;')
+    const result = { error: { message: 'Unknown expression identifier' } }
+    expect(buildDebugChatArgs(snippet, result, 'logs').sqlSnippets).toEqual([
+      { label: 'Current Query', content: 'select count(*) from logs;', source: 'logs' },
+    ])
+    expect(buildDebugChatArgs(snippet, result, 'logs').initialInput).toEqual(
+      'Help me to debug the attached sql snippet which gives the following error: \n\nUnknown expression identifier\n\nThis query runs against the Supabase logs table on a ClickHouse-backed engine, not Postgres.'
+    )
   })
 })
 
@@ -431,6 +299,31 @@ describe('SQLEditor.utils.ts:buildCompletionRequestBody', () => {
       orgSlug: 'acme',
       completionMetadata: { prompt: 'add a where clause' },
     })
+  })
+  test('omits dialect when not provided, so the route keeps its Postgres default', () => {
+    const body = buildCompletionRequestBody({
+      projectRef: 'default',
+      connectionString: null,
+      orgSlug: 'acme',
+    })
+    expect(body).not.toHaveProperty('dialect')
+  })
+  test('includes the dialect when provided', () => {
+    expect(
+      buildCompletionRequestBody({
+        projectRef: 'default',
+        connectionString: null,
+        orgSlug: 'acme',
+        dialect: 'clickhouse',
+      }).dialect
+    ).toBe('clickhouse')
+  })
+})
+
+describe('SQLEditor.utils.ts:sqlSourceToDialect', () => {
+  test('logs snippets get ClickHouse, database snippets get Postgres', () => {
+    expect(sqlSourceToDialect('logs')).toBe('clickhouse')
+    expect(sqlSourceToDialect('database')).toBe('postgres')
   })
 })
 
@@ -1438,9 +1331,21 @@ describe('SQLEditor.utils:assembleCompletionDiff', () => {
 
 describe('SQLEditor.utils:buildDebugPromptText', () => {
   it('builds the debug prompt with the error message and SQL block', () => {
-    const result = buildDebugPromptText('select 1;', 'relation does not exist')
+    const result = buildDebugPromptText('select 1;', 'relation does not exist', 'database')
     expect(result).toContain('relation does not exist')
     expect(result).toContain('```sql\nselect 1;\n```')
+    expect(result).not.toContain('ClickHouse')
+  })
+
+  // This text is copyable and gets pasted into external models, so it has to name
+  // the dialect itself rather than relying on the message metadata.
+  it('names the dialect for a logs snippet', () => {
+    const sql = "select count() from logs where source = 'edge_logs'"
+    const result = buildDebugPromptText(sql, 'Unknown expression identifier', 'logs')
+    expect(result).toContain('Unknown expression identifier')
+    expect(result).toContain('ClickHouse')
+    expect(result).toContain('not Postgres')
+    expect(result).toContain('```clickhouse\n' + sql + '\n```')
   })
 })
 

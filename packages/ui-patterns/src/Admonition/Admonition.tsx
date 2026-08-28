@@ -8,7 +8,7 @@ import { AdmonitionTypeIcon } from './AdmonitionIcons'
 export type { AdmonitionLayout, AdmonitionProps, AdmonitionType }
 
 const admonitionBodyClassName =
-  '[&_p]:!mt-0 [&_p]:!mb-1.5 [&_p:last-child]:!mb-0 [&_ul]:!my-1.5 [&_ol]:!my-1.5 [&_li]:!my-0.5'
+  '!mb-0 [&_p]:!mt-0 [&_p]:!mb-1.5 [&_p:last-child]:!mb-0 [&_ul]:!my-1.5 [&_ol]:!my-1.5 [&_li]:!my-0.5'
 
 export const Admonition = forwardRef<
   React.ComponentRef<typeof Alert>,
@@ -69,7 +69,7 @@ export const Admonition = forwardRef<
               ]
             )}
           >
-            <div>
+            <div className={cn(showIcon && !title && description && 'my-0.5')}>
               {title && (
                 <AlertTitle
                   {...childProps?.title}
@@ -98,7 +98,7 @@ export const Admonition = forwardRef<
             {actions && (
               <div
                 className={cn(
-                  'flex flex-row gap-3',
+                  'flex flex-row gap-2',
                   layout === 'vertical' && 'mt-3 items-start',
                   layout === 'horizontal' && 'items-center',
                   layout === 'responsive' && 'mt-3 items-start @md:mt-0 @md:items-center'
