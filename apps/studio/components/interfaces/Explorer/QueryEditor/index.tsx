@@ -76,8 +76,6 @@ import {
   isRoleImpersonationEnabled,
   type RoleImpersonationController,
 } from '@/state/role-impersonation-state'
-import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
-import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const generatePlaceholder = (os: string | undefined) =>
   `Hit ${os === 'macos' ? 'CMD+SHIFT+K' : 'CTRL+SHIFT+K'} to generate query or just start typing`
