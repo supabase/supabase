@@ -51,7 +51,7 @@ export const QueueTab = () => {
   const { data: policies } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema: 'pgmq',
+    schemas: ['pgmq'],
   })
   const queuePolicies = (policies ?? []).filter((policy) => policy.table === queueRelname)
 
@@ -151,7 +151,7 @@ export const QueueTab = () => {
                 >
                   <Link
                     passHref
-                    href={`/project/${ref}/auth/policies?search=${queueTable?.id}&schema=pgmq`}
+                    href={`/project/${ref}/database/policies?search=${queueTable?.id}&schema=pgmq`}
                   >
                     Add RLS policy
                   </Link>
@@ -176,7 +176,7 @@ export const QueueTab = () => {
                 >
                   <Link
                     passHref
-                    href={`/project/${ref}/auth/policies?search=${queueTable?.id}&schema=pgmq`}
+                    href={`/project/${ref}/database/policies?search=${queueTable?.id}&schema=pgmq`}
                   >
                     Auth {queuePolicies.length > 1 ? 'policies' : 'policy'}
                   </Link>

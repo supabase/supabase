@@ -62,6 +62,15 @@ const page: GoPageInput = {
             company_name: 'company_name',
           },
         },
+        notion: {
+          database_id: '3885004b775f80b98198f7497946e54d',
+          columnMap: {
+            first_name: 'First Name',
+            last_name: 'Last Name',
+            email_address: 'Email',
+            company_name: 'Company',
+          },
+        },
       },
     },
   ],

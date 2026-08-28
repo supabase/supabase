@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { useIsPgDeltaDiffEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { ReviewWithAI } from '../BranchManagement/ReviewWithAI'

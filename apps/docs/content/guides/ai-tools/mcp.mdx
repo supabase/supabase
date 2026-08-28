@@ -8,15 +8,17 @@ sidebar_label: 'MCP Server'
 
 The [Model Context Protocol](https://modelcontextprotocol.io/introduction) (MCP) is a standard for connecting Large Language Models (LLMs) to platforms like Supabase. Once connected, your AI assistants can interact with and query your Supabase projects on your behalf.
 
+<Admonition type="caution">
+
+Connecting an LLM to your Supabase projects carries security risks. Read our [security best practices](#security-risks) before running the MCP server.
+
+</Admonition>
+
 ## Remote MCP installation
 
-### Step 1: Follow our security best practices
-
-Before running the MCP server, we recommend you read our [security best practices](#security-risks) to understand the risks of connecting an LLM to your Supabase projects and how to mitigate them.
-
-### Step 2: Configure your AI tool
-
 Choose your Supabase platform, project, and MCP client and follow the installation instructions:
+
+<a id="configure-your-ai-tool"></a>
 
 <McpConfigPanel />
 
@@ -30,19 +32,19 @@ To verify the client has access to the MCP server tools, try asking it to query 
 
 <$Show if="docs:prompts">
 
-For curated, ready-to-use prompts that work well with IDEs and AI agents, see our [AI Prompts](/docs/guides/getting-started/ai-prompts) collection.
+For curated, ready-to-use prompts that work well with IDEs and AI agents, see our [AI Prompts](/docs/guides/ai-tools/ai-prompts) collection.
 
 </$Show>
 
 <$Show if="docs:agent_skills">
 
-Additionally, you can install Supabase agent skills alongside the MCP server, use the [Supabase Plugin for AI Coding Agents](/docs/guides/getting-started/plugins) for a combined one-step setup.
+Additionally, you can install Supabase agent skills alongside the MCP server, use the [Supabase Plugin for AI Coding Agents](/docs/guides/ai-tools/plugins) for a combined one-step setup.
 
 </$Show>
 
 ## Available tools
 
-The Supabase MCP server provides tools organized into feature groups. All groups except Storage are enabled by default. You can enable or disable specific groups using the [configuration panel above](#step-2-configure-your-ai-tool).
+The Supabase MCP server provides tools organized into feature groups. All groups except Storage are enabled by default. You can enable or disable specific groups using the [configuration panel above](#configure-your-ai-tool).
 
 ### Database
 
@@ -54,7 +56,7 @@ The Supabase MCP server provides tools organized into feature groups. All groups
 
 ### Debugging
 
-- `get_logs` - Retrieve service logs (API, Postgres, Edge Functions, Auth, Storage, Realtime)
+- `query_logs` - Run a read-only SQL query against project logs to filter, aggregate, or join across log fields
 - `get_advisors` - Get security and performance advisors
 
 ### Development
@@ -104,7 +106,7 @@ Requires a paid plan.
 
 ## Configuration options
 
-The [configuration panel above](#step-2-configure-your-ai-tool) can set these options for you. If you prefer to configure manually, the following URL query parameters are available:
+The [configuration panel above](#configure-your-ai-tool) can set these options for you. If you prefer to configure manually, the following URL query parameters are available:
 
 | Parameter           | Description                                          | Example                   |
 | ------------------- | ---------------------------------------------------- | ------------------------- |
@@ -112,11 +114,11 @@ The [configuration panel above](#step-2-configure-your-ai-tool) can set these op
 | `project_ref=<id>`  | Scope to a specific project (disables account tools) | `?project_ref=abc123`     |
 | `features=<groups>` | Enable only specific tool groups (comma-separated)   | `?features=database,docs` |
 
-Parameters can be combined: `https://mcp.supabase.com/mcp?project_ref=abc123&read_only=true`
+Parameters can be combined: <code><CustomContent data="mcp:servers">remote</CustomContent>?project_ref=abc123&read_only=true</code>
 
-<Admonition type="tip">
+<Admonition type="note">
 
-When using [Supabase CLI](/docs/guides/cli) for local development, the MCP server is available at `http://localhost:54321/mcp`.
+When using [Supabase CLI](/docs/guides/local-development) for local development, the MCP server is available at <code><CustomContent data="mcp:servers">local</CustomContent></code>.
 
 </Admonition>
 
@@ -139,19 +141,7 @@ To authenticate the MCP server in a CI environment, you can create a personal ac
 
 1. Pass the token to the `Authorization` header in your MCP server configuration. For example if you are using [Claude Code](https://docs.claude.com/en/docs/claude-code/github-actions), your MCP server configuration might look like this:
 
-   ```json
-   {
-     "mcpServers": {
-       "supabase": {
-         "type": "http",
-         "url": "https://mcp.supabase.com/mcp?project_ref=${SUPABASE_PROJECT_REF}",
-         "headers": {
-           "Authorization": "Bearer ${SUPABASE_ACCESS_TOKEN}"
-         }
-       }
-     }
-   }
-   ```
+   <McpCiConfigBlock />
 
    The above example assumes you have environment variables `SUPABASE_ACCESS_TOKEN` and `SUPABASE_PROJECT_REF` set in your CI environment.
 

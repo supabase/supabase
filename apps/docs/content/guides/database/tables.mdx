@@ -309,6 +309,44 @@ supabase
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+[Table("movies")]
+class Movie : BaseModel
+{
+    [PrimaryKey("id", false)]
+    public long Id { get; set; }
+
+    [Column("name")]
+    public string Name { get; set; }
+
+    [Column("description")]
+    public string Description { get; set; }
+}
+```
+
+```c#
+var movies = new List<Movie>
+{
+    new Movie
+    {
+        Name = "The Empire Strikes Back",
+        Description = "After the Rebels are brutally overpowered by the Empire on the ice planet Hoth, Luke Skywalker begins Jedi training with Yoda."
+    },
+    new Movie
+    {
+        Name = "Return of the Jedi",
+        Description = "After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star."
+    }
+};
+
+await supabase.From<Movie>().Insert(movies);
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ### Bulk data loading
@@ -452,6 +490,12 @@ create table private.salaries (
 );
 ```
 
+<Admonition type="note">
+
+If you want to access a custom schema through the Supabase Data API, you need to expose it and grant the appropriate permissions. See [Using Custom Schemas](/docs/guides/api/using-custom-schemas) for detailed steps. For security best practices around schema exposure, see [Securing your API](/docs/guides/api/securing-your-api).
+
+</Admonition>
+
 ## Views
 
 A View is a convenient shortcut to a query. Creating a view does not involve new tables or data. When run, an underlying query is executed, returning its results to the user.
@@ -579,7 +623,7 @@ from
 where courses.code != 'PG101';
 ```
 
-Without a view, we would need to go into every dependent query to add the new rule. This would increase in the likelihood of errors and inconsistencies, as well as introducing a lot of effort for a developer. With views, we can alter just the underlying query in the view **transcripts**. The change will be applied to all applications using this view.
+Without a view, we would need to go into every dependent query to add the new rule. This would increase in the likelihood of errors and inconsistencies, as well as introducing a lot of effort for a developer. With views, we can alter the underlying query in the view **transcripts**. The change will be applied to all applications using this view.
 
 #### Logical organization
 
@@ -591,7 +635,7 @@ Views can restrict the amount and type of data presented to a user. Instead of a
 
 ### Materialized views
 
-A [materialized view](https://www.postgresql.org/docs/12/rules-materializedviews.html) is a form of view but it also stores the results to disk. In subsequent reads of a materialized view, the time taken to return its results would be much faster than a conventional view. This is because the data is readily available for a materialized view while the conventional view executes the underlying query each time it is called.
+A [materialized view](https://www.postgresql.org/docs/current/rules-materializedviews.html) is a form of view but it also stores the results to disk. In subsequent reads of a materialized view, the time taken to return its results would be much faster than a conventional view. This is because the data is readily available for a materialized view while the conventional view executes the underlying query each time it is called.
 
 Using our example above, a materialized view can be created like this:
 
@@ -634,7 +678,7 @@ Creating a materialized view is not a solution to inefficient queries. You shoul
 ## Resources
 
 - [Official Docs: Create table](https://www.postgresql.org/docs/current/sql-createtable.html)
-- [Official Docs: Create view](https://www.postgresql.org/docs/12/sql-createview.html)
+- [Official Docs: Create view](https://www.postgresql.org/docs/current/sql-createview.html)
 - [Postgres Tutorial: Create tables](https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-create-table/)
 - [Postgres Tutorial: Add column](https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-add-column/)
 - [Postgres Tutorial: Views](https://www.postgresqltutorial.com/postgresql-views/)

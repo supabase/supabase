@@ -1,9 +1,8 @@
+import { companyStats } from '~/data/company-stats'
 import { motion } from 'framer-motion'
 import { FC, useEffect, useMemo, useState } from 'react'
 import { useMedia } from 'react-use'
 import { AnimatedCounter, Badge, cn } from 'ui'
-
-import { companyStats } from '~/data/company-stats'
 
 const UsersGrowthChart: FC = () => {
   return (
@@ -25,7 +24,7 @@ const UsersGrowthChart: FC = () => {
         />
         <path
           d="M11.4209 492.744C295.041 492.744 900.636 410.744 1402.27 0.744141"
-          stroke="hsl(var(--foreground-lighter))"
+          stroke="var(--foreground-lighter)"
         />
         <defs>
           <linearGradient
@@ -36,12 +35,12 @@ const UsersGrowthChart: FC = () => {
             y2="561.839"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor="hsl(var(--border-overlay))" />
-            <stop offset="1" stopColor="hsl(var(--border-overlay))" stopOpacity="0" />
+            <stop stopColor="var(--border-overlay)" />
+            <stop offset="1" stopColor="var(--border-overlay)" stopOpacity="0" />
           </linearGradient>
         </defs>
       </svg>
-      <div className="absolute inset-0 w-full h-full bg-[radial-gradient(50%_50%_at_50%_50%,transparent_0%,hsl(var(--background-default))_100%)]" />
+      <div className="absolute inset-0 w-full h-full bg-[radial-gradient(50%_50%_at_50%_50%,transparent_0%,var(--background-default)_100%)]" />
     </div>
   )
 }

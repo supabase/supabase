@@ -28,7 +28,6 @@
           </div>
         </form>
       </ion-list>
-      <p>{{ email }}</p>
     </ion-content>
   </ion-page>
 </template>

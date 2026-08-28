@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button, DialogFooter, DialogSection, DialogSectionSeparator } from 'ui'
 
-import SqlEditor from '@/components/ui/SqlEditor'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 
 const ReviewEmptyState = () => {
   return (
@@ -17,7 +17,7 @@ interface StoragePoliciesReviewProps {
   onSelectSave: any
 }
 
-const StoragePoliciesReview = ({
+export const StoragePoliciesReview = ({
   policyStatements = [],
   onSelectBack = () => {},
   onSelectSave = () => {},
@@ -46,9 +46,14 @@ const StoragePoliciesReview = ({
             let formattedSQLStatement = policy.statement || ''
             return (
               <div key={`policy_${idx}`} className="space-y-2">
-                <span>{policy.description}</span>
+                <p className="text-sm">{policy.description}</p>
                 <div className="h-40">
-                  <SqlEditor readOnly defaultValue={formattedSQLStatement} />
+                  <CodeEditor
+                    hideLineNumbers
+                    isReadOnly
+                    language="pgsql"
+                    defaultValue={formattedSQLStatement}
+                  />
                 </div>
               </div>
             )
@@ -69,5 +74,3 @@ const StoragePoliciesReview = ({
     </>
   )
 }
-
-export default StoragePoliciesReview

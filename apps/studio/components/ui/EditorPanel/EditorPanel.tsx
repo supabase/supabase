@@ -34,23 +34,20 @@ import {
   PopoverTrigger,
   SQL_ICON,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/AIAssistant.utils'
 import { AIEditor } from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
+import { DataGridResults } from '../DataGridResults'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
 import { formatSqlError } from './EditorPanel.utils'
 import { SaveSnippetDialog } from './SaveSnippetDialog'
 import { isExplainQuery } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
 import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
-import {
-  createSqlSnippetSkeletonV2,
-  suffixWithLimit,
-} from '@/components/interfaces/SQLEditor/SQLEditor.utils'
+import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
 import { useAddDefinitions } from '@/components/interfaces/SQLEditor/useAddDefinitions'
-import Results from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
 import { SqlRunButton } from '@/components/interfaces/SQLEditor/UtilityPanel/RunButton'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useContentIdQuery } from '@/data/content/content-id-query'
@@ -58,6 +55,7 @@ import { useContentQuery, type Content } from '@/data/content/content-query'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 import { contentKeys } from '@/data/content/keys'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
+import { applyAutoLimit } from '@/data/sql/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'
@@ -66,7 +64,7 @@ import { editorPanelState, useEditorPanelStateSnapshot } from '@/state/editor-pa
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export const EditorPanel = () => {
   const {
@@ -231,7 +229,7 @@ export const EditorPanel = () => {
     }
 
     executeSql({
-      sql: suffixWithLimit(acceptUntrustedSql(currentValue), 100),
+      sql: applyAutoLimit(acceptUntrustedSql(currentValue), 100).sql,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       isStatementTimeoutDisabled: true,
@@ -274,7 +272,7 @@ export const EditorPanel = () => {
   }
 
   return (
-    <div className="flex h-full flex-col bg-background">
+    <div className="flex h-full flex-col bg-card">
       <div className="border-b border-b-muted flex items-center justify-between gap-x-4 pl-4 pr-3 h-(--header-height)">
         {isEditingTitle ? (
           <input
@@ -482,7 +480,7 @@ export const EditorPanel = () => {
       </div>
 
       <div className="flex-1 overflow-hidden flex flex-col h-full">
-        <div className="flex-1 min-h-0 relative [&_.monaco-editor]:!bg [&_.monaco-editor_.margin]:!bg [&_.monaco-editor_.monaco-editor-background]:!bg">
+        <div className="flex-1 min-h-0 relative [&_.monaco-editor]:!bg-card [&_.monaco-editor_.margin]:!bg-card [&_.monaco-editor_.monaco-editor-background]:!bg-card">
           <AIEditor
             autoFocus
             language="pgsql"
@@ -507,7 +505,7 @@ export const EditorPanel = () => {
               wordWrap: 'on',
               lineNumbers: 'on',
               folding: false,
-              padding: { top: 16 },
+              padding: { top: 12 },
               lineNumbersMinChars: 3,
             }}
             executeQuery={onExecuteSql}
@@ -516,7 +514,6 @@ export const EditorPanel = () => {
             openAIAssistantShortcutEnabled={isAIAssistantHotkeyEnabled}
           />
         </div>
-
         {error !== undefined && (
           <div className="shrink-0">
             <Admonition
@@ -539,7 +536,6 @@ export const EditorPanel = () => {
             />
           </div>
         )}
-
         {showWarning && (
           <SqlWarningAdmonition
             className="border-t"
@@ -557,7 +553,6 @@ export const EditorPanel = () => {
             }}
           />
         )}
-
         {results !== undefined && results.length > 0 && (
           <div
             className={cn(
@@ -568,7 +563,7 @@ export const EditorPanel = () => {
           >
             {showResults && (
               <div className="border-t flex-1 overflow-hidden">
-                <Results rows={results} />
+                <DataGridResults rows={results} />
               </div>
             )}
             <div className="text-xs text-foreground-light border-t py-2 px-5 flex items-center justify-between">
@@ -593,7 +588,6 @@ export const EditorPanel = () => {
             </p>
           </div>
         )}
-
         <div className="relative shrink-0 flex items-center gap-2 justify-end px-5 py-4 w-full border-t">
           {(isUpserting || saveStatus !== 'idle') && (
             <div
@@ -644,7 +638,7 @@ export const EditorPanel = () => {
                     owner_id: profile.id,
                     content: {
                       ...activeSnippet.content,
-                      sql: currentValue,
+                      unchecked_sql: untrustedSql(currentValue),
                     },
                   },
                 })
@@ -684,5 +678,3 @@ export const EditorPanel = () => {
     </div>
   )
 }
-
-export default EditorPanel

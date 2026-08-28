@@ -11,7 +11,7 @@ This guide covers the **server-side configuration** required to enable social lo
 You need:
 
 - A working self-hosted Supabase installation. See [Self-Hosting with Docker](/docs/guides/self-hosting/docker).
-- `API_EXTERNAL_URL` set to the publicly reachable URL of your Supabase instance (e.g., `https://<your-domain>`).
+- `API_EXTERNAL_URL` set to the publicly reachable URL of your Supabase instance (e.g., `https://<your-domain>/auth/v1`).
 
 <Admonition type="danger">
 
@@ -79,7 +79,7 @@ auth:
     GOTRUE_EXTERNAL_GOOGLE_ENABLED: ${GOOGLE_ENABLED}
     GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
     GOTRUE_EXTERNAL_GOOGLE_SECRET: ${GOOGLE_SECRET}
-    GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI: ${API_EXTERNAL_URL}/auth/v1/callback
+    GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI: ${API_EXTERNAL_URL}/callback
 ```
 
 <Admonition type="note">
@@ -91,7 +91,7 @@ For providers **not** pre-configured in the files (see the [full provider list](
 ### Step 4: Restart the auth service
 
 ```sh
-docker compose up -d --force-recreate --no-deps auth
+sh run.sh recreate auth
 ```
 
 ### Step 5: Verify the configuration
@@ -149,7 +149,7 @@ auth:
     GOTRUE_EXTERNAL_GOOGLE_ENABLED: ${GOOGLE_ENABLED}
     GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
     GOTRUE_EXTERNAL_GOOGLE_SECRET: ${GOOGLE_SECRET}
-    GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI: ${API_EXTERNAL_URL}/auth/v1/callback
+    GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI: ${API_EXTERNAL_URL}/callback
 ```
 
 </TabPanel>
@@ -178,7 +178,7 @@ auth:
     GOTRUE_EXTERNAL_GITHUB_ENABLED: ${GITHUB_ENABLED}
     GOTRUE_EXTERNAL_GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
     GOTRUE_EXTERNAL_GITHUB_SECRET: ${GITHUB_SECRET}
-    GOTRUE_EXTERNAL_GITHUB_REDIRECT_URI: ${API_EXTERNAL_URL}/auth/v1/callback
+    GOTRUE_EXTERNAL_GITHUB_REDIRECT_URI: ${API_EXTERNAL_URL}/callback
 ```
 
 </TabPanel>
@@ -213,7 +213,7 @@ auth:
     GOTRUE_EXTERNAL_AZURE_ENABLED: ${AZURE_ENABLED}
     GOTRUE_EXTERNAL_AZURE_CLIENT_ID: ${AZURE_CLIENT_ID}
     GOTRUE_EXTERNAL_AZURE_SECRET: ${AZURE_SECRET}
-    GOTRUE_EXTERNAL_AZURE_REDIRECT_URI: ${API_EXTERNAL_URL}/auth/v1/callback
+    GOTRUE_EXTERNAL_AZURE_REDIRECT_URI: ${API_EXTERNAL_URL}/callback
     ## Optional: uncomment for tenant-specific Azure login
     # GOTRUE_EXTERNAL_AZURE_URL: ${AZURE_URL}
 ```
@@ -241,7 +241,7 @@ auth:
     GOTRUE_EXTERNAL_APPLE_ENABLED: ${APPLE_ENABLED}
     GOTRUE_EXTERNAL_APPLE_CLIENT_ID: ${APPLE_CLIENT_ID}
     GOTRUE_EXTERNAL_APPLE_SECRET: ${APPLE_SECRET}
-    GOTRUE_EXTERNAL_APPLE_REDIRECT_URI: ${API_EXTERNAL_URL}/auth/v1/callback
+    GOTRUE_EXTERNAL_APPLE_REDIRECT_URI: ${API_EXTERNAL_URL}/callback
 ```
 
 <Admonition type="note">
@@ -280,7 +280,7 @@ auth:
     GOTRUE_EXTERNAL_KEYCLOAK_ENABLED: ${KEYCLOAK_ENABLED}
     GOTRUE_EXTERNAL_KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID}
     GOTRUE_EXTERNAL_KEYCLOAK_SECRET: ${KEYCLOAK_SECRET}
-    GOTRUE_EXTERNAL_KEYCLOAK_REDIRECT_URI: ${API_EXTERNAL_URL}/auth/v1/callback
+    GOTRUE_EXTERNAL_KEYCLOAK_REDIRECT_URI: ${API_EXTERNAL_URL}/callback
     GOTRUE_EXTERNAL_KEYCLOAK_URL: ${KEYCLOAK_URL}
 ```
 
@@ -385,7 +385,7 @@ For detailed client-side integration, see [Social Login](/docs/guides/auth/socia
 ### "Provider not enabled" or provider seen as false in settings
 
 - Check that `GOTRUE_EXTERNAL_*_ENABLED` is set to `true` in `docker-compose.yml`
-- Verify the `.env` variable is not empty, e.g., check with `docker compose exec auth env | grep GOOGLE`
+- Verify the `.env` variable is not empty, e.g., check with `sh run.sh printenv auth | grep GOOGLE`
 
 ### Variables added to the environment but provider still not working
 
@@ -398,13 +398,13 @@ auth:
     GOTRUE_EXTERNAL_GOOGLE_ENABLED: ${GOOGLE_ENABLED}
 ```
 
-Run `docker compose exec auth env | grep GOTRUE_EXTERNAL` to verify the variables are reaching the container.
+Run `sh run.sh printenv auth | grep GOTRUE_EXTERNAL` to verify the variables are reaching the container.
 
 ### Site URL or redirect URL errors after login
 
 After a successful OAuth login, the Auth service redirects to `SITE_URL` or a URL from `ADDITIONAL_REDIRECT_URLS`. Ensure:
 
-- `SITE_URL` in `.env` is set to your application's URL
+- `SITE_URL` in `.env` is set to your **application's URL**
 - If your app uses a different redirect URL, add it to `ADDITIONAL_REDIRECT_URLS` (comma-separated)
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
@@ -443,7 +443,7 @@ docker compose logs auth
 Common causes:
 
 - Missing required environment variable (e.g., `CLIENT_ID` or `SECRET` is empty)
-- Invalid `API_EXTERNAL_URL` (must be a valid URL with protocol)
+- Invalid `API_EXTERNAL_URL` (must be a valid URL - including protocol and ending with `/auth/v1`)
 
 ## Environment variable reference
 
@@ -454,7 +454,7 @@ All OAuth-related environment variables for the `auth` service in `docker-compos
 | `GOTRUE_EXTERNAL_*_ENABLED`      | Enable the provider (`true`/`false`)                                     | Yes      |
 | `GOTRUE_EXTERNAL_*_CLIENT_ID`    | OAuth client ID from the provider                                        | Yes      |
 | `GOTRUE_EXTERNAL_*_SECRET`       | OAuth client secret from the provider                                    | Yes      |
-| `GOTRUE_EXTERNAL_*_REDIRECT_URI` | Callback URL: `${API_EXTERNAL_URL}/auth/v1/callback`                     | Yes      |
+| `GOTRUE_EXTERNAL_*_REDIRECT_URI` | Callback URL: `${API_EXTERNAL_URL}/callback`                             | Yes      |
 | `GOTRUE_SITE_URL`                | Default redirect URL after authentication (set via `SITE_URL` in `.env`) | Yes      |
 
 ## Additional resources

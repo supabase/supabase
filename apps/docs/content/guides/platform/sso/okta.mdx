@@ -9,7 +9,7 @@ This feature is only available on the [Team and Enterprise Plans](/pricing). If 
 
 </Admonition>
 
-<Admonition type="tip">
+<Admonition type="note">
 
 Looking for docs on how to add Single Sign-On support in your Supabase project? Head on over to [Single Sign-On with SAML 2.0 for Projects](/docs/guides/auth/enterprise-sso/auth-sso-saml).
 
@@ -120,7 +120,7 @@ If you did not customize your settings you may save some time by clicking the **
 
 ## Step 11: Join organization on signup (optional) [#dashboard-configure-autojoin]
 
-<Admonition type="tip">
+<Admonition type="note">
 
 **Recommended workflow:** Start with auto-join **disabled** to test your SSO configuration. Once SSO login is working correctly, enable auto-join if desired.
 
@@ -130,7 +130,7 @@ By default this setting is disabled, users logging in via SSO will not be added 
 
 ![Auto-join disabled](/docs/img/sso-dashboard-configure-autojoin-disabled.png)
 
-Toggle this on if you want SSO-authenticated users to be **automatically added to your organization** when they log in via SSO. Auto-join applies on **every login**, not just first signup - this makes it safe to test SSO before enabling this feature.
+Toggle this on if you want SSO-authenticated users to be **automatically added to your organization** when they log in via SSO. Auto-join applies on **every login**, not only on first signup - this makes it safe to test SSO before enabling this feature.
 
 ![Auto-join enable](/docs/img/sso-dashboard-configure-autojoin-enabled.png)
 
@@ -150,7 +150,7 @@ Visit [access-control](/docs/guides/platform/access-control) documentation for d
 
 When you click **Save changes**, your new SSO configuration is applied immediately. From that moment, any user with an email address matching one of your configured domains who visits your organization's sign-in URL will be routed through the SSO flow.
 
-<Admonition type="tip">
+<Admonition type="note">
 
 **Next step: Test your SSO configuration**
 

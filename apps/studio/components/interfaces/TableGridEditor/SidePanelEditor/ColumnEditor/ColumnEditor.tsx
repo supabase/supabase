@@ -434,6 +434,7 @@ export const ColumnEditor = ({
               >
                 <Switch
                   id="isPrimaryKey"
+                  aria-label="Toggle primary key"
                   checked={columnFields?.isPrimaryKey ?? false}
                   onCheckedChange={() =>
                     onUpdateField({
@@ -446,23 +447,27 @@ export const ColumnEditor = ({
               </FormItemLayout>
 
               <Tooltip>
-                <TooltipTrigger>
-                  <FormItemLayout
-                    isReactForm={false}
-                    layout="flex"
-                    id="isNullable"
-                    label="Allow Nullable"
-                    description="Allow the column to assume a NULL value if no value is provided"
-                  >
-                    <Switch
+                <TooltipTrigger asChild>
+                  {/* Wrapped in a div as the Switch is a button itself and cannot be nested within the trigger button */}
+                  <div>
+                    <FormItemLayout
+                      isReactForm={false}
+                      layout="flex"
                       id="isNullable"
-                      disabled={columnFields.isPrimaryKey}
-                      checked={columnFields.isNullable}
-                      onCheckedChange={() =>
-                        onUpdateField({ isNullable: !columnFields.isNullable })
-                      }
-                    />
-                  </FormItemLayout>
+                      label="Allow Nullable"
+                      description="Allow the column to assume a NULL value if no value is provided"
+                    >
+                      <Switch
+                        id="isNullable"
+                        aria-label="Toggle is nullable"
+                        disabled={columnFields.isPrimaryKey}
+                        checked={columnFields.isNullable}
+                        onCheckedChange={() =>
+                          onUpdateField({ isNullable: !columnFields.isNullable })
+                        }
+                      />
+                    </FormItemLayout>
+                  </div>
                 </TooltipTrigger>
                 {columnFields.isPrimaryKey && (
                   <TooltipContent side="left" align="start">
@@ -472,21 +477,25 @@ export const ColumnEditor = ({
               </Tooltip>
 
               <Tooltip>
-                <TooltipTrigger>
-                  <FormItemLayout
-                    isReactForm={false}
-                    layout="flex"
-                    id="isUnique"
-                    label="Is Unique"
-                    description="Enforce values in the column to be unique across rows"
-                  >
-                    <Switch
+                <TooltipTrigger asChild>
+                  {/* Wrapped in a div as the Switch is a button itself and cannot be nested within the trigger button */}
+                  <div>
+                    <FormItemLayout
+                      isReactForm={false}
+                      layout="flex"
                       id="isUnique"
-                      disabled={columnFields.isPrimaryKey}
-                      checked={columnFields.isUnique}
-                      onCheckedChange={() => onUpdateField({ isUnique: !columnFields.isUnique })}
-                    />
-                  </FormItemLayout>
+                      label="Is Unique"
+                      description="Enforce values in the column to be unique across rows"
+                    >
+                      <Switch
+                        id="isUnique"
+                        aria-label="Toggle is unique"
+                        disabled={columnFields.isPrimaryKey}
+                        checked={columnFields.isUnique}
+                        onCheckedChange={() => onUpdateField({ isUnique: !columnFields.isUnique })}
+                      />
+                    </FormItemLayout>
+                  </div>
                 </TooltipTrigger>
                 {columnFields.isPrimaryKey && (
                   <TooltipContent side="left" align="start">
@@ -506,6 +515,30 @@ export const ColumnEditor = ({
               </FormItemLayout>
             </FormSectionContent>
           </FormSection>
+
+          <SidePanel.Separator />
+
+          <FormSection
+            header={<FormSectionLabel className="lg:col-span-4!">Data Privacy</FormSectionLabel>}
+          >
+            <FormSectionContent loading={false} className="lg:col-span-8!">
+              <FormItemLayout
+                isReactForm={false}
+                layout="flex"
+                id="isSensitiveData"
+                label="Mark as sensitive data"
+                description="Column will be masked when viewing table data by default"
+              >
+                <Switch
+                  id="isSensitiveData"
+                  checked={columnFields.isSensitiveData ?? false}
+                  onCheckedChange={() => {
+                    onUpdateField({ isSensitiveData: !columnFields.isSensitiveData })
+                  }}
+                />
+              </FormItemLayout>
+            </FormSectionContent>
+          </FormSection>
         </SheetSection>
 
         <SheetFooter className="justify-between! [&>div]:p-0 [&>div]:border-t-0">
@@ -518,8 +551,14 @@ export const ColumnEditor = ({
           >
             {isNewRecord && (
               <div className="flex items-center gap-x-2">
-                <Switch checked={createMore} onCheckedChange={() => setCreateMore(!createMore)} />
+                <Switch
+                  id="toggle-create-more"
+                  aria-label="Toggle create more"
+                  checked={createMore}
+                  onCheckedChange={() => setCreateMore(!createMore)}
+                />
                 <label
+                  htmlFor="toggle-create-more"
                   className="text-foreground-light text-sm cursor-pointer select-none"
                   onClick={() => setCreateMore(!createMore)}
                 >

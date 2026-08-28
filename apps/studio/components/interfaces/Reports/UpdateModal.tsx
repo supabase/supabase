@@ -21,7 +21,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import { Content } from '@/data/content/content-query'
+import { ContentOfType } from '@/data/content/content-query'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 
 const formSchema = z.object({
@@ -32,7 +32,7 @@ const formSchema = z.object({
 type CustomReport = z.infer<typeof formSchema>
 
 export interface UpdateCustomReportProps {
-  selectedReport?: Content
+  selectedReport?: ContentOfType<'report'>
   initialValues: CustomReport
   onCancel: () => void
 }

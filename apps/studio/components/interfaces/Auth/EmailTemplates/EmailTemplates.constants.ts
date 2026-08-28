@@ -8,6 +8,11 @@ import { getAuthTemplateType } from './EmailTemplates.utils'
 export const AUTH_TEMPLATE_RESET_TYPES: AuthTemplateResetType[] =
   AUTH_TEMPLATE_TYPES.map(getAuthTemplateType)
 
+/** Hosted email templates guide for dashboard users. */
+export const AUTH_EMAIL_TEMPLATES_DOCS_PATH = '/guides/auth/auth-email-templates'
+
+export const AUTH_EMAIL_TEMPLATES_TERMINOLOGY_ANCHOR = 'terminology'
+
 /** Docs heading anchors for customizing-email-templates.mdx (ui Heading slugify output). */
 export const EMAIL_TEMPLATE_DOCS_ANCHORS = {
   CONFIRMATION: 'authemailtemplateconfirmation',

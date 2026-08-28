@@ -1,4 +1,5 @@
 import type { Provider } from '@supabase/auth-js'
+import { useFlag } from 'common'
 import dayjs from 'dayjs'
 import { Edit, Unlink } from 'lucide-react'
 import Link from 'next/link'
@@ -29,6 +30,8 @@ import {
 } from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { parseRedirectMessage, shouldShowAddPasswordRow } from './AccountIdentities.utils'
+import { AddPasswordRow } from './AddPasswordRow'
 import {
   ChangeEmailAddressForm,
   GitHubChangeEmailAddress,
@@ -59,7 +62,11 @@ export const AccountIdentities = () => {
     [enabledProviders]
   )
 
+  const isAddAccountPasswordEnabled = useFlag('enableAccountPassword')
+
   const identities = data?.identities ?? []
+  const showAddPasswordRow =
+    isAddAccountPasswordEnabled && shouldShowAddPasswordRow({ identities, email: data?.email })
   const isChangeExpired = data?.email_change_sent_at
     ? dayjs().utc().diff(dayjs(data?.email_change_sent_at).utc(), 'minute') > 10
     : false
@@ -68,7 +75,7 @@ export const AccountIdentities = () => {
   const [selectedProviderUpdateEmail, setSelectedProviderUpdateEmail] = useState<string>()
   const [linkingProviderId, setLinkingProviderId] = useState<string>()
 
-  const [, message] = router.asPath.split('#message=')
+  const message = parseRedirectMessage(router.asPath)
   const unlinkedExternalProviders = connectableExternalProviders.filter((provider) => {
     return !identities.some(
       (identity) => identity.provider === provider.authProvider || identity.provider === provider.id
@@ -119,14 +126,14 @@ export const AccountIdentities = () => {
   }
 
   useEffect(() => {
-    if (message) toast.success(message.replaceAll('+', ' '))
+    if (message) toast.success(message)
   }, [message])
 
   return (
     <PageSection>
       <PageSectionMeta>
         <PageSectionSummary>
-          <PageSectionTitle>Account identities</PageSectionTitle>
+          <PageSectionTitle>Sign-in methods</PageSectionTitle>
           <PageSectionDescription>
             Manage the providers linked to your Supabase account and update their details.
           </PageSectionDescription>
@@ -141,6 +148,8 @@ export const AccountIdentities = () => {
           )}
           {isSuccess && (
             <div className="divide-y">
+              {showAddPasswordRow && !!data.email && <AddPasswordRow email={data.email} />}
+
               {identities.map((identity) => {
                 const { identity_id, provider } = identity
                 const username = identity.identity_data?.user_name

@@ -46,7 +46,7 @@ import {
 } from './ProjectNeedsSecuring.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { createNavigationHandler } from '@/lib/navigation'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
@@ -195,7 +195,7 @@ export const ProjectNeedsSecuringView = ({
                       return (
                         <TableRow
                           key={getTableKey(table)}
-                          className="relative cursor-pointer inset-focus"
+                          className="relative cursor-pointer focus-inset"
                           onClick={(event) => {
                             trackViewPolicies()
                             handleNavigation(event)

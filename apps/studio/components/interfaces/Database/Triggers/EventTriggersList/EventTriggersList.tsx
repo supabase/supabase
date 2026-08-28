@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { EmptyStatePresentational } from 'ui-patterns'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { EventTriggerList } from './EventTriggerList'
@@ -27,7 +27,7 @@ import {
   selectFilterSchema,
 } from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { Shortcut } from '@/components/ui/Shortcut'

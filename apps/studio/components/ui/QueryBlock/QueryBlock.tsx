@@ -9,6 +9,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { CHART_COLORS } from '../Charts/Charts.constants'
 import { PortalChartTooltip } from '../Charts/PortalChartTooltip'
+import { DataGridResults } from '../DataGridResults'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
 import { BlockViewConfiguration } from './BlockViewConfiguration'
 import { EditQueryButton } from './EditQueryButton'
@@ -21,7 +22,6 @@ import {
 } from './QueryBlock.utils'
 import { ReportBlockContainer } from '@/components/interfaces/Reports/ReportBlock/ReportBlockContainer'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
-import Results from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
 
 export const DEFAULT_CHART_CONFIG: ChartConfig = {
   type: 'bar',
@@ -348,12 +348,12 @@ export const QueryBlock = ({
                       )
                     }
                   />
-                  <Bar radius={1} dataKey={yKey} fill="hsl(var(--chart-1))">
+                  <Bar radius={1} dataKey={yKey} fill="var(--chart-1)">
                     {chartData?.map((_: any, index: number) => (
                       <Cell
                         key={`cell-${index}`}
                         className="transition-all duration-100"
-                        fill="hsl(var(--chart-1))"
+                        fill="var(--chart-1)"
                         opacity={focusDataIndex === undefined || focusDataIndex === index ? 1 : 0.4}
                         enableBackground={12}
                       />
@@ -391,7 +391,7 @@ export const QueryBlock = ({
                   'flex flex-col flex-1 w-full overflow-auto overscroll-contain relative max-h-64'
                 )}
               >
-                <Results rows={results} />
+                <DataGridResults rows={results} />
                 {autoLimit && (
                   <p className="text-xs font-mono px-2 py-1 border-t text-foreground-light">
                     Limited to only 100 rows

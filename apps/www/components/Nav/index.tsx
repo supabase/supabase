@@ -10,7 +10,8 @@ import { usePathname } from 'next/navigation'
 import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
 import { Button, buttonVariants, cn } from 'ui'
-import { AuthenticatedDropdownMenu } from 'ui-patterns'
+import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
+import { AnnouncementBanner } from 'ui-patterns/Banners/AnnouncementBanner'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -43,19 +44,10 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const sendTelemetryEvent = useSendTelemetryEvent()
   const userMenu = useDropdownMenu(user)
 
-  const isLaunchWeekXPage = pathname === '/launch-week/x'
-  const isLaunchWeek12Page = pathname === '/launch-week/12'
-  const isLaunchWeek13Page = pathname === '/launch-week/13'
   const isGAWeekSection = pathname?.startsWith('/ga-week')
   const isStateOfStartupsPage = pathname?.startsWith('/state-of-startups')
-  const disableStickyNav =
-    isLaunchWeekXPage ||
-    isGAWeekSection ||
-    isLaunchWeekXPage ||
-    isLaunchWeek12Page ||
-    isLaunchWeek13Page ||
-    !stickyNavbar
-  const showLaunchWeekNavMode = (isGAWeekSection || isLaunchWeekXPage) && !open
+  const disableStickyNav = isGAWeekSection || !stickyNavbar
+  const showLaunchWeekNavMode = isGAWeekSection && !open
 
   const [scrolled, setScrolled] = React.useState(false)
   React.useEffect(() => {
@@ -87,6 +79,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
 
   return (
     <>
+      <AnnouncementBanner />
       <div
         className={cn(
           'sticky top-0 z-40 transform',
@@ -112,8 +105,8 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
             isTransparent && 'border-transparent backdrop-blur-none'
           )}
         >
-          <div className="relative flex justify-between h-16 mx-auto lg:container lg:px-16 xl:px-20">
-            <div className="flex items-center px-6 lg:px-0 flex-1 sm:items-stretch justify-between">
+          <div className="section-container relative flex justify-between h-16">
+            <div className="flex items-center flex-1 sm:items-stretch justify-between">
               <div className="flex items-center">
                 <div className="flex items-center shrink-0">
                   <RightClickBrandLogo />
@@ -130,7 +123,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                           <NavigationMenuTrigger
                             className={cn(
                               buttonVariants({ variant: 'text', size: 'small' }),
-                              'bg-transparent! hover:text-brand-link data-open:text-brand-link! data-radix-collection-item:focus-visible:ring-2 data-radix-collection-item:focus-visible:ring-foreground-lighter data-radix-collection-item:focus-visible:text-foreground px-2 h-auto'
+                              'bg-transparent! hover:text-brand-link data-open:text-brand-link! focus-ring focus-visible:text-foreground px-2 h-auto'
                             )}
                           >
                             {menuItem.title}

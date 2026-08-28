@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { cn } from 'ui'
 
-import SectionContainer from '../Layouts/SectionContainer'
+import SectionContainerWithCn from '../Layouts/SectionContainerWithCn'
 
 interface Props {
   breadcrumb?: ReactNode
@@ -12,8 +12,8 @@ interface Props {
 }
 
 const PageHeader = ({ breadcrumb, title, h1, subheader, className }: Props) => (
-  <div className={cn('w-full border-b bg-alternative py-8 lg:py-12', className)}>
-    <SectionContainer className="py-0!">
+  <div className={cn('w-full border-b bg-alternative', className)}>
+    <SectionContainerWithCn height="narrow">
       {breadcrumb && <div className="mb-6">{breadcrumb}</div>}
       {title && (
         <p className="mb-3 font-mono text-sm uppercase tracking-widest text-brand">{title}</p>
@@ -24,7 +24,7 @@ const PageHeader = ({ breadcrumb, title, h1, subheader, className }: Props) => (
       {subheader && (
         <p className="mt-3 max-w-2xl text-base text-foreground-light lg:text-lg">{subheader}</p>
       )}
-    </SectionContainer>
+    </SectionContainerWithCn>
   </div>
 )
 

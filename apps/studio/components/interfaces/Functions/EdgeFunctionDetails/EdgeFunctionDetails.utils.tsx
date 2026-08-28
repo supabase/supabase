@@ -1,4 +1,7 @@
+import { getAnchor } from '@ui/components/CustomHTMLElements/CustomHTMLElements.utils'
+
 import { EdgeFunction } from '@/data/edge-functions/edge-function-query'
+import { DOCS_URL } from '@/lib/constants'
 
 export const generateCLICommands = ({
   selectedFunction,
@@ -98,4 +101,19 @@ export const generateCLICommands = ({
   ]
 
   return { managementCommands, secretCommands, invokeCommands }
+}
+
+export const getEdgeFunctionErrorDocs = (headers: Record<string, string | string[]>) => {
+  const header = Object.entries(headers).find(
+    ([name]) => name.toLowerCase() === 'sb-error-code'
+  )?.[1]
+  const code = (Array.isArray(header) ? header[0] : header)?.trim()
+  const anchor = code ? getAnchor(code) : undefined
+
+  if (!code || !anchor) return undefined
+
+  return {
+    code,
+    href: `${DOCS_URL}/guides/functions/error-codes#${anchor}`,
+  }
 }

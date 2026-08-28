@@ -12,6 +12,17 @@ export type OtelLogRow = {
   log_attributes?: Record<string, any>
 }
 
+// OTEL timestamps arrive as an ISO string (sometimes space-separated, no zone)
+// or as numeric microseconds. Strings have a `T` or `-`; anything else is micros.
+export function parseOtelTimestamp(timestamp: unknown): Date {
+  const ts = String(timestamp ?? '')
+  const looksLikeIso = /[T-]/.test(ts)
+  if (!looksLikeIso) return new Date(Number(ts) / 1000)
+  const withT = ts.includes(' ') ? ts.replace(' ', 'T') : ts
+  const hasTz = /Z$|[+-]\d{2}:?\d{2}$/.test(withT)
+  return new Date(hasTz ? withT : `${withT}Z`)
+}
+
 const httpStatusToLevel = (status: number): Level => {
   if (status >= 500) return 'error'
   if (status >= 400) return 'warning'

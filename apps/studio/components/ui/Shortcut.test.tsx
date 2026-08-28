@@ -28,7 +28,7 @@ describe('Shortcut', () => {
     it('renders the wrapped child', () => {
       render(
         <Shortcut id={SHORTCUT_IDS.COMMAND_MENU_OPEN} onTrigger={() => {}}>
-          <button>Open</button>
+          <button tabIndex={0}>Open</button>
         </Shortcut>
       )
       expect(screen.getByRole('button', { name: 'Open' })).toBeInTheDocument()
@@ -37,7 +37,7 @@ describe('Shortcut', () => {
     it('wraps the child in ShortcutTooltip', () => {
       render(
         <Shortcut id={SHORTCUT_IDS.COMMAND_MENU_OPEN} onTrigger={() => {}}>
-          <button>Open</button>
+          <button tabIndex={0}>Open</button>
         </Shortcut>
       )
       const tooltip = screen.getByTestId('shortcut-tooltip')
@@ -50,7 +50,7 @@ describe('Shortcut', () => {
       const handler = vi.fn()
       render(
         <Shortcut id={SHORTCUT_IDS.ACTION_BAR_SAVE} onTrigger={handler}>
-          <button>Save</button>
+          <button tabIndex={0}>Save</button>
         </Shortcut>
       )
       expect(mockUseShortcut).toHaveBeenCalledWith(SHORTCUT_IDS.ACTION_BAR_SAVE, handler, undefined)
@@ -61,7 +61,7 @@ describe('Shortcut', () => {
       const options = { enabled: true, registerInCommandMenu: true }
       render(
         <Shortcut id={SHORTCUT_IDS.ACTION_BAR_SAVE} onTrigger={handler} options={options}>
-          <button>Save</button>
+          <button tabIndex={0}>Save</button>
         </Shortcut>
       )
       expect(mockUseShortcut).toHaveBeenCalledWith(SHORTCUT_IDS.ACTION_BAR_SAVE, handler, options)
@@ -75,7 +75,7 @@ describe('Shortcut', () => {
           onTrigger={handler}
           options={{ enabled: false }}
         >
-          <button>Save</button>
+          <button tabIndex={0}>Save</button>
         </Shortcut>
       )
       expect(mockUseShortcut).toHaveBeenLastCalledWith(SHORTCUT_IDS.ACTION_BAR_SAVE, handler, {
@@ -84,7 +84,7 @@ describe('Shortcut', () => {
 
       rerender(
         <Shortcut id={SHORTCUT_IDS.ACTION_BAR_SAVE} onTrigger={handler} options={{ enabled: true }}>
-          <button>Save</button>
+          <button tabIndex={0}>Save</button>
         </Shortcut>
       )
       expect(mockUseShortcut).toHaveBeenLastCalledWith(SHORTCUT_IDS.ACTION_BAR_SAVE, handler, {
@@ -96,14 +96,14 @@ describe('Shortcut', () => {
       const handler = vi.fn()
       const { rerender } = render(
         <Shortcut id={SHORTCUT_IDS.NAV_HOME} onTrigger={handler}>
-          <button>Go</button>
+          <button tabIndex={0}>Go</button>
         </Shortcut>
       )
       expect(mockUseShortcut).toHaveBeenLastCalledWith(SHORTCUT_IDS.NAV_HOME, handler, undefined)
 
       rerender(
         <Shortcut id={SHORTCUT_IDS.NAV_TABLE_EDITOR} onTrigger={handler}>
-          <button>Go</button>
+          <button tabIndex={0}>Go</button>
         </Shortcut>
       )
       expect(mockUseShortcut).toHaveBeenLastCalledWith(
@@ -118,7 +118,7 @@ describe('Shortcut', () => {
     it('forwards shortcutId to ShortcutTooltip', () => {
       render(
         <Shortcut id={SHORTCUT_IDS.NAV_HOME} onTrigger={() => {}}>
-          <button>Home</button>
+          <button tabIndex={0}>Home</button>
         </Shortcut>
       )
       expect(mockShortcutTooltip).toHaveBeenCalled()
@@ -135,7 +135,7 @@ describe('Shortcut', () => {
           sideOffset={8}
           delayDuration={100}
         >
-          <button>Home</button>
+          <button tabIndex={0}>Home</button>
         </Shortcut>
       )
       const props = mockShortcutTooltip.mock.calls.at(-1)![0]
@@ -148,7 +148,7 @@ describe('Shortcut', () => {
     it('forwards label override to ShortcutTooltip', () => {
       render(
         <Shortcut id={SHORTCUT_IDS.NAV_HOME} onTrigger={() => {}} label="Go home">
-          <button>Home</button>
+          <button tabIndex={0}>Home</button>
         </Shortcut>
       )
       expect(mockShortcutTooltip.mock.calls.at(-1)![0].label).toBe('Go home')
@@ -157,7 +157,7 @@ describe('Shortcut', () => {
     it('omits undefined positioning props rather than fabricating them', () => {
       render(
         <Shortcut id={SHORTCUT_IDS.NAV_HOME} onTrigger={() => {}}>
-          <button>Home</button>
+          <button tabIndex={0}>Home</button>
         </Shortcut>
       )
       const props = mockShortcutTooltip.mock.calls.at(-1)![0]
@@ -175,7 +175,9 @@ describe('Shortcut', () => {
       const onTrigger = vi.fn()
       render(
         <Shortcut id={SHORTCUT_IDS.COMMAND_MENU_OPEN} onTrigger={onTrigger}>
-          <button onClick={onClick}>Open</button>
+          <button tabIndex={0} onClick={onClick}>
+            Open
+          </button>
         </Shortcut>
       )
 
@@ -188,7 +190,7 @@ describe('Shortcut', () => {
       const onTrigger = vi.fn()
       render(
         <Shortcut id={SHORTCUT_IDS.COMMAND_MENU_OPEN} onTrigger={onTrigger}>
-          <button>Open</button>
+          <button tabIndex={0}>Open</button>
         </Shortcut>
       )
       expect(onTrigger).not.toHaveBeenCalled()

@@ -6,9 +6,12 @@ import { BASE_PATH } from '@/lib/constants'
 import { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type ParseSQLQueryVariables = { sql: string }
+export type ParseSQLQueryOperations = 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE' | undefined
 export type ParseSQLQueryResponse = {
   tables: string[]
-  operation: 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE' | undefined
+  operation: ParseSQLQueryOperations
+  whereClause: string | null
+  statementCount: number
 }
 
 export async function parseSQLQuery({ sql }: ParseSQLQueryVariables) {

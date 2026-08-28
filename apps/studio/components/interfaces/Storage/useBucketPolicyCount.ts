@@ -9,7 +9,7 @@ export function useBucketPolicyCount() {
   const { data: policiesData = [], isPending: isPoliciesPending } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema: 'storage',
+    schemas: ['storage'],
   })
 
   const policyCountByBucket = useMemo(() => {

@@ -26,7 +26,8 @@ import {
 
 import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
 import { orderCommandSectionsByPriority } from '@/components/interfaces/App/CommandMenu/ordering'
-import { useSqlSnippetsQuery, type SqlSnippet } from '@/data/content/sql-snippets-query'
+import { type SnippetWithContent } from '@/data/content/sql-folders-query'
+import { useSqlSnippetsQuery } from '@/data/content/sql-snippets-query'
 import {
   useInfiniteTablesQuery,
   usePrefetchTables,
@@ -185,7 +186,7 @@ function SnippetSelector({
   canCreateNew,
 }: {
   projectRef: string | undefined
-  snippets: Array<SqlSnippet> | undefined
+  snippets: Array<SnippetWithContent> | undefined
   canCreateNew: boolean
 }) {
   const router = useRouter()
@@ -244,7 +245,7 @@ function SnippetSelector({
   )
 }
 
-function snippetValue(snippet: SqlSnippet) {
+function snippetValue(snippet: SnippetWithContent) {
   if (snippet.type !== 'sql') return ''
   return escapeAttributeSelector(
     `${snippet.id}-${snippet.name}-${snippet?.content?.unchecked_sql.slice(0, 30)}`

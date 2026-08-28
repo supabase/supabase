@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { BarChart, Shield } from 'lucide-react'
 import { useCallback, useMemo } from 'react'
 import { AiIconAnimation, Badge, Button, Card, CardContent, CardHeader, CardTitle, cn } from 'ui'
-import { Row } from 'ui-patterns'
+import { Row } from 'ui-patterns/Row'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { Markdown } from '../Markdown'

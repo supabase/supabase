@@ -34,7 +34,7 @@ const LW11Header = ({ className }: { className?: string }) => {
           . <br className="hidden sm:block" /> Join us in this major milestone and explore{' '}
           <br className="hidden sm:block" /> the exciting features that come with it.
         </p>
-        <Button asChild size="small" variant="alternative">
+        <Button asChild size="small" variant="primary">
           <Link href="/ga">Read full announcement</Link>
         </Button>
       </SectionContainer>

@@ -2,7 +2,7 @@ import { FileText, Loader } from 'lucide-react'
 import { DragEvent, useCallback, useRef, useState, type ChangeEvent } from 'react'
 import { Button, cn } from 'ui'
 
-import SparkBar from '@/components/ui/SparkBar'
+import { SparkBar } from '@/components/ui/SparkBar'
 
 interface SpreadSheetFileUploadProps {
   parseProgress: number

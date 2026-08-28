@@ -85,7 +85,7 @@
 .syntax-highlight {
   counter-reset: line-numbering;
   font-family: Menlo, Monaco, monospace;
-  color: hsl(var(--foreground-lighter));
+  color: var(--foreground-lighter);
   word-break: break-word;
 }
 
@@ -94,7 +94,7 @@
   counter-increment: line-numbering;
   padding-right: 0px;
   display: inline-block;
-  color: hsl(var(--border-stronger));
+  color: var(--border-stronger);
   /* space after numbers */
   width: 2rem;
   text-align: left;
@@ -104,11 +104,11 @@
   animation: shimmer 1.5s infinite linear;
   background: linear-gradient(
     to right,
-    hsl(var(--background-default)) 0%,
+    var(--background-default) 0%,
     hsl(var(--brand-default)) 25%,
     hsl(var(--brand-300)) 35%,
-    hsl(var(--background-default)) 45%,
-    hsl(var(--background-surface-100)) 75%
+    var(--background-default) 45%,
+    var(--background-surface-100) 75%
   );
   background-size: 3000px 100%;
 }

@@ -3,7 +3,7 @@
 // This enables autocomplete, go to definition, etc.
 
 import { withSupabase } from 'npm:@supabase/server@^1'
-import type { SupabaseClient } from 'npm:@supabase/supabase-js@2'
+import type { SupabaseClient } from 'npm:@supabase/supabase-js@^2'
 
 interface Task {
   name: string

@@ -4,7 +4,7 @@ import { useParams } from 'common'
 import { capitalize } from 'lodash'
 import Link from 'next/link'
 import { Fragment, useEffect } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Alert,
@@ -21,7 +21,7 @@ import {
   InputGroupText,
   Separator,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
@@ -35,9 +35,10 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
 
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { FormActions } from '@/components/ui/Forms/FormActions'
+import { HighAvailabilityDisabledSectionNotice } from '@/components/ui/HighAvailability/HighAvailabilityDisabledSectionNotice'
 import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
 import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
@@ -46,10 +47,14 @@ import { usePgbouncerConfigurationUpdateMutation } from '@/data/database/pgbounc
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
 const formId = 'pooling-configuration-form'
+const HIGH_AVAILABILITY_MAX_CLIENT_CONNECTIONS = 100_000
+const HA_DISABLED_TITLE =
+  'Connection pooling settings are managed automatically on High Availability projects'
 
 const PoolingConfigurationFormSchema = z.object({
   default_pool_size: z.preprocess(
@@ -68,6 +73,8 @@ const PoolingConfigurationFormSchema = z.object({
 export const ConnectionPooling = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { isHighAvailability, isPending: isHighAvailabilityPending } = useHighAvailability()
+  const canLoadPoolingConfig = !isHighAvailability && !isHighAvailabilityPending
   const { can: canUpdateConnectionPoolingConfiguration } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'projects',
@@ -80,15 +87,18 @@ export const ConnectionPooling = () => {
     isPending: isLoadingPgbouncerConfig,
     isError: isErrorPgbouncerConfig,
     isSuccess: isSuccessPgbouncerConfig,
-  } = usePgbouncerConfigQuery({ projectRef })
+  } = usePgbouncerConfigQuery({ projectRef }, { enabled: canLoadPoolingConfig })
 
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
   const disablePoolModeSelection = !hasDedicatedPooler
 
-  const { data: maxConnData } = useMaxConnectionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const { data: maxConnData } = useMaxConnectionsQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    { enabled: canLoadPoolingConfig }
+  )
   const { data: addons, isSuccess: isSuccessAddons } = useProjectAddonsQuery({ projectRef })
 
   const { mutate: updatePoolerConfig, isPending: isUpdatingPoolerConfig } =
@@ -113,14 +123,14 @@ export const ConnectionPooling = () => {
       max_client_conn: undefined,
     },
   })
-  const { default_pool_size } = form.watch()
+  const default_pool_size = useWatch({ control: form.control, name: 'default_pool_size' })
   const connectionPoolingUnavailable = pgbouncerConfig?.pool_mode === null
   const ignoreStartupParameters = pgbouncerConfig?.ignore_startup_parameters
 
   const onSubmit: SubmitHandler<z.infer<typeof PoolingConfigurationFormSchema>> = async (data) => {
     const { default_pool_size } = data
 
-    if (!projectRef) return console.error('Project ref is required')
+    if (!projectRef || isHighAvailability) return
 
     updatePoolerConfig(
       {
@@ -165,7 +175,24 @@ export const ConnectionPooling = () => {
         </PageSectionAside>
       </PageSectionMeta>
       <PageSectionContent className="space-y-4">
-        {isSuccessAddons && !disablePoolModeSelection && !hasIpv4Addon && (
+        {isHighAvailability && (
+          <HighAvailabilityDisabledSectionNotice
+            title={HA_DISABLED_TITLE}
+            description={
+              <>
+                High Availability projects run one pooler per Postgres pod, each supporting up to{' '}
+                {HIGH_AVAILABILITY_MAX_CLIENT_CONNECTIONS.toLocaleString()} active or passive
+                connections, with pooling behavior selected automatically.{' '}
+                <InlineLink href="https://multigres.com/blog/pooling-without-choosing-a-mode">
+                  Learn more
+                </InlineLink>
+                .
+              </>
+            }
+          />
+        )}
+
+        {isSuccessAddons && !isHighAvailability && !disablePoolModeSelection && !hasIpv4Addon && (
           <Admonition
             type="default"
             layout="responsive"
@@ -184,21 +211,23 @@ export const ConnectionPooling = () => {
         <Panel
           noMargin
           footer={
-            <FormActions
-              form={formId}
-              isSubmitting={isUpdatingPoolerConfig}
-              hasChanges={form.formState.isDirty}
-              handleReset={() => resetForm()}
-              helper={
-                !canUpdateConnectionPoolingConfiguration
-                  ? 'You need additional permissions to update connection pooling settings'
-                  : undefined
-              }
-            />
+            isHighAvailability ? undefined : (
+              <FormActions
+                form={formId}
+                isSubmitting={isUpdatingPoolerConfig}
+                hasChanges={form.formState.isDirty}
+                handleReset={() => resetForm()}
+                helper={
+                  !canUpdateConnectionPoolingConfiguration
+                    ? 'You need additional permissions to update connection pooling settings'
+                    : undefined
+                }
+              />
+            )
           }
         >
           <Panel.Content>
-            {isLoadingPgbouncerConfig && (
+            {!isHighAvailability && isLoadingPgbouncerConfig && (
               <div className="flex flex-col gap-y-4">
                 {Array.from({ length: 4 }).map((_, i) => (
                   <Fragment key={`loader-${i}`}>
@@ -213,31 +242,40 @@ export const ConnectionPooling = () => {
                 <ShimmeringLoader className="h-8 w-full" />
               </div>
             )}
-            {isErrorPgbouncerConfig && (
+            {!isHighAvailability && isErrorPgbouncerConfig && (
               <AlertError
                 error={pgbouncerConfigError}
                 subject="Failed to retrieve connection pooler configuration"
               />
             )}
-            {connectionPoolingUnavailable && (
+            {!isHighAvailability && connectionPoolingUnavailable && (
               <Admonition
                 type="default"
                 title="Unable to retrieve pooling configuration"
                 description="Please start a new project to enable this feature"
               />
             )}
-            {isSuccessPgbouncerConfig && !connectionPoolingUnavailable && (
+            {(isHighAvailability ||
+              (isSuccessPgbouncerConfig && !connectionPoolingUnavailable)) && (
               <>
                 <div className="flex flex-row gap-2 justify-between w-full">
                   <div className="flex flex-col text-sm">
                     <h5 className="text-foreground font-normal">Connection poolers</h5>
                     <p className="text-foreground-lighter">
-                      Configuration is shared across all connection poolers.
+                      {isHighAvailability
+                        ? 'One pooler runs for each Postgres pod in the cluster.'
+                        : 'Configuration is shared across all connection poolers.'}
                     </p>
                   </div>
                   <div className="flex flex-row gap-1 items-center">
-                    <Badge>Shared</Badge>
-                    {!disablePoolModeSelection && <Badge>Dedicated</Badge>}
+                    {isHighAvailability ? (
+                      <Badge>High Availability</Badge>
+                    ) : (
+                      <>
+                        <Badge>Shared</Badge>
+                        {!disablePoolModeSelection && <Badge>Dedicated</Badge>}
+                      </>
+                    )}
                   </div>
                 </div>
                 <Separator className="bg-border -mx-6 w-[calc(100%+3rem)] my-4" />
@@ -255,11 +293,18 @@ export const ConnectionPooling = () => {
                           layout="flex-row-reverse"
                           label="Connection pool size"
                           description={
-                            <p>
-                              The maximum number of connections made to the underlying Postgres
-                              cluster, per user+db combination. Pool size has a default of{' '}
-                              {defaultPoolSize} based on your compute size of {computeSize}.
-                            </p>
+                            isHighAvailability ? (
+                              <p>
+                                Pool size is managed automatically for each Postgres pod and cannot
+                                be changed.
+                              </p>
+                            ) : (
+                              <p>
+                                The maximum number of connections made to the underlying Postgres
+                                cluster, per user+db combination. Pool size has a default of{' '}
+                                {defaultPoolSize} based on your compute size of {computeSize}.
+                              </p>
+                            )
                           }
                           className="[&>div]:md:w-1/2 [&>div]:xl:w-2/5 [&>div>div]:w-full"
                         >
@@ -267,10 +312,15 @@ export const ConnectionPooling = () => {
                             <InputGroup>
                               <FormInputGroupInput
                                 {...field}
+                                disabled={isHighAvailability}
                                 type="number"
                                 className="w-full"
-                                value={field.value ?? ''}
-                                placeholder={defaultPoolSize.toString()}
+                                value={isHighAvailability ? '' : (field.value ?? '')}
+                                placeholder={
+                                  isHighAvailability
+                                    ? 'Managed automatically'
+                                    : defaultPoolSize.toString()
+                                }
                                 onChange={(event) =>
                                   field.onChange(
                                     isNaN(event.target.valueAsNumber)
@@ -279,12 +329,15 @@ export const ConnectionPooling = () => {
                                   )
                                 }
                               />
-                              <InputGroupAddon align="inline-end">
-                                <InputGroupText>connections</InputGroupText>
-                              </InputGroupAddon>
+                              {!isHighAvailability && (
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>connections</InputGroupText>
+                                </InputGroupAddon>
+                              )}
                             </InputGroup>
                           </FormControl>
-                          {!!maxConnData &&
+                          {!isHighAvailability &&
+                            !!maxConnData &&
                             (default_pool_size ?? 15) > maxConnData.maxConnections * 0.8 && (
                               <Alert variant="warning" className="mt-2">
                                 <AlertTitle className="text-foreground">
@@ -313,7 +366,14 @@ export const ConnectionPooling = () => {
                           label="Max client connections"
                           className="[&>div]:md:w-1/2 [&>div]:xl:w-2/5 [&>div>div]:w-full"
                           description={
-                            <>
+                            isHighAvailability ? (
+                              <p>
+                                Each pooler can support up to{' '}
+                                {HIGH_AVAILABILITY_MAX_CLIENT_CONNECTIONS.toLocaleString()} active
+                                or passive client connections. This value is managed automatically
+                                and cannot be changed.
+                              </p>
+                            ) : (
                               <p>
                                 The maximum number of concurrent client connections allowed. This
                                 value is fixed at {defaultMaxClientConn} based on your compute size
@@ -324,7 +384,7 @@ export const ConnectionPooling = () => {
                                   Learn more
                                 </InlineLink>
                               </p>
-                            </>
+                            )
                           }
                         >
                           <FormControl>
@@ -333,8 +393,16 @@ export const ConnectionPooling = () => {
                                 {...field}
                                 type="number"
                                 className="w-full"
-                                value={pgbouncerConfig?.max_client_conn ?? ''}
-                                placeholder={defaultMaxClientConn.toString()}
+                                value={
+                                  isHighAvailability
+                                    ? HIGH_AVAILABILITY_MAX_CLIENT_CONNECTIONS
+                                    : (pgbouncerConfig?.max_client_conn ?? '')
+                                }
+                                placeholder={
+                                  isHighAvailability
+                                    ? HIGH_AVAILABILITY_MAX_CLIENT_CONNECTIONS.toString()
+                                    : defaultMaxClientConn.toString()
+                                }
                                 onChange={(event) =>
                                   field.onChange(
                                     isNaN(event.target.valueAsNumber)

@@ -11,8 +11,7 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-  Theme,
-  themes,
+  singleThemes,
 } from 'ui'
 
 interface ThemeToggleProps {
@@ -65,9 +64,9 @@ export const ThemeToggle = ({
               setTheme(value)
             }}
           >
-            {themes
+            {singleThemes
               .filter((x) => x.value === 'dark' || x.value === 'light' || x.value === 'system')
-              .map((theme: Theme) => (
+              .map((theme) => (
                 <DropdownMenuRadioItem key={theme.value} value={theme.value}>
                   {theme.name}
                 </DropdownMenuRadioItem>

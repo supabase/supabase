@@ -386,6 +386,8 @@ export const PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT =
   'Purchase IPv4 add-on or use Shared Pooler if on a IPv4 network'
 export const IPV4_ADDON_TEXT = 'Connections are IPv4 proxied with IPv4 add-on'
 
+export const CONNECTION_SOURCE_LOAD_BALANCER = 'load-balancer'
+
 export type ConnectionStringMethod = 'direct' | 'transaction' | 'session'
 
 export const connectionStringMethodOptions: Record<
@@ -396,7 +398,7 @@ export const connectionStringMethodOptions: Record<
     value: 'direct',
     label: 'Direct connection',
     description:
-      'Ideal for applications with persistent and long-lived connections, such as those running on virtual machines or long-standing containers.',
+      'Ideal for applications with persistent and long-lived connections such as those running on virtual machines or long-standing containers.',
   },
   transaction: {
     value: 'transaction',
@@ -408,6 +410,6 @@ export const connectionStringMethodOptions: Record<
     value: 'session',
     label: 'Session pooler',
     description:
-      'Only recommended as an alternative to Direct Connection, when connecting via an IPv4 network.',
+      'Only recommended as an alternative to direct connection when connecting via an IPv4 network.',
   },
 }

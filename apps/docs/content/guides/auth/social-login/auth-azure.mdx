@@ -95,7 +95,7 @@ Configure this in the following way:
 - Select the _App registrations_ menu in Microsoft Entra ID on the Azure portal.
 - Select the OAuth app.
 - Select the _Manifest_ menu in the sidebar.
-- Make a backup of the JSON just in case.
+- Make a backup of the JSON in case you need it later.
 - Identify the `optionalClaims` key.
 - Edit it by specifying the following object:
   ```json
@@ -142,7 +142,7 @@ Configure this by storing a value under _Azure Tenant URL_ in the Supabase Auth 
 
 ## Add login code to your client app
 
-<Admonition type="tip">
+<Admonition type="note">
 
 Supabase Auth requires that Azure returns a valid email address. Therefore you must request the `email` scope in the `signInWithOAuth` method.
 
@@ -209,6 +209,18 @@ suspend fun signInWithAzure() {
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+When your user signs in, call [`SignIn()`](/docs/reference/csharp/sign-in-with-oauth) with `Provider.Azure` as the provider. Request the `email` scope:
+
+```c#
+var state = await supabase.Auth.SignIn(Provider.Azure, new SignInOptions { Scopes = "email" });
+var signInUrl = state.Uri;
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 <$Partial path="oauth_pkce_flow.mdx" />
@@ -256,6 +268,17 @@ When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) 
 suspend fun signOut() {
 	supabase.auth.signOut()
 }
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+When your user signs out, call [SignOut()](/docs/reference/csharp/sign-out) to remove them from the browser session and any objects from local storage:
+
+```c#
+await supabase.Auth.SignOut();
 ```
 
 </TabPanel>
@@ -313,6 +336,16 @@ suspend fun signInWithAzure() {
         scopes.add("offline_access")
     }
 }
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var state = await supabase.Auth.SignIn(Provider.Azure, new SignInOptions { Scopes = "offline_access" });
+var signInUrl = state.Uri;
 ```
 
 </TabPanel>

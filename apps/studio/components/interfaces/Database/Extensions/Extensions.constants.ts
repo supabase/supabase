@@ -15,6 +15,7 @@ export const HIDDEN_EXTENSIONS = [
   'xml2',
   'pg_tle',
   'pg_stat_monitor',
+  'wal2json',
 ]
 
 export const SEARCH_TERMS: Record<string, string[]> = {

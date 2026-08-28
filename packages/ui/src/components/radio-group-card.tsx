@@ -10,7 +10,13 @@ const RadioGroupCard = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>
 >(({ className, ...props }, ref) => {
-  return <RadioGroupPrimitive.Root className={cn('grid gap-2', className)} {...props} ref={ref} />
+  return (
+    <RadioGroupPrimitive.Root
+      className={cn('relative grid gap-2', className)}
+      {...props}
+      ref={ref}
+    />
+  )
 })
 RadioGroupCard.displayName = RadioGroupPrimitive.Root.displayName
 
@@ -36,14 +42,12 @@ const RadioGroupCardItem = React.forwardRef<
         'border',
         'p-2',
         // 'hover:bg-selection',
-        'hover:border-foreground-muted',
-        'hover:z-1 focus-visible:z-1',
-        'data-[state=checked]:z-1',
-        'data-[state=checked]:ring-2 data-[state=checked]:ring-border',
-        'data-[state=checked]:bg-surface-300 dark:data-[state=checked]:bg-surface-300',
-        'data-[state=checked]:border-foreground/50',
+        'hover:border-control-hover',
+        'hover:z-1 focus-visible:z-1 focus-visible:border-control-hover',
+        'outline-hidden',
         'transition-colors',
         'group',
+        'data-[state=checked]:border-control-hover',
         props.className
       )}
     >
@@ -53,15 +57,15 @@ const RadioGroupCardItem = React.forwardRef<
           <div
             className="
                 aspect-square h-4 w-4
-                rounded-full border group-data-[state=checked]:border-foreground-muted
-                group-focus:border-foreground-muted
-                group-hover:border-foreground-muted
+                rounded-full border group-data-[state=checked]:border-control-hover
+                group-focus:border-control-hover
+                group-hover:border-control-hover
                 ring-offset-background
                 group-focus:outline-hidden
-                group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2
+                group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-background
                 group-disabled:cursor-not-allowed group-disabled:opacity-50
                 flex items-center justify-center
-                transition
+                transition-colors
           "
           >
             <RadioGroupPrimitive.Indicator className="flex items-center justify-center">

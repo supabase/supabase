@@ -4,18 +4,18 @@ import { parseAsBoolean, useQueryState } from 'nuqs'
 import { forwardRef } from 'react'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import Results from './Results'
-import { getSqlErrorLines } from './UtilityTabResults.utils'
 import { subscriptionHasHipaaAddon } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import CopyButton from '@/components/ui/CopyButton'
+import { DataGridResults } from '@/components/ui/DataGridResults'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { getSqlErrorLines } from '@/data/sql/utils'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
 
 export type UtilityTabResultsProps = {
   id: string
@@ -31,10 +31,10 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
     const { ref } = useParams()
     const state = useDatabaseSelectorStateSnapshot()
     const { data: organization } = useSelectedOrganizationQuery()
-    const snapV2 = useSqlEditorV2StateSnapshot()
+    const sessionSnap = useSqlEditorSessionSnapshot()
     const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
-    const result = snapV2.results[id]?.[0]
+    const result = sessionSnap.results[id]?.[0]
     const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
     // Customers on HIPAA plans should not have access to Supabase AI
@@ -139,7 +139,7 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
                   variant="default"
                   onClick={() => {
                     state.setSelectedDatabaseId(ref)
-                    snapV2.resetResults(id)
+                    sessionSnap.resetResult(id)
                   }}
                 >
                   Switch to primary database
@@ -185,7 +185,7 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
       )
     }
 
-    return <Results rows={result.rows} />
+    return <DataGridResults rows={result.rows} />
   }
 )
 

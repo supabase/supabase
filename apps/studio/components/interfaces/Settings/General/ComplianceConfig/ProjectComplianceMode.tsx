@@ -13,7 +13,7 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useComplianceConfigUpdateMutation } from '@/data/config/project-compliance-config-mutation'

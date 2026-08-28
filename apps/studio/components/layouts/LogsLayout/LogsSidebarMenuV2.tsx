@@ -1,17 +1,9 @@
-import { IS_PLATFORM, useFlag, useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { ChevronRight, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
-import {
-  Badge,
-  Button,
-  cn,
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-  Separator,
-} from 'ui'
+import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger, Separator } from 'ui'
 import {
   InnerSideBarEmptyPanel,
   InnerSideBarFilters,
@@ -21,20 +13,18 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
-import {
-  useFeaturePreviewModal,
-  useUnifiedLogsPreview,
-} from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useIsETLPrivateAlpha } from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
 import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
-import SavedQueriesItem from '@/components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
+import { SavedQueriesItem } from '@/components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
 import { LogsSidebarItem } from '@/components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
 import { UnifiedLogsBanner } from '@/components/interfaces/UnifiedLogs/UnifiedLogsBanner'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useContentQuery } from '@/data/content/content-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
+import { useShowPostgresUpgradeLogs } from '@/hooks/misc/useShowPostgresUpgradeLogs'
 
 export function SidebarCollapsible({
   children,
@@ -63,10 +53,6 @@ export function SidebarCollapsible({
 export function LogsSidebarMenuV2() {
   const router = useRouter()
   const { ref } = useParams() as { ref: string }
-
-  const unifiedLogsFlagEnabled = useFlag('unifiedLogs')
-  const { selectFeaturePreview } = useFeaturePreviewModal()
-  const { enable: enableUnifiedLogs, isEligible: isUnifiedLogsEligible } = useUnifiedLogsPreview()
 
   const [searchText, setSearchText] = useState('')
 
@@ -102,6 +88,7 @@ export function LogsSidebarMenuV2() {
 
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
   const showMultigresLogs = useShowMultigresLogs()
+  const showPostgresUpgradeLogs = useShowPostgresUpgradeLogs()
 
   const { data: savedQueriesRes, isPending: savedQueriesLoading } = useContentQuery({
     projectRef: ref,
@@ -205,16 +192,17 @@ export function LogsSidebarMenuV2() {
       : null,
   ].filter((x) => x !== null)
 
-  const OPERATIONAL_COLLECTIONS = IS_PLATFORM
-    ? [
-        {
-          name: 'Postgres Version Upgrade',
-          key: 'pg-upgrade-logs',
-          url: `/project/${ref}/logs/pg-upgrade-logs`,
-          items: [],
-        },
-      ]
-    : []
+  const OPERATIONAL_COLLECTIONS =
+    IS_PLATFORM && showPostgresUpgradeLogs
+      ? [
+          {
+            name: 'Postgres Version Upgrade',
+            key: 'pg-upgrade-logs',
+            url: `/project/${ref}/logs/pg-upgrade-logs`,
+            items: [],
+          },
+        ]
+      : []
 
   const filteredLogs = BASE_COLLECTIONS.filter((collection) => {
     return collection?.name.toLowerCase().includes(searchText.toLowerCase())
@@ -225,36 +213,11 @@ export function LogsSidebarMenuV2() {
 
   return (
     <div className="pb-4 relative">
-      {IS_PLATFORM && !unifiedLogsFlagEnabled && (
-        <FeaturePreviewSidebarPanel
-          className="mx-4 mt-4"
-          illustration={<Badge variant="default">Coming soon</Badge>}
-          title="New logs"
-          description="Get early access"
-          actions={
-            <Link href="https://forms.supabase.com/unified-logs-signup" target="_blank">
-              <Button variant="default" size="tiny">
-                Early access
-              </Button>
-            </Link>
-          }
-        />
-      )}
-      {isUnifiedLogsEligible && (
-        <UnifiedLogsBanner
-          variant="promo"
-          className="mx-4 mt-4"
-          onEnable={() => {
-            enableUnifiedLogs()
-            router.push(`/project/${ref}/logs`)
-          }}
-          onMoreInfo={() => selectFeaturePreview('supabase-ui-preview-unified-logs')}
-        />
-      )}
+      <UnifiedLogsBanner />
 
       <div
         className={cn(
-          'flex gap-x-2 items-center sticky top-0 bg-background-200 z-1 px-4',
+          'flex gap-x-2 items-center sticky top-0 bg-dash-sidebar z-1 px-4',
           !templatesEnabled ? 'pt-4' : 'py-4'
         )}
       >
@@ -265,15 +228,18 @@ export function LogsSidebarMenuV2() {
             aria-labelledby="Search collections"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
-          ></InnerSideBarFilterSearchInput>
+          />
         </InnerSideBarFilters>
 
-        <Button
+        <ButtonTooltip
+          asChild
           variant="default"
           icon={<Plus className="text-foreground" />}
           className="w-[26px]"
-          onClick={() => router.push(`/project/${ref}/logs/explorer`)}
-        />
+          tooltip={{ content: { text: 'New query', side: 'bottom' } }}
+        >
+          <Link href={`/project/${ref}/logs/explorer`} />
+        </ButtonTooltip>
       </div>
       {templatesEnabled && (
         <div className="px-2">

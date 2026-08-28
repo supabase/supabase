@@ -3,15 +3,7 @@
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { Check, Copy, Loader2 } from 'lucide-react'
 import { useCallback, useState } from 'react'
-import {
-  Button,
-  cn,
-  copyToClipboard,
-  Tabs_Shadcn_ as Tabs,
-  TabsContent_Shadcn_ as TabsContent,
-  TabsList_Shadcn_ as TabsList,
-  TabsTrigger_Shadcn_ as TabsTrigger,
-} from 'ui'
+import { Button, cn, copyToClipboard, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 
 import { useLocalStorage } from '../use-local-storage'
 import { ProjectPicker } from './ProjectPicker'
@@ -22,11 +14,11 @@ const LOCAL_STORAGE_KEY = 'package-manager-tanstack-db'
 
 const getBaseUrl = () => {
   if (process.env.NEXT_PUBLIC_VERCEL_TARGET_ENV === 'production') {
-    return 'https://supabase.com/ui'
+    return 'https://supabase.com/library'
   } else if (process.env.NEXT_PUBLIC_VERCEL_TARGET_ENV === 'preview') {
     return `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
   } else {
-    return 'http://localhost:3004/ui'
+    return 'http://localhost:3004/library'
   }
 }
 

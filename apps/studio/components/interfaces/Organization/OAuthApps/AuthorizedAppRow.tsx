@@ -1,6 +1,6 @@
 import { Trash } from 'lucide-react'
 import { Button, TableCell, TableRow } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import CopyButton from '@/components/ui/CopyButton'
 import type { AuthorizedApp } from '@/data/oauth/authorized-apps-query'

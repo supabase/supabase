@@ -7,7 +7,7 @@ import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
-import useLatest from '@/hooks/misc/useLatest'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
 
@@ -68,7 +68,7 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
 
       if (!isValidOrg) {
         toast.error('You do not have access to this organization')
-        router.push(`${DEFAULT_HOME}?error=org_not_found&org=${slug}`)
+        router.push(DEFAULT_HOME)
         return
       }
     }

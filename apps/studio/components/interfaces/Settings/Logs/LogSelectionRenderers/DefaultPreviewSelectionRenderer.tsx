@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
   Separator,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { ErrorCodeDialog } from '../ErrorCodeDialog'
 import type { LogSearchCallback, PreviewLogData } from '../Logs.types'

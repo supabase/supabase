@@ -18,6 +18,7 @@ import {
   PopoverTrigger,
   ScrollArea,
 } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
@@ -83,13 +84,7 @@ export const PublicationsComboBox = ({
             'w-full [&>span]:w-full text-left',
             !selectedPublication && 'text-foreground-muted'
           )}
-          iconRight={
-            showLoadingState ? (
-              <Loader2 className="text-foreground-muted animate-spin" strokeWidth={2} size={14} />
-            ) : (
-              <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
-            )
-          }
+          iconRight={showLoadingState ? <Loader2 className="animate-spin" /> : <ChevronsUpDown />}
           name={field.name}
           onBlur={field.onBlur}
         >
@@ -105,16 +100,13 @@ export const PublicationsComboBox = ({
             onValueChange={setSearchTerm}
           />
           <CommandList>
-            <CommandEmpty>
-              {showLoadingState ? (
-                <div className="flex items-center gap-2 text-center justify-center">
-                  <Loader2 size={12} className="animate-spin" />
-                  Loading...
-                </div>
-              ) : (
-                'No publications found'
-              )}
-            </CommandEmpty>
+            <CommandEmpty>No publications found</CommandEmpty>
+
+            {showLoadingState && (
+              <div className="flex items-center gap-2 p-2 pb-0 text-center justify-center">
+                <GenericSkeletonLoader className="w-full" />
+              </div>
+            )}
 
             <CommandGroup>
               {publications.length === 0 && !showLoadingState && (

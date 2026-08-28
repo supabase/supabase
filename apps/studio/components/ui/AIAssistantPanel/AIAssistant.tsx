@@ -1,617 +1,178 @@
 import type { UIMessage as MessageType } from '@ai-sdk/react'
-import { useChat } from '@ai-sdk/react'
-import { lastAssistantMessageIsCompleteWithApprovalResponses } from 'ai'
-import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
-import { useParams, useSearchParamsShallow } from 'common/hooks'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Eraser, Pencil, X } from 'lucide-react'
+import { useParams } from 'common/hooks'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Button, cn, KeyboardShortcut } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { useEffect, useEffectEvent } from 'react'
+import { toast } from 'sonner'
 
-import AlertError from '../AlertError'
-import { ButtonTooltip } from '../ButtonTooltip'
-import { ErrorBoundary } from '../ErrorBoundary/ErrorBoundary'
-import { ASSISTANT_ERRORS } from './AiAssistant.constants'
-import type { SqlSnippet } from './AIAssistant.types'
-import {
-  hasPendingToolApproval,
-  onErrorChat,
-  resolvePendingToolApprovalsAsDenied,
-} from './AIAssistant.utils'
 import { AIAssistantHeader } from './AIAssistantHeader'
-import { AIOnboarding } from './AIOnboarding'
-import { AssistantChatForm } from './AssistantChatForm'
+import { AssistantChat } from './AssistantChat'
+import { resolveSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
 import {
-  Conversation,
-  ConversationContent,
-  ConversationScrollButton,
-} from './elements/Conversation'
-import { Message } from './Message'
-import { Markdown } from '@/components/interfaces/Markdown'
+  ASSISTANT_HANDOFF_QUERY_PARAM,
+  buildSupportAssistantPrompt,
+  consumeAssistantHandoff,
+} from '@/components/interfaces/Support/SupportAssistant.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
-import { useRateMessageMutation } from '@/data/ai/rate-message-mutation'
-import { useTablesQuery } from '@/data/tables/tables-query'
-import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { getParallelApprovalIdsToReject } from '@/lib/ai/message-utils'
-import {
-  DEFAULT_ASSISTANT_BASE_MODEL_ID,
-  defaultAssistantModelId,
-  isAssistantBaseModelId,
-  isKnownAssistantModelId,
-} from '@/lib/ai/model.utils'
-import { IS_PLATFORM } from '@/lib/constants'
-import { uuidv4 } from '@/lib/helpers'
-import { useTrack } from '@/lib/telemetry/track'
-import type { AssistantModel } from '@/state/ai-assistant-state'
 import { useAiAssistantState, useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import type { SqlSnippet } from '@/state/ai-assistant-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 interface AIAssistantProps {
   initialMessages?: MessageType[] | undefined
   className?: string
 }
 
+type CurrentQuerySnippet = Exclude<SqlSnippet, string>
+
+const isSameSnippet = (snippet: SqlSnippet, currentQuery: CurrentQuerySnippet) =>
+  typeof snippet !== 'string' &&
+  snippet.label === currentQuery.label &&
+  snippet.content === currentQuery.content &&
+  snippet.source === currentQuery.source
+
 export const AIAssistant = ({ className }: AIAssistantProps) => {
   const router = useRouter()
-  const { id: entityId } = useParams()
-  const { data: project } = useSelectedProjectQuery()
-  const searchParams = useSearchParamsShallow()
-
-  const { data: selectedOrganization, isPending: isLoadingOrganization } =
-    useSelectedOrganizationQuery()
-
-  useShortcut(SHORTCUT_IDS.AI_ASSISTANT_CANCEL_EDIT, () => cancelEdit())
-
-  const disablePrompts = useFlag('disableAssistantPrompts')
-  const { snippets } = useSqlEditorV2StateSnapshot()
+  const { id: entityId, source: sourceParam, ref: routeRef } = useParams()
   const snap = useAiAssistantStateSnapshot()
   const state = useAiAssistantState()
+  const { snippets } = useSqlEditorV2StateSnapshot()
   const { activeSidebar, closeSidebar } = useSidebarManagerSnapshot()
+  const shortcutsEnabled = activeSidebar?.id === SIDEBAR_KEYS.AI_ASSISTANT
 
-  const { hasAccess: hasAccessToAdvanceModel, isLoading: isLoadingEntitlements } =
-    useCheckEntitlements('assistant.advance_model')
+  const handleNewChat = () => state.newChat()
 
-  const selectedModel = useMemo<AssistantModel>(() => {
-    // While entitlements are loading, use the stored model without enforcing access
-    if (isLoadingEntitlements) {
-      return snap.model ?? DEFAULT_ASSISTANT_BASE_MODEL_ID
-    }
-
-    const defaultModel = defaultAssistantModelId(hasAccessToAdvanceModel)
-    const model = snap.model ?? defaultModel
-
-    if (!isKnownAssistantModelId(model)) return defaultModel
-    if (!hasAccessToAdvanceModel && !isAssistantBaseModelId(model)) {
-      return DEFAULT_ASSISTANT_BASE_MODEL_ID
-    }
-
-    return model
-  }, [isLoadingEntitlements, hasAccessToAdvanceModel, snap.model])
-
-  const [updatedOptInSinceMCP] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
-    false
-  )
-
-  const inputRef = useRef<HTMLTextAreaElement>(null)
-
-  const { aiOptInLevel, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
-  const showMetadataWarning =
-    IS_PLATFORM &&
-    !!selectedOrganization &&
-    (aiOptInLevel === 'disabled' || aiOptInLevel === 'schema')
-
-  // Add a ref to store the last user message
-  const lastUserMessageRef = useRef<MessageType | null>(null)
-
-  // Keep latest selected organization to avoid stale values in useChat transport
-  const selectedOrganizationRef = useRef(selectedOrganization)
-  useEffect(() => {
-    selectedOrganizationRef.current = selectedOrganization
-  }, [selectedOrganization])
-
-  const [value, setValue] = useState<string>(snap.initialInput || '')
-  const [editingMessageId, setEditingMessageId] = useState<string | null>(null)
-  const [isResubmitting, setIsResubmitting] = useState(false)
-  const [messageRatings, setMessageRatings] = useState<Record<string, 'positive' | 'negative'>>({})
-
-  const { data: check, isSuccess } = useCheckOpenAIKeyQuery()
-  const isApiKeySet = !!check?.hasKey
-
-  const { mutateAsync: rateMessage } = useRateMessageMutation()
+  useShortcut(SHORTCUT_IDS.AI_ASSISTANT_NEW_CHAT, handleNewChat, {
+    enabled: shortcutsEnabled,
+  })
 
   const isInSQLEditor = router.pathname.includes('/sql/[id]')
   const snippet = snippets[entityId ?? '']
   const snippetContent = snippet?.snippet?.content?.unchecked_sql
+  const openSnippetSource = isInSQLEditor
+    ? resolveSnippetSource(snippet?.snippet, sourceParam)
+    : undefined
 
-  const { data: tables } = useTablesQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      schema: 'public',
-    },
-    { enabled: isApiKeySet }
-  )
+  const processAssistantHandoff = useEffectEvent((handoffToken: string) => {
+    const request = consumeAssistantHandoff(handoffToken)
 
-  const currentTable = tables?.find((t) => t.id.toString() === entityId)
-  const currentSchema = searchParams?.get('schema') ?? 'public'
+    // A handoff link binds its target project to `request.projectRef`. Reject (and still
+    // clean up) any handoff that ends up on a different project's page — a stale link, or
+    // one edited/replayed by hand — rather than creating a chat tagged with the wrong project.
+    if (request && request.projectRef === routeRef) {
+      const newChatId = state.newChat({
+        name: 'Support request',
+        initialMessage: buildSupportAssistantPrompt(request),
+      })
 
-  // Update context in state
-  useEffect(() => {
-    state.setContext({
-      projectRef: project?.ref,
-      orgSlug: selectedOrganizationRef.current?.slug,
-      connectionString: project?.connectionString ?? '',
-    })
-  }, [project?.ref, project?.connectionString, selectedOrganizationRef.current?.slug, state])
+      const chat = state.chats[newChatId]
+      if (chat) {
+        chat.supportMetadata = {
+          subject: request.subject,
+          category: request.category,
+          severity: request.severity,
+          organizationSlug: request.organizationSlug,
+          projectRef: request.projectRef,
+          library: request.library,
+          affectedServices: request.affectedServices,
+          allowSupportAccess: request.allowSupportAccess,
+          frontConversationId: request.frontConversationId,
+          threadRef: request.threadRef,
+          isSupportChat: true,
+          lifecycleStatus: 'bot_active',
+          lastSyncedMessageCount: 0,
+          isSyncing: false,
+          isLifecycleSyncing: false,
+        }
 
-  const track = useTrack()
+        void import('@/state/ai-chat-front-sync')
+          .then(({ syncSupportChatToFront }) => syncSupportChatToFront(newChatId, state))
+          .catch(() => {})
+      }
 
-  const {
-    messages: chatMessages,
-    status: chatStatus,
-    error,
-    sendMessage,
-    setMessages,
-    addToolApprovalResponse,
-    stop,
-    regenerate,
-  } = useChat({
-    id: snap.activeChatId,
-    ...(snap.activeChatId && snap.chatInstances[snap.activeChatId]
-      ? { chat: snap.chatInstances[snap.activeChatId] }
-      : {}),
-    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,
-    onError: onErrorChat,
+      state.selectChat(newChatId)
+    } else {
+      // The token didn't resolve (e.g. the link was opened in a new tab, so this tab's
+      // sessionStorage never had it) or belonged to a different project. Start a new chat
+      // rather than silently leaving whichever chat happened to be active for this project —
+      // landing on an unrelated older conversation with no indication anything went wrong
+      // is worse than an empty one.
+      state.newChat()
+      toast.error("Couldn't load your ticket context here — started a new chat instead.")
+    }
+
+    const { [ASSISTANT_HANDOFF_QUERY_PARAM]: _handledParam, ...restQuery } = router.query
+    router.replace({ pathname: router.pathname, query: restQuery }, undefined, { shallow: true })
   })
 
-  const isChatLoading = chatStatus === 'submitted' || chatStatus === 'streaming'
-  const hasPendingApproval = hasPendingToolApproval(chatMessages)
-  const isChatInputDisabled = !isApiKeySet || disablePrompts || isLoadingOrganization
+  // Picks up a support chat handed off from an org-level support page. Waits for
+  // `isInitialized` since the assistant state's IndexedDB restore overwrites
+  // `state.chats`/`activeChatId` wholesale once it resolves, which would wipe out a chat
+  // created here if this ran first.
+  useEffect(() => {
+    if (!snap.isInitialized) return
 
-  const deleteMessageFromHere = useCallback(
-    (messageId: string) => {
-      // Find the message index in current chatMessages
-      const messageIndex = chatMessages.findIndex((msg) => msg.id === messageId)
-      if (messageIndex === -1) return
+    const handoffToken = router.query[ASSISTANT_HANDOFF_QUERY_PARAM]
+    if (typeof handoffToken !== 'string') return
 
-      if (isChatLoading) stop()
+    processAssistantHandoff(handoffToken)
+  }, [snap.isInitialized, router.query[ASSISTANT_HANDOFF_QUERY_PARAM]])
 
-      snap.deleteMessagesAfter(messageId, { includeSelf: true })
+  useEffect(() => {
+    if (!shortcutsEnabled || !isInSQLEditor || !snippetContent) return
 
-      const updatedMessages = chatMessages.slice(0, messageIndex)
-      setMessages(updatedMessages)
-    },
-    [snap, setMessages, chatMessages, isChatLoading, stop]
-  )
+    const currentQuery = {
+      label: 'Current Query',
+      content: snippetContent,
+      source: openSnippetSource,
+    }
+    state.setSqlSnippets([currentQuery])
 
-  const editMessage = useCallback(
-    (messageId: string) => {
-      const messageIndex = chatMessages.findIndex((msg) => msg.id === messageId)
-      if (messageIndex === -1) return
+    return () => {
+      const currentSnippets = state.sqlSnippets
+      const remainingSnippets = currentSnippets?.filter(
+        (snippet) => !isSameSnippet(snippet, currentQuery)
+      )
 
-      // Target message
-      const messageToEdit = chatMessages[messageIndex]
-
-      // Activate editing mode
-      setEditingMessageId(messageId)
-      const textContent =
-        messageToEdit.parts
-          ?.filter((part) => part.type === 'text')
-          .map((part) => part.text)
-          .join('') ?? ''
-      setValue(textContent)
-
-      setTimeout(() => {
-        if (inputRef.current) {
-          inputRef?.current?.focus()
-
-          // [Joshen] This is just to make the cursor go to the end of the text when focusing
-          const val = inputRef.current.value
-          inputRef.current.value = ''
-          inputRef.current.value = val
-        }
-      }, 100)
-    },
-    [chatMessages, setValue]
-  )
-
-  const cancelEdit = useCallback(() => {
-    setEditingMessageId(null)
-    setValue('')
-  }, [setValue])
-
-  const handleRateMessage = useCallback(
-    async (messageId: string, rating: 'positive' | 'negative', reason?: string) => {
-      if (!project?.ref || !selectedOrganization?.slug) return
-
-      // Optimistically update UI
-      setMessageRatings((prev) => ({ ...prev, [messageId]: rating }))
-
-      try {
-        const result = await rateMessage({
-          rating,
-          messages: chatMessages,
-          messageId,
-          projectRef: project.ref,
-          orgSlug: selectedOrganization.slug,
-          reason,
-          spanId: state.messageSpanIds[messageId],
-        })
-
-        track('assistant_message_rating_submitted', {
-          rating,
-          category: result.category,
-          ...(reason && { reason }),
-          chatId: state.activeChatId,
-        })
-      } catch (error) {
-        console.error('Failed to rate message:', error)
-        // Rollback on error
-        setMessageRatings((prev) => {
-          const { [messageId]: _, ...rest } = prev
-          return rest
-        })
+      if (currentSnippets && remainingSnippets?.length !== currentSnippets.length) {
+        state.setSqlSnippets(remainingSnippets ?? [])
       }
-    },
-    [chatMessages, project?.ref, selectedOrganization?.slug, rateMessage, track, state]
-  )
-
-  const isContextExceededError =
-    error &&
-    (error.message?.includes('context_length_exceeded') ||
-      error.message?.includes('exceeds the context window'))
-
-  const renderedMessages = useMemo(
-    () =>
-      chatMessages.map((message, index) => {
-        const isBeingEdited = editingMessageId === message.id
-        const isAfterEditedMessage = editingMessageId
-          ? chatMessages.findIndex((m) => m.id === editingMessageId) < index
-          : false
-        const isLastMessage = index === chatMessages.length - 1
-
-        return (
-          <Message
-            id={message.id}
-            key={message.id}
-            message={message}
-            isLoading={chatStatus === 'submitted' || chatStatus === 'streaming'}
-            readOnly={message.role === 'user'}
-            addToolApprovalResponse={addToolApprovalResponse}
-            onDelete={deleteMessageFromHere}
-            onEdit={editMessage}
-            isAfterEditedMessage={isAfterEditedMessage}
-            isBeingEdited={isBeingEdited}
-            onCancelEdit={cancelEdit}
-            isLastMessage={isLastMessage}
-            onRate={handleRateMessage}
-            rating={messageRatings[message.id] ?? null}
-          />
-        )
-      }),
-    [
-      chatMessages,
-      deleteMessageFromHere,
-      editMessage,
-      cancelEdit,
-      editingMessageId,
-      chatStatus,
-      addToolApprovalResponse,
-      handleRateMessage,
-      messageRatings,
-    ]
-  )
-
-  const hasMessages = chatMessages.length > 0
-
-  const sendMessageToAssistant = (finalContent: string) => {
-    if (editingMessageId) {
-      // Handling when the user is in edit mode
-      // delete the message(s) from the chat just like the delete button
-      setIsResubmitting(true)
-      deleteMessageFromHere(editingMessageId)
-      setEditingMessageId(null)
     }
+  }, [shortcutsEnabled, isInSQLEditor, snippetContent, openSnippetSource, state])
 
-    const payload = {
-      role: 'user',
-      createdAt: new Date(),
-      parts: [{ type: 'text', text: finalContent }],
-      id: uuidv4(),
-    } as MessageType
-
-    snap.clearSqlSnippets()
-    lastUserMessageRef.current = payload
-    if (hasPendingApproval && !editingMessageId) {
-      setMessages(resolvePendingToolApprovalsAsDenied(chatMessages))
-    }
-    sendMessage(payload, {
-      body: {
-        schema: currentSchema,
-        table: currentTable?.name,
-      },
-    })
-    setValue('')
-
-    if (finalContent.includes('Help me to debug')) {
-      track('assistant_debug_submitted', { chatId: snap.activeChatId })
-    } else {
-      track('assistant_prompt_submitted', { chatId: snap.activeChatId })
-    }
-  }
-
-  const handleClearMessages = () => {
-    if (isChatLoading) stop()
-    snap.clearMessages()
-    setMessages([])
-    lastUserMessageRef.current = null
-    setEditingMessageId(null)
-  }
-
-  useEffect(() => {
-    // Keep "Thinking" visible while stopping and resubmitting during edit
-    // Only clear once the new response actually starts streaming (or errors)
-    if (isResubmitting && (chatStatus === 'streaming' || !!error)) {
-      setIsResubmitting(false)
-    }
-  }, [isResubmitting, chatStatus, error])
-
-  useEffect(() => {
-    // Approval-required tools can't run in parallel. Auto-deny extras so the model reissues them sequentially.
-    for (const id of getParallelApprovalIdsToReject(chatMessages)) {
-      addToolApprovalResponse?.({
-        id,
-        approved: false,
-        reason:
-          'Only one approval-required tool call is allowed per turn. Please reissue this tool call after the current one completes.',
-      })
-    }
-  }, [chatMessages, addToolApprovalResponse])
-
-  useEffect(() => {
-    setValue(snap.initialInput || '')
-    if (inputRef.current && snap.initialInput) {
-      inputRef.current.focus()
-      inputRef.current.setSelectionRange(snap.initialInput.length, snap.initialInput.length)
-    }
-  }, [snap.initialInput])
-
-  useEffect(() => {
-    const isOpen = activeSidebar?.id === SIDEBAR_KEYS.AI_ASSISTANT
-    if (isOpen && isInSQLEditor && !!snippetContent) {
-      snap.setSqlSnippets([{ label: 'Current Query', content: snippetContent }])
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeSidebar?.id, isInSQLEditor, snippetContent])
+  if (!snap.activeChatId) return null
 
   return (
-    <ErrorBoundary
-      message="Something went wrong with the AI Assistant"
-      sentryContext={{
-        component: 'AIAssistant',
-        feature: 'AI Assistant Panel',
-        projectRef: project?.ref,
-        organizationSlug: selectedOrganization?.slug,
+    <AssistantChat
+      chatId={snap.activeChatId}
+      className={className}
+      shortcutsEnabled={shortcutsEnabled}
+      onNewChat={handleNewChat}
+      onSelectChat={(chatId) => state.selectChat(chatId)}
+      onBranchChat={(messageId) => state.branchChat(messageId)}
+      composerContext={{
+        initialInput: snap.initialInput,
+        sqlSnippets: snap.sqlSnippets as SqlSnippet[] | undefined,
+        suggestions: snap.suggestions
+          ? {
+              title: snap.suggestions.title,
+              prompts: snap.suggestions.prompts?.map((prompt) => ({ ...prompt })),
+            }
+          : undefined,
+        onSetSqlSnippets: state.setSqlSnippets,
+        onClearSqlSnippets: state.clearSqlSnippets,
       }}
-      actions={[
-        {
-          label: 'Clear messages and refresh',
-          onClick: () => {
-            handleClearMessages()
-            window.location.reload()
-          },
-        },
-      ]}
-    >
-      <div className={cn('flex flex-col h-full w-full md:h-full max-h-dvh', className)}>
+      renderHeader={(props) => (
         <AIAssistantHeader
-          isChatLoading={isChatLoading}
-          onNewChat={snap.newChat}
+          {...props}
+          shortcutsEnabled={shortcutsEnabled}
+          onNewChat={handleNewChat}
           onCloseAssistant={() => closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)}
-          showMetadataWarning={showMetadataWarning}
-          updatedOptInSinceMCP={updatedOptInSinceMCP}
-          isHipaaProjectDisallowed={isHipaaProjectDisallowed}
-          aiOptInLevel={aiOptInLevel}
         />
-        {hasMessages ? (
-          <Conversation className={cn('flex-1')}>
-            <ConversationContent className="w-full px-7 py-8 mb-10">
-              {renderedMessages}
-              {error && (
-                <>
-                  <AlertError
-                    error={
-                      isContextExceededError
-                        ? ASSISTANT_ERRORS['context-exceeded']
-                        : IS_PLATFORM
-                          ? ASSISTANT_ERRORS['default']
-                          : error
-                    }
-                    showErrorPrefix={false}
-                    showInstructions={false}
-                    subject="Sorry, I'm having trouble responding right now."
-                    additionalActions={
-                      <div className="flex items-center gap-x-2 mr-auto">
-                        {isContextExceededError ? (
-                          <Button
-                            variant="default"
-                            size="tiny"
-                            onClick={() => snap.newChat()}
-                            className="text-xs"
-                          >
-                            New chat
-                          </Button>
-                        ) : (
-                          <>
-                            <Button
-                              variant="default"
-                              size="tiny"
-                              onClick={() => regenerate()}
-                              className="text-xs"
-                            >
-                              Retry
-                            </Button>
-                            <ButtonTooltip
-                              variant="default"
-                              size="tiny"
-                              onClick={handleClearMessages}
-                              className="w-7 h-7"
-                              icon={<Eraser />}
-                              tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
-                            />
-                          </>
-                        )}
-                      </div>
-                    }
-                  />
-                </>
-              )}
-              {isChatLoading && (
-                <motion.span
-                  animate={{ opacity: [1, 0] }}
-                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                  className="inline-block w-1.5 h-4 bg-foreground-lighter mt-4"
-                />
-              )}
-              <p className="text-center text-xs text-foreground-muted mt-6">
-                Supabase AI may not always produce correct answers. Double check responses.
-              </p>
-            </ConversationContent>
-            <ConversationScrollButton />
-          </Conversation>
-        ) : (
-          <AIOnboarding
-            sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
-            suggestions={
-              snap.suggestions as
-                | { title?: string; prompts?: { label: string; description: string }[] }
-                | undefined
-            }
-            onValueChange={(val) => setValue(val)}
-            onFocusInput={() => inputRef.current?.focus()}
-          />
-        )}
-
-        <AnimatePresence>
-          {editingMessageId && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="pointer-events-none z-10 -mt-24"
-            >
-              <div className="h-24 w-full bg-linear-to-t from-background to-transparent relative">
-                <motion.div
-                  className="absolute left-1/2 z-20 bottom-8 pointer-events-auto"
-                  variants={{
-                    hidden: { y: 5, opacity: 0 },
-                    show: { y: 0, opacity: 1 },
-                  }}
-                  transition={{ duration: 0.1 }}
-                  initial="hidden"
-                  animate="show"
-                  exit="hidden"
-                >
-                  <div className="-translate-x-1/2 bg-alternative dark:bg-muted border rounded-md px-3 py-2 min-w-[180px] flex items-center justify-between gap-x-2">
-                    <div className="flex items-center gap-x-2 text-sm text-foreground">
-                      <Pencil size={14} />
-                      <span>Editing message</span>
-                    </div>
-                    <ButtonTooltip
-                      variant="outline"
-                      size="tiny"
-                      icon={<X size={14} />}
-                      onClick={cancelEdit}
-                      className="w-6 h-6 p-0"
-                      title="Cancel editing"
-                      aria-label="Cancel editing"
-                      tooltip={{
-                        content: { side: 'top', text: <KeyboardShortcut keys={['Meta', 'Esc']} /> },
-                      }}
-                    />
-                  </div>
-                </motion.div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <div className="px-3 pb-3 z-20 relative">
-          {disablePrompts && (
-            <Admonition
-              showIcon={false}
-              type="default"
-              title="Assistant has been temporarily disabled"
-              description="We're currently looking into getting it back online"
-            />
-          )}
-
-          {isSuccess && !isApiKeySet && (
-            <Admonition
-              type="default"
-              title="OpenAI API key not set"
-              description={
-                <Markdown
-                  content={
-                    'Add your `OPENAI_API_KEY` to your environment variables to use the AI Assistant.'
-                  }
-                />
-              }
-            />
-          )}
-
-          <AssistantChatForm
-            textAreaRef={inputRef}
-            className={cn(
-              'z-20 [&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border [&>form>textarea]:rounded-md [&>form>textarea]:outline-hidden! [&>form>textarea]:ring-offset-0! [&>form>textarea]:ring-0!'
-            )}
-            loading={isChatLoading}
-            isEditing={!!editingMessageId}
-            disabled={isChatInputDisabled}
-            placeholder={
-              hasMessages
-                ? 'Ask a follow up question...'
-                : (snap.sqlSnippets ?? [])?.length > 0
-                  ? 'Ask a question or make a change...'
-                  : 'Chat to Postgres...'
-            }
-            value={value}
-            onValueChange={(e) => setValue(e.target.value)}
-            onSubmit={(finalMessage) => {
-              sendMessageToAssistant(finalMessage)
-            }}
-            onStop={() => {
-              stop()
-              // to save partial responses from the AI
-              const lastMessage = chatMessages[chatMessages.length - 1]
-              if (lastMessage && lastMessage.role === 'assistant') {
-                state.updateMessage(lastMessage)
-              }
-            }}
-            sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
-            onRemoveSnippet={(index) => {
-              const newSnippets = [...(snap.sqlSnippets ?? [])]
-              newSnippets.splice(index, 1)
-              snap.setSqlSnippets(newSnippets)
-            }}
-            includeSnippetsInMessage={aiOptInLevel !== 'disabled'}
-            selectedModel={selectedModel}
-            onSelectModel={(model) => snap.setModel(model)}
-          />
-        </div>
-      </div>
-    </ErrorBoundary>
+      )}
+    />
   )
 }
 

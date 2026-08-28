@@ -12,29 +12,29 @@ export const getStatusConfig = (state: TableState['state']) => {
     case 'queued':
       return {
         badge: <Badge variant="warning">Queued</Badge>,
-        description: 'Table is waiting for ETL to pick it up for replication.',
-        tooltip: 'Table is waiting for ETL to pick it up for replication.',
+        description: 'Table is waiting for the pipeline to pick it up for replication.',
+        tooltip: 'Table is waiting for the pipeline to pick it up for replication.',
         color: 'text-warning',
       }
     case 'copying_table':
       return {
         badge: <Badge variant="success">Copying</Badge>,
-        description: "Table's existing rows are being copied before live streaming begins.",
-        tooltip: "Table's existing rows are being copied before live streaming begins.",
+        description: "Table's existing rows are being copied during the initial sync.",
+        tooltip: "Table's existing rows are being copied during the initial sync.",
         color: 'text-brand-600',
       }
     case 'copied_table':
       return {
         badge: <Badge variant="success">Copied</Badge>,
-        description: "Table copy is complete and it's preparing to follow WAL changes.",
-        tooltip: "Table copy is complete and it's preparing to follow WAL changes.",
+        description: 'Initial sync is complete and the table is preparing for ongoing replication.',
+        tooltip: 'Initial sync is complete and the table is preparing for ongoing replication.',
         color: 'text-success-600',
       }
     case 'following_wal':
       return {
         badge: <Badge variant="success">Live</Badge>,
-        description: 'Table is streaming new changes in real time from the WAL.',
-        tooltip: 'Table is streaming new changes in real time from the WAL.',
+        description: 'Table is receiving ongoing changes from the WAL.',
+        tooltip: 'Table is receiving ongoing changes from the WAL.',
         color: 'text-success-600',
       }
     case 'error':

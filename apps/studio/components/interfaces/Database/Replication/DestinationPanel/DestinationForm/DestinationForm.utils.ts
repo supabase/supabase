@@ -3,18 +3,42 @@ import { snakeCase } from 'lodash'
 import z from 'zod'
 
 import { DestinationType } from '../DestinationPanel.types'
-import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
+import { type ClickHouseApiConfig } from './ClickHouse/ClickHouse.utils'
+import {
+  CREATE_NEW_KEY,
+  CREATE_NEW_NAMESPACE,
+  DEFAULT_CONNECTION_POOL_SIZE,
+  DEFAULT_DUCKLAKE_POOL_SIZE,
+  DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
+  DEFAULT_MAX_FILL_MS,
+  DEFAULT_MAX_TABLE_SYNC_WORKERS,
+} from './DestinationForm.constants'
 import {
   DestinationPanelFormSchema,
   type DestinationPanelSchemaType,
 } from './DestinationForm.schema'
 import {
+  DUCKLAKE_MODE_CUSTOM,
+  DUCKLAKE_MODE_SUPABASE,
+  type DucklakeMode,
+} from './DuckLake/DuckLake.constants'
+import { type DucklakeApiConfig } from './DuckLake/DuckLake.utils'
+import { type SnowflakeApiConfig } from './Snowflake/Snowflake.utils'
+import {
+  BatchConfig,
   BigQueryDestinationConfig,
+  ClickHouseDestinationConfig,
   DestinationConfig,
   DucklakeDestinationConfig,
+  DucklakeManualDestinationConfig,
+  DucklakeSupabaseDestinationConfig,
   IcebergDestinationConfig,
   SnowflakeDestinationConfig,
+  TableSyncCopyConfig,
 } from '@/data/replication/create-destination-pipeline-mutation'
+import { type ReplicationDestinationByIdData } from '@/data/replication/destination-by-id-query'
+import { type ReplicationPipelineByIdData } from '@/data/replication/pipeline-by-id-query'
+import { type ReplicationPublication } from '@/data/replication/publications-query'
 import { type ValidationFailure } from '@/data/replication/validate-destination-mutation'
 import {
   type CreateS3AccessKeyCredentialVariables,
@@ -33,140 +57,244 @@ const normalizeOptionalUntrimmedString = (value?: string) => {
   return value && value.length > 0 ? value : undefined
 }
 
-type DucklakeFieldPath =
-  | 'ducklakeCatalogUrl'
-  | 'ducklakeDataPath'
-  | 'ducklakeS3AccessKeyId'
-  | 'ducklakeS3SecretAccessKey'
-  | 'ducklakeS3Region'
-  | 'ducklakeS3Endpoint'
-  | 'ducklakeMetadataSchema'
+// Builds the initial react-hook-form values for the destination form. New destinations fall back to
+// sensible defaults; existing destinations are hydrated from the destination + pipeline configs.
+export const generateDefaultValues = ({
+  destinationData,
+  pipelineData,
+  catalogToken,
+  region,
+  projectRef,
+  editMode,
+}: {
+  destinationData?: ReplicationDestinationByIdData
+  pipelineData?: ReplicationPipelineByIdData
+  catalogToken: string
+  region?: string
+  projectRef?: string
+  editMode: boolean
+}): DestinationPanelSchemaType => {
+  const config = destinationData?.config
 
-export type DucklakeValidationIssue = {
-  path: DucklakeFieldPath
-  message: string
+  const bigQueryConfig = config && 'big_query' in config ? config.big_query : undefined
+  const icebergConfig =
+    config && 'iceberg' in config && 'supabase' in config.iceberg
+      ? config.iceberg.supabase
+      : undefined
+  const ducklakeConfig =
+    config && 'ducklake' in config ? (config.ducklake as DucklakeApiConfig) : undefined
+  const snowflakeConfig =
+    config && 'snowflake' in config ? (config.snowflake as SnowflakeApiConfig) : undefined
+  const clickhouseConfig =
+    config && 'clickhouse' in config ? (config.clickhouse as ClickHouseApiConfig) : undefined
+
+  const tableSyncCopy = pipelineData?.config.table_sync_copy ?? {
+    type: 'include_all_tables' as const,
+  }
+  const tableSyncCopyTableIds =
+    'table_ids' in tableSyncCopy ? tableSyncCopy.table_ids.map((id) => String(id)) : []
+
+  return {
+    // Common fields
+    name: destinationData?.name ?? '',
+    publicationName: pipelineData?.config.publication_name ?? '',
+    tableSyncCopyMode: tableSyncCopy.type,
+    tableSyncCopyTableIds,
+    maxFillMs: pipelineData?.config?.batch?.max_fill_ms ?? DEFAULT_MAX_FILL_MS,
+    maxTableSyncWorkers:
+      pipelineData?.config?.max_table_sync_workers ?? DEFAULT_MAX_TABLE_SYNC_WORKERS,
+    maxCopyConnectionsPerTable:
+      pipelineData?.config?.max_copy_connections_per_table ??
+      DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
+    invalidatedSlotBehavior:
+      (pipelineData?.config as { invalidated_slot_behavior?: 'error' | 'recreate' } | undefined)
+        ?.invalidated_slot_behavior ?? undefined,
+    // BigQuery fields
+    projectId: bigQueryConfig?.project_id ?? '',
+    datasetId: bigQueryConfig?.dataset_id ?? '',
+    // Destination response DTOs intentionally omit stored secrets. Edit submissions
+    // leave blank secret fields unset so the existing values are preserved.
+    serviceAccountKey: '',
+    connectionPoolSize:
+      (config as { big_query?: { connection_pool_size?: number } } | undefined)?.big_query
+        ?.connection_pool_size ?? DEFAULT_CONNECTION_POOL_SIZE,
+    maxStalenessMins: bigQueryConfig?.max_staleness_mins ?? undefined, // Default: null
+    // Analytics Bucket fields
+    warehouseName: icebergConfig?.warehouse_name ?? '',
+    namespace: icebergConfig?.namespace ?? '',
+    newNamespaceName: '',
+    catalogToken: editMode || icebergConfig ? '' : catalogToken,
+    s3AccessKeyId: '',
+    s3SecretAccessKey: '',
+    s3Region: region ?? icebergConfig?.s3_region ?? '',
+    // DuckLake fields
+    // New destinations default to the managed "Use Supabase" mode with the current project
+    // pre-selected as both catalog and storage. Existing destinations always read back as the
+    // resolved/custom shape, so edit mode is locked to "Custom parameters".
+    ducklakeMode: (editMode ? DUCKLAKE_MODE_CUSTOM : DUCKLAKE_MODE_SUPABASE) as DucklakeMode,
+    ducklakeCatalogProjectRef: editMode ? '' : (projectRef ?? ''),
+    ducklakeStorageProjectRef: editMode ? '' : (projectRef ?? ''),
+    ducklakeStorageBucket: '',
+    ducklakeCatalogUrl: ducklakeConfig?.catalog_url ?? '',
+    ducklakeDataPath: ducklakeConfig?.data_path ?? '',
+    ducklakePoolSize: ducklakeConfig?.pool_size ?? DEFAULT_DUCKLAKE_POOL_SIZE,
+    ducklakeS3AccessKeyId: ducklakeConfig?.s3_access_key_id ?? '',
+    ducklakeS3SecretAccessKey: ducklakeConfig?.s3_secret_access_key ?? '',
+    ducklakeS3Region: ducklakeConfig?.s3_region ?? '',
+    ducklakeS3Endpoint: ducklakeConfig?.s3_endpoint ?? '',
+    ducklakeS3UrlStyle: ducklakeConfig?.s3_url_style ?? 'path',
+    ducklakeS3UseSsl: ducklakeConfig?.s3_use_ssl ?? true,
+    ducklakeMetadataSchema: ducklakeConfig?.metadata_schema ?? 'ducklake',
+    // Snowflake fields
+    snowflakeAccountId: snowflakeConfig?.account_id ?? '',
+    snowflakeUser: snowflakeConfig?.user ?? '',
+    snowflakePrivateKey: snowflakeConfig?.private_key ?? '',
+    snowflakePrivateKeyPassphrase: snowflakeConfig?.private_key_passphrase ?? '',
+    snowflakeDatabase: snowflakeConfig?.database ?? '',
+    snowflakeSchema: snowflakeConfig?.schema ?? '',
+    snowflakeRole: snowflakeConfig?.role ?? '',
+    // ClickHouse fields
+    clickhouseUrl: clickhouseConfig?.url ?? '',
+    clickhouseUser: clickhouseConfig?.user ?? '',
+    clickhousePassword: clickhouseConfig?.password ?? '',
+    clickhouseDatabase: clickhouseConfig?.database ?? '',
+    clickhouseEngine: clickhouseConfig?.engine ?? 'replacing_merge_tree',
+  }
 }
 
-export const getDucklakeValidationIssues = (
-  data: Pick<
-    DestinationPanelSchemaType,
-    | 'ducklakeCatalogUrl'
-    | 'ducklakeDataPath'
-    | 'ducklakeS3AccessKeyId'
-    | 'ducklakeS3SecretAccessKey'
-    | 'ducklakeS3Region'
-    | 'ducklakeS3Endpoint'
-    | 'ducklakeMetadataSchema'
-  >
-): DucklakeValidationIssue[] => {
-  const issues: DucklakeValidationIssue[] = []
+export const buildTableSyncCopyConfig = ({
+  mode,
+  selectedTableIds,
+}: {
+  mode: DestinationPanelSchemaType['tableSyncCopyMode']
+  selectedTableIds: string[]
+}): TableSyncCopyConfig => {
+  if (mode === 'include_all_tables' || mode === 'skip_all_tables') return { type: mode }
 
-  if (!data.ducklakeCatalogUrl?.length) {
-    issues.push({ path: 'ducklakeCatalogUrl', message: 'Catalog URL is required' })
-  } else if (
-    !data.ducklakeCatalogUrl.startsWith('postgres://') &&
-    !data.ducklakeCatalogUrl.startsWith('postgresql://')
-  ) {
-    issues.push({
-      path: 'ducklakeCatalogUrl',
-      message: 'DuckLake catalog URL must be a PostgreSQL-compatible URL',
-    })
+  if (selectedTableIds.length === 0) {
+    throw new Error('Select at least one table for the initial sync.')
   }
 
-  if (!data.ducklakeDataPath?.length) {
-    issues.push({ path: 'ducklakeDataPath', message: 'Data path is required' })
-  } else if (
-    !data.ducklakeDataPath.startsWith('s3://') ||
-    data.ducklakeDataPath.includes('file://')
-  ) {
-    issues.push({
-      path: 'ducklakeDataPath',
-      message: 'DuckLake data path must start with s3:// and cannot contain file://',
-    })
+  const tableIds = selectedTableIds.map(Number)
+  if (tableIds.some((id) => !Number.isSafeInteger(id) || id <= 0)) {
+    throw new Error('The selected table IDs are invalid. Refresh and try again.')
   }
 
-  if (!data.ducklakeS3AccessKeyId?.length) {
-    issues.push({ path: 'ducklakeS3AccessKeyId', message: 'S3 Access Key ID is required' })
+  return {
+    type: mode,
+    table_ids: tableIds,
   }
-
-  if (!data.ducklakeS3SecretAccessKey?.length) {
-    issues.push({
-      path: 'ducklakeS3SecretAccessKey',
-      message: 'S3 Secret Access Key is required',
-    })
-  }
-
-  if (!data.ducklakeS3Region?.length) {
-    issues.push({ path: 'ducklakeS3Region', message: 'S3 Region is required' })
-  }
-
-  if (!data.ducklakeS3Endpoint?.length) {
-    issues.push({ path: 'ducklakeS3Endpoint', message: 'S3 Endpoint is required' })
-  } else if (
-    data.ducklakeS3Endpoint.startsWith('http://') ||
-    data.ducklakeS3Endpoint.startsWith('https://')
-  ) {
-    issues.push({
-      path: 'ducklakeS3Endpoint',
-      message: 'S3 endpoint should not contain the protocol scheme',
-    })
-  }
-
-  if (data.ducklakeMetadataSchema && !/^[A-Za-z0-9_]+$/.test(data.ducklakeMetadataSchema)) {
-    issues.push({
-      path: 'ducklakeMetadataSchema',
-      message: 'DuckLake metadata schema must contain only letters, numbers, and underscores',
-    })
-  }
-
-  return issues
 }
 
-type SnowflakeFieldPath =
-  | 'snowflakeAccountId'
-  | 'snowflakeUser'
-  | 'snowflakePrivateKey'
-  | 'snowflakeDatabase'
-  | 'snowflakeSchema'
+export const buildBatchConfig = ({
+  maxFillMs,
+  existingBatch,
+}: {
+  maxFillMs?: number
+  existingBatch?: ReplicationPipelineByIdData['config']['batch']
+}): BatchConfig | undefined => {
+  if (maxFillMs === undefined && existingBatch === undefined) return undefined
 
-export type SnowflakeValidationIssue = {
-  path: SnowflakeFieldPath
-  message: string
+  return {
+    maxFillMs,
+    maxBytes: existingBatch?.max_bytes,
+    memoryBudgetRatio: existingBatch?.memory_budget_ratio,
+  }
 }
 
-export const getSnowflakeValidationIssues = (
-  data: Pick<
-    DestinationPanelSchemaType,
-    | 'snowflakeAccountId'
-    | 'snowflakeUser'
-    | 'snowflakePrivateKey'
-    | 'snowflakeDatabase'
-    | 'snowflakeSchema'
-  >
-): SnowflakeValidationIssue[] => {
-  const issues: SnowflakeValidationIssue[] = []
+// The set of table ids (as strings, matching form state) currently in the
+// selected publication. Selective table-copy only ever offers/keeps ids that
+// are in this set; ids selected previously that fall out of it are dropped at
+// submit time rather than resolved or displayed.
+export const getPublicationTableIds = (
+  publications: ReplicationPublication[],
+  publicationName: string
+): Set<string> => {
+  const publication = publications.find(({ name }) => name === publicationName)
+  return new Set((publication?.tables ?? []).map(({ id }) => String(id)))
+}
 
-  if (!data.snowflakeAccountId?.trim().length) {
-    issues.push({ path: 'snowflakeAccountId', message: 'Account ID is required' })
+// Drops selected table ids that are no longer in the current publication.
+// Create validation rejects ids that aren't published, while edits are checked
+// against the latest loaded publication before submitting.
+export const pruneStaleSelectedTableIds = ({
+  mode,
+  selectedTableIds,
+  publications,
+  publicationName,
+}: {
+  mode: DestinationPanelSchemaType['tableSyncCopyMode']
+  selectedTableIds: string[]
+  publications: ReplicationPublication[]
+  publicationName: string
+}): string[] => {
+  if (mode === 'include_all_tables' || mode === 'skip_all_tables') return selectedTableIds
+
+  const publicationTableIds = getPublicationTableIds(publications, publicationName)
+  return selectedTableIds.filter((id) => publicationTableIds.has(id))
+}
+
+const buildBigQueryConfig = (
+  data: z.infer<typeof DestinationPanelFormSchema>
+): BigQueryDestinationConfig => ({
+  projectId: data.projectId ?? '',
+  datasetId: data.datasetId ?? '',
+  serviceAccountKey: data.serviceAccountKey ?? '',
+  connectionPoolSize: data.connectionPoolSize,
+  maxStalenessMins: data.maxStalenessMins,
+})
+
+const buildSnowflakeConfig = (
+  data: z.infer<typeof DestinationPanelFormSchema>
+): SnowflakeDestinationConfig => ({
+  accountId: normalizeRequiredString(data.snowflakeAccountId),
+  user: normalizeRequiredString(data.snowflakeUser),
+  privateKey: data.snowflakePrivateKey ?? '',
+  privateKeyPassphrase: normalizeOptionalUntrimmedString(data.snowflakePrivateKeyPassphrase),
+  database: normalizeRequiredString(data.snowflakeDatabase),
+  schema: normalizeRequiredString(data.snowflakeSchema),
+  role: normalizeOptionalString(data.snowflakeRole),
+})
+
+const buildClickHouseConfig = (
+  data: z.infer<typeof DestinationPanelFormSchema>
+): ClickHouseDestinationConfig => ({
+  url: normalizeRequiredString(data.clickhouseUrl),
+  user: normalizeRequiredString(data.clickhouseUser),
+  password: normalizeOptionalUntrimmedString(data.clickhousePassword),
+  database: normalizeRequiredString(data.clickhouseDatabase),
+  engine: data.clickhouseEngine,
+})
+
+// Builds the studio-side DuckLake config from form data, picking the right shape for the
+// selected mode. The create / update / validate mutations convert this to the API payload.
+const buildDucklakeConfig = (
+  data: z.infer<typeof DestinationPanelFormSchema>
+): DucklakeDestinationConfig => {
+  if (data.ducklakeMode === DUCKLAKE_MODE_SUPABASE) {
+    const supabaseConfig: DucklakeSupabaseDestinationConfig = {
+      catalogProjectRef: normalizeRequiredString(data.ducklakeCatalogProjectRef),
+      storageProjectRef: normalizeRequiredString(data.ducklakeStorageProjectRef),
+      bucket: normalizeRequiredString(data.ducklakeStorageBucket),
+      poolSize: data.ducklakePoolSize,
+      metadataSchema: normalizeOptionalString(data.ducklakeMetadataSchema),
+    }
+    return supabaseConfig
   }
 
-  if (!data.snowflakeUser?.trim().length) {
-    issues.push({ path: 'snowflakeUser', message: 'User is required' })
+  const manualConfig: DucklakeManualDestinationConfig = {
+    catalogUrl: data.ducklakeCatalogUrl ?? '',
+    dataPath: data.ducklakeDataPath ?? '',
+    poolSize: data.ducklakePoolSize,
+    s3AccessKeyId: normalizeRequiredString(data.ducklakeS3AccessKeyId),
+    s3SecretAccessKey: normalizeRequiredString(data.ducklakeS3SecretAccessKey),
+    s3Region: normalizeRequiredString(data.ducklakeS3Region),
+    s3Endpoint: normalizeRequiredString(data.ducklakeS3Endpoint),
+    s3UrlStyle: data.ducklakeS3UrlStyle,
+    s3UseSsl: data.ducklakeS3UseSsl,
+    metadataSchema: normalizeOptionalString(data.ducklakeMetadataSchema),
   }
-
-  if (!data.snowflakePrivateKey?.trim().length) {
-    issues.push({ path: 'snowflakePrivateKey', message: 'Private key is required' })
-  }
-
-  if (!data.snowflakeDatabase?.trim().length) {
-    issues.push({ path: 'snowflakeDatabase', message: 'Database is required' })
-  }
-
-  if (!data.snowflakeSchema?.trim().length) {
-    issues.push({ path: 'snowflakeSchema', message: 'Schema is required' })
-  }
-
-  return issues
+  return manualConfig
 }
 
 // Helper function to build destination config for validation
@@ -182,15 +310,7 @@ export const buildDestinationConfigForValidation = ({
   if (!projectRef) throw new Error('Project ref is required')
 
   if (selectedType === 'BigQuery') {
-    return {
-      bigQuery: {
-        projectId: data.projectId ?? '',
-        datasetId: data.datasetId ?? '',
-        serviceAccountKey: data.serviceAccountKey ?? '',
-        connectionPoolSize: data.connectionPoolSize,
-        maxStalenessMins: data.maxStalenessMins,
-      },
-    }
+    return { bigQuery: buildBigQueryConfig(data) }
   } else if (selectedType === 'Analytics Bucket') {
     // For validation, use the namespace as-is (even if it's CREATE_NEW_NAMESPACE)
     // The actual creation will happen later in submitPipeline
@@ -217,34 +337,13 @@ export const buildDestinationConfigForValidation = ({
       },
     }
   } else if (selectedType === 'DuckLake') {
-    return {
-      ducklake: {
-        catalogUrl: data.ducklakeCatalogUrl ?? '',
-        dataPath: data.ducklakeDataPath ?? '',
-        poolSize: data.ducklakePoolSize,
-        s3AccessKeyId: normalizeRequiredString(data.ducklakeS3AccessKeyId),
-        s3SecretAccessKey: normalizeRequiredString(data.ducklakeS3SecretAccessKey),
-        s3Region: normalizeRequiredString(data.ducklakeS3Region),
-        s3Endpoint: normalizeRequiredString(data.ducklakeS3Endpoint),
-        s3UrlStyle: data.ducklakeS3UrlStyle,
-        s3UseSsl: data.ducklakeS3UseSsl,
-        metadataSchema: normalizeOptionalString(data.ducklakeMetadataSchema),
-      },
-    }
+    return { ducklake: buildDucklakeConfig(data) }
   } else if (selectedType === 'Snowflake') {
-    return {
-      snowflake: {
-        accountId: normalizeRequiredString(data.snowflakeAccountId),
-        user: normalizeRequiredString(data.snowflakeUser),
-        privateKey: data.snowflakePrivateKey ?? '',
-        privateKeyPassphrase: normalizeOptionalUntrimmedString(data.snowflakePrivateKeyPassphrase),
-        database: normalizeRequiredString(data.snowflakeDatabase),
-        schema: normalizeRequiredString(data.snowflakeSchema),
-        role: normalizeOptionalString(data.snowflakeRole),
-      },
-    }
+    return { snowflake: buildSnowflakeConfig(data) }
+  } else if (selectedType === 'ClickHouse') {
+    return { clickHouse: buildClickHouseConfig(data) }
   } else {
-    throw new Error('Invalid destination type')
+    throw new Error('Invalid destination type.')
   }
 }
 
@@ -252,14 +351,12 @@ export const buildDestinationConfig = async ({
   projectRef,
   selectedType,
   data,
-  warehouseName,
   createS3AccessKey,
   resolveNamespace,
 }: {
   projectRef?: string
   selectedType: DestinationType
   data: z.infer<typeof DestinationPanelFormSchema>
-  warehouseName?: string
   createS3AccessKey: UseMutateAsyncFunction<
     S3AccessKeyCreateData,
     ResponseError,
@@ -275,21 +372,14 @@ export const buildDestinationConfig = async ({
   let destinationConfig: DestinationConfig | undefined = undefined
 
   if (selectedType === 'BigQuery') {
-    const bigQueryConfig: BigQueryDestinationConfig = {
-      projectId: data.projectId ?? '',
-      datasetId: data.datasetId ?? '',
-      serviceAccountKey: data.serviceAccountKey ?? '',
-      connectionPoolSize: data.connectionPoolSize,
-      maxStalenessMins: data.maxStalenessMins,
-    }
-    destinationConfig = { bigQuery: bigQueryConfig }
+    destinationConfig = { bigQuery: buildBigQueryConfig(data) }
   } else if (selectedType === 'Analytics Bucket') {
     let s3Keys = { accessKey: data.s3AccessKeyId, secretKey: data.s3SecretAccessKey }
 
     if (data.s3AccessKeyId === CREATE_NEW_KEY) {
       const newKeys = await createS3AccessKey({
         projectRef,
-        description: `Autogenerated key for replication to ${snakeCase(warehouseName)}`,
+        description: `Autogenerated key for replication to ${snakeCase(data.warehouseName)}`,
       })
       s3Keys = { accessKey: newKeys.access_key, secretKey: newKeys.secret_key }
     }
@@ -308,30 +398,11 @@ export const buildDestinationConfig = async ({
     }
     destinationConfig = { iceberg: icebergConfig }
   } else if (selectedType === 'DuckLake') {
-    const ducklakeConfig: DucklakeDestinationConfig = {
-      catalogUrl: data.ducklakeCatalogUrl ?? '',
-      dataPath: data.ducklakeDataPath ?? '',
-      poolSize: data.ducklakePoolSize,
-      s3AccessKeyId: normalizeRequiredString(data.ducklakeS3AccessKeyId),
-      s3SecretAccessKey: normalizeRequiredString(data.ducklakeS3SecretAccessKey),
-      s3Region: normalizeRequiredString(data.ducklakeS3Region),
-      s3Endpoint: normalizeRequiredString(data.ducklakeS3Endpoint),
-      s3UrlStyle: data.ducklakeS3UrlStyle,
-      s3UseSsl: data.ducklakeS3UseSsl,
-      metadataSchema: normalizeOptionalString(data.ducklakeMetadataSchema),
-    }
-    destinationConfig = { ducklake: ducklakeConfig }
+    destinationConfig = { ducklake: buildDucklakeConfig(data) }
   } else if (selectedType === 'Snowflake') {
-    const snowflakeConfig: SnowflakeDestinationConfig = {
-      accountId: normalizeRequiredString(data.snowflakeAccountId),
-      user: normalizeRequiredString(data.snowflakeUser),
-      privateKey: data.snowflakePrivateKey ?? '',
-      privateKeyPassphrase: normalizeOptionalUntrimmedString(data.snowflakePrivateKeyPassphrase),
-      database: normalizeRequiredString(data.snowflakeDatabase),
-      schema: normalizeRequiredString(data.snowflakeSchema),
-      role: normalizeOptionalString(data.snowflakeRole),
-    }
-    destinationConfig = { snowflake: snowflakeConfig }
+    destinationConfig = { snowflake: buildSnowflakeConfig(data) }
+  } else if (selectedType === 'ClickHouse') {
+    destinationConfig = { clickHouse: buildClickHouseConfig(data) }
   }
 
   return destinationConfig

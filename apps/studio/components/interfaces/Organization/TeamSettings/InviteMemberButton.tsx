@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { UserPlus } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -30,7 +30,7 @@ import {
   SheetTrigger,
   Switch,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -151,7 +151,10 @@ export const InviteMemberButton = () => {
     defaultValues,
   })
 
-  const { applyToOrg, projectRef, email } = form.watch()
+  const [applyToOrg, projectRef, email] = useWatch({
+    control: form.control,
+    name: ['applyToOrg', 'projectRef', 'email'],
+  })
 
   const emailCount = parseEmails(email ?? '').length
 
@@ -280,7 +283,7 @@ export const InviteMemberButton = () => {
           </ButtonTooltip>
         </Shortcut>
       </SheetTrigger>
-      <SheetContent className="flex flex-col gap-0">
+      <SheetContent size="lg" className="flex flex-col gap-0">
         <SheetHeader>
           <SheetTitle>Invite team members</SheetTitle>
           <SheetDescription>

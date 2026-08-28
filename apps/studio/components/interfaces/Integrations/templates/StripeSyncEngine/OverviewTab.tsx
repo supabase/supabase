@@ -17,7 +17,7 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -248,7 +248,7 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
       )}
 
       <Sheet open={!!shouldShowInstallSheet} onOpenChange={handleCloseInstallSheet}>
-        <SheetContent size="lg" tabIndex={undefined} className="flex flex-col gap-0">
+        <SheetContent size="lg" className="flex flex-col gap-0">
           <Form {...form}>
             <form
               id={formId}

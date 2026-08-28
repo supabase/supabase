@@ -20,7 +20,18 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DestinationType } from '../DestinationPanel.types'
+import {
+  DEFAULT_CONNECTION_POOL_SIZE,
+  DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
+  DEFAULT_MAX_FILL_MS,
+  DEFAULT_MAX_TABLE_SYNC_WORKERS,
+} from './DestinationForm.constants'
 import { type DestinationPanelSchemaType } from './DestinationForm.schema'
+
+const INVALIDATED_SLOT_BEHAVIOR_LABELS = {
+  error: 'Block startup',
+  recreate: 'Recreate slot',
+}
 
 export const AdvancedSettings = ({
   type,
@@ -56,27 +67,18 @@ export const AdvancedSettings = ({
                 <FormItemLayout
                   layout="horizontal"
                   label="Batch wait time"
-                  description={
-                    <>
-                      <p>
-                        Maximum time pipeline waits to collect additional changes before flushing a
-                        batch.
-                      </p>
-                      <p>
-                        Lower values reduce replication latency, higher values improve batching
-                        efficiency.
-                      </p>
-                    </>
-                  }
+                  description="How long the pipeline waits before sending a partially filled batch."
                 >
                   <FormControl>
                     <InputGroup>
                       <FormInputGroupInput
                         {...field}
                         type="number"
+                        min={0}
+                        step={1}
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder="Default: 10000"
+                        placeholder={`Default: ${DEFAULT_MAX_FILL_MS}`}
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>milliseconds</InputGroupText>
@@ -94,23 +96,18 @@ export const AdvancedSettings = ({
                 <FormItemLayout
                   label="Table sync workers"
                   layout="horizontal"
-                  description={
-                    <>
-                      <p>Number of tables copied in parallel during the initial snapshot phase.</p>
-                      <p>
-                        Each worker uses one replication slot (up to N + 1 total while syncing).
-                      </p>
-                    </>
-                  }
+                  description="Maximum number of tables synced at the same time."
                 >
                   <FormControl>
                     <InputGroup>
                       <FormInputGroupInput
                         {...field}
                         type="number"
+                        min={1}
+                        step={1}
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder="Default: 4"
+                        placeholder={`Default: ${DEFAULT_MAX_TABLE_SYNC_WORKERS}`}
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>workers</InputGroupText>
@@ -126,28 +123,20 @@ export const AdvancedSettings = ({
               name="maxCopyConnectionsPerTable"
               render={({ field }) => (
                 <FormItemLayout
-                  label="Copy connections per table"
+                  label="Initial sync connections per table"
                   layout="horizontal"
-                  description={
-                    <>
-                      <p>
-                        Number of parallel connections each table copy can use during initial sync.
-                      </p>
-                      <p>
-                        More connections speed up large table copies, but use more database
-                        connections.
-                      </p>
-                    </>
-                  }
+                  description="Maximum number of source connections used to sync existing rows for each table."
                 >
                   <FormControl>
                     <InputGroup>
                       <FormInputGroupInput
                         {...field}
                         type="number"
+                        min={1}
+                        step={1}
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder="Default: 2"
+                        placeholder={`Default: ${DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE}`}
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>connections</InputGroupText>
@@ -165,22 +154,24 @@ export const AdvancedSettings = ({
                 <FormItemLayout
                   label="Invalidated slot behavior"
                   layout="horizontal"
-                  description="Behavior of the pipeline's replication slot when invalidated."
+                  description="What the pipeline does when its replication slot becomes invalid."
                 >
                   <FormControl>
                     <Select value={field.value ?? 'error'} onValueChange={field.onChange}>
-                      <SelectTrigger className="capitalize">{field.value ?? 'error'}</SelectTrigger>
+                      <SelectTrigger>
+                        {INVALIDATED_SLOT_BEHAVIOR_LABELS[field.value ?? 'error']}
+                      </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="error" className="[&>span]:top-2.5">
-                          <p>Error</p>
+                          <p>Block startup</p>
                           <p className="text-foreground-lighter">
                             Blocks startup for manual recovery.
                           </p>
                         </SelectItem>
                         <SelectItem value="recreate" className="[&>span]:top-2.5">
-                          <p>Recreate</p>
+                          <p>Recreate slot</p>
                           <p className="text-foreground-lighter">
-                            Rebuilds the slot and restarts replication from scratch.
+                            Replaces destination tables and runs a new, billable initial sync.
                           </p>
                         </SelectItem>
                       </SelectContent>
@@ -204,23 +195,18 @@ export const AdvancedSettings = ({
                         </div>
                       }
                       layout="horizontal"
-                      description={
-                        <>
-                          <p>Size of the BigQuery Storage Write API connection pool.</p>
-                          <p>
-                            More connections allow more parallel writes, but consume more resources.
-                          </p>
-                        </>
-                      }
+                      description="Number of BigQuery connections used for destination writes."
                     >
                       <FormControl>
                         <InputGroup>
                           <FormInputGroupInput
                             {...field}
                             type="number"
+                            min={1}
+                            step={1}
                             value={field.value ?? ''}
                             onChange={handleNumberChange(field)}
-                            placeholder="Default: 4"
+                            placeholder={`Default: ${DEFAULT_CONNECTION_POOL_SIZE}`}
                           />
                           <InputGroupAddon align="inline-end">
                             <InputGroupText>connections</InputGroupText>
@@ -243,27 +229,17 @@ export const AdvancedSettings = ({
                         </div>
                       }
                       layout="horizontal"
-                      description={
-                        <>
-                          <p>
-                            Maximum allowed age for BigQuery cached metadata before reading base
-                            tables.
-                          </p>
-                          <p>
-                            Lower values improve freshness, higher values can reduce query cost and
-                            latency.
-                          </p>
-                        </>
-                      }
+                      description="Set the maximum age of query results while BigQuery applies ongoing changes, or leave blank for the freshest results."
                     >
                       <FormControl>
                         <InputGroup>
                           <FormInputGroupInput
                             {...field}
                             type="number"
+                            min={0}
+                            step={1}
                             value={field.value ?? ''}
                             onChange={handleNumberChange(field)}
-                            placeholder="Default: None (No staleness limit)"
                           />
                           <InputGroupAddon align="inline-end">
                             <InputGroupText>minutes</InputGroupText>

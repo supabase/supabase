@@ -54,6 +54,7 @@ Path-specific rules in `.github/instructions/`:
 - **Error Handling**: `studio-error-handling.instructions.md` — error classification, `ErrorMatcher` usage
 - **E2E Tests**: `studio-e2e-tests.instructions.md` — selector priority, anti-patterns (`waitForTimeout`, `force: true`)
 - **Composition Patterns**: `studio-composition-patterns.instructions.md` — avoid boolean props, use compound components
+- **UI Copy**: `studio-copy.instructions.md` → `apps/design-system/content/docs/copywriting.mdx`
 - **shadcn/Radix Components**: `studio-shadcn-components.instructions.md` — accessibility handled by primitives, do not flag
 - **Keyboard Shortcuts**: `studio-shortcuts.instructions.md` — shortcut registry pattern, search-input escape handler, when to flag missing coverage
 

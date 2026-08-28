@@ -5,6 +5,7 @@ import {
   getLogsChartQuery,
   getLogsCountQuery,
   getUnifiedLogsQuery,
+  isUserFilterUnreachable,
 } from './UnifiedLogs.queries'
 import { getUnifiedLogsQuery as getUnifiedLogsQueryBQ } from './UnifiedLogs.queries.bq'
 
@@ -15,30 +16,34 @@ const baseSearch = {
 // Helper: build a search with extra `filter` URL entries on top of the base.
 const withFilters = (...entries: string[]) => ({ ...baseSearch, filter: entries }) as any
 
+// Helper: build a search with the cross-cutting `user` filter set, plus optional `filter` entries.
+const withUser = (user: string, ...entries: string[]) =>
+  ({ ...baseSearch, user, filter: entries }) as any
+
 describe('UnifiedLogs.queries (OTEL flat)', () => {
   describe('getUnifiedLogsQuery', () => {
-    it('defaults to postgres + postgrest log types when none specified', () => {
+    it('defaults to postgres + edge log types when none specified', () => {
       const sql = getUnifiedLogsQuery(baseSearch)
-      expect(sql).toContain(`source = 'postgres_logs'`)
-      // postgrest = edge_logs filtered by /rest/ path
-      expect(sql).toContain(
-        `source = 'edge_logs' AND log_attributes['request.path'] LIKE '%/rest/%'`
-      )
-    })
-
-    it('routes the `edge` log type to edge_logs without /rest/ or /storage/ paths', () => {
-      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:edge'))
-      expect(sql).toContain(`NOT LIKE '%/rest/%'`)
-      expect(sql).toContain(`NOT LIKE '%/storage/%'`)
       const where = sql.split(/\bWHERE\b/)[1] ?? ''
-      expect(where).not.toContain(`source = 'postgres_logs'`)
+      expect(where).toContain(`source = 'postgres_logs'`)
+      expect(where).toContain(`source = 'edge_logs'`)
+      expect(where).not.toContain(`source = 'postgrest_logs'`)
     })
 
-    it('routes the `storage` log type to edge_logs filtered by /storage/', () => {
+    it('routes the `postgrest` log type solely to postgrest_logs (mutually exclusive from edge_logs)', () => {
+      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:postgrest'))
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(`source = 'postgrest_logs'`)
+      expect(where).not.toContain(`source = 'edge_logs'`)
+      expect(where).not.toContain(`log_attributes['request.path'] LIKE '%/rest/%'`)
+    })
+
+    it('routes the `storage` log type solely to storage_logs (mutually exclusive from edge_logs)', () => {
       const sql = getUnifiedLogsQuery(withFilters('log_type:eq:storage'))
-      expect(sql).toContain(
-        `source = 'edge_logs' AND log_attributes['request.path'] LIKE '%/storage/%'`
-      )
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(`source = 'storage_logs'`)
+      expect(where).not.toContain(`source = 'edge_logs'`)
+      expect(where).not.toContain(`log_attributes['request.path'] LIKE '%/storage/%'`)
     })
 
     it('escapes single quotes in filter values to prevent SQL injection', () => {
@@ -111,17 +116,56 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).not.toContain(`'%error%%'`)
     })
 
-    it('excludes connection log messages by default (hide_connection_logs=true)', () => {
-      const sql = getUnifiedLogsQuery({ ...baseSearch, hide_connection_logs: true } as any)
+    it('excludes connection log messages when show_connection_logs=false', () => {
+      const sql = getUnifiedLogsQuery({ ...baseSearch, show_connection_logs: false } as any)
       expect(sql).toContain("source != 'postgres_logs'")
       expect(sql).toContain("event_message NOT LIKE 'connection received%'")
       expect(sql).toContain("event_message NOT LIKE 'connection authenticated%'")
       expect(sql).toContain("event_message NOT LIKE 'connection authorized%'")
     })
 
-    it('includes connection log messages when hide_connection_logs=false', () => {
-      const sql = getUnifiedLogsQuery({ ...baseSearch, hide_connection_logs: false } as any)
+    it('includes connection log messages by default (show_connection_logs=true)', () => {
+      const sql = getUnifiedLogsQuery({ ...baseSearch, show_connection_logs: true } as any)
       expect(sql).not.toContain("event_message NOT LIKE 'connection received%'")
+    })
+
+    it.each([
+      ['edge_auth', '%/auth/%'],
+      ['edge_storage', '%/storage/%'],
+      ['edge_postgrest', '%/rest/%'],
+    ] as const)('excludes %s-pathed requests from edge_logs when %s=false', (key, pathFilter) => {
+      const sql = getUnifiedLogsQuery({ ...baseSearch, [key]: false } as any)
+      expect(sql).toContain("source != 'edge_logs'")
+      expect(sql).toContain(`log_attributes['request.path'] NOT LIKE '${pathFilter}'`)
+    })
+
+    it('does not filter edge_logs by service path by default (all edge_* toggles true)', () => {
+      const sql = getUnifiedLogsQuery(baseSearch)
+      expect(sql).not.toContain("log_attributes['request.path'] NOT LIKE '%/auth/%'")
+      expect(sql).not.toContain("log_attributes['request.path'] NOT LIKE '%/storage/%'")
+      expect(sql).not.toContain("log_attributes['request.path'] NOT LIKE '%/rest/%'")
+    })
+
+    it('leaves dedicated auth_logs/storage_logs/postgrest_logs rows untouched by the edge_* toggles', () => {
+      // These toggles only hide traffic nested inside the `edge_logs` (API
+      // Gateway) source — the dedicated sources are separate log types now
+      // that log types are mutually exclusive, so they shouldn't be scoped by
+      // a `source != 'edge_logs' OR ...` guard meant for gateway rows.
+      const sql = getUnifiedLogsQuery({
+        ...baseSearch,
+        edge_auth: false,
+        edge_storage: false,
+        edge_postgrest: false,
+      } as any)
+      expect(sql).toContain(
+        "(source != 'edge_logs' OR log_attributes['request.path'] NOT LIKE '%/auth/%')"
+      )
+      expect(sql).toContain(
+        "(source != 'edge_logs' OR log_attributes['request.path'] NOT LIKE '%/storage/%')"
+      )
+      expect(sql).toContain(
+        "(source != 'edge_logs' OR log_attributes['request.path'] NOT LIKE '%/rest/%')"
+      )
     })
 
     it('does not emit subqueries or CTEs (rejected by the OTEL endpoint)', () => {
@@ -134,29 +178,59 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
   })
 
   describe('getLogsCountQuery', () => {
-    it('emits one UNION ALL branch per log_type bucket and per level', () => {
+    const whereOfBranchContaining = (sql: string, needle: string) => {
+      const branch = sql.split(/\bUNION ALL\b/).find((b) => b.includes(needle)) ?? ''
+      return branch.split(/\bWHERE\b/)[1]?.split(/\bGROUP BY\b/)[0] ?? ''
+    }
+
+    it('folds facets into single-pass arrayJoin scans with a total row', () => {
       const sql = getLogsCountQuery(baseSearch)
-      // Per-log-type counts
-      for (const lt of ['edge', 'postgrest', 'storage', 'postgres', 'edge function', 'auth']) {
+      expect(sql).toContain('arrayJoin([')
+      expect(sql).toContain('multiIf(')
+      expect(sql).toContain(`facet = 'total', 'all'`)
+      for (const lt of ['postgrest', 'storage', 'postgres', 'edge function', 'auth']) {
         expect(sql).toContain(`'${lt}'`)
       }
-      // Per-level counts
       for (const lvl of ['success', 'warning', 'error']) {
         expect(sql).toContain(`'${lvl}'`)
       }
-      // Bundled via UNION ALL — multiple occurrences expected
-      expect(sql.match(/UNION ALL/g)?.length ?? 0).toBeGreaterThan(5)
+      expect(sql).toContain(`'pathname'`)
+      expect(sql).toContain('LIMIT 20')
+      // log_type + base + pathname = 3 scans
+      expect(sql.match(/FROM logs/g)?.length ?? 0).toBeLessThanOrEqual(4)
     })
 
-    it('honours an active log_type filter in the total count branch', () => {
-      const sql = getLogsCountQuery(withFilters('log_type:eq:edge'))
-      // The first branch is the total — its WHERE must include the edge
-      // log_type predicate, otherwise the total badge would over-count
-      // when a log_type filter is active.
-      const totalBranch = sql.split(/\bUNION ALL\b/)[0]
-      expect(totalBranch).toContain(`'total'`)
-      expect(totalBranch).toContain(`source = 'edge_logs'`)
-      expect(totalBranch).not.toContain(`source = 'postgres_logs'`)
+    it('honours an active log_type filter in the total count scan', () => {
+      const sql = getLogsCountQuery(withFilters('log_type:eq:storage'))
+      // Assert on the WHERE only: value expressions mention other sources inline.
+      const totalWhere = whereOfBranchContaining(sql, `'all'`)
+      expect(totalWhere).toContain(`source = 'storage_logs'`)
+      expect(totalWhere).not.toContain(`source = 'edge_logs'`)
+      expect(totalWhere).not.toContain(`source = 'postgres_logs'`)
+    })
+
+    it('gives the log_type facet its own scan that excludes the log_type filter', () => {
+      const sql = getLogsCountQuery(withFilters('log_type:eq:postgrest'))
+      const logTypeWhere = whereOfBranchContaining(sql, `'log_type'`)
+      expect(logTypeWhere).not.toContain(`LIKE '%/rest/%'`)
+    })
+
+    it('applies the connection-logs filter to every count scan so badges match the list', () => {
+      const sql = getLogsCountQuery({ ...baseSearch, show_connection_logs: false } as any)
+      const scans = sql.split(/\bUNION ALL\b/)
+      expect(scans.length).toBeGreaterThan(1)
+      for (const scan of scans) {
+        expect(scan).toContain("event_message NOT LIKE 'connection received%'")
+      }
+    })
+
+    it('applies the edge_* service filters to every count scan so badges match the list', () => {
+      const sql = getLogsCountQuery({ ...baseSearch, edge_postgrest: false } as any)
+      const scans = sql.split(/\bUNION ALL\b/)
+      expect(scans.length).toBeGreaterThan(1)
+      for (const scan of scans) {
+        expect(scan).toContain("log_attributes['request.path'] NOT LIKE '%/rest/%'")
+      }
     })
   })
 
@@ -204,6 +278,81 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).toMatch(/END\) IN \('200'\)/)
       expect(sql).toContain('GROUP BY value')
       expect(sql).toContain('LIMIT 20')
+    })
+  })
+
+  describe('user filter', () => {
+    it('restricts to auth_logs/edge_logs and skips the default postgres+edge restriction', () => {
+      const sql = getUnifiedLogsQuery(withUser('user-123'))
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(
+        `(source = 'auth_logs' AND log_attributes['auth_event.actor_id'] = 'user-123')`
+      )
+      expect(where).toContain(
+        `(source = 'edge_logs' AND log_attributes['request.sb.jwt.authorization.payload.subject'] = 'user-123')`
+      )
+      // The unfiltered default (edge_logs OR postgres_logs) would incorrectly exclude
+      // auth_logs, the primary attributable source, so it must not appear here.
+      expect(where).not.toContain(`(source = 'edge_logs') OR (source = 'postgres_logs')`)
+    })
+
+    it('does not restrict sources when the user filter is inactive', () => {
+      const sql = getUnifiedLogsQuery(baseSearch)
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).not.toContain(`auth_event.actor_id`)
+    })
+
+    it('ANDs an explicit non-attributable log_type filter with the user condition (edge case: always zero rows)', () => {
+      // Locks in the exact shape `isUserFilterUnreachable` detects — `source = 'edge_logs'`
+      // AND `(source = 'auth_logs' ...) OR (source = 'postgres_logs' ...)` can never both hold.
+      const sql = getUnifiedLogsQuery(withUser('user-123', 'log_type:eq:edge'))
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(`source = 'edge_logs'`)
+      expect(where).toContain(`log_attributes['auth_event.actor_id'] = 'user-123'`)
+    })
+  })
+
+  describe('isUserFilterUnreachable', () => {
+    it('is false when no user filter is active', () => {
+      expect(isUserFilterUnreachable(withFilters('log_type:eq:edge'))).toBe(false)
+    })
+
+    it('is false when the user filter is active with no explicit log_type filter', () => {
+      expect(isUserFilterUnreachable(withUser('user-123'))).toBe(false)
+    })
+
+    it('is false when the explicit log_type filter includes an attributable source (auth)', () => {
+      expect(isUserFilterUnreachable(withUser('user-123', 'log_type:eq:auth'))).toBe(false)
+    })
+
+    it('is false when the explicit log_type filter includes an attributable source (edge)', () => {
+      expect(isUserFilterUnreachable(withUser('user-123', 'log_type:eq:edge'))).toBe(false)
+    })
+
+    it('is false when at least one of several selected log types is attributable', () => {
+      expect(
+        isUserFilterUnreachable(withUser('user-123', 'log_type:eq:edge', 'log_type:eq:auth'))
+      ).toBe(false)
+    })
+
+    it('is true when the explicit log_type filter restricts to a single non-attributable source', () => {
+      expect(isUserFilterUnreachable(withUser('user-123', 'log_type:eq:storage'))).toBe(true)
+    })
+
+    it('is true when every selected log type is non-attributable', () => {
+      expect(
+        isUserFilterUnreachable(withUser('user-123', 'log_type:eq:realtime', 'log_type:eq:storage'))
+      ).toBe(true)
+    })
+
+    it('(neq) is false when excluding a non-attributable source — the attributable sources remain eligible', () => {
+      expect(isUserFilterUnreachable(withUser('user-123', 'log_type:neq:edge'))).toBe(false)
+    })
+
+    it('(neq) is true only when both attributable sources are excluded', () => {
+      expect(
+        isUserFilterUnreachable(withUser('user-123', 'log_type:neq:auth', 'log_type:neq:edge'))
+      ).toBe(true)
     })
   })
 

@@ -2,7 +2,7 @@
 
 import { Check, Copy, File, Terminal } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
 import bash from 'react-syntax-highlighter/dist/cjs/languages/hljs/bash'
@@ -114,17 +114,16 @@ function CodeBlock(props: CodeBlockProps) {
         </div>
       )}
       <div className="relative">
-        {/* @ts-ignore */}
         <SyntaxHighlighter
           language={lang}
           style={
-            isCodeHikeTheme
+            (isCodeHikeTheme
               ? isDarkTheme
                 ? codeHikeTheme.dark
                 : codeHikeTheme.light
               : isDarkTheme
                 ? monokaiCustomTheme.dark
-                : monokaiCustomTheme.light
+                : monokaiCustomTheme.light) as Record<string, CSSProperties>
           }
           className={cn(
             'synthax-highlighter border border-default/15 rounded-lg',
@@ -152,7 +151,7 @@ function CodeBlock(props: CodeBlockProps) {
             fontSize: large ? 14 : '0.75rem',
           }}
         >
-          {content}
+          {content ?? ''}
         </SyntaxHighlighter>
         {!props.hideCopy && props.children ? (
           <div className="absolute right-2 top-2">

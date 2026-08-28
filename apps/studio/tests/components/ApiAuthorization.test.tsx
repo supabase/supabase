@@ -1,14 +1,16 @@
-import { screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import dayjs from 'dayjs'
 import { HttpResponse } from 'msw'
+import { getMcpClientIconSrc } from 'ui-patterns/McpUrlBuilder'
 import { describe, expect, test, vi } from 'vitest'
 
 import {
   ApiAuthorizationScreen,
   type ApiAuthorizationScreenProps,
 } from '@/components/interfaces/ApiAuthorization/ApiAuthorization'
+import { AuthorizeConnectLogo } from '@/components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
 import type { ApiAuthorizationResponse } from '@/data/api-authorization/api-authorization-query'
 import type { ProfileContextType } from '@/lib/profile'
 import { createMockOrganizationResponse } from '@/tests/helpers'
@@ -119,6 +121,93 @@ function renderScreen(props: Partial<ApiAuthorizationScreenProps> = {}) {
 }
 
 // --- Tests ---
+
+describe('AuthorizeConnectLogo', () => {
+  test.each([
+    ['Cursor', 'https://cursor.com/callback', 'cursor'],
+    ['Claude', 'https://claude.ai/api/mcp/auth_callback', 'claude'],
+    ['ChatGPT', 'https://chatgpt.com/callback', 'openai'],
+    ['OpenAI', 'https://openai.com/callback', 'openai'],
+    ['Perplexity', 'https://www.perplexity.ai/callback', 'perplexity'],
+  ])('pairs %s with Supabase when redirect host is allowlisted', (name, redirectUri, iconKey) => {
+    customRender(<AuthorizeConnectLogo icon={null} name={name} redirectUri={redirectUri} />)
+
+    expect(screen.getByAltText(name)).toHaveAttribute(
+      'src',
+      getMcpClientIconSrc({ icon: iconKey, useDarkVariant: false })
+    )
+    expect(screen.getByAltText('Supabase')).toBeInTheDocument()
+  })
+
+  test('does not use a curated logo from the requester name alone', () => {
+    customRender(
+      <AuthorizeConnectLogo icon={null} name="Claude" redirectUri="https://evil.com/callback" />
+    )
+
+    expect(screen.getByAltText('Supabase')).toBeInTheDocument()
+    expect(screen.queryByAltText('Claude')).not.toBeInTheDocument()
+  })
+
+  test('pairs curated logos for localhost when the name matches a trusted partner', () => {
+    customRender(
+      <AuthorizeConnectLogo
+        icon={null}
+        name="Claude"
+        redirectUri="http://127.0.0.1:42813/callback"
+      />
+    )
+
+    expect(screen.getByAltText('Claude')).toHaveAttribute(
+      'src',
+      getMcpClientIconSrc({ icon: 'claude', useDarkVariant: false })
+    )
+    expect(screen.getByAltText('Supabase')).toBeInTheDocument()
+  })
+
+  test('shows Supabase alone when the requester has no icon', () => {
+    customRender(<AuthorizeConnectLogo icon={null} name="Acme" />)
+
+    expect(screen.getByAltText('Supabase')).toBeInTheDocument()
+    expect(screen.queryByAltText('Acme')).not.toBeInTheDocument()
+    expect(screen.queryByText('A')).not.toBeInTheDocument()
+  })
+
+  test('shows Supabase alone when the requester icon fails to load', () => {
+    customRender(
+      <AuthorizeConnectLogo icon="https://example.com/broken-logo.svg" name="Unknown App" />
+    )
+
+    fireEvent.error(screen.getByAltText('Unknown App'))
+
+    expect(screen.getByAltText('Supabase')).toBeInTheDocument()
+    expect(screen.queryByAltText('Unknown App')).not.toBeInTheDocument()
+    expect(screen.queryByText('U')).not.toBeInTheDocument()
+  })
+
+  test('forces light tiles when pairing an uploaded OAuth app icon', () => {
+    customRender(
+      <AuthorizeConnectLogo
+        icon="https://example.com/uploaded-icon.png"
+        name="Acme"
+        redirectUri="https://acme.example/callback"
+      />
+    )
+
+    expect(screen.getByAltText('Acme').parentElement).toHaveClass('bg-white')
+    expect(screen.getByAltText('Acme').parentElement).toHaveClass('border-black/10')
+    expect(screen.getByAltText('Supabase').parentElement).toHaveClass('bg-white')
+    expect(screen.getByAltText('Supabase').parentElement).toHaveClass('border-black/10')
+  })
+
+  test('keeps theme tiles for curated partners', () => {
+    customRender(
+      <AuthorizeConnectLogo icon={null} name="Cursor" redirectUri="https://cursor.com/callback" />
+    )
+
+    expect(screen.getByAltText('Cursor').parentElement).toHaveClass('bg-surface-75')
+    expect(screen.getByAltText('Supabase').parentElement).toHaveClass('bg-surface-75')
+  })
+})
 
 describe('ApiAuthorizationScreen', () => {
   describe('when auth_id is missing', () => {
@@ -254,9 +343,49 @@ describe('ApiAuthorizationScreen', () => {
           mockBothEndpoints(createMockAuthResponse({ name: 'My OAuth App' }))
           renderScreen()
           await screen.findByText('Authorize API access for My OAuth App')
+          expect(screen.getByAltText('Supabase')).toBeInTheDocument()
+          expect(screen.queryByText('M')).not.toBeInTheDocument()
           expect(screen.getByRole('combobox')).toBeInTheDocument()
           expect(screen.getByRole('button', { name: /Authorize My OAuth App/ })).toBeInTheDocument()
           expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument()
+        })
+
+        test('pairs curated MCP requesters with Supabase when redirect host is allowlisted', async () => {
+          mockBothEndpoints(
+            createMockAuthResponse({
+              name: 'Cursor',
+              icon: null,
+              redirect_uri: 'https://cursor.com/callback',
+            })
+          )
+          renderScreen()
+          await screen.findByText('Authorize API access for Cursor')
+          expect(screen.getByAltText('Cursor')).toBeInTheDocument()
+          expect(screen.getByAltText('Supabase')).toBeInTheDocument()
+          expect(
+            screen.queryByText('Check this redirect before authorizing')
+          ).not.toBeInTheDocument()
+        })
+
+        test('warns when a trusted name redirects to a non-allowlisted host', async () => {
+          mockBothEndpoints(
+            createMockAuthResponse({
+              name: 'Claude',
+              icon: null,
+              redirect_uri: 'https://evil.com/callback',
+            })
+          )
+          renderScreen()
+          expect(
+            await screen.findByText('Check this redirect before authorizing')
+          ).toBeInTheDocument()
+          expect(
+            screen.getByText(
+              'This request uses the name Claude, but after you authorize you will be redirected to evil.com, not Claude.'
+            )
+          ).toBeInTheDocument()
+          expect(screen.queryByAltText('Claude')).not.toBeInTheDocument()
+          expect(screen.getByAltText('Supabase')).toBeInTheDocument()
         })
 
         test('auto-selects the only organization when no organization_slug is provided', async () => {
@@ -279,14 +408,19 @@ describe('ApiAuthorizationScreen', () => {
       describe('expiration', () => {
         test('shows expiration warning and hides action buttons when request has expired', async () => {
           mockBothEndpoints(
-            createMockAuthResponse({ expires_at: dayjs().subtract(1, 'hour').toISOString() })
+            createMockAuthResponse({
+              name: 'Claude',
+              redirect_uri: 'https://evil.com/callback',
+              expires_at: dayjs().subtract(1, 'hour').toISOString(),
+            })
           )
           renderScreen()
           await screen.findByText('Authorization request expired')
-          expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
           expect(
-            screen.queryByRole('button', { name: /Authorize Test App/ })
+            screen.queryByText('Check this redirect before authorizing')
           ).not.toBeInTheDocument()
+          expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
+          expect(screen.queryByRole('button', { name: /Authorize Claude/ })).not.toBeInTheDocument()
         })
 
         test('does not show expiration warning when request has not expired', async () => {
@@ -316,6 +450,25 @@ describe('ApiAuthorizationScreen', () => {
           await user.click(screen.getByRole('button', { name: /Authorize Test App/ }))
           await waitFor(() => expect(approveHandler).toHaveBeenCalled())
         })
+
+        test('shows an approval failure inline and keeps the action available', async () => {
+          const user = userEvent.setup()
+          mockBothEndpoints()
+          addAPIMock({
+            method: 'post',
+            path: '/platform/organizations/:slug/oauth/authorizations/:id',
+            response: () =>
+              HttpResponse.json<APIErrorBody>({ message: 'Authorization failed' }, { status: 500 }),
+          })
+          renderScreen()
+
+          await user.click(await screen.findByRole('button', { name: /Authorize Test App/ }))
+
+          expect(await screen.findByRole('alert')).toHaveTextContent(
+            'Failed to authorize request: Authorization failed'
+          )
+          expect(screen.getByRole('button', { name: /Authorize Test App/ })).toBeEnabled()
+        })
       })
 
       describe('decline action', () => {
@@ -335,6 +488,25 @@ describe('ApiAuthorizationScreen', () => {
           await user.click(screen.getByRole('button', { name: 'Cancel' }))
           await waitFor(() => expect(declineHandler).toHaveBeenCalled())
           await waitFor(() => expect(navigate).toHaveBeenCalledWith('/organizations'))
+        })
+
+        test('shows a cancellation failure inline and keeps the action available', async () => {
+          const user = userEvent.setup()
+          mockBothEndpoints()
+          addAPIMock({
+            method: 'delete',
+            path: '/platform/organizations/:slug/oauth/authorizations/:id',
+            response: () =>
+              HttpResponse.json<APIErrorBody>({ message: 'Cancellation failed' }, { status: 500 }),
+          })
+          renderScreen()
+
+          await user.click(await screen.findByRole('button', { name: 'Cancel' }))
+
+          expect(await screen.findByRole('alert')).toHaveTextContent(
+            'Failed to cancel authorization request: Cancellation failed'
+          )
+          expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled()
         })
       })
 

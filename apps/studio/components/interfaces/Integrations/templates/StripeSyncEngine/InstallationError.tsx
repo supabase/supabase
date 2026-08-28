@@ -1,7 +1,7 @@
 import { Button } from 'ui'
 
 import { useStripeSyncStatus } from './useStripeSyncStatus'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 
 export const InstallationError = ({
   error,

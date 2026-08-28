@@ -2,7 +2,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { components } from 'api-types'
 import { toast } from 'sonner'
 
-import { BatchConfig, DestinationConfig } from './create-destination-pipeline-mutation'
+import {
+  buildDucklakeApiConfig,
+  buildPipelineApiConfig,
+  DestinationConfig,
+  PipelineConfig,
+} from './create-destination-pipeline-mutation'
+import { optionalSecret } from './destination-secret-utils'
 import { replicationKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
@@ -14,14 +20,13 @@ export type UpdateDestinationPipelineParams = {
   destinationName: string
   destinationConfig: DestinationConfig
   sourceId: number
-  pipelineConfig: {
-    publicationName: string
-    batch?: BatchConfig
-    maxTableSyncWorkers?: number
-    maxCopyConnectionsPerTable?: number
-    invalidatedSlotBehavior?: 'error' | 'recreate'
-  }
+  pipelineConfig: PipelineConfig
 }
+
+type UpdateDestinationPipelineBody =
+  components['schemas']['UpdateReplicationDestinationPipelineBody']
+type UpdateDestinationConfig = UpdateDestinationPipelineBody['destination_config']
+type UpdatePipelineConfig = UpdateDestinationPipelineBody['pipeline_config']
 
 async function updateDestinationPipeline(
   {
@@ -30,13 +35,7 @@ async function updateDestinationPipeline(
     projectRef,
     destinationName: destinationName,
     destinationConfig,
-    pipelineConfig: {
-      publicationName,
-      batch,
-      maxTableSyncWorkers,
-      maxCopyConnectionsPerTable,
-      invalidatedSlotBehavior,
-    },
+    pipelineConfig,
     sourceId,
   }: UpdateDestinationPipelineParams,
   signal?: AbortSignal
@@ -44,7 +43,7 @@ async function updateDestinationPipeline(
   if (!projectRef) throw new Error('projectRef is required')
 
   // Build destination_config based on the type
-  let destination_config: components['schemas']['UpdateReplicationDestinationPipelineBody']['destination_config']
+  let destination_config: UpdateDestinationConfig
 
   if ('bigQuery' in destinationConfig) {
     const { projectId, datasetId, serviceAccountKey, connectionPoolSize, maxStalenessMins } =
@@ -53,11 +52,11 @@ async function updateDestinationPipeline(
       big_query: {
         project_id: projectId,
         dataset_id: datasetId,
-        service_account_key: serviceAccountKey,
+        service_account_key: optionalSecret(serviceAccountKey),
         connection_pool_size: connectionPoolSize,
         max_staleness_mins: maxStalenessMins,
       },
-    } as components['schemas']['UpdateReplicationDestinationPipelineBody']['destination_config']
+    } as UpdateDestinationConfig
   } else if ('iceberg' in destinationConfig) {
     const {
       projectRef: icebergProjectRef,
@@ -74,40 +73,17 @@ async function updateDestinationPipeline(
           project_ref: icebergProjectRef,
           warehouse_name: warehouseName,
           namespace: namespace,
-          catalog_token: catalogToken,
-          s3_access_key_id: s3AccessKeyId,
-          s3_secret_access_key: s3SecretAccessKey,
+          catalog_token: optionalSecret(catalogToken),
+          s3_access_key_id: optionalSecret(s3AccessKeyId),
+          s3_secret_access_key: optionalSecret(s3SecretAccessKey),
           s3_region: s3Region,
         },
       },
-    }
+    } as UpdateDestinationConfig
   } else if ('ducklake' in destinationConfig) {
-    const {
-      catalogUrl,
-      dataPath,
-      poolSize,
-      s3AccessKeyId,
-      s3SecretAccessKey,
-      s3Region,
-      s3Endpoint,
-      s3UrlStyle,
-      s3UseSsl,
-      metadataSchema,
-    } = destinationConfig.ducklake
-    destination_config = {
-      ducklake: {
-        catalog_url: catalogUrl,
-        data_path: dataPath,
-        pool_size: poolSize,
-        s3_access_key_id: s3AccessKeyId,
-        s3_secret_access_key: s3SecretAccessKey,
-        s3_region: s3Region,
-        s3_endpoint: s3Endpoint,
-        s3_url_style: s3UrlStyle,
-        s3_use_ssl: s3UseSsl,
-        metadata_schema: metadataSchema,
-      },
-    } as unknown as components['schemas']['UpdateReplicationDestinationPipelineBody']['destination_config']
+    destination_config = buildDucklakeApiConfig(destinationConfig.ducklake, {
+      omitBlankSecrets: true,
+    }) as UpdateDestinationConfig
   } else if ('snowflake' in destinationConfig) {
     const { accountId, user, privateKey, privateKeyPassphrase, database, schema, role } =
       destinationConfig.snowflake
@@ -115,26 +91,31 @@ async function updateDestinationPipeline(
       snowflake: {
         account_id: accountId,
         user,
-        private_key: privateKey,
-        private_key_passphrase: privateKeyPassphrase,
+        private_key: optionalSecret(privateKey),
+        private_key_passphrase: optionalSecret(privateKeyPassphrase),
         database,
         schema,
         role,
       },
-    } as unknown as components['schemas']['UpdateReplicationDestinationPipelineBody']['destination_config']
+    } as UpdateDestinationConfig
+  } else if ('clickHouse' in destinationConfig) {
+    const { url, user, password, database, engine } = destinationConfig.clickHouse
+    destination_config = {
+      clickhouse: {
+        url,
+        user,
+        password: optionalSecret(password),
+        database,
+        engine,
+      },
+    } as UpdateDestinationConfig
   } else {
     throw new Error(
-      'Invalid destination config: must specify bigQuery, iceberg, ducklake, or snowflake'
+      'Invalid destination config: must specify bigQuery, iceberg, ducklake, snowflake, or clickHouse'
     )
   }
 
-  const pipeline_config = {
-    publication_name: publicationName,
-    max_table_sync_workers: maxTableSyncWorkers,
-    max_copy_connections_per_table: maxCopyConnectionsPerTable,
-    invalidated_slot_behavior: invalidatedSlotBehavior,
-    batch: batch ? { max_fill_ms: batch.maxFillMs } : undefined,
-  }
+  const pipeline_config = buildPipelineApiConfig(pipelineConfig)
 
   const { data, error } = await post(
     '/platform/replication/{ref}/destinations-pipelines/{destination_id}/{pipeline_id}',
@@ -144,8 +125,7 @@ async function updateDestinationPipeline(
         destination_config,
         source_id: sourceId,
         destination_name: destinationName,
-        pipeline_config:
-          pipeline_config as components['schemas']['UpdateReplicationDestinationPipelineBody']['pipeline_config'],
+        pipeline_config: pipeline_config as UpdatePipelineConfig,
       },
       signal,
     }

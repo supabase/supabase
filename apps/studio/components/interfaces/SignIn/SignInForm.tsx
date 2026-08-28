@@ -14,7 +14,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
 import { LastSignInWrapper } from './LastSignInWrapper'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { useAddLoginEvent } from '@/data/misc/audit-login-mutation'
 import { getMfaAuthenticatorAssuranceLevel } from '@/data/profile/mfa-authenticator-assurance-level-query'
 import { useLastSignIn } from '@/hooks/misc/useLastSignIn'
@@ -108,7 +108,7 @@ export const SignInForm = () => {
 
       if (error.message.toLowerCase() === 'email not confirmed') {
         return toast.error(
-          'Account has not been verified, please check the link sent to your email',
+          'Your account has not been verified. Please check the verification link sent to your email. If you have not received the email or the link has expired, please sign up again to request a new verification link.',
           { id: toastId }
         )
       }
@@ -121,7 +121,12 @@ export const SignInForm = () => {
 
   return (
     <Form {...form}>
-      <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
+      <form
+        id={formId}
+        method="POST"
+        className="flex flex-col gap-4"
+        onSubmit={form.handleSubmit(onSubmit)}
+      >
         {authError && <AlertError error={authError} subject="Error while signing in" />}
         <FormField
           key="email"

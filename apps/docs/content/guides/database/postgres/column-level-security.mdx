@@ -4,7 +4,7 @@ title: 'Column Level Security'
 description: 'Secure your data using Postgres Column Level Security.'
 ---
 
-Postgres's [Row Level Security (RLS)](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) gives you granular control over who can access rows of data. However, it doesn't give you control over which columns they can access within rows. Sometimes you want to restrict access to specific columns in your database. Column Level Privileges allows you to do just that.
+Postgres's [Row Level Security (RLS)](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) gives you granular control over who can access rows of data. However, it doesn't give you control over which columns they can access within rows. Sometimes you want to restrict access to specific columns in your database. Column Level Privileges allows you to do that.
 
 <Admonition type="caution">
 
@@ -31,7 +31,7 @@ For example, assume you have a `posts` table with the following columns:
 - `created_at`
 - `updated_at`
 
-You can restrict updates to just the user who created it using [RLS](/docs/guides/auth#row-level-security), with the following policy:
+You can restrict updates to the user who created it using [RLS](/docs/guides/auth#row-level-security), with the following policy:
 
 ```sql
 create policy "Allow update for owners" on posts for
@@ -66,7 +66,7 @@ update
   (title, content) on table public.posts to authenticated;
 ```
 
-In the above example, we are revoking the table-level `UPDATE` privilege from the `authenticated` role and granting a column-level `UPDATE` privilege on just the `title` and `content` columns.
+In the above example, we are revoking the table-level `UPDATE` privilege from the `authenticated` role and granting a column-level `UPDATE` privilege on the `title` and `content` columns.
 
 If we want to restrict access to updating the `title` column:
 

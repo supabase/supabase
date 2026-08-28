@@ -23,7 +23,7 @@ import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 import { LogDrainsCard } from './LogDrainsCard'
 import { useEnabledLogDrainTypes } from './useEnabledLogDrainTypes'
 import { VoteLink } from './VoteLink'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { LogDrainData } from '@/data/log-drains/log-drains-query'
 import type { ResponseError } from '@/types'
 

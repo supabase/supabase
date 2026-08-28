@@ -1,5 +1,6 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
 import { Check, ChevronDown } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import { useMemo, useState } from 'react'
 import {
   Badge,
@@ -10,10 +11,17 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import { PERMISSIONS_DESCRIPTIONS } from './OAuthApps.constants'
-import { LogoBox } from '@/components/layouts/InterstitialLayout'
+import { getOAuthImpersonationWarning, getRequesterLogo } from './OAuthApps.utils'
+import {
+  CONNECT_LOGO_LIGHT_TILE_CLASSNAME,
+  LogoBox,
+  LogoPair,
+  SupabaseLogo,
+} from '@/components/layouts/InterstitialLayout'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -22,7 +30,6 @@ const PERMISSION_DETAILS_TRIGGER_CLASSNAME =
   'mx-auto flex h-7 cursor-pointer items-center justify-center gap-1.5 rounded-md px-2 text-xs text-foreground-lighter transition-colors hover:bg-surface-200 hover:text-foreground'
 
 export interface AuthorizeRequesterDetailsProps {
-  icon: string | null
   name: string
   domain: string
   scopes: OAuthScope[]
@@ -165,23 +172,79 @@ const PERMISSION_GROUPS: PermissionGroup[] = [
   },
 ]
 
-export const RequesterLogo = ({ icon, name }: { icon: string | null; name: string }) => {
+/**
+ * Connect interstitial header mark for `/authorize`.
+ * Curated logos resolve from allowlisted redirect_uri hosts; otherwise pair only
+ * when a usable remote icon is present, else show Supabase alone.
+ *
+ * Uploaded / unknown bitmaps have no light/dark metadata, so both tiles use
+ * fixed light chrome (`forceLight`) across Studio themes. Curated partners keep
+ * theme-reactive tiles and may swap dark assets when available.
+ */
+export const AuthorizeConnectLogo = ({
+  icon,
+  name,
+  redirectUri,
+}: {
+  icon: string | null
+  name: string
+  redirectUri?: string | null
+}) => {
   const [failedIcon, setFailedIcon] = useState<string | null>(null)
-  const showLetter = !icon || failedIcon === icon
+  const { resolvedTheme } = useTheme()
+
+  const logo = useMemo(
+    () =>
+      getRequesterLogo({
+        icon,
+        name,
+        redirectUri,
+        useDarkVariant: resolvedTheme === 'dark',
+      }),
+    [icon, name, redirectUri, resolvedTheme]
+  )
+
+  const hasUsableLogo = Boolean(logo.src) && failedIcon !== logo.src
+
+  if (!hasUsableLogo) {
+    return <SupabaseLogo />
+  }
+
+  const forceLightPair = !logo.isKnownClient
 
   return (
-    <LogoBox>
-      {showLetter ? (
-        <span className="text-lg font-medium text-foreground-light">{name.slice(0, 1)}</span>
-      ) : (
-        <img
-          alt={name}
-          src={icon}
-          className="size-full object-cover"
-          onError={() => setFailedIcon(icon)}
-        />
-      )}
-    </LogoBox>
+    <LogoPair
+      left={
+        <LogoBox className={forceLightPair ? CONNECT_LOGO_LIGHT_TILE_CLASSNAME : 'bg-surface-75'}>
+          <img
+            alt={name}
+            src={logo.src}
+            className={cn(logo.isKnownClient ? 'size-7 object-contain' : 'size-full object-cover')}
+            onError={() => setFailedIcon(logo.src)}
+          />
+        </LogoBox>
+      }
+      right={<SupabaseLogo forceLight={forceLightPair} />}
+    />
+  )
+}
+
+export const AuthorizeImpersonationWarning = ({
+  name,
+  redirectUri,
+}: {
+  name: string
+  redirectUri?: string | null
+}) => {
+  const warning = getOAuthImpersonationWarning({ name, redirectUri })
+  if (!warning) return null
+
+  return (
+    <Admonition
+      type="caution"
+      title="Check this redirect before authorizing"
+      description={`This request uses the name ${warning.brandDisplayName}, but after you authorize you will be redirected to ${warning.redirectHost}, not ${warning.brandDisplayName}.`}
+    />
   )
 }
 

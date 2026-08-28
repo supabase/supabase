@@ -7,11 +7,12 @@ import { cloneElement, forwardRef, isValidElement, ReactNode } from 'react'
 
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from '../../lib/constants'
 import { cn } from '../../lib/utils/cn'
+import { getExplicitTabIndex } from '../../lib/utils/getExplicitTabIndex'
 
 export type ButtonVariantProps = VariantProps<typeof buttonVariants>
 const buttonVariants = cva(
   `relative
-  flex items-center justify-center
+  inline-flex items-center justify-center
   cursor-pointer
   space-x-2
   text-center
@@ -19,12 +20,8 @@ const buttonVariants = cva(
   ease-out
   duration-200
   rounded-md
-  outline-hidden
-  transition-all
-  outline-0
-  focus-visible:outline-solid
-  focus-visible:outline-4
-  focus-visible:outline-offset-1
+  transition-colors
+  focus-ring
   border
   `,
   {
@@ -36,56 +33,34 @@ const buttonVariants = cva(
           text-foreground
           border-brand-500/75 dark:border-brand/30
           hover:border-brand-600 dark:hover:border-brand
-          focus-visible:outline-brand-600
           data-[state=open]:bg-brand-400/80 dark:data-[state=open]:bg-brand-500/80
-          data-[state=open]:outline-brand-600
           `,
         default: `
           text-foreground
-          bg-alternative dark:bg-muted  hover:bg-selection
-          border-strong hover:border-stronger
-          focus-visible:outline-border-strong
-          data-[state=open]:bg-selection
-          data-[state=open]:outline-border-strong
-          data-[state=open]:border-button-hover
+          bg-background dark:bg-card hover:bg-popover
+          border-strong hover:border-control-hover
+          data-[state=open]:bg-popover
+          data-[state=open]:border-control-hover
           `,
         secondary: `
           bg-foreground
-          text-background hover:text-border-stronger
-          focus-visible:text-border-control
+          text-background hover:text-background/80
           border-foreground-light hover:border-foreground-lighter
-          focus-visible:outline-border-strong
           data-[state=open]:border-foreground-lighter
-          data-[state=open]:outline-border-strong
-        `,
-        /** @deprecated use 'primary' instead */
-        alternative: `
-          text-foreground
-          bg-brand-400 hover:bg-brand-500
-          border-brand-500
-          focus-visible:border-brand-500
-          focus-visible:outline-brand-600
-          data-[state=open]:bg-brand-500
-          data-[state=open]:border-brand-500
-          data-[state=open]:outline-brand-600
         `,
         outline: `
           text-foreground
           bg-transparent
           border-strong hover:border-foreground-muted
-          focus-visible:outline-border-strong
           data-[state=open]:border-stronger
-          data-[state=open]:outline-border-strong
         `,
         dashed: `
           text-foreground
           border
           border-dashed
-          border-strong hover:border-stronger
+          border-strong hover:border-control-hover
           bg-transparent
-          focus-visible:outline-border-strong
-          data-[state=open]:border-stronger
-          data-[state=open]:outline-border-strong
+          data-[state=open]:border-control-hover
         `,
         link: `
           text-brand-600
@@ -93,38 +68,30 @@ const buttonVariants = cva(
           border-transparent/0
           hover:bg-brand-400
           shadow-none
-          focus-visible:outline-border-strong
           data-[state=open]:bg-brand-400
-          data-[state=open]:outline-border-strong
         `,
         text: `
           text-foreground
-          hover:bg-surface-300
+          hover:bg-accent
           shadow-none
-          focus-visible:outline-border-strong
-          data-[state=open]:bg-surface-300
-          data-[state=open]:outline-border-strong
+          data-[state=open]:bg-accent
           border-transparent
         `,
         danger: `
           text-foreground
           bg-destructive-300 dark:bg-destructive-400 hover:bg-destructive-400 dark:hover:bg-destructive/50
-          border-destructive-500 hover:border-destructive
+          border-border-destructive hover:border-destructive
           hover:text-hi-contrast
-          focus-visible:outline-amber-700
           data-[state=open]:border-destructive
-          data-[state=open]:bg-destructive-400 dark:data-[state=open]:bg-destructive-/50
-          data-[state=open]:outline-destructive
+          data-[state=open]:bg-destructive-400 dark:data-[state=open]:bg-destructive/50
         `,
         warning: `
           text-foreground
           bg-warning-300 dark:bg-warning-400 hover:bg-warning-400 dark:hover:bg-warning/50
-          border-warning-500 hover:border-warning
+          border-border-warning hover:border-warning
           hover:text-hi-contrast
-          focus-visible:outline-amber-700
           data-[state=open]:border-warning
-          data-[state=open]:bg-warning-400 dark:data-[state=open]:bg-warning-/50
-          data-[state=open]:outline-warning
+          data-[state=open]:bg-warning-400 dark:data-[state=open]:bg-warning/50
         `,
       },
       block: {
@@ -165,16 +132,16 @@ const IconContainerVariants = cva('inline-flex items-center justify-center shrin
       xxlarge: '[&_svg]:h-[30px] [&_svg]:w-[30px]',
       xxxlarge: '[&_svg]:h-[42px] [&_svg]:w-[42px]',
     },
-    type: {
+    variant: {
       primary: 'text-brand-600',
       default: 'text-foreground-lighter',
-      secondary: 'text-border-muted',
+      secondary: 'text-background',
       alternative: 'text-foreground-lighter',
       outline: 'text-foreground-lighter',
       dashed: 'text-foreground-lighter',
       link: 'text-brand-600',
       text: 'text-foreground-lighter',
-      danger: 'text-destructive-600',
+      danger: 'text-destructive',
       warning: 'text-warning',
     },
   },
@@ -183,16 +150,16 @@ const IconContainerVariants = cva('inline-flex items-center justify-center shrin
 export type LoadingVariantProps = VariantProps<typeof loadingVariants>
 const loadingVariants = cva('', {
   variants: {
-    type: {
+    variant: {
       primary: 'text-brand-600',
       default: 'text-foreground-lighter',
-      secondary: 'text-border-muted',
+      secondary: 'text-background',
       alternative: 'text-foreground-lighter',
       outline: 'text-foreground-lighter',
       dashed: 'text-foreground-lighter',
       link: 'text-brand-600',
       text: 'text-foreground-muted',
-      danger: 'text-destructive-600',
+      danger: 'text-destructive',
       warning: 'text-warning',
     },
     loading: {
@@ -209,7 +176,7 @@ export interface ButtonProps
     React.ButtonHTMLAttributes<HTMLButtonElement>,
     // omit 'disabled' as it is included in HTMLButtonElement
     Omit<ButtonVariantProps, 'disabled'>,
-    Omit<LoadingVariantProps, 'type'> {
+    LoadingVariantProps {
   asChild?: boolean
   variant?: ButtonVariantProps['variant']
   icon?: React.ReactNode
@@ -244,11 +211,13 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     // if loading, button is disabled
     const disabled = loading === true || props.disabled
 
-    // Set default tabIndex for proper Safari focus handling
-    // - Explicit tabIndex prop takes precedence
-    // - If disabled, default to -1 (unless explicitly set)
-    // - Otherwise, default to 0 for keyboard accessibility
-    const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
+    const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
+
+    const renderIconContainer = (content: ReactNode) => (
+      <div aria-hidden className={cn(IconContainerVariants({ size, variant }))}>
+        {content}
+      </div>
+    )
 
     return (
       <Comp
@@ -258,10 +227,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
         disabled={disabled}
         tabIndex={computedTabIndex}
-        className={cn(
-          buttonVariants({ variant: variant, size, disabled, block, rounded }),
-          className
-        )}
+        className={cn(buttonVariants({ variant, size, disabled, block, rounded }), className)}
         onClick={(e) => {
           // [Joshen] Prevents redirecting if Button is used with a link-based child element
           if (disabled) return e.preventDefault()
@@ -274,41 +240,31 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
               children,
               undefined,
               showIcon &&
-                (loading ? (
-                  <div className={cn(IconContainerVariants({ size, type: variant }))}>
-                    <Loader2 className={cn(loadingVariants({ loading, type: variant }))} />
-                  </div>
-                ) : _iconLeft ? (
-                  <div className={cn(IconContainerVariants({ size, type: variant }))}>
-                    {_iconLeft}
-                  </div>
-                ) : null),
+                (loading
+                  ? renderIconContainer(
+                      <Loader2 className={cn(loadingVariants({ loading, variant }))} />
+                    )
+                  : _iconLeft
+                    ? renderIconContainer(_iconLeft)
+                    : null),
               children.props.children && (
                 <span className={'truncate'}>{children.props.children}</span>
               ),
-              iconRight && !loading && (
-                <div className={cn(IconContainerVariants({ size, type: variant }))}>
-                  {iconRight}
-                </div>
-              )
+              iconRight && !loading && renderIconContainer(iconRight)
             )
           ) : null
         ) : (
           <>
             {showIcon &&
-              (loading ? (
-                <div className={cn(IconContainerVariants({ size, type: variant }))}>
-                  <Loader2 className={cn(loadingVariants({ loading, type: variant }))} />
-                </div>
-              ) : _iconLeft ? (
-                <div className={cn(IconContainerVariants({ size, type: variant }))}>
-                  {_iconLeft}
-                </div>
-              ) : null)}{' '}
+              (loading
+                ? renderIconContainer(
+                    <Loader2 className={cn(loadingVariants({ loading, variant }))} />
+                  )
+                : _iconLeft
+                  ? renderIconContainer(_iconLeft)
+                  : null)}{' '}
             {children && <span className={'truncate'}>{children}</span>}{' '}
-            {iconRight && !loading && (
-              <div className={cn(IconContainerVariants({ size, type: variant }))}>{iconRight}</div>
-            )}
+            {iconRight && !loading && renderIconContainer(iconRight)}
           </>
         )}
       </Comp>

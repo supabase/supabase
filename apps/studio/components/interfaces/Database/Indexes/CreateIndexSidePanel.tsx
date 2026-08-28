@@ -33,7 +33,7 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   MultiSelector,
@@ -46,12 +46,13 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { INDEX_TYPES } from './Indexes.constants'
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useDatabaseIndexCreateMutation } from '@/data/database-indexes/index-create-mutation'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useTableColumnsQuery } from '@/data/database/table-columns-query'
 import { useEntityTypesQuery } from '@/data/entity-types/entity-types-infinite-query'
+import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -98,10 +99,11 @@ export const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelP
   const [schemaSearchTerm, setSchemaSearchTerm] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
 
-  const { data: schemas } = useSchemasQuery({
+  const { data: allSchemas } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const schemas = useSchemasFilteredForHighAvailability(allSchemas)
   const { data: entities, isPending: isLoadingEntities } = useEntityTypesQuery({
     schemas: [selectedSchema],
     sort: 'alphabetical',

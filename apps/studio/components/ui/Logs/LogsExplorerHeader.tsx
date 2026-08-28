@@ -1,3 +1,4 @@
+import { useFlag, useParams } from 'common'
 import { BookOpen, Check, ChevronsUpDown, Copy, ExternalLink, List, X } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -23,7 +24,12 @@ import {
 
 import { DocsButton } from '../DocsButton'
 import { LOGS_EXPLORER_DOCS_URL } from '@/components/interfaces/Settings/Logs/Logs.constants'
+import {
+  otelFieldsFromKeys,
+  toOtelFieldSchemas,
+} from '@/components/interfaces/Settings/Logs/Logs.fieldReference'
 import Table from '@/components/to-be-cleaned/Table'
+import { useOtelLogKeysQuery } from '@/data/logs/otel-log-keys-query'
 import { DOCS_URL } from '@/lib/constants'
 
 export interface LogsExplorerHeaderProps {
@@ -33,7 +39,16 @@ export interface LogsExplorerHeaderProps {
 const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
   const [showReference, setShowReference] = useState(false)
   const [open, setOpen] = useState(false)
-  const [selectedSchema, setSelectedSchema] = useState(logConstants.schemas[0])
+  const useOtel = useFlag('otelLegacyLogs')
+  const schemas = useOtel ? toOtelFieldSchemas(logConstants.schemas) : logConstants.schemas
+  const [selectedRef, setSelectedRef] = useState(schemas[0]?.reference)
+  const selectedSchema = schemas.find((s) => s.reference === selectedRef) ?? schemas[0]
+
+  const { ref: projectRef } = useParams()
+  const { data: discoveredKeys, isPending: isLoadingKeys } = useOtelLogKeysQuery(
+    { projectRef, source: selectedRef },
+    { enabled: useOtel && showReference }
+  )
 
   return (
     <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 transition-all pb-6 justify-between">
@@ -79,24 +94,33 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
         >
           <SidePanel.Content>
             <div className="pt-4 pb-2 space-y-1">
-              <p className="text-sm">
-                The following table shows all the available paths that can be queried from each
-                respective source. Do note that to access nested keys, you would need to perform the
-                necessary{' '}
-                <Link
-                  href={`${DOCS_URL}/guides/platform/logs#unnesting-arrays`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-brand"
-                >
-                  unnesting joins
-                  <ExternalLink
-                    size={14}
-                    className="ml-1 inline translate-y-[-2px]"
-                    strokeWidth={1.5}
-                  />
-                </Link>
-              </p>
+              {useOtel ? (
+                <p className="text-sm">
+                  The following table shows the fields available on each source. Nested fields live
+                  in the <code className="text-xs">log_attributes</code> map and are read with{' '}
+                  <code className="text-xs">log_attributes['key']</code> — no unnesting joins
+                  needed.
+                </p>
+              ) : (
+                <p className="text-sm">
+                  The following table shows all the available paths that can be queried from each
+                  respective source. Do note that to access nested keys, you would need to perform
+                  the necessary{' '}
+                  <Link
+                    href={`${DOCS_URL}/guides/platform/logs#unnesting-arrays`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-brand"
+                  >
+                    unnesting joins
+                    <ExternalLink
+                      size={14}
+                      className="ml-1 inline translate-y-[-2px]"
+                      strokeWidth={1.5}
+                    />
+                  </Link>
+                </p>
+              )}
             </div>
           </SidePanel.Content>
           <SidePanel.Separator />
@@ -120,19 +144,21 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                   <CommandList>
                     <CommandEmpty>No source found.</CommandEmpty>
                     <CommandGroup>
-                      {logConstants.schemas.map((schema) => (
+                      {schemas.map((schema) => (
                         <CommandItem
                           key={schema.reference}
                           value={schema.reference}
                           onSelect={() => {
-                            setSelectedSchema(schema)
+                            setSelectedRef(schema.reference)
                             setOpen(false)
                           }}
                         >
                           <Check
                             className={cn(
                               'mr-2 h-4 w-4',
-                              selectedSchema === schema ? 'opacity-100' : 'opacity-0'
+                              selectedSchema?.reference === schema.reference
+                                ? 'opacity-100'
+                                : 'opacity-0'
                             )}
                           />
                           {schema.name}
@@ -143,19 +169,26 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                 </Command>
               </PopoverContent>
             </Popover>
-            <Table
-              head={[
-                <Table.th className="text-xs p-2!" key="path">
-                  Path
-                </Table.th>,
-                <Table.th key="type" className="text-xs p-2!">
-                  Type
-                </Table.th>,
-              ]}
-              body={selectedSchema.fields.map((field) => (
-                <Field key={field.path} field={field} />
-              ))}
-            />
+            {useOtel && isLoadingKeys ? (
+              <p className="text-sm text-foreground-light py-2">Loading fields…</p>
+            ) : (
+              <Table
+                head={[
+                  <Table.th className="text-xs p-2!" key="path">
+                    Path
+                  </Table.th>,
+                  <Table.th key="type" className="text-xs p-2!">
+                    Type
+                  </Table.th>,
+                ]}
+                body={(() => {
+                  const fields = useOtel
+                    ? otelFieldsFromKeys(discoveredKeys ?? [])
+                    : selectedSchema.fields
+                  return fields.map((field) => <Field key={field.path} field={field} />)
+                })()}
+              />
+            )}
           </div>
         </SidePanel>
       </div>

@@ -8,7 +8,7 @@ import { useParams } from 'common'
 import { Storage } from 'icons'
 import { ImageOff, Trash2, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -110,6 +110,8 @@ export const CreateOrUpdateOAuthAppSheet = ({
     resolver: zodResolver(FormSchema),
     defaultValues: initialValues,
   })
+
+  const clientType = useWatch({ control: form.control, name: 'client_type' })
 
   const { hostEndpoint: clientEndpoint } = useProjectApiUrl({ projectRef })
 
@@ -256,17 +258,14 @@ export const CreateOrUpdateOAuthAppSheet = ({
           size="lg"
           showClose={false}
           className="flex flex-col gap-0"
-          tabIndex={undefined}
           aria-describedby={undefined}
         >
           <SheetHeader>
             <div className="flex flex-row gap-3 items-center">
               <SheetClose
                 className={cn(
-                  'text-muted hover:text ring-offset-background transition-opacity hover:opacity-100',
-                  'focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2',
-                  'disabled:pointer-events-none data-[state=open]:bg-secondary',
-                  'transition'
+                  'text-muted hover:text hover:opacity-100 focus-ring',
+                  'disabled:pointer-events-none data-[state=open]:bg-secondary'
                 )}
               >
                 <X className="h-3 w-3" />
@@ -483,7 +482,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
                   )}
                 />
 
-                {form.watch('client_type') === 'confidential' && (
+                {clientType === 'confidential' && (
                   <FormField
                     control={form.control}
                     name="token_endpoint_auth_method"

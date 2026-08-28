@@ -168,6 +168,7 @@ echo ""
 echo "  Auth:     GOTRUE_JWT_KEYS: \${JWT_KEYS:-[]}"
 echo "  Realtime: API_JWT_JWKS: \${JWT_JWKS:-{\"keys\":[]}}"
 echo "  Storage:  JWT_JWKS: \${JWT_JWKS:-{\"keys\":[]}}"
+echo "  Functions:  SUPABASE_JWKS: \${JWT_JWKS:-{\"keys\":[]}}"
 echo ""
 
 if [ "$1" = "--update-env" ]; then
@@ -212,11 +213,13 @@ sed -i.old \
     -e '/^[ ]*#GOTRUE_JWT_KEYS:/ s/#//' \
     -e '/^[ ]*#API_JWT_JWKS:/ s/#//' \
     -e '/^[ ]*#JWT_JWKS:/ s/#//' \
+    -e '/^[ ]*#SUPABASE_JWKS:/ s/#//' \
     docker-compose.yml || true
 
 if grep -q '^[ ]*GOTRUE_JWT_KEYS:' docker-compose.yml && \
    grep -q '^[ ]*API_JWT_JWKS:' docker-compose.yml && \
-   grep -q '^[ ]*JWT_JWKS:' docker-compose.yml; then
+   grep -q '^[ ]*JWT_JWKS:' docker-compose.yml && \
+   grep -q '^[ ]*SUPABASE_JWKS:' docker-compose.yml; then
     echo "Done."
 else
     echo "Warning: could not edit docker-compose.yml. Uncomment auth configuration manually."

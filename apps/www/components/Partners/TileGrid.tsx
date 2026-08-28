@@ -1,5 +1,5 @@
 import type { Category, Partner } from '~/types/partners'
-import type { Listing } from 'common/marketplace-client'
+import type { CatalogListing } from 'common/marketplace-client'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -36,7 +36,7 @@ export default function TileGrid({
           <h2 className="h2">Featured</h2>
           <div className="grid grid-cols-1 gap-5 lg:max-w-none lg:grid-cols-2 xl:grid-cols-3">
             {featuredPartners?.map((p) => (
-              <Link key={p.slug} href={`/partners/integrations/${p.slug}`}>
+              <Link key={p.slug} href={`/partners/catalog/${p.slug}`}>
                 <div
                   className="
                 bg-surface-100
@@ -85,7 +85,7 @@ export default function TileGrid({
               {!hideCategories && <h2 className="h2">{partnersByCategory[slug].category.name}</h2>}
               <div className="grid  grid-cols-1 gap-5 lg:max-w-none lg:grid-cols-2 xl:grid-cols-3">
                 {partners.map((p) => (
-                  <Link key={p.slug} href={`/partners/integrations/${p.slug}`}>
+                  <Link key={p.slug} href={`/partners/catalog/${p.slug}`}>
                     <div
                       className="
                 bg-surface-100

@@ -1,6 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { GripVertical, Link, Plus, Settings, X } from 'lucide-react'
+import { Eye, EyeOff, GripVertical, Link, Plus, Settings, X } from 'lucide-react'
 import { useState } from 'react'
 import {
   Badge,
@@ -16,6 +16,9 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -56,6 +59,7 @@ interface ColumnProps {
   isNewRecord: boolean
   hasForeignKeys: boolean
   hasImportContent: boolean
+  shouldAutoFocusName?: boolean
   onUpdateColumn: (changes: Partial<ColumnField>) => void
   onRemoveColumn: () => void
   onEditForeignKey: (relation?: ForeignKey) => void
@@ -68,6 +72,7 @@ export const Column = ({
   isNewRecord = false,
   hasForeignKeys = false,
   hasImportContent = false,
+  shouldAutoFocusName = false,
   onUpdateColumn,
   onRemoveColumn,
   onEditForeignKey,
@@ -123,15 +128,18 @@ export const Column = ({
           ref={setActivatorNodeRef}
           {...attributes}
           {...listeners}
+          tabIndex={0}
           className="opacity-50 hover:opacity-100 disabled:hover:opacity-50 transition cursor-grab text-foreground"
           type="button"
         >
           <GripVertical size={16} strokeWidth={1.5} />
         </button>
       </div>
-      <div className="w-[25%]">
+      <div className="w-[30%]">
         <div className="flex w-[95%] items-center justify-between">
+          <div className="h-4 w-px bg-border" />
           <Input
+            autoFocus={shouldAutoFocusName}
             aria-label="Column name"
             size="small"
             value={column.name}
@@ -144,14 +152,66 @@ export const Column = ({
             )}
             onChange={(event) => onUpdateColumn({ name: event.target.value })}
           />
+
           {relations.filter((r) => !r.toRemove).length === 0 ? (
-            <Button
-              variant="dashed"
-              className="rounded-l-none h-[30px] py-0 px-2"
-              onClick={() => onEditForeignKey()}
-            >
-              <Link size={12} />
-            </Button>
+            <div className="flex items-center gap-x-1">
+              <Button
+                variant="dashed"
+                className="rounded-l-none h-[30px] py-0 px-2"
+                onClick={() => onEditForeignKey()}
+              >
+                <Link size={12} />
+              </Button>
+              <div className="h-4 w-px bg-border" />
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    tabIndex={0}
+                    onClick={() => {
+                      const SENSITIVE_DATA_MARKER = '[SENSITIVE]'
+
+                      const isSensitive = !column.isSensitiveData
+
+                      let updatedComment = column.comment || ''
+
+                      if (isSensitive && !updatedComment.includes(SENSITIVE_DATA_MARKER)) {
+                        updatedComment = updatedComment
+                          ? `${updatedComment} ${SENSITIVE_DATA_MARKER}`
+                          : SENSITIVE_DATA_MARKER
+                      } else if (!isSensitive) {
+                        updatedComment = updatedComment.replace(SENSITIVE_DATA_MARKER, '').trim()
+                      }
+
+                      onUpdateColumn({ isSensitiveData: isSensitive, comment: updatedComment })
+                    }}
+                    className={cn(
+                      'transition cursor-pointer p-1 hover:bg-surface-100 rounded',
+
+                      column.isSensitiveData
+                        ? 'opacity-100 text-foreground'
+                        : 'opacity-50 hover:opacity-100 text-foreground-light'
+                    )}
+                    type="button"
+                    aria-label={
+                      column.isSensitiveData ? 'Marked as sensitive' : 'Not marked as sensitive'
+                    }
+                  >
+                    {column.isSensitiveData ? (
+                      <EyeOff size={14} strokeWidth={1.5} />
+                    ) : (
+                      <Eye size={14} strokeWidth={1.5} />
+                    )}
+                  </button>
+                </TooltipTrigger>
+
+                <TooltipContent side="bottom">
+                  {column.isSensitiveData
+                    ? 'Data is masked in grid display. Actual data unchanged in database.'
+                    : 'Mark as sensitive to mask in grid display'}
+                </TooltipContent>
+              </Tooltip>
+            </div>
           ) : (
             <Popover open={open} onOpenChange={setOpen} modal={false}>
               <PopoverTrigger asChild>
@@ -269,7 +329,7 @@ export const Column = ({
             size="small"
             value={column.defaultValue ?? ''}
             disabled={column.format.includes('int') && column.isIdentity}
-            className={`rounded-sm bg-surface-100 lg:gap-0 ${
+            className={`rounded-sm lg:gap-0 ${
               column.format.includes('int') && column.isIdentity ? 'opacity-50' : ''
             }`}
             suggestions={suggestions}
@@ -393,7 +453,13 @@ export const Column = ({
       </div>
       {!hasImportContent && (
         <div className="flex w-[5%] justify-end">
-          <button className="cursor-pointer" onClick={() => onRemoveColumn()}>
+          <button
+            type="button"
+            tabIndex={0}
+            aria-label="Remove column"
+            className="cursor-pointer"
+            onClick={() => onRemoveColumn()}
+          >
             <X size={16} strokeWidth={1} />
           </button>
         </div>

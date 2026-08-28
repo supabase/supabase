@@ -85,7 +85,7 @@ export const MoveItemsModal = ({
               />
             </FormItemLayout>
 
-            <button className="hidden" type="submit" onClick={onConfirmMove} />
+            <button tabIndex={-1} className="hidden" type="submit" onClick={onConfirmMove} />
           </form>
         </DialogSection>
         <DialogFooter>

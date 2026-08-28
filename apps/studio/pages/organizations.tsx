@@ -1,11 +1,8 @@
-import { useParams } from 'common'
 import { Plus, Search } from 'lucide-react'
 import Head from 'next/head'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Button, Skeleton } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { NoOrganizationsState } from '@/components/interfaces/Home/ProjectList/EmptyStates'
@@ -24,11 +21,8 @@ import { buildStudioPageTitle } from '@/lib/page-title'
 import type { NextPageWithLayout } from '@/types'
 
 const OrganizationsPage: NextPageWithLayout = () => {
-  const router = useRouter()
   const { appTitle } = useCustomContent(['app:title'])
   const [search, setSearch] = useState('')
-  const { error: orgNotFoundError, org: orgSlug } = useParams()
-  const orgNotFound = orgNotFoundError === 'org_not_found'
   const pageTitle = buildStudioPageTitle({
     section: 'Organizations',
     brand: appTitle || 'Supabase',
@@ -50,14 +44,6 @@ const OrganizationsPage: NextPageWithLayout = () => {
           (x) => x.name.toLowerCase().includes(search) || x.slug.toLowerCase().includes(search)
         )
 
-  useEffect(() => {
-    // If there are no organizations, force the user to create one
-    // unless the user is on the not found page
-    if (isSuccess && organizations.length <= 0 && !orgNotFound) {
-      router.push('/new')
-    }
-  }, [isSuccess, organizations])
-
   return (
     <>
       <Head>
@@ -66,20 +52,6 @@ const OrganizationsPage: NextPageWithLayout = () => {
       </Head>
       <ScaffoldContainer>
         <ScaffoldSection isFullWidth className="flex flex-col gap-y-4">
-          {orgNotFound && (
-            <Admonition
-              type="destructive"
-              title="Organization not found"
-              description={
-                <>
-                  The organization <code className="text-code-inline">{orgSlug}</code> does not
-                  exist or you do not have permission to access to it. Contact the the owner if you
-                  believe this is a mistake.
-                </>
-              }
-            />
-          )}
-
           {organizations.length > 0 && (
             <div className="flex items-center justify-between gap-x-2 md:gap-x-3">
               <Input
@@ -128,7 +100,7 @@ const OrganizationsPage: NextPageWithLayout = () => {
 OrganizationsPage.getLayout = (page) => (
   <AppLayout>
     <DefaultLayout hideMobileMenu headerTitle="Organizations">
-      <PageLayout title="Your Organizations" className="max-w-[1200px] lg:px-6 mx-auto">
+      <PageLayout title="Your organizations" className="max-w-[1200px] lg:px-6 mx-auto">
         {page}
       </PageLayout>
     </DefaultLayout>

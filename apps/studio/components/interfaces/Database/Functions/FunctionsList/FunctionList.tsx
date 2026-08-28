@@ -15,6 +15,9 @@ import {
   DropdownMenuTrigger,
   TableCell,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
 import { stripInArgModePrefixes } from '../Functions.utils'
@@ -160,14 +163,19 @@ export const FunctionList = ({
                 <div className="flex items-center justify-end">
                   {canUpdateFunctions ? (
                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          aria-label="More options"
-                          variant="default"
-                          className="px-1"
-                          icon={<MoreVertical />}
-                        />
-                      </DropdownMenuTrigger>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              aria-label={`${x.name} actions`}
+                              variant="default"
+                              className="px-1"
+                              icon={<MoreVertical />}
+                            />
+                          </DropdownMenuTrigger>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">More options</TooltipContent>
+                      </Tooltip>
                       <DropdownMenuContent side="left" className="w-52">
                         {isApiDocumentAvailable && (
                           <>

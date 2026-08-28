@@ -1,9 +1,14 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
+import { isFeatureEnabled, type Feature } from 'common/enabled-features'
 import matter from 'gray-matter'
 import yaml from 'js-yaml'
+import { fromMarkdown } from 'mdast-util-from-markdown'
+import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm'
+import { toMarkdown } from 'mdast-util-to-markdown'
+import { gfm } from 'micromark-extension-gfm'
 
-import { getInternalLinkBaseUrl, prefixInternalLinks } from './internal-links'
+import { addBaseUrlPrefix } from './internal-links'
 
 const GENERATED = path.join(process.cwd(), 'features/docs/generated')
 const OUT_DIR = path.join(process.cwd(), 'public/markdown/reference')
@@ -28,8 +33,11 @@ type LegacyFn = {
   examples?: Example[]
 }
 
+type TypeComment = { shortText?: string; text?: string; examples?: Example[] }
+
 type TypeSpec = {
-  methods: Record<string, { comment?: { shortText?: string; examples?: Example[] } }>
+  methods: Record<string, { comment?: TypeComment }>
+  variables: Record<string, { comment?: TypeComment }>
 }
 
 type RefBase = {
@@ -37,6 +45,11 @@ type RefBase = {
   outFile: string
   /** Folder under docs/ref/ that holds .mdx sections for `type: "markdown"` entries. */
   mdxDir: string
+  /**
+   * Enabled-features flag gating this reference. When set and the feature is
+   * disabled in enabled-features.json, the file is not generated.
+   */
+  feature?: Feature
 }
 
 type SdkLegacyRef = RefBase & {
@@ -89,12 +102,19 @@ const REFERENCES: Ref[] = [
     contentDir: path.join(process.cwd(), 'content/reference/javascript/v2'),
   },
   {
-    kind: 'sdk-legacy',
+    kind: 'sdk-new',
     title: 'Dart Client Library Reference',
     outFile: 'dart.md',
     mdxDir: path.join(MDX_ROOT, 'dart'),
-    sectionsPath: path.join(GENERATED, 'dart.v2.sections.json'),
-    functionsPath: path.join(GENERATED, 'dart.v2.functions.json'),
+    contentDir: path.join(process.cwd(), 'content/reference/dart/v2'),
+    feature: 'sdk:dart',
+  },
+  {
+    kind: 'sdk-new',
+    title: 'Supabase Server SDK Reference',
+    outFile: 'server.md',
+    mdxDir: path.join(MDX_ROOT, 'server'),
+    contentDir: path.join(process.cwd(), 'content/reference/server/v1'),
   },
   {
     kind: 'sdk-legacy',
@@ -103,6 +123,7 @@ const REFERENCES: Ref[] = [
     mdxDir: path.join(MDX_ROOT, 'kotlin'),
     sectionsPath: path.join(GENERATED, 'kotlin.v1.sections.json'),
     functionsPath: path.join(GENERATED, 'kotlin.v1.functions.json'),
+    feature: 'sdk:kotlin',
   },
   {
     kind: 'sdk-legacy',
@@ -111,6 +132,7 @@ const REFERENCES: Ref[] = [
     mdxDir: path.join(MDX_ROOT, 'python'),
     sectionsPath: path.join(GENERATED, 'python.v2.sections.json'),
     functionsPath: path.join(GENERATED, 'python.v2.functions.json'),
+    feature: 'sdk:python',
   },
   {
     kind: 'sdk-legacy',
@@ -119,6 +141,7 @@ const REFERENCES: Ref[] = [
     mdxDir: path.join(MDX_ROOT, 'swift'),
     sectionsPath: path.join(GENERATED, 'swift.v2.sections.json'),
     functionsPath: path.join(GENERATED, 'swift.v2.functions.json'),
+    feature: 'sdk:swift',
   },
   {
     kind: 'sdk-legacy',
@@ -127,6 +150,7 @@ const REFERENCES: Ref[] = [
     mdxDir: path.join(MDX_ROOT, 'csharp'),
     sectionsPath: path.join(GENERATED, 'csharp.v0.sections.json'),
     functionsPath: path.join(GENERATED, 'csharp.v0.functions.json'),
+    feature: 'sdk:csharp',
   },
 ]
 
@@ -267,6 +291,7 @@ async function renderSdkNew(ref: SdkNewRef): Promise<string> {
   ])
   const fnsById = new Map(functions.map((fn) => [fn.id, fn]))
   const methods = typeSpec.methods ?? {}
+  const variables = typeSpec.variables ?? {}
 
   const parts: string[] = [`# ${ref.title}`]
   for (const section of flatten(sections)) {
@@ -282,11 +307,18 @@ async function renderSdkNew(ref: SdkNewRef): Promise<string> {
     if (section.type !== 'function' || !section.id) continue
     const fn = fnsById.get(section.id)
     if (!fn) continue
-    const tsm = fn.$ref ? methods[fn.$ref] : undefined
+    // Mirror the site's getTypeSpec fallback: TypeDoc consts and type aliases
+    // (e.g. server's error/type exports) live under `variables`, not `methods`.
+    const tsm = fn.$ref ? (methods[fn.$ref] ?? variables[fn.$ref]) : undefined
+    // The site joins shortText + text for the full description; some entries
+    // (e.g. deprecated type aliases) carry content only in `text`.
+    const commentBody = [tsm?.comment?.shortText, tsm?.comment?.text]
+      .filter((s): s is string => !!s?.trim())
+      .join('\n\n')
     parts.push(
       renderFunctionSection({
         title: fn.title || section.title || fn.id,
-        description: fn.description ?? tsm?.comment?.shortText,
+        description: fn.description ?? (commentBody || undefined),
         notes: fn.notes,
         examples: fn.examples ?? tsm?.comment?.examples,
       })
@@ -388,10 +420,11 @@ async function generate() {
   const sharedTypeSpec = await readJson<TypeSpec>(
     path.join(process.cwd(), 'content/reference/javascript/v2/typeSpec.json')
   )
-  const linkBaseUrl = getInternalLinkBaseUrl()
+
+  const references = REFERENCES.filter((ref) => !ref.feature || isFeatureEnabled(ref.feature))
 
   await Promise.all(
-    REFERENCES.map(async (ref) => {
+    references.map(async (ref) => {
       let output: string
       switch (ref.kind) {
         case 'sdk-legacy':
@@ -407,11 +440,21 @@ async function generate() {
           output = await renderCli(ref)
           break
       }
-      await fs.writeFile(path.join(OUT_DIR, ref.outFile), prefixInternalLinks(output, linkBaseUrl))
+      const tree = fromMarkdown(output, {
+        extensions: [gfm()],
+        mdastExtensions: [gfmFromMarkdown()],
+      })
+      addBaseUrlPrefix(tree)
+      const prefixed = toMarkdown(tree, {
+        extensions: [gfmToMarkdown()],
+        bullet: '-',
+        listItemIndent: 'one',
+      })
+      await fs.writeFile(path.join(OUT_DIR, ref.outFile), prefixed)
     })
   )
 
-  console.log(`Generated ${REFERENCES.length} markdown files under public/markdown/reference/`)
+  console.log(`Generated ${references.length} markdown files under public/markdown/reference/`)
 }
 
 generate()

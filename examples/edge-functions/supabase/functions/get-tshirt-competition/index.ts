@@ -2,11 +2,7 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
-import { createClient } from 'npm:supabase-js@2'
-// New approach (v2.95.0+)
-import { corsHeaders } from 'jsr:@supabase/supabase-js@2/cors'
-// For older versions:
-// import { corsHeaders } from '../_shared/cors.ts'
+import { withSupabase } from 'npm:@supabase/server@^1'
 
 console.log(`Function "get-tshirt-competition" up and running!`)
 
@@ -25,72 +21,54 @@ function turnEmailToCount(email: string): string {
   )}`
 }
 
-Deno.serve(async (req) => {
-  // This is needed if you're planning to invoke your function from a browser.
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
-  }
+// Public challenge endpoint, so deploy with verify_jwt = false.
+export default {
+  fetch: withSupabase<any>({ auth: 'none' }, async (req, ctx) => {
+    try {
+      const url = new URL(req.url)
+      const email = url.searchParams.get('email')
+      const twitter = url.searchParams.get('twitter')
+      const size = url.searchParams.get('size')
+      const answer = url.searchParams.get('answer')
 
-  try {
-    const url = new URL(req.url)
-    const email = url.searchParams.get('email')
-    const twitter = url.searchParams.get('twitter')
-    const size = url.searchParams.get('size')
-    const answer = url.searchParams.get('answer')
-
-    if (
-      !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email ?? '') ||
-      !answer ||
-      !twitter ||
-      !size
-    ) {
-      throw new Error(
-        `Please provide valid 'email', 'twitter', 'size', and 'answer' params. HINT: https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/get-tshirt-competition/index.ts`
-      )
-    }
-
-    if (answer !== countEmailSegments(email!)) {
-      throw new Error(
-        `Sorry, that's wrong, please try again! HINT: https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/get-tshirt-competition/index.ts`
-      )
-    }
-
-    const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
-
-    const supabaseAdminClient = createClient(
-      // Supabase API URL - env var exported by default when deployed.
-      Deno.env.get('SUPABASE_URL') ?? '',
-      // Supabase API SECRET KEY - env var exported by default when deployed.
-      SUPABASE_SECRET_KEYS['default'] ?? ''
-    )
-    // Submit email to draw
-    const { error } = await supabaseAdminClient.from('get-tshirt-competition-2').upsert(
-      {
-        email,
-        twitter,
-        size,
-      },
-      { onConflict: 'email' }
-    )
-    if (error) {
-      console.log(error)
-      throw new Error(error.details)
-    }
-
-    return new Response(
-      `Thanks for playing! ${turnEmailToCount(email!)} has been added to the draw \\o/`,
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'text/plain' },
-        status: 200,
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email ?? '') || !answer || !twitter || !size) {
+        throw new Error(
+          `Please provide valid 'email', 'twitter', 'size', and 'answer' params. HINT: https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/get-tshirt-competition/index.ts`
+        )
       }
-    )
-  } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 400,
-    })
-  }
-})
+
+      if (answer !== countEmailSegments(email!)) {
+        throw new Error(
+          `Sorry, that's wrong, please try again! HINT: https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/get-tshirt-competition/index.ts`
+        )
+      }
+
+      // Submit email to draw
+      const { error } = await ctx.supabaseAdmin.from('get-tshirt-competition-2').upsert(
+        {
+          email,
+          twitter,
+          size,
+        },
+        { onConflict: 'email' }
+      )
+      if (error) {
+        console.log(error)
+        throw new Error(error.details)
+      }
+
+      return new Response(
+        `Thanks for playing! ${turnEmailToCount(email!)} has been added to the draw \\o/`,
+        {
+          headers: { 'Content-Type': 'text/plain' },
+          status: 200,
+        }
+      )
+    } catch (error) {
+      return Response.json({ error: error.message }, { status: 400 })
+    }
+  }),
+}
 
 // To invoke:
 // curl -i --location --request GET 'http://localhost:54321/functions/v1/get-tshirt-competition?email=testr@test.de&twitter=thorwebdev&size=2XL&answer=20'

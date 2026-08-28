@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 
 import { useIsFeatureEnabled } from './useIsFeatureEnabled'
 import {
+  CHATGPT_IDENTITY_PROVIDER,
   GITHUB_IDENTITY_PROVIDER,
   type ExternalIdentityProviderConfig,
 } from '@/lib/external-identity-providers'
@@ -12,9 +13,20 @@ import {
  * `dashboard_auth:sign_in_with_*` flag, and gate it here.
  */
 export function useEnabledIdentityProviders(): ExternalIdentityProviderConfig[] {
-  const { dashboardAuthSignInWithGithub: githubEnabled } = useIsFeatureEnabled([
+  const {
+    dashboardAuthSignInWithGithub: githubEnabled,
+    dashboardAuthSignInWithChatgpt: chatgptEnabled,
+  } = useIsFeatureEnabled([
     'dashboard_auth:sign_in_with_github',
+    'dashboard_auth:sign_in_with_chatgpt',
   ])
 
-  return useMemo(() => [...(githubEnabled ? [GITHUB_IDENTITY_PROVIDER] : [])], [githubEnabled])
+  return useMemo(
+    () =>
+      [
+        githubEnabled && GITHUB_IDENTITY_PROVIDER,
+        chatgptEnabled && CHATGPT_IDENTITY_PROVIDER,
+      ].filter((p): p is ExternalIdentityProviderConfig => Boolean(p)),
+    [githubEnabled, chatgptEnabled]
+  )
 }

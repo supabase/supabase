@@ -2,7 +2,7 @@
 
 import { Key } from 'lucide-react'
 import { Button } from 'ui'
-import { EmptyStatePresentational } from 'ui-patterns'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 export default function CopyEmptyStates() {
   return (
