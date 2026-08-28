@@ -222,9 +222,16 @@ export const VersionHistory = ({
         />
       )}
 
-      {isSuccess && versions.length === 0 && (
+      {isSuccess && versions.length === 0 && versioningState === 'disabled' && (
         <p className="text-sm text-foreground-light">
-          No previous versions yet. Overwriting this file will keep a recoverable copy here.
+          Versioning is off for this bucket, so previous versions aren&apos;t retained. Turn it on
+          in the bucket settings to start keeping them.
+        </p>
+      )}
+
+      {isSuccess && versions.length === 0 && versioningState !== 'disabled' && (
+        <p className="text-sm text-foreground-light">
+          No previous versions yet. Overwriting this file will retain a recoverable copy here.
         </p>
       )}
 
