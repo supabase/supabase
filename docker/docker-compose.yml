@@ -123,6 +123,7 @@ services:
       timeout: 5s
       interval: 5s
       retries: 3
+      start_period: 20s
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -509,6 +510,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+      start_period: 60s
     environment:
       POSTGRES_HOST: /var/run/postgresql
       PGPORT: ${POSTGRES_PORT}

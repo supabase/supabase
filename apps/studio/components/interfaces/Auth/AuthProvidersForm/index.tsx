@@ -1,7 +1,8 @@
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { Alert, AlertDescription, AlertTitle, Button, WarningIcon } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import {
   PageSection,
   PageSectionContent,
@@ -41,7 +42,13 @@ export const AuthProvidersForm = () => {
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent>
-        {isError ? (
+        {!IS_PLATFORM ? (
+          <Admonition
+            type="default"
+            title="Auth providers are not configurable for self-hosted projects"
+            description="Auth providers for self-hosted deployments are configured via environment variables. Please update your .env file."
+          />
+        ) : isError ? (
           <AlertError
             error={authConfigError}
             subject="Failed to retrieve auth configuration for hooks"
