@@ -31,7 +31,7 @@ import { type DestinationPanelSchemaType } from './DestinationForm.schema'
 const INVALIDATED_SLOT_BEHAVIOR_LABELS = {
   error: 'Block startup',
   recreate: 'Recreate slot',
-} as const
+}
 
 export const AdvancedSettings = ({
   type,
@@ -229,7 +229,7 @@ export const AdvancedSettings = ({
                         </div>
                       }
                       layout="horizontal"
-                      description="Leave blank for freshest results. When set, the maximum age of query results while BigQuery applies ongoing changes."
+                      description="Set the maximum age of query results while BigQuery applies ongoing changes, or leave blank for the freshest results."
                     >
                       <FormControl>
                         <InputGroup>
