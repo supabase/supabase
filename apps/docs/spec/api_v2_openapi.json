@@ -28,10 +28,30 @@
               }
             }
           },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to fetch log drains" }
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "500": {
+            "description": "Failed to fetch log drains",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
         },
         "security": [{ "bearer": [] }],
         "summary": "List project log drains",
@@ -73,18 +93,36 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/LogDrainResponse" } }
             }
           },
-          "401": { "description": "Unauthorized" },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
           "402": {
             "description": "This feature requires the Pro, Team, or Enterprise organization plan.",
             "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/PlanGateErrorBodyV2" }
-              }
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
             }
           },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to create a log drain" }
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "500": {
+            "description": "Failed to create a log drain",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
         },
         "security": [{ "bearer": [] }],
         "summary": "Create a log drain for a project",
@@ -143,10 +181,30 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/LogDrainResponse" } }
             }
           },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to update log drain" }
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "500": {
+            "description": "Failed to update log drain",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
         },
         "security": [{ "bearer": [] }],
         "summary": "Update a project log drain",
@@ -186,10 +244,30 @@
         ],
         "responses": {
           "204": { "description": "" },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to delete a log drain" }
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "500": {
+            "description": "Failed to delete a log drain",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
         },
         "security": [{ "bearer": [] }],
         "summary": "Delete a project log drain",
@@ -198,6 +276,71 @@
         "x-endpoint-owners": ["analytics"],
         "x-fga-permissions": [["analytics_config_write"]],
         "x-oauth-scope": "analytics_config:write"
+      }
+    },
+    "/v2/projects/{ref}/config": {
+      "get": {
+        "description": "Returns the project's database, pooler, Auth, Data API, Realtime and Storage configuration — the same configuration a branch inherits from its base project. Each is the effective config, so a setting the project has never overridden is reported at its platform default rather than as null. Auth secrets are returned as an HMAC of their value. `storage` is read live from the storage service; the rest come from this platform's own records.",
+        "operationId": "v2-get-project-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V2ProjectConfigResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "[Alpha] Get a project's service configuration",
+        "tags": ["Projects"],
+        "x-endpoint-owners": ["control-plane", "infra"],
+        "x-fga-permissions": [
+          [
+            "database_config_read",
+            "database_read",
+            "database_ssl_config_read",
+            "database_network_restrictions_read",
+            "auth_config_read",
+            "data_api_config_read",
+            "realtime_config_read",
+            "storage_config_read"
+          ]
+        ]
       }
     },
     "/v2/projects/{ref}/transfers/previews": {
@@ -235,14 +378,29 @@
               }
             }
           },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" }
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
         },
         "security": [{ "bearer": [] }],
         "summary": "Previews transferring a project to a different organizations, shows eligibility and impact",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["project_admin_read"]]
       }
     },
@@ -274,14 +432,29 @@
         },
         "responses": {
           "200": { "description": "" },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" }
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
         },
         "security": [{ "bearer": [] }],
         "summary": "Transfers a project to a different organization",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_write"]]
       }
     },
@@ -312,15 +485,35 @@
               }
             }
           },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to retrieve AWS accounts for project" }
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "500": {
+            "description": "Failed to retrieve AWS accounts for project",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
         },
         "security": [{ "bearer": [] }],
         "summary": "List AWS accounts attached to the project PrivateLink share",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["platform-networking", "management-api"],
+        "x-endpoint-owners": ["platform-networking", "control-plane"],
         "x-fga-permissions": [["project_admin_read"]]
       },
       "post": {
@@ -358,25 +551,43 @@
               }
             }
           },
-          "401": { "description": "Unauthorized" },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
           "402": {
             "description": "This feature requires the Team, or Enterprise organization plan.",
             "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/PlanGateErrorBodyV2" }
-              }
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
             }
           },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to add AWS account to PrivateLink share" }
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "500": {
+            "description": "Failed to add AWS account to PrivateLink share",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
         },
         "security": [{ "bearer": [] }],
         "summary": "Add an AWS account to the project PrivateLink share",
         "tags": ["Projects"],
         "x-allowed-plans": ["Team", "Enterprise"],
         "x-badges": [{ "name": "Only available on Team, Enterprise", "position": "before" }],
-        "x-endpoint-owners": ["platform-networking", "management-api"],
+        "x-endpoint-owners": ["platform-networking", "control-plane"],
         "x-fga-permissions": [["project_admin_write"]]
       }
     },
@@ -408,15 +619,35 @@
         ],
         "responses": {
           "204": { "description": "" },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to remove AWS account from PrivateLink share" }
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "500": {
+            "description": "Failed to remove AWS account from PrivateLink share",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
         },
         "security": [{ "bearer": [] }],
         "summary": "Remove an AWS account from the project PrivateLink share",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["platform-networking", "management-api"],
+        "x-endpoint-owners": ["platform-networking", "control-plane"],
         "x-fga-permissions": [["project_admin_write"]]
       }
     },
@@ -455,16 +686,351 @@
         ],
         "responses": {
           "204": { "description": "" },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to remove AWS account from PrivateLink share" }
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "500": {
+            "description": "Failed to remove AWS account from PrivateLink share",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
         },
         "security": [{ "bearer": [] }],
         "summary": "Remove an AWS account from a specific database PrivateLink share",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["platform-networking", "management-api"],
+        "x-endpoint-owners": ["platform-networking", "control-plane"],
         "x-fga-permissions": [["project_admin_write"]]
+      }
+    },
+    "/v2/projects/{ref}/workers": {
+      "get": {
+        "description": "Returns all workers you've previously deployed to the specified project.",
+        "operationId": "v2-list-all-workers",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V2ListWorkersResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "[Alpha] List all workers",
+        "tags": ["Workers"],
+        "x-badges": [{ "name": "OAuth scope: edge_functions:read", "position": "after" }],
+        "x-endpoint-owners": ["functions"],
+        "x-fga-permissions": [["workers_read"]],
+        "x-oauth-scope": "edge_functions:read"
+      }
+    },
+    "/v2/projects/{ref}/workers/{name}": {
+      "get": {
+        "description": "Returns a worker along with its instance tally. Poll this after a deploy until `build_state` leaves `building`.",
+        "operationId": "v2-get-a-worker",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$",
+              "example": "hello-world",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/V2WorkerResponse" } }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "[Alpha] Retrieve a worker",
+        "tags": ["Workers"],
+        "x-badges": [{ "name": "OAuth scope: edge_functions:read", "position": "after" }],
+        "x-endpoint-owners": ["functions"],
+        "x-fga-permissions": [["workers_read"]],
+        "x-oauth-scope": "edge_functions:read"
+      },
+      "delete": {
+        "description": "Tombstones the worker. Its instances and image are torn down asynchronously.",
+        "operationId": "v2-delete-a-worker",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$",
+              "example": "hello-world",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": { "description": "" },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "[Alpha] Delete a worker",
+        "tags": ["Workers"],
+        "x-badges": [{ "name": "OAuth scope: edge_functions:write", "position": "after" }],
+        "x-endpoint-owners": ["functions"],
+        "x-fga-permissions": [["workers_write"]],
+        "x-oauth-scope": "edge_functions:write"
+      }
+    },
+    "/v2/projects/{ref}/workers/{name}/uploads": {
+      "post": {
+        "description": "PUT the `.tar.gz` build context to the returned `url` before `expires_at`, then deploy with the upload id as `context_upload_id`. The bytes go straight to storage — no management API request carries them.",
+        "operationId": "v2-create-worker-upload",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$",
+              "example": "hello-world",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V2WorkerUploadResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "[Alpha] Mint a presigned slot for a build-context upload",
+        "tags": ["Workers"],
+        "x-badges": [{ "name": "OAuth scope: edge_functions:write", "position": "after" }],
+        "x-endpoint-owners": ["functions"],
+        "x-fga-permissions": [["workers_write"]],
+        "x-oauth-scope": "edge_functions:write"
+      }
+    },
+    "/v2/projects/{ref}/workers/{name}/deploy": {
+      "post": {
+        "description": "Creates the worker if it does not exist, building from a context staged through the uploads endpoint. The build runs asynchronously: this answers 202 and the worker reaches `build_state` `active` or `failed` later.",
+        "operationId": "v2-deploy-a-worker",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$",
+              "example": "hello-world",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/V2DeployWorkerRequest" }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/V2WorkerResponse" } }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "[Alpha] Deploy a worker",
+        "tags": ["Workers"],
+        "x-badges": [{ "name": "OAuth scope: edge_functions:write", "position": "after" }],
+        "x-endpoint-owners": ["functions"],
+        "x-fga-permissions": [["workers_write"]],
+        "x-oauth-scope": "edge_functions:write"
       }
     },
     "/v2/organizations/{slug}/members": {
@@ -532,15 +1098,30 @@
               }
             }
           },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" }
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
         },
         "security": [{ "bearer": [] }],
         "summary": "List members of an organization",
         "tags": ["Organizations"],
         "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["members_read"]],
         "x-oauth-scope": "organizations:read"
       }
@@ -589,25 +1170,43 @@
               }
             }
           },
-          "401": { "description": "Unauthorized" },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
           "402": {
             "description": "This feature requires the Enterprise organization plan.",
             "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/PlanGateErrorBodyV2" }
-              }
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
             }
           },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to assign organization member role" }
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "500": {
+            "description": "Failed to assign organization member role",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
         },
         "security": [{ "bearer": [] }],
         "summary": "Assign or change an organization member role",
         "tags": ["Organizations"],
         "x-allowed-plans": ["Enterprise"],
         "x-badges": [{ "name": "Only available on Enterprise", "position": "before" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_write"]]
       }
     },
@@ -637,15 +1236,30 @@
               }
             }
           },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" }
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
         },
         "security": [{ "bearer": [] }],
         "summary": "List roles of an organization",
         "tags": ["Organizations"],
         "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["members_read"]],
         "x-oauth-scope": "organizations:read"
       }
@@ -684,17 +1298,30 @@
               }
             }
           },
-          "401": { "description": "Unauthorized" },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
           "402": {
             "description": "This feature requires the Enterprise organization plan.",
             "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/PlanGateErrorBodyV2" }
-              }
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
             }
           },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" }
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
         },
         "security": [{ "bearer": [] }],
         "summary": "Creates organization invitations",
@@ -704,7 +1331,7 @@
           { "name": "OAuth scope: organizations:write", "position": "after" },
           { "name": "Only available on Enterprise", "position": "before" }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["members_write"]],
         "x-oauth-scope": "organizations:write"
       },
@@ -741,17 +1368,30 @@
               }
             }
           },
-          "401": { "description": "Unauthorized" },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
           "402": {
             "description": "This feature requires the Enterprise organization plan.",
             "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/PlanGateErrorBodyV2" }
-              }
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
             }
           },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" }
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
         },
         "security": [{ "bearer": [] }],
         "summary": "Deletes organization invitations by email",
@@ -761,7 +1401,7 @@
           { "name": "OAuth scope: organizations:write", "position": "after" },
           { "name": "Only available on Enterprise", "position": "before" }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["members_write"]],
         "x-oauth-scope": "organizations:write"
       }
@@ -824,15 +1464,30 @@
               }
             }
           },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" }
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
         },
         "security": [{ "bearer": [] }],
         "summary": "List projects of an organization",
         "tags": ["Organizations"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_projects_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -910,22 +1565,37 @@
               }
             }
           },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" }
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
         },
         "security": [{ "bearer": [] }],
         "summary": "List GitHub connections of an organization",
         "tags": ["Organizations"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "dev-workflows"],
+        "x-endpoint-owners": ["control-plane", "dev-workflows"],
         "x-fga-permissions": [["organization_projects_read"]],
         "x-oauth-scope": "projects:read"
       }
     },
     "/v2/projects/{ref}/webhooks/endpoints": {
       "get": {
-        "operationId": "allV2ProjectsByRefWebhooks",
+        "operationId": "v2-projects-ref-webhooks-endpoints-get",
         "parameters": [
           {
             "in": "path",
@@ -1604,7 +2274,7 @@
         "description": "List all Webhook endpoints based on a project's ref or an organization's slug."
       },
       "post": {
-        "operationId": "allV2ProjectsByRefWebhooks",
+        "operationId": "v2-projects-ref-webhooks-endpoints-post",
         "parameters": [
           {
             "in": "path",
@@ -2341,7 +3011,7 @@
         }
       },
       "delete": {
-        "operationId": "allV2ProjectsByRefWebhooks",
+        "operationId": "v2-projects-ref-webhooks-endpoints-delete",
         "parameters": [
           {
             "in": "path",
@@ -2984,7 +3654,7 @@
     },
     "/v2/projects/{ref}/webhooks/endpoints/{id}": {
       "get": {
-        "operationId": "allV2ProjectsByRefWebhooks",
+        "operationId": "v2-projects-ref-webhooks-endpoints-id-get",
         "parameters": [
           {
             "in": "path",
@@ -3693,7 +4363,7 @@
         "description": "Get details of a specific endpoint."
       },
       "patch": {
-        "operationId": "allV2ProjectsByRefWebhooks",
+        "operationId": "v2-projects-ref-webhooks-endpoints-id-patch",
         "parameters": [
           {
             "in": "path",
@@ -4502,7 +5172,7 @@
         }
       },
       "delete": {
-        "operationId": "allV2ProjectsByRefWebhooks",
+        "operationId": "v2-projects-ref-webhooks-endpoints-id-delete",
         "parameters": [
           {
             "in": "path",
@@ -5213,7 +5883,7 @@
     },
     "/v2/projects/{ref}/webhooks/endpoints/{id}/deliveries": {
       "get": {
-        "operationId": "allV2ProjectsByRefWebhooks",
+        "operationId": "v2-projects-ref-webhooks-endpoints-id-deliveries-get",
         "parameters": [
           {
             "in": "path",
@@ -5952,7 +6622,7 @@
     },
     "/v2/projects/{ref}/webhooks/endpoints/{id}/test": {
       "post": {
-        "operationId": "allV2ProjectsByRefWebhooks",
+        "operationId": "v2-projects-ref-webhooks-endpoints-id-test-post",
         "parameters": [
           {
             "in": "path",
@@ -6744,7 +7414,7 @@
     },
     "/v2/projects/{ref}/webhooks/deliveries/{id}": {
       "get": {
-        "operationId": "allV2ProjectsByRefWebhooks",
+        "operationId": "v2-projects-ref-webhooks-deliveries-id-get",
         "parameters": [
           {
             "in": "path",
@@ -7515,7 +8185,7 @@
     },
     "/v2/projects/{ref}/webhooks/deliveries/{id}/retry": {
       "post": {
-        "operationId": "allV2ProjectsByRefWebhooks",
+        "operationId": "v2-projects-ref-webhooks-deliveries-id-retry-post",
         "parameters": [
           {
             "in": "path",
@@ -8121,7 +8791,7 @@
     },
     "/v2/organizations/{slug}/webhooks/endpoints": {
       "get": {
-        "operationId": "allV2OrganizationsBySlugWebhooks",
+        "operationId": "v2-organizations-slug-webhooks-endpoints-get",
         "parameters": [
           {
             "in": "path",
@@ -8798,7 +9468,7 @@
         "description": "List all Webhook endpoints based on a project's ref or an organization's slug."
       },
       "post": {
-        "operationId": "allV2OrganizationsBySlugWebhooks",
+        "operationId": "v2-organizations-slug-webhooks-endpoints-post",
         "parameters": [
           {
             "in": "path",
@@ -9533,7 +10203,7 @@
         }
       },
       "delete": {
-        "operationId": "allV2OrganizationsBySlugWebhooks",
+        "operationId": "v2-organizations-slug-webhooks-endpoints-delete",
         "parameters": [
           {
             "in": "path",
@@ -10174,7 +10844,7 @@
     },
     "/v2/organizations/{slug}/webhooks/endpoints/{id}": {
       "get": {
-        "operationId": "allV2OrganizationsBySlugWebhooks",
+        "operationId": "v2-organizations-slug-webhooks-endpoints-id-get",
         "parameters": [
           {
             "in": "path",
@@ -10881,7 +11551,7 @@
         "description": "Get details of a specific endpoint."
       },
       "patch": {
-        "operationId": "allV2OrganizationsBySlugWebhooks",
+        "operationId": "v2-organizations-slug-webhooks-endpoints-id-patch",
         "parameters": [
           {
             "in": "path",
@@ -11688,7 +12358,7 @@
         }
       },
       "delete": {
-        "operationId": "allV2OrganizationsBySlugWebhooks",
+        "operationId": "v2-organizations-slug-webhooks-endpoints-id-delete",
         "parameters": [
           {
             "in": "path",
@@ -12397,7 +13067,7 @@
     },
     "/v2/organizations/{slug}/webhooks/endpoints/{id}/deliveries": {
       "get": {
-        "operationId": "allV2OrganizationsBySlugWebhooks",
+        "operationId": "v2-organizations-slug-webhooks-endpoints-id-deliveries-get",
         "parameters": [
           {
             "in": "path",
@@ -13134,7 +13804,7 @@
     },
     "/v2/organizations/{slug}/webhooks/endpoints/{id}/test": {
       "post": {
-        "operationId": "allV2OrganizationsBySlugWebhooks",
+        "operationId": "v2-organizations-slug-webhooks-endpoints-id-test-post",
         "parameters": [
           {
             "in": "path",
@@ -13924,7 +14594,7 @@
     },
     "/v2/organizations/{slug}/webhooks/deliveries/{id}": {
       "get": {
-        "operationId": "allV2OrganizationsBySlugWebhooks",
+        "operationId": "v2-organizations-slug-webhooks-deliveries-id-get",
         "parameters": [
           {
             "in": "path",
@@ -14693,7 +15363,7 @@
     },
     "/v2/organizations/{slug}/webhooks/deliveries/{id}/retry": {
       "post": {
-        "operationId": "allV2OrganizationsBySlugWebhooks",
+        "operationId": "v2-organizations-slug-webhooks-deliveries-id-retry-post",
         "parameters": [
           {
             "in": "path",
@@ -15447,6 +16117,44 @@
         },
         "required": ["data"]
       },
+      "ErrorResponseBodyAPIErrorObject": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "code": { "type": "string" },
+          "message": { "type": "string" },
+          "description": { "type": "string" },
+          "links": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "href": { "type": "string" },
+                "rel": { "type": "string" },
+                "title": { "type": "string" },
+                "type": { "type": "string" },
+                "describedby": { "type": "string" },
+                "meta": { "type": "object", "additionalProperties": {} }
+              },
+              "required": ["href"]
+            }
+          },
+          "meta": { "type": "object", "additionalProperties": {} },
+          "issues": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ErrorResponseBodyAPIErrorObject" }
+          }
+        },
+        "required": ["code", "message"],
+        "ref": "APIErrorObject"
+      },
+      "ErrorResponseBody": {
+        "type": "object",
+        "properties": {
+          "error": { "$ref": "#/components/schemas/ErrorResponseBodyAPIErrorObject" }
+        },
+        "required": ["error"]
+      },
       "CreateLogDrainRequestOpenApi": {
         "type": "object",
         "properties": {
@@ -15712,27 +16420,6 @@
         },
         "required": ["data"]
       },
-      "PlanGateErrorBodyV2": {
-        "type": "object",
-        "properties": {
-          "error": {
-            "type": "object",
-            "properties": {
-              "code": {
-                "type": "string",
-                "description": "HTTP status-derived error code, e.g. \"payment_required\""
-              },
-              "message": {
-                "type": "string",
-                "description": "Human-readable explanation of the plan gate"
-              }
-            },
-            "required": ["code", "message"],
-            "description": "Plan-gate error object"
-          }
-        },
-        "required": ["error"]
-      },
       "UpdateLogDrainRequestOpenApi": {
         "type": "object",
         "properties": {
@@ -15861,6 +16548,437 @@
               }
             },
             "required": ["type", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "V2ProjectConfigResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Resource type.",
+                "enum": ["project_config"]
+              },
+              "id": { "type": "string", "description": "Project ref." },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "database": {
+                    "type": "object",
+                    "properties": {
+                      "major_version": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991,
+                        "description": "The major Postgres version the database runs. `17` covers both Postgres 17 and Oriole on 17, since Oriole is a storage engine rather than a version."
+                      },
+                      "ssl_enforced": {
+                        "type": "boolean",
+                        "description": "Whether the database rejects plaintext connections"
+                      },
+                      "network_restrictions": {
+                        "type": "object",
+                        "properties": {
+                          "entitlement": { "type": "string", "enum": ["disallowed", "allowed"] },
+                          "status": {
+                            "type": "string",
+                            "enum": ["stored", "applied"],
+                            "description": "Whether the allowlist below is applied to the project or only stored."
+                          },
+                          "allowed_cidrs": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "address": { "type": "string" },
+                                "type": { "type": "string", "enum": ["v4", "v6"] }
+                              },
+                              "required": ["address", "type"]
+                            }
+                          },
+                          "updated_at": { "type": "string" },
+                          "applied_at": { "type": "string" }
+                        },
+                        "required": ["entitlement", "status", "allowed_cidrs"]
+                      },
+                      "postgres_settings": {
+                        "type": "object",
+                        "properties": {
+                          "effective_cache_size": { "type": "string" },
+                          "logical_decoding_work_mem": { "type": "string" },
+                          "log_autovacuum_min_duration": {
+                            "type": "string",
+                            "description": "Default unit: ms",
+                            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+                          },
+                          "log_checkpoints": { "type": "boolean" },
+                          "log_connections": { "type": "boolean" },
+                          "log_disconnections": { "type": "boolean" },
+                          "log_duration": { "type": "boolean" },
+                          "log_lock_waits": { "type": "boolean" },
+                          "log_recovery_conflict_waits": { "type": "boolean" },
+                          "log_replication_commands": { "type": "boolean" },
+                          "log_startup_progress_interval": {
+                            "type": "string",
+                            "description": "Default unit: ms",
+                            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+                          },
+                          "log_temp_files": { "type": "string" },
+                          "maintenance_work_mem": { "type": "string" },
+                          "track_activity_query_size": { "type": "string" },
+                          "max_connections": { "type": "integer", "minimum": 1, "maximum": 262143 },
+                          "max_locks_per_transaction": {
+                            "type": "integer",
+                            "minimum": 10,
+                            "maximum": 2147483640
+                          },
+                          "max_logical_replication_workers": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 262143
+                          },
+                          "max_parallel_maintenance_workers": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 1024
+                          },
+                          "max_parallel_workers": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 1024
+                          },
+                          "max_parallel_workers_per_gather": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 1024
+                          },
+                          "max_replication_slots": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "max_slot_wal_keep_size": { "type": "string" },
+                          "max_standby_archive_delay": { "type": "string" },
+                          "max_standby_streaming_delay": { "type": "string" },
+                          "max_sync_workers_per_subscription": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 262143
+                          },
+                          "max_wal_size": { "type": "string" },
+                          "max_wal_senders": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "max_worker_processes": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 262143
+                          },
+                          "session_replication_role": {
+                            "type": "string",
+                            "enum": ["origin", "replica", "local"]
+                          },
+                          "shared_buffers": { "type": "string" },
+                          "statement_timeout": {
+                            "type": "string",
+                            "description": "Default unit: ms",
+                            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+                          },
+                          "track_commit_timestamp": { "type": "boolean" },
+                          "wal_keep_size": { "type": "string" },
+                          "wal_sender_timeout": {
+                            "type": "string",
+                            "description": "Default unit: ms",
+                            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+                          },
+                          "work_mem": { "type": "string" },
+                          "checkpoint_timeout": {
+                            "type": "string",
+                            "description": "Default unit: s",
+                            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+                          },
+                          "hot_standby_feedback": { "type": "boolean" },
+                          "cron_log_statement": { "type": "boolean" }
+                        },
+                        "description": "Postgres parameter overrides. Empty when the project runs entirely on defaults."
+                      }
+                    },
+                    "required": [
+                      "major_version",
+                      "ssl_enforced",
+                      "network_restrictions",
+                      "postgres_settings"
+                    ]
+                  },
+                  "pooler": {
+                    "type": "object",
+                    "properties": {
+                      "pool_mode": {
+                        "type": "string",
+                        "enum": ["transaction", "session", "statement"]
+                      },
+                      "ignore_startup_parameters": { "type": "string" },
+                      "server_idle_timeout": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      "server_lifetime": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      "query_wait_timeout": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      "reserve_pool_size": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      "default_pool_size": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991,
+                        "description": "Defaults to the pooler's size for the project's compute when not overridden."
+                      },
+                      "max_client_conn": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991,
+                        "description": "Defaults to the pooler's size for the project's compute when not overridden."
+                      }
+                    },
+                    "required": [
+                      "pool_mode",
+                      "ignore_startup_parameters",
+                      "server_idle_timeout",
+                      "server_lifetime",
+                      "query_wait_timeout",
+                      "reserve_pool_size",
+                      "default_pool_size",
+                      "max_client_conn"
+                    ]
+                  },
+                  "auth": {
+                    "type": "object",
+                    "additionalProperties": {},
+                    "description": "Effective Auth config, keyed by lowercased GoTrue setting name and resolved through the `gotrue_config` view, so a setting the project has never overridden is reported at its platform default. Secrets are returned as an HMAC of their value, never in plaintext."
+                  },
+                  "api": {
+                    "type": "object",
+                    "properties": {
+                      "db_schema": {
+                        "type": "string",
+                        "description": "Schemas exposed through the Data API"
+                      },
+                      "db_extra_search_path": { "type": "string" },
+                      "max_rows": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      "db_pool_acquisition_timeout": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      "db_pool": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991,
+                        "description": "If `null`, no pool size is written to the project's PostgREST config and PostgREST's own default applies. The platform does not pick a value here.",
+                        "nullable": true
+                      }
+                    },
+                    "required": [
+                      "db_schema",
+                      "db_extra_search_path",
+                      "max_rows",
+                      "db_pool_acquisition_timeout",
+                      "db_pool"
+                    ]
+                  },
+                  "realtime": {
+                    "type": "object",
+                    "properties": {
+                      "private_only": { "type": "boolean" },
+                      "max_concurrent_users": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      "max_events_per_second": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      "max_bytes_per_second": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      "max_channels_per_client": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      "max_joins_per_second": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      "max_presence_events_per_second": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      "max_payload_size_in_kb": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      "presence_enabled": { "type": "boolean" },
+                      "suspend": { "type": "boolean" },
+                      "connection_pool": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991,
+                        "description": "Defaults to Realtime's pool size for the project's compute when not overridden."
+                      },
+                      "postgres_changes_pool": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991,
+                        "description": "If `null`, no override is stored and Realtime applies its own default.",
+                        "nullable": true
+                      }
+                    },
+                    "required": [
+                      "private_only",
+                      "max_concurrent_users",
+                      "max_events_per_second",
+                      "max_bytes_per_second",
+                      "max_channels_per_client",
+                      "max_joins_per_second",
+                      "max_presence_events_per_second",
+                      "max_payload_size_in_kb",
+                      "presence_enabled",
+                      "suspend",
+                      "connection_pool",
+                      "postgres_changes_pool"
+                    ]
+                  },
+                  "storage": {
+                    "type": "object",
+                    "properties": {
+                      "file_size_limit": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991,
+                        "format": "int64"
+                      },
+                      "features": {
+                        "type": "object",
+                        "properties": {
+                          "image_transformation": {
+                            "type": "object",
+                            "properties": { "enabled": { "type": "boolean" } },
+                            "required": ["enabled"]
+                          },
+                          "s3_protocol": {
+                            "type": "object",
+                            "properties": { "enabled": { "type": "boolean" } },
+                            "required": ["enabled"]
+                          },
+                          "purge_cache": {
+                            "type": "object",
+                            "properties": { "enabled": { "type": "boolean" } },
+                            "required": ["enabled"]
+                          },
+                          "iceberg_catalog": {
+                            "type": "object",
+                            "properties": {
+                              "enabled": { "type": "boolean" },
+                              "max_namespaces": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "max_tables": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "max_catalogs": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              }
+                            },
+                            "required": ["enabled", "max_namespaces", "max_tables", "max_catalogs"]
+                          },
+                          "vector_buckets": {
+                            "type": "object",
+                            "properties": {
+                              "enabled": { "type": "boolean" },
+                              "max_buckets": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "max_indexes": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              }
+                            },
+                            "required": ["enabled", "max_buckets", "max_indexes"]
+                          }
+                        },
+                        "required": [
+                          "image_transformation",
+                          "s3_protocol",
+                          "purge_cache",
+                          "iceberg_catalog",
+                          "vector_buckets"
+                        ]
+                      },
+                      "capabilities": {
+                        "type": "object",
+                        "properties": {
+                          "list_v2": { "type": "boolean" },
+                          "iceberg_catalog": { "type": "boolean" }
+                        },
+                        "required": ["list_v2", "iceberg_catalog"]
+                      },
+                      "upstream_target": { "type": "string", "enum": ["main", "canary"] },
+                      "migration_version": { "type": "string" },
+                      "database_pool_mode": { "type": "string" }
+                    },
+                    "required": [
+                      "file_size_limit",
+                      "features",
+                      "capabilities",
+                      "upstream_target",
+                      "migration_version",
+                      "database_pool_mode"
+                    ],
+                    "description": "Read from the storage service's admin API rather than the middleware DB, so unlike the rest of this resource it reflects the tenant's live config."
+                  }
+                },
+                "required": ["database", "pooler", "auth", "api", "realtime", "storage"]
+              }
+            },
+            "required": ["type", "id", "attributes"]
           }
         },
         "required": ["data"]
@@ -15999,6 +17117,18 @@
                     "database_identifier": {
                       "type": "string",
                       "description": "Identifier of the database this PrivateLink share targets - the project ref for the primary, or the read replica identifier."
+                    },
+                    "resource_access_manager_resource_config_id": {
+                      "description": "ID of the AWS VPC Lattice resource configuration backing this PrivateLink share.",
+                      "type": "string"
+                    },
+                    "resource_access_manager_resource_config_arn": {
+                      "description": "ARN of the AWS VPC Lattice resource configuration backing this PrivateLink share.",
+                      "type": "string"
+                    },
+                    "resource_access_manager_share_arn": {
+                      "description": "ARN of the AWS Resource Access Manager resource share for this association.",
+                      "type": "string"
                     }
                   },
                   "required": [
@@ -16108,6 +17238,18 @@
                   "database_identifier": {
                     "type": "string",
                     "description": "Identifier of the database this PrivateLink share targets - the project ref for the primary, or the read replica identifier."
+                  },
+                  "resource_access_manager_resource_config_id": {
+                    "description": "ID of the AWS VPC Lattice resource configuration backing this PrivateLink share.",
+                    "type": "string"
+                  },
+                  "resource_access_manager_resource_config_arn": {
+                    "description": "ARN of the AWS VPC Lattice resource configuration backing this PrivateLink share.",
+                    "type": "string"
+                  },
+                  "resource_access_manager_share_arn": {
+                    "description": "ARN of the AWS Resource Access Manager resource share for this association.",
+                    "type": "string"
                   }
                 },
                 "required": [
@@ -16120,6 +17262,230 @@
               }
             },
             "required": ["type", "id", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "V2ListWorkersResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "description": "Resource type.",
+                  "enum": ["project_worker"]
+                },
+                "id": { "type": "string", "description": "Worker name.", "example": "hello-world" },
+                "attributes": {
+                  "type": "object",
+                  "properties": {
+                    "spec": {
+                      "type": "object",
+                      "properties": {
+                        "runtime": { "example": "node", "type": "string" },
+                        "size": { "type": "string", "example": "2gb-1vcpu" },
+                        "exposure": { "type": "string", "example": "public" },
+                        "instances": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991,
+                          "example": 1
+                        }
+                      },
+                      "required": ["size", "exposure", "instances"]
+                    },
+                    "build_state": { "type": "string", "enum": ["building", "active", "failed"] },
+                    "secret_generation": { "type": "string" },
+                    "state_reason": { "type": "string" },
+                    "image_version": { "type": "string" },
+                    "deleting": { "type": "boolean" },
+                    "instances": {
+                      "type": "object",
+                      "properties": {
+                        "declared": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "live": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "ready": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "stale": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": ["declared", "live", "ready", "stale"]
+                    },
+                    "instances_error": { "type": "string" }
+                  },
+                  "required": ["spec", "build_state", "secret_generation"]
+                }
+              },
+              "required": ["type", "id", "attributes"]
+            }
+          }
+        },
+        "required": ["data"]
+      },
+      "V2WorkerResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Resource type.",
+                "enum": ["project_worker"]
+              },
+              "id": { "type": "string", "description": "Worker name.", "example": "hello-world" },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "spec": {
+                    "type": "object",
+                    "properties": {
+                      "runtime": { "example": "node", "type": "string" },
+                      "size": { "type": "string", "example": "2gb-1vcpu" },
+                      "exposure": { "type": "string", "example": "public" },
+                      "instances": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991,
+                        "example": 1
+                      }
+                    },
+                    "required": ["size", "exposure", "instances"]
+                  },
+                  "build_state": { "type": "string", "enum": ["building", "active", "failed"] },
+                  "secret_generation": { "type": "string" },
+                  "state_reason": { "type": "string" },
+                  "image_version": { "type": "string" },
+                  "deleting": { "type": "boolean" },
+                  "instances": {
+                    "type": "object",
+                    "properties": {
+                      "declared": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      "live": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      "ready": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      "stale": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      }
+                    },
+                    "required": ["declared", "live", "ready", "stale"]
+                  },
+                  "instances_error": { "type": "string" }
+                },
+                "required": ["spec", "build_state", "secret_generation"]
+              }
+            },
+            "required": ["type", "id", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "V2WorkerUploadResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Resource type.",
+                "enum": ["project_worker_upload"]
+              },
+              "id": {
+                "type": "string",
+                "description": "Upload id to pass to the deploy endpoint as `context_upload_id`.",
+                "example": "cafe0000000000000000000000000000"
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "description": "Presigned destination for the `.tar.gz` build context."
+                  },
+                  "method": { "type": "string", "example": "PUT" },
+                  "expires_at": {
+                    "type": "string",
+                    "description": "When the slot stops accepting the upload."
+                  }
+                },
+                "required": ["url", "method", "expires_at"]
+              }
+            },
+            "required": ["type", "id", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "V2DeployWorkerRequest": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Resource type.",
+                "enum": ["project_worker"]
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "spec": {
+                    "type": "object",
+                    "properties": {
+                      "runtime": { "example": "node", "type": "string" },
+                      "size": { "type": "string", "example": "2gb-1vcpu" },
+                      "exposure": { "type": "string", "example": "public" },
+                      "instances": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991,
+                        "example": 1
+                      }
+                    },
+                    "required": ["size", "exposure", "instances"]
+                  },
+                  "context_upload_id": {
+                    "description": "Id of a build context staged through the uploads endpoint. Required unless `runtime` is set.",
+                    "type": "string"
+                  }
+                },
+                "required": ["spec"]
+              }
+            },
+            "required": ["type", "attributes"]
           }
         },
         "required": ["data"]
@@ -16386,7 +17752,9 @@
                     "email": {
                       "type": "string",
                       "format": "email",
-                      "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                      "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+                      "description": "Email address of the invitation receipient.",
+                      "example": "hello@example.com"
                     },
                     "role": {
                       "type": "string",
@@ -16396,6 +17764,7 @@
                     },
                     "projects": {
                       "description": "The projects to limit a user to. If omitted, user will have org-wide access with the provided role.",
+                      "examples": [{ "ref": "abcjuqabhgwjjutfvtpa" }],
                       "minItems": 1,
                       "type": "array",
                       "items": {
@@ -16477,7 +17846,9 @@
                         "email": {
                           "type": "string",
                           "format": "email",
-                          "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                          "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+                          "description": "Email address of the invitation receipient.",
+                          "example": "hello@example.com"
                         }
                       },
                       "required": ["email"]
@@ -16505,7 +17876,9 @@
                     "email": {
                       "type": "string",
                       "format": "email",
-                      "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                      "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+                      "description": "Email address of the invitation receipient.",
+                      "example": "hello@example.com"
                     }
                   },
                   "required": ["email"]
@@ -16538,7 +17911,9 @@
                     "email": {
                       "type": "string",
                       "format": "email",
-                      "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                      "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+                      "description": "Email address of the invitation receipient.",
+                      "example": "hello@example.com"
                     }
                   },
                   "required": ["email"]
@@ -16569,7 +17944,9 @@
                     "email": {
                       "type": "string",
                       "format": "email",
-                      "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                      "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+                      "description": "Email address of the invitation receipient.",
+                      "example": "hello@example.com"
                     }
                   },
                   "required": ["email"]

@@ -15,7 +15,7 @@ type ListGitHubConnectionsResponse = platformComponents['schemas']['ListGitHubCo
 type GetGitHubConnectionConfigResponse =
   platformComponents['schemas']['GetGitHubConnectionConfigResponse']
 type BranchResponse = apiV1Components['schemas']['BranchResponse']
-type V2ProjectConfigResponse = apiV2Components['schemas']['V2ProjectConfigResponse']
+type V2ProjectConfigResponse = apiV2Components['schemas']['V2ProjectConfigResponse_Output']
 
 const PROJECT_REF = 'default'
 const ORGANIZATION_ID = 1
@@ -120,6 +120,7 @@ function createProjectConfigResponse(auth: Record<string, unknown>): V2ProjectCo
         },
         auth,
         database: {
+          major_version: 17,
           network_restrictions: {
             allowed_cidrs: [],
             entitlement: 'disallowed',

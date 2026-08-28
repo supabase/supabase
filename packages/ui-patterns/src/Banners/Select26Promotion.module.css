@@ -7,6 +7,7 @@
 }
 
 .field {
+  width: max-content;
   font-family: 'Departure Mono Superbase', ui-monospace, monospace;
   font-weight: 400;
   letter-spacing: 0;
@@ -28,6 +29,24 @@
   --select26-b2: #95e6b8;
   --select26-b3: #e1fcd7;
   --select26-b4: #ffffff;
+}
+
+.row {
+  display: grid;
+  width: fit-content;
+  flex-shrink: 0;
+}
+
+.fieldAlignStart {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.fieldAlignEnd {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 .cell {
