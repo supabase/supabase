@@ -14,7 +14,7 @@ const Select = SelectPrimitive.Root
 const SelectGroup = SelectPrimitive.Group
 
 const selectTriggerClassName =
-  'flex w-full items-center justify-between rounded-md border border-strong hover:border-control-hover bg-control-raised text-xs data-[placeholder]:text-foreground-lighter ring-border-control focus-ring disabled:cursor-not-allowed disabled:opacity-50 transition-colors duration-200 data-[state=open]:border-control-hover gap-2 [&>span]:truncate text-left'
+  'flex w-full cursor-pointer items-center justify-between rounded-md border border-strong hover:border-control-hover bg-control-raised text-xs data-[placeholder]:text-foreground-lighter ring-border-control focus-ring disabled:cursor-not-allowed disabled:opacity-50 transition-colors duration-200 data-[state=open]:border-control-hover gap-2 [&>span]:truncate text-left'
 
 // If placeholder is a string, wrap it in a span. This is to avoid page crashes when using Google Translate.
 // https://github.com/radix-ui/primitives/issues/2578#issuecomment-1890801041 for more info.
