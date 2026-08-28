@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { BarChart, Shield } from 'lucide-react'
+import { Shield } from 'lucide-react'
 import { useCallback, useMemo } from 'react'
 import { AiIconAnimation, Badge, Button, Card, CardContent, CardHeader, CardTitle, cn } from 'ui'
 import { Row } from 'ui-patterns/Row'
@@ -17,9 +17,11 @@ import {
   severityBadgeVariants,
   severityColorClasses,
   sortAdvisorItems,
+  tabIconMap,
 } from '@/components/ui/AdvisorPanel/AdvisorPanel.utils'
 import { useAdvisorSignals } from '@/components/ui/AdvisorPanel/useAdvisorSignals'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
+import { useProjectHealthLintsQuery } from '@/data/lint/health-lints-query'
 import { useProjectLintsQuery } from '@/data/lint/lint-query'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAdvisorStateSnapshot } from '@/state/advisor-state'
@@ -38,15 +40,21 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
     { enabled: !showEmptyState }
   )
 
+  const { data: healthLints } = useProjectHealthLintsQuery(
+    { projectRef },
+    { enabled: !showEmptyState }
+  )
+
   const { data: signalItems } = useAdvisorSignals({ projectRef, enabled: !showEmptyState })
 
   const advisorItems = useMemo<AdvisorItem[]>(() => {
-    const criticalLintItems = createAdvisorLintItems(lints).filter(
-      (item) => item.source === 'lint' && item.original.level === LINTER_LEVELS.ERROR
-    )
+    const criticalLintItems = createAdvisorLintItems([
+      ...(lints ?? []),
+      ...(healthLints ?? []),
+    ]).filter((item) => item.source === 'lint' && item.original.level === LINTER_LEVELS.ERROR)
 
     return sortAdvisorItems([...criticalLintItems, ...signalItems])
-  }, [lints, signalItems])
+  }, [lints, healthLints, signalItems])
 
   const visibleAdvisorItems = useMemo(
     () => advisorItems.slice(0, MAX_HOMEPAGE_ADVISOR_ITEMS),
@@ -136,7 +144,8 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
           <Row maxColumns={4} minWidth={280}>
             {visibleAdvisorItems.map((item) => {
               const isLint = item.source === 'lint'
-              const categoryLabel = item.tab === 'performance' ? 'PERFORMANCE' : 'SECURITY'
+              const categoryLabel = item.tab.toUpperCase()
+              const CategoryIcon = tabIconMap[item.tab]
               const title = getAdvisorItemDisplayTitle(item)
               const description =
                 item.source === 'signal' ? item.summary : isLint ? item.original.detail : ''
@@ -160,19 +169,11 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
                 >
                   <CardHeader className="border-b-0 shrink-0 flex flex-row gap-2 space-y-0 justify-between items-center">
                     <div className="flex flex-row items-center gap-3">
-                      {item.tab === 'security' ? (
-                        <Shield
-                          size={16}
-                          strokeWidth={1.5}
-                          className={severityColorClasses[item.severity]}
-                        />
-                      ) : (
-                        <BarChart
-                          size={16}
-                          strokeWidth={1.5}
-                          className={severityColorClasses[item.severity]}
-                        />
-                      )}
+                      <CategoryIcon
+                        size={16}
+                        strokeWidth={1.5}
+                        className={severityColorClasses[item.severity]}
+                      />
                       <CardTitle className="text-foreground-light">{categoryLabel}</CardTitle>
                     </div>
                     <div className="flex items-center gap-2">
