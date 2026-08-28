@@ -104,6 +104,51 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
     setPipelineValidationFailures([])
   }, [])
 
+  const validateDestinationConfiguration = async ({
+    data,
+    onValidationFail,
+  }: {
+    data: z.infer<typeof FormSchema>
+    onValidationFail: () => void
+  }) => {
+    if (!projectRef) return { canContinue: false, warnings: [] }
+
+    setHasRunValidation(true)
+
+    try {
+      const result = await validateDestination({
+        projectRef,
+        destinationConfig: buildDestinationConfigForValidation({
+          projectRef,
+          selectedType,
+          data,
+        }),
+      })
+      const failures = result.validation_failures
+      const warnings = failures.filter((failure) => failure.failure_type === 'warning')
+      const hasCriticalFailure = failures.some((failure) => failure.failure_type === 'critical')
+
+      setDestinationValidationFailures(failures)
+      if (hasCriticalFailure) onValidationFail()
+
+      return {
+        canContinue: !hasCriticalFailure,
+        warnings,
+      }
+    } catch {
+      setDestinationValidationFailures([
+        {
+          failure_type: 'critical',
+          name: 'Could not test connection',
+          reason:
+            "We couldn't test this destination. Check your credentials and connection settings, then try again.",
+        },
+      ])
+      onValidationFail()
+      return { canContinue: false, warnings: [] }
+    }
+  }
+
   // Helper function to validate configuration
   const validateConfiguration = async ({
     data,
@@ -315,6 +360,7 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
 
   return {
     isValidating,
+    validateDestinationConfiguration,
     validateConfiguration,
     isSaving,
     submitPipeline,

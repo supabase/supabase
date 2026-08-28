@@ -22,6 +22,7 @@ import {
   cn,
   Form,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
@@ -88,6 +89,7 @@ import {
   CONNECTION_VALIDATION_HINT,
   DATA_VALIDATION_HINT,
   PipelineValidationAdmonition,
+  SANDWICHED_ADMONITION_CLASS,
 } from './PipelineValidationAdmonition'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
 import { useRegisterIsolatedStudioFlowClose } from '@/components/layouts/Navigation/LayoutHeader/IsolatedStudioFlowClose'
@@ -127,6 +129,12 @@ export const CreatePipelineWizard = () => {
   const [step, setStep] = useState<PipelineCreateStepId>('destination')
   const [showValidationWarningsDialog, setShowValidationWarningsDialog] = useState(false)
   const [showCostDialog, setShowCostDialog] = useState(false)
+  const [validatedConnectionSignature, setValidatedConnectionSignature] = useState<string | null>(
+    null
+  )
+  const [verifiedConnectionSignature, setVerifiedConnectionSignature] = useState<string | null>(
+    null
+  )
   const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
   const [newBucketSheetVisible, setNewBucketSheetVisible] = useState(false)
   const [pendingFormValues, setPendingFormValues] = useState<z.infer<typeof FormSchema> | null>(
@@ -203,6 +211,7 @@ export const CreatePipelineWizard = () => {
 
   const {
     isValidating,
+    validateDestinationConfiguration,
     validateConfiguration,
     isSaving,
     submitPipeline,
@@ -283,6 +292,13 @@ export const CreatePipelineWizard = () => {
   const { isDirty } = form.formState
   const formValues = useWatch({ control: form.control }) ?? defaultValues
   const { publicationName } = formValues
+  const connectionSignature = JSON.stringify([
+    selectedType,
+    ...(selectedType === null
+      ? []
+      : getPipelineCreateConnectionStepFieldNames(selectedType).map((field) => formValues[field])),
+  ])
+  const isConnectionVerified = verifiedConnectionSignature === connectionSignature
 
   const publicationNames = useMemo(() => publications.map((pub) => pub.name), [publications])
   const isSelectedPublicationMissing =
@@ -415,7 +431,10 @@ export const CreatePipelineWizard = () => {
         }, 100)
       },
     })
-    if (!validationResult.canContinue) return
+    if (!validationResult.canContinue) {
+      setVerifiedConnectionSignature(null)
+      return
+    }
 
     const hasWarnings = validationResult.warnings.length > 0
     const warningsUnchanged =
@@ -459,6 +478,11 @@ export const CreatePipelineWizard = () => {
     }
 
     if (step === 'connection' && selectedType) {
+      if (isConnectionVerified) {
+        setStep('data')
+        return
+      }
+
       const valid = await form.trigger(getPipelineCreateConnectionStepFieldNames(selectedType))
       if (!valid) return
 
@@ -472,7 +496,21 @@ export const CreatePipelineWizard = () => {
         }
       }
 
-      setStep('data')
+      const validationResult = await validateDestinationConfiguration({
+        data: form.getValues(),
+        onValidationFail: () => {
+          setTimeout(() => {
+            validationSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          }, 100)
+        },
+      })
+      setValidatedConnectionSignature(connectionSignature)
+      if (!validationResult.canContinue) {
+        setVerifiedConnectionSignature(null)
+        return
+      }
+
+      setVerifiedConnectionSignature(connectionSignature)
       return
     }
 
@@ -603,6 +641,10 @@ export const CreatePipelineWizard = () => {
             currentStep={step}
             onStepChange={(nextStep) => setStep(nextStep as PipelineCreateStepId)}
             nextDisabled={nextDisabled}
+            nextLabel={
+              step === 'connection' && !isConnectionVerified ? 'Test connection' : 'Continue'
+            }
+            nextLoading={step === 'connection' && isValidating}
             onNext={handleNext}
             onCancel={confirmOnClose}
             navigationDisabled={isSaving || isValidating}
@@ -662,19 +704,24 @@ export const CreatePipelineWizard = () => {
                     <ClickHouseFields form={form} editMode={false} className="p-0" />
                   )}
                 </CardContent>
-                <CardContent>
-                  <AdvancedSettings
-                    type={selectedType}
-                    form={form}
-                    group="connection"
-                    className="px-0"
-                  />
-                </CardContent>
-                {hasRunValidation && !isValidating && (
-                  <PipelineValidationAdmonition
-                    failures={destinationValidationFailures}
-                    hint={CONNECTION_VALIDATION_HINT}
-                  />
+                <AdvancedSettings type={selectedType} form={form} group="connection" flush />
+                {hasRunValidation &&
+                  validatedConnectionSignature === connectionSignature &&
+                  !isValidating && (
+                    <PipelineValidationAdmonition
+                      ref={validationSectionRef}
+                      failures={destinationValidationFailures}
+                      hint={CONNECTION_VALIDATION_HINT}
+                    />
+                  )}
+                {isConnectionVerified && (
+                  <Admonition
+                    type="success"
+                    title="Ready to continue"
+                    className={SANDWICHED_ADMONITION_CLASS}
+                  >
+                    Supabase can connect to this destination.
+                  </Admonition>
                 )}
               </>
             )}
@@ -695,9 +742,7 @@ export const CreatePipelineWizard = () => {
                 <CardContent>
                   <TableCopySelection form={form} editMode={false} />
                 </CardContent>
-                <CardContent>
-                  <AdvancedSettings type={selectedType} form={form} group="data" className="px-0" />
-                </CardContent>
+                <AdvancedSettings type={selectedType} form={form} group="data" flush />
                 {hasRunValidation && !isValidating && (
                   <PipelineValidationAdmonition
                     failures={pipelineValidationFailures}

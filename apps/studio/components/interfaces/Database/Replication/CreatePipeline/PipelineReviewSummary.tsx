@@ -212,12 +212,12 @@ const getDestinationRows = (
       {
         label: 'Project ID',
         value: values.projectId || '—',
-        description: 'The Google Cloud project ID where data will be sent',
+        description: 'The Google Cloud project ID where data will be sent.',
       },
       {
         label: 'Dataset ID',
         value: values.datasetId || '—',
-        description: 'The BigQuery dataset where replicated tables will be created',
+        description: 'The BigQuery dataset where replicated tables will be created.',
       },
     ]
   }

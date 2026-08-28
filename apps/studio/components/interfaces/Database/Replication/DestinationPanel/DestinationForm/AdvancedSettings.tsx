@@ -31,26 +31,30 @@ import { type DestinationPanelSchemaType } from './DestinationForm.schema'
 
 export type AdvancedSettingsGroup = 'all' | 'connection' | 'data'
 
-const CONNECTION_DESCRIPTION = 'Optional settings for how data is written to the destination.'
 const DATA_DESCRIPTION = 'Optional settings for initial sync and replication slots.'
 const ALL_DESCRIPTION = 'Optional settings to control the pipeline in more depth.'
+
+const getConnectionDescription = (type: DestinationType) =>
+  `Optional settings for how data is written to ${type}.`
 
 export const AdvancedSettings = ({
   type,
   form,
   group = 'all',
+  flush = false,
   className,
 }: {
   type: DestinationType
   form: UseFormReturn<DestinationPanelSchemaType>
   group?: AdvancedSettingsGroup
+  flush?: boolean
   className?: string
 }) => {
   const showConnection = group === 'all' || group === 'connection'
   const showData = group === 'all' || group === 'data'
   const description =
     group === 'connection'
-      ? CONNECTION_DESCRIPTION
+      ? getConnectionDescription(type)
       : group === 'data'
         ? DATA_DESCRIPTION
         : ALL_DESCRIPTION
@@ -62,16 +66,26 @@ export const AdvancedSettings = ({
     }
 
   return (
-    <div className={cn('px-5', className)}>
+    <div className={cn(flush ? 'border-b last:border-none' : 'px-5', className)}>
       <Accordion type="single" collapsible>
         <AccordionItem value="item-1" className="border-none">
-          <AccordionTrigger className="font-normal gap-2 justify-between text-sm py-3 hover:no-underline">
+          <AccordionTrigger
+            className={cn(
+              'font-normal gap-2 justify-between text-sm py-3 hover:no-underline',
+              flush && 'rounded-none px-(--card-padding-x) py-4'
+            )}
+          >
             <div className="flex flex-col items-start gap-0.5">
               <span className="text-sm font-medium">Advanced settings</span>
               <span className="text-sm text-foreground-lighter font-normal">{description}</span>
             </div>
           </AccordionTrigger>
-          <AccordionContent className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4">
+          <AccordionContent
+            className={cn(
+              'pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4',
+              flush && 'px-(--card-padding-x)'
+            )}
+          >
             {showConnection && (
               <FormField
                 control={form.control}
