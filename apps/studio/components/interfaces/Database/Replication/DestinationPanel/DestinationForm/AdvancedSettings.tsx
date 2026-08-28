@@ -269,7 +269,7 @@ export const AdvancedSettings = ({
                         )
                       }
                       layout="horizontal"
-                      description="How old query results can be while BigQuery applies ongoing changes."
+                      description="Leave blank for freshest results. When set, the maximum age of query results while BigQuery applies ongoing changes."
                     >
                       <FormControl>
                         <InputGroup>
@@ -280,7 +280,6 @@ export const AdvancedSettings = ({
                             step={1}
                             value={field.value ?? ''}
                             onChange={handleNumberChange(field)}
-                            placeholder="Default: None (Freshest results)"
                           />
                           <InputGroupAddon align="inline-end">
                             <InputGroupText>minutes</InputGroupText>
