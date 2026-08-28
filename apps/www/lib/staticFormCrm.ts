@@ -10,20 +10,41 @@ import type { GoFormCrmConfig } from 'marketing'
 export const staticFormCrmRegistry: Record<string, GoFormCrmConfig> = {
   'partners/become-a-partner': {
     hubspot: {
+      // TODO: set HUBSPOT_PARTNER_INTAKE_FORM_GUID to
+      // '652a3eed-8d06-45fb-9376-f5aeb0e3f5dc' (portal 19953346) — the real
+      // "Become a Partner" form, confirmed against the live HubSpot schema.
+      // This env var is currently unset, so the HubSpot leg no-ops today.
       formGuid: process.env.HUBSPOT_PARTNER_INTAKE_FORM_GUID ?? '',
       fieldMap: {
         first_name: 'firstname',
         last_name: 'lastname',
+        company_size: 'how_many_people_are_on_your_team_',
         partner_type: 'type_of_partners',
         // Bound to the Company object's `name`/`website` properties (not
         // Contact) in the HubSpot form — the `0-2/` prefix tells
         // HubSpotClient to submit these against objectTypeId '0-2'.
         company_name: '0-2/name',
         company_website: '0-2/website',
+        solution_product_name: 'solution_you_provide',
+        integration_problem_description:
+          'what_problem_does_your_integration_solve_for_a_supabase_customer',
+        integration_docs_link: 'link_to_documentation',
+        partnerships_website: 'can_you_share_your_companys_partnerships_website',
+        services_offered: 'what_services_do_you_offer',
+        operating_regions: 'which_regions_do_you_operate_in',
+        supabase_postgres_experience: 'do_you_have_existing_supabase_or_postgres_experience',
+        client_types: 'what_type_of_clients_do_you_typically_work_with',
+        startup_program_type: 'describe_your_program',
+        startup_stage: 'what_stage_of_startups_do_you_typically_work_with',
+        startup_capital_deployment:
+          'do_you_deploy_capital_into_your_portfoliocohort_if_so_how_much',
+        additional_details: 'any_other_details_youd_like_us_to_know',
+        // `email` and `integration_readiness` are omitted — their app field
+        // name already matches the HubSpot property name exactly.
       },
     },
     // TODO(DEBR-271): add Notion once a real Tech Partner Intake database_id
     // exists and NOTION_FORMS_API_KEY is set — gate to Technology partners only,
-    // e.g. sendWhen: { field: 'partner_type', equals: 'technology' }.
+    // e.g. sendWhen: { field: 'partner_type', equals: 'Tech Partner' }.
   },
 }

@@ -1,0 +1,396 @@
+{
+  "portalId": 19953346,
+  "formGuid": "652a3eed-8d06-45fb-9376-f5aeb0e3f5dc",
+  "submitText": "Submit",
+  "fields": [
+    {
+      "name": "firstname",
+      "label": "First name",
+      "fieldType": "text",
+      "required": true,
+      "options": []
+    },
+    {
+      "name": "lastname",
+      "label": "Last name",
+      "fieldType": "text",
+      "required": true,
+      "options": []
+    },
+    {
+      "name": "email",
+      "label": "Email",
+      "fieldType": "text",
+      "required": true,
+      "options": []
+    },
+    {
+      "name": "name",
+      "label": "Company name",
+      "fieldType": "text",
+      "required": true,
+      "options": []
+    },
+    {
+      "name": "website",
+      "label": "Company website",
+      "fieldType": "text",
+      "required": true,
+      "options": []
+    },
+    {
+      "name": "how_many_people_are_on_your_team_",
+      "label": "How many people work at your company?",
+      "fieldType": "select",
+      "required": true,
+      "options": [
+        {
+          "label": "1-5",
+          "value": "1-5"
+        },
+        {
+          "label": "6-10",
+          "value": "6-10"
+        },
+        {
+          "label": "21-50",
+          "value": "21-50"
+        },
+        {
+          "label": "51-100",
+          "value": "51-100"
+        },
+        {
+          "label": "100+",
+          "value": "100+"
+        }
+      ]
+    },
+    {
+      "name": "type_of_partners",
+      "label": "Type of Partner",
+      "fieldType": "select",
+      "required": true,
+      "options": [
+        {
+          "label": "Marketplace Partners - I'm building a tool that plugs into an existing Supabase project.",
+          "value": "Technology Partners"
+        },
+        {
+          "label": "Technology Partners - I'm building a tool that plugs into an existing Supabase project.",
+          "value": "Tech Partner"
+        },
+        {
+          "label": "Solution Partners - I’m helping my customers build products using Supabase as a solution partner.",
+          "value": "Solution Partners"
+        },
+        {
+          "label": "Startup Partners - I’m helping startups access Supabase.",
+          "value": "Startup Partners"
+        },
+        {
+          "label": "Other",
+          "value": "Other"
+        }
+      ]
+    },
+    {
+      "name": "solution_you_provide",
+      "label": "Solution / Product name",
+      "fieldType": "textarea",
+      "required": true,
+      "options": [],
+      "dependsOn": {
+        "field": "type_of_partners",
+        "values": [
+          "Technology Partners",
+          "Tech Partner"
+        ]
+      }
+    },
+    {
+      "name": "what_problem_does_your_integration_solve_for_a_supabase_customer",
+      "label": "What problem does your integration solve for a Supabase customer?",
+      "fieldType": "textarea",
+      "required": true,
+      "options": [],
+      "dependsOn": {
+        "field": "type_of_partners",
+        "values": [
+          "Technology Partners",
+          "Tech Partner"
+        ]
+      }
+    },
+    {
+      "name": "link_to_documentation",
+      "label": "Link to integration documentation",
+      "fieldType": "text",
+      "required": true,
+      "options": [],
+      "dependsOn": {
+        "field": "type_of_partners",
+        "values": [
+          "Technology Partners",
+          "Tech Partner"
+        ]
+      }
+    },
+    {
+      "name": "integration_readiness",
+      "label": "Integration readiness",
+      "fieldType": "select",
+      "required": true,
+      "options": [
+        {
+          "label": "Our product already works with Supabase (users connect today)",
+          "value": "Our product already works with Supabase (users connect today)"
+        },
+        {
+          "label": "We have a working integration or proof of concept",
+          "value": "We have a working integration or proof of concept"
+        },
+        {
+          "label": "We've scoped the integration but haven't built it yet",
+          "value": "We've scoped the integration but haven't built it yet"
+        },
+        {
+          "label": "We're exploring, no integration work has started",
+          "value": "We're exploring, no integration work has started"
+        }
+      ],
+      "dependsOn": {
+        "field": "type_of_partners",
+        "values": [
+          "Technology Partners",
+          "Tech Partner"
+        ]
+      }
+    },
+    {
+      "name": "describe_your_program",
+      "label": "Describe your program",
+      "fieldType": "select",
+      "required": false,
+      "options": [
+        {
+          "label": "VC",
+          "value": "VC"
+        },
+        {
+          "label": "Accelerator",
+          "value": "Accelerator"
+        },
+        {
+          "label": "Ecosystem",
+          "value": "Ecosystem"
+        },
+        {
+          "label": "Education",
+          "value": "Education"
+        }
+      ],
+      "dependsOn": {
+        "field": "type_of_partners",
+        "values": [
+          "Startup Partners"
+        ]
+      }
+    },
+    {
+      "name": "what_services_do_you_offer",
+      "label": "What services do you offer?",
+      "fieldType": "checkbox",
+      "required": true,
+      "options": [
+        {
+          "label": "Build & implementation",
+          "value": "Build & implementation"
+        },
+        {
+          "label": "Database migration",
+          "value": "Database migration"
+        },
+        {
+          "label": "Auth & identity migration",
+          "value": "Auth & identity migration"
+        },
+        {
+          "label": "Technical consulting & advisory",
+          "value": "Technical consulting & advisory"
+        },
+        {
+          "label": "Managed services",
+          "value": "Managed services"
+        },
+        {
+          "label": "Reseller & VAR",
+          "value": "Reseller & VAR"
+        },
+        {
+          "label": "Other",
+          "value": "Other"
+        }
+      ],
+      "dependsOn": {
+        "field": "type_of_partners",
+        "values": [
+          "Solution Partners"
+        ]
+      }
+    },
+    {
+      "name": "which_regions_do_you_operate_in",
+      "label": "Which regions do you operate in?",
+      "fieldType": "checkbox",
+      "required": true,
+      "options": [
+        {
+          "label": "North America",
+          "value": "North America"
+        },
+        {
+          "label": "EMEA",
+          "value": "EMEA"
+        },
+        {
+          "label": "APAC",
+          "value": "APAC"
+        },
+        {
+          "label": "LATAM",
+          "value": "LATAM"
+        },
+        {
+          "label": "Global",
+          "value": "Global"
+        }
+      ],
+      "dependsOn": {
+        "field": "type_of_partners",
+        "values": [
+          "Solution Partners"
+        ]
+      }
+    },
+    {
+      "name": "do_you_have_existing_supabase_or_postgres_experience",
+      "label": "Do you have existing Supabase or Postgres experience?",
+      "fieldType": "select",
+      "required": false,
+      "options": [
+        {
+          "label": "Yes — active client projects on Supabase",
+          "value": "Yes — active client projects on Supabase"
+        },
+        {
+          "label": "Yes — internal or personal projects only",
+          "value": "Yes — internal or personal projects only"
+        },
+        {
+          "label": "Postgres experience but not Supabase yet",
+          "value": "Postgres experience but not Supabase yet"
+        },
+        {
+          "label": "No experience yet",
+          "value": "No experience yet"
+        }
+      ],
+      "dependsOn": {
+        "field": "type_of_partners",
+        "values": [
+          "Solution Partners"
+        ]
+      }
+    },
+    {
+      "name": "what_type_of_clients_do_you_typically_work_with",
+      "label": "What type of clients do you typically work with?",
+      "fieldType": "checkbox",
+      "required": true,
+      "options": [
+        {
+          "label": "Startups",
+          "value": "Startups"
+        },
+        {
+          "label": "SMB",
+          "value": "SMB"
+        },
+        {
+          "label": "Mid-market",
+          "value": "Mid-market"
+        },
+        {
+          "label": "Enterprise",
+          "value": "Enterprise"
+        },
+        {
+          "label": "Mixed",
+          "value": "Mixed"
+        }
+      ],
+      "dependsOn": {
+        "field": "type_of_partners",
+        "values": [
+          "Solution Partners"
+        ]
+      }
+    },
+    {
+      "name": "can_you_share_your_companys_partnerships_website",
+      "label": "Can you share your company’s partnerships website?",
+      "fieldType": "text",
+      "required": false,
+      "options": [],
+      "dependsOn": {
+        "field": "type_of_partners",
+        "values": [
+          "Technology Partners",
+          "Tech Partner"
+        ]
+      }
+    },
+    {
+      "name": "what_stage_of_startups_do_you_typically_work_with",
+      "label": "What stage of startups do you typically work with?",
+      "fieldType": "text",
+      "required": true,
+      "options": [],
+      "description": "Bootstrapped, Pre-seed/Seed, Series A - C, Series D and beyond",
+      "dependsOn": {
+        "field": "type_of_partners",
+        "values": [
+          "Startup Partners"
+        ]
+      }
+    },
+    {
+      "name": "do_you_deploy_capital_into_your_portfoliocohort_if_so_how_much",
+      "label": "Do you deploy capital into your portfolio/cohort? If so how much?",
+      "fieldType": "text",
+      "required": false,
+      "options": [],
+      "dependsOn": {
+        "field": "type_of_partners",
+        "values": [
+          "Startup Partners"
+        ]
+      }
+    },
+    {
+      "name": "any_other_details_youd_like_us_to_know",
+      "label": "Any other details you'd like us to know?",
+      "fieldType": "textarea",
+      "required": false,
+      "options": []
+    },
+    {
+      "name": "how_many_people_work_at_your_company",
+      "label": "How many people work at your company?\"",
+      "fieldType": "text",
+      "required": false,
+      "options": []
+    }
+  ]
+}
