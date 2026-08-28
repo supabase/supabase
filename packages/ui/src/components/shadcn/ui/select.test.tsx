@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { ComboboxTrigger } from './select'
+import { ComboboxTrigger } from './select-trigger'
 
 describe('ComboboxTrigger', () => {
   it('matches the raised select trigger styling', () => {
