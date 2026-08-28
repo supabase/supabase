@@ -2,6 +2,8 @@ import { describe, expect, test } from 'vitest'
 
 import {
   appendConnectionStringParams,
+  applyTemporaryAccessToConnectionString,
+  applyTemporaryAccessToPooler,
   buildConnectionParameters,
   buildConnectionStringWithPassword,
   buildJdbcString,
@@ -11,6 +13,8 @@ import {
   parseConnectionParams,
   PASSWORD_PLACEHOLDER,
   resolveConnectionString,
+  shouldAddTemporaryAccessPoolerOption,
+  TOKEN_PASSWORD_PLACEHOLDER,
 } from '../ConnectionString.utils'
 
 describe('parseConnectionParams', () => {
@@ -252,5 +256,99 @@ describe('buildConnectionParameters', () => {
       { key: 'database', value: 'd' },
       { key: 'user', value: 'u' },
     ])
+  })
+})
+
+describe('applyTemporaryAccessToConnectionString', () => {
+  test('rewrites a direct URI user and password placeholder', () => {
+    const uri = `postgresql://postgres:${PASSWORD_PLACEHOLDER}@db.proj.supabase.co:5432/postgres?sslmode=require`
+
+    expect(applyTemporaryAccessToConnectionString('', { role: 'analytics' })).toBe('')
+    expect(applyTemporaryAccessToConnectionString(uri, { role: '' })).toBe(uri)
+    expect(applyTemporaryAccessToConnectionString(uri, { role: 'analytics' })).toBe(
+      `postgresql://analytics:${TOKEN_PASSWORD_PLACEHOLDER}@db.proj.supabase.co:5432/postgres?sslmode=require`
+    )
+  })
+
+  test('appends jit on shared pooler URIs once', () => {
+    const uri = `postgresql://postgres.projref:${PASSWORD_PLACEHOLDER}@aws-0-eu-west-1.pooler.supabase.com:6543/postgres`
+    const withJit = applyTemporaryAccessToConnectionString(uri, {
+      role: 'analytics',
+      addPoolerJitOption: true,
+    })
+
+    expect(withJit).toBe(
+      `postgresql://analytics.projref:${TOKEN_PASSWORD_PLACEHOLDER}@aws-0-eu-west-1.pooler.supabase.com:6543/postgres?options=-c%20jit%3dtrue`
+    )
+    expect(
+      applyTemporaryAccessToConnectionString(withJit, {
+        role: 'analytics',
+        addPoolerJitOption: true,
+      })
+    ).toBe(withJit)
+  })
+})
+
+describe('applyTemporaryAccessToPooler', () => {
+  test('rewrites every URI slot and only adds jit on shared pooler strings', () => {
+    const rewritten = applyTemporaryAccessToPooler(
+      {
+        transactionShared: `postgresql://postgres.proj:${PASSWORD_PLACEHOLDER}@pooler:6543/postgres`,
+        sessionShared: `postgresql://postgres.proj:${PASSWORD_PLACEHOLDER}@pooler:5432/postgres`,
+        transactionDedicated: `postgresql://postgres.proj:${PASSWORD_PLACEHOLDER}@dedicated:6543/postgres`,
+        sessionDedicated: `postgresql://postgres:${PASSWORD_PLACEHOLDER}@db.host:5432/postgres`,
+        ipv4SupportedForDedicatedPooler: true,
+        direct: `postgresql://postgres:${PASSWORD_PLACEHOLDER}@db.host:5432/postgres`,
+      },
+      'analytics'
+    )
+
+    expect(rewritten.direct).toBe(
+      `postgresql://analytics:${TOKEN_PASSWORD_PLACEHOLDER}@db.host:5432/postgres`
+    )
+    expect(rewritten.transactionShared).toContain('options=-c%20jit%3dtrue')
+    expect(rewritten.sessionShared).toContain('options=-c%20jit%3dtrue')
+    expect(rewritten.transactionDedicated).not.toContain('jit')
+    expect(rewritten.sessionDedicated).not.toContain('jit')
+  })
+})
+
+describe('shouldAddTemporaryAccessPoolerOption', () => {
+  test('is true only for shared pooler connections', () => {
+    expect(
+      shouldAddTemporaryAccessPoolerOption({
+        connectionMethod: 'direct',
+        useSharedPooler: false,
+        hasDedicatedPooler: true,
+      })
+    ).toBe(false)
+    expect(
+      shouldAddTemporaryAccessPoolerOption({
+        connectionMethod: 'session',
+        useSharedPooler: false,
+        hasDedicatedPooler: true,
+      })
+    ).toBe(true)
+    expect(
+      shouldAddTemporaryAccessPoolerOption({
+        connectionMethod: 'transaction',
+        useSharedPooler: true,
+        hasDedicatedPooler: true,
+      })
+    ).toBe(true)
+    expect(
+      shouldAddTemporaryAccessPoolerOption({
+        connectionMethod: 'transaction',
+        useSharedPooler: false,
+        hasDedicatedPooler: true,
+      })
+    ).toBe(false)
+    expect(
+      shouldAddTemporaryAccessPoolerOption({
+        connectionMethod: 'transaction',
+        useSharedPooler: false,
+        hasDedicatedPooler: false,
+      })
+    ).toBe(true)
   })
 })

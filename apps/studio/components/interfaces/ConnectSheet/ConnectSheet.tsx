@@ -8,6 +8,8 @@ import type { ConnectMode, ProjectKeys } from './Connect.types'
 import { ConnectConfigSection, ModeSelector } from './ConnectConfigSection'
 import { resolveConnectSheetHydration } from './ConnectSheet.utils'
 import { ConnectStepsSection } from './ConnectStepsSection'
+import { TemporaryAccessConnectionProvider } from './TemporaryAccessConnectionProvider'
+import { TemporaryAccessRoleField } from './TemporaryAccessRoleField'
 import { useAvailableConnectModes } from './useAvailableConnectModes'
 import { useConnectSheetParams } from './useConnectSheetParams'
 import { useConnectSheetShortcut } from './useConnectSheetShortcut'
@@ -168,28 +170,35 @@ export const ConnectSheet = () => {
           <SheetDescription>Choose how you want to use Supabase</SheetDescription>
         </SheetHeader>
 
-        <div className="flex min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden divide-y">
-          <div className="p-8">
-            <ModeSelector
-              modes={availableModes}
-              selected={state.mode}
-              onChange={handleModeChange}
-            />
-          </div>
-
-          {activeFields.length > 0 && (
+        <TemporaryAccessConnectionProvider enabled={showConnect}>
+          <div className="flex min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden divide-y">
             <div className="p-8">
-              <ConnectConfigSection
-                state={state}
-                activeFields={activeFields}
-                onFieldChange={handleFieldChange}
-                getFieldOptions={getFieldOptions}
+              <ModeSelector
+                modes={availableModes}
+                selected={state.mode}
+                onChange={handleModeChange}
               />
             </div>
-          )}
 
-          <ConnectStepsSection steps={resolvedSteps} state={state} projectKeys={projectKeys} />
-        </div>
+            {activeFields.length > 0 && (
+              <div className="p-8">
+                <ConnectConfigSection
+                  state={state}
+                  activeFields={activeFields}
+                  onFieldChange={handleFieldChange}
+                  getFieldOptions={getFieldOptions}
+                  insertAfter={
+                    state.mode === 'direct'
+                      ? { fieldId: 'connectionSource', node: <TemporaryAccessRoleField /> }
+                      : undefined
+                  }
+                />
+              </div>
+            )}
+
+            <ConnectStepsSection steps={resolvedSteps} state={state} projectKeys={projectKeys} />
+          </div>
+        </TemporaryAccessConnectionProvider>
       </SheetContent>
     </Sheet>
   )
