@@ -91,6 +91,7 @@ describe('getAIDetails', () => {
       hasAccessToAdvanceModel: false,
       hasHipaaAddon: false,
       orgId: 1,
+      orgSlug: ORG_SLUG,
       planId: 'pro',
       region: 'us-east-1',
       isSensitive: false,

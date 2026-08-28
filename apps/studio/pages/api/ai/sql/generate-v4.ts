@@ -126,6 +126,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
   let projectIsSensitive: boolean | null | undefined
   let projectRegion: string | undefined
   let orgId: number | undefined
+  let verifiedOrgSlug: string | undefined
   let planId: string | undefined
 
   if (!IS_PLATFORM) {
@@ -141,6 +142,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       hasAccessToAdvanceModel = aiDetails.hasAccessToAdvanceModel
       orgHasHipaaAddon = aiDetails.hasHipaaAddon
       orgId = aiDetails.orgId
+      verifiedOrgSlug = aiDetails.orgSlug
       planId = aiDetails.planId
       projectIsSensitive = aiDetails.isSensitive
       projectRegion = aiDetails.region
@@ -234,6 +236,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       supportMode,
       userId,
       orgId,
+      orgSlug: verifiedOrgSlug,
       planId,
       includesLogsSnippets,
       isExplorerEnabled: explorerEnabled,

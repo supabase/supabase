@@ -11,6 +11,7 @@ export type AIDetails = {
   hasAccessToAdvanceModel: boolean
   hasHipaaAddon: boolean | undefined
   orgId: number | undefined
+  orgSlug: string | undefined
   planId: string | undefined
   region: string | undefined
   isSensitive: boolean | null | undefined
@@ -56,6 +57,7 @@ export const getAIDetails = async ({
       // Undefined rather than false so isTracingAllowed fails closed
       hasHipaaAddon: undefined,
       orgId: undefined,
+      orgSlug: undefined,
       planId: undefined,
       region,
       isSensitive,
@@ -72,6 +74,7 @@ export const getAIDetails = async ({
     hasAccessToAdvanceModel: advanceModelAccess.hasAccess,
     hasHipaaAddon,
     orgId: selectedOrg.id,
+    orgSlug: selectedOrg.slug,
     planId: selectedOrg.plan.id,
     region,
     isSensitive,
