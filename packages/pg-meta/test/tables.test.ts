@@ -197,6 +197,26 @@ withTestDatabase(
   }
 )
 
+withTestDatabase(
+  'tables.list excludes INCLUDE payload columns from primary_keys',
+  async ({ executeQuery }) => {
+    // For `PRIMARY KEY (a) INCLUDE (b)`, the INCLUDE payload column `b` is
+    // present in pg_index.indkey but not part of the key. The previous
+    // set-membership join `a.attnum = any (i.indkey)` walked every index
+    // column and surfaced `b` as a primary key column. The fix limits the
+    // walk to the first `indnkeyatts` positions via a positional
+    // unnest(... with ordinality) so INCLUDE columns are dropped.
+    await executeQuery(`
+      create table public.pk_include (a int not null, b int not null, c int not null);
+      create unique index pk_include_idx on public.pk_include (a) include (b);
+      alter table public.pk_include add constraint pk_include_pk primary key using index pk_include_idx;
+    `)
+    const { sql, zod } = pgMeta.tables.list()
+    const row: any = zod.parse((await executeQuery(sql)).find((t: any) => t.name === 'pk_include'))
+    expect(row.primary_keys.map((pk: any) => pk.name)).toEqual(['a'])
+  }
+)
+
 /** Original tests ported from postgres-meta */
 withTestDatabase('list tables', async ({ executeQuery }) => {
   const { sql, zod } = await pgMeta.tables.list()
