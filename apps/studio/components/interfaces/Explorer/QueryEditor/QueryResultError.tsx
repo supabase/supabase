@@ -32,9 +32,17 @@ export const QueryResultError = ({
   const { ref } = useParams()
 
   const { data: org } = useSelectedOrganizationQuery()
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
-  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: ref })
+  const { data: subscription, isLoading: isLoadingSubscription } = useOrgSubscriptionQuery({
+    orgSlug: org?.slug,
+  })
+  const { data: projectSettings, isLoading: isLoadingProjectSettings } = useProjectSettingsV2Query({
+    projectRef: ref,
+  })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
+  // Default deny while HIPAA eligibility is still being resolved, rather than treating an
+  // unresolved query the same as a resolved "no addon" - the assistant sends the SQL and
+  // error to an LLM, so eligibility must be confirmed before that's allowed.
+  const isCheckingHipaaEligibility = isLoadingSubscription || isLoadingProjectSettings
 
   const { createChat, isCreating } = useCreateChat()
 
@@ -156,7 +164,7 @@ export const QueryResultError = ({
               </TooltipContent>
             </Tooltip>
           )}
-          {!hasHipaaAddon && canDebug && (
+          {!hasHipaaAddon && !isCheckingHipaaEligibility && canDebug && (
             <AiAssistantDropdown
               telemetrySource="sql_debug"
               label="Debug with Assistant"

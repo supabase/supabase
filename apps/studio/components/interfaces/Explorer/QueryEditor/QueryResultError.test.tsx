@@ -10,6 +10,8 @@ const mocks = vi.hoisted(() => ({
   createChat: vi.fn(),
   useParams: vi.fn(),
   mockCopyToClipboard: vi.fn(),
+  useOrgSubscriptionQuery: vi.fn(),
+  useProjectSettingsV2Query: vi.fn(),
 }))
 
 vi.mock('common', async (importOriginal) => {
@@ -34,24 +36,45 @@ vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
 }))
 
 vi.mock('@/data/subscriptions/org-subscription-query', () => ({
-  useOrgSubscriptionQuery: () => ({ data: undefined }),
+  useOrgSubscriptionQuery: () => mocks.useOrgSubscriptionQuery(),
 }))
 
 vi.mock('@/data/config/project-settings-v2-query', () => ({
-  useProjectSettingsV2Query: () => ({ data: undefined }),
+  useProjectSettingsV2Query: () => mocks.useProjectSettingsV2Query(),
 }))
 
 describe('QueryResultError', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mocks.useParams.mockReturnValue({ ref: 'default' })
+    mocks.useOrgSubscriptionQuery.mockReturnValue({ data: undefined, isLoading: false })
+    mocks.useProjectSettingsV2Query.mockReturnValue({ data: undefined, isLoading: false })
     // useTrack() (invoked by AiAssistantDropdown) reads the selected project to attach
     // telemetry context, so the platform project fetch needs a handler even though this
     // component doesn't read project data itself.
     addAPIMock({
       method: 'get',
       path: '/platform/projects/:ref',
-      response: { id: 1, ref: 'default', organization_id: 1, name: 'Test Project' },
+      response: {
+        id: 1,
+        ref: 'default',
+        organization_id: 1,
+        name: 'Test Project',
+        status: 'ACTIVE_HEALTHY',
+        cloud_provider: 'AWS',
+        region: 'us-east-1',
+        db_host: 'db.default.supabase.co',
+        restUrl: 'https://default.supabase.co/rest/v1/',
+        inserted_at: '2024-01-01T00:00:00Z',
+        updated_at: '2024-01-01T00:00:00Z',
+        subscription_id: 'sub_123',
+        is_branch_enabled: false,
+        is_physical_backups_enabled: false,
+        high_availability: false,
+        integration_source: null,
+        connectionString: 'postgresql://postgres@localhost:5432/postgres',
+        is_hibernating: false,
+      },
     })
   })
 
@@ -95,6 +118,20 @@ describe('QueryResultError', () => {
 
   it('does not render the assistant dropdown when the query is unavailable', () => {
     customRender(<QueryResultError error={{ message: 'boom' }} />)
+
+    expect(screen.queryByRole('button', { name: 'Debug with Assistant' })).not.toBeInTheDocument()
+  })
+
+  it('does not render the assistant dropdown while HIPAA eligibility is still resolving', () => {
+    mocks.useOrgSubscriptionQuery.mockReturnValue({ data: undefined, isLoading: true })
+
+    customRender(
+      <QueryResultError
+        error={{ message: 'relation "foo" does not exist' }}
+        sql="select * from foo;"
+        source="database"
+      />
+    )
 
     expect(screen.queryByRole('button', { name: 'Debug with Assistant' })).not.toBeInTheDocument()
   })
