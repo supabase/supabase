@@ -76,8 +76,14 @@ export const StorageRetentionBreakdown = () => {
               <p className="w-16 text-right text-xs">{formatBytes(bucket.noncurrent)}</p>
             </div>
           ))}
+          {/*
+           * TODO(storage-versioning): link each row to its bucket once the
+           * endpoint returns a project ref alongside the bucket name. Buckets are
+           * per-project and this is an org-level page, so today two projects with
+           * an identically named bucket are indistinguishable here.
+           */}
           <p className="pt-2 text-xs text-foreground-lighter">
-            Retention is set per bucket, in the bucket’s settings.
+            Retention is set per bucket, under Storage → bucket settings → Object versioning.
           </p>
         </div>
       )}
