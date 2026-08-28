@@ -6,7 +6,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
-import { PublicationsComboBox } from './PublicationsComboBox'
+import { PublicationSelect } from './PublicationSelect'
 import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 
@@ -44,7 +44,7 @@ export const PublicationSelection = ({
           description="Tables in the selected publication will be replicated to this destination."
         >
           <FormControl>
-            <PublicationsComboBox
+            <PublicationSelect
               field={{
                 ...field,
                 onChange: (value) => {
