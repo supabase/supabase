@@ -7,10 +7,14 @@ import * as React from 'react'
 
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from '../../../lib/constants'
 import { cn } from '../../../lib/utils/cn'
+import { getExplicitTabIndex } from '../../../lib/utils/getExplicitTabIndex'
 
 const Select = SelectPrimitive.Root
 
 const SelectGroup = SelectPrimitive.Group
+
+const selectTriggerClassName =
+  'flex w-full items-center justify-between rounded-md border border-strong hover:border-control-hover bg-control-raised text-xs data-[placeholder]:text-foreground-lighter ring-border-control focus-ring disabled:cursor-not-allowed disabled:opacity-50 transition-colors duration-200 data-[state=open]:border-control-hover gap-2 [&>span]:truncate text-left'
 
 // If placeholder is a string, wrap it in a span. This is to avoid page crashes when using Google Translate.
 // https://github.com/radix-ui/primitives/issues/2578#issuecomment-1890801041 for more info.
@@ -46,14 +50,7 @@ const SelectTrigger = React.forwardRef<
 >(({ className, children, size, ...props }, ref) => (
   <SelectPrimitive.Trigger
     ref={ref}
-    className={cn(
-      'flex w-full items-center justify-between rounded-md border border-strong hover:border-control-hover bg-control-raised text-xs data-[placeholder]:text-foreground-lighter ring-border-control focus-ring disabled:cursor-not-allowed disabled:opacity-50 transition-colors duration-200',
-      'data-[state=open]:border-control-hover',
-      'gap-2',
-      '[&>span]:truncate text-left', // [kemal] This is to prevent double lines rendering when a string is particularly long.
-      SelectTriggerVariants({ size }),
-      className
-    )}
+    className={cn(selectTriggerClassName, SelectTriggerVariants({ size }), className)}
     tabIndex={0}
     {...props}
   >
@@ -64,6 +61,34 @@ const SelectTrigger = React.forwardRef<
   </SelectPrimitive.Trigger>
 ))
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName
+
+const ComboboxTrigger = React.forwardRef<
+  HTMLButtonElement,
+  React.ButtonHTMLAttributes<HTMLButtonElement> &
+    VariantProps<typeof SelectTriggerVariants> & {
+      icon?: React.ReactNode
+    }
+>(({ className, children, disabled, icon, size, tabIndex, ...props }, ref) => {
+  const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
+
+  return (
+    <button
+      ref={ref}
+      type="button"
+      role="combobox"
+      disabled={disabled}
+      className={cn(selectTriggerClassName, SelectTriggerVariants({ size }), className)}
+      tabIndex={computedTabIndex}
+      {...props}
+    >
+      <span className="flex-1 truncate text-left">{children}</span>
+      {icon ?? (
+        <ChevronDown className="h-4 w-4 text-foreground-lighter shrink-0" strokeWidth={1.5} />
+      )}
+    </button>
+  )
+})
+ComboboxTrigger.displayName = 'ComboboxTrigger'
 
 const SelectScrollUpButton = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.ScrollUpButton>,
@@ -187,6 +212,7 @@ const SelectSeparator = React.forwardRef<
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName
 
 export {
+  ComboboxTrigger,
   Select,
   SelectContent,
   SelectGroup,
