@@ -234,28 +234,63 @@ create policy "Policy name."
 Users that have enrolled MFA on their account are expecting that your
 application only works for them if they've gone through MFA.
 
+The policy needs to read from `auth.mfa_factors`, but the `authenticated`
+role does not have permission to read that table directly, so the
+`select … from auth.mfa_factors` runs as the calling user and fails
+with `42501: permission denied for table mfa_factors`. Wrap the lookup
+in a `SECURITY DEFINER` function owned by `postgres` and call it from
+the policy:
+
 ```sql
+-- 1. The lookup runs as the function owner, who can read auth.mfa_factors.
+create or replace function public.user_requires_aal2()
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  -- True when the calling user has at least one verified MFA factor.
+  -- auth.jwt() and the implicit current_setting('request.jwt.claims')
+  -- identify the user; the SELECT is run as the function owner.
+  select exists (
+    select 1
+    from auth.mfa_factors
+    where user_id = (select auth.uid())
+      and status = 'verified'
+  );
+$$;
+
+-- 2. Restrict EXECUTE to the role that will use the policy. The function
+-- itself must be owned by a role that can read auth.mfa_factors (e.g.
+-- postgres) so the SECURITY DEFINER switch can take effect.
+revoke execute on function public.user_requires_aal2() from public;
+grant execute on function public.user_requires_aal2() to authenticated;
+
+-- 3. The policy body now calls the helper, which is the only safe place
+-- to inspect auth.mfa_factors from a user-evaluable policy.
 create policy "Policy name."
   on table_name
   as restrictive -- very important!
   to authenticated
   using (
-    array[(select auth.jwt()->>'aal')] <@ (
-      select
-          case
-            when count(id) > 0 then array['aal2']
-            else array['aal1', 'aal2']
-          end as aal
-        from auth.mfa_factors
-        where ((select auth.uid()) = user_id) and status = 'verified'
-    ));
+    case
+      when public.user_requires_aal2() then (select auth.jwt()->>'aal') = 'aal2'
+      else true
+    end
+  );
 ```
 
-- The policy will only accept only `aal2` when the user has at least one MFA
+- The policy will only accept `aal2` when the user has at least one MFA
   factor verified.
 - Otherwise, it will accept both `aal1` and `aal2`.
-- The `<@` operator is Postgres's ["contained in"
-  operator.](https://www.postgresql.org/docs/current/functions-array.html)
+- **The function must be `SECURITY DEFINER` and owned by a role that can
+  read `auth.mfa_factors`** (typically `postgres`). Without that, the
+  inner `select` would still run as `authenticated` and hit
+  `42501: permission denied for table mfa_factors`.
+- **Revoking `execute … from public`** keeps the helper out of reach of
+  roles that should not be able to enumerate the caller’s MFA factors
+  directly; only the policy should reach it.
 - **Using `as restrictive` ensures this policy will restrict all commands on the
   table regardless of other policies!**
 
