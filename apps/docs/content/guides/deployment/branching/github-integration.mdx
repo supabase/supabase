@@ -85,8 +85,6 @@ When a new branch is created in GitHub, a corresponding branch is created in Sup
 
 Every Supabase branch, preview or persistent, is created as a clone of your base project. The new branch starts with the Edge Functions and configuration of that project. Its database schema is not cloned. Instead, it is built from the migrations you commit to your repository.
 
-Your production data and storage objects are not cloned by default. See [Seeding](#seeding) to populate them with sample data.
-
 ### Configuration
 
 You can test configuration changes on your Preview Branch by configuring the `config.toml` file in your Supabase directory. See the [Configuration docs](/docs/guides/deployment/branching/configuration) for more information.
