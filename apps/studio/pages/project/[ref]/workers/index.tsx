@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { useState } from 'react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { Admonition } from 'ui-patterns/Admonition'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -31,7 +31,10 @@ import type { NextPageWithLayout } from '@/types'
 
 const WorkersPage: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const [isDeployInstructionsOpen, setIsDeployInstructionsOpen] = useState(false)
+  const [isDeployInstructionsOpen, setIsDeployInstructionsOpen] = useQueryState(
+    'deploy',
+    parseAsBoolean.withDefault(false)
+  )
   const {
     data: workers,
     error,

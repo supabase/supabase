@@ -43,6 +43,7 @@ import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/L
 const AiIconAnimation = dynamic(() => import('ui').then((mod) => mod.AiIconAnimation))
 const Badge = dynamic(() => import('ui').then((mod) => mod.Badge))
 const EdgeFunctions = dynamic(() => import('icons').then((mod) => mod.EdgeFunctions))
+const Workers = dynamic(() => import('icons').then((mod) => mod.Workers))
 const AnalyticsBucket = dynamic(() => import('icons').then((mod) => mod.AnalyticsBucket))
 const FilesBucket = dynamic(() => import('icons').then((mod) => mod.FilesBucket))
 const VectorBucket = dynamic(() => import('icons').then((mod) => mod.VectorBucket))
@@ -59,6 +60,7 @@ export function useCreateCommands(options?: CommandOptions) {
     authEnabled,
     edgeFunctionsEnabled,
     storageEnabled,
+    workersEnabled,
     sendSmsHook,
     sendEmailHook,
     customAccessTokenHook,
@@ -273,6 +275,21 @@ export function useCreateCommands(options?: CommandOptions) {
     [ref, edgeFunctionsEnabled, openSidebar, snap, setIsOpen]
   )
 
+  const workersCommands = useMemo(
+    () =>
+      workersEnabled
+        ? ([
+            {
+              id: 'deploy-worker',
+              name: 'Deploy a Worker',
+              route: `/project/${ref}/workers?deploy=true`,
+              icon: () => <Workers />,
+            },
+          ].filter(Boolean) as ICommand[])
+        : [],
+    [ref, workersEnabled]
+  )
+
   const storageCommands = useMemo(
     () =>
       storageEnabled
@@ -406,6 +423,15 @@ export function useCreateCommands(options?: CommandOptions) {
             },
           ]
         : []),
+      ...(workersCommands.length > 0
+        ? [
+            {
+              id: 'create-workers',
+              name: 'Workers',
+              commands: workersCommands,
+            },
+          ]
+        : []),
       ...(storageCommands.length > 0
         ? [
             {
@@ -438,6 +464,7 @@ export function useCreateCommands(options?: CommandOptions) {
       databaseCommands,
       authCommands,
       edgeFunctionsCommands,
+      workersCommands,
       storageCommands,
       integrationsCommands,
       observabilityCommands,

@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { useMemo } from 'react'
 import { useSetPage } from 'ui-patterns/CommandMenu'
 
@@ -89,6 +89,8 @@ export function useCreateCommandsConfig() {
   const setPage = useSetPage()
   const { openSidebar } = useSidebarManagerSnapshot()
   const snap = useAiAssistantStateSnapshot()
+
+  const workersEnabled = useFlag('workers')
 
   const {
     projectAuthAll: authEnabled,
@@ -183,6 +185,7 @@ export function useCreateCommandsConfig() {
     authEnabled,
     edgeFunctionsEnabled,
     storageEnabled,
+    workersEnabled,
     sendSmsHook,
     sendEmailHook,
     customAccessTokenHook,
