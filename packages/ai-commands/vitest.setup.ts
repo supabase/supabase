@@ -1,14 +1,17 @@
-import { statSync } from 'fs'
+import { existsSync } from 'fs'
 import { config } from 'dotenv'
 
 import './test/extensions'
 
 if (!process.env.CI) {
-  // Use keys from studio .env.local for local tests
+  // Use keys from studio .env.local for local tests, if the developer has one. It is
+  // gitignored, so it is absent in a fresh clone and this has to stay optional: `statSync`
+  // threw ENOENT here and took the whole suite down before a single test collected.
   const envPath = '../../apps/studio/.env.local'
 
-  statSync(envPath)
-  config({ path: envPath })
+  if (existsSync(envPath)) {
+    config({ path: envPath })
+  }
 }
 
 // Modify fetch to support wasm file URLs
