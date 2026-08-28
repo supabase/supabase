@@ -27,17 +27,14 @@ export const LOG_TYPES_LABELS = {
   supavisor: 'Supavisor',
   pgbouncer: 'PgBouncer',
   multigres: 'Multigres',
+  workers: 'Workers',
 }
 
 type LogType = keyof typeof LOG_TYPES_LABELS
 export const LOG_TYPES = Object.keys(LOG_TYPES_LABELS) as [LogType, ...LogType[]]
 export const DEFAULT_LOG_TYPES = ['postgres', 'edge'] as const
 
-// ClickHouse `source` value for each unified log type. Single source of truth
-// consumed by both the unified logs list query (LOG_TYPE_CONDITION in
-// UnifiedLogs.queries.ts) and the single-log inspection point lookup
-// (unified-log-inspection-query.ts).
-export const LOG_TYPE_TO_SOURCE: Record<LogType, string> = {
+export const LOG_TYPE_TO_SOURCE: Record<Exclude<LogType, 'workers'>, string> = {
   edge: 'edge_logs',
   postgrest: 'postgrest_logs',
   storage: 'storage_logs',

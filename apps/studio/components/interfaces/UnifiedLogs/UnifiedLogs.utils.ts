@@ -2,6 +2,7 @@ import { type Table as TTable } from '@tanstack/react-table'
 import { cn } from 'ui'
 
 import { LOG_TYPES_LABELS } from './UnifiedLogs.constants'
+import { parseLogsFilterUrlParams } from './UnifiedLogs.filters'
 import { FacetMetadataSchema } from './UnifiedLogs.schema'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
@@ -205,19 +206,43 @@ export function getEventMessageDisplay(
   return { message: value, capitalize: false }
 }
 
-/**
- * Multigres logs are gated behind the `showMultigresLogs` flag, so the multigres
- * log_type option is removed from the filter fields when the flag is disabled.
- */
-export function gateMultigresLogType<T extends { value: string; options?: Option[] }>(
+export function gateLogTypeOptions<T extends { value: string; options?: Option[] }>(
   fields: T[],
-  showMultigresLogs: boolean
+  visibility: Partial<Record<UnifiedLogType, boolean>>
 ): T[] {
-  if (showMultigresLogs) return fields
-
-  return fields.map((field) =>
-    field.value === 'log_type' && field.options
-      ? ({ ...field, options: field.options.filter((option) => option.value !== 'multigres') } as T)
-      : field
+  const hiddenLogTypes = new Set(
+    Object.entries(visibility)
+      .filter(([, visible]) => !visible)
+      .map(([logType]) => logType)
   )
+
+  if (hiddenLogTypes.size === 0) return fields
+
+  return fields.map((field) => {
+    if (field.value !== 'log_type' || !field.options) return field
+    return {
+      ...field,
+      options: field.options.filter((option) => !hiddenLogTypes.has(option.value)),
+    }
+  })
+}
+
+export function gateLogTypeFilters(
+  filters: string[] | null | undefined,
+  visibility: Partial<Record<UnifiedLogType, boolean>>
+): string[] | null | undefined {
+  if (!filters) return filters
+
+  const hiddenLogTypes = new Set(
+    Object.entries(visibility)
+      .filter(([, visible]) => !visible)
+      .map(([logType]) => logType)
+  )
+
+  if (hiddenLogTypes.size === 0) return filters
+
+  return filters.filter((filter) => {
+    const parsed = parseLogsFilterUrlParams([filter])[0]
+    return parsed?.column !== 'log_type' || !hiddenLogTypes.has(parsed.value)
+  })
 }

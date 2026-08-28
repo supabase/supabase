@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import {
   buildUnifiedLogsUrl,
-  gateMultigresLogType,
+  gateLogTypeFilters,
+  gateLogTypeOptions,
   getEventMessageDisplay,
   parseMultigresEventMessage,
 } from './UnifiedLogs.utils'
@@ -94,7 +95,7 @@ describe('getEventMessageDisplay', () => {
   })
 })
 
-describe('gateMultigresLogType', () => {
+describe('gateLogTypeOptions', () => {
   const fields = [
     { value: 'date' },
     {
@@ -102,23 +103,51 @@ describe('gateMultigresLogType', () => {
       options: [
         { label: 'Postgres', value: 'postgres' },
         { label: 'Multigres', value: 'multigres' },
+        { label: 'Workers', value: 'workers' },
       ],
     },
   ]
 
-  it('drops the multigres log_type option when the flag is disabled', () => {
-    const gated = gateMultigresLogType(fields, false)
+  it('drops log_type options whose flags are disabled', () => {
+    const gated = gateLogTypeOptions(fields, { multigres: false, workers: false })
     const logType = gated.find((field) => field.value === 'log_type')
     expect(logType?.options?.map((option) => option.value)).toEqual(['postgres'])
   })
 
-  it('keeps the multigres option when the flag is enabled', () => {
-    const gated = gateMultigresLogType(fields, true)
+  it('keeps independently enabled log types', () => {
+    const gated = gateLogTypeOptions(fields, { multigres: false, workers: true })
+    const logType = gated.find((field) => field.value === 'log_type')
+    expect(logType?.options?.map((option) => option.value)).toEqual(['postgres', 'workers'])
+  })
+
+  it('returns the original fields when every gated log type is enabled', () => {
+    const gated = gateLogTypeOptions(fields, { multigres: true, workers: true })
     expect(gated).toBe(fields)
   })
 
   it('leaves non log_type fields untouched', () => {
-    const gated = gateMultigresLogType(fields, false)
+    const gated = gateLogTypeOptions(fields, { workers: false })
     expect(gated.find((field) => field.value === 'date')).toEqual({ value: 'date' })
+  })
+})
+
+describe('gateLogTypeFilters', () => {
+  it('removes disabled log types from equality and inequality filters', () => {
+    expect(
+      gateLogTypeFilters(
+        ['log_type:eq:workers', 'log_type:neq:multigres', 'log_type:eq:postgres', 'method:eq:GET'],
+        { workers: false, multigres: false }
+      )
+    ).toEqual(['log_type:eq:postgres', 'method:eq:GET'])
+  })
+
+  it('keeps enabled log types and unrelated filters unchanged', () => {
+    const filters = ['log_type:eq:workers', 'method:eq:GET']
+    expect(gateLogTypeFilters(filters, { workers: true })).toBe(filters)
+  })
+
+  it('preserves absent filter values', () => {
+    expect(gateLogTypeFilters(undefined, { workers: false })).toBeUndefined()
+    expect(gateLogTypeFilters(null, { workers: false })).toBeNull()
   })
 })

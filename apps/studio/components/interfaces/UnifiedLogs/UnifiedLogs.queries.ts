@@ -13,6 +13,7 @@ import {
   safeSql,
   type SafeLogSqlFragment,
 } from '@/data/logs/safe-analytics-sql'
+import { WORKER_LOG_SOURCES } from '@/lib/constants/workers'
 
 // Operator fragments for SQL emission. `safeSql` rejects plain strings, so we
 // pre-brand the keywords we want to switch between.
@@ -54,12 +55,21 @@ const HTTP_STATUS_EXPR: SafeLogSqlFragment = safeSql`if(source = 'auth_logs', lo
  * logs from postgREST / storage-api and are intentionally not part of unified
  * logs; the UI surfaces gateway HTTP traffic for those buckets.
  */
-const LOG_TYPE_CONDITION: Record<string, SafeLogSqlFragment> = Object.fromEntries(
-  Object.entries(LOG_TYPE_TO_SOURCE).map(([type, source]) => [
-    type,
-    safeSql`source = ${lit(source)}`,
-  ])
-)
+const WORKER_LOG_SOURCE_VALUES = Object.values(WORKER_LOG_SOURCES)
+const WORKER_LOG_SOURCE_CONDITION = safeSql`log_attributes['source'] IN (${joinSqlFragments(
+  WORKER_LOG_SOURCE_VALUES.map((source) => lit(source)),
+  ','
+)})`
+
+const LOG_TYPE_CONDITION: Record<string, SafeLogSqlFragment> = {
+  ...Object.fromEntries(
+    Object.entries(LOG_TYPE_TO_SOURCE).map(([type, source]) => [
+      type,
+      safeSql`source = ${lit(source)}`,
+    ])
+  ),
+  workers: WORKER_LOG_SOURCE_CONDITION,
+}
 
 // Derived `log_type` column for SELECT / GROUP BY / countIf use.
 // WHEN source = 'edge_logs' AND ${ATTR.path} LIKE '%/rest/%' THEN 'postgrest'
@@ -75,6 +85,7 @@ const LOG_TYPE_EXPR: SafeLogSqlFragment = safeSql`CASE
       WHEN source = 'supavisor_logs' THEN 'supavisor'
       WHEN source = 'pgbouncer_logs' THEN 'pgbouncer'
       WHEN source = 'multigres_logs' THEN 'multigres'
+      WHEN ${WORKER_LOG_SOURCE_CONDITION} THEN 'workers'
       ELSE source
     END`
 

@@ -9,12 +9,9 @@ import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
 import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
 import { analyticsLiteral, safeSql } from '@/data/logs/safe-analytics-sql'
 import { IS_PLATFORM } from '@/lib/constants'
+import { WORKER_LOG_SOURCES } from '@/lib/constants/workers'
 
-export const WORKER_LOG_SOURCES = {
-  requests: 'worker_ingress_logs',
-  output: 'worker_guest_logs',
-  builds: 'worker_api_logs',
-} as const
+export { WORKER_LOG_SOURCES } from '@/lib/constants/workers'
 
 export type WorkerLogStream = keyof typeof WORKER_LOG_SOURCES
 

@@ -13,7 +13,7 @@ import {
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table'
-import { LOCAL_STORAGE_KEYS, useDebounce, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useDebounce, useFlag, useParams } from 'common'
 import { Loader2, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -47,7 +47,8 @@ import { isUserFilterUnreachable } from './UnifiedLogs.queries'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
 import {
-  gateMultigresLogType,
+  gateLogTypeFilters,
+  gateLogTypeOptions,
   getFacetedUniqueValues,
   getLevelRowClassName,
 } from './UnifiedLogs.utils'
@@ -93,10 +94,19 @@ export const UnifiedLogs = () => {
   const { ref: projectRef } = useParams()
   const track = useTrack()
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
+  const showMultigresLogs = useShowMultigresLogs()
+  const workersEnabled = !!useFlag('workers')
+  const visibleSearchFilters = gateLogTypeFilters(search.filter, {
+    multigres: showMultigresLogs,
+    workers: workersEnabled,
+  })
 
   const defaultColumnSorting = search.sort ? [search.sort] : []
   const defaultColumnVisibility = { uuid: false }
-  const defaultColumnFilters = buildDefaultColumnFilters(search)
+  const defaultColumnFilters = buildDefaultColumnFilters({
+    ...search,
+    filter: visibleSearchFilters,
+  })
 
   const [topBarHeight, setTopBarHeight] = useState(0)
   const topBarRef = useRef<HTMLDivElement>(null)
@@ -111,8 +121,6 @@ export const UnifiedLogs = () => {
     observer.observe(topBar)
     return () => observer.unobserve(topBar)
   }, [])
-
-  const showMultigresLogs = useShowMultigresLogs()
 
   const [sorting, setSorting] = useState<SortingState>(defaultColumnSorting)
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(defaultColumnFilters)
@@ -135,19 +143,26 @@ export const UnifiedLogs = () => {
 
   // Create a stable query key object by removing nulls/undefined, id, and live
   // Mainly to prevent the react queries from unnecessarily re-fetching
-  const searchParameters = useMemo(
-    () =>
-      Object.entries(search).reduce(
-        (acc, [key, value]) => {
-          if (!['id', 'live'].includes(key) && value !== null && value !== undefined) {
-            acc[key] = value
-          }
-          return acc
-        },
-        {} as Record<string, unknown>
-      ) as QuerySearchParamsType,
-    [search]
-  )
+  const searchParameters = useMemo(() => {
+    const parameters = Object.entries(search).reduce(
+      (acc, [key, value]) => {
+        if (!['id', 'live'].includes(key) && value !== null && value !== undefined) {
+          acc[key] = value
+        }
+        return acc
+      },
+      {} as Record<string, unknown>
+    ) as QuerySearchParamsType
+
+    if (parameters.filter) {
+      parameters.filter =
+        gateLogTypeFilters(parameters.filter, {
+          multigres: showMultigresLogs,
+          workers: workersEnabled,
+        }) ?? null
+    }
+    return parameters
+  }, [search, showMultigresLogs, workersEnabled])
 
   const {
     data: unifiedLogsData,
@@ -274,7 +289,10 @@ export const UnifiedLogs = () => {
   // Will need to refactor this bit
   // - Each facet just handles its own state, rather than getting passed down like this
   const filterFields = useMemo(() => {
-    const gatedFields = gateMultigresLogType(defaultFilterFields, showMultigresLogs)
+    const gatedFields = gateLogTypeOptions(defaultFilterFields, {
+      multigres: showMultigresLogs,
+      workers: workersEnabled,
+    })
 
     return gatedFields.map((field) => {
       const facetsField = facets?.[field.value]
@@ -302,10 +320,17 @@ export const UnifiedLogs = () => {
 
       return { ...field, options }
     })
-  }, [facets, showMultigresLogs])
+  }, [facets, showMultigresLogs, workersEnabled])
 
   const applyFilterSearch = () => {
-    setSearch(buildFilterSearchUpdate(columnFilters, filterFields))
+    const update = buildFilterSearchUpdate(columnFilters, filterFields)
+    if (Array.isArray(update.filter)) {
+      update.filter = gateLogTypeFilters(update.filter.map(String), {
+        multigres: showMultigresLogs,
+        workers: workersEnabled,
+      })
+    }
+    setSearch(update)
   }
 
   const debouncedApplyFilterSearch = useDebounce(applyFilterSearch, 250)
@@ -485,7 +510,7 @@ export const UnifiedLogs = () => {
                     setColumnVisibility={setColumnVisibility}
                     searchParamsParser={SEARCH_PARAMS_PARSER}
                     emptyStateMessage={
-                      isUserFilterUnreachable(search) ? (
+                      isUserFilterUnreachable(searchParameters) ? (
                         <div className="text-sm flex flex-col gap-y-1">
                           <p className="text-foreground-light">No results found</p>
                           <p className="text-foreground-lighter">
