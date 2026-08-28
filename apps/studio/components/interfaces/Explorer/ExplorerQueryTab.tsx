@@ -107,7 +107,7 @@ export const ExplorerQueryTab = () => {
       roleImpersonationState={roleImpersonationState}
       onTitleChange={(value) => {
         persistTab()
-        const name = value.trim() || 'Untitled query'
+        const name = value.trim() || 'Quick query'
         explorerQueryState.updateDraft({ id, name })
         tabs.updateTab(createTabId('query', { id }), { label: name })
       }}

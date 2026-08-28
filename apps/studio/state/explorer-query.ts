@@ -237,7 +237,7 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
     createDraft: ({
       id,
       projectRef,
-      name = 'Untitled query',
+      name = 'Quick query',
       sql = '',
       source = createDefaultSourceBinding('database'),
       rowLimit = DEFAULT_CELL_ROW_LIMIT,
