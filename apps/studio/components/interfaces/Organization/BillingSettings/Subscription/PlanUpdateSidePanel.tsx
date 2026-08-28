@@ -305,6 +305,7 @@ export const PlanUpdateSidePanel = () => {
       <SubscriptionPlanUpdateDialog
         selectedTier={selectedTier}
         onClose={() => setSelectedTier(undefined)}
+        onSuccess={isFullScreen ? onClose : undefined}
         planMeta={planMeta}
         subscriptionPreviewQueryResult={subscriptionPreviewData}
         projects={orgProjects}
