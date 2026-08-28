@@ -288,9 +288,13 @@ create policy "Policy name."
   read `auth.mfa_factors`** (typically `postgres`). Without that, the
   inner `select` would still run as `authenticated` and hit
   `42501: permission denied for table mfa_factors`.
-- **Revoking `execute … from public`** keeps the helper out of reach of
-  roles that should not be able to enumerate the caller’s MFA factors
-  directly; only the policy should reach it.
+- The function only returns whether the calling user has any verified
+  factor, so it does not leak other users' MFA status. The
+  `revoke execute … from public` + `grant execute … to authenticated`
+  pair keeps it out of the `anon` role and limits direct RPC access to
+  authenticated callers; production deployments that want to keep the
+  helper policy-only can additionally revoke from `authenticated` and
+  let the policy’s SECURITY context invoke it as the function owner.
 - **Using `as restrictive` ensures this policy will restrict all commands on the
   table regardless of other policies!**
 
