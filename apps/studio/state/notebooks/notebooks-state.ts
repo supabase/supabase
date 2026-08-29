@@ -6,18 +6,25 @@ import { proxy, snapshot, useSnapshot, type Snapshot } from 'valtio'
 import { proxyMap } from 'valtio/utils'
 
 import type { Notebook, StateNotebook } from './types'
+import { isQueryCell } from '@/data/content/notebooks/notebook-schema'
 import type { SnippetStatus } from '@/data/content/snippet-status'
 import type { Notebooks } from '@/types'
 
-// [Joshen] Deliberately copied from sql-editor-lifecycle cause we might deprecate
-// that in favor of notebooks in the long run
 function statusOnEdit(status: SnippetStatus): SnippetStatus {
   return status === 'saved' ? 'unsaved' : status
+}
+
+type NotebookCellLocalState = {
+  showQuery?: boolean
 }
 
 export const notebooksState = proxy({
   notebooks: {} as Record<string, StateNotebook>,
   needsSaving: proxyMap<string, boolean>([]),
+  /** Session-only UI state keyed by cell ID; never persisted with notebook content. */
+  cellLocalState: proxyMap<string, NotebookCellLocalState>([]),
+  /** Session-only conflicts where an assistant changed the server while local edits remain. */
+  serverDivergedWhileDirty: proxyMap<string, 'updated' | 'deleted'>([]),
 
   /**
    * Load notebook into the Valtio store. No-ops if already present.
@@ -48,6 +55,25 @@ export const notebooksState = proxy({
   },
 
   /**
+   * Marks a notebook as persisted after its first successful save. Every
+   * later save cycle is covered by `updateCells`'s `statusOnEdit` ('saved' ->
+   * 'unsaved' -> ...), but the one-time 'new' -> 'saved' transition has no
+   * other trigger — the resource query that would otherwise pick it up is
+   * disabled while the notebook is still 'new'.
+   */
+  markSaved: ({ id }: { id: string }) => {
+    const stateNotebook = notebooksState.notebooks[id]
+    if (stateNotebook) stateNotebook.status = 'saved'
+    notebooksState.clearServerDivergence({ id })
+  },
+
+  markServerDivergence: ({ id, type }: { id: string; type: 'updated' | 'deleted' }) =>
+    notebooksState.serverDivergedWhileDirty.set(id, type),
+
+  clearServerDivergence: ({ id }: { id: string }) =>
+    notebooksState.serverDivergedWhileDirty.delete(id),
+
+  /**
    * Rename follows its own async save directly at the call site rather than going
    * through needsSaving/the debounced scheduler.
    */
@@ -60,15 +86,16 @@ export const notebooksState = proxy({
 
   /**
    * Remove notebook from the store, and optionally remove it from the sync
-   * saving queue. Also clears any cached query-cell results for this notebook
-   * from the ephemeral session store.
+   * saving queue. Also clears its session-only query-cell UI state.
    */
   removeNotebook: ({ id, skipSave = false }: { id: string; skipSave?: boolean }) => {
     const { [id]: notebook, ...otherNotebooks } = notebooksState.notebooks
+    notebook?.notebook.content?.cells.forEach((cell) =>
+      notebooksState.cellLocalState.delete(cell._id)
+    )
     notebooksState.notebooks = otherNotebooks
     if (!skipSave) notebooksState.needsSaving.delete(id)
-
-    // TODO: clear notebookSessionState once it exists
+    notebooksState.clearServerDivergence({ id })
   },
 
   /**
@@ -114,9 +141,10 @@ export const notebooksState = proxy({
     if (!stateNotebook?.notebook.content) return
 
     const cells = stateNotebook.notebook.content.cells
-    const insertAt = cellId ? cells.findIndex((c) => c.id === cellId) : -1
+    const insertAt = cellId ? cells.findIndex((c) => c._id === cellId) : -1
     const nextCells = [...cells]
     nextCells.splice(insertAt === -1 ? cells.length : insertAt + 1, 0, cell)
+    if (isQueryCell(cell)) notebooksState.cellLocalState.set(cell._id, { showQuery: true })
 
     notebooksState.updateCells({ id, cells: nextCells })
   },
@@ -140,10 +168,16 @@ export const notebooksState = proxy({
     if (!stateNotebook?.notebook.content) return
 
     const nextCells = stateNotebook.notebook.content.cells.map((cell) =>
-      cell.id === cellId ? updater(cell) : cell
+      cell._id === cellId ? updater(cell) : cell
     )
     notebooksState.updateCells({ id, cells: nextCells })
   },
+
+  setQueryVisibility: ({ cellId, showQuery }: { cellId: string; showQuery: boolean }) =>
+    notebooksState.cellLocalState.set(cellId, {
+      ...notebooksState.cellLocalState.get(cellId),
+      showQuery,
+    }),
 
   /**
    * Remove a single cell from a notebook's cell array.
@@ -152,7 +186,8 @@ export const notebooksState = proxy({
     const stateNotebook = notebooksState.notebooks[id]
     if (!stateNotebook?.notebook.content) return
 
-    const nextCells = stateNotebook.notebook.content.cells.filter((c) => c.id !== cellId)
+    const nextCells = stateNotebook.notebook.content.cells.filter((c) => c._id !== cellId)
+    notebooksState.cellLocalState.delete(cellId)
     notebooksState.updateCells({ id, cells: nextCells })
   },
 
@@ -173,7 +208,7 @@ export const notebooksState = proxy({
     if (!stateNotebook?.notebook.content) return
 
     const cells = stateNotebook.notebook.content.cells
-    const currentIndex = cells.findIndex((c) => c.id === cellId)
+    const currentIndex = cells.findIndex((c) => c._id === cellId)
     if (currentIndex === -1) return
 
     const nextIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
@@ -199,8 +234,8 @@ export const notebooksState = proxy({
     if (!stateNotebook?.notebook.content) return
 
     const cells = stateNotebook.notebook.content.cells
-    const oldIndex = cells.findIndex((c) => c.id === activeCellId)
-    const newIndex = cells.findIndex((c) => c.id === overCellId)
+    const oldIndex = cells.findIndex((c) => c._id === activeCellId)
+    const newIndex = cells.findIndex((c) => c._id === overCellId)
     if (oldIndex === -1 || newIndex === -1) return
 
     notebooksState.updateCells({ id, cells: arrayMove([...cells], oldIndex, newIndex) })

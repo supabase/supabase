@@ -12,7 +12,7 @@ interface QueryResultChartProps {
   result?: QueryResult
 }
 
-const Y_COLUMN_COLORS = [
+const Y_SERIES_COLORS = [
   'hsl(var(--brand-default))',
   'hsl(var(--chart-blue))',
   'hsl(var(--chart-3))',
@@ -25,43 +25,44 @@ const toChartValue = (value: unknown): string | number => {
 }
 
 export const QueryResultChart = ({ chart, result }: QueryResultChartProps) => {
-  const { type, x_column, y_columns = [], cumulative, show_labels, scale } = chart ?? {}
+  const { type, x_column, y_series = [], cumulative, show_labels, scale } = chart ?? {}
 
-  const hasConfig = !!x_column && y_columns.length > 0
+  const hasConfig = !!x_column && y_series.length > 0
   // Logarithmic scale only makes sense for a single series — DisplaySettingsButton
   // resets `scale` to linear once a second Y column is added
-  const effectiveScale = y_columns.length > 1 ? 'linear' : scale
+  const effectiveScale = y_series.length > 1 ? 'linear' : scale
 
   const chartConfig: ChartSeriesConfig = useMemo(
     () =>
-      y_columns.reduce((acc, key, index) => {
-        acc[key] = { label: key, color: Y_COLUMN_COLORS[index] }
+      y_series.reduce((acc, key, index) => {
+        acc[key] = { label: key, color: Y_SERIES_COLORS[index] }
         return acc
       }, {} as ChartSeriesConfig),
-    [y_columns]
+    [y_series]
   )
 
   const chartRows = useMemo(() => {
     const xKey = x_column ?? ''
     return (result?.rows ?? []).map((row) => {
       const chartRow: Record<string, string | number> = { [xKey]: toChartValue(row[xKey]) }
-      y_columns.forEach((yKey) => {
+      y_series.forEach((yKey) => {
         chartRow[yKey] = toChartValue(row[yKey])
       })
       return chartRow
     })
-  }, [result, x_column, y_columns])
+  }, [result, x_column, y_series])
 
   const cumulativeResults = useMemo(
-    () => getCumulativeResults({ rows: chartRows }, { yKey: y_columns }),
-    [chartRows, y_columns]
+    () => getCumulativeResults({ rows: chartRows }, { yKey: y_series }),
+    [chartRows, y_series]
   )
   const resultToRender = cumulative ? cumulativeResults : chartRows
 
   if (!result || (result?.rows && result.rows.length === 0)) {
     return (
       <NoDataPlaceholder
-        className="bg border-0"
+        isFullHeight
+        className="border-0"
         size="normal"
         message="No results"
         description="Your query returned no rows"
@@ -72,7 +73,8 @@ export const QueryResultChart = ({ chart, result }: QueryResultChartProps) => {
   if (!hasConfig) {
     return (
       <NoDataPlaceholder
-        className="bg border-0"
+        isFullHeight
+        className="border-0"
         size="normal"
         message="Configure your chart"
         description="Select your X and Y axis in the display settings"
@@ -81,45 +83,43 @@ export const QueryResultChart = ({ chart, result }: QueryResultChartProps) => {
   }
 
   return (
-    <Chart>
-      <ChartCard className="rounded-none border-0">
-        <ChartContent>
-          <div className="h-40">
-            {type === 'bar' && (
-              <ChartBar
-                isFullHeight
-                xKey={x_column}
-                dataKey={y_columns[0]}
-                dataKeys={y_columns}
-                config={chartConfig}
-                showXAxis={show_labels}
-                showYAxis={show_labels}
-                data={resultToRender}
-                YAxisProps={{
-                  scale: effectiveScale === 'log' ? 'log' : 'auto',
-                  domain: effectiveScale === 'log' ? [1, 'auto'] : undefined,
-                  tickFormatter: effectiveScale === 'log' ? formatLogTick : undefined,
-                }}
-              />
-            )}
-            {type === 'line' && (
-              <ChartLine
-                isFullHeight
-                xKey={x_column}
-                dataKey={y_columns[0]}
-                dataKeys={y_columns}
-                config={chartConfig}
-                showXAxis={show_labels}
-                showYAxis={show_labels}
-                data={resultToRender}
-                YAxisProps={{
-                  scale: effectiveScale === 'log' ? 'log' : 'auto',
-                  domain: effectiveScale === 'log' ? [1, 'auto'] : undefined,
-                  tickFormatter: effectiveScale === 'log' ? formatLogTick : undefined,
-                }}
-              />
-            )}
-          </div>
+    <Chart className="flex flex-grow min-h-0">
+      <ChartCard className="flex flex-grow rounded-none border-0 min-h-0">
+        <ChartContent className="min-h-0 w-full">
+          {type === 'bar' && (
+            <ChartBar
+              isFullHeight
+              xKey={x_column}
+              dataKey={y_series[0]}
+              dataKeys={y_series}
+              config={chartConfig}
+              showXAxis={show_labels}
+              showYAxis={show_labels}
+              data={resultToRender}
+              YAxisProps={{
+                scale: effectiveScale === 'log' ? 'log' : 'auto',
+                domain: effectiveScale === 'log' ? [1, 'auto'] : undefined,
+                tickFormatter: effectiveScale === 'log' ? formatLogTick : undefined,
+              }}
+            />
+          )}
+          {type === 'line' && (
+            <ChartLine
+              isFullHeight
+              xKey={x_column}
+              dataKey={y_series[0]}
+              dataKeys={y_series}
+              config={chartConfig}
+              showXAxis={show_labels}
+              showYAxis={show_labels}
+              data={resultToRender}
+              YAxisProps={{
+                scale: effectiveScale === 'log' ? 'log' : 'auto',
+                domain: effectiveScale === 'log' ? [1, 'auto'] : undefined,
+                tickFormatter: effectiveScale === 'log' ? formatLogTick : undefined,
+              }}
+            />
+          )}
         </ChartContent>
       </ChartCard>
     </Chart>

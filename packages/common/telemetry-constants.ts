@@ -10,6 +10,7 @@
  *
  * @module telemetry-frontend
  */
+import type { components } from 'api-types'
 
 export type TelemetryGroups = {
   project: string
@@ -920,14 +921,29 @@ export interface DocsFeedbackClickedEvent {
   }
 }
 
+export type MarkdownAffordancePageType =
+  | 'blog'
+  | 'customers'
+  | 'events'
+  | 'pricing'
+  | 'changelog'
+  | 'guide'
+
 /**
- * User clicked 'Copy as Markdown' option on a page.
+ * User clicked 'Copy as Markdown' on a page and the markdown was copied successfully.
+ * Fires on success only; failed fetch/clipboard writes are not counted.
  *
  * @group Events
- * @source docs
+ * @source www, docs
  */
 export interface CopyAsMarkdownClickedEvent {
   action: 'copy_as_markdown_clicked'
+  properties: {
+    /**
+     * Page class the affordance sits on.
+     */
+    pageType: MarkdownAffordancePageType
+  }
 }
 
 /**
@@ -944,12 +960,16 @@ export interface AgentSetupClickedEvent {
  * User clicked "Ask..." to open a new window to consult an agent about the current page.
  *
  * @group Events
- * @source docs
+ * @source www, docs
  */
 export interface AskAiClickedEvent {
   action: 'ask_ai_clicked'
   properties: {
     agent: 'chatgpt' | 'claude'
+    /**
+     * Page class the affordance sits on.
+     */
+    pageType: MarkdownAffordancePageType
   }
 }
 
@@ -1401,29 +1421,28 @@ export interface ReportsDatabaseGrafanaBannerClickedEvent {
 }
 
 /**
- * User clicks on the Unified Logs banner CTA button in studio project pages.
+ * The logs.all deprecation banner was rendered, fired once per mount. Acts as the
+ * denominator for the dismiss rate. Migration outcome itself is measured via decay in
+ * `/v1/projects/:ref/analytics/endpoints/logs.all` traffic in the warehouse, not from this event.
  *
  * @group Events
  * @source studio
- * @page /project/[ref]/*
+ * @page /project/[ref]/logs/*, /project/[ref]/observability/*
  */
-export interface UnifiedLogsBannerCtaButtonClickedEvent {
-  action: 'unified_logs_banner_cta_button_clicked'
-  properties: {
-    is_enabled: boolean
-  }
+export interface LogsAllDeprecationBannerExposedEvent {
+  action: 'logs_all_deprecation_banner_exposed'
   groups: TelemetryGroups
 }
 
 /**
- * User clicked the dismiss button on the Unified Logs banner in studio project pages.
+ * User dismissed the logs.all deprecation banner.
  *
  * @group Events
  * @source studio
- * @page /project/[ref]/*
+ * @page /project/[ref]/logs/*, /project/[ref]/observability/*
  */
-export interface UnifiedLogsBannerDismissButtonClickedEvent {
-  action: 'unified_logs_banner_dismiss_button_clicked'
+export interface LogsAllDeprecationBannerDismissButtonClickedEvent {
+  action: 'logs_all_deprecation_banner_dismiss_button_clicked'
   groups: TelemetryGroups
 }
 
@@ -1509,6 +1528,28 @@ export interface DatabaseConnectionsBannerCtaButtonClickedEvent {
   properties: {
     isEnabled: boolean
   }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the dismiss button on the Explorer feature preview banner in studio project pages.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ExplorerBannerDismissButtonClickedEvent {
+  action: 'explorer_banner_dismiss_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the CTA button on the Explorer feature preview banner in studio project pages.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ExplorerBannerCtaButtonClickedEvent {
+  action: 'explorer_banner_cta_button_clicked'
   groups: TelemetryGroups
 }
 
@@ -2881,7 +2922,8 @@ export interface AuditLogDrainRemovedEvent {
   groups: Omit<TelemetryGroups, 'project'>
 }
 
-type AdvisorCategory = 'PERFORMANCE' | 'SECURITY'
+type AdvisorCategory =
+  components['schemas']['GetProjectLintsResponse'][number]['categories'][number]
 type AdvisorLevel = 'ERROR' | 'WARN' | 'INFO'
 
 /**
@@ -3781,8 +3823,8 @@ export type TelemetryEvent =
   | StudioBillingCancelSubscriptionClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
-  | UnifiedLogsBannerCtaButtonClickedEvent
-  | UnifiedLogsBannerDismissButtonClickedEvent
+  | LogsAllDeprecationBannerExposedEvent
+  | LogsAllDeprecationBannerDismissButtonClickedEvent
   | IndexAdvisorEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
   | IndexAdvisorTabClickedEvent
@@ -3792,6 +3834,8 @@ export type TelemetryEvent =
   | DatabaseConnectionsBlockerViewClickedEvent
   | DatabaseConnectionsBannerDismissButtonClickedEvent
   | DatabaseConnectionsBannerCtaButtonClickedEvent
+  | ExplorerBannerDismissButtonClickedEvent
+  | ExplorerBannerCtaButtonClickedEvent
   | SessionTerminateButtonClickedEvent
   | SessionTerminateSubmittedEvent
   | QueryCancelButtonClickedEvent

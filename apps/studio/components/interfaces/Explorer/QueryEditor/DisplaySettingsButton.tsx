@@ -1,16 +1,15 @@
-import { BarChart2, Settings2, Table } from 'lucide-react'
+import { BarChart2, LineChart, Settings2, Table } from 'lucide-react'
 import { useEffect, useEffectEvent, useMemo } from 'react'
 import {
-  Checkbox,
   Popover,
   PopoverContent,
-  PopoverSeparator,
   PopoverTrigger,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Switch,
   ToggleGroup,
   ToggleGroupItem,
   Tooltip,
@@ -29,7 +28,7 @@ import {
 import { ExplorerToolbarAction } from '../ExplorerToolbar'
 import { type QueryDisplay, type QueryResult } from '../types'
 import { checkHasNonPositiveValues } from '@/components/ui/QueryBlock/QueryBlock.utils'
-import { MAX_CHART_Y_COLUMNS, type ChartConfig } from '@/data/content/notebooks/notebook-schema'
+import { MAX_CHART_Y_SERIES, type ChartConfig } from '@/data/content/notebooks/notebook-schema'
 
 interface DisplaySettingsButtonProps {
   display: QueryDisplay
@@ -39,9 +38,9 @@ interface DisplaySettingsButtonProps {
   onChange: (display: QueryDisplay) => void
 }
 
-const getLogScaleDisabledReason = (y_columns: string[]) => {
-  if (y_columns.length === 0) return 'Select a column for the Y axis first'
-  if (y_columns.length > 1) return 'Only available with a single Y axis column'
+const getLogScaleDisabledReason = (y_series: string[]) => {
+  if (y_series.length === 0) return 'Select a column for the Y axis first'
+  if (y_series.length > 1) return 'Only available with a single Y axis column'
   return 'Data contains zero or negative values'
 }
 
@@ -56,22 +55,22 @@ export const DisplaySettingsButton = ({
   const {
     type = 'bar',
     x_column,
-    y_columns = [],
+    y_series = [],
     cumulative = false,
     show_labels = false,
     scale = 'linear',
   } = chart ?? {}
 
   const hasNonPositiveValues = useMemo(
-    () => checkHasNonPositiveValues(result?.rows ?? [], y_columns[0]),
-    [result, y_columns]
+    () => checkHasNonPositiveValues(result?.rows ?? [], y_series[0]),
+    [result, y_series]
   )
 
   // Logarithmic scale only applies to a single series.
   const canToggleLogScale = useMemo(() => {
-    if (y_columns.length !== 1 || !result || (result.rows ?? []).length === 0) return false
+    if (y_series.length !== 1 || !result || (result.rows ?? []).length === 0) return false
     return !hasNonPositiveValues
-  }, [hasNonPositiveValues, result, y_columns.length])
+  }, [hasNonPositiveValues, result, y_series.length])
 
   const onChangeView = (view: 'table' | 'chart') => {
     onChange({ ...display, view })
@@ -83,7 +82,7 @@ export const DisplaySettingsButton = ({
       chart: {
         type: chart?.type ?? 'bar',
         x_column: chart?.x_column ?? '',
-        y_columns: chart?.y_columns ?? [],
+        y_series: chart?.y_series ?? [],
         cumulative: chart?.cumulative ?? false,
         scale: chart?.scale ?? 'linear',
         show_labels: chart?.show_labels ?? false,
@@ -97,77 +96,85 @@ export const DisplaySettingsButton = ({
   })
 
   useEffect(() => {
-    if (scale === 'log' && (hasNonPositiveValues || y_columns.length > 1)) {
+    if (scale === 'log' && (hasNonPositiveValues || y_series.length > 1)) {
       resetToLinearScale()
     }
-  }, [hasNonPositiveValues, scale, y_columns.length])
+  }, [hasNonPositiveValues, scale, y_series.length])
 
   return (
     <Popover>
       <PopoverTrigger asChild>
         <ExplorerToolbarAction disabled={disabled} icon={<Settings2 />} tooltip="Result settings" />
       </PopoverTrigger>
-      <PopoverContent side="bottom" className="flex flex-col gap-y-3 p-0 py-3 mr-8 w-80">
-        <div className="flex flex-col gap-y-3 px-3">
-          <p className="text-xs tracking-tighter uppercase font-mono text-foreground-lighter">
-            Result display settings
-          </p>
+      <PopoverContent
+        side="bottom"
+        aria-label="Result display settings"
+        className="mr-8 flex w-80 flex-col p-3"
+      >
+        <div className="flex flex-col gap-y-2.5">
+          <ToggleGroup
+            value={view}
+            onValueChange={(value) => {
+              if (value === 'table' || value === 'chart') onChangeView(value)
+            }}
+            aria-label="View result as"
+            variant="outline"
+            size="tiny"
+            type="single"
+            className="w-full"
+          >
+            <ToggleGroupItem value="table" className="w-full gap-2">
+              <Table size={14} />
+              <span>Table</span>
+            </ToggleGroupItem>
+            <ToggleGroupItem value="chart" className="w-full gap-2">
+              <BarChart2 size={14} />
+              <span>Chart</span>
+            </ToggleGroupItem>
+          </ToggleGroup>
 
-          <FormItemLayout isReactForm={false} label="View data as">
-            <ToggleGroup
-              value={view}
-              onValueChange={(value) => {
-                if (value === 'table' || value === 'chart') onChangeView(value)
-              }}
-              variant="outline"
-              type="single"
-            >
-              <ToggleGroupItem value="table" className="w-full gap-x-2 data-[state=on]:bg-accent">
-                <Table size={14} />
-                <p>Table</p>
-              </ToggleGroupItem>
-              <ToggleGroupItem value="chart" className="w-full gap-x-2 data-[state=on]:bg-accent">
-                <BarChart2 size={14} />
-                <p>Chart</p>
-              </ToggleGroupItem>
-            </ToggleGroup>
-          </FormItemLayout>
-        </div>
-
-        {view === 'chart' && (
-          <>
-            <PopoverSeparator />
-
-            <FormItemLayout isReactForm={false} label="Render chart as" className="px-3 mb-1">
-              <ToggleGroup
-                value={type}
-                onValueChange={(value) => {
-                  if (value === 'bar' || value === 'line') onUpdateChartConfig({ type: value })
-                }}
-                variant="outline"
-                type="single"
-              >
-                <ToggleGroupItem value="bar" className="w-full data-[state=on]:bg-accent">
-                  Bar
-                </ToggleGroupItem>
-                <ToggleGroupItem value="line" className="w-full data-[state=on]:bg-accent">
-                  Line
-                </ToggleGroupItem>
-              </ToggleGroup>
-            </FormItemLayout>
-
-            <div className="px-3 flex flex-col gap-y-2">
+          {view === 'chart' && (
+            <div className="flex min-w-0 flex-col gap-y-2.5">
               <FormItemLayout
                 isReactForm={false}
-                layout="flex-row-reverse"
+                layout="horizontal"
+                size="tiny"
+                label="Chart type"
+              >
+                <ToggleGroup
+                  value={type}
+                  onValueChange={(value) => {
+                    if (value === 'bar' || value === 'line') onUpdateChartConfig({ type: value })
+                  }}
+                  aria-label="Chart type"
+                  variant="default"
+                  size="tiny"
+                  type="single"
+                  className="w-full"
+                >
+                  <ToggleGroupItem value="bar" className="w-full gap-2">
+                    <BarChart2 size={14} />
+                    <span>Bar</span>
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="line" className="w-full gap-2">
+                    <LineChart size={14} />
+                    <span>Line</span>
+                  </ToggleGroupItem>
+                </ToggleGroup>
+              </FormItemLayout>
+
+              <FormItemLayout
+                id="result-x-axis"
+                isReactForm={false}
+                layout="horizontal"
+                size="tiny"
                 label="X axis"
-                className="[&>div:first-child]:xl:w-3/5"
               >
                 <Select
                   value={x_column}
                   onValueChange={(x_column) => onUpdateChartConfig({ x_column })}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger id="result-x-axis" size="tiny" className="w-full">
                     <SelectValue placeholder="Select a column" />
                   </SelectTrigger>
                   <SelectContent>
@@ -181,26 +188,29 @@ export const DisplaySettingsButton = ({
               </FormItemLayout>
 
               <FormItemLayout
+                id="result-y-axis"
                 isReactForm={false}
-                layout="flex-row-reverse"
-                label="Y Axis"
-                className="[&>div:first-child]:xl:w-3/5"
+                layout="horizontal"
+                size="tiny"
+                label="Y axis"
               >
                 <MultiSelector
-                  values={y_columns}
+                  size="tiny"
+                  values={y_series}
                   onValuesChange={(values) => {
-                    if (values.length > MAX_CHART_Y_COLUMNS) return
-                    onUpdateChartConfig({ y_columns: values })
+                    if (values.length > MAX_CHART_Y_SERIES) return
+                    onUpdateChartConfig({ y_series: values })
                   }}
                   className="w-full"
                 >
                   <MultiSelectorTrigger
+                    id="result-y-axis"
                     mode="inline-combobox"
-                    label={`Select up to ${MAX_CHART_Y_COLUMNS} columns`}
+                    label={`Select up to ${MAX_CHART_Y_SERIES} columns`}
                     deletableBadge
-                    badgeLimit="wrap"
+                    badgeLimit={1}
                     showIcon={false}
-                    className="min-w-32!"
+                    className="min-w-0"
                   />
                   <MultiSelectorContent>
                     <MultiSelectorList>
@@ -208,9 +218,7 @@ export const DisplaySettingsButton = ({
                         <MultiSelectorItem
                           key={x}
                           value={x}
-                          disabled={
-                            y_columns.length >= MAX_CHART_Y_COLUMNS && !y_columns.includes(x)
-                          }
+                          disabled={y_series.length >= MAX_CHART_Y_SERIES && !y_series.includes(x)}
                         >
                           {x}
                         </MultiSelectorItem>
@@ -220,70 +228,78 @@ export const DisplaySettingsButton = ({
                 </MultiSelector>
               </FormItemLayout>
 
-              <FormItemLayout
-                isReactForm={false}
-                layout="flex-row-reverse"
-                label="Scale"
-                className="[&>div:first-child]:xl:w-3/5"
-              >
-                <Select
+              <FormItemLayout isReactForm={false} layout="horizontal" size="tiny" label="Scale">
+                <ToggleGroup
                   value={scale}
-                  onValueChange={(scale) =>
-                    onUpdateChartConfig({ scale: scale as 'log' | 'linear' })
-                  }
+                  onValueChange={(value) => {
+                    if (value === 'linear' || (value === 'log' && canToggleLogScale)) {
+                      onUpdateChartConfig({ scale: value })
+                    }
+                  }}
+                  aria-label="Chart scale"
+                  variant="default"
+                  size="tiny"
+                  type="single"
+                  className="w-full"
                 >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select a column" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="linear">Linear</SelectItem>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <SelectItem
-                          disabled={!canToggleLogScale}
+                  <ToggleGroupItem value="linear" className="w-full">
+                    Linear
+                  </ToggleGroupItem>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="flex w-full" tabIndex={!canToggleLogScale ? 0 : undefined}>
+                        <ToggleGroupItem
                           value="log"
-                          className={!canToggleLogScale ? '!pointer-events-auto' : undefined}
+                          disabled={!canToggleLogScale}
+                          className="w-full"
                         >
-                          Logarithmic
-                        </SelectItem>
-                      </TooltipTrigger>
-                      {!canToggleLogScale && (
-                        <TooltipContent side="left">
-                          {getLogScaleDisabledReason(y_columns)}
-                        </TooltipContent>
-                      )}
-                    </Tooltip>
-                  </SelectContent>
-                </Select>
+                          Log
+                        </ToggleGroupItem>
+                      </span>
+                    </TooltipTrigger>
+                    {!canToggleLogScale && (
+                      <TooltipContent side="left">
+                        {getLogScaleDisabledReason(y_series)}
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                </ToggleGroup>
               </FormItemLayout>
 
-              <FormItemLayout id="cumulative" isReactForm={false} layout="flex" label="Cumulative">
-                <Checkbox
+              <FormItemLayout
+                id="cumulative"
+                isReactForm={false}
+                layout="horizontal"
+                size="tiny"
+                label="Cumulative"
+              >
+                <Switch
                   id="cumulative"
+                  aria-label="Cumulative"
+                  size="small"
                   checked={cumulative}
-                  onCheckedChange={(cumulative) =>
-                    onUpdateChartConfig({ cumulative: Boolean(cumulative) })
-                  }
+                  onCheckedChange={(cumulative) => onUpdateChartConfig({ cumulative })}
                 />
               </FormItemLayout>
 
               <FormItemLayout
                 id="show_labels"
                 isReactForm={false}
-                layout="flex"
+                layout="horizontal"
+                size="tiny"
                 label="Show labels"
               >
-                <Checkbox
+                <Switch
                   id="show_labels"
+                  aria-label="Show labels"
+                  size="small"
                   checked={show_labels}
-                  onCheckedChange={(show_labels) =>
-                    onUpdateChartConfig({ show_labels: Boolean(show_labels) })
-                  }
+                  onCheckedChange={(show_labels) => onUpdateChartConfig({ show_labels })}
                 />
               </FormItemLayout>
             </div>
-          </>
-        )}
+          )}
+        </div>
       </PopoverContent>
     </Popover>
   )
