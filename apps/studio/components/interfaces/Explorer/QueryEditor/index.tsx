@@ -367,6 +367,17 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     prettify: handlePrettify,
   }))
 
+  // The editor only exists while `showQuery` is true. Hiding it unmounts the editor and
+  // Monaco disposes it, but a disposed editor still answers `getValue()` with `''`, so
+  // anything still holding this handle reads an empty query instead of the real one. Drop
+  // the handle and the selection flag it feeds; `onMount` re-establishes both from the new
+  // instance if the editor comes back.
+  useEffect(() => {
+    if (showQuery) return
+    editorInstanceRef.current = null
+    setHasSelection(false)
+  }, [showQuery])
+
   useEffect(() => {
     if (!promptState?.isOpen) return
     const node = editorInstanceRef.current?.getDomNode()

@@ -2,6 +2,7 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { HttpResponse } from 'msw'
+import { useEffect, useRef } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ExplorerNotebookTab } from '../ExplorerNotebookTab'
@@ -35,16 +36,50 @@ vi.mock('@/components/ui/CodeEditor/CodeEditor', () => ({
   CodeEditor: ({
     value,
     onInputChange,
+    onMount,
   }: {
     value: string
     onInputChange?: (value: string | undefined) => void
-  }) => (
-    <textarea
-      aria-label="SQL editor"
-      value={value}
-      onChange={(e) => onInputChange?.(e.target.value)}
-    />
-  ),
+    onMount?: (editor: any, monaco: any) => void
+  }) => {
+    const valueRef = useRef(value)
+    valueRef.current = value
+
+    useEffect(() => {
+      // Monaco keeps answering after disposal: `getValue()` returns `''` and
+      // `getSelection()`/`getModel()`/`getAction()` return null (codeEditorWidget.js
+      // guards on `_modelData`). The fake mirrors that so a handle held past unmount
+      // behaves here like it does in the browser.
+      let isDisposed = false
+
+      onMount?.(
+        {
+          getValue: () => (isDisposed ? '' : valueRef.current),
+          getSelection: () => null,
+          getModel: () => (isDisposed ? null : { getValueInRange: () => undefined }),
+          getAction: () => (isDisposed ? null : { run: () => Promise.resolve() }),
+          onDidBlurEditorWidget: () => () => {},
+          onDidChangeCursorSelection: () => ({ dispose: () => {} }),
+          addAction: () => {},
+          focus: () => {},
+        },
+        { KeyMod: { CtrlCmd: 1, Shift: 2, Alt: 4 }, KeyCode: { KeyK: 3, Enter: 4, KeyF: 5 } }
+      )
+
+      return () => {
+        isDisposed = true
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    return (
+      <textarea
+        aria-label="SQL editor"
+        value={value}
+        onChange={(e) => onInputChange?.(e.target.value)}
+      />
+    )
+  },
 }))
 
 vi.mock('../QueryEditor/QuerySourceMenu', () => ({
@@ -387,5 +422,33 @@ describe('ExplorerNotebookTab', () => {
     // The in-flight save only persisted the older content, so the notebook must still be
     // considered unsaved rather than clobbered back to 'saved' by the stale response.
     expect(notebooksState.notebooks[NOTEBOOK_ID]?.status).toBe('unsaved')
+  })
+
+  it("keeps a collapsed cell's SQL when Prettify runs against it", async () => {
+    seedNotebook([databaseCell])
+
+    renderNotebookTab()
+
+    // A saved notebook renders its cells collapsed, so expand first: the editor has to
+    // mount before it can be disposed, which is what leaves a stale handle behind.
+    const showQuery = document.querySelector('.lucide-eye')?.closest('button')
+    expect(showQuery).toBeInstanceOf(HTMLButtonElement)
+    await userEvent.click(showQuery as HTMLButtonElement)
+    await screen.findByLabelText('SQL editor')
+
+    // Collapsing unmounts the CodeEditor, so the handle QueryEditor holds points at a
+    // disposed Monaco instance. Prettify sits in the cell toolbar, which stays rendered,
+    // and it commits whatever the editor reports back to the cell.
+    const hideQuery = document.querySelector('.lucide-eye-off')?.closest('button')
+    expect(hideQuery).toBeInstanceOf(HTMLButtonElement)
+    await userEvent.click(hideQuery as HTMLButtonElement)
+
+    const prettify = document.querySelector('.lucide-align-left')?.closest('button')
+    expect(prettify).toBeInstanceOf(HTMLButtonElement)
+    await userEvent.click(prettify as HTMLButtonElement)
+
+    expect(notebooksState.notebooks[NOTEBOOK_ID]?.notebook.content?.cells[0]).toMatchObject({
+      unchecked_sql: 'select 1',
+    })
   })
 })

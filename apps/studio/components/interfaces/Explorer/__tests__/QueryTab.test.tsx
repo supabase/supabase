@@ -53,11 +53,16 @@ vi.mock('@/components/ui/CodeEditor/CodeEditor', () => ({
         ? { startLineNumber: 1, endLineNumber: 2, startColumn: 1, endColumn: 5 }
         : null
 
+      // Monaco keeps answering after the editor is disposed: `getValue()` returns `''` and
+      // `getSelection()`/`getModel()` return null (codeEditorWidget.js guards on `_modelData`).
+      // The fake mirrors that so a stale handle behaves here like it does in the browser.
+      let isDisposed = false
+
       onMount?.(
         {
-          getValue: () => valueRef.current,
-          getSelection: () => selection,
-          getModel: () => ({ getValueInRange: () => testContext.selectedText }),
+          getValue: () => (isDisposed ? '' : valueRef.current),
+          getSelection: () => (isDisposed ? null : selection),
+          getModel: () => (isDisposed ? null : { getValueInRange: () => testContext.selectedText }),
           onDidBlurEditorWidget: () => () => {},
           // Intentionally never invoked here — the real editor only fires this on a
           // subsequent user-driven selection change, not eagerly on mount. Tests that
@@ -67,6 +72,10 @@ vi.mock('@/components/ui/CodeEditor/CodeEditor', () => ({
         },
         { KeyMod: { CtrlCmd: 1, Shift: 2 }, KeyCode: { KeyK: 3, Enter: 4 } }
       )
+
+      return () => {
+        isDisposed = true
+      }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
@@ -457,6 +466,41 @@ describe('QueryTab execution', () => {
     await waitFor(() => expect(executedQueries).toHaveLength(1))
     expect(executedQueries[0]).toContain('select 2')
     expect(executedQueries[0]).not.toContain('select 1')
+  })
+
+  it('still runs the query after the query panel is hidden', async () => {
+    createDraft({ _tag: 'database' }, 'select 1;\nselect 2;')
+
+    const executedQueries: string[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: async ({ request }) => {
+        const key = new URL(request.url).searchParams.get('key')
+        if (key !== '') return HttpResponse.json([])
+        const { query } = (await request.json()) as { query: string }
+        executedQueries.push(query)
+        return HttpResponse.json([])
+      },
+    })
+
+    renderQueryTab()
+    await screen.findByRole('button', { name: 'Run' })
+
+    // Hiding unmounts CodeEditor, so the handle the run button reads points at a disposed
+    // editor. The SQL itself is still in state and the run button stays enabled, so the
+    // query has to keep running off that rather than off the dead editor.
+    const hideQueryButton = document.querySelector('.lucide-eye-off')?.closest('button')
+    expect(hideQueryButton).toBeInstanceOf(HTMLButtonElement)
+    await userEvent.click(hideQueryButton as HTMLButtonElement)
+
+    const runButton = await screen.findByRole('button', { name: 'Run' })
+    await waitFor(() => expect(runButton).toBeEnabled())
+    await userEvent.click(runButton)
+
+    await waitFor(() => expect(executedQueries).toHaveLength(1))
+    expect(executedQueries[0]).toContain('select 1')
+    expect(executedQueries[0]).toContain('select 2')
   })
 
   it('drops the stale "Run selected" state once the query panel is hidden and shown again', async () => {
