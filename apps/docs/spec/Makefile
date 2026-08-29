@@ -1,5 +1,4 @@
 REPO_DIR=$(shell pwd)
-GENERATOR_DIR=../../../packages/generator
 
 .PHONY: run download download.api.v1 download.storage.v1 download.tsdoc.v2 download.server.v1 transform dereference.api.v1 dereference.auth.v1 dereference.storage.v0 generate generate.sections.api.v1 format
 
