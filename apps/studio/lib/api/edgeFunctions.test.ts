@@ -152,4 +152,21 @@ describe('isValidEdgeFunctionURL', () => {
       expect(isValidEdgeFunctionURL(url, false), `Expected ${url} to be invalid`).toBe(false)
     }
   })
+
+  it('should reject path-normalization escapes that pass a raw-string check', () => {
+    // '/functions/v1/../../x' passes a raw regex but fetch normalizes to '/x'
+    const traversalUrls = [
+      'http://kong:8000/functions/v1/../',
+      'http://169.254.169.254/functions/v1/../../latest/meta-data/',
+      'https://uniquetwentychararef.supabase.co/functions/v1/../rest/v1/',
+    ]
+    for (const url of traversalUrls) {
+      expect(isValidEdgeFunctionURL(url, false), `Expected ${url} to be invalid off platform`).toBe(
+        false
+      )
+      expect(isValidEdgeFunctionURL(url, true), `Expected ${url} to be invalid on platform`).toBe(
+        false
+      )
+    }
+  })
 })
