@@ -1,0 +1,65 @@
+name: Studio Dead Code (knip)
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'apps/studio/**'
+      - 'knip.jsonc'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/studio-knip.yml'
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'apps/studio/**'
+      - 'knip.jsonc'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/studio-knip.yml'
+
+# Cancel old builds on new commit for same workflow + branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  knip:
+    # Uses larger hosted runner as it significantly decreases build times
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    env:
+      NODE_OPTIONS: --max-old-space-size=6144
+
+    steps:
+      # No sparse-checkout: knip resolves the whole pnpm workspace graph, so it
+      # needs every workspace's package.json present even when scoped to studio.
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Use Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      # `symbols` keeps the readable table in the job log, `github-actions` adds
+      # the same findings as inline PR annotations.
+      - name: Run knip
+        run: pnpm knip --workspace apps/studio --no-progress --reporter symbols --reporter github-actions
