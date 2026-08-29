@@ -72,27 +72,37 @@ withTestDatabase(
     // inside the DO body via `format('alter schema %I owner to %I;', old.nspname, new_owner)`,
     // so a `$$` in the role name closes the outer `do $$` delimiter
     // early on the pre-fix source.
-    await executeQuery(`create schema "app$$z";`)
-    await executeQuery(`create role "owner$$role" nologin;`)
+    await executeQuery(`
+      DROP ROLE IF EXISTS "owner$$role";
+      create schema "app$$z";
+      create role "owner$$role" nologin;
+    `)
 
-    const [{ ownerOid }] = await executeQuery<{ ownerOid: number }[]>(
-      `select oid::int as "ownerOid" from pg_roles where rolname = 'owner$$role';`
-    )
+    try {
+      const [{ ownerOid }] = await executeQuery<{ ownerOid: number }[]>(
+        `select oid::int as "ownerOid" from pg_roles where rolname = 'owner$$role';`
+      )
 
-    const { sql: updateSql } = await pgMeta.schemas.update(
-      { name: 'app$$z' },
-      { owner: 'owner$$role' }
-    )
-    await executeQuery(updateSql)
+      const { sql: updateSql } = await pgMeta.schemas.update(
+        { name: 'app$$z' },
+        { owner: 'owner$$role' }
+      )
+      await executeQuery(updateSql)
 
-    // Verify the owner was actually changed to the role's OID (not
-    // merely that *some* OID was set), proving the DO body parsed
-    // and executed end-to-end with the `$$`-containing role name
-    // embedded in the format() arg.
-    const [{ nspowner }] = await executeQuery<{ nspowner: number }[]>(
-      `select nspowner::int as nspowner from pg_namespace where nspname = 'app$$z';`
-    )
-    expect(nspowner).toBe(ownerOid)
+      // Verify the owner was actually changed to the role's OID (not
+      // merely that *some* OID was set), proving the DO body parsed
+      // and executed end-to-end with the `$$`-containing role name
+      // embedded in the format() arg.
+      const [{ nspowner }] = await executeQuery<{ nspowner: number }[]>(
+        `select nspowner::int as nspowner from pg_namespace where nspname = 'app$$z';`
+      )
+      expect(nspowner).toBe(ownerOid)
+    } finally {
+      await executeQuery(`
+        drop schema if exists "app$$z" cascade;
+        drop role if exists "owner$$role";
+      `).catch(() => undefined)
+    }
   }
 )
 
