@@ -348,8 +348,10 @@ export const buildTablePrivilegesSql = (
       ? safeSql`grant select, insert, update, delete on table %I.%I to anon, authenticated, service_role`
       : safeSql`revoke all on table %I.%I from anon, authenticated, service_role`
 
+  const doBlockDelimiter = getDoBlockDelimiter([])
+
   return safeSql`
-    do ${getDoBlockDelimiter(['$pg_meta$'])}
+    do ${doBlockDelimiter}
     declare
       nspname name;
       relname name;
@@ -365,7 +367,7 @@ export const buildTablePrivilegesSql = (
       loop
         execute format('${privilegeClause}', nspname, relname);
       end loop;
-    end ${getDoBlockDelimiter(['$pg_meta$'])};
+    end ${doBlockDelimiter};
   `
 }
 
@@ -390,22 +392,15 @@ export const buildFunctionPrivilegesSql = (
       ? safeSql`grant execute on function %I.%I(%s) to anon, authenticated, service_role`
       : safeSql`revoke all on function %I.%I(%s) from anon, authenticated, service_role`
 
-  // The body embeds `nspname`, `proname`, and `arg_types` (read from
-  // `pg_namespace` / `pg_proc` / `pg_get_function_identity_arguments`)
-  // through `format('... %I.%I(%s) ...', nspname, proname, arg_types)`.
-  // The `where` clause also embeds `schema` and `name` via
-  // `${literal(schema)},${literal(name)}`. If any of those values
-  // contains the literal `$$` the body closes the outer `do $$`
-  // delimiter early and the statement fails with `syntax error at
-  // or near "..."`. Pick a delimiter that is absent from the
-  // `schemaNames` inputs (which seed the where-clause tuples) and
-  // from a hardcoded marker for the catalog-derived values, since
-  // the function does not enumerate every possible catalog name.
-  // The marker is a literal that is never present in any real
-  // catalog identifier and so the base `$pg_meta$` delimiter is
-  // collision-free against both the inputs and the catalog.
+  // The body embeds `schema` and `name` from `schemaNames` via
+  // `${literal(schema)},${literal(name)}` in the tuples list. If any of
+  // those values contains the delimiter (e.g. `$$` or `$pg_meta$`), the
+  // body could prematurely terminate the DO block. Pick a delimiter
+  // that is absent from all `schemaNames` values.
+  const doBlockDelimiter = getDoBlockDelimiter(schemaNames)
+
   return safeSql`
-    do ${getDoBlockDelimiter([...schemaNames, '$pg_meta$'])}
+    do ${doBlockDelimiter}
     declare
       nspname name;
       proname name;
@@ -419,6 +414,6 @@ export const buildFunctionPrivilegesSql = (
       loop
         execute format('${privilegeClause}', nspname, proname, arg_types);
       end loop;
-    end ${getDoBlockDelimiter([...schemaNames, '$pg_meta$'])};
+    end ${doBlockDelimiter};
   `
 }

@@ -22,7 +22,7 @@ test('buildTablePrivilegesSql: uses a non-$$ DO-block delimiter', () => {
   const sql = buildTablePrivilegesSql([1, 2, 3], 'grant')
 
   expect(sql).not.toMatch(/do\s*\$\$\s/)
-  expect(sql).toMatch(/do\s*\$pg_meta/)
+  expect(sql).toMatch(/do\s*\$pg_meta\$\s/)
 
   // Opener and closer must match.
   const openMatch = sql.match(/do\s*(\$pg_meta(?:_\d+)?\$)/)
@@ -41,7 +41,7 @@ test('buildFunctionPrivilegesSql: uses a non-$$ DO-block delimiter', () => {
   const sql = buildFunctionPrivilegesSql(['public.my_func'], 'grant')
 
   expect(sql).not.toMatch(/do\s*\$\$\s/)
-  expect(sql).toMatch(/do\s*\$pg_meta/)
+  expect(sql).toMatch(/do\s*\$pg_meta\$\s/)
 
   const openMatch = sql.match(/do\s*(\$pg_meta(?:_\d+)?\$)/)
   expect(openMatch).not.toBeNull()
@@ -50,14 +50,13 @@ test('buildFunctionPrivilegesSql: uses a non-$$ DO-block delimiter', () => {
 
 test('buildFunctionPrivilegesSql: schemaNames input containing $$ does not collide', () => {
   // A schema.name input that itself contains the literal `$$`.
-  // The helper must pick `$pg_meta_1$` (or higher) so the body's
+  // The helper picks `$pg_meta$` (which does not collide with `$$`) so the body's
   // `literal('weird$$schema_name')` substring does not close the
   // outer delimiter.
   const sql = buildFunctionPrivilegesSql(['weird$$schema.my$$func'], 'grant')
 
   expect(sql).not.toMatch(/do\s*\$\$\s/)
-  expect(sql).not.toMatch(/do\s*\$pg_meta\$$/) // base delimiter collides; must skip
-  expect(sql).toMatch(/do\s*\$pg_meta_\d+\$/)
+  expect(sql).toMatch(/do\s*\$pg_meta\$\s/)
 })
 
 test('buildFunctionPrivilegesSql: input containing $pg_meta$ picks a higher delimiter', () => {
@@ -65,7 +64,10 @@ test('buildFunctionPrivilegesSql: input containing $pg_meta$ picks a higher deli
   // helper must skip past it and pick `$pg_meta_1$`.
   const sql = buildFunctionPrivilegesSql(['$pg_meta$.my_func'], 'grant')
 
+  expect(sql).not.toMatch(/do\s*\$\$\s/)
+  expect(sql).not.toMatch(/do\s*\$pg_meta\$\s/)
   expect(sql).toMatch(/do\s*\$pg_meta_1\$/)
+  expect(sql).toContain('end $pg_meta_1$;')
 })
 
 test('buildFunctionPrivilegesSql: input containing both $pg_meta$ and $pg_meta_1$ picks $pg_meta_2$', () => {
@@ -73,10 +75,7 @@ test('buildFunctionPrivilegesSql: input containing both $pg_meta$ and $pg_meta_1
   // the FIRST generated suffix. The helper must keep skipping
   // until it finds a collision-free delimiter. This proves the
   // loop increments the suffix correctly rather than
-  // special-casing the base delimiter. (CodeRabbit flagged this
-  // as a potential weak test; using `$pg_meta$` alone only proves
-  // the helper rejects the base delimiter, not that the suffix
-  // counter is actually incremented.)
+  // special-casing the base delimiter.
   const sql = buildFunctionPrivilegesSql(['$pg_meta$ $pg_meta_1$ my_func'], 'grant')
 
   expect(sql).toMatch(/do\s*\$pg_meta_2\$/)
