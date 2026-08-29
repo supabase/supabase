@@ -5,13 +5,18 @@ import {
   Form,
   FormControl,
   FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
   Input,
-  SidePanel,
+  Separator,
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetSection,
+  SheetTitle,
   Switch,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 import z from 'zod'
 
 import { ROLE_PERMISSIONS } from './Roles.constants'
@@ -76,115 +81,114 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
   }
 
   return (
-    <SidePanel
-      size="large"
-      visible={visible}
-      header="Create a new role"
-      className="mr-0 transform transition-all duration-300 ease-in-out"
-      loading={false}
-      onCancel={handleClose}
-      customFooter={
-        <div className="flex w-full justify-end space-x-3 border-t border-default px-3 py-4">
+    <Sheet
+      open={visible}
+      onOpenChange={(open) => {
+        if (!open) handleClose()
+      }}
+    >
+      <SheetContent size="lg" className="flex flex-col gap-0">
+        <SheetHeader>
+          <SheetTitle>Create a new role</SheetTitle>
+        </SheetHeader>
+
+        <Form {...form}>
+          <form id={formId} className="flex-1 overflow-auto" onSubmit={form.handleSubmit(onSubmit)}>
+            <SheetSection className="flex flex-col gap-y-6">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItemLayout id="role-name" layout="horizontal" label="Name">
+                    <FormControl>
+                      <Input id="role-name" {...field} className="w-full" />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+
+              <FormLayout layout="horizontal" label="Role privileges">
+                <div className="grid gap-4">
+                  {(Object.keys(ROLE_PERMISSIONS) as (keyof typeof ROLE_PERMISSIONS)[])
+                    .filter((permissionKey) => ROLE_PERMISSIONS[permissionKey].grant_by_dashboard)
+                    .map((permissionKey) => {
+                      const permission = ROLE_PERMISSIONS[permissionKey]
+                      const id = `role-${permissionKey}`
+
+                      return (
+                        <FormField
+                          key={permissionKey}
+                          control={form.control}
+                          name={permissionKey}
+                          render={({ field }) => (
+                            <FormItemLayout id={id} layout="flex" label={permission.description}>
+                              <FormControl>
+                                <Switch
+                                  id={id}
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                            </FormItemLayout>
+                          )}
+                        />
+                      )
+                    })}
+
+                  <Separator />
+
+                  <div className="grid gap-4">
+                    <p className="text-sm">These privileges cannot be granted via the Dashboard:</p>
+                    {(Object.keys(ROLE_PERMISSIONS) as (keyof typeof ROLE_PERMISSIONS)[])
+                      .filter(
+                        (permissionKey) => !ROLE_PERMISSIONS[permissionKey].grant_by_dashboard
+                      )
+                      .map((permissionKey) => {
+                        const permission = ROLE_PERMISSIONS[permissionKey]
+                        const id = `role-${permissionKey}`
+
+                        return (
+                          <FormField
+                            key={permissionKey}
+                            control={form.control}
+                            name={permissionKey}
+                            render={({ field }) => (
+                              <FormItemLayout
+                                id={id}
+                                layout="flex"
+                                label={permission.description}
+                                className="opacity-70"
+                              >
+                                <FormControl>
+                                  <Switch
+                                    id={id}
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                    disabled
+                                    aria-readonly
+                                  />
+                                </FormControl>
+                              </FormItemLayout>
+                            )}
+                          />
+                        )
+                      })}
+                  </div>
+                </div>
+              </FormLayout>
+            </SheetSection>
+          </form>
+        </Form>
+
+        <SheetFooter>
           <FormActions
             form={formId}
             isSubmitting={isCreating}
             hasChanges={form.formState.isDirty}
             handleReset={handleClose}
           />
-        </div>
-      }
-    >
-      <Form {...form}>
-        <form
-          id={formId}
-          className="grid gap-6 w-full px-8 py-8"
-          onSubmit={form.handleSubmit(onSubmit)}
-        >
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
-                <FormLabel className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
-                  Name
-                </FormLabel>
-                <FormControl className="col-span-8">
-                  <Input {...field} className="w-full" />
-                </FormControl>
-                <FormMessage className="col-start-5 col-span-8" />
-              </FormItem>
-            )}
-          />
-          <div className="grid gap-2 mt-4 md:grid md:grid-cols-12">
-            <div className="col-span-4">
-              <FormLabel className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
-                Role privileges
-              </FormLabel>
-            </div>
-            <div className="col-span-8 grid gap-4">
-              {(Object.keys(ROLE_PERMISSIONS) as (keyof typeof ROLE_PERMISSIONS)[])
-                .filter((permissionKey) => ROLE_PERMISSIONS[permissionKey].grant_by_dashboard)
-                .map((permissionKey) => {
-                  const permission = ROLE_PERMISSIONS[permissionKey]
-
-                  return (
-                    <FormField
-                      key={permissionKey}
-                      control={form.control}
-                      name={permissionKey}
-                      render={({ field }) => (
-                        <FormItem className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
-                          <FormControl className="col-span-8 flex items-center gap-4">
-                            <div className="w-full text-sm">
-                              <Switch checked={field.value} onCheckedChange={field.onChange} />
-                              <FormLabel>{permission.description}</FormLabel>
-                            </div>
-                          </FormControl>
-                          <FormMessage className="col-start-5 col-span-8" />
-                        </FormItem>
-                      )}
-                    />
-                  )
-                })}
-
-              <SidePanel.Separator />
-
-              <div className="grid gap-4">
-                <p className="text-sm">These privileges cannot be granted via the Dashboard:</p>
-                {(Object.keys(ROLE_PERMISSIONS) as (keyof typeof ROLE_PERMISSIONS)[])
-                  .filter((permissionKey) => !ROLE_PERMISSIONS[permissionKey].grant_by_dashboard)
-                  .map((permissionKey) => {
-                    const permission = ROLE_PERMISSIONS[permissionKey]
-
-                    return (
-                      <FormField
-                        key={permissionKey}
-                        control={form.control}
-                        name={permissionKey}
-                        render={({ field }) => (
-                          <FormItem className="space-y-0 opacity-70">
-                            <FormControl className="flex items-center gap-4">
-                              <div className="w-full text-sm">
-                                <Switch
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
-                                  disabled
-                                  aria-readonly
-                                />
-                                <FormLabel>{permission.description}</FormLabel>
-                              </div>
-                            </FormControl>
-                            <FormMessage className="col-start-5 col-span-8" />
-                          </FormItem>
-                        )}
-                      />
-                    )
-                  })}
-              </div>
-            </div>
-          </div>
-        </form>
-      </Form>
-    </SidePanel>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   )
 }
