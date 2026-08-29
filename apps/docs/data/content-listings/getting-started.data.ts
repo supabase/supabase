@@ -65,7 +65,7 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       icon: '/docs/img/icons/react-icon',
       hasLightIcon: false,
       description:
-        'Learn how to create a Supabase project, add some sample data to your database, and query the data from a React app.',
+        'Build single-page apps from reusable components, and query Supabase Postgres from the browser.',
     },
     {
       title: 'Next.js',
@@ -73,7 +73,7 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       icon: '/docs/img/icons/nextjs-icon',
       hasLightIcon: true,
       description:
-        'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Next.js app.',
+        'Full-stack React with server rendering, wired to Supabase Postgres and cookie-based auth.',
     },
     {
       title: 'Nuxt',
@@ -81,7 +81,15 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       icon: '/docs/img/icons/nuxt-icon',
       hasLightIcon: false,
       description:
-        'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Nuxt app.',
+        'Full-stack Vue with server rendering, reading Postgres through a Supabase composable.',
+    },
+    {
+      title: 'Astro',
+      href: '/guides/getting-started/quickstarts/astrojs',
+      icon: '/docs/img/icons/astro-icon',
+      hasLightIcon: true,
+      description:
+        'Content-driven sites that render on the server and pull Supabase Postgres data per request.',
     },
     {
       title: 'Hono',
@@ -89,7 +97,7 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       icon: '/docs/img/icons/hono-icon',
       hasLightIcon: false,
       description:
-        'Learn how to create a Supabase project, add some sample data to your database, secure it with auth, and query the data from a Hono app.',
+        'Lightweight web APIs with Supabase Auth anonymous sign-in and RLS-protected reads.',
     },
     {
       title: 'RedwoodJS',
@@ -97,7 +105,15 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       icon: '/docs/img/icons/redwood-icon',
       hasLightIcon: false,
       description:
-        'Learn how to create a Supabase project, add some sample data to your database using Prisma migration and seeds, and query the data from a RedwoodJS app.',
+        'Full-stack React and GraphQL, with Prisma migrations against your Supabase Postgres database.',
+    },
+    {
+      title: 'Expo React Native',
+      href: '/guides/getting-started/quickstarts/expo-react-native',
+      icon: '/docs/img/icons/expo-icon',
+      hasLightIcon: true,
+      description:
+        'Ship iOS and Android from one React Native codebase, backed by Supabase Postgres.',
     },
     {
       title: 'Flutter',
@@ -105,8 +121,7 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       icon: '/docs/img/icons/flutter-icon',
       hasLightIcon: false,
       feature: 'sdk:dart',
-      description:
-        'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Flutter app.',
+      description: 'Ship iOS and Android from one Dart codebase, backed by Supabase Postgres.',
     },
     {
       title: 'iOS SwiftUI',
@@ -114,8 +129,7 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       icon: '/docs/img/icons/swift-icon',
       hasLightIcon: false,
       feature: 'sdk:swift',
-      description:
-        'Learn how to create a Supabase project, add some sample data to your database, and query the data from an iOS app.',
+      description: 'Native iOS apps in Swift, reading Postgres through the Supabase Swift SDK.',
     },
     {
       title: 'Android Kotlin',
@@ -124,15 +138,14 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       hasLightIcon: false,
       feature: 'sdk:kotlin',
       description:
-        'Learn how to create a Supabase project, add some sample data to your database, and query the data from an Android Kotlin app.',
+        'Native Android apps in Kotlin and Jetpack Compose, using the Supabase Kotlin SDK.',
     },
     {
       title: 'SvelteKit',
       href: '/guides/getting-started/quickstarts/sveltekit',
       icon: '/docs/img/icons/svelte-icon',
       hasLightIcon: false,
-      description:
-        'Learn how to create a Supabase project, add some sample data to your database, and query the data from a SvelteKit app.',
+      description: 'Full-stack Svelte that loads Supabase Postgres data in server load functions.',
     },
     {
       title: 'SolidJS',
@@ -140,7 +153,7 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       icon: '/docs/img/icons/solidjs-icon',
       hasLightIcon: false,
       description:
-        'Learn how to create a Supabase project, add some sample data to your database, and query the data from a SolidJS app.',
+        'Fine-grained reactive UIs that load Supabase Postgres data with Solid resources.',
     },
     {
       title: 'Vue',
@@ -148,15 +161,14 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       icon: '/docs/img/icons/vuejs-icon',
       hasLightIcon: false,
       description:
-        'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Vue app.',
+        'Build single-page apps with the Vue composition API, backed by Supabase Postgres.',
     },
     {
       title: 'TanStack Start',
       href: '/guides/getting-started/quickstarts/tanstack',
       icon: '/docs/img/icons/tanstack-icon',
       hasLightIcon: true,
-      description:
-        'Learn how to create a Supabase project, add some sample data to your database, and query the data from a TanStack Start app.',
+      description: 'Type-safe full-stack React that queries Supabase Postgres in server functions.',
     },
     {
       title: 'Refine',
@@ -164,7 +176,30 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       icon: '/docs/img/icons/refine-icon',
       hasLightIcon: false,
       description:
-        'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Refine app.',
+        'Scaffold CRUD dashboards and admin panels straight from your Supabase Postgres tables.',
+    },
+    {
+      title: 'Python',
+      href: '/guides/getting-started/quickstarts/flask',
+      icon: '/docs/img/icons/python-icon',
+      hasLightIcon: false,
+      description: 'Serve Flask web apps that query Postgres with the Supabase Python client.',
+    },
+    {
+      title: 'Laravel',
+      href: '/guides/getting-started/quickstarts/laravel',
+      icon: '/docs/img/icons/laravel-icon',
+      hasLightIcon: false,
+      description:
+        'Full-stack PHP with Eloquent ORM connected directly to your Supabase Postgres database.',
+    },
+    {
+      title: 'Ruby on Rails',
+      href: '/guides/getting-started/quickstarts/ruby-on-rails',
+      icon: '/docs/img/icons/rails-icon',
+      hasLightIcon: false,
+      description:
+        'Convention-driven Ruby apps with Active Record connected directly to your Supabase Postgres database.',
     },
   ],
 }

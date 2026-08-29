@@ -27,9 +27,8 @@ import { FormPanel } from '@/components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent } from '@/components/ui/Forms/FormSection'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
-import { useOrganizationUpdateMutation } from '@/data/organizations/organization-update-mutation'
+import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizations/organization-customer-profile-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 const FORM_ID = 'org-billing-email'
 const formSchema = z.object({
@@ -39,53 +38,56 @@ const formSchema = z.object({
 
 const BillingEmail = () => {
   const { slug } = useParams()
-  const { data: selectedOrganization } = useSelectedOrganizationQuery()
-
-  const { name, billing_email } = selectedOrganization ?? {}
 
   const { can: canReadBillingEmail, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
+    'stripe.customer'
   )
-  const { can: canUpdateOrganization } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'organizations'
+  const { can: canUpdateBillingData } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.customer'
   )
 
   const { ref, inView } = useInView({ triggerOnce: true })
 
-  const { data: billingCustomer, isPending: loadingBillingCustomer } =
-    useOrganizationCustomerProfileQuery({ slug }, { enabled: canReadBillingEmail && inView })
+  const { data: customerProfile, isPending: loadingBillingCustomer } =
+    useOrganizationCustomerProfileQuery(
+      { slug },
+      {
+        enabled: canReadBillingEmail && inView,
+        select: (data) =>
+          data ? { email: data.email, additional_emails: data.additional_emails } : data,
+      }
+    )
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      billingEmail: billing_email ?? '',
-      additionalBillingEmails: billingCustomer?.additional_emails ?? [],
+      billingEmail: customerProfile?.email ?? '',
+      additionalBillingEmails: customerProfile?.additional_emails ?? [],
     },
   })
   const additionalBillingEmails = useWatch({
     control: form.control,
     name: 'additionalBillingEmails',
   })
-  const { errors } = form.formState
+  const { errors, isDirty } = form.formState
   const additionalEmailsError = errors.additionalBillingEmails ?? []
 
-  const { mutate: updateOrganization, isPending: isUpdating } = useOrganizationUpdateMutation()
+  const { mutate: updateCustomerProfile, isPending: isUpdating } =
+    useOrganizationCustomerProfileUpdateMutation()
 
   const onUpdateOrganizationEmail = async (values: z.infer<typeof formSchema>) => {
-    if (!canUpdateOrganization) {
+    if (!canUpdateBillingData) {
       return toast.error('You do not have the required permissions to update this organization')
     }
     if (!slug) return console.error('Slug is required')
-    if (!name) return console.error('Organization name is required')
 
-    updateOrganization(
+    updateCustomerProfile(
       {
         slug,
-        name,
-        billing_email: values.billingEmail,
-        additional_billing_emails: values.additionalBillingEmails,
+        email: values.billingEmail,
+        additional_emails: values.additionalBillingEmails,
       },
       {
         onSuccess: () => {
@@ -97,13 +99,13 @@ const BillingEmail = () => {
   }
 
   useEffect(() => {
-    if (billingCustomer) {
+    if (customerProfile && !isDirty) {
       form.reset({
-        billingEmail: billing_email ?? '',
-        additionalBillingEmails: billingCustomer.additional_emails ?? [],
+        billingEmail: customerProfile.email ?? '',
+        additionalBillingEmails: customerProfile.additional_emails ?? [],
       })
     }
-  }, [billingCustomer])
+  }, [form, customerProfile, isDirty])
 
   return (
     <ScaffoldSection ref={ref}>
@@ -127,11 +129,11 @@ const BillingEmail = () => {
                     <FormActions
                       form={FORM_ID}
                       isSubmitting={isUpdating}
-                      hasChanges={form.formState.isDirty}
+                      hasChanges={isDirty}
                       handleReset={form.reset}
-                      disabled={!canUpdateOrganization}
+                      disabled={!canUpdateBillingData}
                       helper={
-                        !canUpdateOrganization
+                        !canUpdateBillingData
                           ? 'You need additional permissions to update billing emails'
                           : undefined
                       }
@@ -151,7 +153,7 @@ const BillingEmail = () => {
                               type="email"
                               {...field}
                               placeholder="Email"
-                              disabled={!canUpdateOrganization}
+                              disabled={!canUpdateBillingData}
                             />
                           </FormControl>
                           <FormMessage />
@@ -177,7 +179,11 @@ const BillingEmail = () => {
                           }
                         >
                           <FormControl>
-                            <MultiSelector values={field.value} onValuesChange={field.onChange}>
+                            <MultiSelector
+                              values={field.value}
+                              onValuesChange={field.onChange}
+                              disabled={!canUpdateBillingData}
+                            >
                               <MultiSelectorTrigger
                                 deletableBadge
                                 showIcon={false}

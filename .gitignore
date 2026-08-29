@@ -122,6 +122,7 @@ next-env.d.ts
 !.claude/settings.json
 !.claude/scripts/
 !.claude/skills/
+.agents/skills/me-*
 .claude/skills/me-*
 !.claude/CLAUDE.md
 CLAUDE.local.md

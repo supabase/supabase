@@ -48,7 +48,11 @@ const page: GoPageInput = {
             href="https://stigg.io"
             className="flex flex-col items-center gap-4 rounded-xl border border-muted p-8 text-center transition-colors hover:border-foreground-muted hover:bg-surface-100"
           >
-            <img src="/images/customers/logos/stigg.svg" alt="Stigg" className="h-10 w-auto" />
+            <img
+              src="/images/customers/logos/on-light/stigg.svg"
+              alt="Stigg"
+              className="h-10 w-auto"
+            />
             <h3 className="text-foreground font-medium text-lg">Stigg</h3>
             <p className="text-foreground-light text-sm leading-relaxed">
               Monetization layer for AI products

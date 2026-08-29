@@ -1,22 +1,30 @@
 import dayjs from 'dayjs'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Badge, cn, ScrollArea, Sheet, SheetContent, SheetHeader } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
+import { TOKEN_DENIED_REMEDIATION } from '../AccessToken.constants'
+import { scopesToSelection, type ResourceAccessMode } from '../AccessToken.permissions'
+import { useCapabilitySummary } from '../hooks/useCapabilitySummary'
+import { useTokenAccessEvaluation } from '../hooks/useTokenAccessEvaluation'
 import {
-  computeOverallRisk,
-  PERMISSION_CATALOG_BY_CATEGORY,
-  scopesToSelection,
-  type OverallRisk,
-  type PermissionCatalogEntry,
-  type PermissionMode,
-  type ResourceAccessMode,
-  type RiskLevel,
-} from '../AccessToken.permissions'
-import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
+  OrganizationAccessPill,
+  ProjectAccessPill,
+  useResourceAccessWrap,
+} from './ResourceAccessPills'
+import { CapabilitiesSection } from './TokenCapabilities/CapabilitiesSection'
+import { CapabilityLevelToggle } from './TokenCapabilities/CapabilityLevelToggle'
+import { RiskBanner } from './TokenCapabilities/RiskBanner'
+import {
+  computeRiskBanner,
+  getCapabilityDensityTier,
+  type CapabilityLevelFilter,
+} from './TokenCapabilities/TokenCapabilities.utils'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useProjectsInfiniteQuery } from '@/data/projects/projects-infinite-query'
 import {
-  getEnabledEndpointsForCapability,
   getEnabledMcpTools,
   useGetEnabledEndpointsForCapability,
 } from '@/data/scoped-access-tokens/permission-scope-map-query'
@@ -29,33 +37,15 @@ interface ViewTokenSheetProps {
   onClose: () => void
 }
 
-const RISK_TONE_VARIANT: Record<
-  OverallRisk['tone'],
-  'default' | 'success' | 'warning' | 'destructive'
-> = {
-  default: 'default',
-  low: 'success',
-  medium: 'warning',
-  high: 'destructive',
-}
-
-const RISK_DOT_CLASS: Record<RiskLevel, string> = {
-  low: 'bg-brand-600',
-  medium: 'bg-warning-600',
-  high: 'bg-destructive-600',
-}
-
-const modeLabel = (mode: PermissionMode) =>
-  mode === 'readwrite' ? 'Read-write' : mode === 'read' ? 'Read' : 'None'
-
 const SCOPE_TO_RESOURCE_ACCESS: Record<'user' | 'organization' | 'project', ResourceAccessMode> = {
   user: 'account',
   organization: 'organization',
   project: 'project',
 }
 
+const EMPTY_BINDINGS: string[] = []
+
 export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProps) {
-  const { organizations, projects } = useOrgAndProjectData()
   const { data: permissionScopeMap } = useGetEnabledEndpointsForCapability()
 
   const {
@@ -71,176 +61,77 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
     }
   )
 
+  // The sheet stays mounted (hidden) on the tokens page; don't fetch org/project data until it's
+  // actually opened on a token.
+  const { data: organizations = [] } = useOrganizationsQuery({ enabled: visible && !!token })
+  const { data: projectsData } = useProjectsInfiniteQuery(
+    {
+      limit: 1,
+    },
+    { enabled: visible && !!token }
+  )
+
+  const hasTooManyProjects = useMemo(() => {
+    if (!projectsData) {
+      return false
+    }
+    if (projectsData.pages.length === 0) {
+      return false
+    }
+    return projectsData.pages[0].pagination.count > 100
+  }, [projectsData])
+
   const resourceAccess = token ? SCOPE_TO_RESOURCE_ACCESS[token.scope] : 'project'
   const grantedScopes = useMemo(() => token?.permissions ?? [], [token?.permissions])
 
   const selection = useMemo(() => scopesToSelection(grantedScopes), [grantedScopes])
 
+  const tokenOrganizationSlugs = token?.organization_slugs ?? EMPTY_BINDINGS
+  const tokenProjectRefs = token?.project_refs ?? EMPTY_BINDINGS
+
+  const access = useTokenAccessEvaluation({
+    selection,
+    resourceAccess,
+    organizationSlugs: tokenOrganizationSlugs,
+    projectRefs: tokenProjectRefs,
+    enabled: visible && !!token,
+  })
+  const hasExceedingCapabilities = access.exceedingEntryKeys.length > 0
+
+  // Deleting a project/org erases the token's binding to it, so a resource-scoped token with no
+  // bindings left means everything it was bound to has been deleted.
+  const hasNoBoundResources = token !== undefined && access.hasNoBoundResources
+
+  const resourceNoun = resourceAccess === 'organization' ? 'organization' : 'project'
+  // Deleted bindings are erased from the token, so the original count is unknowable — the
+  // phrasing has to work for any number of resources.
+  const boundResourcesDeletedText = `Every ${resourceNoun} this token was bound to has been deleted`
+
   const risk = useMemo(
-    () => computeOverallRisk(selection, resourceAccess),
-    [selection, resourceAccess]
-  )
-
-  const activeByCategory = useMemo(
     () =>
-      PERMISSION_CATALOG_BY_CATEGORY.map((category) => ({
-        ...category,
-        entries: category.entries
-          .map((entry) => ({ entry, mode: selection[entry.key] ?? 'none' }))
-          .filter(({ mode }) => mode !== 'none'),
-      })).filter((category) => category.entries.length > 0),
-    [selection]
+      computeRiskBanner({
+        effectiveSelection: access.effectiveSelection,
+        resourceAccess,
+        organizationSlugs: tokenOrganizationSlugs,
+        projectRefs: tokenProjectRefs,
+      }),
+    [access.effectiveSelection, resourceAccess, tokenOrganizationSlugs, tokenProjectRefs]
   )
-  const hasCapabilities = grantedScopes.length > 0
 
-  const mcpTools = useMemo(
-    () => getEnabledMcpTools({ grantedScopes, permissionScopeMap }),
+  const { capabilities } = useCapabilitySummary({
+    selection,
+    grantedScopes,
+    permissionScopeMap,
+  })
+  const capabilityTier = getCapabilityDensityTier(capabilities.length)
+  const [levelFilter, setLevelFilter] = useState<CapabilityLevelFilter>('all')
+
+  const enabledMcpTools = useMemo(
+    () => getEnabledMcpTools({ grantedScopes, permissionScopeMap }).sort(),
     [grantedScopes, permissionScopeMap]
   )
 
-  const capabilityGroups = useMemo(() => {
-    const groups: { entry: PermissionCatalogEntry; mode: PermissionMode; endpoints: string[][] }[] =
-      []
-    for (const category of activeByCategory) {
-      for (const { entry, mode } of category.entries) {
-        const capabilityScopes =
-          mode === 'readwrite' ? [...entry.readScopes, ...entry.writeScopes] : entry.readScopes
-        const endpoints = getEnabledEndpointsForCapability({
-          capabilityScopes,
-          allGrantedScopes: grantedScopes,
-          permissionScopeMap,
-        })
-        if (endpoints.length > 0) {
-          groups.push({ entry, mode, endpoints: endpoints.map((e) => [e.method, e.path]) })
-        }
-      }
-    }
-    return groups
-  }, [activeByCategory, grantedScopes, permissionScopeMap])
-
-  const resourceSummary = useMemo(() => {
-    if (resourceAccess === 'project') {
-      const selectedProjects = projects.filter((p) => (token?.project_refs ?? []).includes(p.ref))
-      return {
-        title: 'Project',
-        items: selectedProjects.length > 0 ? selectedProjects.map((p) => p.name) : ['-'],
-      }
-    }
-    if (resourceAccess === 'organization') {
-      const selectedOrganizations = organizations.filter((o) =>
-        (token?.organization_slugs ?? []).includes(o.slug)
-      )
-      return {
-        title: 'Organization',
-        items: selectedOrganizations.length > 0 ? selectedOrganizations.map((o) => o.name) : ['-'],
-      }
-    }
-    return { title: 'Account', items: ['Account-level access'] }
-  }, [resourceAccess, token, projects, organizations])
-
-  const rows: [string, React.ReactNode][] = token
-    ? [
-        [
-          'Created',
-          token.created_at ? (
-            <TimestampInfo
-              utcTimestamp={token.created_at}
-              label={dayjs(token.created_at).format('DD MMM YYYY')}
-              className="text-sm"
-            />
-          ) : (
-            <span className="text-foreground-lighter">Unknown</span>
-          ),
-        ],
-        [
-          'Last used',
-          token.last_used_at ? (
-            <TimestampInfo
-              utcTimestamp={token.last_used_at}
-              label={dayjs(token.last_used_at).fromNow()}
-              className="text-sm"
-            />
-          ) : (
-            <span className="text-foreground-lighter">Never</span>
-          ),
-        ],
-        [
-          'Expires',
-          token.expires_at ? (
-            <TimestampInfo
-              utcTimestamp={token.expires_at}
-              label={dayjs(token.expires_at).format('DD MMM YYYY')}
-              className="text-sm"
-            />
-          ) : (
-            <span className="text-foreground-lighter">Never</span>
-          ),
-        ],
-        [
-          'Resource access',
-          <div key="resource-access" className="space-y-2">
-            <p className="text-[11px] font-mono uppercase tracking-wide text-foreground-lighter">
-              {resourceSummary.title}
-            </p>
-            <div className="divide-y">
-              {resourceSummary.items.map((item) => (
-                <p key={item} className="py-2 text-sm text-foreground">
-                  {item}
-                </p>
-              ))}
-            </div>
-          </div>,
-        ],
-        [
-          'Capabilities',
-          hasCapabilities ? (
-            <div className="space-y-4">
-              {activeByCategory.map((category) => (
-                <div key={category.key} className="space-y-2">
-                  <p className="text-[11px] font-mono uppercase tracking-wide text-foreground-lighter">
-                    {category.name}
-                  </p>
-                  <div className="divide-y">
-                    {category.entries.map(({ entry, mode }) => (
-                      <div
-                        key={entry.key}
-                        className="flex items-center justify-between gap-2 text-sm py-2"
-                      >
-                        <span className="flex items-center gap-2">
-                          <span
-                            className={cn(
-                              'h-1.5 w-1.5 shrink-0 rounded-full',
-                              RISK_DOT_CLASS[entry.risk]
-                            )}
-                          />
-                          <span className="text-foreground text-wrap">{entry.name}</span>
-                        </span>
-                        <span className="text-foreground-lighter text-xs font-mono uppercase font-normal text-right">
-                          {modeLabel(mode)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <span className="text-foreground-lighter">No capabilities selected</span>
-          ),
-        ],
-        [
-          'Risk level',
-          <span key="risk" className="flex flex-wrap items-center gap-2">
-            <span className="flex">
-              <Badge variant={RISK_TONE_VARIANT[risk.tone]}>{risk.level} Risk</Badge>
-            </span>
-            <span className="text-sm text-foreground leading-px">
-              {risk.text.replace(`${risk.level} — `, '')}
-            </span>
-          </span>,
-        ],
-      ]
-    : []
+  const { containerRef: pillsRef, isWrapped: isResourceAccessWrapped } = useResourceAccessWrap()
 
   return (
     <Sheet open={visible} onOpenChange={() => onClose()}>
@@ -249,13 +140,31 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
         size="default"
         className="flex h-full flex-col gap-0 sm:w-[656px] lg:w-[800px]"
       >
-        <SheetHeader className={cn('flex flex-row justify-between gap-x-4 items-center border-b')}>
+        <SheetHeader
+          className={cn(
+            'flex flex-col md:flex-row justify-between gap-4 items-start md:items-center border-b'
+          )}
+        >
           <p className="truncate" title={`View access for ${token?.name}`}>
             View access for {token?.name}
           </p>
-          <DocsButton href={`${DOCS_URL}/reference/api/introduction`} />
+          <div className="flex items-center gap-2">
+            <DocsButton
+              href={`${DOCS_URL}/guides/platform/access-control`}
+              topic="Access control"
+              label="Access control docs"
+            />
+            <DocsButton
+              href={`${DOCS_URL}/reference/api/introduction`}
+              topic="Management API"
+              label="API docs"
+            />
+          </div>
         </SheetHeader>
-        <ScrollArea className="flex-1">
+        {/* Radix wraps viewport children in an inline-styled display:table div that grows to fit
+            the widest child, which would let one long endpoint path expand the sheet instead of
+            clipping — force it back to block so widths are bounded and rows can truncate. */}
+        <ScrollArea className="flex-1 [&>[data-radix-scroll-area-viewport]>div]:block!">
           <div className="space-y-6 px-5 sm:px-6 py-6">
             {isTokenLoading && (
               <div className="flex items-center justify-center py-8">
@@ -273,74 +182,142 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
 
             {token && (
               <>
+                {hasNoBoundResources && (
+                  <Admonition
+                    type="destructive"
+                    title="This token's resources no longer exist"
+                    description={`${boundResourcesDeletedText}. ${TOKEN_DENIED_REMEDIATION}`}
+                  />
+                )}
+                {!hasTooManyProjects && access.hasNoAccessibleResource && (
+                  <Admonition
+                    type="destructive"
+                    title="This token no longer has access"
+                    description={`You were removed from the ${resourceNoun}s this token is bound to. ${TOKEN_DENIED_REMEDIATION}`}
+                  />
+                )}
+                {hasExceedingCapabilities && !access.hasNoAccessibleResource && (
+                  <Admonition
+                    type="warning"
+                    title="Some permissions exceed your current role for the selected resources"
+                    description="A token only works with permissions you currently hold. Permissions marked below will be denied until your role includes them."
+                  />
+                )}
+
+                <div className="flex flex-col gap-3">
+                  <h3 className="text-sm">Risk assessment</h3>
+                  <RiskBanner risk={risk} showRoleCaveat={hasExceedingCapabilities} />
+                </div>
+
                 <div className="flex flex-col gap-3">
                   <h3 className="text-sm">Token summary</h3>
                   <dl className="divide-y rounded-md border bg-surface-300">
-                    {rows.map(([key, value]) => (
-                      <div key={key} className="grid grid-cols-3 gap-4 px-4 py-3">
-                        <dt className="text-sm text-foreground-lighter">{key}</dt>
-                        <dd className="col-span-2 text-sm text-foreground">{value}</dd>
-                      </div>
-                    ))}
+                    <div className="flex items-center justify-between gap-4 px-4 py-3">
+                      <dt className="shrink-0 text-sm text-foreground-lighter">Created</dt>
+                      <dd className="text-sm text-foreground">
+                        {token.created_at ? (
+                          <TimestampInfo
+                            utcTimestamp={token.created_at}
+                            label={dayjs(token.created_at).fromNow()}
+                            className="text-sm"
+                          />
+                        ) : (
+                          <span className="text-foreground-lighter">Unknown</span>
+                        )}
+                      </dd>
+                    </div>
+                    <div className="flex items-center justify-between gap-4 px-4 py-3">
+                      <dt className="shrink-0 text-sm text-foreground-lighter">Last used</dt>
+                      <dd className="text-sm text-foreground">
+                        {token.last_used_at ? (
+                          <TimestampInfo
+                            utcTimestamp={token.last_used_at}
+                            label={dayjs(token.last_used_at).fromNow()}
+                            className="text-sm"
+                          />
+                        ) : (
+                          <span className="text-foreground-lighter">Never</span>
+                        )}
+                      </dd>
+                    </div>
+                    <div className="flex items-center justify-between gap-4 px-4 py-3">
+                      <dt className="shrink-0 text-sm text-foreground-lighter">Expires</dt>
+                      <dd className="text-sm text-foreground">
+                        {token.expires_at ? (
+                          <TimestampInfo
+                            utcTimestamp={token.expires_at}
+                            label={dayjs(token.expires_at).fromNow()}
+                            className="text-sm"
+                          />
+                        ) : (
+                          <span className="text-foreground-lighter">Never</span>
+                        )}
+                      </dd>
+                    </div>
+                    <div
+                      className={cn(
+                        'flex flex-col items-start justify-between gap-4 px-4 py-3 sm:flex-row',
+                        isResourceAccessWrapped ? 'sm:items-start' : 'sm:items-center'
+                      )}
+                    >
+                      <dt className="shrink-0 text-sm text-foreground-lighter">Resource access</dt>
+                      <dd className="w-full min-w-0 text-sm text-foreground sm:w-auto sm:flex-1">
+                        <div
+                          ref={pillsRef}
+                          className="flex flex-wrap justify-start gap-1.5 sm:justify-end"
+                        >
+                          {resourceAccess === 'organization'
+                            ? tokenOrganizationSlugs.map((orgSlug) => (
+                                <OrganizationAccessPill
+                                  key={orgSlug}
+                                  slug={orgSlug}
+                                  organization={organizations.find((org) => org.slug === orgSlug)}
+                                />
+                              ))
+                            : null}
+                          {resourceAccess === 'project'
+                            ? tokenProjectRefs.map((projectRef) => (
+                                <ProjectAccessPill key={projectRef} projectRef={projectRef} />
+                              ))
+                            : null}
+                        </div>
+                      </dd>
+                    </div>
                   </dl>
                 </div>
 
-                {hasCapabilities && (
-                  <>
-                    <div className="flex flex-col gap-3">
-                      <h3 className="text-sm">Management API endpoints enabled</h3>
-                      {capabilityGroups.length === 0 ? (
-                        <p className="text-xs text-foreground-light">
-                          No Management API endpoints are enabled by the selected capabilities.
-                        </p>
-                      ) : (
-                        capabilityGroups.map(({ entry, mode, endpoints }) => (
-                          <div key={entry.key} className="rounded-md border">
-                            <div className="flex items-center justify-between border-b bg-surface-100 px-3 py-2">
-                              <span className="text-xs text-foreground">{entry.name}</span>
-                              <span className="text-[11px] font-mono uppercase text-foreground-lighter">
-                                {mode === 'readwrite' ? 'Read-write' : 'Read'}
-                              </span>
-                            </div>
-                            <div className="divide-y">
-                              {endpoints.map(([method, path]) => (
-                                <div
-                                  key={`${method} ${path}`}
-                                  className="flex items-center gap-2 px-3 py-1.5 font-mono text-xs"
-                                >
-                                  <span className="w-14 shrink-0 text-foreground-light">
-                                    {method}
-                                  </span>
-                                  <span className="text-foreground">{path}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm">Capabilities</h3>
+                    {capabilityTier === 'dense' && (
+                      <CapabilityLevelToggle value={levelFilter} onChange={setLevelFilter} />
+                    )}
+                  </div>
+                  <CapabilitiesSection
+                    capabilities={capabilities}
+                    accessEntries={access.entries}
+                    levelFilter={levelFilter}
+                  />
+                </div>
 
-                    <div className="flex flex-col gap-3">
-                      <h3 className="text-sm">MCP tools</h3>
-                      {mcpTools.length === 0 ? (
-                        <p className="text-xs text-foreground-light">
-                          No MCP tools are enabled by the selected capabilities.
-                        </p>
-                      ) : (
-                        <div className="flex flex-wrap gap-2">
-                          {mcpTools.map((tool) => (
-                            <span
-                              key={tool}
-                              className="rounded border bg-surface-100 px-2 py-1 font-mono text-xs text-foreground-light"
-                            >
-                              {tool}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+                <div className="flex flex-col gap-3">
+                  <h3 className="text-sm">Available MCP tools</h3>
+                  {enabledMcpTools.length === 0 ? (
+                    <span className="text-sm text-foreground-lighter">No MCP tools enabled</span>
+                  ) : (
+                    <div className="flex flex-wrap gap-1.5">
+                      {enabledMcpTools.map((tool) => (
+                        <Badge
+                          key={tool}
+                          variant="default"
+                          className="px-2.5 py-1 font-mono text-xs normal-case tracking-normal"
+                        >
+                          {tool}
+                        </Badge>
+                      ))}
                     </div>
-                  </>
-                )}
+                  )}
+                </div>
               </>
             )}
           </div>

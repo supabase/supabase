@@ -1,13 +1,13 @@
 import pgMeta from '@supabase/pg-meta'
 import type { JwtPayload } from '@supabase/supabase-js'
-import { safeValidateUIMessages } from 'ai'
+import { pipeUIMessageStreamToResponse, safeValidateUIMessages, toUIMessageStream } from 'ai'
 import { IS_PLATFORM } from 'common'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
-import { getOrgAIDetails, getProjectAIDetails } from '@/lib/ai/ai-details'
+import { getAIDetails } from '@/lib/ai/ai-details'
 import { NO_SCHEMA_ACCESS_MESSAGE } from '@/lib/ai/assistant-context'
 import {
   assistantMessageMetadataSchema,
@@ -15,6 +15,7 @@ import {
 } from '@/lib/ai/assistant-message-metadata'
 import { isTracingAllowed } from '@/lib/ai/braintrust-logger'
 import { generateAssistantResponse } from '@/lib/ai/generate-assistant-response'
+import { isExplorerEnabled } from '@/lib/ai/is-explorer-enabled'
 import { getModel } from '@/lib/ai/model'
 import {
   DEFAULT_ASSISTANT_ADVANCE_MODEL_ID,
@@ -25,9 +26,11 @@ import {
   type AssistantModelId,
 } from '@/lib/ai/model.utils'
 import { getTools } from '@/lib/ai/tools'
+import { encodeNotebookToolError } from '@/lib/ai/tools/notebook-tools'
 import { apiWrapper } from '@/lib/api/apiWrapper'
 import { executeQuery } from '@/lib/api/self-hosted/query'
 import { getURL } from '@/lib/helpers'
+import { trustedUserEmail } from '@/lib/server/configcat'
 
 export const maxDuration = 120
 
@@ -93,7 +96,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     messages: rawMessages,
     projectRef,
     connectionString,
-    orgSlug,
+    orgSlug: rawOrgSlug,
     chatId,
     chatName,
     model: rawRequestedModel,
@@ -120,9 +123,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
   let aiOptInLevel: AiOptInLevel = 'disabled'
   let hasAccessToAdvanceModel = false
   let orgHasHipaaAddon: boolean | undefined
-  let projectIsSensitive: boolean | undefined
+  let projectIsSensitive: boolean | null | undefined
   let projectRegion: string | undefined
   let orgId: number | undefined
+  let orgSlug: string | undefined
   let planId: string | undefined
 
   if (!IS_PLATFORM) {
@@ -130,26 +134,26 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     hasAccessToAdvanceModel = true
   }
 
-  if (IS_PLATFORM && orgSlug && authorization && projectRef) {
+  if (IS_PLATFORM && rawOrgSlug && authorization && projectRef) {
     try {
-      const [orgDetails, projectDetails] = await Promise.all([
-        getOrgAIDetails({ orgSlug, authorization }),
-        getProjectAIDetails({ projectRef, authorization }),
-      ])
+      const aiDetails = await getAIDetails({ orgSlug: rawOrgSlug, projectRef, authorization })
 
-      aiOptInLevel = orgDetails.aiOptInLevel
-      hasAccessToAdvanceModel = orgDetails.hasAccessToAdvanceModel
-      orgHasHipaaAddon = orgDetails.hasHipaaAddon
-      orgId = orgDetails.orgId
-      planId = orgDetails.planId
-      projectIsSensitive = projectDetails.isSensitive
-      projectRegion = projectDetails.region
+      aiOptInLevel = aiDetails.aiOptInLevel
+      hasAccessToAdvanceModel = aiDetails.hasAccessToAdvanceModel
+      orgHasHipaaAddon = aiDetails.hasHipaaAddon
+      orgId = aiDetails.orgId
+      orgSlug = aiDetails.orgSlug
+      planId = aiDetails.planId
+      projectIsSensitive = aiDetails.isSensitive
+      projectRegion = aiDetails.region
     } catch (error) {
       return res.status(400).json({
         error: 'There was an error fetching your organization details',
       })
     }
   }
+
+  const explorerEnabled = await isExplorerEnabled(trustedUserEmail(claims?.email))
 
   const envThrottled = process.env.IS_THROTTLED !== 'false'
 
@@ -187,6 +191,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       accessToken,
       baseUrl: getURL(),
       supportMode,
+      isExplorerEnabled: explorerEnabled,
       signal: abortController.signal,
     })
 
@@ -231,8 +236,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       supportMode,
       userId,
       orgId,
+      orgSlug,
       planId,
       includesLogsSnippets,
+      isExplorerEnabled: explorerEnabled,
       requestedModel,
       systemProviderOptions,
       abortSignal: abortController.signal,
@@ -241,11 +248,14 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       },
     })
 
-    result.pipeUIMessageStreamToResponse(res, {
+    const stream = toUIMessageStream({
+      stream: result.stream,
       sendReasoning: true,
-      headers: { 'Content-Encoding': 'none' },
       onError: (error) => {
         console.error('Assistant stream error:', error)
+
+        const encoded = encodeNotebookToolError(error)
+        if (encoded !== null) return encoded
 
         if (error == null) {
           return 'unknown error'
@@ -261,6 +271,12 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
         return JSON.stringify(error)
       },
+    })
+
+    pipeUIMessageStreamToResponse({
+      response: res,
+      stream,
+      headers: { 'Content-Encoding': 'none' },
     })
   } catch (error) {
     console.error('Error in handlePost:', error)
