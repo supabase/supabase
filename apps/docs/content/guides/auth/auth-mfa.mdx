@@ -294,7 +294,7 @@ create policy "Policy name."
   pair keeps it out of the `anon` role and limits direct RPC access to
   authenticated callers; production deployments that want to keep the
   helper policy-only can additionally revoke from `authenticated` and
-  let the policy’s SECURITY context invoke it as the function owner.
+  let the policy's SECURITY context invoke it as the function owner.
 - **Using `as restrictive` ensures this policy will restrict all commands on the
   table regardless of other policies!**
 
