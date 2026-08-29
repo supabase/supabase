@@ -14,9 +14,11 @@ import {
   type SaveNotebookError,
   type SaveNotebookParams,
 } from './notebooks.api'
-import { makeNotebooksAtoms } from './notebooks.atoms'
+import { makeNotebooksAtoms, NotebookCacheKey } from './notebooks.atoms'
 import { waitFor } from '@/tests/lib/atom-test-utils'
 
+const PROJECT_REF = 'project-ref'
+const key = (id: NotebookId) => new NotebookCacheKey({ projectRef: PROJECT_REF, id })
 const summary = (id: string) => ({ id: NotebookId.make(id), name: id, favorite: false })
 
 const registries: Array<AtomRegistry.AtomRegistry> = []
@@ -47,56 +49,84 @@ const setup = (
 describe('createLocalNotebook', () => {
   it('creates an empty, non-dirty, "new" notebook', () => {
     const { registry, atoms } = setup()
-    const id = atoms.createLocalNotebook(registry)
+    const id = atoms.createLocalNotebook(registry, PROJECT_REF)
 
-    expect(registry.get(atoms.contentAtom(id))).toEqual({ cells: [] })
-    expect(registry.get(atoms.dirtyAtom(id))).toBe(false)
-    expect(registry.get(atoms.statusAtom(id))).toBe('new')
+    const content = registry.get(atoms.resolvedContentAtom(key(id)))
+    expect(content._tag === 'Success' && content.value).toEqual({ cells: [] })
+    expect(registry.get(atoms.dirtyAtom(key(id)))).toBe(false)
+    expect(registry.get(atoms.statusAtom(key(id)))).toBe('new')
   })
 })
 
 describe('cell mutations', () => {
   it('mark the notebook dirty without changing its "new" status', () => {
     const { registry, atoms } = setup()
-    const id = atoms.createLocalNotebook(registry)
+    const id = atoms.createLocalNotebook(registry, PROJECT_REF)
 
-    atoms.insertCellAfter(registry, id, Option.none(), {
+    atoms.insertCellAfter(registry, PROJECT_REF, id, Option.none(), {
       _tag: 'markdown_cell',
       _id: CellId.make('cell-1'),
       source: 'hello',
     })
 
-    expect(registry.get(atoms.contentAtom(id))?.cells).toHaveLength(1)
-    expect(registry.get(atoms.dirtyAtom(id))).toBe(true)
-    expect(registry.get(atoms.statusAtom(id))).toBe('new')
+    const content = registry.get(atoms.resolvedContentAtom(key(id)))
+    expect(content._tag === 'Success' && content.value.cells).toHaveLength(1)
+    expect(registry.get(atoms.dirtyAtom(key(id)))).toBe(true)
+    expect(registry.get(atoms.statusAtom(key(id)))).toBe('new')
   })
 
   it('are no-ops when the notebook has no loaded content', () => {
     const { registry, atoms } = setup()
     const id = NotebookId.make('unloaded')
 
-    atoms.removeCell(registry, id, CellId.make('missing'))
+    atoms.removeCell(registry, PROJECT_REF, id, CellId.make('missing'))
 
-    expect(registry.get(atoms.contentAtom(id))).toBeUndefined()
-    expect(registry.get(atoms.dirtyAtom(id))).toBe(false)
+    expect(registry.get(atoms.dirtyAtom(key(id)))).toBe(false)
   })
 })
 
 describe('saveNotebook', () => {
   it('clears dirty and flips status to "saved" on success', async () => {
     const { registry, atoms } = setup()
-    const id = atoms.createLocalNotebook(registry)
-    atoms.insertCellAfter(registry, id, Option.none(), {
+    const id = atoms.createLocalNotebook(registry, PROJECT_REF)
+    atoms.insertCellAfter(registry, PROJECT_REF, id, Option.none(), {
       _tag: 'markdown_cell',
       _id: CellId.make('cell-1'),
       source: 'hello',
     })
-    expect(registry.get(atoms.dirtyAtom(id))).toBe(true)
+    expect(registry.get(atoms.dirtyAtom(key(id)))).toBe(true)
 
-    await atoms.saveNotebook(registry, 'project-ref', id, 'My notebook')
+    await atoms.saveNotebook(registry, PROJECT_REF, id, 'My notebook')
 
-    expect(registry.get(atoms.dirtyAtom(id))).toBe(false)
-    expect(registry.get(atoms.statusAtom(id))).toBe('saved')
+    expect(registry.get(atoms.dirtyAtom(key(id)))).toBe(false)
+    expect(registry.get(atoms.statusAtom(key(id)))).toBe('saved')
+  })
+
+  it("keeps dirty when an edit lands before the save's PUT resolves", async () => {
+    const { registry, atoms } = setup()
+    const id = atoms.createLocalNotebook(registry, PROJECT_REF)
+    atoms.insertCellAfter(registry, PROJECT_REF, id, Option.none(), {
+      _tag: 'markdown_cell',
+      _id: CellId.make('cell-1'),
+      source: 'hello',
+    })
+
+    const savePromise = atoms.saveNotebook(registry, PROJECT_REF, id, 'My notebook')
+
+    // Lands before `saveNotebook`'s own `.then()` runs, since `Effect.runPromise`
+    // always resolves as a microtask even for a synchronous effect like `save` here.
+    atoms.insertCellAfter(registry, PROJECT_REF, id, Option.none(), {
+      _tag: 'markdown_cell',
+      _id: CellId.make('cell-2'),
+      source: 'world',
+    })
+    expect(registry.get(atoms.dirtyAtom(key(id)))).toBe(true)
+
+    await savePromise
+
+    expect(registry.get(atoms.dirtyAtom(key(id)))).toBe(true)
+    const content = registry.get(atoms.resolvedContentAtom(key(id)))
+    expect(content._tag === 'Success' && content.value.cells).toHaveLength(2)
   })
 
   it('makes no API call and stays non-dirty when the notebook has no loaded content', async () => {
@@ -109,28 +139,28 @@ describe('saveNotebook', () => {
     })
     const id = NotebookId.make('unloaded')
 
-    await atoms.saveNotebook(registry, 'project-ref', id, 'name')
+    await atoms.saveNotebook(registry, PROJECT_REF, id, 'name')
 
     expect(calls).toBe(0)
-    expect(registry.get(atoms.dirtyAtom(id))).toBe(false)
+    expect(registry.get(atoms.dirtyAtom(key(id)))).toBe(false)
   })
 })
 
-describe('loadNotebook', () => {
-  it('loads content and name from the API and marks the notebook persisted', async () => {
+describe('notebookAtom', () => {
+  it('loads content and name from the API', async () => {
     const { registry, atoms } = setup({
       get: () => Effect.succeed({ name: 'My notebook', content: { cells: [] } }),
     })
     const id = NotebookId.make('server-id')
 
-    await atoms.loadNotebook(registry, 'project-ref', id)
+    const result = await waitFor(registry, atoms.notebookAtom(key(id)), (r) => r._tag === 'Success')
 
-    expect(registry.get(atoms.contentAtom(id))).toEqual({ cells: [] })
-    expect(registry.get(atoms.nameAtom(id))).toBe('My notebook')
-    expect(registry.get(atoms.statusAtom(id))).toBe('saved')
+    expect(result._tag === 'Success' && result.value.name).toBe('My notebook')
+    const content = registry.get(atoms.resolvedContentAtom(key(id)))
+    expect(content._tag === 'Success' && content.value).toEqual({ cells: [] })
   })
 
-  it('does not refetch a notebook that is already loaded', async () => {
+  it('shares one request across overlapping reads instead of firing one each', async () => {
     let calls = 0
     const { registry, atoms } = setup({
       get: () => {
@@ -138,50 +168,122 @@ describe('loadNotebook', () => {
         return Effect.succeed({ name: 'My notebook', content: { cells: [] } })
       },
     })
-    const id = NotebookId.make('server-id')
-
-    await atoms.loadNotebook(registry, 'project-ref', id)
-    await atoms.loadNotebook(registry, 'project-ref', id)
-
-    expect(calls).toBe(1)
-  })
-
-  it('shares one request across overlapping calls instead of firing one each', async () => {
-    let calls = 0
-    const { registry, atoms } = setup({
-      get: () => {
-        calls += 1
-        return Effect.succeed({ name: 'My notebook', content: { cells: [] } })
-      },
-    })
-    const id = NotebookId.make('server-id')
+    const atom = atoms.notebookAtom(key(NotebookId.make('server-id')))
 
     await Promise.all([
-      atoms.loadNotebook(registry, 'project-ref', id),
-      atoms.loadNotebook(registry, 'project-ref', id),
+      waitFor(registry, atom, (r) => r._tag === 'Success'),
+      waitFor(registry, atom, (r) => r._tag === 'Success'),
     ])
 
     expect(calls).toBe(1)
-    expect(registry.get(atoms.nameAtom(id))).toBe('My notebook')
   })
 
-  it('retries after a failed load instead of caching the failure forever', async () => {
+  it('refresh forces a real re-fetch instead of replaying the cached value', async () => {
     let calls = 0
     const { registry, atoms } = setup({
       get: () => {
         calls += 1
-        return calls === 1
-          ? Effect.fail(new GetNotebookError({ cause: 'boom' }))
-          : Effect.succeed({ name: 'My notebook', content: { cells: [] } })
+        return Effect.succeed({ name: `attempt ${calls}`, content: { cells: [] } })
       },
+    })
+    const atom = atoms.notebookAtom(key(NotebookId.make('server-id')))
+
+    const first = await waitFor(registry, atom, (r) => r._tag === 'Success')
+    expect(first._tag === 'Success' && first.value.name).toBe('attempt 1')
+
+    registry.refresh(atom)
+
+    const second = await waitFor(
+      registry,
+      atom,
+      (r) => r._tag === 'Success' && !r.waiting && r.value.name === 'attempt 2'
+    )
+    expect(calls).toBe(2)
+    expect(second._tag === 'Success' && second.value.name).toBe('attempt 2')
+  })
+})
+
+describe('statusAtom', () => {
+  it('reactively flips to "saved" once an in-flight load resolves, for a subscriber that mounted first', async () => {
+    let resolveGet!: (record: NotebookRecord) => void
+    const pending = new Promise<NotebookRecord>((resolve) => {
+      resolveGet = resolve
+    })
+    const { registry, atoms } = setup({ get: () => Effect.promise(() => pending) })
+    const id = NotebookId.make('server-id')
+
+    const seenStatuses: Array<string | undefined> = []
+    const unsubscribe = registry.subscribe(atoms.statusAtom(key(id)), (status) =>
+      seenStatuses.push(status)
+    )
+    // Not yet known to exist server-side, and no local content either — this
+    // is "still loading," not "new" (a real notebook created locally).
+    expect(registry.get(atoms.statusAtom(key(id)))).toBeUndefined()
+
+    // Simulates a component doing `useAtomValue(notebooksAtoms.notebookAtom(key))` —
+    // `registry.mount` kicks off the fetch without waiting on it, the same way.
+    registry.mount(atoms.notebookAtom(key(id)))
+    resolveGet({ name: 'My notebook', content: { cells: [] } })
+
+    await waitFor(registry, atoms.statusAtom(key(id)), (status) => status === 'saved')
+
+    expect(seenStatuses).toContain('saved')
+    unsubscribe()
+  })
+
+  it('reflects a notebook settled via a direct notebookAtom read', async () => {
+    const { registry, atoms } = setup({
+      get: () => Effect.succeed({ name: 'My notebook', content: { cells: [] } }),
     })
     const id = NotebookId.make('server-id')
 
-    await expect(atoms.loadNotebook(registry, 'project-ref', id)).rejects.toThrow()
-    await atoms.loadNotebook(registry, 'project-ref', id)
+    await waitFor(registry, atoms.notebookAtom(key(id)), (r) => r._tag === 'Success')
 
-    expect(calls).toBe(2)
-    expect(registry.get(atoms.nameAtom(id))).toBe('My notebook')
+    expect(registry.get(atoms.statusAtom(key(id)))).toBe('saved')
+  })
+
+  it('is undefined — not "new" — for a notebook that is still loading', () => {
+    const { registry, atoms } = setup({
+      get: () => Effect.promise(() => new Promise<NotebookRecord>(() => {})),
+    })
+    const id = NotebookId.make('server-id')
+    registry.mount(atoms.notebookAtom(key(id)))
+
+    expect(registry.get(atoms.statusAtom(key(id)))).toBeUndefined()
+  })
+
+  it('is undefined for a notebook whose load failed, not "new"', async () => {
+    const { registry, atoms } = setup({
+      get: () => Effect.fail(new GetNotebookError({ cause: 'boom' })),
+    })
+    const id = NotebookId.make('server-id')
+
+    await waitFor(registry, atoms.notebookAtom(key(id)), (r) => r._tag === 'Failure')
+
+    expect(registry.get(atoms.statusAtom(key(id)))).toBeUndefined()
+  })
+})
+
+describe('resolvedContentAtom', () => {
+  it('starts in the Initial state while a load is in flight', () => {
+    const { registry, atoms } = setup({
+      get: () => Effect.promise(() => new Promise<NotebookRecord>(() => {})),
+    })
+    const id = NotebookId.make('server-id')
+    registry.mount(atoms.notebookAtom(key(id)))
+
+    expect(registry.get(atoms.resolvedContentAtom(key(id)))._tag).toBe('Initial')
+  })
+
+  it('surfaces a load failure instead of silently resolving to undefined', async () => {
+    const { registry, atoms } = setup({
+      get: () => Effect.fail(new GetNotebookError({ cause: 'boom' })),
+    })
+    const id = NotebookId.make('server-id')
+
+    await waitFor(registry, atoms.notebookAtom(key(id)), (r) => r._tag === 'Failure')
+
+    expect(registry.get(atoms.resolvedContentAtom(key(id)))._tag).toBe('Failure')
   })
 })
 

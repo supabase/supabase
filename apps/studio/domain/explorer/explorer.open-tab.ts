@@ -2,7 +2,6 @@ import { Array, Option } from 'effect'
 import type { AtomRegistry } from 'effect/unstable/reactivity'
 
 import { NotebookId } from '../notebooks/notebook.schema'
-import { notebooksAtoms } from '../notebooks/notebooks.atoms'
 import { explorerTabs, type ExplorerTab } from './explorer.tabs'
 
 const selectOrAddTab = (
@@ -21,20 +20,15 @@ const selectOrAddTab = (
   return id
 }
 
-/** Opens a notebook tab, reusing one already open for `notebookId` — and (re)loads its content/name. */
-export const openNotebookTab = (
-  registry: AtomRegistry.AtomRegistry,
-  projectRef: string,
-  notebookId: NotebookId
-) => {
-  const id = selectOrAddTab(
+/**
+ * Opens a notebook tab, reusing one already open for `notebookId`.
+ */
+export const openNotebookTab = (registry: AtomRegistry.AtomRegistry, notebookId: NotebookId) =>
+  selectOrAddTab(
     registry,
     (data) => data._tag === 'NotebookTab' && data.notebookId === notebookId,
     () => ({ _tag: 'NotebookTab', notebookId })
   )
-  notebooksAtoms.loadNotebook(registry, projectRef, notebookId)
-  return id
-}
 
 /** Opens a chat tab, reusing one already open for `chatId`. Chat content still lives in legacy state. */
 export const openChatTab = (registry: AtomRegistry.AtomRegistry, chatId: string) =>

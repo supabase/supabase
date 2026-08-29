@@ -19,13 +19,7 @@ const NotebooksSkeleton = () => (
   </div>
 )
 
-const NotebookListItem = ({
-  notebook,
-  projectRef,
-}: {
-  notebook: NotebookSummary
-  projectRef: string
-}) => {
+const NotebookListItem = ({ notebook }: { notebook: NotebookSummary }) => {
   const registry = useContext(RegistryContext)
 
   return (
@@ -33,7 +27,7 @@ const NotebookListItem = ({
       type="button"
       tabIndex={0}
       className="flex items-center gap-2 rounded px-2 py-1.5 text-left text-sm text-foreground-light hover:bg-surface-200 hover:text-foreground"
-      onClick={() => openNotebookTab(registry, projectRef, notebook.id)}
+      onClick={() => openNotebookTab(registry, notebook.id)}
     >
       <NotebookText size={14} className="shrink-0 text-foreground-muted" />
       <span className="truncate">{notebook.name}</span>
@@ -85,7 +79,7 @@ const ExplorerSidebarInner = ({ projectRef }: { projectRef: string }) => {
             .onSuccess((value, success) => (
               <>
                 {value.items.map((notebook) => (
-                  <NotebookListItem key={notebook.id} notebook={notebook} projectRef={projectRef} />
+                  <NotebookListItem key={notebook.id} notebook={notebook} />
                 ))}
                 {!value.done && <div ref={sentinelRef} className="h-1 shrink-0" />}
                 {success.waiting && <NotebooksSkeleton />}

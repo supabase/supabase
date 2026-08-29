@@ -10,12 +10,12 @@ import { openChatTab, openNotebookTab } from './explorer.open-tab'
  * link). Mirrors `useSyncProjectRef` — the write must happen before paint,
  * so it's a `useLayoutEffect`, not derived during render.
  */
-export const useSyncNotebookTabFromUrl = (notebookId: string, projectRef: string) => {
+export const useSyncNotebookTabFromUrl = (notebookId: string) => {
   const registry = useContext(RegistryContext)
 
   useLayoutEffect(() => {
-    openNotebookTab(registry, projectRef, NotebookId.make(notebookId))
-  }, [projectRef, registry, notebookId])
+    openNotebookTab(registry, NotebookId.make(notebookId))
+  }, [registry, notebookId])
 }
 
 /**

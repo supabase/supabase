@@ -1,11 +1,12 @@
 import { RegistryContext, useAtom, useAtomValue } from '@effect/atom-react'
 import { Match, Option } from 'effect'
+import { AsyncResult } from 'effect/unstable/reactivity'
 import { Plus, X } from 'lucide-react'
-import { useContext, useEffect } from 'react'
+import { useContext } from 'react'
 import { Button } from 'ui'
 
 import type { NotebookId } from '../notebooks/notebook.schema'
-import { notebooksAtoms } from '../notebooks/notebooks.atoms'
+import { NotebookCacheKey, notebooksAtoms } from '../notebooks/notebooks.atoms'
 import { explorerTabs, type ExplorerTab } from './explorer.tabs'
 import { withProjectRef } from '@/domain/project/withProjectRef'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -27,10 +28,6 @@ const TabLabel = ({ tab, projectRef }: { tab: ExplorerTab; projectRef: string })
   )
 }
 
-/**
- * Every notebook tab renders one of these regardless of whether it's the
- * current tab, so this is what guarantees its name eventually loads.
- */
 const NotebookTabLabel = ({
   notebookId,
   projectRef,
@@ -38,15 +35,19 @@ const NotebookTabLabel = ({
   notebookId: NotebookId
   projectRef: string
 }) => {
-  const registry = useContext(RegistryContext)
-  const name = useAtomValue(notebooksAtoms.nameAtom(notebookId))
+  const result = useAtomValue(
+    notebooksAtoms.notebookAtom(new NotebookCacheKey({ projectRef, id: notebookId }))
+  )
 
-  useEffect(() => {
-    if (name !== undefined) return
-    notebooksAtoms.loadNotebook(registry, projectRef, notebookId)
-  }, [name, projectRef, registry, notebookId])
-
-  return <>{name ?? LOADING_LABEL}</>
+  return (
+    <>
+      {AsyncResult.match(result, {
+        onInitial: () => LOADING_LABEL,
+        onFailure: () => 'Failed to load',
+        onSuccess: (success) => success.value.name,
+      })}
+    </>
+  )
 }
 
 const ChatTabLabel = ({ chatId }: { chatId: string }) => <>{useChatTabLabel(chatId)}</>

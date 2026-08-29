@@ -1,9 +1,9 @@
-import { Cache, Data, Effect, Option } from 'effect'
+import { Data, Effect, Option } from 'effect'
 import { AsyncResult, Atom, type AtomRegistry } from 'effect/unstable/reactivity'
 
 import * as Cells from './notebook.cells'
 import { Cell, CellId, NotebookContent, NotebookId } from './notebook.schema'
-import { NotebooksApi } from './notebooks.api'
+import { NotebooksApi, type GetNotebookError } from './notebooks.api'
 import { notebookPageStream } from './notebooks.list'
 import { notebooksRuntime } from './notebooks.runtime'
 
@@ -16,16 +16,16 @@ export type NotebookStatus = 'new' | 'unsaved' | 'saved'
  * `Data.Class` gives it structural equality so two calls for the same
  * `(projectRef, id)` are recognized as the same lookup.
  */
-class NotebookCacheKey extends Data.Class<{
+export class NotebookCacheKey extends Data.Class<{
   readonly projectRef: string
   readonly id: NotebookId
 }> {}
 
 /**
  * Runs an effect that needs `NotebooksApi` against the runtime's resolved
- * context. `runtime.pull`/`runtime.atom` do this reactively; imperative
- * actions (load one notebook, save it) need the same context but outside a
- * read function, so they pull it out of the runtime atom's current value.
+ * context. `runtime.pull`/`runtime.atom` do this reactively; an imperative
+ * action like saving a notebook needs the same context but outside a read
+ * function, so it pulls it out of the runtime atom's current value.
  */
 const runWithRuntime = <A, E>(
   runtime: Atom.AtomRuntime<NotebooksApi>,
@@ -71,121 +71,175 @@ export const makeNotebooksAtoms = (runtime: Atom.AtomRuntime<NotebooksApi>) => {
     })
   )
 
-  /** `undefined` means "not yet created locally or loaded from the server". */
-  const contentAtom = Atom.family((_id: NotebookId) =>
-    Atom.make<NotebookContent | undefined>(undefined)
-  )
-  /** `undefined` means "not yet known" — populated once `loadNotebook` resolves. */
-  const nameAtom = Atom.family((_id: NotebookId) => Atom.make<string | undefined>(undefined))
-  const hasBeenPersistedAtom = Atom.family((_id: NotebookId) => Atom.make(false))
-  const dirtyAtom = Atom.family((_id: NotebookId) => Atom.make(false))
-
-  const statusAtom = Atom.family((id: NotebookId) =>
-    Atom.readable(
-      (get): NotebookStatus =>
-        !get(hasBeenPersistedAtom(id)) ? 'new' : get(dirtyAtom(id)) ? 'unsaved' : 'saved'
-    )
-  )
-
-  const createLocalNotebook = (registry: AtomRegistry.AtomRegistry): NotebookId => {
-    const id = NotebookId.make(crypto.randomUUID())
-    registry.set(contentAtom(id), { cells: [] })
-    registry.set(hasBeenPersistedAtom(id), false)
-    return id
-  }
+  const hasBeenPersistedAtom = Atom.family((_key: NotebookCacheKey) => Atom.make(false))
 
   /**
-   * Dedupes concurrent `loadNotebook` calls for the same `(projectRef, id)`:
-   * per `Cache.get`'s contract, overlapping callers for a missing key share
-   * one pending lookup instead of each firing their own request. Entries
-   * never expire (no `timeToLive`), matching `contentAtom`'s own "loaded
-   * once, kept forever" semantics; a failed lookup is invalidated instead,
-   * so it can be retried rather than staying cached as a permanent failure.
+   * Reactive load of a single notebook, keyed by `(projectRef, id)`. Exposed
+   * as `AsyncResult` so any reader can render Initial/waiting/Success/Failure
+   * directly.
+   *
+   * `Atom.family` memoizes by structural key, so overlapping callers for the
+   * same key share one in-flight fetch, and the result is kept once loaded
+   * until something explicitly `refresh`es it. Wrapped, rather than exposing
+   * `runtime.atom`'s result directly, to flip `hasBeenPersistedAtom(key)` to
+   * `true` whenever it settles to `Success`.
    */
-  const notebookCache = Effect.runSync(
-    Cache.make({
-      capacity: 1000,
-      requireServicesAt: 'lookup',
-      lookup: ({ projectRef, id }: NotebookCacheKey) =>
-        Effect.gen(function* () {
-          const api = yield* NotebooksApi
-          return yield* api.get({ projectRef, id })
-        }),
+  const notebookAtom = Atom.family((key: NotebookCacheKey) => {
+    const fetchAtom = runtime.atom(
+      Effect.gen(function* () {
+        const api = yield* NotebooksApi
+        return yield* api.get({ projectRef: key.projectRef, id: key.id })
+      })
+    )
+    return Atom.readable(
+      (get) => {
+        const result = get(fetchAtom)
+        if (AsyncResult.isSuccess(result) && !result.waiting) {
+          get.set(hasBeenPersistedAtom(key), true)
+        }
+        return result
+      },
+      (refresh) => refresh(fetchAtom)
+    )
+  })
+
+  /**
+   * Local edits layered on top of whatever `notebookAtom` loaded. `undefined`
+   * means "no local edits yet" — read `resolvedContentAtom` for the effective
+   * content. Reading this atom never triggers a fetch.
+   */
+  const contentOverwriteAtom = Atom.family((_key: NotebookCacheKey) =>
+    Atom.make<NotebookContent | undefined>(undefined)
+  )
+
+  /**
+   * The effective content, exposed as `AsyncResult` so a reader can render
+   * Initial/waiting/Success/Failure directly instead of collapsing the load
+   * state to a bare value. Local edits, once present, are reported as an
+   * immediate `Success`; otherwise this mirrors whatever `notebookAtom(key)`
+   * is doing. Reading it — like `notebookAtom` — kicks off a fetch if
+   * nothing is known yet, so it's meant for reactive display
+   * (`useAtomValue`), not for imperative "is there content" checks; those
+   * should use {@link getKnownContent} instead to stay side-effect-free.
+   */
+  const resolvedContentAtom = Atom.family((key: NotebookCacheKey) =>
+    Atom.readable((get): AsyncResult.AsyncResult<NotebookContent, GetNotebookError> => {
+      const override = get(contentOverwriteAtom(key))
+      if (override !== undefined) return AsyncResult.success(override)
+      return AsyncResult.map(get(notebookAtom(key)), (record) => record.content)
     })
   )
 
-  /** Fetches a notebook known to exist server-side. No-ops if already loaded. */
-  const loadNotebook = (
-    registry: AtomRegistry.AtomRegistry,
-    projectRef: string,
-    id: NotebookId
-  ): Promise<void> => {
-    if (registry.get(contentAtom(id)) !== undefined) return Promise.resolve()
+  const dirtyAtom = Atom.family((_key: NotebookCacheKey) => Atom.make(false))
 
-    const key = new NotebookCacheKey({ projectRef, id })
-    return runWithRuntime(
-      runtime,
-      registry,
-      Cache.get(notebookCache, key).pipe(
-        Effect.tapError(() => Cache.invalidate(notebookCache, key))
-      )
-    ).then(({ name, content }) => {
-      registry.set(contentAtom(id), content)
-      registry.set(nameAtom(id), name)
-      registry.set(hasBeenPersistedAtom(id), true)
+  const statusAtom = Atom.family((key: NotebookCacheKey) =>
+    Atom.readable((get): NotebookStatus | undefined => {
+      if (get(hasBeenPersistedAtom(key))) return get(dirtyAtom(key)) ? 'unsaved' : 'saved'
+      return get(contentOverwriteAtom(key)) !== undefined ? 'new' : undefined
     })
+  )
+
+  /**
+   * Reads content for `key` without ever triggering a fetch: `undefined`
+   * unless a local notebook was created, edited, or already loaded/saved.
+   * `hasBeenPersistedAtom(key)` only ever becomes `true` as a side effect of
+   * `notebookAtom(key)` settling to `Success`, so once it's true here,
+   * `notebookAtom(key)` is guaranteed to already be mounted and settled — and
+   * reading `resolvedContentAtom` right after can't kick off a new fetch
+   * either.
+   */
+  const getKnownContent = (
+    registry: AtomRegistry.AtomRegistry,
+    key: NotebookCacheKey
+  ): NotebookContent | undefined => {
+    const override = registry.get(contentOverwriteAtom(key))
+    if (override !== undefined) return override
+    if (!registry.get(hasBeenPersistedAtom(key))) return undefined
+
+    const result = registry.get(resolvedContentAtom(key))
+    return AsyncResult.isSuccess(result) ? result.value : undefined
+  }
+
+  const createLocalNotebook = (
+    registry: AtomRegistry.AtomRegistry,
+    projectRef: string
+  ): NotebookId => {
+    const id = NotebookId.make(crypto.randomUUID())
+    const key = new NotebookCacheKey({ projectRef, id })
+    registry.set(contentOverwriteAtom(key), { cells: [] })
+    return id
   }
 
   const mutateCells = (
     registry: AtomRegistry.AtomRegistry,
+    projectRef: string,
     id: NotebookId,
     updateCells: (cells: ReadonlyArray<Cell>) => ReadonlyArray<Cell>
   ) => {
-    const content = registry.get(contentAtom(id))
+    const key = new NotebookCacheKey({ projectRef, id })
+    const content = getKnownContent(registry, key)
     if (!content) return
 
-    registry.set(contentAtom(id), { ...content, cells: updateCells(content.cells) })
-    registry.set(dirtyAtom(id), true)
+    registry.set(contentOverwriteAtom(key), { ...content, cells: updateCells(content.cells) })
+    registry.set(dirtyAtom(key), true)
   }
 
   const insertCellAfter = (
     registry: AtomRegistry.AtomRegistry,
+    projectRef: string,
     id: NotebookId,
     afterId: Option.Option<CellId>,
     cell: Cell
-  ) => mutateCells(registry, id, (cells) => Cells.insertCellAfter(cells, afterId, cell))
+  ) => mutateCells(registry, projectRef, id, (cells) => Cells.insertCellAfter(cells, afterId, cell))
 
-  const removeCell = (registry: AtomRegistry.AtomRegistry, id: NotebookId, cellId: CellId) =>
-    mutateCells(registry, id, (cells) => Cells.removeCell(cells, cellId))
+  const removeCell = (
+    registry: AtomRegistry.AtomRegistry,
+    projectRef: string,
+    id: NotebookId,
+    cellId: CellId
+  ) => mutateCells(registry, projectRef, id, (cells) => Cells.removeCell(cells, cellId))
 
   const updateCell = (
     registry: AtomRegistry.AtomRegistry,
+    projectRef: string,
     id: NotebookId,
     cellId: CellId,
     updater: (cell: Cell) => Cell
-  ) => mutateCells(registry, id, (cells) => Cells.updateCell(cells, cellId, updater))
+  ) => mutateCells(registry, projectRef, id, (cells) => Cells.updateCell(cells, cellId, updater))
 
   const moveCell = (
     registry: AtomRegistry.AtomRegistry,
+    projectRef: string,
     id: NotebookId,
     cellId: CellId,
     direction: 'up' | 'down'
-  ) => mutateCells(registry, id, (cells) => Cells.moveCell(cells, cellId, direction))
+  ) => mutateCells(registry, projectRef, id, (cells) => Cells.moveCell(cells, cellId, direction))
 
   const reorderCells = (
     registry: AtomRegistry.AtomRegistry,
+    projectRef: string,
     id: NotebookId,
     activeId: CellId,
     overId: CellId
-  ) => mutateCells(registry, id, (cells) => Cells.reorderCells(cells, activeId, overId))
+  ) => mutateCells(registry, projectRef, id, (cells) => Cells.reorderCells(cells, activeId, overId))
 
+  /**
+   * Saves the notebook.
+   *
+   * Separately, only clears `dirtyAtom` if `contentOverwriteAtom` still
+   * reference-equals the `content` captured above. `mutateCells` always
+   * produces a new object, so if an edit lands between that capture and the
+   * `save` call resolving, this correctly leaves dirty `true` — that edit
+   * was never sent to the server.
+   */
   const saveNotebook = (
     registry: AtomRegistry.AtomRegistry,
     projectRef: string,
     id: NotebookId,
     name: string
   ): Promise<void> => {
-    const content = registry.get(contentAtom(id))
+    const key = new NotebookCacheKey({ projectRef, id })
+    const content = getKnownContent(registry, key)
     if (!content) return Promise.resolve()
 
     return runWithRuntime(
@@ -196,8 +250,10 @@ export const makeNotebooksAtoms = (runtime: Atom.AtomRuntime<NotebooksApi>) => {
         yield* api.save({ projectRef, id, name, content })
       })
     ).then(() => {
-      registry.set(dirtyAtom(id), false)
-      registry.set(hasBeenPersistedAtom(id), true)
+      if (registry.get(contentOverwriteAtom(key)) === content) {
+        registry.set(dirtyAtom(key), false)
+      }
+      registry.set(hasBeenPersistedAtom(key), true)
     })
   }
 
@@ -205,12 +261,11 @@ export const makeNotebooksAtoms = (runtime: Atom.AtomRuntime<NotebooksApi>) => {
     notebooksAtom,
     loadMoreNotebooks,
     canLoadMoreAtom,
-    contentAtom,
-    nameAtom,
+    notebookAtom,
+    resolvedContentAtom,
     dirtyAtom,
     statusAtom,
     createLocalNotebook,
-    loadNotebook,
     insertCellAfter,
     removeCell,
     updateCell,
