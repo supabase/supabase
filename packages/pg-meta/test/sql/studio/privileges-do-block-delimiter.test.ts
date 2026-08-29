@@ -68,6 +68,21 @@ test('buildFunctionPrivilegesSql: input containing $pg_meta$ picks a higher deli
   expect(sql).toMatch(/do\s*\$pg_meta_1\$/)
 })
 
+test('buildFunctionPrivilegesSql: input containing both $pg_meta$ and $pg_meta_1$ picks $pg_meta_2$', () => {
+  // Adversarial: the input contains both the base delimiter and
+  // the FIRST generated suffix. The helper must keep skipping
+  // until it finds a collision-free delimiter. This proves the
+  // loop increments the suffix correctly rather than
+  // special-casing the base delimiter. (CodeRabbit flagged this
+  // as a potential weak test; using `$pg_meta$` alone only proves
+  // the helper rejects the base delimiter, not that the suffix
+  // counter is actually incremented.)
+  const sql = buildFunctionPrivilegesSql(['$pg_meta$ $pg_meta_1$ my_func'], 'grant')
+
+  expect(sql).toMatch(/do\s*\$pg_meta_2\$/)
+  expect(sql).toContain('end $pg_meta_2$;')
+})
+
 test('buildFunctionPrivilegesSql: empty schemaNames produces empty SQL (unchanged)', () => {
   // Regression guard: no DO block emitted when the input list is
   // empty.
