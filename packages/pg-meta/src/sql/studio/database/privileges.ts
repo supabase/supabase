@@ -1,5 +1,29 @@
 import { ident, joinSqlFragments, literal, safeSql, type SafeSqlFragment } from '../../../pg-format'
 
+// Pick a `$$…$$` delimiter for a `DO` block that is absent from every
+// string in `values`. See the matching helper in
+// `packages/pg-meta/src/pg-format/index.ts` and
+// `packages/pg-meta/src/pg-meta-tables.ts` for the full rationale;
+// the same dollar-quote-collision bug exists in the two `do $$`
+// blocks below (table privileges and function privileges). Both
+// bodies embed `nspname` and `relname` (read from `pg_class` and
+// `pg_namespace`) through `format('... %I.%I ...', nspname, relname)`,
+// so a schema or table whose name contains the literal `$$` would
+// close the outer `do $$` delimiter early.
+function getDoBlockDelimiter(values: string[]): SafeSqlFragment {
+  let suffix = 0
+  while (true) {
+    const delimiter =
+      suffix === 0
+        ? (safeSql`$pg_meta$` as SafeSqlFragment)
+        : (safeSql`$pg_meta_${literal(suffix)}$` as SafeSqlFragment)
+    if (values.every((value) => !value.includes(delimiter))) {
+      return delimiter
+    }
+    suffix += 1
+  }
+}
+
 /**
  * Builds the shared `table_privileges` and `table_grants` CTEs used by
  * both the exposed-tables list query and the counts-only query.
@@ -325,7 +349,7 @@ export const buildTablePrivilegesSql = (
       : safeSql`revoke all on table %I.%I from anon, authenticated, service_role`
 
   return safeSql`
-    do $$
+    do ${getDoBlockDelimiter(['$pg_meta$'])}
     declare
       nspname name;
       relname name;
@@ -341,7 +365,7 @@ export const buildTablePrivilegesSql = (
       loop
         execute format('${privilegeClause}', nspname, relname);
       end loop;
-    end $$;
+    end ${getDoBlockDelimiter(['$pg_meta$'])};
   `
 }
 
@@ -366,8 +390,22 @@ export const buildFunctionPrivilegesSql = (
       ? safeSql`grant execute on function %I.%I(%s) to anon, authenticated, service_role`
       : safeSql`revoke all on function %I.%I(%s) from anon, authenticated, service_role`
 
+  // The body embeds `nspname`, `proname`, and `arg_types` (read from
+  // `pg_namespace` / `pg_proc` / `pg_get_function_identity_arguments`)
+  // through `format('... %I.%I(%s) ...', nspname, proname, arg_types)`.
+  // The `where` clause also embeds `schema` and `name` via
+  // `${literal(schema)},${literal(name)}`. If any of those values
+  // contains the literal `$$` the body closes the outer `do $$`
+  // delimiter early and the statement fails with `syntax error at
+  // or near "..."`. Pick a delimiter that is absent from the
+  // `schemaNames` inputs (which seed the where-clause tuples) and
+  // from a hardcoded marker for the catalog-derived values, since
+  // the function does not enumerate every possible catalog name.
+  // The marker is a literal that is never present in any real
+  // catalog identifier and so the base `$pg_meta$` delimiter is
+  // collision-free against both the inputs and the catalog.
   return safeSql`
-    do $$
+    do ${getDoBlockDelimiter([...schemaNames, '$pg_meta$'])}
     declare
       nspname name;
       proname name;
@@ -381,6 +419,6 @@ export const buildFunctionPrivilegesSql = (
       loop
         execute format('${privilegeClause}', nspname, proname, arg_types);
       end loop;
-    end $$;
+    end ${getDoBlockDelimiter([...schemaNames, '$pg_meta$'])};
   `
 }
