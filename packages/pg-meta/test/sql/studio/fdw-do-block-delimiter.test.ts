@@ -145,7 +145,31 @@ test('create-encrypted-keys: encrypted value containing $pg_meta$ skips past bas
   expect(sql).toMatch(/do\s*\$pg_meta_\d+\$/)
   // And it must NOT use the base delimiter (which would still
   // collide with the encrypted value in the body).
-  expect(sql).not.toMatch(/do\s*\$pg_meta\$$/)
+  expect(sql).not.toMatch(/do\s*\$pg_meta\$\s/)
+})
+
+test('create-encrypted-keys: compound wrapper_option key containing $pg_meta$ across boundary skips base delimiter', () => {
+  // When wrapper_name is 'foo$pg' and option_name is 'meta$bar', neither
+  // contains '$pg_meta$' on its own, but the derived key 'foo$pg_meta$bar'
+  // contains '$pg_meta$'. Delimiter selection must inspect the derived key
+  // and pick $pg_meta_1$ or higher.
+  const sql = getCreateFDWSql({
+    ...baseArgs,
+    wrapperMeta: {
+      handlerName: 'wasm_fdw_handler',
+      validatorName: 'wasm_fdw_validator',
+      server: { options: [{ name: 'meta$bar', encrypted: true }] },
+    },
+    formState: {
+      wrapper_name: 'foo$pg',
+      server_name: 'my_server',
+      'meta$bar': 'shh',
+    },
+  })
+
+  expect(sql).not.toMatch(/do\s*\$\$\s/)
+  expect(sql).toMatch(/do\s*\$pg_meta_1\$/)
+  expect(sql).not.toMatch(/do\s*\$pg_meta\$\s/)
 })
 
 test('non-$$ wrapper and option names still use the base $pg_meta$ delimiter', () => {
@@ -166,5 +190,6 @@ test('non-$$ wrapper and option names still use the base $pg_meta$ delimiter', (
     },
   })
 
-  expect(sql).toMatch(/do\s*\$pg_meta\$/)
+  expect(sql).toMatch(/do\s*\$pg_meta\$\s/)
 })
+

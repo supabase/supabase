@@ -129,6 +129,7 @@ export function getCreateFDWSql({
     // fails with `syntax error at or near "..."`. Pick a delimiter
     // that is absent from all three values.
     const doBlockDelimiter = getDoBlockDelimiter([
+      key,
       formState.wrapper_name,
       option.name,
       formState[option.name] || '',
@@ -218,6 +219,7 @@ export function getCreateFDWSql({
     formState.server_name,
     formState.wrapper_name,
     ...wrapperMeta.server.options.map((option) => option.name),
+    ...encryptedOptions.map((option) => `${formState.wrapper_name}_${option.name}`),
     ...wrapperMeta.server.options
       .filter((option) => formState[option.name])
       .map((option) => formState[option.name]),
@@ -365,7 +367,7 @@ export const getDeleteFDWSql = ({
     // `option.name`) via `${literal(key)}`. If either contains the
     // literal `$$` the body closes the outer `do $$` delimiter
     // early. Pick a delimiter that is absent from both names.
-    const doBlockDelimiter = getDoBlockDelimiter([wrapper.name, option.name])
+    const doBlockDelimiter = getDoBlockDelimiter([key, wrapper.name, option.name])
 
     return safeSql`
       do ${doBlockDelimiter}
