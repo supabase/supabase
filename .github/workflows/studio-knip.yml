@@ -11,9 +11,9 @@ on:
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
       - '.github/workflows/studio-knip.yml'
+  # No `branches` filter: stacked PRs target a sibling branch, not master, and
+  # the gate should still run on them.
   pull_request:
-    branches:
-      - master
     paths:
       - 'apps/studio/**'
       - 'knip.jsonc'
