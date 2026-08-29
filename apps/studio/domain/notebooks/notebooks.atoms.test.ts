@@ -146,16 +146,16 @@ describe('saveNotebook', () => {
   })
 })
 
-describe('notebookAtom', () => {
+describe('nameAtom', () => {
   it('loads content and name from the API', async () => {
     const { registry, atoms } = setup({
       get: () => Effect.succeed({ name: 'My notebook', content: { cells: [] } }),
     })
     const id = NotebookId.make('server-id')
 
-    const result = await waitFor(registry, atoms.notebookAtom(key(id)), (r) => r._tag === 'Success')
+    const result = await waitFor(registry, atoms.nameAtom(key(id)), (r) => r._tag === 'Success')
 
-    expect(result._tag === 'Success' && result.value.name).toBe('My notebook')
+    expect(result._tag === 'Success' && result.value).toBe('My notebook')
     const content = registry.get(atoms.resolvedContentAtom(key(id)))
     expect(content._tag === 'Success' && content.value).toEqual({ cells: [] })
   })
@@ -168,11 +168,29 @@ describe('notebookAtom', () => {
         return Effect.succeed({ name: 'My notebook', content: { cells: [] } })
       },
     })
-    const atom = atoms.notebookAtom(key(NotebookId.make('server-id')))
+    const atom = atoms.nameAtom(key(NotebookId.make('server-id')))
 
     await Promise.all([
       waitFor(registry, atom, (r) => r._tag === 'Success'),
       waitFor(registry, atom, (r) => r._tag === 'Success'),
+    ])
+
+    expect(calls).toBe(1)
+  })
+
+  it('shares one request with resolvedContentAtom mounted for the same key', async () => {
+    let calls = 0
+    const { registry, atoms } = setup({
+      get: () => {
+        calls += 1
+        return Effect.succeed({ name: 'My notebook', content: { cells: [] } })
+      },
+    })
+    const id = NotebookId.make('server-id')
+
+    await Promise.all([
+      waitFor(registry, atoms.nameAtom(key(id)), (r) => r._tag === 'Success'),
+      waitFor(registry, atoms.resolvedContentAtom(key(id)), (r) => r._tag === 'Success'),
     ])
 
     expect(calls).toBe(1)
@@ -186,20 +204,20 @@ describe('notebookAtom', () => {
         return Effect.succeed({ name: `attempt ${calls}`, content: { cells: [] } })
       },
     })
-    const atom = atoms.notebookAtom(key(NotebookId.make('server-id')))
+    const atom = atoms.nameAtom(key(NotebookId.make('server-id')))
 
     const first = await waitFor(registry, atom, (r) => r._tag === 'Success')
-    expect(first._tag === 'Success' && first.value.name).toBe('attempt 1')
+    expect(first._tag === 'Success' && first.value).toBe('attempt 1')
 
     registry.refresh(atom)
 
     const second = await waitFor(
       registry,
       atom,
-      (r) => r._tag === 'Success' && !r.waiting && r.value.name === 'attempt 2'
+      (r) => r._tag === 'Success' && !r.waiting && r.value === 'attempt 2'
     )
     expect(calls).toBe(2)
-    expect(second._tag === 'Success' && second.value.name).toBe('attempt 2')
+    expect(second._tag === 'Success' && second.value).toBe('attempt 2')
   })
 })
 
@@ -220,9 +238,9 @@ describe('statusAtom', () => {
     // is "still loading," not "new" (a real notebook created locally).
     expect(registry.get(atoms.statusAtom(key(id)))).toBeUndefined()
 
-    // Simulates a component doing `useAtomValue(notebooksAtoms.notebookAtom(key))` —
+    // Simulates a component doing `useAtomValue(notebooksAtoms.nameAtom(key))` —
     // `registry.mount` kicks off the fetch without waiting on it, the same way.
-    registry.mount(atoms.notebookAtom(key(id)))
+    registry.mount(atoms.nameAtom(key(id)))
     resolveGet({ name: 'My notebook', content: { cells: [] } })
 
     await waitFor(registry, atoms.statusAtom(key(id)), (status) => status === 'saved')
@@ -231,13 +249,13 @@ describe('statusAtom', () => {
     unsubscribe()
   })
 
-  it('reflects a notebook settled via a direct notebookAtom read', async () => {
+  it('reflects a notebook settled via a direct nameAtom read', async () => {
     const { registry, atoms } = setup({
       get: () => Effect.succeed({ name: 'My notebook', content: { cells: [] } }),
     })
     const id = NotebookId.make('server-id')
 
-    await waitFor(registry, atoms.notebookAtom(key(id)), (r) => r._tag === 'Success')
+    await waitFor(registry, atoms.nameAtom(key(id)), (r) => r._tag === 'Success')
 
     expect(registry.get(atoms.statusAtom(key(id)))).toBe('saved')
   })
@@ -247,7 +265,7 @@ describe('statusAtom', () => {
       get: () => Effect.promise(() => new Promise<NotebookRecord>(() => {})),
     })
     const id = NotebookId.make('server-id')
-    registry.mount(atoms.notebookAtom(key(id)))
+    registry.mount(atoms.nameAtom(key(id)))
 
     expect(registry.get(atoms.statusAtom(key(id)))).toBeUndefined()
   })
@@ -258,7 +276,7 @@ describe('statusAtom', () => {
     })
     const id = NotebookId.make('server-id')
 
-    await waitFor(registry, atoms.notebookAtom(key(id)), (r) => r._tag === 'Failure')
+    await waitFor(registry, atoms.nameAtom(key(id)), (r) => r._tag === 'Failure')
 
     expect(registry.get(atoms.statusAtom(key(id)))).toBeUndefined()
   })
@@ -270,7 +288,7 @@ describe('resolvedContentAtom', () => {
       get: () => Effect.promise(() => new Promise<NotebookRecord>(() => {})),
     })
     const id = NotebookId.make('server-id')
-    registry.mount(atoms.notebookAtom(key(id)))
+    registry.mount(atoms.nameAtom(key(id)))
 
     expect(registry.get(atoms.resolvedContentAtom(key(id)))._tag).toBe('Initial')
   })
@@ -281,7 +299,7 @@ describe('resolvedContentAtom', () => {
     })
     const id = NotebookId.make('server-id')
 
-    await waitFor(registry, atoms.notebookAtom(key(id)), (r) => r._tag === 'Failure')
+    await waitFor(registry, atoms.nameAtom(key(id)), (r) => r._tag === 'Failure')
 
     expect(registry.get(atoms.resolvedContentAtom(key(id)))._tag).toBe('Failure')
   })

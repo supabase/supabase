@@ -36,7 +36,7 @@ const NotebookTabLabel = ({
   projectRef: string
 }) => {
   const result = useAtomValue(
-    notebooksAtoms.notebookAtom(new NotebookCacheKey({ projectRef, id: notebookId }))
+    notebooksAtoms.nameAtom(new NotebookCacheKey({ projectRef, id: notebookId }))
   )
 
   return (
@@ -44,7 +44,7 @@ const NotebookTabLabel = ({
       {AsyncResult.match(result, {
         onInitial: () => LOADING_LABEL,
         onFailure: () => 'Failed to load',
-        onSuccess: (success) => success.value.name,
+        onSuccess: (success) => success.value,
       })}
     </>
   )

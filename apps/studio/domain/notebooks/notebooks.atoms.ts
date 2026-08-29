@@ -103,6 +103,14 @@ export const makeNotebooksAtoms = (runtime: Atom.AtomRuntime<NotebooksApi>) => {
     )
   })
 
+  const nameAtom = Atom.family((key: NotebookCacheKey) =>
+    Atom.readable(
+      (get): AsyncResult.AsyncResult<string, GetNotebookError> =>
+        AsyncResult.map(get(notebookAtom(key)), (record) => record.name),
+      (refresh) => refresh(notebookAtom(key))
+    )
+  )
+
   /**
    * Local edits layered on top of whatever `notebookAtom` loaded. `undefined`
    * means "no local edits yet" — read `resolvedContentAtom` for the effective
@@ -261,7 +269,7 @@ export const makeNotebooksAtoms = (runtime: Atom.AtomRuntime<NotebooksApi>) => {
     notebooksAtom,
     loadMoreNotebooks,
     canLoadMoreAtom,
-    notebookAtom,
+    nameAtom,
     resolvedContentAtom,
     dirtyAtom,
     statusAtom,
