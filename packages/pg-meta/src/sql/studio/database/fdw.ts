@@ -121,11 +121,18 @@ export function getCreateFDWSql({
     const quotedValue = literal(formState[option.name] || '')
 
     // The body embeds `key` (composed of `wrapper_name` and
-    // `option.name`) via `${literal(key)}`. If either contains the
-    // literal `$$` the body closes the outer `do $$` delimiter
-    // early and the statement fails with `syntax error at or near
-    // "..."`. Pick a delimiter that is absent from both names.
-    const doBlockDelimiter = getDoBlockDelimiter([formState.wrapper_name, option.name])
+    // `option.name`) via `${literal(key)}` and the encrypted
+    // option value as `new_secret := ${quotedValue}` (where
+    // `quotedValue = literal(formState[option.name] || '')`). If
+    // any of those values contains the literal `$$` the body
+    // closes the outer `do $$` delimiter early and the statement
+    // fails with `syntax error at or near "..."`. Pick a delimiter
+    // that is absent from all three values.
+    const doBlockDelimiter = getDoBlockDelimiter([
+      formState.wrapper_name,
+      option.name,
+      formState[option.name] || '',
+    ])
 
     return safeSql`
       do ${doBlockDelimiter}

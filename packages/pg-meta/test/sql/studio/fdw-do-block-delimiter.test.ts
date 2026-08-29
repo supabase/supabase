@@ -118,6 +118,36 @@ test('delete-encrypted-keys: wrapper_name containing $$ does not collide with DO
   expect(sql).toMatch(/do\s*\$pg_meta/)
 })
 
+test('create-encrypted-keys: encrypted value containing $pg_meta$ skips past base delimiter', () => {
+  // Regression guard: the encrypted value (formState[option.name]) is
+  // also embedded in the body via `${literal(formState[option.name] || '')}`
+  // and must therefore be part of the delimiter candidate set. If a
+  // user enters an encrypted value that contains the literal
+  // `$pg_meta$`, the helper must pick `$pg_meta_1$` (or higher) to
+  // avoid having the body's own string close the outer delimiter.
+  const sql = getCreateFDWSql({
+    ...baseArgs,
+    wrapperMeta: {
+      handlerName: 'wasm_fdw_handler',
+      validatorName: 'wasm_fdw_validator',
+      server: { options: [{ name: 'api_secret', encrypted: true }] },
+    },
+    formState: {
+      wrapper_name: 'my_wrapper',
+      server_name: 'my_server',
+      api_secret: 'contains $pg_meta$ marker',
+    },
+  })
+
+  expect(sql).not.toMatch(/do\s*\$\$\s/)
+  // The base $pg_meta$ collides with the encrypted value, so the
+  // helper must skip past it.
+  expect(sql).toMatch(/do\s*\$pg_meta_\d+\$/)
+  // And it must NOT use the base delimiter (which would still
+  // collide with the encrypted value in the body).
+  expect(sql).not.toMatch(/do\s*\$pg_meta\$$/)
+})
+
 test('non-$$ wrapper and option names still use the base $pg_meta$ delimiter', () => {
   // Regression guard: the helper must not regress to a literal `$$`
   // delimiter on the common case where the inputs are dollar-quote
