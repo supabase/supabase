@@ -65,24 +65,34 @@ withTestDatabase(
 )
 
 withTestDatabase(
-  'schemas.update: change owner of a schema whose name contains $$',
+  'schemas.update: change owner to a role whose name contains $$',
   async ({ executeQuery }) => {
+    // Create a role whose name contains the literal `$$` and use it
+    // as the schema's new owner. The owner identifier is embedded
+    // inside the DO body via `format('alter schema %I owner to %I;', old.nspname, new_owner)`,
+    // so a `$$` in the role name closes the outer `do $$` delimiter
+    // early on the pre-fix source.
     await executeQuery(`create schema "app$$z";`)
+    await executeQuery(`create role "owner$$role" nologin;`)
+
+    const [{ ownerOid }] = await executeQuery<{ ownerOid: number }[]>(
+      `select oid::int as "ownerOid" from pg_roles where rolname = 'owner$$role';`
+    )
 
     const { sql: updateSql } = await pgMeta.schemas.update(
       { name: 'app$$z' },
-      { owner: 'postgres' }
+      { owner: 'owner$$role' }
     )
     await executeQuery(updateSql)
 
+    // Verify the owner was actually changed to the role's OID (not
+    // merely that *some* OID was set), proving the DO body parsed
+    // and executed end-to-end with the `$$`-containing role name
+    // embedded in the format() arg.
     const [{ nspowner }] = await executeQuery<{ nspowner: number }[]>(
       `select nspowner::int as nspowner from pg_namespace where nspname = 'app$$z';`
     )
-    // The default superuser OID is 10 on a fresh PG; we only care that
-    // the owner was changed away from the original (which is whatever
-    // role created the schema, typically 10 anyway on a fresh DB).
-    // The point of the test is the DO block executes end-to-end.
-    expect(typeof nspowner).toBe('number')
+    expect(nspowner).toBe(ownerOid)
   }
 )
 
