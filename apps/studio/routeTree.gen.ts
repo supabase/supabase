@@ -51,7 +51,6 @@ import { Route as AppOrgRouteImport } from './routes/_app/org'
 import { Route as AppAccountRouteImport } from './routes/_app/account'
 import { Route as ProjectRefIndexRouteImport } from './routes/project/$ref/index'
 import { Route as ApiMcpIndexRouteImport } from './routes/api/mcp/index'
-import { Route as ApiConnectIndexRouteImport } from './routes/api/connect/index'
 import { Route as AppOrgIndexRouteImport } from './routes/_app/org/index'
 import { Route as AppNewIndexRouteImport } from './routes/_app/new/index'
 import { Route as ProjectChar91_Char93SplatRouteImport } from './routes/project.[_].$'
@@ -537,11 +536,6 @@ const ProjectRefIndexRoute = ProjectRefIndexRouteImport.update({
 const ApiMcpIndexRoute = ApiMcpIndexRouteImport.update({
   id: '/api/mcp/',
   path: '/api/mcp/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiConnectIndexRoute = ApiConnectIndexRouteImport.update({
-  id: '/api/connect/',
-  path: '/api/connect/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppOrgIndexRoute = AppOrgIndexRouteImport.update({
@@ -2172,7 +2166,6 @@ export interface FileRoutesByFullPath {
   '/project/_/$': typeof ProjectChar91_Char93SplatRoute
   '/new/': typeof AppNewIndexRoute
   '/org/': typeof AppOrgIndexRoute
-  '/api/connect/': typeof ApiConnectIndexRoute
   '/api/mcp/': typeof ApiMcpIndexRoute
   '/project/$ref/': typeof ProjectRefIndexRoute
   '/account/tokens/scoped': typeof AppAccountTokensScopedRoute
@@ -2478,7 +2471,6 @@ export interface FileRoutesByTo {
   '/project/_/$': typeof ProjectChar91_Char93SplatRoute
   '/new': typeof AppNewIndexRoute
   '/org': typeof AppOrgIndexRoute
-  '/api/connect': typeof ApiConnectIndexRoute
   '/api/mcp': typeof ApiMcpIndexRoute
   '/project/$ref': typeof ProjectRefIndexRoute
   '/account/tokens/scoped': typeof AppAccountTokensScopedRoute
@@ -2795,7 +2787,6 @@ export interface FileRoutesById {
   '/project/_/$': typeof ProjectChar91_Char93SplatRoute
   '/_app/new/': typeof AppNewIndexRoute
   '/_app/org/': typeof AppOrgIndexRoute
-  '/api/connect/': typeof ApiConnectIndexRoute
   '/api/mcp/': typeof ApiMcpIndexRoute
   '/project/$ref/': typeof ProjectRefIndexRoute
   '/_app/account/tokens/scoped': typeof AppAccountTokensScopedRoute
@@ -3114,7 +3105,6 @@ export interface FileRouteTypes {
     | '/project/_/$'
     | '/new/'
     | '/org/'
-    | '/api/connect/'
     | '/api/mcp/'
     | '/project/$ref/'
     | '/account/tokens/scoped'
@@ -3420,7 +3410,6 @@ export interface FileRouteTypes {
     | '/project/_/$'
     | '/new'
     | '/org'
-    | '/api/connect'
     | '/api/mcp'
     | '/project/$ref'
     | '/account/tokens/scoped'
@@ -3736,7 +3725,6 @@ export interface FileRouteTypes {
     | '/project/_/$'
     | '/_app/new/'
     | '/_app/org/'
-    | '/api/connect/'
     | '/api/mcp/'
     | '/project/$ref/'
     | '/_app/account/tokens/scoped'
@@ -4018,7 +4006,6 @@ export interface RootRouteChildren {
   ApiIntegrationsStripeSyncRoute: typeof ApiIntegrationsStripeSyncRoute
   ApiPlatformDeploymentModeRoute: typeof ApiPlatformDeploymentModeRoute
   IntegrationsGithubAuthorizeRoute: typeof IntegrationsGithubAuthorizeRoute
-  ApiConnectIndexRoute: typeof ApiConnectIndexRoute
   ApiMcpIndexRoute: typeof ApiMcpIndexRoute
   ApiAiCodeCompleteRoute: typeof ApiAiCodeCompleteRoute
   ApiAiFeedbackClassifyRoute: typeof ApiAiFeedbackClassifyRoute
@@ -4399,13 +4386,6 @@ declare module '@tanstack/react-router' {
       path: '/api/mcp'
       fullPath: '/api/mcp/'
       preLoaderRoute: typeof ApiMcpIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/connect/': {
-      id: '/api/connect/'
-      path: '/api/connect'
-      fullPath: '/api/connect/'
-      preLoaderRoute: typeof ApiConnectIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/org/': {
@@ -7081,7 +7061,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiIntegrationsStripeSyncRoute: ApiIntegrationsStripeSyncRoute,
   ApiPlatformDeploymentModeRoute: ApiPlatformDeploymentModeRoute,
   IntegrationsGithubAuthorizeRoute: IntegrationsGithubAuthorizeRoute,
-  ApiConnectIndexRoute: ApiConnectIndexRoute,
   ApiMcpIndexRoute: ApiMcpIndexRoute,
   ApiAiCodeCompleteRoute: ApiAiCodeCompleteRoute,
   ApiAiFeedbackClassifyRoute: ApiAiFeedbackClassifyRoute,
