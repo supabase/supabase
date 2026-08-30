@@ -26,18 +26,6 @@ vi.mock('next/router', () => ({
   useRouter: () => ({ push: vi.fn() }),
 }))
 
-vi.mock('@/data/projects/project-detail-query', () => ({
-  useSetProjectStatus: () => ({ setProjectStatus: vi.fn() }),
-}))
-
-vi.mock('@/data/projects/project-restart-mutation', () => ({
-  useProjectRestartMutation: () => ({ mutate: vi.fn(), isPending: false }),
-}))
-
-vi.mock('@/data/projects/project-restart-services-mutation', () => ({
-  useProjectRestartServicesMutation: () => ({ mutate: vi.fn(), isPending: false }),
-}))
-
 vi.mock('@/hooks/misc/useCheckPermissions', () => ({
   useAsyncCheckPermissions: mockUseAsyncCheckPermissions,
 }))
