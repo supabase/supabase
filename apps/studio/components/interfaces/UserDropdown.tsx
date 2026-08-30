@@ -1,3 +1,4 @@
+import { useDevToolbar } from 'dev-tools'
 import { FlaskConical, Loader2, ScrollText, User2 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
@@ -19,11 +20,12 @@ import {
 
 import { ButtonTooltip } from '../ui/ButtonTooltip'
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
+import { DevToolbarMenuGroup } from './DevToolbarMenuGroup'
 import { TimezoneDropdown } from './UserDropdown/TimezoneDropdown'
 import { ProfileImage } from '@/components/ui/ProfileImage'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useUpgradeCtaExperiment } from '@/hooks/misc/useUpgradeCtaExperiment'
+import { useShowUpgradeCta } from '@/hooks/misc/useShowUpgradeCta'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useProfileNameAndPicture } from '@/lib/profile'
 import { useTrack } from '@/lib/telemetry/track'
@@ -44,13 +46,15 @@ export function UserDropdown({
 
   const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
   const track = useTrack()
+  const { isAvailable: isDevToolbarAvailable } = useDevToolbar()
+  const shouldShowSectionSeparator = IS_PLATFORM || isDevToolbarAvailable
 
-  const { variant: upgradeCtaVariant } = useUpgradeCtaExperiment()
-  // Per Slack feedback (Jonny): the upgrade CTA is org-scoped, so only show it on routes
-  // where an org is in scope. Excludes /account/*, /organizations, /new, marketing routes, etc.
+  // The upgrade CTA is org-scoped, so only enable it on routes where an org is in scope.
+  // Excludes /account/*, /organizations, /new, marketing routes, etc. Gating the hook here
+  // also skips fetching organization data on routes where the CTA can't render.
   const isOrgScopedRoute =
     router.pathname.startsWith('/project/') || router.pathname.startsWith('/org/')
-  const showUpgradeCta = upgradeCtaVariant === 'user_dropdown' && isOrgScopedRoute
+  const { showUpgradeCta } = useShowUpgradeCta({ enabled: isOrgScopedRoute })
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -136,10 +140,13 @@ export function UserDropdown({
                   Changelog
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
             </DropdownMenuGroup>
           </>
         )}
+
+        {shouldShowSectionSeparator && <DropdownMenuSeparator />}
+
+        <DevToolbarMenuGroup />
 
         <DropdownMenuGroup>
           <DropdownMenuLabel>Theme</DropdownMenuLabel>

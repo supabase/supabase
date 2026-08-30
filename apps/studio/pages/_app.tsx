@@ -1,5 +1,4 @@
 import '@/styles/code.css'
-import '@/styles/focus.css'
 import '@/styles/globals.css'
 import '@/styles/graphiql-base.css'
 import '@/styles/grid.css'
@@ -81,8 +80,17 @@ const ResourceWarningsTab = IS_DEV_TOOLBAR_ENABLED
     )
   : () => null
 
+const ProjectStatusTab = IS_DEV_TOOLBAR_ENABLED
+  ? dynamic(() =>
+      import('@/components/ui/DevToolbar/ProjectStatusTab').then((m) => m.ProjectStatusTab)
+    )
+  : () => null
+
 const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
-  ? [{ id: 'warnings', label: 'Warnings', content: <ResourceWarningsTab /> }]
+  ? [
+      { id: 'warnings', label: 'Warnings', content: <ResourceWarningsTab /> },
+      { id: 'project-status', label: 'Project Status', content: <ProjectStatusTab /> },
+    ]
   : []
 
 const FeatureFlagProviderWithOrgContext = ({

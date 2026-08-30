@@ -95,6 +95,7 @@ const GuideTemplate = ({
           <article
             // Used to get headings for the table of contents
             id="sb-docs-guide-main-article"
+            data-testid="sb-docs-guide-main-article"
             className="prose max-w-none"
           >
             <header className="mb-8">
@@ -102,9 +103,9 @@ const GuideTemplate = ({
                 <ReactMarkdown>{meta?.title || 'Supabase Docs'}</ReactMarkdown>
               </h1>
               {meta?.subtitle && (
-                <h2 className="mt-1 text-xl text-foreground-light [&>p]:m-0">
+                <div className="mt-3 not-prose [&_p]:text-xl [&_p]:leading-7 text-foreground-light [&>p]:m-0">
                   <ReactMarkdown>{meta.subtitle}</ReactMarkdown>
-                </h2>
+                </div>
               )}
             </header>
 

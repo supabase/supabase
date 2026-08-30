@@ -467,7 +467,7 @@ parameters:
       An array of files or glob patterns to find seeds in.
     links:
       - name: 'Seeding your database'
-        link: 'https://supabase.com/docs/guides/cli/seeding-your-database'
+        link: 'https://supabase.com/docs/guides/local-development/seeding-your-database'
 
   - id: 'realtime.enabled'
     title: 'realtime.enabled'

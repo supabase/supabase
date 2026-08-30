@@ -73,6 +73,7 @@ const PrivilegesTable = ({
         <Table.tr key={column.column_id}>
           <Table.td>
             <button
+              tabIndex={0}
               onClick={() => handleClickColumnName(column.column_id)}
               className="block w-full truncate text-left text-foreground"
             >

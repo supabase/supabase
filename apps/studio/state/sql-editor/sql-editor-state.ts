@@ -4,11 +4,17 @@ import { toast } from 'sonner'
 import { proxy, snapshot, useSnapshot } from 'valtio'
 import { devtools, proxyMap } from 'valtio/utils'
 
-import { folderStatusOnSaveStart, isNewFolder, statusOnEdit } from './sql-editor-lifecycle'
+import {
+  folderStatusOnSaveStart,
+  isNewFolder,
+  statusOnDiscard,
+  statusOnEdit,
+} from './sql-editor-lifecycle'
 import { sqlEditorSessionState } from './sql-editor-session-state'
 import type { StateSnippet, StateSnippetFolder } from './types'
 import type { SnippetWithContent } from '@/data/content/sql-folders-query'
 import { Snippet, SnippetFolder } from '@/data/content/sql-folders-query'
+import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 
 export const sqlEditorState = proxy({
   // ========================================================================
@@ -58,6 +64,19 @@ export const sqlEditorState = proxy({
   },
 
   /**
+   *
+   * Clear local snippet content that is not persisted to the database. Deletes
+   * user edits that have not been saved.
+   */
+  clearSnippetContent: (id: string) => {
+    const storeSnippet = sqlEditorState.snippets[id]
+    if (storeSnippet) {
+      storeSnippet.snippet.content = undefined
+      storeSnippet.snippet.status = statusOnDiscard(storeSnippet.snippet.status)
+    }
+  },
+
+  /**
    * Update snippet data (e.g name, visibility, chart) and queue for sync saving
    */
   updateSnippet: ({
@@ -66,7 +85,7 @@ export const sqlEditorState = proxy({
     skipSave = false,
   }: {
     id: string
-    snippet: Partial<Snippet>
+    snippet: Omit<Partial<Snippet>, 'type'>
     skipSave?: boolean
   }) => {
     if (sqlEditorState.snippets[id]) {
@@ -109,7 +128,11 @@ export const sqlEditorState = proxy({
   }) => {
     let snippet = sqlEditorState.snippets[id]?.snippet
     if (snippet?.content) {
-      snippet.content.unchecked_sql = untrustedSql(sql)
+      if (snippet.type === 'log_sql') {
+        snippet.content.unchecked_sql = untrustedLogSql(sql)
+      } else {
+        snippet.content.unchecked_sql = untrustedSql(sql)
+      }
       // Mark dirty immediately so `status` (not the transient needsSaving queue)
       // is the durable source of truth for unsaved changes, even before the
       // debounced save begins.
@@ -239,7 +262,7 @@ export const sqlEditorState = proxy({
 
   removeFavorite: (id: string) => {
     const storeSnippet = sqlEditorState.snippets[id]
-    if (storeSnippet.snippet) {
+    if (storeSnippet) {
       storeSnippet.snippet.favorite = false
       sqlEditorState.needsSaving.set(id, true)
     }

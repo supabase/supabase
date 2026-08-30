@@ -22,10 +22,14 @@ const CHART_COLORS = {
   BRAND_HOVER: 'hsl(var(--brand-500))',
 }
 
-export type ChartBarTick = {
-  timestamp: string
-  [key: string]: string | number
-}
+export type ChartBarTick =
+  | {
+      timestamp: string
+      [key: string]: string | number
+    }
+  | {
+      [key: string]: string | number
+    }
 
 export type ChartHighlight = {
   handleMouseDown: (e: { activeLabel?: string; coordinates?: string }) => void
@@ -45,7 +49,9 @@ export type ChartHighlightAction = {
 
 export interface ChartBarProps {
   data: ChartBarTick[]
+  xKey?: string
   dataKey: string
+  dataKeys?: string[]
   config?: ChartConfig
   onBarClick?: (datum: ChartBarTick, tooltipData?: CategoricalChartState) => void
   DateTimeFormat?: string
@@ -59,6 +65,7 @@ export interface ChartBarProps {
   cursor?: string
   showGrid?: boolean
   showYAxis?: boolean
+  showXAxis?: boolean
   YAxisProps?: {
     tick?: boolean
     tickFormatter?: (value: any) => string
@@ -67,9 +74,14 @@ export interface ChartBarProps {
   }
 }
 
+// [Joshen] JFYI - shouldn't rely on xKey's value to determine if its a time-based format
+// Preferably provide an additional param like xFormat to be more deterministic
+
 export const ChartBar = ({
   data,
+  xKey = 'timestamp',
   dataKey,
+  dataKeys,
   config,
   onBarClick,
   DateTimeFormat = 'MMM D, YYYY, hh:mma',
@@ -83,6 +95,7 @@ export const ChartBar = ({
   cursor,
   showGrid = false,
   showYAxis = false,
+  showXAxis = false,
   YAxisProps,
 }: ChartBarProps) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
@@ -93,11 +106,15 @@ export const ChartBar = ({
     return null
   }
 
-  const chartConfig: ChartConfig = config || {
-    [dataKey]: {
-      label: dataKey,
-    },
-  }
+  const keysToRender = dataKeys || [dataKey]
+  const isMultiSeries = keysToRender.length > 1
+
+  const chartConfig: ChartConfig =
+    config ||
+    keysToRender.reduce((acc, key) => {
+      acc[key] = { label: key }
+      return acc
+    }, {} as ChartConfig)
 
   const showHighlightActions =
     showHighlightArea &&
@@ -107,11 +124,25 @@ export const ChartBar = ({
 
   const chartCursor = cursor || (chartHighlight ? 'crosshair' : 'default')
 
+  const xAxisConfig = {
+    angle: 0,
+    dataKey: xKey,
+    tick: showXAxis
+      ? { fill: 'var(--color-foreground-lighter)', fontSize: 10, fontFamily: 'var(--font-mono)' }
+      : false,
+    hide: !showXAxis,
+    interval: 'preserveStartEnd' as const,
+    axisLine: { stroke: CHART_COLORS.AXIS },
+    tickLine: { stroke: CHART_COLORS.AXIS },
+  }
+
   const yAxisConfig = {
-    tick: showYAxis,
+    tick: showYAxis
+      ? { fill: 'var(--color-foreground-lighter)', fontSize: 10, fontFamily: 'var(--font-mono)' }
+      : false,
     hide: !showYAxis,
     tickMargin: showYAxis ? (YAxisProps?.tickMargin ?? 4) : 0,
-    width: showYAxis ? (YAxisProps?.width ?? undefined) : 0,
+    width: showYAxis ? (YAxisProps?.width ?? 60) : 0,
     axisLine: { stroke: CHART_COLORS.AXIS },
     tickLine: { stroke: CHART_COLORS.AXIS },
     ...YAxisProps,
@@ -120,7 +151,7 @@ export const ChartBar = ({
   const margin = {
     top: 0,
     right: 0,
-    left: showYAxis ? -40 : 0,
+    left: 0,
     bottom: 0,
   }
 
@@ -141,7 +172,7 @@ export const ChartBar = ({
             }
 
             if (chartHighlight) {
-              const activeTimestamp = data[e.activeTooltipIndex]?.timestamp
+              const activeTimestamp = data[e.activeTooltipIndex]?.[xKey]
               chartHighlight.handleMouseMove({
                 activeLabel: activeTimestamp?.toString(),
                 coordinates: e.activeLabel,
@@ -150,7 +181,7 @@ export const ChartBar = ({
           }}
           onMouseDown={(e: any) => {
             if (chartHighlight && e.activeTooltipIndex !== undefined) {
-              const activeTimestamp = data[e.activeTooltipIndex]?.timestamp
+              const activeTimestamp = data[e.activeTooltipIndex]?.[xKey]
               chartHighlight.handleMouseDown({
                 activeLabel: activeTimestamp?.toString(),
                 coordinates: e.activeLabel,
@@ -178,18 +209,14 @@ export const ChartBar = ({
         >
           {showGrid && <CartesianGrid vertical={false} stroke={CHART_COLORS.AXIS} />}
           <YAxis {...yAxisConfig} />
-          <XAxis
-            dataKey="timestamp"
-            interval={data.length - 2}
-            tick={false}
-            axisLine={{ stroke: CHART_COLORS.AXIS }}
-            tickLine={{ stroke: CHART_COLORS.AXIS }}
-          />
+          <XAxis {...xAxisConfig} />
           <ChartTooltip
             content={
               <ChartTooltipContent
                 className="text-foreground-light -mt-5"
-                labelFormatter={(v: string) => dayjs(v).format(DateTimeFormat)}
+                labelFormatter={(v: string) =>
+                  xKey === 'timestamp' ? dayjs(v).format(DateTimeFormat) : 'Value'
+                }
               />
             }
           />
@@ -204,21 +231,36 @@ export const ChartBar = ({
               fillOpacity={0.2}
             />
           )}
-          <Bar dataKey={dataKey} fill={color} maxBarSize={24}>
-            {data?.map((_entry: ChartBarTick, index: number) => (
-              <Cell
-                className="cursor-pointer transition-colors"
-                key={`bar-${index}`}
-                fill={focusDataIndex === index || focusDataIndex === null ? color : hoverColor}
-              />
-            ))}
-          </Bar>
+          {isMultiSeries ? (
+            keysToRender.map((key) => {
+              const keyConfig = chartConfig[key]
+              const barColor =
+                keyConfig?.color ||
+                (keyConfig?.theme
+                  ? isDarkMode
+                    ? keyConfig.theme.dark
+                    : keyConfig.theme.light
+                  : color)
+              return <Bar key={key} dataKey={key} fill={barColor} maxBarSize={24} />
+            })
+          ) : (
+            <Bar dataKey={dataKey} fill={color} maxBarSize={24}>
+              {data?.map((_entry: ChartBarTick, index: number) => (
+                <Cell
+                  className="cursor-pointer transition-colors"
+                  key={`bar-${index}`}
+                  fill={focusDataIndex === index || focusDataIndex === null ? color : hoverColor}
+                />
+              ))}
+            </Bar>
+          )}
         </RechartBarChart>
       </ChartContainer>
-      {data && data.length > 0 && (
-        <div className="text-foreground-lighter -mt-10 flex items-center justify-between text-[10px] font-mono">
-          <span>{dayjs(data[0]['timestamp']).format(DateTimeFormat)}</span>
-          <span>{dayjs(data[data.length - 1]?.['timestamp']).format(DateTimeFormat)}</span>
+
+      {xKey === 'timestamp' && data && data.length > 0 && (
+        <div className="text-foreground-lighter -mt-6 flex items-center justify-between text-[10px] font-mono">
+          <span>{dayjs(data[0][xKey]).format(DateTimeFormat)}</span>
+          <span>{dayjs(data[data.length - 1]?.[xKey]).format(DateTimeFormat)}</span>
         </div>
       )}
     </div>

@@ -170,7 +170,7 @@ export function FeaturesMatrix({ features }: FeaturesMatrixProps) {
                 <TableCell className="px-3 py-3 min-w-0 hover:bg-transparent!">
                   <Link
                     href={`/features/${feature.slug}`}
-                    className="flex items-center gap-2 text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter rounded min-w-0"
+                    className="flex items-center gap-2 text-foreground focus-ring rounded min-w-0"
                   >
                     <div className="shrink-0 w-7 h-7 rounded-md bg-surface-200 border border-muted hidden md:flex items-center justify-center">
                       <feature.icon className="w-3.5 h-3.5 text-foreground-light group-hover/row:text-foreground transition-colors" />

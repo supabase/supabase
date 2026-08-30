@@ -170,7 +170,7 @@ export const PlatformWebhooksEndpointList = ({
                 return (
                   <TableRow
                     key={endpoint.id}
-                    className="relative cursor-pointer inset-focus"
+                    className="relative cursor-pointer focus-inset"
                     onClick={createNavigationHandler(
                       `${webhooksHref}/${encodeURIComponent(endpoint.id)}`,
                       router

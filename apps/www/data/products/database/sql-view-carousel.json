@@ -9,7 +9,7 @@
   {
     "title": "Monaco editor",
     "label": "Monaco editor",
-    "img_url": "/images/product/database/sql-view/manaco-editor.png",
+    "img_url": "/images/product/database/sql-view/monaco-editor.png",
     "text": "Built in Monaco editor, with rich validation and autocomplete.",
     "url": ""
   },

@@ -153,6 +153,7 @@ const MenuItems = ({ category, menuItemFilter }: MenuItemsProps) => {
       {menuItems.map((item) => (
         <button
           key={item.key}
+          tabIndex={0}
           className="w-full text-left text-sm text-foreground-light px-4 hover:text-foreground"
           onClick={() => navigateToSection(item.key)}
         >

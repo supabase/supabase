@@ -11,13 +11,12 @@ You can configure self-hosted Supabase to use the [new API keys](/docs/guides/ge
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 
 - Complete the [Docker setup guide](/docs/guides/self-hosting/docker) so that `JWT_SECRET`, `ANON_KEY`, and `SERVICE_ROLE_KEY` are set in your `.env` file. [Quick start (Linux)](/docs/guides/self-hosting/docker#quick-start-linux) handles this automatically; the manual path runs [`generate-keys.sh`](/docs/guides/self-hosting/docker#generate-keys-and-secrets).
-- If you are upgrading an existing self-hosted Supabase environment, make sure to check the [changelog](https://github.com/supabase/supabase/blob/master/docker/CHANGELOG.md) and add/update the following files:
+- If you are upgrading from a legacy self-hosted Supabase environment, make sure to check the [changelog](https://github.com/supabase/supabase/blob/master/docker/CHANGELOG.md#2026-03-16) and [add/update](/docs/guides/self-hosting/updating) the following files:
   - `.env.example` (merge new sections into your `.env` file)
   - `docker-compose.yml`
   - `utils/add-new-auth-keys.sh`
   - `utils/rotate-new-api-keys.sh`
-  - `volumes/api/kong-entrypoint.sh`
-  - `volumes/api/kong.yml`
+  - `volumes/api/envoy/*`
 
 ## Adding the new keys
 
@@ -27,7 +26,7 @@ From your project directory where you have `docker-compose.yml`:
 sh utils/add-new-auth-keys.sh --update-env
 ```
 
-This generates new configuration environment variables and writes them to `.env`. Without `--update-env`, the script prints the values and prompts you interactively.
+This generates new configuration environment variables and writes them to `.env`. Omit `--update-env` to review and confirm the changes interactively.
 
 <Admonition type="caution">
 
@@ -35,7 +34,7 @@ The script reads `JWT_SECRET` from `.env` and includes it as a symmetric key ins
 
 </Admonition>
 
-The following configuration should be uncommented in the `.env` file for the new authentication to work correctly:
+In addition, the following configuration is uncommented automatically by the script for the new authentication to work correctly:
 
 ```yaml name=docker-compose.yml
 auth:
@@ -57,6 +56,11 @@ storage:
   environment:
     # JWKS for token verification (EC public + legacy symmetric)
     JWT_JWKS: ${JWT_JWKS:-{"keys":[]}}
+
+functions:
+  environment:
+    # JWKS for token verification (EC public + legacy symmetric).
+    SUPABASE_JWKS: ${JWT_JWKS:-{"keys":[]}}
 ```
 
 <Admonition type="caution">
@@ -68,7 +72,7 @@ Nested variable interpolation (`${A:-${B}}`) requires `podman-compose >= 1.6.0`.
 Restart all services:
 
 ```sh
-docker compose down && docker compose up -d
+sh run.sh recreate
 ```
 
 ### New API keys format
@@ -124,7 +128,7 @@ New variables default to empty values in `.env.example`. When empty, the API gat
 | `SUPABASE_PUBLISHABLE_KEY`              | Opaque           | **New:** Short random key with checksum. Replaces `ANON_KEY` for **client-side** use.                                                 |
 | `SUPABASE_SECRET_KEY`                   | Opaque           | **New:** Short random key with checksum. Replaces `SERVICE_ROLE_KEY` for **server-side** use.                                         |
 | `JWT_KEYS`                              | JSON array       | **New:** JSON array of signing JWKs containing the new asymmetric key pair and the legacy symmetric key. Used by Auth to sign tokens. |
-| `JWT_JWKS`                              | JWKS (JSON)      | **New:** Contains the new public key and the legacy symmetric key. Used by PostgREST, Realtime, and Storage to verify tokens.         |
+| `JWT_JWKS`                              | JWKS (JSON)      | **New:** Contains the new public key and the legacy symmetric key. Used by PostgREST, Realtime, Storage, and Functions.               |
 
 ### Differences from the Supabase platform
 
@@ -156,7 +160,7 @@ sh utils/rotate-new-api-keys.sh --update-env
 After rotating, restart services and update your client applications with the new keys:
 
 ```sh
-docker compose down && docker compose up -d
+sh run.sh recreate
 ```
 
 <Admonition type="note">
@@ -187,93 +191,16 @@ Regenerating asymmetric keys invalidates all ES256 user sessions. Plan a mainten
 
 ## How it works
 
-Below are a few notes on the details of the new authentication architecture.
-
-### What client SDK sends
-
-Every request via `supabase-js` includes two headers:
+Requests via `supabase-js` include two headers for every service except Edge Functions:
 
 - `apikey` - the API key (`sb_` or legacy JWT)
 - `Authorization` - when unauthenticated, the client SDK copies the API key here (`Bearer sb_publishable_xxx` or `Bearer eyJ...`). When authenticated, this contains the user session JWT minted by Auth.
 
 For **Realtime WebSocket** connections, the API key is sent as a `?apikey=` query parameter in the upgrade URL instead of an `apikey` header.
 
-**Storage** and **Edge Functions** accept requests without an API key. These services handle their own authentication.
+**Storage** and **Edge Functions** also accept requests without an API key. These services handle their own authentication.
 
-### Kong API gateway routing
-
-Kong is configured with two consumers that each accept both the legacy and new API keys:
-
-```yaml name=volumes/api/kong.yml
-consumers:
-  - username: anon
-    keyauth_credentials:
-      - key: $SUPABASE_ANON_KEY # legacy HS256 JWT (ANON_KEY)
-      - key: $SUPABASE_PUBLISHABLE_KEY # new opaque key (omitted when not configured)
-  - username: service_role
-    keyauth_credentials:
-      - key: $SUPABASE_SERVICE_KEY # legacy HS256 JWT (SERVICE_ROLE_KEY)
-      - key: $SUPABASE_SECRET_KEY # new opaque key (omitted when not configured)
-```
-
-When new API keys have not been added yet, the `kong-entrypoint.sh` script removes the empty credential entries before Kong loads the config.
-
-To assist with the authorization flows a specialized configuration in `kong.yml` substitutes internal, gateway-level-only pre-signed JWTs for `sb_publishable` and `sb_secret` API keys. These pre-signed JWTs are also auto-configured in `.env` but **should not** be used in any application code.
-
-| Route                      | Service              | API key required | Header substitution |
-| -------------------------- | -------------------- | ---------------- | ------------------- |
-| `/auth/v1/*`               | Auth                 | Yes              | `Authorization`     |
-| `/rest/v1/*`               | PostgREST            | Yes              | `Authorization`     |
-| `/graphql/v1`              | PostgREST            | Yes              | `Authorization`     |
-| `/realtime/v1/api/tenants` | Realtime (REST)      | Denied (blocked) | -                   |
-| `/realtime/v1/api/openapi` | Realtime (REST)      | Denied (blocked) | -                   |
-| `/realtime/v1/api/*`       | Realtime (REST)      | Yes              | `Authorization`     |
-| `/realtime/v1/*`           | Realtime (WebSocket) | Yes              | `x-api-key`         |
-| `/storage/v1/*`            | Storage              | No               | `Authorization`     |
-| `/functions/v1/*`          | Edge Functions       | No               | -                   |
-
-### Request flows
-
-The API gateway (Kong) configuration has the logic to decide what `Authorization` header the upstream service, such as Auth, receives. The logic handles two cases: requests that only carry an API key (no user session), and requests that carry a user session JWT.
-
-#### Unauthenticated requests (API key only, no user session JWT)
-
-When the client sends only an `apikey` header with the API key (no `Authorization` header), or also the API key duplicated in `Authorization` by `supabase-js`:
-
-1. The client sends `apikey: sb_publishable_xxx` (or legacy `apikey: eyJ...`).
-2. The API gateway checks the key and identifies the consumer (`anon` or `service_role`).
-3. The API gateway inspects the `Authorization` header. Since it is either absent or starts with `Bearer sb_` (an opaque key, not a session JWT), the plugin replaces it:
-   - **The new `sb_` key:** `Authorization` header is set to the internal pre-signed ES256 JWT that corresponds to the role.
-   - **The Legacy JWT key:** `Authorization` header is set to the legacy HS256 JWT (the `apikey` value is copied as-is).
-4. The upstream service receives a valid JWT in `Authorization` and verifies it using `JWT_JWKS` (or `JWT_SECRET`).
-
-#### Authenticated requests (user session JWT)
-
-When the client has previously signed in through Auth and has a valid user session JWT token:
-
-1. The client sends `Authorization: Bearer eyJ...` (a JWT session token from Auth) alongside `apikey: sb_publishable_xxx` (or legacy `apikey: eyJ...`).
-2. The API gateway checks the API key and identifies the consumer.
-3. The API gateway inspects the `Authorization` header. Since it exists and does **not** start with `Bearer sb_` (it's a real JWT, not an `sb_` API key), the plugin **passes it through unchanged**. This works the same way regardless of whether the `apikey` is a new `sb_` key or a legacy JWT - the gateway only looks at the `Authorization` header to decide whether a user session is present.
-4. The upstream service verifies the session JWT. If Auth signed it with ES256 (when `JWT_KEYS` is configured), verification uses the EC public key. If Auth signed it with HS256 (legacy), verification uses the symmetric key. Both keys are available in `JWT_JWKS`.
-
-The `request-transformer` expression in `kong.yml` implements this as a single Lua conditional:
-
-```lua
--- Pseudocode for the Authorization header logic:
-if authorization exists AND does not start with "Bearer sb_" then
-  -- User session JWT: pass through unchanged
-  keep authorization
-elseif apikey matches secret key then
-  -- Replace with pre-signed service_role ES256 JWT
-  set authorization = "Bearer <service_role ES256 JWT>"
-elseif apikey matches publishable key then
-  -- Replace with pre-signed anon ES256 JWT
-  set authorization = "Bearer <anon ES256 JWT>"
-else
-  -- Legacy JWT key: copy apikey as authorization
-  set authorization = apikey
-end
-```
+For details on how the API gateway routes and authenticates requests, see the [Envoy API Gateway guide](/docs/guides/self-hosting/self-hosted-envoy#authentication).
 
 ## Additional resources
 
@@ -287,3 +214,4 @@ On GitHub:
 
 - [Upcoming changes to Supabase API Keys (Discussion #29260)](https://github.com/orgs/supabase/discussions/29260)
 - [Supabase Auth: Asymmetric Keys support (Discussion #29289)](https://github.com/orgs/supabase/discussions/29289)
+- [Self-hosted Supabase: Envoy becomes the default API gateway (Discussion #48048)](https://github.com/orgs/supabase/discussions/48048)

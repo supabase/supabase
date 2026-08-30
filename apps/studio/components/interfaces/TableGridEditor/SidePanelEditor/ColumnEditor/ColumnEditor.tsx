@@ -515,6 +515,30 @@ export const ColumnEditor = ({
               </FormItemLayout>
             </FormSectionContent>
           </FormSection>
+
+          <SidePanel.Separator />
+
+          <FormSection
+            header={<FormSectionLabel className="lg:col-span-4!">Data Privacy</FormSectionLabel>}
+          >
+            <FormSectionContent loading={false} className="lg:col-span-8!">
+              <FormItemLayout
+                isReactForm={false}
+                layout="flex"
+                id="isSensitiveData"
+                label="Mark as sensitive data"
+                description="Column will be masked when viewing table data by default"
+              >
+                <Switch
+                  id="isSensitiveData"
+                  checked={columnFields.isSensitiveData ?? false}
+                  onCheckedChange={() => {
+                    onUpdateField({ isSensitiveData: !columnFields.isSensitiveData })
+                  }}
+                />
+              </FormItemLayout>
+            </FormSectionContent>
+          </FormSection>
         </SheetSection>
 
         <SheetFooter className="justify-between! [&>div]:p-0 [&>div]:border-t-0">

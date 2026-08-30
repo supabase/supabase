@@ -45,6 +45,7 @@ export const PITRSelection = () => {
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [selectedTimezone, setSelectedTimezone] = useState<Timezone>(getClientTimezone())
   const [selectedRecoveryPoint, setSelectedRecoveryPoint] = useState<{
+    selectedTimezone: Timezone
     recoveryTimeTargetUnix: number
     recoveryTimeString: string
     recoveryTimeStringUtc: string
@@ -99,11 +100,8 @@ export const PITRSelection = () => {
                 settings prior to starting a PITR restore.
               </AlertDescription>
               <div className="flex items-center gap-x-2 mt-2">
-                {/* [Joshen] Ideally we have some links to a docs to explain why so */}
-                <Button variant="default">
-                  <Link href={`/project/${ref}/settings/infrastructure`}>
-                    Infrastructure settings
-                  </Link>
+                <Button asChild variant="default">
+                  <Link href={`/project/${ref}/database/replication`}>Manage read replicas</Link>
                 </Button>
               </div>
             </Alert>
@@ -136,7 +134,9 @@ export const PITRSelection = () => {
                 <p className="text-sm text-foreground-light">Your database will be restored to:</p>
                 <div className="py-2 flex flex-col gap-3">
                   <div>
-                    <p className="text-sm font-mono text-foreground-lighter">Local Time</p>
+                    <p className="text-sm font-mono text-foreground-lighter">
+                      {selectedRecoveryPoint?.selectedTimezone.text}
+                    </p>
                     <p className="text-2xl">{selectedRecoveryPoint?.recoveryTimeString}</p>
                   </div>
                   <div>

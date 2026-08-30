@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import apiWrapper from '@/lib/api/apiWrapper'
+import { apiWrapper } from '@/lib/api/apiWrapper'
 import { getLegacySigningKey } from '@/lib/api/self-hosted/signing-keys'
 
 export default function legacySigningKey(req: NextApiRequest, res: NextApiResponse) {

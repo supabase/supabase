@@ -11,8 +11,8 @@ export const NoDestinationsAvailable = () => {
       <h3 className="text-lg font-medium text-foreground mb-2">No destinations available</h3>
       <p className="text-sm text-foreground-light max-w-lg">
         No Pipelines destinations are available for this project yet. Request{' '}
-        <InlineLink href="https://forms.supabase.com/pg_replicate">alpha access</InlineLink> to use
-        managed replication pipelines.
+        <InlineLink href="https://forms.supabase.com/pg_replicate">Pipelines access</InlineLink> to
+        use managed pipelines.
       </p>
     </div>
   )

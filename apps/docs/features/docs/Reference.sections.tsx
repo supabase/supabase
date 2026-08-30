@@ -275,10 +275,7 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
     : await getApiEndpointById(section.id)
   if (!endpointDetails) return null
 
-  const endpointFgaPermissionGroups =
-    endpointDetails.security
-      ?.filter((sec) => 'fga_permissions' in sec)
-      .map((sec) => sec.fga_permissions) ?? []
+  const endpointFgaPermissionGroups = endpointDetails['x-fga-permissions'] ?? []
   const pathParameters = (endpointDetails.parameters ?? []).filter((param) => param.in === 'path')
   const queryParameters = (endpointDetails.parameters ?? []).filter((param) => param.in === 'query')
   const bodyParameters =

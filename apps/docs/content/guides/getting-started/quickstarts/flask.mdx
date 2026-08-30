@@ -4,9 +4,11 @@ subtitle: 'Learn how to create a Supabase project, add some sample data to your 
 breadcrumb: 'Framework Quickstarts'
 ---
 
+<AiPrompt id="flask" />
+
 <$Partial path="quickstart_db_setup.mdx" />
 
-## 4. Create a Python app with Flask
+## 3. Create a Python app with Flask
 
 Create a new directory for your Python app and set up a virtual environment.
 
@@ -15,6 +17,10 @@ mkdir my-app && cd my-app
 python3 -m venv venv
 source venv/bin/activate
 ```
+
+## 4. Set up AI tooling (optional)
+
+<$Partial path="quickstart_ai_tooling.mdx" />
 
 ## 5. Install Flask and the Supabase client library
 
@@ -26,14 +32,14 @@ Install both packages using pip.
 pip install flask supabase
 ```
 
-<$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "" }} />
-
 ## 6. Create environment variables file
 
-Create a `.env` file in your project root and populate it with your Supabase connection variables that you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true):
+Create a `.env` file in your project root and populate it with your Supabase connection variables that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=flask):
 
 <Button variant="primary" asChild>
-  <a href="/dashboard/project/_?showConnect=true">Open Connect panel</a>
+  <a href="/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=flask">
+    Open Connect panel
+  </a>
 </Button>
 
 ```text name=.env
@@ -41,7 +47,9 @@ SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
 SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 ```
 
-## 7. Query data from the app
+<$Partial path="api_settings.mdx" variables={{ "framework": "flask", "tab": "frameworks" }} />
+
+## 7. Create the Supabase client
 
 Install the `python-dotenv` package to load environment variables:
 
@@ -49,12 +57,13 @@ Install the `python-dotenv` package to load environment variables:
 pip install python-dotenv
 ```
 
-Create an `app.py` file and add a route that fetches data from your `instruments` table using the Supabase client.
+Create an `app.py` file and initialize the Flask app and the Supabase client from your environment variables.
 
 ```python name=app.py
 import os
 from flask import Flask
 from supabase import create_client, Client
+from postgrest import APIError
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -65,10 +74,20 @@ supabase: Client = create_client(
     os.environ.get("SUPABASE_URL"),
     os.environ.get("SUPABASE_PUBLISHABLE_KEY")
 )
+```
 
+## 8. Query data from the app
+
+Add a route to `app.py` that fetches data from your `instruments` table.
+
+```python name=app.py
 @app.route('/')
 def index():
-    response = supabase.table('instruments').select("*").execute()
+    try:
+        response = supabase.table('instruments').select("*").execute()
+    except APIError as error:
+        return f'<p>Error loading instruments: {error.message}</p>'
+
     instruments = response.data
 
     html = '<h1>Instruments</h1><ul>'
@@ -82,13 +101,21 @@ if __name__ == '__main__':
     app.run(debug=True)
 ```
 
-## 8. Start the app
+## 9. Start the app
 
 Run the Flask development server, and go to http://localhost:5000 in your browser, you should see the list of instruments.
 
 ```bash
 python app.py
 ```
+
+<Admonition type="note">
+
+On macOS, port 5000 is used by the AirPlay Receiver service. If the page doesn't load, turn AirPlay Receiver off in **System Settings > General > AirDrop & Handoff**, or run the app on another port with `app.run(debug=True, port=5001)`.
+
+</Admonition>
+
+<$Partial path="quickstart_going_to_production.mdx" />
 
 ## Next steps
 

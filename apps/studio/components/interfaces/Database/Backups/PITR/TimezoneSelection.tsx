@@ -40,10 +40,11 @@ export const TimezoneSelection = ({
             role="combobox"
             aria-expanded={open}
             aria-controls={listboxId}
-            className="w-[350px] justify-between"
+            className="w-[350px] justify-start"
             size="small"
+            variant="default"
             icon={<Globe />}
-            iconRight={<ChevronsUpDown size={14} strokeWidth={1.5} />}
+            iconRight={<ChevronsUpDown size={14} strokeWidth={1.5} className="ml-auto" />}
           >
             {selectedTimezone
               ? timezoneOptions.find((option) => option === selectedTimezone.text)

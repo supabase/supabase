@@ -3,7 +3,7 @@ import { Checkbox, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { STATUS_CODE_LABELS } from '../UnifiedLogs.constants'
 import { ColumnFilterSchema, ColumnSchema } from '../UnifiedLogs.schema'
-import { parseAuthLogEventMessage } from '../UnifiedLogs.utils'
+import { getEventMessageDisplay } from '../UnifiedLogs.utils'
 import { HoverCardTimestamp } from './HoverCardTimestamp'
 import { LogTypeIcon } from './LogTypeIcon'
 import { DataTableColumnLevelIndicator } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnLevelIndicator'
@@ -44,25 +44,25 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
       header: '',
       cell: ({ row }) => {
         return (
-          <div className="flex items-center justify-center">
-            <Checkbox
-              checked={row.getIsSelected()}
-              onCheckedChange={(value) => row.toggleSelected(!!value)}
-              onClick={(e) => e.stopPropagation()}
-            />
-          </div>
+          <Checkbox
+            className="hit-area-2 hover:border-foreground-muted"
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            onClick={(e) => e.stopPropagation()}
+          />
         )
       },
       enableHiding: false,
       enableResizing: false,
       enableSorting: false,
       filterFn: () => true,
-      size: 48,
-      minSize: 48,
-      maxSize: 48,
+      size: 42,
+      minSize: 42,
+      maxSize: 42,
       meta: {
-        cellClassName: 'w-[32px]',
-        headerClassName: 'w-[32px]',
+        // pl-3.5 → toggle-filter icon; pr-3 matches date pl-3 (equal gaps around the dot)
+        cellClassName: 'w-[42px] min-w-[42px] pl-3.5 pr-3',
+        headerClassName: 'w-[42px] min-w-[42px] pl-3.5 pr-3',
       },
     },
     // Level column - always visible
@@ -77,12 +77,12 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
       enableResizing: false,
       enableSorting: false,
       filterFn: () => true,
-      size: 48,
-      minSize: 48,
-      maxSize: 48,
+      size: 8,
+      minSize: 8,
+      maxSize: 8,
       meta: {
-        cellClassName: 'w-[32px]',
-        headerClassName: 'w-[32px]',
+        cellClassName: 'w-2 min-w-2 px-0',
+        headerClassName: 'w-2 min-w-2 px-0',
       },
     },
     // Date column - always visible
@@ -100,8 +100,8 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
       minSize: 140,
       maxSize: 140,
       meta: {
-        cellClassName: 'font-mono tracking-tight w-[140px]',
-        headerClassName: 'w-[140px]',
+        cellClassName: 'font-mono tracking-tight w-[140px] pl-3',
+        headerClassName: 'w-[140px] pl-3',
         dataType: 'date',
       },
     },
@@ -113,7 +113,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
         const logType = row.getValue<ColumnSchema['log_type']>('log_type')
         return (
           <div className="flex items-center justify-end gap-1">
-            <LogTypeIcon type={logType} size={16} className="text-foreground/70" />
+            <LogTypeIcon type={logType} size={14} className="text-foreground-lighter" />
           </div>
         )
       },
@@ -198,8 +198,11 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
       minSize: 64,
       maxSize: 64,
       meta: {
-        cellClassName: 'font-mono tracking-tight w-[64px]',
-        headerClassName: 'w-[64px]',
+        // Hidden on narrow viewports so the table fits mobile without horizontal
+        // overflow; revealed from `sm` up. Full row detail is still available via
+        // the ServiceFlow panel on row click.
+        cellClassName: 'font-mono tracking-tight w-[64px] hidden sm:table-cell',
+        headerClassName: 'w-[64px] hidden sm:table-cell',
       },
     },
     // Pathname column - controlled by columnVisibility
@@ -213,8 +216,9 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
       minSize: 250,
       maxSize: 250,
       meta: {
-        cellClassName: 'font-mono tracking-tight w-[250px]',
-        headerClassName: 'w-[250px]',
+        // Hidden until `md` — wider than method, so it earns space one step later.
+        cellClassName: 'font-mono tracking-tight w-[250px] hidden md:table-cell',
+        headerClassName: 'w-[250px] hidden md:table-cell',
       },
       cell: ({ row }) => {
         const value = row.getValue<ColumnFilterSchema['pathname']>('pathname') ?? ''
@@ -234,7 +238,10 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
         const value = row.getValue<ColumnSchema['event_message']>('event_message')
         const logType = row.original.log_type
         const logCount = row.original.log_count
-        const displayMessage = logType === 'auth' ? parseAuthLogEventMessage(value) : value
+        const { message: displayMessage, capitalize: capitalizeMessage } = getEventMessageDisplay(
+          logType,
+          value
+        )
 
         return (
           <div className="flex flex-row gap-2 items-center">
@@ -252,7 +259,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
             )}
             {displayMessage && (
               <span
-                className={cn('text-muted-foreground', logType === 'auth' && 'capitalize-sentence')}
+                className={cn('text-muted-foreground', capitalizeMessage && 'capitalize-sentence')}
               >
                 {displayMessage}
               </span>
@@ -266,7 +273,10 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
       minSize: 200,
       maxSize: 400,
       meta: {
-        cellClassName: 'font-mono tracking-tight',
+        // Widest column — hidden until `lg`. No width class so it keeps flexing to
+        // fill remaining space once shown.
+        cellClassName: 'font-mono tracking-tight hidden lg:table-cell',
+        headerClassName: 'hidden lg:table-cell',
       },
     },
   ]

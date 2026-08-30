@@ -21,9 +21,9 @@ type AnalyticsBucketValidationOptions = {
 
 // Fields that are always required regardless of the namespace / access key selections.
 const ANALYTICS_BUCKET_REQUIRED_FIELDS: AnalyticsBucketValidationIssue[] = [
-  { path: 'warehouseName', message: 'Bucket is required' },
-  { path: 's3Region', message: 'S3 Region is required' },
-  { path: 's3AccessKeyId', message: 'S3 Access Key ID is required' },
+  { path: 'warehouseName', message: 'Bucket is required.' },
+  { path: 's3Region', message: 'S3 region is required.' },
+  { path: 's3AccessKeyId', message: 'S3 access key ID is required.' },
 ]
 
 export const getAnalyticsBucketValidationIssues = (
@@ -43,8 +43,8 @@ export const getAnalyticsBucketValidationIssues = (
   if (!hasValidNamespace) {
     issues.push(
       isCreatingNewNamespace
-        ? { path: 'newNamespaceName', message: 'Namespace name is required' }
-        : { path: 'namespace', message: 'Namespace is required' }
+        ? { path: 'newNamespaceName', message: 'Namespace name is required.' }
+        : { path: 'namespace', message: 'Namespace is required.' }
     )
   }
 
@@ -53,7 +53,7 @@ export const getAnalyticsBucketValidationIssues = (
     data.s3SecretAccessKey?.trim().length &&
     !data.s3AccessKeyId?.trim().length
   ) {
-    issues.push({ path: 's3AccessKeyId', message: 'S3 Access Key ID is required' })
+    issues.push({ path: 's3AccessKeyId', message: 'S3 access key ID is required.' })
   }
 
   const currentS3AccessKeyId = data.s3AccessKeyId?.trim()
@@ -69,7 +69,7 @@ export const getAnalyticsBucketValidationIssues = (
     (!options.secretsOptional || hasChangedStoredS3AccessKey) &&
     !data.s3SecretAccessKey?.trim().length
   ) {
-    issues.push({ path: 's3SecretAccessKey', message: 'S3 Secret Access Key is required' })
+    issues.push({ path: 's3SecretAccessKey', message: 'S3 secret access key is required.' })
   }
 
   return issues

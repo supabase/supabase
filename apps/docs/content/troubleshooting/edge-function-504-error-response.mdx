@@ -11,49 +11,44 @@ An internal 504 from an Edge Function means the function failed to initiate a re
 
 As of now, this limit cannot be increased. If your function always needs more time than allowed, skip to [When optimization isn't enough](#when-optimization-is-not-enough) section. Otherwise, follow the steps below to speed up response times.
 
-### Step 1: Identifying slow Functions
+## Step 1: Identifying slow Functions
 
-You can filter for 504 events in the Log Explorer with the below [query](/dashboard/project/_/logs/explorer?q=select%0A++cast%28timestamp+as+datetime%29+as+timestamp%2C%0A++req.pathname%2C%0A++res.status_code%2C%0A++metadata.execution_time_ms%0Afrom%0A++function_edge_logs%0A++cross+join+UNNEST%28metadata%29+as+metadata%0A++cross+join+UNNEST%28metadata.request%29+as+req%0A++cross+join+UNNEST%28metadata.response%29+as+res%0Awhere+res.status_code+%3D+504%0Alimit+20%3B):
+You can filter for 504 events in the SQL Editor with the below [query](/dashboard/project/_/sql/new?skip=true&source=logs&content=select%0A%20%20timestamp%2C%0A%20%20log_attributes%5B%27request.pathname%27%5D%20as%20pathname%2C%0A%20%20log_attributes%5B%27response.status_code%27%5D%20as%20status_code%2C%0A%20%20toFloat64OrZero%28log_attributes%5B%27execution_time_ms%27%5D%29%20as%20execution_time_ms%0Afrom%20logs%0Awhere%0A%20%20source%20%3D%20%27function_edge_logs%27%0A%20%20and%20toInt32OrZero%28log_attributes%5B%27response.status_code%27%5D%29%20%3D%20504%0Aorder%20by%20timestamp%20desc%0Alimit%2020%3B):
 
 ```sql
 select
-  cast(timestamp as datetime) as timestamp,
-  req.pathname,
-  res.status_code,
-  metadata.execution_time_ms
-from
-  function_edge_logs
-  cross join UNNEST(metadata) as metadata
-  cross join UNNEST(metadata.request) as req
-  cross join UNNEST(metadata.response) as res
-where res.status_code = 504
+  timestamp,
+  log_attributes['request.pathname'] as pathname,
+  log_attributes['response.status_code'] as status_code,
+  toFloat64OrZero(log_attributes['execution_time_ms']) as execution_time_ms
+from logs
+where
+  source = 'function_edge_logs'
+  and toInt32OrZero(log_attributes['response.status_code']) = 504
+order by timestamp desc
 limit 20;
 ```
 
-You can further explore how much time a specific function takes on average by running the below [query](/dashboard/project/_/logs/explorer?q=select%0A++req.pathname%2C%0A++res.status_code%2C%0A++AVG%28metadata.execution_time_ms%29+AS+avg_runtime_ms%2C%0A++MIN%28metadata.execution_time_ms%29+AS+min_runtime_ms%2C%0A++MAX%28metadata.execution_time_ms%29+AS+max_runtime_ms%0Afrom%0A++function_edge_logs%0A++cross+join+UNNEST%28metadata%29+as+metadata%0A++cross+join+UNNEST%28metadata.request%29+as+req%0A++cross+join+UNNEST%28sb%29+as+sb%0A++cross+join+UNNEST%28req.headers%29+as+headers%0A++cross+join+UNNEST%28metadata.response%29+as+res%0Awhere+req.pathname+%3D+%27%2Ffunctions%2Fv1%2FYOUR_FUNCTION_NAME%27+--<---add+your+function+name+or+remove+filter%0Agroup+by+req.pathname%2C+res.status_code%0Alimit+20%3B):
+You can further explore how much time a specific function takes on average by running the below [query](/dashboard/project/_/sql/new?skip=true&source=logs&content=select%0A%20%20log_attributes%5B%27request.pathname%27%5D%20as%20pathname%2C%0A%20%20log_attributes%5B%27response.status_code%27%5D%20as%20status_code%2C%0A%20%20avg%28toFloat64OrZero%28log_attributes%5B%27execution_time_ms%27%5D%29%29%20as%20avg_runtime_ms%2C%0A%20%20min%28toFloat64OrZero%28log_attributes%5B%27execution_time_ms%27%5D%29%29%20as%20min_runtime_ms%2C%0A%20%20max%28toFloat64OrZero%28log_attributes%5B%27execution_time_ms%27%5D%29%29%20as%20max_runtime_ms%0Afrom%20logs%0Awhere%0A%20%20source%20%3D%20%27function_edge_logs%27%0A%20%20and%20log_attributes%5B%27request.pathname%27%5D%20%3D%20%27/functions/v1/YOUR_FUNCTION_NAME%27%20--%20%3C---add%20your%20function%20name%20or%20remove%20filter%0Agroup%20by%20pathname%2C%20status_code%0Alimit%2020%3B):
 
 ```sql
 select
-  req.pathname,
-  res.status_code,
-  AVG(metadata.execution_time_ms) as avg_runtime_ms,
-  MIN(metadata.execution_time_ms) as min_runtime_ms,
-  MAX(metadata.execution_time_ms) as max_runtime_ms
-from
-  function_edge_logs
-  cross join UNNEST(metadata) as metadata
-  cross join UNNEST(metadata.request) as req
-  cross join UNNEST(sb) as sb
-  cross join UNNEST(req.headers) as headers
-  cross join UNNEST(metadata.response) as res
-where req.pathname = '/functions/v1/YOUR_FUNCTION_NAME' -- <---add your function name or remove filter
-group by req.pathname, res.status_code
+  log_attributes['request.pathname'] as pathname,
+  log_attributes['response.status_code'] as status_code,
+  avg(toFloat64OrZero(log_attributes['execution_time_ms'])) as avg_runtime_ms,
+  min(toFloat64OrZero(log_attributes['execution_time_ms'])) as min_runtime_ms,
+  max(toFloat64OrZero(log_attributes['execution_time_ms'])) as max_runtime_ms
+from logs
+where
+  source = 'function_edge_logs'
+  and log_attributes['request.pathname'] = '/functions/v1/YOUR_FUNCTION_NAME' -- <---add your function name or remove filter
+group by pathname, status_code
 limit 20;
 ```
 
 Once candidate functions are identified, you can investigate more thoroughly.
 
-### Step 2: Investigating slow Functions
+## Step 2: Investigating slow Functions
 
 Add `console.time` labels around suspicious sections to pinpoint where time is being spent:
 
@@ -76,11 +71,11 @@ Common culprits:
 - External APIs that are throttling or rate-limiting you
 - Loops without a clear escape condition
 
-### Step 3: Optimize
+## Step 3: Optimize
 
 The below suggestions are some strategies you can pursue to reduce execution times.
 
-#### Parallelizing requests
+### Parallelizing requests
 
 If requests are independent of one another, rather than calling them sequentially, you can speed up operations by calling them in parallel with [Promise.all](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all):
 
@@ -96,15 +91,15 @@ const [resultA, resultB] = await Promise.all([
 ])
 ```
 
-#### Splitting up logic
+### Splitting up logic
 
 The Edge Function may be doing more than it needs to. It may be better to split up it's logic into multiple parts that can be called individually and run for shorter periods.
 
-#### Use background tasks [utilize-background-tasks]
+### Use background tasks [utilize-background-tasks]
 
 You can initiate functions in a background task to be handled independently of the request/response handler. The process is outlined in the [Background Task docs](/docs/guides/functions/background-tasks)
 
-#### Offload work to the client or an external service
+### Offload work to the client or an external service
 
 Instead of managing all operations within the function itself, there may be an external API that can execute jobs faster and then send back results. Alternatively, you may be able to offload some processing to the requester rather than doing everything within the function itself.
 
@@ -122,28 +117,24 @@ If you are making requests to the same resource and the return values change irr
 
 ### Restrict request load
 
-If the function is used to evaluate user submissions, you can restrict load size to reduce computational time. You can use the below query in the [log explorer](/dashboard/project/_/logs/explorer?q=select%0A++req.pathname+as+function_name%2C%0A++res.status_code%2C%0A++AVG%28COALESCE%28CAST%28headers.content_length+AS+INT%29%2C+0%29%29+AS+avg_content_size_in_bytes%2C%0A++MIN%28COALESCE%28CAST%28headers.content_length+AS+INT%29%2C+0%29%29+AS+min_content_size_in_bytes%2C%0A++MAX%28COALESCE%28CAST%28headers.content_length+AS+INT%29%2C+0%29%29+AS+max_content_size_in_bytes%0Afrom%0A++function_edge_logs%0A++cross+join+UNNEST%28metadata%29+as+metadata%0A++cross+join+UNNEST%28metadata.request%29+as+req%0A++cross+join+UNNEST%28sb%29+as+sb%0A++cross+join+UNNEST%28req.headers%29+as+headers%0A++cross+join+UNNEST%28metadata.response%29+as+res%0Awhere+%0A++++req.pathname+%3D+%27%2Ffunctions%2Fv1%2Finduce-504%27%0AGROUP+BY+req.pathname%2C+res.status_code+++++%0Alimit+10) to filter by the content size in bytes provided by the initial requester:
+If the function is used to evaluate user submissions, you can restrict load size to reduce computational time. You can use the below query in the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs&content=select%0A%20%20log_attributes%5B%27request.pathname%27%5D%20as%20function_name%2C%0A%20%20log_attributes%5B%27response.status_code%27%5D%20as%20status_code%2C%0A%20%20avg%28toInt64OrZero%28log_attributes%5B%27request.headers.content_length%27%5D%29%29%20as%20avg_content_size_in_bytes%2C%0A%20%20min%28toInt64OrZero%28log_attributes%5B%27request.headers.content_length%27%5D%29%29%20as%20min_content_size_in_bytes%2C%0A%20%20max%28toInt64OrZero%28log_attributes%5B%27request.headers.content_length%27%5D%29%29%20as%20max_content_size_in_bytes%0Afrom%20logs%0Awhere%0A%20%20source%20%3D%20%27function_edge_logs%27%0A%20%20and%20log_attributes%5B%27request.pathname%27%5D%20%3D%20%27/functions/v1/induce-504%27%0Agroup%20by%20function_name%2C%20status_code%0Alimit%2010%3B) to filter by the content size in bytes provided by the initial requester:
 
 ```sql
 select
-  req.pathname as function_name,
-  res.status_code,
-  AVG(COALESCE(cast(headers.content_length as int), 0)) as avg_content_size_in_bytes,
-  MIN(COALESCE(cast(headers.content_length as int), 0)) as min_content_size_in_bytes,
-  MAX(COALESCE(cast(headers.content_length as int), 0)) as max_content_size_in_bytes
-from
-  function_edge_logs
-  cross join UNNEST(metadata) as metadata
-  cross join UNNEST(metadata.request) as req
-  cross join UNNEST(sb) as sb
-  cross join UNNEST(req.headers) as headers
-  cross join UNNEST(metadata.response) as res
-where req.pathname = '/functions/v1/induce-504'
-group by req.pathname, res.status_code
+  log_attributes['request.pathname'] as function_name,
+  log_attributes['response.status_code'] as status_code,
+  avg(toInt64OrZero(log_attributes['request.headers.content_length'])) as avg_content_size_in_bytes,
+  min(toInt64OrZero(log_attributes['request.headers.content_length'])) as min_content_size_in_bytes,
+  max(toInt64OrZero(log_attributes['request.headers.content_length'])) as max_content_size_in_bytes
+from logs
+where
+  source = 'function_edge_logs'
+  and log_attributes['request.pathname'] = '/functions/v1/induce-504'
+group by function_name, status_code
 limit 10;
 ```
 
-### When optimization is not enough
+## When optimization is not enough
 
 Edge Functions have a hard runtime ceiling that cannot be raised. If your use case genuinely requires more, consider:
 

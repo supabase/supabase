@@ -6,6 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { SupaRow } from '../../types'
+import { isColumnMasked } from '../../utils/sensitive-data'
 import { NullValue } from '../common/NullValue'
 import { ReferenceRecordPeek } from './ReferenceRecordPeek'
 import { convertByteaToHex } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
@@ -14,6 +15,7 @@ import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { useTableQuery } from '@/data/tables/table-retrieve-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 interface Props extends PropsWithChildren<RenderCellProps<SupaRow, unknown>> {
   tableId?: number
@@ -21,7 +23,13 @@ interface Props extends PropsWithChildren<RenderCellProps<SupaRow, unknown>> {
 
 export const ForeignKeyFormatter = (props: Props) => {
   const { tableId, row, column } = props
+  const snap = useTableEditorTableStateSnapshot()
   const { data: project } = useSelectedProjectQuery()
+  const isMasked = isColumnMasked(
+    column.key as string,
+    snap.sensitiveDataColumns,
+    snap.temporarilyRevealedColumns
+  )
 
   const { data, isPending: isLoading } = useTableEditorQuery({
     projectRef: project?.ref,
@@ -58,7 +66,7 @@ export const ForeignKeyFormatter = (props: Props) => {
   return (
     <div className="flex w-full items-center justify-between flex justify-between">
       <span className="m-0 grow overflow-hidden text-ellipsis">
-        {formattedValue === null ? <NullValue /> : formattedValue}
+        {formattedValue === null ? <NullValue /> : isMasked ? '••••••••' : formattedValue}
       </span>
       {isLoading && formattedValue !== null && (
         <div className="w-6 h-6 flex items-center justify-center">

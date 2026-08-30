@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
+import { cn, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 import { CodeBlock, type CodeBlockLang } from 'ui-patterns/CodeBlock'
 
 interface MultipleCodeBlockFile {
@@ -12,6 +12,7 @@ interface MultipleCodeBlockProps {
   files: MultipleCodeBlockFile[]
   value?: string
   onValueChange?: (value: string) => void
+  className?: string
 }
 
 const languageAliases: Record<string, CodeBlockLang> = {
@@ -91,7 +92,12 @@ const resolveLanguage = (language: string | undefined, name: string): CodeBlockL
   return inferLanguageFromName(name) ?? 'js'
 }
 
-export const MultipleCodeBlock = ({ files, value, onValueChange }: MultipleCodeBlockProps) => {
+export const MultipleCodeBlock = ({
+  files,
+  value,
+  onValueChange,
+  className,
+}: MultipleCodeBlockProps) => {
   if (!files?.length) {
     return null
   }
@@ -128,7 +134,7 @@ export const MultipleCodeBlock = ({ files, value, onValueChange }: MultipleCodeB
     <Tabs
       value={activeValue}
       onValueChange={handleValueChange}
-      className="border rounded-lg gap-0 space-y-0 overflow-hidden"
+      className={cn('border rounded-lg gap-0 space-y-0 overflow-hidden', className)}
     >
       <TabsList className="bg-surface-75 px-5 gap-5 overflow-x-auto border-0 border-b">
         {files.map((file) => (

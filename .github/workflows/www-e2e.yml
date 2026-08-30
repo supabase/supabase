@@ -1,0 +1,208 @@
+name: WWW E2E Tests
+
+# Path scoping lives in "Detect changed paths" rather than a `paths` trigger, so
+# this reports a check run on every pull request and stays safe to mark required.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]
+    branches: ['master']
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: 'Base URL to test against'
+        required: false
+        default: 'https://supabase.com'
+        type: string
+      page_paths:
+        description: 'Comma-separated site-relative paths to test (required for manual runs)'
+        required: false
+        default: ''
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  statuses: read
+  pull-requests: read
+
+env:
+  CI: true
+
+jobs:
+  e2e:
+    name: WWW E2E
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false
+    timeout-minutes: 30
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+
+    steps:
+      - name: Detect changed paths
+        id: changes
+        if: github.event_name == 'pull_request'
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        with:
+          filters: |
+            www:
+              - 'apps/www/_blog/**/*.mdx'
+              - 'apps/www/_events/**/*.mdx'
+              - 'apps/www/_customers/**/*.mdx'
+              - 'apps/www/_alternatives/**/*.mdx'
+              - 'e2e/www/**'
+              - 'e2e/shared/**'
+              - 'pnpm-lock.yaml'
+              - '.github/workflows/www-e2e.yml'
+            www_app:
+              - 'apps/www/**'
+
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        if: github.event_name == 'workflow_dispatch' || steps.changes.outputs.www == 'true'
+        with:
+          persist-credentials: false
+          # String '0' — numeric 0 is falsy in Actions expressions.
+          fetch-depth: ${{ github.event_name == 'pull_request' && '0' || '1' }}
+          sparse-checkout: |
+            e2e/www
+            e2e/shared
+            scripts
+            patches
+            apps/www/_blog
+            apps/www/_events
+            apps/www/_customers
+            apps/www/_alternatives
+
+      - name: Use Node.js
+        if: github.event_name == 'workflow_dispatch' || steps.changes.outputs.www == 'true'
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Resolve www E2E scope
+        id: scope
+        if: github.event_name == 'workflow_dispatch' || steps.changes.outputs.www == 'true'
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          PAGE_PATHS_INPUT: ${{ inputs.page_paths }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            if [ -z "$PAGE_PATHS_INPUT" ]; then
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+              echo "paths=" >> "$GITHUB_OUTPUT"
+              echo "Manual run requires the page_paths input."
+              exit 0
+            fi
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            printf 'paths=%s\n' "$PAGE_PATHS_INPUT" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          git diff --name-only --diff-filter=ACMR "origin/$BASE_REF"...HEAD \
+            | node --experimental-strip-types e2e/www/scripts/resolve-www-scope.ts
+
+      - name: Skip Playwright (no in-scope pages)
+        if: steps.scope.outputs.skip == 'true'
+        run: echo "No in-scope www pages changed; skipping Playwright suite."
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        if: steps.scope.outputs.skip == 'false'
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Enable pnpm store cache
+        if: steps.scope.outputs.skip == 'false'
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      # Vercel skips the preview when only the harness changed, so wait for one
+      # only when apps/www changed. See scripts/waitForVercelPreview.js.
+      - name: Wait for Vercel www preview
+        if: steps.scope.outputs.skip == 'false' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && steps.changes.outputs.www_app == 'true'
+        id: deployment
+        continue-on-error: true
+        run: node scripts/waitForVercelPreview.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          VERCEL_STATUS_CONTEXT: 'Vercel – zone-www-dot-com'
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
+
+      - name: Resolve base URL
+        if: steps.scope.outputs.skip == 'false'
+        id: base-url
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_URL_INPUT: ${{ inputs.base_url }}
+          DEPLOYMENT_URL: ${{ steps.deployment.outputs.deployment-url }}
+          PAGE_PATHS: ${{ steps.scope.outputs.paths }}
+        run: |
+          set -euo pipefail
+
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            printf 'url=%s\n' "$BASE_URL_INPUT" >> "$GITHUB_OUTPUT"
+            if [ "$BASE_URL_INPUT" = "https://supabase.com" ]; then
+              echo "use_bypass=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "use_bypass=true" >> "$GITHUB_OUTPUT"
+            fi
+            echo "should_test=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ -n "$DEPLOYMENT_URL" ]; then
+            printf 'url=%s\n' "$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
+            echo "use_bypass=true" >> "$GITHUB_OUTPUT"
+            echo "should_test=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Production lacks pages this pull request adds, so it is not a fallback.
+          echo "url=" >> "$GITHUB_OUTPUT"
+          echo "use_bypass=false" >> "$GITHUB_OUTPUT"
+          echo "should_test=false" >> "$GITHUB_OUTPUT"
+          echo "::warning::No Vercel www preview URL for this pull request. Skipping Playwright rather than testing production, which does not have pages this pull request adds."
+          {
+            echo "### WWW E2E skipped: no preview to test against"
+            echo
+            echo "Fork pull requests reach this path because they run without repository"
+            echo "secrets. A maintainer can run the suite against the preview manually:"
+            echo
+            echo '```'
+            echo "gh workflow run www-e2e.yml \\"
+            echo "  -f base_url=<preview-url> \\"
+            echo "  -f page_paths=$PAGE_PATHS"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Install dependencies
+        if: steps.base-url.outputs.should_test == 'true'
+        run: pnpm install --frozen-lockfile --filter=e2e-www...
+
+      - name: Install Playwright Chromium
+        if: steps.base-url.outputs.should_test == 'true'
+        run: pnpm -C e2e/www exec playwright install chromium --with-deps --only-shell
+
+      - name: Run www E2E
+        if: steps.base-url.outputs.should_test == 'true'
+        working-directory: e2e/www
+        run: pnpm run e2e:www
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ steps.base-url.outputs.url }}
+          WWW_E2E_PAGE_PATHS: ${{ steps.scope.outputs.paths }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ steps.base-url.outputs.use_bypass == 'true' && secrets.VERCEL_AUTOMATION_BYPASS_WWW || '' }}
+
+      - name: Upload Playwright report
+        if: failure() && steps.scope.outputs.skip == 'false'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: www-playwright-report
+          path: |
+            e2e/www/playwright-report/
+            e2e/www/test-results/
+          retention-days: 7

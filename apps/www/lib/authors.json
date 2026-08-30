@@ -1,5 +1,13 @@
 [
   {
+    "author_id": "alex_hall",
+    "author": "Alex Hall",
+    "username": "alexhall",
+    "position": "Engineering",
+    "author_url": "https://github.com/alexhall",
+    "author_image_url": "https://github.com/alexhall.png"
+  },
+  {
     "author_id": "angelico_de_los_reyes",
     "author": "Angelico de los Reyes",
     "position": "Engineering",
@@ -697,7 +705,7 @@
   {
     "author_id": "bilharmer",
     "author": "Bil Harmer",
-    "position": "CSO",
+    "position": "CISO",
     "author_url": "#",
     "author_image_url": "/images/blog/avatars/bilharmer.jpg"
   },
@@ -820,6 +828,14 @@
     "author_image_url": "https://github.com/smeubank.png"
   },
   {
+    "author_id": "kemal_y",
+    "author": "Kemal Y",
+    "username": "kemaldotearth",
+    "position": "Design",
+    "author_url": "https://github.com/kemaldotearth",
+    "author_image_url": "https://github.com/kemaldotearth.png"
+  },
+  {
     "author_id": "katerina_skroumpelou",
     "author": "Katerina Skroumpelou",
     "position": "Engineering",
@@ -918,7 +934,7 @@
     "author_id": "gregor_vand",
     "author": "Gregor Vand",
     "username": "gregorvand",
-    "position": "Technical Program Manager",
+    "position": "Product",
     "author_url": "https://www.linkedin.com/in/gregorvand/",
     "author_image_url": "https://github.com/gregorvand.png"
   },

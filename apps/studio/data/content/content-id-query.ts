@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
 
 import type { Content } from './content-query'
-import { remapSqlContentField } from './content-remap'
+import { remapSqlContentField, remapWireSnippet } from './content-remap'
 import { contentKeys } from './keys'
 import type { SnippetWithContent } from './sql-folders-query'
 import { get, handleError } from '@/data/fetchers'
@@ -17,13 +17,15 @@ export type GetUserContentByIdResponse = Omit<
 
 export async function getContentById(
   { projectRef, id }: { projectRef?: string; id?: string },
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headers?: HeadersInit
 ) {
   if (typeof projectRef === 'undefined') throw new Error('projectRef is required')
   if (typeof id === 'undefined') throw new Error('Content ID is required')
 
   const { data, error } = await get('/platform/projects/{ref}/content/item/{id}', {
     params: { path: { ref: projectRef, id } },
+    headers,
     signal,
   })
 
@@ -51,8 +53,7 @@ export async function getSqlSnippetById(
   })
 
   if (error) throw handleError(error)
-  const snippet = remapSqlContentField(data as unknown as Omit<SnippetWithContent, 'status'>)
-  return { ...snippet, status: 'saved' }
+  return remapWireSnippet(data, 'saved')
 }
 
 export type SqlSnippetByIdData = Awaited<ReturnType<typeof getSqlSnippetById>>

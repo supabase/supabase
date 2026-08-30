@@ -7,6 +7,6 @@ export const Route = createFileRoute('/_auth/partners/stripe/projects/login')({
 })
 
 function StripeProjectsLogin() {
-  // Next page default export is already wrapped in withAuth and inlines APIAuthorizationLayout.
+  // Next page default export is already wrapped in withAuth and inlines InterstitialLayout.
   return <StripeProjectsLoginPage dehydratedState={undefined} />
 }

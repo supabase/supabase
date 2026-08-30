@@ -5,6 +5,8 @@ import { filterToolsByOptInLevel } from '../tool-filter'
 import { getFallbackTools } from './fallback-tools'
 import { getIncidentTools } from './incident-tools'
 import { getMcpTools } from './mcp-tools'
+import { getNotebookTools } from './notebook-tools'
+import { getReportTools } from './report-tools'
 import { getSchemaTools } from './schema-tools'
 import { getStudioTools } from './studio-tools'
 import { getSupportLifecycleTools } from './support-tools'
@@ -18,6 +20,7 @@ export const getTools = async ({
   accessToken,
   baseUrl,
   supportMode,
+  isExplorerEnabled,
   signal,
 }: {
   projectRef: string
@@ -27,6 +30,10 @@ export const getTools = async ({
   accessToken?: string
   baseUrl?: string
   supportMode?: boolean
+  // Notebooks haven't shipped yet — they live behind the Explorer feature flag, so the
+  // assistant must not advertise list_notebooks/get_notebook until the caller confirms the
+  // flag is on for this user.
+  isExplorerEnabled?: boolean
   // Required: tools fetched from the remote MCP server hold an HTTP connection
   // that is closed when this signal aborts (i.e. when the request ends).
   signal: AbortSignal
@@ -69,8 +76,16 @@ export const getTools = async ({
       ...getSchemaTools({
         projectRef,
         connectionString,
-        authorization,
       }),
+      ...getReportTools({ projectRef, authorization }),
+      ...(isExplorerEnabled
+        ? getNotebookTools({
+            projectRef,
+            connectionString,
+            authorization,
+            aiOptInLevel,
+          })
+        : {}),
       ...(baseUrl ? getIncidentTools({ baseUrl }) : {}),
     }
   }

@@ -1,6 +1,6 @@
 import { ChevronDown, PlusIcon, RefreshCw } from 'lucide-react'
 import { useMemo, useState, type ComponentProps, type ReactNode } from 'react'
-import type { FieldValues, Path, UseFormReturn } from 'react-hook-form'
+import { useWatch, type FieldValues, type Path, type UseFormReturn } from 'react-hook-form'
 import {
   Button,
   Command,
@@ -125,7 +125,7 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
 }: GitHubRepositoryFieldProps<TFormValues>) => {
   const [isRepoSelectorOpen, setIsRepoSelectorOpen] = useState(false)
 
-  const currentRepositoryId = form.watch(name) as string | undefined
+  const currentRepositoryId = useWatch({ control: form.control, name }) as string | undefined
   const selectedRepository = repositories.find((repo) => repo.id === currentRepositoryId)
 
   return (
@@ -133,12 +133,13 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
       control={form.control}
       name={name}
       render={({ field }) => (
-        <FormItemLayout label={label} layout={layout} description={description}>
+        <FormItemLayout id={name} label={label} layout={layout} description={description}>
           {gitHubAuthorization === null ? (
             <FormControl>
               <Button
+                id={name}
                 variant="default"
-                size="small"
+                size="tiny"
                 type="button"
                 disabled={disabled}
                 onClick={() => {
@@ -155,17 +156,14 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
               <PopoverTrigger asChild>
                 <FormControl>
                   <Button
+                    id={name}
                     variant="default"
                     type="button"
-                    className="justify-start h-[34px] w-full"
+                    className="justify-start h-[34px] w-full [&>div:last-child]:ml-auto"
                     disabled={disabled || isLoading}
                     loading={isLoading}
                     icon={GITHUB_ICON}
-                    iconRight={
-                      <span className="grow flex justify-end">
-                        <ChevronDown />
-                      </span>
-                    }
+                    iconRight={<ChevronDown />}
                   >
                     {selectedRepository?.name ||
                       selectedRepositoryName ||

@@ -8,7 +8,7 @@ import { useMemo, useRef, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { toast } from 'sonner'
 import { Button, cn, Dialog, DialogContent } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -361,6 +361,7 @@ export const SubscriptionPlanUpdateDialog = ({
                         onTaxIdChange={onTaxIdChange}
                         useAsDefaultBillingAddress={useAsDefaultBillingAddress}
                         onUseAsDefaultBillingAddressChange={onUseAsDefaultBillingAddressChange}
+                        onClose={onClose}
                       />
                     </div>
                   )}
@@ -377,14 +378,6 @@ export const SubscriptionPlanUpdateDialog = ({
                         <>You will be charged by them directly.</>
                       )}
                     </p>
-                    {billingViaPartner &&
-                      billingPartner === 'fly' &&
-                      subscriptionPreview?.plan_change_type === 'downgrade' && (
-                        <p className="text-sm">
-                          Your organization will be downgraded at the end of your current billing
-                          cycle.
-                        </p>
-                      )}
                   </div>
                 )}
               </div>

@@ -32,17 +32,13 @@ import { deleteDatabaseColumn } from '@/data/database-columns/database-column-de
 import { updateDatabaseColumn } from '@/data/database-columns/database-column-update-mutation'
 import type { Constraint } from '@/data/database/constraints-query'
 import { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
-import { databaseKeys } from '@/data/database/keys'
-import { entityTypeKeys } from '@/data/entity-types/keys'
-import { lintKeys } from '@/data/lint/keys'
 import { prefetchEditorTablePage } from '@/data/prefetchers/project.$ref.editor.$id'
 import { getQueryClient } from '@/data/query-client'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { tableEditorKeys } from '@/data/table-editor/keys'
 import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
-import { tableRowKeys } from '@/data/table-rows/keys'
 import { executeWithRetry } from '@/data/table-rows/table-rows-query'
 import { tableKeys } from '@/data/tables/keys'
+import { invalidateTableMetadata } from '@/data/tables/table-metadata-invalidation'
 import { getTable, getTableQuery, RetrieveTableResult } from '@/data/tables/table-retrieve-query'
 import {
   UpdateTableBody,
@@ -442,6 +438,7 @@ export const createTable = async ({
   isRLSEnabled,
   importContent,
   track,
+  scoped,
 }: {
   projectRef: string
   connectionString?: string | null
@@ -456,6 +453,7 @@ export const createTable = async ({
   isRLSEnabled: boolean
   importContent?: ImportContent
   track: Track
+  scoped?: boolean
 }) => {
   const queryClient = getQueryClient()
 
@@ -674,6 +672,7 @@ export const createTable = async ({
         projectRef,
         connectionString,
         id: table.id,
+        scoped,
       })
     }
   )
@@ -694,6 +693,7 @@ export const updateTable = async ({
   existingForeignKeyRelations,
   primaryKey,
   track,
+  scoped,
 }: {
   projectRef: string
   connectionString?: string | null
@@ -705,6 +705,7 @@ export const updateTable = async ({
   existingForeignKeyRelations: ForeignKeyConstraint[]
   primaryKey?: Constraint
   track: Track
+  scoped?: boolean
 }) => {
   const queryClient = getQueryClient()
 
@@ -854,23 +855,15 @@ export const updateTable = async ({
     existingForeignKeyRelations,
   })
 
-  await Promise.all([
-    queryClient.invalidateQueries({ queryKey: tableEditorKeys.tableEditor(projectRef, table.id) }),
-    queryClient.invalidateQueries({
-      queryKey: databaseKeys.foreignKeyConstraints(projectRef, table.schema),
-    }),
-    queryClient.invalidateQueries({ queryKey: databaseKeys.tableDefinition(projectRef, table.id) }),
-    queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(projectRef) }),
-    queryClient.invalidateQueries({
-      queryKey: tableKeys.list(projectRef, table.schema, { includeColumns: true }),
-    }),
-    queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
-  ])
-
-  // We need to invalidate tableRowsAndCount after tableEditor
-  // to ensure the query sent is correct
-  await queryClient.invalidateQueries({
-    queryKey: tableRowKeys.tableRowsAndCount(projectRef, table.id),
+  await invalidateTableMetadata(queryClient, {
+    projectRef,
+    schema: table.schema,
+    tableId: table.id,
+    tableName: table.name,
+    newSchema: updatedTable.schema,
+    newTableName: updatedTable.name,
+    includeRows: true,
+    includeLint: true,
   })
 
   return {
@@ -878,6 +871,7 @@ export const updateTable = async ({
       projectRef,
       connectionString,
       id: table.id,
+      scoped,
     }),
     hasError,
   }

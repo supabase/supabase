@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { ScopeSection } from '../OAuthApps/AuthorizeRequesterDetails'
 import { PERMISSIONS_DESCRIPTIONS } from '../OAuthApps/OAuthApps.constants'
@@ -34,7 +34,7 @@ export const ProjectClaimConfirm = ({
   const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
 
   const { mutateAsync: approveRequest, isPending: isApproving } =
-    useApiAuthorizationApproveMutation({ onError: () => {} })
+    useApiAuthorizationApproveMutation()
 
   const { mutateAsync: claimProject, isPending: isClaiming } = useOrganizationProjectClaimMutation()
 
@@ -85,7 +85,7 @@ export const ProjectClaimConfirm = ({
               }}
             >
               {!requester.icon && (
-                <p className="text-foreground-light text-lg">{requester.name[0]}</p>
+                <p className="text-foreground-light text-lg">{requester.name?.[0] ?? '?'}</p>
               )}
             </div>
 

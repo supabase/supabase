@@ -1,15 +1,6 @@
-import { untrustedSql } from '@supabase/pg-meta'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import React, {
-  isValidElement,
-  memo,
-  ReactNode,
-  useEffect,
-  useMemo,
-  useRef,
-  type ReactElement,
-} from 'react'
+import React, { isValidElement, memo, ReactNode, useMemo, type ReactElement } from 'react'
 import type { StreamdownProps } from 'streamdown'
 import {
   Button,
@@ -28,10 +19,9 @@ import { markdownComponents } from 'ui-patterns/Markdown'
 
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { AssistantSnippetProps } from './AIAssistant.types'
+import { AssistantQueryCell } from './AssistantQueryCell'
 import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
-import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 import { defaultUrlTransform, wrapPlaceholderUrls } from './Message.utils'
-import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 
 const Streamdown = dynamic<StreamdownProps>(
   () => import('streamdown').then((mod) => mod.Streamdown),
@@ -188,7 +178,7 @@ export function MessageMarkdown({
 export const MarkdownPre = ({
   children,
   id,
-  isLoading: _isLoading,
+  isLoading,
   readOnly,
 }: {
   children: any
@@ -196,15 +186,6 @@ export const MarkdownPre = ({
   isLoading: boolean
   readOnly?: boolean
 }) => {
-  // [Joshen] Using a ref as this data doesn't need to trigger a re-render
-  const chartConfig = useRef<ChartConfig>({
-    view: 'table',
-    type: 'bar',
-    xKey: '',
-    yKey: '',
-    cumulative: false,
-  })
-
   const childArray = Array.isArray(children) ? children : [children]
   const codeElement = childArray.find(
     (child): child is ReactElement<{ className?: string; children: ReactNode }> =>
@@ -231,22 +212,12 @@ export const MarkdownPre = ({
 
   const { xAxis, yAxis } = snippetProps
   const snippetId = snippetProps.id
-  const title = snippetProps.title || (language === 'edge' ? 'Edge Function' : 'SQL Query')
+  const title = snippetProps.title || (language === 'edge' ? 'Edge Function' : 'SQL query')
   const isChart = snippetProps.isChart === 'true'
   // Strip props from the content for both SQL and edge functions
   const cleanContent = rawContent.replace(/(?:--|\/\/)\s*props:\s*\{[^}]+\}/, '').trim()
 
   const toolCallId = String(snippetId ?? id)
-
-  useEffect(() => {
-    chartConfig.current = {
-      ...chartConfig.current,
-      view: isChart ? 'chart' : 'table',
-      xKey: xAxis ?? '',
-      yKey: yAxis ?? '',
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [snippetProps])
 
   if (!codeElement) {
     return <pre className="w-auto overflow-x-auto not-prose my-4">{children}</pre>
@@ -265,22 +236,14 @@ export const MarkdownPre = ({
         readOnly ? (
           <CollapsibleCodeBlock value={cleanContent} language="sql" hideLineNumbers />
         ) : (
-          <DisplayBlockRenderer
-            messageId={id}
-            toolCallId={toolCallId}
-            initialArgs={{
-              sql: untrustedSql(cleanContent),
-              label: title,
-              isWriteQuery: false,
-              view: isChart ? 'chart' : 'table',
-              xAxis: xAxis ?? '',
-              yAxis: yAxis ?? '',
-            }}
-            onError={() => {}}
-            showConfirmFooter={false}
-            onChartConfigChange={(config) => {
-              chartConfig.current = { ...config }
-            }}
+          <AssistantQueryCell
+            id={toolCallId}
+            sql={cleanContent}
+            title={title}
+            view={isChart ? 'chart' : 'table'}
+            xAxis={xAxis}
+            yAxis={yAxis}
+            isStreaming={isLoading}
           />
         )
       ) : (

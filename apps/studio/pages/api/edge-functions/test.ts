@@ -77,42 +77,21 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       redirect: 'manual', // don't follow the redirect and return response as is
     })
 
-    // Handle non-JSON responses
-    let responseBody: string
-    const contentType = response.headers.get('content-type')
-    if (contentType?.includes('application/json')) {
-      // If JSON, parse and stringify to ensure it's valid JSON
-      const jsonBody = await response.json()
-      responseBody = JSON.stringify(jsonBody)
-    } else {
-      // For non-JSON responses, get raw text
-      responseBody = await response.text()
-    }
+    const responseBody = await response.text()
 
-    if (!response.ok) {
-      // Try to parse error response if it's JSON
-      try {
-        const errorBody = JSON.parse(responseBody)
-
-        return res.status(response.status).json({
-          status: response.status,
-          error: { message: errorBody?.error || 'Edge function returned an error' },
-        })
-      } catch (parseError) {
-        // If not JSON, return the raw error
-        return res.status(response.status).json({
-          status: response.status,
-          error: { message: responseBody || 'Edge function returned an error' },
-        })
-      }
-    }
-
-    const responseHeaders: Record<string, string> = {}
+    const responseHeaders: Record<string, string | string[]> = {}
     response.headers.forEach((value, key) => {
-      responseHeaders[key] = value
+      const existing = responseHeaders[key]
+      if (existing === undefined) {
+        responseHeaders[key] = value
+      } else if (Array.isArray(existing)) {
+        existing.push(value)
+      } else {
+        responseHeaders[key] = [existing, value]
+      }
     })
 
-    return res.status(response.status).json({
+    return res.status(200).json({
       status: response.status,
       headers: responseHeaders,
       body: responseBody,
