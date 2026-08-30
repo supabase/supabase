@@ -1,7 +1,7 @@
 REPO_DIR=$(shell pwd)
 GENERATOR_DIR=../../../packages/generator
 
-.PHONY: run download download.api.v1 download.storage.v1 download.tsdoc.v2 download.server.v1 transform dereference.api.v1 dereference.auth.v1 dereference.storage.v0 generate generate.sections.api.v1 format
+.PHONY: run download download.api.v1 download.mcp-tools-permissions download.storage.v1 download.tsdoc.v2 download.server.v1 transform dereference.api.v1 dereference.auth.v1 dereference.storage.v0 generate generate.sections.api.v1 generate.partials.access-control format
 
 run: download transform generate format
 
@@ -11,11 +11,16 @@ run: download transform generate format
 ###############################################################################
 # comment out download.auth.v1 temporarily, we're manually creating the file
 # download: download.api.v1 download.auth.v1 download.storage.v1 download.tsdoc.v2
-download: download.api.v1 download.storage.v1 download.tsdoc.v2 download.server.v1
+download: download.api.v1 download.mcp-tools-permissions download.storage.v1 download.tsdoc.v2 download.server.v1
 
 download.api.v1:
 	curl -sS https://api.supabase.com/api/v1-json > $(REPO_DIR)/api_v1_openapi.json
 	curl -sS https://api.supabase.com/api/v2-json > $(REPO_DIR)/api_v2_openapi.json
+
+# Download tool permissions from the public Management API projection of its enforcement rules.
+download.mcp-tools-permissions:
+	curl -sSf https://api.supabase.com/platform/mcp-tools-permissions > $(REPO_DIR)/mcp_tools_permissions.json
+	npx prettier --write $(REPO_DIR)/mcp_tools_permissions.json
 
 # This flow needs to be updated, so we'l comment out for the moment
 # Manual flow for now:
@@ -81,13 +86,23 @@ dereference.analytics.v0:
 ###############################################################################
 # Generate sections from OpenAPI 3.0
 ###############################################################################
-generate: generate.sections.api.v1
+generate: generate.sections.api.v1 generate.partials.access-control
 
 generate.sections.api.v1:
 	npx tsx $(REPO_DIR)/sections/generateMgmtApiSections.cts \
 		$(REPO_DIR)/transforms/api_v1_openapi_deparsed.json \
 		$(REPO_DIR)/transforms/api_v2_openapi_deparsed.json \
 		$(REPO_DIR)/common-api-sections.json
+
+# Generate PAT guide tables from Management API inputs and Studio's shared permission catalog.
+generate.partials.access-control:
+	npx tsx $(REPO_DIR)/sections/generateAccessControlPartials.mts \
+		$(REPO_DIR)/transforms/api_v1_openapi_deparsed.json \
+		$(REPO_DIR)/transforms/api_v2_openapi_deparsed.json \
+		$(REPO_DIR)/mcp_tools_permissions.json \
+		$(REPO_DIR)/../content/_partials/access-control/scoped_pat_permissions.mdx \
+		$(REPO_DIR)/../content/_partials/access-control/scoped_pat_mcp_tools.mdx
+	npx prettier --write $(REPO_DIR)/../content/_partials/access-control/*.mdx
 
 ###############################################################################
 # Validate OpenAPI 3.0

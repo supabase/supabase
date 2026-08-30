@@ -2528,6 +2528,9 @@ importers:
 
   packages/shared-data:
     dependencies:
+      '@supabase/shared-types':
+        specifier: 0.1.91
+        version: 0.1.91
       zod:
         specifier: 'catalog:'
         version: 3.25.76
