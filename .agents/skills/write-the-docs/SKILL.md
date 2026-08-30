@@ -48,12 +48,7 @@ When in doubt, ask `ask-the-docs` rather than guessing — this classification i
 - Place the page using existing IA precedent; for a placement call that isn't obvious, consult [`audit-docs-ia`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/audit-docs-ia/SKILL.md)'s nav/IA knowledge rather than guessing a nav slot.
 - **Wire it into navigation, not just onto disk.** Placement (which section) and nav enablement (whether it actually shows up) are separate — confirm the current nav-registration mechanism via `ask-the-docs`/`audit-docs-ia` rather than assuming a page is discoverable just because the file exists in the right folder.
 - Ground every behavior claim in Phase 1's code read (the linked PR when there is one); ground every "why this matters" framing in the PRD/PM context; mark inferred material inline (e.g. an HTML comment or a flagged line in the handoff summary) so a reviewer can find it fast.
-- **Write for timelessness.** Prefer documenting what exists now over promising future features ([Google's timeless documentation principle](https://developers.google.com/style/timeless-documentation)):
-  - ❌ "Feature X is coming soon" / "will be available" / "once finalized"
-  - ✅ Either document what exists now, or wait until it ships
-  - ❌ "being rolled out gradually" without concrete criteria
-  - ✅ "available to organizations on [specific plan]" with clear eligibility
-  - Note: Sometimes future-facing language is necessary for changelog/roadmap content — use judgment based on content type.
+- **Write for timelessness.** Prefer documenting what exists now over promising future features. See [reference/common-pitfalls.md](reference/common-pitfalls.md#2-timeless-documentation).
 - **Keep it concise and avoid redundancy.** If you're restating the same point in multiple ways (e.g. "It's free" + "You won't be billed" + "No charge during Alpha"), consolidate. If a caution admonition already stated a risk, don't restate it verbatim later in the body.
 - **Prefer paragraphs over single-item lists.** If there's only one resource or example, default to paragraph format unless there's a specific reason for list formatting (future expansion expected, layout consistency with other sections, or special emphasis needed).
 - **Strip internal business context before the final draft.** HTML comments flagging PRD intent, roadmap speculation, internal ticket discussions, or "gap-fill" notes must be removed from MDX before handoff. Open-source docs shouldn't expose internal planning. Flag assumptions and open questions for reviewers in the PR description instead, not in the shipped content.
