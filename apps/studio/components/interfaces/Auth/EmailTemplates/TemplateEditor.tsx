@@ -28,7 +28,7 @@ import {
   AUTH_EMAIL_TEMPLATES_TERMINOLOGY_ANCHOR,
 } from './EmailTemplates.constants'
 import type { AuthTemplate } from './EmailTemplates.types'
-import { hasCustomEmailSender } from './EmailTemplates.utils'
+import { hasCustomEmailSender, validateGoTemplate } from './EmailTemplates.utils'
 import { ResetTemplateDialog } from './ResetTemplateDialog'
 import { SpamValidation } from './SpamValidation'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
@@ -103,6 +103,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
 
   const [validationResult, setValidationResult] = useState<ValidateSpamResponse>()
   const [bodyValue, setBodyValue] = useState((authConfig && authConfig[messageSlug]) ?? '')
+  const [bodyError, setBodyError] = useState<string | undefined>()
   const [, setHasUnsavedChanges] = useState(false)
   const [isSavingTemplate, setIsSavingTemplate] = useState(false)
   const [activeView, setActiveView] = useState<'source' | 'preview'>('source')
@@ -157,7 +158,17 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
     // Because the template content uses the code editor which is not a form component
     // its state is kept separately from the form state, hence why we manually inject it here
     delete payload[messageSlug]
-    if (messageProperty) payload[messageSlug] = bodyValue
+    if (messageProperty) {
+      payload[messageSlug] = bodyValue
+      const bodyValidation = validateGoTemplate(bodyValue)
+      if (!bodyValidation.valid) {
+        setIsSavingTemplate(false)
+        setBodyError(bodyValidation.error)
+        toast.error(`Invalid template syntax: ${bodyValidation.error}`)
+        return
+      }
+    }
+    setBodyError(undefined)
 
     const [subjectKey] = Object.keys(properties)
 
@@ -249,6 +260,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
     if (authConfig) {
       form.reset(getFormValuesFromConfig(authConfig))
       setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
+      setBodyError(undefined)
     }
   }, [authConfig, getFormValuesFromConfig, messageSlug, form])
 
@@ -294,6 +306,8 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                   name={x}
                   render={({ field }) => (
                     <FormItemLayout
+                      id={x}
+                      name={x}
                       className="gap-y-3"
                       layout="vertical"
                       label={property.title}
@@ -355,14 +369,24 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                       isReadOnly={!canEdit}
                       className="mb-0! relative h-96 outline-hidden outline-offset-0 outline-width-0 outline-0"
                       onInputChange={(e: string | undefined) => {
-                        setBodyValue(e ?? '')
-                        if (bodyValue !== e) setHasUnsavedChanges(true)
+                        const val = e ?? ''
+                        setBodyValue(val)
+                        if (bodyValue !== val) setHasUnsavedChanges(true)
+                        if (bodyError) {
+                          const check = validateGoTemplate(val)
+                          if (check.valid) setBodyError(undefined)
+                        }
                       }}
                       options={{ wordWrap: 'on', contextmenu: false, padding: { top: 16 } }}
                       value={bodyValue}
                       editorRef={editorRef}
                     />
                   </div>
+                  {bodyError && (
+                    <p className="text-destructive text-sm" role="alert">
+                      Invalid template syntax: {bodyError}
+                    </p>
+                  )}
 
                   <div className="flex flex-col gap-y-2">
                     <div className="flex flex-col">
@@ -443,6 +467,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                   onResetSuccess={(config: AuthConfigResponse) => {
                     form.reset(getFormValuesFromConfig(config))
                     setBodyValue((config && config[messageSlug]) ?? '')
+                    setBodyError(undefined)
                     setValidationResult(undefined)
                     setHasUnsavedChanges(false)
                   }}
@@ -456,6 +481,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                     onClick={() => {
                       form.reset(INITIAL_VALUES)
                       setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
+                      setBodyError(undefined)
                       setHasUnsavedChanges(false)
                     }}
                   >
@@ -484,3 +510,4 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
     </Form>
   )
 }
+

@@ -5,6 +5,7 @@ import {
   hasCustomEmailSender,
   isCustomEmailTemplateEditingRestricted,
   isCustomEmailTemplateRestrictionStatusKnown,
+  validateGoTemplate,
 } from './EmailTemplates.utils'
 import type { Organization } from '@/types'
 
@@ -134,4 +135,74 @@ describe('EmailTemplates.utils', () => {
       })
     ).toBe(false)
   })
+
+  describe('validateGoTemplate', () => {
+    it('accepts valid template strings', () => {
+      expect(validateGoTemplate('')).toEqual({ valid: true })
+      expect(validateGoTemplate('<h2>Hello</h2>')).toEqual({ valid: true })
+      expect(validateGoTemplate('<p><a href="{{ .ConfirmationURL }}">Confirm</a></p>')).toEqual({
+        valid: true,
+      })
+      expect(
+        validateGoTemplate(
+          '{{ if .Data.name }}Hello {{ .Data.name }}{{ else }}Hello user{{ end }}'
+        )
+      ).toEqual({ valid: true })
+      expect(validateGoTemplate('{{/* A Go comment */}} <p>{{ .SiteURL }}</p>')).toEqual({
+        valid: true,
+      })
+      expect(validateGoTemplate('<p>{{ printf "Hello %s" .Email }}</p>')).toEqual({ valid: true })
+    })
+
+    it('rejects extra opening braces inside actions (e.g. {{{ .RedirectTo }}})', () => {
+      const res = validateGoTemplate('<p><a href="{{{ .RedirectTo }}}">Sign in</a></p>')
+      expect(res.valid).toBe(false)
+      expect(res.error).toContain('Unexpected "{" in command')
+    })
+
+    it('rejects unclosed template actions', () => {
+      const res = validateGoTemplate('<p>{{ .ConfirmationURL </p>')
+      expect(res.valid).toBe(false)
+      expect(res.error).toBe('Unclosed template action "{{ ... }}"')
+    })
+
+    it('rejects empty template actions', () => {
+      const res = validateGoTemplate('<p>{{ }}</p>')
+      expect(res.valid).toBe(false)
+      expect(res.error).toBe('Empty template action "{{ }}"')
+    })
+
+    it('rejects invalid syntax like default: "test"', () => {
+      const res = validateGoTemplate('<p>{{ .Data.display_name | default: "test" }}</p>')
+      expect(res.valid).toBe(false)
+      expect(res.error).toContain('Unexpected ":" in command')
+    })
+
+    it('rejects unclosed or unexpected control structures', () => {
+      expect(validateGoTemplate('{{ if .Email }} Hi')).toEqual({
+        valid: false,
+        error: 'Unclosed control structure "{{ if .Email }}"',
+      })
+      expect(validateGoTemplate('{{ end }}')).toEqual({
+        valid: false,
+        error: 'Unexpected "{{ end }}" without matching block',
+      })
+      expect(validateGoTemplate('{{ else }}')).toEqual({
+        valid: false,
+        error: 'Unexpected "{{ else }}" without matching block',
+      })
+    })
+
+    it('rejects unclosed parenthesized expressions', () => {
+      expect(validateGoTemplate('{{ (print .Email }}')).toEqual({
+        valid: false,
+        error: 'Unclosed parenthesized expression in command',
+      })
+      expect(validateGoTemplate('{{ print .Email ) }}')).toEqual({
+        valid: false,
+        error: 'Unexpected ")" in command',
+      })
+    })
+  })
 })
+

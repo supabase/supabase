@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { toast } from 'sonner'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -275,3 +275,54 @@ describe('TemplateEditor reset to default', () => {
     expect(toast.error).not.toHaveBeenCalled()
   })
 })
+
+describe('TemplateEditor syntax validation', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    validateSpamMock.mockImplementation((_vars, callbacks) => callbacks?.onSuccess?.({ rules: [] }))
+  })
+
+  it('rejects saving when body has extra opening braces (e.g. {{{ .RedirectTo }}})', async () => {
+    renderTemplateEditor()
+
+    const bodySource = screen.getByLabelText('Body source')
+    fireEvent.change(bodySource, {
+      target: { value: '<p><a href="{{{ .RedirectTo }}}">Sign in</a></p>' },
+    })
+
+    const saveButton = screen.getByRole('button', { name: 'Save changes' })
+    await waitFor(() => expect(saveButton).not.toBeDisabled())
+    fireEvent.submit(saveButton.closest('form')!)
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Invalid template syntax: Unexpected "{" in command'
+    )
+    expect(toast.error).toHaveBeenCalledWith(
+      'Invalid template syntax: Unexpected "{" in command'
+    )
+    expect(updateAuthConfigMock).not.toHaveBeenCalled()
+  })
+
+  it('rejects saving when subject has invalid Go template syntax', async () => {
+    renderTemplateEditor()
+
+    const subjectInput = screen.getByLabelText('Subject')
+    fireEvent.change(subjectInput, {
+      target: { value: 'Confirm {{{ .Email }}}' },
+    })
+
+    const saveButton = screen.getByRole('button', { name: 'Save changes' })
+    await waitFor(() => expect(saveButton).not.toBeDisabled())
+    fireEvent.submit(saveButton.closest('form')!)
+
+    expect(
+      await screen.findByText('Invalid template syntax: Unexpected "{" in command')
+    ).toBeInTheDocument()
+    expect(updateAuthConfigMock).not.toHaveBeenCalled()
+  })
+})
+
+
+
+
+
