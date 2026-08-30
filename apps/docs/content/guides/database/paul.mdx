@@ -1,0 +1,90 @@
+---
+id: 'paul'
+title: 'Connecting with Paul'
+breadcrumb: 'GUI Quickstarts'
+hideToc: true
+---
+
+## What is Paul?
+
+[`Paul`](https://guillim.github.io/products/paul) is a lightweight, AI-first PostgreSQL client for macOS. It opens in 2 seconds, connects to any Postgres database, and lets you query data in plain language — no SQL required. Read-only by default, with an edit mode when you need it.
+
+## Connecting Paul with your Postgres database
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+
+    <StepHikeCompact.Details title="Download Paul">
+
+    Download Paul from the [official website](https://guillim.github.io/products/paul) and open it. No account or setup required.
+
+    </StepHikeCompact.Details>
+
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Get your connection details">
+
+    In the Supabase Dashboard, click the "Connect" button at the top of the page to open the connect modal. Scroll down to "Session pooler", click "View parameters" to toggle the parameters menu open. You will need the **Host**, **Database name**, **Port**, **User**, and **Password** (the password you set when creating your project — it can be reset in Database Settings if needed).
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ![Find your database connection details in the Supabase Dashboard.](/docs/img/guides/database/connecting-to-postgres/paul/get-credentials.png)
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+
+    <StepHikeCompact.Details title="Connect">
+
+    In Paul, enter your connection details: host, port, user, password, and database name. Click "Connect". Paul will connect to your Supabase Postgres database within seconds.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ![Add connection URI in Paul.](/docs/img/guides/database/connecting-to-postgres/paul/uri.png)
+
+    </StepHikeCompact.Code>
+
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+
+    <StepHikeCompact.Details title="Browse your data">
+
+    You're connected. Browse tables visually, filter and sort without SQL, or use the built-in AI agent to ask questions in plain language. Paul is read-only by default — switch to edit mode when you need to make changes.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ![Browse tables in Paul (Agent, Table, SQL modes).](/docs/img/guides/database/connecting-to-postgres/paul/table-mode.png)
+
+    </StepHikeCompact.Code>
+
+    
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+## Why connect to Paul
+
+Connecting your Supabase Postgres instance to Paul gives you a fast, native macOS client that opens in 2 seconds and stays out of your way. Unlike traditional database tools that require hundreds of megabytes and minutes of setup, Paul is under 20 MB and connects instantly.
+
+Its built-in AI agent lets you query your data in plain language — useful for support teams looking up customer data or engineers investigating issues without writing SQL under pressure. Read-only mode by default means you can safely explore production databases without risking accidental writes.
+
+Paul’s **Agent mode** is designed for quick exploration: ask questions like “show me the most recent signups” or “list all tables”, and Paul will explain what it’s doing and what data it used to answer.
+
+![Paul Agent mode.](/docs/img/guides/database/connecting-to-postgres/paul/agent.png)
+
+For teams that need a simple, safe way to access their Supabase database without building internal tools, Paul is a lightweight alternative to pgAdmin, DBeaver, or DataGrip.
