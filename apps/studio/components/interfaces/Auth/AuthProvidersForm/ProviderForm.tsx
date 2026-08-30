@@ -102,11 +102,17 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
             values[key] = !(config as any)[key]
           } else {
             const configValue = (config as any)[key]
-            values[key] = configValue
+            let value: string | boolean = configValue
               ? configValue
               : provider.properties[key].type === 'boolean'
                 ? false
                 : ''
+            // Convert literal \n escape sequences to actual newlines so the textarea
+            // displays them correctly (supports WebOTP API formatting requirements).
+            if (key === 'SMS_TEMPLATE' && typeof value === 'string') {
+              value = value.replace(/\\n/g, '\n')
+            }
+            values[key] = value
           }
         }
       })
