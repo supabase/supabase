@@ -36,8 +36,13 @@ else
         exit 1
     fi
 
-    if ! docker info >/dev/null 2>&1; then
-        echo "Error: docker is installed but the daemon is not running."
+    # Keep docker's own stderr: a socket permission error (non-root user not in the
+    # `docker` group) and a stopped daemon both fail here, and only docker knows which.
+    if ! docker_error=$(docker info 2>&1 >/dev/null); then
+        echo "Error: cannot connect to the Docker daemon."
+        if [ -n "$docker_error" ]; then
+            echo "$docker_error"
+        fi
         exit 1
     fi
 
