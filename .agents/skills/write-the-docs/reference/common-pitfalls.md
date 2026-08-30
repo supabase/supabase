@@ -7,11 +7,13 @@ Patterns to watch for when drafting docs, based on review feedback. These are gu
 **Principle:** Supabase docs are open source. Internal planning context, unshipped features, and business intent shouldn't be visible in the public repo.
 
 **What to watch for:**
+
 - HTML comments referencing PRDs, roadmaps, or internal ticket discussions
 - "Gap-fill" notes about what's planned but not shipped
 - Internal product strategy or positioning discussions
 
 **Where to put internal context instead:**
+
 - PR description (for review-time context)
 - Linear ticket (for product/PM handoff)
 - Internal Notion/docs (for roadmap tracking)
@@ -21,11 +23,13 @@ Patterns to watch for when drafting docs, based on review feedback. These are gu
 **Principle:** Prefer documenting what exists now over promising future features ([Google's timeless documentation](https://developers.google.com/style/timeless-documentation)). Future promises become stale.
 
 **Common patterns to watch for:**
+
 - "Coming soon" / "will be available" / "once finalized"
 - "This page is a placeholder"
 - "Being rolled out gradually" without concrete eligibility criteria
 
 **Better alternatives:**
+
 - Document what exists today
 - Wait to publish until the feature is complete
 - If phased rollout is real, be specific: "Available to organizations on Pro and Enterprise plans"
@@ -37,6 +41,7 @@ Patterns to watch for when drafting docs, based on review feedback. These are gu
 **Principle:** Generally avoid shipping pages that explicitly say "This is a placeholder" or "More details coming soon."
 
 **Alternatives:**
+
 - Wait to publish until content is ready
 - If navigation structure requires it, link to external resources that are complete
 - Ship minimal but useful content (what's true today) rather than promises
@@ -48,6 +53,7 @@ Patterns to watch for when drafting docs, based on review feedback. These are gu
 **Principle:** Avoid restating the same point in multiple ways.
 
 **Common patterns:**
+
 - Multiple ways of saying the same thing: "It's free" + "You won't be billed" + "No charge"
 - Admonition stating a risk, then body text restating it verbatim
 - Adjacent sentences that rephrase each other
@@ -80,3 +86,7 @@ Before submitting a draft, check:
 - [ ] Admonitions and body text cover distinct points
 
 **Note:** These are guidelines based on review feedback, not absolute rules. Use judgment based on content type, context, and the specific documentation needs. The goal is clearer, more maintainable docs, not rigid adherence to formatting rules.
+
+## Style guide consolidation
+
+This content is style guidance, not skill-specific process. It belongs in a shared, human-and-agent-readable style guide rather than only inside this skill. When [DOCS-1177](https://linear.app/supabase/issue/DOCS-1177/create-a-standalone-public-docs-style-guide)'s dedicated style guide lands, fold this content into it and replace this file with a pointer, the same pattern [reference/style-fallback.md](style-fallback.md) already uses for CONTRIBUTING.md/WORD_LIST.md.
