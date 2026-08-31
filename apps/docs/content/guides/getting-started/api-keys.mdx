@@ -146,31 +146,31 @@ Your project's [Security Advisor](/dashboard/project/_/advisors/security) checks
 
 Exposing a secret key puts all of your project's data at risk. The rules below are grouped by the kind of mistake they prevent.
 
-#### Where a secret key must never appear
+**Where a secret key must never appear**
 
 - A web page, a public document, source code, or a bundled mobile, desktop, or CLI package.
 - A browser, even on `localhost`.
 
-#### How a secret key must never travel
+**How a secret key must never travel**
 
 - Over chat, email, or SMS.
 - In a URL or a query parameter, because those are often logged.
 - In a request header, until you have log sanitization in place.
 
-#### What must never be written down
+**What must never be written down**
 
 - Don't log a key, even one that looks invalid. A typo today can reveal the real key later.
 - If you must record a key, log no more than 6 characters from the random part after its prefix.
 - To record which key was used, store a SHA256 hash of it instead.
 
-#### Storing and sharing a secret key
+**Storing and sharing a secret key**
 
 - Work with secret keys only on computers you fully own or control.
 - Encrypt keys stored in files or environment variables.
 - Keep keys out of source control, including CI scripts. Use the tool's own secrets storage instead.
 - Share keys through an encrypted transfer tool, such as the one in your password manager. Better still, have the other person read the key from the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard.
 
-#### Limiting the damage of a leak
+**Limiting the damage of a leak**
 
 - Use a separate secret key for each backend component. If one component leaks its key, you only rotate that one.
 - Delete a leaked key immediately. The browser block returns HTTP 401 Unauthorized, but an attacker can still use the key from other tools.
