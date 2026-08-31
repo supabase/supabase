@@ -35,18 +35,18 @@ export const ExplorerHomeTab = () => {
         <section className="mt-6">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <ActionCard
+              icon={<SquareCode className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
+              title="Run SQL"
+              description="Write and run an ad-hoc query"
+              bgColor="bg-blue-500"
+              onClick={() => createQuery()}
+            />
+            <ActionCard
               icon={<NotebookText className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
               title="Create a notebook"
               description="Combine notes, queries, and results"
               bgColor="bg-blue-500"
               onClick={() => createNotebook()}
-            />
-            <ActionCard
-              icon={<SquareCode className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
-              title="Run SQL"
-              description="Write and run an ad-hoc query"
-              bgColor="bg-blue-500"
-              onClick={createQuery}
             />
           </div>
         </section>

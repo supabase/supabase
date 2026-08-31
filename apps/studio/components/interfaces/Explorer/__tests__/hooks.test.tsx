@@ -1,16 +1,23 @@
 import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useCreateChat } from '../hooks'
+import { useCreateChat, useCreateQuery } from '../hooks'
 
-const { mockCreateChat, mockPush, mockSelectChat, mockSetContext, mockWhenInitialized } =
-  vi.hoisted(() => ({
-    mockCreateChat: vi.fn(() => 'chat-2'),
-    mockPush: vi.fn(),
-    mockSelectChat: vi.fn(),
-    mockSetContext: vi.fn(),
-    mockWhenInitialized: vi.fn(() => Promise.resolve()),
-  }))
+const {
+  mockCreateChat,
+  mockCreateDraft,
+  mockPush,
+  mockSelectChat,
+  mockSetContext,
+  mockWhenInitialized,
+} = vi.hoisted(() => ({
+  mockCreateChat: vi.fn(() => 'chat-2'),
+  mockCreateDraft: vi.fn(),
+  mockPush: vi.fn(),
+  mockSelectChat: vi.fn(),
+  mockSetContext: vi.fn(),
+  mockWhenInitialized: vi.fn(() => Promise.resolve()),
+}))
 
 vi.mock('next/router', () => ({ useRouter: () => ({ push: mockPush }) }))
 vi.mock('@/hooks/misc/useSelectedProject', () => ({
@@ -20,6 +27,12 @@ vi.mock('@/hooks/misc/useSelectedProject', () => ({
 }))
 vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
   useSelectedOrganizationQuery: () => ({ data: { slug: 'acme' } }),
+}))
+vi.mock('@/lib/api/snippets.browser', () => ({
+  generateUuid: () => 'query-new',
+}))
+vi.mock('@/state/explorer-query', () => ({
+  useExplorerQueryStateSnapshot: () => ({ createDraft: mockCreateDraft }),
 }))
 vi.mock('@/state/ai-assistant-state', () => ({
   useAiAssistantState: () => ({
@@ -95,5 +108,38 @@ describe('useCreateChat', () => {
       initialMessage: undefined,
     })
     expect(mockPush).toHaveBeenCalledWith('/project/default/explorer/chat/chat-2')
+  })
+})
+
+describe('useCreateQuery', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('creates a draft and opens it as an Explorer query tab', () => {
+    const { result } = renderHook(() => useCreateQuery())
+
+    expect(result.current.createQuery({ sql: 'select 1', name: 'Untitled query' })).toBe(
+      'query-new'
+    )
+    expect(mockCreateDraft).toHaveBeenCalledWith({
+      id: 'query-new',
+      projectRef: 'default',
+      sql: 'select 1',
+      name: 'Untitled query',
+    })
+    expect(mockPush).toHaveBeenCalledWith('/project/default/explorer/query/query-new')
+  })
+
+  it('creates an empty draft when no sql or name is provided', () => {
+    const { result } = renderHook(() => useCreateQuery())
+
+    expect(result.current.createQuery()).toBe('query-new')
+    expect(mockCreateDraft).toHaveBeenCalledWith({
+      id: 'query-new',
+      projectRef: 'default',
+      sql: undefined,
+      name: undefined,
+    })
   })
 })
