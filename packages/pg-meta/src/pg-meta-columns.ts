@@ -300,7 +300,7 @@ function update(
   let isUniqueSql: SafeSqlFragment = safeSql``
   if (old.is_unique === true && is_unique === false) {
     isUniqueSql = safeSql`
-DO $$
+DO $pgmeta$
 DECLARE
   r record;
 BEGIN
@@ -314,7 +314,7 @@ BEGIN
     EXECUTE ${literal(`ALTER TABLE ${ident(old.schema)}.${ident(old.table)} DROP CONSTRAINT `)} || quote_ident(r.conname);
   END LOOP;
 END
-$$;`
+$pgmeta$;`
   } else if (old.is_unique === false && is_unique === true) {
     isUniqueSql = safeSql`ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ADD UNIQUE (${ident(old.name)});`
   }
@@ -337,7 +337,7 @@ $$;`
   ASSERT v_conkey[1] = ${literal(old.ordinal_position)}, 'error creating column constraint: check condition cannot refer to other columns';`
         : safeSql``
     checkSql = safeSql`
-DO $$
+DO $pgmeta$
 DECLARE
   v_conname name;
   v_conkey int2[];
@@ -355,7 +355,7 @@ BEGIN
   END IF;
   ${addCheckSql}
 END
-$$;`
+$pgmeta$;`
   }
 
   // TODO: Can't set default if column is previously identity even if
