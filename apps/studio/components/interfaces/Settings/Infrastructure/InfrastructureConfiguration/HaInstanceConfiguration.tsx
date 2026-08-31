@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Loader2 } from 'lucide-react'
 import { useMemo } from 'react'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { DiagramFlow } from './DiagramFlow'
 import { addShardNodes, generateHaNodesAndEdges } from './HaInstanceConfiguration.utils'
@@ -12,6 +13,8 @@ import { AlertError } from '@/components/ui/AlertError'
 import { HighAvailabilityDisabledEmptyState } from '@/components/ui/HighAvailability/HighAvailabilityDisabledEmptyState'
 import { haClusterGatewaysQueryOptions } from '@/data/ha-admin/ha-cluster-gateways-query'
 import { haClusterPoolersQueryOptions } from '@/data/ha-admin/ha-cluster-poolers-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 const nodeTypes = {
   HA_GATEWAY: MultigatewayNode,
@@ -32,6 +35,10 @@ const POOLER_STATUS_REFRESH_MS = 30_000
  */
 export const HaInstanceConfiguration = () => {
   const { ref: projectRef } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+
+  const isProjectBuilding =
+    project?.status === PROJECT_STATUS.COMING_UP || project?.status === PROJECT_STATUS.UNKNOWN
 
   // Gateways poll on the same interval as poolers so the gateway count and
   // gateway→primary edge track cluster changes while the page stays open.
@@ -75,6 +82,29 @@ export const HaInstanceConfiguration = () => {
       <div role="status" className="h-full w-full flex items-center justify-center">
         <span className="sr-only">Loading cluster topology...</span>
         <Loader2 aria-hidden="true" className="motion-safe:animate-spin text-foreground-light" />
+      </div>
+    )
+  }
+
+  // While the project is provisioning, the /ha-admin endpoints fail or return an
+  // empty topology as a matter of course — that's a project still booting, not an
+  // unhealthy cluster.
+  if (isProjectBuilding && (isError || (poolers ?? []).length === 0)) {
+    return (
+      <div className="h-full w-full flex items-center justify-center p-6">
+        <EmptyStatePresentational
+          icon={
+            <Loader2
+              size={24}
+              strokeWidth={1.5}
+              aria-hidden="true"
+              className="motion-safe:animate-spin text-foreground-muted"
+            />
+          }
+          title="Setting up project"
+          description="Cluster topology will be available once your project is ready. This may take a few minutes."
+          className="max-w-md"
+        />
       </div>
     )
   }
