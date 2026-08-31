@@ -202,7 +202,10 @@ export const ExplorerQueryTab = () => {
         <>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <ExplorerToolbarAction icon={<Save />} tooltip="Save query" />
+              <ExplorerToolbarAction
+                icon={<Save size={16} strokeWidth={2} />}
+                tooltip="Save query"
+              />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-52" align="end">
               <DropdownMenuSub>
@@ -250,7 +253,7 @@ export const ExplorerQueryTab = () => {
           </DropdownMenu>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <ExplorerToolbarAction icon={<MoreVertical />} />
+              <ExplorerToolbarAction icon={<MoreVertical size={16} strokeWidth={2} />} />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem

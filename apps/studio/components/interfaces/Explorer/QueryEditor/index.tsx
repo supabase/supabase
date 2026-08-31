@@ -368,7 +368,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       <Shell className={cn(variant === 'embedded' && 'mx-auto max-w-6xl', className)}>
         <ExplorerToolbar className={cn(variant === 'viewport' && 'px-4')}>
           <ExplorerToolbarIcon>
-            <CodeSquare size={14} />
+            <CodeSquare size={16} strokeWidth={2} />
           </ExplorerToolbarIcon>
           <ExplorerToolbarTitle onSaveTitle={onTitleChange}>{title}</ExplorerToolbarTitle>
           <ExplorerToolbarActions>
@@ -396,7 +396,9 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
               />
             )}
             <ExplorerToolbarAction
-              icon={showQuery ? <EyeOff /> : <Eye />}
+              icon={
+                showQuery ? <EyeOff size={16} strokeWidth={2} /> : <Eye size={16} strokeWidth={2} />
+              }
               disabled={pendingProposal !== null}
               tooltip={showQuery ? 'Hide query' : 'Show query'}
               onClick={() => onShowQueryChange(!showQuery)}
@@ -405,7 +407,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
             {toolbarActions}
 
             <ExplorerToolbarAction
-              icon={<Play />}
+              icon={<Play size={16} strokeWidth={2} />}
               loading={isExecuting}
               tooltip={hasSelection ? 'Run selected query' : 'Run query'}
               disabled={
