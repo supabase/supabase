@@ -1,3 +1,4 @@
+import { motion, type Variants } from 'framer-motion'
 import { isArray } from 'lodash'
 import { Check, X } from 'lucide-react'
 import type { PricingInformation } from 'shared-data'
@@ -5,7 +6,12 @@ import { Button, cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { GapFeature, PlanPresentationVariant } from './plan-presentation'
-import { FREE_PLAN_GAPS, PRO_PLAN_GAPS } from './plan-presentation'
+import {
+  FREE_PLAN_GAPS,
+  hasPlanGaps,
+  isParityPresentation,
+  PRO_PLAN_GAPS,
+} from './plan-presentation'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { RequestUpgradeToBillingOwners } from '@/components/ui/RequestUpgradeToBillingOwners'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
@@ -29,6 +35,7 @@ export interface PlanCardProps {
   managedBy: string | undefined
   shouldHighlight: boolean
   variant: PlanPresentationVariant
+  variants?: Variants
   onSelectTier: () => void
   onTrackCtaClick: () => void
 }
@@ -46,14 +53,15 @@ export function PlanCard({
   managedBy,
   shouldHighlight,
   variant,
+  variants,
   onSelectTier,
   onTrackCtaClick,
 }: PlanCardProps) {
-  const isParity = variant === 'parity' || variant === 'gaps'
+  const isParity = isParityPresentation(variant)
   const features = plan.features
   const footer = plan.footer
 
-  const gaps: GapFeature[] = variant === 'gaps' ? (GAPS_BY_PLAN_ID[plan.id] ?? []) : []
+  const gaps: GapFeature[] = hasPlanGaps(variant) ? (GAPS_BY_PLAN_ID[plan.id] ?? []) : []
 
   const ctaButton = isCurrentPlan ? (
     <Button block disabled variant="default">
@@ -112,6 +120,7 @@ export function PlanCard({
         features={features}
         footer={footer}
         ctaButton={ctaButton}
+        variants={variants}
       />
     )
   }
@@ -127,6 +136,7 @@ export function PlanCard({
       footer={footer}
       gaps={gaps}
       ctaButton={ctaButton}
+      variants={variants}
     />
   )
 }
@@ -140,6 +150,7 @@ function ControlCard({
   features,
   footer,
   ctaButton,
+  variants,
 }: {
   plan: PricingInformation
   price: number
@@ -149,9 +160,11 @@ function ControlCard({
   features: (string | string[])[]
   footer: string | undefined
   ctaButton: React.ReactNode
+  variants?: Variants
 }) {
   return (
-    <div
+    <motion.div
+      variants={variants}
       className={cn(
         'px-4 py-4 flex flex-col items-start justify-between',
         'border rounded-md col-span-12 md:col-span-4 bg-surface-200',
@@ -217,7 +230,7 @@ function ControlCard({
           <p className="text-foreground-light text-xs">{footer}</p>
         </div>
       )}
-    </div>
+    </motion.div>
   )
 }
 
@@ -231,6 +244,7 @@ function ParityCard({
   footer,
   gaps,
   ctaButton,
+  variants,
 }: {
   plan: PricingInformation
   price: number
@@ -241,9 +255,11 @@ function ParityCard({
   footer: string | undefined
   gaps: GapFeature[]
   ctaButton: React.ReactNode
+  variants?: Variants
 }) {
   return (
-    <div
+    <motion.div
+      variants={variants}
       className={cn(
         'flex flex-col items-start justify-between',
         'border rounded-md col-span-12 md:col-span-4 bg-surface-200',
@@ -372,6 +388,6 @@ function ParityCard({
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   )
 }

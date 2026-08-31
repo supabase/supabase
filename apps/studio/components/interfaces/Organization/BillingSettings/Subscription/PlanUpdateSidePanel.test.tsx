@@ -9,12 +9,18 @@ const mockSelectedOrganization = vi.hoisted(() => vi.fn())
 const mockPush = vi.hoisted(() => vi.fn())
 const mockPartnerManagedResource = vi.hoisted(() => vi.fn())
 const mockUsePHFlag = vi.hoisted(() => vi.fn())
+const mockFeatureFlags = vi.hoisted(() => vi.fn())
+const mockIsPlatform = vi.hoisted(() => ({ value: true }))
 
 vi.mock('common', async (importOriginal) => {
   const original = (await importOriginal()) as typeof import('common')
   return {
     ...original,
     useParams: () => ({ slug: 'stripe-org' }),
+    useFeatureFlags: mockFeatureFlags,
+    get IS_PLATFORM() {
+      return mockIsPlatform.value
+    },
   }
 })
 
@@ -147,6 +153,8 @@ vi.mock('@/hooks/misc/useTrackExperimentExposure', () => ({
 describe('PlanUpdateSidePanel', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockIsPlatform.value = true
+    mockFeatureFlags.mockReturnValue({ posthog: {}, configcat: {}, hasLoaded: true })
     mockUsePHFlag.mockReturnValue('control')
     mockSelectedOrganization.mockReturnValue(
       createMockOrganization({
@@ -258,6 +266,109 @@ describe('PlanUpdateSidePanel', () => {
       // Free has a `lesser` item, so its heading is "Plan limits"; Pro has only `missing` items → "Not included"
       expect(screen.getByText('Plan limits')).toBeInTheDocument()
       expect(screen.getByText('Not included')).toBeInTheDocument()
+    })
+  })
+
+  describe.each(['fullscreen', 'fullscreen-gaps'])('%s variant', (flag) => {
+    beforeEach(() => {
+      mockUsePHFlag.mockReturnValue(flag)
+      mockSelectedOrganization.mockReturnValue(
+        createMockOrganization({ slug: 'test-org', billing_partner: null })
+      )
+    })
+
+    it('renders the full-screen shell instead of the sheet', () => {
+      render(<PlanUpdateSidePanel />)
+
+      expect(screen.getByRole('button', { name: /Go back to Studio/ })).toBeInTheDocument()
+      expect(screen.getByRole('link', { name: /Compare plans/ })).toBeInTheDocument()
+      expect(screen.queryByRole('link', { name: 'Pricing' })).not.toBeInTheDocument()
+    })
+
+    it('renders parity cards', () => {
+      render(<PlanUpdateSidePanel />)
+
+      expect(
+        screen.getByText('Perfect for passion projects & simple websites.')
+      ).toBeInTheDocument()
+      expect(screen.getByText('Everything in the Free Plan, plus:')).toBeInTheDocument()
+    })
+  })
+
+  describe('fullscreen variant', () => {
+    beforeEach(() => {
+      mockUsePHFlag.mockReturnValue('fullscreen')
+      mockSelectedOrganization.mockReturnValue(
+        createMockOrganization({ slug: 'test-org', billing_partner: null })
+      )
+    })
+
+    it('does not render gap rows', () => {
+      render(<PlanUpdateSidePanel />)
+
+      expect(screen.queryByText('Not included')).not.toBeInTheDocument()
+      expect(screen.queryByText('Plan limits')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('fullscreen-gaps variant', () => {
+    beforeEach(() => {
+      mockUsePHFlag.mockReturnValue('fullscreen-gaps')
+      mockSelectedOrganization.mockReturnValue(
+        createMockOrganization({ slug: 'test-org', billing_partner: null })
+      )
+    })
+
+    it('renders gap rows inside the full-screen shell', () => {
+      render(<PlanUpdateSidePanel />)
+
+      expect(screen.getByRole('button', { name: /Go back to Studio/ })).toBeInTheDocument()
+      expect(screen.getByText('Daily backups')).toBeInTheDocument()
+      expect(screen.getByText('1-day log retention')).toBeInTheDocument()
+      // Free has a `lesser` item → "Plan limits"; Pro has only `missing` items → "Not included"
+      expect(screen.getByText('Plan limits')).toBeInTheDocument()
+      expect(screen.getByText('Not included')).toBeInTheDocument()
+    })
+  })
+
+  describe('while feature flags are still loading', () => {
+    beforeEach(() => {
+      mockFeatureFlags.mockReturnValue({ posthog: {}, configcat: {}, hasLoaded: false })
+      mockUsePHFlag.mockReturnValue(undefined)
+      mockSelectedOrganization.mockReturnValue(
+        createMockOrganization({ slug: 'test-org', billing_partner: null })
+      )
+    })
+
+    it('opens neither shell, so the fullscreen variant cannot flash the sheet', () => {
+      render(<PlanUpdateSidePanel />)
+
+      expect(screen.queryByRole('button', { name: /Go back to Studio/ })).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Upgrade to Pro' })).not.toBeInTheDocument()
+    })
+
+    it('does not gate the panel when self-hosted, where flags never load', () => {
+      mockIsPlatform.value = false
+
+      render(<PlanUpdateSidePanel />)
+
+      expect(screen.getByRole('button', { name: 'Upgrade to Pro' })).toBeInTheDocument()
+    })
+  })
+
+  describe.each(['control', 'parity', 'gaps'])('%s variant keeps the sheet shell', (flag) => {
+    beforeEach(() => {
+      mockUsePHFlag.mockReturnValue(flag)
+      mockSelectedOrganization.mockReturnValue(
+        createMockOrganization({ slug: 'test-org', billing_partner: null })
+      )
+    })
+
+    it('renders the sheet header and no full-screen chrome', () => {
+      render(<PlanUpdateSidePanel />)
+
+      expect(screen.getByRole('link', { name: 'Pricing' })).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /Go back to Studio/ })).not.toBeInTheDocument()
     })
   })
 

@@ -2,14 +2,18 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
-import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
-import { Button, SidePanel } from 'ui'
 
 import { CancellationFlow } from './CancellationFlow'
+import {
+  isFullScreenPresentation,
+  isPlanChangeEligible,
+  usePlanPresentationExperiment,
+} from './plan-presentation'
 import { PlanCards } from './PlanCards'
+import { PlanUpdateFullScreenShell, PlanUpdateSheetShell } from './PlanUpdatePanelShell'
 import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import UpgradeSurveyModal from './UpgradeModal'
 import { STRIPE_PROJECTS_DOCS_URL } from '@/components/interfaces/Billing/Payment/PaymentMethods/StripePaymentConnection'
@@ -42,6 +46,52 @@ const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
       organizationSlug: selectedOrganization?.slug,
     }
   }
+}
+
+const PartnerManagedPlanNotice = ({
+  organization,
+  isStripeManaged,
+  isPartnerBilled,
+  stripeProjectsUpgradeCommand,
+}: {
+  organization: Organization | undefined
+  isStripeManaged: boolean
+  isPartnerBilled: boolean
+  stripeProjectsUpgradeCommand: string
+}) => {
+  if (!organization) return null
+
+  if (isStripeManaged) {
+    return (
+      <PartnerManagedResource
+        managedBy={MANAGED_BY.STRIPE_PROJECTS}
+        resource="Organization plans"
+        title="Organization plans are managed through Stripe."
+        details={
+          <>
+            Run <code className="text-code-inline">{stripeProjectsUpgradeCommand}</code> in your
+            project directory.
+          </>
+        }
+        cta={{
+          overrideUrl: `${STRIPE_PROJECTS_DOCS_URL}#upgrade-a-service-tier`,
+          message: 'Stripe Projects docs',
+        }}
+      />
+    )
+  }
+
+  if (isPartnerBilled) {
+    return (
+      <PartnerManagedResource
+        managedBy={organization.managed_by}
+        resource="Organization plans"
+        cta={getPartnerManagedResourceCta(organization)}
+      />
+    )
+  }
+
+  return null
 }
 
 const getStripeProjectsUpgradeCommand = (planId: string | null | undefined) => {
@@ -92,7 +142,10 @@ export const PlanUpdateSidePanel = () => {
   )
 
   const snap = useOrgSettingsPageStateSnapshot()
-  const visible = snap.panelKey === 'subscriptionPlan'
+  const isOpenedViaUrl = router.query.panel === 'subscriptionPlan'
+  const visible = snap.panelKey === 'subscriptionPlan' || isOpenedViaUrl
+
+  const contentDelay = isOpenedViaUrl ? 0.4 : 0.15
 
   const { data: orgProjectsData } = useOrgProjectsInfiniteQuery({ slug }, { enabled: visible })
   const orgProjects =
@@ -128,6 +181,23 @@ export const PlanUpdateSidePanel = () => {
   })
 
   const availablePlans: OrgPlan[] = plans?.plans ?? []
+
+  // Only orgs that can actually act on the panel enter the experiment, and only once it is open
+  const isPlanPresentationEligible =
+    visible &&
+    isPlanChangeEligible({
+      managedBy: selectedOrganization?.managed_by,
+      billingPartner: selectedOrganization?.billing_partner,
+      currentPlanId: subscription?.plan?.id,
+      canUpdateSubscription,
+    })
+
+  const { variant: presentation, isResolved: isPresentationResolved } =
+    usePlanPresentationExperiment({ eligible: isPlanPresentationEligible })
+  const isFullScreen = isFullScreenPresentation(presentation)
+
+  // The fullscreen variant swaps the shell, so hold the panel closed until the variant is known
+  const isPanelOpen = visible && isPresentationResolved
 
   const onPanelOpened = useEffectEvent(
     (properties: StudioPricingSidePanelOpenedEvent['properties']) => {
@@ -176,62 +246,55 @@ export const PlanUpdateSidePanel = () => {
     selectedOrganization?.plan?.id ?? subscription?.plan?.id
   )
 
+  const notice = (
+    <PartnerManagedPlanNotice
+      organization={selectedOrganization}
+      isStripeManaged={isStripeManagedOrganization}
+      isPartnerBilled={isPartnerBilledOrganization}
+      stripeProjectsUpgradeCommand={stripeProjectsUpgradeCommand}
+    />
+  )
+
+  const planCards = (
+    <PlanCards
+      availablePlans={availablePlans}
+      isLoadingPlans={isLoadingPlans}
+      currentSubscriptionPlanId={subscription?.plan?.id}
+      currentSubscriptionPlanName={subscription?.plan?.name}
+      canUpdateSubscription={canUpdateSubscription}
+      isPartnerBilledOrganization={isPartnerBilledOrganization}
+      hasOrioleProjects={hasOrioleProjects}
+      selectedOrganization={selectedOrganization}
+      variant={presentation}
+      entryDelay={isFullScreen ? contentDelay : undefined}
+      onSelectTier={setSelectedTier}
+    />
+  )
+
   return (
     <>
-      <SidePanel
-        hideFooter
-        size="xxlarge"
-        visible={visible}
-        onCancel={() => onClose()}
-        header={
-          <div className="flex items-center justify-between w-full">
-            <h4>Change subscription plan for {selectedOrganization?.name}</h4>
-            <Button asChild variant="default" icon={<ExternalLink />}>
-              <a href="https://supabase.com/pricing" target="_blank" rel="noreferrer">
-                Pricing
-              </a>
-            </Button>
-          </div>
-        }
-      >
-        {selectedOrganization &&
-          (isStripeManagedOrganization ? (
-            <PartnerManagedResource
-              managedBy={MANAGED_BY.STRIPE_PROJECTS}
-              resource="Organization plans"
-              title="Organization plans are managed through Stripe."
-              details={
-                <>
-                  Run <code className="text-code-inline">{stripeProjectsUpgradeCommand}</code> in
-                  your project directory.
-                </>
-              }
-              cta={{
-                overrideUrl: `${STRIPE_PROJECTS_DOCS_URL}#upgrade-a-service-tier`,
-                message: 'Stripe Projects docs',
-              }}
-            />
-          ) : isPartnerBilledOrganization ? (
-            <PartnerManagedResource
-              managedBy={selectedOrganization.managed_by}
-              resource="Organization plans"
-              cta={getPartnerManagedResourceCta(selectedOrganization)}
-            />
-          ) : null)}
-        <SidePanel.Content>
-          <PlanCards
-            availablePlans={availablePlans}
-            isLoadingPlans={isLoadingPlans}
-            currentSubscriptionPlanId={subscription?.plan?.id}
-            currentSubscriptionPlanName={subscription?.plan?.name}
-            canUpdateSubscription={canUpdateSubscription}
-            isPartnerBilledOrganization={isPartnerBilledOrganization}
-            hasOrioleProjects={hasOrioleProjects}
-            selectedOrganization={selectedOrganization}
-            onSelectTier={setSelectedTier}
-          />
-        </SidePanel.Content>
-      </SidePanel>
+      {isFullScreen && isPanelOpen && (
+        <PlanUpdateFullScreenShell
+          organizationName={selectedOrganization?.name}
+          notice={notice}
+          skipOverlayFade={isOpenedViaUrl}
+          contentDelay={contentDelay}
+          onClose={onClose}
+        >
+          {planCards}
+        </PlanUpdateFullScreenShell>
+      )}
+
+      {!isFullScreen && (
+        <PlanUpdateSheetShell
+          visible={isPanelOpen}
+          organizationName={selectedOrganization?.name}
+          notice={notice}
+          onClose={onClose}
+        >
+          {planCards}
+        </PlanUpdateSheetShell>
+      )}
 
       <CancellationFlow
         visible={selectedTier === 'tier_free'}
@@ -242,6 +305,7 @@ export const PlanUpdateSidePanel = () => {
       <SubscriptionPlanUpdateDialog
         selectedTier={selectedTier}
         onClose={() => setSelectedTier(undefined)}
+        onSuccess={isFullScreen ? onClose : undefined}
         planMeta={planMeta}
         subscriptionPreviewQueryResult={subscriptionPreviewData}
         projects={orgProjects}
