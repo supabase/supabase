@@ -16,7 +16,11 @@ Edge Functions care about two request headers. Sending the wrong credential in t
 | `Authorization` | `Bearer <user-jwt>`                     | A user signed in through Supabase Auth |
 | `apikey`        | `sb_publishable_...` or `sb_secret_...` | Calls from clients or services         |
 
+<Admonition type="note" title="Don't send API keys as bearer tokens">
+
 A common mistake is sending a publishable or secret key as a bearer token: `Authorization: Bearer sb_publishable_...`. The new API keys are not JWTs. The platform check still accepts them, but your handler can't verify them as JWTs. Instead, put API keys in the `apikey` header.
+
+</Admonition>
 
 You can send both headers together. A signed-in user calling your function through `supabase-js`, for example, sends their session JWT in `Authorization` and the project's publishable key in `apikey`.
 
