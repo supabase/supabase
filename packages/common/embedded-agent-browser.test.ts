@@ -1,6 +1,10 @@
+import type { CaptureResult } from 'posthog-js'
 import { describe, expect, it } from 'vitest'
 
-import { detectEmbeddedAgentBrowser } from './embedded-agent-browser'
+import {
+  buildEmbeddedAgentBrowserConfig,
+  detectEmbeddedAgentBrowser,
+} from './embedded-agent-browser'
 
 describe('detectEmbeddedAgentBrowser', () => {
   it('detects Claude Desktop on Mac with Electron token', () => {
@@ -69,5 +73,45 @@ describe('detectEmbeddedAgentBrowser', () => {
 
   it('returns undefined for an empty string', () => {
     expect(detectEmbeddedAgentBrowser('')).toBeUndefined()
+  })
+})
+
+describe('buildEmbeddedAgentBrowserConfig', () => {
+  const claudeUserAgent =
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.37937.3 Chrome/148.0.7778.280 Safari/537.36 MSIX'
+
+  it('returns an empty config for non-agent user agents', () => {
+    expect(
+      buildEmbeddedAgentBrowserConfig(
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36'
+      )
+    ).toEqual({})
+  })
+
+  it('returns an empty config when the user agent is unavailable', () => {
+    expect(buildEmbeddedAgentBrowserConfig(undefined)).toEqual({})
+  })
+
+  it('annotates captured events with the detected agent browser', () => {
+    const config = buildEmbeddedAgentBrowserConfig(claudeUserAgent)
+    const beforeSend = config.before_send as (cr: CaptureResult | null) => CaptureResult | null
+
+    const result = beforeSend({
+      uuid: '00000000-0000-0000-0000-000000000000',
+      event: '$pageview',
+      properties: { $current_url: 'https://supabase.com/dashboard/projects' },
+    } as CaptureResult)
+
+    expect(result?.properties).toEqual({
+      $current_url: 'https://supabase.com/dashboard/projects',
+      embedded_agent_browser: 'claude_desktop',
+    })
+  })
+
+  it('passes through null capture results', () => {
+    const config = buildEmbeddedAgentBrowserConfig(claudeUserAgent)
+    const beforeSend = config.before_send as (cr: CaptureResult | null) => CaptureResult | null
+
+    expect(beforeSend(null)).toBeNull()
   })
 })

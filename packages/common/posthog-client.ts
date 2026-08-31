@@ -4,7 +4,7 @@ import posthog, {
   type SessionRecordingOptions,
 } from 'posthog-js'
 
-import { detectEmbeddedAgentBrowser } from './embedded-agent-browser'
+import { buildEmbeddedAgentBrowserConfig } from './embedded-agent-browser'
 import { safeSessionStorage } from './safe-storage'
 
 export type { CapturedNetworkRequest, SessionRecordingOptions }
@@ -89,27 +89,15 @@ class PostHogClient {
       return
     }
 
-    const embeddedAgentBrowser =
-      typeof navigator !== 'undefined' ? detectEmbeddedAgentBrowser(navigator.userAgent) : undefined
-
     const config: Partial<PostHogConfig> = {
       api_host: this.config.apiHost,
       ui_host: this.config.uiHost,
       autocapture: false, // We'll manually track events
       capture_pageview: false, // We'll manually track pageviews
       capture_pageleave: false, // We'll manually track page leaves
-      ...(embeddedAgentBrowser && {
-        before_send: (captureResult) => {
-          if (!captureResult) return captureResult
-          return {
-            ...captureResult,
-            properties: {
-              ...captureResult.properties,
-              embedded_agent_browser: embeddedAgentBrowser,
-            },
-          }
-        },
-      }),
+      ...buildEmbeddedAgentBrowserConfig(
+        typeof navigator !== 'undefined' ? navigator.userAgent : undefined
+      ),
       ...buildSessionRecordingConfig(sessionReplay),
       loaded: (posthog) => {
         // Apply pending properties that were set before PostHog
