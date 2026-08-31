@@ -80,7 +80,7 @@ revoke execute
   from authenticated, anon, public;
 ```
 
-You will need to alter your row-level security (RLS) policies to allow the `supabase_auth_admin` role to access tables that you have RLS policies on. You can read more about RLS policies [here](/docs/guides/database/postgres/row-level-security).
+You will need to alter your row-level security (RLS) policies to allow the `supabase_auth_admin` role to access tables that you have RLS policies on. You can read more about [RLS policies](/docs/guides/database/postgres/row-level-security).
 
 Alternatively, you can create your Postgres function via the dashboard with the `security definer` tag. The `security definer` tag specifies that the function is to be executed with the privileges of the user that owns it.
 
