@@ -7,17 +7,34 @@
   },
   "entries": [
     {
+      "identifier": "urn:air:supabase.com:mcp:server",
+      "displayName": "Supabase MCP server",
+      "type": "application/json",
+      "url": "https://mcp.supabase.com/mcp",
+      "description": "The Supabase MCP server endpoint (streamable HTTP, OAuth-protected) for managing projects, database schema, and queries from MCP clients.",
+      "tags": ["mcp", "server", "agents"],
+      "representativeQueries": [
+        "connect my agent to Supabase over MCP",
+        "run a query against my Supabase project from an MCP client",
+        "manage my Supabase project from my coding agent"
+      ]
+    },
+    {
       "identifier": "urn:air:supabase.com:metadata:mcp-oauth",
       "displayName": "Supabase MCP OAuth metadata",
       "type": "application/json",
       "url": "https://api.supabase.com/.well-known/oauth-protected-resource/mcp",
       "description": "OAuth protected-resource metadata for connecting clients to the Supabase MCP server.",
-      "tags": ["mcp", "oauth", "authorization", "metadata"]
+      "tags": ["mcp", "oauth", "authorization", "metadata"],
+      "representativeQueries": [
+        "authenticate an MCP client to the Supabase MCP server with OAuth",
+        "what OAuth scopes does the Supabase MCP server support"
+      ]
     },
     {
       "identifier": "urn:air:supabase.com:api:management",
       "displayName": "Supabase Management API",
-      "type": "application/json",
+      "type": "application/openapi+json",
       "url": "https://api.supabase.com/api/v1-json",
       "description": "OpenAPI 3.0 description of the Supabase Management API for managing organizations, projects, branches, and configuration.",
       "tags": ["api", "openapi", "projects", "management"],
