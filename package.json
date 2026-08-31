@@ -48,7 +48,7 @@
     "setup:cli": "supabase start -x studio && supabase status --output json > keys.json && node scripts/generateLocalEnv.js",
     "generate:types": "supabase gen types typescript --local > ./supabase/functions/common/database-types.ts",
     "api:codegen": "cd packages/api-types && pnpm run codegen",
-    "knip": "pnpx knip@~5.50.0",
+    "knip": "knip",
     "authorize-vercel-deploys": "tsx scripts/authorizeVercelDeploys.ts"
   },
   "devDependencies": {
@@ -57,6 +57,7 @@
     "@types/node": "catalog:",
     "eslint": "^9.0.0",
     "jsdom": "^28.1.0",
+    "knip": "6.32.3",
     "prettier": "^3.8.0",
     "prettier-plugin-sql-cst": "^0.18.0",
     "rimraf": "^6.0.0",
