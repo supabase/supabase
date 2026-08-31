@@ -76,7 +76,7 @@ export const getClickHouseValidationIssues = (
 
     if (parsed) {
       if (parsed.protocol !== 'https:') {
-        issues.push({ path: 'clickhouseUrl', message: 'ClickHouse URL must use https://.' })
+        issues.push({ path: 'clickhouseUrl', message: 'ClickHouse URL must use HTTPS.' })
       } else {
         const host = parsed.hostname.replace(/^\[|\]$/g, '')
 

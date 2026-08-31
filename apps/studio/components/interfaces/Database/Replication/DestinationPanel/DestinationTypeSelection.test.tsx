@@ -76,10 +76,10 @@ describe('DestinationTypeSelection', () => {
     expect(await screen.findByText('Select a destination type')).toBeInTheDocument()
   })
 
-  test('renders BigQuery when the flag is enabled', async () => {
+  test('groups destinations by release stage', async () => {
     mockBigQueryEnabled.mockReturnValue(true)
-    mockIcebergEnabled.mockReturnValue(false)
-    mockDucklakeEnabled.mockReturnValue(false)
+    mockIcebergEnabled.mockReturnValue(true)
+    mockDucklakeEnabled.mockReturnValue(true)
     mockSnowflakeEnabled.mockReturnValue(false)
     mockClickHouseEnabled.mockReturnValue(false)
     addBackgroundMocks()
@@ -88,7 +88,12 @@ describe('DestinationTypeSelection', () => {
 
     fireEvent.click(await screen.findByRole('combobox'))
 
-    expect(await screen.findByText('BigQuery')).toBeInTheDocument()
+    expect(await screen.findByText('Public Alpha')).toBeInTheDocument()
+    expect(screen.getByText('Early Access')).toBeInTheDocument()
+    expect(screen.getByText('Deprecated')).toBeInTheDocument()
+    expect(screen.getByText('BigQuery')).toBeInTheDocument()
+    expect(screen.getByText('DuckLake')).toBeInTheDocument()
+    expect(screen.getByText('Analytics Bucket')).toBeInTheDocument()
     expect(screen.queryByText('Pipelines')).not.toBeInTheDocument()
   })
 

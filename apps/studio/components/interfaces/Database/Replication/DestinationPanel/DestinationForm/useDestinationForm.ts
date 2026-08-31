@@ -269,7 +269,7 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
         resolveNamespace,
       })
 
-      if (!destinationConfig) throw new Error('Destination configuration is missing')
+      if (!destinationConfig) throw new Error('Destination configuration is missing.')
 
       const shouldSendBatch =
         !editMode || data.maxFillMs !== (existingBatch?.max_fill_ms ?? DEFAULT_MAX_FILL_MS)

@@ -666,7 +666,7 @@ describe('DestinationForm.utils ClickHouse', () => {
         clickhouseUser: 'default',
         clickhouseDatabase: 'analytics',
       })
-    ).toEqual([{ path: 'clickhouseUrl', message: 'ClickHouse URL must use https://.' }])
+    ).toEqual([{ path: 'clickhouseUrl', message: 'ClickHouse URL must use HTTPS.' }])
 
     expect(
       getClickHouseValidationIssues({
