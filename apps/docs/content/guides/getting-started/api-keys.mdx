@@ -118,13 +118,7 @@ Don't rush. Fix the root cause of the leak before you rotate anything. The [OWAS
 1. Create a new secret key in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard.
 2. Replace the compromised key with the new one everywhere your application uses it. If the compromised key is a JWT-based `service_role` key, replace it with the new secret key.
 3. Confirm that every component now uses the new key.
-4. Delete the compromised key.
-
-<Admonition type="danger" title="Deleting a secret key is irreversible">
-
-Once you delete a secret key, it is gone. Complete step 3 before you delete anything.
-
-</Admonition>
+4. Delete the compromised key. Deleting a secret key can't be undone, so don't start this step until step 3 is done.
 
 ## Security reference
 
