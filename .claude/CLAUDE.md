@@ -12,6 +12,8 @@ pnpm 11 + Turborepo monorepo. Requires Node >= 22.13.
 | `apps/design-system`     | Component demos — source of truth for Studio UI patterns (port 3003)        |
 | `apps/ui-library`        | shadcn-style registry site for Supabase UI blocks (port 3004)               |
 | `apps/lite-studio`       | Lightweight Studio — different stack: React Router 7 + Vite + Tailwind v4   |
+| `apps/learn`             | Courses site — Next.js + contentlayer2 (port 3007)                          |
+| `apps/kb`                | Knowledge Base — Astro (port 3008)                                          |
 | `packages/ui`            | Shared UI components (shadcn/ui based) — `import { Button } from 'ui'`      |
 | `packages/ui-patterns`   | Composite components — subpath imports, e.g. `ui-patterns/AssistantChat`    |
 | `packages/common`        | Shared utils, telemetry constants, feature flags                            |
