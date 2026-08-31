@@ -106,8 +106,78 @@ Secret keys improve on the old JWT-based `service_role` key, and we recommend th
 
 ### Find your keys
 
-1. Open your project's [**Connect** dialog](/dashboard/project/_?showConnect=true). It shows the keys for the framework you select, which is the fastest path for most setups.
-2. To pick a specific key, or to see every key your project has, open the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard.
+There are several ways to read your keys. Pick the one that matches where you are working.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+  queryGroup="retrieval-method"
+>
+<TabPanel id="dashboard" label="Dashboard">
+
+Use the Dashboard when you are setting up a project by hand. This is the fastest path for most setups, and the only one that needs no prior authentication beyond being signed in.
+
+1. Open your project's [**Connect** dialog](/dashboard/project/_?showConnect=true). It shows the URL and publishable key for the framework you select, ready to paste into `.env`.
+2. To pick a specific key, or to see every key your project has, open the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard instead.
+3. Copy each value into your project's `.env` file.
+
+</TabPanel>
+<TabPanel id="cli" label="Supabase CLI">
+
+Use the CLI to script setup, or to read the keys for a preview branch.
+
+1. Sign in, if you haven't already.
+
+   ```bash
+   supabase login
+   ```
+
+2. List the keys for a project.
+
+   ```bash
+   supabase projects api-keys --project-ref your-project-ref
+   ```
+
+Pass the branch's own project ref to read the keys for a preview branch. A branch has its own keys, and the command returns the linked project's keys when you omit the flag.
+
+</TabPanel>
+<TabPanel id="management-api" label="Management API">
+
+Use the Management API to fetch keys from your own tooling, such as a deploy script or an internal provisioning service.
+
+Authenticate with a [personal access token](/dashboard/account/tokens). Secret key values are only returned when you ask for them with `reveal`.
+
+```bash
+export PROJECT_REF="your-project-ref"
+
+curl -X GET "https://api.supabase.com/v1/projects/$PROJECT_REF/api-keys?reveal=true" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  | jq '.[] | {name, type, api_key}'
+```
+
+See [Get project API keys](/docs/reference/api/v1-get-project-api-keys) for the full response.
+
+</TabPanel>
+<TabPanel id="local" label="Local stack">
+
+A local stack mints its own keys. They are unrelated to your hosted project's keys, and they are the same on every machine, so they are safe to commit in a local-only `.env`.
+
+1. Start the stack. The publishable and secret keys are in the startup output, under **Authentication Keys**.
+
+   ```bash
+   supabase start
+   ```
+
+2. Print them again at any time while the stack is running.
+
+   ```bash
+   supabase status
+   ```
+
+</TabPanel>
+</Tabs>
 
 ### Rotate a leaked or compromised key [#leaked-key]
 
