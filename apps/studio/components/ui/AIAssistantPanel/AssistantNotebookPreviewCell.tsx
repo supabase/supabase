@@ -1,4 +1,4 @@
-import { ChevronRight, FileText, SquareCode } from 'lucide-react'
+import { ChevronRight, FileText, Loader2, SquareCode } from 'lucide-react'
 import {
   cn,
   Collapsible,
@@ -15,7 +15,8 @@ import {
   getCellLabel,
   getCellMonacoLanguage,
   getCellSourceText,
-  getEntryMetadataLine,
+  getEntryMetadata,
+  type NotebookDatabaseContext,
 } from './AssistantNotebookPreview.utils'
 import {
   ExplorerQueryFooter,
@@ -34,6 +35,7 @@ export interface AssistantNotebookPreviewCellProps {
   /** Create and run previews omit per-row change glyphs. */
   mode: 'create' | 'update' | 'run'
   result?: QueryResult
+  databaseContext: NotebookDatabaseContext
 }
 
 /**
@@ -62,12 +64,13 @@ export const AssistantNotebookPreviewCell = ({
   onExpandedChange,
   mode,
   result,
+  databaseContext,
 }: AssistantNotebookPreviewCellProps) => {
   const marker = CHANGE_MARKERS[entry._tag]
   const isRemoved = entry._tag === 'removed'
   const cell = getEntryCell(entry)
   const label = getCellLabel(cell)
-  const metadata = getEntryMetadataLine(entry)
+  const metadata = getEntryMetadata(entry, databaseContext)
 
   return (
     <Collapsible open={isExpanded} onOpenChange={onExpandedChange}>
@@ -89,11 +92,20 @@ export const AssistantNotebookPreviewCell = ({
         >
           {label}
         </span>
-        {metadata && (
+        {metadata.status !== 'hidden' ? (
           <span className="min-w-0 max-w-[45%] shrink truncate text-sm text-muted-foreground">
-            {metadata}
+            {metadata.status === 'loading' ? (
+              <span className="flex items-center gap-1.5">
+                <span className="animate-spin">
+                  <Loader2 aria-hidden size={12} />
+                </span>
+                Loading database…
+              </span>
+            ) : (
+              metadata.text
+            )}
           </span>
-        )}
+        ) : null}
       </CollapsibleTrigger>
       <CollapsibleContent>
         <div className="border-t">

@@ -18,6 +18,10 @@ const { mockUseIsFeatureEnabled } = vi.hoisted(() => ({
 vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
   useIsFeatureEnabled: mockUseIsFeatureEnabled,
 }))
+vi.mock(
+  '@/components/interfaces/Settings/Infrastructure/ReadReplicas/AddReadReplicaDialog',
+  () => ({ AddReadReplicaDialog: () => null })
+)
 
 const addReplicaListMocks = () => {
   addAPIMock({
