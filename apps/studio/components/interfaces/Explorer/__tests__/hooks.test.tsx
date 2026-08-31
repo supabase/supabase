@@ -3,19 +3,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useCreateChat } from '../hooks'
 
-const {
-  mockCreateChat,
-  mockPush,
-  mockSelectChat,
-  mockSetContext,
-  mockWhenInitialized,
-} = vi.hoisted(() => ({
-  mockCreateChat: vi.fn(() => 'chat-2'),
-  mockPush: vi.fn(),
-  mockSelectChat: vi.fn(),
-  mockSetContext: vi.fn(),
-  mockWhenInitialized: vi.fn(() => Promise.resolve()),
-}))
+const { mockCreateChat, mockPush, mockSelectChat, mockSetContext, mockWhenInitialized } =
+  vi.hoisted(() => ({
+    mockCreateChat: vi.fn(() => 'chat-2'),
+    mockPush: vi.fn(),
+    mockSelectChat: vi.fn(),
+    mockSetContext: vi.fn(),
+    mockWhenInitialized: vi.fn(() => Promise.resolve()),
+  }))
 
 vi.mock('next/router', () => ({ useRouter: () => ({ push: mockPush }) }))
 vi.mock('@/hooks/misc/useSelectedProject', () => ({
