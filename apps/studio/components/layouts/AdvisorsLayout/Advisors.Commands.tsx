@@ -1,6 +1,7 @@
 import { useParams } from 'common'
 import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands } from 'ui-patterns/CommandMenu'
+import type { IRouteCommand } from 'ui-patterns/CommandMenu/internal/types'
 
 import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -19,7 +20,7 @@ export function useAdvisorsGoToCommands(options?: CommandOptions) {
               name: 'Health Advisor',
               route: `/project/${ref}/advisors/health`,
               defaultHidden: true,
-            },
+            } satisfies IRouteCommand,
           ]
         : []),
       {

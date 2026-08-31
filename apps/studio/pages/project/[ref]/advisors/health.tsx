@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react'
 import { LoadingLine } from 'ui'
 
 import { LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
-import { lintInfoMap } from '@/components/interfaces/Linter/Linter.utils'
+import { lintInfoMap, parseLinterLevel } from '@/components/interfaces/Linter/Linter.utils'
 import { LinterDataGrid } from '@/components/interfaces/Linter/LinterDataGrid'
 import LinterFilters from '@/components/interfaces/Linter/LinterFilters'
 import LintPageTabs from '@/components/interfaces/Linter/LintPageTabs'
@@ -27,7 +27,7 @@ const ProjectHealthLints: NextPageWithLayout = () => {
     { level: LINTER_LEVELS.INFO, filters: [] },
   ])
   const [currentTab, setCurrentTab] = useState<LINTER_LEVELS>(
-    (preset as LINTER_LEVELS) ?? LINTER_LEVELS.ERROR
+    parseLinterLevel(preset) ?? LINTER_LEVELS.ERROR
   )
   const { data, isPending, isRefetching, refetch } = useProjectHealthLintsQuery({
     projectRef: project?.ref,
@@ -38,8 +38,7 @@ const ProjectHealthLints: NextPageWithLayout = () => {
   const isLoading = IS_PLATFORM && isPending
 
   const activeLints = (data ?? []).filter((lint) => lint.categories.includes('HEALTH'))
-  const currentTabFilters = (filters.find((filter) => filter.level === currentTab)?.filters ||
-    []) as string[]
+  const currentTabFilters = filters.find((filter) => filter.level === currentTab)?.filters ?? []
   const filteredLints = activeLints
     .filter((x) => x.level === currentTab)
     .filter((x) => (currentTabFilters.length > 0 ? currentTabFilters.includes(x.name) : x))
