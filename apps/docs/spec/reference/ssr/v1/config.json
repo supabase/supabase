@@ -1,0 +1,5 @@
+{
+  "categoryOrder": ["Clients", "Cookies", "Types", "Deprecated"],
+  "partialsOrder": ["introduction", "installing"],
+  "navigationPrefixes": {}
+}

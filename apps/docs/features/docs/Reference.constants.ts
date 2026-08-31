@@ -16,4 +16,9 @@
  * not listed here keeps reading from the legacy `features/docs/generated/`
  * outputs.
  */
-export const SUPPORTS_NEW_REFERENCE_PROCESS = new Set(['javascript-v2', 'dart-v2', 'server-v1'])
+export const SUPPORTS_NEW_REFERENCE_PROCESS = new Set([
+  'javascript-v2',
+  'dart-v2',
+  'server-v1',
+  'ssr-v1',
+])

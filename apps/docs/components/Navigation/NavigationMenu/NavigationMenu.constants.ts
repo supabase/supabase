@@ -286,6 +286,13 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             new: true,
           },
           {
+            label: 'SSR',
+            icon: 'reference-javascript',
+            href: '/reference/ssr' as `/${string}`,
+            level: 'reference_ssr',
+            new: true,
+          },
+          {
             label: 'CLI Commands',
             icon: 'reference-cli',
             href: '/reference/cli/introduction' as `/${string}`,
@@ -3424,6 +3431,17 @@ export const reference_server_v1 = {
   pkg: {
     name: '@supabase/server',
     repo: 'https://github.com/supabase/server',
+  },
+}
+
+export const reference_ssr_v1 = {
+  icon: 'reference-javascript',
+  title: 'SSR',
+  url: '/reference/ssr',
+  parent: '/reference',
+  pkg: {
+    name: '@supabase/ssr',
+    repo: 'https://github.com/supabase/ssr',
   },
 }
 

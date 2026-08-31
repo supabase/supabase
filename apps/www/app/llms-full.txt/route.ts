@@ -36,6 +36,7 @@ function getSources(): Source[] {
     { title: 'Supabase Reference (Python)', slug: 'python', enabled: sdkPython },
     { title: 'Supabase Reference (C#)', slug: 'csharp', enabled: sdkCsharp },
     { title: 'Supabase Server SDK Reference', slug: 'server', enabled: true },
+    { title: 'Supabase SSR Reference', slug: 'ssr', enabled: true },
     { title: 'Supabase CLI Reference', slug: 'cli', enabled: true },
     { title: 'Supabase Management API Reference', slug: 'api', enabled: true },
   ]
