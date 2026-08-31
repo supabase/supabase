@@ -64,7 +64,7 @@ export const ASSISTANT_MODELS = [
   openaiModelEntry({
     id: 'gpt-5.6-luna',
     requiresAdvanceModelEntitlement: false,
-    reasoningEffort: 'max',
+    reasoningEffort: 'medium',
   }),
   openaiModelEntry({
     id: 'gpt-5.4-nano',

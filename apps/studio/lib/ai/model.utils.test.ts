@@ -137,7 +137,7 @@ describe('model.utils', () => {
     })
 
     it('getAssistantModelEntry returns config for known ids', () => {
-      expect(getAssistantModelEntry('gpt-5.6-luna').reasoningEffort).toBe('max')
+      expect(getAssistantModelEntry('gpt-5.6-luna').reasoningEffort).toBe('medium')
       expect(getAssistantModelEntry('gpt-5.4-nano').reasoningEffort).toBe('low')
       expect(getAssistantModelEntry('gpt-5.3-codex').reasoningEffort).toBe('low')
       expect(getAssistantModelEntry('gpt-5.6-luna')).toEqual(
