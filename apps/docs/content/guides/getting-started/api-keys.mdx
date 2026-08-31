@@ -25,7 +25,7 @@ Pick the key by asking where the code runs.
 
 Think of your project's data as a building. The publishable key is taped to the front door, and it only opens the lobby. The secret key is the master key, and it stays in your pocket.
 
-Once you know which key you need:
+After you know which key you need:
 
 - To get its value, see [Find your keys](#find-your-keys), which covers the Dashboard, the CLI, the Management API, and a local stack.
 - To wire it into code, see [Use a publishable key in client code](#use-a-publishable-key-in-client-code) or [Use a secret key in backend code](#use-a-secret-key-in-backend-code).
@@ -104,11 +104,7 @@ Every key resolves to a built-in Postgres role, and that role is what your Row L
 
 Write your Row Level Security policies for the `anon` and `authenticated` roles. Policies never apply to a secret key, because `service_role` has the `BYPASSRLS` attribute.
 
-<Admonition type="note" title="Grants are checked before Row Level Security">
-
-Postgres evaluates table grants first, and only then applies Row Level Security. The two failures look different: a missing grant returns a permission error, including for `service_role`, whereas a policy that matches no rows returns an empty result. Check the grant before you debug the policy. See [Securing your API](/docs/guides/api/securing-your-api#grants-and-rls).
-
-</Admonition>
+Postgres evaluates table grants first, and only then applies Row Level Security. The two failures look different. A missing grant returns a permission error, including for `service_role`, whereas a policy that matches no rows returns an empty result. Check the grant before you debug the policy. See [Securing your API](/docs/guides/api/securing-your-api#grants-and-rls).
 
 ### Secret keys and elevated access
 
@@ -134,14 +130,7 @@ Secret keys improve on the old JWT-based `service_role` key, and we recommend th
 
 ## Find and use your keys
 
-A key never belongs in your source code. Copying a key is a person's job, because it needs a signed-in Dashboard session. Writing the code is separate, and it only ever refers to the variable name.
-
-| Step                                                    | Who does it            |
-| ------------------------------------------------------- | ---------------------- |
-| Copy the key from the Dashboard into `.env`             | You, signed in         |
-| Read the key from `process.env` and pass it to a client | Your code, or an agent |
-
-So set these variable names in `.env`, and write code against the names rather than the values:
+A key never belongs in your source code. Copying a key is a person's job, because it needs a signed-in Dashboard session. Writing the code is separate, and it only refers to the variable name. So set these names in `.env`, and write code against the names rather than the values:
 
 ```bash .env
 # Safe to expose to the browser. Prefix per your framework.
@@ -300,11 +289,7 @@ const secretKeys = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
 const supabaseAdmin = createClient(Deno.env.get('SUPABASE_URL')!, secretKeys['default'])
 ```
 
-<Admonition type="caution" title="SUPABASE_SERVICE_ROLE_KEY is the legacy variable">
-
-The current injected variables are `SUPABASE_PUBLISHABLE_KEYS` and `SUPABASE_SECRET_KEYS`. `SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` still exist, but they carry the legacy keys, so reading them keeps you on the deprecated path. See [Environment Variables](/docs/guides/functions/secrets) for the full list.
-
-</Admonition>
+`SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` still exist in the runtime, but they carry the legacy keys, so reading them keeps you on the deprecated path. See [Environment Variables](/docs/guides/functions/secrets) for the full list of injected variables.
 
 If you are replacing legacy keys in an existing application rather than starting fresh, follow [Migrating to new API keys](/docs/guides/getting-started/migrating-to-new-api-keys).
 
