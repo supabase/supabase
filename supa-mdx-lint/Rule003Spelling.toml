@@ -248,6 +248,7 @@ allow_list = [
     "FastMCP",
     "Fiberplane",
     "Figma",
+    "FlowSpeech",
     "Firecrawl",
     "Firestore",
     "Fivetran",
