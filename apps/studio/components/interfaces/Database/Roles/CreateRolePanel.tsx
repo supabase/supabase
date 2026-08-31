@@ -49,6 +49,15 @@ const initialValues = {
   canBypassRls: false,
 }
 
+const ROLE_PERMISSION_ENTRIES = [
+  ['canLogin', ROLE_PERMISSIONS.canLogin],
+  ['canCreateRole', ROLE_PERMISSIONS.canCreateRole],
+  ['canCreateDb', ROLE_PERMISSIONS.canCreateDb],
+  ['canBypassRls', ROLE_PERMISSIONS.canBypassRls],
+  ['isSuperuser', ROLE_PERMISSIONS.isSuperuser],
+  ['isReplicationRole', ROLE_PERMISSIONS.isReplicationRole],
+] as const
+
 export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
   const formId = 'create-new-role'
 
@@ -83,8 +92,8 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
   return (
     <Sheet
       open={visible}
-      onOpenChange={(open) => {
-        if (!open) handleClose()
+      onOpenChange={(isOpen) => {
+        if (!isOpen) handleClose()
       }}
     >
       <SheetContent size="lg" className="flex flex-col gap-0">
@@ -109,10 +118,38 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
 
               <FormLayout layout="horizontal" label="Role privileges">
                 <div className="grid gap-4">
-                  {(Object.keys(ROLE_PERMISSIONS) as (keyof typeof ROLE_PERMISSIONS)[])
-                    .filter((permissionKey) => ROLE_PERMISSIONS[permissionKey].grant_by_dashboard)
-                    .map((permissionKey) => {
-                      const permission = ROLE_PERMISSIONS[permissionKey]
+                  {ROLE_PERMISSION_ENTRIES.filter(
+                    ([, permission]) => permission.grant_by_dashboard
+                  ).map(([permissionKey, permission]) => {
+                    const id = `role-${permissionKey}`
+
+                    return (
+                      <FormField
+                        key={permissionKey}
+                        control={form.control}
+                        name={permissionKey}
+                        render={({ field }) => (
+                          <FormItemLayout id={id} layout="flex" label={permission.description}>
+                            <FormControl>
+                              <Switch
+                                id={id}
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                          </FormItemLayout>
+                        )}
+                      />
+                    )
+                  })}
+
+                  <Separator />
+
+                  <div className="grid gap-4">
+                    <p className="text-sm">These privileges cannot be granted via the Dashboard:</p>
+                    {ROLE_PERMISSION_ENTRIES.filter(
+                      ([, permission]) => !permission.grant_by_dashboard
+                    ).map(([permissionKey, permission]) => {
                       const id = `role-${permissionKey}`
 
                       return (
@@ -121,12 +158,19 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
                           control={form.control}
                           name={permissionKey}
                           render={({ field }) => (
-                            <FormItemLayout id={id} layout="flex" label={permission.description}>
+                            <FormItemLayout
+                              id={id}
+                              layout="flex"
+                              label={permission.description}
+                              className="opacity-70"
+                            >
                               <FormControl>
                                 <Switch
                                   id={id}
                                   checked={field.value}
                                   onCheckedChange={field.onChange}
+                                  disabled
+                                  aria-readonly
                                 />
                               </FormControl>
                             </FormItemLayout>
@@ -134,45 +178,6 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
                         />
                       )
                     })}
-
-                  <Separator />
-
-                  <div className="grid gap-4">
-                    <p className="text-sm">These privileges cannot be granted via the Dashboard:</p>
-                    {(Object.keys(ROLE_PERMISSIONS) as (keyof typeof ROLE_PERMISSIONS)[])
-                      .filter(
-                        (permissionKey) => !ROLE_PERMISSIONS[permissionKey].grant_by_dashboard
-                      )
-                      .map((permissionKey) => {
-                        const permission = ROLE_PERMISSIONS[permissionKey]
-                        const id = `role-${permissionKey}`
-
-                        return (
-                          <FormField
-                            key={permissionKey}
-                            control={form.control}
-                            name={permissionKey}
-                            render={({ field }) => (
-                              <FormItemLayout
-                                id={id}
-                                layout="flex"
-                                label={permission.description}
-                                className="opacity-70"
-                              >
-                                <FormControl>
-                                  <Switch
-                                    id={id}
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                    disabled
-                                    aria-readonly
-                                  />
-                                </FormControl>
-                              </FormItemLayout>
-                            )}
-                          />
-                        )
-                      })}
                   </div>
                 </div>
               </FormLayout>
