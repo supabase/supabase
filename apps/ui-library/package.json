@@ -12,6 +12,7 @@
     "build:markdown": "tsx ./scripts/build-markdown.ts",
     "build:llms": "tsx ./scripts/build-llms-txt.ts",
     "test:markdown": "tsx --test scripts/library-mdx-to-markdown.test.ts",
+    "test:middleware": "pnpm run build:markdown && tsx --test middleware.test.ts",
     "build:app": "next build --turbopack",
     "start": "next start",
     "lint": "eslint .",

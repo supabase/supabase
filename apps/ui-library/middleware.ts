@@ -15,6 +15,13 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // Server Actions POST to the page URL with `Accept: text/x-component`, which
+  // matches none of the types this route negotiates and would 406. Let Next.js
+  // handle them.
+  if (request.headers.get('next-action')) {
+    return NextResponse.next()
+  }
+
   const isMdSuffix = pathname.endsWith('.md')
   const slug = pathname.replace(`${DOCS_PATH}/`, '').replace(/\.md$/, '')
   const decision = negotiateMarkdown(
