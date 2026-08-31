@@ -12,7 +12,9 @@ import {
   TooltipTrigger,
 } from 'ui'
 
+import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
+import { getBucketVersioningState } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
 import {
   VirtualizedTableCell,
@@ -26,12 +28,22 @@ import { createNavigationHandler } from '@/lib/navigation'
 
 type BucketTableMode = 'standard' | 'virtualized'
 
+export const useVersioningColumnSpan = () => (useIsStorageVersioningEnabled() ? 1 : 0)
+
+const BucketVersioningBadge = ({ bucket }: { bucket: Bucket }) => {
+  const versioningState = getBucketVersioningState(bucket)
+  if (versioningState === 'enabled') return <Badge variant="success">Enabled</Badge>
+  if (versioningState === 'suspended') return <Badge variant="warning">Suspended</Badge>
+  return <span className="text-foreground-muted">-</span>
+}
+
 type BucketTableHeaderProps = {
   mode: BucketTableMode
   hasBuckets?: boolean
 }
 
 export const BucketTableHeader = ({ mode, hasBuckets = true }: BucketTableHeaderProps) => {
+  const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
   const BucketTableHeader = mode === 'standard' ? TableHeader : VirtualizedTableHeader
   const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
   const BucketTableHead = mode === 'standard' ? TableHead : VirtualizedTableHead
@@ -50,6 +62,9 @@ export const BucketTableHeader = ({ mode, hasBuckets = true }: BucketTableHeader
         <BucketTableHead className={stickyClasses}>Policies</BucketTableHead>
         <BucketTableHead className={stickyClasses}>File size limit</BucketTableHead>
         <BucketTableHead className={stickyClasses}>Allowed MIME types</BucketTableHead>
+        {isStorageVersioningEnabled && (
+          <BucketTableHead className={stickyClasses}>Versioning</BucketTableHead>
+        )}
         <BucketTableHead className={stickyClasses}>
           <span className="sr-only">Actions</span>
         </BucketTableHead>
@@ -66,10 +81,11 @@ type BucketTableEmptyStateProps = {
 export const BucketTableEmptyState = ({ mode, filterString }: BucketTableEmptyStateProps) => {
   const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
   const BucketTableCell = mode === 'standard' ? TableCell : VirtualizedTableCell
+  const versioningColumnSpan = useVersioningColumnSpan()
 
   return (
     <BucketTableRow className="[&>td]:hover:bg-inherit">
-      <BucketTableCell colSpan={5}>
+      <BucketTableCell colSpan={5 + versioningColumnSpan}>
         <p className="text-sm text-foreground">No results found</p>
         <p className="text-sm text-foreground-lighter">
           Your search for “{filterString}” did not return any results
@@ -94,6 +110,7 @@ export const BucketTableRow = ({
 }: BucketTableRowProps) => {
   const router = useRouter()
   const { getPolicyCount } = useBucketPolicyCount()
+  const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
 
   const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
   const BucketTableCell = mode === 'standard' ? TableCell : VirtualizedTableCell
@@ -153,6 +170,12 @@ export const BucketTableRow = ({
           {bucket.allowed_mime_types ? bucket.allowed_mime_types.join(', ') : 'Any'}
         </p>
       </BucketTableCell>
+
+      {isStorageVersioningEnabled && (
+        <BucketTableCell>
+          <BucketVersioningBadge bucket={bucket} />
+        </BucketTableCell>
+      )}
 
       <BucketTableCell>
         <div className="flex justify-end items-center h-full">
