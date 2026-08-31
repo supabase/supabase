@@ -25,6 +25,7 @@ import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
 import MenuItem from './MenuItem'
 import { MobileMenu } from './MobileMenu'
+import styles from './Nav.module.css'
 import RightClickBrandLogo from './RightClickBrandLogo'
 import useDropdownMenu from './useDropdownMenu'
 
@@ -32,6 +33,20 @@ interface Props {
   hideNavbar: boolean
   stickyNavbar?: boolean
 }
+
+// Both constants read the --menu-* variables that Nav.module.css defines on
+// styles.desktopMenu. The `!` on animate-in/out beats the base
+// NavigationMenuContent's animate-fade-in, which tailwind-merge cannot dedupe
+// (neither class is in its `animate` group) — so the motion-reduce animate-none
+// overrides need `!` too, or they would lose to it.
+// fill-mode-forwards on the exit states: Radix unmounts the outgoing panel a
+// frame after animationend, and tw-animate's default fill-mode of none lets it
+// pop back to full opacity for that frame.
+const desktopMenuContentMotion =
+  'data-[motion^=from-]:animate-in! data-[motion^=to-]:animate-out! data-[motion^=from-]:fade-in data-[motion^=to-]:fade-out data-[motion=from-end]:slide-in-from-right-[48px]! data-[motion=from-start]:slide-in-from-left-[48px]! data-[motion=to-end]:slide-out-to-right-[48px]! data-[motion=to-start]:slide-out-to-left-[48px]! data-[motion^=from-]:duration-(--menu-motion-duration) data-[motion^=to-]:duration-(--menu-motion-duration) data-[motion^=from-]:ease-(--menu-ease-in-out-quad) data-[motion^=to-]:ease-(--menu-ease-in-out-quad) data-[motion^=from-]:will-change-[transform,opacity] data-[motion^=to-]:will-change-[transform,opacity] data-[motion^=to-]:fill-mode-forwards motion-reduce:data-[motion^=from-]:animate-none! motion-reduce:data-[motion^=to-]:animate-none!'
+
+const desktopMenuViewportMotion =
+  'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in data-[state=closed]:fade-out data-[state=open]:zoom-in-[98%]! data-[state=closed]:zoom-out-[98%]! data-[state=open]:slide-in-from-right-0! data-[state=open]:duration-(--menu-motion-duration) data-[state=closed]:duration-(--menu-motion-duration) data-[state=open]:ease-[ease] data-[state=closed]:fill-mode-forwards motion-reduce:data-[state=open]:animate-none motion-reduce:data-[state=closed]:animate-none'
 
 const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const pathname = usePathname()
@@ -113,8 +128,12 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                 </div>
                 <NavigationMenu
                   delayDuration={0}
-                  className="hidden pl-8 sm:space-x-4 lg:flex h-16"
-                  viewportClassName="rounded-xl bg-background"
+                  className={cn('hidden pl-8 sm:space-x-4 lg:flex h-16', styles.desktopMenu)}
+                  viewportClassName={cn(
+                    'rounded-xl bg-background xl:w-[1040px]!',
+                    styles.desktopMenuViewport,
+                    desktopMenuViewportMotion
+                  )}
                 >
                   <NavigationMenuList>
                     {menu.primaryNav.map((menuItem) =>
@@ -123,12 +142,16 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                           <NavigationMenuTrigger
                             className={cn(
                               buttonVariants({ variant: 'text', size: 'small' }),
-                              'bg-transparent! hover:text-brand-link data-open:text-brand-link! focus-ring focus-visible:text-foreground px-2 h-auto'
+                              'h-auto rounded-md bg-transparent! px-2 duration-100 ease-(--menu-ease-out-quad) hover:bg-transparent! hover:text-brand-link data-[state=open]:bg-transparent! data-[state=open]:text-brand-link! focus-ring focus-visible:text-foreground'
                             )}
                           >
                             {menuItem.title}
                           </NavigationMenuTrigger>
-                          <NavigationMenuContent>{menuItem.dropdown}</NavigationMenuContent>
+                          <NavigationMenuContent
+                            className={cn(desktopMenuContentMotion, styles.desktopMenuContent)}
+                          >
+                            {menuItem.dropdown}
+                          </NavigationMenuContent>
                         </NavigationMenuItem>
                       ) : (
                         <NavigationMenuItem className="text-sm font-medium" key={menuItem.title}>
