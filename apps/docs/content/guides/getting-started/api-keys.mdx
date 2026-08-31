@@ -113,7 +113,7 @@ Secret keys improve on the old JWT-based `service_role` key, and we recommend th
 
 This procedure covers both a leaked secret key and a leaked `service_role` key.
 
-Don't rush. Fix the root cause of the leak **first**, before you rotate anything. The [OWASP Risk Rating Methodology](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology) helps you judge the severity of the incident and plan your next steps.
+Don't rush. Fix the root cause of the leak before you rotate anything. The [OWASP Risk Rating Methodology](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology) helps you judge the severity of the incident and plan your next steps.
 
 1. Create a new secret key in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard.
 2. Replace the compromised key with the new one everywhere your application uses it. If the compromised key is a JWT-based `service_role` key, replace it with the new secret key.
