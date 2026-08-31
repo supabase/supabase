@@ -1532,6 +1532,18 @@ export interface DatabaseConnectionsBannerCtaButtonClickedEvent {
 }
 
 /**
+ * The Explorer feature preview banner was rendered in studio project pages, fired once per
+ * browser session. Acts as the denominator for the banner's dismiss and CTA rates.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ExplorerBannerExposedEvent {
+  action: 'explorer_banner_exposed'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the dismiss button on the Explorer feature preview banner in studio project pages.
  *
  * @group Events
@@ -3834,6 +3846,7 @@ export type TelemetryEvent =
   | DatabaseConnectionsBlockerViewClickedEvent
   | DatabaseConnectionsBannerDismissButtonClickedEvent
   | DatabaseConnectionsBannerCtaButtonClickedEvent
+  | ExplorerBannerExposedEvent
   | ExplorerBannerDismissButtonClickedEvent
   | ExplorerBannerCtaButtonClickedEvent
   | SessionTerminateButtonClickedEvent
