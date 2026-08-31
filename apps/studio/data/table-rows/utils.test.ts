@@ -24,8 +24,15 @@ describe('formatFilterValue', () => {
   })
 
   it('coerces in-range numerical values to a number', () => {
+    expect(formatFilterValue(table, makeFilter('count', '0'))).toBe(0)
     expect(formatFilterValue(table, makeFilter('count', '42'))).toBe(42)
     expect(formatFilterValue(table, makeFilter('id', '-42'))).toBe(-42)
+  })
+
+  it('does not coerce absent numerical filter values to zero', () => {
+    expect(formatFilterValue(table, makeFilter('count', ''))).toBe('')
+    expect(formatFilterValue(table, makeFilter('count', null))).toBeNull()
+    expect(formatFilterValue(table, makeFilter('count', undefined))).toBeUndefined()
   })
 
   it('returns the original string when the value is not a valid number', () => {
