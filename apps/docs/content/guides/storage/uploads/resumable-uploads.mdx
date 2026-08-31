@@ -281,15 +281,29 @@ Instead of `https://project-id.supabase.co` use `https://project-id.storage.supa
 
   </TabPanel>
   </$Show>
+
+<$Show if="sdk:csharp">
+
+  <TabPanel id="csharp" label="C#">
+
+    C# supports resumable uploads natively via `UploadOrResume`:
+
+    ```c#
+    await supabase.Storage.From("bucket_name")
+      .UploadOrResume("local_file_path", "file_path", new FileOptions { Upsert = true });
+    ```
+
+  </TabPanel>
+  </$Show>
 </Tabs>
 
-### Upload URL
+## Upload URL
 
 When uploading using the resumable upload endpoint, the storage server creates a unique URL for each upload, even for multiple uploads to the same path. All chunks will be uploaded to this URL using the `PATCH` method.
 
 This unique upload URL will be valid for **up to 24 hours**. If the upload is not completed within 24 hours, the URL will expire and you'll need to start the upload again. TUS client libraries typically create a new URL if the previous one expires.
 
-### Concurrency
+## Concurrency
 
 When two or more clients upload to the same upload URL only one of them will succeed. The other clients will receive a `409 Conflict` error. Only 1 client can upload to the same upload URL at a time which prevents data corruption.
 
@@ -297,7 +311,7 @@ When two or more clients upload a file to the same path using different upload U
 
 If you provide the `x-upsert` header the last client to complete the upload will succeed instead.
 
-### Uppy example
+## Uppy example
 
 You can check a [full example using Uppy](https://github.com/supabase/supabase/tree/master/examples/storage/resumable-upload-uppy).
 
@@ -308,7 +322,7 @@ Uppy has integrations with different frameworks:
 - [Vue](https://uppy.io/docs/vue/)
 - [Angular](https://uppy.io/docs/angular/)
 
-### Presigned uploads
+## Presigned uploads
 
 Resumable uploads also supports using signed upload tokens to created time-limited URLs that you can share to your users by invoking the `createSignedUploadUrl` method on the SDK and including the returned token in the `x-signature` header of the resumable upload.
 
@@ -344,6 +358,19 @@ response = supabase.storage.from_('bucket_name').create_signed_upload_url(
 
 # Use the signed URL token in resumable upload headers
 # Include response.token in the x-signature header
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+// Create a signed upload URL
+var signedUrl = await supabase.Storage.From("bucket_name").CreateUploadSignedUrl("file_path");
+
+// Use the signed URL token in resumable upload headers
+// Include signedUrl.Token in the x-signature header
 ```
 
 </TabPanel>

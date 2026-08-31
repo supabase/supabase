@@ -16,7 +16,7 @@ import {
 } from 'ui'
 import { DialogDescription, DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
 
-import { Admonition } from './../admonition'
+import { Admonition } from '../Admonition'
 
 export interface ConfirmationModalProps {
   loading?: boolean
@@ -27,8 +27,12 @@ export interface ConfirmationModalProps {
   confirmLabel?: string
   confirmLabelLoading?: string
   cancelLabel?: string
+  /** Overrides the first footer action label when `onAdditionalAction` is provided. */
+  additionalActionLabel?: string
   onConfirm: () => void
   onCancel: () => void
+  /** Overrides the first footer action while `onCancel` continues to handle dismissal. */
+  onAdditionalAction?: () => void
   disabled?: boolean
   variant?: React.ComponentProps<typeof Alert>['variant']
   alert?: {
@@ -51,8 +55,10 @@ export const ConfirmationModal = forwardRef<
       visible,
       onCancel,
       onConfirm,
+      onAdditionalAction,
       loading: loading_,
       cancelLabel = 'Cancel',
+      additionalActionLabel,
       confirmLabel = 'Submit',
       confirmLabelLoading,
       alert = undefined,
@@ -75,6 +81,10 @@ export const ConfirmationModal = forwardRef<
       if (loading_ === undefined) setLoading(true)
     }
 
+    const preventDismissWhileLoading = (event: Event) => {
+      if (loading) event.preventDefault()
+    }
+
     useEffect(() => {
       if (visible && loading_ === undefined) {
         setLoading(false)
@@ -92,10 +102,8 @@ export const ConfirmationModal = forwardRef<
       <Dialog
         open={visible}
         {...props}
-        onOpenChange={() => {
-          if (visible) {
-            onCancel()
-          }
+        onOpenChange={(open) => {
+          if (!open && visible && !loading) onCancel()
         }}
       >
         <DialogContent
@@ -103,6 +111,8 @@ export const ConfirmationModal = forwardRef<
           ref={ref}
           className="p-0 gap-0 pb-5 block!"
           size={size}
+          onPointerDownOutside={preventDismissWhileLoading}
+          onEscapeKeyDown={preventDismissWhileLoading}
         >
           <DialogHeader className={cn('border-b')} padding={'small'}>
             <DialogTitle>{title}</DialogTitle>
@@ -131,9 +141,9 @@ export const ConfirmationModal = forwardRef<
               block
               variant="default"
               disabled={loading}
-              onClick={() => onCancel()}
+              onClick={() => (onAdditionalAction ?? onCancel)()}
             >
-              {cancelLabel}
+              {additionalActionLabel ?? cancelLabel}
             </Button>
 
             <Button

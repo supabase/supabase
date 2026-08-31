@@ -1,18 +1,32 @@
 import type { Page } from '@playwright/test'
 
-const ARTICLE_SELECTOR = '#sb-docs-guide-main-article'
+export const GUIDE_ARTICLE_SELECTOR = '[data-testid="sb-docs-guide-main-article"]'
+export const TROUBLESHOOTING_ARTICLE_SELECTOR =
+  '[data-testid="sb-docs-troubleshooting-main-article"]'
 const DOCS_PATH_PREFIX = '/docs'
+const TROUBLESHOOTING_PATH_PREFIX = '/docs/guides/troubleshooting/'
 
-/**
- * Collect unique docs-owned links from the main guide article.
- *
- * Cross-app paths such as `/ui` and `/dashboard` are excluded because the
- * docs preview does not own those routes.
- */
-export async function collectDocsOwnedLinks(page: Page, baseURL: string): Promise<string[]> {
+export function articleSelectorForPagePath(pagePath: string): string {
+  const pathname = pagePath.startsWith('http') ? new URL(pagePath).pathname : pagePath
+
+  if (
+    pathname === TROUBLESHOOTING_PATH_PREFIX.slice(0, -1) ||
+    pathname.startsWith(TROUBLESHOOTING_PATH_PREFIX)
+  ) {
+    return TROUBLESHOOTING_ARTICLE_SELECTOR
+  }
+
+  return GUIDE_ARTICLE_SELECTOR
+}
+
+export async function collectDocsOwnedLinks(
+  page: Page,
+  baseURL: string,
+  articleSelector: string = GUIDE_ARTICLE_SELECTOR
+): Promise<string[]> {
   const origin = new URL(baseURL).origin
   const hrefs = await page
-    .locator(`${ARTICLE_SELECTOR} a[href]`)
+    .locator(`${articleSelector} a[href]`)
     .evaluateAll((anchors) =>
       anchors.map((anchor) => (anchor as HTMLAnchorElement).getAttribute('href') ?? '')
     )
@@ -39,4 +53,10 @@ export async function collectDocsOwnedLinks(page: Page, baseURL: string): Promis
   }
 
   return [...links].sort()
+}
+
+// Vercel bot protection blocks the HeadlessChrome UA on some routes; strip it.
+export async function browserLikeUserAgent(page: Page): Promise<string> {
+  const userAgent = await page.evaluate(() => navigator.userAgent)
+  return userAgent.replace('HeadlessChrome', 'Chrome')
 }

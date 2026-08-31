@@ -13,6 +13,7 @@ import {
   getTablesPaginatedSql,
   getViewDefinitionSql,
 } from '../../../src'
+import columnPrivileges from '../../../src/pg-meta-column-privileges'
 import tablePrivileges from '../../../src/pg-meta-table-privileges'
 import * as tables from '../../../src/pg-meta-tables'
 import * as types from '../../../src/pg-meta-types'
@@ -372,6 +373,62 @@ test('tablePrivileges.retrieve: scoped plan stays scoped for a single relation',
     tablePrivileges.retrieve({ name: 't_1000', schema: 'stress', scoped: true }).sql
   )
   assertPlanWithinBudget(result, TABLE_PRIVILEGES_BUDGET)
+}, 60_000)
+
+// ── columnPrivileges.list (sql/column-privileges.ts) — per-table ─────────────
+// The Studio hot path: the column-level privileges page renders exactly one
+// table, so the query is scoped to schema+relname. Scoped prunes pg_class in the
+// `rel` CTE before the aclexplode laterals / UNION / GROUP BY, so pg_class is
+// reached via its (relname, relnamespace) index and pg_attribute via
+// pg_attribute_relid_attnum_index.
+//
+// Only pg_authid is seq-scanned, once: the `roles` CTE is referenced by both the
+// grantor join and the `grantees` UNION, so it materializes and pg_has_role() is
+// evaluated once per role instead of twice per privilege row. (Table privileges
+// needs two scans here because it joins the pg_roles view twice.)
+const COLUMN_PRIVILEGES_TABLE_SCOPED_BUDGET = {
+  allowedSeqScans: {
+    pg_authid: {
+      max: 1,
+      reason:
+        'the `roles` CTE materializes once and feeds both the grantor join and the grantee-with-PUBLIC union; pg_authid scales with role count, not schema size',
+    },
+  },
+}
+
+test('columnPrivileges.list: scoped plan stays scoped for a single table', async () => {
+  const result = await explainAnalyze(
+    db,
+    columnPrivileges.list({
+      includedSchemas: ['stress'],
+      relationName: 't_1000',
+      scoped: true,
+    }).sql
+  )
+  assertPlanWithinBudget(result, COLUMN_PRIVILEGES_TABLE_SCOPED_BUDGET)
+}, 60_000)
+
+// ── columnPrivileges.list (sql/column-privileges.ts) — per-schema listing ────
+// Studio always passes a relation (above); a schema-wide call is still supported
+// for pg-meta consumers. Here one filtered pg_class seq scan is the right plan
+// rather than a regression: the whole `stress` schema is most of the catalog.
+const COLUMN_PRIVILEGES_SCHEMA_SCOPED_BUDGET = {
+  allowedSeqScans: {
+    ...COLUMN_PRIVILEGES_TABLE_SCOPED_BUDGET.allowedSeqScans,
+    pg_class: {
+      max: 1,
+      reason:
+        'schema-wide listing selects nearly every relation in the schema, so one filtered pg_class scan beats per-relation index lookups; pg_attribute stays index-driven',
+    },
+  },
+}
+
+test('columnPrivileges.list: scoped plan stays scoped for a schema', async () => {
+  const result = await explainAnalyze(
+    db,
+    columnPrivileges.list({ includedSchemas: ['stress'], scoped: true }).sql
+  )
+  assertPlanWithinBudget(result, COLUMN_PRIVILEGES_SCHEMA_SCOPED_BUDGET)
 }, 60_000)
 
 // ── tables.retrieve (pg-meta-tables.ts / sql/tables.ts) — single table ───────

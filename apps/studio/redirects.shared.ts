@@ -115,6 +115,16 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
     permanent: true,
   },
   {
+    source: '/project/:ref/settings/compute-and-disk',
+    destination: '/project/:ref/settings/infrastructure',
+    permanent: true,
+  },
+  {
+    source: '/project/:ref/database/replication/replica/:replicaId',
+    destination: '/project/:ref/settings/infrastructure/replica/:replicaId',
+    permanent: true,
+  },
+  {
     source: '/project/:ref/settings/billing/subscription',
     has: [{ type: 'query', key: 'panel', value: 'pitr' }],
     destination: '/project/:ref/settings/addons?panel=pitr',
@@ -123,7 +133,7 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
   {
     source: '/project/:ref/settings/billing/subscription',
     has: [{ type: 'query', key: 'panel', value: 'computeInstance' }],
-    destination: '/project/:ref/settings/compute-and-disk',
+    destination: '/project/:ref/settings/infrastructure#cpu',
     permanent: true,
   },
   {

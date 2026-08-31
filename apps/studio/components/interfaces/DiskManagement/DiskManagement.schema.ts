@@ -57,11 +57,10 @@ export const CreateDiskStorageSchema = ({
   cloudProvider: CloudProvider
   isSpendCapEnabled: boolean
 }) => {
-  const isFlyProject = cloudProvider === 'FLY'
   const isAwsNimbusProject = cloudProvider === 'AWS_NIMBUS'
   const isAwsK8sProject = cloudProvider === 'AWS_K8S'
 
-  const validateDiskConfiguration = !isFlyProject && !isAwsNimbusProject && !isAwsK8sProject
+  const validateDiskConfiguration = !isAwsNimbusProject && !isAwsK8sProject
 
   const schema = baseSchema.superRefine((data, ctx) => {
     const { storageType, totalSize, provisionedIOPS, throughput, maxSizeGb, computeSize } = data

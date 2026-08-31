@@ -1,10 +1,13 @@
 import { screen } from '@testing-library/react'
+import { mockIntersectionObserver } from 'jsdom-testing-mocks'
 import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { BillingCustomerData } from './BillingCustomerData'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { createMockOrganization, render } from '@/tests/helpers'
+
+mockIntersectionObserver()
 
 const mockSelectedOrganization = vi.hoisted(() => vi.fn())
 

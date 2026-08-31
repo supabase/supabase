@@ -43,7 +43,7 @@ export async function getProjectDetail(
    * To prevent odd side effects like pg-meta queries failing or the likes, we wake up the project proactively and wait for it
    * to be back online before returning the project details.
    */
-  if (data?.is_hibernating && !skipWake) {
+  if (data?.status === 'ACTIVE_HEALTHY' && data?.is_hibernating && !skipWake) {
     // In case project was scaled down, explicitly wake it up before continuing to return the project details
     const { error: errorWaking, data: wakeResponse } = await post('/platform/projects/{ref}/wake', {
       params: { path: { ref } },
@@ -123,7 +123,6 @@ export const useProjectDetailQuery = <TData = ProjectDetailData>(
 
 export function prefetchProjectDetail(client: QueryClient, { ref }: ProjectDetailVariables) {
   return client.fetchQuery({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: projectKeys.detail(ref),
     queryFn: ({ client, signal }) =>
       getProjectDetail({ ref, skipWake: true }, signal, undefined, client),

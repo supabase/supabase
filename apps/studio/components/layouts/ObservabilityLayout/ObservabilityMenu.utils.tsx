@@ -2,6 +2,7 @@ import { useFlag, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 
+import { useIsDatabaseConnectionsEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useSupamonitorStatus } from '@/components/interfaces/QueryPerformance/hooks/useSupamonitorStatus'
 import { useContentQuery, type Content, type ContentBase } from '@/data/content/content-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -45,10 +46,10 @@ const usePreservedQueryParams = () => {
 export const useGenerateObservabilityMenu = () => {
   const { ref } = useParams()
   const preservedQueryParams = usePreservedQueryParams()
+  const { isSupamonitorEnabled } = useSupamonitorStatus()
 
   const showOverview = useFlag('observabilityOverview')
-  const topForPostgres = useFlag('topForPostgres')
-  const { isSupamonitorEnabled } = useSupamonitorStatus()
+  const { enabled: isDatabaseConnectionsEnabled } = useIsDatabaseConnectionsEnabled()
   const storageSupported = useIsFeatureEnabled('project_storage:all')
 
   const baseUrl = `/project/${ref}/observability`
@@ -91,7 +92,7 @@ export const useGenerateObservabilityMenu = () => {
           },
         ]
       : []),
-    ...(topForPostgres
+    ...(isDatabaseConnectionsEnabled
       ? [
           {
             name: 'Database Connections',

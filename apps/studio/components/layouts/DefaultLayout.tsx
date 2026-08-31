@@ -1,7 +1,8 @@
-import { useBreakpoint, useParams } from 'common'
+import { useBreakpoint, useFlag, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { ResizablePanel, ResizablePanelGroup, SidebarProvider, usePanelRef } from 'ui'
+import { SkipToContent } from 'ui-patterns/SkipToContent'
 
 import { BannerStack } from '../ui/BannerStack/BannerStack'
 import { LayoutHeader } from './Navigation/LayoutHeader/LayoutHeader'
@@ -15,6 +16,7 @@ import {
 } from './ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 import { AppBannerWrapper } from '@/components/interfaces/App/AppBannerWrapper'
+import { GitHubConfigDriftBanner } from '@/components/interfaces/App/GitHubConfigDriftBanner'
 import { Sidebar } from '@/components/interfaces/Sidebar'
 import { useSyncScopedIntrospection } from '@/data/scoped-introspection'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
@@ -53,6 +55,7 @@ export const DefaultLayout = ({
   const appSnap = useAppStateSnapshot()
   const { isMaximised, activeSidebar } = useSidebarManagerSnapshot()
   const { lastVisitedOrganization } = useLastVisitedOrganization()
+  const showConfigDrift = useFlag('ConfigDrift') && IS_PLATFORM
 
   const [isMounted, setIsMounted] = useState(false)
 
@@ -94,9 +97,7 @@ export const DefaultLayout = ({
         <ProjectContextProvider projectRef={ref}>
           <MobileSheetProvider>
             <div className="flex flex-col h-screen w-screen">
-              <a className="sr-only" href="#main" tabIndex={0}>
-                Skip to content
-              </a>
+              <SkipToContent href="#main" />
               {/* Top Banner */}
               <AppBannerWrapper />
               <div className="shrink-0">
@@ -107,6 +108,7 @@ export const DefaultLayout = ({
                   />
                 )}
                 <LayoutHeader headerTitle={headerTitle} backToDashboardURL={backToDashboardURL} />
+                {showConfigDrift && ref && <GitHubConfigDriftBanner />}
               </div>
               {/* Main Content Area */}
               <div className="flex flex-1 w-full overflow-y-hidden">
@@ -127,7 +129,7 @@ export const DefaultLayout = ({
                     maxSize={`${contentMaxSizePercentage}`}
                     defaultSize={`${contentMaxSizePercentage}`}
                   >
-                    <main id="main" className="h-full overflow-y-auto">
+                    <main id="main" tabIndex={-1} className="h-full overflow-y-auto outline-hidden">
                       {children}
                     </main>
                   </ResizablePanel>

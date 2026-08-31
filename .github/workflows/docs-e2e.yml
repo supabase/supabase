@@ -1,22 +1,25 @@
 name: Docs E2E Tests
 
+# "Docs E2E" is a required status check on master, so this workflow must
+# produce a check run on every PR — a `paths` trigger filter would leave
+# non-docs PRs waiting on a check that never reports. Path scoping happens
+# in the "Detect changed paths" step instead; when nothing docs-related
+# changed, the remaining steps are skipped and the check reports green.
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]
     branches: ['master']
-    paths:
-      - 'apps/docs/content/guides/getting-started/quickstarts/nextjs.mdx'
-      - 'apps/docs/content/_partials/quickstart_db_setup.mdx'
-      - 'apps/docs/content/_partials/api_settings.mdx'
-      - 'e2e/docs/**'
-      - 'pnpm-lock.yaml'
-      - '.github/workflows/docs-e2e.yml'
   workflow_dispatch:
     inputs:
       base_url:
         description: 'Base URL to test against'
         required: false
         default: 'https://supabase.com'
+        type: string
+      page_paths:
+        description: 'Comma-separated /docs/... paths to test (required for manual runs)'
+        required: false
+        default: ''
         type: string
 
 concurrency:
@@ -39,87 +42,185 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
 
     steps:
+      # Runs before checkout — reads the PR file list from the API. `docs`
+      # mirrors the path scope this workflow used to have as a trigger filter;
+      # `docs_app` decides whether a Vercel docs preview exists to test against.
+      - name: Detect changed paths
+        id: changes
+        if: github.event_name == 'pull_request'
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        with:
+          filters: |
+            docs:
+              - 'apps/docs/content/guides/**/*.mdx'
+              - 'apps/docs/content/troubleshooting/**/*.mdx'
+              - 'apps/docs/content/_partials/**'
+              - 'e2e/docs/**'
+              - 'e2e/shared/**'
+              - 'pnpm-lock.yaml'
+              - '.github/workflows/docs-e2e.yml'
+            docs_app:
+              - 'apps/docs/**'
+
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        if: github.event_name == 'workflow_dispatch' || steps.changes.outputs.docs == 'true'
         with:
           persist-credentials: false
+          # Need full history on PRs so we can diff against the base branch.
+          # Use string '0' — numeric 0 is falsy in GitHub Actions expressions.
+          fetch-depth: ${{ github.event_name == 'pull_request' && '0' || '1' }}
           sparse-checkout: |
             e2e/docs
+            e2e/shared
             scripts
             patches
+            apps/docs/content/guides
+            apps/docs/content/troubleshooting
+            apps/docs/content/_partials
+            apps/docs/scripts/federated-content/sources
+
+      - name: Use Node.js
+        if: github.event_name == 'workflow_dispatch' || steps.changes.outputs.docs == 'true'
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+
+      # Map changed owned content (guides, troubleshooting, partials) to page
+      # URLs. Harness-only PRs resolve to skip=true and exit before Playwright.
+      - name: Resolve docs E2E scope
+        id: scope
+        if: github.event_name == 'workflow_dispatch' || steps.changes.outputs.docs == 'true'
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          PAGE_PATHS_INPUT: ${{ inputs.page_paths }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            if [ -z "$PAGE_PATHS_INPUT" ]; then
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+              echo "paths=" >> "$GITHUB_OUTPUT"
+              echo "Manual run requires the page_paths input."
+              exit 0
+            fi
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            printf 'paths=%s\n' "$PAGE_PATHS_INPUT" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          git diff --name-only --diff-filter=ACMR "origin/$BASE_REF"...HEAD \
+            | node --experimental-strip-types e2e/docs/scripts/resolve-docs-scope.ts
+
+      - name: Skip Playwright (no in-scope pages)
+        if: steps.scope.outputs.skip == 'true'
+        run: echo "No in-scope docs pages changed; skipping Playwright suite."
 
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        if: steps.scope.outputs.skip == 'false'
         name: Install pnpm
         with:
           run_install: false
 
-      - name: Use Node.js
+      - name: Enable pnpm store cache
+        if: steps.scope.outputs.skip == 'false'
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
 
       # Vercel skips the docs preview when a PR only changes the harness
-      # (e2e/docs, workflow). Wait for a preview only when apps/docs changed.
-      - name: Detect docs app changes
-        if: github.event_name == 'pull_request'
-        id: filter
-        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
-        with:
-          filters: |
-            docs_app:
-              - 'apps/docs/**'
-
+      # (e2e/docs, workflow), so wait for a preview only when apps/docs changed.
+      #
       # Vercel's GitHub App stopped writing GitHub Deployment objects on
       # 2026-02-17 (broken app auth), so vercel/wait-for-deployment-action
       # times out polling that API even though the preview builds fine.
       # Poll the "Vercel – docs" commit status instead — Vercel keeps posting
       # those — then resolve the deployment it points to via Vercel's own API
-      # to get the actual preview URL. See scripts/waitForVercelDocsPreview.js.
+      # to get the actual preview URL. See scripts/waitForVercelPreview.js.
+      # A Vercel failure or timeout is not the author's problem, and the required
+      # "Vercel – docs" check already reports it. Resolve no URL and skip below.
       - name: Wait for Vercel docs preview
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && steps.filter.outputs.docs_app == 'true'
+        if: steps.scope.outputs.skip == 'false' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && steps.changes.outputs.docs_app == 'true'
         id: deployment
-        run: node scripts/waitForVercelDocsPreview.js
+        continue-on-error: true
+        run: node scripts/waitForVercelPreview.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          VERCEL_STATUS_CONTEXT: 'Vercel – docs'
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
 
       - name: Resolve base URL
+        if: steps.scope.outputs.skip == 'false'
         id: base-url
         env:
           EVENT_NAME: ${{ github.event_name }}
           BASE_URL_INPUT: ${{ inputs.base_url }}
           DEPLOYMENT_URL: ${{ steps.deployment.outputs.deployment-url }}
-          DOCS_APP_CHANGED: ${{ steps.filter.outputs.docs_app }}
+          PAGE_PATHS: ${{ steps.scope.outputs.paths }}
         run: |
+          set -euo pipefail
+
           if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
             printf 'url=%s\n' "$BASE_URL_INPUT" >> "$GITHUB_OUTPUT"
-            echo "use_bypass=false" >> "$GITHUB_OUTPUT"
-          elif [ "$DOCS_APP_CHANGED" = "true" ] && [ -n "$DEPLOYMENT_URL" ]; then
-            printf 'url=%s\n' "$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
-            echo "use_bypass=true" >> "$GITHUB_OUTPUT"
-          else
-            # Harness-only PRs have no docs preview; test against production.
-            echo "url=https://supabase.com" >> "$GITHUB_OUTPUT"
-            echo "use_bypass=false" >> "$GITHUB_OUTPUT"
+            # Non-production targets are previews, which may need the bypass.
+            if [ "$BASE_URL_INPUT" = "https://supabase.com" ]; then
+              echo "use_bypass=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "use_bypass=true" >> "$GITHUB_OUTPUT"
+            fi
+            echo "should_test=true" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
+          if [ -n "$DEPLOYMENT_URL" ]; then
+            printf 'url=%s\n' "$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
+            echo "use_bypass=true" >> "$GITHUB_OUTPUT"
+            echo "should_test=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Production is not a substitute: it lacks pages this pull request
+          # adds, so testing it fails a required check for a valid change.
+          echo "url=" >> "$GITHUB_OUTPUT"
+          echo "use_bypass=false" >> "$GITHUB_OUTPUT"
+          echo "should_test=false" >> "$GITHUB_OUTPUT"
+          echo "::warning::No Vercel docs preview URL for this pull request, so there is nothing serving its content to test. Skipping Playwright rather than testing production, which does not have pages this pull request adds."
+          {
+            echo "### Docs E2E skipped: no preview to test against"
+            echo
+            echo "Nothing is serving this pull request's content, and production is not a"
+            echo "substitute — pages it adds do not exist there yet."
+            echo
+            echo "Fork pull requests reach this path because they run without repository"
+            echo "secrets. A maintainer can run the suite against the preview manually:"
+            echo
+            echo '```'
+            echo "gh workflow run docs-e2e.yml \\"
+            echo "  -f base_url=<preview-url> \\"
+            echo "  -f page_paths=$PAGE_PATHS"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Install dependencies
+        if: steps.base-url.outputs.should_test == 'true'
         run: pnpm install --frozen-lockfile --filter=e2e-docs...
 
       - name: Install Playwright Chromium
+        if: steps.base-url.outputs.should_test == 'true'
         run: pnpm -C e2e/docs exec playwright install chromium --with-deps --only-shell
 
       - name: Run docs E2E
+        if: steps.base-url.outputs.should_test == 'true'
         working-directory: e2e/docs
         run: pnpm run e2e:docs
         env:
           PLAYWRIGHT_BASE_URL: ${{ steps.base-url.outputs.url }}
+          DOCS_E2E_PAGE_PATHS: ${{ steps.scope.outputs.paths }}
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ steps.base-url.outputs.use_bypass == 'true' && secrets.VERCEL_AUTOMATION_BYPASS_DOCS || '' }}
 
       - name: Upload Playwright report
-        if: failure()
+        if: failure() && steps.scope.outputs.skip == 'false'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: docs-playwright-report

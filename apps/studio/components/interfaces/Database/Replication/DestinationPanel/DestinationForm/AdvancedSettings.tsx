@@ -28,6 +28,11 @@ import {
 } from './DestinationForm.constants'
 import { type DestinationPanelSchemaType } from './DestinationForm.schema'
 
+const INVALIDATED_SLOT_BEHAVIOR_LABELS = {
+  error: 'Block startup',
+  recreate: 'Recreate slot',
+}
+
 export const AdvancedSettings = ({
   type,
   form,
@@ -118,9 +123,9 @@ export const AdvancedSettings = ({
               name="maxCopyConnectionsPerTable"
               render={({ field }) => (
                 <FormItemLayout
-                  label="Copy connections per table"
+                  label="Initial sync connections per table"
                   layout="horizontal"
-                  description="Maximum number of connections used to sync each table."
+                  description="Maximum number of source connections used to sync existing rows for each table."
                 >
                   <FormControl>
                     <InputGroup>
@@ -153,16 +158,18 @@ export const AdvancedSettings = ({
                 >
                   <FormControl>
                     <Select value={field.value ?? 'error'} onValueChange={field.onChange}>
-                      <SelectTrigger className="capitalize">{field.value ?? 'error'}</SelectTrigger>
+                      <SelectTrigger>
+                        {INVALIDATED_SLOT_BEHAVIOR_LABELS[field.value ?? 'error']}
+                      </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="error" className="[&>span]:top-2.5">
-                          <p>Error</p>
+                          <p>Block startup</p>
                           <p className="text-foreground-lighter">
                             Blocks startup for manual recovery.
                           </p>
                         </SelectItem>
                         <SelectItem value="recreate" className="[&>span]:top-2.5">
-                          <p>Recreate</p>
+                          <p>Recreate slot</p>
                           <p className="text-foreground-lighter">
                             Replaces destination tables and runs a new, billable initial sync.
                           </p>
@@ -222,7 +229,7 @@ export const AdvancedSettings = ({
                         </div>
                       }
                       layout="horizontal"
-                      description="How old query results can be while BigQuery applies ongoing changes."
+                      description="Set the maximum age of query results while BigQuery applies ongoing changes, or leave blank for the freshest results."
                     >
                       <FormControl>
                         <InputGroup>
@@ -233,7 +240,6 @@ export const AdvancedSettings = ({
                             step={1}
                             value={field.value ?? ''}
                             onChange={handleNumberChange(field)}
-                            placeholder="Default: None (Freshest results)"
                           />
                           <InputGroupAddon align="inline-end">
                             <InputGroupText>minutes</InputGroupText>

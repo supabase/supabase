@@ -51,6 +51,41 @@
  */
 export type SafeLogSqlFragment = string & { readonly __safeLogSqlFragmentBrand: never }
 
+/**
+ * User-authored logs SQL that has NOT yet been promoted to a runnable
+ * `SafeLogSqlFragment`. Mirrors pg-meta's `UntrustedSqlFragment`, but is an
+ * intentionally distinct brand so that Postgres SQL and logs SQL can never
+ * cross paths: neither can be promoted through the other's boundary, and
+ * neither can be composed into the other's queries.
+ *
+ * Safe to display and to store as the editor's working text; must never be
+ * executed without an explicit user run gesture. Promote via
+ * `acceptUntrustedLogsSql` — only inside a user-action event handler.
+ */
+export type UntrustedLogSqlFragment = string & { readonly __untrustedLogSqlBrand: never }
+
+/**
+ * Marks a raw string as user-authored logs SQL awaiting an explicit run
+ * gesture. Use at the editor boundary where the user's logs SQL text enters
+ * the type system; the value stays untrusted until `acceptUntrustedLogsSql`
+ * promotes it.
+ */
+export function untrustedLogSql(sql: string): UntrustedLogSqlFragment {
+  return sql as UntrustedLogSqlFragment
+}
+
+/**
+ * SECURITY BOUNDARY — promotes user-authored logs SQL to a runnable
+ * `SafeLogSqlFragment`.
+ *
+ * ONLY call from an event handler tied to a deliberate user action (Run button
+ * onClick, Cmd+Enter keydown). Never call from render, useEffect, or any path
+ * that runs without a user gesture.
+ */
+export function acceptUntrustedLogsSql(sql: UntrustedLogSqlFragment): SafeLogSqlFragment {
+  return sql as unknown as SafeLogSqlFragment
+}
+
 type LogSqlFragmentSeparator =
   | ','
   | ', '

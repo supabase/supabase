@@ -6,17 +6,18 @@ Next.js pages router + TanStack Start (mid-migration, see below), React 19. Dev 
 
 Load the skills matching the task; stack them when a task spans areas:
 
-| Task                                                   | Additional skills                                                                                 |
-| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
-| Query/mutation hooks, query keys (`data/**`)           | `studio-queries`                                                                                  |
-| UI: pages, forms, tables, charts, sheets, empty states | `studio-ui-patterns`                                                                              |
-| Displaying API errors                                  | `studio-error-handling`                                                                           |
-| Tests (deciding, writing, reviewing)                   | `studio-testing`, then `studio-mock-api-tests` (component/MSW) or `studio-e2e-tests` (Playwright) |
-| PostHog event tracking                                 | `telemetry-standards`                                                                             |
-| SQL against user databases                             | `safe-sql-execution`                                                                              |
-| Logs Explorer SQL, `data/logs`                         | `clickhouse-logs-queries`                                                                         |
-| Component API design, boolean-prop refactors           | `vercel-composition-patterns`                                                                     |
-| User-facing copy                                       | `copywriting`                                                                                     |
+| Task                                                                      | Additional skills                                                                                 |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Query/mutation hooks, query keys (`data/**`)                              | `studio-queries`                                                                                  |
+| UI: pages, forms, tables, charts, sheets, empty states                    | `studio-ui-patterns`                                                                              |
+| Form logic: react-hook-form fields, watch/formState, reset, number inputs | `react-hook-form`                                                                                 |
+| Displaying API errors                                                     | `studio-error-handling`                                                                           |
+| Tests (deciding, writing, reviewing)                                      | `studio-testing`, then `studio-mock-api-tests` (component/MSW) or `studio-e2e-tests` (Playwright) |
+| PostHog event tracking                                                    | `telemetry-standards`                                                                             |
+| SQL against user databases                                                | `safe-sql-execution`                                                                              |
+| Logs Explorer SQL, `data/logs`                                            | `clickhouse-logs-queries`                                                                         |
+| Component API design, boolean-prop refactors                              | `vercel-composition-patterns`                                                                     |
+| User-facing copy                                                          | `copywriting`                                                                                     |
 
 ## TanStack Start migration
 
@@ -69,10 +70,12 @@ Older Studio code predates some of these conventions. For new or modified code, 
 - **Memoization is not the default**: `useMemo`/`useCallback` only for measured expense or referential stability a memoized child depends on.
 - **TypeScript**: avoid `as` casts — where external data enters, parse it with zod (`schema.parse`/`safeParse`) instead. Model multi-state values as discriminated unions (`{ status: 'success'; data: T } | { status: 'error'; error: Error }`) rather than independent boolean flags.
 - **Naming**: prop callbacks are `onX`, internal handlers are `handleX`. Custom hooks return objects, not tuples.
+- **Refactoring**: when you move or extract code into a new module, update every importer to point at the new location directly — do **not** leave a re-export shim in the old file "for backward compatibility." It's a one-line import change per consumer, and keeping shims around makes the codebase messy and the true source of a symbol ambiguous.
 
 ## Defaults that differ here
 
 - **ESLint warnings are ratcheted in CI**: the per-rule occurrence count must not increase, so a new `any`, unresolved `exhaustive-deps` warning, or default export fails the build even though it's "only a warning". Check locally with `pnpm --filter studio run lint:ratchet`.
+- **Dead files and deps are gated in CI** by knip (`pnpm knip --workspace apps/studio` locally). Framework-convention files nothing imports (routes, Vercel functions, TanStack Start files) belong in `knip.jsonc` under `workspaces["apps/studio"].entry`, not `ignore` — an ignored file's imports aren't traced, so anything only it uses gets reported as dead. There's no inline `knip-ignore` comment; the only per-file opt-out is config. In a PR stack, a file whose first consumer lands in a later PR fails the gate on the earlier one — either add it in the same PR as its first use, or add it to `workspaces["apps/studio"].ignore` with a `used from #NNN` comment and remove it in that PR.
 - **Clipboard**: `copyToClipboard` from `'ui'`, and never `await` anything before calling it (Safari requires the write inside the user gesture; lint-enforced) — pass a Promise as the argument instead.
 - **`useParams()` comes from `'common'`**, not `next/navigation` — it camelCases keys and returns `string | undefined`.
 - **Permissions**: `useAsyncCheckPermissions` from `hooks/misc/useCheckPermissions` (returns `can: true` when self-hosted).
