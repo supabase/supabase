@@ -1,12 +1,26 @@
 ## Development
 
-When starting the dev server, use background mode:
+When starting the dev server, run:
 
 ```
-astro dev --background
+# From the root directory of the project
+pnpm dev:kb
+
+# From the apps/kb directory
+pnpm dev
 ```
 
-Manage the background server with `astro dev stop`, `astro dev status`, and `astro dev logs`.
+## Build
+
+To run a full production build, run:
+
+```
+# From the root directory of the project
+pnpm build:kb
+
+# From the apps/kb directory
+pnpm build
+```
 
 ## Documentation
 
