@@ -2,23 +2,22 @@ import type { PostHogConfig } from 'posthog-js'
 
 export type EmbeddedAgentBrowser = 'claude_desktop' | 'chatgpt_desktop'
 
-const CLAUDE_DESKTOP_UA = /(^| )Claude\/\d/
-const CHATGPT_DESKTOP_UA = /(^| )ChatGPT\/\d/
+const CLAUDE_UA = /(^| )Claude\/\d/
+const CHATGPT_UA = /(^| )ChatGPT\/\d/
+const MOBILE_UA = /Mobile|Android|iPhone|iPad/
 
-// Newer Claude Desktop builds omit the Electron/ token, so Claude matches on its product
-// token alone. ChatGPT's token also appears in mobile in-app WebViews, so it stays Electron-gated.
+// Agent product tokens also appear in mobile in-app WebView UAs, which are human browsing,
+// so mobile UAs are excluded. Vendor Electron/ tokens come and go across releases, so
+// desktop detection never gates on them.
 export function detectEmbeddedAgentBrowser(userAgent: string): EmbeddedAgentBrowser | undefined {
-  if (CLAUDE_DESKTOP_UA.test(userAgent)) return 'claude_desktop'
-  if (CHATGPT_DESKTOP_UA.test(userAgent) && userAgent.includes('Electron/')) {
-    return 'chatgpt_desktop'
-  }
+  if (MOBILE_UA.test(userAgent)) return undefined
+  if (CLAUDE_UA.test(userAgent)) return 'claude_desktop'
+  if (CHATGPT_UA.test(userAgent)) return 'chatgpt_desktop'
   return undefined
 }
 
-export function buildEmbeddedAgentBrowserConfig(
-  userAgent: string | undefined
-): Partial<PostHogConfig> {
-  const embeddedAgentBrowser = userAgent ? detectEmbeddedAgentBrowser(userAgent) : undefined
+export function buildEmbeddedAgentBrowserConfig(userAgent: string): Partial<PostHogConfig> {
+  const embeddedAgentBrowser = detectEmbeddedAgentBrowser(userAgent)
   if (!embeddedAgentBrowser) return {}
 
   return {

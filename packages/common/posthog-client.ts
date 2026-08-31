@@ -95,9 +95,7 @@ class PostHogClient {
       autocapture: false, // We'll manually track events
       capture_pageview: false, // We'll manually track pageviews
       capture_pageleave: false, // We'll manually track page leaves
-      ...buildEmbeddedAgentBrowserConfig(
-        typeof navigator !== 'undefined' ? navigator.userAgent : undefined
-      ),
+      ...buildEmbeddedAgentBrowserConfig(navigator.userAgent),
       ...buildSessionRecordingConfig(sessionReplay),
       loaded: (posthog) => {
         // Apply pending properties that were set before PostHog

@@ -51,7 +51,31 @@ describe('detectEmbeddedAgentBrowser', () => {
     ).toBe('chatgpt_desktop')
   })
 
-  it('does not tag ChatGPT Android in-app WebView (no Electron token)', () => {
+  it('detects ChatGPT Desktop if a future build drops the Electron token', () => {
+    expect(
+      detectEmbeddedAgentBrowser(
+        'ChatGPT/1.2027.10 (Windows_NT 10.0.26200; x86_64; build ) Chrome/142.0.7444.235'
+      )
+    ).toBe('chatgpt_desktop')
+  })
+
+  it('does not tag a hypothetical Claude mobile in-app WebView', () => {
+    expect(
+      detectEmbeddedAgentBrowser(
+        'Mozilla/5.0 (Linux; Android 16; Pixel 9; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/139.0.7258.153 Mobile Safari/537.36 Claude/1.50000.0'
+      )
+    ).toBeUndefined()
+  })
+
+  it('does not tag a hypothetical Claude iOS in-app WebView', () => {
+    expect(
+      detectEmbeddedAgentBrowser(
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 19_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Claude/1.50000.0'
+      )
+    ).toBeUndefined()
+  })
+
+  it('does not tag ChatGPT Android in-app WebView', () => {
     expect(
       detectEmbeddedAgentBrowser(
         'Mozilla/5.0 (Linux; Android 16; 25100RA69G Build/BP2A.250605.031.A3; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/139.0.7258.153 Mobile Safari/537.36 ChatGPT/1.2026.230 (Android 16; 25100RA69G)'
@@ -86,10 +110,6 @@ describe('buildEmbeddedAgentBrowserConfig', () => {
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36'
       )
     ).toEqual({})
-  })
-
-  it('returns an empty config when the user agent is unavailable', () => {
-    expect(buildEmbeddedAgentBrowserConfig(undefined)).toEqual({})
   })
 
   it('annotates captured events with the detected agent browser', () => {
