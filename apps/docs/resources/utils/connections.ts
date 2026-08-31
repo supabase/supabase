@@ -349,12 +349,12 @@ function getRequestedSlice<ItemType>(
   let afterIndex = -1
 
   const requestedBefore = pageArgs.before ? toNumber(pageArgs.before) : undefined
-  if (requestedBefore && requestedBefore >= 0 && requestedBefore < beforeIndex) {
+  if (requestedBefore !== undefined && requestedBefore >= 0 && requestedBefore < beforeIndex) {
     beforeIndex = requestedBefore
     hasNextPage = true
   }
   const requestedAfter = pageArgs.after ? toNumber(pageArgs.after) : undefined
-  if (requestedAfter && requestedAfter >= 0) {
+  if (requestedAfter !== undefined && requestedAfter >= 0) {
     afterIndex = requestedAfter
     hasPreviousPage = true
   }
