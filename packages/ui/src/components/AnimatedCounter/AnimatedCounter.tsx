@@ -43,6 +43,49 @@ export interface AnimatedCounterProps {
 }
 
 /**
+ * Formats the in-flight counter value, zero-padding it to the width of the
+ * target so the element keeps a stable width during the animation.
+ *
+ * For percentages the padding is applied to the numeric magnitude and the sign
+ * is re-attached afterwards. Padding the signed string directly inserts the
+ * zeros before the minus sign (e.g. `"-2.0"` padded to `"-13.4"`'s width yields
+ * `"0-2.0"`), producing a garbled value for negative percentages.
+ */
+export const getPaddedCounterValue = (
+  currentValue: number,
+  targetValue: number,
+  isPercentage: boolean,
+  prefix: string = ''
+) => {
+  if (isPercentage) {
+    const prefixed = prefix && currentValue > 0 ? '+' : prefix ? prefix : ''
+    const sign = currentValue < 0 ? '-' : ''
+    const targetString = Math.abs(targetValue).toFixed(1)
+    const currentString = Math.abs(currentValue).toFixed(1)
+    const paddedCurrent = sign + currentString.padStart(targetString.length, '0')
+    return `${prefixed}${paddedCurrent}%`
+  } else {
+    const targetString = targetValue.toLocaleString()
+    const currentString = currentValue.toLocaleString()
+    // Count digits in target (excluding commas)
+    const targetDigits = targetString.replace(/,/g, '').length
+    const currentDigits = currentString.replace(/,/g, '').length
+
+    if (currentDigits < targetDigits) {
+      const paddingNeeded = targetDigits - currentDigits
+      const currentWithoutCommas = currentValue.toString()
+      const paddedNumber = currentWithoutCommas.padStart(
+        currentWithoutCommas.length + paddingNeeded,
+        '0'
+      )
+      // Manually add commas to preserve leading zeros
+      return paddedNumber.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    }
+    return currentString
+  }
+}
+
+/**
  * AnimatedCounter - A component that animates numbers from 0 to a target value
  *
  * Features:
@@ -82,37 +125,8 @@ export const AnimatedCounter: FC<AnimatedCounterProps> = ({
     isPercentage ? Math.round(latest * 10) / 10 : Math.round(latest)
   )
 
-  // Calculate padding based on final value
-  const getPaddedValue = (currentValue: number, targetValue: number, isPercentage: boolean) => {
-    if (isPercentage) {
-      const prefixed = prefix && currentValue > 0 ? '+' : prefix ? prefix : ''
-      const targetString = targetValue.toFixed(1)
-      const currentString = currentValue.toFixed(1)
-      const paddedCurrent = currentString.padStart(targetString.length, '0')
-      return `${prefixed}${paddedCurrent}%`
-    } else {
-      const targetString = targetValue.toLocaleString()
-      const currentString = currentValue.toLocaleString()
-      // Count digits in target (excluding commas)
-      const targetDigits = targetString.replace(/,/g, '').length
-      const currentDigits = currentString.replace(/,/g, '').length
-
-      if (currentDigits < targetDigits) {
-        const paddingNeeded = targetDigits - currentDigits
-        const currentWithoutCommas = currentValue.toString()
-        const paddedNumber = currentWithoutCommas.padStart(
-          currentWithoutCommas.length + paddingNeeded,
-          '0'
-        )
-        // Manually add commas to preserve leading zeros
-        return paddedNumber.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-      }
-      return currentString
-    }
-  }
-
   const displayValue = useTransform(rounded, (latest) =>
-    getPaddedValue(latest, value, isPercentage)
+    getPaddedCounterValue(latest, value, isPercentage, prefix)
   )
 
   const ref = useRef(null)
