@@ -143,6 +143,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/aws-marketplace-onboarding.tsx` ← `pages/aws-marketplace-onboarding.tsx` **Delta vs plan:** placed at root rather than under `_app/` — page uses its own `LinkAwsMarketplaceLayout` and doesn't want `AppLayout` + `DefaultLayout` wrapping.
 - [x] A `routes/claim-project.tsx` ← `pages/claim-project.tsx` **Delta vs plan:** placed at root rather than under `_app/` — page uses its own `<Head>` + `<main>` layout and doesn't want `AppLayout` + `DefaultLayout` wrapping.
 - [x] A `routes/join.tsx` ← `pages/join.tsx` **Delta vs plan:** placed at root rather than under `_app/` — page uses a centered-div layout and doesn't want `AppLayout` + `DefaultLayout` wrapping.
+- [x] A `routes/stripe-atlas-application.tsx` ← `pages/stripe-atlas-application.tsx` (no withAuth — reachable logged in and logged out; InterstitialLayout, no `AppLayout` + `DefaultLayout` wrapping)
 - [x] `routes/_app/support/new.tsx` ← `pages/support/new.tsx` (sets `hideMobileMenu: true` staticData; existing page is `withAuth`-wrapped so no beforeLoad migration needed yet)
 - [x] `routes/_app/support/link.tsx` ← `pages/support/link.tsx`
 
