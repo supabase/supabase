@@ -97,8 +97,8 @@ describe('markdown alternate drift', () => {
       'utf-8'
     )
     expect(
-      source.includes('CHANGELOG_PAGES.has('),
-      'pages/changelog/[slug].tsx must compute the markdown alternate flag from CHANGELOG_PAGES membership'
+      source.includes('CHANGELOG_PAGES.has(`changelog/${entry.slug}`)'),
+      'pages/changelog/[slug].tsx must compute the markdown alternate flag from CHANGELOG_PAGES membership using the changelog/-prefixed key the generator emits'
     ).toBe(true)
     expect(
       source.includes('hasMarkdownVariant &&'),
