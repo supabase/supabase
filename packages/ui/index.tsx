@@ -14,7 +14,12 @@ export * from './src/components/SidePanel'
 
 // HTML
 
-export { Heading, getAnchor, removeAnchor } from './src/components/CustomHTMLElements'
+export {
+  Heading,
+  getAnchor,
+  removeAnchor,
+  highlightSelectedNavItem,
+} from './src/components/CustomHTMLElements'
 
 // UTILITIES
 

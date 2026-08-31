@@ -1,4 +1,4 @@
-import Heading from 'ui'
+import { Heading } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { getAiSkills } from './AiSkills.utils'
