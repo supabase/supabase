@@ -462,6 +462,19 @@ export const AssistantChat = ({
     }
   }, [composerContext?.initialInput])
 
+  let placeholder: string
+  if (hasMessages && isSupportChat) {
+    placeholder = 'Share details so the assistant can help with your support request...'
+  } else if (hasMessages) {
+    placeholder = 'Ask a follow up question...'
+  } else if ((composerContext?.sqlSnippets ?? []).length > 0) {
+    placeholder = 'Ask a question or make a change...'
+  } else if (isSupportChat) {
+    placeholder = 'Describe your support issue...'
+  } else {
+    placeholder = 'Chat to Postgres...'
+  }
+
   return (
     <ErrorBoundary
       message="Something went wrong with the AI Assistant"
@@ -665,26 +678,11 @@ export const AssistantChat = ({
 
             <AssistantChatForm
               textAreaRef={inputRef}
-              className={cn(
-                'z-20',
-                '[&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border',
-                '[&>form>textarea]:rounded-md [&>form>textarea]:outline-hidden!',
-                '[&>form>textarea]:ring-offset-0! [&>form>textarea]:ring-0!'
-              )}
+              className="z-20"
               loading={isChatLoading}
               isEditing={!!editingMessageId}
               disabled={isChatInputDisabled}
-              placeholder={
-                hasMessages
-                  ? isSupportChat
-                    ? 'Share details so the assistant can help with your support request...'
-                    : 'Ask a follow up question...'
-                  : (composerContext?.sqlSnippets ?? []).length > 0
-                    ? 'Ask a question or make a change...'
-                    : isSupportChat
-                      ? 'Describe your support issue...'
-                      : 'Chat to Postgres...'
-              }
+              placeholder={placeholder}
               value={value}
               onValueChange={(e) => {
                 setValue(e.target.value)

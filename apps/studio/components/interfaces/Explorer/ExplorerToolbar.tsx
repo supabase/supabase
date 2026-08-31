@@ -105,7 +105,7 @@ const ExplorerToolbarTitle = ({
             <Edit
               size={16}
               strokeWidth={2}
-              className="opacity-0 transition group-hover/title:opacity-100"
+              className="opacity-0 transition group-hover/title:opacity-100 group-focus-visible/title:opacity-100"
             />
           }
         >
