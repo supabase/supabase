@@ -1,7 +1,6 @@
 import { HotkeySequence } from '@tanstack/react-hotkeys'
-import { TooltipContentProps } from '@ui/components/shadcn/ui/tooltip'
 import { Fragment, useState, type ReactNode } from 'react'
-import { KeyboardShortcut, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { KeyboardShortcut, Tooltip, TooltipContent, TooltipContentProps, TooltipTrigger } from 'ui'
 
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
 import { SHORTCUT_DEFINITIONS, type ShortcutId } from '@/state/shortcuts/registry'

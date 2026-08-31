@@ -14,7 +14,7 @@ export * from './src/components/SidePanel'
 
 // HTML
 
-export { Heading } from './src/components/CustomHTMLElements'
+export { Heading, getAnchor } from './src/components/CustomHTMLElements'
 
 // UTILITIES
 
