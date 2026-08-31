@@ -91,6 +91,25 @@ describe('markdown alternate drift', () => {
     ).toBe(true)
   })
 
+  it('changelog entry page gates its .md alternate on CHANGELOG_PAGES membership', async () => {
+    const source = await fs.readFile(
+      path.join(process.cwd(), 'pages', 'changelog', '[slug].tsx'),
+      'utf-8'
+    )
+    expect(
+      source.includes('CHANGELOG_PAGES.has('),
+      'pages/changelog/[slug].tsx must compute the markdown alternate flag from CHANGELOG_PAGES membership'
+    ).toBe(true)
+    expect(
+      source.includes('hasMarkdownVariant &&'),
+      'pages/changelog/[slug].tsx must render the markdown alternate link only when hasMarkdownVariant is true'
+    ).toBe(true)
+    expect(
+      source.includes('rel="alternate" type="text/markdown"'),
+      'pages/changelog/[slug].tsx must advertise the text/markdown alternate for published slugs'
+    ).toBe(true)
+  })
+
   it.for(MDX_SECTIONS)('%s pages advertise their .md sibling', async (urlPrefix) => {
     const appPagePath = path.join(process.cwd(), 'app', urlPrefix, '[slug]', 'page.tsx')
     if (!existsSync(appPagePath)) {
