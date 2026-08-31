@@ -1,4 +1,3 @@
-import styles from '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
 import { initial, last } from 'lodash'
 import { Dispatch, SetStateAction } from 'react'
 import {
@@ -10,6 +9,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from 'ui'
+import styles from 'ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
 
 import { QueryResponseError } from '@/data/sql/execute-sql-mutation'
 
