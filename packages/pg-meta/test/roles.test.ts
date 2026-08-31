@@ -237,3 +237,28 @@ withTestDatabase('retrieve, create, update, delete roles', async ({ executeQuery
   const finalRoles = finalListZod.parse(await executeQuery(finalListSql))
   expect(finalRoles.find((role) => role.name === 'config_role')).toBeUndefined()
 })
+
+withTestDatabase(
+  'update on a missing role raises a clear not-found error',
+  async ({ executeQuery }) => {
+    const { sql } = pgMeta.roles.update({ name: 'does_not_exist' }, { canLogin: true })
+
+    // The DO block previously referenced an undeclared `id` variable in this
+    // branch, so a missing role surfaced `column "id" does not exist` instead of
+    // the intended not-found message.
+    await expect(executeQuery(sql)).rejects.toThrow(
+      'Cannot find role matching the provided identifier'
+    )
+  }
+)
+
+withTestDatabase(
+  'remove on a missing role raises a clear not-found error',
+  async ({ executeQuery }) => {
+    const { sql } = pgMeta.roles.remove({ name: 'does_not_exist' })
+
+    await expect(executeQuery(sql)).rejects.toThrow(
+      'Cannot find role matching the provided identifier'
+    )
+  }
+)
