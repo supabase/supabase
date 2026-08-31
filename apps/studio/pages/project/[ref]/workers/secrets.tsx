@@ -12,8 +12,6 @@ import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 import { DefaultEdgeFunctionSecrets } from '@/components/interfaces/Functions/EdgeFunctionSecrets/DefaultEdgeFunctionSecrets'
 import { DEFAULT_EDGE_FUNCTION_SECRETS } from '@/components/interfaces/Functions/EdgeFunctionSecrets/DefaultEdgeFunctionSecrets.utils'
-// Secrets are project-level, so workers read the same values as Edge Functions; this page
-// is a separate entry point into that shared list, not a separate store.
 import { EdgeFunctionSecrets } from '@/components/interfaces/Functions/EdgeFunctionSecrets/EdgeFunctionSecrets'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { WorkersLayout } from '@/components/layouts/WorkersLayout/WorkersLayout'
