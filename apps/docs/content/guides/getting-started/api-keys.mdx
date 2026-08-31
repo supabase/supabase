@@ -6,6 +6,12 @@ description: "First-layer protection for your project's data"
 
 Every request to your Supabase project carries an API key. The key identifies **what** is calling your project: a web page, a mobile app, a server, or an Edge Function. [Supabase Auth](/docs/guides/auth) identifies **who** is calling, when someone is signed in.
 
+This guide covers three things:
+
+- [How API keys work](#how-api-keys-work) explains what each key type is and which Postgres role it maps to.
+- [Find and use your keys](#find-and-use-your-keys) covers getting a key out of the Dashboard and rotating one that leaked.
+- [Security reference](#security-reference) lists what publishable keys don't protect against, how to handle secret keys, and the known limitations.
+
 ## Which key do you use?
 
 Pick the key by asking where the code runs.
@@ -18,12 +24,6 @@ Pick the key by asking where the code runs.
 Think of your project's data as a building. The publishable key is taped to the front door, and it only opens the lobby. The secret key is the master key, and it stays in your pocket.
 
 <$Partial path="api_keys_deprecation.mdx" />
-
-This guide covers three things:
-
-- [How API keys work](#how-api-keys-work) explains what each key type is and which Postgres role it maps to.
-- [Find and use your keys](#find-and-use-your-keys) covers getting a key out of the Dashboard and rotating one that leaked.
-- [Security reference](#security-reference) lists what publishable keys don't protect against, how to handle secret keys, and the known limitations.
 
 ## How API keys work
 
