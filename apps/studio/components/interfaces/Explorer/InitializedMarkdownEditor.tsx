@@ -134,11 +134,5 @@ const notebookMarkdownPlugins = [
  * through `MarkdownEditor`, which disables server rendering for this module.
  */
 export function InitializedMarkdownEditor({ editorRef, ...props }: InitializedMarkdownEditorProps) {
-  return (
-    <MDXEditor
-      {...props}
-      ref={editorRef}
-      plugins={notebookMarkdownPlugins}
-    />
-  )
+  return <MDXEditor {...props} ref={editorRef} plugins={notebookMarkdownPlugins} />
 }
