@@ -126,7 +126,7 @@ Use the Dashboard when you are setting up a project by hand. This is the fastest
 </TabPanel>
 <TabPanel id="cli" label="Supabase CLI">
 
-Use the CLI to script setup, or to read the keys for a preview branch.
+Use the CLI to script setup, or to read the keys for a preview branch. This path needs the Supabase CLI, so [install it](/docs/guides/local-development/cli/getting-started#installing-the-supabase-cli) first.
 
 1. Sign in, if you haven't already.
 
@@ -163,6 +163,8 @@ See [Get project API keys](/docs/reference/api/v1-get-project-api-keys) for the 
 <TabPanel id="local" label="Local stack">
 
 A local stack mints its own keys. They are unrelated to your hosted project's keys, and they are the same on every machine, so they are safe to commit in a local-only `.env`.
+
+This path needs the Supabase CLI and a container runtime. See [Running a local Supabase project](/docs/guides/local-development/cli/getting-started#running-a-local-supabase-project) for both.
 
 1. Start the stack. The publishable and secret keys are in the startup output, under **Authentication Keys**.
 
