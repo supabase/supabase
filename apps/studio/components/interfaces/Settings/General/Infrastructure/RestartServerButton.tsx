@@ -107,6 +107,7 @@ export const RestartServerButton = () => {
       {projectSettingsRestartProject ? (
         <div className="flex w-full @lg:w-auto">
           <ButtonTooltip
+            type="button"
             variant="default"
             className={cn(
               'flex-1 px-3 hover:z-10 focus-visible:z-10 @lg:flex-none',
@@ -141,8 +142,9 @@ export const RestartServerButton = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
+                  type="button"
                   variant="default"
-                  aria-label={`Restart ${entityLabel}`}
+                  aria-label="Choose restart type"
                   className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
                   icon={<ChevronDown />}
                   disabled={!canRestartProject}
@@ -158,9 +160,9 @@ export const RestartServerButton = () => {
                 >
                   <div className="space-y-0.5">
                     <p className="block text-foreground">Fast database reboot</p>
-                    <p className="block text-foreground-light">
-                      Restarts only the database. Faster, but may not be able to recover from all
-                      failure modes.
+                    <p className="block text-foreground-lighter">
+                      Restarts only the database service, with less downtime than a full project
+                      restart. Other project services remain running.
                     </p>
                   </div>
                 </DropdownMenuItem>
