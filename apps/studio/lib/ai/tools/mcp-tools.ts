@@ -34,7 +34,7 @@ const EXPECTED_MCP_TOOLS = [
   'list_edge_functions',
   'list_branches',
   'get_advisors',
-  'get_logs',
+  'query_logs',
 ] as const satisfies readonly SupabaseMcpToolName[]
 
 export const getMcpTools = async ({

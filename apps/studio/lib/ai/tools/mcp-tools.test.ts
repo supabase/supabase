@@ -24,7 +24,7 @@ const FULL_REMOTE_TOOLS = {
   list_edge_functions: { description: 'edge functions' },
   list_branches: { description: 'branches' },
   get_advisors: { description: 'advisors' },
-  get_logs: { description: 'get logs' },
+  query_logs: { description: 'query logs' },
   execute_sql: { description: 'execute sql' },
   deploy_edge_function: { description: 'deploy' },
 }
@@ -53,7 +53,7 @@ describe('ai/tools/mcp-tools getMcpTools', () => {
     const result = await getMcpTools(BASE_PARAMS)
 
     expect(result).toHaveProperty('list_tables')
-    expect(result).toHaveProperty('get_logs')
+    expect(result).toHaveProperty('query_logs')
     expect(result).not.toHaveProperty('execute_sql')
     expect(result).not.toHaveProperty('deploy_edge_function')
   })

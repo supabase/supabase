@@ -12,7 +12,7 @@ import {
   useSqlEditorSnippet,
   useSqlEditorUi,
 } from './SQLEditorControllers'
-import ResizableAIWidget from '@/components/ui/AIEditor/ResizableAIWidget'
+import { ResizableAIWidget } from '@/components/ui/AIEditor/ResizableAIWidget'
 import { acceptUntrustedLogsSql } from '@/data/logs/safe-analytics-sql'
 import { detectOS } from '@/lib/helpers'
 
@@ -140,14 +140,14 @@ const SQLEditorMainView = () => {
 
   // Run gesture from the editor — promote here, at the user action.
   const runQuery = useCallback(() => {
-    if (runSource.type === 'logs') {
+    if (runSource._tag === 'logs') {
       const sql = readEditorLogsSql()
       if (sql !== undefined) void executeLogsQuery(acceptUntrustedLogsSql(sql))
     } else {
       const sql = readEditorSql()
       if (sql !== undefined) void executeQuery(acceptUntrustedSql(sql))
     }
-  }, [executeLogsQuery, executeQuery, readEditorLogsSql, readEditorSql, runSource.type])
+  }, [executeLogsQuery, executeQuery, readEditorLogsSql, readEditorSql, runSource._tag])
 
   return (
     <div key={id} className="w-full h-full relative">
