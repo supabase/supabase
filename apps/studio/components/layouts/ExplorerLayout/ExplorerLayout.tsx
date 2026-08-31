@@ -75,7 +75,7 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
       <ExplorerNotebookTabCoordinator />
 
       <div className="flex flex-col h-full">
-        <div className={cn('h-10 md:min-h-(--header-height) flex items-center bg-surface-100')}>
+        <div className="flex h-10 items-center bg-surface-100">
           <EditorTabs
             isCollapseButtonHidden
             customTabs={<HomeTabButton />}
@@ -89,7 +89,7 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
 }
 
 const TabClassName =
-  'flex items-center justify-center min-w-(--header-height) min-h-(--header-height) hover:bg-surface-100 shrink-0'
+  'flex items-center justify-center min-w-10 min-h-10 hover:bg-surface-100 shrink-0'
 
 const HomeTabButton = () => {
   const tabs = useTabsStateSnapshot()

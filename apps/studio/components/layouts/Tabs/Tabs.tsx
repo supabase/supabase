@@ -181,7 +181,7 @@ export const EditorTabs = ({
 
           <TabsList
             className={cn(
-              'rounded-b-none gap-0 min-h-(--header-height) flex items-center w-full z-1',
+              'rounded-b-none gap-0 h-10 flex items-center w-full z-1',
               'bg-surface-200 dark:bg-alternative border-none text-clip'
             )}
           >
@@ -281,7 +281,7 @@ export const EditorTabs = ({
                 {!hasNewTab &&
                   (newTabButton ?? (
                     <motion.button
-                      className="flex items-center justify-center w-10 min-h-(--header-height) hover:bg-surface-100 shrink-0 border-b"
+                      className="flex items-center justify-center w-10 h-10 hover:bg-surface-100 shrink-0 border-b"
                       onClick={() =>
                         router.push(
                           `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new?skip=true`

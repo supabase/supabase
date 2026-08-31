@@ -68,7 +68,7 @@ export const EditorBaseLayout = ({
       <div className="flex flex-col h-full">
         <div
           className={cn(
-            'h-10 md:min-h-(--header-height) flex items-center',
+            'flex h-10 items-center',
             !hideTabs ? 'bg-surface-200 dark:bg-alternative' : 'bg-surface-100'
           )}
         >

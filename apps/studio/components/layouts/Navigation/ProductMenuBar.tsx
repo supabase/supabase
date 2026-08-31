@@ -24,9 +24,9 @@ export const ProductMenuBar = ({
         'hide-scrollbar bg-dash-sidebar border-default'
       )}
     >
-      <div className="border-default flex min-h-(--header-height) items-center border-b px-6 justify-between">
+      <div className="flex h-10 shrink-0 items-center justify-between border-b border-default px-6">
         <div className="flex items-center gap-2">
-          <h4 className="text-lg">{title}</h4>
+          <h4 className="text-sm font-medium">{title}</h4>
           {titleBadge}
         </div>
       </div>
