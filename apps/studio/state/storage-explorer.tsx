@@ -1899,6 +1899,14 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
     bucket,
   ])
 
+  // Re-sync selectedBucket also when the bucket changes,
+  // to ensure the state is always up-to-date with the latest bucket data
+  useEffect(() => {
+    if (bucket && state.selectedBucket?.id === bucket.id && state.selectedBucket !== bucket) {
+      state.selectedBucket = bucket
+    }
+  }, [bucket, state])
+
   return (
     <StorageExplorerStateContext.Provider value={state}>
       {children}
