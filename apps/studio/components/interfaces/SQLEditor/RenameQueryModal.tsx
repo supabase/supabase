@@ -171,7 +171,7 @@ const RenameQueryForm = ({ snippet, onCancel, onComplete }: RenameQueryFormProps
             render={({ field }) => (
               <FormItemLayout name="name" layout="vertical" label="Name">
                 <FormControl>
-                  <Input {...field} id="name" />
+                  <Input {...field} />
                 </FormControl>
               </FormItemLayout>
             )}

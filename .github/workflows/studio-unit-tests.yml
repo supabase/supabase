@@ -8,6 +8,8 @@ on:
     branches: [master, studio]
     paths:
       - 'apps/studio/**'
+      - 'packages/ui/**'
+      - 'packages/ui-patterns/**'
       - 'pnpm-lock.yaml'
   pull_request:
     branches: [master, studio]
@@ -44,6 +46,8 @@ jobs:
         with:
           filters: |
             relevant:
+              - 'packages/ui/**'
+              - 'packages/ui-patterns/**'
               - 'apps/studio/**'
               - 'pnpm-lock.yaml'
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9

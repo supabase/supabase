@@ -44,6 +44,8 @@ jobs:
           filters: |
             studio:
               - 'packages/pg-meta/**'
+              - 'packages/ui/**'
+              - 'packages/ui-patterns/**'
               - 'apps/studio/**'
               - 'apps/ui-library/**'
               - 'apps/design-system/**'
