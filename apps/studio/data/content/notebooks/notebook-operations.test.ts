@@ -5,7 +5,7 @@ import {
   deriveNotebookDiff,
   type NotebookOperation,
 } from './notebook-operations'
-import type { NotebookWire } from './notebook-schema'
+import type { AgentCell, NotebookWire } from './notebook-schema'
 
 const NOTEBOOK: NotebookWire = {
   schema_version: 1,
@@ -452,6 +452,88 @@ describe('deriveNotebookDiff', () => {
         { _tag: 'moved', cell: NOTEBOOK.cells[2], fromIndex: 2, operationIndex: 1 },
         { _tag: 'removed', cell: NOTEBOOK.cells[0], operationIndex: 0 },
         { _tag: 'unchanged', cell: NOTEBOOK.cells[1] },
+      ],
+    })
+  })
+
+  it('places a later same-anchor insert after the anchor after that anchor moves', () => {
+    const notebook: NotebookWire = {
+      schema_version: 1,
+      cells: [
+        { _tag: 'markdown_cell', _id: 'cell-1', text: '# One' },
+        { _tag: 'markdown_cell', _id: 'cell-2', text: '# Two' },
+        { _tag: 'markdown_cell', _id: 'cell-3', text: '# Three' },
+        { _tag: 'markdown_cell', _id: 'cell-4', text: '# Four' },
+      ],
+    }
+
+    const first = { _tag: 'markdown_cell', text: 'first' } satisfies AgentCell
+    const second = { _tag: 'markdown_cell', text: 'second' } satisfies AgentCell
+
+    const result = deriveNotebookDiff(notebook, [
+      { _tag: 'insert_cell', after_cell_id: 'cell-1', cell: first },
+      { _tag: 'move_cell', cell_id: 'cell-1', after_cell_id: 'cell-3' },
+      { _tag: 'insert_cell', after_cell_id: 'cell-1', cell: second },
+    ])
+
+    expect(result).toEqual({
+      success: true,
+      entries: [
+        { _tag: 'added', cell: first, operationIndex: 0 },
+        { _tag: 'unchanged', cell: notebook.cells[1] },
+        { _tag: 'unchanged', cell: notebook.cells[2] },
+        { _tag: 'moved', cell: notebook.cells[0], fromIndex: 0, operationIndex: 1 },
+        { _tag: 'added', cell: second, operationIndex: 2 },
+        { _tag: 'unchanged', cell: notebook.cells[3] },
+      ],
+    })
+  })
+
+  it('does not let a no-op move after a deletion reorder the removed entry', () => {
+    const ops: NotebookOperation[] = [
+      { _tag: 'delete_cell', cell_id: 'cell-2' },
+      { _tag: 'move_cell', cell_id: 'cell-3', after_cell_id: 'cell-1' },
+    ]
+
+    const result = deriveNotebookDiff(NOTEBOOK, ops)
+
+    expect(result.success).toBe(true)
+    if (!result.success) return
+
+    expect(result.entries).toHaveLength(3)
+    expect(result.entries).toEqual([
+      { _tag: 'unchanged', cell: NOTEBOOK.cells[0] },
+      { _tag: 'removed', cell: NOTEBOOK.cells[1], operationIndex: 0 },
+      { _tag: 'unchanged', cell: NOTEBOOK.cells[2] },
+    ])
+  })
+
+  it('keeps an insert anchored to a downgraded move right after it', () => {
+    const notebook: NotebookWire = {
+      schema_version: 1,
+      cells: [
+        { _tag: 'markdown_cell', _id: 'cell-1', text: '# A' },
+        { _tag: 'markdown_cell', _id: 'cell-2', text: '# B' },
+        { _tag: 'markdown_cell', _id: 'cell-3', text: '# C' },
+      ],
+    }
+
+    const inserted = { _tag: 'markdown_cell', text: 'X' } satisfies AgentCell
+
+    // Moving B after A changes nothing about the surviving order, so the move is
+    // downgraded — but X was inserted after B and must stay right after B.
+    const result = deriveNotebookDiff(notebook, [
+      { _tag: 'insert_cell', after_cell_id: 'cell-2', cell: inserted },
+      { _tag: 'move_cell', cell_id: 'cell-2', after_cell_id: 'cell-1' },
+    ])
+
+    expect(result).toEqual({
+      success: true,
+      entries: [
+        { _tag: 'unchanged', cell: notebook.cells[0] },
+        { _tag: 'unchanged', cell: notebook.cells[1] },
+        { _tag: 'added', cell: inserted, operationIndex: 0 },
+        { _tag: 'unchanged', cell: notebook.cells[2] },
       ],
     })
   })
