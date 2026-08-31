@@ -770,6 +770,25 @@ export default defineConfig(({ command, mode }) => {
     //   with `c is not a function` because its `styleHandler` import
     //   came in through the now-too-large `lucide-react` chunk). Pin
     //   React explicitly so it stays a leaf vendor chunk.
+    //
+    //   `packages/ui/src/components/shadcn/ui/field.tsx` — its only
+    //   non-barrel importer is Storage's `FileExplorerHeader`, so
+    //   Rolldown pools it into the storage bucket page chunk while the
+    //   `ui` package barrel (`packages/ui/index.tsx`) re-exports it —
+    //   `ui` ends up importing `FieldDescription` back from the page
+    //   chunk it's itself imported by.
+    //
+    //   `packages/ui/src/components/shadcn/ui/drawer.tsx` — same shape,
+    //   its only non-barrel importer sits inside the Logs Explorer page
+    //   tree (`DataTableFilterControlsDrawer`), so it gets pooled into
+    //   the `logs` page chunk while `ui`'s barrel re-exports it too.
+    //
+    //   `packages/ui/src/components/shadcn/ui/form.tsx` and
+    //   `packages/ui/src/components/shadcn/ui/sidebar.tsx` (+
+    //   `use-mobile.tsx`) — same shape again: each gets pooled into
+    //   whichever page/feature chunk happens to be its only non-barrel
+    //   importer (a form page, `components/interfaces/Sidebar.tsx`)
+    //   while `ui`'s barrel re-exports them too.
     build: {
       rollupOptions: {
         output: {
@@ -790,6 +809,21 @@ export default defineConfig(({ command, mode }) => {
             }
             if (id.includes('node_modules/lucide-react/')) {
               return 'lucide-react'
+            }
+            if (id.includes('packages/ui/src/components/shadcn/ui/field.tsx')) {
+              return 'ui-field'
+            }
+            if (id.includes('packages/ui/src/components/shadcn/ui/drawer.tsx')) {
+              return 'ui-drawer'
+            }
+            if (id.includes('packages/ui/src/components/shadcn/ui/form.tsx')) {
+              return 'ui-form'
+            }
+            if (
+              id.includes('packages/ui/src/components/shadcn/ui/sidebar.tsx') ||
+              id.includes('packages/ui/src/components/hooks/use-mobile.tsx')
+            ) {
+              return 'ui-sidebar'
             }
             return undefined
           },
