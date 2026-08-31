@@ -1,6 +1,7 @@
-import { useBlocker } from '@tanstack/react-router'
-import { useCallback, useMemo, useState } from 'react'
-import { flushSync } from 'react-dom'
+import { useRouter } from 'next/router'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+
+import { BASE_PATH } from '@/lib/constants'
 
 interface UsePreventNavigationOnUnsavedChangesOptions {
   /*
@@ -16,12 +17,11 @@ interface UsePreventNavigationOnUnsavedChangesReturn {
    */
   handleCancelNavigation: () => void
   /*
-   * Confirm the blocked navigation and lose the changes
+   * Confirm the navigation and lose the changes
    */
   handleConfirmNavigation: () => void
   /*
-   * Skip the guard for an intentional leave after the user already confirmed discard
-   * (for example the isolated-flow close button). Call before router.push.
+   * Skip the guard for the next intentional navigation after confirmation was handled elsewhere.
    */
   bypassNavigationGuard: () => void
   /*
@@ -32,39 +32,66 @@ interface UsePreventNavigationOnUnsavedChangesReturn {
 }
 
 /*
- * Prevents in-app navigation and tab close when users could lose changes.
- *
- * Studio's `next/router` is a TanStack shim: throwing from `routeChangeStart` does not cancel
- * navigations. TanStack's `useBlocker` is the correct mechanism (see compat/next/_router-events.ts).
+ * Hook that prevents navigation when users could lose their changes.
+ * It prevents both NextJS and browser navigation (such as when closing the tab)
  */
 export const usePreventNavigationOnUnsavedChanges = ({
   hasChanges,
 }: UsePreventNavigationOnUnsavedChangesOptions): UsePreventNavigationOnUnsavedChangesReturn => {
-  const [allowNavigation, setAllowNavigation] = useState(false)
-  const shouldGuard = hasChanges && !allowNavigation
+  const router = useRouter()
+  const [navigateUrl, setNavigateUrl] = useState<string>()
+  const [confirmNavigate, setConfirmNavigate] = useState(false)
+  const bypassNavigationGuardRef = useRef(false)
 
-  const blocker = useBlocker({
-    shouldBlockFn: () => shouldGuard,
-    withResolver: true,
-    enableBeforeUnload: shouldGuard,
-    disabled: !shouldGuard,
-  })
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasChanges) {
+        e.preventDefault()
+        e.returnValue = '' // deprecated, but older browsers still require this
+      }
+    }
+
+    const handleBrowseAway = (url: string) => {
+      if (bypassNavigationGuardRef.current) {
+        bypassNavigationGuardRef.current = false
+        setNavigateUrl(undefined)
+        return
+      }
+
+      if (hasChanges && !confirmNavigate) {
+        setNavigateUrl(url)
+        throw 'Route change declined' // Just to prevent the route change
+        return
+      }
+      setNavigateUrl(undefined)
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    router.events.on('routeChangeStart', handleBrowseAway)
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+      router.events.off('routeChangeStart', handleBrowseAway)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [confirmNavigate, hasChanges])
 
   const handleCancelNavigation = useCallback(() => {
-    blocker.reset?.()
-  }, [blocker])
+    setNavigateUrl(undefined)
+  }, [])
 
   const handleConfirmNavigation = useCallback(() => {
-    flushSync(() => {
-      setAllowNavigation(true)
-    })
-    blocker.proceed?.()
-  }, [blocker])
+    setConfirmNavigate(true)
+    let urlToNavigate = navigateUrl ?? '/'
+    if (BASE_PATH && urlToNavigate.startsWith(BASE_PATH)) {
+      urlToNavigate = urlToNavigate.slice(BASE_PATH.length) || '/'
+    }
+    if (!urlToNavigate.startsWith('/')) urlToNavigate = `/${urlToNavigate}`
+    setNavigateUrl(undefined)
+    router.push(urlToNavigate)
+  }, [navigateUrl, router])
 
   const bypassNavigationGuard = useCallback(() => {
-    flushSync(() => {
-      setAllowNavigation(true)
-    })
+    bypassNavigationGuardRef.current = true
   }, [])
 
   return useMemo(
@@ -72,8 +99,8 @@ export const usePreventNavigationOnUnsavedChanges = ({
       handleCancelNavigation,
       handleConfirmNavigation,
       bypassNavigationGuard,
-      shouldConfirmNavigation: blocker.status === 'blocked',
+      shouldConfirmNavigation: !!navigateUrl,
     }),
-    [blocker.status, handleCancelNavigation, handleConfirmNavigation, bypassNavigationGuard]
+    [navigateUrl, handleCancelNavigation, handleConfirmNavigation, bypassNavigationGuard]
   )
 }
