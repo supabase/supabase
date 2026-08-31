@@ -36,7 +36,7 @@
     "ui": "workspace:*",
     "ui-patterns": "workspace:*",
     "unist-util-visit": "^5.0.0",
-    "velite": "^0.4.0"
+    "velite": "catalog:"
   },
   "devDependencies": {
     "@shikijs/compat": "^1.1.7",

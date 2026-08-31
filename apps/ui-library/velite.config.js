@@ -49,6 +49,9 @@ const docs = s
 
 export default defineConfig({
   root: './content',
+  output: {
+    clean: true,
+  },
   collections: {
     allDocs: {
       name: 'Doc',
