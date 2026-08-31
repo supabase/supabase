@@ -21,6 +21,9 @@ const rewrites = [
           destination: `${process.env.NEXT_PUBLIC_DOCS_URL}`,
         },
         { source: '/docs/:path*', destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/:path*` },
+        { source: '/kb', destination: `${process.env.NEXT_PUBLIC_KB_URL}` },
+        { source: '/kb/', destination: `${process.env.NEXT_PUBLIC_KB_URL}` },
+        { source: '/kb/:path*', destination: `${process.env.NEXT_PUBLIC_KB_URL}/:path*` },
       ]
     : []),
   {

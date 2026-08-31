@@ -1,3 +1,6 @@
 {
-  "buildCommand": "pnpm build"
+  "buildCommand": "pnpm build",
+  "redirects": [
+    { "source": "/", "destination": "/kb", "permanent": false }
+  ]
 }
