@@ -35,7 +35,12 @@ describe('ExplorerToolbar', () => {
     const runAction = within(toolbar).getByRole('button', { name: 'Run cell' })
     expect(runAction).toHaveAttribute('data-slot', 'explorer-toolbar-action')
     expect(runAction).toHaveAttribute('data-size', 'tiny')
-    expect(runAction).toHaveClass('w-7', 'px-0')
+    expect(runAction).toHaveClass(
+      'w-7',
+      'px-0',
+      'text-tertiary-foreground',
+      'hover:text-foreground'
+    )
   })
 
   it('supports labeled actions and forwards refs and native props', () => {
@@ -64,6 +69,7 @@ describe('ExplorerToolbar', () => {
     expect(toolbar.querySelector('[data-slot="explorer-toolbar-actions"]')).toHaveClass('gap-px')
     expect(action).toHaveAttribute('data-command', 'analyze')
     expect(action).not.toHaveClass('w-7')
+    expect(action).toHaveClass('text-tertiary-foreground', 'hover:text-foreground')
     expect(actionRef.current).toBe(action)
   })
 })

@@ -38,7 +38,7 @@ const ExplorerToolbarIcon = ({
   <span
     data-slot="explorer-toolbar-icon"
     aria-hidden={ariaHidden}
-    className={cn('shrink-0 text-foreground-muted [&_svg]:size-3.5', className)}
+    className={cn('shrink-0 text-tertiary-foreground', className)}
     {...props}
   />
 )
@@ -98,14 +98,19 @@ const ExplorerToolbarTitle = ({
           }}
         />
       ) : onSaveTitle ? (
-        <Button
-          variant="text"
+        <ExplorerToolbarAction
           className="group/title"
           onClick={handleStartEditing}
-          iconRight={<Edit className="opacity-0 group-hover/title:opacity-100 transition" />}
+          iconRight={
+            <Edit
+              size={16}
+              strokeWidth={2}
+              className="opacity-0 transition group-hover/title:opacity-100"
+            />
+          }
         >
           {title}
-        </Button>
+        </ExplorerToolbarAction>
       ) : (
         title
       )}
@@ -139,6 +144,7 @@ export type ExplorerToolbarActionProps = Omit<
 /**
  * The standard tiny, text-style button used for a direct toolbar action.
  * Icon-only actions receive the prototype's compact 28px width automatically.
+ * `!h-auto !w-auto` lets Lucide's `size` prop win over Button `tiny`'s 14px icon box.
  */
 const ExplorerToolbarAction = ({
   children,
@@ -152,7 +158,12 @@ const ExplorerToolbarAction = ({
     data-slot="explorer-toolbar-action"
     variant="text"
     size="tiny"
-    className={cn(children == null && 'w-7 px-0', className)}
+    className={cn(
+      'text-tertiary-foreground hover:text-foreground data-[state=open]:text-foreground',
+      '[&>[aria-hidden]]:text-current [&_svg]:!h-auto [&_svg]:!w-auto',
+      children == null && 'w-7 px-0',
+      className
+    )}
     tooltip={{ content: { side: 'bottom', text: tooltip } }}
     {...props}
   >

@@ -8,14 +8,24 @@ type ConversationProps = ComponentProps<typeof StickToBottom>
 type ConversationContentProps = ComponentProps<typeof StickToBottom.Content>
 type ConversationScrollButtonProps = ComponentProps<typeof Button>
 
-export const Conversation = ({ className, ...props }: ConversationProps) => (
+export const Conversation = ({ className, children, ...props }: ConversationProps) => (
   <StickToBottom
     className={cn('relative flex-1 overflow-y-auto', className)}
     initial="smooth"
     resize="smooth"
     role="log"
     {...props}
-  />
+  >
+    <div
+      aria-hidden
+      className="pointer-events-none absolute inset-x-0 top-0 z-10 h-8 bg-linear-to-b from-card to-transparent"
+    />
+    <div
+      aria-hidden
+      className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-8 bg-linear-to-t from-card to-transparent"
+    />
+    {children}
+  </StickToBottom>
 )
 
 export const ConversationContent = ({ className, ...props }: ConversationContentProps) => (

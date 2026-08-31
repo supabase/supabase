@@ -359,12 +359,18 @@ export const ExplorerNotebookTab = () => {
     <div className="flex flex-col h-full bg-surface-100">
       <ExplorerToolbar className="px-4">
         <ExplorerToolbarIcon>
-          <NotebookText size={14} className="text-foreground-light" />
+          <NotebookText size={16} strokeWidth={2} />
         </ExplorerToolbarIcon>
         <ExplorerToolbarTitle onSaveTitle={handleSaveTitle}>{name ?? ''}</ExplorerToolbarTitle>
         <ExplorerToolbarActions>
           <ExplorerToolbarAction
-            icon={<AiIconAnimation size={16} />}
+            className="group"
+            icon={
+              <AiIconAnimation
+                size={16}
+                className="text-tertiary-foreground group-hover:text-brand"
+              />
+            }
             loading={isCreating}
             disabled={cells.length === 0}
             tooltip={cells.length === 0 ? 'Add a cell to the notebook to analyze it' : undefined}
@@ -374,7 +380,7 @@ export const ExplorerNotebookTab = () => {
           </ExplorerToolbarAction>
           <ExplorerToolbarAction
             aria-label="Save changes"
-            icon={<Save />}
+            icon={<Save size={16} strokeWidth={2} />}
             tooltip="Save changes"
             loading={isUpdating}
             onClick={handleSaveNotebook}
@@ -382,7 +388,10 @@ export const ExplorerNotebookTab = () => {
           <ExplorerToolbarActions>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <ExplorerToolbarAction aria-label="More options" icon={<MoreVertical />} />
+                <ExplorerToolbarAction
+                  aria-label="More options"
+                  icon={<MoreVertical size={16} strokeWidth={2} />}
+                />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem
@@ -405,7 +414,7 @@ export const ExplorerNotebookTab = () => {
           </ExplorerToolbarActions>
           <ExplorerToolbarAction
             aria-label="Run notebook"
-            icon={<Play />}
+            icon={<Play size={16} strokeWidth={2} />}
             tooltip="Run notebook"
             loading={isRunningNotebook}
             disabled={queryCellIds.length === 0}
