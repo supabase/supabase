@@ -50,7 +50,7 @@ export const ExplorerHomeTab = () => {
               title="Run SQL"
               description="Write and run an ad-hoc query"
               bgColor="bg-blue-500"
-              onClick={createQuery}
+              onClick={() => createQuery()}
             />
           </div>
         </section>
