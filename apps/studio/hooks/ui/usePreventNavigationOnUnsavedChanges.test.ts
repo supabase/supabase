@@ -1,87 +1,120 @@
-import { act, renderHook } from '@testing-library/react'
-import { useBlocker } from '@tanstack/react-router'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { usePreventNavigationOnUnsavedChanges } from './usePreventNavigationOnUnsavedChanges'
 
-vi.mock('@tanstack/react-router', () => ({
-  useBlocker: vi.fn(),
+const mocks = vi.hoisted(() => ({
+  tanStackRouter: undefined as undefined | { history: { block: ReturnType<typeof vi.fn> } },
+  nextEvents: { on: vi.fn(), off: vi.fn() },
+  nextPush: vi.fn(),
 }))
 
-const mockUseBlocker = vi.mocked(useBlocker)
-const proceed = vi.fn()
-const reset = vi.fn()
+vi.mock('@tanstack/react-router', () => ({
+  useRouter: () => mocks.tanStackRouter,
+}))
 
-const setBlockerStatus = (status: 'blocked' | 'unblocked') => {
-  mockUseBlocker.mockReturnValue({
-    status,
-    proceed,
-    reset,
-  } as unknown as ReturnType<typeof useBlocker>)
-}
-
-const getLastBlockerOptions = () =>
-  mockUseBlocker.mock.lastCall?.[0] as unknown as {
-    shouldBlockFn: () => boolean
-    withResolver: boolean
-    enableBeforeUnload: boolean
-    disabled: boolean
-  }
+vi.mock('next/router', () => ({
+  useRouter: () => ({ events: mocks.nextEvents, push: mocks.nextPush }),
+}))
 
 describe('usePreventNavigationOnUnsavedChanges', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    setBlockerStatus('unblocked')
+    mocks.tanStackRouter = undefined
   })
 
-  it('guards in-app navigation and tab close while there are changes', () => {
+  it('retains the legacy Next navigation guard', () => {
     renderHook(() => usePreventNavigationOnUnsavedChanges({ hasChanges: true }))
+    const routeChangeHandler = mocks.nextEvents.on.mock.calls.find(
+      ([event]) => event === 'routeChangeStart'
+    )?.[1]
 
-    expect(mockUseBlocker).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        withResolver: true,
-        enableBeforeUnload: true,
-        disabled: false,
-      })
-    )
-    expect(getLastBlockerOptions().shouldBlockFn()).toBe(true)
+    expect(() => act(() => routeChangeHandler('/settings'))).toThrow('Route change declined')
   })
 
-  it('reports and cancels a blocked navigation', () => {
-    setBlockerStatus('blocked')
-    const { result } = renderHook(() =>
-      usePreventNavigationOnUnsavedChanges({ hasChanges: true })
-    )
+  it('blocks TanStack navigation before the route changes and can cancel it', async () => {
+    let blockerFn: (() => Promise<boolean>) | undefined
+    const unblock = vi.fn()
+    mocks.tanStackRouter = {
+      history: {
+        block: vi.fn(({ blockerFn: nextBlockerFn }) => {
+          blockerFn = nextBlockerFn
+          return unblock
+        }),
+      },
+    }
 
-    expect(result.current.shouldConfirmNavigation).toBe(true)
+    const { result } = renderHook(() => usePreventNavigationOnUnsavedChanges({ hasChanges: true }))
+    let navigationResult: Promise<boolean>
+    act(() => {
+      navigationResult = blockerFn!()
+    })
+
+    await waitFor(() => expect(result.current.shouldConfirmNavigation).toBe(true))
     act(() => result.current.handleCancelNavigation())
-    expect(reset).toHaveBeenCalledOnce()
+
+    let resolvedNavigation: boolean | undefined
+    await act(async () => {
+      resolvedNavigation = await navigationResult!
+    })
+    expect(resolvedNavigation).toBe(true)
+    await waitFor(() => expect(result.current.shouldConfirmNavigation).toBe(false))
+    expect(mocks.nextEvents.on).not.toHaveBeenCalled()
   })
 
-  it('proceeds after the user confirms navigation', () => {
-    setBlockerStatus('blocked')
-    const { result } = renderHook(() =>
-      usePreventNavigationOnUnsavedChanges({ hasChanges: true })
-    )
+  it('allows confirmed TanStack navigation to proceed', async () => {
+    let blockerFn: (() => Promise<boolean>) | undefined
+    mocks.tanStackRouter = {
+      history: {
+        block: vi.fn(({ blockerFn: nextBlockerFn }) => {
+          blockerFn = nextBlockerFn
+          return vi.fn()
+        }),
+      },
+    }
 
+    const { result } = renderHook(() => usePreventNavigationOnUnsavedChanges({ hasChanges: true }))
+    let navigationResult: Promise<boolean>
+    act(() => {
+      navigationResult = blockerFn!()
+    })
+
+    await waitFor(() => expect(result.current.shouldConfirmNavigation).toBe(true))
     act(() => result.current.handleConfirmNavigation())
 
-    expect(proceed).toHaveBeenCalledOnce()
-    expect(mockUseBlocker).toHaveBeenLastCalledWith(
-      expect.objectContaining({ enableBeforeUnload: false, disabled: true })
-    )
+    let resolvedNavigation: boolean | undefined
+    await act(async () => {
+      resolvedNavigation = await navigationResult!
+    })
+    expect(resolvedNavigation).toBe(false)
   })
 
-  it('allows an intentional navigation to bypass the guard', () => {
-    const { result } = renderHook(() =>
-      usePreventNavigationOnUnsavedChanges({ hasChanges: true })
-    )
+  it('bypasses only the next intentional TanStack navigation', async () => {
+    let blockerFn: (() => Promise<boolean>) | undefined
+    mocks.tanStackRouter = {
+      history: {
+        block: vi.fn(({ blockerFn: nextBlockerFn }) => {
+          blockerFn = nextBlockerFn
+          return vi.fn()
+        }),
+      },
+    }
 
+    const { result } = renderHook(() => usePreventNavigationOnUnsavedChanges({ hasChanges: true }))
     act(() => result.current.bypassNavigationGuard())
 
-    expect(proceed).not.toHaveBeenCalled()
-    expect(mockUseBlocker).toHaveBeenLastCalledWith(
-      expect.objectContaining({ enableBeforeUnload: false, disabled: true })
-    )
+    await expect(blockerFn!()).resolves.toBe(false)
+
+    let secondNavigation: Promise<boolean>
+    act(() => {
+      secondNavigation = blockerFn!()
+    })
+    await waitFor(() => expect(result.current.shouldConfirmNavigation).toBe(true))
+    act(() => result.current.handleCancelNavigation())
+    let resolvedNavigation: boolean | undefined
+    await act(async () => {
+      resolvedNavigation = await secondNavigation!
+    })
+    expect(resolvedNavigation).toBe(true)
   })
 })

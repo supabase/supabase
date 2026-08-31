@@ -54,15 +54,6 @@ vi.mock('@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges', ()
   PreventNavigationOnUnsavedChanges: () => null,
 }))
 
-vi.mock('@/hooks/ui/usePreventNavigationOnUnsavedChanges', () => ({
-  usePreventNavigationOnUnsavedChanges: () => ({
-    handleCancelNavigation: vi.fn(),
-    handleConfirmNavigation: vi.fn(),
-    bypassNavigationGuard: vi.fn(),
-    shouldConfirmNavigation: false,
-  }),
-}))
-
 vi.mock('@/data/auth/auth-config-query', () => ({
   useAuthConfigQuery: useAuthConfigQueryMock,
 }))

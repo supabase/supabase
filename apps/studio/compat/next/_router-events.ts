@@ -15,7 +15,8 @@
 // — we forward `toLocation.href` as the URL arg.
 //
 // Next's `routeChangeStart` lets handlers throw to cancel navigation. TanStack's
-// `subscribe` is fire-and-forget, so cancellation uses `useBlocker` instead.
+// `subscribe` is fire-and-forget, so the shared unsaved-changes hook blocks through
+// TanStack history before navigation begins instead.
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyRouter = any
