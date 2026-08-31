@@ -1,4 +1,4 @@
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, mergeRefs, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, mergeRefs, useFlag, useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { XIcon } from 'lucide-react'
 import Head from 'next/head'
@@ -23,10 +23,6 @@ import {
   useIsMobile,
   usePanelRef,
 } from 'ui'
-import {
-  SELECT_26_STUDIO_DISMISSAL_KEY,
-  useSelect26PromotionActive,
-} from 'ui-patterns/Banners/Select26Promotion'
 
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { useMainScrollContainer, useSetMainScrollContainer } from '../MainScrollContainerContext'
@@ -46,12 +42,8 @@ import { UnhealthyState } from './UnhealthyState'
 import { UpgradingState } from './UpgradingState'
 import { CreateBranchModal } from '@/components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from '@/components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
+import { BannerExplorer } from '@/components/ui/BannerStack/Banners/BannerExplorer'
 import { BannerFreeMicroUpgrade } from '@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade'
-import { BannerSelect2026 } from '@/components/ui/BannerStack/Banners/BannerSelect2026'
-import {
-  SELECT_26_BANNER_PRIORITY,
-  shouldShowSelect26Banner,
-} from '@/components/ui/BannerStack/Banners/BannerSelect2026.utils'
 import { BANNER_ID, useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import PartnerIcon from '@/components/ui/PartnerIcon'
@@ -161,13 +153,13 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       !!projectResourceWarnings?.disk_io_exhaustion
     const isNanoCompute = selectedProject?.infra_compute_size === 'nano'
     const showUpgradeBanner = isNanoCompute && isComputeNearExhaustion
+
+    const isExplorerEnabled = useFlag('explorer')
+
     const [isFreeMicroUpgradeBannerDismissed] = useLocalStorageQuery(
       LOCAL_STORAGE_KEYS.FREE_MICRO_UPGRADE_BANNER_DISMISSED(selectedProject?.ref ?? ''),
       false
     )
-    const [isSelect26BannerDismissed, , { isSuccess: isSelect26DismissalLoaded }] =
-      useLocalStorageQuery(SELECT_26_STUDIO_DISMISSAL_KEY, false)
-    const isSelect26PromotionActive = useSelect26PromotionActive()
     const [isProjectIntegrationBannerDismissed, setIsProjectIntegrationBannerDismissed] =
       useLocalStorageQuery(
         getProjectIntegrationBannerDismissKey({
@@ -176,6 +168,11 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
         }),
         false
       )
+    const [isExplorerBannerDismissed, , { isSuccess: isLocalStorageReady }] = useLocalStorageQuery(
+      LOCAL_STORAGE_KEYS.EXPLORER_BANNER_DISMISSED,
+      false
+    )
+
     const { showSidebar } = useAppStateSnapshot()
     const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
 
@@ -246,36 +243,15 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     ])
 
     useEffect(() => {
-      // Wait until project + dismissal state are known so we do not call
-      // dismissBanner on every early render (it always schedules a setState).
-      if (!selectedProject?.ref || !isSelect26DismissalLoaded) return
+      if (!isExplorerEnabled || !isLocalStorageReady || isExplorerBannerDismissed) return
 
-      const shouldShow = shouldShowSelect26Banner({
-        isPlatform: IS_PLATFORM,
-        projectRef: selectedProject.ref,
-        dismissalLoaded: isSelect26DismissalLoaded,
-        isActive: isSelect26PromotionActive,
-        isDismissed: isSelect26BannerDismissed,
+      addBanner({
+        id: 'explorer-banner',
+        priority: 2,
+        isDismissed: false,
+        content: <BannerExplorer />,
       })
-
-      if (shouldShow) {
-        addBanner({
-          id: BANNER_ID.SELECT_26,
-          isDismissed: false,
-          content: <BannerSelect2026 />,
-          priority: SELECT_26_BANNER_PRIORITY,
-        })
-      } else {
-        dismissBanner(BANNER_ID.SELECT_26)
-      }
-    }, [
-      selectedProject?.ref,
-      isSelect26DismissalLoaded,
-      isSelect26PromotionActive,
-      isSelect26BannerDismissed,
-      addBanner,
-      dismissBanner,
-    ])
+    }, [addBanner, isExplorerEnabled, isExplorerBannerDismissed, isLocalStorageReady])
 
     useLayoutEffect(() => {
       const unregister = registerOpenMenu(() => {

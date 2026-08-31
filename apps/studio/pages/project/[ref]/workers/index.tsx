@@ -70,7 +70,7 @@ const WorkersPage: NextPageWithLayout = () => {
               <Admonition
                 type="default"
                 title={`${PRODUCT_NAME} is not enabled for this project`}
-                description={`${PRODUCT_NAME} is in private alpha. Contact support to have this project added to the alpha.`}
+                description={`${PRODUCT_NAME} is in Private Alpha. Contact support to have this project added to the alpha.`}
               />
             )}
             {isMissingPermission && <NoPermission resourceText="view this project's workers" />}

@@ -23,8 +23,7 @@ export function hasDiscardableChanges(
 
 /**
  * Evicts a notebook from the React Query cache and the Valtio store together.
- * Applies to a persisted notebook (always safe to refetch) and to a dirty
- * unsaved notebook (safe once the caller has confirmed discarding it).
+ * Callers are responsible for confirming before discarding unsaved edits.
  *
  * Removes the query entry outright rather than invalidating it: a mounted
  * `useNotebookQuery` observer would otherwise read the stale cached value
@@ -32,10 +31,8 @@ export function hasDiscardableChanges(
  * merge guard would treat that stale merge as already-loaded and drop the
  * real update.
  *
- * @returns A boolean indicating whether the notebook was successfully evicted
- *          from the cache.
  */
-export async function evictNotebookFromCaches({
+export function evictNotebookFromCaches({
   queryClient,
   projectRef,
   id,
@@ -43,11 +40,7 @@ export async function evictNotebookFromCaches({
   queryClient: QueryClient
   projectRef: string
   id: string
-}): Promise<boolean> {
-  const stateNotebook = notebooksState.notebooks[id]
-  const canEvict = stateNotebook?.status === 'saved' || hasDiscardableChanges(stateNotebook)
-  if (!canEvict) return false
-
+}): boolean {
   notebooksState.removeNotebook({ id })
   queryClient.removeQueries({ queryKey: contentKeys.resource(projectRef, id) })
 

@@ -4,20 +4,18 @@ import { SELECT_26_BANNER_PRIORITY, shouldShowSelect26Banner } from './BannerSel
 
 const visibleState = {
   isPlatform: true,
-  projectRef: 'project-ref',
   dismissalLoaded: true,
   isActive: true,
   isDismissed: false,
 }
 
 describe('shouldShowSelect26Banner', () => {
-  it('shows the promotion on hosted project pages', () => {
+  it('shows the promotion on hosted Studio', () => {
     expect(shouldShowSelect26Banner(visibleState)).toBe(true)
   })
 
   it.each([
     ['self-hosted Studio', { isPlatform: false }],
-    ['outside a project', { projectRef: undefined }],
     ['before dismissal state loads', { dismissalLoaded: false }],
     ['after campaign expiry', { isActive: false }],
     ['after dismissal', { isDismissed: true }],
