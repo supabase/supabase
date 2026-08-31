@@ -32,23 +32,16 @@ import { Markdown } from '@/components/interfaces/Markdown'
 import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
 import { useRateMessageMutation } from '@/data/ai/rate-message-mutation'
 import { useTablesQuery } from '@/data/tables/tables-query'
-import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import type { AssistantMessageMetadata } from '@/lib/ai/assistant-message-metadata'
 import { getParallelApprovalIdsToReject } from '@/lib/ai/message-utils'
-import {
-  DEFAULT_ASSISTANT_BASE_MODEL_ID,
-  defaultAssistantModelId,
-  isAssistantBaseModelId,
-  isKnownAssistantModelId,
-} from '@/lib/ai/model.utils'
 import { IS_PLATFORM } from '@/lib/constants'
 import { uuidv4 } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
-import type { AssistantModel, SqlSnippet } from '@/state/ai-assistant-state'
+import type { SqlSnippet } from '@/state/ai-assistant-state'
 import { useAiAssistantState, useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -108,26 +101,6 @@ export const AssistantChat = ({
   useShortcut(SHORTCUT_IDS.AI_ASSISTANT_CANCEL_EDIT, () => cancelEdit(), {
     enabled: shortcutsEnabled,
   })
-
-  const { hasAccess: hasAccessToAdvanceModel, isLoading: isLoadingEntitlements } =
-    useCheckEntitlements('assistant.advance_model')
-
-  const selectedModel = useMemo<AssistantModel>(() => {
-    // While entitlements are loading, use the stored model without enforcing access
-    if (isLoadingEntitlements) {
-      return snap.model ?? DEFAULT_ASSISTANT_BASE_MODEL_ID
-    }
-
-    const defaultModel = defaultAssistantModelId(hasAccessToAdvanceModel)
-    const model = snap.model ?? defaultModel
-
-    if (!isKnownAssistantModelId(model)) return defaultModel
-    if (!hasAccessToAdvanceModel && !isAssistantBaseModelId(model)) {
-      return DEFAULT_ASSISTANT_BASE_MODEL_ID
-    }
-
-    return model
-  }, [isLoadingEntitlements, hasAccessToAdvanceModel, snap.model])
 
   const [updatedOptInSinceMCP] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
@@ -707,8 +680,6 @@ export const AssistantChat = ({
               composerContext?.onSetSqlSnippets?.(newSnippets)
             }}
             includeSnippetsInMessage={includeSnippetsInMessage}
-            selectedModel={selectedModel}
-            onSelectModel={(model) => snap.setModel(model)}
           />
         </div>
       </div>
