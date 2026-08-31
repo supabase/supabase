@@ -121,5 +121,4 @@ overrides:
   '@esbuild-plugins/node-resolve>esbuild': ^0.28.1
 
 patchedDependencies:
-  '@mdxeditor/editor@4.2.1': patches/mdxeditor-editor.patch
   react-data-grid: patches/react-data-grid.patch

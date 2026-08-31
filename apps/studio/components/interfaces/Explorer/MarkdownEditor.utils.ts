@@ -50,6 +50,11 @@ const codeEditorLanguageByAlias: Record<string, ValidLanguages> = {
 export const getCodeBlockLanguage = (language?: string): string => {
   if (!language) return 'text'
 
+  // MDXEditor's markdown shortcut hands us the opening fence instead of the language when a
+  // fenced block is typed, because it reads the wrong capture group from Lexical 0.48's start
+  // regex. Treat that as unset. https://github.com/mdx-editor/editor/issues/825
+  if (/^[ \t]*`{3,}$/.test(language)) return 'text'
+
   return codeBlockLanguageByAlias[language.toLowerCase()] ?? language
 }
 

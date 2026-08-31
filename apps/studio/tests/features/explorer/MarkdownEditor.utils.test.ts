@@ -25,6 +25,9 @@ describe('getCodeBlockLanguage', () => {
     ['markdown', 'markdown'],
     ['md', 'markdown'],
     ['python', 'python'],
+    ['```', 'text'],
+    ['````', 'text'],
+    ['  ```', 'text'],
   ])('normalizes %s to %s', (language, expected) => {
     expect(getCodeBlockLanguage(language)).toBe(expected)
   })
