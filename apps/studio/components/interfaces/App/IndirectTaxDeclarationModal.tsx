@@ -29,6 +29,7 @@ export const IndirectTaxDeclarationModal = () => {
   const { data: organization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
 
   const [response, setResponse] = useState<IndirectTaxDeclaration | ''>('')
+  const [failedSubmissionSlug, setFailedSubmissionSlug] = useState<string>()
 
   const [shouldShowDeclarationConfirmation, setShouldShowDeclarationConfirmation] = useQueryState(
     'submit_indirect_tax_declaration',
@@ -51,8 +52,11 @@ export const IndirectTaxDeclarationModal = () => {
           toast.success('GST declaration submitted')
         }
       },
-      onError: (error) => {
-        toast.error(`Failed to submit GST declaration: ${error.message}`)
+      onError: (_error, variables) => {
+        setFailedSubmissionSlug(variables.slug)
+        toast.error("We couldn't submit your GST declaration. Reload the page and try again.", {
+          duration: Infinity,
+        })
       },
     }
   )
@@ -64,7 +68,9 @@ export const IndirectTaxDeclarationModal = () => {
 
   if (canViewDeclaration) {
     if (organization.requires_indirect_tax_declaration) {
-      declarationModal = 'declaration-form'
+      if (organization.slug !== failedSubmissionSlug) {
+        declarationModal = 'declaration-form'
+      }
     } else if (shouldShowDeclarationConfirmation) {
       declarationModal = 'submission-confirmation'
     }

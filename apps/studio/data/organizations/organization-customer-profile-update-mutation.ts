@@ -140,11 +140,6 @@ export const useOrganizationCustomerProfileUpdateMutation = ({
             queryKey: organizationKeys.taxId(slug),
           })
         }
-        if (indirect_tax_registration_declaration !== undefined) {
-          queryClient.invalidateQueries({
-            queryKey: organizationKeys.list(),
-          })
-        }
       }, 3000)
 
       await onSuccess?.(data, variables, context)

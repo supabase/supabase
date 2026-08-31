@@ -2,6 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { HttpResponse } from 'msw'
+import { toast } from 'sonner'
 import { describe, expect, test, vi } from 'vitest'
 
 import { IndirectTaxDeclarationModal } from '@/components/interfaces/App/IndirectTaxDeclarationModal'
@@ -26,6 +27,13 @@ vi.mock('@/lib/constants', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>()
   return { ...actual, IS_PLATFORM: true }
 })
+
+vi.mock('sonner', () => ({
+  toast: {
+    error: vi.fn(),
+    success: vi.fn(),
+  },
+}))
 
 const billingWritePermission = {
   actions: [PermissionAction.BILLING_WRITE],
@@ -128,6 +136,31 @@ describe('IndirectTaxDeclarationModal', () => {
     expect(dialog).toHaveTextContent('GST declaration submitted')
     expect(dialog).toHaveTextContent(
       'The GST declaration for Test Org has been submitted. No further action is required.'
+    )
+  })
+
+  test('closes after a failed submission without showing the submitted confirmation', async () => {
+    setupMocks()
+
+    addAPIMock({
+      method: 'put',
+      path: '/platform/organizations/:slug/customer',
+      response: () => HttpResponse.json({ message: 'Orb update failed' }, { status: 500 }),
+    })
+
+    customRender(<IndirectTaxDeclarationModal />, {
+      profileContext: PROFILE_CONTEXT,
+      nuqs: { searchParams: { submit_indirect_tax_declaration: 'true' } },
+    })
+
+    await userEvent.click(await screen.findByRole('radio', { name: /Yes, I confirm/i }))
+    await userEvent.click(screen.getByRole('button', { name: 'Submit declaration' }))
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    expect(screen.queryByText('GST declaration submitted')).not.toBeInTheDocument()
+    expect(toast.error).toHaveBeenCalledWith(
+      "We couldn't submit your GST declaration. Reload the page and try again.",
+      { duration: Infinity }
     )
   })
 
