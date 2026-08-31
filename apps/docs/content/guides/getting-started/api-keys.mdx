@@ -155,7 +155,7 @@ Pass the branch's own project ref to read the keys for a preview branch. A branc
 
 Use the Management API to fetch keys from your own tooling, such as a deploy script or an internal provisioning service.
 
-Authenticate with a [personal access token](/dashboard/account/tokens). Secret key values are only returned when you ask for them with `reveal`.
+Authenticate with a [personal access token](/dashboard/account/tokens). Pass `reveal=true` to include the key values in the response.
 
 ```bash
 export PROJECT_REF="your-project-ref"
@@ -171,7 +171,7 @@ The `jq` pipe only formats the output, so you can drop it. See [Get project API 
 </TabPanel>
 <TabPanel id="local" label="Local stack">
 
-A local stack mints its own keys. They are unrelated to your hosted project's keys, and they are the same on every machine, so they are safe to commit in a local-only `.env`.
+A local stack mints its own keys. They are unrelated to your hosted project's keys, so a local key never grants access to your hosted data.
 
 This path needs the Supabase CLI and a container runtime. See [Running a local Supabase project](/docs/guides/local-development/cli/getting-started#running-a-local-supabase-project) for both.
 
