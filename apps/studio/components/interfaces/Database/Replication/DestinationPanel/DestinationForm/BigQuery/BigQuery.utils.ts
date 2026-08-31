@@ -7,14 +7,14 @@ export type BigQueryValidationIssue = {
   message: string
 }
 
-export const BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE = 'Service account key must be valid JSON'
+export const BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE = 'Service account key must be valid JSON.'
 
 const BIGQUERY_REQUIRED_FIELDS: {
   path: Exclude<BigQueryFieldPath, 'serviceAccountKey'>
   message: string
 }[] = [
-  { path: 'projectId', message: 'Project ID is required' },
-  { path: 'datasetId', message: 'Dataset ID is required' },
+  { path: 'projectId', message: 'Project ID is required.' },
+  { path: 'datasetId', message: 'Dataset ID is required.' },
 ]
 
 const isValidJsonString = (value: string) => {
@@ -39,7 +39,7 @@ export const getBigQueryValidationIssues = (
 
   if (!serviceAccountKey) {
     if (!secretsOptional) {
-      issues.push({ path: 'serviceAccountKey', message: 'Service account key is required' })
+      issues.push({ path: 'serviceAccountKey', message: 'Service account key is required.' })
     }
     return issues
   }
