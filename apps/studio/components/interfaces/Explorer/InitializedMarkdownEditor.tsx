@@ -114,6 +114,21 @@ const notebookCodeBlockEditorDescriptor: CodeBlockEditorDescriptor = {
   Editor: NotebookCodeBlockEditor,
 }
 
+const notebookMarkdownPlugins = [
+  headingsPlugin(),
+  listsPlugin(),
+  quotePlugin(),
+  thematicBreakPlugin(),
+  linkPlugin(),
+  linkDialogPlugin(),
+  tablePlugin(),
+  codeBlockPlugin({
+    defaultCodeBlockLanguage: 'text',
+    codeBlockEditorDescriptors: [notebookCodeBlockEditorDescriptor],
+  }),
+  markdownShortcutPlugin(),
+]
+
 /**
  * MDXEditor and its plugins must only be initialized in the browser. Import this component
  * through `MarkdownEditor`, which disables server rendering for this module.
@@ -123,20 +138,7 @@ export function InitializedMarkdownEditor({ editorRef, ...props }: InitializedMa
     <MDXEditor
       {...props}
       ref={editorRef}
-      plugins={[
-        headingsPlugin(),
-        listsPlugin(),
-        quotePlugin(),
-        thematicBreakPlugin(),
-        linkPlugin(),
-        linkDialogPlugin(),
-        tablePlugin(),
-        codeBlockPlugin({
-          defaultCodeBlockLanguage: 'text',
-          codeBlockEditorDescriptors: [notebookCodeBlockEditorDescriptor],
-        }),
-        markdownShortcutPlugin(),
-      ]}
+      plugins={notebookMarkdownPlugins}
     />
   )
 }
