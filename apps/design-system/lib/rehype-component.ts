@@ -20,6 +20,11 @@ function getRegistryFiles(styleName: string, name: string) {
   if (!item || item.files.length === 0) {
     throw new Error(`Registry item "${name}" has no source files`)
   }
+  // `components:ui` items are the real shadcn primitives shared via `packages/ui`,
+  // not local copies under `registry/${styleName}/` like examples/fragments/blocks.
+  if (item.type === 'components:ui') {
+    return item.files.map((file) => `../../packages/ui/src/components/shadcn/ui/${file}`)
+  }
   return item.files.map((file) => `registry/${styleName}/${file}`)
 }
 

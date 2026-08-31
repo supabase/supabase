@@ -42,7 +42,9 @@ const docs = s
     // internal doc cross-links (e.g. `[Button](components/button)`) aren't
     // real files on disk — disable Velite's default asset-copying behavior,
     // which otherwise treats every relative link as a local file to copy.
-    code: s.mdx({ copyLinkedFiles: false }),
+    // Minification is also disabled: it's pure CPU-bound Terser work with no
+    // real benefit for a dev-only content cache, and dominates build time.
+    code: s.mdx({ copyLinkedFiles: false, minify: false }),
   })
   .transform(({ path: flattenedPath, ...data }) => ({
     ...data,
@@ -94,10 +96,18 @@ export default defineConfig({
       [
         rehypePrettyCode,
         {
-          getHighlighter: async () => {
-            const theme = await loadTheme(path.join(process.cwd(), '/lib/themes/supabase-2.json'))
-            return await getHighlighter({ theme })
-          },
+          // Memoized so the (expensive) theme parse + oniguruma WASM init runs once
+          // for the whole build, instead of once per file — velite compiles every
+          // file concurrently, so without this every doc pays that cost redundantly.
+          getHighlighter: (() => {
+            let highlighterPromise
+            return () => {
+              highlighterPromise ??= loadTheme(
+                path.join(process.cwd(), '/lib/themes/supabase-2.json')
+              ).then((theme) => getHighlighter({ theme }))
+              return highlighterPromise
+            }
+          })(),
           onVisitLine(node) {
             // Prevent lines from collapsing in `display: grid` mode, and allow empty
             // lines to be copy/pasted

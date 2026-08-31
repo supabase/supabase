@@ -14,7 +14,7 @@
     "build": "pnpm run build:registry && pnpm run build:content && next build --turbopack",
     "start": "next start",
     "lint": "eslint .",
-    "clean": "rimraf .next .turbo tsconfig.tsbuildinfo .contentlayer .velite",
+    "clean": "rimraf .next .turbo tsconfig.tsbuildinfo .contentlayer .velite __registry__",
     "typecheck": "run-p build:registry build:content && tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
