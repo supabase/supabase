@@ -31,7 +31,7 @@ export const getTableRowsCountSql = ({
     const query = new Query()
     let queryChains = query.from(table.name, table.schema ?? undefined).count()
     filters
-      .filter((x) => x.value && x.value !== '')
+      .filter((x) => x.value !== undefined && x.value !== null && x.value !== '')
       .forEach((x) => {
         queryChains = queryChains.filter(x.column, x.operator, x.value)
       })
@@ -44,7 +44,7 @@ export const getTableRowsCountSql = ({
     const selectQuery = new Query()
     let selectQueryChains = selectQuery.from(table.name, table.schema ?? undefined).select()
     filters
-      .filter((x) => x.value && x.value != '')
+      .filter((x) => x.value !== undefined && x.value !== null && x.value !== '')
       .forEach((x) => {
         selectQueryChains = selectQueryChains.filter(x.column, x.operator, x.value)
       })
@@ -56,7 +56,7 @@ export const getTableRowsCountSql = ({
     const countQuery = new Query()
     let countQueryChains = countQuery.from(table.name, table.schema ?? undefined).count()
     filters
-      .filter((x) => x.value && x.value != '')
+      .filter((x) => x.value !== undefined && x.value !== null && x.value !== '')
       .forEach((x) => {
         countQueryChains = countQueryChains.filter(x.column, x.operator, x.value)
       })
