@@ -252,7 +252,7 @@ export default function FormPatternsPageLayout() {
                           <InputGroup>
                             <FormInputGroupInput {...field} type="number" min={5} max={30} />
                             <InputGroupAddon align="inline-end">
-                              <InputGroupText className="font-mono">ms</InputGroupText>
+                              <InputGroupText>milliseconds</InputGroupText>
                             </InputGroupAddon>
                           </InputGroup>
                         </FormControl>
