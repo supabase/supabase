@@ -77,34 +77,40 @@ export const HaInstanceConfiguration = () => {
   const isError = isErrorGateways || isErrorPoolers
   const error = gatewaysError ?? poolersError
 
-  if (isPending) {
-    return (
-      <div role="status" className="h-full w-full flex items-center justify-center">
-        <span className="sr-only">Loading cluster topology...</span>
-        <Loader2 aria-hidden="true" className="motion-safe:animate-spin text-foreground-light" />
-      </div>
-    )
-  }
-
   // While the project is provisioning, the /ha-admin endpoints fail or return an
   // empty topology as a matter of course — that's a project still booting, not an
   // unhealthy cluster.
-  if (isProjectBuilding && (isError || (poolers ?? []).length === 0)) {
+  const isProvisioning = isProjectBuilding && (isError || (poolers ?? []).length === 0)
+
+  // The initial load and the provisioning placeholder share one persistent
+  // role="status" live region so screen readers announce the transition between
+  // them — a live region only announces updates to content it already contains.
+  if (isPending || isProvisioning) {
     return (
-      <div className="h-full w-full flex items-center justify-center p-6">
-        <EmptyStatePresentational
-          icon={
+      <div role="status" className="h-full w-full flex items-center justify-center p-6">
+        {isPending ? (
+          <>
+            <span className="sr-only">Loading cluster topology...</span>
             <Loader2
-              size={24}
-              strokeWidth={1.5}
               aria-hidden="true"
-              className="motion-safe:animate-spin text-foreground-muted"
+              className="motion-safe:animate-spin text-foreground-light"
             />
-          }
-          title="Setting up project"
-          description="Cluster topology will be available once your project is ready. This may take a few minutes."
-          className="max-w-md"
-        />
+          </>
+        ) : (
+          <EmptyStatePresentational
+            icon={
+              <Loader2
+                size={24}
+                strokeWidth={1.5}
+                aria-hidden="true"
+                className="motion-safe:animate-spin text-foreground-muted"
+              />
+            }
+            title="Setting up project"
+            description="Cluster topology will be available once your project is ready. This may take a few minutes."
+            className="max-w-md"
+          />
+        )}
       </div>
     )
   }

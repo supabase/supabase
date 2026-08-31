@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import { platformComponents as components } from 'api-types'
 import { http, HttpResponse } from 'msw'
 import { describe, expect, test, vi } from 'vitest'
@@ -94,7 +94,8 @@ describe('HaInstanceConfiguration', () => {
 
     customRender(<HaInstanceConfiguration />, { profileContext: PROFILE_CONTEXT })
 
-    expect(await screen.findByText('Setting up project')).toBeInTheDocument()
+    const statusRegion = await screen.findByRole('status')
+    expect(await within(statusRegion).findByText('Setting up project')).toBeInTheDocument()
     expect(screen.queryByText('Failed to retrieve cluster topology')).not.toBeInTheDocument()
   })
 
