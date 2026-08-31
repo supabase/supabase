@@ -14,7 +14,7 @@ export * from './src/components/SidePanel'
 
 // HTML
 
-export { Heading, getAnchor } from './src/components/CustomHTMLElements'
+export { Heading, getAnchor, removeAnchor } from './src/components/CustomHTMLElements'
 
 // UTILITIES
 
@@ -161,3 +161,6 @@ export * from './src/lib/Hooks'
 export * from './src/components/hooks/use-mobile'
 
 export * from './src/components/KeyboardShortcut/KeyboardShortcut'
+
+export * as colors from './src/lib/tailwind-demo-classes'
+export * from './src/lib/constants'

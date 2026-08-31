@@ -1,7 +1,9 @@
 import { useState } from 'react'
-import color, { cn } from 'ui'
+import { cn, colors } from 'ui'
 
 import { Grid, GridItem } from './grid'
+
+const color = colors['default']
 
 const Colors = ({
   definition,

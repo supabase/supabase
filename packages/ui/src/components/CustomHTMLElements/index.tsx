@@ -1,4 +1,4 @@
 import Heading from './Heading'
 
 export { Heading }
-export { getAnchor } from './CustomHTMLElements.utils'
+export { getAnchor, removeAnchor } from './CustomHTMLElements.utils'
