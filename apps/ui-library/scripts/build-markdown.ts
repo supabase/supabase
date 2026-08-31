@@ -27,6 +27,9 @@ async function generate() {
   const sources = await collectMdxFiles(CONTENT_DIR)
   const slugs: string[] = []
 
+  // Wipe first so pages that were renamed or deleted don't leave stale markdown
+  // behind — public/markdown is served directly, and the files outlive the manifest.
+  await fs.rm(OUTPUT_DIR, { recursive: true, force: true })
   await fs.mkdir(OUTPUT_DIR, { recursive: true })
 
   for (const sourceFile of sources) {
