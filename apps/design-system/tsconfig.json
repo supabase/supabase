@@ -6,7 +6,8 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "paths": {
       "@/*": ["./*"],
-      "contentlayer/generated": ["./.contentlayer/generated"]
+      "contentlayer/generated": ["./.contentlayer/generated"],
+      "icons/*": ["./../../packages/icons/*"]
     },
     "plugins": [{ "name": "next" }]
   },
