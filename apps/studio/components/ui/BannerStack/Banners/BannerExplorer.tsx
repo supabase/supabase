@@ -1,14 +1,15 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { Badge, Button } from 'ui'
 
 import { BannerCard } from '../BannerCard'
 import { useBannerStack } from '../BannerStackProvider'
-import { claimExplorerBannerSessionExposure } from './BannerExplorer.utils'
 import { useFeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useTrack } from '@/lib/telemetry/track'
+
+let hasTrackedExposureThisPageLoad = false
 
 export const BannerExplorer = () => {
   const track = useTrack()
@@ -20,12 +21,11 @@ export const BannerExplorer = () => {
     false
   )
 
-  const hasTrackedExposure = useRef(false)
   useEffect(() => {
-    if (hasTrackedExposure.current) return
-    hasTrackedExposure.current = true
+    if (hasTrackedExposureThisPageLoad) return
+    hasTrackedExposureThisPageLoad = true
 
-    if (claimExplorerBannerSessionExposure()) track('explorer_banner_exposed')
+    track('explorer_banner_exposed')
   }, [track])
 
   return (

@@ -1532,8 +1532,9 @@ export interface DatabaseConnectionsBannerCtaButtonClickedEvent {
 }
 
 /**
- * The Explorer feature preview banner was rendered in studio project pages, fired once per
- * browser session. Acts as the denominator for the banner's dismiss and CTA rates.
+ * The Explorer feature preview banner was rendered in studio project pages, fired at most once
+ * per page load. Acts as the denominator for the banner's dismiss and CTA rates; dedupe per
+ * session or per user at query time.
  *
  * @group Events
  * @source studio
