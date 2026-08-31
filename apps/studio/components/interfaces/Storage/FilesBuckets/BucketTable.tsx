@@ -13,6 +13,7 @@ import {
 } from 'ui'
 
 import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
+import { getMockBucketProtection } from '@/components/interfaces/Storage/StorageProtection.constants'
 import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
 import {
   VirtualizedTableCell,
@@ -50,6 +51,7 @@ export const BucketTableHeader = ({ mode, hasBuckets = true }: BucketTableHeader
         <BucketTableHead className={stickyClasses}>Policies</BucketTableHead>
         <BucketTableHead className={stickyClasses}>File size limit</BucketTableHead>
         <BucketTableHead className={stickyClasses}>Allowed MIME types</BucketTableHead>
+        <BucketTableHead className={stickyClasses}>Versioning</BucketTableHead>
         <BucketTableHead className={stickyClasses}>
           <span className="sr-only">Actions</span>
         </BucketTableHead>
@@ -69,7 +71,7 @@ export const BucketTableEmptyState = ({ mode, filterString }: BucketTableEmptySt
 
   return (
     <BucketTableRow className="[&>td]:hover:bg-inherit">
-      <BucketTableCell colSpan={5}>
+      <BucketTableCell colSpan={6}>
         <p className="text-sm text-foreground">No results found</p>
         <p className="text-sm text-foreground-lighter">
           Your search for “{filterString}” did not return any results
@@ -97,6 +99,8 @@ export const BucketTableRow = ({
 
   const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
   const BucketTableCell = mode === 'standard' ? TableCell : VirtualizedTableCell
+
+  const versioningState = getMockBucketProtection(bucket.id).versioning
 
   const handleBucketNavigation = createNavigationHandler(
     `/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucket.id)}`,
@@ -152,6 +156,12 @@ export const BucketTableRow = ({
         >
           {bucket.allowed_mime_types ? bucket.allowed_mime_types.join(', ') : 'Any'}
         </p>
+      </BucketTableCell>
+
+      <BucketTableCell>
+        {versioningState === 'enabled' && <Badge variant="success">Enabled</Badge>}
+        {versioningState === 'suspended' && <Badge variant="warning">Suspended</Badge>}
+        {versioningState === 'disabled' && <span className="text-foreground-muted">-</span>}
       </BucketTableCell>
 
       <BucketTableCell>

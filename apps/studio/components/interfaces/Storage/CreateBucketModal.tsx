@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -28,54 +28,70 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
-import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
-import { convertFromBytes, convertToBytes } from './StorageSettings/StorageSettings.utils'
 import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { useBucketCreateMutation } from '@/data/storage/bucket-create-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
-const FormSchema = z
-  .object({
-    name: z
-      .string()
-      .trim()
-      .min(1, 'Please provide a name for your bucket')
-      .max(100, 'Bucket name should be below 100 characters')
-      .refine(
-        (value) => !value.endsWith(' '),
-        'The name of the bucket cannot end with a whitespace'
-      )
-      .refine(
-        (value) => value !== 'public',
-        '"public" is a reserved name. Please choose another name'
-      ),
-    public: z.boolean().default(false),
-    has_file_size_limit: z.boolean().default(false),
-    formatted_size_limit: z.coerce
-      .number()
-      .min(0, 'File size upload limit has to be at least 0')
-      .optional(),
-    allowed_mime_types: z.string().trim().default(''),
-  })
-  .superRefine((data, ctx) => {
-    if (!validBucketNameRegex.test(data.name)) {
-      const [match] = data.name.match(inverseValidBucketNameRegex) ?? []
-      ctx.addIssue({
-        path: ['name'],
-        code: z.ZodIssueCode.custom,
-        message: !!match
-          ? `Bucket name cannot contain the "${match}" character`
-          : 'Bucket name contains an invalid special character',
-      })
-    }
-  })
+import { BucketDataProtectionFields } from './BucketDataProtectionFields'
+import {
+  bucketProtectionFormFields,
+  superRefineBucketProtection,
+} from './BucketDataProtectionFields.schema'
+import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
+import {
+  getVersioningPlanLimits,
+  setMockBucketProtection,
+  useIsStorageProtectionEnabled,
+  type VersioningPlanLimits,
+} from './StorageProtection.constants'
+import { convertFromBytes, convertToBytes } from './StorageSettings/StorageSettings.utils'
+
+const buildFormSchema = (planLimits: VersioningPlanLimits | null) =>
+  z
+    .object({
+      name: z
+        .string()
+        .trim()
+        .min(1, 'Please provide a name for your bucket')
+        .max(100, 'Bucket name should be below 100 characters')
+        .refine(
+          (value) => !value.endsWith(' '),
+          'The name of the bucket cannot end with a whitespace'
+        )
+        .refine(
+          (value) => value !== 'public',
+          '"public" is a reserved name. Please choose another name'
+        ),
+      public: z.boolean().default(false),
+      has_file_size_limit: z.boolean().default(false),
+      formatted_size_limit: z.coerce
+        .number()
+        .min(0, 'File size upload limit has to be at least 0')
+        .optional(),
+      allowed_mime_types: z.string().trim().default(''),
+      ...bucketProtectionFormFields,
+    })
+    .superRefine((data, ctx) => {
+      if (!validBucketNameRegex.test(data.name)) {
+        const [match] = data.name.match(inverseValidBucketNameRegex) ?? []
+        ctx.addIssue({
+          path: ['name'],
+          code: z.ZodIssueCode.custom,
+          message: !!match
+            ? `Bucket name cannot contain the "${match}" character`
+            : 'Bucket name contains an invalid special character',
+        })
+      }
+      superRefineBucketProtection(data, ctx, planLimits)
+    })
 
 const formId = 'create-storage-bucket-form'
 
-export type CreateBucketForm = z.infer<typeof FormSchema>
+export type CreateBucketForm = z.infer<ReturnType<typeof buildFormSchema>>
 
 interface CreateBucketModalProps {
   open: boolean
@@ -86,6 +102,10 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
   const { ref } = useParams()
   const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.MB)
   const [hasAllowedMimeTypes, setHasAllowedMimeTypes] = useState(false)
+  const showProtection = useIsStorageProtectionEnabled()
+
+  const { data: organization } = useSelectedOrganizationQuery()
+  const planLimits = getVersioningPlanLimits(organization?.plan.id)
 
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
@@ -97,14 +117,25 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
     onError: () => {},
   })
 
+  // Depends on the org's plan, which loads asynchronously — rebuild the
+  // schema (and its versioning min/max validation) once it resolves.
+  const formSchema = useMemo(() => buildFormSchema(planLimits), [planLimits])
+
   const form = useForm<CreateBucketForm>({
-    resolver: zodResolver(FormSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
       public: false,
       has_file_size_limit: false,
       formatted_size_limit: undefined,
       allowed_mime_types: '',
+      enable_versioning: false,
+      // Prefill sensible defaults so the inputs aren't blank the moment
+      // versioning is toggled on. A no-policy bucket has to be an explicit
+      // opt-out — clear the field to remove that condition.
+      version_expiry_days: 30,
+      max_noncurrent_versions: 10,
+      expiration_mode: 'and',
     },
   })
   const { formatted_size_limit: formattedSizeLimitError } = form.formState.errors
@@ -142,6 +173,21 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
         allowed_mime_types: allowedMimeTypes,
       })
       track('storage_bucket_created', { bucketType: 'STANDARD' })
+
+      // [Prototype] Object versioning has no platform API yet — persist it to
+      // the in-memory mock store so the buckets list reflects it right away.
+      setMockBucketProtection(values.name, {
+        versioning: values.enable_versioning ? 'enabled' : 'disabled',
+        versionExpiryDays:
+          values.enable_versioning && typeof values.version_expiry_days === 'number'
+            ? values.version_expiry_days
+            : null,
+        maxNoncurrentVersions:
+          values.enable_versioning && typeof values.max_noncurrent_versions === 'number'
+            ? values.max_noncurrent_versions
+            : null,
+        expirationMode: values.expiration_mode,
+      })
 
       toast.success(`Successfully created bucket ${values.name}`)
       form.reset()
@@ -368,6 +414,8 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
                 />
               )}
             </DialogSection>
+
+            {showProtection && <BucketDataProtectionFields isPublicBucket={isPublicBucket} />}
           </form>
         </Form>
 

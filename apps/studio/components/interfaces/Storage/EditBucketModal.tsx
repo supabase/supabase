@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm, useWatch, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -25,9 +25,22 @@ import {
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
+import { BucketDataProtectionFields } from '@/components/interfaces/Storage/BucketDataProtectionFields'
+import {
+  bucketProtectionFormFields,
+  superRefineBucketProtection,
+} from '@/components/interfaces/Storage/BucketDataProtectionFields.schema'
+import {
+  getMockBucketProtection,
+  getVersioningPlanLimits,
+  setMockBucketProtection,
+  useIsStorageProtectionEnabled,
+  type VersioningPlanLimits,
+} from '@/components/interfaces/Storage/StorageProtection.constants'
 import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
 import {
   convertFromBytes,
@@ -37,6 +50,7 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { useBucketUpdateMutation } from '@/data/storage/bucket-update-mutation'
 import { Bucket } from '@/data/storage/buckets-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 
 export interface EditBucketModalProps {
@@ -45,16 +59,20 @@ export interface EditBucketModalProps {
   onClose: () => void
 }
 
-const BucketSchema = z.object({
-  name: z.string(),
-  public: z.boolean().default(false),
-  has_file_size_limit: z.boolean().default(false),
-  formatted_size_limit: z.coerce
-    .number()
-    .min(0, 'File size upload limit has to be at least 0')
-    .optional(),
-  allowed_mime_types: z.string().trim().default(''),
-})
+const buildBucketSchema = (planLimits: VersioningPlanLimits | null) =>
+  z
+    .object({
+      name: z.string(),
+      public: z.boolean().default(false),
+      has_file_size_limit: z.boolean().default(false),
+      formatted_size_limit: z.coerce
+        .number()
+        .min(0, 'File size upload limit has to be at least 0')
+        .optional(),
+      allowed_mime_types: z.string().trim().default(''),
+      ...bucketProtectionFormFields,
+    })
+    .superRefine((data, ctx) => superRefineBucketProtection(data, ctx, planLimits))
 
 const formId = 'edit-storage-bucket-form'
 
@@ -64,6 +82,10 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
+
+  const { data: organization } = useSelectedOrganizationQuery()
+  const planLimits = getVersioningPlanLimits(organization?.plan.id)
+  const bucketProtection = getMockBucketProtection(bucket?.name)
 
   const bucketIdRef = useRef<string | null>(null)
   const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.MB)
@@ -105,16 +127,38 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     },
   })
 
+  // Prefill the two expiration inputs with sensible starter values when the
+  // bucket has never had versioning turned on — so toggling versioning on
+  // for the first time surfaces a policy ready to save, matching the create
+  // form's defaults. If versioning is already on (or has been in the past)
+  // respect the bucket's own values, including `null` which means the user
+  // explicitly opted out of that particular condition.
+  const hasEverBeenVersioned = bucketProtection.versioning !== 'disabled'
+  const defaultVersionExpiryDays = hasEverBeenVersioned
+    ? (bucketProtection.versionExpiryDays ?? ('' as const))
+    : 30
+  const defaultMaxNoncurrentVersions = hasEverBeenVersioned
+    ? (bucketProtection.maxNoncurrentVersions ?? ('' as const))
+    : 10
+
   const defaultValues = {
     name: bucket?.name ?? '',
     public: bucket?.public,
     has_file_size_limit: Boolean(bucket?.file_size_limit),
     formatted_size_limit: bucket?.file_size_limit ? (fileSizeLimit ?? 0) : undefined,
     allowed_mime_types: (bucket?.allowed_mime_types ?? []).join(', '),
+    enable_versioning: !!planLimits && bucketProtection.versioning === 'enabled',
+    version_expiry_days: defaultVersionExpiryDays,
+    max_noncurrent_versions: defaultMaxNoncurrentVersions,
+    expiration_mode: bucketProtection.expirationMode,
   }
 
-  const form = useForm<z.infer<typeof BucketSchema>>({
-    resolver: zodResolver(BucketSchema),
+  // Depends on the org's plan, which loads asynchronously — rebuild the
+  // schema (and its versioning min/max validation) once it resolves.
+  const bucketSchema = useMemo(() => buildBucketSchema(planLimits), [planLimits])
+
+  const form = useForm<z.infer<typeof bucketSchema>>({
+    resolver: zodResolver(bucketSchema),
     defaultValues,
     values: defaultValues,
     mode: 'onSubmit',
@@ -127,16 +171,28 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     Boolean(bucket?.allowed_mime_types?.length)
   )
 
+  const showProtection = useIsStorageProtectionEnabled()
   const isChangingBucketVisibility = bucket?.public !== isPublicBucket
   const isMakingBucketPrivate = bucket?.public && !isPublicBucket
   const isMakingBucketPublic = !bucket?.public && isPublicBucket
 
+  // Suspending a live-versioning bucket is the one action here that needs a
+  // second confirmation — the switch alone doesn't communicate that
+  // "already-retained data stays, no new versions get created" nuance
+  // (the inline admonition is intentionally sparse per the redesign), so we
+  // put the full picture in a follow-up AlertDialog and only actually save
+  // when the user confirms it. Values are stashed at submit time; confirming
+  // replays the write, cancelling bails.
+  const [pendingSuspendedValues, setPendingSuspendedValues] =
+    useState<z.infer<typeof bucketSchema>>()
+
   const closeModal = () => {
     form.reset()
+    setPendingSuspendedValues(undefined)
     onClose()
   }
 
-  const onSubmit: SubmitHandler<z.infer<typeof BucketSchema>> = async (values) => {
+  const onSubmit: SubmitHandler<z.infer<typeof bucketSchema>> = async (values) => {
     if (bucket === undefined) return console.error('Bucket is required')
     if (ref === undefined) return console.error('Project ref is required')
 
@@ -159,6 +215,54 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
         })
       }
     }
+
+    // Suspending versioning is the one path that needs a second look — stash
+    // the resolved values and hand off to the AlertDialog; it'll call
+    // persistChanges once the user confirms.
+    if (bucketProtection.versioning === 'enabled' && !values.enable_versioning) {
+      setPendingSuspendedValues(values)
+      return
+    }
+
+    persistChanges(values)
+  }
+
+  const persistChanges = (values: z.infer<typeof bucketSchema>) => {
+    if (bucket === undefined || ref === undefined) return
+
+    // [Prototype] Object versioning has no platform API yet — persist it to
+    // the in-memory mock store so the buckets list reflects it right away.
+    // Versioning can't go back to a plain "disabled" state once it's ever
+    // been turned on — turning the switch off here suspends it instead.
+    // When versioning is on, the form is the source of truth for both
+    // retention fields — an empty input means "no limit for that condition"
+    // and must persist as `null`, not silently fall back to the previous
+    // value. When versioning is off but the bucket was previously versioned
+    // (now suspended), the last retention settings are kept as-is so any
+    // versions already retained keep expiring on the same schedule they
+    // were created under.
+    setMockBucketProtection(bucket.name, {
+      versioning: values.enable_versioning
+        ? 'enabled'
+        : bucketProtection.versioning !== 'disabled'
+          ? 'suspended'
+          : 'disabled',
+      versionExpiryDays: values.enable_versioning
+        ? typeof values.version_expiry_days === 'number'
+          ? values.version_expiry_days
+          : null
+        : bucketProtection.versioning !== 'disabled'
+          ? bucketProtection.versionExpiryDays
+          : null,
+      maxNoncurrentVersions: values.enable_versioning
+        ? typeof values.max_noncurrent_versions === 'number'
+          ? values.max_noncurrent_versions
+          : null
+        : bucketProtection.versioning !== 'disabled'
+          ? bucketProtection.maxNoncurrentVersions
+          : null,
+      expirationMode: values.expiration_mode,
+    })
 
     updateBucket({
       projectRef: ref,
@@ -189,13 +293,14 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
   }, [visible, bucket, form])
 
   return (
-    <Dialog
-      open={visible}
-      onOpenChange={(open) => {
-        if (!open) closeModal()
-      }}
-    >
-      <DialogContent>
+    <>
+      <Dialog
+        open={visible}
+        onOpenChange={(open) => {
+          if (!open) closeModal()
+        }}
+      >
+        <DialogContent>
         <DialogHeader>
           <DialogTitle>{`Edit bucket “${bucket?.name}”`}</DialogTitle>
         </DialogHeader>
@@ -406,18 +511,48 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                 />
               )}
             </DialogSection>
+
+            {showProtection && (
+              <BucketDataProtectionFields
+                initialVersioningState={bucketProtection.versioning}
+                initialRetentionDays={bucketProtection.versionExpiryDays}
+                initialMaxVersions={bucketProtection.maxNoncurrentVersions}
+                isPublicBucket={isPublicBucket}
+              />
+            )}
           </form>
         </Form>
 
-        <DialogFooter>
-          <Button variant="default" disabled={isUpdating} onClick={closeModal}>
-            Cancel
-          </Button>
-          <Button form={formId} type="submit" loading={isUpdating}>
-            Save
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <DialogFooter>
+            <Button variant="default" disabled={isUpdating} onClick={closeModal}>
+              Cancel
+            </Button>
+            <Button form={formId} type="submit" loading={isUpdating}>
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <ConfirmationModal
+        variant="warning"
+        visible={pendingSuspendedValues !== undefined}
+        title="Suspend versioning?"
+        confirmLabel="Suspend versioning"
+        confirmLabelLoading="Saving..."
+        loading={isUpdating}
+        onCancel={() => setPendingSuspendedValues(undefined)}
+        onConfirm={() => {
+          if (pendingSuspendedValues) persistChanges(pendingSuspendedValues)
+        }}
+      >
+        <p className="text-sm text-foreground-light">
+          New noncurrent versions won't be created and archived files won't accumulate. Every
+          version and archived file this bucket is already retaining stays exactly where it is
+          until it's deleted or a lifecycle policy expires it. You can re-enable versioning at any
+          time.
+        </p>
+      </ConfirmationModal>
+    </>
   )
 }

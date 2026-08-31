@@ -3,6 +3,8 @@ import { compact, isEqual, noop } from 'lodash'
 import {
   ArrowLeft,
   Check,
+  ChevronsDownUp,
+  ChevronsUpDown,
   Columns,
   Edit2,
   FolderPlus,
@@ -39,19 +41,26 @@ import {
   DropdownMenuTrigger,
   FieldDescription,
   Label,
+  Switch,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
-import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
-import { pageChromeRowClassName } from './storageExplorerChrome'
-import { useFileExplorerHeaderShortcuts } from './useFileExplorerHeaderShortcuts'
-import { useStoragePreference } from './useStoragePreference'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
+
+import { useBucketTrashQuery } from '@/data/storage/protection/bucket-trash-query'
+
+import { useSelectedBucket } from '../FilesBuckets/useSelectedBucket'
+import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
+import { hasVersioningHistory } from '../StorageProtection.constants'
+import { useDeletedFilesContext } from './DeletedFilesContext'
+import { pageChromeRowClassName } from './storageExplorerChrome'
+import { useFileExplorerHeaderShortcuts } from './useFileExplorerHeaderShortcuts'
+import { useStoragePreference } from './useStoragePreference'
 
 const VIEW_OPTIONS = [
   { key: STORAGE_VIEWS.COLUMNS, name: 'As columns' },
@@ -174,6 +183,8 @@ export const FileExplorerHeader = ({
     setSortBy: setPreferenceSortBy,
     sortByOrder,
     setSortByOrder: setPreferenceSortByOrder,
+    showArchivedInline,
+    setShowArchivedInline,
   } = useStoragePreference(projectRef)
 
   const breadcrumbs = columns.map((column) => column.name)
@@ -286,6 +297,22 @@ export const FileExplorerHeader = ({
     snap.setIsSearching(value.length > 0)
   }
 
+  const { data: bucket } = useSelectedBucket()
+  const isVersioned = hasVersioningHistory(bucket?.id)
+  const { isShowingDeleted, setIsShowingDeleted, expandedVersionIds, setExpandedVersionIds } =
+    useDeletedFilesContext()
+
+  const { data: trashObjects } = useBucketTrashQuery({
+    projectRef: projectRef ?? undefined,
+    bucketId: bucket?.id,
+  })
+  const expandableIds = (trashObjects ?? [])
+    .filter((o) => o.noncurrentVersions && o.noncurrentVersions.length > 0)
+    .map((o) => o.id)
+  const hasExpandableVersions = expandableIds.length > 0
+  const isAllExpanded =
+    hasExpandableVersions && expandableIds.every((id) => expandedVersionIds.has(id))
+
   const refreshData = async () => {
     await refreshAll()
   }
@@ -300,7 +327,7 @@ export const FileExplorerHeader = ({
       <div className="overflow-x-auto">
         <div className={pageChromeRowClassName}>
           <div className="flex min-w-0 flex-1 items-center gap-2">
-            {isListView && !isBucketRoot && (
+            {isListView && !isBucketRoot && !isShowingDeleted && (
               <Button
                 size="tiny"
                 variant="outline"
@@ -332,17 +359,33 @@ export const FileExplorerHeader = ({
                     ]
                   : undefined
               }
-              placeholder={searchPlaceholder}
+              placeholder={isShowingDeleted ? 'Search archived files...' : searchPlaceholder}
               type="text"
               value={itemSearchString}
               onChange={onSearchChange}
               onFocus={() => setIsPathDialogOpen(false)}
             />
+            {isVersioned && (
+              <div className="flex items-center gap-1.5">
+                <Switch
+                  id="show-archived"
+                  size="small"
+                  checked={isShowingDeleted}
+                  onCheckedChange={setIsShowingDeleted}
+                />
+                <Label
+                  htmlFor="show-archived"
+                  className="text-xs cursor-pointer whitespace-nowrap text-foreground-light"
+                >
+                  Show archived
+                </Label>
+              </div>
+            )}
           </div>
 
           <div className="flex shrink-0 items-center gap-2 whitespace-nowrap">
             <div className="flex shrink-0 items-center gap-1">
-              {view === STORAGE_VIEWS.COLUMNS && (
+              {view === STORAGE_VIEWS.COLUMNS && !isShowingDeleted && (
                 <Button
                   size="tiny"
                   icon={<Edit2 />}
@@ -353,122 +396,171 @@ export const FileExplorerHeader = ({
                   onClick={onOpenNavigate}
                 />
               )}
-              <ShortcutTooltip shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_REFRESH} side="bottom">
+              {!isShowingDeleted && (
+                <>
+                  <ShortcutTooltip shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_REFRESH} side="bottom">
+                    <Button
+                      size="tiny"
+                      icon={<RefreshCw />}
+                      variant="outline"
+                      aria-label="Reload"
+                      className="w-7 px-1"
+                      loading={isRefreshing}
+                      onClick={refreshData}
+                    />
+                  </ShortcutTooltip>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="tiny"
+                        aria-label="View options"
+                        className="w-7 px-1"
+                        icon={view === 'LIST' ? <List size={16} /> : <Columns size={16} />}
+                      />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-44 min-w-0">
+                      {VIEW_OPTIONS.map((option) => (
+                        <DropdownMenuItem key={option.key} onClick={() => setView(option.key)}>
+                          <div className="flex items-center justify-between w-full">
+                            <p>{option.name}</p>
+                            {view === option.key && <Check size={16} className="text-brand" />}
+                          </div>
+                        </DropdownMenuItem>
+                      ))}
+                      {isVersioned && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => setShowArchivedInline(!showArchivedInline)}
+                          >
+                            <div className="flex items-center justify-between w-full">
+                              <p>Show archived</p>
+                              {showArchivedInline && (
+                                <Check size={16} className="text-brand" />
+                              )}
+                            </div>
+                          </DropdownMenuItem>
+                        </>
+                      )}
+                      <DropdownMenuSeparator />
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger>Sort by</DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent className="w-44">
+                          {SORT_BY_OPTIONS.map((option) => (
+                            <DropdownMenuItem
+                              key={option.key}
+                              onClick={() => setSortBy(option.key)}
+                            >
+                              <div className="flex items-center justify-between w-full">
+                                <p>{option.name}</p>
+                                {sortBy === option.key && (
+                                  <Check size={16} className="text-brand" />
+                                )}
+                              </div>
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuSubContent>
+                      </DropdownMenuSub>
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger>Sort order</DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent>
+                          {SORT_ORDER_OPTIONS.map((option) => (
+                            <DropdownMenuItem
+                              key={option.key}
+                              onClick={() => setSortByOrder(option.key)}
+                            >
+                              <div className="flex items-center justify-between w-full">
+                                <p>{option.name}</p>
+                                {sortByOrder === option.key && (
+                                  <Check size={16} className="text-brand" />
+                                )}
+                              </div>
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuSubContent>
+                      </DropdownMenuSub>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </>
+              )}
+            </div>
+
+            {isShowingDeleted && hasExpandableVersions && (
+              <div className="flex shrink-0 items-center gap-1">
                 <Button
                   size="tiny"
-                  icon={<RefreshCw />}
                   variant="outline"
-                  aria-label="Reload"
-                  className="w-7 px-1"
-                  loading={isRefreshing}
-                  onClick={refreshData}
-                />
-              </ShortcutTooltip>
-
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="tiny"
-                    aria-label="View options"
-                    className="w-7 px-1"
-                    icon={view === 'LIST' ? <List size={16} /> : <Columns size={16} />}
-                  />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-40 min-w-0">
-                  {VIEW_OPTIONS.map((option) => (
-                    <DropdownMenuItem key={option.key} onClick={() => setView(option.key)}>
-                      <div className="flex items-center justify-between w-full">
-                        <p>{option.name}</p>
-                        {view === option.key && <Check size={16} className="text-brand" />}
-                      </div>
-                    </DropdownMenuItem>
-                  ))}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuSub>
-                    <DropdownMenuSubTrigger>Sort by</DropdownMenuSubTrigger>
-                    <DropdownMenuSubContent className="w-44">
-                      {SORT_BY_OPTIONS.map((option) => (
-                        <DropdownMenuItem key={option.key} onClick={() => setSortBy(option.key)}>
-                          <div className="flex items-center justify-between w-full">
-                            <p>{option.name}</p>
-                            {sortBy === option.key && <Check size={16} className="text-brand" />}
-                          </div>
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuSubContent>
-                  </DropdownMenuSub>
-                  <DropdownMenuSub>
-                    <DropdownMenuSubTrigger>Sort order</DropdownMenuSubTrigger>
-                    <DropdownMenuSubContent>
-                      {SORT_ORDER_OPTIONS.map((option) => (
-                        <DropdownMenuItem
-                          key={option.key}
-                          onClick={() => setSortByOrder(option.key)}
-                        >
-                          <div className="flex items-center justify-between w-full">
-                            <p>{option.name}</p>
-                            {sortByOrder === option.key && (
-                              <Check size={16} className="text-brand" />
-                            )}
-                          </div>
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuSubContent>
-                  </DropdownMenuSub>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-
-            <div className="flex shrink-0 items-center gap-1">
-              <div className="hidden">
-                <input ref={uploadButtonRef} type="file" multiple onChange={onFilesUpload} />
+                  icon={<ChevronsUpDown size={14} />}
+                  onClick={() => setExpandedVersionIds(new Set(expandableIds))}
+                  disabled={isAllExpanded}
+                >
+                  Expand all
+                </Button>
+                <Button
+                  size="tiny"
+                  variant="outline"
+                  icon={<ChevronsDownUp size={14} />}
+                  onClick={() => setExpandedVersionIds(new Set())}
+                  disabled={expandedVersionIds.size === 0}
+                >
+                  Collapse all
+                </Button>
               </div>
-              <ShortcutTooltip
-                shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_NEW_FOLDER}
-                side="bottom"
-                open={!canUpdateStorage ? false : undefined}
-              >
-                <ButtonTooltip
-                  icon={<FolderPlus size={16} />}
-                  variant="outline"
-                  disabled={!canUpdateStorage || breadcrumbs.length === 0}
-                  onClick={() => addNewFolderPlaceholder(-1)}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: !canUpdateStorage
-                        ? 'You need additional permissions to create folders'
-                        : undefined,
-                    },
-                  }}
+            )}
+
+            {!isShowingDeleted && (
+              <div className="flex shrink-0 items-center gap-1">
+                <div className="hidden">
+                  <input ref={uploadButtonRef} type="file" multiple onChange={onFilesUpload} />
+                </div>
+                <ShortcutTooltip
+                  shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_NEW_FOLDER}
+                  side="bottom"
+                  open={!canUpdateStorage ? false : undefined}
                 >
-                  Create folder
-                </ButtonTooltip>
-              </ShortcutTooltip>
-              <ShortcutTooltip
-                shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_UPLOAD}
-                side="bottom"
-                open={!canUpdateStorage ? false : undefined}
-              >
-                <ButtonTooltip
-                  icon={<Upload size={16} />}
-                  variant="primary"
-                  disabled={!canUpdateStorage || breadcrumbs.length === 0}
-                  onClick={onSelectUpload}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: !canUpdateStorage
-                        ? 'You need additional permissions to upload files'
-                        : undefined,
-                    },
-                  }}
+                  <ButtonTooltip
+                    icon={<FolderPlus size={16} />}
+                    variant="outline"
+                    disabled={!canUpdateStorage || breadcrumbs.length === 0}
+                    onClick={() => addNewFolderPlaceholder(-1)}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: !canUpdateStorage
+                          ? 'You need additional permissions to create folders'
+                          : undefined,
+                      },
+                    }}
+                  >
+                    Create folder
+                  </ButtonTooltip>
+                </ShortcutTooltip>
+                <ShortcutTooltip
+                  shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_UPLOAD}
+                  side="bottom"
+                  open={!canUpdateStorage ? false : undefined}
                 >
-                  Upload files
-                </ButtonTooltip>
-              </ShortcutTooltip>
-            </div>
+                  <ButtonTooltip
+                    icon={<Upload size={16} />}
+                    variant="primary"
+                    disabled={!canUpdateStorage || breadcrumbs.length === 0}
+                    onClick={onSelectUpload}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: !canUpdateStorage
+                          ? 'You need additional permissions to upload files'
+                          : undefined,
+                      },
+                    }}
+                  >
+                    Upload files
+                  </ButtonTooltip>
+                </ShortcutTooltip>
+              </div>
+            )}
           </div>
         </div>
       </div>

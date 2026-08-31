@@ -2,13 +2,15 @@ import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
-import { extractBucketNameFromDefinition } from './Storage.utils'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
 import { useDatabasePolicyDeleteMutation } from '@/data/database-policies/database-policy-delete-mutation'
 import { useBucketDeleteMutation } from '@/data/storage/bucket-delete-mutation'
 import { Bucket } from '@/data/storage/buckets-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+
+import { extractBucketNameFromDefinition } from './Storage.utils'
+import { hasVersioningHistory } from './StorageProtection.constants'
 
 export interface DeleteBucketModalProps {
   visible: boolean
@@ -74,6 +76,8 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
     deleteBucket({ projectRef, id: bucket.id })
   }
 
+  const isVersioned = hasVersioningHistory(bucket?.id)
+
   return (
     <TextConfirmModal
       visible={visible}
@@ -94,6 +98,13 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
       <p className="text-sm">
         Your bucket <span className="font-bold text-foreground">{bucket.id}</span> and all of its
         contents will be permanently deleted.
+        {isVersioned && (
+          <>
+            {' '}
+            This includes every noncurrent object version and every soft-deleted file the bucket is
+            currently retaining.
+          </>
+        )}
       </p>
     </TextConfirmModal>
   )

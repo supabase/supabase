@@ -2,7 +2,7 @@ import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { ArrowDownNarrowWide, RefreshCw, Search } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   Card,
@@ -18,27 +18,52 @@ import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { CreateBucketModal } from '../CreateBucketModal'
-import { EmptyBucketState } from '../EmptyBucketState'
-import { CreateBucketButton } from '../NewBucketButton'
-import { STORAGE_BUCKET_SORT } from '../Storage.constants'
-import { useStoragePreference } from '../StorageExplorer/useStoragePreference'
-import { BucketsTable } from './BucketsTable'
-import { useFilesBucketsShortcuts } from './useFilesBucketsShortcuts'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { usePaginatedBucketsQuery } from '@/data/storage/buckets-query'
+import { deleteMockTrashObjectsPermanently } from '@/data/storage/protection/protection-mocks'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
+import { CreateBucketModal } from '../CreateBucketModal'
+import { EmptyBucketState } from '../EmptyBucketState'
+import { CreateBucketButton } from '../NewBucketButton'
+import { STORAGE_BUCKET_SORT } from '../Storage.constants'
+import { useStoragePreference } from '../StorageExplorer/useStoragePreference'
+import {
+  getVersioningPlanLimits,
+  purgeVersioningOnPlanDowngrade,
+} from '../StorageProtection.constants'
+import { BucketsTable } from './BucketsTable'
+import { useFilesBucketsShortcuts } from './useFilesBucketsShortcuts'
+
 export const FilesBuckets = () => {
   const { ref } = useParams()
   const snap = useStorageExplorerStateSnapshot()
   const { sortBucket, setSortBucket } = useStoragePreference(snap.projectRef)
+
+  const { data: organization } = useSelectedOrganizationQuery()
+  const planLimits = getVersioningPlanLimits(organization?.plan.id)
+  const [purgedBuckets, setPurgedBuckets] = useState<string[]>([])
+
+  // Prototype: simulate the server-side auto-disable-and-purge that would
+  // run after a plan downgrade to a tier without versioning support.
+  // Runs once when the plan resolves to one without versioning support and
+  // finds any buckets still marked as versioned in the mock store.
+  useEffect(() => {
+    if (organization === undefined) return
+    if (planLimits !== null) return
+    const { purgedBuckets: purged } = purgeVersioningOnPlanDowngrade()
+    if (purged.length > 0) {
+      deleteMockTrashObjectsPermanently()
+      setPurgedBuckets(purged)
+    }
+  }, [organization, planLimits])
 
   const searchInputRef = useRef<HTMLInputElement>(null)
   const [filterString, setFilterString] = useState('')
@@ -103,6 +128,13 @@ export const FilesBuckets = () => {
       <PageContainer>
         <PageSection>
           <PageSectionContent className="h-full gap-y-4">
+            {purgedBuckets.length > 0 && (
+              <Admonition
+                type="warning"
+                title="Object versioning was suspended on downgrade"
+                description={`Your plan no longer supports object versioning. Versioning was automatically suspended on ${purgedBuckets.length} bucket${purgedBuckets.length === 1 ? '' : 's'} (${purgedBuckets.join(', ')}) and every noncurrent version and soft-deleted file has been permanently deleted.`}
+              />
+            )}
             {isLoadingBuckets && <GenericSkeletonLoader />}
             {isErrorBuckets && (
               <>

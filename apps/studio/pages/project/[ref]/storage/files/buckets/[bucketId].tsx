@@ -32,6 +32,7 @@ import { useSelectedBucket } from '@/components/interfaces/Storage/FilesBuckets/
 import { PublicBucketWarning } from '@/components/interfaces/Storage/PublicBucketWarning'
 import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
 import StorageBucketsError from '@/components/interfaces/Storage/StorageBucketsError'
+import { DeletedFilesProvider } from '@/components/interfaces/Storage/StorageExplorer/DeletedFilesContext'
 import { StorageExplorer } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer'
 import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
@@ -40,6 +41,18 @@ import { StorageExplorerStateContextProvider } from '@/state/storage-explorer'
 import type { NextPageWithLayout } from '@/types'
 
 const BucketPage: NextPageWithLayout = () => {
+  const { ref } = useParams()
+
+  return (
+    <StorageExplorerStateContextProvider key={`storage-explorer-state-${ref}`}>
+      <DeletedFilesProvider enabled>
+        <BucketPageInner />
+      </DeletedFilesProvider>
+    </StorageExplorerStateContextProvider>
+  )
+}
+
+const BucketPageInner = () => {
   const router = useRouter()
   const { bucketId, ref } = useParams()
   const { data: bucket, error, isSuccess, isError } = useSelectedBucket()
@@ -73,7 +86,7 @@ const BucketPage: NextPageWithLayout = () => {
   }
 
   return (
-    <StorageExplorerStateContextProvider key={`storage-explorer-state-${ref}`}>
+    <>
       <div className="w-full min-h-full flex flex-col items-stretch">
         <PageBreadcrumbs
           actions={
@@ -193,7 +206,7 @@ const BucketPage: NextPageWithLayout = () => {
           />
         </>
       )}
-    </StorageExplorerStateContextProvider>
+    </>
   )
 }
 

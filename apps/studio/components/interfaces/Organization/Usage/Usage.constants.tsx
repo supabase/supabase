@@ -7,6 +7,8 @@ import type { OrgSubscription } from '@/data/subscriptions/types'
 import type { OrgUsageResponse } from '@/data/usage/org-usage-query'
 import { DOCS_URL } from '@/lib/constants'
 
+import { StorageRetentionBreakdown } from './StorageRetention/StorageRetentionBreakdown'
+
 export const COLOR_MAP = {
   white: { bar: 'fill-foreground', marker: 'bg-foreground' },
   green: { bar: 'fill-green-800', marker: 'bg-green-800' },
@@ -215,13 +217,17 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
   databaseAndStorageSizeAttributes.push({
     anchor: 'storageSize',
     key: PricingMetric.STORAGE_SIZE,
-    attributes: [{ key: PricingMetric.STORAGE_SIZE.toLowerCase(), color: 'white' }],
+    attributes: [
+      { key: 'current', name: 'Current objects', color: 'white' },
+      { key: 'noncurrent', name: 'Noncurrent objects', color: 'yellow' },
+    ],
     name: 'Storage Size',
     chartPrefix: 'Average',
     unit: 'bytes',
     description:
-      'Sum of all objects in your storage buckets.\nBilling is prorated down to the hour and will be displayed GB-Hrs.',
+      'Sum of all objects in your storage buckets, including noncurrent objects retained by object versioning.\nBilling is prorated down to the hour and will be displayed GB-Hrs.',
     chartDescription: 'The data refreshes every hour.',
+    additionalInfo: () => <StorageRetentionBreakdown />,
     links: [
       {
         name: 'Storage',

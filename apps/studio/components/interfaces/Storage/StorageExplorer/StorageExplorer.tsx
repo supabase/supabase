@@ -3,10 +3,19 @@ import { useParams } from 'common'
 import { compact, get, isEmpty, uniqBy } from 'lodash'
 import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
+import type { Bucket } from '@/data/storage/buckets-query'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
+
 import { useSelectedBucket } from '../FilesBuckets/useSelectedBucket'
 import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
 import { ConfirmDeleteModal } from './ConfirmDeleteModal'
 import { CustomExpiryModal } from './CustomExpiryModal'
+import { DeletedFilePreviewPane } from './DeletedFilePreviewPane'
+import { useDeletedFilesContext } from './DeletedFilesContext'
+import { DeletedFilesHeaderSelection } from './DeletedFilesHeaderSelection'
+import { DeletedFilesList } from './DeletedFilesList'
 import { FileExplorer } from './FileExplorer'
 import { FileExplorerHeader } from './FileExplorerHeader'
 import { FileExplorerHeaderSelection } from './FileExplorerHeaderSelection'
@@ -14,10 +23,6 @@ import { MoveItemsModal } from './MoveItemsModal'
 import { PreviewPane } from './PreviewPane'
 import { useStorageExplorerShortcuts } from './useStorageExplorerShortcuts'
 import { useStoragePreference } from './useStoragePreference'
-import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
-import type { Bucket } from '@/data/storage/buckets-query'
-import { IS_PLATFORM } from '@/lib/constants'
-import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export const StorageExplorer = () => {
   const { ref, bucketId } = useParams()
@@ -42,6 +47,8 @@ export const StorageExplorer = () => {
     setSelectedItemsToMove,
     setIsSearching,
   } = useStorageExplorerStateSnapshot()
+  const { isShowingDeleted, selectedDeletedIds, selectedDeletedFile, selectedDeletedVersion } =
+    useDeletedFilesContext()
   const { view } = useStoragePreference(projectRef)
 
   useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
@@ -154,29 +161,54 @@ export const StorageExplorer = () => {
 
   return (
     <div ref={storageExplorerRef} className="bg-studio flex h-full w-full flex-col">
-      {selectedItems.length === 0 ? (
+      {isShowingDeleted && selectedDeletedIds.length > 0 ? (
+        <DeletedFilesHeaderSelection />
+      ) : selectedItems.length > 0 && !isShowingDeleted ? (
+        <FileExplorerHeaderSelection />
+      ) : (
         <FileExplorerHeader
           itemSearchString={itemSearchString}
           setItemSearchString={setItemSearchString}
           onFilesUpload={onFilesUpload}
         />
-      ) : (
-        <FileExplorerHeaderSelection />
       )}
       <div className="flex flex-1 min-h-0">
-        <FileExplorer
-          columns={columns}
-          selectedItems={selectedItems}
-          itemSearchString={itemSearchString}
-          isLoading={isLoading}
-          onFilesUpload={onFilesUpload}
-          onSelectAllItemsInColumn={onSelectAllItemsInColumn}
-          onSelectColumnEmptySpace={onSelectColumnEmptySpace}
-          onColumnLoadMore={(index, column) =>
-            fetchMoreFolderContents({ index, column, searchString: itemSearchString })
-          }
-        />
-        <PreviewPane />
+        {isShowingDeleted ? (
+          <div className="relative flex-1 min-w-0 overflow-hidden">
+            <div className="absolute inset-0 overflow-auto">
+              <DeletedFilesList bucketId={selectedBucket.name} searchString={itemSearchString} />
+            </div>
+            {(selectedDeletedFile || selectedDeletedVersion) && (
+              <div className="absolute inset-y-0 right-0 z-10 shadow-lg">
+                <DeletedFilePreviewPane />
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+            <FileExplorer
+              columns={columns}
+              selectedItems={selectedItems}
+              itemSearchString={itemSearchString}
+              isLoading={isLoading}
+              onFilesUpload={onFilesUpload}
+              onSelectAllItemsInColumn={onSelectAllItemsInColumn}
+              onSelectColumnEmptySpace={onSelectColumnEmptySpace}
+              onColumnLoadMore={(index, column) =>
+                fetchMoreFolderContents({ index, column, searchString: itemSearchString })
+              }
+            />
+            {/* Selecting an archived row while `Show archived` is on takes
+                over the normal preview slot with the archived file preview,
+                so restore/permanent-delete actions live in the same spot as
+                the live file's actions. */}
+            {selectedDeletedFile || selectedDeletedVersion ? (
+              <DeletedFilePreviewPane />
+            ) : (
+              <PreviewPane />
+            )}
+          </>
+        )}
       </div>
 
       <ConfirmDeleteModal />
