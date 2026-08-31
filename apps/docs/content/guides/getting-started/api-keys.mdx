@@ -10,7 +10,7 @@ This guide covers:
 
 - [Which key do you use?](#which-key-do-you-use) answers that in one table.
 - [How API keys work](#how-api-keys-work) explains what each key type is and which Postgres role it maps to.
-- [Find and use your keys](#find-and-use-your-keys) covers getting a key out of the Dashboard and rotating one that leaked.
+- [Find and use your keys](#find-and-use-your-keys) covers the ways to retrieve a key and how to rotate one that leaked.
 - [Security reference](#security-reference) lists what publishable keys don't protect against, how to handle secret keys, and the known limitations.
 
 ## Which key do you use?
@@ -108,6 +108,8 @@ Secret keys improve on the old JWT-based `service_role` key, and we recommend th
 
 There are several ways to read your keys. Pick the one that matches where you are working.
 
+Every path below reads keys that already exist. If your project has no publishable or secret key yet, create them first in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard.
+
 <Tabs
   scrollable
   size="small"
@@ -134,7 +136,13 @@ Use the CLI to script setup, or to read the keys for a preview branch. This path
    supabase login
    ```
 
-2. List the keys for a project.
+2. Find the project ref, if you don't know it.
+
+   ```bash
+   supabase projects list
+   ```
+
+3. List the keys for that project.
 
    ```bash
    supabase projects api-keys --project-ref your-project-ref
@@ -151,13 +159,14 @@ Authenticate with a [personal access token](/dashboard/account/tokens). Secret k
 
 ```bash
 export PROJECT_REF="your-project-ref"
+export SUPABASE_ACCESS_TOKEN="your-personal-access-token"
 
 curl -X GET "https://api.supabase.com/v1/projects/$PROJECT_REF/api-keys?reveal=true" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
   | jq '.[] | {name, type, api_key}'
 ```
 
-See [Get project API keys](/docs/reference/api/v1-get-project-api-keys) for the full response.
+The `jq` pipe only formats the output, so you can drop it. See [Get project API keys](/docs/reference/api/v1-get-project-api-keys) for the full response.
 
 </TabPanel>
 <TabPanel id="local" label="Local stack">
