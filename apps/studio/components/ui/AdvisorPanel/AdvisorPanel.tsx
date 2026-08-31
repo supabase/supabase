@@ -48,30 +48,30 @@ export const AdvisorPanel = () => {
   const hasProjectRef = !!project?.ref
   const isCategorySelected = (category: AdvisorCategory) =>
     categoryFilters.length === 0 || categoryFilters.includes(category)
-  const isShowingProjectAdvisors =
-    isCategorySelected('security') ||
-    isCategorySelected('performance') ||
-    isCategorySelected('health')
-  const shouldLoadProjectAdvisorData = isSidebarOpen && hasProjectRef && isShowingProjectAdvisors
+  // Each source is fetched only when a category it can produce items for is selected, so
+  // filtering down to one category doesn't run the checks behind the others. Health in
+  // particular hits live infrastructure, and signals only ever produce security items.
+  const canLoadProjectData = isSidebarOpen && hasProjectRef
+  const shouldLoadLints =
+    canLoadProjectData && (isCategorySelected('security') || isCategorySelected('performance'))
+  const shouldLoadHealthLints = canLoadProjectData && isCategorySelected('health')
+  const shouldLoadSignals = canLoadProjectData && isCategorySelected('security')
 
   const {
     data: lintData,
     isPending: isLintsLoading,
     isError: isLintsError,
-  } = useProjectLintsQuery({ projectRef: project?.ref }, { enabled: shouldLoadProjectAdvisorData })
+  } = useProjectLintsQuery({ projectRef: project?.ref }, { enabled: shouldLoadLints })
 
   const {
     data: healthLintData,
     isPending: isHealthLintsLoading,
     isError: isHealthLintsError,
-  } = useProjectHealthLintsQuery(
-    { projectRef: project?.ref },
-    { enabled: shouldLoadProjectAdvisorData }
-  )
+  } = useProjectHealthLintsQuery({ projectRef: project?.ref }, { enabled: shouldLoadHealthLints })
 
   const { data: signalItems } = useAdvisorSignals({
     projectRef: project?.ref,
-    enabled: shouldLoadProjectAdvisorData,
+    enabled: shouldLoadSignals,
   })
 
   // Notifications should always load when sidebar is open (shown in both 'all' and 'messages' tabs)
@@ -166,14 +166,14 @@ export const AdvisorPanel = () => {
   const isDetailView = !!selectedItem
 
   // Only show loading state if the query is actually enabled
-  const isLintsActuallyLoading = shouldLoadProjectAdvisorData && isLintsLoading
+  const isLintsActuallyLoading = shouldLoadLints && isLintsLoading
   const isNotificationsActuallyLoading = shouldLoadNotifications && isNotificationsLoading
   // Health checks hit live infrastructure and are the slowest of the three. They only block
   // the list when health is all the user asked for — otherwise health items just fill in
   // once they arrive, rather than holding up everything else.
   const isShowingHealthOnly = categoryFilters.length === 1 && categoryFilters[0] === 'health'
   const isHealthLintsActuallyLoading =
-    shouldLoadProjectAdvisorData && isHealthLintsLoading && isShowingHealthOnly
+    shouldLoadHealthLints && isHealthLintsLoading && isShowingHealthOnly
 
   // [Joshen] Opting to ignore loading and error state of advisor signals - render lints irregardless of banned ips
   const isLoading =

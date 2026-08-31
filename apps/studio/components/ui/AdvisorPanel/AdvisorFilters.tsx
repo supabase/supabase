@@ -1,9 +1,26 @@
 import { X } from 'lucide-react'
+import { z } from 'zod'
 
 import { advisorCategoryLabels } from './AdvisorPanel.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FilterPopover } from '@/components/ui/FilterPopover'
-import { AdvisorCategory, AdvisorSeverity } from '@/state/advisor-state'
+import {
+  AdvisorCategory,
+  advisorCategorySchema,
+  AdvisorSeverity,
+  advisorSeveritySchema,
+} from '@/state/advisor-state'
+
+/**
+ * FilterPopover reports its selection as plain strings, so validate them against the
+ * schema before they flow back into typed state. Unrecognized values are dropped rather
+ * than throwing — a stale option should not take the panel down.
+ */
+const parseFilterValues = <T extends string>(schema: z.ZodType<T>, values: string[]): T[] =>
+  values.flatMap((value) => {
+    const result = schema.safeParse(value)
+    return result.success ? [result.data] : []
+  })
 
 const platformCategories: AdvisorCategory[] = ['security', 'performance', 'health', 'messages']
 // Health runs against platform infrastructure and messages are platform notifications
@@ -57,7 +74,7 @@ export const AdvisorFilters = ({
             labelKey="label"
             isMinimized={true}
             onSaveFilters={(values) => {
-              onCategoryFiltersChange(values as AdvisorCategory[])
+              onCategoryFiltersChange(parseFilterValues(advisorCategorySchema, values))
             }}
           />
           {isPlatform && (
@@ -79,7 +96,7 @@ export const AdvisorFilters = ({
             labelKey="label"
             isMinimized={true}
             onSaveFilters={(values) => {
-              onSeverityFiltersChange(values as AdvisorSeverity[])
+              onSeverityFiltersChange(parseFilterValues(advisorSeveritySchema, values))
             }}
           />
         </div>

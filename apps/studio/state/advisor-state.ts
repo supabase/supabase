@@ -1,7 +1,11 @@
 import { proxy, snapshot, useSnapshot } from 'valtio'
+import { z } from 'zod'
 
-export type AdvisorCategory = 'security' | 'performance' | 'health' | 'messages'
-export type AdvisorSeverity = 'critical' | 'warning' | 'info'
+export const advisorCategorySchema = z.enum(['security', 'performance', 'health', 'messages'])
+export const advisorSeveritySchema = z.enum(['critical', 'warning', 'info'])
+
+export type AdvisorCategory = z.infer<typeof advisorCategorySchema>
+export type AdvisorSeverity = z.infer<typeof advisorSeveritySchema>
 export type AdvisorItemSource = 'lint' | 'notification' | 'signal'
 
 const createInitialState = () => ({
