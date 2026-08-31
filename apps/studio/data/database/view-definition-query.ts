@@ -2,8 +2,8 @@ import { getViewDefinitionSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
-import { executeSql, ExecuteSqlError } from '@/data/sql/execute-sql-query'
-import { UseCustomQueryOptions } from '@/types'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type GetViewDefinitionArgs = {
   id?: number
@@ -36,7 +36,7 @@ export async function getViewDefinition(
 }
 
 export type ViewDefinitionData = string
-export type ViewDefinitionError = ExecuteSqlError
+export type ViewDefinitionError = ResponseError
 
 export const useViewDefinitionQuery = <TData = ViewDefinitionData>(
   { projectRef, connectionString, id, includeCreateStatement }: ViewDefinitionVariables,

@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 import { fdwKeys } from './keys'
 import { entityTypeKeys } from '@/data/entity-types/keys'
 import { foreignTableKeys } from '@/data/foreign-tables/keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { vaultSecretsKeys } from '@/data/vault/keys'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 

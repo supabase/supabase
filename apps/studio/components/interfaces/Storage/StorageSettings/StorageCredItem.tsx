@@ -63,7 +63,7 @@ export const StorageCredItem = ({
             <DropdownMenuTrigger asChild>
               <Button
                 icon={<MoreVertical size={14} strokeWidth={1} />}
-                type="text"
+                variant="text"
                 className="px-1.5 text-foreground-lighter hover:text-foreground"
               />
             </DropdownMenuTrigger>

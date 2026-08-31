@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -15,19 +15,20 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
-import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
+import { convertPoolSize, isAllocationUnit } from './PerformanceSettingsForm.utils'
 import { ScaffoldSection, ScaffoldSectionTitle } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
-import NoPermission from '@/components/ui/NoPermission'
+import { AlertError } from '@/components/ui/AlertError'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
@@ -94,7 +95,7 @@ export const PerformanceSettingsForm = () => {
 
   const promptUpgrade = IS_PLATFORM && !isLoadingEntitlement && !hasAccessToPerformance
 
-  const { mutate: updateAuthConfig, isPending: isSaving } = useAuthConfigUpdateMutation()
+  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
 
   const requestDurationForm = useForm({
     resolver: zodResolver(
@@ -103,7 +104,7 @@ export const PerformanceSettingsForm = () => {
     defaultValues: { API_MAX_REQUEST_DURATION: 10 },
   })
 
-  const databaseForm = useForm({
+  const databaseForm = useForm<z.infer<typeof DatabaseFormSchema>>({
     resolver: zodResolver(DatabaseFormSchema),
     defaultValues: {
       DB_MAX_POOL_SIZE: 10,
@@ -111,7 +112,7 @@ export const PerformanceSettingsForm = () => {
     },
   })
 
-  const chosenUnit = databaseForm.watch('DB_MAX_POOL_SIZE_UNIT')
+  const chosenUnit = useWatch({ control: databaseForm.control, name: 'DB_MAX_POOL_SIZE_UNIT' })
 
   const onSubmitRequestDurationForm = (values: any) => {
     if (!project?.ref) return console.error('Project ref is required')
@@ -147,7 +148,7 @@ export const PerformanceSettingsForm = () => {
     updateAuthConfig(
       { projectRef: project?.ref, config },
       {
-        onError: (error) => {
+        onError: () => {
           setIsUpdatingDatabaseForm(false)
         },
         onSuccess: () => {
@@ -266,13 +267,13 @@ export const PerformanceSettingsForm = () => {
 
               <CardFooter className="justify-end space-x-2">
                 {requestDurationForm.formState.isDirty && (
-                  <Button type="default" onClick={() => requestDurationForm.reset()}>
+                  <Button variant="default" onClick={() => requestDurationForm.reset()}>
                     Cancel
                   </Button>
                 )}
                 <Button
-                  type={promptUpgrade ? 'default' : 'primary'}
-                  htmlType="submit"
+                  variant={promptUpgrade ? 'default' : 'primary'}
+                  type="submit"
                   disabled={
                     !canUpdateConfig ||
                     isUpdatingRequestDurationForm ||
@@ -312,51 +313,42 @@ export const PerformanceSettingsForm = () => {
                       }
                     >
                       <FormControl>
-                        <Select_Shadcn_
+                        <Select
                           value={field.value}
                           onValueChange={(value) => {
+                            if (!isAllocationUnit(value)) return
+
                             const values = databaseForm.getValues()
+                            const currentUnit = values.DB_MAX_POOL_SIZE_UNIT
                             field.onChange(value)
 
-                            if (values.DB_MAX_POOL_SIZE_UNIT !== value) {
-                              const currentValue = values.DB_MAX_POOL_SIZE!
-
-                              let preservedPoolSize: number
-                              if (value === 'percent') {
-                                // convert from absolute number to roughly the same percentage
-                                preservedPoolSize = Math.ceil(
-                                  (Math.min(maxConnectionLimit, currentValue) /
-                                    maxConnectionLimit) *
-                                    100
-                                )
-                              } else {
-                                // convert from percentage to roughly the same connection number
-                                preservedPoolSize = Math.floor(
-                                  maxConnectionLimit * (Math.min(100, currentValue) / 100)
-                                )
-                              }
-
-                              databaseForm.setValue('DB_MAX_POOL_SIZE', preservedPoolSize)
+                            if (currentUnit !== value) {
+                              databaseForm.setValue(
+                                'DB_MAX_POOL_SIZE',
+                                convertPoolSize({
+                                  fromUnit: currentUnit,
+                                  toUnit: value,
+                                  currentValue: values.DB_MAX_POOL_SIZE!,
+                                  maxConnectionLimit,
+                                })
+                              )
                             }
                           }}
                         >
-                          <SelectTrigger_Shadcn_
-                            size="small"
-                            disabled={!canUpdateConfig || promptUpgrade}
-                          >
-                            <SelectValue_Shadcn_>
+                          <SelectTrigger size="small" disabled={!canUpdateConfig || promptUpgrade}>
+                            <SelectValue>
                               {field.value === 'percent' ? 'Percentage' : 'Absolute'}
-                            </SelectValue_Shadcn_>
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_ align="end">
-                            <SelectItem_Shadcn_ value="connections" className="text-xs">
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent align="end">
+                            <SelectItem value="connections" className="text-xs">
                               Absolute number of connections
-                            </SelectItem_Shadcn_>
-                            <SelectItem_Shadcn_ value="percent" className="text-xs">
+                            </SelectItem>
+                            <SelectItem value="percent" className="text-xs">
                               Percent of max connections
-                            </SelectItem_Shadcn_>
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -419,13 +411,13 @@ export const PerformanceSettingsForm = () => {
 
               <CardFooter className="justify-end space-x-2">
                 {databaseForm.formState.isDirty && (
-                  <Button type="default" onClick={() => databaseForm.reset()}>
+                  <Button variant="default" onClick={() => databaseForm.reset()}>
                     Cancel
                   </Button>
                 )}
                 <Button
-                  type={promptUpgrade ? 'default' : 'primary'}
-                  htmlType="submit"
+                  variant={promptUpgrade ? 'default' : 'primary'}
+                  type="submit"
                   disabled={
                     !canUpdateConfig || isUpdatingDatabaseForm || !databaseForm.formState.isDirty
                   }

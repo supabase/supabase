@@ -1,6 +1,6 @@
-import Link from 'next/link'
-import { ArrowRight, Check } from 'lucide-react'
 import SectionContainer from 'components/Layouts/SectionContainer'
+import { ArrowRight, Check } from 'lucide-react'
+import Link from 'next/link'
 
 export interface CustomerEvidenceCustomer {
   name: string
@@ -46,7 +46,7 @@ const CustomerEvidenceSection = ({
             />
           )}
           <h3 className="text-lg text-foreground font-medium mb-4">{customer.name}</h3>
-          <ul className="space-y-3 mb-6 flex-grow">
+          <ul className="space-y-3 mb-6 grow">
             {customer.highlights.map((highlight, i) => (
               <li key={i} className="flex items-start gap-3 text-foreground-lighter text-sm">
                 <Check className="w-4 h-4 text-brand shrink-0 mt-0.5" />

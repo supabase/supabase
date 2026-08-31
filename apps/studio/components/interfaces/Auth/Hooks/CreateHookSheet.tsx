@@ -1,15 +1,21 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import {
+  ident,
+  joinSqlFragments,
+  safeSql,
+  type SafeSqlFragment,
+} from '@supabase/pg-meta/src/pg-format'
 import { useParams } from 'common'
 import randomBytes from 'randombytes'
 import { useEffect, useMemo } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Separator,
@@ -21,6 +27,7 @@ import {
   SheetTitle,
   Switch,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import * as z from 'zod'
@@ -29,13 +36,14 @@ import { Hook, HOOK_DEFINITION_TITLE, HOOKS_DEFINITIONS } from './hooks.constant
 import { extractMethod, getRevokePermissionStatements, isValidHook } from './hooks.utils'
 import { convertArgumentTypes } from '@/components/interfaces/Database/Functions/Functions.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { DocsButton } from '@/components/ui/DocsButton'
 import FunctionSelector from '@/components/ui/FunctionSelector'
-import SchemaSelector from '@/components/ui/SchemaSelector'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { AuthConfigResponse } from '@/data/auth/auth-config-query'
 import { useAuthHooksUpdateMutation } from '@/data/auth/auth-hooks-update-mutation'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { DOCS_URL } from '@/lib/constants'
@@ -159,7 +167,10 @@ export const CreateHookSheet = ({
   })
 
   const isDirty = form.formState.isDirty
-  const values = form.watch()
+  const [postgresValues, hookType, selectedType, enabled] = useWatch({
+    control: form.control,
+    name: ['postgresValues', 'hookType', 'selectedType', 'enabled'],
+  })
   const {
     confirmOnClose,
     handleOpenChange,
@@ -170,12 +181,12 @@ export const CreateHookSheet = ({
   })
 
   const statements = useMemo(() => {
-    let permissionChanges: string[] = []
+    let permissionChanges: Array<SafeSqlFragment> = []
     if (hook.method.type === 'postgres') {
       if (
         hook.method.schema !== '' &&
         hook.method.functionName !== '' &&
-        hook.method.functionName !== values.postgresValues.functionName
+        hook.method.functionName !== postgresValues.functionName
       ) {
         permissionChanges = getRevokePermissionStatements(
           hook.method.schema,
@@ -184,25 +195,30 @@ export const CreateHookSheet = ({
       }
     }
 
-    if (values.postgresValues.functionName !== '') {
+    if (postgresValues.functionName !== '') {
+      const schema = postgresValues.schema
+      const functionName = postgresValues.functionName
       permissionChanges = [
         ...permissionChanges,
-        `-- Grant access to function to supabase_auth_admin\ngrant execute on function ${values.postgresValues.schema}.${values.postgresValues.functionName} to supabase_auth_admin;`,
-        `-- Grant access to schema to supabase_auth_admin\ngrant usage on schema ${values.postgresValues.schema} to supabase_auth_admin;`,
-        `-- Revoke function permissions from authenticated, anon and public\nrevoke execute on function ${values.postgresValues.schema}.${values.postgresValues.functionName} from authenticated, anon, public;`,
+        safeSql`-- Grant access to function to supabase_auth_admin
+grant execute on function ${ident(schema)}.${ident(functionName)} to supabase_auth_admin;`,
+        safeSql`-- Grant access to schema to supabase_auth_admin
+grant usage on schema ${ident(schema)} to supabase_auth_admin;`,
+        safeSql`-- Revoke function permissions from authenticated, anon and public
+revoke execute on function ${ident(schema)}.${ident(functionName)} from authenticated, anon, public;`,
       ]
     }
     return permissionChanges
-  }, [hook, values.postgresValues.schema, values.postgresValues.functionName])
+  }, [hook, postgresValues.schema, postgresValues.functionName])
 
   const { mutate: updateAuthHooks, isPending: isUpdatingAuthHooks } = useAuthHooksUpdateMutation({
     onSuccess: () => {
-      toast.success(`Successfully created ${values.hookType}.`)
+      toast.success(`Successfully ${isCreating ? 'created' : 'updated'} ${hookType}.`)
       if (statements.length > 0) {
         executeSql({
           projectRef,
           connectionString: project!.connectionString,
-          sql: statements.join('\n'),
+          sql: joinSqlFragments(statements, '\n'),
         })
       }
       onClose()
@@ -295,7 +311,7 @@ export const CreateHookSheet = ({
           <DocsButton href={`${DOCS_URL}/guides/auth/auth-hooks/${hook.docSlug}`} />
         </SheetHeader>
         <Separator />
-        <SheetSection className="overflow-auto flex-grow px-0">
+        <SheetSection className="overflow-auto grow p-0">
           <Form {...form}>
             <form
               id={FORM_ID}
@@ -308,11 +324,11 @@ export const CreateHookSheet = ({
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout
-                    layout="flex"
-                    className="px-5"
-                    label={`Enable ${values.hookType}`}
+                    layout="flex-row-reverse"
+                    className="px-5 [&>div:first-child]:xl:w-1/5"
+                    label={`Enable ${hookType}`}
                     description={
-                      values.hookType === 'Send SMS hook'
+                      hookType === 'Send SMS hook'
                         ? 'SMS Provider settings will be disabled in favor of SMS hooks'
                         : undefined
                     }
@@ -327,12 +343,32 @@ export const CreateHookSheet = ({
                   </FormItemLayout>
                 )}
               />
+
+              {hook.id === 'send-email' && enabled && (
+                <div className="px-5">
+                  <Admonition type="default" title="This hook replaces your email templates">
+                    <p className="text-balance">
+                      While enabled, email data is sent to this hook instead. Your configured{' '}
+                      <InlineLink href={`/project/${projectRef}/auth/templates`}>
+                        email templates
+                      </InlineLink>{' '}
+                      will not be used.{' '}
+                      <InlineLink href={`${DOCS_URL}/guides/auth/auth-hooks/send-email-hook`}>
+                        Learn more
+                      </InlineLink>
+                      .
+                    </p>
+                  </Admonition>
+                </div>
+              )}
+
               <Separator />
+
               <FormField
                 control={form.control}
                 name="selectedType"
                 render={({ field }) => (
-                  <FormItemLayout label="Hook type" className="px-5">
+                  <FormItemLayout layout="horizontal" label="Hook type" className="px-5">
                     <FormControl>
                       <RadioGroupStacked
                         value={field.value}
@@ -357,86 +393,94 @@ export const CreateHookSheet = ({
                   </FormItemLayout>
                 )}
               />
-              {values.selectedType === 'postgres' ? (
+              {selectedType === 'postgres' ? (
                 <>
-                  <div className="grid grid-cols-2 gap-8 px-5">
-                    <FormField
-                      key="postgresValues.schema"
-                      control={form.control}
-                      name="postgresValues.schema"
-                      render={({ field }) => (
-                        <FormItemLayout
-                          label="Postgres Schema"
-                          description="Postgres schema where the function is defined"
-                        >
-                          <FormControl>
-                            <SchemaSelector
-                              size="small"
-                              showError={false}
-                              stopScrollPropagation
-                              selectedSchemaName={field.value}
-                              onSelectSchema={(name) => field.onChange(name)}
-                              disabled={field.disabled}
-                            />
-                          </FormControl>
-                        </FormItemLayout>
-                      )}
-                    />
-                    <FormField
-                      key="postgresValues.functionName"
-                      control={form.control}
-                      name="postgresValues.functionName"
-                      render={({ field }) => (
-                        <FormItemLayout
-                          label="Postgres function"
-                          description="This function will be called by Supabase Auth each time the hook is triggered"
-                        >
-                          <FormControl>
-                            <FunctionSelector
-                              size="small"
-                              schema={values.postgresValues.schema}
-                              value={field.value}
-                              stopScrollPropagation
-                              onChange={field.onChange}
-                              disabled={field.disabled}
-                              filterFunction={(func) => {
-                                if (supportedReturnTypes.includes(func.return_type)) {
-                                  const { value } = convertArgumentTypes(func.argument_types)
-                                  if (value.length !== 1) return false
-                                  return value[0].type === 'json' || value[0].type === 'jsonb'
-                                }
-                                return false
-                              }}
-                              noResultsLabel={
-                                <span>
-                                  No function with a single JSON/B argument
-                                  <br />
-                                  and JSON/B
-                                  {definition.enabledKey === 'HOOK_SEND_EMAIL_ENABLED'
-                                    ? ' or void'
-                                    : ''}{' '}
-                                  return type found in this schema.
-                                </span>
+                  <FormField
+                    key="postgresValues.schema"
+                    control={form.control}
+                    name="postgresValues.schema"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="horizontal"
+                        className="px-5"
+                        label="Postgres Schema"
+                        description="Postgres schema where the function is defined"
+                      >
+                        <FormControl>
+                          <SchemaSelector
+                            size="small"
+                            showError={false}
+                            stopScrollPropagation
+                            selectedSchemaName={field.value}
+                            onSelectSchema={(name) => field.onChange(name)}
+                            disabled={field.disabled}
+                          />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                  <FormField
+                    key="postgresValues.functionName"
+                    control={form.control}
+                    name="postgresValues.functionName"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="horizontal"
+                        className="px-5"
+                        label="Postgres function"
+                        description="This function will be called by Supabase Auth each time the hook is triggered"
+                      >
+                        <FormControl>
+                          <FunctionSelector
+                            size="small"
+                            schema={postgresValues.schema}
+                            value={field.value}
+                            stopScrollPropagation
+                            onChange={field.onChange}
+                            disabled={field.disabled}
+                            filterFunction={(func) => {
+                              if (supportedReturnTypes.includes(func.return_type)) {
+                                const { value } = convertArgumentTypes({
+                                  type: func.type,
+                                  value: func.argument_types,
+                                })
+                                if (value.length !== 1) return false
+                                return value[0].type === 'json' || value[0].type === 'jsonb'
                               }
-                            />
-                          </FormControl>
-                        </FormItemLayout>
-                      )}
-                    />
-                  </div>
+                              return false
+                            }}
+                            noResultsLabel={
+                              <span>
+                                No function with a single JSON/B argument
+                                <br />
+                                and JSON/B
+                                {definition.enabledKey === 'HOOK_SEND_EMAIL_ENABLED'
+                                  ? ' or void'
+                                  : ''}{' '}
+                                return type found in this schema.
+                              </span>
+                            }
+                          />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
 
                   {statements.length > 0 && (
-                    <div className="h-72 w-full gap-3 flex flex-col">
-                      <p className="text-sm text-foreground-light px-5">
-                        The following statements will be executed on the selected function:
-                      </p>
-                      <CodeEditor
-                        isReadOnly
-                        id="postgres-hook-editor"
-                        language="pgsql"
-                        value={statements.join('\n\n')}
-                      />
-                    </div>
+                    <>
+                      <Separator className="mb-4" />
+                      <div className="h-72 w-full gap-3 flex flex-col">
+                        <p className="text-sm text-foreground-light px-5">
+                          The following statements will be executed on the selected function:
+                        </p>
+                        <CodeEditor
+                          isReadOnly
+                          id="postgres-hook-editor"
+                          language="pgsql"
+                          value={statements.join('\n\n')}
+                        />
+                      </div>
+                    </>
                   )}
                 </>
               ) : (
@@ -447,11 +491,12 @@ export const CreateHookSheet = ({
                     name="httpsValues.url"
                     render={({ field }) => (
                       <FormItemLayout
+                        layout="horizontal"
                         label="URL"
                         description="Supabase Auth will send a HTTPS POST request to this URL each time the hook is triggered."
                       >
                         <FormControl>
-                          <Input_Shadcn_ {...field} />
+                          <Input {...field} placeholder="https://www.example.com" />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -462,11 +507,12 @@ export const CreateHookSheet = ({
                     name="httpsValues.secret"
                     render={({ field }) => (
                       <FormItemLayout
+                        layout="horizontal"
                         label="Secret"
                         description={
                           <div className="flex items-center gap-x-2">
                             <p>
-                              Should be a base64 encoded hook secret with a prefix{' '}
+                              Should be a base64 encoded secret with a prefix{' '}
                               <code className="text-code-inline">v1,whsec_</code>.
                             </p>
                             <InfoTooltip side="bottom" className="w-60 text-center">
@@ -479,11 +525,10 @@ export const CreateHookSheet = ({
                       >
                         <FormControl>
                           <div className="flex flex-row">
-                            <Input_Shadcn_ {...field} className="rounded-r-none border-r-0" />
+                            <Input {...field} className="rounded-r-none border-r-0" />
                             <Button
-                              type="default"
-                              size="small"
-                              className="rounded-l-none text-xs"
+                              variant="default"
+                              className="rounded-l-none text-xs h-auto"
                               onClick={() => {
                                 const authHookSecret = generateAuthHookSecret()
                                 form.setValue('httpsValues.secret', authHookSecret, {
@@ -506,18 +551,18 @@ export const CreateHookSheet = ({
         <SheetFooter>
           {!isCreating && (
             <div className="flex-1">
-              <Button type="danger" onClick={() => onDelete()}>
+              <Button variant="danger" onClick={() => onDelete()}>
                 Delete hook
               </Button>
             </div>
           )}
 
-          <Button disabled={isUpdatingAuthHooks} type="default" onClick={confirmOnClose}>
+          <Button disabled={isUpdatingAuthHooks} variant="default" onClick={confirmOnClose}>
             Cancel
           </Button>
           <Button
             form={FORM_ID}
-            htmlType="submit"
+            type="submit"
             disabled={isUpdatingAuthHooks}
             loading={isUpdatingAuthHooks}
           >

@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { INTERNAL_SCHEMAS, useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 
@@ -33,7 +33,7 @@ export const ProtectedSchemaDialog = ({ onClose }: { onClose: () => void }) => {
             </code>
           ))}
         </div>
-        <p className="text-sm !mt-4">
+        <p className="text-sm mt-4!">
           These schemas are critical to the functionality of your Supabase project and hence we
           highly recommend not altering them.
         </p>
@@ -44,7 +44,7 @@ export const ProtectedSchemaDialog = ({ onClose }: { onClose: () => void }) => {
       </DialogSection>
       <DialogFooter>
         <div className="flex items-center justify-end space-x-2">
-          <Button type="default" onClick={onClose}>
+          <Button variant="default" onClick={onClose}>
             Understood
           </Button>
         </div>
@@ -100,7 +100,7 @@ export const ProtectedSchemaWarning = ({
         showLearnMoreDialog && (
           <Dialog open={showModal} onOpenChange={setShowModal}>
             <DialogTrigger asChild>
-              <Button type="default" size="tiny" onClick={() => setShowModal(true)}>
+              <Button variant="default" size="tiny" onClick={() => setShowModal(true)}>
                 Learn more
               </Button>
             </DialogTrigger>

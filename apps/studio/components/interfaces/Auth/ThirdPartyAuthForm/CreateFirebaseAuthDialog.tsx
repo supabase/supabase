@@ -15,7 +15,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Separator,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -134,7 +134,7 @@ export const CreateFirebaseAuthIntegrationDialog = ({
                 render={({ field }) => (
                   <FormItemLayout label="Firebase Auth Project ID">
                     <FormControl>
-                      <Input_Shadcn_ {...field} />
+                      <Input {...field} />
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -145,16 +145,16 @@ export const CreateFirebaseAuthIntegrationDialog = ({
         <DialogFooter>
           {!isCreating && (
             <div className="flex-1">
-              <Button type="danger" onClick={() => onDelete()} icon={<Trash />}>
+              <Button variant="danger" onClick={() => onDelete()} icon={<Trash />}>
                 Remove connection
               </Button>
             </div>
           )}
 
-          <Button disabled={isPending} type="default" onClick={() => onClose()}>
+          <Button disabled={isPending} variant="default" onClick={() => onClose()}>
             Cancel
           </Button>
-          <Button form={FORM_ID} htmlType="submit" disabled={isPending} loading={isPending}>
+          <Button form={FORM_ID} type="submit" disabled={isPending} loading={isPending}>
             {isCreating ? 'Create connection' : 'Update connection'}
           </Button>
         </DialogFooter>

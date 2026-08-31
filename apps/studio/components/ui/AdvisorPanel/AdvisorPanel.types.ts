@@ -26,6 +26,7 @@ export type AdvisorLintItem = AdvisorBaseItem & {
 export type AdvisorNotificationItem = AdvisorBaseItem & {
   source: 'notification'
   original: Notification
+  project_ref?: string
 }
 
 export type AdvisorSignalItem = AdvisorBaseItem & {

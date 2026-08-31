@@ -1,5 +1,5 @@
 import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
-import { ReactNode, useEffect, useState } from 'react'
+import { ReactNode, useCallback, useEffect, useState } from 'react'
 
 import { FilterInput } from './components/FilterInput'
 import { FilterPill } from './components/FilterPill'
@@ -14,6 +14,8 @@ import {
   ReportsNumericFilter,
 } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
 import { useDebouncedValue } from '@/hooks/misc/useDebouncedValue'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const QueryPerformanceFilterBar = ({
   actions,
@@ -84,6 +86,45 @@ export const QueryPerformanceFilterBar = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedInputValue])
 
+  const hasActiveFilters = Boolean(
+    inputValue ||
+    filters.roles.length > 0 ||
+    filters.sources.length > 0 ||
+    callsFilter ||
+    totalTimeFilter ||
+    indexAdvisor === 'true' ||
+    sort
+  )
+
+  const handleResetFilters = useCallback(() => {
+    setInputValue('')
+    setFilters({ roles: [], sources: [] })
+    setSearchParams({
+      search: '',
+      roles: [],
+      sources: [],
+      callsFilter: null,
+      totalTimeFilter: null,
+      indexAdvisor: 'false',
+    })
+    clearSort()
+  }, [setSearchParams, clearSort])
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      const el = document.getElementById('keyword')
+      if (el instanceof HTMLInputElement) {
+        el.focus()
+        el.select()
+      }
+    },
+    { label: 'Search queries' }
+  )
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, handleResetFilters, {
+    enabled: hasActiveFilters,
+  })
+
   const getCallsFilterDisplay = () => {
     if (!callsFilter) return null
     return `${callsFilter.operator} ${callsFilter.value}`
@@ -95,7 +136,7 @@ export const QueryPerformanceFilterBar = ({
   }
 
   return (
-    <div className="px-4 py-1.5 bg-surface-200 border-t -mt-px flex justify-between items-center overflow-x-auto overflow-y-hidden w-full flex-shrink-0">
+    <div className="px-4 py-1.5 bg-surface-200 border-t -mt-px flex justify-between items-center overflow-x-auto overflow-y-hidden w-full shrink-0">
       <div className="flex items-center gap-x-4">
         <div className="flex items-center gap-x-2">
           <FilterInput value={inputValue} onChange={setInputValue} />

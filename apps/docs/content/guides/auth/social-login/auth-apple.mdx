@@ -22,7 +22,7 @@ In some cases you're able to use the OAuth flow within web-based native apps suc
 
 When developing with Expo, you can test Sign in with Apple via the Expo Go app, in all other cases you will need to obtain an [Apple Developer](https://developer.apple.com) account to enable the capability.
 
-<Admonition type="caution" label="Secret Key Rotation Required">
+<Admonition type="caution" title="Secret Key Rotation Required">
 
 If you're using the OAuth flow (web, Flutter web, Kotlin non-iOS platforms), Apple requires you to generate a new secret key every 6 months using the signing key (`.p8` file). This is a critical maintenance task that will cause authentication failures if missed.
 
@@ -35,7 +35,7 @@ This requirement only applies if you're configuring OAuth settings (Services ID,
 
 </Admonition>
 
-<Admonition type="caution" label="Apple Does Not Provide Full Name in Identity Token">
+<Admonition type="caution" title="Apple Does Not Provide Full Name in Identity Token">
 
 Apple's identity token does not include the user's full name in its claims. This means the Supabase Auth server cannot automatically populate the user's name metadata when users sign in with Apple.
 
@@ -97,7 +97,7 @@ The platform-specific examples below demonstrate how to implement this pattern f
 
     This call takes the user to Apple's consent screen. Once the flow ends, the user's profile information is exchanged and validated with Supabase Auth before it redirects back to your web application with an access and refresh token representing the user's session.
 
-    <Admonition type="note" label="Full Name Not Available in OAuth Flow">
+    <Admonition type="note" title="Full Name Not Available in OAuth Flow">
 
     When using the OAuth flow, the user's full name is not accessible from Apple's response. Apple only provides the full name through native authentication methods (Sign in with Apple JS, or native iOS/macOS SDKs) during the first sign-in.
 
@@ -120,7 +120,7 @@ The platform-specific examples below demonstrate how to implement this pattern f
     4. A **Services ID** which uniquely identifies the web services provided by the app you registered in the previous step. You can create a new Services ID from the [Identifiers](https://developer.apple.com/account/resources/identifiers/list/serviceId) section in the Apple Developer Console (use the filter menu in the upper right side to see all Services IDs). These usually are a reverse domain name string, for example `com.example.app.web`.
     5. Configure Website URLs for the newly created **Services ID**. The web domain you should use is the domain your Supabase project is hosted on. This is usually `<project-id>.supabase.co` while the redirect URL is `https://<project-id>.supabase.co/auth/v1/callback`.
     6. Create a signing **Key** in the [Keys](https://developer.apple.com/account/resources/authkeys/list) section of the Apple Developer Console. You can use this key to generate a secret key using the tool below, which is added to your Supabase project's Auth configuration. Make sure you safely store the `AuthKey_XXXXXXXXXX.p8` file. If you ever lose access to it, or make it public accidentally, revoke it from the Apple Developer Console and create a new one immediately.
-    7. Finally, add the information you configured above to the [Apple provider configuration in the Supabase dashboard](/dashboard/project/_/auth/providers).
+    7. Finally, add the information you configured above to the [Apple provider configuration in the Supabase dashboard](/dashboard/project/_/auth/providers). If your project also uses native Sign in with Apple (for example on iOS, Expo, or Flutter), list this Services ID as the **first** entry in the _Client IDs_ field. Supabase uses the first client ID in the list for the web `signInWithOAuth` flow, while the native `signInWithIdToken` flow accepts any client ID in the list as a valid token audience, regardless of order. If a native App ID comes before the Services ID, native sign-in keeps working but web sign-in is rejected by Apple.
 
 You can also configure the Apple auth provider using the Management API:
 
@@ -140,7 +140,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
   }'
 ```
 
-    <Admonition type="tip">
+    <Admonition type="note">
 
     Use this tool to generate a new Apple client secret. No keys leave your browser! Be aware that this tool does not currently work in Safari, so use Firefox or a Chrome-based browser instead.
 
@@ -371,7 +371,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
     }
     ```
 
-    <Admonition type="note" label="Android Implementation Notes">
+    <Admonition type="note" title="Android Implementation Notes">
 
     - Sign in with Apple is not natively available on Android devices
     - The OAuth flow opens a browser window for authentication
@@ -508,9 +508,9 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
     4. A **Services ID** which uniquely identifies the web services provided by the app you registered in the previous step. You can create a new Services ID from the [Identifiers](https://developer.apple.com/account/resources/identifiers/list/serviceId) section in the Apple Developer Console (use the filter menu in the upper right side to see all Services IDs). These usually are a reverse domain name string, for example `com.example.app.web`.
     5. Configure Website URLs for the newly created **Services ID**. The web domain you should use is the domain your Supabase project is hosted on. This is usually `<project-id>.supabase.co` while the redirect URL is `https://<project-id>.supabase.co/auth/v1/callback`.
     6. Create a signing **Key** in the [Keys](https://developer.apple.com/account/resources/authkeys/list) section of the Apple Developer Console. You can use this key to generate a secret key using the tool below, which is added to your Supabase project's Auth configuration. Make sure you safely store the `AuthKey_XXXXXXXXXX.p8` file. If you ever lose access to it, or make it public accidentally, revoke it from the Apple Developer Console and create a new one immediately. You will have to generate a new secret key using this file every 6 months, so make sure you schedule a recurring reminder in your calendar!
-    7. Finally, add the information you configured above to the [Apple provider configuration in the Supabase dashboard](/dashboard/project/_/auth/providers).
+    7. Finally, add the information you configured above to the [Apple provider configuration in the Supabase dashboard](/dashboard/project/_/auth/providers). If your app also uses native Sign in with Apple (on iOS or macOS), list this Services ID as the **first** entry in the _Client IDs_ field. Supabase uses the first client ID in the list for the web `signInWithOAuth` flow, while the native `signInWithIdToken` flow accepts any client ID in the list as a valid token audience, regardless of order. If a native App ID comes before the Services ID, native sign-in keeps working but web sign-in is rejected by Apple.
 
-    <Admonition type="tip">
+    <Admonition type="note">
 
     Use this tool to generate a new Apple client secret. No keys leave your browser! Be aware that this tool does not currently work in Safari, so use Firefox or a Chrome-based browser instead.
 
@@ -723,7 +723,6 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
     dependencies {
         implementation("io.github.jan-tennert.supabase:gotrue-kt:VERSION")
         implementation("io.github.jan-tennert.supabase:compose-auth:VERSION")
-        implementation("io.github.jan-tennert.supabase:compose-auth-ui:VERSION") // Optional, for UI components
     }
     ```
 

@@ -38,7 +38,7 @@ const AvatarStack = ({
       className={cn(
         avatarStackVariants({ orientation }),
         className,
-        orientation === 'horizontal' ? '-space-x-0' : '-space-y-0'
+        orientation === 'horizontal' ? 'space-x-0' : 'space-y-0'
       )}
       {...props}
     >

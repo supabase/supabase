@@ -4,7 +4,6 @@ import { useParams } from 'common'
 import dayjs from 'dayjs'
 import {
   AlertCircle,
-  Check,
   CheckCircle,
   Circle,
   Loader,
@@ -14,7 +13,7 @@ import {
 } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, SuccessCheck, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
@@ -76,7 +75,7 @@ export const UpgradingState = () => {
           <h1 className="text-3xl">{project?.name}</h1>
         </div>
         <div className="w-full mx-auto mt-8 mb-16 max-w-7xl">
-          <div className="flex h-[500px] items-center justify-center rounded border border-muted bg-surface-100 p-8">
+          <div className="flex h-[500px] items-center justify-center rounded-sm border border-muted bg-surface-100 p-8">
             {isCompleted ? (
               <div className="grid gap-4">
                 <div className="relative mx-auto max-w-[300px]">
@@ -108,7 +107,7 @@ export const UpgradingState = () => {
                   </p>
                 </div>
                 <div className="flex items-center mx-auto space-x-2">
-                  <Button asChild type="default">
+                  <Button asChild variant="default">
                     <SupportLink
                       queryParams={{
                         category: SupportCategories.DATABASE_UNRESPONSIVE,
@@ -156,7 +155,7 @@ export const UpgradingState = () => {
                   )}
 
                   <div
-                    className="!mt-4 !mb-2 py-3 px-4 transition-all overflow-hidden border rounded relative"
+                    className="mt-4! mb-2! py-3 px-4 transition-all overflow-hidden border rounded-sm relative"
                     style={{ maxHeight: isExpanded ? '500px' : '110px' }}
                   >
                     {isExpanded ? (
@@ -202,9 +201,7 @@ export const UpgradingState = () => {
                                 />
                               </div>
                             ) : isCompleted ? (
-                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-brand border-brand">
-                                <Check size={12} className="text-white" strokeWidth={3} />
-                              </div>
+                              <SuccessCheck />
                             ) : (
                               <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-overlay-hover" />
                             )}

@@ -21,7 +21,13 @@ import {
 } from './first-referrer-cookie'
 import { ensurePlatformSuffix, isBrowser } from './helpers'
 import { useFirstTouchStore, useParams } from './hooks'
-import { posthogClient, type ClientTelemetryEvent } from './posthog-client'
+import {
+  buildSessionRecordingConfig,
+  posthogClient,
+  type CapturedNetworkRequest,
+  type ClientTelemetryEvent,
+  type SessionRecordingOptions,
+} from './posthog-client'
 import { TelemetryEvent } from './telemetry-constants'
 import {
   clearFirstTouchData,
@@ -30,7 +36,13 @@ import {
 } from './telemetry-first-touch-store'
 import { getSharedTelemetryData, getTelemetryCookieOptions } from './telemetry-utils'
 
-export { posthogClient, type ClientTelemetryEvent }
+export {
+  buildSessionRecordingConfig,
+  posthogClient,
+  type CapturedNetworkRequest,
+  type ClientTelemetryEvent,
+  type SessionRecordingOptions,
+}
 
 export const TelemetryTagManager = () => {
   const { hasAccepted } = useConsentState()
@@ -109,7 +121,6 @@ interface HandlePageTelemetryOptions {
 }
 
 function handlePageTelemetry({
-  apiUrl: API_URL,
   pathname,
   featureFlags,
   slug,
@@ -229,13 +240,13 @@ function handlePageTelemetry({
 }
 
 export function handlePageLeaveTelemetry(
-  API_URL: string,
+  _API_URL: string,
   pathname: string,
-  featureFlags?: {
+  _featureFlags?: {
     [key: string]: unknown
   },
-  slug?: string,
-  ref?: string
+  _slug?: string,
+  _ref?: string
 ) {
   if (typeof window !== 'undefined') {
     const pageData = getSharedTelemetryData(pathname)
@@ -256,12 +267,15 @@ export const PageTelemetry = ({
   enabled = true,
   organizationSlug,
   projectRef,
+  sessionReplay,
 }: {
   API_URL: string
   hasAcceptedConsent: boolean
   enabled?: boolean
   organizationSlug?: string
   projectRef?: string
+  /** Masking policy for session replay. Omit to disable recording. */
+  sessionReplay?: SessionRecordingOptions
 }) => {
   const router = useRouter()
 
@@ -316,9 +330,9 @@ export const PageTelemetry = ({
 
   useEffect(() => {
     if (hasAcceptedConsent && IS_PLATFORM) {
-      posthogClient.init(true)
+      posthogClient.init({ sessionReplay })
     }
-  }, [hasAcceptedConsent, IS_PLATFORM])
+  }, [hasAcceptedConsent, IS_PLATFORM, sessionReplay])
 
   // Waiting for router.isReady before sending to avoid dynamic route placeholders
   useEffect(() => {
@@ -447,7 +461,13 @@ export function useTelemetryIdentify(API_URL: string) {
         ...(anonymousId && { anonymous_id: anonymousId }),
       })
 
-      posthogClient.identify(user.id, { gotrue_id: user.id })
+      // user.created_at is gotrue's immutable signup timestamp — safe to $set on
+      // every identify because the value never changes per user. Lets flag
+      // targeting distinguish brand-new signups from returning single-org users.
+      posthogClient.identify(user.id, {
+        gotrue_id: user.id,
+        ...(user.created_at && { signup_timestamp: user.created_at }),
+      })
     }
   }, [API_URL, user?.id])
 }

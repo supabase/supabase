@@ -2,7 +2,7 @@ import { AppWindow, Plus } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
-import { EmptyStatePresentational } from 'ui-patterns'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { PromoteInstallationModal } from '../../Installations/PromoteInstallationModal'
 import { PrivateApp, usePrivateApps } from '../../PrivateAppsContext'
@@ -12,14 +12,17 @@ import { DeleteAppModal } from '../DeleteAppModal'
 import { ViewAppSheet } from '../ViewAppSheet/ViewAppSheet'
 import { AppsListLoading } from './AppsListLoading'
 import { AppsListTable } from './AppsListTable'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { usePlatformAppDeleteMutation } from '@/data/platform-apps/platform-app-delete-mutation'
 import { usePlatformAppInstallationDeleteMutation } from '@/data/platform-apps/platform-app-installation-delete-mutation'
+import type { ShortcutId } from '@/state/shortcuts/registry'
 
 interface AppsListProps {
   onCreateApp: () => void
+  createShortcutId?: ShortcutId
 }
 
-export function AppsList({ onCreateApp }: AppsListProps) {
+export function AppsList({ onCreateApp, createShortcutId }: AppsListProps) {
   const { apps, isLoading, slug, installations, removeInstallation, removeInstallationsByAppId } =
     usePrivateApps()
 
@@ -72,9 +75,17 @@ export function AppsList({ onCreateApp }: AppsListProps) {
           title="No private apps yet"
           description="Create a private app to generate scoped access tokens for your organization."
         >
-          <Button type="primary" icon={<Plus size={14} />} onClick={onCreateApp}>
-            Create app
-          </Button>
+          {createShortcutId ? (
+            <Shortcut id={createShortcutId} onTrigger={onCreateApp} side="bottom">
+              <Button variant="primary" icon={<Plus size={14} />} onClick={onCreateApp}>
+                Create app
+              </Button>
+            </Shortcut>
+          ) : (
+            <Button variant="primary" icon={<Plus size={14} />} onClick={onCreateApp}>
+              Create app
+            </Button>
+          )}
         </EmptyStatePresentational>
       ) : (
         <AppsListTable

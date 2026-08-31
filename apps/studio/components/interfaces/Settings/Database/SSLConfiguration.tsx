@@ -2,72 +2,64 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { template } from 'lodash'
 import { Download, Loader2 } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import {
-  Alert,
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-  Button,
-  Card,
-  CardContent,
-  Switch,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
+import { Button, Card, CardContent, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 import {
   PageSection,
   PageSectionContent,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-} from 'ui-patterns'
-import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+} from 'ui-patterns/PageSection'
 
+import { SSLEnforcementConfirmDialog } from './SSLEnforcementConfirmDialog'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useJitDbAccessQuery } from '@/data/jit-db-access/jit-db-access-query'
 import { useSSLEnforcementQuery } from '@/data/ssl-enforcement/ssl-enforcement-query'
 import { useSSLEnforcementUpdateMutation } from '@/data/ssl-enforcement/ssl-enforcement-update-mutation'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
 export const SSLConfiguration = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const [isEnforced, setIsEnforced] = useState(false)
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
+
+  // High Availability projects always enforce SSL and the API rejects any
+  // attempt to read or change the setting, so skip the query for them and
+  // show the setting as always on.
+  const { isHighAvailability, isPending: isHighAvailabilityPending } = useHighAvailability()
+  const canLoadSSLEnforcement = !isHighAvailability && !isHighAvailabilityPending
   const {
     data: sslEnforcementConfiguration,
-    isPending: isLoading,
-    isSuccess,
-  } = useSSLEnforcementQuery({
-    projectRef: ref,
-  })
-  const { mutate: updateSSLEnforcement, isPending: isSubmitting } = useSSLEnforcementUpdateMutation(
-    {
+    isPending: isSSLEnforcementPending,
+    isSuccess: isSSLEnforcementSuccess,
+  } = useSSLEnforcementQuery({ projectRef: ref }, { enabled: canLoadSSLEnforcement })
+
+  const isLoading = isHighAvailabilityPending || (!isHighAvailability && isSSLEnforcementPending)
+  const isSuccess = isHighAvailability || isSSLEnforcementSuccess
+  const { data: jitDbAccessConfiguration } = useJitDbAccessQuery({ projectRef: ref })
+  const { mutateAsync: updateSSLEnforcement, isPending: isSubmitting } =
+    useSSLEnforcementUpdateMutation({
       onSuccess: () => {
         toast.success('Successfully updated SSL configuration')
       },
       onError: (error) => {
-        setIsEnforced(initialIsEnforced)
         toast.error(`Failed to update SSL enforcement: ${error.message}`)
       },
-    }
-  )
+    })
 
   const { can: canUpdateSSLEnforcement } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
@@ -78,16 +70,56 @@ export const SSLConfiguration = () => {
       },
     }
   )
-  const initialIsEnforced = isSuccess
-    ? sslEnforcementConfiguration.appliedSuccessfully &&
-      sslEnforcementConfiguration.currentConfig.database
-    : false
+
+  // Derived directly from the query so a refetch triggered elsewhere (e.g.
+  // enabling SSL enforcement from the JIT DB access unavailable banner) is
+  // reflected here too, instead of relying on a mirrored local state that
+  // would only resync on the initial load.
+  const isEnforced =
+    isHighAvailability ||
+    (isSSLEnforcementSuccess &&
+      sslEnforcementConfiguration.appliedSuccessfully &&
+      sslEnforcementConfiguration.currentConfig.database)
 
   const hasAccessToSSLEnforcement = !(
     sslEnforcementConfiguration !== undefined &&
     'isNotAllowed' in sslEnforcementConfiguration &&
     sslEnforcementConfiguration.isNotAllowed
   )
+
+  // Temporary access requires SSL enforcement to be enabled, so SSL enforcement
+  // can't be turned off again while temporary access is still enabled.
+  const isTemporaryAccessEnabled =
+    jitDbAccessConfiguration?.state === 'enabled' && jitDbAccessConfiguration.appliedSuccessfully
+
+  const isSwitchDisabled =
+    isLoading ||
+    isSubmitting ||
+    isHighAvailability ||
+    !canUpdateSSLEnforcement ||
+    !hasAccessToSSLEnforcement ||
+    isTemporaryAccessEnabled
+
+  let switchTooltipMessage: string | undefined
+  if (isHighAvailability) {
+    switchTooltipMessage = 'SSL is always enforced on High Availability projects'
+  } else if (!canUpdateSSLEnforcement) {
+    switchTooltipMessage =
+      'You need additional permissions to update SSL enforcement for your project'
+  } else if (!hasAccessToSSLEnforcement) {
+    switchTooltipMessage = 'Your project does not have access to SSL enforcement'
+  } else if (isTemporaryAccessEnabled) {
+    switchTooltipMessage =
+      'Temporary access must first be disabled before SSL enforcement can be disabled'
+  }
+
+  let loadingAnnouncement = ''
+  if (isSubmitting) {
+    loadingAnnouncement = 'Updating SSL enforcement'
+  } else if (isLoading) {
+    loadingAnnouncement = 'Loading SSL configuration'
+  }
+
   const env = process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod' ? 'prod' : 'staging'
   const hasSSLCertificate =
     settings?.inserted_at !== undefined && new Date(settings.inserted_at) >= new Date('2021-04-30')
@@ -98,16 +130,9 @@ export const SSLConfiguration = () => {
     [sslCertificateUrlTemplate, env]
   )
 
-  useEffect(() => {
-    if (!isLoading && sslEnforcementConfiguration) {
-      setIsEnforced(initialIsEnforced)
-    }
-  }, [isLoading])
-
   const toggleSSLEnforcement = async () => {
     if (!ref) return console.error('Project ref is required')
-    setIsEnforced(!isEnforced)
-    updateSSLEnforcement({ projectRef: ref, requestedConfig: { database: !isEnforced } })
+    await updateSSLEnforcement({ projectRef: ref, requestedConfig: { database: !isEnforced } })
   }
 
   return (
@@ -126,75 +151,65 @@ export const SSLConfiguration = () => {
               label="Enforce SSL on incoming connections"
               description="Reject non-SSL connections to your database"
             >
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <div className="flex items-center justify-end mt-2.5 space-x-2">
-                    {(isLoading || isSubmitting) && (
-                      <Loader2 className="animate-spin" strokeWidth={1.5} size={16} />
+              <div className="flex items-center justify-end mt-2.5 space-x-2">
+                {(isLoading || isSubmitting) && (
+                  <Loader2
+                    aria-hidden="true"
+                    className="animate-spin motion-reduce:animate-none"
+                    strokeWidth={1.5}
+                    size={16}
+                  />
+                )}
+                {isSuccess && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
+                      {/* A disabled switch can't take focus, so the wrapper becomes the focus
+                          target to keep the tooltip reachable by keyboard */}
+                      <div tabIndex={isSwitchDisabled ? 0 : undefined}>
+                        {/* The dialog is opened from the switch itself rather than a wrapping
+                            trigger, so a disabled switch can never open it. */}
+                        <Switch
+                          size="large"
+                          checked={isEnforced}
+                          disabled={isSwitchDisabled}
+                          onCheckedChange={() => setIsConfirmDialogOpen(true)}
+                        />
+                      </div>
+                    </TooltipTrigger>
+                    {switchTooltipMessage && (
+                      <TooltipContent side="bottom" className="w-64 text-center">
+                        {switchTooltipMessage}
+                      </TooltipContent>
                     )}
-                    {isSuccess && (
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
-                          <div>
-                            <Switch
-                              size="large"
-                              checked={isEnforced}
-                              disabled={
-                                isLoading ||
-                                isSubmitting ||
-                                !canUpdateSSLEnforcement ||
-                                !hasAccessToSSLEnforcement
-                              }
-                            />
-                          </div>
-                        </TooltipTrigger>
-                        {(!canUpdateSSLEnforcement || !hasAccessToSSLEnforcement) && (
-                          <TooltipContent side="bottom" className="w-64 text-center">
-                            {!canUpdateSSLEnforcement
-                              ? 'You need additional permissions to update SSL enforcement for your project'
-                              : !hasAccessToSSLEnforcement
-                                ? 'Your project does not have access to SSL enforcement'
-                                : undefined}
-                          </TooltipContent>
-                        )}
-                      </Tooltip>
-                    )}
-                  </div>
-                </AlertDialogTrigger>
-                <AlertDialogContent size="medium">
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Updating SSL enforcement involves a brief downtime
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      A database restart is required for SSL enforcement changes to take place, and
-                      this involves a few minutes of downtime. Confirm to proceed now?
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      variant="warning"
-                      disabled={isSubmitting}
-                      onClick={toggleSSLEnforcement}
-                    >
-                      {!isEnforced ? 'Enable SSL' : 'Disable SSL'}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+                  </Tooltip>
+                )}
+                {/* Kept mounted so screen readers announce loading state changes */}
+                <span className="sr-only" role="status">
+                  {loadingAnnouncement}
+                </span>
+              </div>
+              <SSLEnforcementConfirmDialog
+                open={isConfirmDialogOpen}
+                onOpenChange={setIsConfirmDialogOpen}
+                isTargetEnforced={!isEnforced}
+                isSubmitting={isSubmitting}
+                onConfirm={toggleSSLEnforcement}
+              />
             </FormLayout>
-            {isSuccess && !sslEnforcementConfiguration?.appliedSuccessfully && (
-              <Alert
-                withIcon
-                variant="warning"
+            {isSSLEnforcementSuccess && !sslEnforcementConfiguration.appliedSuccessfully && (
+              <Admonition
+                type="warning"
+                layout="horizontal"
                 title="SSL enforcement was not updated successfully"
-              >
-                Please try updating again, or contact{' '}
-                <SupportLink className={InlineLinkClassName}>support</SupportLink> if this error
-                persists
-              </Alert>
+                description={
+                  <>
+                    Please try updating again, or contact{' '}
+                    <SupportLink className={InlineLinkClassName}>support</SupportLink> if this error
+                    persists
+                  </>
+                }
+              />
             )}
           </CardContent>
           <CardContent>
@@ -207,7 +222,7 @@ export const SSLConfiguration = () => {
                 {!hasSSLCertificate ? (
                   <ButtonTooltip
                     disabled
-                    type="default"
+                    variant="default"
                     icon={<Download />}
                     tooltip={{
                       content: {
@@ -219,7 +234,7 @@ export const SSLConfiguration = () => {
                     Download certificate
                   </ButtonTooltip>
                 ) : (
-                  <Button type="default" icon={<Download />}>
+                  <Button variant="default" icon={<Download />}>
                     <a href={sslCertificateUrl}>Download certificate</a>
                   </Button>
                 )}

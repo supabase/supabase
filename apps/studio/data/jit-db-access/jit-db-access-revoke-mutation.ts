@@ -44,7 +44,7 @@ export const useJitDbAccessRevokeMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to revoke JIT database access: ${data.message}`)
+        toast.error(`Failed to revoke temporary access: ${data.message}`)
       } else {
         onError(data, variables, context)
       }

@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS, mergeRefs, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, mergeRefs, useFlag, useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { XIcon } from 'lucide-react'
 import Head from 'next/head'
@@ -12,9 +12,9 @@ import {
   type ReactNode,
 } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   cn,
   LogoLoader,
   ResizableHandle,
@@ -25,13 +25,12 @@ import {
 } from 'ui'
 
 import { useEditorType } from '../editors/EditorsLayout.hooks'
-import { useSetMainScrollContainer } from '../MainScrollContainerContext'
+import { useMainScrollContainer, useSetMainScrollContainer } from '../MainScrollContainerContext'
 import { useMobileSheet } from '../Navigation/NavigationBar/MobileSheetContext'
-import ProductMenuBar from '../Navigation/ProductMenuBar'
+import { ProductMenuBar } from '../Navigation/ProductMenuBar'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
 import { getSectionKeyFromPathname, MobileMenuContent } from './LayoutHeader/MobileMenuContent'
-import { LoadingState } from './LoadingState'
 import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import { PauseFailedState } from './PauseFailedState'
 import { PausingState } from './PausingState'
@@ -43,6 +42,7 @@ import { UnhealthyState } from './UnhealthyState'
 import { UpgradingState } from './UpgradingState'
 import { CreateBranchModal } from '@/components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from '@/components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
+import { BannerExplorer } from '@/components/ui/BannerStack/Banners/BannerExplorer'
 import { BannerFreeMicroUpgrade } from '@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade'
 import { BANNER_ID, useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -106,6 +106,7 @@ export interface ProjectLayoutProps {
   isLoading?: boolean
   isBlocking?: boolean
   product?: string
+  productMenuBadge?: ReactNode
   productMenu?: ReactNode
   browserTitle?: {
     entity?: string
@@ -124,6 +125,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       isLoading = false,
       isBlocking = true,
       product = '',
+      productMenuBadge,
       productMenu,
       browserTitle,
       children,
@@ -141,7 +143,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const { data: resourceWarnings } = useResourceWarningsQuery({
       slug: selectedOrganization?.slug,
     })
-    const projectResourceWarnings = resourceWarnings?.find(
+    const projectResourceWarnings = (Array.isArray(resourceWarnings) ? resourceWarnings : []).find(
       (w) => w.project === selectedProject?.ref
     )
     const isComputeNearExhaustion =
@@ -151,6 +153,9 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       !!projectResourceWarnings?.disk_io_exhaustion
     const isNanoCompute = selectedProject?.infra_compute_size === 'nano'
     const showUpgradeBanner = isNanoCompute && isComputeNearExhaustion
+
+    const isExplorerEnabled = useFlag('explorer')
+
     const [isFreeMicroUpgradeBannerDismissed] = useLocalStorageQuery(
       LOCAL_STORAGE_KEYS.FREE_MICRO_UPGRADE_BANNER_DISMISSED(selectedProject?.ref ?? ''),
       false
@@ -163,12 +168,18 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
         }),
         false
       )
+    const [isExplorerBannerDismissed, , { isSuccess: isLocalStorageReady }] = useLocalStorageQuery(
+      LOCAL_STORAGE_KEYS.EXPLORER_BANNER_DISMISSED,
+      false
+    )
+
     const { showSidebar } = useAppStateSnapshot()
     const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
 
     const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
     const currentSectionKey = getSectionKeyFromPathname(pathname)
 
+    const mainScrollContainer = useMainScrollContainer()
     const setMainScrollContainer = useSetMainScrollContainer()
     const combinedRef = mergeRefs(ref, setMainScrollContainer)
 
@@ -231,6 +242,17 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       dismissBanner,
     ])
 
+    useEffect(() => {
+      if (!isExplorerEnabled || !isLocalStorageReady || isExplorerBannerDismissed) return
+
+      addBanner({
+        id: 'explorer-banner',
+        priority: 2,
+        isDismissed: false,
+        content: <BannerExplorer />,
+      })
+    }, [addBanner, isExplorerEnabled, isExplorerBannerDismissed, isLocalStorageReady])
+
     useLayoutEffect(() => {
       const unregister = registerOpenMenu(() => {
         setMobileSheetContent(
@@ -244,6 +266,10 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       })
       return unregister
     }, [registerOpenMenu, productMenu, product, currentSectionKey, setMobileSheetContent])
+
+    useLayoutEffect(() => {
+      mainScrollContainer?.scrollTo({ top: 0, left: 0 })
+    }, [pathname, mainScrollContainer])
 
     return (
       <>
@@ -275,7 +301,11 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                       isBlocking={isBlocking}
                       productMenu={productMenu}
                     >
-                      <ProductMenuBar title={product} className={productMenuClassName}>
+                      <ProductMenuBar
+                        title={product}
+                        titleBadge={productMenuBadge}
+                        className={productMenuClassName}
+                      >
                         {productMenu}
                       </ProductMenuBar>
                     </MenuBarWrapper>
@@ -299,7 +329,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                 ref={combinedRef}
               >
                 {showStripeProjectBanner && (
-                  <Alert_Shadcn_
+                  <Alert
                     variant="default"
                     className="flex items-center gap-4 border-t-0 border-x-0 rounded-none"
                   >
@@ -309,20 +339,20 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                       size="medium"
                     />
                     <div className="flex-1">
-                      <AlertTitle_Shadcn_>This project is connected to Stripe</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
+                      <AlertTitle>This project is connected to Stripe</AlertTitle>
+                      <AlertDescription>
                         Changes made here may affect your connected Stripe project.
-                      </AlertDescription_Shadcn_>
+                      </AlertDescription>
                     </div>
                     <ButtonTooltip
-                      type="text"
+                      variant="text"
                       icon={<XIcon size={14} />}
                       className="h-7 w-7 p-0"
                       onClick={() => setIsProjectIntegrationBannerDismissed(true)}
                       aria-label="Dismiss project integration banner"
                       tooltip={{ content: { text: 'Dismiss' } }}
                     />
-                  </Alert_Shadcn_>
+                  </Alert>
                 )}
                 {showPausedState ? (
                   <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center px-4">
@@ -331,7 +361,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                     </div>
                   </div>
                 ) : (
-                  <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
+                  <ContentWrapper>
                     <ResourceExhaustionWarningBanner />
                     {children}
                   </ContentWrapper>
@@ -379,8 +409,6 @@ const MenuBarWrapper = ({
 }
 
 interface ContentWrapperProps {
-  isLoading: boolean
-  isBlocking?: boolean
   children: ReactNode
 }
 
@@ -396,7 +424,7 @@ interface ContentWrapperProps {
  *
  * [TODO] Next iteration should scrape long polling and just listen to the project's status
  */
-const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapperProps) => {
+const ContentWrapper = ({ children }: ContentWrapperProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
@@ -406,7 +434,6 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
 
   const requiresDbConnection = !routesToIgnoreDBConnection.some((x) => router.pathname.includes(x))
   const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(router.pathname)
-  const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
 
   const isRestarting = selectedProject?.status === PROJECT_STATUS.RESTARTING
   const isResizing = selectedProject?.status === PROJECT_STATUS.RESIZING
@@ -440,10 +467,6 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   useEffect(() => {
     if (ref) state.setSelectedDatabaseId(ref)
   }, [ref])
-
-  if (isBlocking && (isLoading || (requiresProjectDetails && selectedProject === undefined))) {
-    return router.pathname.endsWith('[ref]') ? <LoadingState /> : <LogoLoader />
-  }
 
   if (isRestarting && !isBackupsPage) {
     return <RestartingState />

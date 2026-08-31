@@ -10,26 +10,24 @@ sidebar_label: 'Bandwidth & Storage Egress'
 
 Free Plan Organizations in Supabase have a limit of 10 GB of bandwidth (5 GB cached + 5 GB uncached). This limit is calculated by the sum of all the data transferred from the Supabase servers to the client. This includes all the data transferred from the database, storage, and functions.
 
-### Checking Storage egress requests in Logs Explorer
+### Checking Storage egress requests in the SQL Editor
 
-We have a template query that you can use to get the number of requests for each object in [Logs Explorer](/dashboard/project/_/logs/explorer/templates).
+You can use the following query to get the number of requests for each object. Run it in the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs) with the query source set to **Logs**.
 
 ```sql
 select
-  request.method as http_verb,
-  request.path as filepath,
-  (responseHeaders.cf_cache_status = 'HIT') as cached,
-  count(*) as num_requests
-from
-  edge_logs
-  cross join unnest(metadata) as metadata
-  cross join unnest(metadata.request) as request
-  cross join unnest(metadata.response) as response
-  cross join unnest(response.headers) as responseHeaders
-where
-  (path like '%storage/v1/object/%' or path like '%storage/v1/render/%')
-  and request.method = 'GET'
-group by 1, 2, 3
+  log_attributes['request.method'] as http_verb,
+  log_attributes['request.path'] as filepath,
+  (log_attributes['response.headers.cf_cache_status'] = 'HIT') as cached,
+  count() as num_requests
+from logs
+where source = 'edge_logs'
+  and (
+    log_attributes['request.path'] like '%storage/v1/object/%'
+    or log_attributes['request.path'] like '%storage/v1/render/%'
+  )
+  and log_attributes['request.method'] = 'GET'
+group by http_verb, filepath, cached
 order by num_requests desc
 limit 100;
 ```
@@ -41,13 +39,13 @@ Example of the output:
   {
     "filepath": "/storage/v1/object/sign/large%20bucket/20230902_200037.gif",
     "http_verb": "GET",
-    "cached": true,
+    "cached": 1,
     "num_requests": 100
   },
   {
     "filepath": "/storage/v1/object/public/demob/Sports/volleyball.png",
     "http_verb": "GET",
-    "cached": false,
+    "cached": 0,
     "num_requests": 168
   }
 ]
@@ -63,7 +61,7 @@ curl -s -w "%{size_download}\n" -o /dev/null "https://my_project.supabase.co/sto
 ```
 
 This will return the size of the file in bytes.
-For this example, let's say that `20230902_200037.gif` has a file size of 3 megabytes and `volleyball.png` has a file size of 570 kilobytes.
+For this example, assume that `20230902_200037.gif` has a file size of 3 megabytes and `volleyball.png` has a file size of 570 kilobytes.
 
 Now, we have to sum all the egress for all the files to get the total egress:
 

@@ -165,6 +165,8 @@ function createStorageExplorerState({
     isSearching: false,
     setIsSearching: (value: boolean) => (state.isSearching = value),
 
+    isRefreshing: false,
+
     selectedFilePreview: undefined as StorageItemWithColumn | undefined,
     setSelectedFilePreview: (file?: StorageItemWithColumn) => (state.selectedFilePreview = file),
 
@@ -398,6 +400,15 @@ function createStorageExplorerState({
       await state.fetchFoldersByPath({ paths })
     },
 
+    refreshAll: async () => {
+      state.isRefreshing = true
+      try {
+        await state.refetchAllOpenedFolders()
+      } finally {
+        state.isRefreshing = false
+      }
+    },
+
     fetchFoldersByPath: async ({
       paths,
       searchString = '',
@@ -418,7 +429,7 @@ function createStorageExplorerState({
       }
 
       const foldersItems = await Promise.all(
-        pathsWithEmptyPrefix.map(async (path, idx) => {
+        pathsWithEmptyPrefix.map(async (_path, idx) => {
           const prefix = paths.slice(0, idx).join('/')
           const options = {
             limit: LIMIT,
@@ -1779,7 +1790,7 @@ function createStorageExplorerState({
             toastId && (
               <Button
                 size="tiny"
-                type="default"
+                variant="default"
                 className="ml-6"
                 onClick={() => state.abortUploads(toastId)}
               >
@@ -1828,16 +1839,16 @@ function createStorageExplorerState({
 
 export type StorageExplorerState = ReturnType<typeof createStorageExplorerState>
 
-const DEFAULT_STATE_CONFIG = {
+const createDefaultStateConfig = () => ({
   projectRef: '',
   connectionString: '',
   resumableUploadUrl: '',
   clientEndpoint: '',
   bucket: {} as Bucket,
-}
+})
 
 const StorageExplorerStateContext = createContext<StorageExplorerState>(
-  createStorageExplorerState(DEFAULT_STATE_CONFIG)
+  createStorageExplorerState(createDefaultStateConfig())
 )
 
 export const StorageExplorerStateContextProvider = ({ children }: PropsWithChildren) => {
@@ -1845,7 +1856,7 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   const { data: bucket } = useSelectedBucket()
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
 
-  const [state, setState] = useState(() => createStorageExplorerState(DEFAULT_STATE_CONFIG))
+  const [state, setState] = useState(() => createStorageExplorerState(createDefaultStateConfig()))
   const stateRef = useLatest(state)
 
   const {

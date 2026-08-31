@@ -1,6 +1,6 @@
 import { cva } from 'class-variance-authority'
 import React from 'react'
-import { cn, FormDescription, FormLabel, FormMessage, Label_Shadcn_ } from 'ui'
+import { cn, FormDescription, FormLabel, FormMessage, Label } from 'ui'
 import { SIZE } from 'ui/src/lib/constants'
 
 type Props = {
@@ -18,6 +18,14 @@ type Props = {
   isReactForm?: boolean
   hideMessage?: boolean
   name?: string
+  /**
+   * For layout="horizontal", switches the label/content split to react to the nearest
+   * `@container` ancestor's width instead of the viewport width. Use when the layout sits
+   * inside a narrower column (e.g. next to a sidebar) so it stacks to a single column as
+   * soon as that column gets tight, rather than waiting for a viewport breakpoint that may
+   * never reflect the column's actual available space.
+   */
+  isContainerResponsive?: boolean
 }
 
 const ContainerVariants = cva('relative grid gap-10', {
@@ -35,7 +43,7 @@ const ContainerVariants = cva('relative grid gap-10', {
       false: '',
     },
     layout: {
-      horizontal: 'flex flex-col gap-2 md:grid md:grid-cols-12',
+      horizontal: 'flex flex-col gap-2',
       vertical: 'flex flex-col gap-2',
       flex: 'flex flex-row gap-3',
       'flex-row-reverse':
@@ -57,8 +65,20 @@ const ContainerVariants = cva('relative grid gap-10', {
       align: 'right',
       className: 'justify-between',
     },
+    {
+      layout: 'horizontal',
+      responsive: false,
+      className: 'md:grid md:grid-cols-12',
+    },
+    {
+      layout: 'horizontal',
+      responsive: true,
+      className: '@xl:grid @xl:grid-cols-12',
+    },
   ],
-  defaultVariants: {},
+  defaultVariants: {
+    responsive: false,
+  },
 })
 
 const LabelContainerVariants = cva('transition-all duration-500 ease-in-out', {
@@ -75,7 +95,7 @@ const LabelContainerVariants = cva('transition-all duration-500 ease-in-out', {
       horizontal: 'flex flex-col gap-2 col-span-4',
       vertical: 'flex flex-row gap-2 justify-between',
       flex: 'flex flex-col gap-0 min-w-0',
-      'flex-row-reverse': 'flex flex-col min-w-0 flex-grow',
+      'flex-row-reverse': 'flex flex-col min-w-0 grow',
     },
     labelLayout: {
       horizontal: '',
@@ -227,7 +247,7 @@ const FlexContainer = cva('', {
     {
       layout: 'flex-row-reverse',
       className:
-        'flex flex-col justify-center items-start md:items-end shrink-0 md:w-1/2 xl:w-2/5 md:min-w-100 [&>div]:md:w-full',
+        'flex flex-col justify-center items-start md:items-end shrink-0 md:w-1/2 xl:w-2/5 [&>div]:md:w-full',
     },
   ],
 })
@@ -286,6 +306,8 @@ export const FormLayout = React.forwardRef<
       nonBoxInput = !label,
       hideMessage = false,
       isReactForm,
+      error,
+      isContainerResponsive = false,
       ...props
     },
     ref
@@ -301,6 +323,10 @@ export const FormLayout = React.forwardRef<
           )}
           data-formlayout-id="message"
         />
+      ) : error && !hideMessage ? (
+        <p className={cn('mt-2 text-sm text-destructive', layout === 'flex-row-reverse' && 'mt-0')}>
+          {error}
+        </p>
       ) : null
 
     const renderDescription =
@@ -313,12 +339,14 @@ export const FormLayout = React.forwardRef<
           {description}
         </FormDescription>
       ) : description ? (
-        <p
-          className={cn(DescriptionVariants({ size, layout }), 'text-sm text-foreground-light')}
+        // Rendered as a div rather than a p as descriptions can be arbitrary JSX
+        // which may contain block-level elements (invalid HTML inside a p)
+        <div
+          className={cn(DescriptionVariants({ size, layout }))}
           data-formlayout-id={'description'}
         >
           {description}
-        </p>
+        </div>
       ) : null
 
     const LabelContents = () => (
@@ -349,7 +377,10 @@ export const FormLayout = React.forwardRef<
       <div
         ref={ref}
         {...props}
-        className={cn(ContainerVariants({ size, flex, align, layout }), className)}
+        className={cn(
+          ContainerVariants({ size, flex, align, layout, responsive: isContainerResponsive }),
+          className
+        )}
       >
         {flex && (
           <div className={cn(FlexContainer({ flex, align, layout }))}>
@@ -365,20 +396,20 @@ export const FormLayout = React.forwardRef<
             >
               {hasLabel && isReactForm ? (
                 <FormLabel
-                  className="text-foreground flex gap-2 items-center break-words"
+                  className="text-foreground flex gap-2 items-center wrap-break-word"
                   data-formlayout-id="formLabel"
-                  htmlFor={props.name || id}
+                  htmlFor={id}
                 >
                   <LabelContents />
                 </FormLabel>
               ) : (
-                <Label_Shadcn_
-                  className="text-foreground flex gap-2 items-center break-words leading-normal"
+                <Label
+                  className="text-foreground flex gap-2 items-center wrap-break-word leading-normal"
                   data-formlayout-id="label"
                   htmlFor={props.name || id}
                 >
                   <LabelContents />
-                </Label_Shadcn_>
+                </Label>
               )}
               {labelOptional && (
                 <span

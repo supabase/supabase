@@ -1,4 +1,5 @@
 import { CubeIcon } from '@heroicons/react/outline'
+import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
 import { useBreakpoint } from 'common'
 import { Check, Sparkles, Timer } from 'lucide-react'
 import dynamic from 'next/dynamic'
@@ -69,7 +70,7 @@ const data: () => {
       ctas: [
         {
           label: 'Start your project',
-          href: 'https://supabase.com/dashboard',
+          href: DASHBOARD_SIGN_UP_URL,
           type: 'primary' as any,
           onClick: () =>
             sendTelemetryEvent({
@@ -145,10 +146,10 @@ const data: () => {
         'Supabase includes everything you need to create the perfect app for your brand, business, or just for fun.',
       className: cn(
         '[&_div.grid]:sm:divide-x [&_div.grid]:divide-y',
-        '[&_div.grid>div:nth-child(2n+2)]:sm:!border-l-0',
-        '[&_div.grid>div:nth-child(2n+2)]:lg:!border-l',
-        '[&_div.grid>div:nth-child(3n+3)]:lg:!border-l-0',
-        '[&_div.grid>div:nth-child(2)]:lg:!border-t-0'
+        '[&_div.grid>div:nth-child(2n+2)]:sm:border-l-0!',
+        '[&_div.grid>div:nth-child(2n+2)]:lg:border-l!',
+        '[&_div.grid>div:nth-child(3n+3)]:lg:border-l-0!',
+        '[&_div.grid>div:nth-child(2)]:lg:border-t-0!'
       ),
       features: [
         {
@@ -203,7 +204,7 @@ const data: () => {
                   absolute pointer-events-none
                   w-full h-full
                   inset-0 top-auto
-                  bg-[linear-gradient(to_bottom,transparent_0%,hsl(var(--background-default))_100%)]
+                  bg-[linear-gradient(to_bottom,transparent_0%,var(--background-default)_100%)]
                 "
               />
             </div>
@@ -277,7 +278,7 @@ const data: () => {
               more. Secure and trusted.
             </>
           ),
-          image: <AuthVisual className="2xl:!-bottom-20" />,
+          image: <AuthVisual className="2xl:-bottom-20!" />,
         },
         {
           id: 'storage',
@@ -319,7 +320,7 @@ const data: () => {
             </>
           ),
           image: (
-            <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]" />
+            <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,var(--background-default)_75%)]" />
           ),
         },
         {
@@ -409,7 +410,7 @@ const data: () => {
             absolute pointer-events-none
             w-full h-full
             inset-0 top-auto
-            bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]
+            bg-[linear-gradient(to_top,transparent_0%,transparent_50%,var(--background-default)_75%)]
           "
               />
               <Image
@@ -479,7 +480,7 @@ const data: () => {
       heading: 'Fun projects built with Supabase',
       subheading: 'Discover what our community has to say about their Supabase experience.',
       ctas: (
-        <Button asChild type="default" size="small" icon={<IconDiscord />}>
+        <Button asChild variant="default" size="small" icon={<IconDiscord />}>
           <Link
             href={'https://discord.supabase.com/'}
             target="_blank"

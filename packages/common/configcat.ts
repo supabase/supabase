@@ -1,7 +1,6 @@
 import * as configcat from 'configcat-js'
 
 let client: configcat.IConfigCatClient
-const endpoint = '/configuration-files/configcat-proxy/frontend-v2/config_v6.json'
 
 /**
  * To set up ConfigCat for another app
@@ -14,50 +13,43 @@ const endpoint = '/configuration-files/configcat-proxy/frontend-v2/config_v6.jso
  * - Can now use ConfigCat feature flags with the `useFlag` hook
  */
 
-export const fetchHandler: typeof fetch = async (input, init) => {
-  try {
-    return await fetch(input, init)
-  } catch (err: any) {
-    if (err instanceof TypeError && err.message === 'Failed to fetch') {
-      console.error(err)
-      throw new Error('Unable to reach the server. Please check your network or try again later.')
-    }
-    throw err
-  }
-}
-
 async function getClient() {
   if (client) return client
 
-  if (!process.env.NEXT_PUBLIC_CONFIGCAT_SDK_KEY && !process.env.NEXT_PUBLIC_CONFIGCAT_PROXY_URL) {
+  const proxyUrl = process.env.NEXT_PUBLIC_CONFIGCAT_PROXY_URL
+  const sdkKey = process.env.NEXT_PUBLIC_CONFIGCAT_SDK_KEY
+
+  if (!sdkKey && !proxyUrl) {
     console.log('Skipping ConfigCat set up as env vars are not present')
     return undefined
   }
 
-  try {
-    const response = await fetchHandler(process.env.NEXT_PUBLIC_CONFIGCAT_PROXY_URL + endpoint)
-    const options = { pollIntervalSeconds: 7 * 60 } // 7 minutes
+  const options = { pollIntervalSeconds: 7 * 60 } // 7 minutes
 
-    if (response.status !== 200) {
-      if (!process.env.NEXT_PUBLIC_CONFIGCAT_SDK_KEY) {
-        console.error('Failed to set up ConfigCat: SDK Key is missing')
-        return undefined
+  try {
+    if (proxyUrl) {
+      const proxyClient = configcat.getClient(
+        'configcat-proxy/frontend-v2',
+        configcat.PollingMode.AutoPoll,
+        { ...options, baseUrl: proxyUrl }
+      )
+      const cacheState = await proxyClient.waitForReady()
+
+      if (cacheState !== configcat.ClientCacheState.NoFlagData) {
+        client = proxyClient
+        return client
       }
 
-      // proxy is down, use default client
-      client = configcat.getClient(
-        process.env.NEXT_PUBLIC_CONFIGCAT_SDK_KEY ?? '',
-        configcat.PollingMode.AutoPoll,
-        options
-      )
-    } else {
-      client = configcat.getClient('configcat-proxy/frontend-v2', configcat.PollingMode.AutoPoll, {
-        ...options,
-        baseUrl: process.env.NEXT_PUBLIC_CONFIGCAT_PROXY_URL,
-      })
+      proxyClient.dispose()
     }
 
-    return client
+    if (sdkKey) {
+      client = configcat.getClient(sdkKey, configcat.PollingMode.AutoPoll, options)
+      return client
+    }
+
+    console.error('ConfigCat proxy unreachable and SDK key is missing')
+    return undefined
   } catch (error: any) {
     console.error(`Failed to get ConfigCat client: ${error.message}`)
     return undefined

@@ -127,7 +127,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "publishable-or-anon-key"
+              supabaseKey = "your-publishable-key"
           ) {
               install(Auth)
               install(Postgrest)
@@ -140,7 +140,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "publishable-or-anon-key"
+              supabaseKey = "your-publishable-key"
           ) {
               install(Auth) {
                   alwaysAutoRefresh = false // default: true
@@ -197,7 +197,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "publishable-or-anon-key"
+              supabaseKey = "your-publishable-key"
           ) {
               install(Postgrest) {
                   defaultSchema = "schema" // default: "public"
@@ -219,7 +219,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "publishable-or-anon-key"
+              supabaseKey = "your-publishable-key"
           ) {
               install(Storage) {
                   transferTimeout = 90.seconds // Default: 120 seconds
@@ -246,7 +246,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "publishable-or-anon-key"
+              supabaseKey = "your-publishable-key"
           ) {
               install(Realtime) {
                   reconnectDelay = 5.seconds // Default: 7 seconds
@@ -273,7 +273,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "publishable-or-anon-key"
+              supabaseKey = "your-publishable-key"
           ) {
               install(Functions) {
                   //no custom settings
@@ -290,7 +290,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "publishable-or-anon-key"
+              supabaseKey = "your-publishable-key"
           ) {
               install(GraphQL) {
                   apolloConfiguration {
@@ -2748,7 +2748,7 @@ functions:
       Explain is not enabled by default as it can reveal sensitive information about your database.
       It's best to only enable this for testing environments but if you wish to enable it for production you can provide additional protection by using a `pre-request` function.
 
-      Follow the [Performance Debugging Guide](/docs/guides/api/rest/debugging-performance) to enable the functionality on your project.
+      Follow the [Performance Debugging Guide](/docs/guides/database/debugging-performance) to enable the functionality on your project.
     params:
       - name: analyze
         isOptional: true
@@ -2816,7 +2816,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val supabase = createSupabaseClient(supabaseURL = "https://xyzcompany.supabase.co'", supabaseKey = "publishable-or-anon-key") { ... }
+          val supabase = createSupabaseClient(supabaseUrl = "https://xyzcompany.supabase.co", supabaseKey = "your-publishable-key") { ... }
           val auth = supabase.auth
           ```
   - id: sign-up
@@ -2912,7 +2912,7 @@ functions:
       - id: sign-up-with-redirect
         name: Sign up with a redirect URL
         description: |
-          - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+          - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
         code: |
           ```kotlin
           val user = supabase.auth.signUpWith(Email, redirectUrl = "https://example.com") {
@@ -3068,7 +3068,7 @@ functions:
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/redirect-urls).
-      - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
       - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://supabase.com/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
     params:
@@ -3166,7 +3166,7 @@ functions:
         isSpotlight: false
         description: |
           - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectUrl` parameter. This parameter defaults to the [`SITE_URL`](/docs/guides/auth/redirect-urls). It does not redirect the user immediately after invoking this method.
-          - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+          - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
           - getOAuthUrl() provides the URL which needs to be opened in a browser.
           - The redirectTo URL needs to be setup correctly in your project under Authentication -> URL Configuration -> Redirect URLs.
           - To see how you can use a custom in-app browser on Android, check our [demo](https://github.com/supabase-community/supabase-kt/tree/development/demos/android-login) on GitHub.
@@ -3190,7 +3190,7 @@ functions:
     title: 'signInWithSSO()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithSSO'
     notes: |
-      - Before you can call this method you need to [establish a connection](/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
+      - Before you can call this method you need to [establish a connection](/docs/guides/auth/enterprise-sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
       - If you've associated an email domain to the identity provider, you can change the `domain` property in the `signInWith(SSO)` method to start a sign-in flow.
       - In case you need to use a different way to start the authentication flow with an identity provider, you can change the `providerId` property. For example:
           - Mapping specific user email addresses with an identity provider.
@@ -3973,8 +3973,8 @@ functions:
   - id: admin-api
     title: 'Overview'
     notes: |
-      - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
-      - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the browser.
+      - Any method under the `supabase.auth.admin` namespace requires a `secret` key.
+      - These methods are considered admin methods and should be called on a trusted server. Never expose your `secret` key in the browser.
     examples:
       - id: create-auth-admin-client
         name: Create server-side auth client
@@ -3988,9 +3988,9 @@ functions:
               install(Auth) {
                   minimalSettings() //disables session saving and auto-refreshing
               }
-              // install other plugins (these will use the service role key)
+              // install other plugins (these will use the secret key)
           }
-          supabase.auth.importAuthToken("service_role")
+          supabase.auth.importAuthToken("your-secret-key")
 
           // Access auth admin api
           val adminAuthClient = supabase.auth.admin
@@ -4552,7 +4552,7 @@ functions:
       Subscribe to realtime changes in your database.
     title: 'on().subscribe()'
     notes: |
-      - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/database/api#managing-realtime).
+      - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api).
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
       - When using a method with a generic type like `track`, `broadcast` or `broadcastFlow`, you have to provide a [serializable class](/docs/reference/kotlin/installing#serialization) as the type parameter.
       - Presence, Broadcast and Database updates are sent through a [Flow](https://kotlinlang.org/docs/flow.html)

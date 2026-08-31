@@ -84,13 +84,13 @@ export default function TableCrossLink() {
                 </Link>
               </TableCell>
               <TableCell className="flex items-center gap-x-2">
-                <Button type="default" size="tiny" icon={<Edit2 />} className="hit-area-2">
+                <Button variant="default" size="tiny" icon={<Edit2 />} className="hit-area-2">
                   Edit
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
-                      type="default"
+                      variant="default"
                       icon={<EllipsisVertical />}
                       aria-label="More actions"
                       className="w-7 hit-area-2"

@@ -1,14 +1,6 @@
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import {
-  isValidElement,
-  memo,
-  ReactNode,
-  useEffect,
-  useMemo,
-  useRef,
-  type ReactElement,
-} from 'react'
+import React, { isValidElement, memo, ReactNode, useMemo, type ReactElement } from 'react'
 import type { StreamdownProps } from 'streamdown'
 import {
   Button,
@@ -27,10 +19,9 @@ import { markdownComponents } from 'ui-patterns/Markdown'
 
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { AssistantSnippetProps } from './AIAssistant.types'
+import { AssistantQueryCell } from './AssistantQueryCell'
 import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
-import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 import { defaultUrlTransform, wrapPlaceholderUrls } from './Message.utils'
-import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 
 const Streamdown = dynamic<StreamdownProps>(
   () => import('streamdown').then((mod) => mod.Streamdown),
@@ -84,7 +75,7 @@ export const Hyperlink = memo(({ href, children }: { href?: string; children?: R
       <DialogTrigger asChild>
         <span
           className={cn(
-            '!m-0 text-foreground cursor-pointer transition',
+            'm-0! text-foreground cursor-pointer transition',
             'underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground-lighter'
           )}
         >
@@ -106,12 +97,12 @@ export const Hyperlink = memo(({ href, children }: { href?: string; children?: R
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button type="default" className="opacity-100">
+            <Button variant="default" className="opacity-100">
               Cancel
             </Button>
           </DialogClose>
           <DialogClose asChild>
-            <Button asChild type="primary" className="opacity-100">
+            <Button asChild variant="primary" className="opacity-100">
               {isExternalURL ? (
                 <a href={safeUrl} target="_blank" rel="noreferrer noopener">
                   Head to link
@@ -134,8 +125,8 @@ const baseMarkdownComponents = {
   h3: Heading3,
   code: InlineCode,
   a: Hyperlink,
-  img: ({ src }: JSX.IntrinsicElements['img']) => (
-    <span className="text-foreground-light font-mono">[Image: {src}]</span>
+  img: ({ src }: React.JSX.IntrinsicElements['img']) => (
+    <span className="text-foreground-light font-mono">[Image: {src?.toString()}]</span>
   ),
 }
 
@@ -168,7 +159,7 @@ export function MessageMarkdown({
     () => ({
       ...markdownComponents,
       ...baseMarkdownComponents,
-      pre: (props: JSX.IntrinsicElements['pre']) => (
+      pre: (props: React.JSX.IntrinsicElements['pre']) => (
         <MarkdownPre id={id} isLoading={isLoading} readOnly={readOnly}>
           {props.children}
         </MarkdownPre>
@@ -195,18 +186,12 @@ export const MarkdownPre = ({
   isLoading: boolean
   readOnly?: boolean
 }) => {
-  // [Joshen] Using a ref as this data doesn't need to trigger a re-render
-  const chartConfig = useRef<ChartConfig>({
-    view: 'table',
-    type: 'bar',
-    xKey: '',
-    yKey: '',
-    cumulative: false,
-  })
-
   const childArray = Array.isArray(children) ? children : [children]
-  const codeElement = childArray.find((child): child is ReactElement => isValidElement(child))
-  const codeProps = codeElement?.props || {}
+  const codeElement = childArray.find(
+    (child): child is ReactElement<{ className?: string; children: ReactNode }> =>
+      isValidElement<{ className?: string; children: ReactNode }>(child)
+  )
+  const codeProps = codeElement?.props || ({} as { className?: string; children: ReactNode })
   const language = codeProps.className?.replace('language-', '') || 'sql'
   const codeChildren = codeProps.children
   const rawContent = Array.isArray(codeChildren)
@@ -227,22 +212,12 @@ export const MarkdownPre = ({
 
   const { xAxis, yAxis } = snippetProps
   const snippetId = snippetProps.id
-  const title = snippetProps.title || (language === 'edge' ? 'Edge Function' : 'SQL Query')
+  const title = snippetProps.title || (language === 'edge' ? 'Edge Function' : 'SQL query')
   const isChart = snippetProps.isChart === 'true'
   // Strip props from the content for both SQL and edge functions
   const cleanContent = rawContent.replace(/(?:--|\/\/)\s*props:\s*\{[^}]+\}/, '').trim()
 
   const toolCallId = String(snippetId ?? id)
-
-  useEffect(() => {
-    chartConfig.current = {
-      ...chartConfig.current,
-      view: isChart ? 'chart' : 'table',
-      xKey: xAxis ?? '',
-      yKey: yAxis ?? '',
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [snippetProps])
 
   if (!codeElement) {
     return <pre className="w-auto overflow-x-auto not-prose my-4">{children}</pre>
@@ -261,22 +236,14 @@ export const MarkdownPre = ({
         readOnly ? (
           <CollapsibleCodeBlock value={cleanContent} language="sql" hideLineNumbers />
         ) : (
-          <DisplayBlockRenderer
-            messageId={id}
-            toolCallId={toolCallId}
-            initialArgs={{
-              sql: cleanContent,
-              label: title,
-              isWriteQuery: false,
-              view: isChart ? 'chart' : 'table',
-              xAxis: xAxis ?? '',
-              yAxis: yAxis ?? '',
-            }}
-            onError={() => {}}
-            showConfirmFooter={false}
-            onChartConfigChange={(config) => {
-              chartConfig.current = { ...config }
-            }}
+          <AssistantQueryCell
+            id={toolCallId}
+            sql={cleanContent}
+            title={title}
+            view={isChart ? 'chart' : 'table'}
+            xAxis={xAxis}
+            yAxis={yAxis}
+            isStreaming={isLoading}
           />
         )
       ) : (
@@ -285,7 +252,7 @@ export const MarkdownPre = ({
           value={cleanContent}
           language={language as CodeBlockLang}
           className={cn(
-            'my-4 max-h-96 max-w-none block border rounded !bg-transparent !py-3 !px-3.5 prose dark:prose-dark text-foreground',
+            'my-4 max-h-96 max-w-none block border rounded-sm bg-transparent! py-3! px-3.5! prose dark:prose-dark text-foreground',
             '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap [&>code]:block [&>code>span]:text-foreground'
           )}
         />

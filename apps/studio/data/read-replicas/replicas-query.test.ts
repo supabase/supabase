@@ -1,10 +1,13 @@
+import { HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
 
 import {
   getMaxReplicas,
+  getReadReplicas,
   READ_REPLICA_COMPUTE_CAPS,
   READ_REPLICAS_MAX_COUNT,
 } from './replicas-query'
+import { addAPIMock } from '@/tests/lib/msw'
 
 describe('getMaxReplicas', () => {
   it('returns 0 for ineligible compute sizes (pico, nano, micro)', () => {
@@ -39,10 +42,31 @@ describe('getMaxReplicas', () => {
   })
 
   it('all eligible READ_REPLICA_COMPUTE_CAPS are greater than 0 and at most READ_REPLICAS_MAX_COUNT', () => {
-    for (const [key, cap] of Object.entries(READ_REPLICA_COMPUTE_CAPS)) {
+    for (const [, cap] of Object.entries(READ_REPLICA_COMPUTE_CAPS)) {
       if (cap > 0) {
         expect(cap).toBeLessThanOrEqual(READ_REPLICAS_MAX_COUNT)
       }
     }
+  })
+})
+
+describe('getReadReplicas', () => {
+  it('forwards the given headers on the request', async () => {
+    let receivedAuthHeader: string | null = null
+
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref/databases',
+      response: ({ request }) => {
+        receivedAuthHeader = request.headers.get('Authorization')
+        return HttpResponse.json([])
+      },
+    })
+
+    await getReadReplicas({ projectRef: 'default' }, undefined, {
+      Authorization: 'Bearer test-token',
+    })
+
+    expect(receivedAuthHeader).toBe('Bearer test-token')
   })
 })

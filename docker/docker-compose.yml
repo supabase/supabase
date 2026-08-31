@@ -2,10 +2,10 @@
 #   Start:              docker compose up -d
 #   Stop:               docker compose down
 #   Dev mode:           docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up -d
-#   Reset everything:  ./reset.sh
+#   Reset everything:   sh reset.sh
 #
-# TODO:
-#   - Podman does not support nested variable interpolation (${A:-${B}})
+# Notes:
+#   - Nested variable interpolation (${A:-${B}}) requires podman-compose >= 1.6.0
 #
 
 name: supabase
@@ -14,7 +14,7 @@ services:
 
   studio:
     container_name: supabase-studio
-    image: supabase/studio:2026.04.08-sha-205cbe7
+    image: supabase/studio:2026.08.03-sha-022b374
     restart: unless-stopped
     healthcheck:
       test:
@@ -25,11 +25,9 @@ services:
       timeout: 10s
       interval: 5s
       retries: 3
-    depends_on:
-      analytics:
-        condition: service_healthy
+      start_period: 20s
     environment:
-      #  Listen on all IPv4 interfaces
+      # Listen on all IPv4 interfaces
       HOSTNAME: "0.0.0.0"
 
       STUDIO_PG_META_URL: http://meta:8080
@@ -39,7 +37,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
       # See: https://supabase.com/docs/guides/self-hosting/remove-superuser-access
-      #POSTGRES_USER_READ_WRITE: postgres
+      POSTGRES_USER_READ_WRITE: postgres
 
       PG_META_CRYPTO_KEY: ${PG_META_CRYPTO_KEY}
       PGRST_DB_SCHEMAS: ${PGRST_DB_SCHEMAS}
@@ -48,81 +46,69 @@ services:
 
       DEFAULT_ORGANIZATION_NAME: ${STUDIO_DEFAULT_ORGANIZATION}
       DEFAULT_PROJECT_NAME: ${STUDIO_DEFAULT_PROJECT}
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
 
-      SUPABASE_URL: http://kong:8000
+      SUPABASE_URL: http://api-gw:8000
       SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
       AUTH_JWT_SECRET: ${JWT_SECRET}
+      SUPABASE_PUBLISHABLE_KEY: ${SUPABASE_PUBLISHABLE_KEY}
+      SUPABASE_SECRET_KEY: ${SUPABASE_SECRET_KEY}
 
-      # LOGFLARE_API_KEY is deprecated
-      LOGFLARE_API_KEY: ${LOGFLARE_PUBLIC_ACCESS_TOKEN}
-      LOGFLARE_PUBLIC_ACCESS_TOKEN: ${LOGFLARE_PUBLIC_ACCESS_TOKEN}
-      LOGFLARE_PRIVATE_ACCESS_TOKEN: ${LOGFLARE_PRIVATE_ACCESS_TOKEN}
+      # See: docker-compose.logs.yml
+      ENABLED_FEATURES_LOGS_ALL: "false"
 
-      LOGFLARE_URL: http://analytics:4000
-      NEXT_PUBLIC_ENABLE_LOGS: "true"
-      # Comment to use Big Query backend for analytics
-      NEXT_ANALYTICS_BACKEND_PROVIDER: postgres
-      # Uncomment to use Big Query backend for analytics
-      # NEXT_ANALYTICS_BACKEND_PROVIDER: bigquery
       SNIPPETS_MANAGEMENT_FOLDER: /app/snippets
       EDGE_FUNCTIONS_MANAGEMENT_FOLDER: /app/edge-functions
     volumes:
-      - ./volumes/snippets:/app/snippets:Z
-      - ./volumes/functions:/app/edge-functions:Z
+      - ./volumes/snippets:/app/snippets:z
+      - ./volumes/functions:/app/edge-functions:ro,z
 
-  kong:
-    container_name: supabase-kong
-    image: kong/kong:3.9.1
+  # Envoy is the default API gateway
+  # See: https://github.com/orgs/supabase/discussions/48048
+  api-gw:
+    container_name: supabase-envoy
+    image: envoyproxy/envoy:v1.39.0
     restart: unless-stopped
     networks:
       default:
+        # Expose `envoy` and `kong` as network aliases, so internal configs
+        # that reference either hostname resolve to whichever gateway is active.
         aliases:
-          - api-gw
+          - envoy
+          - kong
     healthcheck:
-      test: ["CMD", "kong", "health"]
-      interval: 5s
+      # Using a TCP port check because this image does not include curl or wget.
+      test: ["CMD-SHELL", "timeout 1 bash -c '</dev/tcp/127.0.0.1/8000'"]
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 3
     depends_on:
       studio:
         condition: service_healthy
     ports:
-      - ${KONG_HTTP_PORT}:8000/tcp
-      - ${KONG_HTTPS_PORT}:8443/tcp
+      - ${API_GW_HTTP_PORT:-${KONG_HTTP_PORT:-8000}}:8000/tcp
     volumes:
-      # https://github.com/supabase/supabase/issues/12661
-      - ./volumes/api/kong.yml:/home/kong/temp.yml:ro,z
-      - ./volumes/api/kong-entrypoint.sh:/home/kong/kong-entrypoint.sh:ro,z
-      #- ./volumes/api/server.crt:/home/kong/server.crt:ro
-      #- ./volumes/api/server.key:/home/kong/server.key:ro
+      - ./volumes/api/envoy/envoy.yaml:/etc/envoy/envoy.yaml:ro
+      - ./volumes/api/envoy/cds.yaml:/etc/envoy/cds.yaml:ro
+      - ./volumes/api/envoy/lds.template.yaml:/etc/envoy/lds.template.yaml:ro
+      - ./volumes/api/envoy/docker-entrypoint.sh:/docker-entrypoint.sh:ro
     environment:
-      KONG_DATABASE: "off"
-      KONG_DECLARATIVE_CONFIG: /usr/local/kong/kong.yml
-      # https://github.com/supabase/cli/issues/14
-      KONG_DNS_ORDER: LAST,A,CNAME
-      KONG_DNS_NOT_FOUND_TTL: 1
-      KONG_PLUGINS: request-transformer,cors,key-auth,acl,basic-auth,request-termination,ip-restriction,post-function
-      KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
-      KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
-      KONG_PROXY_ACCESS_LOG: /dev/stdout combined
-      #KONG_SSL_CERT: /home/kong/server.crt
-      #KONG_SSL_CERT_KEY: /home/kong/server.key
-      SUPABASE_ANON_KEY: ${ANON_KEY}
-      SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
+      ANON_KEY: ${ANON_KEY}
+      SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY}
       SUPABASE_PUBLISHABLE_KEY: ${SUPABASE_PUBLISHABLE_KEY:-}
       SUPABASE_SECRET_KEY: ${SUPABASE_SECRET_KEY:-}
       ANON_KEY_ASYMMETRIC: ${ANON_KEY_ASYMMETRIC:-}
       SERVICE_ROLE_KEY_ASYMMETRIC: ${SERVICE_ROLE_KEY_ASYMMETRIC:-}
+      SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
       DASHBOARD_USERNAME: ${DASHBOARD_USERNAME}
       DASHBOARD_PASSWORD: ${DASHBOARD_PASSWORD}
-    entrypoint: /home/kong/kong-entrypoint.sh
+    entrypoint: ["/bin/sh", "/docker-entrypoint.sh"]
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.186.0
+    image: supabase/gotrue:v2.189.0
     restart: unless-stopped
     healthcheck:
       test:
@@ -165,6 +151,8 @@ services:
       # For Podman, use: GOTRUE_JWT_KEYS: ${JWT_KEYS}
       #GOTRUE_JWT_KEYS: ${JWT_KEYS:-[]}
 
+      GOTRUE_JWT_ISSUER: ${API_EXTERNAL_URL}
+
       GOTRUE_EXTERNAL_EMAIL_ENABLED: ${ENABLE_EMAIL_SIGNUP}
       GOTRUE_EXTERNAL_ANONYMOUS_USERS_ENABLED: ${ENABLE_ANONYMOUS_USERS}
       GOTRUE_MAILER_AUTOCONFIRM: ${ENABLE_EMAIL_AUTOCONFIRM}
@@ -192,17 +180,17 @@ services:
       # GOTRUE_EXTERNAL_GOOGLE_ENABLED: ${GOOGLE_ENABLED}
       # GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       # GOTRUE_EXTERNAL_GOOGLE_SECRET: ${GOOGLE_SECRET}
-      # GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI: ${API_EXTERNAL_URL}/auth/v1/callback
+      # GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI: ${API_EXTERNAL_URL}/callback
 
       # GOTRUE_EXTERNAL_GITHUB_ENABLED: ${GITHUB_ENABLED}
       # GOTRUE_EXTERNAL_GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
       # GOTRUE_EXTERNAL_GITHUB_SECRET: ${GITHUB_SECRET}
-      # GOTRUE_EXTERNAL_GITHUB_REDIRECT_URI: ${API_EXTERNAL_URL}/auth/v1/callback
+      # GOTRUE_EXTERNAL_GITHUB_REDIRECT_URI: ${API_EXTERNAL_URL}/callback
 
       # GOTRUE_EXTERNAL_AZURE_ENABLED: ${AZURE_ENABLED}
       # GOTRUE_EXTERNAL_AZURE_CLIENT_ID: ${AZURE_CLIENT_ID}
       # GOTRUE_EXTERNAL_AZURE_SECRET: ${AZURE_SECRET}
-      # GOTRUE_EXTERNAL_AZURE_REDIRECT_URI: ${API_EXTERNAL_URL}/auth/v1/callback
+      # GOTRUE_EXTERNAL_AZURE_REDIRECT_URI: ${API_EXTERNAL_URL}/callback
 
       # Uncomment to configure SMS delivery (phone auth and phone MFA).
       # GOTRUE_SMS_PROVIDER: ${SMS_PROVIDER}
@@ -227,12 +215,14 @@ services:
       # GOTRUE_MFA_MAX_ENROLLED_FACTORS: ${MFA_MAX_ENROLLED_FACTORS}
 
       # SAML SSO
+      # See: https://supabase.com/docs/guides/self-hosting/self-hosted-saml-sso
       # GOTRUE_SAML_ENABLED: ${SAML_ENABLED}
       # GOTRUE_SAML_PRIVATE_KEY: ${SAML_PRIVATE_KEY}
       # GOTRUE_SAML_ALLOW_ENCRYPTED_ASSERTIONS: ${SAML_ALLOW_ENCRYPTED_ASSERTIONS}
       # GOTRUE_SAML_RELAY_STATE_VALIDITY_PERIOD: ${SAML_RELAY_STATE_VALIDITY_PERIOD}
-      # GOTRUE_SAML_EXTERNAL_URL: ${SAML_EXTERNAL_URL}
       # GOTRUE_SAML_RATE_LIMIT_ASSERTION: ${SAML_RATE_LIMIT_ASSERTION}
+      # Optional, defaults to API_EXTERNAL_URL if not set
+      # GOTRUE_SAML_EXTERNAL_URL: ${SAML_EXTERNAL_URL}
 
       # Uncomment to enable custom access token hook.
       # See: https://supabase.com/docs/guides/auth/auth-hooks for
@@ -258,18 +248,26 @@ services:
 
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:v14.8
+    image: postgrest/postgrest:v14.12
     restart: unless-stopped
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
         condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "postgrest", "--ready" ]
+      interval: 5s
+      timeout: 5s
+      retries: 3
     environment:
       PGRST_DB_URI: postgres://authenticator:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       PGRST_DB_SCHEMAS: ${PGRST_DB_SCHEMAS}
       PGRST_DB_MAX_ROWS: ${PGRST_DB_MAX_ROWS:-1000}
       PGRST_DB_EXTRA_SEARCH_PATH: ${PGRST_DB_EXTRA_SEARCH_PATH:-public}
       PGRST_DB_ANON_ROLE: anon
+
+      PGRST_ADMIN_SERVER_PORT: 3001
+      PGRST_ADMIN_SERVER_HOST: localhost
 
       # PostgREST accepts a plain-text symmetric secret, a single JWK, or a JWKS.
       # For Podman, use either PGRST_JWT_SECRET: ${JWT_SECRET} or
@@ -287,7 +285,7 @@ services:
   realtime:
     # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
     container_name: realtime-dev.supabase-realtime
-    image: supabase/realtime:v2.76.5
+    image: supabase/realtime:v2.102.3
     restart: unless-stopped
     depends_on:
       db:
@@ -311,7 +309,7 @@ services:
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_NAME: ${POSTGRES_DB}
       DB_AFTER_CONNECT_QUERY: 'SET search_path TO _realtime'
-      DB_ENC_KEY: supabaserealtime
+      DB_ENC_KEY: ${REALTIME_DB_ENC_KEY:-supabaserealtime}
 
       # Legacy symmetric HS256 key
       API_JWT_SECRET: ${JWT_SECRET}
@@ -333,7 +331,7 @@ services:
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v1.48.26
+    image: supabase/storage-api:v1.60.4
     restart: unless-stopped
     depends_on:
       db:
@@ -419,7 +417,7 @@ services:
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.96.3
+    image: supabase/postgres-meta:v0.96.6
     restart: unless-stopped
     depends_on:
       db:
@@ -430,24 +428,33 @@ services:
       PG_META_DB_HOST: ${POSTGRES_HOST}
       PG_META_DB_PORT: ${POSTGRES_PORT}
       PG_META_DB_NAME: ${POSTGRES_DB}
-      PG_META_DB_USER: supabase_admin
+      PG_META_DB_USER: postgres
       PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
       CRYPTO_KEY: ${PG_META_CRYPTO_KEY}
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.71.2
+    image: supabase/edge-runtime:v1.74.0
     restart: unless-stopped
     volumes:
-      - ./volumes/functions:/home/deno/functions:Z
+      - ./volumes/functions:/home/deno/functions:z
       - deno-cache:/root/.cache/deno
     depends_on:
-      kong:
+      api-gw:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 1 bash -c '</dev/tcp/127.0.0.1/9000'"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
     environment:
       # Legacy symmetric HS256 key
       JWT_SECRET: ${JWT_SECRET}
-      SUPABASE_URL: http://kong:8000
+      # JWKS for token verification (EC public + legacy symmetric).
+      # For Podman, use: SUPABASE_JWKS: ${JWT_JWKS}
+      #SUPABASE_JWKS: ${JWT_JWKS:-{"keys":[]}}
+
+      SUPABASE_URL: http://api-gw:8000
       SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
       # Legacy API keys (HS256-signed JWTs)
       SUPABASE_ANON_KEY: ${ANON_KEY}
@@ -465,57 +472,11 @@ services:
         "/home/deno/functions/main"
       ]
 
-  analytics:
-    container_name: supabase-analytics
-    image: supabase/logflare:1.36.1
-    restart: unless-stopped
-    # ports:
-    #   - 4000:4000
-    # Uncomment to use Big Query backend for analytics
-    # volumes:
-    #   - type: bind
-    #     source: ${PWD}/gcloud.json
-    #     target: /opt/app/rel/logflare/bin/gcloud.json
-    #     read_only: true
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "curl",
-          "http://localhost:4000/health"
-        ]
-      timeout: 5s
-      interval: 5s
-      retries: 10
-    depends_on:
-      db:
-        # Disable this if you are using an external Postgres database
-        condition: service_healthy
-    environment:
-      LOGFLARE_NODE_HOST: 127.0.0.1
-      DB_USERNAME: supabase_admin
-      DB_DATABASE: _supabase
-      DB_HOSTNAME: ${POSTGRES_HOST}
-      DB_PORT: ${POSTGRES_PORT}
-      DB_PASSWORD: ${POSTGRES_PASSWORD}
-      DB_SCHEMA: _analytics
-      LOGFLARE_PUBLIC_ACCESS_TOKEN: ${LOGFLARE_PUBLIC_ACCESS_TOKEN}
-      LOGFLARE_PRIVATE_ACCESS_TOKEN: ${LOGFLARE_PRIVATE_ACCESS_TOKEN}
-      LOGFLARE_SINGLE_TENANT: "true"
-      LOGFLARE_SUPABASE_MODE: "true"
-
-      # Comment variables to use Big Query backend for analytics
-      POSTGRES_BACKEND_URL: postgresql://supabase_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/_supabase
-      POSTGRES_BACKEND_SCHEMA: _analytics
-      LOGFLARE_FEATURE_FLAG_OVERRIDE: multibackend=true
-      # Uncomment to use Big Query backend for analytics
-      # GOOGLE_PROJECT_ID: ${GOOGLE_PROJECT_ID}
-      # GOOGLE_PROJECT_NUMBER: ${GOOGLE_PROJECT_NUMBER}
-
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:15.8.1.085
+    # To upgrade an existing Postgres 15 database in place, see utils/upgrade-pg17.sh.
+    image: supabase/postgres:17.6.1.136
     restart: unless-stopped
     volumes:
       - ./volumes/db/realtime.sql:/docker-entrypoint-initdb.d/migrations/99-realtime.sql:Z
@@ -567,40 +528,10 @@ services:
         "log_min_messages=fatal" # prevents Realtime polling queries from appearing in logs
       ]
 
-  vector:
-    container_name: supabase-vector
-    image: timberio/vector:0.53.0-alpine
-    restart: unless-stopped
-    volumes:
-      - ./volumes/logs/vector.yml:/etc/vector/vector.yml:ro,z
-      - ${DOCKER_SOCKET_LOCATION}:/var/run/docker.sock:ro,z
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "wget",
-          "--no-verbose",
-          "--tries=1",
-          "--spider",
-          "http://vector:9001/health"
-        ]
-      timeout: 5s
-      interval: 5s
-      retries: 3
-    environment:
-      LOGFLARE_PUBLIC_ACCESS_TOKEN: ${LOGFLARE_PUBLIC_ACCESS_TOKEN}
-    command:
-      [
-        "--config",
-        "/etc/vector/vector.yml"
-      ]
-    security_opt:
-      - "label=disable"
-
   # Update the DATABASE_URL if you are using an external Postgres database
   supavisor:
     container_name: supabase-pooler
-    image: supabase/supavisor:2.7.4
+    image: supabase/supavisor:2.9.5
     restart: unless-stopped
     ports:
       - ${POSTGRES_PORT}:5432
@@ -628,6 +559,7 @@ services:
     environment:
       PORT: 4000
       POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       DATABASE_URL: ecto://supabase_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/_supabase

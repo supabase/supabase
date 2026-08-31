@@ -115,6 +115,10 @@
       "type": "boolean",
       "description": "Enable the sign in with github provider"
     },
+    "dashboard_auth:sign_in_with_chatgpt": {
+      "type": "boolean",
+      "description": "Enable the sign in with ChatGPT provider"
+    },
     "dashboard_auth:sign_in_with_sso": {
       "type": "boolean",
       "description": "Enable the sign in with sso provider"
@@ -229,6 +233,18 @@
       "type": "boolean",
       "description": "Enable web apps getting started documentation"
     },
+    "docs:agent_plugin": {
+      "type": "boolean",
+      "description": "Enable documentation for the agent plugin"
+    },
+    "docs:agent_skills": {
+      "type": "boolean",
+      "description": "Enable documentation for agent skills"
+    },
+    "docs:prompts": {
+      "type": "boolean",
+      "description": "Enable documentation for prompts"
+    },
 
     "edge_functions:show_stripe_example": {
       "type": "boolean",
@@ -266,6 +282,10 @@
       "description": "Enable read replicas management"
     },
 
+    "logs:all": {
+      "type": "boolean",
+      "description": "Enable the logs pages and navigation. Disable to hide all logs pages, for example when Logflare is not configured."
+    },
     "logs:templates": {
       "type": "boolean",
       "description": "Enable the logs templates page"
@@ -452,6 +472,7 @@
     "billing:all",
     "dashboard_auth:sign_up",
     "dashboard_auth:sign_in_with_github",
+    "dashboard_auth:sign_in_with_chatgpt",
     "dashboard_auth:sign_in_with_sso",
     "dashboard_auth:sign_in_with_email",
     "dashboard_auth:show_tos",
@@ -488,6 +509,7 @@
     "profile:show_information",
     "profile:show_analytics_and_marketing",
     "profile:show_account_deletion",
+    "logs:all",
     "logs:templates",
     "logs:collections",
     "logs:metadata",

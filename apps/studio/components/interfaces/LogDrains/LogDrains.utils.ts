@@ -40,8 +40,10 @@ export const HEADER_VALIDATION_ERRORS = {
   VALUE_REQUIRED: 'Header value is required',
 } as const
 
+// Webhook drains intentionally omit a Content-Type default: the delivery side already sets
+// `application/json`, and seeding it here produces a duplicated Content-Type header that can
+// break body parsing on the receiver. OTLP needs it since its delivery does not set one.
 const DEFAULT_HEADERS_BY_TYPE: Partial<Record<LogDrainType, Record<string, string>>> = {
-  webhook: { 'Content-Type': 'application/json' },
   otlp: { 'Content-Type': 'application/x-protobuf' },
 }
 

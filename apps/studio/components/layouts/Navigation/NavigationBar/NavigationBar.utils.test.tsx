@@ -1,10 +1,11 @@
-import { describe, expect, it } from 'vitest'
+import { renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   generateOtherRoutes,
   generateProductRoutes,
   generateSettingsRoutes,
-  generateToolRoutes,
+  useGenerateToolRoutes,
 } from './NavigationBar.utils'
 import type { Project } from '@/data/projects/project-detail-query'
 
@@ -16,25 +17,55 @@ const inactiveProject = { status: 'INACTIVE' } as Project
 
 const keys = (routes: { key: string }[]) => routes.map((r) => r.key)
 
-describe('generateToolRoutes', () => {
+const mockUseParams = vi.fn()
+const mockUseSelectedProjectQuery = vi.fn()
+const mockUseIsExplorerEnabled = vi.fn()
+
+vi.mock('common', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('common')>()),
+  useParams: () => mockUseParams(),
+}))
+
+vi.mock('@/hooks/misc/useSelectedProject', () => ({
+  useSelectedProjectQuery: () => mockUseSelectedProjectQuery(),
+}))
+
+vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
+  useIsExplorerEnabled: () => mockUseIsExplorerEnabled(),
+  useUnifiedLogsPreview: () => ({ isEnabled: false }),
+}))
+
+describe('useGenerateToolRoutes', () => {
+  beforeEach(() => {
+    mockUseParams.mockReturnValue({ ref: REF })
+    mockUseSelectedProjectQuery.mockReturnValue({ data: activeProject })
+    mockUseIsExplorerEnabled.mockReturnValue(false)
+  })
+
   it('always returns Table Editor and SQL Editor', () => {
-    const routes = generateToolRoutes(REF, activeProject)
-    expect(keys(routes)).toEqual(['editor', 'sql'])
+    const { result } = renderHook(() => useGenerateToolRoutes())
+    expect(keys(result.current)).toEqual(['editor', 'sql'])
   })
 
   it('marks routes as disabled when project is not active', () => {
-    const routes = generateToolRoutes(REF, inactiveProject)
-    expect(routes.every((r) => r.disabled)).toBe(true)
+    mockUseSelectedProjectQuery.mockReturnValue({ data: inactiveProject })
+
+    const { result } = renderHook(() => useGenerateToolRoutes())
+    expect(result.current.every((r) => r.disabled)).toBe(true)
   })
 
   it('points links to the building URL when project is building', () => {
-    const routes = generateToolRoutes(REF, buildingProject)
-    expect(routes.every((r) => r.link === `/project/${REF}`)).toBe(true)
+    mockUseSelectedProjectQuery.mockReturnValue({ data: buildingProject })
+
+    const { result } = renderHook(() => useGenerateToolRoutes())
+    expect(result.current.every((r) => r.link === `/project/${REF}`)).toBe(true)
   })
 
   it('returns links as false when ref is undefined', () => {
-    const routes = generateToolRoutes(undefined, activeProject)
-    expect(routes.every((r) => r.link === undefined)).toBe(true)
+    mockUseParams.mockReturnValue({ ref: undefined })
+
+    const { result } = renderHook(() => useGenerateToolRoutes())
+    expect(result.current.every((r) => r.link === undefined)).toBe(true)
   })
 })
 
@@ -52,6 +83,11 @@ describe('generateProductRoutes', () => {
   it('includes all product routes by default (features default to true)', () => {
     const routes = generateProductRoutes(REF, activeProject)
     expect(keys(routes)).toEqual(['database', 'auth', 'storage', 'functions', 'realtime'])
+  })
+
+  it('includes workers only when the workers flag is enabled', () => {
+    expect(keys(generateProductRoutes(REF, activeProject))).not.toContain('workers')
+    expect(keys(generateProductRoutes(REF, activeProject, { workers: true }))).toContain('workers')
   })
 
   it('excludes auth when auth feature is disabled', () => {
@@ -102,95 +138,68 @@ describe('generateProductRoutes', () => {
 
 describe('generateOtherRoutes', () => {
   it('always includes advisors, logs, and integrations', () => {
-    const routes = generateOtherRoutes(REF, activeProject, { isPlatform: true })
+    const routes = generateOtherRoutes(REF, activeProject)
     expect(keys(routes)).toContain('advisors')
     expect(keys(routes)).toContain('logs')
     expect(keys(routes)).toContain('integrations')
   })
 
-  it('includes observability on platform when reports are enabled', () => {
-    const routes = generateOtherRoutes(REF, activeProject, {
-      isPlatform: true,
-      showReports: true,
-    })
+  it('includes observability when reports are enabled', () => {
+    const routes = generateOtherRoutes(REF, activeProject, { showReports: true })
     expect(keys(routes)).toContain('observability')
   })
 
-  it('excludes observability on platform when reports are disabled', () => {
-    const routes = generateOtherRoutes(REF, activeProject, {
-      isPlatform: true,
-      showReports: false,
-    })
+  it('excludes observability when reports are disabled', () => {
+    const routes = generateOtherRoutes(REF, activeProject, { showReports: false })
     expect(keys(routes)).not.toContain('observability')
   })
 
-  it('excludes observability in self-hosted mode even when reports are enabled', () => {
-    const routes = generateOtherRoutes(REF, activeProject, {
-      isPlatform: false,
-      showReports: true,
-    })
-    expect(keys(routes)).not.toContain('observability')
-  })
-
-  it('excludes observability in self-hosted mode when reports are disabled', () => {
-    const routes = generateOtherRoutes(REF, activeProject, {
-      isPlatform: false,
-      showReports: false,
-    })
-    expect(keys(routes)).not.toContain('observability')
+  it('links observability to the query performance page in self-hosted mode', () => {
+    // NEXT_PUBLIC_IS_PLATFORM is false in .env.test, so IS_PLATFORM is false here
+    const routes = generateOtherRoutes(REF, activeProject, { showReports: true })
+    const observabilityRoute = routes.find((r) => r.key === 'observability')
+    expect(observabilityRoute?.link).toBe(`/project/${REF}/query-performance`)
   })
 
   it('does not include API Docs nav item', () => {
-    const routes = generateOtherRoutes(REF, activeProject, { isPlatform: true })
+    const routes = generateOtherRoutes(REF, activeProject)
     expect(keys(routes)).not.toContain('api')
   })
 
   it('links logs to unified logs page when unifiedLogs is enabled', () => {
-    const routes = generateOtherRoutes(REF, activeProject, {
-      isPlatform: true,
-      unifiedLogs: true,
-    })
+    const routes = generateOtherRoutes(REF, activeProject, { unifiedLogs: true })
     const logsRoute = routes.find((r) => r.key === 'logs')
     expect(logsRoute?.link).toBe(`/project/${REF}/logs`)
   })
 
   it('links logs to explorer page by default', () => {
-    const routes = generateOtherRoutes(REF, activeProject, { isPlatform: true })
+    const routes = generateOtherRoutes(REF, activeProject)
     const logsRoute = routes.find((r) => r.key === 'logs')
     expect(logsRoute?.link).toBe(`/project/${REF}/logs/explorer`)
   })
 
   it('points links to building URL when project is building', () => {
-    const routes = generateOtherRoutes(REF, buildingProject, {
-      isPlatform: true,
-      showReports: true,
-    })
+    const routes = generateOtherRoutes(REF, buildingProject, { showReports: true })
     const observabilityRoute = routes.find((r) => r.key === 'observability')
     expect(observabilityRoute?.link).toBe(`/project/${REF}`)
   })
 
   it('marks routes as disabled when project is not active', () => {
-    const routes = generateOtherRoutes(REF, inactiveProject, { isPlatform: true })
+    const routes = generateOtherRoutes(REF, inactiveProject)
     const advisorsRoute = routes.find((r) => r.key === 'advisors')
     expect(advisorsRoute?.disabled).toBe(true)
   })
 })
 
 describe('generateSettingsRoutes', () => {
-  it('links to general settings on platform', () => {
-    const routes = generateSettingsRoutes(REF, { isPlatform: true })
+  it('links to general settings', () => {
+    const routes = generateSettingsRoutes(REF)
     const settingsRoute = routes.find((r) => r.key === 'settings')
     expect(settingsRoute?.link).toBe(`/project/${REF}/settings/general`)
   })
 
-  it('links to log-drains settings in self-hosted mode', () => {
-    const routes = generateSettingsRoutes(REF, { isPlatform: false })
-    const settingsRoute = routes.find((r) => r.key === 'settings')
-    expect(settingsRoute?.link).toBe(`/project/${REF}/settings/log-drains`)
-  })
-
   it('returns a link as false when ref is undefined', () => {
-    const routes = generateSettingsRoutes(undefined, { isPlatform: true })
+    const routes = generateSettingsRoutes(undefined)
     const settingsRoute = routes.find((r) => r.key === 'settings')
     expect(settingsRoute?.link).toBe(undefined)
   })

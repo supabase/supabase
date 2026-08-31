@@ -34,7 +34,7 @@ const TwitterSocialProofMobile: FC<Props> = ({ tweets, className }: any) => {
         watchOverflow
         threshold={2}
         updateOnWindowResize
-        className="h-[400px] !px-6 w-full overflow-visible"
+        className="h-[400px] px-6! w-full overflow-visible"
         breakpoints={{
           320: {
             slidesPerView: 1.1,

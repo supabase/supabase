@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import {
   Button,
   Card,
@@ -12,7 +12,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
@@ -71,7 +71,7 @@ export const CustomDomainsConfigureHostname = () => {
     )
   }
 
-  const domain = form.watch('domain')
+  const domain = useWatch({ control: form.control, name: 'domain' })
   const trimmedDomain = domain.trim()
   const isSubmitting = isCheckingRecord || isCreating
 
@@ -96,7 +96,7 @@ export const CustomDomainsConfigureHostname = () => {
                     className="[&>div]:md:w-1/2"
                   >
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         {...field}
                         placeholder="subdomain.example.com"
                         disabled={!canConfigureCustomDomain || isSubmitting}
@@ -119,7 +119,7 @@ export const CustomDomainsConfigureHostname = () => {
                   <code className="text-code-inline">{endpoint}</code>
                   <CopyButton
                     iconOnly
-                    type="text"
+                    variant="text"
                     className="h-5 w-5 min-w-0 p-0 [&_svg]:h-3 [&_svg]:w-3"
                     text={endpoint}
                   />
@@ -146,7 +146,7 @@ export const CustomDomainsConfigureHostname = () => {
           <CardFooter className="justify-end space-x-2">
             {form.formState.isDirty && (
               <Button
-                type="default"
+                variant="default"
                 disabled={isSubmitting}
                 onClick={() => form.reset({ domain: '' })}
               >
@@ -154,8 +154,8 @@ export const CustomDomainsConfigureHostname = () => {
               </Button>
             )}
             <Button
-              type="primary"
-              htmlType="submit"
+              variant="primary"
+              type="submit"
               loading={isSubmitting}
               disabled={!form.formState.isDirty || isSubmitting || !canConfigureCustomDomain}
             >

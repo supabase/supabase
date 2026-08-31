@@ -3,14 +3,14 @@ import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 
 import { authKeys } from './keys'
 import type { components } from '@/data/api'
-import { executeSql, ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
-import { UseCustomInfiniteQueryOptions } from '@/types'
+import { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
 const USERS_PAGE_LIMIT = 50
 type UsersData = { result: User[] }
-type UsersError = ExecuteSqlError
+type UsersError = ResponseError
 type UsersVariables = {
   projectRef?: string
   connectionString?: string | null

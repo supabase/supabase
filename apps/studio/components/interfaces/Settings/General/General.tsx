@@ -1,23 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
+import { IS_PLATFORM, useParams } from 'common'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Button,
-  Card,
-  CardContent,
-  CardFooter,
-  Form,
-  FormControl,
-  FormField,
-  Input_Shadcn_,
-  WarningIcon,
-} from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Input } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
@@ -29,14 +17,29 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
+import { AVAILABLE_REPLICA_REGIONS } from '../Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { ProjectAccessSection } from './ProjectAccessSection'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useBranchesQuery } from '@/data/branches/branches-query'
 import { useProjectUpdateMutation } from '@/data/projects/project-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 export const General = () => {
+  const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const isBranch = Boolean(project?.parent_project_ref)
+  const entityLabel = isBranch ? 'Branch' : 'Project'
+
+  const { data: branches } = useBranchesQuery(
+    { projectRef: project?.parent_project_ref },
+    { enabled: isBranch }
+  )
+  const branch = branches?.find((x) => x.project_ref === ref)
+  const projectName = isBranch ? branch?.name : project?.name
 
   const { can: canUpdateProject } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
     resource: {
@@ -50,7 +53,7 @@ export const General = () => {
     name: z.string().trim().min(3, 'Project name must be at least 3 characters long'),
   })
 
-  const defaultValues = { name: project?.name ?? '' }
+  const defaultValues = { name: projectName ?? '' }
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues,
@@ -58,6 +61,10 @@ export const General = () => {
     mode: 'onSubmit',
     reValidateMode: 'onBlur',
   })
+
+  const regionLabel = AVAILABLE_REPLICA_REGIONS.find((region) =>
+    project?.region?.includes(region.region)
+  )
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!project?.ref) return console.error('Ref is required')
@@ -73,6 +80,65 @@ export const General = () => {
     )
   }
 
+  const { isCli, isSelfHosted } = useDeploymentMode()
+
+  if (!IS_PLATFORM) {
+    return (
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>General settings</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent className="space-y-4">
+          {project === undefined ? (
+            <Card>
+              <CardContent>
+                <GenericSkeletonLoader />
+              </CardContent>
+            </Card>
+          ) : (
+            <Form {...form}>
+              <Card>
+                <CardContent>
+                  <FormItemLayout
+                    layout="flex-row-reverse"
+                    label="Project name"
+                    className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
+                  >
+                    <Input readOnly value={project.name ?? ''} />
+                  </FormItemLayout>
+                </CardContent>
+              </Card>
+            </Form>
+          )}
+          {isCli && (
+            <Admonition
+              type="default"
+              title="Local development with the Supabase CLI"
+              description={
+                <p>
+                  Project settings are configured in{' '}
+                  <code className="text-code-inline">supabase/config.toml</code> — applied on{' '}
+                  <code className="text-code-inline">supabase start</code>.
+                </p>
+              }
+              actions={<DocsButton href={`${DOCS_URL}/guides/local-development`} />}
+            />
+          )}
+          {isSelfHosted && (
+            <Admonition
+              type="default"
+              title="Self-hosted Supabase"
+              description={<p>Project settings are configured via environment variables.</p>}
+              actions={<DocsButton href={`${DOCS_URL}/guides/self-hosting`} />}
+            />
+          )}
+        </PageSectionContent>
+      </PageSection>
+    )
+  }
+
   return (
     <>
       <PageSection>
@@ -83,23 +149,18 @@ export const General = () => {
         </PageSectionMeta>
         <PageSectionContent>
           {isBranch && (
-            <Alert_Shadcn_ variant="default">
-              <WarningIcon />
-              <AlertTitle_Shadcn_>
-                You are currently on a preview branch of your project
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
-                Certain settings are not available while you're on a preview branch. To adjust your
-                project settings, you may return to your{' '}
-                <Link
-                  href={`/project/${project?.parent_project_ref}/settings/general`}
-                  className="text-brand"
-                >
-                  main branch
-                </Link>
-                .
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
+            <Admonition
+              type="default"
+              className="mb-4"
+              title="You are currently on a preview branch of your project"
+            >
+              Certain settings are not available while you're on a preview branch. To adjust your
+              project settings, you may return to your{' '}
+              <InlineLink href={`/project/${project?.parent_project_ref}/settings/general`}>
+                main branch
+              </InlineLink>
+              .
+            </Admonition>
           )}
 
           {project === undefined ? (
@@ -119,14 +180,14 @@ export const General = () => {
                       render={({ field }) => (
                         <FormItemLayout
                           layout="flex-row-reverse"
-                          label="Project name"
+                          label={`${entityLabel} name`}
                           description="Displayed throughout the dashboard."
                           className="[&>div]:md:w-1/2"
                         >
                           <FormControl>
-                            <Input_Shadcn_
+                            <Input
                               {...field}
-                              disabled={isBranch || !canUpdateProject}
+                              readOnly={isBranch || !canUpdateProject}
                               autoComplete="off"
                             />
                           </FormControl>
@@ -134,23 +195,53 @@ export const General = () => {
                       )}
                     />
                   </CardContent>
+
+                  {isBranch && (
+                    <CardContent>
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label={`${entityLabel} type`}
+                        description="Preview or persistent"
+                        className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
+                      >
+                        <FormControl>
+                          <Input readOnly value={branch?.persistent ? 'Persistent' : 'Preview'} />
+                        </FormControl>
+                      </FormItemLayout>
+                    </CardContent>
+                  )}
+
                   <CardContent>
                     <FormItemLayout
                       layout="flex-row-reverse"
-                      label="Project ID"
+                      label={`${entityLabel} ID`}
                       description="Reference used in APIs and URLs."
                       className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
                     >
                       <FormControl>
-                        <Input copy readOnly size="small" value={project?.ref ?? ''} />
+                        <PasswordInput copy readOnly size="small" value={project.ref} />
                       </FormControl>
                     </FormItemLayout>
                   </CardContent>
+
+                  <CardContent>
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label={`${entityLabel} region`}
+                      description={regionLabel?.name}
+                      className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
+                    >
+                      <FormControl>
+                        <PasswordInput copy readOnly size="small" value={project.region} />
+                      </FormControl>
+                    </FormItemLayout>
+                  </CardContent>
+
                   <CardFooter className="justify-end space-x-2">
                     {form.formState.isDirty && (
                       <Button
-                        type="default"
-                        htmlType="button"
+                        variant="default"
+                        type="button"
                         disabled={isUpdating}
                         onClick={() => form.reset({ name: project?.name ?? '' })}
                       >
@@ -158,8 +249,8 @@ export const General = () => {
                       </Button>
                     )}
                     <Button
-                      type="primary"
-                      htmlType="submit"
+                      variant="primary"
+                      type="submit"
                       disabled={
                         !form.formState.isDirty || isUpdating || !canUpdateProject || isBranch
                       }

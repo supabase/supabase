@@ -21,7 +21,9 @@
  *   --init                Write current counts for the provided --rule(s) into metadata and exit 0
  *   --eslint "<cmd>"      ESLint command to run (default "npx eslint"). Do not pass untrusted input.
  *   --eslint-args "<...>" Extra args/paths for ESLint (e.g., "."). Do not pass untrusted input.
- *   --rule <id>[,<id>...] Rule id(s). Repeat flag or comma-separate. REQUIRED.
+ *   --rule <id>[,<id>...] Rule id(s). Repeat flag or comma-separate.
+ *   --rules-file <path>   Path to a JSON file containing an array of rule id strings.
+ *                         Combines with --rule if both are given. One of the two is REQUIRED.
  *   --decrease-baselines  When improvements occur, lower stored baselines to match the new counts.
  *
  * Notes:
@@ -41,6 +43,7 @@ interface Args {
   eslintArgs: string
   decreaseBaselines: boolean
   rules: string[]
+  rulesFile?: string
 }
 
 interface ESLintMessage {
@@ -65,6 +68,31 @@ interface BaselineData {
 interface RuleSnapshot {
   total: number
   files: Record<string, number>
+}
+
+function readRulesFile(filePath: string): string[] {
+  let raw: string
+  try {
+    raw = readFileSync(filePath, 'utf8')
+  } catch (e) {
+    console.error(`Error: Could not read --rules-file ${filePath}: ${e}`)
+    process.exit(2)
+  }
+
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(raw)
+  } catch (e) {
+    console.error(`Error: Could not parse --rules-file ${filePath} as JSON: ${e}`)
+    process.exit(2)
+  }
+
+  if (!Array.isArray(parsed) || !parsed.every((r) => typeof r === 'string')) {
+    console.error(`Error: --rules-file ${filePath} must contain a JSON array of rule id strings.`)
+    process.exit(2)
+  }
+
+  return parsed
 }
 
 function parseArgs(argv: string[]): Args {
@@ -97,6 +125,8 @@ function parseArgs(argv: string[]): Args {
             .filter(Boolean)
         )
       }
+    } else if (a === '--rules-file') {
+      args.rulesFile = argv[++i]
     } else if (a === '--decrease-baselines') {
       args.decreaseBaselines = true
     } else {
@@ -104,9 +134,14 @@ function parseArgs(argv: string[]): Args {
     }
   }
 
+  if (args.rulesFile) {
+    args.rules.push(...readRulesFile(args.rulesFile))
+  }
+
   if (args.rules.length === 0) {
-    console.error('Error: You must provide at least one --rule <rule-id>.')
+    console.error('Error: You must provide at least one --rule <rule-id> or a --rules-file.')
     console.error('Example: --rule exhaustive-deps --rule no-console')
+    console.error('Example: --rules-file scripts/ratchet-rules.json')
     process.exit(2)
   }
 
@@ -128,7 +163,7 @@ function dangerouslyRunEsLint(eslintCmd: string, eslintArgs: string): ESLintExec
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
     env: process.env,
-    maxBuffer: 32 * 1024 * 1024, // allow large ESLint JSON payloads
+    maxBuffer: 128 * 1024 * 1024, // allow large ESLint JSON payloads (the studio repo regularly emits ~35MB+)
   })
 
   const stdout = typeof proc.stdout === 'string' ? proc.stdout : ''

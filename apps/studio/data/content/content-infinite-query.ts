@@ -1,6 +1,7 @@
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 
 import { Content, ContentType } from './content-query'
+import { remapSqlContentFields } from './content-remap'
 import { contentKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { UseCustomInfiniteQueryOptions } from '@/types'
@@ -16,7 +17,8 @@ interface GetContentVariables {
 
 export async function getContent(
   { projectRef, type, name, limit = 10, sort, cursor }: GetContentVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headers?: HeadersInit
 ) {
   if (typeof projectRef === 'undefined') {
     throw new Error('projectRef is required for getContent')
@@ -33,6 +35,7 @@ export async function getContent(
         cursor,
       },
     },
+    headers,
     signal,
   })
 
@@ -40,7 +43,7 @@ export async function getContent(
 
   return {
     cursor: data.cursor,
-    content: data.data as unknown as Content[],
+    content: remapSqlContentFields(data.data as unknown as Content[]),
   }
 }
 

@@ -47,13 +47,13 @@ export const OperationQueueSidePanel = () => {
             </SheetDescription>
           </SheetHeader>
 
-          <SheetSection className="overflow-auto flex-grow p-0">
+          <SheetSection className="overflow-auto grow p-0">
             <OperationList operations={operations} />
           </SheetSection>
 
-          <SheetFooter className="!justify-between">
+          <SheetFooter className="justify-between!">
             <Button
-              type="default"
+              variant="default"
               onClick={snap.closeSidePanel}
               iconRight={<KeyboardShortcut keys={['Meta', '.']} variant="inline" />}
             >
@@ -61,7 +61,7 @@ export const OperationQueueSidePanel = () => {
             </Button>
             <div className="flex space-x-3">
               <Button
-                type="default"
+                variant="default"
                 onClick={confirmOnClose}
                 disabled={isSaving || operations.length === 0}
               >

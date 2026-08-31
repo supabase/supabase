@@ -4,9 +4,9 @@ import { Clock } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { TimestampInfo } from 'ui-patterns'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { BackupItem } from './BackupItem'
 import { BackupsEmpty } from './BackupsEmpty'
@@ -119,7 +119,7 @@ export const BackupsList = () => {
                 displayAs="utc"
                 utcTimestamp={selectedBackup.inserted_at}
                 labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
-                className="!text-sm"
+                className="text-sm!"
               />
             </p>
           )}

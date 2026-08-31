@@ -1,7 +1,7 @@
 import { getUnsafeEntitiesInApiSql } from '@supabase/pg-meta'
 
 import type { EnableCheckAction, EnableCheckState } from './DataApiEnableSwitch.types'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 
 export type ExposedEntity = {
   schema: string

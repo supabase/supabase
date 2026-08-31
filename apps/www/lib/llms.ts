@@ -2,6 +2,7 @@ import { plans } from 'shared-data/plans'
 import { pricing } from 'shared-data/pricing'
 
 import addOnTable from '@/data/PricingAddOnTable.json'
+import pricingFaq from '@/data/PricingFAQ.json'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -245,6 +246,20 @@ function buildFeatureComparisonSection(): string {
 }
 
 // ---------------------------------------------------------------------------
+// FAQ
+// ---------------------------------------------------------------------------
+
+function buildFAQSection(): string {
+  const lines: string[] = ['## Frequently Asked Questions', '']
+
+  for (const { question, answer } of pricingFaq) {
+    lines.push(`### ${question}`, '', answer, '')
+  }
+
+  return lines.join('\n')
+}
+
+// ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
@@ -269,6 +284,7 @@ export function generatePricingContent(): string {
     buildDiskSection(),
     buildAddOnsSection(),
     buildFeatureComparisonSection(),
+    buildFAQSection(),
     '## Links',
     '',
     '- Pricing page: https://supabase.com/pricing',

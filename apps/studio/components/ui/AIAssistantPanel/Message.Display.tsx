@@ -53,13 +53,14 @@ function MessageDisplayContent({ message }: { message: VercelMessage }) {
     <div className="flex-1 min-w-0">
       {messageParts?.length > 0
         ? messageParts.map((part: NonNullable<VercelMessage['parts'][number]>, idx) => {
-            const isLastPart = idx === messageParts.length - 1
-            return <MessagePartSwitcher key={idx} part={part} isLastPart={isLastPart} />
+            return <MessagePartSwitcher key={idx} part={part} />
           })
         : content && (
-            <MessageDisplayTextMessage id={id} isLoading={isLoading} readOnly={readOnly}>
-              {content}
-            </MessageDisplayTextMessage>
+            <div className="w-full max-w-3xl mx-auto">
+              <MessageDisplayTextMessage id={id} isLoading={isLoading} readOnly={readOnly}>
+                {content}
+              </MessageDisplayTextMessage>
+            </div>
           )}
     </div>
   )
@@ -76,7 +77,7 @@ function MessageDisplayTextMessage({
       id={id}
       isLoading={isLoading}
       readOnly={readOnly}
-      className="prose prose-sm max-w-none break-words prose-h2:font-medium"
+      className="prose prose-sm max-w-none wrap-break-word prose-h2:font-medium"
     >
       {children}
     </MessageMarkdown>

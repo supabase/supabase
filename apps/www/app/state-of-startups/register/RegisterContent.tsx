@@ -25,12 +25,12 @@ export function RegisterContent() {
   return (
     <main
       className="relative w-full overflow-hidden flex flex-col"
-      style={{ background: 'hsl(var(--background-alternative-default))' }}
+      style={{ background: 'var(--background-alternative-default)' }}
     >
       <div>
         <header
           className="relative w-full overflow-hidden"
-          style={{ minHeight: '60vh', background: 'hsl(var(--background-alternative-default))' }}
+          style={{ minHeight: '60vh', background: 'var(--background-alternative-default)' }}
         >
           {/* Aurora shader scene — hidden when user prefers reduced motion */}
           {!prefersReducedMotion && (
@@ -53,7 +53,7 @@ export function RegisterContent() {
             className="absolute inset-0 pointer-events-none transition-opacity [transition-duration:1200ms]"
             style={{
               opacity: shaderLoaded ? 0 : 1,
-              background: 'hsl(var(--background-alternative-default))',
+              background: 'var(--background-alternative-default)',
             }}
           />
 
@@ -62,7 +62,7 @@ export function RegisterContent() {
             className="absolute inset-0 pointer-events-none"
             style={{
               background:
-                'linear-gradient(to top, hsl(var(--background-alternative-default)) 0%, hsl(var(--background-alternative-default) / 0.9) 15%, transparent 90%)',
+                'linear-gradient(to top, var(--background-alternative-default) 0%, oklch(from var(--background-alternative-default) l c h / 0.9) 15%, transparent 90%)',
             }}
           />
 
@@ -84,7 +84,7 @@ export function RegisterContent() {
             <div className="flex-1 hidden md:block" />
 
             {/* Bottom content — two columns, bottom-aligned */}
-            <div className="max-w-[65rem] mx-auto w-full px-8 pb-16 md:pb-24 pt-24 md:pt-0 grid grid-cols-1 lg:grid-cols-[auto_1fr] items-end gap-12 lg:gap-20 transition-opacity [transition-duration:1200ms]">
+            <div className="max-w-260 mx-auto w-full px-8 pb-16 md:pb-24 pt-24 md:pt-0 grid grid-cols-1 lg:grid-cols-[auto_1fr] items-end gap-12 lg:gap-20 transition-opacity [transition-duration:1200ms]">
               <div className="flex flex-col">
                 <h1 className="text-6xl md:text-8xl font-light text-foreground leading-[0.92] tracking-tight">
                   The State <br /> of Startups
@@ -119,7 +119,7 @@ export function RegisterContent() {
       {/* About section */}
       <SurveySectionBreak />
       <section className="w-full">
-        <div className="grid grid-cols-1 md:grid-cols-3 max-w-[60rem] mx-auto md:border-x border-muted">
+        <div className="grid grid-cols-1 md:grid-cols-3 max-w-240 mx-auto md:border-x border-muted">
           {/* Left: description text */}
           <div className="md:col-span-2 flex flex-col gap-4 px-8 py-10 border-b md:border-b-0 md:border-r border-muted text-foreground text-xl md:text-2xl text-balance">
             <p>
@@ -135,7 +135,7 @@ export function RegisterContent() {
       </section>
 
       <section className="px-4 py-16 md:px-8 md:py-32">
-        <div className="max-w-[60rem] mx-auto">
+        <div className="max-w-240 mx-auto">
           <PreviousResultsCta />
         </div>
       </section>
@@ -149,7 +149,7 @@ function ShirtImage() {
   const [hasAppeared, setHasAppeared] = useState(false)
 
   return (
-    <div className="flex items-center justify-center relative overflow-hidden aspect-[1/1]">
+    <div className="flex items-center justify-center relative overflow-hidden aspect-square">
       <motion.div
         className="relative w-full h-full"
         initial={{ scale: 0.6, opacity: 0 }}

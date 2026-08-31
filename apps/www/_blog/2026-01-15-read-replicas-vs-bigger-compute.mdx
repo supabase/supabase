@@ -41,7 +41,7 @@ The rest of this post explains how to diagnose your specific situation and make 
 
 ## First, diagnose the actual problem
 
-Before choosing a scaling strategy, figure out what is actually causing the slowdown. Throwing hardware at the wrong problem wastes money. The [database performance guide](https://supabase.com/docs/guides/database/debugging-performance) covers diagnostics in depth. Here are the essentials.
+Before choosing a scaling strategy, figure out what is actually causing the slowdown. Throwing hardware at the wrong problem wastes money. The [database performance guide](/docs/guides/database/debugging-performance) covers diagnostics in depth. Here are the essentials.
 
 ### Check your query patterns
 
@@ -103,7 +103,7 @@ Read Replicas cannot help with writes. All INSERT, UPDATE, and DELETE operations
 
 ### You have headroom in the compute tiers
 
-Supabase offers [compute tiers](https://supabase.com/docs/guides/platform/compute-and-disk) from Micro ($10/month) to 16XL ($3,730/month). If you are on Medium and experiencing slowdowns, upgrading to Large or XL is straightforward and immediate.
+Supabase offers [compute tiers](/docs/guides/platform/compute-and-disk) from Micro ($10/month) to 16XL ($3,730/month). If you are on Medium and experiencing slowdowns, upgrading to Large or XL is straightforward and immediate.
 
 | Current tier | Next tier    | Monthly cost increase | What you get          |
 | ------------ | ------------ | --------------------- | --------------------- |
@@ -116,7 +116,7 @@ Supabase offers [compute tiers](https://supabase.com/docs/guides/platform/comput
 
 Before scaling hardware, check that your queries use indexes effectively. An index is like the index at the back of a book. Instead of reading every page to find a topic, you look it up in the index and jump straight to the right page. Postgres works the same way. Without an index, Postgres reads every row in a table to find matching data. This is called a sequential scan. With an index, Postgres looks up which rows match and jumps directly to them. The difference can be dramatic: a query that takes 30 seconds without an index might take 30 milliseconds with one.
 
-Run `EXPLAIN ANALYZE` on slow queries to see if Postgres is using indexes or doing sequential scans. If you see "Seq Scan" on a large table, you probably need an index. The [Database Advisor](https://supabase.com/docs/guides/database/database-advisors) in your Supabase Dashboard can also identify missing indexes and other performance issues automatically.
+Run `EXPLAIN ANALYZE` on slow queries to see if Postgres is using indexes or doing sequential scans. If you see "Seq Scan" on a large table, you probably need an index. The [Database Advisor](/docs/guides/database/database-advisors) in your Supabase Dashboard can also identify missing indexes and other performance issues automatically.
 
 **Quick index guidelines:**
 
@@ -130,7 +130,7 @@ Sometimes a $0 index beats a $200/month compute upgrade.
 
 **Analyze your queries with Claude Code:**
 
-If you use [Claude Code](https://claude.ai/claude-code) with the [Supabase MCP Server](https://github.com/supabase-community/supabase-mcp), you can ask Claude to analyze your database and suggest indexes:
+If you use [Claude Code](https://claude.ai/claude-code) with the [Supabase MCP Server](https://github.com/supabase/mcp), you can ask Claude to analyze your database and suggest indexes:
 
 ```
 Analyze my Supabase database for missing indexes:
@@ -151,7 +151,7 @@ Vertical scaling requires no code changes. No connection string updates. No rout
 
 ## When Read Replicas are the right choice
 
-[Read Replicas](https://supabase.com/blog/introducing-read-replicas) add complexity but unlock capabilities that vertical scaling cannot provide. Choose Read Replicas when:
+[Read Replicas](/blog/introducing-read-replicas) add complexity but unlock capabilities that vertical scaling cannot provide. Choose Read Replicas when:
 
 ### Analytics queries are hurting production
 
@@ -210,7 +210,7 @@ A 4XL primary with a 2XL replica ($960 + $410 = $1,370) costs less than an 8XL p
 
 ### You want redundancy
 
-Read Replicas provide a warm standby. If your primary has issues, your replica has a recent copy of your data. This is not automatic failover (that is coming with [Multigres](https://supabase.com/blog/multigres-vitess-for-postgres)), but it reduces your blast radius.
+Read Replicas provide a warm standby. If your primary has issues, your replica has a recent copy of your data. This is not automatic failover (that is coming with [Multigres](/blog/multigres-vitess-for-postgres)), but it reduces your blast radius.
 
 ## The decision framework
 
@@ -256,7 +256,7 @@ flowchart TD
 
 **Situation:** IoT platform on 4XL ($960/month). Devices send telemetry every second. CPU at 80%. Workload is 60% writes.
 
-**Recommendation:** Upgrade to 8XL ($1,870/month). Write-heavy workloads need a bigger primary. Read Replicas would only help with the 40% that is reads. Consider [Supabase Queues](https://supabase.com/docs/guides/queues) to batch and process writes asynchronously.
+**Recommendation:** Upgrade to 8XL ($1,870/month). Write-heavy workloads need a bigger primary. Read Replicas would only help with the 40% that is reads. Consider [Supabase Queues](/docs/guides/queues) to batch and process writes asynchronously.
 
 ## What about other scaling options?
 
@@ -266,43 +266,42 @@ Read Replicas and compute upgrades are not the only tools:
 
 If you are hitting connection limits but CPU is fine, enable connection pooling. Supavisor multiplexes many client connections across fewer database connections. This is free and built into every Supabase project.
 
-### Supabase ETL and Analytics Buckets
+### Supabase Pipelines
 
 Read Replicas isolate analytics from production, but the replica is still Postgres. It still uses row-based storage optimized for transactions. If your analytics queries scan tens of millions of rows, even a dedicated replica will feel slow.
 
-This is where [Supabase ETL](https://supabase.com/blog/introducing-supabase-etl) and [Analytics Buckets](https://supabase.com/blog/introducing-analytics-buckets) come in. They solve a different problem: not just isolating analytics, but running analytics on infrastructure designed for analytical workloads.
+This is where [Supabase Pipelines](/blog/introducing-supabase-pipelines) comes in. It solves a different problem: not just isolating analytics, but moving data into infrastructure designed for analytical workloads.
 
 **How it works:**
 
-1. Supabase ETL captures changes from your Postgres tables using change-data-capture (CDC)
-2. Changes stream in near real-time to Analytics Buckets (or BigQuery)
-3. Analytics Buckets store your data in columnar Parquet format on S3, built on Apache Iceberg
-4. You query the data with tools like DuckDB, PyIceberg, or Apache Spark
+1. Pipelines captures changes from your Postgres tables using change-data-capture (CDC)
+2. Changes stream in near real time to a supported analytical destination
+3. The destination stores the data for large scans and aggregations
+4. You query the data with BI tools or downstream analytics workflows
 
-Columnar storage is dramatically faster for analytical queries. A query that scans a single column across 100 million rows only reads that column, not the entire row. Compression ratios are higher. Query times drop from minutes to seconds.
+Analytical systems are optimized for large scans and aggregations. They keep heavy reporting workloads away from your production database and give data teams a better place to run long-running queries.
 
-**When to use ETL and Analytics Buckets instead of Read Replicas:**
+**When to use Pipelines instead of Read Replicas:**
 
 - Your analytical queries scan millions of rows regularly
 - You need to retain historical data for years without bloating your database
-- You want 30-90% storage cost savings on large datasets
-- You need a complete audit trail with time-travel capabilities
-- Your data team wants to use specialized analytics tools (Spark, DuckDB, Python notebooks)
+- You need a complete downstream copy for reporting, audit trails, or data warehousing
+- Your data team wants to use dedicated analytics and BI tools
 
 **When Read Replicas are still the right choice:**
 
 - Your analytics queries are moderately heavy but not massive
 - You want your data team to use the same SQL they already know
 - You need the simplest possible setup with no new tools
-- You also need geo-distribution, which ETL does not provide
+- You also need geo-distribution, which Pipelines does not provide
 
-**A common pattern: use both.** Keep 90 days of data in Postgres for fast operational queries. Stream everything to Analytics Buckets for long-term retention and heavy analytics. Your application queries Postgres. Your data team queries Analytics Buckets for historical trends. You get speed where you need it and cost efficiency where you need that.
+**A common pattern: use both.** Keep 90 days of data in Postgres for fast operational queries. Stream everything to a supported analytical destination for long-term retention and heavy analytics. Your application queries Postgres. Your data team queries the analytical destination for historical trends. You get speed where you need it and cost efficiency where you need that.
 
 ### Multigres: the future of horizontal write scaling
 
 Read Replicas scale reads. Bigger compute scales everything, but only so far. What happens when you max out the largest compute tier and your workload is write-heavy?
 
-This is the problem [Multigres](https://supabase.com/blog/multigres-vitess-for-postgres) is designed to solve. Multigres is a database proxy layer that brings Vitess-style horizontal scaling to Postgres. Vitess powers some of the largest MySQL deployments in the world (YouTube, Slack, GitHub). Multigres adapts that architecture for Postgres.
+This is the problem [Multigres](/blog/multigres-vitess-for-postgres) is designed to solve. Multigres is a database proxy layer that brings Vitess-style horizontal scaling to Postgres. Vitess powers some of the largest MySQL deployments in the world (YouTube, Slack, GitHub). Multigres adapts that architecture for Postgres.
 
 **What Multigres enables:**
 
@@ -326,7 +325,7 @@ If you have decided Read Replicas are right for your workload:
 
 The replica provisions in a few minutes. You will get a dedicated connection string. For analytics tools, use that connection string directly. For application traffic, the API load balancer handles routing automatically.
 
-Read the full setup guide in [the documentation](https://supabase.com/docs/guides/platform/read-replicas).
+Read the full setup guide in [the documentation](/docs/guides/platform/read-replicas).
 
 ## Summary
 

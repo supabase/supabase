@@ -31,7 +31,7 @@ export default () => ({
     },
   },
   highlightsSection: {
-    className: '!py-4 [&_.highlights-grid]:xl:grid-cols-3',
+    className: 'py-4! [&_.highlights-grid]:xl:grid-cols-3',
     highlights: [
       {
         title: 'Postgres Native',
@@ -171,7 +171,7 @@ export default () => ({
         contentClassName="aspect-video border overflow-hidden rounded-lg"
         hasFrameButtons={false}
       >
-        <div className="video-container !border-none !rounded-none">
+        <div className="video-container border-none! rounded-none!">
           <iframe
             src="https://www.youtube-nocookie.com/embed/miRQPbIJOuQ"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -217,7 +217,7 @@ export default () => ({
       label: 'Start scheduling',
       url: 'https://supabase.com/dashboard/project/_/integrations/cron/overview',
     },
-    className: 'md:!py-0',
+    className: 'md:py-0!',
   },
   section3: {
     id: 'UI-Job-Observability',
@@ -239,7 +239,7 @@ export default () => ({
         draggable={false}
       />
     ),
-    className: 'md:!pb-0 [&_.image-container]:md:max-w-xl',
+    className: 'md:pb-0! [&_.image-container]:md:max-w-xl',
     reverse: true,
   },
   section4: {

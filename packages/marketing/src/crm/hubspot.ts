@@ -71,8 +71,13 @@ export class HubSpotClient {
       }
     }
 
+    // portalId comes from env; formGuid is validated at the zod layer to a
+    // UUID-like shape, but encodeURIComponent keeps this safe even if the
+    // client is constructed from an untrusted source.
     const response = await fetch(
-      `https://api.hsforms.com/submissions/v3/integration/submit/${this.portalId}/${this.formGuid}`,
+      `https://api.hsforms.com/submissions/v3/integration/submit/${encodeURIComponent(
+        this.portalId
+      )}/${encodeURIComponent(this.formGuid)}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

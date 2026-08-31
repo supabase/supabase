@@ -1,20 +1,78 @@
 'use client'
 
-import Image from 'next/image'
+import React from 'react'
+import ReactMarkdown, { type Components, type Options } from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { cn } from 'ui'
-import { CodeBlock } from 'ui-patterns/CodeBlock'
+import { Heading } from 'ui/src/components/CustomHTMLElements'
 
-const NextImageHandler = (props: any) => {
+import {
+  Avatar,
+  Blockquote,
+  Code,
+  CodeBlockPre,
+  DefaultPre,
+  Img,
+  InlineCode,
+  Quote,
+  SimplePre,
+} from './components'
+
+const defaultComponents: Components = {
+  h1: (props) => <Heading tag="h1" {...props} />,
+  h2: (props) => <Heading tag="h2" {...props} />,
+  h3: (props) => <Heading tag="h3" {...props} />,
+  h4: (props) => <Heading tag="h4" {...props} />,
+  h5: (props) => <Heading tag="h5" {...props} />,
+  h6: (props) => <Heading tag="h6" {...props} />,
+  code: Code,
+  img: Img,
+  blockquote: Blockquote,
+  pre: DefaultPre,
+}
+
+interface MarkdownProps extends Omit<Options, 'children' | 'node' | 'components'> {
+  children?: string
+  className?: string
+  codeBlock?: boolean
+  /** @deprecated Use children instead */
+  content?: string
+  components?: Partial<Components> & Record<string, React.ComponentType<any>>
+}
+
+export function Markdown({
+  children,
+  content = '',
+  codeBlock = false,
+  components,
+  className,
+  remarkPlugins,
+  ...props
+}: MarkdownProps) {
+  // Allow opting into code block syntax highlighting
+  const mergedComponents = {
+    ...defaultComponents,
+    ...(codeBlock && { pre: CodeBlockPre }),
+    ...components,
+  }
+
   return (
-    <span className={cn('next-image--dynamic-fill', props.className)}>
-      <Image {...props} className={['rounded-md border'].join(' ')} layout="fill" />
-    </span>
+    <div className={cn('prose max-w-none', className)}>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm, ...(remarkPlugins ?? [])]}
+        components={mergedComponents}
+        {...props}
+      >
+        {children ?? content}
+      </ReactMarkdown>
+    </div>
   )
 }
 
 export const markdownComponents = {
   mono: (props: any) => <code className="text-sm">{props.children}</code>,
-  code: (props: any) => <CodeBlock {...props} />,
-  img: (props: any) => NextImageHandler(props),
-  Image: (props: any) => NextImageHandler(props),
+  code: Code,
+  img: Img,
 }
+
+export { Avatar, Blockquote, Code, CodeBlockPre, DefaultPre, Img, InlineCode, Quote, SimplePre }

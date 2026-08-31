@@ -19,10 +19,10 @@ import {
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { useQueryAbortMutation } from '@/data/sql/abort-query-mutation'
 import { useOngoingQueriesQuery } from '@/data/sql/ongoing-queries-query'
+import { useSessionTerminateMutation } from '@/data/sql/terminate-session-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useUrlState } from '@/hooks/ui/useUrlState'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -67,9 +67,9 @@ export const OngoingQueriesPanel = () => {
     }
   }, [viewOngoingQueries])
 
-  const { mutate: abortQuery, isPending } = useQueryAbortMutation({
+  const { mutate: terminateSession, isPending } = useSessionTerminateMutation({
     onSuccess: () => {
-      toast.success(`Successfully aborted query (ID: ${selectedId})`)
+      toast.success(`Successfully terminated session (ID: ${selectedId})`)
       setSelectedId(undefined)
     },
   })
@@ -88,7 +88,7 @@ export const OngoingQueriesPanel = () => {
               Running queries on{' '}
               {database?.identifier === project?.ref ? 'primary database' : 'read replica'}
               <Button
-                type="default"
+                variant="default"
                 className="px-1.5"
                 loading={isLoadingOngoingQueries || isFetchingOngoingQueries}
                 icon={<RefreshCw />}
@@ -122,7 +122,7 @@ export const OngoingQueriesPanel = () => {
                       : 'database'}
                 </span>
                 <Button
-                  type="default"
+                  variant="default"
                   loading={isLoadingOngoingQueries || isFetchingOngoingQueries}
                   icon={<RefreshCw />}
                   onClick={() => refetch()}
@@ -140,7 +140,7 @@ export const OngoingQueriesPanel = () => {
                     language="sql"
                     className={cn(
                       'max-w-none max-h-52 w-full',
-                      '!bg-transparent !py-3 !px-3.5 prose dark:prose-dark',
+                      'bg-transparent! py-3! px-3.5! prose dark:prose-dark',
                       '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
                     )}
                   />
@@ -156,7 +156,7 @@ export const OngoingQueriesPanel = () => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
-                      type="warning"
+                      variant="warning"
                       className="px-1.5"
                       icon={<StopCircle />}
                       onClick={() => setSelectedId(query.pid)}
@@ -173,19 +173,22 @@ export const OngoingQueriesPanel = () => {
       <ConfirmationModal
         loading={isPending}
         variant="warning"
-        title={`Confirm to abort this query? (ID: ${selectedId})`}
+        title={`Confirm to terminate this session? (ID: ${selectedId})`}
         visible={selectedId !== undefined}
         onCancel={() => setSelectedId(undefined)}
         onConfirm={() => {
           if (selectedId !== undefined)
-            abortQuery({
+            terminateSession({
               pid: selectedId,
               projectRef: project?.ref,
               connectionString: database?.connectionString,
             })
         }}
       >
-        <p className="text-sm">This will force the query to stop running.</p>
+        <p className="text-sm">
+          Terminating this session will close its connection and roll back any open transaction. The
+          application will need to reconnect.
+        </p>
       </ConfirmationModal>
     </>
   )

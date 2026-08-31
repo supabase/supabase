@@ -32,7 +32,7 @@ const ApplicationFormSection = ({ id, title, subtitle, cta, className }: Props) 
         </div>
       </div>
 
-      <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-transparent to-background opacity-80 z-0"></div>
+      <div className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-transparent to-background opacity-80 z-0"></div>
     </SectionContainer>
   )
 }

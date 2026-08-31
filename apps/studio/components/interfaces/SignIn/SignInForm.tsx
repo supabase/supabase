@@ -2,23 +2,25 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { AuthError } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
+import { useAuthError } from 'common'
 import { Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form, FormControl, FormField, Input_Shadcn_ } from 'ui'
+import { Button, Form, FormControl, FormField, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
 import { LastSignInWrapper } from './LastSignInWrapper'
+import { AlertError } from '@/components/ui/AlertError'
 import { useAddLoginEvent } from '@/data/misc/audit-login-mutation'
 import { getMfaAuthenticatorAssuranceLevel } from '@/data/profile/mfa-authenticator-assurance-level-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useLastSignIn } from '@/hooks/misc/useLastSignIn'
 import { captureCriticalError } from '@/lib/error-reporting'
 import { auth, buildPathWithParams, getReturnToPath } from '@/lib/gotrue'
+import { useTrack } from '@/lib/telemetry/track'
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Must be a valid email'),
@@ -48,7 +50,7 @@ export const SignInForm = () => {
     setReturnTo(getReturnToPath())
   }, [])
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { mutate: addLoginEvent } = useAddLoginEvent()
 
   let forgotPasswordUrl = `/forgot-password`
@@ -86,10 +88,7 @@ export const SignInForm = () => {
         }
 
         toast.success(`Signed in successfully!`, { id: toastId })
-        sendEvent({
-          action: 'sign_in',
-          properties: { category: 'account', method: 'email' },
-        })
+        track('sign_in', { category: 'account', method: 'email' })
         addLoginEvent({})
 
         await queryClient.resetQueries()
@@ -109,7 +108,7 @@ export const SignInForm = () => {
 
       if (error.message.toLowerCase() === 'email not confirmed') {
         return toast.error(
-          'Account has not been verified, please check the link sent to your email',
+          'Your account has not been verified. Please check the verification link sent to your email. If you have not received the email or the link has expired, please sign up again to request a new verification link.',
           { id: toastId }
         )
       }
@@ -118,9 +117,17 @@ export const SignInForm = () => {
     }
   }
 
+  const authError = useAuthError()
+
   return (
     <Form {...form}>
-      <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
+      <form
+        id={formId}
+        method="POST"
+        className="flex flex-col gap-4"
+        onSubmit={form.handleSubmit(onSubmit)}
+      >
+        {authError && <AlertError error={authError} subject="Error while signing in" />}
         <FormField
           key="email"
           name="email"
@@ -128,7 +135,7 @@ export const SignInForm = () => {
           render={({ field }) => (
             <FormItemLayout name="email" label="Email">
               <FormControl>
-                <Input_Shadcn_
+                <Input
                   id="email"
                   type="email"
                   autoComplete="email"
@@ -150,7 +157,7 @@ export const SignInForm = () => {
               <FormItemLayout name="password" label="Password">
                 <FormControl>
                   <div className="relative">
-                    <Input_Shadcn_
+                    <Input
                       id="password"
                       type={passwordHidden ? 'password' : 'text'}
                       autoComplete="current-password"
@@ -160,7 +167,7 @@ export const SignInForm = () => {
                       className="pr-10"
                     />
                     <Button
-                      type="default"
+                      variant="default"
                       title={passwordHidden ? `Show password` : `Hide password`}
                       aria-label={passwordHidden ? `Show password` : `Hide password`}
                       className="absolute right-1 top-1 px-1.5"
@@ -198,7 +205,7 @@ export const SignInForm = () => {
         </div>
 
         <LastSignInWrapper type="email">
-          <Button block form={formId} htmlType="submit" size="large" loading={isSubmitting}>
+          <Button block form={formId} type="submit" size="large" loading={isSubmitting}>
             Sign in
           </Button>
         </LastSignInWrapper>

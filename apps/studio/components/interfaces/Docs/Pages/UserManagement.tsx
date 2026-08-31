@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 
 import CodeSnippet from '../CodeSnippet'
 import { DocSection } from '../DocSection'
@@ -18,7 +17,6 @@ interface UserManagementProps {
 }
 
 export const UserManagement = ({ selectedLang, showApiKey }: UserManagementProps) => {
-  const router = useRouter()
   const { ref: projectRef } = useParams()
   const keyToShow = showApiKey ? showApiKey : 'SUPABASE_KEY'
 
@@ -90,7 +88,7 @@ export const UserManagement = ({ selectedLang, showApiKey }: UserManagementProps
       />
 
       <DocSection
-        title="Log in with Magic Link via Email"
+        title="Sign in with magic link"
         content={
           <>
             <p>Send a user a passwordless link which they can use to redeem an access_token.</p>

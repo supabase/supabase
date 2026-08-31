@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { useEffect, useRef, useState } from 'react'
-import { useForm, type SubmitHandler } from 'react-hook-form'
+import { useForm, useWatch, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -16,15 +16,15 @@ import {
   FormControl,
   FormField,
   FormMessage,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Switch,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
@@ -121,8 +121,8 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
   })
   const { formatted_size_limit: formattedSizeLimitError } = form.formState.errors
 
-  const isPublicBucket = form.watch('public')
-  const hasFileSizeLimit = form.watch('has_file_size_limit')
+  const isPublicBucket = useWatch({ control: form.control, name: 'public' })
+  const hasFileSizeLimit = useWatch({ control: form.control, name: 'has_file_size_limit' })
   const [hasAllowedMimeTypes, setHasAllowedMimeTypes] = useState(
     Boolean(bucket?.allowed_mime_types?.length)
   )
@@ -212,12 +212,11 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                 render={({ field }) => (
                   <FormItemLayout
                     hideMessage
-                    name="name"
                     label="Bucket name"
                     labelOptional="Cannot be changed after creation"
                   >
                     <FormControl>
-                      <Input_Shadcn_ id="name" {...field} disabled />
+                      <Input {...field} disabled />
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -231,14 +230,12 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                   render={({ field }) => (
                     <FormItemLayout
                       hideMessage
-                      name="public"
                       label="Public bucket"
                       description="Allow anyone to read objects without authorization"
                       layout="flex"
                     >
                       <FormControl>
                         <Switch
-                          id="public"
                           size="large"
                           checked={field.value}
                           onCheckedChange={field.onChange}
@@ -260,11 +257,11 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
 
                         {isMakingBucketPrivate && (
                           <>
-                            <p className="mb-2 !leading-normal">
+                            <p className="mb-2 leading-normal!">
                               All objects in your bucket will only accessible via signed URLs, or
                               downloaded with the right authorization headers.
                             </p>
-                            <p className="!leading-normal">
+                            <p className="leading-normal!">
                               Assets cached in the CDN may still be publicly accessible. You can
                               consider{' '}
                               <InlineLink
@@ -292,18 +289,12 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout
-                    name="has_file_size_limit"
                     label="Restrict file size"
                     description="Prevent uploading of files larger than a specified limit"
                     layout="flex"
                   >
                     <FormControl>
-                      <Switch
-                        id="has_file_size_limit"
-                        size="large"
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
+                      <Switch size="large" checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -315,16 +306,11 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                     name="formatted_size_limit"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout
-                        hideMessage
-                        name="formatted_size_limit"
-                        label="File size limit"
-                      >
+                      <FormItemLayout hideMessage label="File size limit">
                         <div className="grid grid-cols-12 gap-x-2">
                           <div className="col-span-8">
                             <FormControl>
-                              <Input_Shadcn_
-                                id="formatted_size_limit"
+                              <Input
                                 aria-label="File size limit"
                                 type="number"
                                 min={0}
@@ -334,18 +320,18 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                             </FormControl>
                           </div>
                           <div className="col-span-4">
-                            <Select_Shadcn_ value={selectedUnit} onValueChange={setSelectedUnit}>
-                              <SelectTrigger_Shadcn_ aria-label="File size limit unit" size="small">
-                                <SelectValue_Shadcn_>{selectedUnit}</SelectValue_Shadcn_>
-                              </SelectTrigger_Shadcn_>
-                              <SelectContent_Shadcn_>
+                            <Select value={selectedUnit} onValueChange={setSelectedUnit}>
+                              <SelectTrigger aria-label="File size limit unit" size="small">
+                                <SelectValue>{selectedUnit}</SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
                                 {Object.values(StorageSizeUnits).map((unit: string) => (
-                                  <SelectItem_Shadcn_ key={unit} value={unit} className="text-xs">
+                                  <SelectItem key={unit} value={unit} className="text-xs">
                                     {unit}
-                                  </SelectItem_Shadcn_>
+                                  </SelectItem>
                                 ))}
-                              </SelectContent_Shadcn_>
-                            </Select_Shadcn_>
+                              </SelectContent>
+                            </Select>
                           </div>
                         </div>
                       </FormItemLayout>
@@ -386,14 +372,12 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
 
             <DialogSection className="space-y-2">
               <FormItemLayout
-                name="has_allowed_mime_types"
                 label="Restrict MIME types"
                 description="Allow only certain types of files to be uploaded"
                 layout="flex"
               >
                 <FormControl>
                   <Switch
-                    id="has_allowed_mime_types"
                     size="large"
                     checked={hasAllowedMimeTypes}
                     onCheckedChange={setHasAllowedMimeTypes}
@@ -407,14 +391,12 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                   control={form.control}
                   render={({ field }) => (
                     <FormItemLayout
-                      name="allowed_mime_types"
                       label="Allowed MIME types"
                       labelOptional="Comma separated values"
                       description="Wildcards are allowed, e.g. image/*."
                     >
                       <FormControl>
-                        <Input_Shadcn_
-                          id="allowed_mime_types"
+                        <Input
                           {...field}
                           placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
                         />
@@ -428,10 +410,10 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
         </Form>
 
         <DialogFooter>
-          <Button type="default" disabled={isUpdating} onClick={closeModal}>
+          <Button variant="default" disabled={isUpdating} onClick={closeModal}>
             Cancel
           </Button>
-          <Button form={formId} htmlType="submit" loading={isUpdating}>
+          <Button form={formId} type="submit" loading={isUpdating}>
             Save
           </Button>
         </DialogFooter>

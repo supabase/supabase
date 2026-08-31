@@ -94,7 +94,7 @@ on storage.objects
 for insert
 to authenticated
 with check (
-    (storage.folder(name))[1] = (select auth.uid())
+    (storage.foldername(name))[1] = (select auth.uid())
 );
 
 create policy "User can update their own objects (in any buckets)"

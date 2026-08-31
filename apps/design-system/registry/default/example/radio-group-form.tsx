@@ -11,8 +11,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  RadioGroup_Shadcn_,
-  RadioGroupItem_Shadcn_,
+  RadioGroup,
+  RadioGroupItem,
 } from 'ui'
 import { z } from 'zod'
 
@@ -47,36 +47,36 @@ export default function RadioGroupForm() {
             <FormItem className="space-y-3">
               <FormLabel>Notify me about...</FormLabel>
               <FormControl>
-                <RadioGroup_Shadcn_
+                <RadioGroup
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                   className="flex flex-col space-y-1"
                 >
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem_Shadcn_ value="all" />
-                    </FormControl>
-                    <FormLabel className="font-normal">All new messages</FormLabel>
-                  </FormItem>
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem_Shadcn_ value="mentions" />
-                    </FormControl>
-                    <FormLabel className="font-normal">Direct messages and mentions</FormLabel>
-                  </FormItem>
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem_Shadcn_ value="none" />
-                    </FormControl>
-                    <FormLabel className="font-normal">Nothing</FormLabel>
-                  </FormItem>
-                </RadioGroup_Shadcn_>
+                  <div className="flex items-center space-x-3 space-y-0">
+                    <RadioGroupItem value="all" id="type-all" />
+                    <FormLabel className="font-normal" htmlFor="type-all">
+                      All new messages
+                    </FormLabel>
+                  </div>
+                  <div className="flex items-center space-x-3 space-y-0">
+                    <RadioGroupItem value="mentions" id="type-mentions" />
+                    <FormLabel className="font-normal" htmlFor="type-mentions">
+                      Direct messages and mentions
+                    </FormLabel>
+                  </div>
+                  <div className="flex items-center space-x-3 space-y-0">
+                    <RadioGroupItem value="none" id="type-none" />
+                    <FormLabel className="font-normal" htmlFor="type-none">
+                      Nothing
+                    </FormLabel>
+                  </div>
+                </RadioGroup>
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button htmlType="submit">Submit</Button>
+        <Button type="submit">Submit</Button>
       </form>
     </Form>
   )

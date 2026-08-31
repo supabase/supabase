@@ -2,8 +2,8 @@ import { getMaxConnectionsSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
-import { executeSql, ExecuteSqlError } from '@/data/sql/execute-sql-query'
-import { UseCustomQueryOptions } from '@/types'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type MaxConnectionsVariables = {
   projectRef?: string
@@ -29,7 +29,7 @@ export async function getMaxConnections(
 }
 
 export type MaxConnectionsData = Awaited<ReturnType<typeof getMaxConnections>>
-export type MaxConnectionsError = ExecuteSqlError
+export type MaxConnectionsError = ResponseError
 
 export const useMaxConnectionsQuery = <TData = MaxConnectionsData>(
   { projectRef, connectionString }: MaxConnectionsVariables,

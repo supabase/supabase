@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { useCallback } from 'react'
 
 import {
@@ -28,9 +28,8 @@ const DEFAULT_PREFERENCES: StoragePreference = {
  * Use this outside of React (e.g. inside Valtio state methods).
  */
 export function getStoragePreference(projectRef: string): StoragePreference {
-  if (typeof window === 'undefined') return DEFAULT_PREFERENCES
   try {
-    const raw = window.localStorage.getItem(LOCAL_STORAGE_KEYS.STORAGE_PREFERENCE(projectRef))
+    const raw = safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.STORAGE_PREFERENCE(projectRef))
     if (raw) {
       return { ...DEFAULT_PREFERENCES, ...JSON.parse(raw) }
     }

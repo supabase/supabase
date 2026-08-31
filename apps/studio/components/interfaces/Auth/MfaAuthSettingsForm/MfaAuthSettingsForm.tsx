@@ -2,11 +2,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertTitle,
   Button,
   Card,
   CardContent,
@@ -15,19 +15,18 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
-  Input_Shadcn_,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Switch,
   WarningIcon,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
@@ -37,10 +36,12 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
-import AlertError from '@/components/ui/AlertError'
-import NoPermission from '@/components/ui/NoPermission'
+import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
+import { AlertError } from '@/components/ui/AlertError'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
@@ -169,6 +170,7 @@ export const MfaAuthSettingsForm = () => {
     },
   })
   const { reset: resetPhoneForm } = phoneForm
+  const mfaPhoneValue = useWatch({ control: phoneForm.control, name: 'MFA_PHONE' })
 
   const securityForm = useForm<SecurityFormValues>({
     resolver: zodResolver(securitySchema),
@@ -328,8 +330,7 @@ export const MfaAuthSettingsForm = () => {
     )
   }
 
-  const phoneMFAIsEnabled =
-    phoneForm.watch('MFA_PHONE') === 'Enabled' || phoneForm.watch('MFA_PHONE') === 'Verify Enabled'
+  const phoneMFAIsEnabled = mfaPhoneValue === 'Enabled' || mfaPhoneValue === 'Verify Enabled'
   const hasUpgradedPhoneMFA =
     authConfig && !authConfig.MFA_PHONE_VERIFY_ENABLED && phoneMFAIsEnabled
 
@@ -364,22 +365,22 @@ export const MfaAuthSettingsForm = () => {
                         description="Control use of TOTP (App Authenticator) factors"
                       >
                         <FormControl>
-                          <Select_Shadcn_
+                          <Select
                             value={field.value}
                             onValueChange={field.onChange}
                             disabled={!canUpdateConfig}
                           >
-                            <SelectTrigger_Shadcn_>
-                              <SelectValue_Shadcn_ placeholder="Select status" />
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                            <SelectContent>
                               {MFAFactorSelectionOptions.map((option) => (
-                                <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                                <SelectItem key={option.value} value={option.value}>
                                   {option.label}
-                                </SelectItem_Shadcn_>
+                                </SelectItem>
                               ))}
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -421,13 +422,13 @@ export const MfaAuthSettingsForm = () => {
 
                 <CardFooter className="justify-end space-x-2">
                   {totpForm.formState.isDirty && (
-                    <Button type="default" onClick={() => totpForm.reset()}>
+                    <Button variant="default" onClick={() => totpForm.reset()}>
                       Cancel
                     </Button>
                   )}
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     disabled={!canUpdateConfig || isUpdatingTotpForm || !totpForm.formState.isDirty}
                     loading={isUpdatingTotpForm}
                   >
@@ -466,34 +467,34 @@ export const MfaAuthSettingsForm = () => {
                         description="Control use of phone factors"
                       >
                         <FormControl>
-                          <Select_Shadcn_
+                          <Select
                             value={field.value}
                             onValueChange={field.onChange}
                             disabled={!canUpdateConfig || !hasAccessToMFA}
                           >
-                            <SelectTrigger_Shadcn_>
-                              <SelectValue_Shadcn_ placeholder="Select status" />
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                            <SelectContent>
                               {MFAFactorSelectionOptions.map((option) => (
-                                <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                                <SelectItem key={option.value} value={option.value}>
                                   {option.label}
-                                </SelectItem_Shadcn_>
+                                </SelectItem>
                               ))}
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                       </FormItemLayout>
                     )}
                   />
 
                   {!hasValidMFAProvider && phoneMFAIsEnabled && (
-                    <Alert_Shadcn_ variant="warning" className="mt-3">
+                    <Alert variant="warning" className="mt-3">
                       <WarningIcon />
-                      <AlertTitle_Shadcn_>
+                      <AlertTitle>
                         To use MFA with Phone you should set up a Phone provider or Send SMS Hook.
-                      </AlertTitle_Shadcn_>
-                    </Alert_Shadcn_>
+                      </AlertTitle>
+                    </Alert>
                   )}
                 </CardContent>
 
@@ -541,7 +542,7 @@ export const MfaAuthSettingsForm = () => {
                         description="To format the OTP code use `{{ .Code }}`"
                       >
                         <FormControl>
-                          <Input_Shadcn_
+                          <Input
                             type="text"
                             {...field}
                             disabled={!canUpdateConfig || !hasAccessToMFA}
@@ -568,13 +569,13 @@ export const MfaAuthSettingsForm = () => {
 
                 <CardFooter className="justify-end space-x-2">
                   {phoneForm.formState.isDirty && (
-                    <Button type="default" onClick={() => phoneForm.reset()}>
+                    <Button variant="default" onClick={() => phoneForm.reset()}>
                       Cancel
                     </Button>
                   )}
                   <Button
-                    type={promptProPlanUpgrade ? 'default' : 'primary'}
-                    htmlType="submit"
+                    variant={promptProPlanUpgrade ? 'default' : 'primary'}
+                    type="submit"
                     disabled={
                       !canUpdateConfig ||
                       isUpdatingPhoneForm ||
@@ -610,6 +611,7 @@ export const MfaAuthSettingsForm = () => {
           Billing will start immediately upon enabling this add-on, regardless of whether your
           customers are using SMS MFA.
         </p>
+        <TaxDisclaimer className="mt-2" />
       </ConfirmationModal>
 
       <PageSection>
@@ -656,13 +658,13 @@ export const MfaAuthSettingsForm = () => {
                 )}
                 <CardFooter className="justify-end space-x-2">
                   {securityForm.formState.isDirty && (
-                    <Button type="default" onClick={() => securityForm.reset()}>
+                    <Button variant="default" onClick={() => securityForm.reset()}>
                       Cancel
                     </Button>
                   )}
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     disabled={
                       !canUpdateConfig || isUpdatingSecurityForm || !securityForm.formState.isDirty
                     }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildOperatorItems, buildValueItems } from './menuItems'
+import { buildOperatorItems, buildPropertyItems, buildValueItems } from './menuItems'
 import { FilterGroup, FilterProperty } from './types'
 
 const stringProperty: FilterProperty = {
@@ -144,5 +144,65 @@ describe('buildValueItems', () => {
       { value: 'alice', label: 'Alice' },
       { value: 'bob', label: 'Bob' },
     ])
+  })
+})
+
+describe('buildPropertyItems', () => {
+  const properties: FilterProperty[] = [
+    { label: 'Name', name: 'name', type: 'string', operators: ['='] },
+    { label: 'Status', name: 'status', type: 'string', operators: ['='] },
+  ]
+
+  it('returns property items matching the input', () => {
+    const items = buildPropertyItems({
+      filterProperties: properties,
+      inputValue: 'nam',
+    })
+
+    expect(items).toEqual([{ value: 'name', label: 'Name' }])
+  })
+
+  it('uses a sentinel value for the "New Group" action when supportsOperators is true', () => {
+    const items = buildPropertyItems({
+      filterProperties: properties,
+      inputValue: '',
+      supportsOperators: true,
+    })
+
+    const groupItem = items.find((item) => item.label === 'New Group')
+    expect(groupItem).toBeDefined()
+    expect(groupItem?.value).toBe('__new_group__')
+  })
+
+  it('does not include "New Group" when supportsOperators is false', () => {
+    const items = buildPropertyItems({
+      filterProperties: properties,
+      inputValue: '',
+      supportsOperators: false,
+    })
+
+    expect(items.find((item) => item.label === 'New Group')).toBeUndefined()
+  })
+
+  it('does not collide with a property named "group"', () => {
+    const propertiesWithGroup: FilterProperty[] = [
+      { label: 'group', name: 'group', type: 'string', operators: ['='] },
+      { label: 'Name', name: 'name', type: 'string', operators: ['='] },
+    ]
+
+    const items = buildPropertyItems({
+      filterProperties: propertiesWithGroup,
+      inputValue: '',
+      supportsOperators: true,
+    })
+
+    const groupPropertyItem = items.find((item) => item.label === 'group')
+    const newGroupItem = items.find((item) => item.label === 'New Group')
+
+    expect(groupPropertyItem).toBeDefined()
+    expect(groupPropertyItem?.value).toBe('group')
+    expect(newGroupItem).toBeDefined()
+    expect(newGroupItem?.value).toBe('__new_group__')
+    expect(groupPropertyItem?.value).not.toBe(newGroupItem?.value)
   })
 })

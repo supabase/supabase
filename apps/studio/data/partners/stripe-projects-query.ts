@@ -1,7 +1,7 @@
 import { queryOptions } from '@tanstack/react-query'
 import type { components } from 'api-types'
 
-import { stripeProjectsKeys } from './keys'
+import { partnersKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 
 type GetAccountRequestVariables = {
@@ -30,7 +30,7 @@ export const accountRequestQueryOptions = (
   { enabled = true }: { enabled?: boolean } = { enabled: true }
 ) => {
   return queryOptions({
-    queryKey: stripeProjectsKeys.get(arId),
+    queryKey: partnersKeys.getStripeProjects(arId),
     queryFn: ({ signal }) => getAccountRequest({ arId }, signal),
     enabled: enabled && typeof arId !== 'undefined',
   })

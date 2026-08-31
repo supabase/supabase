@@ -12,27 +12,27 @@ import {
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
-  Label_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Input,
+  Label,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectSeparator_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
   SidePanel,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -51,6 +51,7 @@ import type { AvailableColumn, Table, TableOption } from './Wrappers.types'
 import { getTableFormSchema } from './Wrappers.utils'
 import { ActionBar } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
 import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export type WrapperTableEditorProps = {
@@ -115,13 +116,11 @@ const WrapperTableEditor = ({
       <SidePanel.Content>
         <div className="my-4 flex flex-col gap-y-6">
           <div className="flex flex-col gap-y-2">
-            <Label_Shadcn_ className="text-foreground-light">
-              Select a target the table will point to
-            </Label_Shadcn_>
-            <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-              <PopoverTrigger_Shadcn_ asChild>
+            <Label className="text-foreground-light">Select a target the table will point to</Label>
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
                 <Button
-                  type="default"
+                  variant="default"
                   role="combobox"
                   aria-expanded={open}
                   aria-controls={listboxId}
@@ -136,16 +135,16 @@ const WrapperTableEditor = ({
                 >
                   {!!selectedTableIndex ? tables[Number(selectedTableIndex)].label : '---'}
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ id={listboxId} className="p-0" sameWidthAsTrigger>
-                <Command_Shadcn_>
-                  <CommandInput_Shadcn_ placeholder="Find a table..." />
-                  <CommandList_Shadcn_>
-                    <CommandEmpty_Shadcn_>No targets found</CommandEmpty_Shadcn_>
-                    <CommandGroup_Shadcn_>
+              </PopoverTrigger>
+              <PopoverContent id={listboxId} className="p-0" sameWidthAsTrigger>
+                <Command>
+                  <CommandInput placeholder="Find a table..." />
+                  <CommandList>
+                    <CommandEmpty>No targets found</CommandEmpty>
+                    <CommandGroup>
                       <ScrollArea className={(tables ?? []).length > 7 ? 'h-[200px]' : ''}>
                         {(tables ?? []).map((table, i) => (
-                          <CommandItem_Shadcn_
+                          <CommandItem
                             key={table.label}
                             className="cursor-pointer flex items-center justify-between space-x-2 w-full"
                             onSelect={() => {
@@ -164,14 +163,14 @@ const WrapperTableEditor = ({
                             {String(i) === selectedTableIndex && (
                               <Check className={cn('mr-2 h-4 w-4')} />
                             )}
-                          </CommandItem_Shadcn_>
+                          </CommandItem>
                         ))}
                       </ScrollArea>
-                    </CommandGroup_Shadcn_>
-                  </CommandList_Shadcn_>
-                </Command_Shadcn_>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
 
           {selectedTable && (
@@ -193,21 +192,21 @@ const Option = ({ option, control }: { option: TableOption; control: Control<Fie
         name={option.name}
         defaultValue={option.defaultValue}
         render={({ field }) => (
-          <FormItemLayout layout="vertical" label={option.label} name={option.name}>
+          <FormItemLayout layout="vertical" label={option.label}>
             <FormControl>
-              <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger_Shadcn_>
-                  <SelectValue_Shadcn_ placeholder="Select an option" />
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
-                  <SelectSeparator_Shadcn_ />
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select an option" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectSeparator />
                   {option.options.map((subOption) => (
-                    <SelectItem_Shadcn_ key={subOption.value} value={subOption.value}>
+                    <SelectItem key={subOption.value} value={subOption.value}>
                       {subOption.label}
-                    </SelectItem_Shadcn_>
+                    </SelectItem>
                   ))}
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
+                </SelectContent>
+              </Select>
             </FormControl>
           </FormItemLayout>
         )}
@@ -221,9 +220,9 @@ const Option = ({ option, control }: { option: TableOption; control: Control<Fie
       name={option.name}
       defaultValue={option.defaultValue ?? ''}
       render={({ field }) => (
-        <FormItemLayout layout="vertical" label={option.label} name={option.name}>
+        <FormItemLayout layout="vertical" label={option.label}>
           <FormControl>
-            <Input_Shadcn_ {...field} id={option.name} placeholder={option.placeholder ?? ''} />
+            <Input {...field} placeholder={option.placeholder ?? ''} />
           </FormControl>
         </FormItemLayout>
       )}
@@ -241,10 +240,11 @@ const TableForm = ({
   initialData: any
 }) => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: schemas, isPending: isLoading } = useSchemasQuery({
+  const { data: allSchemas, isPending: isLoading } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const schemas = useSchemasFilteredForHighAvailability(allSchemas)
 
   const requiredOptions: TableOption[] = []
   const optionalOptions: TableOption[] = []
@@ -348,29 +348,28 @@ const TableForm = ({
           render={({ field }) => (
             <FormItemLayout layout="vertical" label="Select a schema for the foreign table">
               <FormControl>
-                <Select_Shadcn_
-                  name="schema"
+                <Select
                   value={field.value}
                   onValueChange={(schema) => {
                     field.onChange(schema)
                     form.resetField('schema_name')
                   }}
                 >
-                  <SelectTrigger_Shadcn_>
-                    <SelectValue_Shadcn_ placeholder="Select an option" />
-                  </SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_>
-                    <SelectItem_Shadcn_ value="custom">Create a new schema</SelectItem_Shadcn_>
-                    <SelectSeparator_Shadcn_ />
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select an option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="custom">Create a new schema</SelectItem>
+                    <SelectSeparator />
                     {(schemas ?? [])?.map((schema) => {
                       return (
-                        <SelectItem_Shadcn_ key={schema.name} value={schema.name}>
+                        <SelectItem key={schema.name} value={schema.name}>
                           {schema.name}
-                        </SelectItem_Shadcn_>
+                        </SelectItem>
                       )
                     })}
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                  </SelectContent>
+                </Select>
               </FormControl>
             </FormItemLayout>
           )}
@@ -380,9 +379,9 @@ const TableForm = ({
             control={form.control}
             name="schema_name"
             render={({ field }) => (
-              <FormItemLayout name="schema_name" layout="vertical" label="Schema name">
+              <FormItemLayout layout="vertical" label="Schema name">
                 <FormControl>
-                  <Input_Shadcn_ {...field} id="schema_name" />
+                  <Input {...field} />
                 </FormControl>
               </FormItemLayout>
             )}
@@ -395,12 +394,11 @@ const TableForm = ({
           render={({ field }) => (
             <FormItemLayout
               layout="vertical"
-              name="table_name"
               label="Table name"
               description="You can query from this table after the wrapper is enabled."
             >
               <FormControl>
-                <Input_Shadcn_ {...field} id="table_name" />
+                <Input {...field} />
               </FormControl>
             </FormItemLayout>
           )}
@@ -445,11 +443,11 @@ const TableForm = ({
                       badgeLimit="wrap"
                       showIcon={false}
                       deletableBadge
-                      className="w-full !min-w-lg"
+                      className="w-full"
                     />
                     <MultiSelectorContent>
                       <MultiSelectorList>
-                        {table.availableColumns!.map((availableColumn, index) => (
+                        {table.availableColumns!.map((availableColumn) => (
                           <MultiSelectorItem
                             key={availableColumn.name}
                             value={availableColumn.name}
@@ -472,13 +470,9 @@ const TableForm = ({
                   control={form.control}
                   name={`columns.${columnIndex}.name`}
                   render={({ field }) => (
-                    <FormItemLayout
-                      layout="vertical"
-                      name={`columns.${columnIndex}.name`}
-                      label="Name"
-                    >
+                    <FormItemLayout layout="vertical" label="Name">
                       <FormControl>
-                        <Input_Shadcn_ {...field} id={`columns.${columnIndex}.name`} />
+                        <Input {...field} />
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -490,7 +484,7 @@ const TableForm = ({
                   enumTypes={[]}
                 />
                 <Button
-                  type="outline"
+                  variant="outline"
                   icon={<XIcon strokeWidth={1.5} />}
                   onClick={() => removeColumn(columnIndex)}
                   className="self-end -translate-y-1.5 px-1.5"
@@ -500,7 +494,7 @@ const TableForm = ({
               </div>
             ))}
             <Button
-              type="default"
+              variant="default"
               onClick={() => appendColumn({ name: '', type: 'text' })}
               className="self-start"
             >

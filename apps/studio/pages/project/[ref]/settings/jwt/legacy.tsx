@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 
 import { JWTSettings } from '@/components/interfaces/JwtSecrets/jwt-settings'
 import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from '@/components/interfaces/JwtSecrets/jwt.constants'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import JWTKeysLayout from '@/components/layouts/JWTKeys/JWTKeysLayout'
 import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
@@ -27,7 +27,7 @@ const JWTKeysLegacyPage: NextPageWithLayout = () => {
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
   const jwtSecretUpdateError = data?.jwtSecretUpdateError
 
-  const previousJwtSecretUpdateStatus = useRef<JwtSecretUpdateStatus>()
+  const previousJwtSecretUpdateStatus = useRef<JwtSecretUpdateStatus>(undefined)
   const { Failed, Updated, Updating } = JwtSecretUpdateStatus
   const jwtSecretUpdateErrorMessage =
     JWT_SECRET_UPDATE_ERROR_MESSAGES[jwtSecretUpdateError as JwtSecretUpdateError]

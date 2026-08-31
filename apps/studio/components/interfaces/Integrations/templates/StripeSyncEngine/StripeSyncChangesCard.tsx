@@ -1,6 +1,6 @@
+import { SchemaInstallationStatus } from '@stripe/sync-engine/supabase'
 import { EdgeFunctions } from 'icons'
 import { Layers, Loader2, Table } from 'lucide-react'
-import { SchemaInstallationStatus } from 'stripe-experiment-sync/supabase'
 import { Card, CardContent, cn } from 'ui'
 
 import {

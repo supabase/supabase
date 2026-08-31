@@ -98,7 +98,10 @@ export const AccountConnections = () => {
                   alt={`GitHub icon`}
                 />
                 <div>
-                  <p className="text-sm">GitHub</p>
+                  <div className="flex items-center gap-x-2">
+                    <p className="text-sm">GitHub</p>
+                    {isConnected && <Badge variant="success">Connected</Badge>}
+                  </div>
                   <p className="text-sm text-foreground-lighter">
                     Sync repos to Supabase projects for automatic branch creation and merging
                   </p>
@@ -106,38 +109,35 @@ export const AccountConnections = () => {
               </div>
               <div className="flex items-center gap-x-2 ml-2">
                 {isConnected ? (
-                  <>
-                    <Badge variant="success">Connected</Badge>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button iconRight={<ChevronDown size={14} />} type="default">
-                          <span>Manage</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent side="bottom" align="end" className="w-44">
-                        <DropdownMenuItem
-                          className="space-x-2"
-                          onSelect={(event) => {
-                            event.preventDefault()
-                            handleReauthenticate()
-                          }}
-                        >
-                          <RefreshCw size={14} />
-                          <p>Re-authenticate</p>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className="space-x-2"
-                          onSelect={() => setIsRemoveModalOpen(true)}
-                        >
-                          <Unlink size={14} />
-                          <p>Remove connection</p>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button iconRight={<ChevronDown size={14} />} variant="default">
+                        <span>Manage</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent side="bottom" align="end" className="w-44">
+                      <DropdownMenuItem
+                        className="space-x-2"
+                        onSelect={(event) => {
+                          event.preventDefault()
+                          handleReauthenticate()
+                        }}
+                      >
+                        <RefreshCw size={14} />
+                        <p>Re-authenticate</p>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="space-x-2"
+                        onSelect={() => setIsRemoveModalOpen(true)}
+                      >
+                        <Unlink size={14} />
+                        <p>Remove connection</p>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 ) : (
-                  <Button type="primary" onClick={handleConnect}>
+                  <Button variant="primary" onClick={handleConnect}>
                     Connect
                   </Button>
                 )}

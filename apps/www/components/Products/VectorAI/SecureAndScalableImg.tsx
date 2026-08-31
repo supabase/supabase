@@ -1,11 +1,11 @@
-import React, { useEffect, useRef } from 'react'
-import { useTheme } from 'next-themes'
 import { DEFAULT_EASE } from '~/lib/animations'
+import { useTheme } from 'next-themes'
+import React, { useEffect, useRef } from 'react'
 
 const SecureAndScalableImg = ({ isHovered }: { isHovered: boolean }) => {
   const { resolvedTheme } = useTheme()
-  const shieldsRef = useRef<any>()
-  const mainRef = useRef<any>()
+  const shieldsRef = useRef<any | null>(null)
+  const mainRef = useRef<any | null>(null)
 
   const colors = {
     shieldsStroke: resolvedTheme?.includes('dark') ? '#494949' : '#D5D5D5',

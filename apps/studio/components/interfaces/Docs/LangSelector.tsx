@@ -79,7 +79,7 @@ export const LangSelector = ({
         apiKeys.length > 0 && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button type="default" size="tiny" className="p-0 h-7 w-7">
+              <Button variant="default" size="tiny" className="p-0 h-7 w-7">
                 {selectedApiKey.key === DEFAULT_KEY.key ? (
                   <EyeOff size={12} strokeWidth={1.5} />
                 ) : (

@@ -2,9 +2,23 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { describe, expect, it } from 'vitest'
 
-import { formatTimestamp } from './Reports.utils'
+import { formatTimestamp, safeDecodeURIComponent } from './Reports.utils'
 
 dayjs.extend(utc)
+
+describe('safeDecodeURIComponent', () => {
+  it('decodes a valid percent-encoded string', () => {
+    expect(safeDecodeURIComponent('a%20b')).toBe('a b')
+  })
+
+  it('returns the original string when percent-encoding is malformed', () => {
+    expect(safeDecodeURIComponent('?discount=100%')).toBe('?discount=100%')
+  })
+
+  it('handles an empty string', () => {
+    expect(safeDecodeURIComponent('')).toBe('')
+  })
+})
 
 describe('formatTimestamp', () => {
   it('formats milliseconds timestamp correctly', () => {

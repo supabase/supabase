@@ -14,6 +14,14 @@ vi.mock('./util', () => ({
   assertSelfHosted: vi.fn(),
 }))
 
+// A distinctive, non-default value so the assertions verify the URL reflects the
+// configured exposed schemas (PGRST_DB_SCHEMAS) — whatever they are — rather than
+// coupling the test to a specific default.
+const EXPOSED_SCHEMAS = 'public,custom_schema,graphql_public'
+vi.mock('./constants', () => ({
+  DEFAULT_EXPOSED_SCHEMAS: 'public,custom_schema,graphql_public',
+}))
+
 describe('api/self-hosted/generate-types', () => {
   let mockFetchGet: ReturnType<typeof vi.fn>
   let mockAssertSelfHosted: ReturnType<typeof vi.fn>
@@ -37,57 +45,17 @@ describe('api/self-hosted/generate-types', () => {
       expect(mockAssertSelfHosted).toHaveBeenCalled()
     })
 
-    it('should fetch from correct URL with schema params', async () => {
+    it('should request types for the configured exposed schemas', async () => {
       mockFetchGet.mockResolvedValue({ types: 'export type User = {}' })
 
       await generateTypescriptTypes({ headers: {} })
 
-      expect(mockFetchGet).toHaveBeenCalledWith(
-        expect.stringContaining('http://localhost:8080/generators/typescript'),
-        expect.any(Object)
-      )
-
       const callUrl = mockFetchGet.mock.calls[0][0]
-      expect(callUrl).toContain('included_schema=public,graphql_public,storage')
-      expect(callUrl).toContain('excluded_schemas=')
-    })
-
-    it('should include correct schemas in URL', async () => {
-      mockFetchGet.mockResolvedValue({ types: '' })
-
-      await generateTypescriptTypes({ headers: {} })
-
-      const callUrl = mockFetchGet.mock.calls[0][0]
-      expect(callUrl).toContain('public')
-      expect(callUrl).toContain('graphql_public')
-      expect(callUrl).toContain('storage')
-    })
-
-    it('should exclude system schemas', async () => {
-      mockFetchGet.mockResolvedValue({ types: '' })
-
-      await generateTypescriptTypes({ headers: {} })
-
-      const callUrl = mockFetchGet.mock.calls[0][0]
-      const excludedSchemas = [
-        'auth',
-        'cron',
-        'extensions',
-        'graphql',
-        'net',
-        'pgsodium',
-        'pgsodium_masks',
-        'realtime',
-        'supabase_functions',
-        'supabase_migrations',
-        'vault',
-        '_analytics',
-        '_realtime',
-      ]
-
-      excludedSchemas.forEach((schema) => {
-        expect(callUrl).toContain(schema)
-      })
+      expect(callUrl).toContain('http://localhost:8080/generators/typescript')
+      // Forwards the exposed-schemas config verbatim as the plural allowlist param.
+      expect(callUrl).toContain(`included_schemas=${EXPOSED_SCHEMAS}`)
+      // No hardcoded exclude list — the exposed-schemas config is the source of truth.
+      expect(callUrl).not.toContain('excluded_schemas=')
     })
 
     it('should pass headers to fetchGet', async () => {
@@ -127,16 +95,6 @@ describe('api/self-hosted/generate-types', () => {
       await generateTypescriptTypes({})
 
       expect(mockFetchGet).toHaveBeenCalledWith(expect.any(String), { headers: undefined })
-    })
-
-    it('should construct URL with both included and excluded schemas', async () => {
-      mockFetchGet.mockResolvedValue({ types: '' })
-
-      await generateTypescriptTypes({ headers: {} })
-
-      const callUrl = mockFetchGet.mock.calls[0][0]
-      expect(callUrl).toContain('included_schema=')
-      expect(callUrl).toContain('excluded_schemas=')
     })
   })
 })

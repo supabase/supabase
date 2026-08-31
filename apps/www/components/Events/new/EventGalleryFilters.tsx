@@ -1,13 +1,13 @@
 'use client'
 
-import { Input_Shadcn_ as Input } from 'ui'
-import { SearchIcon } from 'lucide-react'
-import { Badge } from 'ui'
 import { useEvents } from '~/app/events/context'
+import { SearchIcon } from 'lucide-react'
+import { Badge, Input } from 'ui'
 
 const CATEGORIES_FILTERS = [
   { name: 'All', value: 'all' },
   { name: 'Conference', value: 'conference' },
+  { name: 'Community Event', value: 'community' },
   { name: 'Meetup', value: 'meetup' },
   { name: 'Workshop', value: 'workshop' },
   { name: 'Hackathon', value: 'hackathon' },
@@ -46,6 +46,15 @@ export function EventGalleryFilters() {
             </Badge>
           )
         })}
+        {(categories['on-demand'] ?? 0) > 0 && (
+          <Badge
+            variant={selectedCategories.includes('on-demand') ? 'success' : 'default'}
+            className="cursor-pointer"
+            onClick={() => toggleCategory('on-demand')}
+          >
+            On-demand ({categories['on-demand']})
+          </Badge>
+        )}
       </div>
     </div>
   )

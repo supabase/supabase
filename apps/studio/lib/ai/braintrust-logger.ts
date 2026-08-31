@@ -18,17 +18,12 @@ if (IS_TRACING_ENABLED) {
 export function isTracingAllowed({
   orgHasHipaaAddon,
   projectIsSensitive,
-  orgIsDpaSigned,
   projectRegion,
 }: {
   orgHasHipaaAddon: boolean | undefined
   projectIsSensitive: boolean | null | undefined
-  orgIsDpaSigned: boolean | undefined
   projectRegion: string | undefined
 }) {
-  // Disable tracing for orgs with a signed (or unknown) DPA status
-  if (orgIsDpaSigned !== false) return false
-
   // Disable tracing for EU (or unknown) regions
   if (projectRegion === undefined || projectRegion.startsWith('eu-')) return false
 

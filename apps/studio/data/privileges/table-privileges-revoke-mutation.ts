@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 
 import { privilegeKeys } from './keys'
 import { invalidateTablePrivilegesQuery } from './table-privileges-query'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type TablePrivilegesRevoke = Parameters<

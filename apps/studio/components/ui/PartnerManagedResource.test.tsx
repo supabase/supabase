@@ -43,11 +43,17 @@ describe('PartnerManagedResource', () => {
       <PartnerManagedResource
         managedBy={MANAGED_BY.STRIPE_PROJECTS}
         resource="Payment Methods"
+        details={
+          <>
+            Run <code>stripe projects upgrade supabase/free</code>
+          </>
+        }
         cta={{ installationId: 'vercel-installation-id', organizationSlug: 'aws-org' }}
       />
     )
 
-    expect(screen.getByText('Payment Methods are connected to Stripe.')).toBeInTheDocument()
+    expect(screen.getByText('Payment Methods are connected to Stripe')).toBeInTheDocument()
+    expect(screen.getByText('stripe projects upgrade supabase/free')).toBeInTheDocument()
     expect(screen.queryByRole('link')).toBeNull()
     expect(mockUseVercelRedirectQuery).toHaveBeenCalledWith(
       { installationId: 'vercel-installation-id' },
@@ -74,7 +80,7 @@ describe('PartnerManagedResource', () => {
       />
     )
 
-    expect(screen.getByText('Invoices are managed by AWS Marketplace.')).toBeInTheDocument()
+    expect(screen.getByText('Invoices are managed by AWS Marketplace')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'View Invoices on AWS Marketplace' })).toHaveAttribute(
       'href',
       'https://console.aws.amazon.com/billing/home#/bills'
@@ -97,7 +103,7 @@ describe('PartnerManagedResource', () => {
     )
 
     expect(
-      screen.getByText('Organization plans are managed by Vercel Marketplace.')
+      screen.getByText('Organization plans are managed by Vercel Marketplace')
     ).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /view organization plans/i })).toBeNull()
   })

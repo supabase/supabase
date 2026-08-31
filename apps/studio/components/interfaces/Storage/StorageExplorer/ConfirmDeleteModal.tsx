@@ -49,7 +49,7 @@ export const ConfirmDeleteModal = () => {
     <ConfirmationModal
       size="medium"
       visible={visible}
-      title={<span className="break-words">{title}</span>}
+      title={<span className="wrap-break-word">{title}</span>}
       loading={deleting}
       onCancel={() => setSelectedItemsToDelete([])}
       onConfirm={onDeleteSelectedFiles}

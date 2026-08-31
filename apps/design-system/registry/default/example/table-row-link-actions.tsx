@@ -70,7 +70,7 @@ export default function TableRowLinkActions() {
           {policies.map((policy) => (
             <TableRow
               key={policy.id}
-              className="relative cursor-pointer inset-focus"
+              className="relative cursor-pointer focus-inset"
               onClick={(event) => {
                 if (event.currentTarget !== event.target) return
                 handlePolicyNavigation(policy.id, event)
@@ -103,7 +103,7 @@ export default function TableRowLinkActions() {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
-                        type="default"
+                        variant="default"
                         icon={<EllipsisVertical />}
                         aria-label="More actions"
                         className="w-7 hit-area-2"

@@ -56,7 +56,7 @@ vi.mock('next/head', async () => {
         (child) => React.isValidElement(child) && child.type === 'title'
       )
 
-      if (!React.isValidElement(titleElement)) return
+      if (!React.isValidElement<{ children: ReactNode }>(titleElement)) return
 
       const titleText = React.Children.toArray(titleElement.props.children).join('')
       document.title = titleText
@@ -81,6 +81,7 @@ vi.mock('common', () => ({
       `project-integration-banner-dismissed-${ref}-${integrationSource}`,
   },
   isFeatureEnabled: () => false,
+  useFlag: () => false,
 }))
 
 vi.mock('framer-motion', () => ({
@@ -93,14 +94,14 @@ vi.mock('framer-motion', () => ({
 
 vi.mock('ui', () => ({
   cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
-  Alert_Shadcn_: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-  AlertDescription_Shadcn_: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-  AlertTitle_Shadcn_: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-  CommandInput_Shadcn_: { displayName: 'CommandInput' },
-  Command_Shadcn_: { displayName: 'Command' },
-  CommandGroup_Shadcn_: { displayName: 'CommandGroup' },
-  CommandItem_Shadcn_: { displayName: 'CommandItem' },
-  CommandList_Shadcn_: { displayName: 'CommandList' },
+  Alert: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  AlertDescription: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  AlertTitle: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  CommandInput: { displayName: 'CommandInput' },
+  Command: { displayName: 'Command' },
+  CommandGroup: { displayName: 'CommandGroup' },
+  CommandItem: { displayName: 'CommandItem' },
+  CommandList: { displayName: 'CommandList' },
   LogoLoader: () => <div data-testid="logo-loader" />,
   ResizableHandle: (props: any) => <div {...props} />,
   ResizablePanel: ({ children, ...props }: any) => <div {...props}>{children}</div>,
@@ -126,6 +127,7 @@ vi.mock('../editors/EditorsLayout.hooks', () => ({
 }))
 
 vi.mock('../MainScrollContainerContext', () => ({
+  useMainScrollContainer: () => null,
   useSetMainScrollContainer: () => () => {},
 }))
 
@@ -136,7 +138,7 @@ vi.mock('./PausedState/ProjectPausedState', () => ({ ProjectPausedState: () => n
 vi.mock('./PauseFailedState', () => ({ PauseFailedState: () => null }))
 vi.mock('./PausingState', () => ({ PausingState: () => null }))
 vi.mock('./ProductMenuBar', () => ({
-  default: ({ children }: { children: ReactNode }) => <>{children}</>,
+  ProductMenuBar: ({ children }: { children: ReactNode }) => <>{children}</>,
 }))
 vi.mock('./ResizingState', () => ({ ResizingState: () => null }))
 vi.mock('./RestartingState', () => ({ default: () => null }))
@@ -154,7 +156,11 @@ vi.mock('@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarni
   ResourceExhaustionWarningBanner: () => null,
 }))
 vi.mock('@/components/ui/ButtonTooltip', () => ({
-  ButtonTooltip: ({ children, ...props }: any) => <button {...props}>{children}</button>,
+  ButtonTooltip: ({ children, ...props }: any) => (
+    <button tabIndex={0} {...props}>
+      {children}
+    </button>
+  ),
 }))
 vi.mock('@/components/ui/PartnerIcon', () => ({
   default: () => <div data-testid="partner-icon" />,
@@ -169,7 +175,10 @@ vi.mock('@/hooks/misc/useLocalStorage', () => ({
 }))
 
 vi.mock('@/components/ui/BannerStack/BannerStackProvider', () => ({
-  BANNER_ID: { FREE_MICRO_UPGRADE: 'free-micro-upgrade-banner' },
+  BANNER_ID: {
+    FREE_MICRO_UPGRADE: 'free-micro-upgrade-banner',
+    SELECT_26: 'select-2026-banner',
+  },
   useBannerStack: () => ({
     addBanner: mockAddBanner,
     dismissBanner: mockDismissBanner,
@@ -240,7 +249,11 @@ describe('ProjectLayout title', () => {
       integration_source: null,
     }
     mockBannerDismissedState.current = false
-    mockUseLocalStorageQuery.mockImplementation(() => [mockBannerDismissedState.current, vi.fn()])
+    mockUseLocalStorageQuery.mockImplementation(() => [
+      mockBannerDismissedState.current,
+      vi.fn(),
+      { isSuccess: true },
+    ])
   })
 
   afterEach(() => {
@@ -373,7 +386,9 @@ describe('FREE_MICRO_UPGRADE banner', () => {
     await waitFor(() => {
       expect(mockDismissBanner).toHaveBeenCalledWith('free-micro-upgrade-banner')
     })
-    expect(mockAddBanner).not.toHaveBeenCalled()
+    expect(mockAddBanner).not.toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'free-micro-upgrade-banner' })
+    )
   })
 
   it('calls dismissBanner when compute warnings are cleared', async () => {
@@ -391,7 +406,9 @@ describe('FREE_MICRO_UPGRADE banner', () => {
     await waitFor(() => {
       expect(mockDismissBanner).toHaveBeenCalledWith('free-micro-upgrade-banner')
     })
-    expect(mockAddBanner).not.toHaveBeenCalled()
+    expect(mockAddBanner).not.toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'free-micro-upgrade-banner' })
+    )
   })
 
   it('calls dismissBanner when project is not nano compute', async () => {
@@ -402,6 +419,8 @@ describe('FREE_MICRO_UPGRADE banner', () => {
     await waitFor(() => {
       expect(mockDismissBanner).toHaveBeenCalledWith('free-micro-upgrade-banner')
     })
-    expect(mockAddBanner).not.toHaveBeenCalled()
+    expect(mockAddBanner).not.toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'free-micro-upgrade-banner' })
+    )
   })
 })

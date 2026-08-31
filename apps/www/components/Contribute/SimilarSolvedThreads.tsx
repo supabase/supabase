@@ -24,8 +24,8 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Label_Shadcn_,
-  TextArea_Shadcn_,
+  Label,
+  TextArea,
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -165,9 +165,10 @@ export const SimilarSolvedThreads = ({ threads, parentThreadId }: SimilarSolvedT
     <Card className={cn('relative')}>
       <CardHeader className={cn('p-0', !isExpanded && 'border-b-0')}>
         <button
+          tabIndex={0}
           type="button"
           onClick={() => setIsExpanded((prev) => !prev)}
-          className="flex w-full items-center gap-1.5 px-[var(--card-padding-x)] py-4 text-left text-xs font-mono uppercase text-card-foreground"
+          className="flex w-full items-center gap-1.5 px-(--card-padding-x) py-4 text-left text-xs font-mono uppercase text-card-foreground"
         >
           Related threads
           <span className="text-foreground-muted tabular-nums font-normal">({threads.length})</span>
@@ -200,10 +201,11 @@ export const SimilarSolvedThreads = ({ threads, parentThreadId }: SimilarSolvedT
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
+                        tabIndex={0}
                         type="button"
                         onClick={() => handleThumbClick('positive')}
                         disabled={isSubmitting}
-                        className="p-1 rounded hover:bg-surface-200 transition-colors disabled:opacity-50"
+                        className="p-1 rounded-sm hover:bg-surface-200 transition-colors disabled:opacity-50"
                         aria-label="Relevant"
                       >
                         <ThumbsUp className="h-4 w-4 text-foreground-muted" />
@@ -214,10 +216,11 @@ export const SimilarSolvedThreads = ({ threads, parentThreadId }: SimilarSolvedT
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
+                        tabIndex={0}
                         type="button"
                         onClick={() => handleThumbClick('negative')}
                         disabled={isSubmitting}
-                        className="p-1 rounded hover:bg-surface-200 transition-colors disabled:opacity-50"
+                        className="p-1 rounded-sm hover:bg-surface-200 transition-colors disabled:opacity-50"
                         aria-label="Irrelevant"
                       >
                         <ThumbsDown className="h-4 w-4 text-foreground-muted" />
@@ -245,7 +248,7 @@ export const SimilarSolvedThreads = ({ threads, parentThreadId }: SimilarSolvedT
               <div className="flex items-center gap-1">
                 <label
                   className={cn(
-                    'p-2 rounded cursor-pointer transition-colors',
+                    'p-2 rounded-sm cursor-pointer transition-colors',
                     dialogReaction === 'positive'
                       ? 'bg-surface-300 text-foreground'
                       : 'hover:bg-surface-200 text-foreground-lighter'
@@ -264,7 +267,7 @@ export const SimilarSolvedThreads = ({ threads, parentThreadId }: SimilarSolvedT
                 </label>
                 <label
                   className={cn(
-                    'p-2 rounded cursor-pointer transition-colors',
+                    'p-2 rounded-sm cursor-pointer transition-colors',
                     dialogReaction === 'negative'
                       ? 'bg-surface-300 text-foreground'
                       : 'hover:bg-surface-200 text-foreground-lighter'
@@ -284,10 +287,10 @@ export const SimilarSolvedThreads = ({ threads, parentThreadId }: SimilarSolvedT
               </div>
             </fieldset>
             <div className="space-y-1">
-              <Label_Shadcn_ htmlFor="feedback">
+              <Label htmlFor="feedback">
                 Additional feedback <span className="text-foreground-muted">(optional)</span>
-              </Label_Shadcn_>
-              <TextArea_Shadcn_
+              </Label>
+              <TextArea
                 id="feedback"
                 placeholder="What was helpful or missing?"
                 rows={4}

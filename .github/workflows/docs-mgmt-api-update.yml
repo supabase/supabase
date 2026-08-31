@@ -3,7 +3,7 @@ name: Update Mgmt Api Docs
 on:
   schedule:
     # Run at 00:00 UTC every Monday
-    - cron: '0 0 * * 1'
+    - cron: "0 0 * * 1"
   workflow_dispatch:
 
 permissions:
@@ -15,15 +15,16 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
 
     steps:
-      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
-          ref: master
+          persist-credentials: false
+          ref: ${{ github.ref }}
           sparse-checkout: |
             apps/docs
             patches
             packages/generator
 
-      - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
         name: Install pnpm
         with:
           run_install: false
@@ -31,8 +32,8 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version-file: '.nvmrc'
-          cache: 'pnpm'
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
 
       - name: Install deps
         run: pnpm install --frozen-lockfile
@@ -43,17 +44,19 @@ jobs:
 
       - name: Generate token
         id: app-token
-        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
-          app-id: ${{ secrets.GH_AUTOFIX_APP_ID }}
+          client-id: ${{ vars.GH_AUTOFIX_APP_CLIENT_ID }}
           private-key: ${{ secrets.GH_AUTOFIX_PRIVATE_KEY }}
+          permission-pull-requests: write
+          permission-contents: write
 
       - name: Create pull request
         uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6.1.0
         with:
           token: ${{ steps.app-token.outputs.token }}
-          commit-message: 'feat: update mgmt api docs'
-          title: 'feat: update mgmt api docs'
-          body: 'This PR updates mgmt api docs automatically.'
-          branch: 'gha/auto-update-mgmt-api-docs'
-          base: 'master'
+          commit-message: "feat: update mgmt api docs"
+          title: "feat: update mgmt api docs"
+          body: "This PR updates mgmt api docs automatically."
+          branch: "gha/auto-update-mgmt-api-docs"
+          base: "master"

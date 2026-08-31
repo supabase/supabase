@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -96,7 +96,7 @@ export const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainA
             <DocsButton href={`${DOCS_URL}/guides/platform/custom-domains`} />
             <div className="flex items-center space-x-2">
               <Button
-                type="default"
+                variant="default"
                 className="self-end"
                 onClick={onCancelCustomDomain}
                 loading={isDeleting}
@@ -126,7 +126,7 @@ export const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainA
         onConfirm={onActivateCustomDomain}
       >
         <p className="text-sm">
-          Activating <code className="text-code-inline !break-normal">{customDomain.hostname}</code>{' '}
+          Activating <code className="text-code-inline break-normal!">{customDomain.hostname}</code>{' '}
           will make it visible to users in place of your project’s Supabase domain. The Supabase
           domain will continue to work too.
         </p>

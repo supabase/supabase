@@ -11,24 +11,17 @@ import { useEntitlementsQuery } from '@/data/entitlements/entitlements-query'
 import { IS_PLATFORM } from '@/lib/constants'
 
 function isNumericConfig(
-  config: EntitlementConfig,
+  _config: EntitlementConfig,
   type: EntitlementType
-): config is { enabled: boolean; unlimited: boolean; value: number } {
+): _config is { enabled: boolean; unlimited: boolean; value: number } {
   return type === 'numeric'
 }
 
 function isSetConfig(
-  config: EntitlementConfig,
+  _config: EntitlementConfig,
   type: EntitlementType
-): config is { enabled: boolean; set: string[] } {
+): _config is { enabled: boolean; set: string[] } {
   return type === 'set'
-}
-
-function isBooleanConfig(
-  config: EntitlementConfig,
-  type: EntitlementType
-): config is { enabled: boolean } {
-  return type === 'boolean'
 }
 
 function getEntitlementNumericValue(entitlement: Entitlement | null): number | undefined {
@@ -76,7 +69,7 @@ export function useHasEntitlementAccess(organizationSlug?: string) {
   return useCallback(
     (key: string) =>
       IS_PLATFORM
-        ? (entitlementsData?.entitlements.find((e) => e.feature.key === key)?.hasAccess ?? false)
+        ? (entitlementsData?.entitlements?.find((e) => e.feature.key === key)?.hasAccess ?? false)
         : true,
     [entitlementsData]
   )
@@ -114,7 +107,7 @@ export function useCheckEntitlements(
     // If no organization slug, no access
     if (!finalOrgSlug) return { entitlement: null }
 
-    const entitlement = entitlementsData?.entitlements.find(
+    const entitlement = entitlementsData?.entitlements?.find(
       (entitlement) => entitlement.feature.key === featureKey
     )
 

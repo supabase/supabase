@@ -3,17 +3,18 @@ import Link from 'next/link'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
   ScrollArea,
 } from 'ui'
 
 import { BranchLink } from './BranchLink'
+import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import type { Branch } from '@/data/branches/branches-query'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -46,10 +47,10 @@ export function BranchDropdownCommandContent({
 
   if (embedded) {
     return (
-      <Command_Shadcn_ className={cn(className, 'flex flex-col flex-1 min-h-0 overflow-hidden')}>
+      <Command className={cn(className, 'flex flex-col flex-1 min-h-0 overflow-hidden')}>
         <div className="grid grid-cols-2 gap-2 shrink-0 p-2 border-b">
           <Button
-            type="text"
+            variant="text"
             size="small"
             asChild
             block
@@ -64,7 +65,7 @@ export function BranchDropdownCommandContent({
             </Link>
           </Button>
           <Button
-            type="text"
+            variant="text"
             size="small"
             asChild
             block
@@ -81,7 +82,7 @@ export function BranchDropdownCommandContent({
             </a>
           </Button>
           <Button
-            type="default"
+            variant="default"
             size="small"
             block
             className="col-span-full text-xs text-foreground-light hover:text-foreground"
@@ -96,11 +97,11 @@ export function BranchDropdownCommandContent({
           </Button>
         </div>
         {isBranchingEnabled && (
-          <CommandInput_Shadcn_ placeholder="Find branch..." wrapperClassName="shrink-0 border-b" />
+          <CommandInput placeholder="Find branch..." wrapperClassName="shrink-0 border-b" />
         )}
-        <CommandList_Shadcn_ className="flex flex-col flex-1 p-1 min-h-0 overflow-y-auto !max-h-none">
-          {isBranchingEnabled && <CommandEmpty_Shadcn_>No branches found</CommandEmpty_Shadcn_>}
-          <CommandGroup_Shadcn_ className="min-h-0">
+        <CommandList className="flex flex-col flex-1 p-1 min-h-0 overflow-y-auto max-h-none!">
+          {isBranchingEnabled && <CommandEmpty>No branches found</CommandEmpty>}
+          <CommandGroup className="min-h-0">
             {branchList.map((branch) => (
               <BranchLink
                 key={branch.id}
@@ -109,18 +110,18 @@ export function BranchDropdownCommandContent({
                 onClose={onClose}
               />
             ))}
-          </CommandGroup_Shadcn_>
-        </CommandList_Shadcn_>
-      </Command_Shadcn_>
+          </CommandGroup>
+        </CommandList>
+      </Command>
     )
   }
 
   return (
-    <Command_Shadcn_ className={className}>
-      {isBranchingEnabled && <CommandInput_Shadcn_ placeholder="Find branch..." />}
-      <CommandList_Shadcn_>
-        {isBranchingEnabled && <CommandEmpty_Shadcn_>No branches found</CommandEmpty_Shadcn_>}
-        <CommandGroup_Shadcn_>
+    <Command className={className}>
+      {isBranchingEnabled && <CommandInput placeholder="Find branch..." />}
+      <CommandList>
+        {isBranchingEnabled && <CommandEmpty>No branches found</CommandEmpty>}
+        <CommandGroup>
           <ScrollArea className="max-h-[210px] overflow-y-auto">
             {branchList.map((branch) => (
               <BranchLink
@@ -131,12 +132,12 @@ export function BranchDropdownCommandContent({
               />
             ))}
           </ScrollArea>
-        </CommandGroup_Shadcn_>
+        </CommandGroup>
 
-        <CommandSeparator_Shadcn_ />
+        <CommandSeparator />
 
-        <CommandGroup_Shadcn_>
-          <CommandItem_Shadcn_
+        <CommandGroup>
+          <CommandItem
             className="cursor-pointer w-full"
             onSelect={() => {
               track('branch_selector_create_clicked')
@@ -148,51 +149,37 @@ export function BranchDropdownCommandContent({
               <Plus size={14} strokeWidth={1.5} />
               <p>Create branch</p>
             </div>
-          </CommandItem_Shadcn_>
-          <CommandItem_Shadcn_
-            className="cursor-pointer w-full"
+          </CommandItem>
+          <CommandItemLink
+            href={`/project/${projectRef}/branches`}
+            className="cursor-pointer w-full gap-2"
             onSelect={() => {
               track('branch_selector_manage_clicked')
               onClose()
             }}
           >
-            <Link
-              href={`/project/${projectRef}/branches`}
-              className="w-full flex items-center gap-2"
-            >
-              <ListTree size={14} strokeWidth={1.5} />
-              <p>Manage branches</p>
-            </Link>
-          </CommandItem_Shadcn_>
-        </CommandGroup_Shadcn_>
+            <ListTree size={14} strokeWidth={1.5} />
+            <p>Manage branches</p>
+          </CommandItemLink>
+        </CommandGroup>
 
-        <CommandSeparator_Shadcn_ />
+        <CommandSeparator />
 
-        <CommandGroup_Shadcn_>
-          <CommandItem_Shadcn_
-            className="cursor-pointer w-full"
-            onSelect={() => {
-              onClose()
-              window?.open(BRANCHING_GITHUB_DISCUSSION_LINK, '_blank')?.focus()
-            }}
-            onClick={onClose}
+        <CommandGroup>
+          <CommandItemLink
+            href={BRANCHING_GITHUB_DISCUSSION_LINK}
+            linkProps={{ target: '_blank', rel: 'noreferrer noopener' }}
+            className="cursor-pointer w-full gap-2"
+            onSelect={onClose}
           >
-            <a
-              target="_blank"
-              rel="noreferrer noopener"
-              href={BRANCHING_GITHUB_DISCUSSION_LINK}
-              onClick={onClose}
-              className="w-full flex gap-2"
-            >
-              <MessageCircle size={14} strokeWidth={1} className="mt-0.5" />
-              <div>
-                <p>Branching feedback</p>
-                <p className="text-lighter">Join GitHub Discussion</p>
-              </div>
-            </a>
-          </CommandItem_Shadcn_>
-        </CommandGroup_Shadcn_>
-      </CommandList_Shadcn_>
-    </Command_Shadcn_>
+            <MessageCircle size={14} strokeWidth={1} className="mt-0.5" />
+            <div>
+              <p>Branching feedback</p>
+              <p className="text-lighter">Join GitHub Discussion</p>
+            </div>
+          </CommandItemLink>
+        </CommandGroup>
+      </CommandList>
+    </Command>
   )
 }

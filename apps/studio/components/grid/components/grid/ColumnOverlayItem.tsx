@@ -34,7 +34,7 @@ export function ColumnOverlayItem({ column }: ColumnOverlayItemProps) {
           {columnFormat === 'bytea' ? ` (hex)` : ''}
         </span>
         {column.isEncrypted && <Lock size={14} strokeWidth={2} />}
-        {hasIndexSuggestion && <Lightbulb size={14} strokeWidth={2} className="!text-warning" />}
+        {hasIndexSuggestion && <Lightbulb size={14} strokeWidth={2} className="text-warning!" />}
       </div>
     </div>
   )

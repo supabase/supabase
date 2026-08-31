@@ -69,3 +69,41 @@ export async function createTableWithRLS(
 export async function dropTable(tableName: string) {
   await query(`DROP TABLE IF EXISTS ${tableName} CASCADE`)
 }
+
+/**
+ * Create a view in the public schema. Assumes the underlying table already exists.
+ *
+ * @param viewName - The view name to create
+ * @param selectSql - The SELECT statement that defines the view (without trailing semicolon)
+ */
+export async function createView(viewName: string, selectSql: string) {
+  await query(`CREATE OR REPLACE VIEW public.${viewName} AS ${selectSql}`)
+}
+
+/**
+ * Drop a view if it exists.
+ *
+ * @param viewName - The view name to drop
+ */
+export async function dropView(viewName: string) {
+  await query(`DROP VIEW IF EXISTS public.${viewName} CASCADE`)
+}
+
+/**
+ * Create a materialized view in the public schema.
+ *
+ * @param viewName - The materialized view name to create
+ * @param selectSql - The SELECT statement that defines the view (without trailing semicolon)
+ */
+export async function createMaterializedView(viewName: string, selectSql: string) {
+  await query(`CREATE MATERIALIZED VIEW IF NOT EXISTS public.${viewName} AS ${selectSql}`)
+}
+
+/**
+ * Drop a materialized view if it exists.
+ *
+ * @param viewName - The materialized view name to drop
+ */
+export async function dropMaterializedView(viewName: string) {
+  await query(`DROP MATERIALIZED VIEW IF EXISTS public.${viewName} CASCADE`)
+}

@@ -34,7 +34,7 @@ export default function InnerSideMenuEmpty() {
             description="Create your first serverless function to get started."
             illustration={<div className="text-4xl">🚀</div>}
             actions={
-              <Button type="default" onClick={() => setHasItems(true)}>
+              <Button variant="default" onClick={() => setHasItems(true)}>
                 Create Function
               </Button>
             }
@@ -55,14 +55,14 @@ export default function InnerSideMenuEmpty() {
                   <Heart className="text-light" size={13} />
                 </div>
                 <Pointer
-                  className="absolute -right-[6px] -bottom-2 text-lighter"
+                  className="absolute right-[-6px] -bottom-2 text-lighter"
                   strokeWidth={1.5}
                   size={16}
                 />
               </figure>
             }
             actions={
-              <Button type="default" onClick={() => setHasItems(true)}>
+              <Button variant="default" onClick={() => setHasItems(true)}>
                 Create Function
               </Button>
             }

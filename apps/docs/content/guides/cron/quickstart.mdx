@@ -40,14 +40,12 @@ select cron.schedule('permanent-cron-job-name', '30 seconds', 'CALL do_something
 
 <Accordion
   type="default"
-  openBehaviour="multiple"
   chevronAlign="right"
   justified
   size="medium"
   className="text-foreground-light mt-8 mb-6"
 >
-  <div className="border-b mt-3 pb-3">
-    <AccordionItem
+  <AccordionItem
       header="Cron syntax"
       id="item-1"
     >
@@ -68,7 +66,6 @@ select cron.schedule('permanent-cron-job-name', '30 seconds', 'CALL do_something
 
     </AccordionItem>
 
-  </div>
 </Accordion>
 
 <Admonition type="note">

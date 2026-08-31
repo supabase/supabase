@@ -9,7 +9,7 @@ interface SchemaTableProps {
 export const SchemaTable = ({ schema, filterString }: SchemaTableProps) => {
   return (
     <div key={schema}>
-      <div className="sticky top-0 backdrop-blur backdrop-filter">
+      <div className="sticky top-0 backdrop-blur-sm backdrop-filter">
         <div className="flex items-baseline space-x-1 py-2">
           <h5 className="text-foreground-light">schema</h5>
           <h4>{schema}</h4>

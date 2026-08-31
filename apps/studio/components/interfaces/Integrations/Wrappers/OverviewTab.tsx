@@ -1,18 +1,20 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import Link from 'next/link'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { Button, Sheet, SheetContent } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
-import { IntegrationOverviewTabV2 } from '../Integration/IntegrationOverviewTabV2'
+import { RequiredExtensionsSection } from '../Integration/RequiredExtensionsSection'
 import { useAvailableIntegrations } from '../Landing/useAvailableIntegrations'
 import { CreateIcebergWrapperSheet } from './CreateIcebergWrapperSheet'
 import { CreateWrapperSheet } from './CreateWrapperSheet'
 import { WRAPPERS } from './Wrappers.constants'
 import { WrapperTable } from './WrapperTable'
+import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -58,7 +60,7 @@ const WrapperOverviewContent = () => {
 
       {!!CreateWrapperSheetComponent && !!wrapperMeta && (
         <Sheet open={!!createWrapperShown} onOpenChange={handleOpenChange}>
-          <SheetContent size="lg" tabIndex={undefined}>
+          <SheetContent size="lg">
             <CreateWrapperSheetComponent
               wrapperMeta={wrapperMeta}
               onDirty={setIsDirty}
@@ -105,7 +107,7 @@ const AddNewWrapperCTA = () => {
   if (!!wrapperMeta && isWrappersExtensionInstalled && !hasRequiredVersion) {
     return (
       <Admonition type="warning" title="Your extension version is outdated for this wrapper">
-        <div className="flex flex-col gap-y-2 [&>p]:!mb-0">
+        <div className="flex flex-col gap-y-2 [&>p]:mb-0!">
           <p>
             The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
             {wrapperMeta.minimumExtensionVersion}. You have version{' '}
@@ -119,11 +121,11 @@ const AddNewWrapperCTA = () => {
             wrappers. Afterward, you can recreate the wrappers.
           </p>
         </div>
-        <Button asChild type="default" className="w-min mt-3">
+        <Button asChild variant="default" className="w-min mt-3">
           <Link
             href={
               databaseNeedsUpgrading
-                ? `/project/${project?.ref}/settings/infrastructure`
+                ? getServiceVersionsPath(project?.ref)
                 : `/project/${project?.ref}/database/extensions?filter=wrappers`
             }
           >
@@ -137,7 +139,7 @@ const AddNewWrapperCTA = () => {
   return (
     <div className="py-3 px-5 border rounded-md">
       <ButtonTooltip
-        type="default"
+        variant="default"
         onClick={() => setCreateWrapperShown(true)}
         disabled={!canCreateWrapper}
         tooltip={{
@@ -154,10 +156,9 @@ const AddNewWrapperCTA = () => {
   )
 }
 
-export const WrapperOverviewTab = () => {
+export const WrapperContent = () => {
   const { id } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
 
   const { data: integrations = [] } = useAvailableIntegrations()
   const integration = integrations.find((i) => i.id === id)
@@ -182,24 +183,25 @@ export const WrapperOverviewTab = () => {
     )
   }
 
-  if (isMarketplaceEnabled) {
-    return (
-      <IntegrationOverviewTabV2>
-        {isInstalled && (
-          <>
-            <AddNewWrapperCTA />
-            <WrapperOverviewContent />
-          </>
-        )}
-      </IntegrationOverviewTabV2>
-    )
-  } else {
-    return (
-      <IntegrationOverviewTab actions={<AddNewWrapperCTA />}>
-        <div className="mx-10">
-          <WrapperOverviewContent />
-        </div>
-      </IntegrationOverviewTab>
-    )
-  }
+  return (
+    <>
+      <RequiredExtensionsSection />
+      <AddNewWrapperCTA />
+      {isInstalled && <WrapperOverviewContent />}
+    </>
+  )
+}
+
+export const WrapperOverviewTab = () => {
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
+
+  if (isMarketplaceEnabled) return <RequiredExtensionsSection />
+
+  return (
+    <IntegrationOverviewTab actions={<AddNewWrapperCTA />}>
+      <div className="mx-10">
+        <WrapperOverviewContent />
+      </div>
+    </IntegrationOverviewTab>
+  )
 }

@@ -6,9 +6,9 @@ import {
   Button,
   Calendar as CalendarPicker,
   Popover,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  PopoverContent,
+  PopoverSeparator,
+  PopoverTrigger,
 } from 'ui'
 import { ButtonProps } from 'ui/src/components/Button/Button'
 
@@ -19,7 +19,7 @@ interface DatePickerProps {
   onChange?: (args: DatePickerToFrom) => void
   to?: string // ISO string
   from?: string // ISO string
-  triggerButtonType?: ButtonProps['type']
+  triggerButtonVariant?: ButtonProps['variant']
   triggerButtonClassName?: string
   triggerButtonTitle?: string
   triggerButtonSize?: 'tiny' | 'small'
@@ -59,7 +59,7 @@ export function DatePicker({
   to,
   from,
   onChange,
-  triggerButtonType = 'default',
+  triggerButtonVariant = 'default',
   triggerButtonClassName = '',
   triggerButtonTitle,
   triggerButtonSize,
@@ -81,6 +81,9 @@ export function DatePicker({
   const [endTime, setEndTime] = useState<any>(END_TIME_DEFAULT)
 
   const disabledDays = useMemo(() => calculateDisabledDays(minDate, maxDate), [minDate, maxDate])
+
+  const startMonth = minDate ? dayjs(minDate).startOf('month').toDate() : undefined
+  const endMonth = maxDate ? dayjs(maxDate).endOf('month').toDate() : undefined
 
   const clampDateToRange = useCallback(
     (date: Date | null) => {
@@ -210,11 +213,11 @@ export function DatePicker({
   }
 
   return (
-    <Popover_Shadcn_ modal open={open} onOpenChange={setOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover modal open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
         <Button
           title={triggerButtonTitle}
-          type={triggerButtonType}
+          variant={triggerButtonVariant}
           icon={<Calendar />}
           size={triggerButtonSize}
           className={triggerButtonClassName}
@@ -240,8 +243,8 @@ export function DatePicker({
             </>
           )}
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ align="center" side={contentSide} className="p-0">
+      </PopoverTrigger>
+      <PopoverContent align="center" side={contentSide} className="p-0">
         <>
           {hideTime ? null : (
             <>
@@ -286,6 +289,8 @@ export function DatePicker({
             {selectsRange ? (
               <CalendarPicker
                 mode="range"
+                startMonth={startMonth}
+                endMonth={endMonth}
                 disabled={disabledDays}
                 selected={{ from: startDate ?? undefined, to: endDate ?? undefined }}
                 onSelect={(range) => {
@@ -295,6 +300,8 @@ export function DatePicker({
             ) : (
               <CalendarPicker
                 mode="single"
+                startMonth={startMonth}
+                endMonth={endMonth}
                 disabled={disabledDays}
                 selected={endDate ?? undefined}
                 onSelect={(date) => {
@@ -307,17 +314,17 @@ export function DatePicker({
             from: startDate?.toISOString() || null,
             to: endDate?.toISOString() || null,
           })}
-          <Popover.Separator />
+          <PopoverSeparator />
           <div className="flex items-center justify-end gap-2 py-2 px-3 pb-4">
             {!hideClear && (
-              <Button type="default" onClick={() => handleClear()}>
+              <Button variant="default" onClick={() => handleClear()}>
                 Clear
               </Button>
             )}
             <Button onClick={() => handleSubmit()}>Apply</Button>
           </div>
         </>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

@@ -1,7 +1,7 @@
 import { paths } from 'api-types'
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import apiWrapper from '@/lib/api/apiWrapper'
+import { apiWrapper } from '@/lib/api/apiWrapper'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -20,7 +20,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 type ResponseData =
   paths['/platform/organizations/{slug}/billing/subscription']['get']['responses']['200']['content']['application/json']
 
-const handleGet = async (req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
+const handleGet = async (_req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
   const response: ResponseData = {
     billing_cycle_anchor: 0,
     current_period_end: 0,
@@ -35,7 +35,7 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse<ResponseData>
     project_addons: [],
     payment_method_type: '',
     billing_via_partner: false,
-    billing_partner: 'fly',
+    billing_partner: 'aws_marketplace',
     scheduled_plan_change: null,
     customer_balance: 0,
   }

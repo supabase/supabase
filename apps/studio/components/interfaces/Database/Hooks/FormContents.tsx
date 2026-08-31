@@ -1,48 +1,49 @@
-import type { PostgresTrigger } from '@supabase/postgres-meta'
+import type { PGTrigger } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Image from 'next/legacy/image'
 import { useEffect } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import {
-  Checkbox_Shadcn_,
+  Checkbox,
   FormControl,
   FormField,
-  Input_Shadcn_,
-  Label_Shadcn_,
+  Input,
+  Label,
   RadioGroupStacked,
   RadioGroupStackedItem,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   SidePanel,
   useWatch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { isEdgeFunction } from './EditHookPanel'
 import { WebhookFormValues } from './EditHookPanel.constants'
 import { AVAILABLE_WEBHOOK_TYPES, HOOK_EVENTS } from './Hooks.constants'
 import { HTTPHeaders } from './HTTPHeaders'
 import { HTTPParameters } from './HTTPParameters'
 import { HTTPRequestConfig } from './HTTPRequestConfig'
+import { ensureEdgeFunctionAuthorizationHeader } from '@/components/interfaces/Functions/httpHeaderAddActions'
 import {
   FormSection,
   FormSectionContent,
   FormSectionLabel,
 } from '@/components/ui/Forms/FormSection'
-import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
 import { useTableNamesQuery } from '@/data/tables/table-names-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { buildDatabaseEdgeFunctionUrl, isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
 import { uuidv4 } from '@/lib/helpers'
 
 export interface FormContentsProps {
   form: UseFormReturn<WebhookFormValues>
-  selectedHook?: PostgresTrigger
+  selectedHook?: PGTrigger
 }
 
 export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
@@ -50,7 +51,6 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
   const { data: project } = useSelectedProjectQuery()
 
   const restUrl = project?.restUrl
-  const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
 
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: keys = [] } = useAPIKeysQuery(
@@ -61,7 +61,8 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
     projectRef: ref,
   })
 
-  const legacyServiceRole = keys.find((x) => x.name === 'service_role')?.api_key ?? '[YOUR API KEY]'
+  const { serviceKey } = getKeys(keys)
+  const serviceRoleKey = serviceKey?.api_key
 
   const httpUrl = useWatch({ control: form.control, name: 'http_url' })
   const httpHeaders = useWatch({ control: form.control, name: 'httpHeaders' })
@@ -75,43 +76,35 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
   useEffect(() => {
     if (!isSuccessEdgeFunctions) return
 
-    const isEdgeFunctionSelected = isEdgeFunction({ ref, restUrlTld, url: httpUrl })
+    const isEdgeFunctionSelected = isEdgeFunctionUrl(httpUrl, ref ?? '', restUrl)
 
     if (httpUrl && isEdgeFunctionSelected) {
       const fnSlug = httpUrl.split('/').at(-1)
       const fn = functions.find((x) => x.slug === fnSlug)
-      const authorizationHeader = httpHeaders.find((x) => x.name === 'Authorization')
-      const edgeFunctionAuthHeaderVal = `Bearer ${legacyServiceRole}`
+      const updatedHttpHeaders = ensureEdgeFunctionAuthorizationHeader({
+        headers: httpHeaders,
+        serviceRoleKey,
+        verifyJwt: fn?.verify_jwt,
+        createRow: (name, value) => ({ id: uuidv4(), name, value }),
+      })
 
-      if (fn?.verify_jwt && authorizationHeader == null) {
-        const newAuthHeader = {
-          id: uuidv4(),
-          name: 'Authorization',
-          value: edgeFunctionAuthHeaderVal,
-        }
-        form.setValue('httpHeaders', [...httpHeaders, newAuthHeader])
-      } else if (fn?.verify_jwt && authorizationHeader?.value !== edgeFunctionAuthHeaderVal) {
-        const updatedHttpHeaders = httpHeaders.map((x) => {
-          if (x.name === 'Authorization') return { ...x, value: edgeFunctionAuthHeaderVal }
-          else return x
-        })
+      if (updatedHttpHeaders !== httpHeaders) {
         form.setValue('httpHeaders', updatedHttpHeaders)
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [httpUrl, isSuccessEdgeFunctions])
+  }, [form, functions, httpHeaders, httpUrl, isSuccessEdgeFunctions, serviceRoleKey, ref, restUrl])
 
   return (
     <div>
-      <FormSection header={<FormSectionLabel className="lg:!col-span-4">General</FormSectionLabel>}>
-        <FormSectionContent loading={false} className="lg:!col-span-8">
+      <FormSection header={<FormSectionLabel className="lg:col-span-4!">General</FormSectionLabel>}>
+        <FormSectionContent loading={false} className="lg:col-span-8!">
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
               <FormItemLayout label="Name" layout="vertical" className="gap-1">
                 <FormControl>
-                  <Input_Shadcn_ {...field} placeholder="my_webhook" />
+                  <Input {...field} placeholder="my_webhook" />
                 </FormControl>
                 <p className="mt-2 text-xs text-foreground-lighter">
                   Do not use spaces/whitespaces
@@ -125,7 +118,7 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
       <FormSection
         header={
           <FormSectionLabel
-            className="lg:!col-span-4"
+            className="lg:col-span-4!"
             description={
               <p className="text-sm text-foreground-light">
                 Select which table and events will trigger your webhook
@@ -136,7 +129,7 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
           </FormSectionLabel>
         }
       >
-        <FormSectionContent loading={false} className="lg:!col-span-8">
+        <FormSectionContent loading={false} className="lg:col-span-8!">
           <FormField
             control={form.control}
             name="table_id"
@@ -147,23 +140,23 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
                 className="gap-1"
                 description="This is the table the trigger will watch for changes. You can only select 1 table for a trigger."
               >
-                <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
+                <Select value={field.value} onValueChange={field.onChange}>
                   <FormControl>
-                    <SelectTrigger_Shadcn_>
-                      <SelectValue_Shadcn_ placeholder="Select a table" />
-                    </SelectTrigger_Shadcn_>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a table" />
+                    </SelectTrigger>
                   </FormControl>
-                  <SelectContent_Shadcn_>
+                  <SelectContent>
                     {tables.map((table) => (
-                      <SelectItem_Shadcn_ key={table.id} value={table.id.toString()}>
+                      <SelectItem key={table.id} value={table.id.toString()}>
                         <div className="flex items-center space-x-2">
                           <span className="text-foreground-light">{table.schema}</span>
                           <span className="text-foreground">{table.name}</span>
                         </div>
-                      </SelectItem_Shadcn_>
+                      </SelectItem>
                     ))}
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                  </SelectContent>
+                </Select>
               </FormItemLayout>
             )}
           />
@@ -181,7 +174,7 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
                 <div className="space-y-3">
                   {HOOK_EVENTS.map((event) => (
                     <div key={event.value} className="flex items-start space-x-3">
-                      <Checkbox_Shadcn_
+                      <Checkbox
                         id={`event-${event.value}`}
                         checked={field.value.includes(event.value)}
                         onCheckedChange={(checked) => {
@@ -193,12 +186,12 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
                         }}
                       />
                       <div className="grid gap-1.5 leading-none">
-                        <Label_Shadcn_
+                        <Label
                           htmlFor={`event-${event.value}`}
                           className="text-sm font-normal cursor-pointer"
                         >
                           {event.label}
-                        </Label_Shadcn_>
+                        </Label>
                         <p className="text-xs text-foreground-lighter">{event.description}</p>
                       </div>
                     </div>
@@ -212,10 +205,10 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
       <SidePanel.Separator />
       <FormSection
         header={
-          <FormSectionLabel className="lg:!col-span-4">Webhook configuration</FormSectionLabel>
+          <FormSectionLabel className="lg:col-span-4!">Webhook configuration</FormSectionLabel>
         }
       >
-        <FormSectionContent loading={false} className="lg:!col-span-8">
+        <FormSectionContent loading={false} className="lg:col-span-8!">
           <FormField
             control={form.control}
             name="function_type"
@@ -235,9 +228,13 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
                       } else if (functionType === 'supabase_function') {
                         // Default to first edge function in the list
                         const fnSlug = functions[0]?.slug
-                        const defaultFunctionUrl = `https://${ref}.supabase.${restUrlTld}/functions/v1/${fnSlug}`
+                        const defaultFunctionUrl = buildDatabaseEdgeFunctionUrl(
+                          fnSlug ?? '',
+                          ref ?? '',
+                          restUrl
+                        )
                         const currentUrl = form.getValues('http_url')
-                        if (!isEdgeFunction({ ref, restUrlTld, url: currentUrl })) {
+                        if (!isEdgeFunctionUrl(currentUrl, ref ?? '', restUrl)) {
                           form.setValue('http_url', defaultFunctionUrl, { shouldDirty: false })
                         }
                       }
@@ -252,7 +249,7 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
                         label=""
                         showIndicator={false}
                       >
-                        <div className="flex items-center space-x-5">
+                        <div className="flex items-center gap-5">
                           <Image
                             alt={webhook.label}
                             src={webhook.icon}

@@ -91,3 +91,12 @@ export class DownloadSaveError extends ExportAllRowsErrorFamily {
     this.name = 'DownloadSaveError'
   }
 }
+
+export class NoPrimaryKeyForTruncatedRowsError extends ExportAllRowsErrorFamily {
+  constructor(tableName: string) {
+    super(
+      `Cannot export rows with truncated values from "${tableName}" because the table has no primary key.`
+    )
+    this.name = 'NoPrimaryKeyForTruncatedRowsError'
+  }
+}

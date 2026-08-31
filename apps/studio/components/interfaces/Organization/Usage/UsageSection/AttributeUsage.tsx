@@ -13,9 +13,9 @@ import {
 } from '../Usage.utils'
 import UsageBarChart from '../UsageBarChart'
 import { ChartMeta } from './UsageSection'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import Panel from '@/components/ui/Panel'
-import SparkBar from '@/components/ui/SparkBar'
+import { SparkBar } from '@/components/ui/SparkBar'
 import type { OrgSubscription } from '@/data/subscriptions/types'
 import type { OrgMetricsUsage, OrgUsageResponse } from '@/data/usage/org-usage-query'
 import { USAGE_APPROACHING_THRESHOLD } from '@/lib/constants'
@@ -139,24 +139,27 @@ const AttributeUsage = ({
                       </div>
                     </div>
 
-                    {currentBillingCycleSelected && usageMeta && !usageMeta.unlimited && (
-                      <SparkBar
-                        type="horizontal"
-                        barClass={cn(
-                          usageRatio >= 1
-                            ? usageBasedBilling
-                              ? 'bg-foreground-light'
-                              : 'bg-red-900'
-                            : usageBasedBilling === false &&
-                                usageRatio >= USAGE_APPROACHING_THRESHOLD
-                              ? 'bg-amber-900'
-                              : 'bg-foreground-light'
-                        )}
-                        bgClass="bg-surface-300"
-                        value={usageMeta?.usage ?? 0}
-                        max={usageMeta?.pricing_free_units || 1}
-                      />
-                    )}
+                    {currentBillingCycleSelected &&
+                      usageMeta &&
+                      usageMeta.capped &&
+                      !usageMeta.unlimited && (
+                        <SparkBar
+                          type="horizontal"
+                          barClass={cn(
+                            usageRatio >= 1
+                              ? usageBasedBilling
+                                ? 'bg-foreground-light'
+                                : 'bg-red-900'
+                              : usageBasedBilling === false &&
+                                  usageRatio >= USAGE_APPROACHING_THRESHOLD
+                                ? 'bg-amber-900'
+                                : 'bg-foreground-light'
+                          )}
+                          bgClass="bg-surface-300"
+                          value={usageMeta?.usage ?? 0}
+                          max={usageMeta?.pricing_free_units || 1}
+                        />
+                      )}
 
                     <div>
                       {usageMeta && usageMeta.pricing_free_units !== 0 && (
@@ -259,7 +262,7 @@ const AttributeUsage = ({
                       </div>
                     </div>
 
-                    <Button type="primary" asChild>
+                    <Button variant="primary" asChild>
                       <Link href={upgradeUrl}>Upgrade plan</Link>
                     </Button>
                   </div>

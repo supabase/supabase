@@ -1,13 +1,17 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
+import { Lock } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form, FormControl, FormField, Input_Shadcn_ } from 'ui'
+import { Button, Form, FormControl, FormField, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
+import { LastSignInWrapper } from './LastSignInWrapper'
 import { useLastSignIn } from '@/hooks/misc/useLastSignIn'
 import { BASE_PATH } from '@/lib/constants'
 import { captureCriticalError } from '@/lib/error-reporting'
@@ -73,7 +77,12 @@ export const SignInSSOForm = () => {
 
   return (
     <Form {...form}>
-      <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
+      <form
+        id={formId}
+        method="POST"
+        className="flex flex-col gap-4"
+        onSubmit={form.handleSubmit(onSubmit)}
+      >
         <FormField
           key="email"
           name="email"
@@ -81,7 +90,7 @@ export const SignInSSOForm = () => {
           render={({ field }) => (
             <FormItemLayout name="email" label="Email">
               <FormControl>
-                <Input_Shadcn_
+                <Input
                   id="email"
                   type="email"
                   autoComplete="email"
@@ -107,10 +116,22 @@ export const SignInSSOForm = () => {
           />
         </div>
 
-        <Button block form={formId} htmlType="submit" size="large" loading={isSubmitting}>
+        <Button block form={formId} type="submit" size="large" loading={isSubmitting}>
           Sign in
         </Button>
       </form>
     </Form>
+  )
+}
+
+export const SignInWithSSOButton = () => {
+  const router = useRouter()
+
+  return (
+    <LastSignInWrapper type="sso">
+      <Button asChild block size="large" variant="outline" icon={<Lock />}>
+        <Link href={{ pathname: '/sign-in-sso', query: router.query }}>Continue with SSO</Link>
+      </Button>
+    </LastSignInWrapper>
   )
 }

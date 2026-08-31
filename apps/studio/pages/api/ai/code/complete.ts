@@ -1,15 +1,20 @@
 import pgMeta, { getEntityDefinitionsSql } from '@supabase/pg-meta'
-import { generateText, ModelMessage, stepCountIs, tool } from 'ai'
+import { generateText, isStepCount, ModelMessage, tool } from 'ai'
 import { IS_PLATFORM } from 'common'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
-import { getOrgAIDetails } from '@/lib/ai/ai-details'
+import { getAIDetails } from '@/lib/ai/ai-details'
+import {
+  buildClickhouseLogsSchemaSection,
+  CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS,
+  CLICKHOUSE_LOGS_REWRITE_INSTRUCTION,
+} from '@/lib/ai/clickhouse-logs'
 import { getModel } from '@/lib/ai/model'
-import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
+import { DEFAULT_COMPLETION_MODEL, LOGS_REWRITE_MODEL } from '@/lib/ai/model.utils'
 import {
   COMPLETION_PROMPT,
   EDGE_FUNCTION_PROMPT,
@@ -17,7 +22,7 @@ import {
   SECURITY_PROMPT,
   SQL_COMPLETION_INSTRUCTIONS,
 } from '@/lib/ai/prompts'
-import apiWrapper from '@/lib/api/apiWrapper'
+import { apiWrapper } from '@/lib/api/apiWrapper'
 import { executeQuery } from '@/lib/api/self-hosted/query'
 
 export const maxDuration = 60
@@ -123,11 +128,24 @@ const requestBodySchema = z.object({
     textAfterCursor: z.string(),
     prompt: z.string(),
     selection: z.string(),
+    /**
+     * The real `log_attributes` keys observed for the query's source, when the
+     * client discovered them. ClickHouse-only — there is no schema to fetch
+     * server-side for the logs table the way there is for Postgres DDL.
+     */
+    availableKeys: z.array(z.string()).optional(),
   }),
   projectRef: z.string(),
   connectionString: z.string().nullish(),
   orgSlug: z.string().optional(),
   language: z.string().optional(),
+  dialect: z.enum(['postgres', 'clickhouse']).optional(),
+  /**
+   * What the caller wants done. `rewrite` swaps the user instruction for the
+   * canonical BigQuery → ClickHouse rewrite instruction, so the client never has
+   * to carry prompt text. ClickHouse-only; defaults to `edit`.
+   */
+  intent: z.enum(['edit', 'rewrite']).optional(),
 })
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -148,27 +166,27 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(400).json({ error: 'Invalid request body', issues: parseError.issues })
     }
 
-    const { completionMetadata, projectRef, connectionString, orgSlug, language } = data
-    const { textBeforeCursor, textAfterCursor, prompt, selection } = completionMetadata
+    const { completionMetadata, projectRef, connectionString, orgSlug, language, dialect, intent } =
+      data
+    const { textBeforeCursor, textAfterCursor, prompt, selection, availableKeys } =
+      completionMetadata
+    const isClickhouse = dialect === 'clickhouse'
 
     const authorization = req.headers.authorization
     let aiOptInLevel: AiOptInLevel = IS_PLATFORM ? 'disabled' : 'schema'
 
     if (IS_PLATFORM && orgSlug && authorization && projectRef) {
-      const { aiOptInLevel: orgAIOptInLevel } = await getOrgAIDetails({
-        orgSlug,
-        authorization,
-      })
-      aiOptInLevel = orgAIOptInLevel
+      const aiDetails = await getAIDetails({ orgSlug, projectRef, authorization })
+      aiOptInLevel = aiDetails.aiOptInLevel
     }
 
     const {
       modelParams,
       error: modelError,
-      promptProviderOptions,
+      systemProviderOptions,
     } = await getModel({
       provider: 'openai',
-      modelEntry: DEFAULT_COMPLETION_MODEL,
+      modelEntry: isClickhouse ? LOGS_REWRITE_MODEL : DEFAULT_COMPLETION_MODEL,
     })
 
     if (modelError) {
@@ -180,7 +198,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       ...(authorization && { Authorization: authorization }),
     }
 
-    const includeSchema = aiOptInLevel !== 'disabled'
+    const includeSchema = !isClickhouse && aiOptInLevel !== 'disabled'
 
     // Fetch schema list first so we can determine which schemas to load DDL for.
     // These are best-effort — if they fail, we proceed without DDL context.
@@ -227,18 +245,34 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           otherSchemas: schemas.filter((s) => !fetchedSchemaSet.has(s.name)).map((s) => s.name),
         }
 
-    // Important: do not use dynamic content in the system prompt or Bedrock will not cache it
-    const system = source`
-      ${COMPLETION_PROMPT}
-      ${language === 'sql' ? SQL_COMPLETION_INSTRUCTIONS : ''}
-      ${language === 'sql' ? PG_BEST_PRACTICES : EDGE_FUNCTION_PROMPT}
-      ${SECURITY_PROMPT}
-    `
+    const system = isClickhouse
+      ? source`
+          You write and edit ClickHouse SQL for the Supabase logs table.
+          Reply with ONLY the SQL that replaces the <selection> block below, keeping the
+          surrounding query valid: no explanation, no comments, and no markdown code fences.
+          ${CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS}
+          ${SECURITY_PROMPT}
+        `
+      : source`
+          ${COMPLETION_PROMPT}
+          ${language === 'sql' ? `${SQL_COMPLETION_INSTRUCTIONS}\n${PG_BEST_PRACTICES}` : EDGE_FUNCTION_PROMPT}
+          ${SECURITY_PROMPT}
+        `
+
+    const schemaSection = isClickhouse
+      ? { heading: 'Logs Schema', body: buildClickhouseLogsSchemaSection(availableKeys) }
+      : {
+          heading: 'Database Schema',
+          body: buildDatabaseSchemaSection({ includeSchema, schemaListResult, schemaDDLResult }),
+        }
+
+    const instruction =
+      isClickhouse && intent === 'rewrite' ? CLICKHOUSE_LOGS_REWRITE_INSTRUCTION : prompt
 
     const userMessage = source`
-      ## Database Schema
+      ## ${schemaSection.heading}
 
-      ${buildDatabaseSchemaSection({ includeSchema, schemaListResult, schemaDDLResult })}
+      ${schemaSection.body}
 
       ## Code
 
@@ -248,17 +282,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       ## Instruction
 
-      ${prompt}
+      ${instruction}
     `
 
     // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
     // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
     const coreMessages: ModelMessage[] = [
-      {
-        role: 'system',
-        content: system,
-        ...(promptProviderOptions && { providerOptions: promptProviderOptions }),
-      },
       {
         role: 'user',
         content: userMessage,
@@ -267,7 +296,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const { text } = await generateText({
       ...modelParams,
-      stopWhen: stepCountIs(5),
+      instructions: {
+        role: 'system',
+        content: system,
+        ...(systemProviderOptions && { providerOptions: systemProviderOptions }),
+      },
+      stopWhen: isStepCount(5),
       messages: coreMessages,
       tools:
         includeSchema && !schemaListResult.error

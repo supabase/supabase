@@ -1,80 +1,48 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import {
-  Background,
-  ColorMode,
-  Edge,
-  ReactFlow,
-  ReactFlowProvider,
-  useReactFlow,
-} from '@xyflow/react'
-import { partition } from 'lodash'
-import { ChevronDown, Globe2, Loader2, Network } from 'lucide-react'
-import { useTheme } from 'next-themes'
-import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
-
-import '@xyflow/react/dist/style.css'
-
+import { Edge, ReactFlowProvider } from '@xyflow/react'
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
-import {
-  Button,
-  cn,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from 'ui'
+import { partition } from 'lodash'
+import { Globe2, Loader2, Network } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { Button } from 'ui'
 
-import DropAllReplicasConfirmationModal from './DropAllReplicasConfirmationModal'
-import { DropReplicaConfirmationModal } from './DropReplicaConfirmationModal'
+import { DiagramFlow } from './DiagramFlow'
 import { SmoothstepEdge } from './Edge'
-import { REPLICA_STATUS } from './InstanceConfiguration.constants'
-import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceConfiguration.utils'
+import { HaInstanceConfiguration } from './HaInstanceConfiguration'
+import { addRegionNodes, generateNodes } from './InstanceConfiguration.utils'
 import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
-import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
-import AlertError from '@/components/ui/AlertError'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'
+import { AlertError } from '@/components/ui/AlertError'
 import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
-import { Database, useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import {
   ReplicaInitializationStatus,
   useReadReplicasStatusesQuery,
 } from '@/data/read-replicas/replicas-status-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import {
-  useIsAwsCloudProvider,
-  useIsOrioleDb,
-  useSelectedProjectQuery,
-} from '@/hooks/misc/useSelectedProject'
-import { timeout } from '@/lib/helpers'
+import { useIsAwsCloudProvider, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
-interface InstanceConfigurationUIProps {
-  diagramOnly?: boolean
+const nodeTypes = {
+  PRIMARY: PrimaryNode,
+  READ_REPLICA: ReplicaNode,
+  REGION: RegionNode,
+  LOAD_BALANCER: LoadBalancerNode,
 }
 
-const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationUIProps) => {
-  const router = useRouter()
-  const reactFlow = useReactFlow()
-  const isOrioleDb = useIsOrioleDb()
-  const { resolvedTheme } = useTheme()
+const edgeTypes = {
+  smoothstep: SmoothstepEdge,
+}
+
+const InstanceConfigurationUI = () => {
   const { ref: projectRef } = useParams()
   const { isPending: isLoadingProject } = useSelectedProjectQuery()
 
   const isAws = useIsAwsCloudProvider()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
-  const newReplicaURL = `/project/${projectRef}/database/replication?type=Read+Replica`
 
   const [view, setView] = useState<'flow' | 'map'>('flow')
-  const [showDeleteAllModal, setShowDeleteAllModal] = useState(false)
   const [refetchInterval, setRefetchInterval] = useState<number | false>(10000)
-  const [selectedReplicaToDrop, setSelectedReplicaToDrop] = useState<Database>()
-  const [selectedReplicaToRestart, setSelectedReplicaToRestart] = useState<Database>()
-
-  const { can: canManageReplicas } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
 
   const {
     data: loadBalancers,
@@ -140,9 +108,6 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
     replicasStatuses,
   ])
 
-  const backgroundPatternColor =
-    resolvedTheme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.4)'
-
   const nodes = useMemo(
     () =>
       isSuccessReplicas && isSuccessLoadBalancers && primary !== undefined
@@ -150,8 +115,6 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
             primary,
             replicas,
             loadBalancers: loadBalancers ?? [],
-            onSelectRestartReplica: setSelectedReplicaToRestart,
-            onSelectDropReplica: setSelectedReplicaToDrop,
           })
         : [],
     [isSuccessReplicas, isSuccessLoadBalancers, primary, replicas, loadBalancers]
@@ -168,8 +131,9 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
                     source: 'load-balancer',
                     target: primary.identifier,
                     type: 'smoothstep',
-                    animated: true,
-                    className: '!cursor-default',
+                    // Static: no data flows between the load balancer and the
+                    // database — the line only indicates a relation.
+                    className: 'cursor-default!',
                   },
                 ]
               : []),
@@ -180,7 +144,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
                 target: database.identifier,
                 type: 'smoothstep',
                 animated: true,
-                className: '!cursor-default',
+                className: 'cursor-default!',
                 data: {
                   status: database.status,
                   identifier: database.identifier,
@@ -193,103 +157,31 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
     [isSuccessLoadBalancers, isSuccessReplicas, loadBalancers, primary?.identifier, replicas]
   )
 
-  const nodeTypes = useMemo(
-    () => ({
-      PRIMARY: PrimaryNode,
-      READ_REPLICA: ReplicaNode,
-      REGION: RegionNode,
-      LOAD_BALANCER: LoadBalancerNode,
-    }),
-    []
-  )
-
-  const edgeTypes = useMemo(
-    () => ({
-      smoothstep: SmoothstepEdge,
-    }),
-    []
-  )
-
-  const setReactFlow = async () => {
-    const graph = getDagreGraphLayout(nodes, edges)
-    const { nodes: updatedNodes } = addRegionNodes(graph.nodes, graph.edges)
-    reactFlow.setNodes(updatedNodes)
-    reactFlow.setEdges(graph.edges)
-
-    // [Joshen] Odd fix to ensure that react flow snaps back to center when adding nodes
-    await timeout(1)
-    reactFlow.fitView({ maxZoom: 0.9, minZoom: 0.9 })
-  }
-
-  // [Joshen] Just FYI this block is oddly triggering whenever we refocus on the viewport
-  // even if I change the dependency array to just data. Not blocker, just an area to optimize
-  useEffect(() => {
-    if (isSuccessReplicas && isSuccessLoadBalancers && nodes.length > 0 && view === 'flow') {
-      setReactFlow()
-    }
-  }, [isSuccessReplicas, isSuccessLoadBalancers, nodes, edges, view])
-
   return (
-    <div className={cn('nowheel', diagramOnly ? 'h-full' : 'border-y')}>
+    <div className="nowheel h-full">
       <div
-        className={`${diagramOnly ? 'h-full' : 'h-[500px]'} w-full relative ${
+        className={`h-full w-full relative ${
           isSuccessReplicas && !isLoadingProject ? '' : 'flex items-center justify-center px-28'
         }`}
       >
         {(isLoading || isLoadingProject) && (
-          <Loader2 className="animate-spin text-foreground-light" />
+          <div role="status">
+            <span className="sr-only">Loading infrastructure...</span>
+            <Loader2
+              aria-hidden="true"
+              className="motion-safe:animate-spin text-foreground-light"
+            />
+          </div>
         )}
         {isError && <AlertError error={error} subject="Failed to retrieve replicas" />}
         {isSuccessReplicas && !isLoadingProject && (
           <>
-            {!diagramOnly && infrastructureReadReplicas && (
+            {infrastructureReadReplicas && (
               <div className="z-10 absolute top-4 right-4 flex items-center justify-center gap-x-2">
-                <div className="flex items-center justify-center">
-                  <ButtonTooltip
-                    asChild
-                    type="default"
-                    disabled={!canManageReplicas || isOrioleDb}
-                    className={cn(replicas.length > 0 ? 'rounded-r-none' : '')}
-                    tooltip={{
-                      content: {
-                        side: 'bottom',
-                        text: !canManageReplicas
-                          ? 'You need additional permissions to deploy replicas'
-                          : isOrioleDb
-                            ? 'Read replicas are not supported with OrioleDB'
-                            : undefined,
-                      },
-                    }}
-                  >
-                    <Link href={newReplicaURL}>Deploy a new replica</Link>
-                  </ButtonTooltip>
-                  {replicas.length > 0 && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          type="default"
-                          icon={<ChevronDown size={16} />}
-                          className="px-1 rounded-l-none border-l-0"
-                        />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-52 *:space-x-2">
-                        <DropdownMenuItem asChild>
-                          <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
-                            Resize databases
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => setShowDeleteAllModal(true)}>
-                          <div>Remove all replicas</div>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
-                </div>
                 {isAws && (
                   <div className="flex items-center justify-center">
                     <Button
-                      type="default"
+                      variant="default"
                       icon={<Network size={15} />}
                       className={`rounded-r-none transition ${
                         view === 'flow' ? 'opacity-100' : 'opacity-50'
@@ -297,7 +189,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
                       onClick={() => setView('flow')}
                     />
                     <Button
-                      type="default"
+                      variant="default"
                       icon={<Globe2 size={15} />}
                       className={`rounded-l-none transition ${
                         view === 'map' ? 'opacity-100' : 'opacity-50'
@@ -309,71 +201,40 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
               </div>
             )}
             {view === 'flow' ? (
-              <ReactFlow
-                // FIXME: https://github.com/xyflow/xyflow/issues/4876
-                colorMode={'' as unknown as ColorMode}
-                fitView
-                fitViewOptions={{ minZoom: 0.9, maxZoom: 0.9 }}
-                className="instance-configuration"
-                zoomOnPinch={false}
-                zoomOnScroll={false}
-                nodesDraggable={false}
-                nodesConnectable={false}
-                zoomOnDoubleClick={false}
-                edgesFocusable={false}
-                edgesReconnectable={false}
-                defaultNodes={[]}
-                defaultEdges={[]}
+              <DiagramFlow
+                nodes={nodes}
+                edges={edges}
                 nodeTypes={nodeTypes}
                 edgeTypes={edgeTypes}
-                proOptions={{ hideAttribution: true }}
-              >
-                <Background color={backgroundPatternColor} />
-              </ReactFlow>
-            ) : (
-              <MapView
-                onSelectDeployNewReplica={() => router.push(newReplicaURL)}
-                onSelectRestartReplica={setSelectedReplicaToRestart}
-                onSelectDropReplica={setSelectedReplicaToDrop}
+                addGroupNodes={addRegionNodes}
               />
+            ) : (
+              <MapView />
             )}
           </>
         )}
       </div>
-
-      {!diagramOnly && (
-        <>
-          <DropReplicaConfirmationModal
-            selectedReplica={selectedReplicaToDrop}
-            onSuccess={() => setRefetchInterval(5000)}
-            onCancel={() => setSelectedReplicaToDrop(undefined)}
-          />
-
-          <DropAllReplicasConfirmationModal
-            visible={showDeleteAllModal}
-            onSuccess={() => setRefetchInterval(5000)}
-            onCancel={() => setShowDeleteAllModal(false)}
-          />
-
-          <RestartReplicaConfirmationModal
-            selectedReplica={selectedReplicaToRestart}
-            onSuccess={() => setRefetchInterval(5000)}
-            onCancel={() => setSelectedReplicaToRestart(undefined)}
-          />
-        </>
-      )}
     </div>
   )
 }
 
-interface InstanceConfigurationProps {
-  diagramOnly?: boolean
-}
+export const InstanceConfiguration = () => {
+  const { isHighAvailability, isPending } = useHighAvailability()
 
-export const InstanceConfiguration = ({ diagramOnly = false }: InstanceConfigurationProps) => {
+  // Wait for the project record so an HA project never briefly mounts the
+  // standard diagram (and fires its queries) before swapping.
+  if (isPending) {
+    return (
+      <div role="status" className="h-full w-full flex items-center justify-center">
+        <span className="sr-only">Loading infrastructure...</span>
+        <Loader2 aria-hidden="true" className="motion-safe:animate-spin text-foreground-light" />
+      </div>
+    )
+  }
+
   return (
     <ReactFlowProvider>
-      <InstanceConfigurationUI diagramOnly={diagramOnly} />
+      {isHighAvailability ? <HaInstanceConfiguration /> : <InstanceConfigurationUI />}
     </ReactFlowProvider>
   )
 }

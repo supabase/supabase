@@ -1,10 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -14,27 +13,24 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Switch,
 } from 'ui'
-import { PageSection, PageSectionContent } from 'ui-patterns'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
+import { OAuthEndpointsTable } from './OAuthEndpointsTable'
 import { InlineLink } from '@/components/ui/InlineLink'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useOAuthServerAppsQuery } from '@/data/oauth-server-apps/oauth-server-apps-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { DOCS_URL } from '@/lib/constants'
-
-const OAuthEndpointsTable = dynamic(() =>
-  import('./OAuthEndpointsTable').then((mod) => ({ default: mod.OAuthEndpointsTable }))
-)
 
 const configUrlSchema = z.object({
   id: z.string(),
@@ -191,6 +187,12 @@ export const OAuthServerSettingsForm = () => {
     setShowDisableOAuthServerConfirmation(false)
   }
 
+  const oauthServerEnabled = useWatch({ control: form.control, name: 'OAUTH_SERVER_ENABLED' })
+  const authorizationPath = useWatch({
+    control: form.control,
+    name: 'OAUTH_SERVER_AUTHORIZATION_PATH',
+  })
+
   if (isPermissionsLoaded && !canReadConfig) {
     return <NoPermission resourceText="view OAuth server settings" />
   }
@@ -238,7 +240,7 @@ export const OAuthServerSettingsForm = () => {
                     )}
                   />
                 </CardContent>
-                {form.watch('OAUTH_SERVER_ENABLED') && (
+                {oauthServerEnabled && (
                   <>
                     <CardContent>
                       <FormItemLayout
@@ -258,7 +260,7 @@ export const OAuthServerSettingsForm = () => {
                           </>
                         }
                       >
-                        <Input_Shadcn_
+                        <Input
                           value={authConfig?.SITE_URL}
                           disabled
                           placeholder="https://example.com"
@@ -276,20 +278,22 @@ export const OAuthServerSettingsForm = () => {
                             description="Path where you'll implement the OAuth authorization UI (consent screens)."
                           >
                             <FormControl>
-                              <Input_Shadcn_ {...field} placeholder="/auth/authorize" />
+                              <Input {...field} placeholder="/auth/authorize" />
                             </FormControl>
                           </FormItemLayout>
                         )}
                       />
                       {(() => {
                         const siteUrl = authConfig?.SITE_URL?.trim()
-                        const authorizationPath =
-                          form.watch('OAUTH_SERVER_AUTHORIZATION_PATH')?.trim() || '/oauth/consent'
-                        const authorizationUrl = siteUrl ? `${siteUrl}${authorizationPath}` : ''
+                        const resolvedAuthorizationPath =
+                          authorizationPath?.trim() || '/oauth/consent'
+                        const authorizationUrl = siteUrl
+                          ? `${siteUrl}${resolvedAuthorizationPath}`
+                          : ''
 
                         return (
                           <Admonition
-                            type="tip"
+                            type="note"
                             title="Make sure this path is implemented in your application."
                             description={
                               <>
@@ -349,12 +353,12 @@ export const OAuthServerSettingsForm = () => {
                 )}
 
                 <CardFooter className="justify-end space-x-2">
-                  <Button type="default" onClick={() => form.reset()} disabled={isPending}>
+                  <Button variant="default" onClick={() => form.reset()} disabled={isPending}>
                     Cancel
                   </Button>
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     disabled={!canUpdateConfig || !form.formState.isDirty}
                     loading={isPending}
                   >
@@ -366,7 +370,7 @@ export const OAuthServerSettingsForm = () => {
           </Form>
         </PageSectionContent>
       </PageSection>
-      {isSuccess && authConfig?.OAUTH_SERVER_ENABLED && form.watch('OAUTH_SERVER_ENABLED') && (
+      {isSuccess && authConfig?.OAUTH_SERVER_ENABLED && oauthServerEnabled && (
         <OAuthEndpointsTable isLoading={isPending} />
       )}
 

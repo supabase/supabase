@@ -1,25 +1,36 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { noop } from 'lodash'
-import { Check, Copy, Edit, Eye, Filter, MoreVertical, Plus, Search, Trash, X } from 'lucide-react'
+import {
+  Check,
+  ChevronDown,
+  Copy,
+  Edit,
+  Eye,
+  MoreVertical,
+  Plus,
+  Search,
+  Trash,
+  X,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Button,
   Card,
-  Checkbox_Shadcn_,
+  Checkbox,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Label_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Label,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Table,
   TableBody,
   TableCell,
@@ -37,28 +48,33 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { formatAllEntities } from './Tables.utils'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
-import SchemaSelector from '@/components/ui/SchemaSelector'
+import { SchemaSelector } from '@/components/ui/SchemaSelector'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { useForeignTablesQuery } from '@/data/foreign-tables/foreign-tables-query'
 import { useMaterializedViewsQuery } from '@/data/materialized-views/materialized-views-query'
 import { usePrefetchEditorTablePage } from '@/data/prefetchers/project.$ref.editor.$id'
-import { useTablesQuery } from '@/data/tables/tables-query'
+import { useInfiniteTablesQuery } from '@/data/tables/tables-query'
 import { useViewsQuery } from '@/data/views/views-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import type { SafePostgresTable } from '@/lib/postgres-types'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface TableListProps {
   onAddTable: () => void
-  onEditTable: (table: PostgresTable) => void
-  onDeleteTable: (table: PostgresTable) => void
-  onDuplicateTable: (table: PostgresTable) => void
+  onEditTable: (table: SafePostgresTable) => void
+  onDeleteTable: (table: SafePostgresTable) => void
+  onDuplicateTable: (table: SafePostgresTable) => void
 }
 
 export const TableList = ({
@@ -76,7 +92,10 @@ export const TableList = ({
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const [filterString, setFilterString] = useQueryState('search', parseAsString.withDefault(''))
+  const debouncedFilterString = useDebounce(filterString, 300)
   const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
+  const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   const { can: canUpdateTables } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -84,27 +103,40 @@ export const TableList = ({
   )
 
   const {
-    data: tables,
+    data: tablesData,
     error: tablesError,
     isError: isErrorTables,
     isPending: isLoadingTables,
     isSuccess: isSuccessTables,
-  } = useTablesQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      schema: selectedSchema,
-      sortByProperty: 'name',
-      includeColumns: true,
-    },
-    {
-      select(tables) {
-        return filterString.length === 0
-          ? tables
-          : tables.filter((table) => table.name.toLowerCase().includes(filterString.toLowerCase()))
-      },
+    hasNextPage: hasNextTablesPage,
+    isFetchingNextPage: isFetchingNextTablesPage,
+    fetchNextPage: fetchNextTablesPage,
+  } = useInfiniteTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: selectedSchema,
+    includeColumns: true,
+    pageSize: 50,
+    nameFilter: debouncedFilterString,
+  })
+
+  const tables = tablesData?.pages.flat() ?? []
+
+  const [sentinelRef, sentinelEntry] = useIntersectionObserver({
+    threshold: 0,
+    rootMargin: '200px 0px 200px 0px',
+  })
+
+  useEffect(() => {
+    if (sentinelEntry?.isIntersecting && hasNextTablesPage && !isFetchingNextTablesPage) {
+      fetchNextTablesPage()
     }
-  )
+  }, [
+    sentinelEntry?.isIntersecting,
+    hasNextTablesPage,
+    isFetchingNextTablesPage,
+    fetchNextTablesPage,
+  ])
 
   const {
     data: views,
@@ -116,7 +148,7 @@ export const TableList = ({
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: selectedSchema,
+      schemas: [selectedSchema],
     },
     {
       select(views) {
@@ -137,7 +169,7 @@ export const TableList = ({
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: selectedSchema,
+      schemas: [selectedSchema],
     },
     {
       select(materializedViews) {
@@ -160,7 +192,7 @@ export const TableList = ({
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: selectedSchema,
+      schemas: [selectedSchema],
     },
     {
       select(foreignTables) {
@@ -184,8 +216,25 @@ export const TableList = ({
   const entities = formatAllEntities({ tables, views, materializedViews, foreignTables }).filter(
     (x) => visibleTypes.includes(x.type)
   )
+  const footerCount = hasNextTablesPage ? tables.length : entities.length
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
+
+  const canAddTables = canUpdateTables && !isSchemaLocked
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search tables' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
+    setVisibleTypes(Object.values(ENTITY_TYPE))
+    setFilterString('')
+  })
 
   const error = tablesError || viewsError || materializedViewsError || foreignTablesError
   const isError = isErrorTables || isErrorViews || isErrorMaterializedViews || isErrorForeignTables
@@ -193,6 +242,8 @@ export const TableList = ({
     isLoadingTables || isLoadingViews || isLoadingMaterializedViews || isLoadingForeignTables
   const isSuccess =
     isSuccessTables && isSuccessViews && isSuccessMaterializedViews && isSuccessForeignTables
+
+  const hasFiltersApplied = visibleTypes.length !== 5
 
   const formatTooltipText = (entityType: string) => {
     const text =
@@ -208,90 +259,108 @@ export const TableList = ({
   return (
     <div className="flex flex-col gap-y-4">
       <div className="flex flex-col lg:flex-row lg:items-center gap-2 flex-wrap">
-        <div className="flex gap-2 items-center">
+        <Shortcut
+          id={SHORTCUT_IDS.LIST_PAGE_FOCUS_SCHEMA}
+          onTrigger={() => setSchemaSelectorOpen(true)}
+          side="bottom"
+          tooltipOpen={schemaSelectorOpen ? false : undefined}
+        >
           <SchemaSelector
-            className="flex-grow lg:flex-grow-0 w-[180px]"
+            className="grow lg:grow-0 w-[180px]"
             size="tiny"
             showError={false}
             selectedSchemaName={selectedSchema}
             onSelectSchema={setSelectedSchema}
+            open={schemaSelectorOpen}
+            onOpenChange={setSchemaSelectorOpen}
           />
-          <Popover_Shadcn_>
-            <PopoverTrigger_Shadcn_ asChild>
-              <Button
-                size="tiny"
-                type={visibleTypes.length !== 5 ? 'default' : 'dashed'}
-                className="px-1"
-                icon={<Filter />}
-              />
-            </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
-              <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
-                <p className="text-xs">Show entity types</p>
-                <div className="flex flex-col">
-                  {Object.entries(ENTITY_TYPE).map(([key, value]) => (
-                    <div key={key} className="group flex items-center justify-between py-0.5">
-                      <div className="flex items-center gap-x-2">
-                        <Checkbox_Shadcn_
-                          id={key}
-                          name={key}
-                          checked={visibleTypes.includes(value)}
-                          onCheckedChange={() => {
-                            if (visibleTypes.includes(value)) {
-                              setVisibleTypes(visibleTypes.filter((y) => y !== value))
-                            } else {
-                              setVisibleTypes(visibleTypes.concat([value]))
-                            }
-                          }}
-                        />
-                        <Label_Shadcn_ htmlFor={key} className="capitalize text-xs">
-                          {key.toLowerCase().replace('_', ' ')}
-                        </Label_Shadcn_>
-                      </div>
-                      <Button
-                        size="tiny"
-                        type="default"
-                        onClick={() => setVisibleTypes([value])}
-                        className="transition opacity-0 group-hover:opacity-100 h-auto px-1 py-0.5"
-                      >
-                        Select only
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </PopoverContent_Shadcn_>
-          </Popover_Shadcn_>
-        </div>
-        <div className="flex flex-grow justify-between gap-2 items-center">
-          <Input
-            size="tiny"
-            className="flex-grow lg:flex-grow-0 w-52"
-            placeholder="Search for a table"
-            value={filterString}
-            onChange={(e) => setFilterString(e.target.value)}
-            icon={<Search />}
-          />
+        </Shortcut>
+        <Input
+          ref={searchInputRef}
+          size="tiny"
+          containerClassName="grow lg:grow-0 w-52"
+          placeholder="Search for a table"
+          value={filterString}
+          onChange={(e) => setFilterString(e.target.value)}
+          onKeyDown={onSearchInputEscape(filterString, setFilterString)}
+          icon={<Search />}
+        />
 
-          {!isSchemaLocked && (
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              size="tiny"
+              variant={hasFiltersApplied ? 'default' : 'dashed'}
+              iconRight={<ChevronDown />}
+            >
+              Entity Type
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="p-0 w-60" side="bottom" align="center">
+            <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
+              <p className="text-xs">Show entity types</p>
+              <div className="flex flex-col">
+                {Object.entries(ENTITY_TYPE).map(([key, value]) => (
+                  <div key={key} className="group flex items-center justify-between py-0.5">
+                    <div className="flex items-center gap-x-2">
+                      <Checkbox
+                        id={key}
+                        name={key}
+                        checked={visibleTypes.includes(value)}
+                        onCheckedChange={() => {
+                          if (visibleTypes.includes(value)) {
+                            setVisibleTypes(visibleTypes.filter((y) => y !== value))
+                          } else {
+                            setVisibleTypes(visibleTypes.concat([value]))
+                          }
+                        }}
+                      />
+                      <Label htmlFor={key} className="capitalize text-xs">
+                        {key.toLowerCase().replace('_', ' ')}
+                      </Label>
+                    </div>
+                    <Button
+                      size="tiny"
+                      variant="default"
+                      onClick={() => setVisibleTypes([value])}
+                      className="transition opacity-0 group-hover:opacity-100 h-auto px-1 py-0.5"
+                    >
+                      Select only
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        {!isSchemaLocked &&
+          (canAddTables ? (
+            <Shortcut
+              id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+              label="Create new table"
+              onTrigger={() => onAddTable()}
+              side="bottom"
+            >
+              <Button className="w-auto ml-auto" icon={<Plus />} onClick={() => onAddTable()}>
+                New table
+              </Button>
+            </Shortcut>
+          ) : (
             <ButtonTooltip
               className="w-auto ml-auto"
               icon={<Plus />}
-              disabled={!canUpdateTables}
-              onClick={() => onAddTable()}
+              disabled
               tooltip={{
                 content: {
                   side: 'bottom',
-                  text: !canUpdateTables
-                    ? 'You need additional permissions to create tables'
-                    : undefined,
+                  text: 'You need additional permissions to create tables',
                 },
               }}
             >
               New table
             </ButtonTooltip>
-          )}
-        </div>
+          ))}
       </div>
 
       {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="tables" />}
@@ -306,7 +375,7 @@ export const TableList = ({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead key="icon" className="w-0 !px-0" />
+                  <TableHead key="icon" className="w-0 px-0!" />
                   <TableHead key="name" className="max-w-[160px] sm:max-w-[280px]">
                     Name
                   </TableHead>
@@ -367,7 +436,7 @@ export const TableList = ({
                   {entities.length > 0 &&
                     entities.map((x) => (
                       <TableRow key={x.id}>
-                        <TableCell className="w-0 !pl-5 !pr-1">
+                        <TableCell className="w-0 pl-5! pr-1!">
                           <Tooltip>
                             <TooltipTrigger asChild className="cursor-default">
                               <div className="flex w-4 justify-center">
@@ -442,7 +511,7 @@ export const TableList = ({
                         </TableCell>
                         <TableCell>
                           <div className="flex justify-end gap-2">
-                            <Button asChild type="default">
+                            <Button asChild variant="default">
                               <Link href={`/project/${ref}/database/tables/${x.id}`}>
                                 View columns
                               </Link>
@@ -450,9 +519,19 @@ export const TableList = ({
 
                             {!isSchemaLocked && (
                               <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button type="default" className="px-1" icon={<MoreVertical />} />
-                                </DropdownMenuTrigger>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button
+                                        variant="default"
+                                        className="px-1"
+                                        icon={<MoreVertical />}
+                                        aria-label={`Table ${x.name} actions`}
+                                      />
+                                    </DropdownMenuTrigger>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="bottom">More options</TooltipContent>
+                                </Tooltip>
                                 <DropdownMenuContent side="bottom" align="end" className="w-40">
                                   <DropdownMenuItem
                                     className="flex items-center space-x-2"
@@ -542,9 +621,13 @@ export const TableList = ({
                 </>
               </TableBody>
               <TableFooter className="font-normal">
-                <TableRow className="border-b-0 [&>td]:hover:bg-inherit">
-                  <TableCell colSpan={7} className="text-foreground-muted">
-                    {entities.length} {entities.length === 1 ? 'table' : 'tables'}
+                <TableRow ref={sentinelRef} className="border-b-0">
+                  <TableCell colSpan={7} className="text-foreground-muted hover:bg-inherit">
+                    {isFetchingNextTablesPage
+                      ? 'Loading more tables…'
+                      : `${footerCount} ${footerCount === 1 ? 'table' : 'tables'}${
+                          hasNextTablesPage ? ' loaded' : ''
+                        }`}
                   </TableCell>
                 </TableRow>
               </TableFooter>

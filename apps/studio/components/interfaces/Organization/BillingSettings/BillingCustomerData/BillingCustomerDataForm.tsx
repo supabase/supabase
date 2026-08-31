@@ -6,23 +6,23 @@ import type {
 } from '@stripe/stripe-js'
 import { Check, ChevronsUpDown, Info, X } from 'lucide-react'
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
-import { UseFormReturn } from 'react-hook-form'
+import { UseFormReturn, useWatch } from 'react-hook-form'
 import {
   Button,
   cn,
-  Command_Shadcn_ as Command,
-  CommandEmpty_Shadcn_ as CommandEmpty,
-  CommandGroup_Shadcn_ as CommandGroup,
-  CommandInput_Shadcn_ as CommandInput,
-  CommandItem_Shadcn_ as CommandItem,
-  CommandList_Shadcn_ as CommandList,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   FormControl,
   FormField,
   FormMessage,
-  Input_Shadcn_ as Input,
-  Popover_Shadcn_ as Popover,
-  PopoverContent_Shadcn_ as PopoverContent,
-  PopoverTrigger_Shadcn_ as PopoverTrigger,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -78,7 +78,7 @@ export const BillingCustomerDataForm = ({
     form.setValue('tax_id_value', '', { shouldDirty: true })
   }
 
-  const { tax_id_name } = form.watch()
+  const tax_id_name = useWatch({ control: form.control, name: 'tax_id_name' })
   const selectedTaxId = TAX_IDS.find((option) => option.name === tax_id_name)
 
   const availableTaxIds = useMemo(() => {
@@ -143,7 +143,7 @@ export const BillingCustomerDataForm = ({
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
-                      type="default"
+                      variant="default"
                       role="combobox"
                       size="medium"
                       disabled={disabled}
@@ -221,7 +221,7 @@ export const BillingCustomerDataForm = ({
             />
 
             <Button
-              type="text"
+              variant="text"
               className="px-1"
               icon={<X />}
               disabled={disabled}

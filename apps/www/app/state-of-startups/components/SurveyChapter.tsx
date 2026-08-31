@@ -1,6 +1,7 @@
 'use client'
 
 import { SurveyPullQuote } from './SurveyPullQuote'
+import { SurveyPullQuoteCarousel, type CarouselPullQuote } from './SurveyPullQuoteCarousel'
 
 import './surveyResults.css'
 
@@ -15,9 +16,10 @@ interface SurveyChapterProps {
   pullQuote?: {
     quote: string
     author: string
-    authorPosition: string
-    authorAvatar: string
+    authorPosition?: string
+    authorAvatar?: string
   }
+  pullQuoteCarousel?: CarouselPullQuote[]
   children: React.ReactNode
 }
 
@@ -27,6 +29,7 @@ export function SurveyChapter({
   shortTitle,
   description,
   pullQuote,
+  pullQuoteCarousel,
   children,
 }: SurveyChapterProps) {
   const accent = 'green'
@@ -51,7 +54,7 @@ export function SurveyChapter({
               align={number % 2 === 0 ? 'start' : 'end'}
             />
             {/* Text content */}
-            <div className="max-w-[60rem] mx-auto grid gap-y-4 sm:gap-y-8 grid-cols-1 md:grid-cols-3 text-balance pb-12">
+            <div className="max-w-240 mx-auto grid gap-y-4 sm:gap-y-8 grid-cols-1 md:grid-cols-3 text-balance pb-12">
               <div className="md:col-span-2 flex flex-col gap-4 px-8">
                 <p
                   className={`text-sm uppercase font-mono text-balance tracking-wider text-brand-link`}
@@ -71,13 +74,17 @@ export function SurveyChapter({
           <div className="flex flex-col">{children}</div>
         </div>
 
-        {pullQuote && (
-          <SurveyPullQuote
-            quote={pullQuote.quote}
-            author={pullQuote.author}
-            authorPosition={pullQuote.authorPosition}
-            authorAvatar={pullQuote.authorAvatar}
-          />
+        {pullQuoteCarousel && pullQuoteCarousel.length > 0 ? (
+          <SurveyPullQuoteCarousel quotes={pullQuoteCarousel} />
+        ) : (
+          pullQuote && (
+            <SurveyPullQuote
+              quote={pullQuote.quote}
+              author={pullQuote.author}
+              authorPosition={pullQuote.authorPosition}
+              authorAvatar={pullQuote.authorAvatar}
+            />
+          )
         )}
       </section>
     </AccentContext.Provider>

@@ -1,5 +1,5 @@
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { FilterIcon } from 'lucide-react'
+import { VisuallyHidden } from 'radix-ui'
 import { useRef } from 'react'
 import {
   Button,
@@ -19,6 +19,7 @@ import {
 import { useMediaQuery } from '../hooks/useMediaQuery'
 import { Kbd } from '../primitives/Kbd'
 import { DataTableFilterControls } from './DataTableFilterControls'
+import { UserLogFilterControl } from '@/components/interfaces/UnifiedLogs/components/UserLogFilterControl'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -35,9 +36,14 @@ export function DataTableFilterControlsDrawer() {
       <Tooltip>
         <TooltipTrigger asChild>
           <DrawerTrigger asChild>
-            <Button className="h-9 w-9" ref={isMobile ? triggerButtonRef : null}>
-              <FilterIcon className="w-4 h-4" />
-            </Button>
+            <Button
+              size="tiny"
+              variant="text"
+              icon={<FilterIcon />}
+              className="w-[26px]"
+              ref={isMobile ? triggerButtonRef : null}
+              aria-label="Open filters"
+            />
           </DrawerTrigger>
         </TooltipTrigger>
         <TooltipContent side="right">
@@ -51,18 +57,18 @@ export function DataTableFilterControlsDrawer() {
         </TooltipContent>
       </Tooltip>
       <DrawerContent className="max-h-[calc(100dvh-4rem)]">
-        <VisuallyHidden>
+        <VisuallyHidden.VisuallyHidden>
           <DrawerHeader>
             <DrawerTitle>Filters</DrawerTitle>
             <DrawerDescription>Adjust your table filters</DrawerDescription>
           </DrawerHeader>
-        </VisuallyHidden>
+        </VisuallyHidden.VisuallyHidden>
         <div className="px-4 flex-1 overflow-y-auto">
-          <DataTableFilterControls />
+          <DataTableFilterControls itemsAfter={{ level: <UserLogFilterControl /> }} />
         </div>
         <DrawerFooter>
           <DrawerClose asChild>
-            <Button type="outline" className="w-full">
+            <Button variant="outline" className="w-full">
               Close
             </Button>
           </DrawerClose>

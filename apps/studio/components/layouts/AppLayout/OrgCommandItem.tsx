@@ -1,7 +1,7 @@
 import { Check } from 'lucide-react'
-import Link from 'next/link'
-import { cn, CommandItem_Shadcn_ } from 'ui'
+import { cn } from 'ui'
 
+import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import type { Organization } from '@/types'
 
@@ -25,25 +25,21 @@ export function OrgCommandItem({
   const href = hasRouteSlug ? routePathname.replace('[slug]', org.slug) : `/org/${org.slug}`
 
   return (
-    <CommandItem_Shadcn_
+    <CommandItemLink
       key={org.slug}
+      href={href}
       value={`${org.name.replaceAll('"', '')} - ${org.slug}`}
-      className="cursor-pointer w-full"
-      onSelect={() => onClose()}
+      className={cn(
+        'cursor-pointer w-full flex items-center justify-between text-sm md:text-xs',
+        !compactPadding && 'p-0.5'
+      )}
+      onSelect={onClose}
     >
-      <Link
-        href={href}
-        className={cn(
-          'w-full flex items-center justify-between text-sm md:text-xs',
-          !compactPadding && 'p-0.5'
-        )}
-      >
-        <div className="flex items-center gap-2">
-          <span>{org.name}</span>
-          <PartnerIcon organization={org} />
-        </div>
-        {org.slug === selectedSlug && <Check size={16} />}
-      </Link>
-    </CommandItem_Shadcn_>
+      <div className="flex items-center gap-2">
+        <span>{org.name}</span>
+        <PartnerIcon organization={org} />
+      </div>
+      {org.slug === selectedSlug && <Check size={16} />}
+    </CommandItemLink>
   )
 }

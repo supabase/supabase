@@ -1,14 +1,15 @@
 import dayjs from 'dayjs'
-import { Copy, Trash, UserIcon } from 'lucide-react'
+import { SqlEditor, TableEditor } from 'icons'
+import { Copy, ScrollText, Trash, UserIcon } from 'lucide-react'
 import { Column, useRowSelection } from 'react-data-grid'
 import {
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
-  ContextMenu_Shadcn_,
-  ContextMenuContent_Shadcn_,
-  ContextMenuItem_Shadcn_,
-  ContextMenuSeparator_Shadcn_,
-  ContextMenuTrigger_Shadcn_,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
   copyToClipboard,
 } from 'ui'
 
@@ -20,6 +21,10 @@ import { BASE_PATH } from '@/lib/constants'
 
 const GITHUB_AVATAR_URL = 'https://avatars.githubusercontent.com'
 const SUPPORTED_CSP_AVATAR_URLS = [GITHUB_AVATAR_URL, 'https://lh3.googleusercontent.com']
+
+const isCustomProvider = (provider: string) => provider.startsWith('custom:')
+
+type FormattedUserRow = ReturnType<typeof formatUsersData>[number]
 
 export const formatUsersData = (users: User[]) => {
   return users.map((user) => {
@@ -38,25 +43,31 @@ export const formatUsersData = (users: User[]) => {
       providers: user.is_anonymous ? '-' : providers,
       provider_icons: providers
         .map((p) => {
-          return p === 'email'
-            ? `${BASE_PATH}/img/icons/email-icon2.svg`
-            : p === 'SAML'
-              ? `${BASE_PATH}/img/icons/saml-icon.svg`
-              : providerIconMap[p]
-                ? `${BASE_PATH}/img/icons/${providerIconMap[p]}.svg`
-                : undefined
+          const isCustom = isCustomProvider(p)
+
+          return isCustom
+            ? 'custom'
+            : p === 'email'
+              ? `${BASE_PATH}/img/icons/email-icon2.svg`
+              : p === 'SAML'
+                ? `${BASE_PATH}/img/icons/saml-icon.svg`
+                : providerIconMap[p]
+                  ? `${BASE_PATH}/img/icons/${providerIconMap[p]}.svg`
+                  : undefined
         })
-        .filter(Boolean),
+        .filter((icon): icon is string => Boolean(icon)),
       // I think it's alright to just check via the main provider since email and phone should be mutually exclusive
       provider_type: user.is_anonymous
         ? 'Anonymous'
         : provider === 'email'
           ? '-'
-          : socialProviders.includes(provider)
-            ? 'Social'
-            : phoneProviders.includes(provider)
-              ? 'Phone'
-              : '-',
+          : isCustomProvider(provider)
+            ? 'Custom'
+            : socialProviders.includes(provider)
+              ? 'Social'
+              : phoneProviders.includes(provider)
+                ? 'Phone'
+                : '-',
       // [Joshen] Note that the images might not load due to CSP issues
       img: getAvatarUrl(user),
       name: getDisplayName(user),
@@ -167,7 +178,7 @@ export function getDisplayName(user: User, fallback = '-'): string {
     last_name: cc_last_name,
     firstName: ccFirstName,
     first_name: cc_first_name,
-  } = (custom_claims ?? {}) as any
+  } = (custom_claims ?? {}) as Record<string, unknown>
 
   const last = toPrettyJsonString(
     familyName ||
@@ -252,6 +263,17 @@ export function getAvatarUrl(user: User): string | undefined {
   }
 }
 
+const formatUserProviders = (providers: string[]) => {
+  return providers
+    .map((x) => {
+      const provider = PROVIDERS_SCHEMAS.find(
+        (y) => ('key' in y && y.key === x) || y.title.toLowerCase() === x
+      )
+      return provider?.title ?? (isCustomProvider(x) ? x.split('custom:')[1] : x)
+    })
+    .join(', ')
+}
+
 export const formatUserColumns = ({
   specificFilterColumn,
   columns,
@@ -260,6 +282,8 @@ export const formatUserColumns = ({
   visibleColumns = [],
   setSortByValue,
   onSelectDeleteUser,
+  onSelectImpersonateUser,
+  onSelectViewLogs,
 }: {
   specificFilterColumn: string
   columns: UsersTableColumn[]
@@ -268,12 +292,14 @@ export const formatUserColumns = ({
   visibleColumns?: string[]
   setSortByValue: (val: string) => void
   onSelectDeleteUser: (user: User) => void
+  onSelectImpersonateUser: (user: User, destination: 'sql' | 'table-editor') => Promise<void>
+  onSelectViewLogs: (user: User) => void
 }) => {
   const columnOrder = config.map((c) => c.id) ?? columns.map((c) => c.id)
 
   let gridColumns = columns.map((col) => {
     const savedConfig = config.find((c) => c.id === col.id)
-    const res: Column<any> = {
+    const res: Column<FormattedUserRow> = {
       key: col.id,
       name: col.name,
       resizable: col.resizable ?? true,
@@ -281,7 +307,7 @@ export const formatUserColumns = ({
       draggable: true,
       width: savedConfig?.width ?? col.width,
       minWidth: col.minWidth ?? 120,
-      headerCellClass: 'z-50 outline-none !shadow-none',
+      headerCellClass: 'z-50 outline-hidden shadow-none!',
       renderHeaderCell: () => {
         // [Joshen] I'm on the fence to support "Select all" for users, as the results are infinitely paginated
         // "Select all" wouldn't be an accurate representation if not all the pages have been fetched, but if decide
@@ -301,29 +327,27 @@ export const formatUserColumns = ({
         // eslint-disable-next-line react-hooks/rules-of-hooks
         const { isRowSelected, onRowSelectionChange } = useRowSelection()
 
-        const value = row?.[col.id]
+        const value = row?.[col.id as keyof FormattedUserRow]
         const user = users?.find((u) => u.id === row.id)
-        const formattedValue =
-          value !== null && ['created_at', 'last_sign_in_at'].includes(col.id)
-            ? dayjs(value).format('ddd DD MMM YYYY HH:mm:ss [GMT]ZZ')
-            : Array.isArray(value)
-              ? col.id === 'providers'
-                ? value
-                    .map((x) => {
-                      const meta = PROVIDERS_SCHEMAS.find(
-                        (y) => ('key' in y && y.key === x) || y.title.toLowerCase() === x
-                      )
-                      return meta?.title
-                    })
-                    .join(', ')
-                : value.join(', ')
-              : value
+
         const isConfirmed = !!user?.confirmed_at
+        const isDateBasedValue =
+          value !== null &&
+          ['created_at', 'last_sign_in_at'].includes(col.id) &&
+          typeof value === 'string'
+
+        const formattedValue = isDateBasedValue
+          ? dayjs(value).format('ddd DD MMM YYYY HH:mm:ss [GMT]ZZ')
+          : Array.isArray(value)
+            ? col.id === 'providers'
+              ? formatUserProviders(value)
+              : value.join(', ')
+            : value
 
         if (col.id === 'img') {
           return (
             <div className="flex items-center justify-center gap-x-2">
-              <Checkbox_Shadcn_
+              <Checkbox
                 checked={isRowSelected}
                 onClick={(e) => {
                   e.stopPropagation()
@@ -348,8 +372,8 @@ export const formatUserColumns = ({
         }
 
         return (
-          <ContextMenu_Shadcn_>
-            <ContextMenuTrigger_Shadcn_ asChild>
+          <ContextMenu>
+            <ContextMenuTrigger asChild>
               <div
                 className={cn(
                   'w-full flex items-center text-xs',
@@ -360,26 +384,38 @@ export const formatUserColumns = ({
                 {col.id === 'providers' &&
                   row.provider_icons.map((icon: string, idx: number) => {
                     const provider = row.providers[idx]
-                    return (
-                      <div
-                        key={`${user?.id}-${provider}-wrapper`}
-                        className="min-w-6 min-h-6 rounded-full border flex items-center justify-center bg-surface-75"
-                        style={{
-                          marginLeft: idx === 0 ? 0 : `-8px`,
-                          zIndex: row.provider_icons.length - idx,
-                        }}
-                      >
-                        <img
-                          key={`${user?.id}-${provider}`}
-                          width={16}
-                          src={icon}
-                          alt={`${provider} auth icon`}
-                          className={cn(
-                            (provider === 'github' || provider === 'x') && 'dark:invert'
-                          )}
-                        />
-                      </div>
-                    )
+                    const isCustom = isCustomProvider(provider)
+
+                    if (isCustom) {
+                      return (
+                        <div
+                          key={`${user?.id}-${provider}-wrapper`}
+                          className="min-w-6 min-h-6 rounded-full border flex items-center justify-center bg-surface-75"
+                        >
+                          {provider.split('custom:')[1][0]}
+                        </div>
+                      )
+                    } else
+                      return (
+                        <div
+                          key={`${user?.id}-${provider}-wrapper`}
+                          className="min-w-6 min-h-6 rounded-full border flex items-center justify-center bg-surface-75"
+                          style={{
+                            marginLeft: idx === 0 ? 0 : `-8px`,
+                            zIndex: row.provider_icons.length - idx,
+                          }}
+                        >
+                          <img
+                            key={`${user?.id}-${provider}`}
+                            width={16}
+                            src={icon}
+                            alt={`${provider} auth icon`}
+                            className={cn(
+                              (provider === 'github' || provider === 'x') && 'dark:invert'
+                            )}
+                          />
+                        </div>
+                      )
                   })}
                 {col.id === 'last_sign_in_at' && !isConfirmed ? (
                   <p className="text-foreground-lighter">Waiting for verification</p>
@@ -389,21 +425,61 @@ export const formatUserColumns = ({
                   </p>
                 )}
               </div>
-            </ContextMenuTrigger_Shadcn_>
-            <ContextMenuContent_Shadcn_ onClick={(e) => e.stopPropagation()}>
-              <ContextMenuItem_Shadcn_
+            </ContextMenuTrigger>
+            <ContextMenuContent onClick={(e) => e.stopPropagation()}>
+              <ContextMenuItem
                 className="gap-x-2"
                 onFocusCapture={(e) => e.stopPropagation()}
                 onSelect={() => {
-                  const value = col.id === 'providers' ? row.providers.join(', ') : formattedValue
-                  copyToClipboard(value)
+                  const value =
+                    col.id === 'providers' && Array.isArray(row.providers)
+                      ? row.providers.join(', ')
+                      : formattedValue
+                  if (value) copyToClipboard(value)
                 }}
               >
                 <Copy size={12} />
                 <span>Copy {col.id === 'id' ? col.name : col.name.toLowerCase()}</span>
-              </ContextMenuItem_Shadcn_>
-              <ContextMenuSeparator_Shadcn_ />
-              <ContextMenuItem_Shadcn_
+              </ContextMenuItem>
+
+              <ContextMenuSeparator />
+
+              <ContextMenuItem
+                className="gap-x-2"
+                onFocusCapture={(e) => e.stopPropagation()}
+                onSelect={() => {
+                  if (user) onSelectImpersonateUser(user, 'table-editor')
+                }}
+              >
+                <TableEditor size={12} />
+                <span>View data as user</span>
+              </ContextMenuItem>
+
+              <ContextMenuItem
+                className="gap-x-2"
+                onFocusCapture={(e) => e.stopPropagation()}
+                onSelect={() => {
+                  if (user) onSelectImpersonateUser(user, 'sql')
+                }}
+              >
+                <SqlEditor size={12} />
+                <span>Run SQL as user</span>
+              </ContextMenuItem>
+
+              <ContextMenuItem
+                className="gap-x-2"
+                onFocusCapture={(e) => e.stopPropagation()}
+                onSelect={() => {
+                  if (user) onSelectViewLogs(user)
+                }}
+              >
+                <ScrollText size={12} />
+                <span>View user logs</span>
+              </ContextMenuItem>
+
+              <ContextMenuSeparator />
+
+              <ContextMenuItem
                 className="gap-x-2"
                 onFocusCapture={(e) => e.stopPropagation()}
                 onSelect={() => {
@@ -412,9 +488,9 @@ export const formatUserColumns = ({
               >
                 <Trash size={12} />
                 <span>Delete user</span>
-              </ContextMenuItem_Shadcn_>
-            </ContextMenuContent_Shadcn_>
-          </ContextMenu_Shadcn_>
+              </ContextMenuItem>
+            </ContextMenuContent>
+          </ContextMenu>
         )
       },
     }
@@ -426,7 +502,7 @@ export const formatUserColumns = ({
   if (columnOrder.length > 0) {
     gridColumns = gridColumns
       .filter((col) => columnOrder.includes(col.key))
-      .sort((a: any, b: any) => {
+      .sort((a, b) => {
         return columnOrder.indexOf(a.key) - columnOrder.indexOf(b.key)
       })
   }
@@ -435,5 +511,5 @@ export const formatUserColumns = ({
     ? gridColumns
     : ([profileImageColumn].concat(
         gridColumns.filter((col) => visibleColumns.includes(col.key))
-      ) as Column<any>[])
+      ) as Column<FormattedUserRow>[])
 }

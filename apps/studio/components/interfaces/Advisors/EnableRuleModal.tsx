@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -25,7 +24,6 @@ interface EnableRuleModalProps {
 
 export const EnableRuleModal = ({ lint, rule }: EnableRuleModalProps) => {
   const { ref } = useParams()
-  const router = useRouter()
 
   const [open, setOpen] = useState(false)
 
@@ -44,7 +42,7 @@ export const EnableRuleModal = ({ lint, rule }: EnableRuleModalProps) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button type="default">Enable rule</Button>
+        <Button variant="default">Enable rule</Button>
       </DialogTrigger>
       <DialogContent size="small">
         <DialogHeader>
@@ -58,10 +56,10 @@ export const EnableRuleModal = ({ lint, rule }: EnableRuleModalProps) => {
           </p>
         </DialogSection>
         <DialogFooter>
-          <Button disabled={isDeleting} type="default" onClick={() => setOpen(false)}>
+          <Button disabled={isDeleting} variant="default" onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button loading={isDeleting} type="primary" onClick={onDeleteRule}>
+          <Button loading={isDeleting} variant="primary" onClick={onDeleteRule}>
             Enable
           </Button>
         </DialogFooter>

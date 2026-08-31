@@ -1,51 +1,18 @@
 import { expect, Page } from '@playwright/test'
 
+import { createTableWithRLS, dropTable } from '../utils/db/queries.js'
 import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
-import { createApiResponseWaiter, waitForApiResponse } from '../utils/wait-for-response.js'
-import { createTableWithRLS, dropTable } from '../utils/db/queries.js'
+import { createApiResponseWaiter } from '../utils/wait-for-response.js'
 
 /**
  * Helper function to navigate to policies page and wait for it to load
  */
 const navigateToPoliciesPage = async (page: Page, ref: string) => {
-  const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'policies')
-  await page.goto(toUrl(`/project/${ref}/auth/policies`))
+  const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=policies')
+  await page.goto(toUrl(`/project/${ref}/database/policies`))
   await wait
   await page.waitForTimeout(500)
-}
-
-/**
- * Helper function to delete a policy if it exists
- */
-const deletePolicyIfExists = async (page: Page, ref: string, policyNameToDelete: string) => {
-  // Look for the policy in the table
-  const policyButton = page.getByRole('button', { name: policyNameToDelete })
-  const policyExists = (await policyButton.count()) > 0
-
-  if (policyExists) {
-    // Click the policy row actions button
-    await page.getByTestId(`policy-${policyNameToDelete}-actions-button`).click()
-    await page.waitForTimeout(200)
-
-    // Click delete
-    await page.getByText('Delete', { exact: true }).click()
-    await page.waitForTimeout(200)
-
-    const waitForDeletion = waitForApiResponse(page, 'pg-meta', ref, 'query?key=')
-    // Confirm deletion
-    await page.getByRole('button', { name: 'Delete' }).click()
-
-    // Wait for deletion to complete
-    await waitForDeletion
-
-    await expect(
-      page.getByText('Successfully removed policy'),
-      'Policy deletion confirmation should be visible'
-    ).toBeVisible({ timeout: 50000 })
-
-    await page.waitForTimeout(500)
-  }
 }
 
 test.describe('RLS Policies', () => {
@@ -159,6 +126,25 @@ test.describe('RLS Policies', () => {
           page.getByRole('heading', { name: 'Disable Row Level Security' }),
           'RLS disable confirmation modal should appear'
         ).toBeVisible({ timeout: 50000 })
+        await expect(
+          page.getByRole('alertdialog'),
+          'RLS disable confirmation should explain the access risk'
+        ).toContainText(
+          'This table will become publicly readable and writable. Anyone can view, add, update, or delete data in this table, and existing RLS policies will no longer apply.'
+        )
+        await expect(
+          page
+            .getByRole('alertdialog')
+            .locator('span.font-medium.text-foreground')
+            .filter({ hasText: 'Anyone can view, add, update, or delete data in this table' }),
+          'Key risk phrase should be visually emphasized'
+        ).toBeVisible()
+        await expect(
+          page.getByRole('alertdialog').getByRole('link', { name: 'Learn more' })
+        ).toHaveAttribute(
+          'href',
+          'https://supabase.com/docs/guides/database/postgres/row-level-security'
+        )
 
         // Confirm disabling RLS
         await page.getByRole('button', { name: 'Disable RLS' }).click()
@@ -232,7 +218,7 @@ test.describe('RLS Policies', () => {
       await expect(page.getByRole('radio', { name: 'SELECT' })).toBeChecked()
 
       // Fill in USING clause - allow all access
-      await page.locator('.view-lines').click()
+      await page.getByRole('textbox', { name: /Editor content/i }).focus()
       await page.keyboard.type('true')
 
       // Save policy
@@ -245,7 +231,7 @@ test.describe('RLS Policies', () => {
       ).toBeVisible({ timeout: 50000 })
 
       // Verify policy appears in the list
-      await expect(page.getByRole('button', { name: policySelectName })).toBeVisible()
+      await expect(page.getByRole('button', { name: policySelectName, exact: true })).toBeVisible()
 
       // Verify policy details
       const policyRow = page.locator(`tr:has-text("${policySelectName}")`)
@@ -283,14 +269,14 @@ test.describe('RLS Policies', () => {
       await page.getByRole('radio', { name: 'INSERT' }).click()
 
       // Select target role - authenticated
-      await page.getByText('Defaults to all (public) roles if none selected').click()
+      await page.getByRole('combobox', { name: 'Target Roles' }).click()
       await page.getByRole('option', { name: 'authenticated' }).click()
 
       // Close the dropdown
       await page.keyboard.press('Escape')
 
       // Fill in WITH CHECK clause - allow all inserts
-      await page.locator('.view-lines').click()
+      await page.getByRole('textbox', { name: /Editor content/i }).focus()
       await page.keyboard.type('true')
 
       // Save policy
@@ -302,7 +288,7 @@ test.describe('RLS Policies', () => {
       })
 
       // Verify policy appears with correct details
-      await expect(page.getByRole('button', { name: policyInsertName })).toBeVisible()
+      await expect(page.getByRole('button', { name: policyInsertName, exact: true })).toBeVisible()
       const policyRow = page.locator(`tr:has-text("${policyInsertName}")`)
       await expect(policyRow.locator('code').filter({ hasText: /^INSERT$/ })).toBeVisible()
       await expect(policyRow.locator('code').filter({ hasText: /^authenticated$/ })).toBeVisible()
@@ -338,12 +324,20 @@ test.describe('RLS Policies', () => {
       await page.getByRole('radio', { name: 'UPDATE' }).click()
 
       // Select authenticated role
-      await page.getByText('Defaults to all (public) roles if none selected').click()
+      await page.getByRole('combobox', { name: 'Target Roles' }).click()
       await page.getByRole('option', { name: 'authenticated' }).click()
       await page.keyboard.press('Escape')
 
+      await page
+        .getByRole('textbox', { name: /Editor content/i })
+        .nth(0)
+        .focus()
+      await page.keyboard.type('true')
       // Fill in USING clause (UPDATE has both USING and WITH CHECK editors, so use first)
-      await page.locator('.view-lines').first().click()
+      await page
+        .getByRole('textbox', { name: /Editor content/i })
+        .nth(1)
+        .focus()
       await page.keyboard.type('true')
 
       // Save policy
@@ -355,7 +349,7 @@ test.describe('RLS Policies', () => {
       })
 
       // Verify policy appears
-      await expect(page.getByRole('button', { name: policyUpdateName })).toBeVisible()
+      await expect(page.getByRole('button', { name: policyUpdateName, exact: true })).toBeVisible()
       const policyRow = page.locator(`tr:has-text("${policyUpdateName}")`)
       await expect(policyRow.locator('code').filter({ hasText: /^UPDATE$/ })).toBeVisible()
     })
@@ -390,12 +384,12 @@ test.describe('RLS Policies', () => {
       await page.getByRole('radio', { name: 'DELETE' }).click()
 
       // Select authenticated role
-      await page.getByText('Defaults to all (public) roles if none selected').click()
+      await page.getByRole('combobox', { name: 'Target Roles' }).click()
       await page.getByRole('option', { name: 'authenticated' }).click()
       await page.keyboard.press('Escape')
 
       // Fill in USING clause
-      await page.locator('.view-lines').click()
+      await page.getByRole('textbox', { name: /Editor content/i }).focus()
       await page.keyboard.type('true')
 
       // Save policy
@@ -407,7 +401,7 @@ test.describe('RLS Policies', () => {
       })
 
       // Verify policy appears
-      await expect(page.getByRole('button', { name: policyDeleteName })).toBeVisible()
+      await expect(page.getByRole('button', { name: policyDeleteName, exact: true })).toBeVisible()
       const policyRow = page.locator(`tr:has-text("${policyDeleteName}")`)
       await expect(policyRow.locator('code').filter({ hasText: /^DELETE$/ })).toBeVisible()
     })

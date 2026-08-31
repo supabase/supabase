@@ -26,14 +26,7 @@ import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
 import { isFeatureEnabled } from 'common'
 import { Fragment } from 'react'
 import ReactMarkdown from 'react-markdown'
-import {
-  Badge,
-  cn,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-} from 'ui'
+import { Badge, cn, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 
 import { type IApiEndPoint } from './Reference.api.utils'
 import { RefInternalLink } from './Reference.navigation.client'
@@ -171,8 +164,8 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
 
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
-      <StickyHeader title={command.title} className="col-[1_/_-1]" monoFont={true} />
-      <div className="w-full min-w-0 prose break-words mb-8">
+      <StickyHeader title={command.title} className="col-span-full" monoFont={true} />
+      <div className="w-full min-w-0 prose wrap-break-word mb-8">
         {command.description && <ReactMarkdown>{command.description}</ReactMarkdown>}
         {command.usage && (
           <div className="mb-8">
@@ -206,7 +199,7 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
         {(command.flags ?? []).length > 0 && (
           <>
             <h3 className="mb-3 text-base text-foreground">Flags</h3>
-            <ul>
+            <ul className="not-prose">
               {command.flags.map((flag, index) => (
                 <li key={index} className="border-t last-of-type:border-b py-5 flex flex-col gap-3">
                   <div className="flex flex-wrap items-baseline gap-3">
@@ -220,7 +213,7 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
                     )}
                   </div>
                   {flag.description && (
-                    <div className="prose break-words text-sm">
+                    <div className="prose wrap-break-word text-sm">
                       <ReactMarkdown>{flag.description}</ReactMarkdown>
                     </div>
                   )}
@@ -234,10 +227,10 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
         {'examples' in command &&
           Array.isArray(command.examples) &&
           command.examples.length > 0 && (
-            <Tabs_Shadcn_ defaultValue={command.examples[0].id}>
-              <TabsList_Shadcn_ className="flex-wrap gap-2 border-0">
+            <Tabs defaultValue={command.examples[0].id}>
+              <TabsList className="flex-wrap gap-2 border-0">
                 {command.examples.map((example) => (
-                  <TabsTrigger_Shadcn_
+                  <TabsTrigger
                     key={example.id}
                     value={example.id}
                     className={cn(
@@ -251,19 +244,19 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
                     )}
                   >
                     {example.name}
-                  </TabsTrigger_Shadcn_>
+                  </TabsTrigger>
                 ))}
-              </TabsList_Shadcn_>
+              </TabsList>
               {command.examples.map((example) => (
-                <TabsContent_Shadcn_ key={example.id} value={example.id}>
+                <TabsContent key={example.id} value={example.id}>
                   <CodeBlock lang="bash" className="mb-6">
                     {example.code}
                   </CodeBlock>
                   <h3 className="text-foreground-lighter text-sm mb-2">Response</h3>
                   <CodeBlock lang="txt">{example.response}</CodeBlock>
-                </TabsContent_Shadcn_>
+                </TabsContent>
               ))}
-            </Tabs_Shadcn_>
+            </Tabs>
           )}
       </div>
     </RefSubLayout.Section>
@@ -282,10 +275,7 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
     : await getApiEndpointById(section.id)
   if (!endpointDetails) return null
 
-  const endpointFgaPermissionGroups =
-    endpointDetails.security
-      ?.filter((sec) => 'fga_permissions' in sec)
-      .map((sec) => sec.fga_permissions) ?? []
+  const endpointFgaPermissionGroups = endpointDetails['x-fga-permissions'] ?? []
   const pathParameters = (endpointDetails.parameters ?? []).filter((param) => param.in === 'path')
   const queryParameters = (endpointDetails.parameters ?? []).filter((param) => param.in === 'query')
   const bodyParameters =
@@ -320,7 +310,7 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
             )}
           </>
         }
-        className="col-[1_/_-1]"
+        className="col-span-full"
       />
       <div className="flex flex-col gap-12">
         <div className="flex items-center gap-2">
@@ -342,7 +332,7 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
           </code>
         </div>
         {endpointDetails.description && (
-          <div className="prose break-words mb-8">
+          <div className="prose wrap-break-word mb-8">
             <ReactMarkdown>{endpointDetails.description}</ReactMarkdown>
           </div>
         )}
@@ -355,6 +345,20 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
                   {endpointDetails['x-oauth-scope']}
                 </span>
               </li>
+            </ul>
+          </section>
+        )}
+        {endpointDetails['x-allowed-plans'] && (
+          <section>
+            <h3 className="mb-3 text-base text-foreground">
+              This endpoint is only available on the following plans:
+            </h3>
+            <ul>
+              {endpointDetails['x-allowed-plans'].map((plan) => (
+                <li key={plan} className="list-['-'] ml-2 pl-2">
+                  <span className="font-mono text-sm font-medium text-foreground">{plan}</span>
+                </li>
+              ))}
             </ul>
           </section>
         )}
@@ -458,7 +462,7 @@ async function FunctionSection({
 
   let types: MethodTypes | VariableTypes | undefined
   if (useTypeSpec && '$ref' in fn) {
-    types = await getTypeSpec(fn['$ref'] as string)
+    types = await getTypeSpec(sdkId, version, fn['$ref'] as string)
   }
 
   const fullDescription = [
@@ -473,11 +477,11 @@ async function FunctionSection({
 
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
-      <StickyHeader {...section} className="col-[1_/_-1]" />
+      <StickyHeader {...section} className="col-span-full" />
 
       {/* Display method signature below title */}
       {types && 'params' in types && formatMethodSignature(types) && (
-        <div className="col-[1_/_-1] -mt-2 mb-4">
+        <div className="col-span-full -mt-2 mb-4">
           <code className="text-sm text-foreground-muted font-mono">
             {formatMethodSignature(types)}
           </code>
@@ -485,7 +489,7 @@ async function FunctionSection({
       )}
 
       <div className="overflow-hidden flex flex-col gap-8">
-        <div className="prose break-words text-sm">
+        <div className="prose wrap-break-word text-sm">
           <MDXRemoteRefs source={fullDescription} />
         </div>
         <FnParameterDetails
@@ -522,10 +526,10 @@ async function FunctionSection({
           if (examples.length === 0) return null
 
           return (
-            <Tabs_Shadcn_ defaultValue={examples[0].id}>
-              <TabsList_Shadcn_ className="flex-wrap gap-2 border-0">
+            <Tabs defaultValue={examples[0].id}>
+              <TabsList className="flex-wrap gap-2 border-0">
                 {examples.map((example) => (
-                  <TabsTrigger_Shadcn_
+                  <TabsTrigger
                     key={example.id}
                     value={example.id}
                     className={cn(
@@ -539,11 +543,11 @@ async function FunctionSection({
                     )}
                   >
                     {example.name}
-                  </TabsTrigger_Shadcn_>
+                  </TabsTrigger>
                 ))}
-              </TabsList_Shadcn_>
+              </TabsList>
               {examples.map((example) => (
-                <TabsContent_Shadcn_ key={example.id} value={example.id}>
+                <TabsContent key={example.id} value={example.id}>
                   <MDXRemoteRefs source={example.code} />
                   <div className="flex flex-col gap-2 mt-2">
                     {'data' in example && !!example.data?.sql && (
@@ -559,9 +563,9 @@ async function FunctionSection({
                       />
                     )}
                   </div>
-                </TabsContent_Shadcn_>
+                </TabsContent>
               ))}
-            </Tabs_Shadcn_>
+            </Tabs>
           )
         })()}
       </div>

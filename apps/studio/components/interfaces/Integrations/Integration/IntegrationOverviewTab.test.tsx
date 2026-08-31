@@ -40,6 +40,7 @@ vi.mock('@/hooks/misc/useSelectedProject', () => ({
     data: { ref: 'default', connectionString: 'postgres://localhost' },
   }),
   useIsOrioleDb: () => false,
+  useIsHighAvailability: () => false,
 }))
 
 vi.mock('common', async (importOriginal) => {
@@ -54,6 +55,17 @@ vi.mock('./MarkdownContent', () => ({
   MarkdownContent: () => null,
 }))
 
+vi.mock('../Landing/useIntegrationDetail', () => ({
+  useIntegrationDetail: () => ({
+    integration: {
+      id: 'test-integration',
+      name: 'Test Integration',
+      requiredExtensions: ['pg_net'],
+      missingExtensionsAlert: null,
+    },
+  }),
+}))
+
 describe('IntegrationOverviewTab', () => {
   beforeEach(() => {
     routerMock.setCurrentUrl('/project/default/integrations/test-integration/overview')
@@ -66,7 +78,7 @@ describe('IntegrationOverviewTab', () => {
     customRender(
       <IntegrationOverviewTab
         hideRequiredExtensionsSection
-        actions={<button>Enable webhooks</button>}
+        actions={<button tabIndex={0}>Enable webhooks</button>}
       />
     )
 
@@ -76,7 +88,9 @@ describe('IntegrationOverviewTab', () => {
   })
 
   it('disables actions when extensions are uninstalled and hideRequiredExtensionsSection is false', () => {
-    customRender(<IntegrationOverviewTab actions={<button>Enable integration</button>} />)
+    customRender(
+      <IntegrationOverviewTab actions={<button tabIndex={0}>Enable integration</button>} />
+    )
 
     const actionsArea = screen.getByText('Enable integration').closest('[aria-disabled]')
     expect(actionsArea).toHaveAttribute('aria-disabled', 'true')

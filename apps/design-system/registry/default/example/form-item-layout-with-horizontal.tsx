@@ -48,7 +48,7 @@ export default function FormItemLayoutDemo() {
         />
         <Separator />
         <div className="w-full flex justify-end">
-          <Button size="small" type="secondary" htmlType="submit">
+          <Button size="small" variant="secondary" type="submit">
             Submit
           </Button>
         </div>

@@ -1,0 +1,24 @@
+description = "Prefer '%r' to '%s'."
+level = "WARNING"
+words = [
+    [
+        "eg.",
+        "e.g.",
+    ],
+    [
+        "eg",
+        "e.g.",
+    ],
+    [
+        "i.e.",
+        "that is",
+    ],
+    [
+        "ie.",
+        "that is",
+    ],
+    [
+        "ie",
+        "that is",
+    ],
+]

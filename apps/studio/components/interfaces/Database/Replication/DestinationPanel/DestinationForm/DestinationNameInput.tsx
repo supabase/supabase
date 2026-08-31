@@ -1,5 +1,5 @@
 import type { UseFormReturn } from 'react-hook-form'
-import { FormControl, FormField, Input_Shadcn_ } from 'ui'
+import { FormControl, FormField, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
@@ -14,9 +14,21 @@ export const DestinationNameInput = ({ form }: DestinationNameInputProps) => {
       control={form.control}
       name="name"
       render={({ field }) => (
-        <FormItemLayout label="Name" layout="horizontal">
+        <FormItemLayout
+          label="Name"
+          layout="horizontal"
+          description="Used to identify this pipeline in Supabase."
+        >
           <FormControl>
-            <Input_Shadcn_ {...field} placeholder="My destination" />
+            <Input
+              {...field}
+              autoFocus
+              placeholder="My destination"
+              data-1p-ignore
+              data-lpignore="true"
+              data-form-type="other"
+              data-bwignore
+            />
           </FormControl>
         </FormItemLayout>
       )}

@@ -6,25 +6,26 @@ import { useMemo } from 'react'
 import {
   Badge,
   Button,
-  Checkbox_Shadcn_,
-  Label_Shadcn_,
+  Checkbox,
+  Label,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import BarChart from '@/components/ui/Charts/BarChart'
 import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
+import { getCumulativeResults } from '@/components/ui/QueryBlock/QueryBlock.utils'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 type Results = { rows: readonly any[] }
@@ -40,21 +41,6 @@ export type ChartConfig = {
   logScale?: boolean
 }
 
-const getCumulativeResults = (results: Results, config: ChartConfig) => {
-  if (!results?.rows?.length) {
-    return []
-  }
-
-  const cumulativeResults = results.rows.reduce((acc, row) => {
-    const prev = acc[acc.length - 1] || {}
-    const next = {
-      ...row,
-      [config.yKey]: (prev[config.yKey] || 0) + row[config.yKey],
-    }
-    return [...acc, next]
-  }, [])
-  return cumulativeResults
-}
 const VALID_RESULT_KEY_TYPES = ['number', 'string', 'date']
 
 type ChartConfigProps = {
@@ -133,7 +119,7 @@ export const ChartConfig = ({
   }
 
   return (
-    <ResizablePanelGroup orientation="horizontal" className="flex-grow h-full">
+    <ResizablePanelGroup orientation="horizontal" className="grow h-full">
       <ResizablePanel className="p-4 h-full" defaultSize="75">
         {!hasConfig ? (
           <ResizablePanel className="p-4 h-full" defaultSize="75">
@@ -176,13 +162,13 @@ export const ChartConfig = ({
       <ResizablePanel
         defaultSize="25"
         minSize="15"
-        className="px-3 py-3 space-y-4 !overflow-y-auto"
+        className="px-3 py-3 space-y-4 overflow-y-auto!"
       >
         <div className="flex justify-between items-center h-5">
           <h2 className="text-sm text-foreground-lighter">Chart options</h2>
           {config.xKey && config.yKey && (
             <ButtonTooltip
-              type="text"
+              variant="text"
               size="tiny"
               onClick={onFlip}
               disabled={!canFlip}
@@ -203,7 +189,7 @@ export const ChartConfig = ({
         </div>
 
         {!acknowledged && (
-          <Admonition showIcon={false} type="tip" className="p-2 relative group">
+          <Admonition showIcon={false} type="note" className="p-2 relative group">
             <Tooltip>
               <TooltipTrigger
                 onClick={() => setAcknowledged(true)}
@@ -217,86 +203,86 @@ export const ChartConfig = ({
               <Badge variant="success">New</Badge>
               <p className="text-xs">Add this chart to custom reports</p>
             </div>
-            <p className="text-xs text-foreground-light !mt-1">
+            <p className="text-xs text-foreground-light mt-1!">
               SQL snippets can now be added and saved to your custom reports. Try it out now!
             </p>
-            <Button asChild size="tiny" type="default" className="mt-1">
+            <Button asChild size="tiny" variant="default" className="mt-1">
               <Link href={`/project/${ref}/reports`}>Head to Reports</Link>
             </Button>
           </Admonition>
         )}
 
         <div>
-          <Label_Shadcn_ className="text-xs text-foreground-light">X Axis</Label_Shadcn_>
-          <Select_Shadcn_
+          <Label className="text-xs text-foreground-light">X Axis</Label>
+          <Select
             value={config.xKey}
             onValueChange={(value) => {
               onConfigChange({ ...config, xKey: value })
             }}
           >
-            <SelectTrigger_Shadcn_>{config.xKey || 'Select X Axis'}</SelectTrigger_Shadcn_>
-            <SelectContent_Shadcn_>
-              <SelectGroup_Shadcn_>
+            <SelectTrigger>{config.xKey || 'Select X Axis'}</SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
                 {resultKeys.map((key) => (
-                  <SelectItem_Shadcn_ value={key} key={key}>
+                  <SelectItem value={key} key={key}>
                     {key}
-                  </SelectItem_Shadcn_>
+                  </SelectItem>
                 ))}
-              </SelectGroup_Shadcn_>
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
 
         <div>
-          <Label_Shadcn_ className="text-xs text-foreground-light">Y Axis</Label_Shadcn_>
-          <Select_Shadcn_
+          <Label className="text-xs text-foreground-light">Y Axis</Label>
+          <Select
             value={config.yKey}
             onValueChange={(value) => {
               onConfigChange({ ...config, yKey: value })
             }}
           >
-            <SelectTrigger_Shadcn_>{config.yKey || 'Select Y Axis'}</SelectTrigger_Shadcn_>
-            <SelectContent_Shadcn_>
-              <SelectGroup_Shadcn_>
+            <SelectTrigger>{config.yKey || 'Select Y Axis'}</SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
                 {yAxisKeys.map((key) => (
-                  <SelectItem_Shadcn_ value={key} key={key}>
+                  <SelectItem value={key} key={key}>
                     {key}
-                  </SelectItem_Shadcn_>
+                  </SelectItem>
                 ))}
-              </SelectGroup_Shadcn_>
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
         <div className="*:flex *:gap-2 *:items-center grid gap-2 *:text-foreground-light *:p-1.5 *:pl-0">
-          <Label_Shadcn_ className="" htmlFor="cumulative">
-            <Checkbox_Shadcn_
+          <Label className="" htmlFor="cumulative">
+            <Checkbox
               id="cumulative"
               name="cumulative"
               checked={config.cumulative}
               onClick={() => onConfigChange({ ...config, cumulative: !config.cumulative })}
             />
             Cumulative
-          </Label_Shadcn_>
+          </Label>
 
-          <Label_Shadcn_ htmlFor="showLabels">
-            <Checkbox_Shadcn_
+          <Label htmlFor="showLabels">
+            <Checkbox
               id="showLabels"
               name="showLabels"
               checked={config.showLabels}
               onClick={() => onConfigChange({ ...config, showLabels: !config.showLabels })}
             />
             Show labels
-          </Label_Shadcn_>
+          </Label>
 
-          <Label_Shadcn_ htmlFor="showGrid">
-            <Checkbox_Shadcn_
+          <Label htmlFor="showGrid">
+            <Checkbox
               id="showGrid"
               name="showGrid"
               checked={config.showGrid}
               onClick={() => onConfigChange({ ...config, showGrid: !config.showGrid })}
             />
             Show grid
-          </Label_Shadcn_>
+          </Label>
         </div>
       </ResizablePanel>
     </ResizablePanelGroup>

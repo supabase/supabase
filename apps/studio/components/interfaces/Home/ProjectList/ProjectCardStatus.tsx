@@ -163,7 +163,7 @@ export const ProjectCardStatus = ({
   if (!alertTitle) return null
 
   return (
-    <div role="alert" className={cn('w-full p-5 pb-[1.25rem] flex flex-row gap-x-2 items-center')}>
+    <div role="alert" className={cn('w-full p-5 pb-5 flex flex-row gap-x-2 items-center')}>
       {/* Icon */}
       <div
         className={cn(

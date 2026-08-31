@@ -1,6 +1,6 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { Search } from 'lucide-react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import {
   Button,
   Card,
@@ -16,22 +16,37 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition, TimestampInfo } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { MigrationsEmptyState } from './MigrationsEmptyState'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { DatabaseMigration, useMigrationsQuery } from '@/data/database/migrations-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { formatMigrationVersionLabel, parseMigrationVersion } from '@/lib/migration-utils'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
-const Migrations = () => {
+export const Migrations = () => {
   const [search, setSearch] = useState('')
   const [selectedMigration, setSelectedMigration] = useState<DatabaseMigration>()
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search migrations' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setSearch(''))
 
   const { data: project } = useSelectedProjectQuery()
   const {
@@ -76,7 +91,7 @@ const Migrations = () => {
               </>
             }
           >
-            <Button key="contact-support" asChild type="default">
+            <Button key="contact-support" asChild variant="default">
               <SupportLink
                 queryParams={{
                   projectRef: project?.ref,
@@ -96,11 +111,12 @@ const Migrations = () => {
             {data.length > 0 && (
               <div className="flex flex-col gap-y-4">
                 <Input
+                  ref={searchInputRef}
                   size="tiny"
                   placeholder="Search for a migration"
                   value={search}
                   className="w-full lg:w-52"
-                  onChange={(e: any) => setSearch(e.target.value)}
+                  onChange={(e) => setSearch(e.target.value)}
                   icon={<Search />}
                 />
                 <Card>
@@ -127,7 +143,7 @@ const Migrations = () => {
                               <TableCell>{migration.version}</TableCell>
                               <TableCell
                                 className={cn(
-                                  (migration?.name ?? '').length === 0 && '!text-foreground-lighter'
+                                  (migration?.name ?? '').length === 0 && 'text-foreground-lighter!'
                                 )}
                               >
                                 {migration?.name ?? 'Name not available'}
@@ -161,7 +177,7 @@ const Migrations = () => {
                               </TableCell>
                               <TableCell align="right">
                                 <Button
-                                  type="default"
+                                  variant="default"
                                   onClick={() => setSelectedMigration(migration)}
                                 >
                                   View migration SQL
@@ -196,7 +212,7 @@ const Migrations = () => {
         onCancel={() => setSelectedMigration(undefined)}
         customFooter={
           <div className="flex items-center justify-end p-4 border-t border-overlay-border">
-            <Button type="default" onClick={() => setSelectedMigration(undefined)}>
+            <Button variant="default" onClick={() => setSelectedMigration(undefined)}>
               Close
             </Button>
           </div>
@@ -205,10 +221,14 @@ const Migrations = () => {
         <div className="h-full">
           <div className="relative h-full">
             <CodeEditor
+              // The CodeEditor does not react to content only changes,
+              // specifically when two projects have migrations with the same version but different content.
+              // Setting the key ensure it always update when the migration changes
+              key={`${project?.ref}-${selectedMigration?.version}`}
               isReadOnly
               id={selectedMigration?.version ?? ''}
               language="pgsql"
-              defaultValue={
+              value={
                 selectedMigration?.statements?.join(';\n') +
                 (selectedMigration?.statements?.length ? ';' : '')
               }
@@ -219,5 +239,3 @@ const Migrations = () => {
     </>
   )
 }
-
-export default Migrations

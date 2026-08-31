@@ -9,48 +9,50 @@ import { useRouter } from 'next/router'
 import React, { useEffect, useState, type PropsWithChildren } from 'react'
 import { toast } from 'sonner'
 import {
-  BreadcrumbItem_Shadcn_ as BreadcrumbItem,
-  BreadcrumbLink_Shadcn_ as BreadcrumbLink,
-  BreadcrumbList_Shadcn_ as BreadcrumbList,
-  BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
   Button,
+  copyToClipboard,
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
   NavMenu,
   NavMenuItem,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Separator,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { PageBreadcrumbs, PageBreadcrumbsActions } from 'ui-patterns/PageBreadcrumbs'
 import {
   PageHeader,
-  PageHeaderAside,
-  PageHeaderBreadcrumb,
   PageHeaderDescription,
   PageHeaderMeta,
   PageHeaderNavigationTabs,
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { ProjectLayout } from '../ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
 import { EdgeFunctionTesterSheet } from '@/components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
+import { useFunctionsDetailShortcuts } from '@/components/interfaces/Functions/useFunctionsDetailShortcuts'
 import CopyButton from '@/components/ui/CopyButton'
 import { DocsButton } from '@/components/ui/DocsButton'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useEdgeFunctionBodyQuery } from '@/data/edge-functions/edge-function-body-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 dayjs.extend(relativeTime)
 
@@ -63,9 +65,8 @@ const EdgeFunctionDetailsLayout = ({
   children,
 }: PropsWithChildren<EdgeFunctionDetailsLayoutProps>) => {
   const router = useRouter()
-  const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
   const { functionSlug, ref } = useParams()
-  const { mutate: sendEvent } = useSendEventMutation()
 
   const { isLoading, can: canReadFunctions } = useAsyncCheckPermissions(
     PermissionAction.FUNCTIONS_READ,
@@ -73,6 +74,7 @@ const EdgeFunctionDetailsLayout = ({
   )
 
   const [isOpen, setIsOpen] = useState(false)
+  const [isDownloadOpen, setIsDownloadOpen] = useState(false)
   const [isTimestampHoverCardOpen, setIsTimestampHoverCardOpen] = useState(false)
 
   const {
@@ -235,6 +237,30 @@ const EdgeFunctionDetailsLayout = ({
     }
   }, [isError])
 
+  const openTestSheet = () => {
+    if (!functionSlug) return
+    setIsOpen(true)
+    if (IS_PLATFORM) {
+      track('edge_function_test_side_panel_opened')
+    }
+  }
+
+  const copyFunctionUrl = () => {
+    if (!functionUrl) return
+    copyToClipboard(functionUrl)
+    toast.success('Function URL copied to clipboard')
+  }
+
+  useFunctionsDetailShortcuts({
+    projectRef: ref,
+    functionSlug,
+    canReadFunctions,
+    isPlatform: IS_PLATFORM,
+    onOpenTest: openTestSheet,
+    onOpenDownload: () => setIsDownloadOpen((prev) => !prev),
+    onCopyUrl: copyFunctionUrl,
+  })
+
   if (!isLoading && !canReadFunctions) {
     return (
       <ProjectLayout product="Edge Functions" browserTitle={browserTitle}>
@@ -246,9 +272,67 @@ const EdgeFunctionDetailsLayout = ({
   return (
     <EdgeFunctionsLayout title={title} browserTitle={browserTitle}>
       <div className="w-full min-h-full flex flex-col items-stretch">
-        <PageHeader size="full" className="sticky top-0 z-10 bg-surface-75">
+        <div className="sticky top-0 z-10">
           {breadcrumbItems.length > 0 && (
-            <PageHeaderBreadcrumb>
+            <PageBreadcrumbs
+              slotClassName="bg-sidebar"
+              actions={
+                <PageBreadcrumbsActions>
+                  <DocsButton href={`${DOCS_URL}/guides/functions`} />
+                  <Popover open={isDownloadOpen} onOpenChange={setIsDownloadOpen}>
+                    <ShortcutTooltip
+                      shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_OPEN_DOWNLOAD}
+                      side="bottom"
+                      open={isDownloadOpen ? false : undefined}
+                    >
+                      <PopoverTrigger asChild>
+                        <Button variant="default" icon={<Download />}>
+                          Download
+                        </Button>
+                      </PopoverTrigger>
+                    </ShortcutTooltip>
+                    <PopoverContent align="end" className="p-0">
+                      {IS_PLATFORM && (
+                        <>
+                          <div className="p-3 flex flex-col gap-y-2">
+                            <p className="text-xs text-foreground-light">Download via CLI</p>
+                            <Input
+                              copy
+                              showCopyOnHover
+                              readOnly
+                              containerClassName=""
+                              className="text-xs font-mono tracking-tighter"
+                              value={`supabase functions download ${functionSlug}`}
+                            />
+                          </div>
+                          <Separator className="bg-border-overlay!" />
+                        </>
+                      )}
+                      <div className="py-2 px-1">
+                        <Button
+                          variant="text"
+                          className="w-min hover:bg-transparent"
+                          icon={<FileArchive />}
+                          onClick={downloadFunction}
+                        >
+                          Download as ZIP
+                        </Button>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                  {!!functionSlug && (
+                    <ShortcutTooltip
+                      shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_OPEN_TEST}
+                      side="bottom"
+                    >
+                      <Button variant="default" icon={<Send />} onClick={openTestSheet}>
+                        Test
+                      </Button>
+                    </ShortcutTooltip>
+                  )}
+                </PageBreadcrumbsActions>
+              }
+            >
               <BreadcrumbList>
                 {breadcrumbItems.map((item, index) => (
                   <React.Fragment key={item.label || `breadcrumb-${index}`}>
@@ -265,145 +349,91 @@ const EdgeFunctionDetailsLayout = ({
                   </React.Fragment>
                 ))}
               </BreadcrumbList>
-            </PageHeaderBreadcrumb>
+            </PageBreadcrumbs>
           )}
 
-          <PageHeaderMeta>
-            <PageHeaderSummary>
-              <PageHeaderTitle>{functionSlug ? name : 'Edge Functions'}</PageHeaderTitle>
-              <PageHeaderDescription className="flex flex-row flex-wrap items-center gap-x-4 gap-y-1 !text-sm">
-                <div className="flex items-center gap-x-2">
-                  <span className="flex items-center gap-2">{functionUrl}</span>
-                  <CopyButton iconOnly type="text" text={functionUrl} />
-                </div>
+          <PageHeader size="full" className="bg-surface-75">
+            <PageHeaderMeta>
+              <PageHeaderSummary>
+                <PageHeaderTitle>{functionSlug ? name : 'Edge Functions'}</PageHeaderTitle>
+                <PageHeaderDescription className="flex flex-row flex-wrap items-center gap-x-4 gap-y-1 text-sm!">
+                  <div className="flex items-center gap-x-2">
+                    <span className="flex items-center gap-2">{functionUrl}</span>
+                    <ShortcutTooltip
+                      shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_COPY_URL}
+                      side="bottom"
+                    >
+                      <CopyButton iconOnly variant="text" text={functionUrl} />
+                    </ShortcutTooltip>
+                  </div>
 
-                <HoverCard
-                  openDelay={250}
-                  closeDelay={100}
-                  open={isTimestampHoverCardOpen}
-                  onOpenChange={setIsTimestampHoverCardOpen}
-                >
-                  <HoverCardTrigger asChild>
-                    <button type="button" className="flex items-center gap-2 group">
-                      <Clock size={16} strokeWidth={1.5} className="text-foreground-lighter" />
-                      <span className="transition text-foreground-light group-hover:text-foreground underline decoration-dotted decoration-foreground-muted underline-offset-4">
-                        {updatedRelative ?? 'Deploy status unavailable'}
-                      </span>
-                    </button>
-                  </HoverCardTrigger>
-                  <HoverCardContent side="bottom" align="start" className="w-40 p-0">
-                    {createdRelative && (
-                      <div className="px-4 py-2 space-y-1">
-                        <h3 className="heading-meta text-foreground-light">Created</h3>
-                        {!!selectedFunction && (
-                          <TimestampInfo
-                            className="text-sm"
-                            label={createdRelative}
-                            utcTimestamp={selectedFunction.created_at}
-                          />
-                        )}
-                      </div>
-                    )}
-                    {updatedRelative && (
-                      <div className="px-4 py-2 space-y-1">
-                        <h3 className="heading-meta text-foreground-light">Last deployed</h3>
-                        {!!selectedFunction && (
-                          <TimestampInfo
-                            className="text-sm"
-                            label={updatedRelative}
-                            utcTimestamp={selectedFunction.updated_at}
-                          />
-                        )}
-                      </div>
-                    )}
-                    {selectedFunction?.version !== undefined && (
-                      <div className="px-4 py-2 space-y-1">
-                        <h3 className="heading-meta text-foreground-light">Deployments</h3>
-                        <p className="text-sm text-foreground">{selectedFunction.version}</p>
-                      </div>
-                    )}
-                  </HoverCardContent>
-                </HoverCard>
-              </PageHeaderDescription>
-            </PageHeaderSummary>
-
-            <PageHeaderAside>
-              <div className="flex items-center space-x-2">
-                <DocsButton href={`${DOCS_URL}/guides/functions`} />
-                <Popover_Shadcn_>
-                  <PopoverTrigger_Shadcn_ asChild>
-                    <Button type="default" icon={<Download />}>
-                      Download
-                    </Button>
-                  </PopoverTrigger_Shadcn_>
-                  <PopoverContent_Shadcn_ align="end" className="p-0">
-                    {IS_PLATFORM && (
-                      <>
-                        <div className="p-3 flex flex-col gap-y-2">
-                          <p className="text-xs text-foreground-light">Download via CLI</p>
-                          <Input
-                            copy
-                            showCopyOnHover
-                            readOnly
-                            containerClassName=""
-                            className="text-xs font-mono tracking-tighter"
-                            value={`supabase functions download ${functionSlug}`}
-                          />
-                        </div>
-                        <Separator className="!bg-border-overlay" />
-                      </>
-                    )}
-                    <div className="py-2 px-1">
-                      <Button
-                        type="text"
-                        className="w-min hover:bg-transparent"
-                        icon={<FileArchive />}
-                        onClick={downloadFunction}
-                      >
-                        Download as ZIP
-                      </Button>
-                    </div>
-                  </PopoverContent_Shadcn_>
-                </Popover_Shadcn_>
-                {!!functionSlug && (
-                  <Button
-                    type="default"
-                    icon={<Send />}
-                    onClick={() => {
-                      setIsOpen(true)
-                      if (IS_PLATFORM) {
-                        sendEvent({
-                          action: 'edge_function_test_side_panel_opened',
-                          groups: {
-                            project: ref ?? 'Unknown',
-                            organization: org?.slug ?? 'Unknown',
-                          },
-                        })
-                      }
-                    }}
+                  <HoverCard
+                    openDelay={250}
+                    closeDelay={100}
+                    open={isTimestampHoverCardOpen}
+                    onOpenChange={setIsTimestampHoverCardOpen}
                   >
-                    Test
-                  </Button>
-                )}
-              </div>
-            </PageHeaderAside>
-          </PageHeaderMeta>
+                    <HoverCardTrigger asChild>
+                      <button type="button" tabIndex={0} className="flex items-center gap-2 group">
+                        <Clock size={16} strokeWidth={1.5} className="text-foreground-lighter" />
+                        <span className="transition text-foreground-light group-hover:text-foreground underline decoration-dotted decoration-foreground-muted underline-offset-4">
+                          {updatedRelative ?? 'Deploy status unavailable'}
+                        </span>
+                      </button>
+                    </HoverCardTrigger>
+                    <HoverCardContent side="bottom" align="start" className="w-40 p-0">
+                      {createdRelative && (
+                        <div className="px-4 py-2 space-y-1">
+                          <h3 className="heading-meta text-foreground-light">Created</h3>
+                          {!!selectedFunction && (
+                            <TimestampInfo
+                              className="text-sm"
+                              label={createdRelative}
+                              utcTimestamp={selectedFunction.created_at}
+                            />
+                          )}
+                        </div>
+                      )}
+                      {updatedRelative && (
+                        <div className="px-4 py-2 space-y-1">
+                          <h3 className="heading-meta text-foreground-light">Last deployed</h3>
+                          {!!selectedFunction && (
+                            <TimestampInfo
+                              className="text-sm"
+                              label={updatedRelative}
+                              utcTimestamp={selectedFunction.updated_at}
+                            />
+                          )}
+                        </div>
+                      )}
+                      {selectedFunction?.version !== undefined && (
+                        <div className="px-4 py-2 space-y-1">
+                          <h3 className="heading-meta text-foreground-light">Deployments</h3>
+                          <p className="text-sm text-foreground">{selectedFunction.version}</p>
+                        </div>
+                      )}
+                    </HoverCardContent>
+                  </HoverCard>
+                </PageHeaderDescription>
+              </PageHeaderSummary>
+            </PageHeaderMeta>
 
-          {navigationItems.length > 0 && (
-            <PageHeaderNavigationTabs>
-              <NavMenu>
-                {navigationItems.map((item) => {
-                  const isActive = router.asPath.split('?')[0] === item.href
-                  return (
-                    <NavMenuItem key={item.label} active={isActive}>
-                      <Link href={item.href}>{item.label}</Link>
-                    </NavMenuItem>
-                  )
-                })}
-              </NavMenu>
-            </PageHeaderNavigationTabs>
-          )}
-        </PageHeader>
+            {navigationItems.length > 0 && (
+              <PageHeaderNavigationTabs>
+                <NavMenu>
+                  {navigationItems.map((item) => {
+                    const isActive = router.asPath.split('?')[0] === item.href
+                    return (
+                      <NavMenuItem key={item.label} active={isActive}>
+                        <Link href={item.href}>{item.label}</Link>
+                      </NavMenuItem>
+                    )
+                  })}
+                </NavMenu>
+              </PageHeaderNavigationTabs>
+            )}
+          </PageHeader>
+        </div>
 
         {children}
         <EdgeFunctionTesterSheet visible={isOpen} onClose={() => setIsOpen(false)} />

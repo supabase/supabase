@@ -1,3 +1,6 @@
+// Required to avoid issue:
+// The inferred type of InfoTooltip cannot be named without a reference to TooltipContentProps
+import { Tooltip as _RadixToolpip } from 'radix-ui'
 import { ElementRef, forwardRef } from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -19,16 +22,16 @@ const SVG = forwardRef<SVGSVGElement, React.SVGProps<SVGSVGElement>>((props, ref
 
 const InfoTooltip = forwardRef<
   ElementRef<typeof TooltipContent>,
-  React.ComponentPropsWithoutRef<typeof TooltipContent>
->(({ ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof TooltipContent> & { label?: string }
+>(({ label, ...props }, _ref) => {
   return (
     <Tooltip>
       <TooltipTrigger
         type="button"
-        role="button"
         className="flex [&_svg]:data-[state=delayed-open]:fill-foreground-lighter [&_svg]:data-[state=instant-open]:fill-foreground-lighter"
       >
         <SVG strokeWidth={2} className="transition-colors fill-foreground-muted w-4 h-4" />
+        <span className="sr-only">{label ?? 'More information'}</span>
       </TooltipTrigger>
       <TooltipContent {...props} />
     </Tooltip>

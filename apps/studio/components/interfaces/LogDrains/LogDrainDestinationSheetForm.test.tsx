@@ -1,20 +1,22 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ComponentProps } from 'react'
+import { toast } from 'sonner'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { LogDrainDestinationSheetForm } from './LogDrainDestinationSheetForm'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { render } from '@/tests/helpers'
 
-const { trackMock, useFlagMock, useLogDrainsQueryMock, useParamsMock, useTrackMock } = vi.hoisted(
-  () => ({
+const { mockShortcut, trackMock, useFlagMock, useLogDrainsQueryMock, useParamsMock, useTrackMock } =
+  vi.hoisted(() => ({
+    mockShortcut: vi.fn(({ children }: any) => <div data-testid="shortcut">{children}</div>),
     trackMock: vi.fn(),
     useFlagMock: vi.fn(),
     useLogDrainsQueryMock: vi.fn(),
     useParamsMock: vi.fn(),
     useTrackMock: vi.fn(),
-  })
-)
+  }))
 
 vi.mock(import('common'), async (importOriginal) => {
   const actual = await importOriginal()
@@ -38,6 +40,10 @@ vi.mock(import('@/data/log-drains/log-drains-query'), async (importOriginal) => 
 
 vi.mock('@/lib/telemetry/track', () => ({
   useTrack: useTrackMock,
+}))
+
+vi.mock('@/components/ui/Shortcut', () => ({
+  Shortcut: mockShortcut,
 }))
 
 vi.mock('sonner', () => ({
@@ -79,13 +85,61 @@ describe('LogDrainDestinationSheetForm', () => {
     useTrackMock.mockReturnValue(trackMock)
   })
 
-  it('shows the JSON content type header for webhook create mode', async () => {
+  it('does not prefill a Content-Type header for webhook create mode', async () => {
     renderForm()
 
     await screen.findByRole('dialog')
 
-    expect(screen.getByDisplayValue('Content-Type')).toBeInTheDocument()
-    expect(screen.getByDisplayValue('application/json')).toBeInTheDocument()
+    expect(screen.queryByDisplayValue('Content-Type')).not.toBeInTheDocument()
+    expect(screen.queryByDisplayValue('application/json')).not.toBeInTheDocument()
+  })
+
+  it('wraps the save button with the save destination shortcut while open', async () => {
+    renderForm()
+
+    await screen.findByRole('dialog')
+
+    expect(mockShortcut).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: SHORTCUT_IDS.LOG_DRAINS_SAVE_DESTINATION,
+        onTrigger: expect.any(Function),
+        options: { enabled: true },
+        side: 'top',
+      }),
+      undefined
+    )
+    expect(screen.getByRole('button', { name: 'Save destination' })).toBeInTheDocument()
+  })
+
+  it('blocks submission when the destination name matches an existing drain', async () => {
+    const user = userEvent.setup()
+    const { onSubmit } = renderForm({ existingDrainNames: ['existing-drain'] })
+
+    await screen.findByRole('dialog')
+
+    await user.type(screen.getByPlaceholderText('My Destination'), 'existing-drain')
+    submitForm()
+
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Log drain name already exists'))
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('invokes onSaveClick with the destination type when saving', async () => {
+    const user = userEvent.setup()
+    const onSaveClick = vi.fn()
+    const { onSubmit } = renderForm({ onSaveClick })
+
+    await screen.findByRole('dialog')
+
+    await user.type(screen.getByPlaceholderText('My Destination'), 'Webhook sink')
+    await user.type(
+      screen.getByPlaceholderText('https://example.com/log-drain'),
+      'https://logs.example.com/ingest'
+    )
+    submitForm()
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
+    expect(onSaveClick).toHaveBeenCalledWith('webhook')
   })
 
   it('shows the protobuf content type header for OTLP create mode', async () => {
@@ -115,8 +169,8 @@ describe('LogDrainDestinationSheetForm', () => {
     const headerNameInputs = screen.getAllByPlaceholderText('Header name')
     const headerValueInputs = screen.getAllByPlaceholderText('Header value')
 
-    await user.type(headerNameInputs[1], 'X-API-Key')
-    await user.type(headerValueInputs[1], 'secret-key')
+    await user.type(headerNameInputs[0], 'X-API-Key')
+    await user.type(headerValueInputs[0], 'secret-key')
 
     submitForm()
 
@@ -125,7 +179,6 @@ describe('LogDrainDestinationSheetForm', () => {
       expect.objectContaining({
         type: 'webhook',
         headers: {
-          'Content-Type': 'application/json',
           'X-API-Key': 'secret-key',
         },
       })
@@ -145,12 +198,15 @@ describe('LogDrainDestinationSheetForm', () => {
       'https://logs.example.com/ingest'
     )
     await user.click(screen.getByRole('button', { name: 'Add a new header' }))
+    await user.click(screen.getByRole('button', { name: 'Add a new header' }))
 
     const headerNameInputs = screen.getAllByPlaceholderText('Header name')
     const headerValueInputs = screen.getAllByPlaceholderText('Header value')
 
-    await user.type(headerNameInputs[1], 'Content-Type')
-    await user.type(headerValueInputs[1], 'application/custom')
+    await user.type(headerNameInputs[0], 'X-Custom')
+    await user.type(headerValueInputs[0], 'one')
+    await user.type(headerNameInputs[1], 'X-Custom')
+    await user.type(headerValueInputs[1], 'two')
 
     submitForm()
 
@@ -177,11 +233,9 @@ describe('LogDrainDestinationSheetForm', () => {
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
         type: 'webhook',
-        headers: {
-          'Content-Type': 'application/json',
-        },
       })
     )
+    expect(onSubmit.mock.calls[0][0]).not.toHaveProperty('headers')
     expect(screen.queryByText('undefined')).not.toBeInTheDocument()
   })
 
@@ -199,7 +253,7 @@ describe('LogDrainDestinationSheetForm', () => {
     await user.click(screen.getByRole('button', { name: 'Add a new header' }))
 
     const headerNameInputs = screen.getAllByPlaceholderText('Header name')
-    await user.type(headerNameInputs[1], 'X-Draft-Only')
+    await user.type(headerNameInputs[0], 'X-Draft-Only')
 
     submitForm()
 
@@ -222,7 +276,7 @@ describe('LogDrainDestinationSheetForm', () => {
     await user.click(screen.getByRole('button', { name: 'Add a new header' }))
 
     const headerValueInputs = screen.getAllByPlaceholderText('Header value')
-    await user.type(headerValueInputs[1], 'draft-value')
+    await user.type(headerValueInputs[0], 'draft-value')
 
     submitForm()
 

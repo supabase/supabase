@@ -34,7 +34,7 @@ const deleteTable = async (page: Page, ref: string, tableName: string) => {
 }
 
 const deleteEnumIfExist = async (page: Page, ref: string, enumName: string) => {
-  const loadTypesPromise = waitForApiResponse(page, 'pg-meta', ref, `types`)
+  const loadTypesPromise = waitForApiResponse(page, 'pg-meta', ref, `query?key=types`)
   await page.goto(toUrl(`/project/${ref}/database/types?schema=public`))
   await loadTypesPromise
   expect(page.getByText('public').first()).toBeVisible()
@@ -155,6 +155,37 @@ testRunner('table editor', () => {
     await expect(page.getByLabel(`View ${authTableMfa}`)).toBeVisible()
   })
 
+  test('protected schema empty tables do not expose CSV import actions', async ({ page, ref }) => {
+    const emptyAuthTables = await query<{ relname: string }>(`
+      select relname
+      from pg_stat_user_tables
+      where schemaname = 'auth'
+        and n_live_tup = 0
+        and relname <> 'schema_migrations'
+      order by relname
+      limit 1;
+    `)
+    test.skip(emptyAuthTables.length === 0, 'Requires an empty auth table in the test dataset')
+    const [{ relname: tableName }] = emptyAuthTables
+
+    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+
+    await page.getByTestId('schema-selector').click()
+    await page.getByPlaceholder('Find schema...').fill('auth')
+
+    const tableLoadPromise = waitForTableToLoad(page, ref, 'auth')
+    await page.getByRole('option', { name: 'auth' }).click()
+    await tableLoadPromise
+
+    await expect(page.getByRole('button', { name: `View ${tableName}`, exact: true })).toBeVisible()
+    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=auth$/)
+
+    await expect(page.getByText('This table is empty')).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Import data from CSV' })).not.toBeVisible()
+    await expect(page.getByText('or drag and drop a CSV file here')).not.toBeVisible()
+  })
+
   test('should show rls accordingly', async ({ page, ref }) => {
     const tableNameRlsEnabled = 'pw_table_rls_enabled'
     const tableNameRlsDisabled = 'pw_table_rls_disabled'
@@ -176,7 +207,15 @@ testRunner('table editor', () => {
     await expect(page.getByRole('link', { name: 'Add RLS policy' })).toBeVisible()
 
     await page.getByRole('button', { name: `View ${tableNameRlsDisabled}` }).click()
-    await expect(page.getByRole('button', { name: 'RLS disabled' })).toBeVisible()
+    await page.getByRole('button', { name: 'RLS disabled' }).click()
+    await page.getByRole('button', { name: 'Enable RLS for this table' }).click()
+    await expect(page.getByRole('heading', { name: 'Enable Row Level Security' })).toBeVisible()
+    await expect(
+      page.getByText(
+        'RLS restricts table access until policies allow a request. Existing queries may stop returning rows until policies are added.'
+      )
+    ).toBeVisible()
+    await page.getByRole('button', { name: 'Cancel' }).click()
   })
 
   test('add enums and show enums on table', async ({ page, ref }) => {
@@ -212,8 +251,14 @@ testRunner('table editor', () => {
     await expect(page.getByRole('cell', { name: 'value1, value2', exact: true })).toBeVisible()
 
     // create a new table with new column for enums
+    const tableEditorEnumLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.goto(toUrl(`/project/${ref}/editor`))
-    await waitForTableToLoad(page, ref) // load tables
+    await tableEditorEnumLoadWait // load tables
 
     await page.getByRole('button', { name: 'New table', exact: true }).click()
     await page.getByTestId('table-name-input').fill(tableNameEnum)
@@ -243,16 +288,18 @@ testRunner('table editor', () => {
 
     // insert row with enum value
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByText('Insert a new row into').click()
-    await page.getByRole('combobox').selectOption('value1')
+    await page.getByText('Insert row').click()
+    await page.getByRole('combobox').click()
+    await page.getByRole('option', { name: 'value1' }).click()
     await page.getByTestId('action-bar-save-row').click()
     await expect(page.getByTestId('side-panel-row-editor')).not.toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'value1' })).toBeVisible()
 
     // insert row with another enum value
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByText('Insert a new row into').click()
-    await page.getByRole('combobox').selectOption('value2')
+    await page.getByText('Insert row').click()
+    await page.getByRole('combobox').click()
+    await page.getByRole('option', { name: 'value2' }).click()
     await page.getByTestId('action-bar-save-row').click()
     await expect(page.getByRole('gridcell', { name: 'value2' })).toBeVisible({ timeout: 10_000 })
 
@@ -288,7 +335,7 @@ testRunner('table editor', () => {
     // create 3 rows
     for (const value of ['789', '456', '123']) {
       await page.getByTestId('table-editor-insert-new-row').click()
-      await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+      await page.getByRole('menuitem', { name: 'Insert row' }).click()
       await page.getByTestId('pw_column-input').fill(value)
       const insertPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
         method: 'POST',
@@ -475,8 +522,14 @@ testRunner('table editor', () => {
       }
     )
 
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${viewName}`, exact: true }).click()
 
@@ -488,7 +541,13 @@ testRunner('table editor', () => {
     await expect(page.locator('.view-lines')).toContainText(`security_invoker = true`)
 
     const openInSqlEditorLink = page.getByRole('link', { name: 'Open in SQL Editor' })
-    await expect(openInSqlEditorLink).toHaveAttribute('href', /security_invoker%20%3D%20true/)
+    // Accept either percent-encoded (`%20`) or form-encoded (`+`) spaces —
+    // some routers serialize search params via URLSearchParams which emits
+    // `+` for spaces. Both decode to the same SQL.
+    await expect(openInSqlEditorLink).toHaveAttribute(
+      'href',
+      /security_invoker(%20|\+)%3D(%20|\+)true/
+    )
     await openInSqlEditorLink.click()
     await page.waitForURL(/\/sql\/new/)
     await expect(page.locator('.view-lines')).toContainText(`create view public.${viewName}`)
@@ -512,7 +571,7 @@ testRunner('table editor', () => {
 
     for (const value of ['789', '456', '123']) {
       await page.getByTestId('table-editor-insert-new-row').click()
-      await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+      await page.getByRole('menuitem', { name: 'Insert row' }).click()
       await page.getByTestId(`${colName}-input`).fill(value)
       const insertPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
         method: 'POST',
@@ -767,7 +826,7 @@ testRunner('table editor', () => {
 
     // Insert first row with value 'first_row_value'
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${colName}-input`).fill('first_row_value')
     const insertFirstPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
@@ -777,7 +836,7 @@ testRunner('table editor', () => {
 
     // Insert second row with value 'second_row_value'
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${colName}-input`).fill('second_row_value')
     const insertSecondPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
@@ -817,6 +876,52 @@ testRunner('table editor', () => {
       value: 'second_row_value',
       exact: true,
     })
+  })
+
+  test('copying cell values preserves false and zero', async ({ page, ref }) => {
+    const tableName = 'pw_table_copy_falsy_values'
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        await query(`
+          create table if not exists public.${tableName} (
+            bool_false boolean,
+            bool_true boolean,
+            zero_int integer
+          );
+        `)
+        await query(`
+          insert into public.${tableName} (bool_false, bool_true, zero_int)
+          values (false, true, 0);
+        `)
+      },
+      async () => {
+        await dropTable(tableName)
+      }
+    )
+
+    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+    await expect(page.getByRole('grid')).toBeVisible()
+
+    const falseCell = page.getByRole('gridcell', { name: 'FALSE' }).first()
+    await expect(falseCell).toBeVisible()
+    await falseCell.click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Copy cell' }).click()
+    await expectClipboardValue({ page, value: 'false', exact: true })
+
+    const zeroCell = page.getByRole('gridcell', { name: '0' }).first()
+    await expect(zeroCell).toBeVisible()
+    await zeroCell.click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Copy cell' }).click()
+    await expectClipboardValue({ page, value: '0', exact: true })
+
+    const trueCell = page.getByRole('gridcell', { name: 'TRUE' }).first()
+    await expect(trueCell).toBeVisible()
+    await trueCell.click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Copy cell' }).click()
+    await expectClipboardValue({ page, value: 'true', exact: true })
   })
 
   test('boolean fields can be edited correctly', async ({ page, ref }) => {
@@ -860,7 +965,7 @@ testRunner('table editor', () => {
 
     // Insert a row with TRUE value via side panel
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByRole('combobox').click()
     await page.getByRole('option', { name: 'TRUE' }).click()
     const insertTruePromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
@@ -876,7 +981,7 @@ testRunner('table editor', () => {
 
     // Insert a row with FALSE value via side panel
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByRole('combobox').click()
     await page.getByRole('option', { name: 'FALSE' }).click()
     const insertFalsePromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
@@ -903,7 +1008,8 @@ testRunner('table editor', () => {
     const updateTrueResponse = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
     })
-    await booleanEditor.selectOption('true')
+    await booleanEditor.click()
+    await page.getByRole('option', { name: 'true' }).click()
     await page.getByRole('columnheader', { name: 'id' }).click()
     await updateTrueResponse
 
@@ -922,7 +1028,8 @@ testRunner('table editor', () => {
     const updateFalseResponse = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
     })
-    await booleanEditor.selectOption('false')
+    await booleanEditor.click()
+    await page.getByRole('option', { name: 'false' }).click()
     await page.getByRole('columnheader', { name: 'id' }).click()
     await updateFalseResponse
 
@@ -979,7 +1086,7 @@ testRunner('table editor', () => {
 
     // Insert a row with TRUE value
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByRole('combobox').click()
     await page.getByRole('option', { name: 'TRUE' }).click()
     const insertTruePromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
@@ -995,7 +1102,7 @@ testRunner('table editor', () => {
 
     // Insert a row with FALSE value
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByRole('combobox').click()
     await page.getByRole('option', { name: 'FALSE' }).click()
     const insertFalsePromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
@@ -1019,7 +1126,8 @@ testRunner('table editor', () => {
     const updateNullResponse = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
     })
-    await booleanEditor.selectOption('null')
+    await booleanEditor.click()
+    await page.getByRole('option', { name: 'null' }).click()
     await page.getByRole('columnheader', { name: 'id' }).click()
     await updateNullResponse
 
@@ -1034,7 +1142,8 @@ testRunner('table editor', () => {
     const updateFalseResponse = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
     })
-    await booleanEditor.selectOption('false')
+    await booleanEditor.click()
+    await page.getByRole('option', { name: 'false' }).click()
     await page.getByRole('columnheader', { name: 'id' }).click()
     await updateFalseResponse
 
@@ -1042,6 +1151,65 @@ testRunner('table editor', () => {
       page.getByRole('gridcell', { name: 'FALSE' }),
       'NULL should change to FALSE after inline edit'
     ).toBeVisible()
+  })
+
+  test('can insert a row into a table with a generated column', async ({ page, ref }) => {
+    const tableName = 'pw_table_generated_column'
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        await query(`
+          create table public.${tableName} (
+            id bigint generated by default as identity primary key,
+            base_price int,
+            discounted_price int,
+            is_discounted boolean generated always as (
+              base_price is not null
+              and discounted_price is not null
+              and base_price is distinct from discounted_price
+            ) stored
+          );
+        `)
+      },
+      async () => {
+        await dropTable(tableName)
+      }
+    )
+
+    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+
+    // insert a row, filling only the non-generated columns
+    await page.getByTestId('table-editor-insert-new-row').click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
+
+    const sidePanel = page.getByTestId('side-panel-row-editor')
+    await page.getByTestId('base_price-input').fill('100')
+    await page.getByTestId('discounted_price-input').fill('80')
+    const insertPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
+    await page.getByTestId('action-bar-save-row').click()
+    await insertPromise
+
+    await expect(
+      sidePanel,
+      'Row editor should close after inserting a row into a table with a generated column'
+    ).not.toBeVisible()
+    await expect(
+      page.getByRole('gridcell', { name: 'TRUE' }),
+      'Generated column value should be computed by the database'
+    ).toBeVisible()
+
+    // the generated column should not be editable in the insert form
+    await page.getByTestId('table-editor-insert-new-row').click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
+    await expect(sidePanel.getByText('base_price')).toBeVisible()
+    await expect(
+      sidePanel.getByText('is_discounted'),
+      'Generated column should not be shown in the insert form'
+    ).not.toBeVisible()
   })
 
   test('can create and remove foreign key with column selection', async ({ page, ref }) => {
@@ -1070,19 +1238,19 @@ testRunner('table editor', () => {
       .click()
     await page.getByRole('menuitem', { name: 'Edit table' }).click()
 
-    // Open foreign key selector
-    await page.getByRole('button', { name: 'Add foreign key relation' }).click()
-
-    // Select schema (should default to public)
-    await expect(page.getByRole('button', { name: 'Select a schema' })).toContainText('public')
-
     // Select target table
     const tableQueryPromise = waitForApiResponseWithTimeout(page, (response) =>
       response.url().includes(`table-public-${targetTableName}`)
     )
 
-    await page.getByRole('button', { name: 'Select a table to reference to' }).click()
-    await page.getByRole('menuitem', { name: `public ${targetTableName}` }).click()
+    // Open foreign key selector
+    await page.getByRole('button', { name: 'Add foreign key relation' }).click()
+
+    // Select schema (should default to public)
+    await expect(page.getByRole('combobox', { name: 'Select a schema' })).toContainText('public')
+
+    await page.getByRole('combobox', { name: 'Select a table to reference to' }).click()
+    await page.getByRole('option', { name: `public ${targetTableName}` }).click()
 
     // Wait for table columns to load
     await tableQueryPromise
@@ -1093,15 +1261,12 @@ testRunner('table editor', () => {
     ).toBeVisible()
 
     // Select source column (id from source table)
-    await page.getByRole('button', { name: '---' }).first().click()
-    await page.getByRole('menuitem', { name: 'id int8' }).click()
-
-    // Wait for the first dropdown to update - there should only be one '---' button left now
-    await expect(page.getByRole('button', { name: '---' })).toHaveCount(1)
+    await page.getByRole('combobox', { name: 'Column from public.pw_table_fk_source' }).click()
+    await page.getByRole('option', { name: 'id int8' }).click()
 
     // Select target column (id from target table)
-    await page.getByRole('button', { name: '---' }).first().click()
-    await page.getByRole('menuitem', { name: 'id int8' }).click()
+    await page.getByRole('combobox', { name: 'Column from public.pw_table_fk_target' }).click()
+    await page.getByRole('option', { name: 'id int8' }).click()
 
     // Verify cascade action options are visible
     await expect(page.getByText('Action if referenced row is updated')).toBeVisible()
@@ -1127,7 +1292,7 @@ testRunner('table editor', () => {
     const saveTablePromise = waitForApiResponseWithTimeout(
       page,
       (response) => response.url().includes('query?key=table-update'),
-      15000
+      30000
     )
     await page.getByRole('button', { name: 'Save' }).first().click()
     await saveTablePromise
@@ -1149,13 +1314,13 @@ testRunner('table editor', () => {
     await expect(page.getByRole('link', { name: 'public.pw_table_fk_target' })).toBeVisible()
 
     // Remove the foreign key relation
-    await page.getByRole('button', { name: 'Remove' }).click()
+    await page.getByRole('button', { name: 'Remove', exact: true }).click()
 
     // Save the table changes after removing foreign key
     const removeFkPromise = waitForApiResponseWithTimeout(
       page,
       (response) => response.url().includes('query?key=table-update'),
-      15000
+      30000
     )
     await page.getByRole('button', { name: 'Save' }).first().click()
     await removeFkPromise
@@ -1178,6 +1343,91 @@ testRunner('table editor', () => {
     // Close the edit table dialog
     await page.getByRole('button', { name: 'Cancel' }).click()
     await expect(page.getByTestId('table-editor-side-panel')).not.toBeVisible()
+  })
+
+  test('shortcut saves fk before column update', async ({ page, ref }) => {
+    const runId = `${test.info().parallelIndex}_${test.info().repeatEachIndex}`
+    const sourceTableName = `pw_column_fk_shortcut_source_${runId}`
+    const targetTableName = `pw_column_fk_shortcut_target_${runId}`
+    const columnEditor = page.getByRole('dialog', {
+      name: `Update column ref_id from ${sourceTableName}`,
+      exact: true,
+    })
+    const foreignKeySchemaSelect = page.getByRole('combobox', { name: 'Select a schema' })
+    const foreignKeyLink = columnEditor.getByRole('link', {
+      name: `public.${targetTableName}`,
+      exact: true,
+    })
+    const openColumnEditor = async () => {
+      await page
+        .getByRole('columnheader', { name: 'ref_id' })
+        .getByRole('button', { name: 'Column ref_id actions' })
+        .click()
+      await page.getByRole('menuitem', { name: 'Edit column' }).click()
+      await expect(columnEditor).toBeVisible()
+    }
+
+    await using _ = await withSetupCleanup(
+      () =>
+        query(`
+          drop table if exists public.${sourceTableName} cascade;
+          drop table if exists public.${targetTableName} cascade;
+
+          create table public.${targetTableName} (
+            id text primary key
+          );
+
+          create table public.${sourceTableName} (
+            id bigint generated by default as identity primary key,
+            ref_id text
+          );
+        `),
+      async () => {
+        await dropTable(sourceTableName)
+        await dropTable(targetTableName)
+      }
+    )
+
+    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+    await page.getByRole('button', { name: `View ${sourceTableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+
+    await openColumnEditor()
+
+    await columnEditor.getByRole('button', { name: 'Add foreign key' }).click()
+    await expect(foreignKeySchemaSelect).toContainText('public')
+
+    const tableQueryPromise = waitForApiResponseWithTimeout(page, (response) =>
+      response.url().includes(`table-public-${targetTableName}`)
+    )
+
+    await page.getByRole('combobox', { name: 'Select a table to reference to' }).click()
+    await page.getByRole('option', { name: `public ${targetTableName}` }).click()
+    await tableQueryPromise
+
+    await page.getByRole('combobox', { name: `Column from public.${targetTableName}` }).click()
+    await page.getByRole('option', { name: 'id text' }).click()
+
+    await page.keyboard.press('ControlOrMeta+Enter')
+
+    await expect(foreignKeySchemaSelect).not.toBeVisible()
+    await expect(foreignKeyLink).toBeVisible()
+
+    const updateColumnPromise = waitForApiResponse(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=column-update',
+      {
+        method: 'POST',
+      }
+    )
+    await columnEditor.getByRole('button', { name: 'Save' }).click()
+    await updateColumnPromise
+    await expect(columnEditor).not.toBeVisible()
+
+    await openColumnEditor()
+    await expect(foreignKeyLink).toBeVisible()
   })
 
   test('CSV drag and drop imports data on empty table', async ({ page, ref }) => {
@@ -1316,8 +1566,14 @@ testRunner('table editor', () => {
       }
     )
 
+    const tableEditorLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
-    await waitForTableToLoad(page, ref)
+    await tableEditorLoadWait
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
@@ -1351,7 +1607,7 @@ testRunner('table editor', () => {
       .toBe('229|229|t')
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId('name-input').fill('Dave')
     const insertPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
@@ -1430,7 +1686,7 @@ testRunner('table editor', () => {
       .toBe('229|229|t')
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId('name-input').fill('Dave')
     const insertPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
@@ -1461,15 +1717,21 @@ testRunner('table editor', () => {
       }
     )
 
+    const tableEditorLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
-    await waitForTableToLoad(page, ref)
+    await tableEditorLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
     // Open side panel to insert a new row
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('immediate insert')
 
     // Wait for the POST mutation to complete when saving
@@ -1511,8 +1773,14 @@ testRunner('table editor', () => {
       }
     )
 
+    const tableEditorLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
-    await waitForTableToLoad(page, ref)
+    await tableEditorLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -1579,8 +1847,14 @@ testRunner('table editor', () => {
       }
     )
 
+    const tableEditorLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
-    await waitForTableToLoad(page, ref)
+    await tableEditorLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -1644,8 +1918,14 @@ testRunner('table editor', () => {
       }
     )
 
+    const tableEditorLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
-    await waitForTableToLoad(page, ref)
+    await tableEditorLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -1758,15 +2038,21 @@ testRunner('table editor', () => {
       }
     )
 
+    const tableEditorLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
-    await waitForTableToLoad(page, ref)
+    await tableEditorLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
     // Open side panel to insert a new row
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
 
     // Open the field actions dropdown and set the text column to NULL
     await page.getByTestId(`${columnName}-field-actions`).click()

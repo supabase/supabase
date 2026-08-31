@@ -6,17 +6,18 @@ import { useEffect, useRef, useState } from 'react'
 import {
   Button_Shadcn_ as Button,
   cn,
-  Command_Shadcn_ as Command,
-  CommandGroup_Shadcn_ as CommandGroup,
-  CommandInput_Shadcn_ as CommandInput,
-  CommandItem_Shadcn_ as CommandItem,
-  CommandList_Shadcn_ as CommandList,
-  Popover_Shadcn_ as Popover,
-  PopoverContent_Shadcn_ as PopoverContent,
-  PopoverTrigger_Shadcn_ as PopoverTrigger,
+  Command,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
 
 export interface ComboBoxOption {

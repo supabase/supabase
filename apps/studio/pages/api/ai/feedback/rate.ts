@@ -6,12 +6,12 @@ import { z } from 'zod'
 
 import { rateMessageResponseSchema } from '@/components/ui/AIAssistantPanel/Message.utils'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
-import { getOrgAIDetails, getProjectAIDetails } from '@/lib/ai/ai-details'
+import { getAIDetails } from '@/lib/ai/ai-details'
 import { IS_TRACING_ENABLED, isTracingAllowed } from '@/lib/ai/braintrust-logger'
 import { getModel } from '@/lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
 import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
-import apiWrapper from '@/lib/api/apiWrapper'
+import { apiWrapper } from '@/lib/api/apiWrapper'
 
 export const maxDuration = 30
 
@@ -56,8 +56,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
   let orgHasHipaaAddon: boolean | undefined
-  let projectIsSensitive: boolean | undefined
-  let orgIsDpaSigned: boolean | undefined
+  let projectIsSensitive: boolean | null | undefined
   let projectRegion: string | undefined
 
   if (!IS_PLATFORM) {
@@ -66,16 +65,12 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   if (IS_PLATFORM && orgSlug && authorization && projectRef) {
     try {
-      const [orgDetails, projectDetails] = await Promise.all([
-        getOrgAIDetails({ orgSlug, authorization }),
-        getProjectAIDetails({ projectRef, authorization }),
-      ])
+      const aiDetails = await getAIDetails({ orgSlug, projectRef, authorization })
 
-      aiOptInLevel = orgDetails.aiOptInLevel
-      orgHasHipaaAddon = orgDetails.hasHipaaAddon
-      orgIsDpaSigned = orgDetails.isDpaSigned
-      projectIsSensitive = projectDetails.isSensitive
-      projectRegion = projectDetails.region
+      aiOptInLevel = aiDetails.aiOptInLevel
+      orgHasHipaaAddon = aiDetails.hasHipaaAddon
+      projectIsSensitive = aiDetails.isSensitive
+      projectRegion = aiDetails.region
     } catch (error) {
       return res.status(400).json({
         error: 'There was an error fetching your organization details',
@@ -138,7 +133,7 @@ Instructions:
     // Log feedback to Braintrust if tracing is enabled and span ID is available
     if (
       IS_TRACING_ENABLED &&
-      isTracingAllowed({ orgHasHipaaAddon, projectIsSensitive, orgIsDpaSigned, projectRegion }) &&
+      isTracingAllowed({ orgHasHipaaAddon, projectIsSensitive, projectRegion }) &&
       spanId
     ) {
       try {

@@ -1,6 +1,5 @@
-import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
-import { UseFormReturn } from 'react-hook-form'
+import { UseFormReturn, useWatch } from 'react-hook-form'
 import {
   Button,
   FormControl,
@@ -14,10 +13,8 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import {
   calculateComputeSizeRequiredForIops,
-  calculateIOPSPrice,
   mapAddOnVariantIdToComputeSize,
 } from '../DiskManagement.utils'
-import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import { ComputeSizeRecommendationSection } from '../ui/ComputeSizeRecommendationSection'
 import { DiskType, RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3 } from '../ui/DiskManagement.constants'
 import { DiskManagementIOPSReadReplicas } from '../ui/DiskManagementReadReplicas'
@@ -30,20 +27,13 @@ type IOPSFieldProps = {
 
 export function IOPSField({ form, disableInput }: IOPSFieldProps) {
   const { ref: projectRef } = useParams()
-  const { control, formState, setValue, trigger, getValues, watch } = form
+  const { control, formState, setValue, trigger, getValues } = form
 
-  const watchedStorageType = watch('storageType')
-  const watchedComputeSize = watch('computeSize')
-  const watchedIOPS = watch('provisionedIOPS') ?? 0
+  const watchedStorageType = useWatch({ control, name: 'storageType' })
+  const watchedComputeSize = useWatch({ control, name: 'computeSize' })
+  const watchedIOPS = useWatch({ control, name: 'provisionedIOPS' }) ?? 0
 
-  const { isPending: isLoading, error, isError } = useDiskAttributesQuery({ projectRef })
-
-  const iopsPrice = calculateIOPSPrice({
-    oldStorageType: formState.defaultValues?.storageType as DiskType,
-    oldProvisionedIOPS: formState.defaultValues?.provisionedIOPS || 0,
-    newStorageType: getValues('storageType') as DiskType,
-    newProvisionedIOPS: getValues('provisionedIOPS'),
-  })
+  const { isError } = useDiskAttributesQuery({ projectRef })
 
   const disableIopsInput =
     RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3.includes(watchedComputeSize) && watchedStorageType === 'gp3'
@@ -56,7 +46,7 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
         const reccomendedComputeSize = calculateComputeSizeRequiredForIops(watchedIOPS)
         return (
           <FormItemLayout
-            layout="horizontal"
+            layout="flex-row-reverse"
             label="IOPS"
             id={field.name}
             description={
@@ -66,7 +56,7 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
                   form={form}
                   actions={
                     <Button
-                      type="default"
+                      variant="default"
                       onClick={() => {
                         setValue('computeSize', reccomendedComputeSize ?? 'ci_nano')
                         trigger('provisionedIOPS')
@@ -88,21 +78,7 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
               </span>
             }
             labelOptional={
-              <>
-                <BillingChangeBadge
-                  show={
-                    (watchedStorageType !== formState.defaultValues?.storageType ||
-                      (watchedStorageType === 'gp3' &&
-                        field.value !== formState.defaultValues?.provisionedIOPS)) &&
-                    !formState.errors.provisionedIOPS &&
-                    !disableIopsInput
-                  }
-                  beforePrice={Number(iopsPrice.oldPrice)}
-                  afterPrice={Number(iopsPrice.newPrice)}
-                  className="mb-2"
-                />
-                <p className="text-foreground-lighter">Input/output operations per second.</p>
-              </>
+              <p className="text-foreground-lighter">Input/output operations per second.</p>
             }
           >
             <FormControl className="max-w-32">
@@ -110,6 +86,7 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
                 <FormInputGroupInput
                   type="number"
                   {...field}
+                  id={field.name}
                   value={field.value}
                   disabled={disableInput || disableIopsInput || isError}
                   onChange={(e) => {

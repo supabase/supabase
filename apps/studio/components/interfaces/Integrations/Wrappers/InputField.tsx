@@ -2,8 +2,8 @@ import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import type { Control, FieldPath, FieldValues } from 'react-hook-form'
-import { cn, FormControl, FormField, Input_Shadcn_, Textarea } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { cn, FormControl, FormField, Input, Textarea } from 'ui'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { ServerOption } from './Wrappers.types'
@@ -29,7 +29,6 @@ const InputField = <
       defaultValue={(option.defaultValue ?? '') as any}
       render={({ field }) => (
         <FormItemLayout
-          name={option.name}
           layout="vertical"
           label={
             <div className="flex items-center space-x-2">
@@ -55,11 +54,11 @@ const InputField = <
                 Fetching value from Vault...
               </span>
             ) : option.isTextArea ? (
-              <Textarea {...field} id={option.name} rows={6} className="input-mono resize-none" />
+              <Textarea {...field} rows={6} className="input-mono resize-none" />
             ) : option.secureEntry ? (
-              <Input copy reveal {...field} id={option.name} />
+              <PasswordInput copy reveal {...field} />
             ) : (
-              <Input_Shadcn_ {...field} id={option.name} />
+              <Input {...field} />
             )}
           </FormControl>
         </FormItemLayout>

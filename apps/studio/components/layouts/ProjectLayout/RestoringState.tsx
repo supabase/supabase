@@ -3,7 +3,7 @@ import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { CheckCircle, Download, Loader } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -20,12 +20,14 @@ import {
 } from '@/lib/project-transition-state'
 import { getRestoreLongRunningThresholdMinutes } from '@/lib/restore-estimate'
 
+export const POLL_INTERVAL_MS = 4000
+
 export const RestoringState = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const [loading, setLoading] = useState(false)
-  const [isCompleted, setIsCompleted] = useState(false)
+  const [isConfirming, setIsConfirming] = useState(false)
+  const [hasLeftHealthyState, setHasLeftHealthyState] = useState(false)
   const restoreStateStartStorageKey = ref
     ? LOCAL_STORAGE_KEYS.PROJECT_RESTORING_STARTED_AT(ref)
     : null
@@ -42,19 +44,34 @@ export const RestoringState = () => {
 
   const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
 
-  const { data: projectStatusData, isSuccess: isProjectStatusSuccess } = useProjectStatusQuery(
+  const { data: projectStatusData } = useProjectStatusQuery(
     { projectRef: ref },
     {
       enabled: project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY,
       refetchInterval: (query) => {
-        const data = query.state.data
-        return data?.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
-          data?.status === PROJECT_STATUS.RESTORE_FAILED
-          ? false
-          : 4000
+        const status = query.state.data?.status
+        if (status === PROJECT_STATUS.RESTORE_FAILED) return false
+        if (status === PROJECT_STATUS.ACTIVE_HEALTHY && hasLeftHealthyState) return false
+        return POLL_INTERVAL_MS
       },
     }
   )
+
+  const projectStatus = projectStatusData?.status
+
+  // Right after a restore is triggered the status endpoint can still report the stale
+  // pre-restore ACTIVE_HEALTHY, so completion is only trusted once the status has been
+  // observed leaving the healthy state.
+  if (
+    !hasLeftHealthyState &&
+    projectStatus !== undefined &&
+    projectStatus !== PROJECT_STATUS.ACTIVE_HEALTHY
+  ) {
+    setHasLeftHealthyState(true)
+  }
+
+  const hasRestoreFailed = projectStatus === PROJECT_STATUS.RESTORE_FAILED
+  const isCompleted = hasLeftHealthyState && projectStatus === PROJECT_STATUS.ACTIVE_HEALTHY
 
   const { mutate: downloadBackup, isPending: isDownloading } = useBackupDownloadMutation({
     onSuccess: (res) => {
@@ -77,28 +94,25 @@ export const RestoringState = () => {
   }
 
   const onConfirm = async () => {
-    if (!project) return console.error('Project is required')
-    setLoading(true)
-    if (ref) await invalidateProjectDetailsQuery(ref)
+    if (!ref) return console.error('Project ref is required')
+    setIsConfirming(true)
+    try {
+      await invalidateProjectDetailsQuery(ref)
+    } finally {
+      setIsConfirming(false)
+    }
   }
 
   useEffect(() => {
-    if (!isProjectStatusSuccess) return
+    if (!isCompleted && !hasRestoreFailed) return
 
-    if (projectStatusData.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
-      if (restoreStateStartStorageKey) {
-        clearPersistedTransitionStartTime(restoreStateStartStorageKey)
-      }
-      setIsCompleted(true)
-    } else if (projectStatusData.status === PROJECT_STATUS.RESTORE_FAILED) {
-      if (restoreStateStartStorageKey) {
-        clearPersistedTransitionStartTime(restoreStateStartStorageKey)
-      }
-      if (ref) void invalidateProjectDetailsQuery(ref)
+    if (restoreStateStartStorageKey) {
+      clearPersistedTransitionStartTime(restoreStateStartStorageKey)
     }
+    if (hasRestoreFailed && ref) void invalidateProjectDetailsQuery(ref)
   }, [
-    isProjectStatusSuccess,
-    projectStatusData,
+    isCompleted,
+    hasRestoreFailed,
     restoreStateStartStorageKey,
     ref,
     invalidateProjectDetailsQuery,
@@ -121,7 +135,7 @@ export const RestoringState = () => {
               </div>
             </div>
             <div className="border-t border-overlay flex items-center justify-end py-4 px-8">
-              <Button disabled={loading} loading={loading} onClick={onConfirm}>
+              <Button disabled={isConfirming} loading={isConfirming} onClick={onConfirm}>
                 Return to project
               </Button>
             </div>
@@ -147,7 +161,7 @@ export const RestoringState = () => {
                       layout="responsive"
                       description="Contact support if this project remains in a restoring state."
                       actions={
-                        <Button asChild type="default">
+                        <Button asChild variant="default">
                           <SupportLink
                             queryParams={{
                               category: SupportCategories.DATABASE_UNRESPONSIVE,
@@ -160,7 +174,7 @@ export const RestoringState = () => {
                           </SupportLink>
                         </Button>
                       }
-                      className="!mt-5"
+                      className="mt-5!"
                     />
                   )}
                 </div>
@@ -168,7 +182,7 @@ export const RestoringState = () => {
             </div>
             <div className="border-t border-overlay flex items-center justify-end py-4 px-8 gap-x-2">
               <ButtonTooltip
-                type="default"
+                variant="default"
                 icon={<Download />}
                 loading={isDownloading}
                 disabled={logicalBackups.length === 0}

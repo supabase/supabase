@@ -2,9 +2,9 @@ import { getMigrationsSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
-import { executeSql, ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { PROJECT_STATUS } from '@/lib/constants'
-import { UseCustomQueryOptions } from '@/types'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type DatabaseMigration = {
   version: string
@@ -33,7 +33,7 @@ export async function getMigrations(
     return result as DatabaseMigration[]
   } catch (error) {
     if (
-      (error as ExecuteSqlError).message.includes(
+      (error as ResponseError).message.includes(
         'relation "supabase_migrations.schema_migrations" does not exist'
       )
     ) {
@@ -45,7 +45,7 @@ export async function getMigrations(
 }
 
 export type MigrationsData = Awaited<ReturnType<typeof getMigrations>>
-export type MigrationsError = ExecuteSqlError
+export type MigrationsError = ResponseError
 
 export const useMigrationsQuery = <TData = MigrationsData>(
   { projectRef, projectStatus, connectionString }: MigrationsVariables,

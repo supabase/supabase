@@ -6,15 +6,15 @@ import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type OAuthIntegrationInstallVariables = {
   projectRef: string
-  id: string
+  listingSlug: string
 }
 
 export async function installOAuthIntegration({
   projectRef,
-  id,
+  listingSlug,
 }: OAuthIntegrationInstallVariables) {
-  const { data, error } = await post('/platform/integrations/partners/{ref}/{listing_id}', {
-    params: { path: { ref: projectRef, listing_id: id } },
+  const { data, error } = await post('/platform/integrations/partners/{ref}/{listing_slug}', {
+    params: { path: { ref: projectRef, listing_slug: listingSlug } },
   })
 
   if (error) handleError(error)

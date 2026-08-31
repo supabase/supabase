@@ -1,11 +1,12 @@
 import { useParams } from 'common'
-import { AlertTriangle, BookOpen, ChevronDown, Sparkles, Wrench } from 'lucide-react'
+import { AlertTriangle, BookOpen, ChartLine, ChevronDown, Sparkles, Wrench } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { COMPUTE_DISK } from 'shared-data'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   cn,
   DropdownMenu,
@@ -15,25 +16,32 @@ import {
 } from 'ui'
 
 import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.constants'
-import { getWarningContent } from './ResourceExhaustionWarningBanner.utils'
+import {
+  getResourceWarningCorrectionUrl,
+  getWarningContent,
+  isComputeUpgradeWarning,
+} from './ResourceExhaustionWarningBanner.utils'
+import { mapComputeSizeNameToAddonVariantId } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
-
-const COMPUTE_UPGRADE_METRICS = ['disk_io', 'cpu', 'ram']
-const COMPUTE_UPGRADE_WARNING_TYPES = [
-  'disk_io_exhaustion',
-  'cpu_exhaustion',
-  'memory_and_swap_exhaustion',
-]
 
 export const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
   const router = useRouter()
   const { data: organization, isLoading: isOrgLoading } = useSelectedOrganizationQuery()
+  const { data: project } = useSelectedProjectQuery()
+  const diskIoBaselineLabel = (() => {
+    const variant = mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
+    const baseline = COMPUTE_DISK[variant]?.baselineThroughputMBps
+    return typeof baseline === 'number' ? `${baseline} MB/s` : 'its baseline'
+  })()
+  const applyDiskIoBaseline = (text?: string) =>
+    text ? text.replace(/\{baseline\}/g, diskIoBaselineLabel) : text
   const { openSidebar } = useSidebarManagerSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
   const track = useTrack()
@@ -69,19 +77,21 @@ export const ResourceExhaustionWarningBanner = () => {
       ? getWarningContent(projectResourceWarnings, activeWarnings[0], 'bannerContent')
       : undefined
 
-  const title =
+  const title = applyDiskIoBaseline(
     activeWarnings.length > 1
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.bannerContent[
           hasCriticalWarning ? 'critical' : 'warning'
         ].title
       : warningContent?.title
+  )
 
-  const description =
+  const description = applyDiskIoBaseline(
     activeWarnings.length > 1
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.bannerContent[
           hasCriticalWarning ? 'critical' : 'warning'
         ].description
       : warningContent?.description
+  )
 
   const learnMoreUrl =
     activeWarnings.length > 1
@@ -89,52 +99,28 @@ export const ResourceExhaustionWarningBanner = () => {
       : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
           ?.docsUrl
 
+  const singleWarningMessage =
+    activeWarnings.length === 1 ? RESOURCE_WARNING_MESSAGES[activeWarnings[0]] : undefined
+  const metricsHref = singleWarningMessage?.metricsHref?.replace('[ref]', ref ?? 'default')
+
   const metric =
     activeWarnings.length > 1
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.metric
       : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
           ?.metric
 
-  const correctionUrlVariants = {
-    undefined: undefined,
-    null: '/project/[ref]/settings/[infra-path]',
-    disk_space: '/project/[ref]/settings/compute-and-disk',
-    read_only: '/project/[ref]/settings/compute-and-disk',
-    disk_io: '/project/[ref]/settings/compute-and-disk',
-    cpu: '/project/[ref]/settings/compute-and-disk',
-    ram: '/project/[ref]/settings/compute-and-disk',
-    auth_email_rate_limit: '/project/[ref]/auth/rate-limits',
-    auth_restricted_email_sending: '/project/[ref]/auth/smtp',
-    default: (metric: string) => `/project/[ref]/settings/[infra-path]#${metric}`,
-  }
-
-  const getCorrectionUrl = (metric: string | undefined | null) => {
-    const variant = metric === undefined ? 'undefined' : metric === null ? 'null' : metric
-    const url =
-      correctionUrlVariants[variant as keyof typeof correctionUrlVariants] ||
-      correctionUrlVariants.default(metric as string)
-    return typeof url === 'function' ? url(metric as string) : url
-  }
-
   const isFreePlan = organization?.plan?.id === 'free'
 
   // True for a single compute warning, or when all active warnings are compute-related
-  const isComputeUpgradeMetric =
-    (metric !== null && metric !== undefined && COMPUTE_UPGRADE_METRICS.includes(metric)) ||
-    (activeWarnings.length > 1 &&
-      activeWarnings.every((w) => COMPUTE_UPGRADE_WARNING_TYPES.includes(w)))
+  const isComputeUpgradeMetric = isComputeUpgradeWarning(metric, activeWarnings)
 
-  const correctionUrl = (() => {
-    if (isComputeUpgradeMetric && isFreePlan) {
-      return `/org/${organization?.slug ?? '_'}/billing?panel=subscriptionPlan&source=resource_exhaustion_banner`
-    }
-    if (isComputeUpgradeMetric && activeWarnings.length > 1) {
-      return `/project/${ref ?? 'default'}/settings/compute-and-disk`
-    }
-    return getCorrectionUrl(metric)
-      ?.replace('[ref]', ref ?? 'default')
-      ?.replace('[infra-path]', 'infrastructure')
-  })()
+  const correctionUrl = getResourceWarningCorrectionUrl({
+    metric,
+    activeWarnings,
+    projectRef: ref,
+    isFreePlan,
+    organizationSlug: organization?.slug,
+  })
 
   const buttonText = (() => {
     if (isComputeUpgradeMetric) return 'Upgrade compute'
@@ -165,15 +151,15 @@ export const ResourceExhaustionWarningBanner = () => {
     warningContent === undefined || (!warningContent?.title && !warningContent?.description)
   const isUsageOrInfraPage =
     router.pathname.endsWith('/usage') || router.pathname.endsWith('/infrastructure')
-  // Compute warnings now link to compute-and-disk, so they should remain visible on infrastructure
+  // Compute warnings now link to infrastructure, so they should remain visible on usage.
   const onUsageOrInfraAndNotInReadOnlyMode =
     isUsageOrInfraPage &&
     !activeWarnings.includes('is_readonly_mode_enabled') &&
     !isComputeUpgradeMetric
   // Suppress when already on the target page (no-op CTA). Paid-plan compute warnings link to
-  // compute-and-disk; free-plan links to billing instead, so we keep the banner visible for them.
-  const onDatabaseSettingsAndInReadOnlyMode =
-    router.pathname.endsWith('settings/compute-and-disk') &&
+  // infrastructure; free-plan links to billing instead, so we keep the banner visible for them.
+  const shouldSuppressOnInfrastructurePage =
+    router.pathname.endsWith('settings/infrastructure') &&
     (activeWarnings.includes('is_readonly_mode_enabled') || (isComputeUpgradeMetric && !isFreePlan))
 
   // these take precedence over each other, so there's only one active warning to check
@@ -200,14 +186,14 @@ export const ResourceExhaustionWarningBanner = () => {
     hasNoWarnings ||
     hasNoWarningContent ||
     onUsageOrInfraAndNotInReadOnlyMode ||
-    onDatabaseSettingsAndInReadOnlyMode ||
+    shouldSuppressOnInfrastructurePage ||
     !isVisible
   ) {
     return null
   }
 
   return (
-    <Alert_Shadcn_
+    <Alert
       variant={isCritical ? 'destructive' : 'warning'}
       className={cn(
         'flex items-center justify-between',
@@ -216,15 +202,15 @@ export const ResourceExhaustionWarningBanner = () => {
     >
       <AlertTriangle />
       <div className="">
-        <AlertTitle_Shadcn_>{title}</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{description}</AlertDescription_Shadcn_>
+        <AlertTitle>{title}</AlertTitle>
+        <AlertDescription>{description}</AlertDescription>
       </div>
       <div className="flex items-center gap-x-2">
         {learnMoreUrl !== undefined && aiPrompt !== undefined ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                type="default"
+                variant="default"
                 icon={<Wrench size={14} />}
                 iconRight={<ChevronDown size={14} />}
               >
@@ -232,6 +218,14 @@ export const ResourceExhaustionWarningBanner = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              {metricsHref !== undefined && (
+                <DropdownMenuItem asChild>
+                  <Link href={metricsHref} className="flex items-center gap-x-2 cursor-pointer">
+                    <ChartLine size={14} />
+                    View metrics
+                  </Link>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem asChild>
                 <a
                   href={learnMoreUrl}
@@ -253,20 +247,20 @@ export const ResourceExhaustionWarningBanner = () => {
             </DropdownMenuContent>
           </DropdownMenu>
         ) : learnMoreUrl !== undefined ? (
-          <Button asChild type="default" icon={<BookOpen size={14} />}>
+          <Button asChild variant="default" icon={<BookOpen size={14} />}>
             <a href={learnMoreUrl} target="_blank" rel="noreferrer">
               Learn more
             </a>
           </Button>
         ) : aiPrompt !== undefined ? (
-          <Button type="default" onClick={handleAskAI}>
+          <Button variant="default" onClick={handleAskAI}>
             Ask AI Assistant
           </Button>
         ) : null}
         {correctionUrl !== undefined && (
           <Button
             asChild
-            type="primary"
+            variant="primary"
             disabled={isComputeUpgradeMetric && isOrgLoading}
             onClick={() =>
               track('resource_exhaustion_banner_upgrade_clicked', {
@@ -279,6 +273,6 @@ export const ResourceExhaustionWarningBanner = () => {
           </Button>
         )}
       </div>
-    </Alert_Shadcn_>
+    </Alert>
   )
 }

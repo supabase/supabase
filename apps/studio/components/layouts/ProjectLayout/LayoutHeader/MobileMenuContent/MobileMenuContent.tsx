@@ -6,19 +6,18 @@ import { ChevronLeft } from 'lucide-react'
 import { useRouter } from 'next/router'
 import React, { useMemo } from 'react'
 import { Button, cn, Separator, SidebarGroup, SidebarMenu } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { resolveSectionDisplay } from './MobileMenuContent.utils'
 import { getProductMenuComponent } from './mobileProductMenuRegistry'
 import { TopLevelRouteItem } from './TopLevelRouteItem'
 import { routeHasSubmenu, useMobileMenuNavigation } from './useMobileMenuNavigation'
-import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from '@/components/interfaces/Sidebar'
 import {
-  generateOtherRoutes,
   generateProductRoutes,
   generateSettingsRoutes,
-  generateToolRoutes,
+  useGenerateOtherRoutes,
+  useGenerateToolRoutes,
 } from '@/components/layouts/Navigation/NavigationBar/NavigationBar.utils'
 import type { Route } from '@/components/ui/ui.types'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -63,10 +62,9 @@ export function MobileMenuContent({
     'realtime:all',
   ])
   const authOverviewPageEnabled = useFlag('authOverviewPage')
-  const showReports = useIsFeatureEnabled('reports:all')
-  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
+  const workersEnabled = useFlag('workers')
 
-  const toolRoutes = useMemo(() => generateToolRoutes(ref, project), [ref, project])
+  const toolRoutes = useGenerateToolRoutes()
   const productRoutes = useMemo(
     () =>
       generateProductRoutes(ref, project, {
@@ -75,6 +73,7 @@ export function MobileMenuContent({
         storage: storageEnabled,
         realtime: realtimeEnabled,
         authOverviewPage: authOverviewPageEnabled,
+        workers: workersEnabled,
       }),
     [
       ref,
@@ -84,16 +83,10 @@ export function MobileMenuContent({
       storageEnabled,
       realtimeEnabled,
       authOverviewPageEnabled,
+      workersEnabled,
     ]
   )
-  const otherRoutes = useMemo(
-    () =>
-      generateOtherRoutes(ref, project, {
-        unifiedLogs: isUnifiedLogsEnabled,
-        showReports,
-      }),
-    [ref, project, isUnifiedLogsEnabled, showReports]
-  )
+  const otherRoutes = useGenerateOtherRoutes()
   const settingsRoutes = useMemo(() => generateSettingsRoutes(ref), [ref])
 
   const homeRoute: Route = useMemo(
@@ -138,12 +131,12 @@ export function MobileMenuContent({
       {viewLevel === 'section' && sectionLabel && (
         <div
           className={cn(
-            'flex-shrink-0 flex items-center gap-2 border-b border-default px-3 min-h-[var(--header-height)]'
+            'shrink-0 flex items-center gap-2 border-b border-default px-3 min-h-(--header-height)'
           )}
         >
           <Button
-            type="text"
-            className="!p-1 justify-start"
+            variant="text"
+            className="p-1! justify-start"
             icon={<ChevronLeft size={20} />}
             onClick={handleBackToTop}
             aria-label="Back to menu"

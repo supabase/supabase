@@ -16,6 +16,7 @@ export type WrapperMeta = {
   sourceSchemaOption?: ServerOption
   // Array of tables that needs to be supplied to the wrapper. If the array is empty, the wrapper should target a schema.
   tables: Table[]
+  categories?: string[]
 }
 
 export type ServerOption = {

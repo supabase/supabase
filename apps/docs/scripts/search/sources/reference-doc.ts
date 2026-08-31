@@ -2,10 +2,12 @@ import { createHash } from 'crypto'
 import { readFile } from 'fs/promises'
 import yaml from 'js-yaml'
 import type { OpenAPIV3 } from 'openapi-types'
+
 import type {
   ICommonItem,
   ICommonSection,
   IFunctionDefinition,
+  IFunctionExample,
   ISpec,
 } from '../../../components/reference/Reference.types.js'
 import { getApiEndpointById } from '../../../features/docs/Reference.generated.singleton.js'
@@ -274,6 +276,76 @@ export class ClientLibReferenceLoader extends ReferenceLoader<IFunctionDefinitio
   enhanceMeta(section: IFunctionDefinition): Record<string, unknown> {
     return { ...this.meta, slug: section.id, methodName: section.title }
   }
+}
+
+/**
+ * Build search sources for a client lib from the new reference pipeline
+ * (`content/reference/<lib>/<ver>/{sections,functions,typeSpec}.json`) instead
+ * of the legacy YAML.
+ *
+ * Each function entry in `functions.json` either has rich content inline
+ * (partial-authored entries like subcategory overviews) or just an `id` +
+ * `$ref` pointing into `typeSpec.json`'s `methods` map for the TSDoc-extracted
+ * description and examples. We merge those into the `IFunctionDefinition`
+ * shape `ClientLibReferenceSource` already knows how to render, so no
+ * downstream changes are needed.
+ */
+export async function loadClientLibReferenceFromNewPipeline({
+  source,
+  path,
+  meta,
+  contentDir,
+}: {
+  source: string
+  path: string
+  meta: Record<string, unknown>
+  contentDir: string
+}): Promise<BaseSource[]> {
+  const [sectionsRaw, functionsRaw, typeSpecRaw] = await Promise.all([
+    readFile(`${contentDir}/sections.json`, 'utf8'),
+    readFile(`${contentDir}/functions.json`, 'utf8'),
+    readFile(`${contentDir}/typeSpec.json`, 'utf8'),
+  ])
+
+  const refSections = JSON.parse(sectionsRaw) as ICommonItem[]
+  const functions = JSON.parse(functionsRaw) as Array<{
+    id: string
+    $ref?: string
+    title?: string
+    description?: string
+    examples?: IFunctionExample[]
+  }>
+  const typeSpec = JSON.parse(typeSpecRaw) as {
+    methods: Record<string, { comment?: { shortText?: string; examples?: IFunctionExample[] } }>
+  }
+
+  const enriched: IFunctionDefinition[] = functions.map((fn) => {
+    const typeSpecEntry = fn.$ref ? typeSpec.methods[fn.$ref] : undefined
+    return {
+      id: fn.id,
+      $ref: fn.$ref ?? '',
+      title: fn.title ?? '',
+      description: fn.description ?? typeSpecEntry?.comment?.shortText ?? '',
+      examples: fn.examples ?? typeSpecEntry?.comment?.examples,
+    }
+  })
+
+  const flattened = flattenSections(refSections)
+
+  return flattened
+    .map((refSection) => {
+      const specSection = enriched.find((e) => e.id === refSection.id)
+      if (!specSection) return undefined
+      const titleForMeta = specSection.title || refSection.title
+      return new ClientLibReferenceSource(
+        source,
+        `${path}/${refSection.slug}`,
+        refSection,
+        specSection,
+        { ...meta, slug: specSection.id, methodName: titleForMeta }
+      )
+    })
+    .filter((s): s is ClientLibReferenceSource => s !== undefined)
 }
 
 export class ClientLibReferenceSource extends ReferenceSource<IFunctionDefinition> {

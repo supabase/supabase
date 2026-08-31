@@ -23,6 +23,14 @@ Realtime uses the `messages` table in your database's `realtime` schema to gener
 
 By creating RLS policies on the `realtime.messages` table you can control the access users have to a Channel topic, and features within a Channel topic.
 
+<Admonition type="caution">
+
+Realtime locks down the `realtime` schema to protect it against unexpected changes to guarantee the healthy operation of the Realtime service and avoid conflicts that could be caused by future migrations. Creating a table or function in `realtime` is expected to fail with `permission denied for schema realtime`, whether you run the SQL yourself or through the dashboard. Managing RLS policies on `realtime.messages` is allowed.
+
+Row level security (RLS) is enabled by default on table `realtime.messages`, you don't need to execute `ALTER TABLE realtime.messages ENABLE ROW LEVEL SECURITY`.
+
+</Admonition>
+
 The validation is done when the user connects. When their WebSocket connection is established and a Channel topic is joined, their permissions are calculated based on:
 
 - The RLS policies on the `realtime.messages` table
@@ -84,6 +92,8 @@ create table public.rooms (
     topic text not null unique
 );
 
+GRANT SELECT ON public.rooms TO anon;
+
 alter table public.rooms enable row level security;
 
 create table public.profiles (
@@ -93,6 +103,9 @@ create table public.profiles (
   primary key (id)
 );
 
+GRANT SELECT ON public.profiles TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated;
+
 alter table public.profiles enable row level security;
 
 create table public.rooms_users (
@@ -101,7 +114,15 @@ create table public.rooms_users (
   created_at timestamptz default current_timestamp
 );
 
+GRANT SELECT ON public.rooms_users TO authenticated;
+
 alter table public.rooms_users enable row level security;
+
+create policy "authenticated can read own room memberships"
+on public.rooms_users
+for select
+to authenticated
+using ((select auth.uid()) = user_id);
 ```
 
 ### Broadcast
@@ -368,9 +389,9 @@ with check (
 
 ## Interaction with Postgres Changes
 
-Realtime Postgres Changes are separate from Channel authorization. The `private` Channel option does not apply to Postgres Changes.
+When using Postgres Changes on tables with RLS, database records are sent only to clients who are allowed to read them based on your RLS policies.
 
-When using Postgres Changes with RLS, database records are sent only to clients who are allowed to read them based on your RLS policies.
+Private and public channels can subscribe to Postgres Changes.
 
 ## Updating RLS policies
 

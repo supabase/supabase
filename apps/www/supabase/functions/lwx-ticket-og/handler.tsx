@@ -1,5 +1,5 @@
-import React from 'https://esm.sh/react@18.2.0?deno-std=0.140.0'
 import { ImageResponse } from 'https://deno.land/x/og_edge@0.0.4/mod.ts'
+import React from 'https://esm.sh/react@18.2.0?deno-std=0.140.0'
 import { createClient } from 'jsr:@supabase/supabase-js@2'
 
 const corsHeaders = {
@@ -77,7 +77,7 @@ export async function handler(req: Request) {
       // Supabase API URL - env var exported by default when deployed.
       Deno.env.get('MISC_USE_URL') ?? '',
       // Supabase API SERVICE ROLE KEY - env var exported by default when deployed.
-      Deno.env.get('MISC_USE_ANON_KEY') ?? ''
+      Deno.env.get('MISC_USE_SERVICE_ROLE_KEY') ?? ''
     )
 
     // return geneartedOGImage

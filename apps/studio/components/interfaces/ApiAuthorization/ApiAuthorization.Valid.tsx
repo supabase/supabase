@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import Head from 'next/head'
+import { useEffect, useEffectEvent, useMemo, useState, type ReactNode } from 'react'
 import { useForm, type UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
 
@@ -16,7 +17,7 @@ import { useApiAuthorizationApproveMutation } from '@/data/api-authorization/api
 import { useApiAuthorizationDeclineMutation } from '@/data/api-authorization/api-authorization-decline-mutation'
 import { useApiAuthorizationQuery } from '@/data/api-authorization/api-authorization-query'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
+import { buildStudioPageTitle } from '@/lib/page-title'
 import type { Organization } from '@/types'
 
 function getMatchingOrganization(
@@ -46,16 +47,19 @@ function preselectOrganizationSlug({
   }
 }
 
-function useOrganizationsState(organization_slug: string | undefined) {
+function useOrganizationsState(organization_slug: string | undefined, enabled = true) {
   const {
     data: organizations,
     isPending: isLoadingOrganizations,
     isError: isErrorOrganizations,
     error: organizationsError,
-  } = useOrganizationsQuery()
+  } = useOrganizationsQuery({ enabled })
 
   const organizationsState = useMemo(
     function calculateOrganizationsState() {
+      if (!enabled) {
+        return { _tag: 'loading' as const }
+      }
       if (isLoadingOrganizations) {
         return { _tag: 'loading' as const }
       }
@@ -74,6 +78,7 @@ function useOrganizationsState(organization_slug: string | undefined) {
       return { _tag: 'success' as const, organizations }
     },
     [
+      enabled,
       isLoadingOrganizations,
       isErrorOrganizations,
       organizationsError,
@@ -90,7 +95,7 @@ function usePrefillFormOnOrganizationsSuccess(
   organizationsState: ReturnType<typeof useOrganizationsState>,
   organization_slug: string | undefined
 ) {
-  const prefillForm = useStaticEffectEvent(() => {
+  const prefillForm = useEffectEvent(() => {
     if (organizationsState._tag === 'success') {
       preselectOrganizationSlug({
         form,
@@ -103,7 +108,7 @@ function usePrefillFormOnOrganizationsSuccess(
     if (organizationsState._tag === 'success') {
       prefillForm()
     }
-  }, [organizationsState._tag, prefillForm])
+  }, [organizationsState._tag])
 }
 
 export interface ApiAuthorizationValidScreenProps {
@@ -137,38 +142,57 @@ export function ApiAuthorizationValidScreen({
   } = useApiAuthorizationQuery({ id: auth_id })
   const isApproved = (requester?.approved_at ?? null) !== null
 
-  const { mutate: approveRequest } = useApiAuthorizationApproveMutation({
+  const {
+    mutate: approveRequest,
+    error: approveError,
+    reset: resetApproveError,
+  } = useApiAuthorizationApproveMutation({
     onSuccess: (res) => {
       window.location.href = res.url
     },
+    onError: () => {
+      setApprovalState('indeterminate')
+    },
   })
-  const { mutate: declineRequest } = useApiAuthorizationDeclineMutation({
+  const {
+    mutate: declineRequest,
+    error: declineError,
+    reset: resetDeclineError,
+  } = useApiAuthorizationDeclineMutation({
     onSuccess: () => {
       toast.success('Declined API authorization request')
       navigate('/organizations')
     },
+    onError: () => {
+      setApprovalState('indeterminate')
+    },
   })
+  const actionError = approveError
+    ? `Failed to authorize request: ${approveError.message}`
+    : declineError
+      ? `Failed to cancel authorization request: ${declineError.message}`
+      : undefined
+  const resetActionError = () => {
+    resetApproveError()
+    resetDeclineError()
+  }
 
   const onApproveRequest = form.handleSubmit((values) => {
     if (approvalState !== 'indeterminate') {
       return
     }
+    resetActionError()
     setApprovalState('approving')
-    approveRequest(
-      { id: auth_id, slug: values.selectedOrgSlug },
-      { onError: () => setApprovalState('indeterminate') }
-    )
+    approveRequest({ id: auth_id, slug: values.selectedOrgSlug })
   })
 
   const onDeclineRequest = form.handleSubmit((values) => {
     if (approvalState !== 'indeterminate') {
       return
     }
+    resetActionError()
     setApprovalState('declining')
-    declineRequest(
-      { id: auth_id, slug: values.selectedOrgSlug },
-      { onError: () => setApprovalState('indeterminate') }
-    )
+    declineRequest({ id: auth_id, slug: values.selectedOrgSlug })
   })
 
   if (isLoading) {
@@ -179,28 +203,51 @@ export function ApiAuthorizationValidScreen({
     return <ApiAuthorizationErrorScreen error={error} />
   }
 
+  const effectiveRequester = requester
+  const effectiveOrganizationsState = organizationsState
+  const effectiveOrganizationSlug = organization_slug
+  const effectiveApprovalState = approvalState
+  const pageTitle = effectiveRequester
+    ? buildStudioPageTitle({ section: `Authorize ${effectiveRequester.name}`, brand: 'Supabase' })
+    : undefined
+
+  if (!effectiveRequester) {
+    return <ApiAuthorizationErrorScreen error={undefined} />
+  }
+
   if (isApproved) {
     const approvedOrganization =
-      organizationsState._tag === 'success'
-        ? organizationsState.organizations.find(
-            (org) => org.slug === requester.approved_organization_slug
+      effectiveOrganizationsState._tag === 'success'
+        ? effectiveOrganizationsState.organizations.find(
+            (org) => org.slug === effectiveRequester.approved_organization_slug
           )
         : undefined
 
     return (
-      <ApiAuthorizationApprovedScreen requester={requester} organization={approvedOrganization} />
+      <>
+        <Head>{pageTitle && <title>{pageTitle}</title>}</Head>
+        <ApiAuthorizationApprovedScreen
+          requester={effectiveRequester}
+          organization={approvedOrganization}
+        />
+      </>
     )
   }
 
   return (
-    <ApiAuthorizationMainView
-      approvalState={approvalState}
-      form={form}
-      requester={requester}
-      requestedOrganizationSlug={organization_slug}
-      organizations={organizationsState}
-      onApprove={onApproveRequest}
-      onDecline={onDeclineRequest}
-    />
+    <>
+      <Head>{pageTitle && <title>{pageTitle}</title>}</Head>
+      <ApiAuthorizationMainView
+        approvalState={effectiveApprovalState}
+        form={form}
+        requester={effectiveRequester}
+        requestedOrganizationSlug={effectiveOrganizationSlug}
+        organizations={effectiveOrganizationsState}
+        actionError={actionError}
+        onOrganizationChange={resetActionError}
+        onApprove={onApproveRequest}
+        onDecline={onDeclineRequest}
+      />
+    </>
   )
 }

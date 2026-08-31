@@ -115,12 +115,11 @@ export const EdgeFunctionUsageSection = ({
                   {
                     y: averageCpuTime,
                     label: 'average',
-                    stroke: 'hsl(var(--foreground-default))',
+                    stroke: 'var(--foreground-default)',
                     strokeWidth: 1.5,
                   },
                 ]}
                 yAxisProps={{
-                  width: 64,
                   tickFormatter: (value: number) => `${Math.round(value)}ms`,
                 }}
               />
@@ -140,12 +139,11 @@ export const EdgeFunctionUsageSection = ({
                   {
                     y: averageMemoryUsage,
                     label: 'average',
-                    stroke: 'hsl(var(--foreground-default))',
+                    stroke: 'var(--foreground-default)',
                     strokeWidth: 1.5,
                   },
                 ]}
                 yAxisProps={{
-                  width: 64,
                   tickFormatter: (value: number) => `${Number(value).toFixed(1)}MB`,
                 }}
               />

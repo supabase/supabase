@@ -16,24 +16,23 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-  WarningIcon,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
 import {
+  CLASSIC_TOKEN_WARNING,
   CUSTOM_EXPIRY_VALUE,
   EXPIRES_AT_OPTIONS,
-  NON_EXPIRING_TOKEN_VALUE,
 } from '../AccessToken.constants'
-import { getExpirationDate } from '../AccessToken.utils'
+import { getExpirationDate, getMaxCustomExpiryDate } from '../AccessToken.utils'
 import { DatePicker } from '@/components/ui/DatePicker'
 import {
   useAccessTokenCreateMutation,
@@ -45,15 +44,12 @@ const formId = 'new-access-token-form'
 
 const TokenSchema = z.object({
   tokenName: z.string().min(1, 'Please enter a name for the token'),
-  expiresAt: z.preprocess(
-    (val) => (val === NON_EXPIRING_TOKEN_VALUE ? undefined : val),
-    z.string().optional()
-  ),
+  expiresAt: z.string().min(1, 'Please select an expiry'),
 })
 
 export interface NewAccessTokenDialogProps {
   open: boolean
-  tokenScope: 'V0' | undefined
+  tokenScope?: 'V0' | undefined
   onOpenChange: (open: boolean) => void
   onCreateToken: (token: NewAccessToken) => void
 }
@@ -81,7 +77,7 @@ export const NewTokenDialog = ({
     if (isCustomExpiry && customExpiryDate) {
       expiresAt = customExpiryDate.date
     } else {
-      expiresAt = getExpirationDate(values.expiresAt || '')
+      expiresAt = getExpirationDate(values.expiresAt)
     }
 
     createAccessToken(
@@ -90,7 +86,7 @@ export const NewTokenDialog = ({
         onSuccess: (data) => {
           track('access_token_created', {
             tokenType: 'classic',
-            expiryPreset: values.expiresAt || 'never',
+            expiryPreset: values.expiresAt,
           })
           toast.success('Access token created successfully')
           onCreateToken(data)
@@ -101,7 +97,7 @@ export const NewTokenDialog = ({
   }
 
   const handleClose = () => {
-    form.reset({ tokenName: '' })
+    form.reset()
     setCustomExpiryDate(undefined)
     setIsCustomExpiry(false)
     onOpenChange(false)
@@ -158,7 +154,7 @@ export const NewTokenDialog = ({
                   be very careful when using this API.
                 </p>
                 <div className="mt-4">
-                  <Button asChild type="default" icon={<ExternalLink />}>
+                  <Button asChild variant="default" icon={<ExternalLink />}>
                     <a href="https://api.supabase.com/api/v0" target="_blank" rel="noreferrer">
                       Experimental API documentation
                     </a>
@@ -171,8 +167,8 @@ export const NewTokenDialog = ({
           <Admonition
             type="warning"
             className="rounded-none border-t-0 border-x-0"
-            title="Access tokens can be used to control your whole account"
-            description="Be careful when sharing your tokens"
+            title={CLASSIC_TOKEN_WARNING.title}
+            description={CLASSIC_TOKEN_WARNING.description}
           />
         )}
         <DialogSection className="flex flex-col gap-4">
@@ -189,7 +185,7 @@ export const NewTokenDialog = ({
                 render={({ field }) => (
                   <FormItemLayout name="tokenName" label="Name">
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         id="tokenName"
                         {...field}
                         placeholder="Provide a name for your token"
@@ -205,21 +201,21 @@ export const NewTokenDialog = ({
                 render={({ field }) => (
                   <FormItemLayout name="expiresAt" label="Expires in">
                     <div className="flex gap-2">
-                      <FormControl className="flex-grow">
-                        <Select_Shadcn_ value={field.value} onValueChange={handleExpiryChange}>
-                          <SelectTrigger_Shadcn_>
-                            <SelectValue_Shadcn_ placeholder="Expires at" />
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
+                      <FormControl className="grow">
+                        <Select value={field.value} onValueChange={handleExpiryChange}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Expires at" />
+                          </SelectTrigger>
+                          <SelectContent>
                             {Object.values(EXPIRES_AT_OPTIONS).map(
                               (option: { value: string; label: string }) => (
-                                <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                                <SelectItem key={option.value} value={option.value}>
                                   {option.label}
-                                </SelectItem_Shadcn_>
+                                </SelectItem>
                               )
                             )}
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                       {isCustomExpiry && (
                         <DatePicker
@@ -228,21 +224,13 @@ export const NewTokenDialog = ({
                           contentSide="top"
                           to={customExpiryDate?.date}
                           minDate={new Date()}
-                          maxDate={dayjs().add(1, 'year').toDate()}
+                          maxDate={getMaxCustomExpiryDate().toDate()}
                           onChange={(date) => {
                             if (date.to) handleCustomDateChange({ date: date.to })
                           }}
                         />
                       )}
                     </div>
-                    {field.value === NON_EXPIRING_TOKEN_VALUE && (
-                      <div className="w-full flex gap-x-2 items-center mt-3 mx-0.5">
-                        <WarningIcon />
-                        <span className="text-xs text-left text-foreground-lighter">
-                          Make sure to keep your non-expiring token safe and secure.
-                        </span>
-                      </div>
-                    )}
                   </FormItemLayout>
                 )}
               />
@@ -251,7 +239,7 @@ export const NewTokenDialog = ({
         </DialogSection>
         <DialogFooter>
           <Button
-            type="default"
+            variant="default"
             disabled={isPending}
             onClick={() => {
               form.reset()
@@ -262,7 +250,7 @@ export const NewTokenDialog = ({
           >
             Cancel
           </Button>
-          <Button form={formId} htmlType="submit" loading={isPending}>
+          <Button form={formId} type="submit" loading={isPending}>
             Generate token
           </Button>
         </DialogFooter>

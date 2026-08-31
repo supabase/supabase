@@ -2,9 +2,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Link2 } from 'lucide-react'
 import { useEffect } from 'react'
 import type { SubmitHandler } from 'react-hook-form'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, DialogSectionSeparator, Form, FormControl, FormField, Input_Shadcn_ } from 'ui'
+import { Button, DialogSectionSeparator, Form, FormControl, FormField, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CategoryAndSeverityInfo } from './CategoryAndSeverityInfo'
@@ -14,8 +14,13 @@ import {
 } from './LinkSupportTicketForm.schema'
 import { OrganizationSelector } from './OrganizationSelector'
 import { ProjectAndPlanInfo } from './ProjectAndPlanInfo'
-import { DISABLE_SUPPORT_ACCESS_CATEGORIES, SupportAccessToggle } from './SupportAccessToggle'
-import { getOrgSubscriptionPlan, NO_ORG_MARKER, NO_PROJECT_MARKER } from './SupportForm.utils'
+import { SupportAccessToggle } from './SupportAccessToggle'
+import {
+  canAllowSupportAccess,
+  getOrgSubscriptionPlan,
+  NO_ORG_MARKER,
+  NO_PROJECT_MARKER,
+} from './SupportForm.utils'
 import { useLinkSupportTicketMutation } from '@/data/feedback/link-support-ticket-mutation'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 
@@ -46,7 +51,10 @@ export const LinkSupportTicketForm = ({
     reValidateMode: 'onBlur',
   })
 
-  const { category, organizationSlug, projectRef } = form.watch()
+  const [category, organizationSlug, projectRef] = useWatch({
+    control: form.control,
+    name: ['category', 'organizationSlug', 'projectRef'],
+  })
   const selectedOrgSlug = organizationSlug === NO_ORG_MARKER ? null : organizationSlug
   const selectedProjectRef = projectRef === NO_PROJECT_MARKER ? null : projectRef
   const subscriptionPlanId = getOrgSubscriptionPlan(organizations, selectedOrgSlug)
@@ -81,10 +89,9 @@ export const LinkSupportTicketForm = ({
           ? values.projectRef
           : undefined,
       category: values.category,
-      allow_support_access:
-        values.category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(values.category)
-          ? values.allowSupportAccess
-          : false,
+      allow_support_access: canAllowSupportAccess(values.category, values.projectRef)
+        ? values.allowSupportAccess
+        : false,
     })
   }
 
@@ -117,7 +124,7 @@ export const LinkSupportTicketForm = ({
               render={({ field }) => (
                 <FormItemLayout hideMessage layout="vertical" label="Conversation ID">
                   <FormControl>
-                    <Input_Shadcn_ {...field} readOnly />
+                    <Input {...field} readOnly />
                   </FormControl>
                 </FormItemLayout>
               )}
@@ -131,7 +138,6 @@ export const LinkSupportTicketForm = ({
                 projectRef={selectedProjectRef}
                 subscriptionPlanId={subscriptionPlanId}
                 category={category}
-                showPlanExpectationInfo={false}
               />
             )}
 
@@ -147,7 +153,7 @@ export const LinkSupportTicketForm = ({
 
         <DialogSectionSeparator />
 
-        {!!category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(category) && (
+        {canAllowSupportAccess(category, projectRef) && (
           <>
             <div className="py-4">
               <SupportAccessToggle form={form as any} />
@@ -159,8 +165,8 @@ export const LinkSupportTicketForm = ({
         <div className="px-6 py-8">
           <Button
             block
-            type="primary"
-            htmlType="submit"
+            variant="primary"
+            type="submit"
             size="large"
             icon={<Link2 />}
             loading={isPending}

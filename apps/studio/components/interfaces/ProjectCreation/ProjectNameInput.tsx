@@ -1,5 +1,5 @@
 import { UseFormReturn } from 'react-hook-form'
-import { FormControl, FormField, Input_Shadcn_ } from 'ui'
+import { FormControl, FormField, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CreateProjectForm } from './ProjectCreation.schema'
@@ -16,9 +16,9 @@ export const ProjectNameInput = ({ form }: ProjectNameInputProps) => {
         control={form.control}
         name="projectName"
         render={({ field }) => (
-          <FormItemLayout label="Project name" layout="horizontal">
+          <FormItemLayout id="projectName" label="Project name" layout="horizontal">
             <FormControl>
-              <Input_Shadcn_ {...field} placeholder="Project name" />
+              <Input {...field} id="projectName" placeholder="Project name" />
             </FormControl>
           </FormItemLayout>
         )}

@@ -5,7 +5,7 @@ import {
 import { QueryPerformanceRow } from '../QueryPerformance.types'
 
 export const transformStatementDataToRows = (
-  data: any[],
+  data: QueryPerformanceRow[],
   filterIndexAdvisor: boolean = false
 ): QueryPerformanceRow[] => {
   if (!data || data.length === 0) return []

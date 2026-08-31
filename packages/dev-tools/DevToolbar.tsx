@@ -1,7 +1,7 @@
 'use client'
 
 import { useFeatureFlags } from 'common'
-import { Copy, EyeOff, Search, X } from 'lucide-react'
+import { Copy, Search, X } from 'lucide-react'
 import Image from 'next/image'
 import {
   useCallback,
@@ -16,6 +16,9 @@ import {
   Button,
   cn,
   Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   Sheet,
   SheetClose,
   SheetContent,
@@ -23,9 +26,9 @@ import {
   SheetHeader,
   SheetTitle,
   Switch,
-  Tabs_Shadcn_ as Tabs,
-  TabsList_Shadcn_ as TabsList,
-  TabsTrigger_Shadcn_ as TabsTrigger,
+  Tabs,
+  TabsList,
+  TabsTrigger,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -117,7 +120,7 @@ function EventRow({ event }: { event: DevTelemetryEvent }) {
                 type="button"
                 onClick={handleCopy}
                 aria-label="Copy JSON"
-                className="p-1 rounded hover:bg-surface-200 text-foreground-muted hover:text-foreground-light"
+                className="p-1 rounded-sm hover:bg-surface-200 text-foreground-muted hover:text-foreground-light"
               >
                 <Copy className="w-3 h-3" />
               </button>
@@ -205,10 +208,11 @@ function FlagRow({
 }
 
 export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
-  const { isEnabled, isOpen, setIsOpen, events, setEvents, dismissToolbar } = useDevToolbar()
+  const { isEnabled, isOpen, setIsOpen, events, setEvents } = useDevToolbar()
   const [activeTab, setActiveTab] = useState<string>('events')
   const [flagsSubTab, setFlagsSubTab] = useState<'posthog' | 'configcat'>('posthog')
   const [eventFilter, setEventFilter] = useState<string>('')
+  const [flagFilter, setFlagFilter] = useState<string>('')
   const { posthog: posthogFlags, configcat: configcatFlags } = useFeatureFlags()
   const [phFlagOverrides, setPhFlagOverrides] = useState<Record<string, unknown>>({})
   const [ccFlagOverrides, setCcFlagOverrides] = useState<Record<string, unknown>>({})
@@ -350,6 +354,20 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
   const ccOverrideCount = Object.keys(ccFlagOverrides).length
   const totalOverrideCount = phOverrideCount + ccOverrideCount
 
+  const normalizedFlagFilter = flagFilter.trim().toLowerCase()
+
+  const filteredPosthogEntries = normalizedFlagFilter
+    ? Object.entries(posthogFlags).filter(([flagName]) =>
+        flagName.toLowerCase().includes(normalizedFlagFilter)
+      )
+    : Object.entries(posthogFlags)
+
+  const filteredConfigcatEntries = normalizedFlagFilter
+    ? Object.entries(configcatFlags).filter(([flagName]) =>
+        flagName.toLowerCase().includes(normalizedFlagFilter)
+      )
+    : Object.entries(configcatFlags)
+
   if (!IS_TOOLBAR_ENABLED || !isEnabled) return null
 
   return (
@@ -385,24 +403,18 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
                 aria-hidden="true"
                 className="shrink-0 mr-4"
               />
-              <TabsList className="flex gap-x-4 rounded-none !border-none h-auto">
-                <TabsTrigger
-                  value="events"
-                  className="text-xs py-3 border-b-[1px] font-mono uppercase"
-                >
+              <TabsList className="flex gap-x-4 rounded-none border-none! h-auto">
+                <TabsTrigger value="events" className="text-xs py-3 border-b font-mono uppercase">
                   Events ({filteredEvents.length})
                 </TabsTrigger>
-                <TabsTrigger
-                  value="flags"
-                  className="text-xs py-3 border-b-[1px] font-mono uppercase"
-                >
+                <TabsTrigger value="flags" className="text-xs py-3 border-b font-mono uppercase">
                   Flags {totalOverrideCount > 0 && `(${totalOverrideCount})`}
                 </TabsTrigger>
                 {extraTabs.map((tab) => (
                   <TabsTrigger
                     key={tab.id}
                     value={tab.id}
-                    className="text-xs py-3 border-b-[1px] font-mono uppercase"
+                    className="text-xs py-3 border-b font-mono uppercase"
                   >
                     {tab.label}
                   </TabsTrigger>
@@ -411,20 +423,9 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
               <div className="ml-auto flex items-center gap-2">
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button
-                      type="text"
-                      icon={<EyeOff className="w-4 h-4" />}
-                      onClick={dismissToolbar}
-                      className="text-foreground-light hover:text-foreground p-1"
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent side="top">Hide Dev Toolbar</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
                     <SheetClose asChild>
                       <Button
-                        type="text"
+                        variant="text"
                         icon={<X className="w-4 h-4" />}
                         className="text-foreground-light hover:text-foreground p-1"
                       />
@@ -439,17 +440,20 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
           <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
             {activeTab === 'events' && (
               <div className="flex-1 overflow-hidden flex flex-col">
-                <div className="flex items-center justify-between border-b shrink-0 px-6 py-2">
-                  <Input
-                    size="tiny"
-                    placeholder="Filter events..."
-                    value={eventFilter}
-                    onChange={(e) => setEventFilter(e.target.value)}
-                    icon={<Search size={14} className="text-foreground-lighter" />}
-                    className="flex-1 rounded-none border-0 bg-transparent shadow-none focus-visible:ring-0 max-w-96"
-                  />
+                <div className="flex items-center justify-between border-b shrink-0 px-6 py-2 gap-2">
+                  <InputGroup className="w-full max-w-sm">
+                    <InputGroupInput
+                      size="tiny"
+                      placeholder="Filter events..."
+                      value={eventFilter}
+                      onChange={(e) => setEventFilter(e.target.value)}
+                    />
+                    <InputGroupAddon>
+                      <Search size={14} className="text-foreground-lighter" />
+                    </InputGroupAddon>
+                  </InputGroup>
                   <Button
-                    type="default"
+                    variant="default"
                     onClick={() => setEvents([])}
                     className="text-foreground-lighter hover:text-foreground"
                   >
@@ -493,9 +497,12 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
                       <button
                         key={id}
                         type="button"
-                        onClick={() => setFlagsSubTab(id)}
+                        onClick={() => {
+                          setFlagsSubTab(id)
+                          setFlagFilter('')
+                        }}
                         className={cn(
-                          'flex items-center justify-between px-3 py-1.5 rounded text-sm text-left uppercase font-mono tracking-wide',
+                          'flex items-center justify-between px-3 py-1.5 rounded-sm text-sm text-left uppercase font-mono tracking-wide',
                           flagsSubTab === id
                             ? 'bg-surface-300 text-foreground'
                             : 'text-foreground-light hover:bg-surface-200'
@@ -510,7 +517,7 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
                   </nav>
                   {totalOverrideCount > 0 && (
                     <div className="mt-auto p-2 border-t">
-                      <Button type="outline" size="tiny" block onClick={clearAllOverrides}>
+                      <Button variant="outline" size="tiny" block onClick={clearAllOverrides}>
                         Reset & Reload
                       </Button>
                     </div>
@@ -520,13 +527,35 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
                 {/* Flag list */}
                 <div className="flex-1 min-h-0 overflow-y-auto pb-6">
                   <div className="divide-y">
+                    <div className="flex items-center gap-x-1 p-2">
+                      <Input
+                        size="tiny"
+                        value={flagFilter}
+                        onChange={(e) => setFlagFilter(e.target.value)}
+                        placeholder="Search flag"
+                        className="w-64"
+                      />
+                      {!!flagFilter && (
+                        <Button
+                          className="px-1"
+                          variant="text"
+                          icon={<X />}
+                          onClick={() => setFlagFilter('')}
+                        />
+                      )}
+                    </div>
+
                     {flagsSubTab === 'posthog' &&
                       (Object.keys(posthogFlags).length === 0 ? (
                         <div className="text-center text-foreground-lighter py-8 text-sm">
                           No PostHog feature flags loaded yet.
                         </div>
+                      ) : filteredPosthogEntries.length === 0 ? (
+                        <div className="text-center text-foreground-lighter py-8 text-sm">
+                          No PostHog flags match &quot;{flagFilter}&quot;.
+                        </div>
                       ) : (
-                        Object.entries(posthogFlags).map(([flagName, flagValue]) => (
+                        filteredPosthogEntries.map(([flagName, flagValue]) => (
                           <FlagRow
                             key={flagName}
                             flagName={flagName}
@@ -539,13 +568,18 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
                           />
                         ))
                       ))}
+
                     {flagsSubTab === 'configcat' &&
                       (Object.keys(configcatFlags).length === 0 ? (
                         <div className="text-center text-foreground-lighter py-8 text-sm">
                           No ConfigCat feature flags loaded yet.
                         </div>
+                      ) : filteredConfigcatEntries.length === 0 ? (
+                        <div className="text-center text-foreground-lighter py-8 text-sm">
+                          No ConfigCat flags match &quot;{flagFilter}&quot;.
+                        </div>
                       ) : (
-                        Object.entries(configcatFlags).map(([flagName, flagValue]) => (
+                        filteredConfigcatEntries.map(([flagName, flagValue]) => (
                           <FlagRow
                             key={flagName}
                             flagName={flagName}

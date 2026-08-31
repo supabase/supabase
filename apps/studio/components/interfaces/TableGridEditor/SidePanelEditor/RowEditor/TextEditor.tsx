@@ -1,7 +1,6 @@
-import { Editor } from '@monaco-editor/react'
+import type { OnMount } from '@monaco-editor/react'
 import { MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
 import { useParams } from 'common'
-import { Loader } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import remarkGfm from 'remark-gfm'
 import { toast } from 'sonner'
@@ -10,11 +9,14 @@ import { Button, cn, SidePanel } from 'ui'
 import { ActionBar } from '../ActionBar'
 import { isValueTruncated } from './RowEditor.utils'
 import { Markdown } from '@/components/interfaces/Markdown'
-import TwoOptionToggle from '@/components/ui/TwoOptionToggle'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from '@/data/table-rows/get-cell-value-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { RoleImpersonationState } from '@/lib/role-impersonation'
+import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 interface TextEditorProps {
   visible: boolean
@@ -49,6 +51,7 @@ export const TextEditor = ({
   const isTruncated = isValueTruncated(value)
 
   const { mutate: getCellValue, isPending, isSuccess, reset } = useGetCellValueMutation()
+  const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
   const loadFullValue = () => {
     if (
@@ -73,14 +76,32 @@ export const TextEditor = ({
         pkMatch,
         projectRef: project?.ref,
         connectionString: project?.connectionString,
+        roleImpersonationState: roleImpersonationState as RoleImpersonationState,
       },
       { onSuccess: (data) => setStrValue(data) }
     )
   }
 
-  const saveValue = (resolve: () => void) => {
-    if (onSaveField) onSaveField(strValue, resolve)
-  }
+  const saveValue = useCallback(
+    (nextValue: string, resolve: () => void) => {
+      if (onSaveField) onSaveField(nextValue, resolve)
+    },
+    [onSaveField]
+  )
+
+  const handleEditorMount: OnMount = useCallback(
+    (editor, monaco) => {
+      if (readOnly) return
+
+      editor.addAction({
+        id: 'save-value',
+        label: 'Save value',
+        keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.Enter],
+        run: () => saveValue(editor.getValue(), () => undefined),
+      })
+    },
+    [readOnly, saveValue]
+  )
 
   useEffect(() => {
     if (visible) {
@@ -111,7 +132,7 @@ export const TextEditor = ({
               options={['view', 'edit']}
               activeOption={view}
               borderOverride="border-muted"
-              onClickOption={setView}
+              onClickOption={(value) => setView(value as 'view' | 'edit')}
             />
           )}
         </div>
@@ -122,46 +143,24 @@ export const TextEditor = ({
           closePanel={onClose}
           backButtonLabel="Cancel"
           applyButtonLabel="Save value"
-          applyFunction={readOnly ? undefined : saveValue}
+          applyFunction={readOnly ? undefined : (resolve) => saveValue(strValue, resolve)}
         />
       }
     >
       <div className="relative flex flex-auto h-full flex-col gap-y-4">
         {view === 'edit' ? (
-          <div className="w-full h-full flex-grow">
-            <Editor
+          <div className="w-full h-full grow">
+            <CodeEditor
               key={value}
-              theme="supabase"
-              className="monaco-editor"
-              defaultLanguage="markdown"
-              value={strValue}
-              loading={<Loader className="animate-spin" strokeWidth={2} size={20} />}
-              options={{
-                readOnly,
-                tabSize: 2,
-                fontSize: 13,
-                minimap: {
-                  enabled: false,
-                },
-                wordWrap: 'on',
-                fixedOverflowWidgets: true,
-                lineNumbersMinChars: 4,
-              }}
-              onMount={(editor) => {
-                editor.changeViewZones((accessor) => {
-                  accessor.addZone({
-                    afterLineNumber: 0,
-                    heightInPx: 4,
-                    domNode: document.createElement('div'),
-                  })
-                })
-                editor.focus()
-              }}
-              onChange={(val) => setStrValue(val ?? '')}
+              isReadOnly={readOnly}
+              language="markdown"
+              value={strValue ?? ''}
+              onInputChange={(val) => setStrValue(val ?? '')}
+              onMount={handleEditorMount}
             />
           </div>
         ) : (
-          <SidePanel.Content className="py-4 bg-default flex-grow">
+          <SidePanel.Content className="py-4 bg-default grow">
             <Markdown
               remarkPlugins={[remarkGfm]}
               className="bg-default markdown-body"
@@ -184,7 +183,7 @@ export const TextEditor = ({
                 performance issues
               </p>
             </div>
-            <Button type="default" loading={isPending} onClick={loadFullValue}>
+            <Button variant="default" loading={isPending} onClick={loadFullValue}>
               Load full text data
             </Button>
           </div>

@@ -3,7 +3,20 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form, FormControl, FormField, Input_Shadcn_, Modal } from 'ui'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -54,45 +67,45 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
   }
 
   return (
-    <Modal
-      hideFooter
-      size="small"
-      key="invite-user-modal"
-      visible={visible}
-      header="Invite a new user"
-      onCancel={handleToggle}
-    >
-      <Form {...form}>
-        <Modal.Content>
-          <form id={formId} onSubmit={form.handleSubmit(onInviteUser)} noValidate>
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItemLayout layout="vertical" label="User email">
-                  <FormControl className="relative col-span-6">
-                    <Input_Shadcn_ {...field} />
-                  </FormControl>
-                </FormItemLayout>
-              )}
-            />
-          </form>
-        </Modal.Content>
+    <Dialog key="invite-user-modal" open={visible} onOpenChange={handleToggle}>
+      <DialogContent size="small">
+        <DialogHeader>
+          <DialogTitle>Invite a new user</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <Form {...form}>
+          <DialogSection>
+            <form id={formId} onSubmit={form.handleSubmit(onInviteUser)} noValidate>
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItemLayout layout="vertical" label="User email">
+                    <FormControl className="relative col-span-6">
+                      <Input {...field} />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            </form>
+          </DialogSection>
 
-        <Modal.Content>
-          <Button
-            form={formId}
-            block
-            size="small"
-            htmlType="submit"
-            loading={isInviting}
-            disabled={!canInviteUsers || isInviting}
-          >
-            Invite user
-          </Button>
-        </Modal.Content>
-      </Form>
-    </Modal>
+          <DialogFooter>
+            <Button variant="default" onClick={handleToggle}>
+              Cancel
+            </Button>
+            <Button
+              form={formId}
+              type="submit"
+              loading={isInviting}
+              disabled={!canInviteUsers || isInviting}
+            >
+              Invite user
+            </Button>
+          </DialogFooter>
+        </Form>
+      </DialogContent>
+    </Dialog>
   )
 }
 

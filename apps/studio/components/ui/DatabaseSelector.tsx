@@ -1,21 +1,19 @@
 import { useParams } from 'common'
 import { noop } from 'lodash'
 import { Check, ChevronDown, Loader2, Plus } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import {
   Button,
   ButtonProps,
   cn,
-  Command_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
   Tooltip,
   TooltipContent,
@@ -23,10 +21,16 @@ import {
 } from 'ui'
 
 import { Markdown } from '@/components/interfaces/Markdown'
-import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
+import {
+  getAddReadReplicaPath,
+  getInfrastructurePath,
+} from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
+import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'
+import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from '@/data/read-replicas/replicas.utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
@@ -51,8 +55,9 @@ export const DatabaseSelector = ({
   className,
   isForm = false,
 }: DatabaseSelectorProps) => {
-  const router = useRouter()
   const { ref: projectRef } = useParams()
+  const isHighAvailability = useIsHighAvailability()
+
   const [open, setOpen] = useState(false)
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
@@ -73,7 +78,7 @@ export const DatabaseSelector = ({
 
   const selectedAdditionalOption = additionalOptions.find((x) => x.id === selectedDatabaseId)
 
-  const newReplicaURL = `/project/${projectRef}/database/replication?type=Read+Replica`
+  const newReplicaURL = getAddReadReplicaPath(projectRef)
 
   useEffect(() => {
     if (_selectedDatabaseId && !isForm) state.setSelectedDatabaseId(_selectedDatabaseId)
@@ -81,8 +86,8 @@ export const DatabaseSelector = ({
   }, [_selectedDatabaseId])
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
+      <PopoverTrigger asChild>
         <div className={cn('flex cursor-pointer', className)}>
           {!isForm && (
             <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
@@ -90,7 +95,7 @@ export const DatabaseSelector = ({
             </span>
           )}
           <Button
-            type="default"
+            variant="default"
             icon={isLoading && <Loader2 className="animate-spin" />}
             iconRight={<ChevronDown strokeWidth={1.5} size={12} />}
             {...buttonProps}
@@ -121,14 +126,14 @@ export const DatabaseSelector = ({
             )}
           </Button>
         </div>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align={align}>
-        <Command_Shadcn_>
-          <CommandList_Shadcn_>
+      </PopoverTrigger>
+      <PopoverContent className="p-0 w-64" side="bottom" align={align}>
+        <Command>
+          <CommandList>
             {additionalOptions.length > 0 && (
-              <CommandGroup_Shadcn_ className="border-b">
+              <CommandGroup className="border-b">
                 {additionalOptions.map((option) => (
-                  <CommandItem_Shadcn_
+                  <CommandItem
                     key={option.id}
                     value={option.id}
                     className="cursor-pointer w-full"
@@ -147,11 +152,11 @@ export const DatabaseSelector = ({
                       <p>{option.name}</p>
                       {option.id === selectedDatabaseId && <Check size={14} />}
                     </div>
-                  </CommandItem_Shadcn_>
+                  </CommandItem>
                 ))}
-              </CommandGroup_Shadcn_>
+              </CommandGroup>
             )}
-            <CommandGroup_Shadcn_>
+            <CommandGroup>
               <ScrollArea className={(databases || []).length > 7 ? 'h-[210px]' : ''}>
                 {sortedDatabases?.map((database) => {
                   const region = formatDatabaseRegion(database.region)
@@ -177,7 +182,7 @@ export const DatabaseSelector = ({
                         <TooltipContent side="right" className="w-80">
                           <Markdown
                             className="text-xs text-foreground"
-                            content={`Replica unable to accept requests as its ${status}. [View infrastructure settings](/project/${projectRef}/settings/infrastructure) for more information.`}
+                            content={`Replica unable to accept requests as its ${status}. [View infrastructure settings](${getInfrastructurePath(projectRef)}) for more information.`}
                           />
                         </TooltipContent>
                       </Tooltip>
@@ -185,7 +190,7 @@ export const DatabaseSelector = ({
                   }
 
                   return (
-                    <CommandItem_Shadcn_
+                    <CommandItem
                       key={database.identifier}
                       value={database.identifier}
                       className="cursor-pointer w-full"
@@ -208,39 +213,30 @@ export const DatabaseSelector = ({
                         </p>
                         {database.identifier === selectedDatabaseId && <Check size={16} />}
                       </div>
-                    </CommandItem_Shadcn_>
+                    </CommandItem>
                   )
                 })}
               </ScrollArea>
-            </CommandGroup_Shadcn_>
-            {IS_PLATFORM && infrastructureReadReplicas && (
-              <CommandGroup_Shadcn_ className="border-t">
-                <CommandItem_Shadcn_
-                  className="cursor-pointer w-full"
+            </CommandGroup>
+
+            {IS_PLATFORM && infrastructureReadReplicas && !isHighAvailability && (
+              <CommandGroup className="border-t">
+                <CommandItemLink
+                  href={newReplicaURL}
+                  className="cursor-pointer w-full gap-2"
                   onSelect={() => {
                     setOpen(false)
-                    router.push(newReplicaURL)
+                    setShowConnect(false)
                   }}
-                  onClick={() => setOpen(false)}
                 >
-                  <Link
-                    href={newReplicaURL}
-                    onClick={async () => {
-                      setOpen(false)
-                      // [Joshen] This is used in the Connect UI which is available across all pages
-                      setShowConnect(false)
-                    }}
-                    className="w-full flex items-center gap-2"
-                  >
-                    <Plus size={14} strokeWidth={1.5} />
-                    <p>Create a new read replica</p>
-                  </Link>
-                </CommandItem_Shadcn_>
-              </CommandGroup_Shadcn_>
+                  <Plus size={14} strokeWidth={1.5} />
+                  <p>Create a new read replica</p>
+                </CommandItemLink>
+              </CommandGroup>
             )}
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }

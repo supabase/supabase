@@ -10,7 +10,7 @@ type GitHubRepositoryRelease = {
 
 const current = process.env.CURRENT_CLI_VERSION ? `v${process.env.CURRENT_CLI_VERSION}` : undefined
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
   try {
     const { tag_name: latest, published_at }: GitHubRepositoryRelease = await fetch(
       'https://api.github.com/repos/supabase/cli/releases/latest'

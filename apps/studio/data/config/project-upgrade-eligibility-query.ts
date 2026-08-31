@@ -14,6 +14,7 @@ export type ProjectUpgradeEligibilityResponse =
   components['schemas']['ProjectUpgradeEligibilityResponse']
 export type ProjectUpgradeEligibilityValidationError =
   ProjectUpgradeEligibilityResponse['validation_errors'][number]
+export type ProjectUpgradeEligibilityWarning = ProjectUpgradeEligibilityResponse['warnings'][number]
 
 /**
  * Fetches upgrade eligibility information for a project.

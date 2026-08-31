@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 import { LogoLoader } from 'ui'
 
 import { SignInMfaForm } from '@/components/interfaces/SignIn/SignInMfaForm'
-import ForgotPasswordLayout from '@/components/layouts/SignInLayout/ForgotPasswordLayout'
+import { ForgotPasswordLayout } from '@/components/layouts/SignInLayout/ForgotPasswordLayout'
 import { auth, buildPathWithParams, getReturnToPath } from '@/lib/gotrue'
 import type { NextPageWithLayout } from '@/types'
 

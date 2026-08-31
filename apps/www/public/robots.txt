@@ -1,3 +1,11 @@
 User-agent: *
+Allow: /
+
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: Google-Extended
+User-agent: PerplexityBot
+Allow: /
+
 Sitemap: https://supabase.com/sitemap.xml
 Content-Signal: ai-train=yes, search=yes, ai-input=yes

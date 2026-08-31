@@ -282,7 +282,7 @@ export function getAvailableComputeOptions(
 }
 
 export const calculateMaxIopsAllowedForDiskSizeWithGp3 = (totalSize: number) => {
-  return Math.min(3000 * totalSize, 16000)
+  return Math.max(3000, Math.min(500 * totalSize, 16000))
 }
 
 export const calculateDiskSizeRequiredForIopsWithGp3 = (iops: number) => {
@@ -399,6 +399,28 @@ export const mapComputeSizeNameToAddonVariantId = (
   const matchedSize = computeSize && isInfraInstanceSize(computeSize) ? computeSize : undefined
   const sizeKey = matchedSize ?? fallback
   return infraToAddonVariant[sizeKey]
+}
+
+// Compute variants below 4XL run on EBS instances that draw on a burst credit
+// pool for disk IO, so burst balance metrics only make sense for these. 4XL
+// and larger instances have sustained disk IO at their baseline (baseline
+// equals max) and don't expose a burst budget.
+const BURSTABLE_IO_VARIANTS: ReadonlySet<ComputeInstanceAddonVariantId> = new Set([
+  'ci_nano',
+  'ci_micro',
+  'ci_small',
+  'ci_medium',
+  'ci_large',
+  'ci_xlarge',
+  'ci_2xlarge',
+])
+
+export const hasBurstableIO = (computeSize: ProjectDetail['infra_compute_size']): boolean => {
+  // Don't fall back to the nano default that mapComputeSizeNameToAddonVariantId
+  // uses: if compute metadata is missing or unrecognized, treat the project as
+  // non-burstable so we don't accidentally surface burst-only charts.
+  if (!computeSize || !isInfraInstanceSize(computeSize)) return false
+  return BURSTABLE_IO_VARIANTS.has(infraToAddonVariant[computeSize])
 }
 
 const addonVariantToComputeSize: Record<ComputeInstanceAddonVariantId, ComputeInstanceSize> = {

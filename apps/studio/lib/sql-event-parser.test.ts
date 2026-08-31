@@ -288,6 +288,42 @@ describe('SQL Event Parser', () => {
       const results = sqlEventParser.getTableEvents('ALTER TABLE users DISABLE ROW LEVEL SECURITY')
       expect(results).toHaveLength(0)
     })
+
+    it('detects ALTER TABLE IF EXISTS ENABLE ROW LEVEL SECURITY', () => {
+      const results = sqlEventParser.getTableEvents(
+        'ALTER TABLE IF EXISTS public."Conversations" ENABLE ROW LEVEL SECURITY'
+      )
+      expect(results).toHaveLength(1)
+      expect(results[0]).toEqual({
+        type: TABLE_EVENT_ACTIONS.TableRLSEnabled,
+        schema: 'public',
+        tableName: 'Conversations',
+      })
+    })
+
+    it('detects ALTER TABLE ONLY ENABLE ROW LEVEL SECURITY', () => {
+      const results = sqlEventParser.getTableEvents(
+        'ALTER TABLE ONLY public.users ENABLE ROW LEVEL SECURITY'
+      )
+      expect(results).toHaveLength(1)
+      expect(results[0]).toEqual({
+        type: TABLE_EVENT_ACTIONS.TableRLSEnabled,
+        schema: 'public',
+        tableName: 'users',
+      })
+    })
+
+    it('detects ALTER TABLE IF EXISTS ONLY ENABLE ROW LEVEL SECURITY', () => {
+      const results = sqlEventParser.getTableEvents(
+        'ALTER TABLE IF EXISTS ONLY public.users ENABLE ROW LEVEL SECURITY'
+      )
+      expect(results).toHaveLength(1)
+      expect(results[0]).toEqual({
+        type: TABLE_EVENT_ACTIONS.TableRLSEnabled,
+        schema: 'public',
+        tableName: 'users',
+      })
+    })
   })
 
   describe('ReDoS protection', () => {

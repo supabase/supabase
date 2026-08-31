@@ -12,16 +12,33 @@
  *   URL                 -> rich_text  (event URL)
  *   Book Meeting Link   -> url
  *   Location            -> rich_text
- *   Category            -> multi_select
+ *   Type                -> multi_select  (drives the site's category filter)
+ *   Category            -> multi_select  (audience taxonomy)
  *   Are you speaking at this event? -> multi_select
  *   Participation       -> multi_select
  */
+import fs from 'fs'
+import path from 'path'
+import matter from 'gray-matter'
 import { queryDatabase } from 'lib/notion'
 
-import { SUPABASE_HOST, SupabaseEvent } from './eventsTypes'
+import { EventHost, SUPABASE_HOST, SupabaseEvent } from './eventsTypes'
 
 // The actual DB ID (child database inside the page)
 const NOTION_EVENTS_DB_ID_FALLBACK = '21b5004b775f8058872fe8fa81e2c7ac'
+
+// Maps Notion "Type" options to the app's category vocabulary (the values in
+// CATEGORIES_FILTERS). Keys are lowercased for case-insensitive matching.
+// "Supabase Event", "Party" and "Sales Event" have no filter bucket and fall
+// through to DEFAULT_NOTION_CATEGORY.
+const NOTION_TYPE_CATEGORY_MAP: Record<string, string> = {
+  conference: 'conference',
+  hackathon: 'hackathon',
+  meetup: 'meetup',
+  'meetup - third party': 'meetup',
+}
+
+const DEFAULT_NOTION_CATEGORY = 'conference'
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -70,6 +87,33 @@ function getMultiSelect(page: any, name: string): string[] {
   return prop.multi_select.map((s: any) => s.name)
 }
 
+/**
+ * Derive the site's category values for a Notion event.
+ *
+ * "Type" is the primary signal. "Category" is an audience taxonomy (AI / ML,
+ * Postgres / Databases, …) that also carries a "Hackathon" option, so it's read
+ * as a secondary signal for events typed as something else — e.g. a third-party
+ * meetup that is really a hackathon.
+ */
+function getNotionCategories(page: any): string[] {
+  const mapped = getMultiSelect(page, 'Type')
+    .map((type) => NOTION_TYPE_CATEGORY_MAP[type.trim().toLowerCase()])
+    .filter(Boolean)
+
+  const isHackathonCategory = getMultiSelect(page, 'Category').some(
+    (category) => category.trim().toLowerCase() === 'hackathon'
+  )
+  if (isHackathonCategory) mapped.push('hackathon')
+
+  return mapped.length > 0 ? Array.from(new Set(mapped)) : [DEFAULT_NOTION_CATEGORY]
+}
+
+function getFormulaString(page: any, name: string): string {
+  const prop = page.properties[name]
+  if (!prop || prop.type !== 'formula' || prop.formula?.type !== 'string') return ''
+  return prop.formula.string ?? ''
+}
+
 // ─── Main fetch ─────────────────────────────────────────────────────────────
 
 /**
@@ -95,7 +139,7 @@ export const getNotionEvents = async (): Promise<SupabaseEvent[]> => {
 
     return pages
       .map((page): SupabaseEvent | null => {
-        const title = getTitle(page)
+        const title = getFormulaString(page, 'Publish to Web Title') || getTitle(page)
         const startDate = getDate(page, 'Start Date')
         if (!title || !startDate) return null
 
@@ -107,7 +151,7 @@ export const getNotionEvents = async (): Promise<SupabaseEvent[]> => {
         const rawMeetingLink = getUrl(page, 'Book Meeting Link')
         const meetingLink = isSafeHttpUrl(rawMeetingLink) ? rawMeetingLink : ''
         const location = getRichText(page, 'Location')
-        const categories = ['conference']
+        const categories = getNotionCategories(page)
         const speakingAnswers = getMultiSelect(page, 'Are you speaking at this event?')
         const isSpeaking = speakingAnswers.includes('Yes')
 
@@ -126,7 +170,9 @@ export const getNotionEvents = async (): Promise<SupabaseEvent[]> => {
           categories,
           timezone: '',
           location,
-          hosts: [SUPABASE_HOST],
+          // Notion events are third-party — Supabase attends but does not host,
+          // so no "Hosted by" line. Only Luma events are Supabase-hosted.
+          hosts: [],
           source: 'notion',
           disable_page_build: true,
           isSpeaking,
@@ -139,4 +185,137 @@ export const getNotionEvents = async (): Promise<SupabaseEvent[]> => {
     console.error('Error fetching Notion events:', error)
     return []
   }
+}
+
+// ─── MDX events ─────────────────────────────────────────────────────────────
+
+const EVENTS_DIRECTORY = '_events'
+const FILENAME_DATE_PREFIX_LENGTH = 11
+
+type MdxHost = { name?: string; avatar_url?: string }
+
+type MdxFrontmatter = {
+  title?: string
+  subtitle?: string
+  description?: string
+  meta_description?: string
+  type?: string
+  date?: string
+  end_date?: string
+  timezone?: string
+  categories?: string[]
+  tags?: string[]
+  onDemand?: boolean
+  disable_page_build?: boolean
+  hosts?: MdxHost[]
+  main_cta?: { url?: string; target?: '_blank' | '_self'; label?: string }
+}
+
+function mdxSlugFromFilename(filename: string): string {
+  // Matches the slug produced by getAllPostSlugs for `_events` (keeps any leading
+  // underscore from `YYYY-MM-DD__name.mdx`), so /events/{slug} lands on the built page.
+  return filename.replace(/\.mdx$/, '').substring(FILENAME_DATE_PREFIX_LENGTH)
+}
+
+function mdxHostsToEventHosts(hosts: MdxHost[] | undefined): EventHost[] {
+  if (!hosts || hosts.length === 0) return [SUPABASE_HOST]
+  return hosts.map((host, i) => ({
+    id: `mdx-host-${i}`,
+    email: '',
+    name: host.name ?? null,
+    first_name: host.name ?? null,
+    last_name: null,
+    avatar_url: host.avatar_url ?? '',
+  }))
+}
+
+function startOfTodayUtc(): Date {
+  const now = new Date()
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
+}
+
+function readMdxEventFilenames(): string[] {
+  const postDirectory = path.join(process.cwd(), EVENTS_DIRECTORY)
+  try {
+    return fs.readdirSync(postDirectory).filter((filename) => filename.endsWith('.mdx'))
+  } catch (error) {
+    console.error('Error reading _events directory:', error)
+    return []
+  }
+}
+
+function mdxFileToEvent(filename: string): SupabaseEvent | null {
+  try {
+    const fullPath = path.join(process.cwd(), EVENTS_DIRECTORY, filename)
+    const fileContents = fs.readFileSync(fullPath, 'utf8')
+    const { data } = matter(fileContents) as unknown as { data: MdxFrontmatter }
+
+    if (!data.title || !data.date) return null
+
+    const slug = mdxSlugFromFilename(filename)
+    const categories = data.categories ?? (data.type ? [data.type] : [])
+    // Webinars don't show a "Hosted by" line — drop hosts entirely.
+    const isWebinar = data.type === 'webinar' || categories.includes('webinar')
+    const rawCtaUrl = data.main_cta?.url ?? ''
+    const isExternalCta = /^https?:\/\//i.test(rawCtaUrl)
+    const safeExternalCta = isExternalCta && isSafeHttpUrl(rawCtaUrl) ? rawCtaUrl : ''
+    const internalPath = `/events/${slug}`
+    const href = data.disable_page_build ? safeExternalCta || internalPath : internalPath
+    const target = data.disable_page_build && safeExternalCta ? '_blank' : '_self'
+
+    return {
+      slug,
+      type: data.type ?? 'event',
+      title: data.title,
+      date: data.date,
+      end_date: data.end_date,
+      description: data.meta_description ?? data.description ?? data.subtitle ?? '',
+      thumb: '',
+      cover_url: '',
+      path: internalPath,
+      url: href,
+      tags: data.tags ?? categories,
+      categories,
+      timezone: data.timezone ?? '',
+      location: '',
+      hosts: isWebinar ? [] : mdxHostsToEventHosts(data.hosts),
+      source: 'mdx',
+      onDemand: data.onDemand,
+      disable_page_build: data.disable_page_build,
+      link: { href, target, label: data.main_cta?.label },
+    }
+  } catch (error) {
+    console.error(`Error parsing mdx event ${filename}:`, error)
+    return null
+  }
+}
+
+let parsedMdxEventsCache: SupabaseEvent[] | null = null
+
+/** Parse every `_events/*.mdx` file once per process and reuse the result. */
+function getAllParsedMdxEvents(): SupabaseEvent[] {
+  if (parsedMdxEventsCache) return parsedMdxEventsCache
+  parsedMdxEventsCache = readMdxEventFilenames()
+    .map(mdxFileToEvent)
+    .filter((e): e is SupabaseEvent => e !== null)
+  return parsedMdxEventsCache
+}
+
+/**
+ * Read all events under `_events/` and return today-and-future events.
+ * Past events are excluded (by end_date when present, otherwise start date).
+ * Events already flipped to `onDemand: true` are excluded too — they've
+ * already happened and belong in the on-demand bucket (getOnDemandMdxEvents),
+ * not the upcoming one, regardless of how their UTC-converted date compares to today.
+ */
+export const getMdxEvents = (): SupabaseEvent[] => {
+  const today = startOfTodayUtc()
+  return getAllParsedMdxEvents().filter(
+    (event) => !event.onDemand && new Date(event.end_date ?? event.date) >= today
+  )
+}
+
+/** All MDX events with `onDemand: true`, including past recordings. */
+export const getOnDemandMdxEvents = (): SupabaseEvent[] => {
+  return getAllParsedMdxEvents().filter((event) => event.onDemand === true)
 }

@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 import { ChevronLeft, ChevronRight, FileText, Receipt, ScrollText } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
 import {
   Button,
@@ -19,7 +20,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import InvoicePayButton from './InvoicePayButton'
 import { InvoiceStatus } from '@/components/interfaces/Billing/Invoices.types'
 import InvoiceStatusBadge from '@/components/interfaces/Billing/InvoiceStatusBadge'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
 import { getInvoice } from '@/data/invoices/invoice-query'
@@ -56,13 +57,16 @@ export const InvoicesSettings = () => {
   const isPartnerBilledOrganization = isPartnerBillingOrganization(
     selectedOrganization?.billing_partner
   )
+
+  const { ref, inView } = useInView({ triggerOnce: true })
+
   const offset = (page - 1) * PAGE_LIMIT
 
   const { data: count, isError: isErrorCount } = useInvoicesCountQuery(
     {
       slug,
     },
-    { enabled: !isPartnerBilledOrganization }
+    { enabled: !isPartnerBilledOrganization && inView }
   )
   const {
     data,
@@ -75,7 +79,7 @@ export const InvoicesSettings = () => {
       offset,
       limit: PAGE_LIMIT,
     },
-    { enabled: !isPartnerBilledOrganization }
+    { enabled: !isPartnerBilledOrganization && inView }
   )
   const invoices = data || []
 
@@ -118,7 +122,7 @@ export const InvoicesSettings = () => {
     isLoading || invoices.length === 0 ? 'text-foreground-muted' : undefined
 
   return (
-    <Card>
+    <Card ref={ref}>
       <Table>
         <TableHeader>
           <TableRow>
@@ -149,7 +153,7 @@ export const InvoicesSettings = () => {
             <TableRow className="rounded-b">
               <TableCell
                 colSpan={invoices.length > 0 ? 6 : 5}
-                className="!p-0 !rounded-b overflow-hidden"
+                className="p-0! rounded-b! overflow-hidden"
               >
                 <AlertError
                   className="border-0 rounded-none"
@@ -201,7 +205,7 @@ export const InvoicesSettings = () => {
                           )}
 
                         <ButtonTooltip
-                          type="outline"
+                          variant="outline"
                           className="w-7"
                           icon={<ScrollText size={16} strokeWidth={1.5} />}
                           onClick={() => fetchInvoice(x.id)}
@@ -210,7 +214,7 @@ export const InvoicesSettings = () => {
 
                         {x.status === InvoiceStatus.PAID && x.amount_due > 0 && (
                           <ButtonTooltip
-                            type="outline"
+                            variant="outline"
                             className="w-7"
                             icon={<Receipt size={16} strokeWidth={1.5} />}
                             onClick={() => fetchReceipt(x.id)}
@@ -239,7 +243,7 @@ export const InvoicesSettings = () => {
             <Button
               icon={<ChevronLeft />}
               aria-label="Previous page"
-              type="default"
+              variant="default"
               size="tiny"
               disabled={page === 1}
               onClick={async () => setPage(page - 1)}
@@ -247,7 +251,7 @@ export const InvoicesSettings = () => {
             <Button
               icon={<ChevronRight />}
               aria-label="Next page"
-              type="default"
+              variant="default"
               size="tiny"
               disabled={page * PAGE_LIMIT >= (count ?? 0)}
               onClick={async () => setPage(page + 1)}

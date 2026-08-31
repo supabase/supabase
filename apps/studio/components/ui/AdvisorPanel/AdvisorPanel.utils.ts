@@ -83,6 +83,7 @@ export const createAdvisorNotificationItems = (
       tab: 'messages' as const,
       source: 'notification' as const,
       original: notification,
+      project_ref: data.project_ref,
     }
   })
 }
@@ -129,13 +130,21 @@ export const getAdvisorPanelItemDisplayTitle = (item: AdvisorItem): string => {
   return getAdvisorItemDisplayTitle(item)
 }
 
-export const getAdvisorItemSecondaryText = (item: AdvisorItem): string | undefined => {
+export const getAdvisorItemSecondaryText = (
+  item: AdvisorItem,
+  projectNameByRef?: ReadonlyMap<string, string>
+): string | undefined => {
   if (item.source === 'lint') {
     return getLintEntityString(item.original)
   }
 
   if (item.source === 'signal') {
     return `Database · ${item.sourceData.ip}`
+  }
+
+  if (item.source === 'notification') {
+    if (!item.project_ref) return undefined
+    return projectNameByRef?.get(item.project_ref) ?? item.project_ref
   }
 
   return undefined
@@ -176,7 +185,10 @@ export const getLintEntityString = (lint: Lint | null): string | undefined => {
   }
 
   if (lint.metadata.schema && lint.metadata.name) {
-    return `${lint.metadata.schema}.${lint.metadata.name}`
+    const extendedMetadata = lint.metadata as typeof lint.metadata & { arguments?: string }
+    const args =
+      typeof extendedMetadata.arguments === 'string' ? extendedMetadata.arguments : undefined
+    return `${lint.metadata.schema}.${lint.metadata.name}${args !== undefined ? `(${args})` : ''}`
   }
 
   return undefined

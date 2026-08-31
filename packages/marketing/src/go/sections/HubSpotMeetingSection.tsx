@@ -59,7 +59,7 @@ export default function HubSpotMeetingSection({ section }: { section: GoHubSpotM
   }, [state.selectedSlot, timezone])
 
   return (
-    <div ref={sectionRef} className="max-w-[80rem] mx-auto px-8">
+    <div ref={sectionRef} className="max-w-7xl mx-auto px-8">
       {(section.title || section.description) && (
         <div className="max-w-3xl mx-auto text-center mb-12">
           {section.title && (

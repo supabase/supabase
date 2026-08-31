@@ -1,3 +1,9 @@
+import type { DeploymentMode } from '@/hooks/misc/useDeploymentMode'
+
+// Re-exported so ConnectSheet consumers can keep importing from Connect.types
+// without reaching across to the hooks tree.
+export type { DeploymentMode }
+
 // ============================================================================
 // Project Keys (existing)
 // ============================================================================
@@ -51,7 +57,7 @@ export type ConditionalValue<T> =
 // Schema Types - Modes
 // ============================================================================
 
-export const CONNECT_MODES = ['framework', 'direct', 'orm', 'mcp'] as const
+export const CONNECT_MODES = ['framework', 'direct', 'orm', 'mcp', 'server'] as const
 export type ConnectMode = (typeof CONNECT_MODES)[number]
 
 export interface ModeDefinition {
@@ -59,6 +65,7 @@ export interface ModeDefinition {
   label: string
   description: string
   icon?: string
+  prompt?: string
   fields: string[] // References to field IDs
 }
 
@@ -74,8 +81,6 @@ export interface FieldOption {
   icon?: string
   description?: string
 }
-
-type FieldOptionsResolver = (state: ConnectState) => FieldOption[]
 
 interface FieldDefinition {
   id: string
@@ -98,6 +103,8 @@ export interface StepDefinition {
   id: string
   title: string
   description: string
+  /** When true, renders a muted "(optional)" label next to the title. */
+  optional?: boolean
   // Component identifier or content file path, can be conditional
   content: ConditionalValue<string | null>
 }
@@ -137,6 +144,7 @@ export interface ResolvedStep {
   id: string
   title: string
   description: string
+  optional?: boolean
   content: string // Resolved component identifier
 }
 
@@ -156,4 +164,5 @@ export interface StepContentProps {
   state: ConnectState
   projectKeys: ProjectKeys
   connectionStringPooler: ConnectionStringPooler
+  deploymentMode: DeploymentMode
 }

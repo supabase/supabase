@@ -3,6 +3,7 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { cn } from 'ui'
 
+import { parseCatchAllRoute } from '@/compat/next/router'
 import {
   Header,
   LoadingCardView,
@@ -20,7 +21,10 @@ import { buildStudioPageTitle } from '@/lib/page-title'
 const GenericOrganizationPage: NextPage = () => {
   const router = useRouter()
   const { appTitle } = useCustomContent(['app:title'])
-  const { routeSlug, ...queryParams } = router.query
+  // Normalise the catch-all path across Next (`routeSlug: string[]`) and
+  // TanStack (`_splat: string`) so downstream URL building (buildOrgUrl)
+  // keeps working — see parseCatchAllRoute.
+  const { segments: routeSlug, queryParams } = parseCatchAllRoute(router.query, 'routeSlug')
   const queryString =
     Object.keys(queryParams).length > 0
       ? new URLSearchParams(queryParams as Record<string, string>).toString()
@@ -40,11 +44,11 @@ const GenericOrganizationPage: NextPage = () => {
         <meta name="description" content="Supabase Studio" />
       </Head>
       <Header />
-      <PageLayout className="flex-grow min-h-0" title="Select an organization to continue">
+      <PageLayout className="grow min-h-0" title="Select an organization to continue">
         <ScaffoldContainer>
           <ScaffoldSection isFullWidth>
             <div
-              className="flex-grow overflow-y-auto"
+              className="grow overflow-y-auto"
               style={{ maxHeight: 'calc(100vh - 49px - 64px)' }}
             >
               <div className="w-full mx-auto flex flex-col gap-y-8">

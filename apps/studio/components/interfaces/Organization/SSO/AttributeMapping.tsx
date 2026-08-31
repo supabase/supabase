@@ -108,17 +108,14 @@ export const AttributeMapping = ({
       label="Attribute mapping"
       layout="flex-row-reverse"
       description={
-        <div>
-          <p>Map SSO attributes to user fields</p>
-          <div className="flex flex-col gap-y-2 my-2 mt-4">
-            <p>Presets for supported identity providers:</p>
-            <div className="flex flex-wrap items-center gap-2">
-              {PROVIDER_PRESETS.map((preset) => (
-                <Button key={preset.name} type="outline" onClick={() => applyPreset(preset)}>
-                  {preset.name}
-                </Button>
-              ))}
-            </div>
+        <div className="flex flex-col gap-2">
+          <p>Map SSO attributes to user fields. Presets for supported identity providers:</p>
+          <div className="flex flex-wrap items-center gap-2">
+            {PROVIDER_PRESETS.map((preset) => (
+              <Button key={preset.name} variant="outline" onClick={() => applyPreset(preset)}>
+                {preset.name}
+              </Button>
+            ))}
           </div>
         </div>
       }

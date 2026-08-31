@@ -1,4 +1,4 @@
-import type { PostgresColumn } from '@supabase/postgres-meta'
+import type { PGColumn } from '@supabase/pg-meta'
 
 import { ProjectLogStatsVariables } from '@/data/analytics/project-log-stats-query'
 
@@ -41,5 +41,5 @@ export interface SchemaView {
   schema: string
   is_updatable: boolean
   comment?: string
-  columns: PostgresColumn[]
+  columns: PGColumn[]
 }

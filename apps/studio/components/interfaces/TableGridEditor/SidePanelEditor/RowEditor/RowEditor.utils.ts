@@ -1,7 +1,7 @@
+import type { PGColumn, PGTable, PGTableRelationship } from '@supabase/pg-meta'
 import { MAX_ARRAY_SIZE, MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
-import type { PostgresColumn, PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
 import dayjs from 'dayjs'
-import { compact, isEqual, isNull, isString, isUndefined, omitBy } from 'lodash'
+import { compact, isEqual, isString, isUndefined, omitBy } from 'lodash'
 
 import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import {
@@ -15,7 +15,7 @@ import type { RowField } from './RowEditor.types'
 import { minifyJSON, tryParseJson } from '@/lib/helpers'
 import type { Dictionary } from '@/types'
 
-const getRowValue = ({ column, row }: { column: PostgresColumn; row?: Dictionary<any> }) => {
+const getRowValue = ({ column, row }: { column: PGColumn; row?: Dictionary<any> }) => {
   const isNewRow = row === undefined
 
   if (isNewRow) {
@@ -43,7 +43,7 @@ const getRowValue = ({ column, row }: { column: PostgresColumn; row?: Dictionary
 
 export const generateRowFields = (
   row: Dictionary<any> | undefined,
-  table: PostgresTable,
+  table: PGTable,
   foreignKeys: ForeignKey[]
 ): RowField[] => {
   const { primary_keys = [] } = table
@@ -69,7 +69,7 @@ export const generateRowFields = (
               target_table_name: foreignKey.table,
               target_column_name:
                 foreignKey.columns.find((c) => c.source === column.name)?.target ?? '',
-            } as PostgresRelationship)
+            } as PGTableRelationship)
           : undefined,
       id: column.id,
       name: column.name,
@@ -79,6 +79,7 @@ export const generateRowFields = (
       defaultValue: column?.default_value as string | null,
       isNullable: column.is_nullable,
       isIdentity: column.is_identity,
+      isGenerated: column.is_generated,
       isPrimaryKey: primaryKeyColumns.includes(column.name),
     }
   })
@@ -87,6 +88,9 @@ export const generateRowFields = (
 export const validateFields = (fields: RowField[]) => {
   const errors = {} as any
   fields.forEach((field) => {
+    // Generated columns are not shown in the form, so any error on them would not be fixable
+    if (field.isGenerated) return
+
     const isArray = field.format.startsWith('_')
 
     if (isArray && field.value) {
@@ -97,7 +101,7 @@ export const validateFields = (fields: RowField[]) => {
       }
     }
     if (field.format.includes('json') && (field.value?.length ?? 0) > 0) {
-      const isTruncated = isValueTruncated(field.value)
+      const isTruncated = isValueTruncated(field.value, field.format)
       // don't validate if the value is truncated
       if (isTruncated) return
 
@@ -191,16 +195,29 @@ const convertInputDatetimeToPostgresDatetime = (
 export const generateRowObjectFromFields = ({
   fields,
   includeUndefinedValues = false,
+  useDefaultForEmptyValues = false,
 }: {
   fields: RowField[]
   includeUndefinedValues?: boolean
+  useDefaultForEmptyValues?: boolean
 }): object => {
   const rowObject = {} as any
   fields.forEach((field) => {
+    // Generated columns are always computed by the database - Postgres rejects
+    // inserts and updates that provide an explicit value for them
+    if (field.isGenerated) return
+
     const isArray = field.format.startsWith('_')
     const value = field.value
+    const shouldUseDefaultValue =
+      useDefaultForEmptyValues &&
+      value === '' &&
+      (field.isIdentity || field.defaultValue !== null) &&
+      !TEXT_TYPES.includes(field.format)
 
-    if (isArray && value !== null) {
+    if (shouldUseDefaultValue) {
+      rowObject[field.name] = undefined
+    } else if (isArray && value !== null) {
       rowObject[field.name] = tryParseJson(value)
     } else if (field.format.includes('json')) {
       if (typeof field.value === 'object') {
@@ -244,7 +261,7 @@ export const generateUpdateRowPayload = (originalRow: any, fields: RowField[]) =
     } else if (type !== undefined && JSON_TYPES.includes(type)) {
       // don't update if the value is truncated. This is to enable the user to change cell values on rows which have
       // truncated JSON values. If the user
-      const isTruncated = isValueTruncated(field?.value)
+      const isTruncated = isValueTruncated(field?.value, field?.format)
       if (!isTruncated) {
         payload[property] = rowObject[property]
       }
@@ -263,7 +280,9 @@ export const generateUpdateRowPayload = (originalRow: any, fields: RowField[]) =
 /**
  * Checks if the value is truncated. The JSON types are usually truncated if they're too big to show in the editor.
  */
-export const isValueTruncated = (value: string | null | undefined) => {
+export const isValueTruncated = (value: string | null | undefined, format?: string | null) => {
+  const isArrayColumn = typeof format === 'string' && format.startsWith('_')
+
   return (
     (typeof value === 'string' && value.endsWith('...') && value.length > MAX_CHARACTERS) ||
     // if the value is an array which total representation is > MAX_CHARACTERS
@@ -275,9 +294,7 @@ export const isValueTruncated = (value: string | null | undefined) => {
       // If the array have MAX_ARRAY_SIZE elements in it
       // its a large truncated array
       (value.match(/","/g) || []).length === MAX_ARRAY_SIZE) ||
-    // if the string represent a multi-dimentional array we always consider it as possibly truncated
-    // so user load the whole value before edition
-    (typeof value === 'string' && value.startsWith('[["')) ||
+    (typeof value === 'string' && isArrayColumn && value.startsWith('[["')) ||
     // [Joshen] For json arrays, refer to getTableRowsSql from table-row-query
     // for array types, we're adding {"truncated": true} as the last item of the JSON to
     // maintain the JSON array structure

@@ -1,15 +1,19 @@
 ---
-title = "546 - WORKER_LIMIT Exceeded"
+title = "546 - WORKER_RESOURCE_LIMIT Exceeded / WORKER_LIMIT Exceeded"
 topics = [ "functions" ]
 keywords = [ "546", "error", "resource", "memory", "cpu", "event loop", "edge function" ]
 database_id = "4e6ff2e4-2abb-4fba-8233-5883b3d56fb0"
 
 [[errors]]
 http_status_code = 546
+message = "WORKER_RESOURCE_LIMIT"
+
+[[errors]]
+http_status_code = 546
 message = "WORKER_LIMIT"
 ---
 
-A 546 error indicates that an edge function used more resources (CPU or Memory) than it was allocated.
+A 546 error indicates that an edge function used more resources (CPU or Memory) than it was allocated. Previously it was `WORKER_LIMIT`.
 
 ## Context for the error
 
@@ -37,7 +41,7 @@ When an edge function fails due to internal CPU or memory limits, it will return
 
 ```json
 {
-  "code": "WORKER_LIMIT",
+  "code": "WORKER_RESOURCE_LIMIT",
   "message": "Function failed due to not having enough compute resources (please check logs)"
 }
 ```
@@ -49,50 +53,53 @@ In the [function dashboard's](/dashboard/project/_/functions/) `Logs` tab, you c
 
 ![image](/docs/img/troubleshooting/limit_logs.png)
 
-Alternatively, you can filter for the specific errors from the function using the [log explorer](/dashboard/project/_/logs/explorer?q=SELECT%0A++fl.event_message%2C%0A++content.timestamp%2C%0A++fel.function_name%2C%0A++fel.status_code%0AFROM+function_logs+fl%0ALEFT+JOIN+UNNEST%28fl.metadata%29+AS+content+ON+TRUE%0ALEFT+JOIN+%28%0A++SELECT%0A++++em.execution_id%2C%0A++++req.pathname+AS+function_name%2C%0A++++res.status_code%0A++FROM+function_edge_logs%0A++LEFT+JOIN+UNNEST%28metadata%29+AS+em+ON+TRUE%0A++LEFT+JOIN+UNNEST%28em.request%29+AS+req+ON+TRUE%0A++LEFT+JOIN+UNNEST%28em.response%29+AS+res+ON+TRUE%0A%29+fel+ON+content.execution_id+%3D+fel.execution_id%0AWHERE+%0A++content.level+%3D+%27error%27%0A++++AND%0A++fel.status_code+%3D+546%0AORDER+BY+function_name%2C+timestamp%0ALIMIT+5)
+Alternatively, you can filter for the specific errors from the function using the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs&content=select%0A%20%20fl.event_message%2C%0A%20%20fl.timestamp%2C%0A%20%20fel.function_name%2C%0A%20%20fel.status_code%0Afrom%0A%20%20%28%0A%20%20%20%20select%0A%20%20%20%20%20%20timestamp%2C%0A%20%20%20%20%20%20event_message%2C%0A%20%20%20%20%20%20log_attributes%5B%27execution_id%27%5D%20as%20execution_id%0A%20%20%20%20from%20logs%0A%20%20%20%20where%20source%20%3D%20%27function_logs%27%0A%20%20%20%20%20%20and%20log_attributes%5B%27level%27%5D%20%3D%20%27error%27%0A%20%20%29%20as%20fl%0A%20%20inner%20join%20%28%0A%20%20%20%20select%0A%20%20%20%20%20%20log_attributes%5B%27execution_id%27%5D%20as%20execution_id%2C%0A%20%20%20%20%20%20log_attributes%5B%27request.pathname%27%5D%20as%20function_name%2C%0A%20%20%20%20%20%20log_attributes%5B%27response.status_code%27%5D%20as%20status_code%0A%20%20%20%20from%20logs%0A%20%20%20%20where%20source%20%3D%20%27function_edge_logs%27%0A%20%20%20%20%20%20and%20toInt32OrZero%28log_attributes%5B%27response.status_code%27%5D%29%20%3D%20546%0A%20%20%29%20as%20fel%20on%20fl.execution_id%20%3D%20fel.execution_id%0Aorder%20by%20fl.timestamp%2C%20fel.function_name%0Alimit%2020%3B)
 
 ```sql
 select
   fl.event_message,
-  content.timestamp,
+  fl.timestamp,
   fel.function_name,
   fel.status_code
 from
-  function_logs as fl
-  left join UNNEST(fl.metadata) as content on true
-  left join (
+  (
     select
-      em.execution_id,
-      req.pathname as function_name,
-      res.status_code
-    from
-      function_edge_logs
-      left join UNNEST(metadata) as em on true
-      left join UNNEST(em.request) as req on true
-      left join UNNEST(em.response) as res on true
-  ) as fel
-    on content.execution_id = fel.execution_id
-where content.level = 'error' and fel.status_code = 546
-order by timestamp, function_name
+      timestamp,
+      event_message,
+      log_attributes['execution_id'] as execution_id
+    from logs
+    where source = 'function_logs'
+      and log_attributes['level'] = 'error'
+  ) as fl
+  inner join (
+    select
+      log_attributes['execution_id'] as execution_id,
+      log_attributes['request.pathname'] as function_name,
+      log_attributes['response.status_code'] as status_code
+    from logs
+    where source = 'function_edge_logs'
+      and toInt32OrZero(log_attributes['response.status_code']) = 546
+  ) as fel on fl.execution_id = fel.execution_id
+order by fl.timestamp, fel.function_name
 limit 20;
 ```
 
 ## Step 2: Check error frequency
 
-Before optimizing, run the below query in the [Log Explorer](/dashboard/project/_/logs/explorer?q=SELECT%0A++COUNT%28id%29+AS+total_responses%2C%0A++COUNTIF%28response.status_code+%3D+546%29+AS+total_546%2C%0A++SAFE_DIVIDE%28COUNTIF%28response.status_code+%3D+546%29%2C+COUNT%28*%29%29+*+100+AS+pct_546%0AFROM+function_edge_logs%0ACROSS+JOIN+UNNEST%28function_edge_logs.metadata%29+AS+metadata%0ACROSS+JOIN+UNNEST%28metadata.response%29+AS+response%0ACROSS+JOIN+UNNEST%28metadata.request%29+AS+request%0AWHERE+pathname+%3D+%27%2Ffunctions%2Fv1%2FYOUR_FUNCTION_NAME%27+) to understand how often 546s are occurring relative to total requests:
+Before optimizing, run the below query in the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs&content=select%0A%20%20count%28%29%20as%20total_responses%2C%0A%20%20countIf%28toInt32OrZero%28log_attributes%5B%27response.status_code%27%5D%29%20%3D%20546%29%20as%20total_546%2C%0A%20%20countIf%28toInt32OrZero%28log_attributes%5B%27response.status_code%27%5D%29%20%3D%20546%29%20/%20count%28%29%20%2A%20100%20as%20pct_546%0Afrom%20logs%0Awhere%0A%20%20source%20%3D%20%27function_edge_logs%27%0A%20%20and%20log_attributes%5B%27request.method%27%5D%20%21%3D%20%27OPTIONS%27%0A%20%20--%20%3C--%20add%20your%20function%20name%20to%20inspect%20specific%20endpoints%0A%20%20and%20log_attributes%5B%27request.pathname%27%5D%20%3D%20%27/functions/v1/YOUR_FUNCTION_NAME%27%0Alimit%201%3B) to understand how often 546s are occurring relative to total requests:
 
 ```sql
 select
-  COUNT(id) as total_responses,
-  COUNTIF(response.status_code = 546) as total_546,
-  SAFE_DIVIDE(COUNTIF(response.status_code = 546), COUNT(*)) * 100 as pct_546
-from
-  function_edge_logs
-  cross join UNNEST(function_edge_logs.metadata) as metadata
-  cross join UNNEST(metadata.response) as response
-  cross join UNNEST(metadata.request) as request
-where method != 'OPTIONS' and pathname = '/functions/v1/YOUR_FUNCTION_NAME';
--- <-- add your function name to inspect specific endpoints
+  count() as total_responses,
+  countIf(toInt32OrZero(log_attributes['response.status_code']) = 546) as total_546,
+  countIf(toInt32OrZero(log_attributes['response.status_code']) = 546) / count() * 100 as pct_546
+from logs
+where
+  source = 'function_edge_logs'
+  and log_attributes['request.method'] != 'OPTIONS'
+  -- <-- add your function name to inspect specific endpoints
+  and log_attributes['request.pathname'] = '/functions/v1/YOUR_FUNCTION_NAME'
+limit 1;
 ```
 
 Depending on the results, you may be able to determine if the event is an edge case or affecting a function's overall behavior.
@@ -131,13 +138,11 @@ There are a few other queries that may be useful for identifying patterns around
 
 <Accordion
   type="default"
-  openBehaviour="multiple"
   chevronAlign="right"
   justified
   size="medium"
   className="text-foreground-light mt-8 mb-6"
 >
-  <div className="border-b mt-3 pb-3">
     <AccordionItem
       header="Checking if a specific version is an offender"
       id="item-1"
@@ -148,25 +153,23 @@ There are a few other queries that may be useful for identifying patterns around
 
 ```sql
 select
-  COUNT(id) as total_responses,
-  version,
-  COUNTIF(response.status_code = 546) as total_546,
-  SAFE_DIVIDE(COUNTIF(response.status_code = 546), COUNT(*)) * 100 as pct_546
-from
-  function_edge_logs
-  cross join UNNEST(function_edge_logs.metadata) as metadata
-  cross join UNNEST(metadata.response) as response
-  cross join UNNEST(metadata.request) as request
-where method != 'OPTIONS' and pathname = '/functions/v1/FUNCTION_NAME' -- <--OPTIONAL FILTER: add specific function name to target query
+  count() as total_responses,
+  log_attributes['version'] as version,
+  countIf(toInt32OrZero(log_attributes['response.status_code']) = 546) as total_546,
+  countIf(toInt32OrZero(log_attributes['response.status_code']) = 546) / count() * 100 as pct_546
+from logs
+where
+  source = 'function_edge_logs'
+  and log_attributes['request.method'] != 'OPTIONS'
+  and log_attributes['request.pathname'] = '/functions/v1/FUNCTION_NAME' -- <--OPTIONAL FILTER: add specific function name to target query
 group by version
 having pct_546 > 5 -- <--Failure percentage threshold. The query only shows versions with a 5% or above 546 error rate
-order by pct_546;
+order by pct_546
+limit 100;
 ```
 
     </AccordionItem>
 
-  </div>
-  <div className="border-b mt-3 pb-3">
     <AccordionItem
       header="Check error frequency by time"
       id="item-2"
@@ -175,26 +178,20 @@ order by pct_546;
     You can check to see how frequent 546 errors are per hour with the below query:
 
     ```sql
-
-SELECT
-FORMAT_TIMESTAMP("%Y-%m-%d %H:00", TIMESTAMP(timestamp), "UTC") AS hour,
-COUNT(id) AS total_responses,
-
-COUNTIF(response.status_code = 546) AS total_546,
-
-SAFE_DIVIDE(COUNTIF(response.status_code = 546), COUNT(id)) \* 100
-AS pct_546
-
-FROM function_edge_logs
-CROSS JOIN UNNEST(function_edge_logs.metadata) AS metadata
-CROSS JOIN UNNEST(metadata.response) AS response
-CROSS JOIN UNNEST(metadata.request) AS request
-WHERE pathname = '/functions/v1/FUNCTION_NAME'--<--OPTIONAL FILTER: add specific function name to target query
-group by hour
-ORDER by hour DESC
-LIMIT 24;
-
-````
+    select
+      formatDateTime(toStartOfHour(timestamp), '%Y-%m-%d %H:00', 'UTC') as hour,
+      count() as total_responses,
+      countIf(toInt32OrZero(log_attributes['response.status_code']) = 546) as total_546,
+      countIf(toInt32OrZero(log_attributes['response.status_code']) = 546) / count() * 100 as pct_546
+    from logs
+    where
+      source = 'function_edge_logs'
+      -- <--OPTIONAL FILTER: add specific function name to target query
+      and log_attributes['request.pathname'] = '/functions/v1/FUNCTION_NAME'
+    group by hour
+    order by hour desc
+    limit 24;
+    ```
 
     The output may look like:
     ![image](/docs/img/troubleshooting/546_errors_by_hour.png)
@@ -204,9 +201,6 @@ LIMIT 24;
 
     </AccordionItem>
 
-  </div>
-
-      <div className="border-b mt-3 pb-3">
     <AccordionItem
       header="Check requests per isolate"
       id="item-3"
@@ -215,34 +209,33 @@ LIMIT 24;
     If your isolates are serving more than 2 requests before retiring, it suggests variability in how much processing each request needs. In that case, you may want to cross compare your successful requests with your failed ones. Maybe there's a query parameter or specific content-length header that makes failures more likely.
 
     ```sql
-
-SELECT
-COUNT(fel.id) AS requests_served,
-metadata.execution_id AS isolate_id
-FROM function_logs
-LEFT JOIN UNNEST(function_logs.metadata) AS metadata ON TRUE
-LEFT JOIN (
-SELECT
-em.execution_id,
-id,
-pathname,
-method
-FROM function_edge_logs
-LEFT JOIN UNNEST(function_edge_logs.metadata) AS em ON TRUE
-LEFT JOIN UNNEST(em.request) AS req ON TRUE
-) fel ON metadata.execution_id = fel.execution_id
-WHERE
-metadata.reason IN ('Memory', 'CPUTime')
-AND
-method <> 'OPTIONS' --ignore OPTION requests
-AND
-pathname = '/functions/v1/FUNCTION_NAME' --<-- add your function name to inspect specific endpoints
-GROUP BY metadata.execution_id
-````
+    select
+      count() as requests_served,
+      fl.execution_id as isolate_id
+    from
+      (
+        select log_attributes['execution_id'] as execution_id
+        from logs
+        where source = 'function_logs'
+          and log_attributes['reason'] in ('Memory', 'CPUTime')
+      ) as fl
+      inner join (
+        select
+          log_attributes['execution_id'] as execution_id,
+          log_attributes['request.pathname'] as pathname,
+          log_attributes['request.method'] as method
+        from logs
+        where source = 'function_edge_logs'
+          and log_attributes['request.method'] != 'OPTIONS' --ignore OPTION requests
+          -- <-- add your function name to inspect specific endpoints
+          and log_attributes['request.pathname'] = '/functions/v1/FUNCTION_NAME'
+      ) as fel on fl.execution_id = fel.execution_id
+    group by isolate_id
+    limit 100;
+    ```
 
     </AccordionItem>
 
-  </div>
 </Accordion>
 
 ## Step 3: Correcting the error
@@ -255,7 +248,7 @@ If you believe a portion of your function is overly aggressive, try testing loca
 
 Common culprits:
 
-**CPU intensive recursions**: intensive loops or recursion can quickly exhaust CPU
+**CPU intensive recursions**: intensive loops or recursion can exhaust CPU
 
 ```js
 // This will exhaust CPU allocation when called repeatedly
@@ -291,7 +284,7 @@ If you are performing logic to process data from Supabase Postgres, you may be a
 
 ### 4. Offload operations to an external API:
 
-Instead of managing all operations within the function itself, there may be an external API that can execute CPU or memory intensive jobs on its behalf. One [example](/docs/guides/functions/examples/screenshots) would be using an external API for orchestrating a headless browser and then just using the edge function to manage the output of the activity instead of everything all in place.
+Instead of managing all operations within the function itself, there may be an external API that can execute CPU or memory intensive jobs on its behalf. One [example](/docs/guides/functions/examples/screenshots) would be using an external API for orchestrating a headless browser and then using the edge function to manage the output of the activity instead of everything all in place.
 
 ### 5. Split operations into individual functions:
 
@@ -315,7 +308,7 @@ Performing edits against images or other large files can be both CPU and Memory 
 
 ### AI embedding generation and inference
 
-AI models process data into embeddings (large arrays), that they can more understand. Edge Functions are capable of managing [some small models directly](/blog/ai-inference-now-available-in-supabase-edge-functions); however, some require more processing power than what the edge function can support directly. In these cases, the solution is to manage the embeddings via an external source, such as OpenAI, Anthropic, etc. and to just use the edge function for light processing and coordination.
+AI models process data into embeddings (large arrays), that they can more understand. Edge Functions are capable of managing [some small models directly](/blog/ai-inference-now-available-in-supabase-edge-functions); however, some require more processing power than what the edge function can support directly. In these cases, the solution is to manage the embeddings via an external source, such as OpenAI, Anthropic, etc. and to use the edge function for light processing and coordination.
 
 ### Web scraping
 

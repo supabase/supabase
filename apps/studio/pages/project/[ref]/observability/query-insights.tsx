@@ -1,11 +1,6 @@
-import {
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-} from 'ui'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'ui'
 
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import { QueryInsights } from '@/components/interfaces/QueryInsights/QueryInsights'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
@@ -13,7 +8,6 @@ import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/Observ
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useReportDateRange } from '@/hooks/misc/useReportDateRange'
-import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const PRESETS = [
@@ -21,6 +15,8 @@ const PRESETS = [
   REPORT_DATERANGE_HELPER_LABELS.LAST_3_HOURS,
   REPORT_DATERANGE_HELPER_LABELS.LAST_24_HOURS,
 ]
+
+const REPORT_TITLE = 'Query Insights'
 
 const QueryInsightsReport: NextPageWithLayout = () => {
   const { selectedDateRange, datePickerValue, datePickerHelpers, handleDatePickerChange } =
@@ -36,27 +32,25 @@ const QueryInsightsReport: NextPageWithLayout = () => {
   return (
     <div className="h-full flex flex-col">
       <div className="w-full mb-0 flex lg:items-center justify-between gap-4 py-2 px-6 lg:flex-row flex-col border-b lg:h-[48px]">
-        <h3 className="text-foreground text-xl prose">Query Insights</h3>
+        <h3 className="text-foreground text-xl prose">{REPORT_TITLE}</h3>
         <div className="flex items-center gap-2 flex-wrap">
-          <DocsButton
-            href={`${DOCS_URL}/guides/platform/performance#examining-query-performance`}
-          />
+          <DocsButton href={OBSERVABILITY_DOCS_HREFS.queryInsights} topic={REPORT_TITLE} />
           <DatabaseSelector />
-          <Select_Shadcn_
+          <Select
             value={datePickerValue.isHelper ? datePickerValue.text : undefined}
             onValueChange={handleSelect}
           >
-            <SelectTrigger_Shadcn_ size="tiny" className="w-[150px]">
-              <SelectValue_Shadcn_ />
-            </SelectTrigger_Shadcn_>
-            <SelectContent_Shadcn_ align="end">
+            <SelectTrigger size="tiny" className="w-[150px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent align="end">
               {PRESETS.map((label) => (
-                <SelectItem_Shadcn_ key={label} value={label}>
+                <SelectItem key={label} value={label}>
                   {label}
-                </SelectItem_Shadcn_>
+                </SelectItem>
               ))}
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+            </SelectContent>
+          </Select>
         </div>
       </div>
       <QueryInsights dateRange={selectedDateRange} />

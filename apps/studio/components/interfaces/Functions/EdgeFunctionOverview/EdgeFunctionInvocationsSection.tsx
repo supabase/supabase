@@ -22,7 +22,7 @@ import {
 } from './EdgeFunctionOverview.utils'
 import type { InvocationChartDatum, InvocationUpdateAnnotation } from './EdgeFunctionOverview.utils'
 import { toAlertError } from './EdgeFunctionRecentErrors.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import type { ChartIntervals } from '@/types'
 
 interface EdgeFunctionInvocationsSectionProps {
@@ -73,7 +73,7 @@ export const EdgeFunctionInvocationsSection = ({
       <PageSectionContent>
         <PageContainer size="full">
           <div className="flex flex-col gap-5">
-            <PageSectionMeta className="!items-center">
+            <PageSectionMeta className="items-center!">
               <PageSectionSummary>
                 <div className="flex flex-wrap items-start gap-x-8 gap-y-4">
                   <ChartMetric
@@ -102,7 +102,7 @@ export const EdgeFunctionInvocationsSection = ({
                     return (
                       <Button
                         key={`function-filter-${item.key}`}
-                        type={interval === item.key ? 'secondary' : 'default'}
+                        variant={interval === item.key ? 'secondary' : 'default'}
                         onClick={() => onIntervalChange(item.key)}
                         className={getSegmentedButtonClassName(
                           index,

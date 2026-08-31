@@ -4,17 +4,7 @@ import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Button,
-  Card,
-  CardContent,
-  CardFooter,
-  Form,
-  FormControl,
-  FormField,
-  Input_Shadcn_,
-} from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
@@ -23,15 +13,16 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 const schema = z.object({
-  SITE_URL: z.string().min(1, 'Must have a Site URL'),
+  SITE_URL: z.string().trim().min(1, 'Must have a Site URL'),
 })
 
 const SiteUrl = () => {
@@ -126,7 +117,7 @@ const SiteUrl = () => {
                       description="Configure the default redirect URL used when a redirect URL is not specified or doesn't match one from the allow list. This value is also exposed as a template variable in the email templates section. Wildcards cannot be used here."
                     >
                       <FormControl>
-                        <Input_Shadcn_ {...field} disabled={!canUpdateConfig} />
+                        <Input {...field} disabled={!canUpdateConfig} />
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -135,13 +126,13 @@ const SiteUrl = () => {
 
               <CardFooter className="justify-end space-x-2">
                 {isDirty && (
-                  <Button type="default" onClick={() => siteUrlForm.reset()}>
+                  <Button variant="default" onClick={() => siteUrlForm.reset()}>
                     Cancel
                   </Button>
                 )}
                 <Button
-                  type="primary"
-                  htmlType="submit"
+                  variant="primary"
+                  type="submit"
                   disabled={!canUpdateConfig || isUpdatingSiteUrl || !isDirty}
                   loading={isUpdatingSiteUrl}
                 >

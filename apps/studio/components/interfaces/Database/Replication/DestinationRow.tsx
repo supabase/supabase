@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { AnalyticsBucket, BigQuery, Database } from 'icons'
 import { Minus } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -16,9 +15,10 @@ import {
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DeleteDestination } from './DeleteDestination'
-import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
+import { DestinationIcon } from './DestinationIcon'
 import { PipelineStatus } from './PipelineStatus'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
+import { getFormattedLagValue } from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
 import { RowMenu } from './RowMenu'
 import { UpdateVersionModal } from './UpdateVersionModal'
 import { useDestinationInformation } from './useDestinationInformation'
@@ -32,6 +32,7 @@ import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
+import { type ResponseError } from '@/types'
 
 interface DestinationRowProps {
   destinationId: number
@@ -76,12 +77,23 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
   const { mutateAsync: deleteDestinationPipeline } = useDeleteDestinationPipelineMutation({})
 
   // Fetch table-level replication status to surface errors in list view
-  const { data: replicationStatusData } = useReplicationPipelineReplicationStatusQuery(
+  const {
+    data: replicationStatusData,
+    isPending: isReplicationStatusLoading,
+    isError: isReplicationStatusError,
+  } = useReplicationPipelineReplicationStatusQuery(
     { projectRef, pipelineId: pipeline?.id },
     { refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
   )
   const tableStatuses = replicationStatusData?.table_statuses ?? []
   const errorCount = tableStatuses.filter((t) => t.state?.name === 'error').length
+  const applyLag = replicationStatusData?.apply_lag
+  // Show the byte-based slot lag (WAL the destination hasn't confirmed flushing yet). The
+  // time-based flush_lag from pg_stat_replication is routinely NULL for logical slots that are
+  // idle or don't report timed feedback, whereas confirmed_flush_lsn_bytes is always populated.
+  const lagBytes = applyLag?.confirmed_flush_lsn_bytes
+  const lag = getFormattedLagValue('bytes', lagBytes)
+  const isCaughtUp = lagBytes === 0
   // Only show errors when pipeline is running (not when stopped or restarting)
   const isPipelineStopped = statusName === PipelineStatusName.STOPPED
   const isRestarting = requestStatus === PipelineStatusRequestStatus.RestartRequested
@@ -99,7 +111,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
       return console.error('Project ref is required')
     }
     if (!pipeline) {
-      return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
+      return toast.error('No pipeline found')
     }
 
     try {
@@ -114,7 +126,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
       setShowDeleteDestinationForm(false)
       toast.success(`Deleted destination "${destinationName}"`)
     } catch (error) {
-      toast.error(PIPELINE_ERROR_MESSAGES.DELETE_DESTINATION)
+      toast.error(`Failed to delete destination: ${(error as ResponseError).message}`)
     } finally {
       setIsDeleting(false)
     }
@@ -129,29 +141,33 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
   return (
     <>
       {isPipelineError && (
-        <AlertError error={pipelineError} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE} />
+        <TableRow>
+          <TableCell colSpan={6}>
+            <AlertError error={pipelineError} subject="Failed to retrieve pipeline information" />
+          </TableCell>
+        </TableRow>
       )}
       {isPipelineSuccess && (
         <TableRow>
           <TableCell>
-            {type === 'BigQuery' ? (
-              <BigQuery size={18} className="text-foreground-light" />
-            ) : type === 'Analytics Bucket' ? (
-              <AnalyticsBucket size={18} className="text-foreground-light" />
-            ) : (
-              <Database size={18} className="text-foreground-light" />
-            )}
+            {type ? (
+              <DestinationIcon type={type} size={18} className="text-foreground-light" />
+            ) : null}
           </TableCell>
 
           <TableCell className="max-w-[180px]">
             {isPipelineLoading ? (
               <ShimmeringLoader />
             ) : (
-              <div>
-                <p>
-                  {type} (ID: {pipeline?.id})
+              <div className="flex flex-col gap-y-0.5">
+                <p className="text-sm font-medium text-foreground truncate">
+                  {destinationName || type}
                 </p>
-                <p className="text-foreground-lighter">{destinationName}</p>
+                <div className="flex items-center gap-x-1.5 text-xs text-foreground-lighter">
+                  <span className="font-mono">#{pipeline?.id}</span>
+                  <span aria-hidden>&middot;</span>
+                  <span>{type}</span>
+                </div>
               </div>
             )}
           </TableCell>
@@ -173,7 +189,17 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
           </TableCell>
 
           <TableCell>
-            <Minus size={18} className="text-foreground-lighter" />
+            {!pipeline ? (
+              <Minus size={18} className="text-foreground-lighter" />
+            ) : isReplicationStatusLoading ? (
+              <ShimmeringLoader />
+            ) : isReplicationStatusError || !applyLag ? (
+              <Minus size={18} className="text-foreground-lighter" />
+            ) : isCaughtUp ? (
+              <span className="text-foreground-light whitespace-nowrap">Caught up</span>
+            ) : (
+              <span className="text-foreground whitespace-nowrap">{lag.display}</span>
+            )}
           </TableCell>
 
           <TableCell>
@@ -192,13 +218,13 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
                     <WarningIcon />
                   </TooltipTrigger>
                   <TooltipContent side="bottom">
-                    {errorCount} table{errorCount === 1 ? '' : 's'} encountered replication errors
+                    {errorCount} table{errorCount === 1 ? '' : 's'} encountered replication errors.
                   </TooltipContent>
                 </Tooltip>
               )}
-              <Button asChild type="default" className="relative">
+              <Button asChild variant="default" className="relative">
                 <Link href={`/project/${projectRef}/database/replication/${pipeline?.id}`}>
-                  View replication
+                  View pipeline
                 </Link>
               </Button>
               <RowMenu

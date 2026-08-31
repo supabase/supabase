@@ -15,6 +15,7 @@ import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/L
 import { useProjectLintsQuery } from '@/data/lint/lint-query'
 import { Notification, useNotificationsV2Query } from '@/data/notifications/notifications-v2-query'
 import { useNotificationsV2UpdateMutation } from '@/data/notifications/notifications-v2-update-mutation'
+import { useProjectsInfiniteQuery } from '@/data/projects/projects-infinite-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
@@ -51,7 +52,7 @@ export const AdvisorPanel = () => {
     isError: isLintsError,
   } = useProjectLintsQuery({ projectRef: project?.ref }, { enabled: shouldLoadProjectAdvisorData })
 
-  const { data: signalItems, isPending: isSignalsPending } = useAdvisorSignals({
+  const { data: signalItems } = useAdvisorSignals({
     projectRef: project?.ref,
     enabled: shouldLoadProjectAdvisorData,
   })
@@ -95,6 +96,18 @@ export const AdvisorPanel = () => {
     return notificationsData?.pages.flatMap((page) => page) ?? []
   }, [notificationsData?.pages])
 
+  const { data: projectsData } = useProjectsInfiniteQuery({}, { enabled: shouldLoadNotifications })
+
+  const projectNameByRef = useMemo(() => {
+    const map = new Map<string, string>()
+    projectsData?.pages.forEach((page) => {
+      page.projects.forEach((project) => {
+        if (project.ref) map.set(project.ref, project.name)
+      })
+    })
+    return map
+  }, [projectsData?.pages])
+
   const markNotificationsRead = () => {
     if (markedRead.current.length > 0) {
       updateNotifications({ ids: markedRead.current, status: 'seen' })
@@ -102,7 +115,7 @@ export const AdvisorPanel = () => {
   }
 
   const lintItems = useMemo<AdvisorItem[]>(() => {
-    return createAdvisorLintItems(lintData)
+    return createAdvisorLintItems(lintData ?? [])
   }, [lintData])
 
   const notificationItems = useMemo<AdvisorItem[]>(() => {
@@ -157,11 +170,9 @@ export const AdvisorPanel = () => {
   // Only show loading state if the query is actually enabled
   const isLintsActuallyLoading = shouldLoadProjectAdvisorData && isLintsLoading
   const isNotificationsActuallyLoading = shouldLoadNotifications && isNotificationsLoading
-  const isSignalsActuallyLoading = shouldLoadProjectAdvisorData && isSignalsPending
-  const isLoading =
-    isLintsActuallyLoading || isNotificationsActuallyLoading || isSignalsActuallyLoading
 
-  // [Joshen] Opting to ignore error state of advisor signals for now - render lints irregardless of banned ips
+  // [Joshen] Opting to ignore loading and error state of advisor signals - render lints irregardless of banned ips
+  const isLoading = isLintsActuallyLoading || isNotificationsActuallyLoading
   const isError = isLintsError || isNotificationsError
 
   const handleTabChange = (tab: string) => {
@@ -191,11 +202,7 @@ export const AdvisorPanel = () => {
 
     const advisorCategory =
       item.source === 'lint'
-        ? item.original.categories.includes('SECURITY')
-          ? 'SECURITY'
-          : item.original.categories.includes('PERFORMANCE')
-            ? 'PERFORMANCE'
-            : undefined
+        ? item.original.categories[0]
         : item.source === 'signal'
           ? 'SECURITY'
           : undefined
@@ -242,6 +249,7 @@ export const AdvisorPanel = () => {
                 item={selectedItem}
                 projectRef={project?.ref ?? ''}
                 onUpdateNotificationStatus={handleUpdateNotificationStatus}
+                onAfterLintAction={handleBackToList}
               />
             ) : (
               <div className="px-6 py-8">
@@ -283,6 +291,7 @@ export const AdvisorPanel = () => {
               hiddenItemsCount={hiddenItemsCount}
               hasAnyFilters={hasAnyFilters}
               hasProjectRef={hasProjectRef}
+              projectNameByRef={projectNameByRef}
             />
           </div>
         </>

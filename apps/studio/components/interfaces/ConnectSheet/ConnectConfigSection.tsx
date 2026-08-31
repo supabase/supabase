@@ -1,13 +1,12 @@
-import { Box, Cable, Database, Sparkles } from 'lucide-react'
 import {
   cn,
   RadioGroupStacked,
   RadioGroupStackedItem,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -21,13 +20,11 @@ import {
 
 import type { ConnectMode, FieldOption, ResolvedField } from './Connect.types'
 import { ConnectionIcon } from './ConnectionIcon'
-
-const MODE_ICONS: Record<string, React.ReactNode> = {
-  framework: <Box size={16} strokeWidth={1.5} />,
-  direct: <Database size={16} strokeWidth={1.5} />,
-  orm: <Cable size={16} strokeWidth={1.5} />,
-  mcp: <Sparkles size={16} strokeWidth={1.5} />,
-}
+import {
+  ConnectModeButton,
+  getConnectModeButtonCornerVariants,
+  getConnectModeEmptySlotClasses,
+} from './ConnectModeButton'
 
 interface ConnectConfigSectionProps {
   activeFields: ResolvedField[]
@@ -100,27 +97,22 @@ export function ConnectConfigSection({
                 <RadioGroupStacked
                   value={String(value ?? '')}
                   onValueChange={(v) => onFieldChange(field.id, v)}
+                  className="min-w-0 w-full"
                 >
                   {options.map((option) => (
                     <RadioGroupStackedItem
                       key={option.value}
                       id={`connect-${field.id}-${option.value}`}
                       value={option.value}
-                      label=""
-                      className="w-full text-left"
-                    >
-                      <div className="flex flex-col gap-0.5">
-                        <div className="flex items-center gap-2">
+                      className="min-w-0 w-full text-left"
+                      label={
+                        <span className="flex min-w-0 items-center gap-2">
                           {option.icon && <ConnectionIcon icon={option.icon} />}
-                          <span className="text-sm">{option.label}</span>
-                        </div>
-                        {option.description && (
-                          <span className="text-sm text-foreground-lighter">
-                            {option.description}
-                          </span>
-                        )}
-                      </div>
-                    </RadioGroupStackedItem>
+                          <span className="truncate">{option.label}</span>
+                        </span>
+                      }
+                      description={option.description}
+                    />
                   ))}
                 </RadioGroupStacked>
               </FormItemLayout>
@@ -134,25 +126,27 @@ export function ConnectConfigSection({
                 layout="horizontal"
                 label={field.label}
                 description={field.description}
+                name={`connect-${field.id}`}
               >
-                <Select_Shadcn_
+                <Select
                   value={String(value ?? '')}
                   onValueChange={(v) => onFieldChange(field.id, v)}
                 >
-                  <SelectTrigger_Shadcn_
+                  <SelectTrigger
+                    id={`connect-${field.id}`}
                     size="small"
                     className="[&>span:first-child]:flex [&>span:first-child]:items-center [&>span:first-child]:gap-x-2"
                   >
-                    <SelectValue_Shadcn_ />
-                  </SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
                     {options.map((option) => (
-                      <SelectItem_Shadcn_
+                      <SelectItem
                         key={option.value}
                         value={option.value}
                         className="[&>span:last-child]:flex [&>span:last-child]:items-center [&>span:last-child]:gap-x-2"
                       >
-                        {/* 
+                        {/*
                           [Joshen] Omitting MCP icons for now as the images are not optimized (large)
                           and is causing noticeably latency issues on the browser (even with the existing Connect UI)
                          */}
@@ -160,10 +154,10 @@ export function ConnectConfigSection({
                           <ConnectionIcon icon={option.icon} />
                         )}
                         {option.label}
-                      </SelectItem_Shadcn_>
+                      </SelectItem>
                     ))}
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                  </SelectContent>
+                </Select>
               </FormItemLayout>
             )
 
@@ -175,7 +169,8 @@ export function ConnectConfigSection({
                 layout="horizontal"
                 label={field.label}
                 description={field.description}
-                className="[&>div>label>span]:!break-keep [&>div>label>span]:text-balance"
+                name={field.id}
+                className="[&>div>label>span]:break-keep! [&>div>label>span]:text-balance"
               >
                 <Switch
                   id={field.id}
@@ -193,14 +188,16 @@ export function ConnectConfigSection({
                 layout="horizontal"
                 label={field.label}
                 description={field.description}
+                name={`connect-${field.id}`}
               >
                 <MultiSelector
                   values={Array.isArray(value) ? value : []}
                   onValuesChange={(v) => onFieldChange(field.id, v)}
                 >
                   <MultiSelectorTrigger
+                    id={`connect-${field.id}`}
                     className="w-full"
-                    label="All features except Storage enabled by default"
+                    label="Select features"
                     badgeLimit="wrap"
                     showIcon={true}
                   />
@@ -243,27 +240,43 @@ interface ModeSelectorProps {
 }
 
 export function ModeSelector({ modes, selected, onChange }: ModeSelectorProps) {
+  const count = modes.length
+  // 2-col layout leaves an empty cell when count is odd; hide it once we switch to a single row
+  const emptySlots = count % 2 === 1 ? 1 : 0
+
   return (
-    <div className="grid grid-cols-4 rounded-lg border overflow-hidden">
-      {modes.map((mode) => (
-        <button
-          key={mode.id}
-          type="button"
-          onClick={() => onChange(mode.id)}
-          className={cn(
-            'flex flex-col items-center gap-2 p-4 transition-colors border-r last:border-r-0',
-            selected === mode.id
-              ? 'bg-surface-200'
-              : 'border-default hover:border-strong hover:bg-surface-100 '
-          )}
-        >
-          <span className="text-foreground-light">{MODE_ICONS[mode.id]}</span>
-          <div>
-            <p className="heading-default text-center">{mode.label}</p>
-            <p className="text-sm text-foreground-lighter text-center">{mode.description}</p>
-          </div>
-        </button>
-      ))}
+    // Container query: 2-col when the sheet is narrow; one equal row when there's room
+    <div className="@container">
+      <div
+        className={cn(
+          'grid',
+          'grid-cols-2',
+          count === 3 && '@[28rem]:grid-cols-3',
+          count === 4 && '@[30rem]:grid-cols-4',
+          count === 5 && '@[32rem]:grid-cols-5',
+          count >= 6 && '@[36rem]:grid-cols-6'
+        )}
+      >
+        {modes.map((mode, index) => (
+          <ConnectModeButton
+            key={mode.id}
+            modeId={mode.id}
+            label={mode.label}
+            description={mode.description}
+            selected={selected === mode.id}
+            onClick={() => onChange(mode.id)}
+            {...getConnectModeButtonCornerVariants({ index, count, emptySlots })}
+          />
+        ))}
+
+        {Array.from({ length: emptySlots }, (_, index) => (
+          <div
+            key={`empty-${index}`}
+            aria-hidden
+            className={getConnectModeEmptySlotClasses(count)}
+          />
+        ))}
+      </div>
     </div>
   )
 }

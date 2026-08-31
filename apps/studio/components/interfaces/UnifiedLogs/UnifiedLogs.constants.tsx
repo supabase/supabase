@@ -9,8 +9,6 @@ import {
 } from 'nuqs'
 
 import {
-  ARRAY_DELIMITER,
-  LEVELS,
   RANGE_DELIMITER,
   SLIDER_DELIMITER,
   SORT_DELIMITER,
@@ -18,8 +16,39 @@ import {
 
 export const REGIONS = ['ams', 'fra', 'gru', 'hkg', 'iad', 'syd'] as const
 export const METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] as const
-export const LOG_TYPES = ['postgres', 'postgrest', 'auth', 'storage', 'edge function'] as const
-export const DEFAULT_LOG_TYPES = ['postgres', 'postgrest'] as const
+export const LOG_TYPES_LABELS = {
+  edge: 'API Gateway',
+  postgres: 'Postgres',
+  postgrest: 'PostgREST',
+  auth: 'Auth',
+  storage: 'Storage',
+  'edge function': 'Edge Function',
+  realtime: 'Realtime',
+  supavisor: 'Supavisor',
+  pgbouncer: 'PgBouncer',
+  multigres: 'Multigres',
+}
+
+type LogType = keyof typeof LOG_TYPES_LABELS
+export const LOG_TYPES = Object.keys(LOG_TYPES_LABELS) as [LogType, ...LogType[]]
+export const DEFAULT_LOG_TYPES = ['postgres', 'edge'] as const
+
+// ClickHouse `source` value for each unified log type. Single source of truth
+// consumed by both the unified logs list query (LOG_TYPE_CONDITION in
+// UnifiedLogs.queries.ts) and the single-log inspection point lookup
+// (unified-log-inspection-query.ts).
+export const LOG_TYPE_TO_SOURCE: Record<LogType, string> = {
+  edge: 'edge_logs',
+  postgrest: 'postgrest_logs',
+  storage: 'storage_logs',
+  postgres: 'postgres_logs',
+  'edge function': 'function_edge_logs',
+  auth: 'auth_logs',
+  realtime: 'realtime_logs',
+  supavisor: 'supavisor_logs',
+  pgbouncer: 'pgbouncer_logs',
+  multigres: 'multigres_logs',
+}
 
 const parseAsSort = createParser({
   parse(queryValue: string) {
@@ -33,20 +62,18 @@ const parseAsSort = createParser({
 })
 
 export const SEARCH_PARAMS_PARSER = {
-  // CUSTOM FILTERS
-  level: parseAsArrayOf(parseAsStringLiteral(LEVELS), ARRAY_DELIMITER),
-  log_type: parseAsArrayOf(parseAsString, ARRAY_DELIMITER),
+  // Equality filters. Repeatable `?filter=column:opAbbrev:value` (e.g. `level:eq:info`,
+  // `host:neq:foo`). Parsed with the helpers in `UnifiedLogs.filters.ts`.
+  filter: parseAsArrayOf(parseAsString),
+
+  // Range/special filters keep their dedicated keys — their semantics are inherently
+  // multi-value (sliders, time ranges) and don't fit the eq/neq model.
   latency: parseAsArrayOf(parseAsInteger, SLIDER_DELIMITER),
   'timing.dns': parseAsArrayOf(parseAsInteger, SLIDER_DELIMITER),
   'timing.connection': parseAsArrayOf(parseAsInteger, SLIDER_DELIMITER),
   'timing.tls': parseAsArrayOf(parseAsInteger, SLIDER_DELIMITER),
   'timing.ttfb': parseAsArrayOf(parseAsInteger, SLIDER_DELIMITER),
   'timing.transfer': parseAsArrayOf(parseAsInteger, SLIDER_DELIMITER),
-  status: parseAsArrayOf(parseAsString, ARRAY_DELIMITER),
-  regions: parseAsArrayOf(parseAsStringLiteral(REGIONS), ARRAY_DELIMITER),
-  method: parseAsArrayOf(parseAsStringLiteral(METHODS), ARRAY_DELIMITER),
-  host: parseAsString,
-  pathname: parseAsString,
   date: parseAsArrayOf(parseAsTimestamp, RANGE_DELIMITER),
 
   // REQUIRED FOR SORTING & PAGINATION
@@ -61,6 +88,16 @@ export const SEARCH_PARAMS_PARSER = {
 
   uuid: parseAsString,
   id: parseAsString,
+
+  // View options
+  show_connection_logs: parseAsBoolean.withDefault(true),
+  edge_auth: parseAsBoolean.withDefault(true),
+  edge_storage: parseAsBoolean.withDefault(true),
+  edge_postgrest: parseAsBoolean.withDefault(true),
+
+  // Support searching for user against user ID
+  // See userAttributionCondition in UnifiedLogs.queries.ts.
+  user: parseAsString,
 }
 
 const POSTGRES_STATUS_CODE_LABELS = {

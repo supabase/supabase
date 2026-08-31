@@ -1,6 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import {
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
   Button,
   Card,
   CardContent,
@@ -15,6 +21,7 @@ import {
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { PageBreadcrumbs } from 'ui-patterns/PageBreadcrumbs'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -74,6 +81,20 @@ export default function PageLayoutSettings() {
 
   return (
     <div className="w-full">
+      <PageBreadcrumbs>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href="/project/demo/auth">Authentication</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>User Sessions</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </PageBreadcrumbs>
+
       <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
@@ -140,13 +161,13 @@ export default function PageLayoutSettings() {
                   </CardContent>
                   <CardFooter className="justify-end space-x-2">
                     {refreshTokenForm.formState.isDirty && (
-                      <Button type="default" onClick={() => refreshTokenForm.reset()}>
+                      <Button variant="default" onClick={() => refreshTokenForm.reset()}>
                         Cancel
                       </Button>
                     )}
                     <Button
-                      type="primary"
-                      htmlType="submit"
+                      variant="primary"
+                      type="submit"
                       disabled={!refreshTokenForm.formState.isDirty}
                     >
                       Save changes
@@ -245,13 +266,13 @@ export default function PageLayoutSettings() {
 
                   <CardFooter className="justify-end space-x-2">
                     {userSessionsForm.formState.isDirty && (
-                      <Button type="default" onClick={() => userSessionsForm.reset()}>
+                      <Button variant="default" onClick={() => userSessionsForm.reset()}>
                         Cancel
                       </Button>
                     )}
                     <Button
-                      type="primary"
-                      htmlType="submit"
+                      variant="primary"
+                      type="submit"
                       disabled={!userSessionsForm.formState.isDirty}
                     >
                       Save changes

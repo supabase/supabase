@@ -10,16 +10,16 @@ export const ButtonTooltip = forwardRef<
       }
     }
   }
->(({ ...props }, ref) => {
+>(({ tooltip, className, ...props }, ref) => {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button ref={ref} {...props} className={cn(props.className, 'pointer-events-auto')}>
+        <Button ref={ref} {...props} className={cn(className, 'pointer-events-auto')}>
           {props.children}
         </Button>
       </TooltipTrigger>
-      {props.tooltip.content.text !== undefined && (
-        <TooltipContent {...props.tooltip.content}>{props.tooltip.content.text}</TooltipContent>
+      {tooltip.content.text !== undefined && (
+        <TooltipContent {...tooltip.content}>{tooltip.content.text}</TooltipContent>
       )}
     </Tooltip>
   )

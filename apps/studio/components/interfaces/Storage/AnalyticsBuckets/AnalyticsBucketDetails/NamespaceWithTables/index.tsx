@@ -301,7 +301,7 @@ export const NamespaceWithTables = ({
                 ) : null}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button type="default" className="w-7" icon={<MoreVertical />} />
+                    <Button variant="default" className="w-7" icon={<MoreVertical />} />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-fit min-w-[180px]">
                     <DropdownMenuItem
@@ -316,7 +316,7 @@ export const NamespaceWithTables = ({
               </>
             ) : missingTables.length > 0 ? (
               <Button
-                type={schema ? 'default' : 'warning'}
+                variant={schema ? 'default' : 'warning'}
                 size="tiny"
                 icon={schema ? <RefreshCw /> : <Plus size={14} />}
                 onClick={() => (schema ? rescanNamespace() : setImportForeignSchemaShown(true))}

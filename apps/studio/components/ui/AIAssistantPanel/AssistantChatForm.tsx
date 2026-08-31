@@ -5,14 +5,15 @@ import { ExpandingTextArea } from 'ui'
 import { cn } from 'ui/src/lib/utils'
 
 import { ButtonTooltip } from '../ButtonTooltip'
-import { type SqlSnippet } from './AIAssistant.types'
+import { formatAttachedSnippets } from './AIAssistant.utils'
 import { ModelSelector } from './ModelSelector'
-import { getSnippetContent, SnippetRow } from './SnippetRow'
+import { SnippetRow } from './SnippetRow'
 import type { AssistantModelId } from '@/lib/ai/model.utils'
+import { type SqlSnippet } from '@/state/ai-assistant-state'
 
 export interface FormProps {
   /* The ref for the textarea, optional. Exposed for the CommandsPopover to attach events. */
-  textAreaRef?: React.RefObject<HTMLTextAreaElement>
+  textAreaRef?: React.RefObject<HTMLTextAreaElement | null>
   /* The loading state of the form */
   loading: boolean
   /* The disabled state of the form */
@@ -72,21 +73,18 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
       onSelectModel,
       ...props
     },
-    ref
+    _ref
   ) => {
     const formRef = useRef<HTMLFormElement>(null)
     const isMobile = useBreakpoint('md')
 
     const handleSubmit = (event?: FormEvent<HTMLFormElement>) => {
       if (event) event.preventDefault()
-      if (!value || (loading && !isEditing)) return
+      if (disabled || !value || (loading && !isEditing)) return
 
       let finalMessage = value
       if (includeSnippetsInMessage && sqlSnippets && sqlSnippets.length > 0) {
-        const sqlSnippetsString = sqlSnippets
-          .map((snippet: SqlSnippet) => '```sql\n' + getSnippetContent(snippet) + '\n```')
-          .join('\n')
-        finalMessage = [value, sqlSnippetsString].filter(Boolean).join('\n\n')
+        finalMessage = [value, formatAttachedSnippets(sqlSnippets)].filter(Boolean).join('\n\n')
       }
 
       onSubmit(finalMessage)
@@ -96,10 +94,12 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
       if (event.key === 'Enter' && !event.shiftKey) {
         event.preventDefault()
         handleSubmit()
+      } else if (event.key === 'Escape') {
+        event.currentTarget.blur()
       }
     }
 
-    const canSubmit = !loading && !!value
+    const canSubmit = !disabled && !loading && !!value
 
     return (
       <div className="w-full">
@@ -141,7 +141,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
               {loading ? (
                 onStop ? (
                   <ButtonTooltip
-                    type="outline"
+                    variant="outline"
                     aria-label="Stop response"
                     icon={<Square fill="currentColor" className="scale-75" />}
                     onClick={onStop}
@@ -153,7 +153,8 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
                 )
               ) : (
                 <ButtonTooltip
-                  htmlType="submit"
+                  type="submit"
+                  variant={canSubmit ? 'primary' : 'default'}
                   aria-label="Send message"
                   icon={<ArrowUp />}
                   disabled={!canSubmit}

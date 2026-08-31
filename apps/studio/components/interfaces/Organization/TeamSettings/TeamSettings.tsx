@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { InviteMemberButton } from './InviteMemberButton'
@@ -33,7 +33,7 @@ export const TeamSettings = () => {
 
   return (
     <ScaffoldContainer>
-      <ScaffoldSection isFullWidth className="!py-8 gap-y-8">
+      <ScaffoldSection isFullWidth className="py-8! gap-y-8">
         <ScaffoldTitle>Team</ScaffoldTitle>
         <ScaffoldFilterAndContent>
           <ScaffoldActionsContainer className="w-full flex-col md:flex-row gap-2 justify-between">

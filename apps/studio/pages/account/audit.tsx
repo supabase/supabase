@@ -1,4 +1,3 @@
-import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
   PageHeaderDescription,
@@ -16,7 +15,7 @@ import type { NextPageWithLayout } from '@/types'
 const Audit: NextPageWithLayout = () => {
   return (
     <>
-      <PageHeader size="small">
+      <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Audit Logs</PageHeaderTitle>
@@ -26,9 +25,7 @@ const Audit: NextPageWithLayout = () => {
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>
-      <PageContainer size="small" className="mt-8">
-        <AuditLogs />
-      </PageContainer>
+      <AuditLogs />
     </>
   )
 }

@@ -61,7 +61,7 @@ export const DeleteRowOperationItem = ({
           </div>
         </div>
         <ButtonTooltip
-          type="text"
+          variant="text"
           aria-label="Discard change"
           className="w-7"
           icon={<Undo2 />}

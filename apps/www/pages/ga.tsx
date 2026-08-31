@@ -49,7 +49,7 @@ export default function IndexPage() {
               <Image
                 src="/images/launchweek/ga/ga-black.svg"
                 alt="GA logo"
-                className="dark:hidden w-12 md:w-16 aspect-[104/57] h-auto"
+                className="dark:hidden w-12 md:w-16 aspect-104/57 h-auto"
                 priority
                 quality={100}
                 width={300}
@@ -58,7 +58,7 @@ export default function IndexPage() {
               <Image
                 src="/images/launchweek/ga/ga-white.svg"
                 alt="GA logo"
-                className="hidden dark:block w-12 md:w-16 aspect-[104/57] h-auto"
+                className="hidden dark:block w-12 md:w-16 aspect-104/57 h-auto"
                 priority
                 quality={100}
                 width={300}
@@ -85,7 +85,7 @@ export default function IndexPage() {
             </div>
           </div>
         </SectionContainer>
-        <SectionContainer className="!pt-2 lg:!pt-8">
+        <SectionContainer className="pt-2! lg:pt-8!">
           {data.highlightsSection.highlights && (
             <div
               className="flex-wrap md:flex-nowrap w-fit md:w-full md:flex md:items-start grid lg:grid-cols-4 gap-4 md:gap-10 lg:gap-20
@@ -95,7 +95,7 @@ export default function IndexPage() {
                 (highlight: { number: string; text: string }, i: number) => {
                   return (
                     <div key={i} className="">
-                      <div className="border-t-[1px] border-brand-500 w-[32px]"></div>
+                      <div className="border-t border-brand-500 w-[32px]"></div>
                       <h2 className="text-xl md:text-2xl lg:text-4xl pt-1.5 lg:pt-3 tracking-[-1.5px] font-mono">
                         {highlight.number}
                       </h2>
@@ -129,9 +129,9 @@ export default function IndexPage() {
         </SectionContainer>
       </div>
       <ParagraphSection {...data.companySection} hasStickyTitle />
-      <SectionContainer className="!py-0 border-b" children={null} />
+      <SectionContainer className="py-0! border-b" children={null} />
       <ParagraphSection {...data.openSourceSection} hasStickyTitle />
-      <SectionContainer className="!pt-0">
+      <SectionContainer className="pt-0!">
         {data.communityStats.highlights && (
           <div
             className="grid grid-cols-2 md:grid md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-8 md:gap-10 lg:gap-20
@@ -151,7 +151,7 @@ export default function IndexPage() {
                     >
                       {highlight.icon}
                     </Link>
-                    <div className="border-t-[1px] border-brand-500 w-[32px] mb-1 mt-4"></div>
+                    <div className="border-t border-brand-500 w-[32px] mb-1 mt-4"></div>
                     <h2 className="text-xl md:text-2xl lg:text-4xl pt-1.5 lg:pt-3 tracking-[-1.5px] font-mono">
                       {highlight.number}
                     </h2>
@@ -165,11 +165,11 @@ export default function IndexPage() {
           </div>
         )}
       </SectionContainer>
-      <SectionContainer className="!py-0 border-b" children={null} />
+      <SectionContainer className="py-0! border-b" children={null} />
       <ParagraphSection {...data.scaleSection} hasStickyTitle />
-      <SectionContainer className="!py-0 border-b" children={null} />
-      <ParagraphSection {...data.enterpriseSection} hasStickyTitle className="!pb-8 lg:!pb-16" />
-      <SectionContainer className="!pt-0 !grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8 xl:gap-10">
+      <SectionContainer className="py-0! border-b" children={null} />
+      <ParagraphSection {...data.enterpriseSection} hasStickyTitle className="pb-8! lg:pb-16!" />
+      <SectionContainer className="pt-0! grid! grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8 xl:gap-10">
         <div className="col-span-full lg:col-start-6 lg:col-span-7">
           <ImageGrid
             smCols={2}
@@ -181,7 +181,7 @@ export default function IndexPage() {
           />
         </div>
       </SectionContainer>
-      <SectionContainer className="!pt-0">
+      <SectionContainer className="pt-0!">
         {data.enterpriseSection.highlights && (
           <div
             className="grid grid-cols-2 md:grid md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-8 md:gap-10 lg:gap-20
@@ -192,7 +192,7 @@ export default function IndexPage() {
                 return (
                   <div key={i} className="">
                     {highlight.icon}
-                    <div className="border-t-[1px] border-brand-500 w-[32px] mb-1 mt-4"></div>
+                    <div className="border-t border-brand-500 w-[32px] mb-1 mt-4"></div>
                     {highlight.number && (
                       <h2 className="text-xl md:text-2xl lg:text-4xl pt-1.5 lg:pt-3 tracking-[-1.5px] font-mono">
                         {highlight.number}
@@ -208,9 +208,9 @@ export default function IndexPage() {
           </div>
         )}
       </SectionContainer>
-      <SectionContainer className="!py-0 border-b" children={null} />
-      <ParagraphSection {...data.integrationsSection} hasStickyTitle className="!pb-8 lg:!pb-16" />
-      <SectionContainer className="!pt-0 !grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8 xl:gap-10">
+      <SectionContainer className="py-0! border-b" children={null} />
+      <ParagraphSection {...data.integrationsSection} hasStickyTitle className="pb-8! lg:pb-16!" />
+      <SectionContainer className="pt-0! grid! grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8 xl:gap-10">
         <div className="col-span-full lg:col-start-6 lg:col-span-7">
           <ImageGrid
             smCols={3}
@@ -222,9 +222,9 @@ export default function IndexPage() {
           />
         </div>
       </SectionContainer>
-      <SectionContainer className="!py-0 border-b" children={null} />
+      <SectionContainer className="py-0! border-b" children={null} />
       <ParagraphSection {...data['whats-new']} hasStickyTitle />
-      <SectionContainer className="!py-0 border-b" children={null} />
+      <SectionContainer className="py-0! border-b" children={null} />
       <ParagraphSection {...data['whats-next']} hasStickyTitle />
       <CTABanner />
     </DefaultLayout>

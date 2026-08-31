@@ -48,6 +48,7 @@ import { useLegacyJWTSigningKeyCreateMutation } from '@/data/jwt-signing-keys/le
 import { useLegacyJWTSigningKeyQuery } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 type DialogType = 'legacy' | 'create' | 'rotate' | 'key-details' | 'revoke' | 'delete'
 
@@ -166,7 +167,7 @@ export const JWTSecretKeysTable = () => {
 
   if (!canReadAPIKeys && !isLoadingCanReadAPIKeys) {
     return (
-      <div className="bg-surface-100 rounded-md border shadow-sm">
+      <div className="bg-surface-100 rounded-md border shadow-xs">
         <div className="flex items-center py-8 px-8 space-x-2">
           <AlertCircle size={16} strokeWidth={1.5} />
           <p className="text-sm text-foreground-light">
@@ -195,7 +196,7 @@ export const JWTSecretKeysTable = () => {
                 onClick={() => setShownDialog('rotate')}
                 loading={isUpdatingJWTSigningKey}
                 icon={<RotateCw className="size-4" />}
-                type="primary"
+                variant="primary"
               />
             ) : (
               <ActionPanel
@@ -204,8 +205,9 @@ export const JWTSecretKeysTable = () => {
                 buttonLabel="Create Standby Key"
                 onClick={() => setShownDialog('create')}
                 loading={isPendingMutation}
-                type="primary"
+                variant="primary"
                 icon={<Timer className="size-4" />}
+                shortcutId={SHORTCUT_IDS.JWT_KEYS_CREATE_STANDBY}
               />
             )}
           </>

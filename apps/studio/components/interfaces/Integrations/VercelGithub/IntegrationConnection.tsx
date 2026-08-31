@@ -29,7 +29,7 @@ interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
 }
 
 export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectionItemProps>(
-  ({ disabled, onDeleteConnection, ...props }, ref) => {
+  ({ disabled, onDeleteConnection, ...props }, _ref) => {
     const router = useRouter()
     const { data: org } = useSelectedOrganizationQuery()
 
@@ -80,7 +80,7 @@ export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationCo
               <ButtonTooltip
                 disabled
                 iconRight={<ChevronDown size={14} />}
-                type="default"
+                variant="default"
                 tooltip={{
                   content: {
                     side: 'bottom',
@@ -97,7 +97,7 @@ export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationCo
                 modal={false}
               >
                 <DropdownMenuTrigger asChild>
-                  <Button iconRight={<ChevronDown size={14} />} type="default">
+                  <Button iconRight={<ChevronDown size={14} />} variant="default">
                     <span>Manage</span>
                   </Button>
                 </DropdownMenuTrigger>

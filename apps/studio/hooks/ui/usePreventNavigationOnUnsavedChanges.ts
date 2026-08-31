@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { useStaticEffectEvent } from '../useStaticEffectEvent'
 import { BASE_PATH } from '@/lib/constants'
 
 interface UsePreventNavigationOnUnsavedChangesOptions {
@@ -16,16 +15,16 @@ interface UsePreventNavigationOnUnsavedChangesReturn {
   /*
    * Cancel the navigation and keep the changes
    */
-  handleCancel: () => void
+  handleCancelNavigation: () => void
   /*
    * Confirm the navigation and lose the changes
    */
-  handleConfirm: () => void
+  handleConfirmNavigation: () => void
   /*
    * Boolean indicating whether UI to request users confirmation for the navigation should be
    * displayed
    */
-  shouldConfirm: boolean
+  shouldConfirmNavigation: boolean
 }
 
 /*
@@ -65,11 +64,11 @@ export const usePreventNavigationOnUnsavedChanges = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [confirmNavigate, hasChanges])
 
-  const handleCancel = useStaticEffectEvent(() => {
+  const handleCancelNavigation = useCallback(() => {
     setNavigateUrl(undefined)
-  })
+  }, [])
 
-  const handleConfirm = useStaticEffectEvent(() => {
+  const handleConfirmNavigation = useCallback(() => {
     setConfirmNavigate(true)
     let urlToNavigate = navigateUrl ?? '/'
     if (BASE_PATH && urlToNavigate.startsWith(BASE_PATH)) {
@@ -78,14 +77,14 @@ export const usePreventNavigationOnUnsavedChanges = ({
     if (!urlToNavigate.startsWith('/')) urlToNavigate = `/${urlToNavigate}`
     setNavigateUrl(undefined)
     router.push(urlToNavigate)
-  })
+  }, [navigateUrl, router])
 
   return useMemo(
     () => ({
-      handleCancel,
-      handleConfirm,
-      shouldConfirm: !!navigateUrl,
+      handleCancelNavigation,
+      handleConfirmNavigation,
+      shouldConfirmNavigation: !!navigateUrl,
     }),
-    [navigateUrl, handleCancel, handleConfirm]
+    [navigateUrl, handleCancelNavigation, handleConfirmNavigation]
   )
 }

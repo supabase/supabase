@@ -5,15 +5,26 @@ import { cn, Separator } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { InfoTooltip } from '../info-tooltip'
+import {
+  FEATURE_GROUPS_NON_PLATFORM,
+  FEATURE_GROUPS_PLATFORM,
+  MCP_CLIENT_GROUPS,
+} from './clients.data'
 import { ClientSelectDropdown } from './components/ClientSelectDropdown'
 import { McpConfigurationDisplay } from './components/McpConfigurationDisplay'
 import { McpConfigurationOptions } from './components/McpConfigurationOptions'
-import { FEATURE_GROUPS_NON_PLATFORM, FEATURE_GROUPS_PLATFORM, MCP_CLIENTS } from './constants'
+import { MCP_CLIENTS } from './mcpClients'
 import type { McpClient, McpOnCopyCallback } from './types'
 import { getMcpUrl } from './utils/getMcpUrl'
 
+const CLIENT_GROUPS = MCP_CLIENT_GROUPS.map((group) => ({
+  heading: group.heading,
+  clients: group.keys
+    .map((key) => MCP_CLIENTS.find((c) => c.key === key))
+    .filter(Boolean) as (typeof MCP_CLIENTS)[number][],
+}))
+
 export interface McpConfigPanelProps {
-  baseUrl?: string
   projectRef?: string
   initialSelectedClient?: McpClient
   onClientSelect?: (client: McpClient) => void
@@ -23,6 +34,10 @@ export interface McpConfigPanelProps {
   className?: string
   isPlatform: boolean // For docs this is controlled by state, for studio by environment variable
   apiUrl?: string
+  /** Overrides the NEXT_PUBLIC_MCP_URL/DEFAULT_MCP_URL_PLATFORM fallback for the hosted MCP server */
+  platformUrl?: string
+  /** Overrides the DEFAULT_MCP_URL_NON_PLATFORM fallback for the self-hosted MCP server (used when apiUrl is unset) */
+  nonPlatformUrl?: string
 }
 
 export function McpConfigPanel({
@@ -35,12 +50,16 @@ export function McpConfigPanel({
   theme = 'dark',
   isPlatform,
   apiUrl,
+  platformUrl,
+  nonPlatformUrl,
 }: McpConfigPanelProps) {
   const [readonly, setReadonly] = useState(false)
-  const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
+  const supportedFeatures = isPlatform ? FEATURE_GROUPS_PLATFORM : FEATURE_GROUPS_NON_PLATFORM
+  const [selectedFeatures, setSelectedFeatures] = useState<string[]>(() =>
+    supportedFeatures.filter((group) => group.id !== 'storage').map((group) => group.id)
+  )
   const [selectedClient, setSelectedClient] = useState(initialSelectedClient ?? MCP_CLIENTS[0])
 
-  const supportedFeatures = isPlatform ? FEATURE_GROUPS_PLATFORM : FEATURE_GROUPS_NON_PLATFORM
   const selectedFeaturesSupported = useMemo(() => {
     return selectedFeatures.filter((feature) =>
       supportedFeatures.some((group) => group.id === feature)
@@ -51,6 +70,8 @@ export function McpConfigPanel({
     projectRef,
     isPlatform,
     apiUrl,
+    platformUrl,
+    nonPlatformUrl,
     readonly,
     features: selectedFeaturesSupported,
     selectedClient,
@@ -75,7 +96,6 @@ export function McpConfigPanel({
         <Separator />
         <McpConfigurationOptions
           className={innerPanelSpacing}
-          isPlatform={isPlatform}
           readonly={readonly}
           onReadonlyChange={setReadonly}
           selectedFeatures={selectedFeaturesSupported}
@@ -106,6 +126,7 @@ export function McpConfigPanel({
         <ClientSelectDropdown
           label="Client"
           clients={MCP_CLIENTS}
+          groups={CLIENT_GROUPS}
           selectedClient={selectedClient}
           onClientChange={handleClientChange}
           theme={theme}

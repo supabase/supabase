@@ -19,7 +19,7 @@ launchweek: '14'
   information.
 </Admonition>
 
-We are launching an official [Supabase MCP server](https://github.com/supabase-community/supabase-mcp). You can use this server to connect your favorite AI tools (such as [Cursor](https://www.cursor.com/) or [Claude](https://claude.ai/download)) directly with Supabase.
+We are launching an official [Supabase MCP server](https://github.com/supabase/mcp). You can use this server to connect your favorite AI tools (such as [Cursor](https://www.cursor.com/) or [Claude](https://claude.ai/download)) directly with Supabase.
 
 <div className="video-container mb-8">
   <iframe
@@ -39,7 +39,7 @@ Our MCP server connects your AI tools to Supabase so that they can perform tasks
 
 For example, here is Cursor building a Next.js + Supabase app, fetching a Supabase URL and anonymous key, and saving them to a `.env.local` file for Next.js to consume:
 
-<video className="rounded-sm m-0" autoPlay loop muted>
+<video className="rounded-xs m-0" autoPlay loop muted>
   <source
     src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/blog/mcp-server/supabase-mcp-demo.mp4"
     type="video/mp4"
@@ -61,11 +61,11 @@ You can:
 - Retrieve logs to debug issues
 - Generate TypeScript types based on your database schema
 
-For a full list of abilities, see [Tools](https://github.com/supabase-community/supabase-mcp#tools) in the project README.
+For a full list of abilities, see [Tools](https://github.com/supabase/mcp#tools) in the project README.
 
 ## Setup
 
-You can [setup](https://github.com/supabase-community/supabase-mcp#2-configure-mcp-client) Supabase MCP on most AI clients using the following JSON:
+You can [setup](https://github.com/supabase/mcp#2-configure-mcp-client) Supabase MCP on most AI clients using the following JSON:
 
 ```json name=.cursor/mcp.json
 {
@@ -193,6 +193,6 @@ We've built the Supabase MCP server to bridge the gap between AI tools and your 
 
 The MCP protocol is evolving with proposals like the new [Streamable HTTP transport](https://github.com/modelcontextprotocol/specification/pull/206) that supports fully stateless servers without requiring long-lived connections. We're following these developments closely and evaluating how they might benefit the Supabase MCP experience.
 
-If you run into issues or have ideas for new tools we should add, [open an issue](https://github.com/supabase-community/supabase-mcp/issues/new) on the GitHub repo. We're particularly interested in hearing about your experiences with schema discovery, database branching, and other safety features as we continue to refine its protections.
+If you run into issues or have ideas for new tools we should add, [open an issue](https://github.com/supabase/mcp/issues/new) on the GitHub repo. We're particularly interested in hearing about your experiences with schema discovery, database branching, and other safety features as we continue to refine its protections.
 
 Check out our [docs](/docs/guides/getting-started/mcp) for the latest updates and examples of what you can build with Supabase MCP.

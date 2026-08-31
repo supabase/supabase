@@ -9,8 +9,10 @@ export const databaseKeys = {
     schema: string | undefined,
     table: string | undefined
   ) => ['projects', projectRef, 'table-columns', schema, table] as const,
-  databaseFunctions: (projectRef: string | undefined) =>
-    ['projects', projectRef, 'database-functions'] as const,
+  tableColumnsPrefix: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'table-columns'] as const,
+  databaseFunctions: (projectRef: string | undefined, schema?: string) =>
+    ['projects', projectRef, 'database-functions', schema].filter(Boolean),
   entityDefinition: (projectRef: string | undefined, id?: number) =>
     ['projects', projectRef, 'entity-definition', id] as const,
   entityDefinitions: (projectRef: string | undefined, schemas: string[]) =>
@@ -43,6 +45,10 @@ export const databaseKeys = {
   },
   tableConstraints: (projectRef: string | undefined, id?: number) =>
     ['projects', projectRef, 'table-constraints', id] as const,
+  foreignKeyConstraintsPrefix: (projectRef: string | undefined, schema?: string) =>
+    schema === undefined
+      ? (['projects', projectRef, 'foreign-key-constraints'] as const)
+      : (['projects', projectRef, 'foreign-key-constraints', schema] as const),
   foreignKeyConstraints: (projectRef: string | undefined, schema?: string, options = {}) =>
     ['projects', projectRef, 'foreign-key-constraints', schema, options] as const,
   databaseSize: (projectRef: string | undefined) =>
@@ -64,6 +70,8 @@ export const databaseKeys = {
   ) => ['projects', projectRef, 'table-index-advisor', schema, table] as const,
   supamonitorEnabled: (projectRef: string | undefined) =>
     ['projects', projectRef, 'supamonitor-enabled'] as const,
+  databaseActivity: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'database-activity'] as const,
 }
 
 export const getLiveTupleEstimateKey = (

@@ -1,16 +1,16 @@
-import { ExternalLink } from 'lucide-react'
-import { type ReactNode } from 'react'
-import ReactMarkdown from 'react-markdown'
-
-import { cn } from 'ui'
-
 import Breadcrumbs from '~/components/Breadcrumbs'
 import GuidesSidebar from '~/components/GuidesSidebar'
 import { TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import type { WithRequired } from '~/features/helpers.types'
+import { resolveBreadcrumbs } from '~/lib/breadcrumbs'
 import { type GuideFrontmatter } from '~/lib/docs'
+import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
 import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
+import { ExternalLink } from 'lucide-react'
+import { type ReactNode } from 'react'
+import ReactMarkdown from 'react-markdown'
+import { cn } from 'ui'
 
 const EDIT_LINK_SYMBOL = Symbol('edit link')
 interface EditLink {
@@ -54,14 +54,25 @@ interface BaseGuideTemplateProps {
   children?: ReactNode
   editLink: EditLink
   mdxOptions?: SerializeOptions
+  pathname: `/${string}`
 }
 
 type GuideTemplateProps =
   | WithRequired<BaseGuideTemplateProps, 'children'>
   | WithRequired<BaseGuideTemplateProps, 'content'>
 
-const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideTemplateProps) => {
+const GuideTemplate = ({
+  meta,
+  content,
+  children,
+  editLink,
+  mdxOptions,
+  pathname,
+}: GuideTemplateProps) => {
   const hideToc = meta?.hideToc || meta?.hide_table_of_contents
+  const breadcrumbChain = resolveBreadcrumbs(pathname)
+  const breadcrumbSchema = breadcrumbListSchema({ pathname, chain: breadcrumbChain })
+  const breadcrumbJsonLd = breadcrumbSchema ? serializeJsonLd(breadcrumbSchema) : null
 
   return (
     <TocAnchorsProvider>
@@ -71,24 +82,32 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
             'relative',
             'transition-all ease-out',
             'duration-100',
-            'col-span-12 md:col-span-9'
+            'col-span-12 md:col-span-8'
           )}
         >
-          <Breadcrumbs className="mb-2" />
+          {breadcrumbJsonLd && (
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }}
+            />
+          )}
+          <Breadcrumbs className="mb-6" />
           <article
             // Used to get headings for the table of contents
             id="sb-docs-guide-main-article"
+            data-testid="sb-docs-guide-main-article"
             className="prose max-w-none"
           >
-            <h1 className="mb-0 [&>p]:m-0">
-              <ReactMarkdown>{meta?.title || 'Supabase Docs'}</ReactMarkdown>
-            </h1>
-            {meta?.subtitle && (
-              <h2 className="mt-3 text-xl text-foreground-light">
-                <ReactMarkdown>{meta.subtitle}</ReactMarkdown>
-              </h2>
-            )}
-            <hr className="not-prose border-t-0 border-b my-8" />
+            <header className="mb-8">
+              <h1 className="mt-0 mb-0 [&>p]:m-0">
+                <ReactMarkdown>{meta?.title || 'Supabase Docs'}</ReactMarkdown>
+              </h1>
+              {meta?.subtitle && (
+                <div className="mt-3 not-prose [&_p]:text-xl [&_p]:leading-7 text-foreground-light [&>p]:m-0">
+                  <ReactMarkdown>{meta.subtitle}</ReactMarkdown>
+                </div>
+              )}
+            </header>
 
             {content && (
               <MDXRemoteBase source={content} options={mdxOptions} customPreprocess={(x) => x} />
@@ -103,7 +122,7 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
                 className={cn(
                   'w-fit',
                   'flex items-center gap-1',
-                  'text-sm text-scale-1000 hover:text-scale-1200',
+                  'text-sm text-tertiary-foreground hover:text-foreground',
                   'transition-colors'
                 )}
                 target="_blank"
@@ -119,16 +138,17 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
           hideToc={hideToc}
           className={cn(
             'hidden md:flex',
-            'col-span-3 self-start',
+            'md:col-span-3 md:col-start-10',
+            'self-start',
             'sticky',
             /**
              * --header-height: height of nav
              * 1px: height of nav border
-             * 2rem: content padding
+             * 3rem: content padding
              */
-            'top-[calc(var(--header-height)+1px+2rem)]',
-            // 3rem accounts for 2rem of top padding + 1rem of extra breathing room
-            'max-h-[calc(100vh-var(--header-height)-3rem)]'
+            'top-[calc(var(--header-height)+1px+3rem)]',
+            // 4rem accounts for 3rem of top padding + 1rem of extra breathing room
+            'max-h-[calc(100vh-var(--header-height)-4rem)]'
           )}
         />
       </div>

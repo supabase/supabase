@@ -49,31 +49,16 @@ export default function RadioGroupForm() {
               <FormLabel>Notify me about...</FormLabel>
               <FormControl>
                 <RadioGroupStacked onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormItem asChild>
-                    <FormControl>
-                      <RadioGroupStackedItem value="all" label="All new messages" />
-                    </FormControl>
-                  </FormItem>
-                  <FormItem asChild>
-                    <FormControl>
-                      <RadioGroupStackedItem
-                        value="mentions"
-                        label="Direct messages and mentions"
-                      />
-                    </FormControl>
-                  </FormItem>
-                  <FormItem asChild>
-                    <FormControl>
-                      <RadioGroupStackedItem value="none" label="Nothing" />
-                    </FormControl>
-                  </FormItem>
+                  <RadioGroupStackedItem value="all" label="All new messages" />
+                  <RadioGroupStackedItem value="mentions" label="Direct messages and mentions" />
+                  <RadioGroupStackedItem value="none" label="Nothing" />
                 </RadioGroupStacked>
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button htmlType="submit" type="secondary" size="small">
+        <Button type="submit" variant="secondary" size="small">
           Submit
         </Button>
       </form>

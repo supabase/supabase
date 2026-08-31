@@ -2,6 +2,12 @@
   "$schema": "./../../node_modules/turbo/schema.json",
   "extends": ["//"],
   "tasks": {
+    "lint": {
+      "env": ["GITHUB_TOKEN"],
+    },
+    "typecheck": {
+      "env": ["GITHUB_TOKEN"],
+    },
     "build": {
       "dependsOn": ["^build"],
       "env": [
@@ -14,6 +20,8 @@
         "NEXT_PUBLIC_STUDIO_URL",
         "NEXT_PUBLIC_DOCS_URL",
         "NEXT_PUBLIC_REFERENCE_DOCS_URL",
+        "NEXT_PUBLIC_LIBRARY_URL",
+        // Temporary fallback during the production environment-variable migration.
         "NEXT_PUBLIC_UI_LIBRARY_URL",
         "NEXT_PUBLIC_SUPABASE_URL",
         "NEXT_PUBLIC_SUPABASE_ANON_KEY",
@@ -29,6 +37,9 @@
         "VERCEL",
         "VERCEL_ENV",
         "VERCEL_GIT_COMMIT_SHA",
+        "NEXT_PUBLIC_INTEGRATIONS_MARKETPLACE_DB",
+        "NEXT_PUBLIC_MARKETPLACE_API_URL",
+        "NEXT_PUBLIC_MARKETPLACE_PUBLISHABLE_KEY",
         // These envs are used in the packages
         "NEXT_PUBLIC_STORAGE_KEY",
         "NEXT_PUBLIC_AUTH_DEBUG_KEY",
@@ -48,6 +59,9 @@
         "GITHUB_CHANGELOG_APP_INSTALLATION_ID",
         "GITHUB_CHANGELOG_APP_REST_KEY",
         "GITHUB_CHANGELOG_APP_PRIVATE_KEY",
+        "CHANGELOG_SYNC_APP_ID",
+        "CHANGELOG_SYNC_APP_INSTALLATION_ID",
+        "CHANGELOG_SYNC_APP_PRIVATE_KEY",
         "NEXT_PUBLIC_EMAIL_ABUSE_URL",
         "EMAIL_ABUSE_SERVICE_KEY",
         "HUBSPOT_PORTAL_ID",
@@ -62,6 +76,7 @@
         "ASSET_CDN_S3_ENDPOINT",
         "SITE_NAME",
         "LUMA_API_KEY",
+        "LUMA_HACKATHONS_API_KEY",
         "NEXT_RUNTIME",
         // These env vars are used by some community and marketing integrations
         "SENTRY_DSN_COMMUNITY",
