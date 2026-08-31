@@ -122,6 +122,7 @@ When reviewing a PR, flag these as **required changes:**
 3. **Deprecated hook** — any usage of `useSendEventMutation` instead of `useTrack`
 4. **Unnecessary view tracking** — events that fire on page load without user interaction
 5. **Inaccurate docs** — `@page`/`@source` descriptions that don't match the actual implementation
+6. **distinct_id joins across sign-in** — any funnel or analysis that links pre-auth events to post-auth events must join on `person_id`, not `distinct_id`: client-side `posthog.identify` switches the distinct_id at auth, and account events like `sign_in` are captured server-side under the user id
 
 When a PR adds user-facing interactions (buttons, forms, toggles, modals) **without** tracking, suggest:
 

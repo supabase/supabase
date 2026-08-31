@@ -46,14 +46,22 @@ export interface SignUpEvent {
 }
 
 /**
- * Triggered when a user signs in with GitHub, Email and Password or SSO.
+ * Triggered when a user signs in with an OAuth provider, Email and Password, or SSO.
+ *
+ * Emission sites: SignInForm (password without an MFA challenge), SignInMfaForm
+ * (completed TOTP challenge), and the /sign-in-mfa page mount (OAuth/SSO return
+ * with the assurance level already satisfied).
  *
  * Some unintuitive behavior:
  *   - If signing up with GitHub the SignInEvent gets triggered first before the SignUpEvent.
+ *   - The event is captured server-side under the authenticated user id, not the
+ *     browser's distinct_id, and client-side identify switches the distinct_id at
+ *     auth anyway. Funnels crossing the sign-in transition must join on person_id,
+ *     never distinct_id.
  *
  * @group Events
  * @source studio
- * @page /sign-in-mfa
+ * @page /sign-in, /sign-in-mfa
  */
 export interface SignInEvent {
   action: 'sign_in'
