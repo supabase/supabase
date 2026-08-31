@@ -38,7 +38,7 @@ export function shouldUseComboboxTrigger({
 }: {
   asChild?: boolean
   role?: string
-  variant?: string
+  variant?: string | null
   iconRight?: ReactNode
 }): boolean {
   if (asChild) return false
