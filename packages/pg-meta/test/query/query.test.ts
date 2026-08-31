@@ -420,6 +420,26 @@ describe('Query.utils', () => {
         expect(result).toBe('select * from public.users where id in (1,2,3);')
       })
 
+      test('should emit an always-false predicate for an empty "in" array', () => {
+        // `in ()` is a syntax error in Postgres, so an empty set has to become `false`:
+        // membership in nothing is never true.
+        const filters: Filter[] = [{ column: 'id', operator: 'in', value: [] }]
+        const result = QueryUtils.selectQuery(table, safeSql`*`, { filters: filters })
+        expect(result).toBe('select * from public.users where false;')
+      })
+
+      test('should emit an always-false predicate for an empty tuple "in" array', () => {
+        const filters: Filter[] = [{ column: ['id', 'version'], operator: 'in', value: [] }]
+        const result = QueryUtils.selectQuery(table, safeSql`*`, { filters: filters })
+        expect(result).toBe('select * from public.users where false;')
+      })
+
+      test('should keep an empty "in" delete a no-op rather than invalid sql', () => {
+        const filters: Filter[] = [{ column: 'id', operator: 'in', value: [] }]
+        const result = QueryUtils.deleteQuery(table, filters)
+        expect(result).toBe('delete from public.users where false;')
+      })
+
       test('should correctly handle "in" operator with comma-separated string', () => {
         const filters: Filter[] = [{ column: 'id', operator: 'in', value: '1,2,3' }]
         const result = QueryUtils.selectQuery(table, safeSql`*`, { filters: filters })

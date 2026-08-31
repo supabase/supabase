@@ -224,6 +224,10 @@ function applyFilters(query: SafeSqlFragment, filters: Filter[]) {
 }
 
 function inFilterSql(filter: Filter) {
+  // Postgres rejects `in ()` outright. Membership in an empty set is always false, so emit
+  // that instead: selects return nothing and updates/deletes stay no-ops.
+  if (Array.isArray(filter.value) && filter.value.length === 0) return safeSql`false`
+
   let values: Array<SafeSqlFragment>
   if (Array.isArray(filter.value)) {
     values = filter.value.map((x) => filterLiteral(x))
@@ -263,6 +267,8 @@ function inTupleFilterSql(filter: Filter) {
   if (!Array.isArray(filter.value)) {
     throw new Error(`Values for a tuple 'in' filter must be an array`)
   }
+  // Same as inFilterSql: `(a, b) in ()` is a syntax error, and an empty set is always false.
+  if (filter.value.length === 0) return safeSql`false`
 
   const columns = safeSql`(${joinSqlFragments(
     filter.column.map((c) => ident(c)),
