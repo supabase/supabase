@@ -1,53 +1,72 @@
-import { useRouter } from 'next/router'
+import { useRouter as useTanStackRouter } from '@tanstack/react-router'
+import { useRouter as useNextRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { BASE_PATH } from '@/lib/constants'
 
 interface UsePreventNavigationOnUnsavedChangesOptions {
-  /*
-   * Boolean indicating whether there are changes that would be lost if users navigate to another
-   * page or close the browser tab
-   */
   hasChanges: boolean
 }
 
 interface UsePreventNavigationOnUnsavedChangesReturn {
-  /*
-   * Cancel the navigation and keep the changes
-   */
   handleCancelNavigation: () => void
-  /*
-   * Confirm the navigation and lose the changes
-   */
   handleConfirmNavigation: () => void
-  /*
-   * Skip the guard for the next intentional navigation after confirmation was handled elsewhere.
-   */
   bypassNavigationGuard: () => void
-  /*
-   * Boolean indicating whether UI to request users confirmation for the navigation should be
-   * displayed
-   */
   shouldConfirmNavigation: boolean
 }
 
+interface PendingTanStackNavigation {
+  proceed: () => void
+  reset: () => void
+}
+
 /*
- * Hook that prevents navigation when users could lose their changes.
- * It prevents both NextJS and browser navigation (such as when closing the tab)
+ * Prevents in-app navigation and tab close when users could lose changes.
+ *
+ * Studio ships Next and TanStack Router side by side. TanStack navigation must be blocked through
+ * its history API before the route starts rendering; Next continues to use routeChangeStart.
  */
 export const usePreventNavigationOnUnsavedChanges = ({
   hasChanges,
 }: UsePreventNavigationOnUnsavedChangesOptions): UsePreventNavigationOnUnsavedChangesReturn => {
-  const router = useRouter()
+  const nextRouter = useNextRouter()
+  const tanStackRouter = useTanStackRouter({ warn: false })
   const [navigateUrl, setNavigateUrl] = useState<string>()
   const [confirmNavigate, setConfirmNavigate] = useState(false)
+  const [pendingTanStackNavigation, setPendingTanStackNavigation] =
+    useState<PendingTanStackNavigation>()
   const bypassNavigationGuardRef = useRef(false)
 
   useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+    if (!tanStackRouter || !hasChanges) return
+
+    return tanStackRouter.history.block({
+      enableBeforeUnload: true,
+      blockerFn: async () => {
+        if (bypassNavigationGuardRef.current) {
+          bypassNavigationGuardRef.current = false
+          return false
+        }
+
+        const shouldCancelNavigation = await new Promise<boolean>((resolve) => {
+          setPendingTanStackNavigation({
+            proceed: () => resolve(false),
+            reset: () => resolve(true),
+          })
+        })
+        setPendingTanStackNavigation(undefined)
+        return shouldCancelNavigation
+      },
+    })
+  }, [hasChanges, tanStackRouter])
+
+  useEffect(() => {
+    if (tanStackRouter) return
+
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
       if (hasChanges) {
-        e.preventDefault()
-        e.returnValue = '' // deprecated, but older browsers still require this
+        event.preventDefault()
+        event.returnValue = ''
       }
     }
 
@@ -60,26 +79,31 @@ export const usePreventNavigationOnUnsavedChanges = ({
 
       if (hasChanges && !confirmNavigate) {
         setNavigateUrl(url)
-        throw 'Route change declined' // Just to prevent the route change
-        return
+        throw 'Route change declined'
       }
       setNavigateUrl(undefined)
     }
+
     window.addEventListener('beforeunload', handleBeforeUnload)
-    router.events.on('routeChangeStart', handleBrowseAway)
+    nextRouter.events.on('routeChangeStart', handleBrowseAway)
 
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload)
-      router.events.off('routeChangeStart', handleBrowseAway)
+      nextRouter.events.off('routeChangeStart', handleBrowseAway)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [confirmNavigate, hasChanges])
+  }, [confirmNavigate, hasChanges, nextRouter.events, tanStackRouter])
 
   const handleCancelNavigation = useCallback(() => {
+    pendingTanStackNavigation?.reset()
     setNavigateUrl(undefined)
-  }, [])
+  }, [pendingTanStackNavigation])
 
   const handleConfirmNavigation = useCallback(() => {
+    if (pendingTanStackNavigation) {
+      pendingTanStackNavigation.proceed()
+      return
+    }
+
     setConfirmNavigate(true)
     let urlToNavigate = navigateUrl ?? '/'
     if (BASE_PATH && urlToNavigate.startsWith(BASE_PATH)) {
@@ -87,8 +111,8 @@ export const usePreventNavigationOnUnsavedChanges = ({
     }
     if (!urlToNavigate.startsWith('/')) urlToNavigate = `/${urlToNavigate}`
     setNavigateUrl(undefined)
-    router.push(urlToNavigate)
-  }, [navigateUrl, router])
+    nextRouter.push(urlToNavigate)
+  }, [navigateUrl, nextRouter, pendingTanStackNavigation])
 
   const bypassNavigationGuard = useCallback(() => {
     bypassNavigationGuardRef.current = true
@@ -99,8 +123,14 @@ export const usePreventNavigationOnUnsavedChanges = ({
       handleCancelNavigation,
       handleConfirmNavigation,
       bypassNavigationGuard,
-      shouldConfirmNavigation: !!navigateUrl,
+      shouldConfirmNavigation: pendingTanStackNavigation !== undefined || navigateUrl !== undefined,
     }),
-    [navigateUrl, handleCancelNavigation, handleConfirmNavigation, bypassNavigationGuard]
+    [
+      handleCancelNavigation,
+      handleConfirmNavigation,
+      bypassNavigationGuard,
+      navigateUrl,
+      pendingTanStackNavigation,
+    ]
   )
 }

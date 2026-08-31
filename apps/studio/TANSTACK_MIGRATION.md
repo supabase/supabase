@@ -455,10 +455,9 @@ inline.
   `router.subscribe(tsEvent, …)`. Forwards Next's `(url, { shallow })`
   args. Maps `routeChangeStart` / `routeChangeComplete` /
   `beforeHistoryChange` / `hashChangeStart` / `hashChangeComplete`.
-  **Known gap:** Next's throw-from-`routeChangeStart`-to-cancel pattern
-  isn't supportable — `subscribe` is fire-and-forget.
-  `usePreventNavigationOnUnsavedChanges` relies on it and needs
-  migrating to TanStack's `useBlocker` separately.
+  **Cancellation:** Next's throw-from-`routeChangeStart`-to-cancel pattern
+  isn't supportable because `subscribe` is fire-and-forget.
+  `usePreventNavigationOnUnsavedChanges` blocks through TanStack history instead.
 - `api.ts` — `toWebHandler(nextHandler)`. See **API routes → Shim
   coverage** above.
 - `link.tsx`, `navigation.ts`, `dynamic.tsx`, `image.tsx`,
@@ -604,7 +603,7 @@ for the Vite pipeline:
 
 - Switch `routes/index.tsx` redirects from `href` to `to` — all targets
   now live in the TanStack tree.
-- Migrate `usePreventNavigationOnUnsavedChanges` from `router.events.on('routeChangeStart', …)` (throw-to-cancel pattern) to TanStack's `useBlocker`.
+- [x] Make `usePreventNavigationOnUnsavedChanges` block through TanStack history while retaining the Next implementation for the legacy runtime.
 - Drop the `_splat` / `routeSlug` normalisation block from
   `pages/org/_/[[...routeSlug]].tsx` + `pages/project/_/[[...routeSlug]].tsx` (only there to keep both runtimes mounting the same body).
 - Remove `RouteValidationWrapper` + `next/router` compat shim usage from `__root.tsx`.
