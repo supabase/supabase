@@ -202,11 +202,7 @@ export const AdvisorPanel = () => {
 
     const advisorCategory =
       item.source === 'lint'
-        ? item.original.categories.includes('SECURITY')
-          ? 'SECURITY'
-          : item.original.categories.includes('PERFORMANCE')
-            ? 'PERFORMANCE'
-            : undefined
+        ? item.original.categories[0]
         : item.source === 'signal'
           ? 'SECURITY'
           : undefined

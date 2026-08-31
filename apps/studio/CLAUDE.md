@@ -75,6 +75,7 @@ Older Studio code predates some of these conventions. For new or modified code, 
 ## Defaults that differ here
 
 - **ESLint warnings are ratcheted in CI**: the per-rule occurrence count must not increase, so a new `any`, unresolved `exhaustive-deps` warning, or default export fails the build even though it's "only a warning". Check locally with `pnpm --filter studio run lint:ratchet`.
+- **Dead files and deps are gated in CI** by knip (`pnpm knip --workspace apps/studio` locally). Framework-convention files nothing imports (routes, Vercel functions, TanStack Start files) belong in `knip.jsonc` under `workspaces["apps/studio"].entry`, not `ignore` — an ignored file's imports aren't traced, so anything only it uses gets reported as dead. There's no inline `knip-ignore` comment; the only per-file opt-out is config. In a PR stack, a file whose first consumer lands in a later PR fails the gate on the earlier one — either add it in the same PR as its first use, or add it to `workspaces["apps/studio"].ignore` with a `used from #NNN` comment and remove it in that PR.
 - **Clipboard**: `copyToClipboard` from `'ui'`, and never `await` anything before calling it (Safari requires the write inside the user gesture; lint-enforced) — pass a Promise as the argument instead.
 - **`useParams()` comes from `'common'`**, not `next/navigation` — it camelCases keys and returns `string | undefined`.
 - **Permissions**: `useAsyncCheckPermissions` from `hooks/misc/useCheckPermissions` (returns `can: true` when self-hosted).
