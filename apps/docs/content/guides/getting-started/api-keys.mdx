@@ -9,7 +9,6 @@ Every request to your Supabase project carries an API key. The key identifies wh
 This guide covers:
 
 - [Which key do you use?](#which-key-do-you-use) answers that in one table.
-- [Coming from `anon` and `service_role`](#legacy-key-mapping) maps each legacy key to its replacement.
 - [How API keys work](#how-api-keys-work) explains what each key type is and which Postgres role it maps to.
 - [Find and use your keys](#find-and-use-your-keys) covers the ways to retrieve a key, wiring it into your code, and rotating one that leaked.
 - [Security reference](#security-reference) lists what publishable keys don't protect against, how to handle secret keys, and the known limitations.
@@ -34,19 +33,6 @@ After you know which key you need:
 
 <$Partial path="api_keys_deprecation.mdx" />
 
-## Coming from `anon` and `service_role` [#legacy-key-mapping]
-
-Publishable and secret keys replace the legacy `anon` and `service_role` keys:
-
-| Legacy key     | Replacement     |
-| -------------- | --------------- |
-| `anon`         | Publishable key |
-| `service_role` | Secret key      |
-
-Publishable and secret keys are short strings that begin with `sb_publishable_` or `sb_secret_`. They aren't JWTs. If a tool, tutorial, or AI assistant tells you to copy a long key that begins with `eyJ`, it was written for the legacy keys, and the replacement above is what you want instead.
-
-The Dashboard has no **Settings > API** page. Every key your project has, legacy or not, lives in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section.
-
 ## How API keys work
 
 ### What an API key identifies
@@ -70,6 +56,8 @@ Supabase supports four types of API keys:
 | Secret&nbsp;keys                                           | <span className="whitespace-nowrap!">`sb_secret_...`</span>      | Elevated   | <span className="whitespace-nowrap!">Platform, CLI</span> | Only use in backend components of your app, such as servers, APIs with their own authorization checks, [Edge Functions](/docs/guides/functions), and microservices. They provide full access to your project's data, bypassing [Row Level Security](/docs/guides/database/postgres/row-level-security). |
 | <span className="whitespace-nowrap!">`anon`</span>         | JWT (long-lived)                                                 | Low        | <span className="whitespace-nowrap!">Platform, CLI</span> | Legacy version of publishable keys.                                                                                                                                                                                                                                                             |
 | <span className="whitespace-nowrap!">`service_role`</span> | JWT (long-lived)                                                 | Elevated   | <span className="whitespace-nowrap!">Platform, CLI</span> | Legacy version of secret keys.                                                                                                                                                                                                                                                                  |
+
+Publishable and secret keys are short strings, not JWTs. If a tool, tutorial, or AI assistant tells you to copy a long key that begins with `eyJ`, it was written for the legacy keys.
 
 Running `supabase start` prints a publishable key and a secret key for your local project. The local secret key takes the place of the local `service_role` key. See the [CLI getting started guide](/docs/guides/local-development/cli/getting-started) for the full output.
 
@@ -160,7 +148,7 @@ Every path below reads keys that already exist. If your project has no publishab
 Use the Dashboard when you are setting up a project by hand. It needs nothing but a signed-in session.
 
 1. Open your project's [**Connect** dialog](/dashboard/project/_?showConnect=true). It shows the URL and publishable key for the framework you select, ready to paste into `.env`.
-2. To pick a specific key, or to see every key your project has, open the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard instead.
+2. To pick a specific key, or to see every key your project has, open the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard instead. Every key lives there, legacy or not, and there is no separate **Settings > API** page.
 3. Copy each value into `.env` under the variable names above.
 
 </TabPanel>
