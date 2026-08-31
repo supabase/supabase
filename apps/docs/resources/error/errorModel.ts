@@ -27,6 +27,28 @@ type ErrorCollectionFetch = CollectionFetch<
   { service?: Service; code?: string }
 >['fetch']
 
+/**
+ * Trims the sentinel row from an over-fetched page.
+ *
+ * Both pagination directions request `limit + 1` rows to detect whether a
+ * further page exists. The extra ("sentinel") row is fetched at the far end of
+ * the window: it is the last row for a `first` query and — because a `last`
+ * query is fetched in reverse and then re-reversed to ascending order — the
+ * first row for a `last` query.
+ *
+ * The sentinel must only be dropped when it was actually fetched. When the
+ * window holds `<= limit` rows there is no sentinel, so a `last` query must
+ * return every row; unconditionally slicing off the first row would silently
+ * drop a legitimate result.
+ */
+export function trimPageSentinel<T>(rows: T[], limit: number, last: boolean): T[] {
+  const hasSentinel = rows.length > limit
+  if (last) {
+    return hasSentinel ? rows.slice(1) : rows
+  }
+  return rows.slice(0, limit)
+}
+
 export class ErrorModel {
   public id: string
   public code: string
@@ -117,7 +139,7 @@ export class ErrorModel {
       .join(errorCodesResult)
       .map(([count, errorCodes]) => {
         const hasMoreItems = errorCodes.length > limit
-        const items = args?.last ? errorCodes.slice(1) : errorCodes.slice(0, limit)
+        const items = trimPageSentinel(errorCodes, limit, !!args?.last)
 
         return {
           items: items.map((errorCode) => new ErrorModel(errorCode)),
