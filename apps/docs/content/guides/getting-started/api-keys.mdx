@@ -290,9 +290,19 @@ Set `verify_jwt = false` for a function called with a secret key rather than a u
 verify_jwt = false
 ```
 
-<Admonition type="caution" title="Don't reach for SUPABASE_SERVICE_ROLE_KEY">
+If you build the client yourself instead of using the SDK, read the key from `SUPABASE_SECRET_KEYS`. The runtime injects it as a JSON dictionary keyed by key name, so pick the one you want.
 
-The Edge Functions runtime still injects `SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` for backward compatibility, and those variables hold publishable and secret key values. Reading them is the legacy path, and the names are misleading. Prefer `withSupabase` as shown above, which needs neither variable. Anywhere outside that runtime, a variable named `SUPABASE_SERVICE_ROLE_KEY` refers to the deprecated legacy key.
+```ts supabase/functions/roster/index.ts
+import { createClient } from 'npm:@supabase/supabase-js@2'
+
+const secretKeys = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
+
+const supabaseAdmin = createClient(Deno.env.get('SUPABASE_URL')!, secretKeys['default'])
+```
+
+<Admonition type="caution" title="SUPABASE_SERVICE_ROLE_KEY is the legacy variable">
+
+The current injected variables are `SUPABASE_PUBLISHABLE_KEYS` and `SUPABASE_SECRET_KEYS`. `SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` still exist, but they carry the legacy keys, so reading them keeps you on the deprecated path. See [Environment Variables](/docs/guides/functions/secrets) for the full list.
 
 </Admonition>
 
