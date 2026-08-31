@@ -6,6 +6,7 @@
   "types": "./index.ts",
   "exports": {
     ".": "./index.ts",
+    "./forms": "./src/forms/index.ts",
     "./crm": "./src/crm/index.ts"
   },
   "scripts": {
