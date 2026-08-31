@@ -43,7 +43,7 @@ export const ExplorerHomeTab = () => {
               title="Run SQL"
               description="Write and run an ad-hoc query"
               bgColor="bg-blue-500"
-              onClick={createQuery}
+              onClick={() => createQuery()}
             />
             <ActionCard
               icon={<NotebookText className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
