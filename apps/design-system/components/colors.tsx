@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { cn } from 'ui'
-import color from 'ui/src/lib/tailwind-demo-classes'
+import color, { cn } from 'ui'
 
 import { Grid, GridItem } from './grid'
 
