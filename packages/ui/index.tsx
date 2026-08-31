@@ -31,6 +31,7 @@ export * from './src/components/LoadingLine'
 
 // ai icon
 export * from './src/layout/ai-icon-animation'
+export { default as aiIconAnimationStyles } from './src/layout/ai-icon-animation/ai-icon-animation-style.module.css'
 
 // theme switcher
 export * from './src/components/ThemeProvider/singleThemes'

@@ -8,8 +8,8 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
+  aiIconAnimationStyles as styles,
 } from 'ui'
-import styles from 'ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
 
 import { QueryResponseError } from '@/data/sql/execute-sql-mutation'
 
