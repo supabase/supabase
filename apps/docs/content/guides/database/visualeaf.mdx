@@ -1,0 +1,49 @@
+---
+id: 'visualeaf'
+title: 'Connecting with VisuaLeaf'
+breadcrumb: 'GUI Quickstarts'
+hideToc: true
+---
+
+If you do not have VisuaLeaf, you can download the free Community Edition from the [VisuaLeaf website](https://visualeaf.com/download).
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Select Supabase">
+      In VisuaLeaf, open the Connections panel and create a new connection. Under **PostgreSQL-compatible**, select **Supabase**.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ![Select Supabase when creating a new connection in VisuaLeaf.](/docs/img/guides/database/connecting-to-postgres/visualeaf/new-connection.png)
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="Add your connection details">
+      In your Supabase project dashboard, click [**Connect**](/dashboard/project/_?showConnect=true). Select **Session pooler**, choose **URI**, and copy the connection string.
+
+      Replace `[YOUR-PASSWORD]` with the database password you created for your Supabase project. If you forgot it, you can reset it in the [Database Settings](/dashboard/project/_/database/settings).
+
+      In VisuaLeaf, paste the connection string into **Paste Connection URL**, then click **Auto-Fill**. Click **Test Connection**, and save the connection after the test succeeds.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ![Add and test a Supabase connection in VisuaLeaf.](/docs/img/guides/database/connecting-to-postgres/visualeaf/supabase-connection.png)
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Open your database">
+      Open the saved connection. Your Supabase schemas and tables appear in the Connections panel. Select a table to browse its data or run a SQL query.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ![Browse a connected Supabase database and open a table in VisuaLeaf.](/docs/img/guides/database/connecting-to-postgres/visualeaf/connected-table.png)
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
