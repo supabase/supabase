@@ -40,12 +40,12 @@ export const getDestinationTypeCreateDescription = (type: DestinationType) => {
 
 export const BIGQUERY_PROJECT_ID_FIELD_COPY = {
   label: 'Project ID',
-  description: 'Google Cloud project ID where data will be sent.',
+  description: 'The Google Cloud project ID where data will be sent',
 } as const
 
 export const BIGQUERY_DATASET_ID_FIELD_COPY = {
   label: 'Dataset ID',
-  description: 'BigQuery dataset where replicated tables will be created.',
+  description: 'The BigQuery dataset where replicated tables will be created',
 } as const
 
 export const ANALYTICS_BUCKET_BUCKET_FIELD_COPY = {
