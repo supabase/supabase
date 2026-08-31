@@ -1,10 +1,12 @@
 import { ArrowDownIcon } from 'lucide-react'
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import { useCallback } from 'react'
 import { Button, cn } from 'ui'
 import { StickToBottom, useStickToBottomContext } from 'use-stick-to-bottom'
 
-type ConversationProps = ComponentProps<typeof StickToBottom>
+type ConversationProps = Omit<ComponentProps<typeof StickToBottom>, 'children'> & {
+  children?: ReactNode
+}
 type ConversationContentProps = ComponentProps<typeof StickToBottom.Content>
 type ConversationScrollButtonProps = ComponentProps<typeof Button>
 
