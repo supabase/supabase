@@ -122,7 +122,6 @@ When reviewing a PR, flag these as **required changes:**
 3. **Deprecated hook** — any usage of `useSendEventMutation` instead of `useTrack`
 4. **Unnecessary view tracking** — events that fire on page load without user interaction
 5. **Inaccurate docs** — `@page`/`@source` descriptions that don't match the actual implementation
-6. **distinct_id joins across sign-in** — any funnel or analysis that links pre-auth events to post-auth events must join on `person_id`, not `distinct_id`: client-side `posthog.identify` switches the distinct_id at auth, and account events like `sign_in` are captured server-side under the user id
 
 When a PR adds user-facing interactions (buttons, forms, toggles, modals) **without** tracking, suggest:
 
@@ -131,6 +130,13 @@ When a PR adds user-facing interactions (buttons, forms, toggles, modals) **with
 - Propose the `useTrack()` call with suggested properties
 
 When checking property consistency, search `packages/common/telemetry-constants.ts` for similar events and verify property names match.
+
+## Querying sign-in events
+
+For anyone building funnels or analyses over these events in PostHog or Hex:
+
+- Never join pre-auth events to post-auth events on `distinct_id`: client-side `posthog.identify` switches the distinct_id at auth, so distinct_id-keyed funnels across the sign-in transition measure an identify race, not conversion. Join client-side events (pageviews) on `person_id`.
+- Don't use `sign_in` as a funnel join key across the auth boundary at all. It is captured server-side with its distinct_id resolved from telemetry cookies (`user_id` when present, else `anonymous_id` with person-profile processing disabled), and the majority of sign_in events take the fallback because the event races the identify call that sets the cookie. Treat it as a count/method metric.
 
 ## Well-Formed Event Examples
 

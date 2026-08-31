@@ -54,10 +54,13 @@ export interface SignUpEvent {
  *
  * Some unintuitive behavior:
  *   - If signing up with GitHub the SignInEvent gets triggered first before the SignUpEvent.
- *   - The event is captured server-side under the authenticated user id, not the
- *     browser's distinct_id, and client-side identify switches the distinct_id at
- *     auth anyway. Funnels crossing the sign-in transition must join on person_id,
- *     never distinct_id.
+ *   - The event is captured server-side with its distinct_id resolved from telemetry
+ *     cookies: the user_id cookie when present, else the anonymous_id cookie with
+ *     person-profile processing disabled. The majority of sign_in events take the
+ *     fallback because the event races the identify call that sets the cookie, so
+ *     they carry no person profile. Don't use this event as a funnel join key across
+ *     the auth boundary; join client-side events on person_id instead (client
+ *     identify switches the distinct_id at auth).
  *
  * @group Events
  * @source studio
