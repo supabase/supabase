@@ -72,6 +72,12 @@
         // read are documentation of the valid values, not dead code. Scoped to
         // this file so `enumMembers` keeps working everywhere else.
         "data/database/constraints-query.ts": ["enumMembers"],
+        // Shared experiment plumbing every A/B test plugs into. Gaps between
+        // experiments are normal, but deleting-and-restoring this hook each
+        // cycle churns the codebase and caused a stacked-merge race that
+        // broke master (#49719 removed it, #49534 reintroduced a usage — see
+        // #49763 for the fix). Keep it around across the gaps.
+        "hooks/misc/useTrackExperimentExposure.ts": ["files"],
       },
       // `vercel` is a globally installed CLI used by the `deploy:staging` script
       "ignoreBinaries": ["vercel"],
