@@ -54,6 +54,26 @@ export const storageKeys = {
       ...(path ? [path] : []),
       ...(params ? [params] : []),
     ] as const,
+  /**
+   * The lifecycle policy is part of the key because the API applies it when
+   * deriving each version's expiry, so editing the policy must invalidate the
+   * cached version list rather than leave a stale one behind.
+   */
+  objectVersions: (
+    projectRef: string | undefined,
+    bucketId: string | undefined,
+    objectName: string | undefined,
+    lifecyclePolicy?: { expiryDays: number | null; maxVersions: number | null }
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'buckets',
+      bucketId,
+      'object-versions',
+      objectName,
+      ...(lifecyclePolicy ? [lifecyclePolicy] : []),
+    ] as const,
   icebergNamespaces: ({ projectRef, warehouse }: { projectRef?: string; warehouse?: string }) =>
     [projectRef, 'warehouse', warehouse, 'namespaces'] as const,
   icebergNamespace: ({
