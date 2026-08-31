@@ -42,6 +42,24 @@ export function generateParameters(tsDefinition: any) {
   return parameters
 }
 
+type SortableParam = { name?: string; flags?: { isOptional?: boolean } }
+
+/**
+ * Order params with required ones first, then alphabetically by name.
+ *
+ * Both comparisons are done in a single comparator so the ordering is stable
+ * and total. The previous implementation chained two `.sort()` calls, the
+ * second of which (`(a, b) => (a.flags?.isOptional ? 1 : -1)`) never inspected
+ * `b` and never returned 0 — an invalid comparator whose result is
+ * implementation-defined and can scramble the alphabetical pre-sort.
+ */
+export function compareParamsByRequiredThenName(a: SortableParam, b: SortableParam): number {
+  const aOptional = a.flags?.isOptional ? 1 : 0
+  const bOptional = b.flags?.isOptional ? 1 : 0
+  if (aOptional !== bOptional) return aOptional - bOptional // required (0) before optional (1)
+  return (a.name ?? '').localeCompare(b.name ?? '')
+}
+
 function recurseThroughParams(paramDefinition: any) {
   const param = { ...paramDefinition }
   const labelParams = generateLabelParam(param)
@@ -102,8 +120,7 @@ function recurseThroughParams(paramDefinition: any) {
 
   if (children) {
     const properties = children
-      .sort((a, b) => a.name?.localeCompare(b.name)) // first alphabetical
-      .sort((a, b) => (a.flags?.isOptional ? 1 : -1)) // required params first
+      .sort(compareParamsByRequiredThenName) // required params first, then alphabetical
       .map((x) => recurseThroughParams(x))
     labelParams.subContent = properties
   }
