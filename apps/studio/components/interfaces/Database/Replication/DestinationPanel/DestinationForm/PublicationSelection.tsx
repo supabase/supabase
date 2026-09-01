@@ -59,6 +59,10 @@ export const PublicationSelection = ({
                       shouldDirty: true,
                       shouldValidate: true,
                     })
+                    form.setValue('tableOptions', [], {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
                   }
                   field.onChange(value)
                 },
