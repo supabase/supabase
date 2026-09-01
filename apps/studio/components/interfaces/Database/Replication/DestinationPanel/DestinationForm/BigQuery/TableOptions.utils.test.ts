@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  findFirstErrorMessage,
   isIntegerPartitionColumnType,
   isPartitionColumnTypeCompatible,
   isTimePartitionColumnType,
@@ -77,5 +78,39 @@ describe('partition column type compatibility', () => {
   it('treats an unknown type as compatible so columns can still be chosen while loading', () => {
     expect(isPartitionColumnTypeCompatible('time_column')).toBe(true)
     expect(isPartitionColumnTypeCompatible('integer_range', 'text')).toBe(false)
+  })
+})
+
+describe('findFirstErrorMessage', () => {
+  it('returns the first message nested anywhere inside a field-array error', () => {
+    expect(
+      findFirstErrorMessage({
+        partitionBy: { column: { type: 'too_small', message: 'Select a partition column' } },
+      })
+    ).toBe('Select a partition column')
+  })
+
+  it('ignores branches without a message rather than reporting an empty error', () => {
+    expect(findFirstErrorMessage(undefined)).toBeUndefined()
+    expect(
+      findFirstErrorMessage({ partitionBy: { column: { type: 'too_small' } } })
+    ).toBeUndefined()
+    expect(findFirstErrorMessage({ clusterBy: { message: '' } })).toBeUndefined()
+  })
+
+  it('does not walk into the DOM node that react-hook-form attaches to every field error', () => {
+    const input = document.createElement('input')
+    input.setAttribute('message', 'not an error message')
+
+    expect(
+      findFirstErrorMessage({ partitionBy: { column: { type: 'too_small', ref: input } } })
+    ).toBeUndefined()
+  })
+
+  it('survives a cyclic error graph', () => {
+    const partitionBy: Record<string, unknown> = { column: { type: 'too_small' } }
+    partitionBy.self = partitionBy
+
+    expect(findFirstErrorMessage({ partitionBy })).toBeUndefined()
   })
 })

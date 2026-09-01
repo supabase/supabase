@@ -5,7 +5,6 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-  Badge,
   FormControl,
   FormField,
   FormInputGroupInput,
@@ -60,7 +59,6 @@ export const AdvancedSettings = ({
             </div>
           </AccordionTrigger>
           <AccordionContent className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4">
-            {/* Batch wait time - applies to all destinations */}
             <FormField
               control={form.control}
               name="maxFillMs"
@@ -189,12 +187,7 @@ export const AdvancedSettings = ({
                   name="connectionPoolSize"
                   render={({ field }) => (
                     <FormItemLayout
-                      label={
-                        <div className="flex flex-col gap-y-2">
-                          <span>Connection pool size</span>
-                          <Badge className="w-min">BigQuery only</Badge>
-                        </div>
-                      }
+                      label="Connection pool size"
                       layout="horizontal"
                       description="Number of BigQuery connections used for destination writes."
                     >
@@ -223,12 +216,7 @@ export const AdvancedSettings = ({
                   name="maxStalenessMins"
                   render={({ field }) => (
                     <FormItemLayout
-                      label={
-                        <div className="flex flex-col gap-y-2">
-                          <span>Maximum staleness*</span>
-                          <Badge className="w-min">BigQuery only</Badge>
-                        </div>
-                      }
+                      label="Maximum staleness"
                       layout="horizontal"
                       description="Set the maximum age of query results while BigQuery applies ongoing changes, or leave blank for the freshest results."
                     >
@@ -253,23 +241,14 @@ export const AdvancedSettings = ({
 
                 <div className="flex flex-col gap-y-3">
                   <div className="flex flex-col gap-y-1">
-                    <div className="flex items-center gap-x-2">
-                      <span className="text-sm text-foreground">
-                        Table partitioning and clustering*
-                      </span>
-                      <Badge className="w-min">BigQuery only</Badge>
-                    </div>
+                    <span className="text-sm text-foreground">Table layout</span>
                     <p className="text-sm text-foreground-lighter">
-                      Configure partitioning and clustering for individual tables in the selected
-                      publication.
+                      Partitioning and clustering for each BigQuery table. Applied when a
+                      destination table is first created or reset.
                     </p>
                   </div>
                   <TableOptions control={form.control} />
                 </div>
-
-                <p className="text-sm text-foreground-lighter leading-normal">
-                  * Applied when a destination table is first created or after you use Reset table.
-                </p>
               </>
             )}
           </AccordionContent>

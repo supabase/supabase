@@ -15,7 +15,7 @@ import {
 } from '@/data/replication/create-destination-pipeline-mutation'
 
 const PARTITION_KIND_LABELS: Record<BigQueryPartitionKind, string> = {
-  none: 'No partitioning',
+  none: 'None',
   time_column: 'Time column',
   integer_range: 'Integer range',
   ingestion_time: 'Ingestion time',
@@ -100,10 +100,14 @@ export const PartitioningFields = ({
           )
         )
       : columnSelection.availableColumnNames
+  const compatibleColumnEmptyLabel =
+    partitionBy?.kind === 'time_column'
+      ? 'No published date or timestamp columns'
+      : 'No published integer columns'
 
   return (
     <>
-      <FormItemLayout isReactForm={false} label="Partitioning" layout="vertical">
+      <FormItemLayout isReactForm={false} label="Partition by" layout="vertical">
         <Select
           value={partitionKind}
           onValueChange={(kind: BigQueryPartitionKind) => {
@@ -162,7 +166,7 @@ export const PartitioningFields = ({
                   !columnSelection.isError &&
                   compatibleColumnNames.length === 0
                 }
-                emptyLabel="No compatible published columns available"
+                emptyLabel={compatibleColumnEmptyLabel}
                 errorLabel="Unable to load columns. Open the list again to retry."
               />
               {compatibleColumnNames.map((column) => (
@@ -198,7 +202,7 @@ export const PartitioningFields = ({
       )}
 
       {partitionBy?.kind === 'integer_range' && (
-        <div className="grid grid-cols-3 gap-x-2">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(10rem,1fr))] gap-2">
           <FormItemLayout
             isReactForm={false}
             label="Start"
@@ -280,7 +284,7 @@ export const ClusteringFields = ({
   return (
     <FormItemLayout
       isReactForm={false}
-      label="Clustering columns"
+      label="Cluster by"
       layout="vertical"
       description={`Selection order sets the clustering order. Maximum ${BIGQUERY_MAX_CLUSTERING_COLUMNS} columns.`}
       error={error}

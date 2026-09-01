@@ -1,6 +1,9 @@
 import { useParams } from 'common'
+import { RotateCcw } from 'lucide-react'
 import { useState } from 'react'
 import { get, useController, useFormState, type Control, type FieldErrors } from 'react-hook-form'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
 import {
@@ -16,46 +19,55 @@ import {
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useReplicationTableColumnsQuery } from '@/data/replication/table-columns-query'
 
+type TableOption = NonNullable<DestinationPanelSchemaType['tableOptions']>[number]
+type PartitionBy = TableOption['partitionBy']
+
 const getFieldErrorMessage = (errors: FieldErrors<DestinationPanelSchemaType>, path: string) => {
   const error = get(errors, path)
   return typeof error?.message === 'string' ? error.message : undefined
 }
 
-interface TableOptionRowProps {
-  control: Control<DestinationPanelSchemaType>
-  index: number
+interface TableOptionErrors {
+  partitionBy?: string
+  column?: string
+  start?: string
+  end?: string
+  interval?: string
+  clusterBy?: string
+}
+
+interface TableOptionEditorProps {
+  partitionBy: PartitionBy
+  clusterBy: string[]
+  onPartitionByChange: (partitionBy: PartitionBy) => void
+  onClusterByChange: (clusterBy: string[]) => void
+  errors?: TableOptionErrors
   isPublicationColumnsError?: boolean
   isPublicationColumnsPending?: boolean
   publishedColumnNames?: ReadonlySet<string> | null
   tableId: number
+  onClear?: () => void
 }
 
-export const TableOptionRow = ({
-  control,
-  index,
+const TableOptionEditor = ({
+  partitionBy,
+  clusterBy,
+  onPartitionByChange,
+  onClusterByChange,
+  errors = {},
   isPublicationColumnsError = false,
   isPublicationColumnsPending = false,
   publishedColumnNames,
   tableId,
-}: TableOptionRowProps) => {
+  onClear,
+}: TableOptionEditorProps) => {
   const { ref: projectRef } = useParams()
   const sourceId = useReplicationSourceId({ projectRef })
-  const { errors } = useFormState({ control })
 
-  const { field: partitionByField } = useController({
-    control,
-    name: `tableOptions.${index}.partitionBy`,
-  })
-  const { field: clusterByField } = useController({
-    control,
-    name: `tableOptions.${index}.clusterBy`,
-  })
-
-  const partitionBy = partitionByField.value
   const shouldInitiallyLoadColumns =
     partitionBy?.kind === 'time_column' ||
     partitionBy?.kind === 'integer_range' ||
-    (clusterByField.value?.length ?? 0) > 0
+    clusterBy.length > 0
   const [shouldLoadColumns, setShouldLoadColumns] = useState(shouldInitiallyLoadColumns)
   const {
     data: columns = [],
@@ -85,7 +97,7 @@ export const TableOptionRow = ({
   const columnTypeByName = new Map(columns.map((column) => [column.name, column.type]))
   const areColumnsVerified = isSuccess && canUseColumns
   const partitionColumn = partitionBy && 'column' in partitionBy ? partitionBy.column : undefined
-  const configuredColumns = [partitionColumn, ...(clusterByField.value ?? [])].filter(
+  const configuredColumns = [partitionColumn, ...clusterBy].filter(
     (column, columnIndex, allConfiguredColumns): column is string =>
       typeof column === 'string' &&
       column.trim().length > 0 &&
@@ -113,15 +125,6 @@ export const TableOptionRow = ({
     handleRefreshColumnsOnOpen(isOpen)
   }
 
-  const fieldPath = `tableOptions.${index}`
-  const partitionByError = getFieldErrorMessage(errors, `${fieldPath}.partitionBy`)
-  const partitionErrors = {
-    column: getFieldErrorMessage(errors, `${fieldPath}.partitionBy.column`),
-    start: getFieldErrorMessage(errors, `${fieldPath}.partitionBy.start`),
-    end: getFieldErrorMessage(errors, `${fieldPath}.partitionBy.end`),
-    interval: getFieldErrorMessage(errors, `${fieldPath}.partitionBy.interval`),
-  }
-  const clusterByError = getFieldErrorMessage(errors, `${fieldPath}.clusterBy`)
   const columnSelection: ColumnSelectionState = {
     availableColumnNames,
     columnTypeByName,
@@ -132,36 +135,125 @@ export const TableOptionRow = ({
   }
 
   return (
-    <div className="flex flex-col gap-y-3 rounded-md border p-3 ml-6">
+    <div className="flex flex-col gap-y-4 border-t px-3 py-4">
       <PartitioningFields
         partitionBy={partitionBy}
-        onChange={partitionByField.onChange}
+        onChange={onPartitionByChange}
         onNeedsColumns={() => setShouldLoadColumns(true)}
         columnSelection={columnSelection}
-        errors={partitionErrors}
+        errors={{
+          column: errors.column,
+          start: errors.start,
+          end: errors.end,
+          interval: errors.interval,
+        }}
       />
+
+      {errors.partitionBy && <p className="text-sm text-destructive-600">{errors.partitionBy}</p>}
 
       <ClusteringFields
-        clusterBy={clusterByField.value ?? []}
-        onChange={clusterByField.onChange}
+        clusterBy={clusterBy}
+        onChange={onClusterByChange}
         columnSelection={columnSelection}
-        error={clusterByError}
+        error={errors.clusterBy}
       />
 
-      {partitionByError && <p className="text-sm text-destructive-600">{partitionByError}</p>}
-
       {shouldLoadColumns && isColumnSelectionError && (
-        <p className="text-sm text-warning-600">
-          Unable to verify columns against the source and publication. Refresh and try again.
-        </p>
+        <Admonition
+          type="warning"
+          title="Columns could not be verified"
+          description="Refresh the page before changing or saving this table’s layout."
+        />
       )}
 
       {unavailableColumns.length > 0 && (
-        <p className="text-sm text-destructive-600 leading-normal">
-          Some columns are no longer in the source or publication. Choose different columns or
-          remove them.
-        </p>
+        <Admonition
+          type="destructive"
+          title="Some selected columns are no longer available"
+          description="Choose columns that are still in the source and publication."
+        />
+      )}
+
+      {onClear !== undefined && (
+        <Button
+          type="button"
+          variant="default"
+          className="self-start"
+          icon={<RotateCcw size={14} />}
+          onClick={onClear}
+        >
+          Clear
+        </Button>
       )}
     </div>
   )
 }
+
+type SharedRowProps = Pick<
+  TableOptionEditorProps,
+  'isPublicationColumnsError' | 'isPublicationColumnsPending' | 'publishedColumnNames' | 'tableId'
+>
+
+interface TableOptionRowProps extends SharedRowProps {
+  control: Control<DestinationPanelSchemaType>
+  index: number
+  onClear: () => void
+}
+
+export const TableOptionRow = ({
+  control,
+  index,
+  onClear,
+  ...sharedProps
+}: TableOptionRowProps) => {
+  const { errors } = useFormState({ control })
+
+  const { field: partitionByField } = useController({
+    control,
+    name: `tableOptions.${index}.partitionBy`,
+  })
+  const { field: clusterByField } = useController({
+    control,
+    name: `tableOptions.${index}.clusterBy`,
+  })
+
+  const fieldPath = `tableOptions.${index}`
+
+  return (
+    <TableOptionEditor
+      partitionBy={partitionByField.value}
+      clusterBy={clusterByField.value ?? []}
+      onPartitionByChange={partitionByField.onChange}
+      onClusterByChange={clusterByField.onChange}
+      errors={{
+        partitionBy: getFieldErrorMessage(errors, `${fieldPath}.partitionBy`),
+        column: getFieldErrorMessage(errors, `${fieldPath}.partitionBy.column`),
+        start: getFieldErrorMessage(errors, `${fieldPath}.partitionBy.start`),
+        end: getFieldErrorMessage(errors, `${fieldPath}.partitionBy.end`),
+        interval: getFieldErrorMessage(errors, `${fieldPath}.partitionBy.interval`),
+        clusterBy: getFieldErrorMessage(errors, `${fieldPath}.clusterBy`),
+      }}
+      onClear={onClear}
+      {...sharedProps}
+    />
+  )
+}
+
+interface TableOptionDraftRowProps extends SharedRowProps {
+  onCreate: (option: Pick<TableOption, 'partitionBy' | 'clusterBy'>) => void
+}
+
+/**
+ * Rendered while a table has no entry in the tableOptions field array. Expanding a row must not
+ * touch form state, otherwise merely looking at a table leaves the form dirty and triggers the
+ * unsaved-changes prompt. The first edit creates the entry, after which TableOptionRow takes over.
+ */
+export const TableOptionDraftRow = ({ onCreate, ...sharedProps }: TableOptionDraftRowProps) => (
+  <TableOptionEditor
+    partitionBy={undefined}
+    clusterBy={[]}
+    onPartitionByChange={(partitionBy) => onCreate({ partitionBy, clusterBy: [] })}
+    onClusterByChange={(clusterBy) => onCreate({ partitionBy: undefined, clusterBy })}
+    {...sharedProps}
+  />
+)
