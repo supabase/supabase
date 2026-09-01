@@ -74,7 +74,7 @@ export interface SignInEvent {
  *
  * @group Events
  * @source studio
- * @page /sign-in, /sign-in-sso
+ * @page /sign-in, /sign-in-sso, /sign-in-partner
  */
 export interface SignInSubmittedEvent {
   action: 'sign_in_submitted'
