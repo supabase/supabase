@@ -76,9 +76,12 @@ vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
   useCheckEntitlements: () => ({ hasAccess: false }),
 }))
 
+const mockRolesManagementPermissions = vi.hoisted(() => ({
+  rolesAddable: [1, 2, 3, 4] as number[],
+}))
 vi.mock('@/components/interfaces/Organization/TeamSettings/TeamSettings.utils', () => ({
   useGetRolesManagementPermissions: () => ({
-    rolesAddable: [1, 2, 3, 4],
+    rolesAddable: mockRolesManagementPermissions.rolesAddable,
     rolesRemovable: [1, 2, 3, 4],
   }),
 }))
@@ -120,11 +123,28 @@ describe('InviteMemberButton', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockInvite.mockResolvedValue({ succeeded: [], failed: [] })
+    mockRolesManagementPermissions.rolesAddable = [1, 2, 3, 4]
   })
 
   it('renders an enabled Invite members button', () => {
     customRender(<InviteMemberButton />)
     expect(screen.getByRole('button', { name: /invite members/i })).toBeEnabled()
+  })
+
+  it('only shows the permission tooltip when inviting members is not allowed', async () => {
+    mockRolesManagementPermissions.rolesAddable = []
+    customRender(<InviteMemberButton />)
+
+    const inviteButton = screen.getByRole('button', { name: /invite members/i })
+    expect(inviteButton).toBeDisabled()
+
+    await userEvent.hover(inviteButton)
+
+    const permissionTooltip = await screen.findByRole('tooltip')
+    expect(permissionTooltip).toHaveTextContent(
+      'You need additional permissions to invite members to this organization'
+    )
+    expect(screen.getAllByText('Invite members')).toHaveLength(1)
   })
 
   it('opens the invite dialog when the button is clicked', async () => {
