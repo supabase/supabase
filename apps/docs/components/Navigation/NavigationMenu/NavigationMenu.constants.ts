@@ -286,6 +286,13 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             new: true,
           },
           {
+            label: 'Middleware SDK',
+            icon: 'reference-javascript',
+            href: '/reference/middleware' as `/${string}`,
+            level: 'reference_middleware',
+            new: true,
+          },
+          {
             label: 'CLI Commands',
             icon: 'reference-cli',
             href: '/reference/cli/introduction' as `/${string}`,
