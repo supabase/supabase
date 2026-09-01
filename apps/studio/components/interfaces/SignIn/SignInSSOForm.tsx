@@ -88,15 +88,9 @@ export const SignInSSOForm = () => {
           name="email"
           control={form.control}
           render={({ field }) => (
-            <FormItemLayout name="email" label="Email">
+            <FormItemLayout label="Email">
               <FormControl>
-                <Input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  {...field}
-                  placeholder="gavin@hooli.com"
-                />
+                <Input type="email" autoComplete="email" {...field} placeholder="gavin@hooli.com" />
               </FormControl>
             </FormItemLayout>
           )}
