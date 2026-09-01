@@ -63,6 +63,7 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
             track('access_token_created', {
               tokenType: 'classic',
               expiryPreset: values.expiresAt,
+              resourceAccess: 'account',
             })
             showCreatedToken(data)
           },

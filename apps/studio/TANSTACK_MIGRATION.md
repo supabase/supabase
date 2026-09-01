@@ -231,6 +231,8 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 ### Project shell — `/workers/*`
 
 - [x] A `routes/project/$ref/workers/index.tsx` ← `pages/project/[ref]/workers/index.tsx`
+- [x] A `routes/project/$ref/workers/$name.tsx` ← `pages/project/[ref]/workers/[name].tsx`
+- [x] A `routes/project/$ref/workers/secrets.tsx` ← `pages/project/[ref]/workers/secrets.tsx`
 
 ### Project shell — `/functions/*`
 

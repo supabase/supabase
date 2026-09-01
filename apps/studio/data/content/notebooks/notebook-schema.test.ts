@@ -136,6 +136,27 @@ describe('notebookSchema', () => {
     expect(result.success).toBe(true)
   })
 
+  it('normalizes an empty-string database_identifier to absent — a model asked to omit it often writes "" instead', () => {
+    const result = notebookSchema.safeParse({
+      schema_version: 1,
+      cells: [
+        {
+          _tag: 'database_cell',
+          _id: '1',
+          sql: 'select 1',
+          row_limit: 100,
+          database_identifier: '',
+        },
+      ],
+    })
+
+    expect(result.success).toBe(true)
+    if (!result.success) return
+    const [cell] = result.data.cells
+    expect(cell._tag).toBe('database_cell')
+    expect(cell._tag === 'database_cell' ? cell.database_identifier : undefined).toBeUndefined()
+  })
+
   it('rejects a cell with no _id — the backend always assigns one on save', () => {
     const result = notebookSchema.safeParse({
       schema_version: 1,
