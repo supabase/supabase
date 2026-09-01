@@ -130,19 +130,19 @@ Use the Dashboard when you are setting up a project by hand. It needs nothing bu
 
 Use the CLI to script setup, or to read the keys for a preview branch. This path needs the Supabase CLI, so [install it](/docs/guides/local-development/cli/getting-started#installing-the-supabase-cli) first.
 
-1. Sign in, if you haven't already.
+1. Sign in, if you haven't already:
 
    ```bash
    supabase login
    ```
 
-2. Find the project ref, if you don't know it.
+2. Find the project ref, if you don't know it:
 
    ```bash
    supabase projects list
    ```
 
-3. List the keys for that project.
+3. List the keys for that project:
 
    ```bash
    supabase projects api-keys --project-ref your-project-ref
@@ -175,13 +175,15 @@ A local stack mints its own keys. They are unrelated to your hosted project's ke
 
 This path needs the Supabase CLI and a container runtime. See [Running a local Supabase project](/docs/guides/local-development/cli/getting-started#running-a-local-supabase-project) for both.
 
-1. Start the stack. The publishable and secret keys are in the startup output, under **Authentication Keys**.
+1. Start the stack:
 
    ```bash
    supabase start
    ```
 
-2. Print them again at any time while the stack is running.
+   The publishable and secret keys are in the output, under **Authentication Keys**.
+
+2. Print them again at any time while the stack is running:
 
    ```bash
    supabase status
