@@ -45,6 +45,8 @@ export const FunctionEditor = ({
               onClick={() => setFocused(!focused)}
               icon={focused ? <Minimize2 /> : <Maximize2 />}
               aria-label={focused ? 'Minimize editor' : 'Maximize editor'}
+              // Tooltip repeats the label; the description would read the name twice
+              aria-describedby={undefined}
             />
           </TooltipTrigger>
           <TooltipContent side="bottom">
