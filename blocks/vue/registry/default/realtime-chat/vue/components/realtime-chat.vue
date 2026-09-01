@@ -74,6 +74,9 @@ function handleSendMessage() {
     <!-- Messages -->
     <div
       ref="containerRef"
+      role="log"
+      aria-label="Chat messages"
+      aria-live="polite"
       class="flex-1 overflow-y-auto p-4 space-y-4"
     >
       <div
@@ -111,6 +114,7 @@ function handleSendMessage() {
         :disabled="!isConnected"
         type="text"
         placeholder="Type a message..."
+        aria-label="Message"
         :class="[
           'rounded-full bg-background text-sm transition-all duration-300',
           isConnected && newMessage.trim()
@@ -123,9 +127,10 @@ function handleSendMessage() {
         v-if="isConnected && newMessage.trim()"
         type="submit"
         :disabled="!isConnected"
+        aria-label="Send message"
         class="aspect-square rounded-full animate-in fade-in slide-in-from-right-4 duration-300"
       >
-        <Send class="size-4" />
+        <Send class="size-4" aria-hidden="true" />
       </Button>
     </form>
   </div>

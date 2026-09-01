@@ -84,7 +84,13 @@ export const RealtimeChat = ({
   return (
     <div className="flex flex-col h-full w-full bg-background text-foreground antialiased">
       {/* Messages */}
-      <div ref={containerRef} className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div
+        ref={containerRef}
+        role="log"
+        aria-label="Chat messages"
+        aria-live="polite"
+        className="flex-1 overflow-y-auto p-4 space-y-4"
+      >
         {allMessages.length === 0 ? (
           <div className="text-center text-sm text-muted-foreground">
             No messages yet. Start the conversation!
@@ -121,15 +127,17 @@ export const RealtimeChat = ({
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Type a message..."
+          aria-label="Message"
           disabled={!isConnected}
         />
         {isConnected && newMessage.trim() && (
           <Button
             className="aspect-square rounded-full animate-in fade-in slide-in-from-right-4 duration-300"
             type="submit"
+            aria-label="Send message"
             disabled={!isConnected}
           >
-            <Send className="size-4" />
+            <Send className="size-4" aria-hidden="true" />
           </Button>
         )}
       </form>
