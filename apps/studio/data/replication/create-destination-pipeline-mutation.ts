@@ -5,6 +5,9 @@ import { toast } from 'sonner'
 import { replicationKeys } from './keys'
 import type {
   BigQueryDestinationConfig,
+  BigQueryPartitionBy,
+  BigQueryTableOption,
+  CompleteBigQueryPartitionBy,
   DestinationConfig,
   DucklakeDestinationConfig,
   PipelineConfig,
@@ -20,6 +23,75 @@ type CreateDestinationApiConfig = CreateDestinationPipelineBody['destination_con
 type CreateBigQueryApiConfig = Extract<CreateDestinationApiConfig, { big_query: unknown }>
 type CreateDucklakeApiConfig = Extract<CreateDestinationApiConfig, { ducklake: unknown }>
 
+const hasClusteringColumns = (clusterBy: string[] | undefined) => (clusterBy?.length ?? 0) > 0
+
+const isCompleteBigQueryPartition = (
+  partitionBy: BigQueryPartitionBy | undefined
+): partitionBy is CompleteBigQueryPartitionBy => {
+  if (!partitionBy) return false
+  if (partitionBy.kind === 'ingestion_time') return true
+  if (!('column' in partitionBy) || partitionBy.column.trim().length === 0) return false
+  if (partitionBy.kind !== 'integer_range') return true
+  return (
+    typeof partitionBy.start === 'number' &&
+    typeof partitionBy.end === 'number' &&
+    typeof partitionBy.interval === 'number'
+  )
+}
+
+const buildBigQueryPartitionByApiConfig = (partitionBy: CompleteBigQueryPartitionBy) => {
+  switch (partitionBy.kind) {
+    case 'time_column':
+      return {
+        kind: partitionBy.kind,
+        column: partitionBy.column,
+        granularity: partitionBy.granularity,
+      }
+    case 'integer_range':
+      return {
+        kind: partitionBy.kind,
+        column: partitionBy.column,
+        start: partitionBy.start,
+        end: partitionBy.end,
+        interval: partitionBy.interval,
+      }
+    case 'ingestion_time':
+      return { kind: partitionBy.kind, granularity: partitionBy.granularity }
+  }
+}
+
+const buildBigQueryTableOptionApiConfig = (option: BigQueryTableOption) => ({
+  table_id: option.tableId,
+  partition_by: isCompleteBigQueryPartition(option.partitionBy)
+    ? buildBigQueryPartitionByApiConfig(option.partitionBy)
+    : undefined,
+  cluster_by: hasClusteringColumns(option.clusterBy) ? option.clusterBy : undefined,
+})
+
+const isBigQueryTableOptionConfigured = (option: BigQueryTableOption) =>
+  isCompleteBigQueryPartition(option.partitionBy) || hasClusteringColumns(option.clusterBy)
+
+const getConfiguredBigQueryTableOptions = (tableOptions: BigQueryTableOption[] | undefined) =>
+  (tableOptions ?? []).filter(isBigQueryTableOptionConfigured)
+
+const buildBigQueryTableOptionsApiConfig = (tableOptions: BigQueryTableOption[] | undefined) => {
+  const configuredTableOptions = getConfiguredBigQueryTableOptions(tableOptions)
+
+  if (tableOptions === undefined || configuredTableOptions.length === 0) return undefined
+  return { tables: configuredTableOptions.map(buildBigQueryTableOptionApiConfig) }
+}
+
+// Updates must send null to clear previously stored table options; omitting the property leaves
+// the current value unchanged.
+export const buildBigQueryTableOptionsUpdateApiConfig = (
+  tableOptions: BigQueryTableOption[] | undefined
+) => {
+  const configuredTableOptions = (tableOptions ?? []).filter(isBigQueryTableOptionConfigured)
+  if (tableOptions === undefined) return undefined
+  if (configuredTableOptions.length === 0) return null
+  return { tables: configuredTableOptions.map(buildBigQueryTableOptionApiConfig) }
+}
+
 // Maps the studio-side BigQuery config to the snake_case `{ big_query: ... }` payload accepted
 // by the platform API. Shared by the create and validate mutations.
 export function buildBigQueryApiConfig(config: BigQueryDestinationConfig): CreateBigQueryApiConfig {
@@ -30,6 +102,7 @@ export function buildBigQueryApiConfig(config: BigQueryDestinationConfig): Creat
       service_account_key: config.serviceAccountKey,
       connection_pool_size: config.connectionPoolSize,
       max_staleness_mins: config.maxStalenessMins,
+      table_options: buildBigQueryTableOptionsApiConfig(config.tableOptions),
     },
   }
 }

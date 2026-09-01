@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { components } from 'api-types'
 import { toast } from 'sonner'
 
+import { buildBigQueryTableOptionsUpdateApiConfig } from './create-destination-pipeline-mutation'
 import { optionalSecret } from './destination-secret-utils'
 import { replicationKeys } from './keys'
 import type {
@@ -31,6 +32,7 @@ export function buildBigQueryUpdateApiConfig(
       service_account_key: optionalSecret(config.serviceAccountKey),
       connection_pool_size: config.connectionPoolSize,
       max_staleness_mins: config.maxStalenessMins,
+      table_options: buildBigQueryTableOptionsUpdateApiConfig(config.tableOptions),
     },
   }
 }
