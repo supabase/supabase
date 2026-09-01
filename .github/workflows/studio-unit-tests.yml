@@ -36,6 +36,10 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
+          # On push events paths-filter diffs against github.event.before with
+          # local git; without enough history it falls back to a git fetch that
+          # fails unauthenticated (persist-credentials is false).
+          fetch-depth: 50
           sparse-checkout: |
             apps/studio
             packages
