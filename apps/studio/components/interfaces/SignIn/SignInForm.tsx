@@ -81,7 +81,7 @@ export const SignInForm = () => {
         if (data) {
           if (data.currentLevel !== data.nextLevel) {
             toast.success(`You need to provide your second factor authentication`, { id: toastId })
-            const url = buildPathWithParams('/sign-in-mfa')
+            const url = buildPathWithParams('/sign-in-mfa?method=email')
             router.replace(url)
             return
           }
