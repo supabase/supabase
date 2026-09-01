@@ -2,7 +2,9 @@ import { Admonition } from 'ui-patterns/Admonition'
 
 <Admonition type="warning">
 
-The MessageBird provider only works with the APIs before the [transition to Bird](https://bird.com/blog/messagebird-is-now-bird). If you are using a new Bird account, this provider will not work properly since it relies on using the old set of [MessageBird APIs](https://developers.messagebird.com/api/sms-messaging/).
+MessageBird is now [Bird](https://bird.com/blog/messagebird-is-now-bird). The **MessageBird** SMS provider in Supabase Auth still talks to the legacy Connectivity Platform (`rest.messagebird.com`) with an `AccessKey`. It does **not** accept Bird platform keys (`bk_us1_…` / `bk_eu1_…`). Those keys return `401` against the legacy API, so OTPs never send.
+
+Use this provider only if you still have a **legacy MessageBird AccessKey** (it does not start with `bk_`). If you signed up for a new Bird workspace, wait for Auth to route `bk_` keys and add Bird Verify. Those changes are tracked in [supabase/auth#2684](https://github.com/supabase/auth/pull/2684) and [supabase/auth#2685](https://github.com/supabase/auth/pull/2685).
 
 </Admonition>
 
@@ -10,36 +12,42 @@ The MessageBird provider only works with the APIs before the [transition to Bird
 
 You'll need:
 
-- A MessageBird account (sign up [here](https://dashboard.messagebird.com/en/sign-up))
+- A **legacy** MessageBird AccessKey (not a Bird `bk_` API key)
 - A Supabase project (create one [here](https://supabase.com/dashboard))
 - A mobile phone capable of receiving SMS
 
-## Set up MessageBird as your SMS provider
+New Bird accounts create keys under [Developers > API keys](https://bird.com/en-us/docs/guides/authentication). Those keys authenticate as `Authorization: Bearer bk_{region}_…` against `https://us1.platform.bird.com` or `https://eu1.platform.bird.com`. They are not the Live/Test AccessKey this provider expects.
 
-Start by logging into your MessageBird account and verify the mobile number you'll be using to test with [here](https://dashboard.messagebird.com/en/getting-started/sms). This is the number that will be receiving the SMS OTPs.
+## Set up MessageBird as your SMS provider (legacy AccessKey)
+
+If your account still uses the Connectivity Platform, start in the [legacy MessageBird dashboard](https://dashboard.messagebird.com/en/getting-started/sms) and verify the mobile number you'll use for tests. This is the number that will receive the SMS OTPs.
 
 ![Verify your own phone number](/docs/img/guides/auth-messagebird/1.png)
 
 ![Get your API Keys](/docs/img/guides/auth-messagebird/2.png)
 
-Navigate to the [dashboard settings](https://dashboard.messagebird.com/en/settings/sms) to set the default originator. The messagebird originator is the name or number from which the message is sent. For more information, you can refer to the messagebird article on choosing an originator [here](https://support.messagebird.com/hc/en-us/articles/115002628665-Choosing-an-originator)
+Navigate to the [dashboard settings](https://dashboard.messagebird.com/en/settings/sms) to set the default originator. The originator is the name or number from which the message is sent. See MessageBird's article on [choosing an originator](https://support.messagebird.com/hc/en-us/articles/115002628665-Choosing-an-originator).
 
 ![Set the default originator](/docs/img/guides/auth-messagebird/3.png)
 
-You will need the following values to get started:
+You will need:
 
-- Live API Key / Test API Key
+- Live API Key / Test API Key (legacy AccessKey)
 - MessageBird originator
 
-Now go to the [Auth > Providers](https://supabase.com/dashboard/project/_/auth/providers) page in the Supabase dashboard and select "Phone" from the Auth Providers list.
+Go to the [Auth > Providers](https://supabase.com/dashboard/project/_/auth/providers) page in the Supabase dashboard and select **Phone** from the Auth Providers list.
 
-You should see an option to enable the Phone provider.
-
-Toggle it on, and copy the 2 values over from the Messagebird dashboard. Click save.
+Enable the Phone provider, choose **MessageBird**, paste the two values from the MessageBird dashboard, and save.
 
 <Admonition>
 
-If you use the Test API Key, the OTP will not be delivered to the mobile number specified but messagebird will log the response in the dashboard. If the Live API Key is used instead, the OTP will be delivered and there will be a deduction in your free credits.
+If you use the Test API Key, the OTP is not delivered to the phone. MessageBird logs the response in the dashboard instead. A Live API Key delivers the OTP and deducts credits.
+
+</Admonition>
+
+<Admonition type="caution">
+
+If your key starts with `bk_`, do not paste it here. Auth will call `rest.messagebird.com` with `AccessKey` auth and the send will fail with `401`. There is no `bird_verify` provider in the dashboard yet.
 
 </Admonition>
 
@@ -47,6 +55,6 @@ If you use the Test API Key, the OTP will not be delivered to the mobile number 
 
 The SMS message sent to a phone containing an OTP code can be customized. This is useful if you need to mention a brand name or display a website address.
 
-Go to [Auth > Templates](https://supabase.com/dashboard/project/_/auth/templates) page in the Supabase dashboard.
+Go to the [Auth > Templates](https://supabase.com/dashboard/project/_/auth/templates) page in the Supabase dashboard.
 
 Use the variable `.Code` in the template to display the code.
