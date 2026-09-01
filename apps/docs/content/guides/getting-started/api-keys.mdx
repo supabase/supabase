@@ -119,7 +119,7 @@ Follow these guidelines when you work with secret keys:
 - Keep keys out of source control, including CI scripts. Use the tool's own secrets storage instead.
 - Use a separate secret key for each backend component. If one component leaks its key, you only rotate that one.
 - Delete a leaked key immediately. The browser block returns HTTP 401 Unauthorized, but an attacker can still use the key from other tools.
-- Log no more than the first 6 characters if you must record a key.
+- Log no more than 6 characters if you must record a key, counted from the random part after its prefix.
 - Store a SHA256 hash if you need to record which key was used.
 
 ### What to do if a secret key or `service_role` has been leaked or compromised?
