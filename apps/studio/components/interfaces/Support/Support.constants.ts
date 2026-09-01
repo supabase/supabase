@@ -78,8 +78,9 @@ export const CATEGORY_OPTIONS: {
         },
       ]),
   {
-    // Must stay 'Others' (plural) — Front's `Type` custom field is a fixed,
-    // case-sensitive enum that only contains the lowercased value 'others'.
+    // Must stay 'Others' (plural). The backend lowercases this before writing
+    // it to Front's `Type` custom field, which is a fixed, case-sensitive
+    // enum containing 'others' — not 'other'.
     value: 'Others' as const,
     label: 'Other',
     description: "An issue that doesn't fit the categories above",
