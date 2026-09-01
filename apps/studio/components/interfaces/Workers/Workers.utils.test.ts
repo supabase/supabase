@@ -112,8 +112,8 @@ describe('formatRuntime', () => {
     expect(formatRuntime('rust')).toBe('rust')
   })
 
-  it('reports unknown when the API omits the runtime', () => {
-    expect(formatRuntime(undefined)).toBe('Unknown')
+  it('labels an omitted runtime as custom', () => {
+    expect(formatRuntime(undefined)).toBe('Custom')
   })
 })
 
