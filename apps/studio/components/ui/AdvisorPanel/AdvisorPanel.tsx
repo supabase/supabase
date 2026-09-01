@@ -6,7 +6,6 @@ import type { AdvisorItem } from './AdvisorPanel.types'
 import {
   createAdvisorLintItems,
   createAdvisorNotificationItems,
-  getAdvisorTelemetryCategory,
   sortAdvisorItems,
 } from './AdvisorPanel.utils'
 import { AdvisorPanelBody } from './AdvisorPanelBody'
@@ -201,7 +200,12 @@ export const AdvisorPanel = () => {
       }
     }
 
-    const advisorCategory = getAdvisorTelemetryCategory(item)
+    const advisorCategory =
+      item.source === 'lint'
+        ? item.original.categories[0]
+        : item.source === 'signal'
+          ? 'SECURITY'
+          : undefined
     const advisorType =
       item.source === 'signal'
         ? item.type

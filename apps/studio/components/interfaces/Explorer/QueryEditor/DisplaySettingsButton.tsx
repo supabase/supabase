@@ -104,7 +104,11 @@ export const DisplaySettingsButton = ({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <ExplorerToolbarAction disabled={disabled} icon={<Settings2 />} tooltip="Result settings" />
+        <ExplorerToolbarAction
+          disabled={disabled}
+          icon={<Settings2 size={16} strokeWidth={2} />}
+          tooltip="Result settings"
+        />
       </PopoverTrigger>
       <PopoverContent
         side="bottom"
