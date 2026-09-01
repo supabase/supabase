@@ -202,6 +202,7 @@ export const PublicationsList = () => {
                     {publicationEvents.map((event) => (
                       <TableCell key={event.key}>
                         <Switch
+                          aria-label={`${event.event} for ${x.name}`}
                           size="small"
                           checked={(x as any)[event.key]}
                           disabled={!canUpdatePublications}
