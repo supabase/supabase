@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
 import { InlineLink } from '@/components/ui/InlineLink'
+import { getIdentityProviderConfig } from '@/lib/external-identity-providers'
 import { auth } from '@/lib/gotrue'
 import { classifyApiError } from '@/lib/telemetry/funnel-errors'
 import { useTrack } from '@/lib/telemetry/track'
@@ -23,7 +24,13 @@ export const SignInPartner = () => {
       const { data } = await auth.getSession()
 
       if (!data.session && partner && token) {
-        track('sign_in_submitted', { category: 'account', method: partner })
+        // partner comes from the URL hash unauthenticated; only registry-known values may
+        // enter the method vocabulary, anything else would let a crafted link poison it
+        const knownPartner = getIdentityProviderConfig(partner)
+        track('sign_in_submitted', {
+          category: 'account',
+          method: knownPartner ? partner : 'unknown',
+        })
         try {
           const { error } = await auth.signInWithIdToken({ provider: partner, token })
           if (error) {

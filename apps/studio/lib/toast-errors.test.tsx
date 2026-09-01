@@ -83,13 +83,13 @@ describe('ToastErrorTracker', () => {
       toastId = toast.loading('Signing in...')
     })
     act(() => {
+      toast.error('Invalid login credentials', { id: toastId })
       registerFunnelErrorToast(toastId, {
         origin: 'signin',
         errorCategory: 'api',
         errorReason: 'invalid_credentials',
         errorCode: 400,
       })
-      toast.error('Invalid login credentials', { id: toastId })
     })
     await waitFor(() =>
       expect(mockTrack).toHaveBeenCalledWith('dashboard_error_created', {

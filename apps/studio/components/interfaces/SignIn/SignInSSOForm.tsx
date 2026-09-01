@@ -46,7 +46,11 @@ export const SignInSSOForm = () => {
     let token = captchaToken
     if (!token) {
       const captcha = await resolveCaptchaToken(captchaRef, trackFunnelError, toastId)
-      if (!captcha.ok) return
+      if (!captcha.ok) {
+        setCaptchaToken(null)
+        captchaRef.current?.resetCaptcha()
+        return
+      }
       token = captcha.token
     }
 
