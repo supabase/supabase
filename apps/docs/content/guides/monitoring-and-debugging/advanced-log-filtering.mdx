@@ -176,7 +176,7 @@ alter role postgres set pgaudit.log to 'function, write, ddl';
 
 To help with debugging, we recommend adjusting the log scope to only relevant statements as having too wide of a scope would result in a lot of noise in your Postgres logs.
 
-Note that in the above example, the role is set to `postgres`. To log user traffic flowing through the [HTTP APIs](/docs/guides/database/api#rest-api-overview), which use PostgREST, set your configuration values for the `authenticator`.
+Note that in the above example, the role is set to `postgres`. To log user traffic flowing through the [HTTP APIs](/docs/guides/api#rest-api-overview), which use PostgREST, set your configuration values for the `authenticator`.
 
 ```sql
 -- for API-related logs
