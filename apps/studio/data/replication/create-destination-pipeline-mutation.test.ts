@@ -37,7 +37,7 @@ describe('buildBigQueryApiConfig', () => {
     serviceAccountKey: '{}',
   }
 
-  it('maps the destination config to the API shape', () => {
+  it('omits table_options when none are configured', () => {
     expect(buildBigQueryApiConfig(baseConfig)).toEqual({
       big_query: {
         project_id: 'my-project',
@@ -45,7 +45,125 @@ describe('buildBigQueryApiConfig', () => {
         service_account_key: '{}',
         connection_pool_size: undefined,
         max_staleness_mins: undefined,
+        table_options: undefined,
       },
+    })
+  })
+
+  it('maps per-table partitioning and clustering to the API shape', () => {
+    expect(
+      buildBigQueryApiConfig({
+        ...baseConfig,
+        tableOptions: [
+          {
+            tableId: 16_408,
+            partitionBy: { kind: 'time_column', column: 'created_at', granularity: 'day' },
+            clusterBy: ['customer_id', 'region'],
+          },
+          {
+            tableId: 16_409,
+            partitionBy: {
+              kind: 'integer_range',
+              column: 'shard',
+              start: 0,
+              end: 100,
+              interval: 10,
+            },
+          },
+        ],
+      })
+    ).toMatchObject({
+      big_query: {
+        table_options: {
+          tables: [
+            {
+              table_id: 16_408,
+              partition_by: { kind: 'time_column', column: 'created_at', granularity: 'day' },
+              cluster_by: ['customer_id', 'region'],
+            },
+            {
+              table_id: 16_409,
+              partition_by: {
+                kind: 'integer_range',
+                column: 'shard',
+                start: 0,
+                end: 100,
+                interval: 10,
+              },
+              cluster_by: undefined,
+            },
+          ],
+        },
+      },
+    })
+  })
+
+  it('omits a time-column partition that has no column selected', () => {
+    expect(
+      buildBigQueryApiConfig({
+        ...baseConfig,
+        tableOptions: [
+          { tableId: 16_408, partitionBy: { kind: 'time_column', column: '', granularity: 'day' } },
+          {
+            tableId: 16_409,
+            partitionBy: { kind: 'time_column', column: '', granularity: 'day' },
+            clusterBy: ['customer_id'],
+          },
+        ],
+      })
+    ).toMatchObject({
+      big_query: {
+        table_options: {
+          tables: [
+            {
+              table_id: 16_409,
+              partition_by: undefined,
+              cluster_by: ['customer_id'],
+            },
+          ],
+        },
+      },
+    })
+  })
+
+  it('omits a table entry that has neither partitioning nor clustering set', () => {
+    expect(
+      buildBigQueryApiConfig({
+        ...baseConfig,
+        tableOptions: [
+          { tableId: 16_408, partitionBy: undefined, clusterBy: [] },
+          {
+            tableId: 16_409,
+            partitionBy: { kind: 'ingestion_time', granularity: 'day' },
+          },
+        ],
+      })
+    ).toMatchObject({
+      big_query: {
+        table_options: {
+          tables: [
+            {
+              table_id: 16_409,
+              partition_by: { kind: 'ingestion_time', granularity: 'day' },
+            },
+          ],
+        },
+      },
+    })
+  })
+
+  it('sends table_options: null on update when every configured table is removed or blank', () => {
+    expect(
+      buildBigQueryUpdateApiConfig({
+        ...baseConfig,
+        tableOptions: [{ tableId: 16_408, clusterBy: [] }],
+      })
+    ).toMatchObject({ big_query: { table_options: null } })
+  })
+
+  it('sends table_options: null on update when every configured table is removed', () => {
+    expect(buildBigQueryUpdateApiConfig({ ...baseConfig, tableOptions: [] })).toMatchObject({
+      big_query: { table_options: null },
     })
   })
 

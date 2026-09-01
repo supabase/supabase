@@ -33,6 +33,43 @@ export type BigQueryDestinationConfig = {
   serviceAccountKey: string
   connectionPoolSize?: number
   maxStalenessMins?: number
+  tableOptions?: BigQueryTableOption[]
+}
+
+export const BIGQUERY_TIME_PARTITION_GRANULARITIES = ['hour', 'day', 'month', 'year'] as const
+export const BIGQUERY_MAX_CLUSTERING_COLUMNS = 4
+
+export type BigQueryTimePartitionGranularity =
+  (typeof BIGQUERY_TIME_PARTITION_GRANULARITIES)[number]
+
+export type BigQueryPartitionBy =
+  | { kind: 'time_column'; column: string; granularity?: BigQueryTimePartitionGranularity }
+  | {
+      kind: 'integer_range'
+      column: string
+      start: number | ''
+      end: number | ''
+      interval: number | ''
+    }
+  | { kind: 'ingestion_time'; granularity?: BigQueryTimePartitionGranularity }
+
+type CompleteBigQueryPartitionBy =
+  | Exclude<BigQueryPartitionBy, { kind: 'integer_range' }>
+  | {
+      kind: 'integer_range'
+      column: string
+      start: number
+      end: number
+      interval: number
+    }
+
+// A single source table's BigQuery partitioning/clustering configuration. `tableId` is the
+// source Postgres table OID, stable across renames, matching the id used by the replication
+// tables/columns endpoints.
+export type BigQueryTableOption = {
+  tableId: number
+  partitionBy?: BigQueryPartitionBy
+  clusterBy?: string[]
 }
 
 export type IcebergDestinationConfig = {
@@ -81,6 +118,75 @@ function isDucklakeSupabaseConfig(
   return 'catalogProjectRef' in config
 }
 
+const hasClusteringColumns = (clusterBy: string[] | undefined) => (clusterBy?.length ?? 0) > 0
+
+const isCompleteBigQueryPartition = (
+  partitionBy: BigQueryPartitionBy | undefined
+): partitionBy is CompleteBigQueryPartitionBy => {
+  if (!partitionBy) return false
+  if (partitionBy.kind === 'ingestion_time') return true
+  if (!('column' in partitionBy) || partitionBy.column.trim().length === 0) return false
+  if (partitionBy.kind !== 'integer_range') return true
+  return (
+    typeof partitionBy.start === 'number' &&
+    typeof partitionBy.end === 'number' &&
+    typeof partitionBy.interval === 'number'
+  )
+}
+
+const buildBigQueryPartitionByApiConfig = (partitionBy: CompleteBigQueryPartitionBy) => {
+  switch (partitionBy.kind) {
+    case 'time_column':
+      return {
+        kind: partitionBy.kind,
+        column: partitionBy.column,
+        granularity: partitionBy.granularity,
+      }
+    case 'integer_range':
+      return {
+        kind: partitionBy.kind,
+        column: partitionBy.column,
+        start: partitionBy.start,
+        end: partitionBy.end,
+        interval: partitionBy.interval,
+      }
+    case 'ingestion_time':
+      return { kind: partitionBy.kind, granularity: partitionBy.granularity }
+  }
+}
+
+const buildBigQueryTableOptionApiConfig = (option: BigQueryTableOption) => ({
+  table_id: option.tableId,
+  partition_by: isCompleteBigQueryPartition(option.partitionBy)
+    ? buildBigQueryPartitionByApiConfig(option.partitionBy)
+    : undefined,
+  cluster_by: hasClusteringColumns(option.clusterBy) ? option.clusterBy : undefined,
+})
+
+const isBigQueryTableOptionConfigured = (option: BigQueryTableOption) =>
+  isCompleteBigQueryPartition(option.partitionBy) || hasClusteringColumns(option.clusterBy)
+
+const getConfiguredBigQueryTableOptions = (tableOptions: BigQueryTableOption[] | undefined) =>
+  (tableOptions ?? []).filter(isBigQueryTableOptionConfigured)
+
+const buildBigQueryTableOptionsApiConfig = (tableOptions: BigQueryTableOption[] | undefined) => {
+  const configuredTableOptions = getConfiguredBigQueryTableOptions(tableOptions)
+
+  if (tableOptions === undefined || configuredTableOptions.length === 0) return undefined
+  return { tables: configuredTableOptions.map(buildBigQueryTableOptionApiConfig) }
+}
+
+// Updates must send null to clear previously stored table options; omitting the property leaves
+// the current value unchanged.
+const buildBigQueryTableOptionsUpdateApiConfig = (
+  tableOptions: BigQueryTableOption[] | undefined
+) => {
+  const configuredTableOptions = (tableOptions ?? []).filter(isBigQueryTableOptionConfigured)
+  if (tableOptions === undefined) return undefined
+  if (configuredTableOptions.length === 0) return null
+  return { tables: configuredTableOptions.map(buildBigQueryTableOptionApiConfig) }
+}
+
 // Maps the studio-side BigQuery config to the snake_case `{ big_query: ... }` payload accepted
 // by the platform API. Shared by the create and validate mutations.
 export function buildBigQueryApiConfig(config: BigQueryDestinationConfig): CreateBigQueryApiConfig {
@@ -91,6 +197,7 @@ export function buildBigQueryApiConfig(config: BigQueryDestinationConfig): Creat
       service_account_key: config.serviceAccountKey,
       connection_pool_size: config.connectionPoolSize,
       max_staleness_mins: config.maxStalenessMins,
+      table_options: buildBigQueryTableOptionsApiConfig(config.tableOptions),
     },
   }
 }
@@ -105,6 +212,7 @@ export function buildBigQueryUpdateApiConfig(
       service_account_key: optionalSecret(config.serviceAccountKey),
       connection_pool_size: config.connectionPoolSize,
       max_staleness_mins: config.maxStalenessMins,
+      table_options: buildBigQueryTableOptionsUpdateApiConfig(config.tableOptions),
     },
   }
 }
