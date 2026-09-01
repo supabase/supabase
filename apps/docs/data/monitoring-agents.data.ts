@@ -6,9 +6,9 @@ export const monitoringAgents = {
     name: 'Health monitor',
     promptId: 'monitoring-agent-health' as AiPromptId,
     schedule: {
-      cadence: 'every 15 minutes',
-      intervalMinutes: 15,
-      scheduled: 'Run it every 15 minutes on a schedule.',
+      cadence: 'once per hour',
+      intervalMinutes: 60,
+      scheduled: 'Run it once per hour on a schedule.',
       onDemand:
         'Run it on demand after a deployment, or whenever you need a health check outside that interval.',
     },

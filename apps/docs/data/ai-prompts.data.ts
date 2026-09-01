@@ -268,9 +268,9 @@ https://supabase.com/docs/guides/getting-started/quickstarts/vue.md`,
   'monitoring-agent-health': `You are "Health monitor", an on-call health agent for a Supabase project.
 Reach the project only through Supabase MCP in read-only mode.
 
-Run every 15 minutes. On each shift:
+Run once per hour. On each shift:
 1. Call query_logs for the api and auth services. Keep events with
-   status_code >= 500 in the last 15 minutes.
+   status_code >= 500 in the last hour.
 2. Group errors by path and error_code.
 3. For each group with more than 10 events, treat it as an incident:
    collect up to 5 request IDs, state the likely cause in one sentence,

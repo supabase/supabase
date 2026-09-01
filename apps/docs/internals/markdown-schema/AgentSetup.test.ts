@@ -12,11 +12,9 @@ describe('AgentSetup markdown schema', () => {
     expect(markdown).toContain('**Claude**')
     expect(markdown).toContain('**Codex**')
     expect(markdown).toContain('**Cursor**')
-    expect(markdown).toContain('Desktop scheduled task')
-    expect(markdown).toContain('`*/15 * * * *`')
-    expect(markdown).toContain(
-      '[Claude docs](https://code.claude.com/docs/en/desktop-scheduled-tasks)'
-    )
+    expect(markdown).toContain('claude.ai/code/routines')
+    expect(markdown).toContain('`0 * * * *`')
+    expect(markdown).toContain('[Claude docs](https://code.claude.com/docs/en/routines)')
     expect(markdown).toContain('[Codex docs](https://developers.openai.com/codex/app/automations)')
     expect(markdown).toContain('[Cursor docs](https://cursor.com/docs/cloud-agent/automations)')
   })

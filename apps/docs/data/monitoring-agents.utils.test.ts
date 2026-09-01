@@ -63,13 +63,13 @@ describe('getCronExpression', () => {
 })
 
 describe('getMonitoringAgentHarnesses', () => {
-  it('includes a Desktop-task note for sub-hourly Claude routines', () => {
+  it('uses a Claude routine for hourly health checks', () => {
     const claude = getMonitoringAgentHarnesses(monitoringAgents.health).find(
       (harness) => harness.key === 'claude'
     )
 
-    expect(claude?.intro).toContain('Desktop scheduled task')
-    expect(claude?.note).toContain('1-hour minimum')
+    expect(claude?.intro).toContain('Create a Claude routine')
+    expect(claude?.note).toBeUndefined()
   })
 
   it('omits the Desktop-task note when the cadence is hourly or slower', () => {
