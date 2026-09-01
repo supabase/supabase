@@ -2,9 +2,6 @@
 
 Supabase is deprecating the `anon` and `service_role` keys by the end of 2026. Use the publishable (`sb_publishable_xxx`) and secret (`sb_secret_xxx`) keys instead. For the reasoning behind the change, see [the announcement on GitHub](https://github.com/orgs/supabase/discussions/29260).
 
-In most cases you can get keys from your project's [**Connect** dialog](/dashboard/project/\_?showConnect=true&connectTab={{ .tab }}&framework={{ .framework }}). To pick a specific key, open the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard.
-
-- **For publishable and secret keys**, open the **API Keys** tab. If you don't have a publishable key, select **Create new API Keys**. Copy the **Publishable key** for client-side operations, and a key from **Secret keys** for server-side operations.
-- **For legacy keys**, open the **Legacy API Keys** tab. Copy the `anon` key for client-side operations and the `service_role` key for server-side operations.
+In most cases you can get keys from your project's [**Connect** dialog](/dashboard/project/\_?showConnect=true&connectTab={{ .tab }}&framework={{ .framework }}). For every way to retrieve a key, including the CLI and the Management API, refer to [Find your keys](/docs/guides/getting-started/api-keys#find-your-keys).
 
 </Admonition>

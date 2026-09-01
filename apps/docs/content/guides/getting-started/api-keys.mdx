@@ -10,7 +10,7 @@ This guide covers:
 
 - [Which key do you use?](#which-key-do-you-use) answers that in one table.
 - [How API keys work](#how-api-keys-work) explains what each key type is and which Postgres role it maps to.
-- [Find and use your keys](#find-and-use-your-keys) covers getting a key out of the Dashboard and rotating one that leaked.
+- [Find and use your keys](#find-and-use-your-keys) covers the ways to retrieve a key and how to rotate one that leaked.
 - [Security reference](#security-reference) lists what publishable keys don't protect against, how to handle secret keys, and the known limitations.
 
 ## Which key do you use?
@@ -106,8 +106,91 @@ Secret keys improve on the old JWT-based `service_role` key, and we recommend th
 
 ### Find your keys
 
-1. Open your project's [**Connect** dialog](/dashboard/project/_?showConnect=true). It shows the keys for the framework you select, which is the fastest path for most setups.
-2. To pick a specific key, or to see every key your project has, open the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard.
+Pick the path that matches where you are working.
+
+Every path below reads keys that already exist. If your project has no publishable or secret key yet, create them first in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+  queryGroup="retrieval-method"
+>
+<TabPanel id="dashboard" label="Dashboard">
+
+Use the Dashboard when you are setting up a project by hand. It needs nothing but a signed-in session.
+
+1. Open your project's [**Connect** dialog](/dashboard/project/_?showConnect=true). It shows the URL and publishable key for the framework you select, ready to paste into `.env`.
+2. To pick a specific key, or to see every key your project has, open the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard instead.
+3. Copy each value into your project's `.env` file.
+
+</TabPanel>
+<TabPanel id="cli" label="Supabase CLI">
+
+Use the CLI to script setup, or to read the keys for a preview branch. This path needs the Supabase CLI, so [install it](/docs/guides/local-development/cli/getting-started#installing-the-supabase-cli) first.
+
+1. Sign in, if you haven't already:
+
+   ```bash
+   supabase login
+   ```
+
+2. Find the project ref, if you don't know it:
+
+   ```bash
+   supabase projects list
+   ```
+
+3. List the keys for that project:
+
+   ```bash
+   supabase projects api-keys --project-ref your-project-ref
+   ```
+
+Pass the branch's own project ref to read the keys for a preview branch. A branch has its own keys, and the command returns the linked project's keys when you omit the flag.
+
+</TabPanel>
+<TabPanel id="management-api" label="Management API">
+
+Use the Management API to fetch keys from your own tooling, such as a deploy script or an internal provisioning service.
+
+Authenticate with a [personal access token](/dashboard/account/tokens). An OAuth application needs the `secrets:read` scope, and a fine-grained token needs the `api_gateway_keys_read` permission. Without either, the request returns 403 Forbidden.
+
+```bash
+export PROJECT_REF="your-project-ref"
+export SUPABASE_ACCESS_TOKEN="your-personal-access-token"
+
+curl -X GET "https://api.supabase.com/v1/projects/$PROJECT_REF/api-keys?reveal=true" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  | jq '.[] | {name, type}'
+```
+
+`reveal=true` includes the key values in the response, and this `jq` filter drops them again so they stay out of your terminal. Write the values straight into your secret store rather than printing them, because anything on standard output lands in your CI logs. See [Get project API keys](/docs/reference/api/v1-get-project-api-keys) for the full response.
+
+</TabPanel>
+<TabPanel id="local" label="Local stack">
+
+A local stack mints its own keys. They are unrelated to your hosted project's keys, so a local key never grants access to your hosted data.
+
+This path needs the Supabase CLI and a container runtime. See [Running a local Supabase project](/docs/guides/local-development/cli/getting-started#running-a-local-supabase-project) for both.
+
+1. Start the stack:
+
+   ```bash
+   supabase start
+   ```
+
+   The publishable and secret keys are in the output, under **Authentication Keys**.
+
+2. Print them again at any time while the stack is running:
+
+   ```bash
+   supabase status
+   ```
+
+</TabPanel>
+</Tabs>
 
 ### Rotate a leaked or compromised key [#leaked-key]
 
