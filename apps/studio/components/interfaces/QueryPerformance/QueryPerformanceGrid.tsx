@@ -13,6 +13,8 @@ import {
   Sheet,
   SheetContent,
   SheetDescription,
+  SheetHeader,
+  SheetSection,
   SheetTitle,
   Tabs,
   TabsContent,
@@ -73,6 +75,8 @@ const calculateTimeConsumedWidth = (data: QueryPerformanceRow[]) => {
   return Math.min(maxWidth, 300)
 }
 
+type View = 'details' | 'suggestion'
+
 export const QueryPerformanceGrid = ({
   aggregatedData,
   isLoading,
@@ -97,7 +101,7 @@ export const QueryPerformanceGrid = ({
   })
   const dataGridContainerRef = useRef<HTMLDivElement>(null)
 
-  const [view, setView] = useState<'details' | 'suggestion'>('details')
+  const [view, setView] = useState<View>('details')
   const [selectedRow, setSelectedRow] = useState<number>()
 
   const columns = QUERY_PERFORMANCE_COLUMNS.map((col) => {
@@ -110,7 +114,7 @@ export const QueryPerformanceGrid = ({
       resizable: true,
       minWidth:
         col.id === 'prop_total_time'
-          ? calculateTimeConsumedWidth((aggregatedData as any) ?? [])
+          ? calculateTimeConsumedWidth(aggregatedData ?? [])
           : (col.minWidth ?? 120),
       sortable: !nonSortableColumns.includes(col.id),
       headerCellClass: 'first:pl-6 cursor-pointer',
@@ -135,6 +139,7 @@ export const QueryPerformanceGrid = ({
                     className="p-1 h-5 w-5 shrink-0"
                     icon={<ChevronDown size={14} className="text-foreground-muted" />}
                     onClick={(e) => e.stopPropagation()}
+                    aria-label={`Sort options for ${col.name}`}
                   />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
@@ -590,13 +595,9 @@ export const QueryPerformanceGrid = ({
         }}
         modal={false}
       >
-        <SheetTitle className="sr-only">Query details</SheetTitle>
-        <SheetDescription className="sr-only">
-          Query Performance Details &amp; Indexes
-        </SheetDescription>
         <SheetContent
           side="right"
-          className="flex flex-col h-full bg-studio border-l lg:w-[calc(100vw-802px)]! max-w-[700px] w-full"
+          className="flex flex-col gap-0"
           hasOverlay={false}
           onInteractOutside={(event) => {
             if (dataGridContainerRef.current?.contains(event.target as Node)) {
@@ -604,45 +605,54 @@ export const QueryPerformanceGrid = ({
             }
           }}
         >
-          <Tabs
-            value={view}
-            className="flex flex-col h-full"
-            onValueChange={(value: any) => setView(value)}
-          >
-            <div className="px-5 border-b">
-              <TabsList className="px-0 flex gap-x-4 min-h-[46px] border-b-0 [&>button]:h-[47px]">
-                <TabsTrigger
-                  value="details"
-                  className="px-0 pb-0 data-[state=active]:bg-transparent shadow-none!"
-                >
-                  Query details
-                </TabsTrigger>
-                {selectedRow !== undefined && canShowIndexesTab && (
+          <SheetHeader className="sr-only">
+            <SheetTitle>Query details</SheetTitle>
+            <SheetDescription>Query Performance Details &amp; Indexes</SheetDescription>
+          </SheetHeader>
+
+          <div className="overflow-auto grow px-0">
+            <Tabs
+              value={view}
+              className="flex flex-col h-full"
+              onValueChange={(value) => setView(value as View)}
+            >
+              <div className="border-b">
+                <TabsList className="px-5 flex gap-x-4 min-h-[46px] border-b-0 [&>button]:h-[47px]">
                   <TabsTrigger
-                    value="suggestion"
+                    value="details"
                     className="px-0 pb-0 data-[state=active]:bg-transparent shadow-none!"
                   >
-                    Indexes
+                    Query details
                   </TabsTrigger>
-                )}
-              </TabsList>
-            </div>
+                  {selectedRow !== undefined && canShowIndexesTab && (
+                    <TabsTrigger
+                      value="suggestion"
+                      className="px-0 pb-0 data-[state=active]:bg-transparent shadow-none!"
+                    >
+                      Indexes
+                    </TabsTrigger>
+                  )}
+                </TabsList>
+              </div>
 
-            <TabsContent value="details" className="mt-0 grow min-h-0 overflow-y-auto">
-              {selectedRow !== undefined && (
-                <QueryDetail
-                  selectedRow={reportData[selectedRow]}
-                  onClickViewSuggestion={() => setView('suggestion')}
-                  onClose={() => setSelectedRow(undefined)}
-                />
-              )}
-            </TabsContent>
-            {selectedRow !== undefined && canShowIndexesTab && (
-              <TabsContent value="suggestion" className="mt-0 grow min-h-0 overflow-y-auto">
-                <QueryIndexes selectedRow={reportData[selectedRow]} />
-              </TabsContent>
-            )}
-          </Tabs>
+              <SheetSection className="pt-0">
+                <TabsContent value="details" className="mt-0 grow min-h-0 overflow-y-auto">
+                  {selectedRow !== undefined && (
+                    <QueryDetail
+                      selectedRow={reportData[selectedRow]}
+                      onClickViewSuggestion={() => setView('suggestion')}
+                      onClose={() => setSelectedRow(undefined)}
+                    />
+                  )}
+                </TabsContent>
+                {selectedRow !== undefined && canShowIndexesTab && (
+                  <TabsContent value="suggestion" className="mt-0 grow min-h-0 overflow-y-auto">
+                    <QueryIndexes selectedRow={reportData[selectedRow]} />
+                  </TabsContent>
+                )}
+              </SheetSection>
+            </Tabs>
+          </div>
         </SheetContent>
       </Sheet>
     </div>

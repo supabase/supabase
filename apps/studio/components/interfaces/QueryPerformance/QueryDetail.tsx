@@ -128,7 +128,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
         <div className="absolute bottom-[-13px] left-0 right-0 w-full flex items-center justify-center z-10">
           <Button
             variant="default"
-            className="rounded-full"
+            className="rounded-full !bg-background"
             icon={<ChevronsUpDown />}
             onClick={() => setIsExpanded(!isExpanded)}
           >
