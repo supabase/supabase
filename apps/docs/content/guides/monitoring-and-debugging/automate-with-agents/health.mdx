@@ -7,7 +7,7 @@ description: 'An on-call triage agent that watches logs for 5xx spikes, Auth fai
 
 ```mermaid
 flowchart TD
-  Schedule([Every 15 minutes]) --> Inspect[query_logs]
+  Schedule([Every hour]) --> Inspect[query_logs]
   Inspect --> Signals["5xx, Auth failures, error-rate spikes"]
   Signals --> Threshold{Threshold crossed?}
   Threshold -->|Yes| Report[Incident report]
