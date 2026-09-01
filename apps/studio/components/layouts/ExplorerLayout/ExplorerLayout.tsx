@@ -1,6 +1,5 @@
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
-import { SqlEditor } from 'icons'
 import { Home, MessageCirclePlus, NotebookText, Plus, SquareCode } from 'lucide-react'
 import Link from 'next/link'
 import { ComponentProps, ReactNode, useEffect, useEffectEvent, useState } from 'react'
@@ -13,6 +12,7 @@ import {
   TabsTrigger,
 } from 'ui'
 
+import { EditorNavigationButton } from '../EditorNavigationButton'
 import { ProjectLayoutWithAuth } from '../ProjectLayout'
 import { EditorTabs } from '../Tabs/Tabs'
 import { type ExplorerResourceType } from './ExplorerLayout.constants'
@@ -26,8 +26,7 @@ import {
   useCreateNotebook,
   useCreateQuery,
 } from '@/components/interfaces/Explorer/hooks'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useIsTemporarySqlEditorVisit } from '@/hooks/misc/useIsTemporarySqlEditorVisit'
 import {
   editorEntityTypes,
   EXPLORER_HOME_TAB,
@@ -47,10 +46,7 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
 
   const [section, setSection] = useState<ExplorerResourceType>()
 
-  const [, setIsTemporarySqlEditorVisit] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.SQL_EDITOR_TEMPORARY_FROM_EXPLORER(ref ?? ''),
-    false
-  )
+  const { setIsTemporary: setIsTemporarySqlEditorVisit } = useIsTemporarySqlEditorVisit(ref)
 
   useEffect(() => {
     if (ref) setIsTemporarySqlEditorVisit(false)
@@ -106,33 +102,21 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
 
 const BackToSqlEditorButton = () => {
   const { ref } = useParams()
-  const [, setIsTemporary] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.SQL_EDITOR_TEMPORARY_FROM_EXPLORER(ref ?? ''),
-    false
-  )
+  const { setIsTemporary } = useIsTemporarySqlEditorVisit(ref)
 
   if (!ref) return null
 
   return (
-    <ButtonTooltip
+    <EditorNavigationButton
       asChild
-      size="tiny"
-      variant="outline"
-      className="size-7 shrink-0 px-0"
-      icon={<SqlEditor size={14} strokeWidth={1.5} />}
-      tooltip={{
-        content: {
-          side: 'bottom',
-          text: 'Temporarily switch to SQL Editor to access your snippets',
-        },
-      }}
+      tooltip="Temporarily switch to SQL Editor to access your snippets"
     >
       <Link
         href={`/project/${ref}/sql`}
         aria-label="Switch to SQL Editor"
         onClick={() => setIsTemporary(true)}
       />
-    </ButtonTooltip>
+    </EditorNavigationButton>
   )
 }
 

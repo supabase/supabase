@@ -1,15 +1,14 @@
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { SqlEditor } from 'icons'
+import { useParams } from 'common'
 import { usePathname, useRouter } from 'next/navigation'
 import { ComponentProps, ReactNode } from 'react'
 import { cn } from 'ui'
 
+import { EditorNavigationButton } from '../EditorNavigationButton'
 import { ProjectLayoutWithAuth } from '../ProjectLayout'
 import { CollapseButton } from '../Tabs/CollapseButton'
 import { EditorTabs } from '../Tabs/Tabs'
 import { useEditorType } from './EditorsLayout.hooks'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useIsTemporarySqlEditorVisit } from '@/hooks/misc/useIsTemporarySqlEditorVisit'
 import { useTabsStateSnapshot } from '@/state/tabs'
 
 export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayoutWithAuth> {
@@ -87,20 +86,13 @@ export const EditorBaseLayout = ({
 const BackToExplorerButton = () => {
   const { ref } = useParams()
   const router = useRouter()
-  const [isTemporary, setIsTemporary] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.SQL_EDITOR_TEMPORARY_FROM_EXPLORER(ref ?? ''),
-    false
-  )
+  const { isTemporary, setIsTemporary } = useIsTemporarySqlEditorVisit(ref)
 
   if (!ref || !isTemporary) return null
 
   return (
-    <ButtonTooltip
-      size="tiny"
-      variant="outline"
-      className="size-7 shrink-0 px-0"
-      icon={<SqlEditor size={14} strokeWidth={1.5} />}
-      tooltip={{ content: { side: 'bottom', text: 'Back to Explorer' } }}
+    <EditorNavigationButton
+      tooltip="Back to Explorer"
       onClick={() => {
         setIsTemporary(false)
         router.push(`/project/${ref}/explorer`)
