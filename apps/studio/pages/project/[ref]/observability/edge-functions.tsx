@@ -8,7 +8,7 @@ import { Button } from 'ui'
 
 import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
-import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
+import { ReportPadding } from '@/components/interfaces/Reports/ReportPadding'
 import {
   EDGE_FUNCTION_REGIONS,
   REPORT_DATERANGE_HELPER_LABELS,
@@ -243,7 +243,7 @@ const EdgeFunctionsUsage = () => {
                   value: region.key,
                   label: (
                     <div className="flex items-center gap-x-2">
-                      <RegionFlag aria-hidden="true" className="w-4" region={region.key} />
+                      <RegionFlag className="w-4" region={region.key} />
                       <div className="flex flex-wrap gap-x-2 items-center">
                         <span className="text-foreground text-xs">{region.label}</span>
                         <span className="text-foreground-lighter text-xs">{region.key}</span>

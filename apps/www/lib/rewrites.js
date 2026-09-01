@@ -75,6 +75,10 @@ const rewrites = [
     source: '/.well-known/security.txt',
     destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/.well-known/security.txt`,
   },
+  {
+    source: '/openapi.json',
+    destination: 'https://api.supabase.com/api/v1-json',
+  },
   { source: '/feed.xml', destination: `/rss.xml` },
 ]
 

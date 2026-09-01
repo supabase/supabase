@@ -37,6 +37,7 @@ Barco Fourie
 Barry Roodt
 Beng Eu
 Benjamin Coenen
+Beth Long
 Bo Lu
 Bobbie Soedirgo
 Brad Gyger
@@ -272,6 +273,7 @@ Sana Cordeaux
 Sasi Kanumuri
 Sara Read
 Satya Rohith Gannamanedi
+Sean Geoghegan
 Sean Oliver
 Sean Romberg
 Sean Thompson
@@ -282,6 +284,7 @@ Shane E
 Shaun Newman
 Shardul Borhade
 Shreekar Shetty
+Simon Tomlinson
 Sreyas Udayavarman
 Stephanie Jackson (stejacks)
 Stephen Morgan

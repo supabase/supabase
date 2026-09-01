@@ -122,6 +122,7 @@ describe('applyNotebookCacheEffects', () => {
   afterEach(() => {
     delete notebooksState.notebooks[NOTEBOOK.id]
     notebooksState.needsSaving.clear()
+    notebooksState.serverDivergedWhileDirty.clear()
   })
 
   it('invalidates the nav list and evicts an upserted, saved notebook from the cache', async () => {
@@ -170,7 +171,7 @@ describe('applyNotebookCacheEffects', () => {
     expect(notebooksState.notebooks[NOTEBOOK.id]).toBeUndefined()
   })
 
-  it('leaves a dirty (unsaved) notebook in the store untouched', async () => {
+  it('records an assistant update while leaving a dirty notebook untouched', async () => {
     notebooksState.addNotebook({ projectRef: PROJECT_REF, notebook: NOTEBOOK })
     const queryClient = new QueryClient()
 
@@ -181,9 +182,10 @@ describe('applyNotebookCacheEffects', () => {
     })
 
     expect(notebooksState.notebooks[NOTEBOOK.id]).toBeDefined()
+    expect(notebooksState.serverDivergedWhileDirty.get(NOTEBOOK.id)).toBe('updated')
   })
 
-  it('leaves an edited (unsaved, non-empty) notebook untouched', async () => {
+  it('records an assistant deletion while leaving an edited notebook untouched', async () => {
     notebooksState.setNotebook({ projectRef: PROJECT_REF, notebook: NOTEBOOK })
     notebooksState.updateCells({
       id: NOTEBOOK.id,
@@ -195,10 +197,25 @@ describe('applyNotebookCacheEffects', () => {
     await applyNotebookCacheEffects({
       queryClient,
       projectRef: PROJECT_REF,
-      effects: [{ _tag: 'upserted', toolCallId: 'call-1', id: NOTEBOOK.id }],
+      effects: [{ _tag: 'deleted', toolCallId: 'call-1', id: NOTEBOOK.id }],
     })
 
     expect(notebooksState.notebooks[NOTEBOOK.id]).toBeDefined()
+    expect(notebooksState.serverDivergedWhileDirty.get(NOTEBOOK.id)).toBe('deleted')
+  })
+
+  it('does not record a conflict for a different notebook', async () => {
+    notebooksState.addNotebook({ projectRef: PROJECT_REF, notebook: NOTEBOOK })
+    const queryClient = new QueryClient()
+
+    await applyNotebookCacheEffects({
+      queryClient,
+      projectRef: PROJECT_REF,
+      effects: [{ _tag: 'upserted', toolCallId: 'call-1', id: 'other-notebook' }],
+    })
+
+    expect(notebooksState.serverDivergedWhileDirty.has(NOTEBOOK.id)).toBe(false)
+    expect(notebooksState.serverDivergedWhileDirty.has('other-notebook')).toBe(false)
   })
 
   it('no-ops entirely for an empty effects list', async () => {

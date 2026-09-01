@@ -1,11 +1,14 @@
+import { useParams } from 'common'
 import { NotebookText } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button, cn } from 'ui'
 
 import {
   formatNotebookDiffSummary,
   getEntryKey,
+  notebookEntriesNeedDatabaseLookup,
   summarizeNotebookDiff,
+  type NotebookDatabaseContext,
 } from './AssistantNotebookPreview.utils'
 import { AssistantNotebookPreviewCell } from './AssistantNotebookPreviewCell'
 import {
@@ -16,6 +19,7 @@ import {
 } from '@/components/interfaces/Explorer/ExplorerToolbar'
 import type { QueryResult } from '@/components/interfaces/Explorer/types'
 import type { NotebookCellDiffEntry } from '@/data/content/notebooks/notebook-operations'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 
 export interface AssistantNotebookPreviewProps {
   entries: NotebookCellDiffEntry[]
@@ -48,8 +52,27 @@ export const AssistantNotebookPreview = ({
   results,
   className,
 }: AssistantNotebookPreviewProps) => {
+  const { ref: projectRef } = useParams()
   const [isShowingAllEntries, setIsShowingAllEntries] = useState(false)
   const [expandedOverrides, setExpandedOverrides] = useState<Record<string, boolean>>({})
+
+  const needsDatabaseLookup = notebookEntriesNeedDatabaseLookup(entries, projectRef)
+  const {
+    data: databases,
+    isPending: isLoadingDatabases,
+    isError: isDatabaseError,
+  } = useReadReplicasQuery({ projectRef }, { enabled: needsDatabaseLookup })
+  const databasesByIdentifier = useMemo(
+    () => new Map((databases ?? []).map((database) => [database.identifier, database])),
+    [databases]
+  )
+  const databaseContext: NotebookDatabaseContext = !needsDatabaseLookup
+    ? { status: 'success', projectRef, databasesByIdentifier }
+    : isLoadingDatabases
+      ? { status: 'loading', projectRef }
+      : isDatabaseError
+        ? { status: 'error', projectRef }
+        : { status: 'success', projectRef, databasesByIdentifier }
 
   const summary = summarizeNotebookDiff(entries, mode)
   const visibleEntries = isShowingAllEntries ? entries : entries.slice(0, VISIBLE_ENTRY_LIMIT)
@@ -63,7 +86,7 @@ export const AssistantNotebookPreview = ({
     <div className={cn('flex w-full min-w-0 max-w-6xl mx-auto flex-col', className)}>
       <ExplorerToolbar aria-label="Notebook toolbar">
         <ExplorerToolbarIcon>
-          <NotebookText />
+          <NotebookText size={16} strokeWidth={2} />
         </ExplorerToolbarIcon>
         <ExplorerToolbarTitle>{title ?? FALLBACK_TITLE[mode]}</ExplorerToolbarTitle>
         <ExplorerToolbarActions>
@@ -91,6 +114,7 @@ export const AssistantNotebookPreview = ({
                     mode={mode}
                     result={results?.[key]}
                     isExpanded={isExpanded(entry)}
+                    databaseContext={databaseContext}
                     onExpandedChange={(open) =>
                       setExpandedOverrides((prev) => ({ ...prev, [key]: open }))
                     }

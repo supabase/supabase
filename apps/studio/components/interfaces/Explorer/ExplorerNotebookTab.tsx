@@ -12,6 +12,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { acceptUntrustedSql } from '@supabase/pg-meta'
+import { useQueryClient } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   Check,
@@ -28,7 +29,7 @@ import {
   Trash,
 } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   AiIconAnimation,
@@ -59,7 +60,10 @@ import { type QueryEditorHandle } from './QueryEditor'
 import { createMarkdownCellSkeleton, createQueryCellSkeleton } from './utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
-import { hasDiscardableChanges } from '@/data/content/notebooks/notebook-cache'
+import {
+  evictNotebookFromCaches,
+  hasDiscardableChanges,
+} from '@/data/content/notebooks/notebook-cache'
 import {
   isQueryCell,
   WritableCell,
@@ -80,6 +84,7 @@ export const ExplorerNotebookTab = () => {
   const { id, ref } = useParams()
   const tabs = useTabsStateSnapshot()
   const snap = useNotebooksStateSnapshot()
+  const queryClient = useQueryClient()
   const { createChat, isCreating } = useCreateChat()
 
   const [isIntellisenseEnabled, setIsIntellisenseEnabled] = useLocalStorageQuery(
@@ -96,12 +101,14 @@ export const ExplorerNotebookTab = () => {
   const [isRunningNotebook, setIsRunningNotebook] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isSaveBeforeAnalyzeOpen, setIsSaveBeforeAnalyzeOpen] = useState(false)
+  const [isSaveConflictOpen, setIsSaveConflictOpen] = useState(false)
   const [pendingMutationCells, setPendingMutationCells] = useState<
     { id: string; title: string }[] | null
   >(null)
   const [skipMutatingCells, setSkipMutatingCells] = useState(false)
   const queryCellRefs = useRef(new Map<string, QueryEditorHandle>())
   const savedContentRef = useRef<typeof content>(undefined)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   const { mutate: updateNotebook, isPending: isUpdating } = useUpsertNotebookMutation({
     onSuccess: () => {
@@ -199,7 +206,7 @@ export const ExplorerNotebookTab = () => {
     runNotebook({ cellIdsToRun, force: true })
   }
 
-  const handleSaveNotebook = () => {
+  const persistNotebook = () => {
     const notebookId = currentNotebook?.notebook.id
     if (!ref || !notebookId || !name || !content) return
 
@@ -231,6 +238,10 @@ export const ExplorerNotebookTab = () => {
       }),
     }
 
+    if (snap.serverDivergedWhileDirty.get(notebookId) === 'deleted') {
+      writableContent.cells = writableContent.cells.map(({ _id: _, ...cell }) => cell)
+    }
+
     // [Joshen] For tracking if a notebook is updated while being saved, so that we do not
     // incorrectly show the saved toast if it's subsequently then saved once again while
     // the initial save is midflight
@@ -243,6 +254,32 @@ export const ExplorerNotebookTab = () => {
       description: currentNotebook?.notebook.description,
       content: writableContent,
     })
+  }
+
+  const handleSaveNotebook = () => {
+    const notebookId = currentNotebook?.notebook.id
+    if (notebookId && snap.serverDivergedWhileDirty.get(notebookId)) {
+      setIsSaveConflictOpen(true)
+      return
+    }
+
+    persistNotebook()
+  }
+
+  const handleSaveAnyway = () => {
+    setIsSaveConflictOpen(false)
+    persistNotebook()
+  }
+
+  const handleDiscardNotebookChanges = async () => {
+    if (!ref || !id) return
+
+    const wasDeletedOnServer = snap.serverDivergedWhileDirty.get(id) === 'deleted'
+    setIsSaveConflictOpen(false)
+    const evicted = await evictNotebookFromCaches({ queryClient, projectRef: ref, id })
+    if (wasDeletedOnServer && evicted) {
+      tabs.removeTab(createTabId('notebook', { id }))
+    }
   }
 
   const handleAnalyze = () => {
@@ -286,6 +323,17 @@ export const ExplorerNotebookTab = () => {
     snap.insertCellAfter({ id: notebookId, cellId: lastCellId, cell })
   }
 
+  const scrollToBottomIfPending = useEffectEvent(() => {
+    if (!id || snap.pendingScrollToBottom !== id || !scrollContainerRef.current) return
+
+    scrollContainerRef.current.scrollTo({
+      top: scrollContainerRef.current.scrollHeight,
+    })
+    snap.clearPendingScrollToBottom()
+  })
+
+  useEffect(() => scrollToBottomIfPending(), [id, snap.pendingScrollToBottom, content])
+
   if (isNotFound) {
     return (
       <div className="p-4 h-full bg-surface-100">
@@ -311,28 +359,28 @@ export const ExplorerNotebookTab = () => {
     <div className="flex flex-col h-full bg-surface-100">
       <ExplorerToolbar className="px-4">
         <ExplorerToolbarIcon>
-          <NotebookText size={14} className="text-foreground-light" />
+          <NotebookText size={16} strokeWidth={2} />
         </ExplorerToolbarIcon>
         <ExplorerToolbarTitle onSaveTitle={handleSaveTitle}>{name ?? ''}</ExplorerToolbarTitle>
         <ExplorerToolbarActions>
           <ExplorerToolbarAction
-            icon={<AiIconAnimation size={16} />}
+            className="group"
+            icon={
+              <AiIconAnimation
+                size={16}
+                className="text-tertiary-foreground group-hover:text-brand"
+              />
+            }
             loading={isCreating}
+            disabled={cells.length === 0}
+            tooltip={cells.length === 0 ? 'Add a cell to the notebook to analyze it' : undefined}
             onClick={handleClickAnalyze}
           >
             Analyze
           </ExplorerToolbarAction>
           <ExplorerToolbarAction
-            aria-label="Run notebook"
-            icon={<Play />}
-            tooltip="Run notebook"
-            loading={isRunningNotebook}
-            disabled={queryCellIds.length === 0}
-            onClick={handleRunNotebook}
-          />
-          <ExplorerToolbarAction
             aria-label="Save changes"
-            icon={<Save />}
+            icon={<Save size={16} strokeWidth={2} />}
             tooltip="Save changes"
             loading={isUpdating}
             onClick={handleSaveNotebook}
@@ -340,7 +388,10 @@ export const ExplorerNotebookTab = () => {
           <ExplorerToolbarActions>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <ExplorerToolbarAction aria-label="More options" icon={<MoreVertical />} />
+                <ExplorerToolbarAction
+                  aria-label="More options"
+                  icon={<MoreVertical size={16} strokeWidth={2} />}
+                />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem
@@ -361,10 +412,20 @@ export const ExplorerNotebookTab = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           </ExplorerToolbarActions>
+          <ExplorerToolbarAction
+            aria-label="Run notebook"
+            icon={<Play size={16} strokeWidth={2} />}
+            tooltip="Run notebook"
+            loading={isRunningNotebook}
+            disabled={queryCellIds.length === 0}
+            onClick={handleRunNotebook}
+          >
+            Run
+          </ExplorerToolbarAction>
         </ExplorerToolbarActions>
       </ExplorerToolbar>
 
-      <div className="w-full mx-auto flex-grow min-h-0 overflow-y-auto">
+      <div ref={scrollContainerRef} className="w-full mx-auto flex-grow min-h-0 overflow-y-auto">
         <div className="p-4 pb-10">
           {cells.length === 0 && (
             <EmptyStatePresentational
@@ -397,6 +458,7 @@ export const ExplorerNotebookTab = () => {
                           key={cell._id}
                           cell={cell}
                           onEdit={persistNotebookTab}
+                          onPrettifyQuery={() => queryCellRefs.current.get(cell._id)?.prettify()}
                           ref={(instance) => {
                             if (instance) queryCellRefs.current.set(cell._id, instance)
                             else queryCellRefs.current.delete(cell._id)
@@ -460,6 +522,25 @@ export const ExplorerNotebookTab = () => {
         <p className="text-sm">
           This notebook has unsaved changes. Save it first so the assistant analyzes the latest
           content.
+        </p>
+      </ConfirmationModal>
+
+      <ConfirmationModal
+        size="small"
+        visible={isSaveConflictOpen}
+        title="Assistant changes detected"
+        additionalActionLabel="Discard changes"
+        confirmLabel={
+          id && snap.serverDivergedWhileDirty.get(id) === 'deleted' ? 'Recreate' : 'Save anyway'
+        }
+        onAdditionalAction={handleDiscardNotebookChanges}
+        onCancel={() => setIsSaveConflictOpen(false)}
+        onConfirm={handleSaveAnyway}
+      >
+        <p className="text-sm">
+          {id && snap.serverDivergedWhileDirty.get(id) === 'deleted'
+            ? 'An assistant deleted this notebook after your local changes. Saving will recreate it.'
+            : "An assistant updated this notebook after your local changes. Saving will overwrite the assistant's update."}
         </p>
       </ConfirmationModal>
 

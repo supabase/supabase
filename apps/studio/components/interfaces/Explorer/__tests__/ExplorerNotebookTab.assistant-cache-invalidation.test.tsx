@@ -1,7 +1,8 @@
 import { QueryClient } from '@tanstack/react-query'
-import { screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { HttpResponse } from 'msw'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { ExplorerNotebookTab } from '../ExplorerNotebookTab'
 import type { components } from '@/data/api'
@@ -16,7 +17,7 @@ import {
 } from '@/lib/ai/test-fixtures'
 import { notebooksState } from '@/state/notebooks/notebooks-state'
 import type { Notebook } from '@/state/notebooks/types'
-import { createTabsState, TabsStateContext } from '@/state/tabs'
+import { createTabId, createTabsState, TabsStateContext } from '@/state/tabs'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { setupSqlEditorMocks } from '@/tests/lib/sql-editor-test-utils'
@@ -62,13 +63,17 @@ const seedNotebook = () => {
   notebooksState.setNotebook({ projectRef: PROJECT_REF, notebook })
 }
 
-const renderNotebookTab = (queryClient: QueryClient) =>
+const renderNotebookTab = (queryClient: QueryClient, tabsState = createTabsState(PROJECT_REF)) =>
   customRender(
-    <TabsStateContext.Provider value={createTabsState(PROJECT_REF)}>
+    <TabsStateContext.Provider value={tabsState}>
       <ExplorerNotebookTab />
     </TabsStateContext.Provider>,
     { queryClient }
   )
+
+afterEach(() => {
+  notebooksState.serverDivergedWhileDirty.clear()
+})
 
 describe('ExplorerNotebookTab — assistant cache invalidation', () => {
   it('refetches and renders the updated cells after an assistant update_notebook tool call completes', async () => {
@@ -205,4 +210,235 @@ describe('ExplorerNotebookTab — assistant cache invalidation', () => {
     expect(await screen.findByText('Notebook not found')).toBeInTheDocument()
     expect(screen.queryByText('Original content')).not.toBeInTheDocument()
   })
+
+  it('saves normally without a conflict dialog when the notebook has not diverged', async () => {
+    setupSqlEditorMocks()
+    seedNotebook()
+    const queryClient = new QueryClient()
+    let mutationCount = 0
+    addAPIMock({
+      method: 'put',
+      path: '/platform/projects/:ref/content',
+      response: () => {
+        mutationCount += 1
+        return HttpResponse.json({ id: NOTEBOOK_ID })
+      },
+    })
+
+    renderNotebookTab(queryClient)
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
+
+    await waitFor(() => expect(mutationCount).toBe(1))
+    expect(
+      screen.queryByRole('dialog', { name: 'Assistant changes detected' })
+    ).not.toBeInTheDocument()
+  })
+
+  it.each([
+    {
+      type: 'updated' as const,
+      description:
+        "An assistant updated this notebook after your local changes. Saving will overwrite the assistant's update.",
+      saveLabel: 'Save anyway',
+    },
+    {
+      type: 'deleted' as const,
+      description:
+        'An assistant deleted this notebook after your local changes. Saving will recreate it.',
+      saveLabel: 'Recreate',
+    },
+  ])('shows the $type conflict copy before saving', async ({ type, description, saveLabel }) => {
+    setupSqlEditorMocks()
+    seedNotebook()
+    notebooksState.updateCells({
+      id: NOTEBOOK_ID,
+      cells: notebooksState.notebooks[NOTEBOOK_ID]!.notebook.content!.cells,
+    })
+    notebooksState.markServerDivergence({ id: NOTEBOOK_ID, type })
+
+    renderNotebookTab(new QueryClient())
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
+
+    const dialog = await screen.findByRole('dialog', { name: 'Assistant changes detected' })
+    expect(dialog).toHaveTextContent(description)
+    expect(dialog).toHaveTextContent(saveLabel)
+    expect(dialog).toHaveTextContent('Discard changes')
+  })
+
+  it('saves exactly once and clears the conflict only after a successful save', async () => {
+    setupSqlEditorMocks()
+    seedNotebook()
+    notebooksState.updateCells({
+      id: NOTEBOOK_ID,
+      cells: notebooksState.notebooks[NOTEBOOK_ID]!.notebook.content!.cells,
+    })
+    notebooksState.markServerDivergence({ id: NOTEBOOK_ID, type: 'updated' })
+    const queryClient = new QueryClient()
+    let mutationCount = 0
+    let resolveSave: (() => void) | undefined
+    const savePromise = new Promise<void>((resolve) => {
+      resolveSave = resolve
+    })
+    addAPIMock({
+      method: 'put',
+      path: '/platform/projects/:ref/content',
+      response: async () => {
+        mutationCount += 1
+        await savePromise
+        return HttpResponse.json({ id: NOTEBOOK_ID })
+      },
+    })
+
+    renderNotebookTab(queryClient)
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
+    expect(notebooksState.serverDivergedWhileDirty.get(NOTEBOOK_ID)).toBe('updated')
+    await userEvent.click(await screen.findByRole('button', { name: 'Save anyway' }))
+
+    await waitFor(() => expect(mutationCount).toBe(1))
+    expect(notebooksState.serverDivergedWhileDirty.get(NOTEBOOK_ID)).toBe('updated')
+    resolveSave?.()
+    await waitFor(() =>
+      expect(notebooksState.serverDivergedWhileDirty.has(NOTEBOOK_ID)).toBe(false)
+    )
+  })
+
+  it('keeps the conflict marker when saving anyway fails', async () => {
+    setupSqlEditorMocks()
+    seedNotebook()
+    notebooksState.updateCells({
+      id: NOTEBOOK_ID,
+      cells: notebooksState.notebooks[NOTEBOOK_ID]!.notebook.content!.cells,
+    })
+    notebooksState.markServerDivergence({ id: NOTEBOOK_ID, type: 'updated' })
+    let mutationCount = 0
+    addAPIMock({
+      method: 'put',
+      path: '/platform/projects/:ref/content',
+      response: () => {
+        mutationCount += 1
+        return HttpResponse.json({ message: 'Save failed' }, { status: 500 })
+      },
+    })
+
+    renderNotebookTab(new QueryClient())
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Save anyway' }))
+
+    await waitFor(() => expect(mutationCount).toBe(1))
+    expect(notebooksState.serverDivergedWhileDirty.get(NOTEBOOK_ID)).toBe('updated')
+  })
+
+  it('omits existing cell IDs when saving anyway recreates an assistant-deleted notebook', async () => {
+    setupSqlEditorMocks()
+    seedNotebook()
+    notebooksState.updateCells({
+      id: NOTEBOOK_ID,
+      cells: notebooksState.notebooks[NOTEBOOK_ID]!.notebook.content!.cells,
+    })
+    notebooksState.markServerDivergence({ id: NOTEBOOK_ID, type: 'deleted' })
+    let sentBody: Record<string, unknown> | undefined
+    addAPIMock({
+      method: 'put',
+      path: '/platform/projects/:ref/content',
+      response: async ({ request }) => {
+        sentBody = (await request.json()) as Record<string, unknown>
+        return HttpResponse.json({ id: NOTEBOOK_ID })
+      },
+    })
+
+    renderNotebookTab(new QueryClient())
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Recreate' }))
+
+    await waitFor(() => expect(sentBody).toBeDefined())
+    const content = sentBody?.content as { cells: Array<Record<string, unknown>> }
+    content.cells.forEach((cell) => expect(cell).not.toHaveProperty('_id'))
+  })
+
+  it('discards local changes without mutating and evicts the conflicted notebook', async () => {
+    setupSqlEditorMocks()
+    seedNotebook()
+    notebooksState.updateCells({
+      id: NOTEBOOK_ID,
+      cells: notebooksState.notebooks[NOTEBOOK_ID]!.notebook.content!.cells,
+    })
+    notebooksState.markServerDivergence({ id: NOTEBOOK_ID, type: 'updated' })
+    const queryClient = new QueryClient()
+    queryClient.setQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK_ID), { id: NOTEBOOK_ID })
+    let mutationCount = 0
+    addAPIMock({
+      method: 'put',
+      path: '/platform/projects/:ref/content',
+      response: () => {
+        mutationCount += 1
+        return HttpResponse.json({ id: NOTEBOOK_ID })
+      },
+    })
+
+    renderNotebookTab(queryClient)
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Discard changes' }))
+
+    await waitFor(() => expect(notebooksState.notebooks[NOTEBOOK_ID]).toBeUndefined())
+    expect(notebooksState.serverDivergedWhileDirty.has(NOTEBOOK_ID)).toBe(false)
+    expect(queryClient.getQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK_ID))).toBeUndefined()
+    expect(mutationCount).toBe(0)
+  })
+
+  it('closes the notebook tab when discarding edits after an assistant deletion', async () => {
+    setupSqlEditorMocks()
+    seedNotebook()
+    notebooksState.updateCells({
+      id: NOTEBOOK_ID,
+      cells: notebooksState.notebooks[NOTEBOOK_ID]!.notebook.content!.cells,
+    })
+    notebooksState.markServerDivergence({ id: NOTEBOOK_ID, type: 'deleted' })
+    const tabsState = createTabsState(PROJECT_REF)
+    const tabId = createTabId('notebook', { id: NOTEBOOK_ID })
+    tabsState.addTab({ id: tabId, type: 'notebook', metadata: { notebookId: NOTEBOOK_ID } })
+
+    renderNotebookTab(new QueryClient(), tabsState)
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Discard changes' }))
+
+    await waitFor(() => expect(tabsState.tabsMap[tabId]).toBeUndefined())
+  })
+
+  it.each(['the close button', 'the backdrop'])(
+    'dismisses the conflict with %s without changing notebook state',
+    async (dismissal) => {
+      setupSqlEditorMocks()
+      seedNotebook()
+      notebooksState.updateCells({
+        id: NOTEBOOK_ID,
+        cells: notebooksState.notebooks[NOTEBOOK_ID]!.notebook.content!.cells,
+      })
+      notebooksState.markServerDivergence({ id: NOTEBOOK_ID, type: 'updated' })
+
+      renderNotebookTab(new QueryClient())
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
+      const dialog = await screen.findByRole('dialog', { name: 'Assistant changes detected' })
+      if (dismissal === 'the close button') {
+        await userEvent.click(screen.getByRole('button', { name: 'Close' }))
+      } else {
+        fireEvent.pointerDown(dialog.parentElement!, { button: 0, ctrlKey: false })
+      }
+
+      await waitFor(() =>
+        expect(
+          screen.queryByRole('dialog', { name: 'Assistant changes detected' })
+        ).not.toBeInTheDocument()
+      )
+      expect(notebooksState.notebooks[NOTEBOOK_ID]).toBeDefined()
+      expect(notebooksState.serverDivergedWhileDirty.get(NOTEBOOK_ID)).toBe('updated')
+    }
+  )
 })
