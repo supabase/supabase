@@ -1,6 +1,6 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useTheme } from 'next-themes'
-import { memo, useCallback, useEffect, useState } from 'react'
+import { CSSProperties, memo, useCallback, useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
 import {
   Button,
@@ -138,6 +138,8 @@ const ThemeOverrideFields = () => {
                 </span>
               </div>
               <Slider
+                variant="expressive"
+                style={{ '--slider-track-image': knob.trackImage } as CSSProperties}
                 aria-label={knob.label}
                 min={knob.min}
                 max={knob.max}

@@ -23,6 +23,12 @@ export interface ThemeOverrideKnob {
   min: number
   max: number
   step: number
+  /**
+   * CSS `background-image` for the expressive slider's track, so the control
+   * previews the property it sets. Built from the live theme custom properties
+   * rather than fixed colours, so each track re-renders as the theme changes.
+   */
+  trackImage: string
 }
 
 export const THEME_OVERRIDE_KNOBS: readonly ThemeOverrideKnob[] = [
@@ -34,6 +40,9 @@ export const THEME_OVERRIDE_KNOBS: readonly ThemeOverrideKnob[] = [
     min: 0,
     max: 0.06,
     step: 0.001,
+    // Neutral on the left, tinted at the theme's own hue on the right.
+    trackImage:
+      'linear-gradient(to right, oklch(from var(--foreground) l 0 h / 0.08), oklch(from var(--foreground) l 0.14 h / 0.16))',
   },
   {
     key: 'contrast',
@@ -43,6 +52,8 @@ export const THEME_OVERRIDE_KNOBS: readonly ThemeOverrideKnob[] = [
     min: 0,
     max: 1,
     step: 0.01,
+    // Flat on the left, fully separated from the surface on the right.
+    trackImage: 'linear-gradient(to right, transparent, var(--tertiary))',
   },
   {
     key: 'surface',
@@ -52,6 +63,9 @@ export const THEME_OVERRIDE_KNOBS: readonly ThemeOverrideKnob[] = [
     min: 0,
     max: 1,
     step: 0.005,
+    // The canvas lightness range the knob sweeps, at the theme's chroma and hue.
+    trackImage:
+      'linear-gradient(to right, oklch(0.15 var(--chroma) var(--surface-hue) / 0.22), oklch(0.98 var(--chroma) var(--surface-hue) / 0.22))',
   },
   {
     key: 'elevationStep',
@@ -61,6 +75,10 @@ export const THEME_OVERRIDE_KNOBS: readonly ThemeOverrideKnob[] = [
     min: 0,
     max: 0.08,
     step: 0.001,
+    // Four flat bands: the surface, then the elevation 1-3 overlays the knob
+    // spaces apart. Flattening the knob visibly flattens the bands.
+    trackImage:
+      'linear-gradient(to right, transparent 0 25%, var(--muted) 25% 50%, var(--accent) 50% 75%, var(--tertiary) 75% 100%)',
   },
 ]
 
