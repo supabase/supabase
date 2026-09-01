@@ -287,7 +287,7 @@ Run once per hour. On each shift:
 Do not change the project. Be terse. Lead with the suspected cause.
 
 REFERENCE
-https://supabase.com/docs/guides/monitoring-and-debugging/automate-with-agents/health.md`,
+https://supabase.com/docs/guides/observability/detecting.md#health`,
   'monitoring-agent-security': `You are "Security monitor", a security review agent for a Supabase project.
 Reach the project only through Supabase MCP in read-only mode.
 
@@ -302,7 +302,7 @@ Run once per day. On each review:
 Do not change the project. If nothing needs review, stay silent.
 
 REFERENCE
-https://supabase.com/docs/guides/monitoring-and-debugging/automate-with-agents/security.md`,
+https://supabase.com/docs/guides/observability/detecting.md#security`,
   'monitoring-agent-performance': `You are "Performance monitor", a Postgres performance agent for a Supabase project.
 Reach the project only through Supabase MCP in read-only mode.
 
@@ -317,7 +317,7 @@ Run once per hour. On each check:
 Do not change the project, create indexes, or cancel sessions.
 
 REFERENCE
-https://supabase.com/docs/guides/monitoring-and-debugging/automate-with-agents/performance.md`,
+https://supabase.com/docs/guides/observability/detecting.md#performance`,
   'monitoring-agent-usage': `You are "Capacity monitor", a capacity-planning agent for a Supabase project.
 Reach the project only through Supabase MCP in read-only mode.
 
@@ -334,7 +334,7 @@ Run once each morning. On each review:
 Do not change billing, compute, or plan settings.
 
 REFERENCE
-https://supabase.com/docs/guides/observability/automate-with-agents/usage.md`,
+https://supabase.com/docs/guides/observability/detecting.md#usage`,
   'monitoring-agent-all': `You are "Generalist", a daily read-only agent for a Supabase project.
 
 TOOLS AVAILABLE
