@@ -51,7 +51,7 @@ export default function HomePage() {
               name: 'Supabase',
               description: DEFAULT_META_DESCRIPTION,
               url: 'https://supabase.com',
-              serviceType: 'Backend as a Service',
+              serviceType: 'Postgres development platform',
               offerings: [
                 { name: 'Database', url: 'https://supabase.com/database' },
                 { name: 'Authentication', url: 'https://supabase.com/auth' },
