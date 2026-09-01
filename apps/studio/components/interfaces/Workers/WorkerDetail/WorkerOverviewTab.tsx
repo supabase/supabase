@@ -156,7 +156,7 @@ export const WorkerOverviewTab = ({ worker }: WorkerOverviewTabProps) => {
               <RuntimeBadge runtime={worker.runtime} />
             </SettingsRow>
             {worker.imageVersion !== undefined && (
-              <SettingsRow label="Image version">
+              <SettingsRow label="Version">
                 <span className="font-mono text-xs text-foreground-light">
                   {worker.imageVersion}
                 </span>
