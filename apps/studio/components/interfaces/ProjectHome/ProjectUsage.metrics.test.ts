@@ -98,10 +98,10 @@ describe('ProjectUsage.metrics', () => {
       })
     })
 
-    it('returns a one-day window for 7day', () => {
+    it('returns a six-hour window for 7day', () => {
       expect(getBucketLogRange(timestamp, '7day')).toEqual({
         start: timestamp,
-        end: '2024-01-16T12:00:00.000Z',
+        end: '2024-01-15T18:00:00.000Z',
       })
     })
 
