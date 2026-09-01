@@ -37,6 +37,7 @@ Studio is migrating from the Next.js pages router (`pages/**`) to TanStack Start
 - **Telemetry** — `useTrack()` from `lib/telemetry/track`; event types live in `packages/common/telemetry-constants.ts`.
 - **Tests** — default to including relevant tests with any change: a couple of unit tests for extracted logic, component tests for UI behavior, E2E only when the scope demands it (`studio-testing` has the decision tree). Not every PR needs them, but "no tests" should be a considered choice, not the default. Tooling: vitest + MSW; component tests use `customRender` + `addAPIMock` from `tests/lib/`; unhandled network requests fail tests. Don't `vi.mock('@/data/...')`.
 - **Shortcuts** — use the registry in `state/shortcuts/` and `components/ui/Shortcut*.tsx`; keep `G then …` chords for navigation; no one-off keyboard listeners.
+- **Scoped PAT catalog** — `packages/shared-data/scoped-access-token-permissions.ts` feeds Studio and the generated Personal Access Tokens guide. After changing it, run `make -C apps/docs/spec generate.partials.access-control`; Docs Tests rejects stale tables.
 - **Reuse first** — before writing a new hook or helper, search for an existing one (`hooks/`, `lib/`, `packages/common`, `packages/ui-patterns`). If you do need a new one, make it as reusable as possible: general naming, no page-specific coupling, placed where other callers can find it.
 - Co-locate sub-components with their parent; avoid barrel re-export files.
 
@@ -75,6 +76,7 @@ Older Studio code predates some of these conventions. For new or modified code, 
 ## Defaults that differ here
 
 - **ESLint warnings are ratcheted in CI**: the per-rule occurrence count must not increase, so a new `any`, unresolved `exhaustive-deps` warning, or default export fails the build even though it's "only a warning". Check locally with `pnpm --filter studio run lint:ratchet`.
+- **Dead files and deps are gated in CI** by knip (`pnpm knip --workspace apps/studio` locally). Framework-convention files nothing imports (routes, Vercel functions, TanStack Start files) belong in `knip.jsonc` under `workspaces["apps/studio"].entry`, not `ignore` — an ignored file's imports aren't traced, so anything only it uses gets reported as dead. There's no inline `knip-ignore` comment; the only per-file opt-out is config. In a PR stack, a file whose first consumer lands in a later PR fails the gate on the earlier one — either add it in the same PR as its first use, or add it to `workspaces["apps/studio"].ignore` with a `used from #NNN` comment and remove it in that PR.
 - **Clipboard**: `copyToClipboard` from `'ui'`, and never `await` anything before calling it (Safari requires the write inside the user gesture; lint-enforced) — pass a Promise as the argument instead.
 - **`useParams()` comes from `'common'`**, not `next/navigation` — it camelCases keys and returns `string | undefined`.
 - **Permissions**: `useAsyncCheckPermissions` from `hooks/misc/useCheckPermissions` (returns `can: true` when self-hosted).

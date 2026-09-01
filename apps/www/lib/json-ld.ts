@@ -41,6 +41,19 @@ export function organizationSchema(input: OrganizationSchemaInput = {}) {
       url: ORG_LOGO_URL,
     },
     description: input.description ?? DEFAULT_META_DESCRIPTION,
+    legalName: 'Supabase Pte. Ltd.',
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'customer support',
+      url: `${CANONICAL_ORIGIN}/support`,
+    },
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: '65 Chulia Street #38-02/03, OCBC Centre',
+      addressLocality: 'Singapore',
+      postalCode: '049513',
+      addressCountry: 'SG',
+    },
     sameAs: ORG_SAMEAS,
   }
 }

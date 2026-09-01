@@ -1,5 +1,7 @@
+import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Home, MessageCirclePlus, NotebookText, Plus, SquareCode } from 'lucide-react'
+import Link from 'next/link'
 import { ComponentProps, ReactNode, useEffect, useEffectEvent, useState } from 'react'
 import {
   cn,
@@ -10,6 +12,7 @@ import {
   TabsTrigger,
 } from 'ui'
 
+import { EditorNavigationButton } from '../EditorNavigationButton'
 import { ProjectLayoutWithAuth } from '../ProjectLayout'
 import { EditorTabs } from '../Tabs/Tabs'
 import { type ExplorerResourceType } from './ExplorerLayout.constants'
@@ -23,6 +26,7 @@ import {
   useCreateNotebook,
   useCreateQuery,
 } from '@/components/interfaces/Explorer/hooks'
+import { useIsTemporarySqlEditorVisit } from '@/hooks/misc/useIsTemporarySqlEditorVisit'
 import {
   editorEntityTypes,
   EXPLORER_HOME_TAB,
@@ -37,9 +41,16 @@ export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayout
 }
 
 export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayoutProps) => {
+  const { ref } = useParams()
   const tabs = useTabsStateSnapshot()
 
   const [section, setSection] = useState<ExplorerResourceType>()
+
+  const { setIsTemporary: setIsTemporarySqlEditorVisit } = useIsTemporarySqlEditorVisit(ref)
+
+  useEffect(() => {
+    if (ref) setIsTemporarySqlEditorVisit(false)
+  }, [ref, setIsTemporarySqlEditorVisit])
 
   const activeTab = tabs.activeTab ? tabs.tabsMap[tabs.activeTab] : undefined
   const isActiveExplorerTab =
@@ -56,6 +67,7 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
     <ProjectLayoutWithAuth
       product="Explorer"
       browserTitle={mergedBrowserTitle}
+      productMenuBadge={<BackToSqlEditorButton />}
       productMenu={
         <div className="relative h-full overflow-hidden">
           <AnimatePresence mode="wait">
@@ -85,6 +97,26 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
         <div className="flex-grow min-h-0">{children}</div>
       </div>
     </ProjectLayoutWithAuth>
+  )
+}
+
+const BackToSqlEditorButton = () => {
+  const { ref } = useParams()
+  const { setIsTemporary } = useIsTemporarySqlEditorVisit(ref)
+
+  if (!ref) return null
+
+  return (
+    <EditorNavigationButton
+      asChild
+      tooltip="Temporarily switch to SQL Editor to access your snippets"
+    >
+      <Link
+        href={`/project/${ref}/sql`}
+        aria-label="Switch to SQL Editor"
+        onClick={() => setIsTemporary(true)}
+      />
+    </EditorNavigationButton>
   )
 }
 
@@ -153,7 +185,7 @@ const NewTabButton = () => {
       <DropdownMenuContent className="w-40" align="end">
         <DropdownMenuItem className="gap-x-2" onClick={() => createQuery()}>
           <SquareCode size={14} />
-          <span>New query</span>
+          <span>Run SQL</span>
         </DropdownMenuItem>
         <DropdownMenuItem className="gap-x-2" onClick={() => createNotebook()}>
           <NotebookText size={14} />

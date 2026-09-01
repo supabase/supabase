@@ -1,4 +1,4 @@
-import { WORKERS_REGION, workerUrl } from './Workers.constants'
+import { RUNTIMES, WORKERS_REGION, workerUrl } from './Workers.constants'
 import type { WorkerAccess } from './Workers.types'
 import { formatSize } from './Workers.utils'
 import { CLI_NAME } from '@/lib/constants/workers'
@@ -14,6 +14,7 @@ export interface WorkerSnippetInput {
 }
 
 export interface WorkerSnippets {
+  aiPrompt: string
   configToml: string
   cli: string
   curl: string
@@ -40,12 +41,19 @@ export function buildWorkerSnippets(input: WorkerSnippetInput): WorkerSnippets {
 
   const cli = [
     `supabase ${CLI_NAME} new ${name} --runtime ${runtime}`,
-    `supabase ${CLI_NAME} push ${name}`,
+    // size comes from config.toml — push has no flag for it. Same for access: the CLI
+    // doesn't have a route to a private worker yet, so this always deploys as public.
+    `supabase ${CLI_NAME} push ${name} --instances ${input.instances}`,
+    ...(input.access === 'private' ? [`# note: the CLI can only deploy public workers today`] : []),
   ].join('\n')
 
-  const configToml = [
-    `# supabase/config.toml`,
-    ``,
+  const curl = [
+    `curl --request POST '${url}' \\`,
+    `  --header 'Content-Type: application/json' \\`,
+    `  --data '{"name":"world"}'`,
+  ].join('\n')
+
+  const configBlock = [
     `[${CLI_NAME}.${name}]`,
     `runtime   = "${runtime}"`,
     `size      = "${input.size}"    # ${formatSize(input.size)}`,
@@ -54,16 +62,26 @@ export function buildWorkerSnippets(input: WorkerSnippetInput): WorkerSnippets {
     `# region is locked to ${WORKERS_REGION} at alpha`,
   ].join('\n')
 
-  const authHeader =
-    input.access === 'public'
-      ? `  -H 'Authorization: Bearer [YOUR ANON KEY]' \\`
-      : `  -H 'Authorization: Bearer [YOUR SERVICE ROLE KEY]' \\`
+  const configToml = [`# supabase/config.toml`, ``, configBlock].join('\n')
 
-  const curl = [
-    `curl -L -X POST '${url}' \\`,
-    authHeader,
-    `  -H 'Content-Type: application/json' \\`,
-    `  --data '{"name":"world"}'`,
+  const runtimeMeta = RUNTIMES[runtime] ?? RUNTIMES.node
+  // The entrypoint metadata is "<run command> <filename>" — the filename is the last token.
+  const entrypointFile = runtimeMeta.entrypoint.split(' ').pop()
+
+  const aiPrompt = [
+    `Scaffold and deploy a Supabase Workers worker named "${name}" using the ${runtimeMeta.label} runtime:`,
+    ``,
+    `1. Create a supabase/${CLI_NAME}/${name}/ directory with a ${runtimeMeta.label} entrypoint (${entrypointFile}) that responds with "Hello, world!".`,
+    ``,
+    `2. Add this block to supabase/config.toml:`,
+    '```toml',
+    configBlock,
+    '```',
+    ``,
+    `3. Run \`supabase ${CLI_NAME} push ${name}\` to deploy it.`,
+    ...(input.access === 'private'
+      ? [``, `Note: the CLI can only deploy public workers today.`]
+      : []),
   ].join('\n')
 
   const keyPlaceholder = input.access === 'public' ? '[YOUR ANON KEY]' : '[YOUR SERVICE ROLE KEY]'
@@ -91,7 +109,7 @@ export function buildWorkerSnippets(input: WorkerSnippetInput): WorkerSnippets {
     `print(res.json())`,
   ].join('\n')
 
-  return { configToml, cli, curl, javascript, python }
+  return { aiPrompt, configToml, cli, curl, javascript, python }
 }
 
 export interface WorkerCliCommand {
@@ -103,7 +121,6 @@ export function buildWorkerCliCommands(name: string): WorkerCliCommand[] {
   const slug = safeName(name)
   return [
     { comment: 'Recreate the source locally', command: `supabase ${CLI_NAME} pull ${slug}` },
-    { comment: 'Run it locally on a port', command: `supabase ${CLI_NAME} serve ${slug}` },
     { comment: 'Deploy a new version', command: `supabase ${CLI_NAME} push ${slug}` },
     { comment: 'Stream logs', command: `supabase ${CLI_NAME} logs ${slug} --follow` },
     { comment: 'Delete the worker', command: `supabase ${CLI_NAME} delete ${slug}` },

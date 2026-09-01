@@ -22,8 +22,10 @@ import { REPLICA_STATUS } from './ReadReplicas.constants'
 import type { RecommendedComputeForReadReplicas } from './recommendCompute'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { HighAvailabilityDisabledSectionNotice } from '@/components/ui/HighAvailability/HighAvailabilityDisabledSectionNotice'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
 interface ReadReplicasSectionProps {
@@ -32,6 +34,8 @@ interface ReadReplicasSectionProps {
 
 export const ReadReplicasSection = ({ onRecommendCompute }: ReadReplicasSectionProps) => {
   const { ref: projectRef } = useParams()
+  const isHighAvailability = useIsHighAvailability()
+
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
   const [isAddReplicaOpen, setAddReplica] = useQueryState(
     'addReplica',
@@ -87,18 +91,23 @@ export const ReadReplicasSection = ({ onRecommendCompute }: ReadReplicasSectionP
               Scale reads or serve queries closer to users.
             </PageSectionDescription>
           </PageSectionSummary>
+
           <PageSectionAside>
             <DocsButton href={`${DOCS_URL}/guides/platform/read-replicas`} />
-            <Button
-              type="button"
-              variant="primary"
-              icon={<Plus />}
-              onClick={() => setAddReplica(true)}
-            >
-              Add read replica
-            </Button>
+            {!isHighAvailability && (
+              <Button
+                type="button"
+                variant="primary"
+                icon={<Plus />}
+                onClick={() => setAddReplica(true)}
+              >
+                Add read replica
+              </Button>
+            )}
           </PageSectionAside>
         </PageSectionMeta>
+
+        <HighAvailabilityDisabledSectionNotice title="Read replicas are unavailable on High Availability projects" />
 
         <PageSectionContent className="flex flex-col gap-y-4">
           {isDatabasesError && (
@@ -140,14 +149,16 @@ export const ReadReplicasSection = ({ onRecommendCompute }: ReadReplicasSectionP
               title="No read replicas"
               description="All reads and writes currently go to the primary."
             >
-              <Button
-                type="button"
-                variant="default"
-                icon={<Plus />}
-                onClick={() => setAddReplica(true)}
-              >
-                Add read replica
-              </Button>
+              {!isHighAvailability && (
+                <Button
+                  type="button"
+                  variant="default"
+                  icon={<Plus />}
+                  onClick={() => setAddReplica(true)}
+                >
+                  Add read replica
+                </Button>
+              )}
             </EmptyStatePresentational>
           )}
         </PageSectionContent>

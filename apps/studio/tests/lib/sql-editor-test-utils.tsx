@@ -227,6 +227,7 @@ export function setupSqlEditorMocks({
         organization_missing_address: false,
         organization_missing_tax_id: false,
         organization_requires_mfa: false,
+        requires_indirect_tax_declaration: false,
         plan: { id: 'free', name: 'Free' },
         restriction_data: null,
         restriction_status: null,
