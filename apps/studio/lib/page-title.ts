@@ -1,3 +1,14 @@
+/**
+ * Browser tab title segments.
+ *
+ * Use title case for `section` and `entity` values
+ * (e.g. "New Pipeline", not "New pipeline").
+ * Product names like "Database" or "Auth" are proper nouns and keep their
+ * original casing in `surface`.
+ *
+ * The final title is built as:
+ *   entity | section | surface | project | org | brand
+ */
 export interface StudioPageTitleParts {
   entity?: string
   section?: string

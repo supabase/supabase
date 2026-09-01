@@ -6,6 +6,7 @@ import { Button, cn } from 'ui'
 import { MobileSheetNav } from 'ui-patterns/MobileSheetNav'
 
 import { HomeIcon } from '../LayoutHeader/HomeIcon'
+import { IsolatedStudioFlowCloseButton } from '../LayoutHeader/IsolatedStudioFlowClose'
 import { useMobileSheet } from './MobileSheetContext'
 import { OrgSelector } from './OrgSelector'
 import { ProjectBranchSelector } from './ProjectBranchSelector'
@@ -13,28 +14,66 @@ import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButt
 import { LocalDropdown } from '@/components/interfaces/LocalDropdown'
 import { SidebarContent } from '@/components/interfaces/Sidebar'
 import { UserDropdown } from '@/components/interfaces/UserDropdown'
+import { ProjectDropdown } from '@/components/layouts/AppLayout/ProjectDropdown'
 import { FloatingMobileToolbar } from '@/components/layouts/Navigation/FloatingMobileToolbar/FloatingMobileToolbar'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useIsolatedStudioFlow } from '@/hooks/misc/useHideSidebar'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
 
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
 
+const IsolatedMobileNavigationBar = ({ headerTitle }: { headerTitle?: string }) => {
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { isPending: isLoadingOrganizations } = useOrganizationsQuery()
+  const showOrgSelection = isLoadingOrganizations || !!selectedOrganization
+
+  return (
+    <div className="w-full flex flex-row md:hidden">
+      <nav
+        className={cn(
+          'group pr-3 pl-2 z-10 w-full h-12 gap-2',
+          'border-b bg-dash-sidebar border-default shadow-[0_0_30px_0_rgba(0,0,0,0.07)]',
+          'transition-width duration-200',
+          'hide-scrollbar flex flex-row items-center justify-between overflow-x-auto'
+        )}
+      >
+        <div className={cn('flex min-w-0 shrink items-center gap-2', !IS_PLATFORM && 'pl-2')}>
+          <HomeIcon className="ml-1" />
+          {IS_PLATFORM && showOrgSelection ? <OrgSelector /> : null}
+          <ProjectDropdown />
+          {headerTitle ? (
+            <span className="truncate text-sm text-foreground">{headerTitle}</span>
+          ) : null}
+        </div>
+        <IsolatedStudioFlowCloseButton />
+      </nav>
+    </div>
+  )
+}
+
 const MobileNavigationBar = ({
   hideMobileMenu,
   backToDashboardURL,
+  headerTitle,
 }: {
   hideMobileMenu?: boolean
   backToDashboardURL?: string
+  headerTitle?: string
 }) => {
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const { ref: projectRef, slug } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { isPending: isLoadingOrganizations } = useOrganizationsQuery()
   const isProjectScope = !!projectRef
+  const isolatedFlow = useIsolatedStudioFlow()
   const showOrgSelection = slug || isLoadingOrganizations || (selectedOrganization && projectRef)
   const { openMenu } = useMobileSheet()
+
+  if (isolatedFlow) {
+    return <IsolatedMobileNavigationBar headerTitle={headerTitle} />
+  }
 
   return (
     <div className="w-full flex flex-row md:hidden">

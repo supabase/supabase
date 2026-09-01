@@ -41,8 +41,8 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
 
   const formId = 'publication-editor'
   const FormSchema = z.object({
-    name: z.string().min(1, 'Name is required'),
-    tables: z.array(z.string()).min(1, 'At least one table is required'),
+    name: z.string().min(1, 'Name is required.'),
+    tables: z.array(z.string()).min(1, 'At least one table is required.'),
   })
   const defaultValues: z.infer<typeof FormSchema> = {
     name: '',

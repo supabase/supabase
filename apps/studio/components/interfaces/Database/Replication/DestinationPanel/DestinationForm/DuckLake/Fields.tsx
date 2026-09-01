@@ -29,6 +29,13 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DEFAULT_DUCKLAKE_POOL_SIZE, STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
 import {
+  DUCKLAKE_BUCKET_FIELD_COPY,
+  DUCKLAKE_CATALOG_PROJECT_FIELD_COPY,
+  DUCKLAKE_CATALOG_URL_FIELD_COPY,
+  DUCKLAKE_DATA_PATH_FIELD_COPY,
+  DUCKLAKE_STORAGE_PROJECT_FIELD_COPY,
+} from '../DestinationFormFieldCopy'
+import {
   DUCKLAKE_MODE_CUSTOM,
   DUCKLAKE_MODE_SUPABASE,
   type DucklakeMode,
@@ -192,14 +199,11 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
         render={({ field }) => (
           <FormItemLayout
             layout="horizontal"
-            label="Catalog project"
+            label={DUCKLAKE_CATALOG_PROJECT_FIELD_COPY.label}
             description={
               <div className="flex flex-col gap-y-2">
                 {renderRegionWarning(field.value)}
-                <span>
-                  Pipelines connects to this project's Postgres instance to store the DuckLake
-                  catalog
-                </span>
+                <span>{DUCKLAKE_CATALOG_PROJECT_FIELD_COPY.description}</span>
               </div>
             }
           >
@@ -268,11 +272,11 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
         render={({ field }) => (
           <FormItemLayout
             layout="horizontal"
-            label="Storage project"
+            label={DUCKLAKE_STORAGE_PROJECT_FIELD_COPY.label}
             description={
               <div className="flex flex-col gap-y-2">
                 {renderRegionWarning(field.value)}
-                <span>The project whose object storage holds the DuckLake data files</span>
+                <span>{DUCKLAKE_STORAGE_PROJECT_FIELD_COPY.description}</span>
               </div>
             }
           >
@@ -297,8 +301,8 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
         render={({ field }) => (
           <FormItemLayout
             layout="horizontal"
-            label="Bucket"
-            description="The bucket in which DuckLake data files will be stored."
+            label={DUCKLAKE_BUCKET_FIELD_COPY.label}
+            description={DUCKLAKE_BUCKET_FIELD_COPY.description}
           >
             <div className="flex items-center gap-x-2">
               <div className="grow">
@@ -387,11 +391,11 @@ const DuckLakeCustomFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="Catalog URL"
+              label={DUCKLAKE_CATALOG_URL_FIELD_COPY.label}
               description={
                 editMode
-                  ? 'Stored catalog URL is hidden. Enter a new URL to replace it.'
-                  : 'A PostgreSQL connection string for the DuckLake catalog'
+                  ? DUCKLAKE_CATALOG_URL_FIELD_COPY.editDescription
+                  : DUCKLAKE_CATALOG_URL_FIELD_COPY.createDescription
               }
             >
               <FormControl>
@@ -426,8 +430,8 @@ const DuckLakeCustomFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="Data path"
-              description="An S3 path where DuckLake data files will be written"
+              label={DUCKLAKE_DATA_PATH_FIELD_COPY.label}
+              description={DUCKLAKE_DATA_PATH_FIELD_COPY.description}
             >
               <FormControl>
                 <Input {...field} placeholder="s3://bucket/path" value={field.value ?? ''} />
@@ -639,9 +643,11 @@ const DuckLakeCustomFields = ({
 export const DuckLakeFields = ({
   form,
   editMode,
+  className,
 }: {
   form: UseFormReturn<DestinationPanelSchemaType>
   editMode: boolean
+  className?: string
 }) => {
   const ducklakeMode = (useWatch({ control: form.control, name: 'ducklakeMode' }) ??
     DUCKLAKE_MODE_SUPABASE) as DucklakeMode
@@ -651,7 +657,7 @@ export const DuckLakeFields = ({
   const effectiveMode = editMode ? DUCKLAKE_MODE_CUSTOM : ducklakeMode
 
   return (
-    <div className="flex flex-col gap-y-6 p-5">
+    <div className={cn('flex flex-col gap-y-6 p-5', className)}>
       <p className="text-sm font-medium text-foreground">DuckLake settings</p>
 
       {!editMode && (

@@ -131,6 +131,8 @@ export const LOCAL_STORAGE_KEYS = {
   // Dated so the key retires with the banner; see BannerLogsAllDeprecation
   LOGS_ALL_DEPRECATION_2026_09_23: 'logs-all-deprecation-2026-09-23-dismissed',
   SCOPED_TOKENS_MIGRATION_ADMONITION_DISMISSED: 'scoped-tokens-migration-admonition-dismissed',
+  REPLICATION_LOCAL_UNAVAILABLE_ADMONITION_DISMISSED:
+    'replication-local-unavailable-admonition-dismissed',
   STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED: (ref: string, bucketId: string) =>
     `storage-public-bucket-select-policy-warning-dismissed-${ref}-${bucketId}`,
   /**

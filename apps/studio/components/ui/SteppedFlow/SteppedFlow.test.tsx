@@ -84,15 +84,32 @@ describe('SteppedFlow', () => {
         currentStep="review"
         onStepChange={vi.fn()}
         onNext={vi.fn()}
-        finalAction={{ label: 'Create and start pipeline', onClick: onFinal }}
+        finalAction={{ label: 'Start pipeline', onClick: onFinal }}
       >
         Step body
       </SteppedFlow>
     )
 
     expect(screen.queryByRole('button', { name: /Next/ })).not.toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Create and start pipeline' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Start pipeline' }))
     expect(onFinal).toHaveBeenCalledOnce()
+  })
+
+  test('uses the warning variant for the final action when requested', () => {
+    customRender(
+      <SteppedFlow
+        steps={steps}
+        currentStep="review"
+        onStepChange={vi.fn()}
+        finalAction={{ label: 'Start pipeline anyway', variant: 'warning' }}
+      >
+        Step body
+      </SteppedFlow>
+    )
+
+    expect(screen.getByRole('button', { name: 'Start pipeline anyway' })).toHaveClass(
+      'bg-warning-300'
+    )
   })
 
   test('renders a step header heading', () => {
@@ -131,7 +148,7 @@ describe('SteppedFlow', () => {
         currentStep="review"
         onStepChange={vi.fn()}
         navigationDisabled
-        finalAction={{ label: 'Create and start pipeline', loading: true }}
+        finalAction={{ label: 'Start pipeline', loading: true }}
       >
         Step body
       </SteppedFlow>
@@ -162,12 +179,12 @@ describe('SteppedFlow', () => {
         currentStep="review"
         onStepChange={vi.fn()}
         navigationDisabled
-        finalAction={{ label: 'Create and start pipeline' }}
+        finalAction={{ label: 'Start pipeline' }}
       >
         Step body
       </SteppedFlow>
     )
 
-    expect(screen.getByRole('button', { name: 'Create and start pipeline' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Start pipeline' })).toBeDisabled()
   })
 })

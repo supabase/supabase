@@ -8,6 +8,11 @@ import { cloneElement, forwardRef, isValidElement, ReactNode } from 'react'
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from '../../lib/constants'
 import { cn } from '../../lib/utils/cn'
 import { getExplicitTabIndex } from '../../lib/utils/getExplicitTabIndex'
+import {
+  ComboboxTrigger,
+  isChevronsUpDownIcon,
+  shouldUseComboboxTrigger,
+} from '../shadcn/ui/select-trigger'
 
 export type ButtonVariantProps = VariantProps<typeof buttonVariants>
 const buttonVariants = cva(
@@ -204,14 +209,50 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const Comp = asChild ? Slot.Slot : 'button'
-    const { className, tabIndex } = props
+    const { className, tabIndex, role, disabled: disabledProp, onClick, ...restProps } = props
     const showIcon = loading || icon
     // decrecating 'showIcon' for rightIcon
     const _iconLeft: React.ReactNode = icon ?? iconLeft
     // if loading, button is disabled
-    const disabled = loading === true || props.disabled
+    const disabled = loading === true || disabledProp
 
     const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
+
+    const useComboboxTrigger = shouldUseComboboxTrigger({
+      asChild,
+      role,
+      variant,
+      iconRight,
+    })
+
+    if (useComboboxTrigger) {
+      const trailingIcon = loading ? (
+        <Loader2 className={cn('h-4 w-4 animate-spin', loadingVariants({ loading, variant }))} />
+      ) : iconRight && !isChevronsUpDownIcon(iconRight) ? (
+        iconRight
+      ) : undefined
+
+      return (
+        <ComboboxTrigger
+          ref={ref}
+          size={size}
+          type={type}
+          role="combobox"
+          disabled={disabled}
+          tabIndex={computedTabIndex}
+          leadingIcon={_iconLeft ?? undefined}
+          icon={trailingIcon}
+          className={cn(block && 'w-full', className)}
+          onClick={(e) => {
+            if (disabled) return e.preventDefault()
+            onClick?.(e)
+          }}
+          {...restProps}
+        >
+          {children}
+        </ComboboxTrigger>
+      )
+    }
 
     const renderIconContainer = (content: ReactNode) => (
       <div aria-hidden className={cn(IconContainerVariants({ size, variant }))}>
@@ -224,14 +265,15 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         data-size={size}
         type={type}
-        {...props}
+        role={role}
+        {...restProps}
         disabled={disabled}
         tabIndex={computedTabIndex}
         className={cn(buttonVariants({ variant, size, disabled, block, rounded }), className)}
         onClick={(e) => {
           // [Joshen] Prevents redirecting if Button is used with a link-based child element
           if (disabled) return e.preventDefault()
-          else props?.onClick?.(e)
+          else onClick?.(e)
         }}
       >
         {asChild ? (

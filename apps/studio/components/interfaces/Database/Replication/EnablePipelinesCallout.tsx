@@ -24,12 +24,13 @@ import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { DOCS_URL } from '@/lib/constants'
 
 type EnablePipelinesModalProps =
-  | { open: boolean; onOpenChange: (open: boolean) => void }
-  | { open?: never; onOpenChange?: never }
+  | { open: boolean; onOpenChange: (open: boolean) => void; onCancel?: () => void }
+  | { open?: never; onOpenChange?: never; onCancel?: never }
 
 export const EnablePipelinesModal = ({
   open: extOpen,
   onOpenChange,
+  onCancel,
 }: EnablePipelinesModalProps) => {
   const { ref: projectRef } = useParams()
   const [_open, _setOpen] = useState(false)
@@ -101,7 +102,14 @@ export const EnablePipelinesModal = ({
           </Admonition>
         </DialogSection>
         <DialogFooter>
-          <Button variant="default" disabled={creatingTenantSource} onClick={() => setOpen(false)}>
+          <Button
+            variant="default"
+            disabled={creatingTenantSource}
+            onClick={() => {
+              setOpen(false)
+              onCancel?.()
+            }}
+          >
             Cancel
           </Button>
           {hasAccess ? (

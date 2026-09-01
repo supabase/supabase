@@ -1,10 +1,11 @@
 import { useBreakpoint, useFlag, useParams } from 'common'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useState } from 'react'
+import { PropsWithChildren, useCallback, useEffect, useState } from 'react'
 import { ResizablePanel, ResizablePanelGroup, SidebarProvider, usePanelRef } from 'ui'
 import { SkipToContent } from 'ui-patterns/SkipToContent'
 
 import { BannerStack } from '../ui/BannerStack/BannerStack'
+import { IsolatedStudioFlowCloseProvider } from './Navigation/LayoutHeader/IsolatedStudioFlowClose'
 import { LayoutHeader } from './Navigation/LayoutHeader/LayoutHeader'
 import MobileNavigationBar from './Navigation/NavigationBar/MobileNavigationBar'
 import { MobileSheetProvider } from './Navigation/NavigationBar/MobileSheetContext'
@@ -19,6 +20,7 @@ import { AppBannerWrapper } from '@/components/interfaces/App/AppBannerWrapper'
 import { GitHubConfigDriftBanner } from '@/components/interfaces/App/GitHubConfigDriftBanner'
 import { Sidebar } from '@/components/interfaces/Sidebar'
 import { useSyncScopedIntrospection } from '@/data/scoped-introspection'
+import { useIsolatedStudioFlow } from '@/hooks/misc/useHideSidebar'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useCheckLatestDeploy } from '@/hooks/use-check-latest-deploy'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -55,7 +57,17 @@ export const DefaultLayout = ({
   const appSnap = useAppStateSnapshot()
   const { isMaximised, activeSidebar } = useSidebarManagerSnapshot()
   const { lastVisitedOrganization } = useLastVisitedOrganization()
+  const isolatedFlow = useIsolatedStudioFlow()
   const showConfigDrift = useFlag('ConfigDrift') && IS_PLATFORM
+  const resolvedHeaderTitle = headerTitle ?? (isolatedFlow ? 'New pipeline' : undefined)
+  const resolvedHideMobileMenu = hideMobileMenu || isolatedFlow
+  const closeIsolatedFlow = useCallback(() => {
+    if (!ref) return
+    // Isolated flows currently only exist for pipeline create. Pages override
+    // this with useRegisterIsolatedStudioFlowClose when they need a different
+    // destination (or a dirty-state confirm).
+    router.push(`/project/${ref}/database/replication`)
+  }, [ref, router])
 
   const [isMounted, setIsMounted] = useState(false)
 
@@ -96,54 +108,66 @@ export const DefaultLayout = ({
       <LayoutSidebarProvider>
         <ProjectContextProvider projectRef={ref}>
           <MobileSheetProvider>
-            <div className="flex flex-col h-screen w-screen">
-              <SkipToContent href="#main" />
-              {/* Top Banner */}
-              <AppBannerWrapper />
-              <div className="shrink-0">
-                {isMobile && (
-                  <MobileNavigationBar
-                    hideMobileMenu={hideMobileMenu}
+            <IsolatedStudioFlowCloseProvider
+              fallbackClose={isolatedFlow ? closeIsolatedFlow : undefined}
+            >
+              <div className="flex flex-col h-screen w-screen">
+                <SkipToContent href="#main" />
+                {/* Top Banner */}
+                <AppBannerWrapper />
+                <div className="shrink-0">
+                  {isMobile && (
+                    <MobileNavigationBar
+                      hideMobileMenu={resolvedHideMobileMenu}
+                      backToDashboardURL={backToDashboardURL}
+                      headerTitle={resolvedHeaderTitle}
+                    />
+                  )}
+                  <LayoutHeader
+                    headerTitle={resolvedHeaderTitle}
                     backToDashboardURL={backToDashboardURL}
                   />
-                )}
-                <LayoutHeader headerTitle={headerTitle} backToDashboardURL={backToDashboardURL} />
-                {showConfigDrift && ref && <GitHubConfigDriftBanner />}
-              </div>
-              {/* Main Content Area */}
-              <div className="flex flex-1 w-full overflow-y-hidden">
-                {/* Sidebar - Only show for project pages, not account pages */}
-                {!router.pathname.startsWith('/account') && <Sidebar />}
-                {/* Main Content with Layout Sidebar */}
-                <ResizablePanelGroup
-                  orientation="horizontal"
-                  className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
-                  autoSaveId="default-layout-content"
-                >
-                  <ResizablePanel
-                    id="panel-content"
-                    className="w-full"
-                    panelRef={panelRef}
-                    collapsible={activeSidebar?.id === SIDEBAR_KEYS.AI_ASSISTANT}
-                    minSize={`${contentMinSizePercentage}`}
-                    maxSize={`${contentMaxSizePercentage}`}
-                    defaultSize={`${contentMaxSizePercentage}`}
+                  {showConfigDrift && ref && <GitHubConfigDriftBanner />}
+                </div>
+                {/* Main Content Area */}
+                <div className="flex flex-1 w-full overflow-y-hidden">
+                  {/* Sidebar - Only show for project pages, not account pages */}
+                  {!router.pathname.startsWith('/account') && <Sidebar />}
+                  {/* Main Content with Layout Sidebar */}
+                  <ResizablePanelGroup
+                    orientation="horizontal"
+                    className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
+                    autoSaveId="default-layout-content"
                   >
-                    <main id="main" tabIndex={-1} className="h-full overflow-y-auto outline-hidden">
-                      {children}
-                    </main>
-                  </ResizablePanel>
-                  <LayoutSidebar
-                    minSize={`${100 - contentMaxSizePercentage}`}
-                    maxSize="100"
-                    defaultSize={`${100 - contentMaxSizePercentage}`}
-                  />
-                </ResizablePanelGroup>
+                    <ResizablePanel
+                      id="panel-content"
+                      className="w-full"
+                      panelRef={panelRef}
+                      collapsible={activeSidebar?.id === SIDEBAR_KEYS.AI_ASSISTANT}
+                      minSize={`${contentMinSizePercentage}`}
+                      maxSize={`${contentMaxSizePercentage}`}
+                      defaultSize={`${contentMaxSizePercentage}`}
+                    >
+                      <main
+                        id="main"
+                        tabIndex={-1}
+                        className="h-full overflow-y-auto outline-hidden"
+                      >
+                        {children}
+                      </main>
+                    </ResizablePanel>
+                    <LayoutSidebar
+                      minSize={`${100 - contentMaxSizePercentage}`}
+                      maxSize="100"
+                      defaultSize={`${100 - contentMaxSizePercentage}`}
+                    />
+                  </ResizablePanelGroup>
+                </div>
               </div>
-            </div>
 
-            <BannerStack />
-            <StudioMobileSheetNav />
+              <BannerStack />
+              <StudioMobileSheetNav />
+            </IsolatedStudioFlowCloseProvider>
           </MobileSheetProvider>
         </ProjectContextProvider>
       </LayoutSidebarProvider>

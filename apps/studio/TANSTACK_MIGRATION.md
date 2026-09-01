@@ -83,7 +83,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 ### Project shell
 
 - [x] `routes/project/$ref.tsx` — DefaultLayout only. **Delta vs plan:** ProjectLayoutWithAuth omitted from the shell because product layouts (DatabaseLayout, AuthLayout, StorageLayout, …) already render `withAuth(... ProjectLayout ...)` internally — adding it here would double-wrap. The home page (`/project/$ref/index.tsx`) wraps itself in `ProjectLayoutWithAuth` since it has no product layout.
-- [x] `routes/project/$ref/database.tsx` — DatabaseLayout (reads `databaseLayoutTitle` from leaf `staticData`)
+- [x] `routes/project/$ref/database.tsx` — DatabaseLayout (reads `databaseLayoutTitle` from leaf `staticData`). **Delta vs plan:** shell honours `skipDatabaseLayout: true` for `replication/new`, which wraps in `ProjectLayoutWithAuth` without the Database product menu. That leaf hides the primary sidebar and lightens LayoutHeader to logo + org + project + title with a close control.
 - [x] `routes/project/$ref/database/triggers.tsx` — sub-shell with `PageLayout` + permission gate + nav items, inlined from `DatabaseTriggersLayout`. **Delta vs plan:** the existing `DatabaseTriggersLayout` component wraps `<DatabaseLayout title="Triggers">` internally, so re-using it inside the database.tsx shell would double-wrap. Inlined the inner part instead; the Next-side component is left untouched (still used by the `pages/...` files we re-export).
 - [x] `routes/project/$ref/auth.tsx` — AuthLayout (reads `authLayoutTitle` from leaf `staticData`). **Delta vs plan:** shell honours a `skipAuthLayout: true` opt-out in `staticData` for leaves whose own body or sub-layout already wraps in `AuthLayout` (`AuthProvidersLayout`, `AuthEmailsLayout`, `pages/.../auth/third-party.tsx`) — without it those routes would double-wrap (which also doubles `withAuth` + `ProjectLayout`).
 - ~~`routes/project/$ref/auth/templates.tsx` — AuthEmailsLayout~~ **Delta vs plan: not landed.** A unified `templates.tsx` sub-shell would force `templates/$templateId.tsx` (which uses plain `AuthLayout`, not `AuthEmailsLayout`) into the wrong wrapping. Instead `templates/index.tsx` and `auth/smtp.tsx` each set `skipAuthLayout: true` and wrap themselves in `AuthEmailsLayout`; `templates/$templateId.tsx` uses the standard auth shell with `authLayoutTitle: 'Emails'`.
@@ -183,6 +183,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/database/replication/index.tsx` ← `pages/project/[ref]/database/replication/index.tsx`
 - [x] A `routes/project/$ref/database/replication/$pipelineId.tsx` ← `pages/project/[ref]/database/replication/[pipelineId].tsx`
 - [x] A `routes/project/$ref/database/replication/replica/$replicaId.tsx` ← `pages/project/[ref]/database/replication/replica/[replicaId].tsx` (redirects to Infrastructure)
+- [x] A `routes/project/$ref/database/replication/new.tsx` ← `pages/project/[ref]/database/replication/new.tsx` (sets `skipDatabaseLayout: true`, wraps in `ProjectLayoutWithAuth` without the Database product menu; isolated sidebar, LayoutHeader is logo + org + project + title with a close control)
 - [x] A `routes/project/$ref/database/triggers/index.tsx` ← `pages/project/[ref]/database/triggers/index.tsx`
 - [x] A `routes/project/$ref/database/triggers/data.tsx` ← `pages/project/[ref]/database/triggers/data.tsx` (sub-shell at `database/triggers.tsx` provides PageLayout + nav, parent shell provides DatabaseLayout)
 - [x] A `routes/project/$ref/database/triggers/event.tsx` ← `pages/project/[ref]/database/triggers/event.tsx` (same as data)
@@ -461,10 +462,9 @@ inline.
   `router.subscribe(tsEvent, …)`. Forwards Next's `(url, { shallow })`
   args. Maps `routeChangeStart` / `routeChangeComplete` /
   `beforeHistoryChange` / `hashChangeStart` / `hashChangeComplete`.
-  **Known gap:** Next's throw-from-`routeChangeStart`-to-cancel pattern
-  isn't supportable — `subscribe` is fire-and-forget.
-  `usePreventNavigationOnUnsavedChanges` relies on it and needs
-  migrating to TanStack's `useBlocker` separately.
+  **Cancellation:** Next's throw-from-`routeChangeStart`-to-cancel pattern
+  isn't supportable because `subscribe` is fire-and-forget.
+  `usePreventNavigationOnUnsavedChanges` blocks through TanStack history instead.
 - `api.ts` — `toWebHandler(nextHandler)`. See **API routes → Shim
   coverage** above.
 - `link.tsx`, `navigation.ts`, `dynamic.tsx`, `image.tsx`,
@@ -610,7 +610,7 @@ for the Vite pipeline:
 
 - Switch `routes/index.tsx` redirects from `href` to `to` — all targets
   now live in the TanStack tree.
-- Migrate `usePreventNavigationOnUnsavedChanges` from `router.events.on('routeChangeStart', …)` (throw-to-cancel pattern) to TanStack's `useBlocker`.
+- [x] Make `usePreventNavigationOnUnsavedChanges` block through TanStack history while retaining the Next implementation for the legacy runtime.
 - Drop the `_splat` / `routeSlug` normalisation block from
   `pages/org/_/[[...routeSlug]].tsx` + `pages/project/_/[[...routeSlug]].tsx` (only there to keep both runtimes mounting the same body).
 - Remove `RouteValidationWrapper` + `next/router` compat shim usage from `__root.tsx`.

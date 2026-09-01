@@ -3,6 +3,7 @@ import { useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import {
   Button,
+  cn,
   FormControl,
   FormField,
   Input,
@@ -16,18 +17,25 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
+import {
+  CLICKHOUSE_DATABASE_FIELD_COPY,
+  CLICKHOUSE_ENGINE_FIELD_COPY,
+  CLICKHOUSE_URL_FIELD_COPY,
+} from '../DestinationFormFieldCopy'
 
 export const ClickHouseFields = ({
   form,
   editMode,
+  className,
 }: {
   form: UseFormReturn<DestinationPanelSchemaType>
   editMode: boolean
+  className?: string
 }) => {
   const [showPassword, setShowPassword] = useState(false)
 
   return (
-    <div className="flex flex-col gap-y-6 p-5">
+    <div className={cn('flex flex-col gap-y-6 p-5', className)}>
       <p className="text-sm font-medium text-foreground">ClickHouse settings</p>
 
       <div className="flex flex-col gap-y-4">
@@ -37,8 +45,8 @@ export const ClickHouseFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="URL"
-              description="HTTPS endpoint for your ClickHouse server, including port"
+              label={CLICKHOUSE_URL_FIELD_COPY.label}
+              description={CLICKHOUSE_URL_FIELD_COPY.description}
             >
               <FormControl>
                 <Input
@@ -110,8 +118,8 @@ export const ClickHouseFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="Database"
-              description="The ClickHouse database where replicated tables will be created"
+              label={CLICKHOUSE_DATABASE_FIELD_COPY.label}
+              description={CLICKHOUSE_DATABASE_FIELD_COPY.description}
             >
               <FormControl>
                 <Input {...field} value={field.value ?? ''} placeholder="default" />
@@ -126,8 +134,8 @@ export const ClickHouseFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="Table engine"
-              description="Server defaults to replacing_merge_tree when unset"
+              label={CLICKHOUSE_ENGINE_FIELD_COPY.label}
+              description={CLICKHOUSE_ENGINE_FIELD_COPY.description}
             >
               <FormControl>
                 <Select
