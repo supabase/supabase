@@ -165,7 +165,7 @@ export const ConnectionPooling = () => {
         </PageSectionSummary>
         <PageSectionAside>
           <DocsButton
-            href={`${DOCS_URL}/guides/database/connecting-to-postgres#connection-pooler`}
+            href={`${DOCS_URL}/guides/database/connecting-to-postgres#how-connection-pooling-works`}
           />
         </PageSectionAside>
       </PageSectionMeta>
