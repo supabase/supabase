@@ -10,7 +10,7 @@ import {
 
 describe('getMonitoringAgent', () => {
   it('returns a registered agent', () => {
-    expect(getMonitoringAgent('health').name).toBe('Doctor')
+    expect(getMonitoringAgent('health').name).toBe('Health monitor')
   })
 
   it('fails clearly for an unknown id', () => {

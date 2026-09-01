@@ -22,6 +22,7 @@ export function AgentSetup({ props }: HandlerContext): string {
     ...harnesses.map((harness) => {
       const parts = [`**${harness.label}**`, harness.intro, renderMarkdownSteps(harness.steps)]
       if (harness.note) parts.push(harness.note)
+      parts.push(`[${harness.label} docs](${harness.docsUrl})`)
       return parts.join('\n\n')
     }),
   ]

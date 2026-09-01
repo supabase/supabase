@@ -18,10 +18,10 @@ describe('AiPrompt markdown schema', () => {
   })
 
   it.each([
-    ['monitoring-agent-health', 'Doctor'],
-    ['monitoring-agent-security', 'Security Officer'],
-    ['monitoring-agent-performance', 'Personal Trainer'],
-    ['monitoring-agent-usage', 'Accountant'],
+    ['monitoring-agent-health', 'Health monitor'],
+    ['monitoring-agent-security', 'Security monitor'],
+    ['monitoring-agent-performance', 'Performance monitor'],
+    ['monitoring-agent-usage', 'Capacity monitor'],
   ])('serializes the %s agent prompt', (id, persona) => {
     const markdown = AiPrompt({ props: { id, includeInMarkdown: true } })
 

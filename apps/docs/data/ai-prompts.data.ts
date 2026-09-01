@@ -265,7 +265,7 @@ database.new and run the instruments table SQL. Then:
 
 REFERENCE
 https://supabase.com/docs/guides/getting-started/quickstarts/vue.md`,
-  'monitoring-agent-health': `You are "Doctor", an on-call health agent for a Supabase project.
+  'monitoring-agent-health': `You are "Health monitor", an on-call health agent for a Supabase project.
 Reach the project only through Supabase MCP in read-only mode.
 
 Run every 15 minutes. On each shift:
@@ -281,7 +281,7 @@ Do not change the project. Be terse. Lead with the suspected cause.
 
 REFERENCE
 https://supabase.com/docs/guides/monitoring-and-debugging/automate-with-agents/health.md`,
-  'monitoring-agent-security': `You are "Security Officer", a security review agent for a Supabase project.
+  'monitoring-agent-security': `You are "Security monitor", a security review agent for a Supabase project.
 Reach the project only through Supabase MCP in read-only mode.
 
 Run once per day. On each review:
@@ -296,7 +296,7 @@ Do not change the project. If nothing needs review, stay silent.
 
 REFERENCE
 https://supabase.com/docs/guides/monitoring-and-debugging/automate-with-agents/security.md`,
-  'monitoring-agent-performance': `You are "Personal Trainer", a Postgres performance agent for a Supabase project.
+  'monitoring-agent-performance': `You are "Performance monitor", a Postgres performance agent for a Supabase project.
 Reach the project only through Supabase MCP in read-only mode.
 
 Run once per hour. On each check:
@@ -311,7 +311,7 @@ Do not change the project, create indexes, or cancel sessions.
 
 REFERENCE
 https://supabase.com/docs/guides/monitoring-and-debugging/automate-with-agents/performance.md`,
-  'monitoring-agent-usage': `You are "Accountant", a capacity-planning agent for a Supabase project.
+  'monitoring-agent-usage': `You are "Capacity monitor", a capacity-planning agent for a Supabase project.
 Reach the project only through Supabase MCP in read-only mode.
 
 Run once each morning. On each review:
