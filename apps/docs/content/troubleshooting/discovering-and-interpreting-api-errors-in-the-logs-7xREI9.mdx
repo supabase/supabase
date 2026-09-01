@@ -98,21 +98,18 @@ limit 100;
 **Suggested use cases:**
 
 - identify problematic queries
-- identify unusual behavior by authenticated users
 
-| Column                                       | Description                                               | Sample value                                                                                                              |
-| -------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| request.method                               | Request Method (PATCH, GET, PUT...)                       | GET                                                                                                                       |
-| request.url                                  | Request URL, which contains the PostgREST formatted query | https://yuhplfrsdxxxtldakizi.supabase.co/rest/v1/users?select=username&id=eq.63b6190e-214f-4b8a-b72d-3af6e1921411&limit=1 |
-| request.sb.jwt.authorization.payload.subject | authenticated user's ID                                   | 63b6190e-214f-4b8a-b72d-3af6e1921411                                                                                      |
+| Column         | Description                                               | Sample value                                                                                                              |
+| -------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| request.method | Request Method (PATCH, GET, PUT...)                       | GET                                                                                                                       |
+| request.url    | Request URL, which contains the PostgREST formatted query | https://yuhplfrsdxxxtldakizi.supabase.co/rest/v1/users?select=username&id=eq.63b6190e-214f-4b8a-b72d-3af6e1921411&limit=1 |
 
 **Unnesting example:**
 
 ```sql
 select
   log_attributes['request.method'] as method,
-  log_attributes['request.url'] as url,
-  log_attributes['request.sb.jwt.authorization.payload.subject'] as auth_user
+  log_attributes['request.url'] as url
 from logs
 where source = 'edge_logs'
 limit 100;
@@ -289,23 +286,5 @@ where
   and match(log_attributes['request.path'], '^/auth/v1/')
 group by ip
 order by ip_count desc
-limit 100;
-```
-
-**Search frequented query paths by authenticated user:**
-
-```sql
-select
-  -- only available for front-end clients
-  log_attributes['request.sb.jwt.authorization.payload.subject'] as auth_user,
-  log_attributes['request.path'] as path,
-  count() as request_count
-from logs
-where
-  source = 'edge_logs'
-  -- only look at DB API
-  and match(log_attributes['request.path'], '^/rest/v1/')
-group by auth_user, path
-order by request_count desc
 limit 100;
 ```
