@@ -395,7 +395,13 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
           <ExplorerToolbarIcon>
             <CodeSquare size={16} strokeWidth={2} />
           </ExplorerToolbarIcon>
-          <ExplorerToolbarTitle onSaveTitle={onTitleChange}>{title}</ExplorerToolbarTitle>
+          {variant === 'viewport' ? (
+            <ExplorerToolbarTitle className="text-muted text-xs italic">
+              Run SQL
+            </ExplorerToolbarTitle>
+          ) : (
+            <ExplorerToolbarTitle onSaveTitle={onTitleChange}>{title}</ExplorerToolbarTitle>
+          )}
           <ExplorerToolbarActions>
             {onSourceChange && (
               <QuerySourceMenu
