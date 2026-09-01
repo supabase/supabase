@@ -3,7 +3,7 @@
   "specifiers": {
     "jsr:@supabase/functions-js@2.108.2": "2.108.2",
     "npm:@modelcontextprotocol/server@2.0.0": "2.0.0",
-    "npm:@supabase/server@1.5.0-rc.114": "1.5.0-rc.114_@supabase+supabase-js@2.108.2",
+    "npm:@supabase/server@1.5.1": "1.5.1_@supabase+supabase-js@2.108.2",
     "npm:@supabase/supabase-js@2.108.2": "2.108.2",
     "npm:openai@^4.52.5": "4.104.0"
   },
@@ -41,8 +41,8 @@
         "tslib"
       ]
     },
-    "@supabase/middleware@0.3.1": {
-      "integrity": "sha512-ssU8dSgRkKJwwT8AaAno4HDrXs0iD4ocNKDPeBGmi3KIQNtjXZrW4ae4NAPg5O75xHkheOfrZPeXhH2edwgeRw==",
+    "@supabase/middleware@0.4.0": {
+      "integrity": "sha512-iGDAzSQVKRzaKkcbap4G9C20NWc6MYXNht2Mgg7dkY1E8H3Y4bsR7UlWiaL1sbMkgVO/qS0GnrEEXPnzzBXd0A==",
       "dependencies": [
         "std-env"
       ]
@@ -63,8 +63,8 @@
         "tslib"
       ]
     },
-    "@supabase/server@1.5.0-rc.114_@supabase+supabase-js@2.108.2": {
-      "integrity": "sha512-H3/riTkn5fwMXNnYk0I4e5hjo/SwUhRiMvy/DwWko20sqzsEJYyxfcjjpmBC+10BBQEzbxhfmJ0xyeLNEiJuPg==",
+    "@supabase/server@1.5.1_@supabase+supabase-js@2.108.2": {
+      "integrity": "sha512-rQFxruipHTWFHEVnUYRrcH2dHLBRapk5hsrpwyssrvH3HJZIh+VZJ6Qa+tgcbIUVSmPaqYehFsFUU3LH9LlsDQ==",
       "dependencies": [
         "@supabase/middleware",
         "@supabase/supabase-js",

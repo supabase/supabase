@@ -28,6 +28,12 @@ The function verifies access tokens itself, so disable the gateway JWT check:
 verify_jwt = false
 ```
 
+The project must sign JWTs with an asymmetric key. Projects that still use the
+legacy HS256 secret do not expose signing keys from the JWKS endpoint, so the
+function cannot authenticate embedded product sessions or external MCP clients.
+Switch to an ES256 or RS256 key in
+[JWT Keys](https://supabase.com/dashboard/project/_/settings/jwt).
+
 ## Choose how agents authenticate
 
 ### Embedded product agents
@@ -58,11 +64,6 @@ change.
 
 `allow_dynamic_registration` lets any compatible client register itself. Set it
 to `false` if you register clients yourself.
-
-This assumes the project signs JWTs with an asymmetric key. A project still using
-the legacy HS256 secret cannot issue ID tokens, so clients that request the
-`openid` scope fail. Switch to an ES256 or RS256 key in
-[JWT Keys](https://supabase.com/dashboard/project/_/settings/jwt).
 
 ## Authentication
 
