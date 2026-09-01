@@ -1,29 +1,41 @@
-import { getCreatePublicationSQL } from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from '../sql/execute-sql-mutation'
 import { replicationKeys } from './keys'
+import { handleError, put } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type CreatePublicationParams = {
   projectRef: string
   sourceId: number
   name: string
-  tables: { schema: string; name: string }[]
-  connectionString?: string | null
+  tableIds: number[]
 }
 
 async function createPublication(
-  { projectRef, connectionString, name, tables }: CreatePublicationParams,
+  { projectRef, sourceId, name, tableIds }: CreatePublicationParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const sql = getCreatePublicationSQL({ name, tables })
-  const { result } = await executeSql({ projectRef, connectionString, sql }, signal)
+  const { data, error } = await put(
+    '/platform/replication/v2/{ref}/sources/{source_id}/publications/{publication_name}',
+    {
+      params: { path: { ref: projectRef, source_id: sourceId, publication_name: name } },
+      body: {
+        type: 'tables',
+        tables: tableIds.map((id) => ({ id })),
+        operations: ['insert', 'update', 'delete', 'truncate'],
+        publish_via_partition_root: true,
+      },
+      signal,
+    }
+  )
+  if (error) {
+    handleError(error)
+  }
 
-  return result
+  return data
 }
 
 type CreatePublicationData = Awaited<ReturnType<typeof createPublication>>

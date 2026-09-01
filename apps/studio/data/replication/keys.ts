@@ -4,8 +4,26 @@ export const replicationKeys = {
     ['projects', projectRef, 'destinations'] as const,
   destinationById: (projectRef: string | undefined, destinationId: number | undefined | null) =>
     ['projects', projectRef, 'destinations', destinationId] as const,
+  // Prefix shared by publicationNames, publication details, and cost-estimate keys.
+  // Publication create/update/delete invalidate this so all three refresh together.
   publications: (projectRef: string | undefined, source_id: number | undefined) =>
     ['projects', projectRef, 'sources', source_id, 'publications'] as const,
+  publicationNames: (projectRef: string | undefined, source_id: number | undefined) =>
+    ['projects', projectRef, 'sources', source_id, 'publications', 'list'] as const,
+  publication: (
+    projectRef: string | undefined,
+    source_id: number | undefined,
+    publicationName: string | undefined
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'sources',
+      source_id,
+      'publications',
+      'detail',
+      publicationName,
+    ] as const,
   tables: (projectRef: string | undefined, source_id: number | undefined) =>
     ['projects', projectRef, 'sources', source_id, 'tables'] as const,
   costEstimate: (

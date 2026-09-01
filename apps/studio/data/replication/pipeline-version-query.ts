@@ -6,8 +6,7 @@ import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type ReplicationPipelineVersionParams = { projectRef?: string; pipelineId?: number }
-type ReplicationPipelineVersionResponse =
-  components['schemas']['ReplicationPipelineVersionResponse']
+type ReplicationPipelineVersionResponse = components['schemas']['PipelineVersionResponse_Output']
 
 export async function fetchReplicationPipelineVersion(
   { projectRef, pipelineId }: ReplicationPipelineVersionParams,
