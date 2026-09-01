@@ -109,6 +109,10 @@ const levelsData = {
     icon: 'reference-javascript',
     name: 'Server Reference v1.0',
   },
+  reference_middleware_v1: {
+    icon: 'reference-javascript',
+    name: 'Middleware Reference v1.0',
+  },
   reference_javascript_v1: {
     icon: 'reference-javascript',
     name: 'JavaScript Reference v1.0',

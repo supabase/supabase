@@ -3439,6 +3439,17 @@ export const reference_server_v1 = {
   },
 }
 
+export const reference_middleware_v1 = {
+  icon: 'reference-javascript',
+  title: 'Middleware',
+  url: '/reference/middleware',
+  parent: '/reference',
+  pkg: {
+    name: '@supabase/middleware',
+    repo: 'https://github.com/supabase/middleware',
+  },
+}
+
 // TODO: How to?
 export const reference_dart_v1 = {
   icon: 'reference-dart',
