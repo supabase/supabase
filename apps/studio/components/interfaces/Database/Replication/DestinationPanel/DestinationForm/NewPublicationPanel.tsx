@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
+  Checkbox,
   Form,
   FormControl,
   FormField,
@@ -42,12 +43,14 @@ const FORM_ID = 'publication-editor'
 const FormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   tableIds: z.array(z.string()).min(1, 'At least one table is required'),
+  publishViaPartitionRoot: z.boolean(),
 })
 type FormValues = z.infer<typeof FormSchema>
 
 const defaultValues: FormValues = {
   name: '',
   tableIds: [],
+  publishViaPartitionRoot: true,
 }
 
 export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelProps) => {
@@ -110,6 +113,7 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
       sourceId,
       name: data.name,
       tableIds: data.tableIds.map(Number),
+      publishViaPartitionRoot: data.publishViaPartitionRoot,
     })
   }
 
@@ -188,6 +192,26 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
                               </MultiSelector.List>
                             </MultiSelector.Content>
                           </MultiSelector>
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="publishViaPartitionRoot"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        hideMessage
+                        label="Publish partitions as the parent table"
+                        description="Changes from partitioned tables appear in one destination table. Turn off to create a table for each partition."
+                        layout="flex"
+                      >
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            aria-label="Publish partitions as the parent table"
+                            onCheckedChange={(checked) => field.onChange(checked === true)}
+                          />
                         </FormControl>
                       </FormItemLayout>
                     )}
