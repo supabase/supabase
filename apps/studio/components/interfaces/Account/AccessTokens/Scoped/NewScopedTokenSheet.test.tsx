@@ -12,6 +12,7 @@ import { addAPIMock } from '@/tests/lib/msw'
 
 type OrganizationResponse = components['schemas']['OrganizationResponse']
 type ProjectsResponse = components['schemas']['ListProjectsPaginatedResponse']
+type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse']
 type CreateTokenResponse = components['schemas']['CreateScopedAccessTokenResponse']
 type CreateClassicTokenResponse = components['schemas']['CreateAccessTokenResponse']
 
@@ -81,6 +82,29 @@ const mockProjects = () =>
       }),
   })
 
+const mockOrgProjects = () =>
+  addAPIMock({
+    method: 'get',
+    path: '/platform/organizations/:slug/projects',
+    response: () =>
+      HttpResponse.json<OrganizationProjectsResponse>({
+        pagination: { count: 1, limit: 100, offset: 0 },
+        projects: [
+          {
+            cloud_provider: 'AWS',
+            databases: [],
+            inserted_at: new Date().toISOString(),
+            integration_source: null,
+            is_branch: false,
+            name: 'Project 1',
+            ref: 'project-1',
+            region: 'us-east-1',
+            status: 'ACTIVE_HEALTHY',
+          },
+        ],
+      }),
+  })
+
 const mockPermissionsMap = () =>
   addAPIMock({
     method: 'get',
@@ -145,6 +169,7 @@ describe('NewScopedTokenSheet', () => {
     mockPermissionsMap()
     mockOrganizations()
     mockProjects()
+    mockOrgProjects()
     mockCreateToken()
     mockCreateClassicToken()
   })
