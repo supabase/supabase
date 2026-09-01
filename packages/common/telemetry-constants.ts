@@ -69,6 +69,29 @@ export interface SignInEvent {
 }
 
 /**
+ * Triggered when a user initiates a sign-in, before the auth call resolves: password or SSO
+ * form submit (including submits that fail client-side validation), OAuth or custom-provider
+ * button click, or partner token exchange start.
+ *
+ * Fires pre-auth, so the distinct_id is the anonymous cookie — use it as a count/method
+ * metric, never as a person-level join key across the auth boundary.
+ *
+ * @group Events
+ * @source studio
+ * @page /sign-in, /sign-in-sso
+ */
+export interface SignInSubmittedEvent {
+  action: 'sign_in_submitted'
+  properties: {
+    category: 'account'
+    /**
+     * Matches the sign_in event's method vocabulary, e.g. email (password path), github, sso
+     */
+    method: string
+  }
+}
+
+/**
  * User copied the database connection string.
  *
  * @group Events
@@ -3176,7 +3199,7 @@ export interface DashboardErrorCreatedEvent {
     /**
      * Funnel the error occurred in (set only for instrumented funnel errors)
      */
-    origin?: 'signup' | 'project_creation' | 'org_creation'
+    origin?: 'signup' | 'signin' | 'project_creation' | 'org_creation'
     /**
      * Coarse classification of the funnel error
      */
@@ -3772,6 +3795,7 @@ export interface HeaderLocalVersionPopoverOpenedEvent {
 export type TelemetryEvent =
   | SignUpEvent
   | SignInEvent
+  | SignInSubmittedEvent
   | ConnectionStringCopiedEvent
   | McpInstallButtonClickedEvent
   | ApiDocsOpenedEvent
