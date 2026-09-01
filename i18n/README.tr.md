@@ -54,7 +54,7 @@ Ayrıca [self-host](https://supabase.com/docs/guides/hosting/overview) ve [yerel
 - [pg_graphql](http://github.com/supabase/pg_graphql/) GraphQL API'si sunan bir PostgreSQL uzantısı
 - [Storage](https://github.com/supabase/storage-api), izinleri yönetmek için Postgres kullanarak S3'te depolanan Dosyaları yönetmek için RESTful bir arayüz sağlar.
 - [postgres-meta](https://github.com/supabase/postgres-meta) Postgres'inizi yönetmek için RESTful bir API'dir ve tabloları getirmenize, roller eklemenize ve sorgular çalıştırmanıza vb. olanak tanır.
-- [GoTrue](https://github.com/netlify/gotrue) kullanıcıları yönetmek ve SWT belirteçleri vermek için SWT tabanlı bir API'dir.
+- [GoTrue](https://github.com/supabase/gotrue) kullanıcıları yönetmek ve JWT belirteçleri vermek için JWT tabanlı bir API'dir.
 - [Kong](https://github.com/Kong/kong) bulut tabanlı bir API ağ geçididir.
 
 #### İstemci kütüphaneleri
