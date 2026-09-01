@@ -4,9 +4,14 @@ import { useEffect } from 'react'
 
 import { InlineLink } from '@/components/ui/InlineLink'
 import { auth } from '@/lib/gotrue'
+import { classifyApiError } from '@/lib/telemetry/funnel-errors'
+import { useTrack } from '@/lib/telemetry/track'
+import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 
 export const SignInPartner = () => {
   const router = useRouter()
+  const track = useTrack()
+  const trackFunnelError = useTrackFunnelError()
 
   useEffect(() => {
     ;(async () => {
@@ -18,8 +23,12 @@ export const SignInPartner = () => {
       const { data } = await auth.getSession()
 
       if (!data.session && partner && token) {
+        track('sign_in_submitted', { category: 'account', method: partner })
         try {
-          await auth.signInWithIdToken({ provider: partner, token })
+          const { error } = await auth.signInWithIdToken({ provider: partner, token })
+          if (error) {
+            trackFunnelError('signin', classifyApiError('signin', error), 'form')
+          }
         } finally {
           router.replace({ pathname: '/sign-in-mfa', query: { method: partner } })
         }
