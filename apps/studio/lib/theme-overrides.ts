@@ -123,3 +123,13 @@ export function applyThemeOverrides(root: HTMLElement, overrides: ThemeOverrides
     }
   })
 }
+
+/**
+ * Writes a single knob straight to the document element while a slider is
+ * being dragged. The sliders are driven from local state during interaction,
+ * so the visual update must not depend on `ThemeOverridesProvider` re-running
+ * its effect — that only happens once the value is persisted on commit.
+ */
+export function previewThemeOverride(knob: ThemeOverrideKnob, value: number) {
+  document.documentElement.style.setProperty(knob.cssVar, String(clampThemeOverride(knob, value)))
+}
