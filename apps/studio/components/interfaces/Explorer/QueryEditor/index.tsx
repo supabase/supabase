@@ -227,13 +227,11 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   )
 
   const { mutateAsync: executeSql, isPending: isExecutingSql } = useExecuteSqlMutation({
-    onSuccess: (data) => onResultChange({ rows: data.result }),
-    onError: (error) => onResultChange({ error }),
+    onError: () => {},
   })
 
   const { mutateAsync: executeLogsSql, isPending: isExecutingLogs } = useExecuteLogsSqlMutation({
-    onSuccess: (data) => onResultChange({ rows: data.rows as readonly Record<string, unknown>[] }),
-    onError: (error) => onResultChange({ error }),
+    onError: () => {},
   })
 
   const isResolvingDatabase =
@@ -259,6 +257,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     }
 
     onRun?.()
+    const querySnapshot = { sql: rawSql, source: query._tag }
     // [Joshen] This is deliberate to commit the sql, rather than the passed rawSql
     // As we want to save the cell's content into the store, rather than what's getting run
     onSqlCommit?.(sql)
@@ -267,6 +266,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       if (!isOtelLogsEnabled) {
         onResultChange({
           error: { message: "Querying logs isn't available for this project yet." },
+          ...querySnapshot,
         })
         return
       }
@@ -276,7 +276,14 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
         sql: acceptUntrustedLogsSql(untrustedLogSql(rawSql)),
         range: resolveLogTimeRange(query.time_range),
         endpoint: QUERY_SOURCE_REGISTRY.logs.endpoint,
-      }).catch(() => {})
+      }).then(
+        (data) =>
+          onResultChange({
+            rows: data.rows as readonly Record<string, unknown>[],
+            ...querySnapshot,
+          }),
+        (error) => onResultChange({ error, ...querySnapshot })
+      )
       return
     }
 
@@ -284,7 +291,10 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     const limitedSql = applyAutoLimit(safeSql, rowLimit)
 
     if (!isValidConnString(connectionString)) {
-      onResultChange({ error: { message: 'Unable to run query: Connection string is missing' } })
+      onResultChange({
+        error: { message: 'Unable to run query: Connection string is missing' },
+        ...querySnapshot,
+      })
       return
     }
 
@@ -296,7 +306,10 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       contextualInvalidation: true,
       isStatementTimeoutDisabled: true,
       isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
-    }).catch(() => {})
+    }).then(
+      (data) => onResultChange({ rows: data.result, ...querySnapshot }),
+      (error) => onResultChange({ error, ...querySnapshot })
+    )
   }
 
   const handleConfirmPendingRun = () => {
@@ -584,7 +597,13 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
               : 'overflow-x-auto'
           )}
         >
-          <QueryResultRenderer view={view} result={result} chart={display?.chart} />
+          <QueryResultRenderer
+            view={view}
+            result={result}
+            chart={display?.chart}
+            sql={result?.sql}
+            source={result?.source}
+          />
         </ExplorerQueryResults>
 
         <ExplorerQueryFooter className="flex items-center gap-x-2">
