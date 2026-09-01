@@ -21,7 +21,7 @@ export const SignInPartner = () => {
         try {
           await auth.signInWithIdToken({ provider: partner, token })
         } finally {
-          router.replace({ pathname: '/sign-in-mfa' })
+          router.replace({ pathname: '/sign-in-mfa', query: { method: partner } })
         }
       } else {
         router.replace({ pathname: '/sign-in' })
