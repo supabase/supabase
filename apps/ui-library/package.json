@@ -16,11 +16,10 @@
     "build": "run-p build:content build:registry build:llms build:markdown && pnpm build:next",
     "test:markdown": "tsx --test scripts/library-mdx-to-markdown.test.ts",
     "test:middleware": "pnpm run build:markdown && tsx --test middleware.test.ts",
-    "build:app": "next build --turbopack",
     "start": "next start",
     "lint": "eslint .",
     "lint:mdx": "supa-mdx-lint content --config ../../supa-mdx-lint.config.toml",
-    "clean": "rimraf .next .turbo tsconfig.tsbuildinfo .contentlayer .velite tsconfig.tsbuildinfo",
+    "clean": "rimraf .next .turbo tsconfig.tsbuildinfo .contentlayer .velite",
     "typecheck": "pnpm build:content && tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
