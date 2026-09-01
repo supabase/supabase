@@ -19,6 +19,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DestinationType } from '../DestinationPanel.types'
+import { TableOptions } from './BigQuery/TableOptions'
 import {
   DEFAULT_CONNECTION_POOL_SIZE,
   DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
@@ -237,6 +238,17 @@ export const AdvancedSettings = ({
                     </FormItemLayout>
                   )}
                 />
+
+                <div className="flex flex-col gap-y-3">
+                  <div className="flex flex-col gap-y-1">
+                    <span className="text-sm text-foreground">Table layout</span>
+                    <p className="text-sm text-foreground-lighter">
+                      Partitioning and clustering for each BigQuery table. Applied when a
+                      destination table is first created or reset.
+                    </p>
+                  </div>
+                  <TableOptions control={form.control} />
+                </div>
               </>
             )}
           </AccordionContent>
