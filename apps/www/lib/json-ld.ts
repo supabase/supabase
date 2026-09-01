@@ -96,6 +96,38 @@ export function softwareApplicationSchema(input: SoftwareApplicationSchemaInput)
   }
 }
 
+interface ServiceSchemaInput {
+  name: string
+  description: string
+  url: string
+  serviceType: string
+  offerings: Array<{ name: string; url: string }>
+}
+
+export function serviceSchema(input: ServiceSchemaInput) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: input.name,
+    description: input.description,
+    url: input.url,
+    serviceType: input.serviceType,
+    provider: { '@id': ORG_ID },
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: `${input.name} products`,
+      itemListElement: input.offerings.map((offering) => ({
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: offering.name,
+          url: offering.url,
+        },
+      })),
+    },
+  }
+}
+
 export interface BreadcrumbItem {
   name: string
   url: string
