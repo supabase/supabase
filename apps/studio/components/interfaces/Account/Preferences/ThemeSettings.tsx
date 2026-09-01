@@ -1,6 +1,6 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useTheme } from 'next-themes'
-import { CSSProperties, memo, useCallback, useEffect, useState } from 'react'
+import { CSSProperties, memo, useCallback, useEffect, useRef, useState } from 'react'
 import SVG from 'react-inlinesvg'
 import {
   Button,
@@ -38,6 +38,7 @@ import {
   hasThemeOverrides,
   previewThemeOverride,
   THEME_OVERRIDE_KNOBS,
+  ThemeOverrideKey,
   ThemeOverrides,
 } from '@/lib/theme-overrides'
 
@@ -94,22 +95,66 @@ const SingleThemeSelection = memo(function SingleThemeSelection({
  *
  * A drag is held in local `draft` state and pushed straight to the document
  * element via `previewThemeOverride`, so moving a slider neither writes to
- * localStorage nor invalidates a React Query. The value is persisted once on
- * commit (pointer or key release), which is also when the draft is dropped and
- * the stored value takes over as the source of truth.
+ * localStorage nor invalidates a React Query. The value is persisted once the
+ * gesture ends, which is also when the draft entry is dropped and the stored
+ * value takes over as the source of truth. See `commitDraft` for why that is
+ * driven from pointer release as well as Radix's own commit callback.
  */
 const ThemeOverrideFields = () => {
   const { mode, overrides, setOverride, resetOverrides } = useThemeOverrides()
   const [draft, setDraft] = useState<ThemeOverrides>({})
+  /**
+   * The draft is mirrored in a ref because `commitDraft` has to read the value
+   * a gesture just produced from inside that same gesture, before React has
+   * re-rendered. Reading `draft` there would see the previous render's value.
+   */
+  const draftRef = useRef<ThemeOverrides>({})
+
+  const writeDraft = useCallback((next: ThemeOverrides) => {
+    draftRef.current = next
+    setDraft(next)
+  }, [])
 
   // Overrides are stored per mode, so an uncommitted dark-mode drag must not
   // be shown against light's values if the resolved mode changes mid-drag.
-  useEffect(() => setDraft({}), [mode])
+  useEffect(() => writeDraft({}), [mode, writeDraft])
 
   const handleReset = useCallback(() => {
-    setDraft({})
+    writeDraft({})
     resetOverrides()
-  }, [resetOverrides])
+  }, [resetOverrides, writeDraft])
+
+  /**
+   * Persists a knob's pending value and drops it from the draft.
+   *
+   * Radix only fires `onValueCommit` when the value at pointer release differs
+   * from the one it snapshotted at pointer press, and it reads both from its
+   * render closure. A gesture that begins and ends within a single frame — a
+   * quick flick, which is how a knob usually gets thrown to one end — leaves
+   * React no chance to re-render in between, so Radix sees no change and never
+   * commits. The knob had still been previewed imperatively, so the new value
+   * was on screen and in the slider while nothing was written; the next knob
+   * that did commit then let `applyThemeOverrides` strip the unsaved custom
+   * property, resetting the knob to its stylesheet default while the slider
+   * carried on showing the dragged number.
+   *
+   * Flushing on pointer release too means persistence no longer depends on
+   * that callback firing. Both paths are idempotent: whichever runs first
+   * clears the draft entry, and the other then finds nothing to do.
+   */
+  const commitDraft = useCallback(
+    (key: ThemeOverrideKey, committed?: number) => {
+      // Prefer the draft: it holds the last previewed value, which is also the
+      // freshest one when Radix commits a value from an earlier render.
+      const pending = draftRef.current[key] ?? committed
+      if (pending === undefined) return
+
+      setOverride(key, pending)
+      const { [key]: _flushed, ...rest } = draftRef.current
+      writeDraft(rest)
+    },
+    [setOverride, writeDraft]
+  )
 
   return (
     <CardContent className="grid grid-cols-12 gap-6">
@@ -146,13 +191,13 @@ const ThemeOverrideFields = () => {
                 step={knob.step}
                 value={[value]}
                 onValueChange={([next]) => {
-                  setDraft((current) => ({ ...current, [knob.key]: next }))
+                  writeDraft({ ...draftRef.current, [knob.key]: next })
                   previewThemeOverride(knob, next)
                 }}
-                onValueCommit={([next]) => {
-                  setOverride(knob.key, next)
-                  setDraft(({ [knob.key]: _committed, ...rest }) => rest)
-                }}
+                onValueCommit={([next]) => commitDraft(knob.key, next)}
+                // Fires after every pointer gesture, including the ones Radix
+                // decides not to commit.
+                onLostPointerCapture={() => commitDraft(knob.key)}
               />
               <p className="text-sm text-foreground-lighter">{knob.description}</p>
             </div>

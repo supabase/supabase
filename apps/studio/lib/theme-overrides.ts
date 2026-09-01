@@ -122,6 +122,30 @@ export function formatThemeOverrideValue(knob: ThemeOverrideKnob, value: number)
   return value.toFixed(decimals)
 }
 
+/**
+ * Merges one knob value into the per-mode store.
+ *
+ * Pure, so the merge can be exercised without React: writing one knob must
+ * leave its siblings alone, and writing one mode must leave the other mode's
+ * overrides alone.
+ */
+export function mergeThemeOverride(
+  current: ThemeOverridesByMode,
+  mode: ThemeOverrideMode,
+  key: ThemeOverrideKey,
+  value: number
+): ThemeOverridesByMode {
+  return { ...current, [mode]: { ...current[mode], [key]: value } }
+}
+
+/** Drops every override for one mode, leaving the other mode's untouched. */
+export function clearThemeOverridesForMode(
+  current: ThemeOverridesByMode,
+  mode: ThemeOverrideMode
+): ThemeOverridesByMode {
+  return { ...current, [mode]: {} }
+}
+
 export function hasThemeOverrides(overrides: ThemeOverrides): boolean {
   return THEME_OVERRIDE_KNOBS.some((knob) => overrides[knob.key] !== undefined)
 }

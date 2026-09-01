@@ -4,6 +4,8 @@ import { useCallback, useMemo } from 'react'
 
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import {
+  clearThemeOverridesForMode,
+  mergeThemeOverride,
   resolveThemeOverrideMode,
   ThemeOverrideKey,
   ThemeOverrideMode,
@@ -31,16 +33,13 @@ export function useThemeOverrides() {
 
   const setOverride = useCallback(
     (key: ThemeOverrideKey, value: number) => {
-      setOverridesByMode((current) => ({
-        ...current,
-        [mode]: { ...current[mode], [key]: value },
-      }))
+      setOverridesByMode((current) => mergeThemeOverride(current, mode, key, value))
     },
     [mode, setOverridesByMode]
   )
 
   const resetOverrides = useCallback(() => {
-    setOverridesByMode((current) => ({ ...current, [mode]: {} }))
+    setOverridesByMode((current) => clearThemeOverridesForMode(current, mode))
   }, [mode, setOverridesByMode])
 
   return useMemo(
