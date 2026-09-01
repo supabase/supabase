@@ -23,7 +23,10 @@ export const HEALTH_LINT_NAMES = [
   'instance_db_down',
   'db_not_reachable',
   'db_connection_limit_reached',
-  'log_service_error_rate_high',
+  'log_data_api_error_rate_high',
+  'log_auth_error_rate_high',
+  'log_storage_error_rate_high',
+  'log_edge_function_error_rate_high',
   'instance_alert_firing',
 ] as const satisfies readonly AdvisorLintName[]
 
