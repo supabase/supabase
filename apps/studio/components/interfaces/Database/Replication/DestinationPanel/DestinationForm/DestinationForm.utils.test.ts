@@ -15,7 +15,7 @@ import {
 import { getDucklakeValidationIssues } from './DuckLake/DuckLake.utils'
 import { getSnowflakeValidationIssues } from './Snowflake/Snowflake.utils'
 import type { ReplicationPipelineByIdData } from '@/data/replication/pipeline-by-id-query'
-import type { ReplicationPublication } from '@/data/replication/publications-query'
+import type { ReplicationPublicationData } from '@/data/replication/publication-query'
 
 const baseDucklakeFormData = {
   name: 'DuckLake Destination',
@@ -169,30 +169,58 @@ describe('DestinationForm.utils table copy selection', () => {
   })
 
   it('drops selected ids that are no longer in the publication', () => {
-    const publications = [
-      { name: 'analytics', tables: [{ id: 101, schema: 'public', name: 'orders' }] },
-    ] as ReplicationPublication[]
+    const publication: ReplicationPublicationData = {
+      name: 'analytics',
+      config: {
+        type: 'all_tables',
+        operations: ['insert'],
+        publish_via_partition_root: false,
+      },
+      tables: [
+        {
+          id: 101,
+          schema: 'public',
+          name: 'orders',
+          kind: 'table',
+          partition_parent_id: null,
+        },
+      ],
+    }
 
     expect(
       pruneStaleSelectedTableIds({
         mode: 'include_tables',
         selectedTableIds: ['101', '202'],
-        publications,
+        publication,
         publicationName: 'analytics',
       })
     ).toEqual(['101'])
   })
 
   it('leaves selected ids untouched for non-selective modes', () => {
-    const publications = [
-      { name: 'analytics', tables: [{ id: 101, schema: 'public', name: 'orders' }] },
-    ] as ReplicationPublication[]
+    const publication: ReplicationPublicationData = {
+      name: 'analytics',
+      config: {
+        type: 'all_tables',
+        operations: ['insert'],
+        publish_via_partition_root: false,
+      },
+      tables: [
+        {
+          id: 101,
+          schema: 'public',
+          name: 'orders',
+          kind: 'table',
+          partition_parent_id: null,
+        },
+      ],
+    }
 
     expect(
       pruneStaleSelectedTableIds({
         mode: 'include_all_tables',
         selectedTableIds: ['202'],
-        publications,
+        publication,
         publicationName: 'analytics',
       })
     ).toEqual(['202'])
