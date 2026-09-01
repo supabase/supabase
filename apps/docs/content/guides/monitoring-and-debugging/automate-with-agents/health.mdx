@@ -1,7 +1,7 @@
 ---
 id: 'automate-with-agents-health'
-title: 'Doctor'
-subtitle: 'Doctor is a read-only health agent. It polls logs on a short interval, clusters errors, and reports only when a threshold is crossed.'
+title: 'Health monitor'
+subtitle: 'Health monitor is a read-only agent. It polls logs on a short interval, clusters errors, and reports only when a threshold is crossed.'
 description: 'An on-call triage agent that watches logs for 5xx spikes, Auth failures, and availability issues.'
 ---
 
@@ -28,7 +28,7 @@ It uses `query_logs` on project-scoped, read-only [Supabase MCP](/docs/guides/ai
 
 ## What it will output
 
-When a threshold is crossed, Doctor reports an incident: grouped errors, a few request IDs, a likely cause, and a troubleshooting link. If nothing crosses the threshold, it stays silent.
+When a threshold is crossed, Health monitor reports an incident: grouped errors, a few request IDs, a likely cause, and a troubleshooting link. If nothing crosses the threshold, it stays silent.
 
 <$Partial path="monitoring_agent_output.mdx" />
 

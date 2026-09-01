@@ -68,7 +68,7 @@ describe('serializeContentListingGroupToMarkdown', () => {
         id: 'hire-agent',
         items: [
           {
-            title: 'Doctor',
+            title: 'Health monitor',
             href: '/guides/monitoring-and-debugging/automate-with-agents/health',
             subtitle: 'Every 15 minutes',
             description: 'Watch logs for 5xx spikes and Auth failures.',
@@ -79,7 +79,7 @@ describe('serializeContentListingGroupToMarkdown', () => {
     )
 
     expect(markdown).toContain(
-      '**[Doctor](https://supabase.com/docs/guides/monitoring-and-debugging/automate-with-agents/health):** Every 15 minutes. Watch logs for 5xx spikes and Auth failures.'
+      '**[Health monitor](https://supabase.com/docs/guides/monitoring-and-debugging/automate-with-agents/health):** Every 15 minutes. Watch logs for 5xx spikes and Auth failures.'
     )
   })
 

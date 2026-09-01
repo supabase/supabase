@@ -1,7 +1,7 @@
 ---
 id: 'automate-with-agents-performance'
-title: 'Personal trainer'
-subtitle: 'Personal trainer is a read-only performance agent. It inspects query statistics, blocking sessions, and Performance Advisor findings, then proposes the next change for a person to apply.'
+title: 'Performance monitor'
+subtitle: 'Performance monitor is a read-only agent. It inspects query statistics, blocking sessions, and Performance Advisor findings, then proposes the next change for a person to apply.'
 description: 'A query health agent that looks for slow queries, lock waits, and performance advisor findings.'
 ---
 
@@ -28,7 +28,7 @@ It uses `get_advisors` and read-only `execute_sql` on project-scoped [Supabase M
 
 ## What it will output
 
-Personal trainer reports slow or regressing queries, lock waits, and Performance Advisor findings, with a verification plan. It can recommend that a person cancel a session. It does not cancel the session or create indexes.
+Performance monitor reports slow or regressing queries, lock waits, and Performance Advisor findings, with a verification plan. It can recommend that a person cancel a session. It does not cancel the session or create indexes.
 
 <$Partial path="monitoring_agent_output.mdx" />
 

@@ -3116,19 +3116,19 @@ export const telemetry: NavMenuConstant = {
       url: '/guides/monitoring-and-debugging/automate-with-agents' as `/${string}`,
       items: [
         {
-          name: 'Doctor',
+          name: 'Health monitor',
           url: '/guides/monitoring-and-debugging/automate-with-agents/health' as `/${string}`,
         },
         {
-          name: 'Security officer',
+          name: 'Security monitor',
           url: '/guides/monitoring-and-debugging/automate-with-agents/security' as `/${string}`,
         },
         {
-          name: 'Personal trainer',
+          name: 'Performance monitor',
           url: '/guides/monitoring-and-debugging/automate-with-agents/performance' as `/${string}`,
         },
         {
-          name: 'Accountant',
+          name: 'Capacity monitor',
           url: '/guides/monitoring-and-debugging/automate-with-agents/usage' as `/${string}`,
         },
       ],

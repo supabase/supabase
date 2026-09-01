@@ -1,7 +1,7 @@
 ---
 id: 'automate-with-agents-security'
-title: 'Security officer'
-subtitle: 'Security officer is a read-only security agent. It reviews Security Advisor findings and bounded authentication or authorization failure counts, then proposes changes for a person to apply.'
+title: 'Security monitor'
+subtitle: 'Security monitor is a read-only agent. It reviews Security Advisor findings and bounded authentication or authorization failure counts, then proposes changes for a person to apply.'
 description: 'A security review agent that reports advisor findings and authentication or authorization spikes.'
 ---
 
@@ -28,7 +28,7 @@ It uses `get_advisors` and `query_logs` on project-scoped, read-only [Supabase M
 
 ## What it will output
 
-Security officer reports warning and error advisor findings, grouped authentication or authorization failures, and the least invasive fix for a person to apply. If nothing needs review, it stays silent.
+Security monitor reports warning and error advisor findings, grouped authentication or authorization failures, and the least invasive fix for a person to apply. If nothing needs review, it stays silent.
 
 <$Partial path="monitoring_agent_output.mdx" />
 

@@ -147,25 +147,25 @@ export const telemetryHireAgent: ContentListingGroup = {
   columns: 2,
   items: [
     {
-      title: 'Doctor',
+      title: monitoringAgents.health.name,
       href: '/guides/monitoring-and-debugging/automate-with-agents/health',
       subtitle: getScheduleLabel(monitoringAgents.health),
       description: 'Watch logs for 5xx spikes and Auth failures.',
     },
     {
-      title: 'Security officer',
+      title: monitoringAgents.security.name,
       href: '/guides/monitoring-and-debugging/automate-with-agents/security',
       subtitle: getScheduleLabel(monitoringAgents.security),
       description: 'Review advisor findings and authorization failures.',
     },
     {
-      title: 'Personal trainer',
+      title: monitoringAgents.performance.name,
       href: '/guides/monitoring-and-debugging/automate-with-agents/performance',
       subtitle: getScheduleLabel(monitoringAgents.performance),
       description: 'Find slow queries, lock waits, and missing indexes.',
     },
     {
-      title: 'Accountant',
+      title: monitoringAgents.usage.name,
       href: '/guides/monitoring-and-debugging/automate-with-agents/usage',
       subtitle: getScheduleLabel(monitoringAgents.usage),
       description: 'Track request growth, error rates, and approaching limits.',
