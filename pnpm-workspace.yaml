@@ -90,6 +90,8 @@ minimumReleaseAgeExclude:
   - mdast-jsx
   # The following are excluded to fix vulnerablities.
   - react-use
+  - '@astrojs/markdown-satteri@0.3.8'
+  - astro@7.2.6
 
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3

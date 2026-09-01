@@ -2729,6 +2729,11 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/access-control' as `/${string}`,
         },
         {
+          name: 'Personal Access Tokens',
+          url: '/guides/platform/personal-access-tokens' as `/${string}`,
+          enabled: fullPlatformEnabled,
+        },
+        {
           name: 'Multi-factor Authentication',
           url: '/guides/platform/multi-factor-authentication',
           enabled: fullPlatformEnabled,

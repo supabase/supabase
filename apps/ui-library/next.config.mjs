@@ -12,6 +12,9 @@ const nextConfig = {
       },
     },
   },
+  outputFileTracingIncludes: {
+    '/api/docs-md/**/*': ['./public/markdown/docs/**/*'],
+  },
   async redirects() {
     return [
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length

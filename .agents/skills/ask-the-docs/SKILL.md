@@ -87,7 +87,7 @@ at hand — they cite each other where context matters.
 | [`reference/llm-agent-parity.md`](./reference/llm-agent-parity.md)                 | HTML↔markdown fidelity (e.g. AI prompts), search caveat, agent onboarding guides, in-flux wiring.                                                     |
 | [`reference/federated-docs.md`](./reference/federated-docs.md)                     | How docs pulls markdown from external repos at build time. Routes, `pageMap`, remark/rehype plugins, link transforms, known failure modes.            |
 | [`reference/ci-and-lint.md`](./reference/ci-and-lint.md)                           | GitHub Actions on every PR — `docs_lint`, `Docs Tests`, typecheck, prettier, Vercel preview gate. Where to add a check before creating a new one.     |
-| [`reference/management-api-reference.md`](./reference/management-api-reference.md) | Management API OpenAPI download → Redocly bundle → codegen → `ApiEndpointSection`; why not to swap in Scalar/Redoc.                                   |
+| [`reference/management-api-reference.md`](./reference/management-api-reference.md) | Management API OpenAPI → reference generation, including scoped PAT permission tables; why not to swap in Scalar/Redoc.                               |
 | [`reference/gotchas.md`](./reference/gotchas.md)                                   | Specific traps to watch for. One-liner per item.                                                                                                      |
 
 ## How to use during a chat

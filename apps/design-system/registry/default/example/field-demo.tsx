@@ -1,5 +1,6 @@
-import { Button, Checkbox, Input, Textarea } from 'ui'
 import {
+  Button,
+  Checkbox,
   Field,
   FieldDescription,
   FieldGroup,
@@ -7,14 +8,14 @@ import {
   FieldLegend,
   FieldSeparator,
   FieldSet,
-} from 'ui/src/components/shadcn/ui/field'
-import {
+  Input,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from 'ui/src/components/shadcn/ui/select'
+  Textarea,
+} from 'ui'
 
 export default function FieldDemo() {
   return (
