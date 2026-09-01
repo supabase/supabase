@@ -21,7 +21,7 @@ import {
   getCapabilityDensityTier,
   type CapabilityLevelFilter,
 } from './TokenCapabilities/TokenCapabilities.utils'
-import { DocsButton } from '@/components/ui/DocsButton'
+import { TokenDocsButtons } from './TokenDocsButtons'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useProjectsInfiniteQuery } from '@/data/projects/projects-infinite-query'
 import {
@@ -29,7 +29,6 @@ import {
   useGetEnabledEndpointsForCapability,
 } from '@/data/scoped-access-tokens/permission-scope-map-query'
 import { useScopedAccessTokenQuery } from '@/data/scoped-access-tokens/scoped-access-token-query'
-import { DOCS_URL } from '@/lib/constants'
 
 interface ViewTokenSheetProps {
   visible: boolean
@@ -148,18 +147,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
           <p className="truncate" title={`View access for ${token?.name}`}>
             View access for {token?.name}
           </p>
-          <div className="flex items-center gap-2">
-            <DocsButton
-              href={`${DOCS_URL}/guides/platform/access-control`}
-              topic="Access control"
-              label="Access control docs"
-            />
-            <DocsButton
-              href={`${DOCS_URL}/reference/api/introduction`}
-              topic="Management API"
-              label="API docs"
-            />
-          </div>
+          <TokenDocsButtons />
         </SheetHeader>
         {/* Radix wraps viewport children in an inline-styled display:table div that grows to fit
             the widest child, which would let one long endpoint path expand the sheet instead of
