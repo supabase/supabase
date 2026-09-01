@@ -33,6 +33,7 @@ import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   AiIconAnimation,
+  Badge,
   Button,
   Checkbox,
   DropdownMenu,
@@ -45,7 +46,11 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { findMutatingQueryCells } from './ExplorerNotebookTab.utils'
+import {
+  findQueryCellsMatchingSql,
+  isMutatingSql,
+  type QueryCellSummary,
+} from './ExplorerNotebookTab.utils'
 import {
   ExplorerToolbar,
   ExplorerToolbarAction,
@@ -58,6 +63,7 @@ import { MarkdownCell } from './MarkdownCell'
 import { QueryCell } from './QueryCell'
 import { type QueryEditorHandle } from './QueryEditor'
 import { createMarkdownCellSkeleton, createQueryCellSkeleton } from './utils'
+import { checkDestructiveQuery } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
 import {
@@ -102,9 +108,10 @@ export const ExplorerNotebookTab = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isSaveBeforeAnalyzeOpen, setIsSaveBeforeAnalyzeOpen] = useState(false)
   const [isSaveConflictOpen, setIsSaveConflictOpen] = useState(false)
-  const [pendingMutationCells, setPendingMutationCells] = useState<
-    { id: string; title: string }[] | null
-  >(null)
+  const [pendingQueryMatches, setPendingQueryMatches] = useState<{
+    destructiveQueries: QueryCellSummary[]
+    mutatingQueries: QueryCellSummary[]
+  } | null>(null)
   const [skipMutatingCells, setSkipMutatingCells] = useState(false)
   const queryCellRefs = useRef(new Map<string, QueryEditorHandle>())
   const savedContentRef = useRef<typeof content>(undefined)
@@ -184,25 +191,33 @@ export const ExplorerNotebookTab = () => {
 
   const handleRunNotebook = () => {
     const freshCells = getFreshCells()
-    const mutatingCells = findMutatingQueryCells({
+    const { destructiveQueries, mutatingQueries } = findQueryCellsMatchingSql({
       cells: freshCells,
       getLiveSql: (cellId) => queryCellRefs.current.get(cellId)?.getSql(),
+      matchers: {
+        destructiveQueries: checkDestructiveQuery,
+        mutatingQueries: isMutatingSql,
+      },
     })
-    if (mutatingCells.length === 0) {
+    if (mutatingQueries.length === 0) {
       runNotebook({ cellIdsToRun: freshCells.filter(isQueryCell).map((cell) => cell._id) })
     } else {
       setSkipMutatingCells(false)
-      setPendingMutationCells(mutatingCells)
+      setPendingQueryMatches({ destructiveQueries, mutatingQueries })
     }
   }
 
   const handleConfirmRunNotebook = () => {
-    const mutatingCellIds = new Set((pendingMutationCells ?? []).map((cell) => cell.id))
+    const mutatingCellIds = new Set(
+      (pendingQueryMatches?.mutatingQueries ?? []).map((cell) => cell.id)
+    )
+    const freshCells = getFreshCells()
+    const freshQueryCellIds = freshCells.filter(isQueryCell).map((cell) => cell._id)
     const cellIdsToRun = skipMutatingCells
-      ? queryCellIds.filter((id) => !mutatingCellIds.has(id))
-      : queryCellIds
+      ? freshQueryCellIds.filter((id) => !mutatingCellIds.has(id))
+      : freshQueryCellIds
 
-    setPendingMutationCells(null)
+    setPendingQueryMatches(null)
     runNotebook({ cellIdsToRun, force: true })
   }
 
@@ -546,22 +561,27 @@ export const ExplorerNotebookTab = () => {
 
       <ConfirmationModal
         size="small"
-        visible={pendingMutationCells !== null}
+        visible={pendingQueryMatches !== null}
         title="Confirm to run notebook"
         confirmLabel={skipMutatingCells ? 'Run read-only cells' : 'Run all cells'}
         variant="warning"
-        onCancel={() => setPendingMutationCells(null)}
+        onCancel={() => setPendingQueryMatches(null)}
         onConfirm={handleConfirmRunNotebook}
       >
         <p className="text-sm">
-          This notebook has {pendingMutationCells?.length ?? 0}{' '}
-          {pendingMutationCells?.length === 1 ? 'query' : 'queries'} that{' '}
-          {pendingMutationCells?.length === 1 ? 'modifies' : 'modify'} data or schema and cannot be
-          undone once run:
+          This notebook has {pendingQueryMatches?.mutatingQueries.length ?? 0}{' '}
+          {pendingQueryMatches?.mutatingQueries.length === 1 ? 'query' : 'queries'} that{' '}
+          {pendingQueryMatches?.mutatingQueries.length === 1 ? 'modifies' : 'modify'} data or schema
+          and cannot be undone once run:
         </p>
         <ul className="text-sm list-disc pl-4 mt-2">
-          {pendingMutationCells?.map((cell) => (
-            <li key={cell.id}>{cell.title}</li>
+          {pendingQueryMatches?.mutatingQueries.map((cell) => (
+            <li key={cell.id} className="flex items-center gap-2">
+              {cell.title}
+              {pendingQueryMatches.destructiveQueries.some(({ id }) => id === cell.id) && (
+                <Badge variant="destructive">Destructive</Badge>
+              )}
+            </li>
           ))}
         </ul>
         <FormItemLayout
