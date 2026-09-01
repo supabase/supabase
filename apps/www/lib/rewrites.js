@@ -21,9 +21,6 @@ const rewrites = [
           destination: `${process.env.NEXT_PUBLIC_DOCS_URL}`,
         },
         { source: '/docs/:path*', destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/:path*` },
-        { source: '/kb', destination: `${process.env.NEXT_PUBLIC_KB_URL}` },
-        { source: '/kb/', destination: `${process.env.NEXT_PUBLIC_KB_URL}` },
-        { source: '/kb/:path*', destination: `${process.env.NEXT_PUBLIC_KB_URL}/:path*` },
       ]
     : []),
   {
@@ -41,6 +38,14 @@ const rewrites = [
   {
     source: '/design-system/:path*',
     destination: `${process.env.NEXT_PUBLIC_DESIGN_SYSTEM_URL}/:path*`,
+  },
+  {
+    source: '/kb',
+    destination: `${process.env.NEXT_PUBLIC_KB_URL}`,
+  },
+  {
+    source: '/kb/:path*',
+    destination: `${process.env.NEXT_PUBLIC_KB_URL}/:path*`,
   },
   {
     source: '/evals',
