@@ -149,6 +149,20 @@ export function getStorageKey(prefix: string, ref: string) {
   return `${prefix}_${ref}`
 }
 
+/**
+ * JSON.parse also succeeds on values that are not records ('null', '3', '[]'), and indexing
+ * those by tableId either throws or reads a bogus entry, so the shape is checked here.
+ */
+function parseStoredTableEditorState(jsonStr: string): Record<string, any> | undefined {
+  try {
+    const parsed: unknown = JSON.parse(jsonStr)
+    if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) return undefined
+    return parsed as Record<string, any>
+  } catch {
+    return undefined
+  }
+}
+
 export function loadTableEditorStateFromLocalStorage(
   projectRef: string,
   tableId: number
@@ -157,12 +171,7 @@ export function loadTableEditorStateFromLocalStorage(
   // Prefer sessionStorage (scoped to current tab) over localStorage
   const jsonStr = safeSessionStorage.getItem(storageKey) ?? safeLocalStorage.getItem(storageKey)
   if (!jsonStr) return
-  try {
-    const json = JSON.parse(jsonStr)
-    return json[tableId]
-  } catch {
-    return undefined
-  }
+  return parseStoredTableEditorState(jsonStr)?.[tableId]
 }
 
 /**
@@ -222,11 +231,7 @@ export function saveTableEditorStateToLocalStorage({
 
   let savedJson
   if (savedStr) {
-    try {
-      savedJson = JSON.parse(savedStr)
-    } catch {
-      savedJson = {}
-    }
+    savedJson = parseStoredTableEditorState(savedStr) ?? {}
     const previousConfig = savedJson[tableId]
     savedJson = { ...savedJson, [tableId]: { ...previousConfig, ...config } }
   } else {

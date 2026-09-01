@@ -62,6 +62,11 @@ export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
             } catch {
               return `'${String(val).replaceAll("'", "''")}'`
             }
+            // JSON.parse also returns scalars and objects, which formatArrayForSql would
+            // turn into invalid Postgres array syntax
+            if (!Array.isArray(array)) {
+              return `'${String(val).replaceAll("'", "''")}'`
+            }
           }
           return `${formatArrayForSql(array as unknown[])}`
         } else if (format?.includes('json')) {

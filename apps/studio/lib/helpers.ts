@@ -136,11 +136,14 @@ export const formatBytes = (
   const dm = decimals < 0 ? 0 : decimals
   const sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
-  if (bytes === 0 || bytes === undefined || Number.isNaN(bytes)) return size !== undefined ? `0 ${size}` : '0 bytes'
+  // Number.isNaN on its own lets Infinity through, which formats as "NaN undefined"
+  const numericBytes = typeof bytes === 'number' ? bytes : Number(bytes)
+  if (bytes === undefined || bytes === null || !Number.isFinite(numericBytes) || numericBytes === 0)
+    return size !== undefined ? `0 ${size}` : '0 bytes'
 
   // Handle negative values
-  const isNegative = bytes < 0
-  const absBytes = Math.abs(bytes)
+  const isNegative = numericBytes < 0
+  const absBytes = Math.abs(numericBytes)
 
   const i = size !== undefined ? sizes.indexOf(size) : Math.floor(Math.log(absBytes) / Math.log(k))
   const formattedValue = parseFloat((absBytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
