@@ -16,6 +16,9 @@ import { useLastSignIn } from '@/hooks/misc/useLastSignIn'
 import { BASE_PATH } from '@/lib/constants'
 import { captureCriticalError } from '@/lib/error-reporting'
 import { auth, buildPathWithParams } from '@/lib/gotrue'
+import { classifyApiError, classifyValidationError } from '@/lib/telemetry/funnel-errors'
+import { useTrack } from '@/lib/telemetry/track'
+import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Must be a valid email'),
@@ -28,6 +31,8 @@ export const SignInSSOForm = () => {
   const captchaRef = useRef<HCaptcha>(null)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [_, setLastSignInUsed] = useLastSignIn()
+  const track = useTrack()
+  const trackFunnelError = useTrackFunnelError()
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: { email: '' },
@@ -39,8 +44,19 @@ export const SignInSSOForm = () => {
 
     let token = captchaToken
     if (!token) {
-      const captchaResponse = await captchaRef.current?.execute({ async: true })
-      token = captchaResponse?.response ?? null
+      try {
+        const captchaResponse = await captchaRef.current?.execute({ async: true })
+        token = captchaResponse?.response ?? null
+      } catch {
+        toast.error('Could not complete the security check. Please try again.', { id: toastId })
+        trackFunnelError(
+          'signin',
+          { errorCategory: 'validation', errorReason: 'captcha_failed' },
+          'toast',
+          toastId
+        )
+        return
+      }
     }
 
     // redirects to /sign-in to check if the user has MFA setup (handled in SignInLayout.tsx)
@@ -71,6 +87,7 @@ export const SignInSSOForm = () => {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
       toast.error(`Failed to sign in: ${error.message}`, { id: toastId })
+      trackFunnelError('signin', classifyApiError('signin', error), 'toast', toastId)
       captureCriticalError(error, 'sign in via SSO')
     }
   }
@@ -81,7 +98,12 @@ export const SignInSSOForm = () => {
         id={formId}
         method="POST"
         className="flex flex-col gap-4"
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={(e) => {
+          track('sign_in_submitted', { category: 'account', method: 'sso' })
+          return form.handleSubmit(onSubmit, (errors) =>
+            trackFunnelError('signin', classifyValidationError('signin', errors), 'form')
+          )(e)
+        }}
       >
         <FormField
           key="email"
