@@ -199,7 +199,6 @@ const ThemeOverrideFields = () => {
                 // decides not to commit.
                 onLostPointerCapture={() => commitDraft(knob.key)}
               />
-              <p className="text-sm text-foreground-lighter">{knob.description}</p>
             </div>
           )
         })}

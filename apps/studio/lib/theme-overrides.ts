@@ -19,7 +19,6 @@ export interface ThemeOverrideKnob {
   /** Custom property the knob writes to on the document element. */
   cssVar: string
   label: string
-  description: string
   min: number
   max: number
   step: number
@@ -36,7 +35,6 @@ export const THEME_OVERRIDE_KNOBS: readonly ThemeOverrideKnob[] = [
     key: 'chroma',
     cssVar: '--chroma',
     label: 'Chroma',
-    description: 'Colour saturation of the neutral surface, text and border ramp. 0 is grayscale.',
     min: 0,
     max: 0.06,
     step: 0.001,
@@ -48,7 +46,6 @@ export const THEME_OVERRIDE_KNOBS: readonly ThemeOverrideKnob[] = [
     key: 'contrast',
     cssVar: '--contrast',
     label: 'Contrast',
-    description: 'Strength of text, borders and accents against their surface. 0.5 is baseline.',
     min: 0,
     max: 1,
     step: 0.01,
@@ -59,7 +56,6 @@ export const THEME_OVERRIDE_KNOBS: readonly ThemeOverrideKnob[] = [
     key: 'surface',
     cssVar: '--surface',
     label: 'Surface',
-    description: 'Base lightness of the canvas that every elevated surface steps away from.',
     min: 0,
     max: 1,
     step: 0.005,
@@ -71,7 +67,6 @@ export const THEME_OVERRIDE_KNOBS: readonly ThemeOverrideKnob[] = [
     key: 'elevationStep',
     cssVar: '--elevation-step',
     label: 'Elevation step',
-    description: 'Lightness added per elevation level. 0 renders every surface flat.',
     min: 0,
     max: 0.08,
     step: 0.001,
