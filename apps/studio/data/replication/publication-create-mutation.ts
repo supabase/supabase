@@ -10,10 +10,11 @@ export type CreatePublicationParams = {
   sourceId: number
   name: string
   tableIds: number[]
+  publishViaPartitionRoot?: boolean
 }
 
 async function createPublication(
-  { projectRef, sourceId, name, tableIds }: CreatePublicationParams,
+  { projectRef, sourceId, name, tableIds, publishViaPartitionRoot = true }: CreatePublicationParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
@@ -26,7 +27,7 @@ async function createPublication(
         type: 'tables',
         tables: tableIds.map((id) => ({ id })),
         operations: ['insert', 'update', 'delete', 'truncate'],
-        publish_via_partition_root: true,
+        publish_via_partition_root: publishViaPartitionRoot,
       },
       signal,
     }
