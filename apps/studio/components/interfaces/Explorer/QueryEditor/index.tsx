@@ -12,7 +12,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import { Button, cn } from 'ui'
+import { Button, cn, KeyboardShortcut } from 'ui'
 
 import { resolveLogTimeRange } from '../../QuerySources/LogTimeRange.utils'
 import {
@@ -113,6 +113,8 @@ export type QueryEditorHandle = {
   run: (force?: boolean) => Promise<void>
   /** The editor's live text buffer, ahead of any blur-triggered commit to the store. */
   getSql: () => string
+  /** Formats the editor's SQL in place and commits the result, same as the SQL Editor's Prettify SQL action. */
+  prettify: () => Promise<void>
 }
 
 type QueryEditorProps = {
@@ -350,9 +352,19 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
 
   const Shell = variant === 'viewport' ? ExplorerQueryViewport : ExplorerQuery
 
+  const handlePrettify = async () => {
+    if (pendingProposalRef.current) return
+
+    const editor = editorInstanceRef.current
+    if (!editor) return
+    await editor.getAction('editor.action.formatDocument')?.run()
+    onSqlCommitRef.current?.(editor.getValue())
+  }
+
   useImperativeHandle(ref, () => ({
     run: (force = false) => handleRunQuery({ shouldForce: force }),
     getSql: () => sqlRef.current,
+    prettify: handlePrettify,
   }))
 
   useEffect(() => {
@@ -366,13 +378,12 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   return (
     <>
       <Shell className={cn(variant === 'embedded' && 'mx-auto max-w-6xl', className)}>
-        <ExplorerToolbar>
+        <ExplorerToolbar className={cn(variant === 'viewport' && 'px-4')}>
           <ExplorerToolbarIcon>
-            <CodeSquare size={14} />
+            <CodeSquare size={16} strokeWidth={2} />
           </ExplorerToolbarIcon>
           <ExplorerToolbarTitle onSaveTitle={onTitleChange}>{title}</ExplorerToolbarTitle>
           <ExplorerToolbarActions>
-            {toolbarActions}
             {onSourceChange && (
               <QuerySourceMenu
                 disabled={pendingProposal !== null}
@@ -386,6 +397,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
                 roleImpersonationState={roleImpersonationState}
               />
             )}
+
             {display && onDisplayChange && (
               <DisplaySettingsButton
                 result={result}
@@ -396,15 +408,25 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
               />
             )}
             <ExplorerToolbarAction
-              icon={showQuery ? <EyeOff /> : <Eye />}
+              icon={
+                showQuery ? <EyeOff size={16} strokeWidth={2} /> : <Eye size={16} strokeWidth={2} />
+              }
               disabled={pendingProposal !== null}
               tooltip={showQuery ? 'Hide query' : 'Show query'}
               onClick={() => onShowQueryChange(!showQuery)}
             />
+
+            {toolbarActions}
+
             <ExplorerToolbarAction
+              icon={<Play size={16} strokeWidth={2} />}
               loading={isExecuting}
-              icon={<Play />}
-              tooltip={hasSelection ? 'Run selected query' : 'Run query'}
+              tooltip={
+                <div className="flex items-center gap-2.5">
+                  <span>{hasSelection ? 'Run selected query' : 'Run query'}</span>
+                  <KeyboardShortcut keys={['Meta', 'Enter']} />
+                </div>
+              }
               disabled={
                 isBusy || pendingProposal !== null || isRunDisabled || sql.trim().length === 0
               }
@@ -487,6 +509,16 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
                       if (pendingProposalRef.current) return
                       const selectionParts = getEditorSelectionParts(editor)
                       if (selectionParts) setPromptState({ isOpen: true, ...selectionParts })
+                    },
+                  })
+
+                  editor.addAction({
+                    id: 'prettify-query',
+                    label: 'Prettify SQL',
+                    keybindings: [monaco.KeyMod.Alt | monaco.KeyMod.Shift | monaco.KeyCode.KeyF],
+                    contextMenuGroupId: 'operation',
+                    run: () => {
+                      handlePrettify()
                     },
                   })
                 }}

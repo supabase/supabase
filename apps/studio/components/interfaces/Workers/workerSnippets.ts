@@ -17,6 +17,7 @@ export interface WorkerSnippets {
   aiPrompt: string
   configToml: string
   cli: string
+  curl: string
   javascript: string
   python: string
 }
@@ -44,6 +45,12 @@ export function buildWorkerSnippets(input: WorkerSnippetInput): WorkerSnippets {
     // doesn't have a route to a private worker yet, so this always deploys as public.
     `supabase ${CLI_NAME} push ${name} --instances ${input.instances}`,
     ...(input.access === 'private' ? [`# note: the CLI can only deploy public workers today`] : []),
+  ].join('\n')
+
+  const curl = [
+    `curl --request POST '${url}' \\`,
+    `  --header 'Content-Type: application/json' \\`,
+    `  --data '{"name":"world"}'`,
   ].join('\n')
 
   const configBlock = [
@@ -102,7 +109,7 @@ export function buildWorkerSnippets(input: WorkerSnippetInput): WorkerSnippets {
     `print(res.json())`,
   ].join('\n')
 
-  return { aiPrompt, configToml, cli, javascript, python }
+  return { aiPrompt, configToml, cli, curl, javascript, python }
 }
 
 export interface WorkerCliCommand {
