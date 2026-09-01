@@ -50,8 +50,7 @@ export interface SignUpEvent {
  *
  * Some unintuitive behavior:
  *   - If signing up with GitHub the SignInEvent gets triggered first before the SignUpEvent.
- *   - Captured server-side; the distinct_id often resolves to the anonymous cookie because
- *     the event races identify, so don't use it as a funnel join key across the auth boundary.
+ *   - distinct_id often resolves to the anonymous cookie (races identify); not a person-level join key.
  *
  * @group Events
  * @source studio
@@ -69,12 +68,9 @@ export interface SignInEvent {
 }
 
 /**
- * Triggered when a user initiates a sign-in, before the auth call resolves: password or SSO
- * form submit (including submits that fail client-side validation), OAuth or custom-provider
- * button click, or partner token exchange start.
- *
- * Fires pre-auth, so the distinct_id is the anonymous cookie — use it as a count/method
- * metric, never as a person-level join key across the auth boundary.
+ * Triggered when a user initiates a sign-in (form submit including client-side validation
+ * failures, OAuth or custom-provider click, partner token exchange), before auth resolves.
+ * Pre-auth, so distinct_id is the anonymous cookie: not a person-level join key.
  *
  * @group Events
  * @source studio
