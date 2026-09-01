@@ -2961,10 +2961,20 @@ commands:
         name: --name <string>
         description: Name for the generated migration file.
         default_value: ''
+      - id: no-apply
+        name: --no-apply
+        description: |
+          Generate the migration file without prompting or applying it to the local database.
+        default_value: 'false'
       - id: schema
         name: -s, --schema <strings>
         description: Comma separated list of schema to include.
         default_value: '[]'
+      - id: strict-coverage
+        name: --strict-coverage
+        description: |
+          Fail when bundled pg-delta finds schema objects it cannot manage instead of leaving them unmanaged.
+        default_value: 'false'
       - id: experimental
         name: --experimental
         description: enable experimental features
@@ -3002,6 +3012,11 @@ commands:
         name: --local
         description: Generates declarative schema from the local database.
         default_value: 'false'
+      - id: output-dir
+        name: --output-dir <string>
+        description: |
+          Write declarative schema files to this directory instead of the configured declarative schema directory.
+        default_value: ''
       - id: overwrite
         name: --overwrite
         description: Overwrite declarative schema files without confirmation.
@@ -3019,6 +3034,11 @@ commands:
         name: -s, --schema <strings>
         description: Comma separated list of schema to include.
         default_value: '[]'
+      - id: strict-coverage
+        name: --strict-coverage
+        description: |
+          Fail when bundled pg-delta finds schema objects it cannot manage instead of leaving them unmanaged.
+        default_value: 'false'
       - id: experimental
         name: --experimental
         description: enable experimental features
@@ -3212,9 +3232,11 @@ commands:
 
       Optionally, a new row can be inserted into the migration history table to reflect the current state of the remote database.
 
-      If no entries exist in the migration history table, `pg_dump` will be used to capture all contents of the remote schemas you have created. Otherwise, this command will only diff schema changes against the remote database, similar to running `db diff --linked`.
+      If no entries exist in the migration history table, the behavior depends on the diff engine. Under `pg-delta`, the remote database is diffed against an empty shadow database. Under the legacy `migra` engine, the CLI uses `pg_dump` to capture all contents of the remote schemas you have created. Otherwise, this command only diffs schema changes against the remote database, similar to running `db diff --linked`.
 
-      Pass `--diff-engine pg-delta` to keep the migration-file `db pull` workflow while using pg-delta for the shadow diff step. Pass `--use-pg-delta` to switch to the declarative pg-delta export workflow instead.
+      Pass `--diff-engine pg-delta` to keep the migration-file `db pull` workflow while using pg-delta for the shadow diff step. Pass `--declarative` to replace the declarative schema tree under `supabase/schemas` from the selected database instead of creating a migration.
+
+      Under the pg-delta engine, your own customizations in Supabase-managed schemas are captured automatically, such as triggers on managed tables like `auth.users` and RLS policies on `storage.objects` and `storage.buckets`. Under the legacy migra engine, trigger and RLS policy changes in managed schemas are diffed, and recent CLI versions include them in the initial `pg_dump` baseline. If an older CLI reports that `auth` and `storage` were excluded, capture existing customizations there with `--schema auth,storage`.
     examples:
       - id: basic-usage
         name: Basic usage
@@ -3225,28 +3247,29 @@ commands:
           Update remote migration history table? [Y/n]
           Repaired migration history: [20240414044403] => applied
           Finished supabase db pull.
-          The auth and storage schemas are excluded. Run supabase db pull --schema auth,storage again to diff them.
       - id: local-studio
         name: Local studio
         code: supabase db pull --local
         response: |
           Connecting to local database...
-          Setting up initial schema....
-          Creating custom roles supabase/roles.sql...
+          Creating shadow database...
+          Seeding globals from roles.sql...
           Applying migration 20240414044403_remote_schema.sql...
+          Diffing schemas...
           No schema changes found
-          The auth and storage schemas are excluded. Run supabase db pull --schema auth,storage again to diff them.
+          The remote database is already in sync with your local migrations — nothing to pull.
           exit status 1
       - id: custom-schemas
         name: Custom schemas
-        code: supabase db pull --schema auth,storage
+        code: supabase db pull --schema public,extensions
         response: |
           Connecting to remote database...
-          Setting up initial schema....
-          Creating custom roles supabase/roles.sql...
+          Creating shadow database...
+          Seeding globals from roles.sql...
           Applying migration 20240414044403_remote_schema.sql...
+          Diffing schemas: public,extensions
           No schema changes found
-          Try rerunning the command with --debug to troubleshoot the error.
+          The remote database is already in sync with your local migrations — nothing to pull.
           exit status 1
     tags: []
     links: []
@@ -3258,6 +3281,11 @@ commands:
         description: |
           Pulls from the database specified by the connection string (must be percent-encoded).
         default_value: ''
+      - id: declarative
+        name: --declarative
+        description: |
+          Replace the declarative schema tree from the selected database instead of creating a migration. Migration history is not updated. Only use this on projects with `[experimental.pgdelta] enabled = true`. On the legacy migra engine, `db diff` tries to load the generated tree as its baseline and fails.
+        default_value: 'false'
       - id: diff-engine
         name: --diff-engine <[ migra | pg-delta ]>
         description: Diff engine to use for migration-style db pull.
@@ -3285,9 +3313,15 @@ commands:
         name: -s, --schema <strings>
         description: Comma separated list of schema to include.
         default_value: '[]'
+      - id: strict-coverage
+        name: --strict-coverage
+        description: |
+          Fail when bundled pg-delta finds schema objects it cannot manage instead of leaving them unmanaged.
+        default_value: 'false'
       - id: use-pg-delta
         name: --use-pg-delta
-        description: Use pg-delta to pull declarative schema.
+        description: |
+          Use pg-delta to pull declarative schema. Deprecated: use `--declarative` instead.
         default_value: 'false'
   - id: supabase-db-lint
     title: supabase db lint
@@ -3560,6 +3594,11 @@ commands:
         name: -s, --schema <strings>
         description: Comma separated list of schema to include.
         default_value: '[]'
+      - id: strict-coverage
+        name: --strict-coverage
+        description: |
+          Fail when bundled pg-delta finds schema objects it cannot manage instead of leaving them unmanaged.
+        default_value: 'false'
       - id: to
         name: --to <string>
         description: Diff to local, linked, migrations, or a Postgres URL.

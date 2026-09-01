@@ -11,11 +11,13 @@ Declarative schemas provide a developer-friendly way to maintain <InfoTooltip to
 
 [Migrations](/docs/guides/deployment/database-migrations) are traditionally managed imperatively (you provide the instructions on how exactly to change the database). This can lead to related information being scattered over multiple migration files. With declarative schemas, you instead declare the state you want your database to be in, and the instructions are generated for you.
 
-Because the schema files are the source of truth, make every change by editing them - not through Studio or the SQL editor. Migrations are generated from your schema files with `supabase db schema declarative sync`, which compares the files against your migration history, not the live database - so changes made directly to the database are not picked up.
+Because the schema files are the source of truth, make every change by editing them, not through Studio or the SQL editor. Migrations are generated from your schema files with `supabase db schema declarative sync`, which compares the files against your migration history, not the live database. Changes made directly to the database are not picked up.
 
-<Admonition type="note">
+<Admonition type="note" title="Check your diff engine first">
 
-The `db schema declarative` commands use the `pg-delta` diff engine and require `[experimental.pgdelta] enabled = true` in `config.toml`. Projects created with a recent `supabase init` have this enabled by default; on older projects, add that section. For a single run of `sync` or `generate`, the `--experimental` flag also works; `db pull --declarative` reads the config only.
+<$Partial path="diff_engine_check.mdx" />
+
+This guide describes the workflow on `pg-delta`. The `db schema declarative` commands require it and won't run on the legacy engine. For a single run of `sync` or `generate` without changing `config.toml`, pass the `--experimental` flag. `db pull --declarative` runs regardless of the `[experimental.pgdelta]` setting, but only use it on `pg-delta`. On the legacy engine it leaves `db diff` unable to run. If your project is still on `migra`, follow [Declarative schemas on the legacy `migra` engine](#declarative-schemas-on-the-legacy-migra-engine) instead.
 
 </Admonition>
 
@@ -50,7 +52,7 @@ create table "employees" (
 
   <StepHikeCompact.Step step={2}>
     <StepHikeCompact.Details title="Generate a migration file">
-      Generate a migration file by diffing against your declared schema. The command also offers to apply the migration to your local database; pass `--no-apply` to only generate the file. Both `--apply` and the global `--yes` flag apply it without prompting.
+      Generate a migration file by diffing against your declared schema. The command also offers to apply the migration to your local database. Pass `--no-apply` to only generate the file. Both `--apply` and the global `--yes` flag apply it without prompting. Without one of those flags, a non-interactive run writes the file and silently skips the apply step.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
@@ -87,9 +89,9 @@ supabase migration up
 
 <Admonition type="caution" label="Edit the schema files, not the database">
 
-With declarative schemas, the files in `supabase/schemas/` are the source of truth. `supabase db schema declarative sync` compares **those files** against your migrations - it does **not** read the live database. Changes you make directly (Studio, the SQL editor, `psql`) are invisible to the diff: it reports "No schema changes found" and the change is silently dropped. Always edit the schema files, then run `sync`.
+With declarative schemas, the files in `supabase/schemas/` are the source of truth. `supabase db schema declarative sync` compares those files against your migrations. It does not read the live database. Changes you make directly (Studio, the SQL editor, `psql`) are invisible to the diff, which reports "No schema changes found" and silently drops the change. Always edit the schema files, then run `sync`.
 
-Don't use `supabase db diff` here: it diffs a live database against your migrations and never uses `supabase/schemas/` as its baseline.
+Don't use `supabase db diff` here, because it diffs a live database against your migrations and never uses `supabase/schemas/` as its baseline.
 
 </Admonition>
 
@@ -247,7 +249,7 @@ AS $$
 $$;
 ```
 
-You don't need to order your schema files manually. When generating a migration, the engine analyzes the dependencies between your statements, such as foreign keys, views over tables, and functions used by triggers, and orders them automatically - file names and directory layout are purely for readability. If your statements contain a genuine dependency cycle, the command reports it as a diagnostic instead of producing a broken migration.
+You don't need to order your schema files manually. When generating a migration, the engine analyzes the dependencies between your statements, such as foreign keys, views over tables, and functions used by triggers, and orders them automatically. File names and directory layout are for readability only. If your statements contain a dependency cycle, the command fails with a diagnostic instead of producing a broken migration.
 
 This means you can organize `supabase/schemas/` however you like. For example, one file per table:
 
@@ -263,11 +265,11 @@ This means you can organize `supabase/schemas/` however you like. For example, o
         └── 20241006112233_add_managers_table.sql
 ```
 
-Or the per-schema layout that `supabase db schema declarative generate` produces, with one directory per database schema (such as `supabase/schemas/public/tables/employees.sql`) and cluster-level objects like roles under a reserved `_cluster/` directory. A reserved `_custom/` directory holds hand-authored SQL for objects the engine doesn't track - the export never writes to it and never prunes it. See [Known caveats](#known-caveats).
+Or the per-schema layout that `supabase db schema declarative generate` produces, with one directory per database schema (such as `supabase/schemas/public/tables/employees.sql`) and cluster-level objects like roles under a reserved `_cluster/` directory. You can also create a reserved `_custom/` directory for hand-authored SQL covering objects the engine doesn't track. `generate` doesn't create it, and once it exists the export never writes to it or prunes it. See [Known caveats](#known-caveats).
 
 <Admonition type="note">
 
-The `[db.migrations].schema_paths` setting from earlier CLI versions no longer controls declarative file ordering - ordering is automatic.
+Under the `pg-delta` engine, the `[db.migrations].schema_paths` setting from earlier CLI versions no longer controls declarative file ordering, because ordering is automatic. The CLI warns while the setting is present. On the legacy `migra` engine, `schema_paths` still controls the order in which declarative files are applied. See [Ordering schema files](#ordering-schema-files-on-the-legacy-engine).
 
 </Admonition>
 
@@ -279,7 +281,9 @@ To set up declarative schemas on an existing project, export your production sch
 supabase db schema declarative generate --linked
 ```
 
-This writes per-object SQL files under `supabase/schemas/`, organized by database schema. In scripts, pass the target explicitly (`--local`, `--linked`, or `--db-url`) and add `--overwrite` to replace an existing tree without prompting. To later refresh the declarative tree from the remote database (for example, after a change was deployed outside your local workflow), run `supabase db pull --declarative` - it replaces the schema files without creating a migration or touching migration history.
+This writes per-object SQL files under `supabase/schemas/`, organized by database schema. In scripts, pass the target explicitly (`--local`, `--linked`, or `--db-url`) and add `--overwrite` to replace an existing tree without prompting. To later refresh the declarative tree from the remote database (for example, after a change was deployed outside your local workflow), run `supabase db pull --declarative`. It replaces the schema files without creating a migration or touching migration history.
+
+`generate` writes schema files only. Because `sync` diffs your schema files against your migration history, that history must describe the same database before your first `sync`. If your project has no migrations yet, run `supabase db pull` first to create a baseline migration. Without a baseline, the first `sync` regenerates the entire schema as one migration. That migration can apply cleanly to an empty local database and still fail on `db push`, because the remote database already has those objects.
 
 ### Rolling back a schema change
 
@@ -301,29 +305,94 @@ SQL statements generated in a down migration are usually destructive. You must r
 
 ## Known caveats
 
-Schema diffs are generated by `pg-delta`, which models most database entities - including tables, views, materialized views, functions, triggers, RLS policies, grants, comments, domains, and partitions. There are still cases it cannot capture. Review every generated migration before committing.
+Schema diffs are generated by `pg-delta`, which models most database entities, including tables, views, materialized views, functions, triggers, RLS policies, grants, comments, domains, partitions, and publications. There are still cases it cannot capture. Review every generated migration before committing.
 
 ### Data manipulation language
 
-DML statements such as `insert`, `update`, and `delete` are never captured by a schema diff. This includes storage buckets, which are rows in the `storage.buckets` table rather than schema objects. A DML statement inside a declarative schema file is an error - keep data changes in [seed files](/docs/guides/local-development/seeding-your-database) or hand-written [versioned migrations](/docs/guides/deployment/database-migrations).
+DML statements such as `insert`, `update`, and `delete` are never captured by a schema diff. This includes storage buckets, which are rows in the `storage.buckets` table rather than schema objects. A DML statement inside a declarative schema file is an error. Keep data changes in [seed files](/docs/guides/local-development/seeding-your-database) or hand-written [versioned migrations](/docs/guides/deployment/database-migrations).
+
+### Default privileges on new objects
+
+Both engines treat permissions as part of the schema state. When you create a new object, generated migrations can include `GRANT`/`REVOKE` statements you didn't write, reflecting default privileges. If you haven't customized permissions, these lines are safe to remove.
 
 ### Object kinds that aren't tracked
 
-Some object kinds are not tracked by the engine: casts, operators, operator classes and families, text search configurations and dictionaries, statistics objects, and transforms. They are never silently dropped - the engine reports them as warnings, and you can pass `--strict-coverage` to turn those warnings into hard failures (useful in CI).
+Some object kinds are not tracked by the engine: casts, operators, operator classes and families, text search configurations, dictionaries, parsers, and templates, statistics objects, languages, transforms, and parameter ACLs. They are never silently dropped. The engine reports them as warnings, and you can pass `--strict-coverage` to turn those warnings into hard failures (useful in CI).
 
-To use these objects with declarative schemas, put their SQL in the reserved `supabase/schemas/_custom/` directory (which `generate` never overwrites) so dependent objects still resolve, and deliver the change itself through a versioned migration.
+To use these objects with declarative schemas, create the reserved `supabase/schemas/_custom/` directory if it doesn't exist and put their SQL there so dependent objects still resolve. `generate` never creates, overwrites, or prunes that directory. Deliver the change itself through a versioned migration, and make sure that migration sorts before the generated migration that depends on the object. Otherwise `db reset` and every later `sync` fail. Parameter ACLs are the exception because they live in a catalog shared by every database in the cluster. Keep them out of `_custom/` and manage them through versioned migrations only.
 
 ### Supabase-managed schemas
 
-Platform objects in managed schemas such as `auth` and `storage` are excluded from diffs. Your own customizations on top of them are captured: triggers on managed tables (for example, a trigger on `auth.users` whose function lives in `public`) and RLS policies on `storage.objects` and `storage.buckets`. Other objects you create inside managed schemas, such as your own functions or indexes, are not diffed - manage those through versioned migrations.
+<$Partial path="managed_schemas_diff_capture.mdx" />
+
+Manage those objects through versioned migrations.
+
+### Extension-managed objects
+
+Objects that belong to an extension are recognized as the extension's, not yours. Anything an extension owns is excluded from diffs. Objects extensions create as they run, such as partitions maintained by `pg_partman` and queue tables created by `pgmq`, are never emitted as raw `create table` or `drop table` statements. The diff expresses changes to them through the extension's own API instead, such as `select pgmq.drop_queue('q');` or a `delete from partman.part_config` row, and the CLI flags those statements as destructive. Create and change these objects through the extension's own functions, and review any generated API calls before committing.
 
 ### Adopting an existing schema tree
 
 Two checks gate `sync` on a schema tree the CLI didn't generate:
 
-- If your migrations call `pg_net` (for example, database webhooks), enable `[experimental.webhooks]` in `config.toml` first.
-- Declare every extension your schema files depend on. When an older export omits one, interactive `sync` offers to add the missing declarations and re-plan. It can also stage a fresh export into a sibling `-next` directory and print the commands to adopt it.
+- If your migrations call `pg_net` (for example, database webhooks), add `[experimental.webhooks]` with `enabled = true` to `config.toml` first. The section isn't part of the default `init` template.
+- Declare the extensions your schema files depend on. The check trips for `pg_net` and for extensions your own migrations create. When it does, interactive `sync` offers to add the missing declaration and re-plan, or to stage a fresh export into a sibling `-next` directory and print the commands to adopt it. A non-interactive run only prints those commands. Extensions the local stack already ships, such as `pgcrypto` and `uuid-ossp`, don't trip the check even when undeclared, so declare them yourself.
 
-### Legacy `migra` engine
+## Declarative schemas on the legacy `migra` engine [#declarative-schemas-on-the-legacy-migra-engine]
 
-On projects that haven't enabled `pg-delta`, diffs come from the legacy [`migra`](https://github.com/djrobstep/migra) engine, which has additional limitations: [view owner and grants](https://github.com/djrobstep/migra/issues/160#issuecomment-1702983833), [security invoker on views](https://github.com/djrobstep/migra/issues/234), [materialized views](https://github.com/djrobstep/migra/issues/194), [alter policy statements](https://github.com/djrobstep/schemainspect/blob/master/schemainspect/pg/obj.py#L228), [column privileges](https://github.com/djrobstep/schemainspect/pull/67), [comments](https://github.com/djrobstep/migra/issues/69), [partitions](https://github.com/djrobstep/migra/issues/186), [`alter publication ... add table`](https://github.com/supabase/cli/issues/883), [`create domain` statements](https://github.com/supabase/cli/issues/2137), and [duplicated grants from default privileges](https://github.com/supabase/cli/issues/1864). Add those entities through versioned migrations instead.
+Projects that haven't enabled `pg-delta` can still use declarative schemas. The workflow has the same shape, but the commands differ, and the `db schema declarative` commands aren't available. See [Diff engines](/docs/guides/local-development/diff-engines) for how to check which engine you're on and how the engines compare.
+
+<Admonition type="caution">
+
+On the legacy engine, don't run `supabase db pull --declarative`. The command runs regardless of the `[experimental.pgdelta]` setting, but the tree it writes is only readable by the `db schema declarative` commands. `db diff` on the legacy engine tries to load that tree as its baseline, in lexicographic order, and fails on the first file. If you've already run it, delete the generated tree under `supabase/schemas/` or [switch to `pg-delta`](#switching-to-pg-delta).
+
+</Admonition>
+
+### Generating migrations on the legacy engine
+
+On the legacy engine, `supabase db diff` reads your declarative files. When `supabase/schemas/` contains files, it compares them against your migrations instead of reading the live database. Generate migrations with the local stack stopped.
+
+1. Edit the files in `supabase/schemas/`.
+2. Stop the local stack and generate a migration:
+
+   ```bash
+   supabase stop
+   supabase db diff -f add_age
+   ```
+
+3. Start the stack and apply the migration:
+
+   ```bash
+   supabase start
+   supabase migration up
+   ```
+
+As on `pg-delta`, changes made directly through Studio, the SQL editor, or `psql` are not picked up. Always edit the schema files, then diff.
+
+### Ordering schema files on the legacy engine
+
+The legacy engine applies your schema files in lexicographic order. The order matters when tables reference each other, because the parent table must be created first. To control the order, list files or glob patterns under `[db.migrations].schema_paths` in `config.toml`. The CLI expands the patterns, removes duplicates, and sorts the result lexicographically. This example always runs `employees.sql` first:
+
+```toml name=supabase/config.toml
+[db.migrations]
+schema_paths = [
+  "./schemas/employees.sql",
+  "./schemas/*.sql",
+]
+```
+
+### Starting from an existing database on the legacy engine
+
+`supabase db schema declarative generate` isn't available on the legacy engine. Instead, dump your production schema into a single file and split it into smaller files over time:
+
+```bash
+supabase db dump > supabase/schemas/prod.sql
+```
+
+### Limitations of the legacy engine [#limitations-of-the-legacy-engine]
+
+In addition to the caveats above, the legacy [`migra`](https://github.com/djrobstep/migra) engine has these limitations: [view owner and grants](https://github.com/djrobstep/migra/issues/160#issuecomment-1702983833), [security invoker on views](https://github.com/djrobstep/migra/issues/234) (the setting is silently dropped from the view definition), [indexes on a materialized view aren't restored when the view is recreated](https://github.com/djrobstep/migra/issues/194), [alter policy statements](https://github.com/djrobstep/schemainspect/blob/master/schemainspect/pg/obj.py#L228), [column privileges](https://github.com/djrobstep/schemainspect/pull/67), [comments](https://github.com/djrobstep/migra/issues/69), [roles](https://github.com/djrobstep/migra/issues/240), [`alter publication ... add table`](https://github.com/supabase/cli/issues/883), and [`create domain` statements](https://github.com/supabase/cli/issues/2137). Add those entities through versioned migrations instead.
+
+### Switching to `pg-delta` [#switching-to-pg-delta]
+
+Follow [Switch an existing project to `pg-delta`](/docs/guides/local-development/diff-engines#switch-an-existing-project-to-pg-delta). For a declarative project, the steps that change your day-to-day work are removing `schema_paths`, replacing `db diff` with `db schema declarative sync` in scripts and CI, and dropping the `supabase stop` step.

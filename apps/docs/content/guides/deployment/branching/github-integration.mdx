@@ -97,6 +97,10 @@ A comment is added to your PR with the deployment status of your preview branch.
 
 The migrations in the `migrations` subdirectory of your Supabase directory are automatically run when the branch is created. Each later commit runs only the migrations that haven't been applied yet.
 
+If your project uses [declarative schemas](/docs/guides/local-development/declarative-database-schemas), the files in `supabase/schemas/` are not applied by branching. Run `supabase db schema declarative sync` to generate a migration from your schema changes, and commit the generated migration alongside your schema files.
+
+Branching runs each migration file inside a single transaction and does not honor the `-- pg-delta: transaction=false` directive. A migration that can't run in a transaction (for example, one that uses `create index concurrently`, or a [`pg-delta`](/docs/guides/local-development/diff-engines) file that carries the directive) applies with `supabase db push` but fails when branching deploys it.
+
 If you want to rerun existing migrations, reset the branch from the Supabase dashboard to start from scratch. Note that existing data on your branch will also be dropped by a reset.
 
 ### Seeding
