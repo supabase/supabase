@@ -27,9 +27,10 @@ export const SignInPartner = () => {
         // partner comes from the URL hash unauthenticated; only registry-known values may
         // enter the method vocabulary, anything else would let a crafted link poison it
         const knownPartner = getIdentityProviderConfig(partner)
+        const method = knownPartner?.id ?? 'unregistered_partner'
         track('sign_in_submitted', {
           category: 'account',
-          method: knownPartner ? partner : 'unknown',
+          method,
         })
         try {
           const { error } = await auth.signInWithIdToken({ provider: partner, token })
@@ -37,7 +38,7 @@ export const SignInPartner = () => {
             trackFunnelError('signin', classifyApiError('signin', error), 'form')
           }
         } finally {
-          router.replace({ pathname: '/sign-in-mfa', query: { method: partner } })
+          router.replace({ pathname: '/sign-in-mfa', query: { method } })
         }
       } else {
         router.replace({ pathname: '/sign-in' })
