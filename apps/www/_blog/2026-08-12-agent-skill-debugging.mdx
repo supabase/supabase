@@ -1,0 +1,46 @@
+---
+title: 'Introducing the Supabase debugging skills'
+description: 'Install the Supabase agent skill and your coding agent investigates and debugs Supabase errors with evidence instead of slowly scanning every log.'
+author: jordi,steven_eubank
+imgSocial: 2026-08-12-agent-skill-debugging/og.jpg
+imgThumb: 2026-08-12-agent-skill-debugging/thumb.jpg
+categories:
+  - product
+tags:
+  - ai
+  - skills
+  - debugging
+  - developer-tools
+date: '2026-08-12'
+toc_depth: 2
+---
+
+The [Supabase agent skill](https://github.com/supabase/agent-skills) now includes a debugging workflow. Install it, and the next time your agent hits a Supabase error, it stops guessing and starts investigating.
+
+## Why install it
+
+Claude Code, Cursor, and other coding agents connect to Supabase through the [Supabase MCP server](https://supabase.com/docs/guides/getting-started/mcp) or the CLI, so they debug your project as often as they write code for it. Left on their own, agents default to the same failure mode: a broad, all-source log scan with no time bound and no filter. That buries the one line that matters, floods the agent's context while wasting tokens, and on paid projects runs up the data scanned.
+
+With the skill installed, your agent instead reproduces the error, isolates which Supabase service caused it, and runs one narrow log query against that exact source before proposing a fix. The approach comes straight from Supabase's own [Debugging guide](https://supabase.com/docs/guides/monitoring-and-debugging/debugging), so it stays current as that guide is updated, without needing a new version of the skill.
+
+## What you get
+
+- **Root-cause fixes, not symptom patches.** The agent isolates the product layer that failed (Auth, the Data API, Realtime, Storage, Edge Functions, or Postgres itself) instead of only attempting to pattern-match on the error message.
+- **Cheaper, faster log queries.** Narrow, filtered queries through the `query_logs` MCP tool replace an unfiltered dump across every log source.
+- **A workflow that doesn't go stale.** The skill points at Supabase's troubleshooting guides rather than carrying its own copy, so it updates automatically as those guides do.
+- **No new tool to learn.** It works with any agent already connected through the Supabase MCP server or CLI.
+
+## How to install it
+
+```bash
+npx skills add supabase/agent-skills
+```
+
+If you already have the skill installed, update to v0.1.8 or later to pick up the debugging workflow. Then ask your agent to debug whatever's broken, no extra setup required.
+
+- [Supabase Agent Skills on GitHub](https://github.com/supabase/agent-skills)
+- [Debugging guide](https://supabase.com/docs/guides/monitoring-and-debugging/debugging)
+- [Supabase MCP setup guide](https://supabase.com/docs/guides/getting-started/mcp)
+- [Agent Skills guide](https://supabase.com/docs/guides/ai-tools/ai-skills)
+
+Found a gap in the debugging workflow? [Open an issue](https://github.com/supabase/agent-skills/issues) on the repo.
