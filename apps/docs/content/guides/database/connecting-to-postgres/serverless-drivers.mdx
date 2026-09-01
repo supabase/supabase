@@ -7,11 +7,15 @@ subtitle: 'Choose a driver for connecting to your Postgres database from a serve
 
 Learn how to connect to your Postgres database from a serverless environment. The driver you use depends on which runtime your code runs in.
 
-[supabase-js](/docs/reference/javascript/introduction) is an isomorphic JavaScript client that uses the [auto-generated REST API](/docs/guides/api), so it works in any environment that supports HTTPS connections. This API has a built-in [connection pooler](/docs/guides/database/connecting-to-postgres#poolers) and can serve thousands of simultaneous requests, which suits serverless workloads.
+[supabase-js](/docs/reference/javascript/introduction) is an isomorphic JavaScript client that uses the [auto-generated REST API](/docs/guides/api), so it works in any environment that supports HTTPS connections. This API has a built-in [connection pooler](/docs/guides/database/connecting-to-postgres#how-connection-pooling-works) and can serve thousands of simultaneous requests, which suits serverless workloads.
+
+If you connect with a Postgres client instead, use the [shared pooler in transaction mode](/docs/guides/database/connecting-to-postgres#pooler-transaction-mode). Transaction mode doesn't support [prepared statements](https://postgresql.org/docs/current/sql-prepare.html), so [turn them off](https://github.com/orgs/supabase/discussions/28239) in your connection library.
 
 ## Vercel Edge Functions
 
 Vercel's [Edge runtime](https://vercel.com/docs/functions/runtimes/edge-runtime) runs on the [V8 engine](https://v8.dev/) and exposes a limited set of Web Standard APIs.
+
+Start from a deploy template, or configure the connection yourself.
 
 ### Quickstart
 
@@ -125,6 +129,8 @@ export { sql } from 'kysely'
 
 Cloudflare's Workers runtime also uses the [V8 engine](https://v8.dev/), but it provides polyfills for a subset of Node.js APIs and the [TCP Sockets API](https://developers.cloudflare.com/workers/runtime-apis/tcp-sockets/). That gives you three options:
 
+### Drivers
+
 - [supabase-js](https://developers.cloudflare.com/workers/databases/native-integrations/supabase/)
 - [Postgres.js](https://github.com/porsager/postgres?tab=readme-ov-file#cloudflare-workers-support)
 - [node-postgres](https://developers.cloudflare.com/workers/tutorials/postgres/)
@@ -132,6 +138,8 @@ Cloudflare's Workers runtime also uses the [V8 engine](https://v8.dev/), but it 
 ## Supabase Edge Functions
 
 Supabase Edge Functions use the [Deno runtime](https://deno.com/), which has native support for TCP connections. You can choose any of these clients:
+
+### Drivers
 
 - [supabase-js](/docs/guides/functions/connect-to-postgres#using-supabase-js)
 - [Deno Postgres driver](/docs/guides/functions/connect-to-postgres#using-a-postgres-client)
