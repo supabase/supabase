@@ -97,4 +97,20 @@ describe('findFirstErrorMessage', () => {
     ).toBeUndefined()
     expect(findFirstErrorMessage({ clusterBy: { message: '' } })).toBeUndefined()
   })
+
+  it('does not walk into the DOM node that react-hook-form attaches to every field error', () => {
+    const input = document.createElement('input')
+    input.setAttribute('message', 'not an error message')
+
+    expect(
+      findFirstErrorMessage({ partitionBy: { column: { type: 'too_small', ref: input } } })
+    ).toBeUndefined()
+  })
+
+  it('survives a cyclic error graph', () => {
+    const partitionBy: Record<string, unknown> = { column: { type: 'too_small' } }
+    partitionBy.self = partitionBy
+
+    expect(findFirstErrorMessage({ partitionBy })).toBeUndefined()
+  })
 })

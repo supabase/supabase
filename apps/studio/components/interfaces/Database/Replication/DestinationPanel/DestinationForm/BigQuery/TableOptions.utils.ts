@@ -79,14 +79,30 @@ export const resolvePublishedColumnNames = (
 
 // React Hook Form nests field-array errors by field name. A collapsed row can only show one
 // line, and any error there blocks the save, so the first message is enough to explain why.
-export const findFirstErrorMessage = (error: unknown): string | undefined => {
-  if (error === null || typeof error !== 'object') return undefined
+// Only plain objects and arrays are worth walking. React Hook Form hangs a `ref` on every
+// field error, which points at a DOM node whose graph is deep and cyclic.
+const isTraversable = (value: unknown): value is Record<string, unknown> => {
+  if (typeof value !== 'object' || value === null) return false
+  if (Array.isArray(value)) return true
 
-  const { message } = error as { message?: unknown }
+  const prototype = Object.getPrototypeOf(value)
+  return prototype === Object.prototype || prototype === null
+}
+
+export const findFirstErrorMessage = (
+  error: unknown,
+  visited = new WeakSet<object>()
+): string | undefined => {
+  if (!isTraversable(error) || visited.has(error)) return undefined
+  visited.add(error)
+
+  const { message } = error
   if (typeof message === 'string' && message.length > 0) return message
 
-  for (const nested of Object.values(error)) {
-    const nestedMessage = findFirstErrorMessage(nested)
+  for (const [key, nested] of Object.entries(error)) {
+    if (key === 'ref') continue
+
+    const nestedMessage = findFirstErrorMessage(nested, visited)
     if (nestedMessage !== undefined) return nestedMessage
   }
 
