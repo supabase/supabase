@@ -4045,6 +4045,10 @@ export interface components {
             /** @enum {string} */
             type: 'operator_estimator_gate'
           }
+        | {
+            /** @enum {string} */
+            type: 'btree_gist_nan_reindex'
+          }
       )[]
     }
     ProjectUpgradeInitiateResponse: {

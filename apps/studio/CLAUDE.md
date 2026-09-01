@@ -37,6 +37,7 @@ Studio is migrating from the Next.js pages router (`pages/**`) to TanStack Start
 - **Telemetry** — `useTrack()` from `lib/telemetry/track`; event types live in `packages/common/telemetry-constants.ts`.
 - **Tests** — default to including relevant tests with any change: a couple of unit tests for extracted logic, component tests for UI behavior, E2E only when the scope demands it (`studio-testing` has the decision tree). Not every PR needs them, but "no tests" should be a considered choice, not the default. Tooling: vitest + MSW; component tests use `customRender` + `addAPIMock` from `tests/lib/`; unhandled network requests fail tests. Don't `vi.mock('@/data/...')`.
 - **Shortcuts** — use the registry in `state/shortcuts/` and `components/ui/Shortcut*.tsx`; keep `G then …` chords for navigation; no one-off keyboard listeners.
+- **Scoped PAT catalog** — `packages/shared-data/scoped-access-token-permissions.ts` feeds Studio and the generated Personal Access Tokens guide. After changing it, run `make -C apps/docs/spec generate.partials.access-control`; Docs Tests rejects stale tables.
 - **Reuse first** — before writing a new hook or helper, search for an existing one (`hooks/`, `lib/`, `packages/common`, `packages/ui-patterns`). If you do need a new one, make it as reusable as possible: general naming, no page-specific coupling, placed where other callers can find it.
 - Co-locate sub-components with their parent; avoid barrel re-export files.
 

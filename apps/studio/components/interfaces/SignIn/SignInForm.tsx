@@ -81,7 +81,7 @@ export const SignInForm = () => {
         if (data) {
           if (data.currentLevel !== data.nextLevel) {
             toast.success(`You need to provide your second factor authentication`, { id: toastId })
-            const url = buildPathWithParams('/sign-in-mfa')
+            const url = buildPathWithParams('/sign-in-mfa?method=email')
             router.replace(url)
             return
           }
@@ -133,10 +133,9 @@ export const SignInForm = () => {
           name="email"
           control={form.control}
           render={({ field }) => (
-            <FormItemLayout name="email" label="Email">
+            <FormItemLayout label="Email">
               <FormControl>
                 <Input
-                  id="email"
                   type="email"
                   autoComplete="email"
                   {...field}
@@ -154,11 +153,10 @@ export const SignInForm = () => {
             name="password"
             control={form.control}
             render={({ field }) => (
-              <FormItemLayout name="password" label="Password">
-                <FormControl>
-                  <div className="relative">
+              <FormItemLayout label="Password">
+                <div className="relative">
+                  <FormControl>
                     <Input
-                      id="password"
                       type={passwordHidden ? 'password' : 'text'}
                       autoComplete="current-password"
                       {...field}
@@ -166,17 +164,17 @@ export const SignInForm = () => {
                       disabled={isSubmitting}
                       className="pr-10"
                     />
-                    <Button
-                      variant="default"
-                      title={passwordHidden ? `Show password` : `Hide password`}
-                      aria-label={passwordHidden ? `Show password` : `Hide password`}
-                      className="absolute right-1 top-1 px-1.5"
-                      icon={passwordHidden ? <Eye /> : <EyeOff />}
-                      disabled={isSubmitting}
-                      onClick={() => setPasswordHidden((prev) => !prev)}
-                    />
-                  </div>
-                </FormControl>
+                  </FormControl>
+                  <Button
+                    variant="default"
+                    title={passwordHidden ? `Show password` : `Hide password`}
+                    aria-label={passwordHidden ? `Show password` : `Hide password`}
+                    className="absolute right-1 top-1 px-1.5"
+                    icon={passwordHidden ? <Eye /> : <EyeOff />}
+                    disabled={isSubmitting}
+                    onClick={() => setPasswordHidden((prev) => !prev)}
+                  />
+                </div>
               </FormItemLayout>
             )}
           />

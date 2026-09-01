@@ -2,10 +2,9 @@ import pricingAddOn from '~/data/PricingAddOnTable.json'
 import { Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { plans as allPlans } from 'shared-data/plans'
-import { Button, cn, Slider } from 'ui'
+import { Button, cn, Slider, ToggleGroup, ToggleGroupItem } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { ToggleGroup, ToggleGroupItem } from 'ui/src/components/shadcn/ui/toggle-group'
 
 const STANDALONE_PLANS = allPlans
   .filter((plan) => plan.planId === 'pro' || plan.planId === 'team')
