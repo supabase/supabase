@@ -155,7 +155,7 @@ Pass the branch's own project ref to read the keys for a preview branch. A branc
 
 Use the Management API to fetch keys from your own tooling, such as a deploy script or an internal provisioning service.
 
-Authenticate with a [personal access token](/dashboard/account/tokens). Pass `reveal=true` to include the key values in the response.
+Authenticate with a [personal access token](/dashboard/account/tokens). An OAuth application needs the `secrets:read` scope, and a fine-grained token needs the `api_gateway_keys_read` permission. Without either, the request returns 403 Forbidden.
 
 ```bash
 export PROJECT_REF="your-project-ref"
@@ -163,10 +163,10 @@ export SUPABASE_ACCESS_TOKEN="your-personal-access-token"
 
 curl -X GET "https://api.supabase.com/v1/projects/$PROJECT_REF/api-keys?reveal=true" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
-  | jq '.[] | {name, type, api_key}'
+  | jq '.[] | {name, type}'
 ```
 
-The `jq` pipe only formats the output, so you can drop it. See [Get project API keys](/docs/reference/api/v1-get-project-api-keys) for the full response.
+`reveal=true` includes the key values in the response, and this `jq` filter drops them again so they stay out of your terminal. Write the values straight into your secret store rather than printing them, because anything on standard output lands in your CI logs. See [Get project API keys](/docs/reference/api/v1-get-project-api-keys) for the full response.
 
 </TabPanel>
 <TabPanel id="local" label="Local stack">
