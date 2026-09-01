@@ -16,7 +16,7 @@ export const PublicationSkeleton = ({ index }: PublicationSkeletonProps) => {
       </TableCell>
       {Array.from({ length: 4 }).map((_, i) => (
         <TableCell key={i}>
-          <div aria-hidden="true" />
+          <Switch size="small" checked={false} disabled={true} />
         </TableCell>
       ))}
       <TableCell className="px-4 py-3 pr-2">
