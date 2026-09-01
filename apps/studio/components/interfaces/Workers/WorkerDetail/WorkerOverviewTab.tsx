@@ -18,7 +18,7 @@ import { LISTENING_PORT, WORKERS_REGION_LABEL } from '../Workers.constants'
 import type { Worker } from '../Workers.types'
 import { formatSize, getRuntimeMeta } from '../Workers.utils'
 import { buildWorkerCliCommands } from '../workerSnippets'
-import { WorkerSnippetTabs } from '../WorkerSnippetTabs'
+import { WORKER_CALL_TABS, WorkerSnippetTabs } from '../WorkerSnippetTabs'
 import { CLI_NAME } from '@/lib/constants/workers'
 
 interface WorkerOverviewTabProps {
@@ -215,9 +215,7 @@ export const WorkerOverviewTab = ({ worker }: WorkerOverviewTabProps) => {
         <PageSectionMeta>
           <PageSectionSummary>
             <PageSectionTitle>How to call</PageSectionTitle>
-            <PageSectionDescription>
-              Call the worker over its gateway URL. Pass your project API key as a bearer token.
-            </PageSectionDescription>
+            <PageSectionDescription>Call the worker over its gateway URL.</PageSectionDescription>
           </PageSectionSummary>
         </PageSectionMeta>
         <PageSectionContent>
@@ -229,7 +227,7 @@ export const WorkerOverviewTab = ({ worker }: WorkerOverviewTabProps) => {
               access: worker.access,
               instances: worker.declaredInstances,
             }}
-            tabs={['cli', 'js', 'python']}
+            tabs={WORKER_CALL_TABS}
           />
         </PageSectionContent>
       </PageSection>
