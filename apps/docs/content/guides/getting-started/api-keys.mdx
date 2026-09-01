@@ -24,12 +24,7 @@ Pick the key by asking where the code runs.
 
 Think of your project's data as a building. The publishable key is taped to the front door, and it only opens the lobby. The secret key is the master key, and it stays in your pocket.
 
-After you know which key you need:
-
-- To get its value, see [Find your keys](#find-your-keys), which covers the Dashboard, the CLI, the Management API, and a local stack.
-- To wire it into code, see [Use a publishable key in client code](#use-a-publishable-key-in-client-code) or [Use a secret key in backend code](#use-a-secret-key-in-backend-code).
-- To learn what the key authorizes, see [How API keys work](#how-api-keys-work).
-- To swap keys in an application that already ships legacy keys, see [Migrating to new API keys](/docs/guides/getting-started/migrating-to-new-api-keys).
+After you know which key you need, see [Find and use your keys](#find-and-use-your-keys) to get its value and wire it in. To swap keys in an application that already ships legacy keys, follow [Migrating to new API keys](/docs/guides/getting-started/migrating-to-new-api-keys) instead.
 
 <$Partial path="api_keys_deprecation.mdx" />
 
@@ -50,12 +45,12 @@ API keys provide the first layer of authentication for data access. Supabase Aut
 
 Supabase supports four types of API keys:
 
-| Type                                                       | Format                                                           | Privileges | Availability                                              | Use                                                                                                                                                                                                                                                                                             |
-| ---------------------------------------------------------- | ---------------------------------------------------------------- | ---------- | --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Publishable&nbsp;key                                       | <span className="whitespace-nowrap!">`sb_publishable_...`</span> | Low        | <span className="whitespace-nowrap!">Platform, CLI</span> | Safe to expose online: web page, mobile or desktop app, GitHub actions, CLIs, source code.                                                                                                                                                                                                      |
+| Type                                                       | Format                                                           | Privileges | Availability                                              | Use                                                                                                                                                                                                                                                                                                     |
+| ---------------------------------------------------------- | ---------------------------------------------------------------- | ---------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Publishable&nbsp;key                                       | <span className="whitespace-nowrap!">`sb_publishable_...`</span> | Low        | <span className="whitespace-nowrap!">Platform, CLI</span> | Safe to expose online: web page, mobile or desktop app, GitHub actions, CLIs, source code.                                                                                                                                                                                                              |
 | Secret&nbsp;keys                                           | <span className="whitespace-nowrap!">`sb_secret_...`</span>      | Elevated   | <span className="whitespace-nowrap!">Platform, CLI</span> | Only use in backend components of your app, such as servers, APIs with their own authorization checks, [Edge Functions](/docs/guides/functions), and microservices. They provide full access to your project's data, bypassing [Row Level Security](/docs/guides/database/postgres/row-level-security). |
-| <span className="whitespace-nowrap!">`anon`</span>         | JWT (long-lived)                                                 | Low        | <span className="whitespace-nowrap!">Platform, CLI</span> | Legacy version of publishable keys.                                                                                                                                                                                                                                                             |
-| <span className="whitespace-nowrap!">`service_role`</span> | JWT (long-lived)                                                 | Elevated   | <span className="whitespace-nowrap!">Platform, CLI</span> | Legacy version of secret keys.                                                                                                                                                                                                                                                                  |
+| <span className="whitespace-nowrap!">`anon`</span>         | JWT (long-lived)                                                 | Low        | <span className="whitespace-nowrap!">Platform, CLI</span> | Legacy version of publishable keys.                                                                                                                                                                                                                                                                     |
+| <span className="whitespace-nowrap!">`service_role`</span> | JWT (long-lived)                                                 | Elevated   | <span className="whitespace-nowrap!">Platform, CLI</span> | Legacy version of secret keys.                                                                                                                                                                                                                                                                          |
 
 Publishable and secret keys are short strings, not JWTs. If a tool, tutorial, or AI assistant tells you to copy a long key that begins with `eyJ`, it was written for the legacy keys.
 
@@ -118,7 +113,7 @@ Secret keys improve on the old JWT-based `service_role` key, and we recommend th
 
 ## Find and use your keys
 
-A key never belongs in your source code. Copying a key is a person's job, because it needs a signed-in Dashboard session. Writing the code is separate, and it only refers to the variable name. So set these names in `.env`, and write code against the names rather than the values:
+Getting a key into an app has two halves. You copy the value, which needs a signed-in Dashboard session, and your code reads it by name. The key itself never belongs in source code, so start by setting these names in `.env`:
 
 ```bash .env
 # Safe to expose to the browser. Prefix per your framework.
@@ -220,7 +215,7 @@ This path needs the Supabase CLI and a container runtime. See [Running a local S
 
 ### Use a publishable key in client code
 
-Pass the publishable key to `createClient` in any code that reaches a user's device. Prefix the environment variable so your bundler exposes it to the client. The prefix depends on your framework, such as `NEXT_PUBLIC_` for Next.js or `VITE_` for Vite.
+Pass the publishable key to `createClient` in any code that reaches a user's device.
 
 ```ts lib/supabase.ts
 import { createClient } from '@supabase/supabase-js'
@@ -235,7 +230,7 @@ Row Level Security decides what this client can reach, so enable it on every tab
 
 ### Use a secret key in backend code
 
-Pass the secret key to `createClient` only in code that never reaches a user's device, such as a server route or a worker. Read it from an environment variable with no public prefix, so no bundler can inline it into your client. Name the variable `SUPABASE_SECRET_KEY`, which is the convention across these docs.
+Pass the secret key to `createClient` only in code that never reaches a user's device, such as a server route or a worker.
 
 ```ts server/supabase.ts
 import { createClient } from '@supabase/supabase-js'
