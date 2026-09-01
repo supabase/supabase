@@ -19,7 +19,7 @@ export async function resolveCaptchaToken(
     toast.error('Could not complete the security check. Please try again.', { id: toastId })
     trackFunnelError(
       'signin',
-      { errorCategory: 'api', errorReason: 'captcha_failed' },
+      { errorCategory: 'unknown', errorReason: 'captcha_challenge_failed' },
       'toast',
       toastId
     )

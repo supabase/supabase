@@ -81,6 +81,7 @@ const STRIPE_DECLINE_REASONS = {
 } as const satisfies Record<string, string>
 
 const GENERIC_REASONS = [
+  'captcha_challenge_failed',
   'rate_limited',
   'server_error',
   'connection_timeout',
