@@ -16,7 +16,7 @@ import {
   mapAddOnVariantIdToComputeSize,
 } from '../DiskManagement.utils'
 import { ComputeSizeRecommendationSection } from '../ui/ComputeSizeRecommendationSection'
-import { DiskType, RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3 } from '../ui/DiskManagement.constants'
+import { DiskType } from '../ui/DiskManagement.constants'
 import { DiskManagementIOPSReadReplicas } from '../ui/DiskManagementReadReplicas'
 import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
 
@@ -29,14 +29,9 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
   const { ref: projectRef } = useParams()
   const { control, formState, setValue, trigger, getValues } = form
 
-  const watchedStorageType = useWatch({ control, name: 'storageType' })
-  const watchedComputeSize = useWatch({ control, name: 'computeSize' })
   const watchedIOPS = useWatch({ control, name: 'provisionedIOPS' }) ?? 0
 
   const { isError } = useDiskAttributesQuery({ projectRef })
-
-  const disableIopsInput =
-    RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3.includes(watchedComputeSize) && watchedStorageType === 'gp3'
 
   return (
     <FormField
@@ -88,7 +83,7 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
                   {...field}
                   id={field.name}
                   value={field.value}
-                  disabled={disableInput || disableIopsInput || isError}
+                  disabled={disableInput || isError}
                   onChange={(e) => {
                     setValue('provisionedIOPS', e.target.valueAsNumber, {
                       shouldDirty: true,

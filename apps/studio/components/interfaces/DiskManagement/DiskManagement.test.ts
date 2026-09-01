@@ -9,6 +9,8 @@ import {
   calculateMaxIopsAllowedForDiskSizeWithGp3,
   calculateMaxIopsForComputeSize,
   calculateThroughputPrice,
+  getDiskConfigEditability,
+  isDiskConfigOverProvisioned,
   mapAddOnVariantIdToComputeSize,
   mapComputeSizeNameToAddonVariantId,
 } from './DiskManagement.utils'
@@ -286,4 +288,251 @@ describe('CreateDiskStorageSchema', () => {
       ).toBe(true)
     }
   )
+})
+
+describe('isDiskConfigOverProvisioned', () => {
+  test('io2 is always over-provisioned relative to the gp3 baseline', () => {
+    expect(
+      isDiskConfigOverProvisioned({
+        storageType: DiskType.IO2,
+        provisionedIOPS: 1500,
+        throughput: undefined,
+      })
+    ).toBe(true)
+  })
+
+  test('gp3 at the 3000 IOPS / 125 MB/s baseline is not over-provisioned', () => {
+    expect(
+      isDiskConfigOverProvisioned({
+        storageType: DiskType.GP3,
+        provisionedIOPS: 3000,
+        throughput: 125,
+      })
+    ).toBe(false)
+  })
+
+  test('gp3 with IOPS above the baseline is over-provisioned', () => {
+    expect(
+      isDiskConfigOverProvisioned({
+        storageType: DiskType.GP3,
+        provisionedIOPS: 8000,
+        throughput: 125,
+      })
+    ).toBe(true)
+  })
+
+  test('gp3 with throughput above the baseline is over-provisioned', () => {
+    expect(
+      isDiskConfigOverProvisioned({
+        storageType: DiskType.GP3,
+        provisionedIOPS: 3000,
+        throughput: 500,
+      })
+    ).toBe(true)
+  })
+})
+
+describe('getDiskConfigEditability', () => {
+  const base = {
+    isHardBlocked: false,
+    isComputeSizeGuardrailActive: false,
+    isSpendCapEnabled: false,
+    isDiskOverProvisioned: false,
+  }
+
+  test('no guardrail active — editable', () => {
+    expect(getDiskConfigEditability(base)).toEqual({ status: 'editable' })
+  })
+
+  test('compute-size guardrail active, disk within bounds — locked', () => {
+    expect(getDiskConfigEditability({ ...base, isComputeSizeGuardrailActive: true })).toEqual({
+      status: 'locked',
+      guardrails: ['computeSize'],
+    })
+  })
+
+  test('compute-size guardrail active, disk over-provisioned — downsizeOnly', () => {
+    expect(
+      getDiskConfigEditability({
+        ...base,
+        isComputeSizeGuardrailActive: true,
+        isDiskOverProvisioned: true,
+      })
+    ).toEqual({ status: 'downsizeOnly', guardrails: ['computeSize'] })
+  })
+
+  test('spend cap active, disk over-provisioned — downsizeOnly', () => {
+    expect(
+      getDiskConfigEditability({ ...base, isSpendCapEnabled: true, isDiskOverProvisioned: true })
+    ).toEqual({ status: 'downsizeOnly', guardrails: ['spendCap'] })
+  })
+
+  test('both guardrails active, disk over-provisioned — downsizeOnly with both reasons', () => {
+    expect(
+      getDiskConfigEditability({
+        ...base,
+        isComputeSizeGuardrailActive: true,
+        isSpendCapEnabled: true,
+        isDiskOverProvisioned: true,
+      })
+    ).toEqual({ status: 'downsizeOnly', guardrails: ['computeSize', 'spendCap'] })
+  })
+
+  test('hard block wins even when the disk is over-provisioned — never a downsize carve-out', () => {
+    expect(
+      getDiskConfigEditability({
+        ...base,
+        isHardBlocked: true,
+        isComputeSizeGuardrailActive: true,
+        isDiskOverProvisioned: true,
+      })
+    ).toEqual({ status: 'locked', guardrails: ['computeSize'] })
+  })
+
+  test('hard block wins even with no guardrail active', () => {
+    expect(getDiskConfigEditability({ ...base, isHardBlocked: true })).toEqual({
+      status: 'locked',
+      guardrails: [],
+    })
+  })
+})
+
+describe('CreateDiskStorageSchema with downsizeOnlyFrom', () => {
+  const baseConfig = {
+    storageType: DiskType.GP3,
+    totalSize: 100,
+    provisionedIOPS: 3000,
+    throughput: 125,
+    computeSize: 'ci_large' as const,
+    growthPercent: null,
+    minIncrementGb: null,
+    maxSizeGb: null,
+  }
+
+  test('rejects an IOPS increase above the persisted ceiling', () => {
+    const schema = CreateDiskStorageSchema({
+      defaultTotalSize: 100,
+      cloudProvider: 'AWS',
+      isSpendCapEnabled: false,
+      downsizeOnlyFrom: { storageType: DiskType.GP3, provisionedIOPS: 3000, throughput: 125 },
+    })
+
+    const result = schema.safeParse({ ...baseConfig, provisionedIOPS: 5000 })
+
+    expect(result.success).toBe(false)
+    if (result.success) return
+    expect(result.error.issues).toContainEqual(
+      expect.objectContaining({
+        path: ['provisionedIOPS'],
+        message: 'Maximum IOPS is 3,000 for your current configuration.',
+      })
+    )
+  })
+
+  test('accepts a reduced IOPS value', () => {
+    const schema = CreateDiskStorageSchema({
+      defaultTotalSize: 100,
+      cloudProvider: 'AWS',
+      isSpendCapEnabled: false,
+      downsizeOnlyFrom: { storageType: DiskType.GP3, provisionedIOPS: 8000, throughput: 125 },
+    })
+
+    expect(schema.safeParse({ ...baseConfig, provisionedIOPS: 3000 }).success).toBe(true)
+  })
+
+  test('rejects switching to io2 when the persisted type was gp3', () => {
+    const schema = CreateDiskStorageSchema({
+      defaultTotalSize: 100,
+      cloudProvider: 'AWS',
+      isSpendCapEnabled: false,
+      downsizeOnlyFrom: { storageType: DiskType.GP3, provisionedIOPS: 3000, throughput: 125 },
+    })
+
+    const result = schema.safeParse({
+      ...baseConfig,
+      storageType: DiskType.IO2,
+      provisionedIOPS: 1500,
+      throughput: undefined,
+    })
+
+    expect(result.success).toBe(false)
+    if (result.success) return
+    expect(result.error.issues).toContainEqual(
+      expect.objectContaining({
+        path: ['storageType'],
+        message:
+          'Switching to io2 is unsupported. Your project is over-provisioned for its size, and can only be downsized.',
+      })
+    )
+  })
+
+  test('accepts io2 with reduced IOPS when the persisted type was already io2', () => {
+    const schema = CreateDiskStorageSchema({
+      defaultTotalSize: 100,
+      cloudProvider: 'AWS',
+      isSpendCapEnabled: false,
+      downsizeOnlyFrom: { storageType: DiskType.IO2, provisionedIOPS: 50_000 },
+    })
+
+    const result = schema.safeParse({
+      ...baseConfig,
+      storageType: DiskType.IO2,
+      provisionedIOPS: 10_000,
+      throughput: undefined,
+    })
+
+    expect(result.success).toBe(true)
+  })
+
+  test("io2@1500 moving to gp3 floors the IOPS ceiling at gp3's own 3000 minimum", () => {
+    const schema = CreateDiskStorageSchema({
+      defaultTotalSize: 100,
+      cloudProvider: 'AWS',
+      isSpendCapEnabled: false,
+      downsizeOnlyFrom: { storageType: DiskType.IO2, provisionedIOPS: 1500 },
+    })
+
+    expect(schema.safeParse({ ...baseConfig, provisionedIOPS: 3000 }).success).toBe(true)
+
+    const result = schema.safeParse({ ...baseConfig, provisionedIOPS: 3001 })
+    expect(result.success).toBe(false)
+    if (result.success) return
+    expect(result.error.issues).toContainEqual(
+      expect.objectContaining({
+        path: ['provisionedIOPS'],
+        message: 'Maximum IOPS is 3,000 for your current configuration.',
+      })
+    )
+  })
+
+  test('throughput is capped at the gp3 minimum when the persisted type was io2', () => {
+    const schema = CreateDiskStorageSchema({
+      defaultTotalSize: 100,
+      cloudProvider: 'AWS',
+      isSpendCapEnabled: false,
+      downsizeOnlyFrom: { storageType: DiskType.IO2, provisionedIOPS: 1500 },
+    })
+
+    expect(schema.safeParse({ ...baseConfig, throughput: 125 }).success).toBe(true)
+
+    const result = schema.safeParse({ ...baseConfig, throughput: 200 })
+    expect(result.success).toBe(false)
+    if (result.success) return
+    expect(result.error.issues).toContainEqual(
+      expect.objectContaining({
+        path: ['throughput'],
+        message: 'Maximum throughput is 125 MB/s for your current configuration.',
+      })
+    )
+  })
+
+  test('behaves like the schema without downsizeOnlyFrom when no guardrail is active', () => {
+    const schema = CreateDiskStorageSchema({
+      defaultTotalSize: 100,
+      cloudProvider: 'AWS',
+      isSpendCapEnabled: false,
+    })
+
+    expect(schema.safeParse({ ...baseConfig, provisionedIOPS: 10_000 }).success).toBe(true)
+  })
 })
