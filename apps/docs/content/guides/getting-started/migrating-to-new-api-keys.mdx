@@ -210,8 +210,8 @@ Once you've confirmed nothing uses the legacy keys, deactivate them in the [**Se
 
 A few behaviors differ from the legacy JWT-based keys. Plan for them during the migration:
 
-- You can't send a publishable or secret key in the `Authorization: Bearer ...` header. Send it on the `apikey` header instead.
-- Edge Functions don't verify the `apikey` header for the new keys. Use `verify_jwt = false` and authorize in code, as shown in [Step 4](#step-4-update-edge-functions).
+- Send publishable and secret keys on the `apikey` header. For migration compatibility the `verify_jwt` check also accepts them on `Authorization: Bearer ...`, but passing that check doesn't authenticate the caller, and the keys aren't JWTs, so nothing downstream can verify them as one.
+- Edge Functions need to authorize API keys in code. The `verify_jwt` platform check alone doesn't authenticate a caller that sends only an API key, so authorize the key in your handler, as shown in [Step 4](#step-4-update-edge-functions).
 - Public Realtime connections are limited to 24 hours unless the connection is upgraded with user-level authentication through Supabase Auth or a supported third-party auth provider.
 
 ## Next steps
