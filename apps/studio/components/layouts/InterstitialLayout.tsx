@@ -204,3 +204,15 @@ export const InterstitialAccountRow = ({
     </CardContent>
   </Card>
 )
+
+export const InterstitialActionError = ({ error }: { error?: ReactNode }) => {
+  if (!error) return null
+
+  return (
+    <div className="mt-3 border-t border-muted pt-5">
+      <p role="alert" className="text-center text-xs text-destructive text-balance">
+        {error}
+      </p>
+    </div>
+  )
+}

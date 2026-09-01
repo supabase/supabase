@@ -805,11 +805,11 @@ export default defineConfig(({ command, mode }) => {
       postcss: { plugins: [] },
     },
     ssr: {
-      // `lodash` must stay inlined so its ids flow through the plugin
-      // pipeline, where ssrLodashEs (above) rewrites them to lodash-es.
-      // Externalized bare ids skip user plugins in the dev module runner, so
-      // dropping this entry resurfaces Node's CJS named-export failure
-      // ("Named export 'debounce' not found") on every `from 'lodash'` import.
+      optimizeDeps: {
+        include: ['lodash'],
+      },
+
+      // `lodash` is CJS; its named-export interop fails in Node ESM unless bundled.
       // `next/*` must be bundled so our nextCompat shim wins — otherwise Vite's
       // SSR externalizer leaves `next/router` as a runtime package import and
       // Node resolves it to Next's real module.

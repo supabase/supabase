@@ -53,6 +53,8 @@ Never hand-edit generated files: `packages/api-types/types/**`, `**/routeTree.ge
 
 **Language** — Use U.S. English everywhere.
 
+**Public surfaces** — this repo is public: PR descriptions, issues, and code comments are world-readable. Keep internal content out of them: absolute production metrics (event counts, user counts, revenue figures: state percentages, ratios, or relative change instead), internal decision detail (vendor, legal, pricing, or strategy discussions), and competitor names (protocol identifiers such as user-agent strings are fine). Put that context in the Linear issue and link it.
+
 ## Skills
 
 The skills in `.claude/skills/` are the source of truth for conventions — load the relevant ones before working, don't guess:

@@ -1,4 +1,3 @@
-import { renderHook } from '@testing-library/react'
 import { useFlag, useParams } from 'common'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -9,6 +8,7 @@ import {
 import { useSupamonitorStatus } from '@/components/interfaces/QueryPerformance/hooks/useSupamonitorStatus'
 import { useContentQuery } from '@/data/content/content-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { customRenderHook as renderHook } from '@/tests/lib/custom-render'
 import { routerMock } from '@/tests/lib/route-mock'
 
 const { REF, mockIsPlatform } = vi.hoisted(() => ({
@@ -26,10 +26,14 @@ vi.mock('@/lib/constants', async () => {
   }
 })
 
-vi.mock('common', () => ({
-  useFlag: vi.fn().mockReturnValue(false),
-  useParams: vi.fn().mockReturnValue({ ref: REF }),
-}))
+vi.mock('common', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('common')>()
+  return {
+    ...actual,
+    useFlag: vi.fn().mockReturnValue(false),
+    useParams: vi.fn().mockReturnValue({ ref: REF }),
+  }
+})
 
 vi.mock('@/components/interfaces/QueryPerformance/hooks/useSupamonitorStatus', () => ({
   useSupamonitorStatus: vi.fn(),

@@ -129,18 +129,24 @@ export const SERVICE_OPTIONS = [
   },
   {
     id: 5,
+    name: 'Multigres',
+    value: 'Multigres',
+    disabled: false,
+  },
+  {
+    id: 6,
     name: 'Realtime',
     value: 'Realtime',
     disabled: false,
   },
   {
-    id: 6,
+    id: 7,
     name: 'Storage',
     value: 'Storage',
     disabled: false,
   },
   {
-    id: 7,
+    id: 8,
     name: 'Others',
     value: 'Others',
     disabled: false,

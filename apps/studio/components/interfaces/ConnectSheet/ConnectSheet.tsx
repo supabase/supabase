@@ -162,7 +162,6 @@ export const ConnectSheet = () => {
       <SheetContent
         size="lg"
         className="flex w-full min-w-0 flex-col gap-0 space-y-0 p-0 max-w-4xl"
-        tabIndex={undefined}
       >
         <SheetHeader className={cn('text-left border-b shrink-0 py-6 px-8')}>
           <SheetTitle>Connect to your project</SheetTitle>

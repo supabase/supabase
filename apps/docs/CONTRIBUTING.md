@@ -19,6 +19,21 @@ To make docs as clear as possible:
 - Avoid using idioms and colloquialisms, such as `piece of cake`. These phrases are often specific to a region or culture.
 - Refer to the reader as `you`. Don't use `we` to refer to the reader. Use `we` only to refer to the Supabase team.
 
+## AI agent skills for docs authoring
+
+If you're using Claude Code or Cursor, this repo ships four skills that back the [Write the docs](../../.agents/skills/pm-the-docs/reference/write-the-docs-checklist.md) authoring checklist.
+
+Invoke a skill by name: `/write-the-docs`, `/ask-the-docs`, `/pm-the-docs`, `/review-the-docs`.
+
+| Skill | Checklist stage | Use for |
+| --- | --- | --- |
+| [`pm-the-docs`](../../.agents/skills/pm-the-docs/SKILL.md) | Frame / Shape | Audience, product-stage, and cross-cutting scope calls |
+| [`ask-the-docs`](../../.agents/skills/ask-the-docs/SKILL.md) | Frame / Shape | `apps/docs` architecture, IA placement, and where content lives |
+| [`write-the-docs`](../../.agents/skills/write-the-docs/SKILL.md) | Draft | Drafting net-new content grounded in the code |
+| [`review-the-docs`](../../.agents/skills/review-the-docs/SKILL.md) | Self-review / PR review | Checking a draft and PR triage/verification |
+
+The canonical files live in `.agents/skills/`, with Git symlinks in `.claude/skills/` and `.cursor/skills/`.
+
 ## Document types
 
 Supabase docs contain 4 types of documents. Before you start writing, think about what type of doc you need.
@@ -193,8 +208,18 @@ Choose the appropriate `type` for your admonition:
 - `caution`: Warn about behavior that could cause bugs, failed operations, unexpected results, or serious inconvenience but doesn't rise to the severity of `danger`.
 - `note`: Highlight an important prerequisite, constraint, clarification, or optional shortcut that doesn't represent a risk. If the information is essential to completing a step, include it in the procedure instead.
 
-```
-<Admonition type="note" title="Optional title">
+Structure an admonition with these props and content:
+
+- `title` (optional): Add a short callout title. Don't put Markdown or HTML headings inside an admonition. If the content needs a heading to structure the page, move the heading and its section outside the admonition.
+- `children`: Add rich body content such as paragraphs, lists, links, and code.
+- `actions` (optional): Add standalone calls to action so they remain separate from the body content. Keep contextual links and interactive examples in the body when they are part of the explanation.
+
+```mdx
+<Admonition
+  type="note"
+  title="Optional title"
+  actions={<Button>Continue</Button>}
+>
 
 Your content here
 
@@ -260,7 +285,7 @@ Run `pnpm test:local lib/content-listings.test.ts` from apps/docs.
 **Manually add content listings:**
 
 1. Add or update a `ContentListingGroup` export in [`data/content-listings/[topic].data.ts`](data/content-listings/). The `id` field must be globally unique across all listing groups. For example, use `storage-get-started` rather than `get-started`. The ID is both the lookup key and the telemetry `listingId`.
-2. Place the component inline in guide MDX, for example `<ContentListings id="storage-get-started" />`. Use a partial only when the block is reused or gated with `$Show` at the partial level.
+2. Place the component inline in guide MDX, for example `<ContentListings id="storage-get-started" />`. Use a partial only when the block is reused or gated with `$Show` at the partial level. For individual items that depend on a feature flag (for example `sdk:dart`), set `feature` on the item instead of wrapping the whole listing.
 3. Run `pnpm test:local lib/content-listings.test.ts` from `apps/docs`.
 
 Code snippets for manually adding content listings are available in [`.vscode/content-listing.code-snippets`](../../.vscode/content-listing.code-snippets). Use `cl-data` for a data export with a namespaced ID. Use `cl-inline` for an MDX component.

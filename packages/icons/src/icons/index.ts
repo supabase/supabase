@@ -13,6 +13,7 @@ export { default as ClickHouse } from './click-house';
 export { default as Database } from './database';
 export { default as Datadog } from './datadog';
 export { default as EdgeFunctions } from './edge-functions';
+export { default as Elastic } from './elastic';
 export { default as FilesBucket } from './files-bucket';
 export { default as Grafana } from './grafana';
 export { default as Graphql } from './graphql';
@@ -33,4 +34,5 @@ export { default as Storage } from './storage';
 export { default as TableEditor } from './table-editor';
 export { default as User } from './user';
 export { default as VectorBucket } from './vector-bucket';
+export { default as Workers } from './workers';
 

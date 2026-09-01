@@ -4,6 +4,12 @@ title: Available regions
 
 Each Supabase project is deployed to one primary region. Choose the location closest to your users for the best performance.
 
+## Data residency
+
+The region you choose also determines where your primary project data is stored. If your data residency requirements call for data to stay within a specific jurisdiction, choose a [specific region](#specific-regions) rather than a general region grouping.
+
+General regions deploy to _an_ available AWS region within that broader area, which may not match a specific jurisdiction. For example, the "Europe" general region includes London and Zurich, which are not EU member states. Region selection is a data-location control, not proof of regulatory compliance. For GDPR considerations, see the [GDPR compliance guide](/docs/guides/security/gdpr-compliance).
+
 ## General regions
 
 For most projects, we recommend choosing a general region. Supabase will deploy your project to an available AWS region within that area based on current infrastructure capacity.

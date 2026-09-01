@@ -100,6 +100,15 @@ response = supabase.auth.sign_in_with_otp({
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+await supabase.Auth.SignIn(SignInType.Phone, "+13334445555");
+```
+
+</TabPanel>
+</$Show>
 <TabPanel id="http" label="HTTP">
 
 ```bash
@@ -193,6 +202,17 @@ response = supabase.auth.verify_otp({
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `VerifyOTP`:
+
+```c#
+var session = await supabase.Auth.VerifyOTP("+13334445555", "123456", MobileOtpType.SMS);
+```
+
+</TabPanel>
+</$Show>
 <TabPanel id="http" label="HTTP">
 
 ```bash
@@ -278,6 +298,15 @@ supabase.auth.updateUser {
 response = supabase.auth.update_user({
   'phone': '123456789',
 })
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var response = await supabase.Auth.Update(new UserAttributes { Phone = "123456789" });
 ```
 
 </TabPanel>

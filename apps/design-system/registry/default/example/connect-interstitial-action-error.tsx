@@ -2,6 +2,7 @@ import { Button } from 'ui'
 
 import {
   AccountRow,
+  InterstitialActionError,
   InterstitialShell,
   LogoPair,
   StripeLogo,
@@ -24,11 +25,7 @@ export default function ConnectInterstitialActionError() {
           <Button variant="text" block>
             Cancel
           </Button>
-          <div className="mt-3 border-t border-muted pt-5">
-            <p role="alert" className="text-center text-xs text-destructive text-balance">
-              Failed to authorize Stripe Projects. Please try again.
-            </p>
-          </div>
+          <InterstitialActionError error="Failed to authorize Stripe Projects. Please try again." />
         </div>
       </div>
     </InterstitialShell>

@@ -109,6 +109,17 @@ response = supabase.auth.sign_in_anonymously()
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+Call the [`SignInAnonymously()`](/docs/reference/csharp/sign-in-anonymously) method:
+
+```c#
+var session = await supabase.Auth.SignInAnonymously();
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ## Convert an anonymous user to a permanent user
@@ -206,6 +217,23 @@ response = supabase.auth.update_user({
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+You can use the [`Update()`](/docs/reference/csharp/update-user) method to link an email or phone identity to the anonymous user. To add a password for the anonymous user, the user's email or phone number needs to be verified first.
+
+```c#
+var updateEmail = await supabase.Auth.Update(new UserAttributes { Email = "valid.email@supabase.io" });
+
+// verify the user's email by clicking on the email change link
+// or entering the 6-digit OTP sent to the email address
+
+// once the user has been verified, update the password
+var updatePassword = await supabase.Auth.Update(new UserAttributes { Password = "password" });
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ### Link an OAuth identity
@@ -271,6 +299,18 @@ You can use the [`link_identity()`](/docs/reference/python/auth-linkidentity) me
 
 ```python
 response = supabase.auth.link_identity({'provider': 'google'})
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+You can use the [`LinkIdentity()`](/docs/reference/csharp/link-identity) method to link an OAuth identity to the anonymous user.
+
+```c#
+var state = await supabase.Auth.LinkIdentity(Provider.Google, new SignInOptions { FlowType = OAuthFlowType.PKCE });
+var authorizeUrl = state.Uri;
 ```
 
 </TabPanel>

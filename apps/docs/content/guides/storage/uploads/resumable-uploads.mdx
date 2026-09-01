@@ -281,6 +281,20 @@ Instead of `https://project-id.supabase.co` use `https://project-id.storage.supa
 
   </TabPanel>
   </$Show>
+
+<$Show if="sdk:csharp">
+
+  <TabPanel id="csharp" label="C#">
+
+    C# supports resumable uploads natively via `UploadOrResume`:
+
+    ```c#
+    await supabase.Storage.From("bucket_name")
+      .UploadOrResume("local_file_path", "file_path", new FileOptions { Upsert = true });
+    ```
+
+  </TabPanel>
+  </$Show>
 </Tabs>
 
 ## Upload URL
@@ -344,6 +358,19 @@ response = supabase.storage.from_('bucket_name').create_signed_upload_url(
 
 # Use the signed URL token in resumable upload headers
 # Include response.token in the x-signature header
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+// Create a signed upload URL
+var signedUrl = await supabase.Storage.From("bucket_name").CreateUploadSignedUrl("file_path");
+
+// Use the signed URL token in resumable upload headers
+// Include signedUrl.Token in the x-signature header
 ```
 
 </TabPanel>
