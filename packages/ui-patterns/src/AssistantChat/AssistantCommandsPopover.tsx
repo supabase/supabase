@@ -12,6 +12,7 @@ import {
   useRef,
 } from 'react'
 import {
+  cn,
   Command,
   CommandEmpty,
   CommandGroup,
@@ -19,9 +20,10 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from 'ui/src/components/shadcn/ui/command'
-import { Popover, PopoverAnchor, PopoverContent } from 'ui/src/components/shadcn/ui/popover'
-import { cn } from 'ui/src/lib/utils/cn'
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+} from 'ui'
 
 const AssistantCommandsPopover = forwardRef<
   ComponentRef<typeof Popover>,

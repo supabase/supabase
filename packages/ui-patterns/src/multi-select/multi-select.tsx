@@ -17,8 +17,9 @@ import {
   PopoverAnchor,
   PopoverContent,
   PopoverContentProps,
+  SIZE_VARIANTS,
+  SIZE_VARIANTS_DEFAULT,
 } from 'ui'
-import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
 
 interface MultiSelectContextProps {
   id: string
