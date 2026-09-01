@@ -77,6 +77,14 @@ export const CATEGORY_OPTIONS: {
           query: undefined,
         },
       ]),
+  {
+    // Must stay 'Others' (plural) — Front's `Type` custom field is a fixed,
+    // case-sensitive enum that only contains the lowercased value 'others'.
+    value: 'Others' as const,
+    label: 'Other',
+    description: "An issue that doesn't fit the categories above",
+    query: undefined,
+  },
 ]
 
 export const SEVERITY_OPTIONS = [
