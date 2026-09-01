@@ -19,7 +19,7 @@ const TAB_LABEL: Record<WorkerSnippetTab, string> = {
   ai: 'AI Prompt',
   config: 'config.toml',
   cli: 'CLI',
-  curl: 'CLI',
+  curl: 'cURL',
   js: 'JavaScript',
   python: 'Python',
 }
