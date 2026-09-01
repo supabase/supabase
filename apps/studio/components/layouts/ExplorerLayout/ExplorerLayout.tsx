@@ -153,7 +153,7 @@ const NewTabButton = () => {
       <DropdownMenuContent className="w-40" align="end">
         <DropdownMenuItem className="gap-x-2" onClick={() => createQuery()}>
           <SquareCode size={14} />
-          <span>New query</span>
+          <span>Run SQL</span>
         </DropdownMenuItem>
         <DropdownMenuItem className="gap-x-2" onClick={() => createNotebook()}>
           <NotebookText size={14} />
