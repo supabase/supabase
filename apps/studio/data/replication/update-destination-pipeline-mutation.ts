@@ -1,14 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import type { components } from 'api-types'
 import { toast } from 'sonner'
 
 import {
-  buildDucklakeApiConfig,
   buildPipelineApiConfig,
+  buildUpdateDestinationApiConfig,
   DestinationConfig,
   PipelineConfig,
 } from './create-destination-pipeline-mutation'
-import { optionalSecret } from './destination-secret-utils'
 import { replicationKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
@@ -22,11 +20,6 @@ export type UpdateDestinationPipelineParams = {
   sourceId: number
   pipelineConfig: PipelineConfig
 }
-
-type UpdateDestinationPipelineBody =
-  components['schemas']['UpdateReplicationDestinationPipelineBody']
-type UpdateDestinationConfig = UpdateDestinationPipelineBody['destination_config']
-type UpdatePipelineConfig = UpdateDestinationPipelineBody['pipeline_config']
 
 async function updateDestinationPipeline(
   {
@@ -42,78 +35,7 @@ async function updateDestinationPipeline(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  // Build destination_config based on the type
-  let destination_config: UpdateDestinationConfig
-
-  if ('bigQuery' in destinationConfig) {
-    const { projectId, datasetId, serviceAccountKey, connectionPoolSize, maxStalenessMins } =
-      destinationConfig.bigQuery
-    destination_config = {
-      big_query: {
-        project_id: projectId,
-        dataset_id: datasetId,
-        service_account_key: optionalSecret(serviceAccountKey),
-        connection_pool_size: connectionPoolSize,
-        max_staleness_mins: maxStalenessMins,
-      },
-    } as UpdateDestinationConfig
-  } else if ('iceberg' in destinationConfig) {
-    const {
-      projectRef: icebergProjectRef,
-      warehouseName,
-      namespace,
-      catalogToken,
-      s3AccessKeyId,
-      s3SecretAccessKey,
-      s3Region,
-    } = destinationConfig.iceberg
-    destination_config = {
-      iceberg: {
-        supabase: {
-          project_ref: icebergProjectRef,
-          warehouse_name: warehouseName,
-          namespace: namespace,
-          catalog_token: optionalSecret(catalogToken),
-          s3_access_key_id: optionalSecret(s3AccessKeyId),
-          s3_secret_access_key: optionalSecret(s3SecretAccessKey),
-          s3_region: s3Region,
-        },
-      },
-    } as UpdateDestinationConfig
-  } else if ('ducklake' in destinationConfig) {
-    destination_config = buildDucklakeApiConfig(destinationConfig.ducklake, {
-      omitBlankSecrets: true,
-    }) as UpdateDestinationConfig
-  } else if ('snowflake' in destinationConfig) {
-    const { accountId, user, privateKey, privateKeyPassphrase, database, schema, role } =
-      destinationConfig.snowflake
-    destination_config = {
-      snowflake: {
-        account_id: accountId,
-        user,
-        private_key: optionalSecret(privateKey),
-        private_key_passphrase: optionalSecret(privateKeyPassphrase),
-        database,
-        schema,
-        role,
-      },
-    } as UpdateDestinationConfig
-  } else if ('clickHouse' in destinationConfig) {
-    const { url, user, password, database, engine } = destinationConfig.clickHouse
-    destination_config = {
-      clickhouse: {
-        url,
-        user,
-        password: optionalSecret(password),
-        database,
-        engine,
-      },
-    } as UpdateDestinationConfig
-  } else {
-    throw new Error(
-      'Invalid destination config: must specify bigQuery, iceberg, ducklake, snowflake, or clickHouse'
-    )
-  }
+  const destination_config = buildUpdateDestinationApiConfig(destinationConfig)
 
   const pipeline_config = buildPipelineApiConfig(pipelineConfig)
 
@@ -125,7 +47,7 @@ async function updateDestinationPipeline(
         destination_config,
         source_id: sourceId,
         destination_name: destinationName,
-        pipeline_config: pipeline_config as UpdatePipelineConfig,
+        pipeline_config,
       },
       signal,
     }
