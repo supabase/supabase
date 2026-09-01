@@ -76,6 +76,33 @@ describe('ToastErrorTracker', () => {
     expect(mockTrack).toHaveBeenCalledTimes(1)
   })
 
+  it('tracks a loading toast updated to an error exactly once (sign-in reuses the loading toast id)', async () => {
+    render(<ToastErrorTracker />)
+    let toastId: string | number
+    act(() => {
+      toastId = toast.loading('Signing in...')
+    })
+    act(() => {
+      registerFunnelErrorToast(toastId, {
+        origin: 'signin',
+        errorCategory: 'api',
+        errorReason: 'invalid_credentials',
+        errorCode: 400,
+      })
+      toast.error('Invalid login credentials', { id: toastId })
+    })
+    await waitFor(() =>
+      expect(mockTrack).toHaveBeenCalledWith('dashboard_error_created', {
+        source: 'toast',
+        origin: 'signin',
+        errorCategory: 'api',
+        errorReason: 'invalid_credentials',
+        errorCode: 400,
+      })
+    )
+    expect(mockTrack).toHaveBeenCalledTimes(1)
+  })
+
   it('ignores non-error toasts', async () => {
     render(<ToastErrorTracker />)
     act(() => {
