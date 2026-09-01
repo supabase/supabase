@@ -48,19 +48,10 @@ export interface SignUpEvent {
 /**
  * Triggered when a user signs in with an OAuth provider, Email and Password, or SSO.
  *
- * Emission sites: SignInForm (password without an MFA challenge), SignInMfaForm
- * (completed TOTP challenge), and the /sign-in-mfa page mount (OAuth/SSO return
- * with the assurance level already satisfied).
- *
  * Some unintuitive behavior:
  *   - If signing up with GitHub the SignInEvent gets triggered first before the SignUpEvent.
- *   - The event is captured server-side with its distinct_id resolved from telemetry
- *     cookies: the user_id cookie when present, else the anonymous_id cookie with
- *     person-profile processing disabled. The majority of sign_in events take the
- *     fallback because the event races the identify call that sets the cookie, so
- *     they carry no person profile. Don't use this event as a funnel join key across
- *     the auth boundary; join client-side events on person_id instead (client
- *     identify switches the distinct_id at auth).
+ *   - Captured server-side; the distinct_id often resolves to the anonymous cookie because
+ *     the event races identify, so don't use it as a funnel join key across the auth boundary.
  *
  * @group Events
  * @source studio
