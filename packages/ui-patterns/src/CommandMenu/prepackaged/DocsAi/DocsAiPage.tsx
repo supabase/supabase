@@ -5,9 +5,8 @@ import { User } from 'lucide-react'
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { AiIconAnimation, Button, cn, CommandGroup, CommandItem, CommandList } from 'ui'
+import { AiIconAnimation, Button, cn, CommandGroup, CommandItem, CommandList, StatusIcon } from 'ui'
 import { markdownComponents } from 'ui-patterns/Markdown'
-import { StatusIcon } from 'ui/src/components/StatusIcon'
 
 import {
   Breadcrumb,
