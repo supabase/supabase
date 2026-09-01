@@ -21,20 +21,20 @@ API keys provide the first layer of authentication for data access. Supabase Aut
 
 ## Overview
 
-An API key authenticates an application component to give it access to Supabase services. An application component might be a web page, a mobile app, or a server. An API key doesn't distinguish between users, only between applications.
+An API key authenticates an application component to give it access to Supabase services. An application component might be a web page, a mobile app, or a server. An API key doesn't distinguish between users but between applications.
 
 Supabase supports four types of API keys:
 
-| Type                                                       | Format                                                           | Privileges | Availability                                              | Use                                                                                                                                                                                                                                                                                         |
-| ---------------------------------------------------------- | ---------------------------------------------------------------- | ---------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Publishable&nbsp;key                                       | <span className="whitespace-nowrap!">`sb_publishable_...`</span> | Low        | Platform                                                  | Safe to expose online: web page, mobile or desktop app, GitHub actions, CLIs, source code.                                                                                                                                                                                                  |
-| Secret&nbsp;keys                                           | <span className="whitespace-nowrap!">`sb_secret_...`</span>      | Elevated   | Platform                                                  | Only use in backend components of your app: servers, already secured APIs (admin panels), [Edge Functions](/docs/guides/functions), microservices, etc. They provide full access to your project's data, bypassing [Row Level Security](/docs/guides/database/postgres/row-level-security). |
-| <span className="whitespace-nowrap!">`anon`</span>         | JWT (long lived)                                                 | Low        | <span className="whitespace-nowrap!">Platform, CLI</span> | Legacy version of publishable keys.                                                                                                                                                                                                                                                         |
-| <span className="whitespace-nowrap!">`service_role`</span> | JWT (long lived)                                                 | Elevated   | <span className="whitespace-nowrap!">Platform, CLI</span> | Legacy version of secret keys.                                                                                                                                                                                                                                                              |
+| Type                                                       | Format                                                           | Privileges | Availability                                              | Use                                                                                                                                                                                                                                                                                                     |
+| ---------------------------------------------------------- | ---------------------------------------------------------------- | ---------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Publishable&nbsp;key                                       | <span className="whitespace-nowrap!">`sb_publishable_...`</span> | Low        | Platform                                                  | Safe to expose online: web page, mobile or desktop app, GitHub actions, CLIs, source code.                                                                                                                                                                                                              |
+| Secret&nbsp;keys                                           | <span className="whitespace-nowrap!">`sb_secret_...`</span>      | Elevated   | Platform                                                  | Only use in backend components of your app, such as servers, APIs with their own authorization checks, [Edge Functions](/docs/guides/functions), and microservices. They provide full access to your project's data, bypassing [Row Level Security](/docs/guides/database/postgres/row-level-security). |
+| <span className="whitespace-nowrap!">`anon`</span>         | JWT (long-lived)                                                 | Low        | <span className="whitespace-nowrap!">Platform, CLI</span> | Legacy version of publishable keys.                                                                                                                                                                                                                                                                     |
+| <span className="whitespace-nowrap!">`service_role`</span> | JWT (long-lived)                                                 | Elevated   | <span className="whitespace-nowrap!">Platform, CLI</span> | Legacy version of secret keys.                                                                                                                                                                                                                                                                          |
 
 <Admonition type="note" title="Creating new keys doesn't revoke your legacy keys">
 
-Both key types work simultaneously. Creating publishable and secret keys adds them _alongside_ your existing `anon` and `service_role` keys without affecting them — your legacy keys keep working. They remain valid until you disable them in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard, which is a separate step. See [Migrating to new API keys](/docs/guides/getting-started/migrating-to-new-api-keys) for the full process.
+Both key types work simultaneously. Creating publishable and secret keys adds them alongside your existing `anon` and `service_role` keys without affecting them, so your legacy keys keep working. They remain valid until you disable them in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard, which is a separate step. See [Migrating to new API keys](/docs/guides/getting-started/migrating-to-new-api-keys) for the full process.
 
 </Admonition>
 
@@ -55,10 +55,10 @@ These environments are always considered public because anyone can retrieve the 
 
 Using a publishable key doesn't mean your user is anonymous. Your application authenticates with the publishable key while your user authenticates separately through Supabase Auth with their own JWT:
 
-| Key             | User logged in via Supabase Auth | Postgres role used for RLS, etc. |
-| --------------- | -------------------------------- | -------------------------------- |
-| Publishable key | No                               | `anon`                           |
-| Publishable key | Yes                              | `authenticated`                  |
+| Key             | User logged in via Supabase Auth | Postgres role   |
+| --------------- | -------------------------------- | --------------- |
+| Publishable key | No                               | `anon`          |
+| Publishable key | Yes                              | `authenticated` |
 
 ### Security considerations
 
