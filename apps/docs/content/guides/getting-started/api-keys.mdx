@@ -118,7 +118,7 @@ Don't rush. Fix the root cause of the leak before you rotate anything. The [OWAS
 1. Create a new secret key in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard.
 2. Replace the compromised key with the new one everywhere your application uses it. If the compromised key is a JWT-based `service_role` key, replace it with the new secret key.
 3. Confirm that every component now uses the new key.
-4. Delete the compromised key. Deleting a secret key can't be undone, so don't start this step until step 3 is done.
+4. Retire the compromised key. Delete a secret key, which can't be undone, so don't start until step 3 is done. For a legacy `anon` or `service_role` key, deactivate the legacy keys in the same Dashboard section instead. Deactivation is reversible, so you can re-enable them if you find a client you missed.
 
 ## Security reference
 
@@ -153,6 +153,7 @@ Exposing a secret key puts all of your project's data at risk. The rules below a
 - Over chat, email, or SMS.
 - In a URL or a query parameter, because those are often logged.
 - In a request header, until you have log sanitization in place.
+- Over plain HTTP, or to any host other than your project's Supabase endpoint.
 
 **What must never be written down**
 
