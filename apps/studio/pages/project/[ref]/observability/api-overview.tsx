@@ -179,7 +179,7 @@ export const ApiReport: NextPageWithLayout = () => {
           params={params.networkTraffic}
           error={error.networkTraffic}
           title="Network Traffic"
-          tooltip="Ingress and egress are measured from request and response logs and do not represent billable egress."
+          tooltip="Ingress is measured from request logs."
           data={data.networkTraffic || []}
           renderer={NetworkTrafficRenderer}
         />
