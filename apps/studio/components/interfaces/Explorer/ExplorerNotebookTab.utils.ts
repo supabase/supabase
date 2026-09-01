@@ -31,7 +31,7 @@ export function findQueryCellsMatchingSql<T extends SqlMatchers>({
   matchers: T
 }): Record<keyof T, QueryCellSummary[]> {
   const matchingCells = {} as Record<keyof T, QueryCellSummary[]>
-  for (const name of Object.keys(matchers) as (keyof T)[]) {
+  for (const name in matchers) {
     matchingCells[name] = []
   }
 
@@ -43,8 +43,8 @@ export function findQueryCellsMatchingSql<T extends SqlMatchers>({
     )
     const summary = { id: cell._id, title: cell.title ?? 'Untitled query' }
 
-    for (const [name, matches] of Object.entries(matchers) as [keyof T, T[keyof T]][]) {
-      if (sql.some(matches)) matchingCells[name].push(summary)
+    for (const name in matchers) {
+      if (sql.some(matchers[name])) matchingCells[name].push(summary)
     }
   })
 
