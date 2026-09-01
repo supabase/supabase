@@ -27,7 +27,12 @@ import {
   selfHostingSupport,
 } from './self-hosting.data'
 import { storageExamples, storageGetStarted, storageResources } from './storage.data'
-import { telemetryAccessWhat, telemetryAccessWhere, telemetryDebugging, telemetryMonitoring } from './telemetry.data'
+import {
+  telemetryAccessWhat,
+  telemetryAccessWhere,
+  telemetryDebugging,
+  telemetryMonitoring,
+} from './telemetry.data'
 
 const ALL_GROUPS: readonly ContentListingGroup[] = [
   aiToolsSupportedAgents,
