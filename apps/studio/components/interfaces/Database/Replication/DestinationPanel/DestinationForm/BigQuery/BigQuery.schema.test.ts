@@ -35,13 +35,18 @@ describe('BigQuery replication schemas', () => {
     expect(BigQueryTableOptionSchema.safeParse({ tableId: 1 }).success).toBe(true)
   })
 
-  it('allows an unfinished time-column partition so save can omit it', () => {
-    expect(
-      BigQueryTableOptionSchema.safeParse({
-        tableId: 1,
-        partitionBy: { kind: 'time_column', column: '', granularity: 'day' },
-      }).success
-    ).toBe(true)
+  it('rejects a column-based partition with no column instead of dropping it on save', () => {
+    for (const partitionBy of [
+      { kind: 'time_column', column: '', granularity: 'day' },
+      { kind: 'integer_range', column: '', start: 0, end: 10, interval: 1 },
+    ]) {
+      const result = BigQueryTableOptionSchema.safeParse({ tableId: 1, partitionBy })
+
+      expect(result.success).toBe(false)
+      expect(result.error?.issues.map(({ message }) => message)).toContain(
+        'Select a partition column'
+      )
+    }
   })
 
   it('requires the integer range end to be greater than the start', () => {

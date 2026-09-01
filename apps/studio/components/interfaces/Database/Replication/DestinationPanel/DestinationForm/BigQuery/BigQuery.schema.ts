@@ -15,15 +15,19 @@ const integerRangeValue = (label: string) =>
     ])
     .refine((value): boolean => value !== '', `${label} is required`)
 
+// A column-based partition is dropped from the save payload when its column is missing, so
+// require one here rather than letting the form accept a layout it will silently discard.
+const partitionColumn = z.string().min(1, 'Select a partition column')
+
 export const BigQueryPartitionBySchema = z.discriminatedUnion('kind', [
   z.object({
     kind: z.literal('time_column'),
-    column: z.string(),
+    column: partitionColumn,
     granularity: BigQueryTimePartitionGranularitySchema.optional(),
   }),
   z.object({
     kind: z.literal('integer_range'),
-    column: z.string(),
+    column: partitionColumn,
     start: integerRangeValue('Start'),
     end: integerRangeValue('End'),
     interval: integerRangeValue('Interval'),

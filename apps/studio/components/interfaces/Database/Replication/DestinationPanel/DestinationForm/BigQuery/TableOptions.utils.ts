@@ -76,3 +76,19 @@ export const resolvePublishedColumnNames = (
 
   return null
 }
+
+// React Hook Form nests field-array errors by field name. A collapsed row can only show one
+// line, and any error there blocks the save, so the first message is enough to explain why.
+export const findFirstErrorMessage = (error: unknown): string | undefined => {
+  if (error === null || typeof error !== 'object') return undefined
+
+  const { message } = error as { message?: unknown }
+  if (typeof message === 'string' && message.length > 0) return message
+
+  for (const nested of Object.values(error)) {
+    const nestedMessage = findFirstErrorMessage(nested)
+    if (nestedMessage !== undefined) return nestedMessage
+  }
+
+  return undefined
+}
