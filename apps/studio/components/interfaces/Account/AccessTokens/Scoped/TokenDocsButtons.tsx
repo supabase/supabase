@@ -8,7 +8,7 @@ export const TokenDocsButtons = () => {
       <DocsButton
         href={`${DOCS_URL}/guides/platform/personal-access-tokens`}
         topic="Personal access tokens"
-        label="Personal access tokens docs"
+        label="Access tokens docs"
       />
       <DocsButton
         href={`${DOCS_URL}/guides/platform/access-control`}
