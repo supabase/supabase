@@ -23,13 +23,12 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
-import * as z from 'zod'
 
-import { urlRegex } from '../Auth.constants'
 import { AUTH_TEMPLATE_RESET_TYPES } from '../EmailTemplates/EmailTemplates.constants'
 import { isBeforeFreeTierTemplateBlockCutoff } from '../EmailTemplates/EmailTemplates.utils'
 import { SmtpDisableConfirmationDialog } from './SmtpDisableConfirmationDialog'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
+import { smtpSchema, type SmtpFormValues } from './SmtpForm.schema'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -39,64 +38,6 @@ import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-muta
 import { useAuthTemplateResetMutation } from '@/data/auth/auth-template-reset-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-
-const smtpEnabledSchema = z.object({
-  ENABLE_SMTP: z.literal(true),
-  SMTP_ADMIN_EMAIL: z
-    .string()
-    .trim()
-    .min(1, 'Sender email address is required')
-    .email('Must be a valid email'),
-  SMTP_SENDER_NAME: z.string().trim().min(1, 'Sender name is required'),
-  SMTP_HOST: z
-    .string()
-    .trim()
-    .min(1, 'Host URL is required')
-    .regex(urlRegex({ excludeSimpleDomains: false }), 'Must be a valid URL or IP address'),
-  SMTP_PORT: z.preprocess(
-    (val) => (val === '' || val == null ? undefined : val),
-    z.coerce
-      .number({
-        required_error: 'Port number is required',
-        invalid_type_error: 'Port number is required',
-      })
-      .min(1, 'Must be a valid port number more than 0')
-      .max(65535, 'Must be a valid port number no more than 65535')
-  ),
-  SMTP_MAX_FREQUENCY: z.preprocess(
-    (val) => (val === '' || val == null ? undefined : val),
-    z.coerce
-      .number({
-        required_error: 'Rate limit is required',
-        invalid_type_error: 'Rate limit is required',
-      })
-      .min(1, 'Must be more than 0')
-      .max(32767, 'Must not be more than 32,767 an hour')
-  ),
-  SMTP_USER: z.string().trim().min(1, 'SMTP Username is required'),
-  SMTP_PASS: z.string().trim().optional(),
-})
-
-const smtpDisabledSchema = z.object({
-  ENABLE_SMTP: z.literal(false),
-  SMTP_ADMIN_EMAIL: z.string().optional(),
-  SMTP_SENDER_NAME: z.string().optional(),
-  SMTP_HOST: z.string().optional(),
-  SMTP_PORT: z.preprocess(
-    (val) => (val === '' || val == null ? undefined : val),
-    z.coerce.number().optional()
-  ),
-  SMTP_MAX_FREQUENCY: z.preprocess(
-    (val) => (val === '' || val == null ? undefined : val),
-    z.coerce.number().optional()
-  ),
-  SMTP_USER: z.string().optional(),
-  SMTP_PASS: z.string().optional(),
-})
-
-const smtpSchema = z.discriminatedUnion('ENABLE_SMTP', [smtpEnabledSchema, smtpDisabledSchema])
-
-type SmtpFormValues = z.infer<typeof smtpSchema>
 
 export const SmtpForm = () => {
   const { ref: projectRef } = useParams()
@@ -462,7 +403,18 @@ export const SmtpForm = () => {
                           render={({ field }) => (
                             <FormItemLayout
                               label="Username"
-                              description="Username for your SMTP server."
+                              description={
+                                <>
+                                  <span className="block">
+                                    Username for your SMTP server.
+                                  </span>
+                                  <span className="block text-foreground-lighter">
+                                    Azure Communication Services uses your resource name,
+                                    application ID, and tenant ID joined by dots or pipes (e.g.{' '}
+                                    <code>resource.applicationId.tenantId</code>).
+                                  </span>
+                                </>
+                              }
                             >
                               <FormControl>
                                 <Input
