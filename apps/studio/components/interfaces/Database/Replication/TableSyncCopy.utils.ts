@@ -1,8 +1,4 @@
-export type TableSyncCopyConfig =
-  | { type: 'include_all_tables' }
-  | { type: 'skip_all_tables' }
-  | { type: 'include_tables'; table_ids: number[] }
-  | { type: 'skip_tables'; table_ids: number[] }
+import type { TableSyncCopyConfig } from '@/data/replication/create-destination-pipeline-mutation'
 
 export type ReplicationTableIdentity = {
   id: number
