@@ -215,12 +215,6 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             href: '/guides/observability' as `/${string}`,
             level: 'telemetry',
           },
-          {
-            label: 'Troubleshooting',
-            icon: 'troubleshooting',
-            href: '/guides/troubleshooting' as `/${string}`,
-            level: 'troubleshooting',
-          },
         ],
       ],
     },
@@ -3102,15 +3096,21 @@ export const telemetry: NavMenuConstant = {
       ],
     },
     {
-      name: 'Detect and diagnose',
-      url: undefined,
+      name: 'Detect issues',
+      url: '/guides/observability/detecting' as `/${string}`,
       items: [
         {
-          name: 'Detecting',
+          name: 'Detection checks',
           url: '/guides/observability/detecting' as `/${string}`,
         },
+      ],
+    },
+    {
+      name: 'Diagnose and resolve',
+      url: '/guides/troubleshooting' as `/${string}`,
+      items: [
         {
-          name: 'Diagnosing',
+          name: 'Troubleshooting',
           url: '/guides/troubleshooting' as `/${string}`,
         },
       ],

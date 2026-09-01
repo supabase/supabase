@@ -11,8 +11,8 @@ This guide explains how to run a Supabase monitoring agent in your own harness. 
 
 Start with one monitor. Add another only when the project needs a different source or cadence.
 
-| Monitor                                                                                       | What it watches                                                               | Default cadence  | Use it when                                                    |
-| --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ---------------- | -------------------------------------------------------------- |
+| Monitor                                                                            | What it watches                                                               | Default cadence  | Use it when                                                    |
+| ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ---------------- | -------------------------------------------------------------- |
 | [Health monitor](/docs/guides/observability/automate-with-agents/health)           | API and Auth server errors, error-rate spikes, connection pressure            | Hourly           | You need incident detection and regular feedback loops         |
 | [Security monitor](/docs/guides/observability/automate-with-agents/security)       | Security Advisor findings, authentication and authorization failures          | Daily            | You need a regular access-control and configuration review     |
 | [Performance monitor](/docs/guides/observability/automate-with-agents/performance) | Slow queries, lock waits, long-running sessions, Performance Advisor findings | Hourly           | You need query and database performance checks                 |

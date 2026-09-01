@@ -1,69 +1,139 @@
 ---
 id: 'detecting'
-title: 'Detecting'
-description: 'Run a Health, Security, Performance, or Usage check against your project data to pick up a signal.'
+title: 'Detecting issues'
+description: 'Run Health, Security, Performance, and Usage checks against logs and database statistics to pick up actionable signals.'
 ---
 
-This guide explains how to use the sources in [Observe the data](/docs/guides/observability/access-data) to notice that something is wrong. You want a count, a rate, or a finding, not a root cause.
+Detection is the step between accessing project data and troubleshooting a specific problem. Use the sources in [Observe the data](/docs/guides/observability/access-data) to produce a count, rate, trend, or named finding. Do not try to prove the root cause yet.
 
-Use this page to run a [Health](#health), [Security](#security), [Performance](#performance), or [Usage](#usage) check. Already have an error message, HTTP status, SQLSTATE, or a clear advisor finding? Skip straight to [Diagnosing](/docs/guides/troubleshooting).
+This guide provides starting checks for [Health](#health), [Security](#security), [Performance](#performance), and [Usage](#usage). The log examples use ClickHouse SQL in the [Logs Explorer](/dashboard/project/_/logs/explorer) or MCP `query_logs`. The database examples use Postgres SQL in the [SQL Editor](/dashboard/project/_/sql) or MCP `execute_sql`.
 
-## Use the sources [#notice-a-signal]
+Use a time range that represents normal traffic, then compare it with the same period after a deployment or configuration change. When a check returns a spike, error code, SQLSTATE, object name, or advisor finding, take that evidence to [Diagnosing](/docs/guides/troubleshooting).
 
-Run a coarse check against the sources in [Observe the data](/docs/guides/observability/access-data). How to access each source lives there. The queries below show what to look for.
+## Health
 
-If a check turns up a spike, a named error, or an advisor finding, take it to [Diagnosing](/docs/guides/troubleshooting). If the result is only a count, narrow the time window and pick one identifier (path, status, SQLSTATE, request ID) first.
+Health checks answer whether a service is available and behaving within its normal error and resource envelope.
 
-### Health
+### Measure API server-error rate
 
-Ask whether API error rates or availability are off.
-
-Count API 5xx responses by path. Compare the count to the last quiet window.
+Count requests and 5xx responses by hour. A rate is more useful than a raw error count when traffic changes.
 
 ```sql
--- api 5xx by path
+select
+  toStartOfHour(timestamp) as hour,
+  count() as requests,
+  countIf(toInt32OrZero(log_attributes['response.status_code']) >= 500) as server_errors,
+  round(
+    100.0 * countIf(toInt32OrZero(log_attributes['response.status_code']) >= 500) /
+      nullIf(count(), 0),
+    2
+  ) as server_error_percent
+from logs
+where source = 'edge_logs'
+group by hour
+order by hour desc
+limit 24;
+```
+
+### Find failing API paths
+
+Use the rate check to find an affected window, then identify the paths and status codes producing the errors.
+
+```sql
 select
   log_attributes['request.path'] as path,
+  toInt32OrZero(log_attributes['response.status_code']) as status,
   count() as errors
 from logs
 where source = 'edge_logs'
   and toInt32OrZero(log_attributes['response.status_code']) >= 500
-group by path
+group by path, status
 order by errors desc
 limit 20;
 ```
 
-You can also read the same signal on [Reports](/docs/guides/observability/reports) (API response errors) without writing SQL. Check connection pressure with [`supabase inspect db role-connections`](/docs/reference/cli/supabase-inspect-db-role-connections), or scrape CPU and connection series from the [Metrics API](/docs/guides/observability/metrics).
+### Check Postgres connection pressure
 
-### Security
-
-Ask whether advisors or authorization failures need review.
-
-Pull [Security Advisor](/docs/guides/observability/advisors) findings from Studio, MCP `get_advisors`, the CLI, or the Management API. Then count API 401 and 403 responses by path.
+Compare active and waiting connections with the configured limit. A high percentage is a signal to inspect pooler settings, long-running transactions, and traffic before changing the limit.
 
 ```sql
--- api 401 and 403 by path
 select
-  log_attributes['request.path'] as path,
+  count(*) as current_connections,
+  count(*) filter (where state = 'active') as active_connections,
+  count(*) filter (where wait_event_type is not null) as waiting_connections,
+  current_setting('max_connections')::int as max_connections,
+  round(
+    100.0 * count(*) / nullif(current_setting('max_connections')::int, 0),
+    2
+  ) as connection_percent
+from pg_stat_activity;
+```
+
+You can read API response errors and service availability in [Reports](/docs/guides/observability/reports), or use the [Metrics API](/docs/guides/observability/metrics) for CPU and connection series. Once you have a failing path, status, or saturated resource, continue in [Diagnosing](/docs/guides/troubleshooting).
+
+## Security
+
+Security checks look for access-control findings and changes in authentication or authorization failures. Treat them as review signals, not proof of an attack.
+
+### Measure authorization failures
+
+Count 401 and 403 responses by hour and status. Compare the rate with a known-good window so normal unauthenticated traffic does not become an alert by itself.
+
+```sql
+select
+  toStartOfHour(timestamp) as hour,
   toInt32OrZero(log_attributes['response.status_code']) as status,
-  count() as events
+  count() as failures
 from logs
 where source = 'edge_logs'
   and toInt32OrZero(log_attributes['response.status_code']) in (401, 403)
-group by path, status
-order by events desc
+group by hour, status
+order by hour desc, status
+limit 48;
+```
+
+### Find affected paths and methods
+
+After detecting a spike, group failures by route and method. This separates a broken client flow from failures spread across the API.
+
+```sql
+select
+  log_attributes['request.method'] as method,
+  log_attributes['request.path'] as path,
+  toInt32OrZero(log_attributes['response.status_code']) as status,
+  count() as failures
+from logs
+where source = 'edge_logs'
+  and toInt32OrZero(log_attributes['response.status_code']) in (401, 403)
+group by method, path, status
+order by failures desc
 limit 20;
 ```
 
-Read a finding together with the matching log window. Advisors are not a substitute for error rates. Auth error charts in [Reports](/docs/guides/observability/reports) show the same 4xx signal without SQL.
+### Find public-schema tables without RLS
 
-### Performance
+This database query is a focused inventory check. Confirm each result against the project's intended access model; a result is not evidence that data was exposed.
 
-Ask whether queries are slow, blocked, missing indexes, or going to disk.
+```sql
+select
+  n.nspname as schema_name,
+  c.relname as table_name
+from
+  pg_class as c
+  join pg_namespace as n on n.oid = c.relnamespace
+where n.nspname = 'public' and c.relkind in ('r', 'p') and not c.relrowsecurity
+order by table_name;
+```
 
-Poor performance often shows up as long-running sessions, lock waits, sequential scans, bloat, or a cache hit rate below 99%. Confirm with a check, then [Diagnosing](/docs/guides/troubleshooting).
+Run [Security Advisor](/docs/guides/observability/advisors) from Studio, MCP `get_advisors`, the CLI, or the Management API for the full catalog of deterministic checks. Take a lint name, table, policy, path, or status pattern to [Diagnosing](/docs/guides/troubleshooting) before changing policies, grants, or keys.
 
-Look for sessions that have been `active` or `idle in transaction` for more than 30 seconds. You can run the same check with [`supabase inspect db long-running-queries`](/docs/reference/cli/supabase-inspect-db-long-running-queries).
+## Performance
+
+Performance checks identify expensive work, contention, and cache misses. They narrow the investigation to a query, relation, session, or resource.
+
+### Find long-running sessions
+
+Look for sessions that have been active or idle in a transaction for more than 30 seconds.
 
 ```sql
 select
@@ -72,7 +142,8 @@ select
   state,
   now() - query_start as duration,
   wait_event_type,
-  left(query, 80) as query
+  wait_event,
+  left(query, 120) as query
 from pg_stat_activity
 where datname = current_database()
   and pid != pg_backend_pid()
@@ -82,26 +153,131 @@ order by duration desc
 limit 20;
 ```
 
-Also pull [Performance Advisor](/docs/guides/observability/advisors) findings, and use [`supabase inspect db cache-hit`](/docs/reference/cli/supabase-inspect-db-cache-hit) or [`outliers`](/docs/reference/cli/supabase-inspect-db-outliers) for cache and query-time shape. Index or table hit rate below 99% means the instance is reading from disk. [Reports](/docs/guides/observability/reports) and the [Metrics API](/docs/guides/observability/metrics) show CPU, disk IOPS, and connection pressure for the same window. The command catalog and matching SQL live in [Inspect the database](/docs/guides/observability/inspect).
+### Find blocked sessions
 
-### Usage
-
-Ask whether traffic or storage is growing in a way that will hurt.
-
-Count API requests by path. Compare the count to a recent baseline.
+Use `pg_blocking_pids` to name the blocked and blocking processes. Do not cancel either process until you understand the transaction and its impact.
 
 ```sql
--- api requests by path
 select
+  blocked.pid as blocked_pid,
+  blocked.usename as blocked_role,
+  blocker.pid as blocking_pid,
+  blocker.usename as blocking_role,
+  now() - blocked.query_start as blocked_for,
+  left(blocked.query, 120) as blocked_query,
+  left(blocker.query, 120) as blocking_query
+from pg_stat_activity as blocked
+cross join lateral unnest(pg_blocking_pids(blocked.pid)) as blocking_pid
+join pg_stat_activity as blocker on blocker.pid = blocking_pid
+order by blocked_for desc;
+```
+
+### Find expensive query patterns
+
+`pg_stat_statements` aggregates normalized queries over time. Rank by total execution time, then inspect mean time and calls before deciding whether a frequent query is inefficient.
+
+```sql
+select
+  calls,
+  round(total_exec_time::numeric, 2) as total_time_ms,
+  round(mean_exec_time::numeric, 2) as mean_time_ms,
+  rows,
+  left(query, 160) as query
+from pg_stat_statements
+order by total_exec_time desc
+limit 20;
+```
+
+### Measure shared-buffer hit rate
+
+A ratio below 99% means more than 1% of observed block accesses missed `shared_buffers`. Postgres cannot tell whether a miss was served by the operating system cache or physical disk.
+
+```sql
+select
+  'index hit rate' as name,
+  round(100.0 * sum(idx_blks_hit) / nullif(sum(idx_blks_hit) + sum(idx_blks_read), 0), 2) as ratio
+from pg_statio_user_indexes
+union all
+select
+  'table hit rate' as name,
+  round(
+    100.0 * sum(heap_blks_hit) / nullif(sum(heap_blks_hit) + sum(heap_blks_read), 0),
+    2
+  ) as ratio
+from pg_statio_user_tables;
+```
+
+Pull [Performance Advisor](/docs/guides/observability/advisors) findings and compare the same window with [Reports](/docs/guides/observability/reports) or the [Metrics API](/docs/guides/observability/metrics). The full command and SQL catalog is in [Inspect the database](/docs/guides/observability/inspect).
+
+## Usage
+
+Usage checks identify growth in traffic, data, and connections before it becomes a capacity problem. They do not calculate billing totals.
+
+### Trend API requests
+
+Count requests by hour to establish a baseline and spot step changes.
+
+```sql
+select
+  toStartOfHour(timestamp) as hour,
+  count() as requests
+from logs
+where source = 'edge_logs'
+group by hour
+order by hour desc
+limit 168;
+```
+
+### Find high-volume API paths
+
+Group by method and path to identify which workload accounts for the growth.
+
+```sql
+select
+  log_attributes['request.method'] as method,
   log_attributes['request.path'] as path,
   count() as requests
 from logs
 where source = 'edge_logs'
-group by path
+group by method, path
 order by requests desc
 limit 20;
 ```
 
-[Reports](/docs/guides/observability/reports) show total requests, disk usage, and database size without SQL. [`supabase inspect db table-sizes`](/docs/reference/cli/supabase-inspect-db-table-sizes) and [`bloat`](/docs/reference/cli/supabase-inspect-db-bloat) name the large relations. The [Management API usage endpoint](/docs/reference/api/v1-get-project-usage-api-count) returns request counts for a script.
+### Find the largest relations
 
-Once a check turns up an error message, status, SQLSTATE, or finding, take it to [Diagnosing](/docs/guides/troubleshooting) to confirm the cause, apply a fix, and verify it.
+Measure tables and their indexes together. Save the result on a regular cadence to establish a growth trend.
+
+```sql
+select
+  schemaname,
+  relname as table_name,
+  pg_total_relation_size(relid) as total_bytes,
+  pg_size_pretty(pg_total_relation_size(relid)) as total_size
+from pg_catalog.pg_statio_user_tables
+order by total_bytes desc
+limit 20;
+```
+
+### Count connections by role and state
+
+Connection growth can reveal a new workload or a client that is not pooling correctly.
+
+```sql
+select
+  usename as role,
+  state,
+  count(*) as connections
+from pg_stat_activity
+where datname = current_database()
+group by role, state
+order by connections desc;
+```
+
+[Reports](/docs/guides/observability/reports) show request, disk, and database-size trends without SQL. The [Management API usage endpoint](/docs/reference/api/v1-get-project-usage-api-count) returns request counts for authorized scripts. Use [`supabase inspect db table-sizes`](/docs/reference/cli/supabase-inspect-db-table-sizes) and [`bloat`](/docs/reference/cli/supabase-inspect-db-bloat) to run related database checks from the CLI.
+
+## Turn a detection into a diagnosis
+
+A detection result should name an affected time window and at least one concrete anchor: a path, status, SQLSTATE, request ID, query, relation, PID, policy, or advisor lint. Take that evidence to [Diagnosing](/docs/guides/troubleshooting), identify the cause, apply the smallest relevant solution, and rerun the same detection check to verify the result.
+
+After a check is useful and repeatable, [hire an agent](/docs/guides/observability/automate-with-agents) to run it on a schedule.

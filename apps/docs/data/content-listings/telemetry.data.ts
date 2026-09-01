@@ -36,21 +36,28 @@ export const telemetryAccessWhat: ContentListingGroup = {
   ],
 }
 
-export const telemetryDetectResolve: ContentListingGroup = {
-  id: 'telemetry-detect-resolve',
+export const telemetryDetect: ContentListingGroup = {
+  id: 'telemetry-detect',
   type: 'grid',
-  columns: 2,
   items: [
     {
-      title: 'Detecting',
+      title: 'Detect issues',
       href: '/guides/observability/detecting',
       description:
-        'Use logs, metrics, inspect, and advisors to pick up a signal. If you already have an error, go to Diagnosing.',
+        'Run health, security, performance, and usage checks against logs and database statistics to pick up a signal.',
     },
+  ],
+}
+
+export const telemetryDiagnose: ContentListingGroup = {
+  id: 'telemetry-diagnose',
+  type: 'grid',
+  items: [
     {
-      title: 'Diagnosing',
+      title: 'Diagnose and resolve',
       href: '/guides/troubleshooting',
-      description: 'Browse known symptoms, error codes, and fixes by product or type.',
+      description:
+        'Use a concrete finding, symptom, or error code to identify the cause and apply a known solution.',
     },
   ],
 }
