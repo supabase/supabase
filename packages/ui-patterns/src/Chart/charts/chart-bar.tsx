@@ -51,6 +51,7 @@ export interface ChartBarProps {
   data: ChartBarTick[]
   xKey?: string
   dataKey: string
+  dataKeys?: string[]
   config?: ChartConfig
   onBarClick?: (datum: ChartBarTick, tooltipData?: CategoricalChartState) => void
   DateTimeFormat?: string
@@ -73,10 +74,14 @@ export interface ChartBarProps {
   }
 }
 
+// [Joshen] JFYI - shouldn't rely on xKey's value to determine if its a time-based format
+// Preferably provide an additional param like xFormat to be more deterministic
+
 export const ChartBar = ({
   data,
   xKey = 'timestamp',
   dataKey,
+  dataKeys,
   config,
   onBarClick,
   DateTimeFormat = 'MMM D, YYYY, hh:mma',
@@ -101,11 +106,15 @@ export const ChartBar = ({
     return null
   }
 
-  const chartConfig: ChartConfig = config || {
-    [dataKey]: {
-      label: dataKey,
-    },
-  }
+  const keysToRender = dataKeys || [dataKey]
+  const isMultiSeries = keysToRender.length > 1
+
+  const chartConfig: ChartConfig =
+    config ||
+    keysToRender.reduce((acc, key) => {
+      acc[key] = { label: key }
+      return acc
+    }, {} as ChartConfig)
 
   const showHighlightActions =
     showHighlightArea &&
@@ -222,15 +231,29 @@ export const ChartBar = ({
               fillOpacity={0.2}
             />
           )}
-          <Bar dataKey={dataKey} fill={color} maxBarSize={24}>
-            {data?.map((_entry: ChartBarTick, index: number) => (
-              <Cell
-                className="cursor-pointer transition-colors"
-                key={`bar-${index}`}
-                fill={focusDataIndex === index || focusDataIndex === null ? color : hoverColor}
-              />
-            ))}
-          </Bar>
+          {isMultiSeries ? (
+            keysToRender.map((key) => {
+              const keyConfig = chartConfig[key]
+              const barColor =
+                keyConfig?.color ||
+                (keyConfig?.theme
+                  ? isDarkMode
+                    ? keyConfig.theme.dark
+                    : keyConfig.theme.light
+                  : color)
+              return <Bar key={key} dataKey={key} fill={barColor} maxBarSize={24} />
+            })
+          ) : (
+            <Bar dataKey={dataKey} fill={color} maxBarSize={24}>
+              {data?.map((_entry: ChartBarTick, index: number) => (
+                <Cell
+                  className="cursor-pointer transition-colors"
+                  key={`bar-${index}`}
+                  fill={focusDataIndex === index || focusDataIndex === null ? color : hoverColor}
+                />
+              ))}
+            </Bar>
+          )}
         </RechartBarChart>
       </ChartContainer>
 

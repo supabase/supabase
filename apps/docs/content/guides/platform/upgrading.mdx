@@ -18,7 +18,7 @@ Free projects will move to the latest minor version when their paused project is
 
 The upgrade process is as follows:
 
-1. Use the "Upgrade project" button on the [Infrastructure](/dashboard/project/_/settings/infrastructure) section of your dashboard.
+1. Use the "Upgrade project" button on the [General settings](/dashboard/project/_/settings/general) page of your dashboard.
 2. An estimate of the time to upgrade is shown and anything that needs to be addressed before you are eligible to upgrade is shown as a warning. Ensure you have reviewed the [caveats](#caveats) section of this document before executing the upgrade.
 3. Your project is taken offline and the Dashboard shows the upgrade status.
 4. Behind the scenes, a new instance is created running the latest version of Supabase.
@@ -39,7 +39,7 @@ When upgrading, a notification will inform you about what is blocking the upgrad
 3. Logical replication slots must be dropped.
 4. Deprecated/unsupported extensions must be dropped. Extensions can have dependencies, make sure you backup that data to restore it after the upgrade, with the updated extension version.
 
-Newer versions of services can break functionality or change the performance characteristics you rely on. If your project is eligible for an upgrade, you will be able to find your current service versions from within [the Supabase dashboard](/dashboard/project/_/settings/infrastructure).
+Newer versions of services can break functionality or change the performance characteristics you rely on. If your project is eligible for an upgrade, you will be able to find your current service versions from within [the Supabase dashboard](/dashboard/project/_/settings/general).
 
 Breaking changes are generally only present in major version upgrades of Postgres and PostgREST. You can find their respective release notes at:
 
@@ -192,7 +192,7 @@ Existing projects on pg_graphql 1.5.x are not impacted unless they choose to upg
 
 ### Ltree indexes require reindexing after upgrade
 
-_Applies when upgrading to Postgres 15.18 or 17.10._
+_Applies when upgrading to Postgres 15.19 or 17.11._
 
 <Admonition type="caution">
 
@@ -221,29 +221,115 @@ To mitigate this issue:
 2. If `reindex_required` is `true`, find the affected indexes:
 
    ```sql
-   select schemaname, tablename, indexname
-   from pg_indexes
+   select distinct
+     n.nspname as schema_name,
+     cls.relname as table_name,
+     ic.relname as index_name
+   from pg_index idx
+     join pg_class ic on idx.indexrelid = ic.oid
+     join pg_class cls on idx.indrelid = cls.oid
+     join pg_namespace n on ic.relnamespace = n.oid
+     join lateral unnest(idx.indclass::oid[]) with ordinality as k(opclass, pos) on true
+     join pg_opclass oc on oc.oid = k.opclass
+     join pg_type ty on ty.oid = oc.opcintype
    where
-     indexname in (
-       select c.relname
-       from
-         pg_index as i
-         join pg_class as c on i.indexrelid = c.oid
-         join pg_attribute as a on a.attrelid = i.indrelid and a.attnum = ANY(i.indkey)
-         join pg_type as t on a.atttypid = t.oid
-       where t.typname in ('ltree', '_ltree')
-     );
+     k.pos <= idx.indnkeyatts -- key columns only, excludes INCLUDE
+     and ty.typname in ('ltree', '_ltree');
    ```
 
-3. Reindex each affected index. `REINDEX INDEX CONCURRENTLY` runs online with no downtime:
+3. Reindex each affected index using its schema-qualified name. `REINDEX INDEX CONCURRENTLY` runs online with no downtime, but cannot run inside a transaction block:
 
    ```sql
-   REINDEX INDEX CONCURRENTLY <index_name>;
+   REINDEX INDEX CONCURRENTLY <schema_name>.<index_name>;
+   ```
+
+Separately from the encoding case above, this release also fixes an integer overflow in `ltree` comparisons: values with more than about 14,653 labels could compare incorrectly, which can corrupt B-tree indexes built over them, regardless of your database encoding. The following query lists only the B-tree indexes whose `ltree` column or expression actually contains such values, so they are the ones to reindex (an empty result means no action is needed):
+
+```sql
+SELECT s.schema_name || '.' || s.index_name AS index_to_reindex
+FROM (
+  SELECT
+    n.nspname AS schema_name,
+    c.relname AS table_name,
+    ic.relname AS index_name,
+    min(pg_get_expr(i.indpred, i.indrelid)) AS pred, -- partial-index predicate, if any
+    string_agg('nlevel(' || pg_get_indexdef(i.indexrelid, k.pos::int, true) || ') > 14653', ' OR ') AS keys_cond
+  FROM pg_index i
+  JOIN pg_class ic ON ic.oid = i.indexrelid
+  JOIN pg_class c ON c.oid = i.indrelid
+  JOIN pg_namespace n ON n.oid = c.relnamespace
+  JOIN pg_am am ON am.oid = ic.relam
+  JOIN LATERAL generate_series(1, i.indnkeyatts) AS k(pos) ON true
+  JOIN pg_attribute ia ON ia.attrelid = i.indexrelid AND ia.attnum = k.pos
+  JOIN pg_type t ON t.oid = ia.atttypid
+  WHERE am.amname = 'btree'
+    AND t.typname = 'ltree'
+    AND n.nspname NOT IN ('pg_catalog', 'information_schema')
+  GROUP BY n.nspname, c.relname, ic.relname
+) s
+WHERE (xpath(
+         '/row/cnt/text()',
+         query_to_xml(
+           format('SELECT count(*) AS cnt FROM %I.%I WHERE %s(%s)',
+                  s.schema_name, s.table_name,
+                  CASE WHEN s.pred IS NOT NULL THEN '(' || s.pred || ') AND ' ELSE '' END,
+                  s.keys_cond),
+           false, true, ''
+         )
+       ))[1]::text::bigint > 0
+ORDER BY 1;
+```
+
+Reindex each index it returns, using the schema-qualified name. `REINDEX INDEX CONCURRENTLY` runs online with no downtime, but cannot run inside a transaction block:
+
+```sql
+REINDEX INDEX CONCURRENTLY <schema_name>.<index_name>;
+```
+
+### Btree_gist indexes on float columns require reindexing after upgrade
+
+_Applies when upgrading to Postgres 15.19 or 17.11._
+
+<Admonition type="caution">
+
+You are affected only if you have `btree_gist` indexes on `float4` or `float8` columns that may contain `NaN` values.
+
+</Admonition>
+
+This release fixes `NaN` handling in `btree_gist`'s `float4` and `float8` operator classes. Indexes on those columns built under the previous version can return wrong results for rows containing `NaN` until the index is rebuilt.
+
+To mitigate this issue:
+
+1. Find `btree_gist` indexes on float columns:
+
+   ```sql
+   select distinct
+     n.nspname as schema_name,
+     cls.relname as table_name,
+     ic.relname as index_name
+   from pg_index idx
+     join pg_class ic on idx.indexrelid = ic.oid
+     join pg_am am on ic.relam = am.oid
+     join pg_class cls on idx.indrelid = cls.oid
+     join pg_namespace n on ic.relnamespace = n.oid
+     join lateral unnest(idx.indclass::oid[]) with ordinality as k(opclass, pos) on true
+     join pg_opclass oc on oc.oid = k.opclass
+     join pg_type ty on ty.oid = oc.opcintype
+   where
+     am.amname = 'gist'
+     and k.pos <= idx.indnkeyatts
+     and ty.typname in ('float4', 'float8');
+   ```
+
+2. If any indexes are returned and those columns may contain `NaN` values, reindex them using the schema-qualified name. `REINDEX INDEX CONCURRENTLY` runs online with no downtime, but cannot run inside a transaction block:
+
+   ```sql
+   REINDEX INDEX CONCURRENTLY <schema_name>.<index_name>;
    ```
 
 ### Custom operator selectivity estimators
 
-_Applies when upgrading to Postgres 15.18 or 17.10._
+_Applies when upgrading to Postgres 15.19 or 17.11._
 
 Attaching a non-built-in (extension- or user-provided) selectivity estimator function to an operator now requires superuser. Existing operators continue to work — the check only fires when an operator is (re)created, most commonly during `pg_dump` / `pg_restore`, a logical restore, or a branch.
 
@@ -256,7 +342,9 @@ ERROR: must be superuser to specify a non-built-in restriction estimator functio
 Most projects are not affected. To check whether your database has any user-defined operators that reference a non-built-in estimator:
 
 ```sql
-SELECT n.nspname AS schema, o.oprname AS operator
+SELECT n.nspname AS schema, o.oprname AS operator,
+       o.oprrest::regproc AS restrict_estimator,
+       o.oprjoin::regproc AS join_estimator
 FROM pg_operator o
 JOIN pg_namespace n ON o.oprnamespace = n.oid
 WHERE n.nspname NOT IN ('pg_catalog', 'information_schema')

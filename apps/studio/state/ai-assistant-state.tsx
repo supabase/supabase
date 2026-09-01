@@ -3,17 +3,29 @@ import { DefaultChatTransport, lastAssistantMessageIsCompleteWithApprovalRespons
 import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { DBSchema, IDBPDatabase, openDB } from 'idb'
 import { debounce } from 'lodash'
-import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import {
+  createContext,
+  PropsWithChildren,
+  useContext,
+  useEffect,
+  useReducer,
+  useState,
+} from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 
 import type { SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
 import type { AiSupportStatus } from '@/data/feedback/ai-chat-front-sync'
 import { constructHeaders } from '@/data/fetchers'
+import { getQueryClient } from '@/data/query-client'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { prepareMessagesForAPI } from '@/lib/ai/message-utils'
 import { isKnownAssistantModelId } from '@/lib/ai/model.utils'
 import type { AssistantModelId } from '@/lib/ai/model.utils'
+import {
+  applyNotebookCacheEffects,
+  collectNotebookCacheEffects,
+} from '@/lib/ai/notebook-cache-invalidation'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 
 type SuggestionsType = {
@@ -270,6 +282,19 @@ function createChatInstance(
   state: AiAssistantState,
   options: { id: string; initialMessages: MessageType[] }
 ) {
+  // Seeded so effects already reflected in persisted history aren't replayed on the first
+  // onFinish after a reload.
+  const processedNotebookToolCallIds = new Set<string>(
+    collectNotebookCacheEffects(options.initialMessages, new Set()).map(
+      (effect) => effect.toolCallId
+    )
+  )
+
+  // The project a pending request's tool calls actually ran against — captured when the
+  // request is sent, not re-read from (mutable) state.context in onFinish, since the user
+  // can switch projects while the request is still in flight.
+  let requestProjectRef: string | undefined
+
   return new Chat<MessageType>({
     id: options.id,
     messages: options.initialMessages.map((message) => sanitizeForCloning(message)),
@@ -291,6 +316,8 @@ function createChatInstance(
 
         // Get the chat specific to this request to ensure we have the correct name
         const chat = state.chats[options.id]
+
+        requestProjectRef = state.context.projectRef
 
         return {
           ...opts,
@@ -361,6 +388,15 @@ function createChatInstance(
             .then(({ syncSupportChatToFront }) => syncSupportChatToFront(options.id, state))
             .catch(() => {})
         }
+
+        const projectRef = requestProjectRef
+        if (projectRef) {
+          const effects = collectNotebookCacheEffects(messages, processedNotebookToolCallIds)
+          effects.forEach((effect) => processedNotebookToolCallIds.add(effect.toolCallId))
+          if (effects.length > 0) {
+            void applyNotebookCacheEffects({ queryClient: getQueryClient(), projectRef, effects })
+          }
+        }
       }
     },
   })
@@ -375,6 +411,7 @@ export const createAiAssistantState = (): AiAssistantState => {
     chatInstances: {},
     pendingSpanIds: {},
     messageSpanIds: {},
+    isInitialized: false,
 
     setContext: (context: Partial<AiAssistantContext>) => {
       state.context = { ...state.context, ...context }
@@ -382,6 +419,7 @@ export const createAiAssistantState = (): AiAssistantState => {
 
     resetAiAssistantPanel: () => {
       Object.assign(state, createInitialAiAssistantData())
+      state.isInitialized = false
     },
 
     setModel: (model: AssistantModel) => {
@@ -672,9 +710,10 @@ export const createAiAssistantState = (): AiAssistantState => {
 export type AiAssistantState = AiAssistantData & {
   resetAiAssistantPanel: () => void
   activeChat: ChatSession | undefined
-  chatInstances: Record<string, Chat<MessageType>>
+  chatInstances: Record<string, ReturnType<typeof ref<Chat<MessageType>>>>
   pendingSpanIds: Record<string, string>
   messageSpanIds: Record<string, string>
+  isInitialized: boolean
   setContext: (context: Partial<AiAssistantContext>) => void
   setModel: (model: AssistantModel) => void
   createChat: (options?: CreateChatOptions) => string
@@ -705,6 +744,7 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
   // Effect to load state from IndexedDB on mount or projectRef change
   useEffect(() => {
     let isMounted = true
+    state.isInitialized = false
 
     async function loadAndInitializeState() {
       if (!project?.ref || typeof window === 'undefined') {
@@ -733,6 +773,7 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
 
       // 4. Ensure an active chat exists and handle URL overrides
       ensureActiveChatOrInitialize(state)
+      state.isInitialized = true
     }
 
     loadAndInitializeState()
@@ -790,6 +831,33 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
 export const useAiAssistantStateSnapshot = (options?: Parameters<typeof useSnapshot>[1]) => {
   const state = useContext(AiAssistantStateContext)
   return useSnapshot(state, options)
+}
+
+export const useAiAssistantChatList = (): ChatSession[] => {
+  const state = useContext(AiAssistantStateContext)
+  const [, rerender] = useReducer((count) => count + 1, 0)
+  // Subscribe to the parent, not `state.chats` — createChat, createBranch, deleteChat and
+  // loadPersistedState all replace `state.chats` wholesale, which would leave a subscription
+  // to the old object silently stale.
+  useEffect(() => subscribe(state, rerender), [state])
+  return Object.values(state.chats)
+}
+
+/**
+ * Resolves once the assistant state has hydrated from storage. `loadPersistedState` replaces
+ * `state.chats` wholesale, so anything that adds a chat has to wait for hydration or the new
+ * chat is dropped the moment the persisted state lands.
+ */
+export const whenAiAssistantInitialized = (state: AiAssistantState): Promise<void> => {
+  if (state.isInitialized) return Promise.resolve()
+
+  return new Promise((resolve) => {
+    const unsubscribe = subscribe(state, () => {
+      if (!state.isInitialized) return
+      unsubscribe()
+      resolve()
+    })
+  })
 }
 
 export const useAiAssistantState = () => {

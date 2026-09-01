@@ -1,176 +1,152 @@
-import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta'
-import { CodeSquare, Eye, EyeOff, Play } from 'lucide-react'
-import { useState } from 'react'
-import { cn } from 'ui'
+import { AlignLeft } from 'lucide-react'
+import { forwardRef, useState } from 'react'
+import { KeyboardShortcut } from 'ui'
 import { type Snapshot } from 'valtio'
 
+import { AddCellDropdown } from '../AddCellDropdown'
+import { ExplorerToolbarAction } from '../ExplorerToolbar'
+import { MoveCellDropdownContent } from '../MoveCellDropdownContent'
+import { QueryEditor, type QueryEditorHandle } from '../QueryEditor'
+import { type QueryDisplay, type QueryResult } from '../types'
 import {
-  ExplorerQuery,
-  ExplorerQueryEditor,
-  ExplorerQueryFooter,
-  ExplorerQueryResults,
-} from '../ExplorerQuery'
-import {
-  ExplorerToolbar,
-  ExplorerToolbarAction,
-  ExplorerToolbarActions,
-  ExplorerToolbarIcon,
-  ExplorerToolbarTitle,
-} from '../ExplorerToolbar'
-import { QueryResultTable } from '../QueryResultTable'
-import { type QueryResult } from '../types'
-import { DisplaySettingsButton } from './DisplaySettingsButton'
-import { QueryResultChart } from './QueryResultChart'
-import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+  changeCellSource,
+  cloneChartConfig,
+  cloneQueryCell,
+  getCellDisplay,
+  setCellRowLimit,
+  setCellSql,
+  toQueryModel,
+} from './QueryCell.utils'
 import { SortableSection } from '@/components/ui/SortableSection'
-import { type DatabaseCell as DatabaseCellSchema } from '@/data/content/notebooks/notebook-schema'
-import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
-import { useLatest } from '@/hooks/misc/useLatest'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import {
+  isQueryCell,
+  type QueryCell as QueryCellSchema,
+} from '@/data/content/notebooks/notebook-schema'
+import { type QuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
-import { type ResponseError } from '@/types'
+import { useLocalRoleImpersonationState } from '@/state/role-impersonation-state'
+import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
+import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
+
+const PRETTIFY_SHORTCUT_KEYS = hotkeyToKeys(
+  SHORTCUT_DEFINITIONS[SHORTCUT_IDS.SQL_EDITOR_FORMAT].sequence[0]
+)
 
 interface QueryCellProps {
-  cell: Snapshot<DatabaseCellSchema>
+  cell: Snapshot<QueryCellSchema>
+  onEdit?: () => void
+  onPrettifyQuery?: () => void
 }
 
-/**
- * [Joshen] Aiming to keep PRs small so the following are deliberating missing for now:
- * - Auto limit logic
- * - Database selection logic
- * - Data display logic
- *
- * QueryCell atm minimally supports running queries and rendering results
- */
-
-export const QueryCell = ({ cell }: QueryCellProps) => {
+/** Notebook adapter around the shared QueryEditor. */
+export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function QueryCell(
+  { cell, onEdit, onPrettifyQuery },
+  ref
+) {
   const snap = useNotebooksStateSnapshot()
   const currentNotebook = useCurrentNotebook()
-  const { data: project } = useSelectedProjectQuery()
-  const cells = currentNotebook?.notebook.content?.cells ?? []
 
-  const { title = 'Untitled snippet', row_limit, view } = cell
-
-  const [showQuery, setShowQuery] = useState(true)
-  const [value, setValue] = useState<string>(cell.unchecked_sql)
+  const [sql, setSql] = useState<string>(cell.unchecked_sql)
   const [result, setResult] = useState<QueryResult>()
-  const columns = Object.keys(result?.rows?.[0] ?? {})
+  const roleImpersonationState = useLocalRoleImpersonationState()
 
-  const valueRef = useLatest(value)
+  const title = cell.title ?? 'Untitled query'
+  const showQuery =
+    snap.cellLocalState.get(cell._id)?.showQuery ?? currentNotebook?.status === 'new'
 
-  const { mutateAsync: executeQuery, isPending: isExecuting } = useExecuteSqlMutation({
-    onSuccess: (data) =>
-      setResult({
-        rows: data.result,
-        error: undefined,
-        autoLimit: undefined,
-      }),
-    onError: (error) =>
-      setResult({
-        rows: undefined,
-        error: error as unknown as ResponseError,
-        autoLimit: undefined,
-      }),
-  })
-
-  const onRunQuery = async () => {
-    if (!project) return console.error('Project is required')
-
-    handleUpdateCell({ sql: value })
-
-    executeQuery({
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      sql: acceptUntrustedSql(untrustedSql(value)),
-    })
-  }
-
-  const handleUpdateCell = (payload: { sql: string } | { title: string }) => {
+  /**
+   * Applies an update to this cell. The updater runs against the cell as the store holds
+   * it rather than the snapshot this component rendered with, so a concurrent edit isn't
+   * clobbered; `isQueryCell` keeps the per-backend helpers off a markdown cell that
+   * somehow shares the id.
+   */
+  const updateQueryCell = (updater: (candidate: Snapshot<QueryCellSchema>) => QueryCellSchema) => {
     const notebookId = currentNotebook?.notebook.id
     if (!notebookId) return
 
-    const nextCells = cells.map((c) => {
-      if (c.id !== cell.id || c._tag !== 'database_cell') {
-        return c
-      }
-
-      if ('sql' in payload) {
-        return { ...c, unchecked_sql: untrustedSql(payload.sql) }
-      }
-
-      const trimmedTitle = payload.title.trim()
-      return trimmedTitle ? { ...c, title: trimmedTitle } : c
+    onEdit?.()
+    snap.updateCell({
+      id: notebookId,
+      cellId: cell._id,
+      updater: (candidate) => {
+        if (!isQueryCell(candidate)) return candidate
+        return updater(candidate)
+      },
     })
-
-    snap.updateCells({ id: notebookId, cells: nextCells })
   }
 
-  const handleUpdateCellRef = useLatest(handleUpdateCell)
+  const handleSourceChange = (source: QuerySourceBinding) => {
+    // The query text carries over (see `changeCellSource`), so the editor's buffer stays
+    // valid — but a result the old backend produced does not, since another engine
+    // returns unrelated columns.
+    const isBackendChange = (source._tag === 'logs') !== (cell._tag === 'log_cell')
+    if (isBackendChange) setResult(undefined)
+
+    updateQueryCell((candidate) => changeCellSource(candidate, source))
+  }
+
+  const handleTitleChange = (value: string) => {
+    const nextTitle = value.trim()
+    if (!nextTitle) return
+    updateQueryCell((candidate) => ({ ...cloneQueryCell(candidate), title: nextTitle }))
+  }
+
+  // Running a cell re-commits its current SQL (see QueryEditor's handleRunQuery) even when
+  // nothing changed — skip the store write so that doesn't spuriously mark the notebook
+  // unsaved.
+  const handleSqlCommit = (value: string) => {
+    if (value === cell.unchecked_sql) return
+    updateQueryCell((candidate) => setCellSql(candidate, value))
+  }
+
+  const handleDisplayChange = (display: QueryDisplay) =>
+    updateQueryCell((candidate) => ({
+      ...cloneQueryCell(candidate),
+      view: display.view,
+      chart: cloneChartConfig(display.chart),
+    }))
+
+  const handleRowLimitChange = (rowLimit: number) =>
+    updateQueryCell((candidate) => setCellRowLimit(candidate, rowLimit))
 
   return (
-    <SortableSection gripClassName="mt-2.5" id={cell.id}>
-      <ExplorerQuery className="max-w-4xl mx-auto">
-        <ExplorerToolbar>
-          <ExplorerToolbarIcon>
-            <CodeSquare size={14} />
-          </ExplorerToolbarIcon>
-          <ExplorerToolbarTitle onSaveTitle={(newTitle) => handleUpdateCell({ title: newTitle })}>
-            {title}
-          </ExplorerToolbarTitle>
-          <ExplorerToolbarActions>
-            <DisplaySettingsButton
-              cell={cell}
-              columns={columns}
-              disabled={(result?.rows ?? []).length === 0}
-            />
-            <ExplorerToolbarAction
-              icon={showQuery ? <EyeOff /> : <Eye />}
-              tooltip={showQuery ? 'Hide query' : 'Show query'}
-              onClick={() => setShowQuery((prev) => !prev)}
-            />
-            <ExplorerToolbarAction
-              loading={isExecuting}
-              icon={<Play />}
-              tooltip="Run query"
-              onClick={onRunQuery}
-            />
-          </ExplorerToolbarActions>
-        </ExplorerToolbar>
-
-        {showQuery && (
-          <ExplorerQueryEditor>
-            <CodeEditor
-              language="pgsql"
-              value={value}
-              onInputChange={(v) => setValue(v ?? '')}
-              className="h-32"
-              actions={{ runQuery: { enabled: true, callback: onRunQuery } }}
-              onMount={(editor) => {
-                editor.onDidBlurEditorWidget(() =>
-                  handleUpdateCellRef.current({ sql: valueRef.current })
-                )
-              }}
-            />
-          </ExplorerQueryEditor>
-        )}
-
-        <ExplorerQueryResults
-          className={cn(
-            (result?.rows ?? []).length === 0 && view === 'table'
-              ? 'flex items-center justify-center'
-              : 'overflow-x-auto'
-          )}
-        >
-          {view === 'table' && <QueryResultTable result={result} />}
-          {view === 'chart' && <QueryResultChart cell={cell} result={result} />}
-        </ExplorerQueryResults>
-
-        <ExplorerQueryFooter className="flex items-center gap-x-2">
-          <p>{(result?.rows ?? []).length.toLocaleString()} rows</p>
-          <p>·</p>
-          <p>Limit {row_limit} rows</p>
-        </ExplorerQueryFooter>
-      </ExplorerQuery>
+    <SortableSection
+      id={cell._id}
+      actions={<AddCellDropdown cellId={cell._id} />}
+      gripDropdownContent={<MoveCellDropdownContent cellId={cell._id} />}
+      gripClassName="mt-2 opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition"
+    >
+      <QueryEditor
+        ref={ref}
+        id={cell._id}
+        variant="embedded"
+        title={title}
+        query={toQueryModel(cell, sql)}
+        result={result}
+        showQuery={showQuery}
+        onShowQueryChange={(showQuery) => snap.setQueryVisibility({ cellId: cell._id, showQuery })}
+        roleImpersonationState={roleImpersonationState}
+        display={getCellDisplay(cell)}
+        onTitleChange={handleTitleChange}
+        onSqlChange={setSql}
+        onSqlCommit={handleSqlCommit}
+        onSourceChange={handleSourceChange}
+        onResultChange={setResult}
+        onRowLimitChange={handleRowLimitChange}
+        onDisplayChange={handleDisplayChange}
+        toolbarActions={
+          <ExplorerToolbarAction
+            icon={<AlignLeft />}
+            tooltip={
+              <div className="flex items-center gap-2.5">
+                <span>Prettify SQL</span>
+                <KeyboardShortcut keys={PRETTIFY_SHORTCUT_KEYS} />
+              </div>
+            }
+            onClick={onPrettifyQuery}
+          />
+        }
+      />
     </SortableSection>
   )
-}
+})

@@ -1,6 +1,6 @@
 import pgMeta from '@supabase/pg-meta'
 import type { JwtPayload } from '@supabase/supabase-js'
-import { safeValidateUIMessages } from 'ai'
+import { pipeUIMessageStreamToResponse, safeValidateUIMessages, toUIMessageStream } from 'ai'
 import { IS_PLATFORM } from 'common'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
@@ -26,6 +26,7 @@ import {
   type AssistantModelId,
 } from '@/lib/ai/model.utils'
 import { getTools } from '@/lib/ai/tools'
+import { encodeNotebookToolError } from '@/lib/ai/tools/notebook-tools'
 import { apiWrapper } from '@/lib/api/apiWrapper'
 import { executeQuery } from '@/lib/api/self-hosted/query'
 import { getURL } from '@/lib/helpers'
@@ -95,7 +96,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     messages: rawMessages,
     projectRef,
     connectionString,
-    orgSlug,
+    orgSlug: rawOrgSlug,
     chatId,
     chatName,
     model: rawRequestedModel,
@@ -125,6 +126,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
   let projectIsSensitive: boolean | null | undefined
   let projectRegion: string | undefined
   let orgId: number | undefined
+  let orgSlug: string | undefined
   let planId: string | undefined
 
   if (!IS_PLATFORM) {
@@ -132,14 +134,15 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     hasAccessToAdvanceModel = true
   }
 
-  if (IS_PLATFORM && orgSlug && authorization && projectRef) {
+  if (IS_PLATFORM && rawOrgSlug && authorization && projectRef) {
     try {
-      const aiDetails = await getAIDetails({ orgSlug, projectRef, authorization })
+      const aiDetails = await getAIDetails({ orgSlug: rawOrgSlug, projectRef, authorization })
 
       aiOptInLevel = aiDetails.aiOptInLevel
       hasAccessToAdvanceModel = aiDetails.hasAccessToAdvanceModel
       orgHasHipaaAddon = aiDetails.hasHipaaAddon
       orgId = aiDetails.orgId
+      orgSlug = aiDetails.orgSlug
       planId = aiDetails.planId
       projectIsSensitive = aiDetails.isSensitive
       projectRegion = aiDetails.region
@@ -233,6 +236,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       supportMode,
       userId,
       orgId,
+      orgSlug,
       planId,
       includesLogsSnippets,
       isExplorerEnabled: explorerEnabled,
@@ -244,11 +248,14 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       },
     })
 
-    result.pipeUIMessageStreamToResponse(res, {
+    const stream = toUIMessageStream({
+      stream: result.stream,
       sendReasoning: true,
-      headers: { 'Content-Encoding': 'none' },
       onError: (error) => {
         console.error('Assistant stream error:', error)
+
+        const encoded = encodeNotebookToolError(error)
+        if (encoded !== null) return encoded
 
         if (error == null) {
           return 'unknown error'
@@ -264,6 +271,12 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
         return JSON.stringify(error)
       },
+    })
+
+    pipeUIMessageStreamToResponse({
+      response: res,
+      stream,
+      headers: { 'Content-Encoding': 'none' },
     })
   } catch (error) {
     console.error('Error in handlePost:', error)

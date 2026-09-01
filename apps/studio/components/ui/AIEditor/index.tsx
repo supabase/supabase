@@ -8,7 +8,7 @@ import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 import { CodeEditor, type ValidLanguages } from '../CodeEditor/CodeEditor'
 import { DiffEditor } from '../DiffEditor'
-import ResizableAIWidget from './ResizableAIWidget'
+import { ResizableAIWidget } from './ResizableAIWidget'
 import { getEditorSelectionParts } from './utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { constructHeaders } from '@/data/fetchers'

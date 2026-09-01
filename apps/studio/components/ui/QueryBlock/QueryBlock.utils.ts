@@ -1,5 +1,7 @@
-export const checkHasNonPositiveValues = (data: Record<string, unknown>[], key: string): boolean =>
-  data.some((row) => (row[key] as number) <= 0)
+export const checkHasNonPositiveValues = (
+  data: readonly Record<string, unknown>[],
+  key: string
+): boolean => data.some((row) => (row[key] as number) <= 0)
 
 export const formatYAxisTick = (value: number): string => {
   if (Math.abs(value) >= 1_000_000) {
@@ -47,21 +49,23 @@ export const formatLogTick = (value: number): string => {
 
 export const getCumulativeResults = (
   results: { rows: readonly any[] },
-  config: { yKey: string }
+  config: { yKey: string | string[] }
 ) => {
   if (!results?.rows?.length) {
     return []
   }
 
+  const yKeys = Array.isArray(config.yKey) ? config.yKey : [config.yKey]
+
   const cumulativeResults = results.rows.reduce((acc, row) => {
     const prev = acc[acc.length - 1] || {}
-    // Coerce to Number before adding: Postgres returns `bigint`, `numeric`,
-    // `money` and `count(*)` columns as strings, so a bare `+` would
-    // concatenate (e.g. "10" + "20" -> "1020") instead of summing.
-    const next = {
-      ...row,
-      [config.yKey]: (Number(prev[config.yKey]) || 0) + (Number(row[config.yKey]) || 0),
-    }
+    const next = { ...row }
+    yKeys.forEach((yKey) => {
+      // Coerce to Number before adding: Postgres returns `bigint`, `numeric`,
+      // `money` and `count(*)` columns as strings, so a bare `+` would
+      // concatenate (e.g. "10" + "20" -> "1020") instead of summing.
+      next[yKey] = (Number(prev[yKey]) || 0) + (Number(row[yKey]) || 0)
+    })
     return [...acc, next]
   }, [])
 
