@@ -61,11 +61,13 @@ describe('multi-select', () => {
   it('renders selected values with a custom label', () => {
     render(
       <MultiSelector values={['101']} onValuesChange={() => undefined}>
-        <MultiSelectorTrigger renderValue={(value) => `public.table_${value}`} />
+        <MultiSelectorTrigger renderValue={(value) => `Public.MixedCase_${value}`} />
       </MultiSelector>
     )
 
-    expect(screen.getByRole('combobox')).toHaveTextContent('public.table_101')
+    const badge = screen.getByText('Public.MixedCase_101').closest('[class*=rounded]')
+    expect(screen.getByRole('combobox')).toHaveTextContent('Public.MixedCase_101')
+    expect(badge).toHaveClass('normal-case', 'tracking-normal')
   })
 
   it('opens the dropdown when the MultiSelectorTrigger is clicked', () => {
@@ -76,6 +78,45 @@ describe('multi-select', () => {
 
     fireEvent.click(trigger) // Click on the trigger to open
     expect(screen.getByText('Apple')).toBeInTheDocument() // Apple should be visible in the dropdown
+  })
+
+  it('shows loading rows only inside the open dropdown', () => {
+    render(
+      <MultiSelector values={[]} onValuesChange={() => undefined}>
+        <MultiSelectorTrigger label="Select fruits" />
+        <MultiSelectorContent>
+          <MultiSelectorList loading>
+            <MultiSelectorItem value="Apple">Apple</MultiSelectorItem>
+          </MultiSelectorList>
+        </MultiSelectorContent>
+      </MultiSelector>
+    )
+
+    expect(document.querySelector('.shimmering-loader')).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('combobox'))
+
+    expect(document.querySelector('.shimmering-loader')).toBeInTheDocument()
+    expect(screen.queryByText('Apple')).not.toBeInTheDocument()
+  })
+
+  it('shows a custom loading error instead of an empty result', () => {
+    render(
+      <MultiSelector values={[]} onValuesChange={() => undefined}>
+        <MultiSelectorTrigger label="Select fruits" />
+        <MultiSelectorContent>
+          <MultiSelectorList error errorLabel="Unable to load fruits">
+            <MultiSelectorItem value="Apple">Apple</MultiSelectorItem>
+          </MultiSelectorList>
+        </MultiSelectorContent>
+      </MultiSelector>
+    )
+
+    fireEvent.click(screen.getByRole('combobox'))
+
+    expect(screen.getByText('Unable to load fruits')).toBeInTheDocument()
+    expect(screen.queryByText('Apple')).not.toBeInTheDocument()
+    expect(screen.queryByText('No results found')).not.toBeInTheDocument()
   })
 
   it('adds and removes value when toggling MultiSelectorItem', () => {
