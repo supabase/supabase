@@ -1,8 +1,7 @@
 import { useBreakpoint } from 'common'
 import { ArrowUp, Loader2, Square } from 'lucide-react'
 import { ChangeEvent, FormEvent, forwardRef, KeyboardEvent, memo, useRef } from 'react'
-import { ExpandingTextArea } from 'ui'
-import { cn } from 'ui/src/lib/utils'
+import { cn, ExpandingTextArea } from 'ui'
 
 import { ButtonTooltip } from '../ButtonTooltip'
 import { formatAttachedSnippets } from './AIAssistant.utils'

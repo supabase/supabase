@@ -1,5 +1,5 @@
 import pgMeta, { getEntityDefinitionsSql } from '@supabase/pg-meta'
-import { generateText, ModelMessage, stepCountIs, tool } from 'ai'
+import { generateText, isStepCount, ModelMessage, tool } from 'ai'
 import { IS_PLATFORM } from 'common'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
@@ -289,11 +289,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
     const coreMessages: ModelMessage[] = [
       {
-        role: 'system',
-        content: system,
-        ...(systemProviderOptions && { providerOptions: systemProviderOptions }),
-      },
-      {
         role: 'user',
         content: userMessage,
       },
@@ -301,7 +296,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const { text } = await generateText({
       ...modelParams,
-      stopWhen: stepCountIs(5),
+      instructions: {
+        role: 'system',
+        content: system,
+        ...(systemProviderOptions && { providerOptions: systemProviderOptions }),
+      },
+      stopWhen: isStepCount(5),
       messages: coreMessages,
       tools:
         includeSchema && !schemaListResult.error

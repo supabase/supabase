@@ -41,7 +41,7 @@ export const SQLEditorMenu = () => {
   const { data: project } = useSelectedProjectQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const isDatabaseConnectionsEnabled = useIsDatabaseConnectionsEnabled()
+  const { enabled: isDatabaseConnectionsEnabled } = useIsDatabaseConnectionsEnabled()
   const sqlEditorLogsSource = useFlag('sqlEditorLogsSource')
   const otelLegacyLogs = useFlag('otelLegacyLogs')
   const canCreateLogsSnippet = sqlEditorLogsSource && otelLegacyLogs

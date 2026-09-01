@@ -74,7 +74,7 @@ describe('ai/tools/mock-tools getMockTools', () => {
 
       const result = await mockTools.list_notebooks.execute(
         { limit: 20 },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
 
       expect(result.notebooks.map((notebook) => notebook.name)).toEqual([
@@ -92,7 +92,7 @@ describe('ai/tools/mock-tools getMockTools', () => {
 
       const result = await mockTools.get_notebook.execute(
         { id: AUTH_HEALTH_NOTEBOOK_ID },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
 
       expect(result.cells.map((cell) => cell._tag)).toEqual([
@@ -112,9 +112,32 @@ describe('ai/tools/mock-tools getMockTools', () => {
       await expect(
         mockTools.get_notebook.execute(
           { id: 'unknown-notebook-id' },
-          { toolCallId: 'test', messages: [] }
+          { toolCallId: 'test', messages: [], context: {} }
         )
       ).rejects.toThrow(/not found/i)
+    })
+
+    it('shares deterministic run_notebook output with eval models', async () => {
+      const mockTools = await getMockTools(undefined, new AbortController().signal)
+      if (!mockTools.run_notebook.execute) throw new Error('execute is undefined')
+      if (!mockTools.run_notebook.toModelOutput) throw new Error('toModelOutput is undefined')
+
+      const output = await mockTools.run_notebook.execute(
+        { id: AUTH_HEALTH_NOTEBOOK_ID, expected_updated_at: MOCK_NOTEBOOKS_DATA[0].updated_at },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+      const modelOutput = mockTools.run_notebook.toModelOutput({
+        toolCallId: 'test',
+        input: { id: AUTH_HEALTH_NOTEBOOK_ID, expected_updated_at: output.updated_at },
+        output,
+      })
+
+      expect(modelOutput).toMatchObject({
+        type: 'json',
+        value: {
+          cells: expect.arrayContaining([expect.objectContaining({ rows: [] })]),
+        },
+      })
     })
 
     it('overrides create_notebook needsApproval to false, unlike the real tool', async () => {
@@ -140,20 +163,20 @@ describe('ai/tools/mock-tools getMockTools', () => {
 
       const created = await mockTools.create_notebook.execute(
         { name: 'New notebook', content },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
       expect(created).toEqual({ id: expect.any(String), name: 'New notebook' })
 
       const fetched = await mockTools.get_notebook.execute(
         { id: created.id },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
       expect(fetched.cells).toHaveLength(2)
-      expect(fetched.cells.every((cell) => typeof cell.id === 'string')).toBe(true)
+      expect(fetched.cells.every((cell) => typeof cell._id === 'string')).toBe(true)
 
       const listed = await mockTools.list_notebooks.execute(
         { limit: 20 },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
       expect(listed.notebooks).toHaveLength(3)
       const newEntry = listed.notebooks.find((notebook) => notebook.id === created.id)
@@ -175,29 +198,30 @@ describe('ai/tools/mock-tools getMockTools', () => {
 
       const before = await mockTools.get_notebook.execute(
         { id: AUTH_HEALTH_NOTEBOOK_ID },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
       const [markdownCell, , logCell] = before.cells
 
       const result = await mockTools.update_notebook.execute(
         {
           id: AUTH_HEALTH_NOTEBOOK_ID,
+          expected_updated_at: before.updated_at,
           operations: [
             {
               _tag: 'insert_cell',
-              after_cell_id: markdownCell.id,
+              after_cell_id: markdownCell._id,
               cell: { _tag: 'database_cell', sql: 'select 1', row_limit: 10 },
             },
-            { _tag: 'delete_cell', cell_id: logCell.id },
+            { _tag: 'delete_cell', cell_id: logCell._id },
           ],
         },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
       expect(result).toEqual({ id: AUTH_HEALTH_NOTEBOOK_ID, name: 'Auth health check' })
 
       const after = await mockTools.get_notebook.execute(
         { id: AUTH_HEALTH_NOTEBOOK_ID },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
       expect(after.cells.map((cell) => cell._tag)).toEqual([
         'markdown_cell',
@@ -207,7 +231,7 @@ describe('ai/tools/mock-tools getMockTools', () => {
 
       const listed = await mockTools.list_notebooks.execute(
         { limit: 20 },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
       const entry = listed.notebooks.find((notebook) => notebook.id === AUTH_HEALTH_NOTEBOOK_ID)
       expect(entry?.cell_count).toBe(3)
@@ -218,21 +242,64 @@ describe('ai/tools/mock-tools getMockTools', () => {
       if (!mockTools.get_notebook.execute) throw new Error('execute is undefined')
       if (!mockTools.update_notebook.execute) throw new Error('execute is undefined')
 
+      const before = await mockTools.get_notebook.execute(
+        { id: EDGE_FUNCTION_NOTEBOOK_ID },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+
       await expect(
         mockTools.update_notebook.execute(
           {
             id: EDGE_FUNCTION_NOTEBOOK_ID,
+            expected_updated_at: before.updated_at,
             operations: [{ _tag: 'delete_cell', cell_id: 'does-not-exist' }],
           },
-          { toolCallId: 'test', messages: [] }
+          { toolCallId: 'test', messages: [], context: {} }
         )
       ).rejects.toThrow(/does-not-exist/)
 
       const after = await mockTools.get_notebook.execute(
         { id: EDGE_FUNCTION_NOTEBOOK_ID },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
       expect(after.cells.map((cell) => cell._tag)).toEqual(['markdown_cell', 'log_cell'])
+    })
+
+    it('overrides delete_notebook needsApproval to false, unlike the real tool', async () => {
+      const mockTools = await getMockTools(undefined, new AbortController().signal)
+
+      expect(getNotebookTools().delete_notebook.needsApproval).toBe(true)
+      expect(mockTools.delete_notebook.needsApproval).toBe(false)
+    })
+
+    it('delete_notebook removes the notebook, and list_notebooks no longer returns it', async () => {
+      const mockTools = await getMockTools(undefined, new AbortController().signal)
+      if (!mockTools.delete_notebook.execute) throw new Error('execute is undefined')
+      if (!mockTools.list_notebooks.execute) throw new Error('execute is undefined')
+
+      const result = await mockTools.delete_notebook.execute(
+        { id: AUTH_HEALTH_NOTEBOOK_ID },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+      expect(result).toEqual({ id: AUTH_HEALTH_NOTEBOOK_ID, name: 'Auth health check' })
+
+      const listed = await mockTools.list_notebooks.execute(
+        { limit: 20 },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+      expect(listed.notebooks.map((notebook) => notebook.id)).toEqual([EDGE_FUNCTION_NOTEBOOK_ID])
+    })
+
+    it('delete_notebook rejects an unknown id', async () => {
+      const mockTools = await getMockTools(undefined, new AbortController().signal)
+      if (!mockTools.delete_notebook.execute) throw new Error('execute is undefined')
+
+      await expect(
+        mockTools.delete_notebook.execute(
+          { id: 'unknown-notebook-id' },
+          { toolCallId: 'test', messages: [], context: {} }
+        )
+      ).rejects.toThrow(/unknown-notebook-id/)
     })
 
     it('is isolated per call to getMockTools', async () => {
@@ -244,7 +311,7 @@ describe('ai/tools/mock-tools getMockTools', () => {
           name: 'Ephemeral notebook',
           content: { schema_version: 1, cells: [{ _tag: 'markdown_cell', text: 'hi' }] },
         },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
 
       const secondCall = await getMockTools(undefined, new AbortController().signal)
@@ -252,7 +319,7 @@ describe('ai/tools/mock-tools getMockTools', () => {
 
       const result = await secondCall.list_notebooks.execute(
         { limit: 20 },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
       expect(result.notebooks.map((notebook) => notebook.name)).toEqual([
         'Auth health check',

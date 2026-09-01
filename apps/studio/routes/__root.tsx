@@ -64,6 +64,7 @@ import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
 import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { FeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewModal'
+import { IndirectTaxDeclarationModal } from '@/components/interfaces/App/IndirectTaxDeclarationModal'
 import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProvider'
 import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
 import { ShellFallback } from '@/components/interfaces/App/ShellFallback'
@@ -138,6 +139,12 @@ const TimestampInfoTimezoneBridge = ({ children }: { children: ReactNode }) => {
 const IS_NON_PROD_ENV =
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+
+// Mirrors the `MAINTENANCE_MODE` reads in `next.config.ts` and `vercel.ts`.
+// The var is unprefixed, so vite.config.ts inlines it explicitly (see the
+// define there) rather than it arriving via the NEXT_PUBLIC_ sweep — that
+// keeps the toggle a single build-time env var across all three runtimes.
+const IS_MAINTENANCE_MODE = process.env.MAINTENANCE_MODE === 'true'
 
 // Keep dev-only components out of the production bundle.
 const IS_DEV_TOOLBAR_ENABLED = IS_NON_PROD_ENV
@@ -329,6 +336,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       pathname: location.pathname,
       search: location.search as Record<string, string | string[] | undefined>,
       isPlatform: IS_PLATFORM,
+      maintenanceMode: IS_MAINTENANCE_MODE,
       hash: location.hash,
     })
     if (!match) return
@@ -387,6 +395,7 @@ function RootComponent() {
                                   <GlobalShortcuts />
                                   <StudioCommandMenu />
                                   <FeaturePreviewModal />
+                                  <IndirectTaxDeclarationModal />
                                 </FeaturePreviewContextProvider>
                               </BannerStackProvider>
                               <Toaster />

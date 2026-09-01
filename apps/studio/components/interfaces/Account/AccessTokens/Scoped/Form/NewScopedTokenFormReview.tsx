@@ -1,23 +1,35 @@
 import dayjs from 'dayjs'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
+import { Badge, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
-import {
-  computeOverallRisk,
-  PERMISSION_MODE_LABEL,
-  selectionToScopes,
-} from '../../AccessToken.permissions'
+import { PERMISSION_MODE_LABEL, selectionToScopes } from '../../AccessToken.permissions'
 import {
   groupFailingResources,
   TOKEN_ROLE_LABEL,
   type TokenAccessEvaluation,
 } from '../../AccessToken.roles'
 import { useCapabilitySummary } from '../../hooks/useCapabilitySummary'
-import { useOrgAndProjectData } from '../../hooks/useOrgAndProjectData'
 import { failingResourceLine } from '../ExceedsRoleBadge'
-import { CapabilityCategoryList, ResourceSummaryItem, RiskLevelSummary } from '../TokenSummaryRows'
+import {
+  OrganizationAccessPill,
+  ProjectAccessPill,
+  useResourceAccessWrap,
+} from '../ResourceAccessPills'
+import { CapabilitiesSection } from '../TokenCapabilities/CapabilitiesSection'
+import { CapabilityLevelToggle } from '../TokenCapabilities/CapabilityLevelToggle'
+import { RiskBanner } from '../TokenCapabilities/RiskBanner'
+import {
+  computeRiskBanner,
+  getCapabilityDensityTier,
+  type CapabilityLevelFilter,
+} from '../TokenCapabilities/TokenCapabilities.utils'
 import { EXPIRY_OPTIONS, type TokenFormValues } from './NewScopedTokenForm.utils'
-import { PermissionScopeMap } from '@/data/scoped-access-tokens/permission-scope-map-query'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import {
+  getEnabledMcpTools,
+  PermissionScopeMap,
+} from '@/data/scoped-access-tokens/permission-scope-map-query'
 
 interface ReviewStepProps {
   values: TokenFormValues
@@ -25,12 +37,16 @@ interface ReviewStepProps {
   permissionScopeMap: PermissionScopeMap | undefined
 }
 
+/**
+ * Mirrors the token view sheet (risk banner, summary, capability cards) so reviewing a token
+ * before creating it looks identical to viewing it afterwards.
+ */
 export const NewScopedTokenFormReview = ({
   values,
   access,
   permissionScopeMap,
 }: ReviewStepProps) => {
-  const { organizations, projects } = useOrgAndProjectData()
+  const { data: organizations = [] } = useOrganizationsQuery()
   const selection = values.permissions
   const grantedScopes = useMemo(() => selectionToScopes(selection), [selection])
 
@@ -44,38 +60,15 @@ export const NewScopedTokenFormReview = ({
   )
 
   const risk = useMemo(
-    () => computeOverallRisk(access.effectiveSelection, values.resourceAccess),
-    [access.effectiveSelection, values.resourceAccess]
+    () =>
+      computeRiskBanner({
+        effectiveSelection: access.effectiveSelection,
+        resourceAccess: values.resourceAccess,
+        organizationSlugs: values.organizationSlugs,
+        projectRefs: values.projectRefs,
+      }),
+    [access.effectiveSelection, values.resourceAccess, values.organizationSlugs, values.projectRefs]
   )
-
-  const resourceSummary = useMemo(() => {
-    if (values.resourceAccess === 'project') {
-      const selectedProjects = projects.filter((p) => values.projectRefs.includes(p.ref))
-      return {
-        title: 'Projects',
-        items:
-          selectedProjects.length > 0
-            ? selectedProjects.map((p) => ({ key: p.ref, label: p.name, sublabel: p.ref }))
-            : [{ key: 'none', label: '-', sublabel: undefined }],
-      }
-    }
-    if (values.resourceAccess === 'organization') {
-      const selectedOrganizations = organizations.filter((o) =>
-        values.organizationSlugs.includes(o.slug)
-      )
-      return {
-        title: 'Organizations',
-        items:
-          selectedOrganizations.length > 0
-            ? selectedOrganizations.map((o) => ({ key: o.slug, label: o.name, sublabel: o.slug }))
-            : [{ key: 'none', label: '-', sublabel: undefined }],
-      }
-    }
-    return {
-      title: 'Account',
-      items: [{ key: 'account', label: 'Account-level access', sublabel: undefined }],
-    }
-  }, [values, projects, organizations])
 
   const expiresSummary = useMemo(() => {
     if (values.expiresAt === 'custom') {
@@ -86,53 +79,23 @@ export const NewScopedTokenFormReview = ({
     return EXPIRY_OPTIONS.find((o) => o.value === values.expiresAt)?.label ?? values.expiresAt
   }, [values])
 
-  const hasCapabilities = grantedScopes.length > 0
-
-  const { activeByCategory, mcpTools, capabilityGroups } = useCapabilitySummary({
+  const { capabilities } = useCapabilitySummary({
     selection,
     grantedScopes,
     permissionScopeMap,
   })
+  const capabilityTier = getCapabilityDensityTier(capabilities.length)
+  const [levelFilter, setLevelFilter] = useState<CapabilityLevelFilter>('all')
 
-  const rows: [string, React.ReactNode][] = [
-    ['Name', values.tokenName || <span className="text-foreground-lighter">Untitled token</span>],
-    ['Expires', expiresSummary],
-    [
-      'Resource access',
-      <div key="resource-access" className="space-y-2">
-        <p className="text-[11px] font-mono uppercase tracking-wide text-foreground-lighter">
-          {resourceSummary.title}
-        </p>
-        <div className="divide-y">
-          {resourceSummary.items.map((item) => (
-            <ResourceSummaryItem key={item.key} label={item.label} sublabel={item.sublabel} />
-          ))}
-        </div>
-      </div>,
-    ],
-    [
-      'Capabilities',
-      hasCapabilities ? (
-        <CapabilityCategoryList categories={activeByCategory} accessEntries={access.entries} />
-      ) : (
-        <span className="text-foreground-lighter">No capabilities selected</span>
-      ),
-    ],
-    [
-      'Risk level',
-      <RiskLevelSummary key="risk" risk={risk} showRoleCaveat={hasExceedingCapabilities} />,
-    ],
-  ]
+  const enabledMcpTools = useMemo(
+    () => getEnabledMcpTools({ grantedScopes, permissionScopeMap }).sort(),
+    [grantedScopes, permissionScopeMap]
+  )
+
+  const { containerRef: pillsRef, isWrapped: isResourceAccessWrapped } = useResourceAccessWrap()
 
   return (
     <div className="space-y-6 px-5 sm:px-6 py-6">
-      {!hasCapabilities && (
-        <Admonition
-          type="warning"
-          title="This token has no capabilities"
-          description="Go back and grant at least one permission before creating it."
-        />
-      )}
       {hasExceedingCapabilities && (
         <Admonition
           type="warning"
@@ -160,72 +123,86 @@ export const NewScopedTokenFormReview = ({
           }
         />
       )}
+
+      <div className="flex flex-col gap-3">
+        <h3 className="text-sm">Risk assessment</h3>
+        <RiskBanner risk={risk} showRoleCaveat={hasExceedingCapabilities} />
+      </div>
+
       <div className="flex flex-col gap-3">
         <h3 className="text-sm">Token summary</h3>
         <dl className="divide-y rounded-md border bg-surface-300">
-          {rows.map(([key, value]) => (
-            <div key={key} className="grid grid-cols-3 gap-4 px-4 py-3">
-              <dt className="text-sm text-foreground-lighter">{key}</dt>
-              <dd className="col-span-2 text-sm text-foreground">{value}</dd>
-            </div>
-          ))}
+          <div className="flex items-center justify-between gap-4 px-4 py-3">
+            <dt className="shrink-0 text-sm text-foreground-lighter">Name</dt>
+            <dd className="text-sm text-foreground">
+              {values.tokenName || <span className="text-foreground-lighter">Untitled token</span>}
+            </dd>
+          </div>
+          <div className="flex items-center justify-between gap-4 px-4 py-3">
+            <dt className="shrink-0 text-sm text-foreground-lighter">Expires</dt>
+            <dd className="text-sm text-foreground">{expiresSummary}</dd>
+          </div>
+          <div
+            className={cn(
+              'flex flex-col items-start justify-between gap-4 px-4 py-3 sm:flex-row',
+              isResourceAccessWrapped ? 'sm:items-start' : 'sm:items-center'
+            )}
+          >
+            <dt className="shrink-0 text-sm text-foreground-lighter">Resource access</dt>
+            <dd className="w-full min-w-0 text-sm text-foreground sm:w-auto sm:flex-1">
+              <div ref={pillsRef} className="flex flex-wrap justify-start gap-1.5 sm:justify-end">
+                {values.resourceAccess === 'organization'
+                  ? values.organizationSlugs.map((orgSlug) => (
+                      <OrganizationAccessPill
+                        key={orgSlug}
+                        slug={orgSlug}
+                        organization={organizations.find((org) => org.slug === orgSlug)}
+                      />
+                    ))
+                  : null}
+                {values.resourceAccess === 'project'
+                  ? values.projectRefs.map((projectRef) => (
+                      <ProjectAccessPill key={projectRef} projectRef={projectRef} />
+                    ))
+                  : null}
+              </div>
+            </dd>
+          </div>
         </dl>
       </div>
 
-      {hasCapabilities && (
-        <>
-          <div className="flex flex-col gap-3">
-            <h3 className="text-sm">Management API endpoints enabled</h3>
-            {capabilityGroups.length === 0 ? (
-              <p className="text-xs text-foreground-light">
-                No Management API endpoints are enabled by the selected capabilities.
-              </p>
-            ) : (
-              capabilityGroups.map(({ entry, mode, endpoints }) => (
-                <div key={entry.key} className="rounded-md border">
-                  <div className="flex items-center justify-between border-b bg-surface-100 px-3 py-2">
-                    <span className="text-xs text-foreground">{entry.name}</span>
-                    <span className="text-[11px] font-mono uppercase text-foreground-lighter">
-                      {PERMISSION_MODE_LABEL[mode]}
-                    </span>
-                  </div>
-                  <div className="divide-y">
-                    {endpoints.map(([method, path]) => (
-                      <div
-                        key={`${method} ${path}`}
-                        className="flex items-center gap-2 px-3 py-1.5 font-mono text-xs"
-                      >
-                        <span className="w-14 shrink-0 text-foreground-light">{method}</span>
-                        <span className="text-foreground">{path}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm">Capabilities</h3>
+          {capabilityTier === 'dense' && (
+            <CapabilityLevelToggle value={levelFilter} onChange={setLevelFilter} />
+          )}
+        </div>
+        <CapabilitiesSection
+          capabilities={capabilities}
+          accessEntries={access.entries}
+          levelFilter={levelFilter}
+        />
+      </div>
 
-          <div className="flex flex-col gap-3">
-            <h3 className="text-sm">MCP tools</h3>
-            {mcpTools.length === 0 ? (
-              <p className="text-xs text-foreground-light">
-                No MCP tools are enabled by the selected capabilities.
-              </p>
-            ) : (
-              <div className="flex flex-wrap gap-2">
-                {mcpTools.map((tool) => (
-                  <span
-                    key={tool}
-                    className="rounded border bg-surface-100 px-2 py-1 font-mono text-xs text-foreground-light"
-                  >
-                    {tool}
-                  </span>
-                ))}
-              </div>
-            )}
+      <div className="flex flex-col gap-3">
+        <h3 className="text-sm">Available MCP tools</h3>
+        {enabledMcpTools.length === 0 ? (
+          <span className="text-sm text-foreground-lighter">No MCP tools enabled</span>
+        ) : (
+          <div className="flex flex-wrap gap-1.5">
+            {enabledMcpTools.map((tool) => (
+              <Badge
+                key={tool}
+                variant="default"
+                className="px-2.5 py-1 font-mono text-xs normal-case tracking-normal"
+              >
+                {tool}
+              </Badge>
+            ))}
           </div>
-        </>
-      )}
+        )}
+      </div>
     </div>
   )
 }

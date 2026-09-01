@@ -11,7 +11,7 @@ import {
 import { datePickerValueToLogTimeRange, logTimeRangesEqual } from './LogTimeRange.utils'
 import { EXPLORER_DATEPICKER_HELPERS } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import { maybeShowUpgradePromptIfNotEntitled } from '@/components/interfaces/Settings/Logs/Logs.utils'
-import type { LogTimeRange } from '@/data/query-sources/query-source-registry'
+import type { TimeRange } from '@/data/content/notebooks/notebook-schema'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 
 export const LogsTimeRangeSubMenu = ({
@@ -20,15 +20,15 @@ export const LogsTimeRangeSubMenu = ({
   onOpenCustomRange,
   onShowUpgrade,
 }: {
-  range: LogTimeRange
-  onRangeChange: (range: LogTimeRange) => void
+  range: TimeRange
+  onRangeChange: (range: TimeRange) => void
   onOpenCustomRange: () => void
   onShowUpgrade: () => void
 }) => {
   const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
   const entitledToLogDays = getEntitlementNumericValue()
 
-  const isCustomRange = range.type === 'absolute'
+  const isCustomRange = range._tag === 'absolute_time_range'
   const presets = EXPLORER_DATEPICKER_HELPERS.map((helper) => ({
     helper,
     range: datePickerValueToLogTimeRange({
@@ -47,7 +47,7 @@ export const LogsTimeRangeSubMenu = ({
           <span>Time range</span>
           <span className="text-foreground-lighter text-xs">
             {isCustomRange
-              ? `${dayjs(range.from).format('DD MMM, HH:mm')} - ${dayjs(range.to).format('DD MMM, HH:mm')}`
+              ? `${dayjs(range.start).format('DD MMM, HH:mm')} - ${dayjs(range.end).format('DD MMM, HH:mm')}`
               : (selectedPreset?.helper.text ?? 'Custom range')}
           </span>
         </div>

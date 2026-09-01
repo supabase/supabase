@@ -452,7 +452,7 @@ th code {
 }
 
 /* Word wrap styles for code blocks */
-.shiki[data-wrapped='true'] {
+.shiki[data-wrapped='true'] .code-scroll {
   overflow-x: hidden !important;
 }
 

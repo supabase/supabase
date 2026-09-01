@@ -1,14 +1,13 @@
 import { useMemo } from 'react'
 
 import { MULTIGRES_SCHEMA_NAME, resolveHighAvailability } from './useHighAvailability.constants'
-import { useSelectedProjectQuery } from './useSelectedProject'
+import { useIsHighAvailability, useSelectedProjectQuery } from './useSelectedProject'
 
 export { MULTIGRES_SCHEMA_NAME, resolveHighAvailability }
 
 export function useHighAvailability() {
-  const { data: project, isPending } = useSelectedProjectQuery()
-
-  const isHighAvailability = resolveHighAvailability(project)
+  const isHighAvailability = useIsHighAvailability()
+  const { isPending } = useSelectedProjectQuery()
 
   return {
     isHighAvailability,

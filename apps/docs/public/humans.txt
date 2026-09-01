@@ -37,6 +37,7 @@ Barco Fourie
 Barry Roodt
 Beng Eu
 Benjamin Coenen
+Beth Long
 Bo Lu
 Bobbie Soedirgo
 Brad Gyger
@@ -90,6 +91,7 @@ Dimitrios Liappis
 Div Arora
 Divit D
 Divya Sharma
+Donna Alexandra
 Douglas Hunley
 Eduardo Gurgel
 Eleftheria Trivyzaki
@@ -98,6 +100,7 @@ Emmett Folger
 Erfi Anugrah
 Eric Kharitonashvili
 Etienne Stalmans
+Evan Cummack
 Eyal Ehrlich
 Fabrizio Fenoglio
 Fady A
@@ -241,6 +244,8 @@ Peter Lyn
 Peter Soderberg
 Pierre Ducroquet
 Pierre Frances
+Ping-Min Lin
+Prashansa Kulshrestha
 Qiao Han
 Quintin Willison
 Rafael Chacón
@@ -268,6 +273,7 @@ Sana Cordeaux
 Sasi Kanumuri
 Sara Read
 Satya Rohith Gannamanedi
+Sean Geoghegan
 Sean Oliver
 Sean Romberg
 Sean Thompson
@@ -278,6 +284,7 @@ Shane E
 Shaun Newman
 Shardul Borhade
 Shreekar Shetty
+Simon Tomlinson
 Sreyas Udayavarman
 Stephanie Jackson (stejacks)
 Stephen Morgan
@@ -304,6 +311,7 @@ Tobias Pfeiffer
 Tom Ashley
 Tom G
 Tomás Pozo
+Tomás Torgal
 Tyler Hillery
 Tyler Fontaine
 Tyler Shukert

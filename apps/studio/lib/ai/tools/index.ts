@@ -78,7 +78,14 @@ export const getTools = async ({
         connectionString,
       }),
       ...getReportTools({ projectRef, authorization }),
-      ...(isExplorerEnabled ? getNotebookTools({ projectRef, authorization }) : {}),
+      ...(isExplorerEnabled
+        ? getNotebookTools({
+            projectRef,
+            connectionString,
+            authorization,
+            aiOptInLevel,
+          })
+        : {}),
       ...(baseUrl ? getIncidentTools({ baseUrl }) : {}),
     }
   }

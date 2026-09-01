@@ -14,11 +14,12 @@ import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks
 
 interface MarkdownCellProps {
   cell: MarkdownCellSchema
+  onEdit?: () => void
 }
 
 // [Joshen] handleUpdateMarkdown could be shifted into notebook-state as a updateCell action
 
-export const MarkdownCell = ({ cell }: MarkdownCellProps) => {
+export const MarkdownCell = ({ cell, onEdit }: MarkdownCellProps) => {
   const snap = useNotebooksStateSnapshot()
   const currentNotebook = useCurrentNotebook()
   const cells = currentNotebook?.notebook.content?.cells ?? []
@@ -41,7 +42,8 @@ export const MarkdownCell = ({ cell }: MarkdownCellProps) => {
     const notebookId = currentNotebook?.notebook.id
     if (!notebookId) return
 
-    const nextCells = cells.map((c) => (c.id === cellId ? { ...c, text } : c))
+    onEdit?.()
+    const nextCells = cells.map((c) => (c._id === cellId ? { ...c, text } : c))
     snap.updateCells({ id: notebookId, cells: nextCells })
     setIsEditing(false)
   }
@@ -50,9 +52,9 @@ export const MarkdownCell = ({ cell }: MarkdownCellProps) => {
 
   return (
     <SortableSection
-      id={cell.id}
-      actions={<AddCellDropdown cellId={cell.id} />}
-      gripDropdownContent={<MoveCellDropdownContent cellId={cell.id} />}
+      id={cell._id}
+      actions={<AddCellDropdown cellId={cell._id} />}
+      gripDropdownContent={<MoveCellDropdownContent cellId={cell._id} />}
       gripClassName="mt-1.5 opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition"
     >
       {isEditing ? (
@@ -84,10 +86,10 @@ export const MarkdownCell = ({ cell }: MarkdownCellProps) => {
                 ].join(' && ')
               )
               editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () =>
-                handleUpdateMarkdownRef.current(cell.id, valueRef.current)
+                handleUpdateMarkdownRef.current(cell._id, valueRef.current)
               )
               editor.onDidBlurEditorWidget(() =>
-                handleUpdateMarkdownRef.current(cell.id, valueRef.current)
+                handleUpdateMarkdownRef.current(cell._id, valueRef.current)
               )
             }}
           />
@@ -100,7 +102,7 @@ export const MarkdownCell = ({ cell }: MarkdownCellProps) => {
               <Button
                 variant="text"
                 onMouseDown={(e) => e.preventDefault()}
-                onClick={() => handleUpdateMarkdown(cell.id, value)}
+                onClick={() => handleUpdateMarkdown(cell._id, value)}
               >
                 Done
               </Button>
