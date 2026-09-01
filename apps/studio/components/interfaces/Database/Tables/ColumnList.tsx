@@ -391,7 +391,7 @@ export const ColumnList = ({
                                 </TooltipTrigger>
                                 <TooltipContent side="bottom">
                                   {!canUpdateColumns
-                                    ? 'Additional permissions required to edit column'
+                                    ? 'Additional permissions required to delete column'
                                     : `Delete ${column.name} column`}
                                 </TooltipContent>
                               </Tooltip>
