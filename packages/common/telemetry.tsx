@@ -430,10 +430,14 @@ export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathn
 
   // keepalive lets the request survive a same-tick navigation (e.g. the OAuth
   // provider redirect right after sign_in_submitted); without it the browser
-  // aborts the in-flight fetch and the event is silently lost.
+  // aborts the in-flight fetch and the event is silently lost. Callers like
+  // useTrack fire-and-forget, so rejections (e.g. the 64KB keepalive quota)
+  // are handled here rather than surfacing as unhandled promise rejections.
   return post(`${ensurePlatformSuffix(API_URL)}/telemetry/event`, body, {
     headers: { Version: '2' },
     keepalive: true,
+  }).catch((error) => {
+    console.error('Problem sending telemetry event:', error)
   })
 }
 

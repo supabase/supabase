@@ -12,6 +12,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
 import { LastSignInWrapper } from './LastSignInWrapper'
+import { resolveCaptchaToken } from './SignIn.utils'
 import { useLastSignIn } from '@/hooks/misc/useLastSignIn'
 import { BASE_PATH } from '@/lib/constants'
 import { captureCriticalError } from '@/lib/error-reporting'
@@ -44,19 +45,9 @@ export const SignInSSOForm = () => {
 
     let token = captchaToken
     if (!token) {
-      try {
-        const captchaResponse = await captchaRef.current?.execute({ async: true })
-        token = captchaResponse?.response ?? null
-      } catch {
-        toast.error('Could not complete the security check. Please try again.', { id: toastId })
-        trackFunnelError(
-          'signin',
-          { errorCategory: 'validation', errorReason: 'captcha_failed' },
-          'toast',
-          toastId
-        )
-        return
-      }
+      const captcha = await resolveCaptchaToken(captchaRef, trackFunnelError, toastId)
+      if (!captcha.ok) return
+      token = captcha.token
     }
 
     // redirects to /sign-in to check if the user has MFA setup (handled in SignInLayout.tsx)

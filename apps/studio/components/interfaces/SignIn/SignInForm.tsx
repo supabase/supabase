@@ -14,6 +14,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
 import { LastSignInWrapper } from './LastSignInWrapper'
+import { resolveCaptchaToken } from './SignIn.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { useAddLoginEvent } from '@/data/misc/audit-login-mutation'
 import { getMfaAuthenticatorAssuranceLevel } from '@/data/profile/mfa-authenticator-assurance-level-query'
@@ -67,19 +68,9 @@ export const SignInForm = () => {
 
     let token = captchaToken
     if (!token) {
-      try {
-        const captchaResponse = await captchaRef.current?.execute({ async: true })
-        token = captchaResponse?.response ?? null
-      } catch {
-        toast.error('Could not complete the security check. Please try again.', { id: toastId })
-        trackFunnelError(
-          'signin',
-          { errorCategory: 'validation', errorReason: 'captcha_failed' },
-          'toast',
-          toastId
-        )
-        return
-      }
+      const captcha = await resolveCaptchaToken(captchaRef, trackFunnelError, toastId)
+      if (!captcha.ok) return
+      token = captcha.token
     }
 
     const { error } = await auth.signInWithPassword({
