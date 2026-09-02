@@ -123,7 +123,10 @@ write it down.
 
 - [`pm-the-docs`](../pm-the-docs/SKILL.md) — audience, stage, and
   cross-cutting scope calls (Frame stage of the "Write the docs" checklist,
-  mirrored in `pm-the-docs`'s reference file).
+  mirrored in `pm-the-docs`'s reference file). Cross-repo **product** lookup
+  (universe) lives there, not in this skill.
+- [`test-the-docs`](../test-the-docs/SKILL.md) — execute docs snippets against a
+  Docker-isolated local stack; Verification table.
 - [`work-linear-issue`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/work-linear-issue/SKILL.md) — implementing
   assigned DOCS-\* tickets.
 - [`review-the-docs`](../review-the-docs/SKILL.md) — reviewing open docs

@@ -69,7 +69,8 @@ pnpm build:reference-markdown   # when reference pipeline changed
 ```
 
 4. Spot-check frontmatter, internal links, and nav wiring for content changes.
-5. Write a short **self-review note** (blockers vs nits) suitable to paste into the future PR body under a "Self-review" heading.
+5. **Runnable verification** — for content/tutorial PRs with new or changed procedural fenced blocks, run or confirm [`test-the-docs`](../test-the-docs/SKILL.md) and include the Verification table (or credible `deferred` reasons). Do not reimplement sandbox execution here.
+6. Write a short **self-review note** (blockers vs nits) suitable to paste into the future PR body under a "Self-review" heading.
 
 Then open the PR and continue with open-PR review if a second pass is needed.
 
@@ -216,6 +217,7 @@ Checklist:
 - [ ] `$CodeSample` paths match existing example directories
 - [ ] Admonitions, tabs, and partial includes render sensibly in PR preview
 - [ ] No accidental whitespace-only or empty sections where components were removed
+- [ ] Verification table present for new/changed procedural snippets (or credible `deferred` reasons) — see [`test-the-docs`](../test-the-docs/SKILL.md)
 
 Compare PR preview URL (from Vercel/deployment comment) against production for visual regressions when layout components are involved.
 
