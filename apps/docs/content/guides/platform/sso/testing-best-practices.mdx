@@ -54,13 +54,13 @@ SP-initiated sign-in requires domain configuration. Only test this if you've ena
 
 <Admonition type="note">
 
-If you haven't configured domains or have "Enable SP-initiated sign-in" disabled, skip this test. SP-initiated will not work without domain configuration.
+If you haven't configured domains or have "Enable SP-initiated login" disabled, skip this test. SP-initiated will not work without domain configuration.
 
 </Admonition>
 
 **Prerequisites:**
 
-- "Enable SP-initiated sign-in" toggle is **ON**
+- "Enable SP-initiated login" toggle is **ON**
 - At least one email domain configured
 
 **Test procedure:**
@@ -98,7 +98,7 @@ This is a critical test for domainless providers, which enable multiple SAML app
 
 You've configured SSO with:
 
-- "Enable SP-initiated sign-in" **OFF** (or no domains configured)
+- "Enable SP-initiated login" **OFF** (or no domains configured)
 - IdP metadata configured
 - Attribute mappings configured
 
@@ -286,7 +286,7 @@ Test with 2-3 additional users to verify:
 3. **Test SSO mismatch scenario**:
    - Create an SSO-required invitation
    - Have recipient try to accept while signed in with a non-SSO account
-   - Error should display: "Invite token SSO provider does not match the one you are signed in with"
+   - Error should display: "Invite token SSO provider does not match the one you are logged in with"
    - Recipient should sign out and sign in via SSO
    - Can then successfully accept the invitation
 

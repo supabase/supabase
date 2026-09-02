@@ -52,11 +52,11 @@ functions:
           - name: persist_session
             isOptional: true
             type: bool
-            description: Whether to persist a signed in session to storage.
+            description: Whether to persist a signed-in session to storage.
           - name: storage
             isOptional: true
             type: SyncSupportedStorage
-            description: A storage provider. Used to store the signed in session.
+            description: A storage provider. Used to store the signed-in session.
           - name: realtime
             isOptional: true
             type: string

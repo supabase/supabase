@@ -471,7 +471,7 @@ Use _use_ or a more specific verb. The linter warns about _leverage_.
 
 Write _lifecycle_, not _life cycle_ or _life-cycle_.
 
-### sign in, sign-in, sign out, and sign-up
+### sign in, sign-in, sign out, sign-out, sign up, and sign-up
 
 Use _sign in_, _sign out_, and _sign up_ as verbs. Use _sign-in_, _sign-out_, and
 _sign-up_ as nouns or adjectives, including in hyphenated compounds such as

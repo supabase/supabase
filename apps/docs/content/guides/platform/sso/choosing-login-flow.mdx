@@ -60,7 +60,7 @@ Do users need to start login at supabase.com?
    - "Supabase Production" → Points to prod org ACS URL
 2. In each Supabase organization:
    - Enable SSO
-   - Leave "Enable SP-initiated sign-in" **OFF**
+   - Leave "Enable SP-initiated login" **OFF**
    - Configure metadata from corresponding IdP app
 3. Users access each environment via IdP tiles
 
@@ -88,7 +88,7 @@ Do users need to start login at supabase.com?
 **How to configure:**
 
 1. Enable SSO in your Supabase organization
-2. Leave "Enable SP-initiated sign-in" **OFF**
+2. Leave "Enable SP-initiated login" **OFF**
 3. Configure identity provider metadata
 4. Create Supabase app tile in your IdP
 
@@ -115,7 +115,7 @@ Do users need to start login at supabase.com?
 **How to configure:**
 
 1. Enable SSO in your Supabase organization
-2. Toggle "Enable SP-initiated sign-in" **ON**
+2. Toggle "Enable SP-initiated login" **ON**
 3. Add your email domain(s) (e.g., `company.com`)
 4. Configure identity provider metadata
 5. Create Supabase app tile in your IdP (optional but recommended)
@@ -143,7 +143,7 @@ Do users need to start login at supabase.com?
 **How to configure:**
 
 1. Ensure at least one non-SSO owner account exists
-2. Enable SSO and toggle "Enable SP-initiated sign-in" **ON**
+2. Enable SSO and toggle "Enable SP-initiated login" **ON**
 3. Add email domain(s)
 4. Start with auto-join **disabled**
 5. Test with small group
@@ -178,7 +178,7 @@ Do users need to start login at supabase.com?
 **How to configure:**
 
 1. Enable SSO in your Supabase organization
-2. Toggle "Enable SP-initiated sign-in" **ON**
+2. Toggle "Enable SP-initiated login" **ON**
 3. Add all domains: `parent.com`, `sub1.com`, `sub2.com`
 4. Configure identity provider to accept all domains
 5. Create Supabase app tiles in IdP (IdP-initiated also works)
@@ -282,14 +282,14 @@ You can safely change sign-in flow configuration at any time:
 
 ### Adding SP-initiated to IdP-only
 
-- Toggle "Enable SP-initiated sign-in" ON
+- Toggle "Enable SP-initiated login" ON
 - Add required domains
 - Test with existing users
 - No disruption to IdP-initiated flow
 
 ### Removing SP-initiated
 
-- Toggle "Enable SP-initiated sign-in" OFF
+- Toggle "Enable SP-initiated login" OFF
 - Domains are preserved (can re-enable later)
 - IdP-initiated continues working
 - Users who bookmarked supabase.com need to use IdP tiles instead
