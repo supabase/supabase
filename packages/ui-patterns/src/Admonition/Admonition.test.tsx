@@ -138,8 +138,7 @@ describe('Admonition', () => {
     const description = within(note).getByText('Body copy.')
 
     expect(description.tagName).toBe('P')
-    expect(description.parentElement).toHaveClass('!mb-0')
-    expect(description.parentElement?.parentElement).toHaveClass('my-0.5')
+    expect(description.parentElement).toHaveClass('mb-0')
   })
 
   it('wraps MDX children in AlertDescription', () => {
@@ -153,26 +152,21 @@ describe('Admonition', () => {
     const paragraph = within(note).getByText('Children body copy.')
 
     expect(paragraph.tagName).toBe('P')
-    expect(paragraph.parentElement).toHaveClass('text-sm', '!mb-0')
+    expect(paragraph.parentElement).toHaveClass('mb-0')
     expect(paragraph.parentElement).toHaveAttribute('data-slot', 'alert-description')
-    expect(paragraph.parentElement?.parentElement).not.toHaveClass('my-0.5')
   })
 
-  it('does not offset titled content', () => {
-    render(<Admonition type="note" title="Manual approval required" description="Body copy." />)
+  it('only offsets content when there is an icon to align against', () => {
+    const { rerender } = render(<Admonition type="note" description="Body copy." />)
 
-    const note = screen.getByRole('alert', { name: 'Note' })
-    const title = within(note).getByText('Manual approval required')
+    const wrapper = () =>
+      screen.getByRole('alert', { name: 'Note' }).querySelector('[data-slot="alert-description"]')
+        ?.parentElement
 
-    expect(title.parentElement).not.toHaveClass('my-0.5')
-  })
+    expect(wrapper()?.className).not.toBe('')
 
-  it('does not offset titleless content when the icon is hidden', () => {
-    render(<Admonition type="note" showIcon={false} description="Body copy." />)
+    rerender(<Admonition type="note" showIcon={false} description="Body copy." />)
 
-    const note = screen.getByRole('alert', { name: 'Note' })
-    const description = within(note).getByText('Body copy.')
-
-    expect(description.parentElement?.parentElement).not.toHaveClass('my-0.5')
+    expect(wrapper()?.className).toBe('')
   })
 })
