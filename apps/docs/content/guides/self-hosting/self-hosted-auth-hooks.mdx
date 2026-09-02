@@ -18,7 +18,7 @@ You need:
 
 ## How hooks work
 
-The Auth service (GoTrue) can call a **hook** at specific lifecycle events during the auth flow. Each hook can be configured with the following environment variables:
+Supabase Auth can call a **hook** at specific lifecycle events during the auth flow. Each hook can be configured with the following environment variables:
 
 - `GOTRUE_HOOK_{HOOK_NAME}_ENABLED`: Enable the hook (`true`/`false`)
 - `GOTRUE_HOOK_{HOOK_NAME}_URI`: The hook endpoint
@@ -42,7 +42,7 @@ Hooks support two URI schemes:
 | `pg-functions://`       | `pg-functions://postgres/<schema>/<function_name>` |
 | `http://` or `https://` | `https://example.com/hook`                         |
 
-<Admonition type="tip">
+<Admonition type="note">
 
 Postgres function hooks run inside your database - no network overhead, no secrets required.
 
@@ -60,7 +60,7 @@ This example enables the **Custom Access Token** hook using a Postgres function 
 
 ### Step 1: Create the Postgres function
 
-You can execute the following SQL from the Supabase dashboard SQL editor, or by connecting to your database using a PostgreSQL client such as psql.
+You can execute the following SQL from the Supabase Dashboard SQL Editor, or by connecting to your database using a Postgres client such as psql.
 
 ```sql name=custom_access_token_hook.sql
 create or replace function public.custom_access_token_hook(event jsonb)
@@ -108,6 +108,7 @@ Update the `auth` service `environment:` block:
 services:
   auth:
     environment:
+      # ... existing variables ...
       GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_ENABLED: 'true' # 👈 enabling the hook is required
       GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_URI: 'pg-functions://postgres/public/custom_access_token_hook'
 ```
@@ -193,6 +194,7 @@ Add the following environment variables to the auth and functions services. For 
 services:
   auth:
     environment:
+      # ... existing variables ...
       GOTRUE_HOOK_SEND_SMS_ENABLED: 'true'
       GOTRUE_HOOK_SEND_SMS_URI: ${SEND_SMS_HOOK_URI}
       GOTRUE_HOOK_SEND_SMS_SECRETS: ${SEND_SMS_HOOK_SECRET}
@@ -201,6 +203,7 @@ services:
 
   functions:
     environment:
+      # ... existing variables ...
       SEND_SMS_HOOK_SECRET: ${SEND_SMS_HOOK_SECRET}
 ```
 
@@ -234,7 +237,6 @@ echo "v1,whsec_$(openssl rand -base64 32)"
 ### Secret format
 
 - **Symmetric**: `v1,whsec_[base64]{32-88 characters}`
-- **Asymmetric**: `v1a,whpk_[base64]:v1a,whsk_[base64]`
 
 ### Key rotation
 
@@ -248,12 +250,13 @@ SEND_EMAIL_HOOK_SECRET=v1,whsec_new-secret|v1,whsec_old-secret
 services:
   auth:
     environment:
+      # ... existing variables ...
       GOTRUE_HOOK_SEND_EMAIL_ENABLED: 'true'
       GOTRUE_HOOK_SEND_EMAIL_URI: 'https://example.com'
       GOTRUE_HOOK_SEND_EMAIL_SECRETS: ${SEND_EMAIL_HOOK_SECRET}
 ```
 
-The Auth service tries each secret in order. Once all clients are using the new secret, remove the old one.
+The Auth service signs each request with all configured secrets, so receivers can verify against either. Once all clients accept the new secret, remove the old one.
 
 <Admonition type="note">
 
@@ -273,8 +276,8 @@ Postgres function hooks (`pg-functions://` URIs) do not require secrets - they r
 
 The URI format must be exactly `pg-functions://postgres/<schema>/<function_name>`:
 
-- The host must be `postgres`
-- Schema and function name must be valid PostgreSQL identifiers
+- Use `postgres` as the host by convention. The host segment is not validated.
+- Schema and function name must be valid Postgres identifiers
 - The function must exist and be granted to `supabase_auth_admin`
 
 ### HTTP hook returns errors
@@ -307,6 +310,6 @@ grant execute on function public.your_hook_function
   to supabase_auth_admin;
 ```
 
-### SMS OTP expires too quickly
+### SMS OTP expiry is too short
 
 Refer to [OTP Settings Docs](/docs/guides/self-hosting/self-hosted-phone-mfa#otp-settings)
