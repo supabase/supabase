@@ -1,17 +1,9 @@
 import { useParams } from 'common'
-import { Minus } from 'lucide-react'
-import Link from 'next/link'
+import { ChevronRight, Minus } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import {
-  Button,
-  TableCell,
-  TableRow,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  WarningIcon,
-} from 'ui'
+import { TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger, WarningIcon } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DeleteDestination } from './DeleteDestination'
@@ -23,6 +15,7 @@ import { RowMenu } from './RowMenu'
 import { UpdateVersionModal } from './UpdateVersionModal'
 import { useDestinationInformation } from './useDestinationInformation'
 import { AlertError } from '@/components/ui/AlertError'
+import { createNavigationHandler } from '@/lib/navigation'
 import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
 import { useReplicationPipelineReplicationStatusQuery } from '@/data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
@@ -39,6 +32,7 @@ interface DestinationRowProps {
 }
 
 export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
+  const router = useRouter()
   const { ref: projectRef } = useParams()
   const [showDeleteDestinationForm, setShowDeleteDestinationForm] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -106,6 +100,11 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
   })
   const hasUpdate = Boolean(versionData?.new_version)
 
+  const handleNavigation = createNavigationHandler(
+    `/project/${projectRef}/database/replication/${pipeline?.id}`,
+    router
+  )
+
   const onDeleteClick = async () => {
     if (!projectRef) {
       return console.error('Project ref is required')
@@ -148,7 +147,13 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
         </TableRow>
       )}
       {isPipelineSuccess && (
-        <TableRow>
+        <TableRow
+          className="relative cursor-pointer focus-inset"
+          onClick={handleNavigation}
+          onAuxClick={handleNavigation}
+          onKeyDown={handleNavigation}
+          tabIndex={0}
+        >
           <TableCell>
             {type ? (
               <DestinationIcon type={type} size={18} className="text-foreground-light" />
@@ -222,21 +227,27 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
                   </TooltipContent>
                 </Tooltip>
               )}
-              <Button asChild variant="default" className="relative">
-                <Link href={`/project/${projectRef}/database/replication/${pipeline?.id}`}>
-                  View pipeline
-                </Link>
-              </Button>
-              <RowMenu
-                destinationId={destinationId}
-                pipeline={pipeline}
-                pipelineStatus={pipelineStatus?.status}
-                error={pipelineStatusError}
-                isLoading={isPipelineStatusLoading}
-                isError={isPipelineStatusError}
-                onDeleteClick={() => setShowDeleteDestinationForm(true)}
-                hasUpdate={hasUpdate}
-                onUpdateClick={() => setShowUpdateVersionModal(true)}
+              <div
+                onClick={(event) => event.stopPropagation()}
+                onKeyDown={(event) => event.stopPropagation()}
+              >
+                <RowMenu
+                  destinationId={destinationId}
+                  pipeline={pipeline}
+                  pipelineStatus={pipelineStatus?.status}
+                  error={pipelineStatusError}
+                  isLoading={isPipelineStatusLoading}
+                  isError={isPipelineStatusError}
+                  onDeleteClick={() => setShowDeleteDestinationForm(true)}
+                  hasUpdate={hasUpdate}
+                  onUpdateClick={() => setShowUpdateVersionModal(true)}
+                />
+              </div>
+              <ChevronRight
+                size={16}
+                strokeWidth={1.5}
+                className="text-foreground-lighter"
+                aria-hidden
               />
             </div>
           </TableCell>

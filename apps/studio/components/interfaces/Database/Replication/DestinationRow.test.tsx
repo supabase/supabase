@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
@@ -7,6 +8,7 @@ import { describe, expect, test, vi } from 'vitest'
 import { DestinationRow } from './DestinationRow'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+import { routerMock } from '@/tests/lib/route-mock'
 
 type ReplicationPipelinesResponse = components['schemas']['ReplicationPipelinesResponse']
 type ReplicationDestinationResponse = components['schemas']['ReplicationDestinationResponse']
@@ -149,6 +151,40 @@ const addVersionMock = () =>
   })
 
 describe('DestinationRow', () => {
+  const addAllMocks = () => {
+    addSourcesMock()
+    addDestinationMock()
+    addPipelinesMock()
+    addPipelineStatusMock('started')
+    addReplicationStatusMock(0)
+    addVersionMock()
+  }
+
+  test('navigates to the pipeline when the row is clicked', async () => {
+    addAllMocks()
+    routerMock.setCurrentUrl('/project/default/database/replication')
+
+    customRender(<DestinationRow destinationId={DESTINATION_ID} />)
+
+    const row = (await screen.findByText('supabase_realtime')).closest('tr')
+    expect(row).not.toBeNull()
+    await userEvent.click(row!)
+
+    expect(routerMock.asPath).toBe(`/project/default/database/replication/${PIPELINE_ID}`)
+  })
+
+  test('does not navigate when the row overflow menu is opened', async () => {
+    addAllMocks()
+    routerMock.setCurrentUrl('/project/default/database/replication')
+
+    customRender(<DestinationRow destinationId={DESTINATION_ID} />)
+
+    await screen.findByText('supabase_realtime')
+    await userEvent.click(screen.getByRole('button', { name: 'Destination options' }))
+
+    expect(routerMock.asPath).toBe('/project/default/database/replication')
+  })
+
   test('shows "Caught up" when confirmed_flush_lsn_bytes is 0', async () => {
     addSourcesMock()
     addDestinationMock()
