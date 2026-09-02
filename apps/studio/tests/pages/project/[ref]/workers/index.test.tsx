@@ -91,7 +91,7 @@ describe('/project/[ref]/workers', () => {
   })
 
   it('refreshes the workers list on request', async () => {
-    const responses = [[], [workerDatum('embed')]]
+    const responses = [[workerDatum('existing')], [workerDatum('embed')]]
     let requestCount = 0
     addAPIMock({
       method: 'get',
@@ -125,5 +125,23 @@ describe('/project/[ref]/workers', () => {
       screen.getByText("You need additional permissions to view this project's workers")
     ).toBeVisible()
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
+  })
+
+  it('allows retrying an unexpected error', async () => {
+    let requestCount = 0
+    addAPIMock({
+      method: 'get',
+      path: '/v2/projects/:ref/workers',
+      response: () =>
+        requestCount++ === 0
+          ? HttpResponse.json<APIErrorBody>({ message: 'Unavailable' }, { status: 500 })
+          : HttpResponse.json({ data: [workerDatum('embed')] }),
+    })
+
+    await renderWorkersPage()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh' }))
+
+    expect(await screen.findByRole('link', { name: 'embed' })).toBeVisible()
   })
 })
