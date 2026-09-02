@@ -8,4 +8,4 @@
 services:
   rustfs:
     ports:
-      - "${S3_BACKEND_TEST_PORT:-9100}:9000"
+      - "${S3_BACKEND_TEST_PORT:-9000}:9000"
