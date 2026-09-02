@@ -361,10 +361,10 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                     </div>
                   </div>
                 ) : (
-                  <ContentWrapper>
+                  <>
                     <ResourceExhaustionWarningBanner />
-                    {children}
-                  </ContentWrapper>
+                    <ContentWrapper>{children}</ContentWrapper>
+                  </>
                 )}
               </main>
             </ResizablePanel>

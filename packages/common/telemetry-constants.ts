@@ -3572,6 +3572,20 @@ export interface ResourceExhaustionBannerUpgradeClickedEvent {
 }
 
 /**
+ * User clicked "Restart database" on a resource exhaustion warning banner.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ResourceExhaustionBannerRestartClickedEvent {
+  action: 'resource_exhaustion_banner_restart_clicked'
+  groups: TelemetryGroups
+  properties: {
+    warningTypes: string[]
+  }
+}
+
+/**
  * User clicked "Ask AI Assistant" on a resource exhaustion warning banner.
  *
  * @group Events
@@ -3982,6 +3996,7 @@ export type TelemetryEvent =
   | AccessTokenCreatedEvent
   | AccessTokenRemovedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent
+  | ResourceExhaustionBannerRestartClickedEvent
   | ResourceExhaustionBannerAiAssistantClickedEvent
   | UnifiedLogsRowClickedEvent
   | HeaderHomeLogoClickedEvent
