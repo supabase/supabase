@@ -281,10 +281,6 @@ pre[class*='language-'] {
   }
 }
 
-.admonition-content > p {
-  @apply m-0;
-}
-
 /* format <code> inside <p> */
 h2 code,
 h3 code,
@@ -299,13 +295,6 @@ h4 code {
   &::after {
     display: none;
   }
-}
-
-/* code inside admonitions */
-.admonition-content p code {
-  @apply bg-control;
-  word-break: keep-all !important;
-  white-space: nowrap !important;
 }
 
 article p strong {
