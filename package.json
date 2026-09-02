@@ -30,6 +30,7 @@
     "test:docs": "turbo run test --filter=docs",
     "test:ui": "turbo run test --filter=ui",
     "test:ui-patterns": "turbo run test --filter=ui-patterns",
+    "test:marketing": "turbo run test --filter=marketing",
     "test:studio": "turbo run test --filter=studio",
     "test:studio:watch": "turbo run test --filter=studio -- watch",
     "e2e:setup:cli": "supabase stop --all --no-backup --workdir ./e2e/studio; supabase start --exclude studio,mailpit --workdir ./e2e/studio && supabase status --output json --workdir ./e2e/studio > keys.json && node scripts/generateLocalEnv.js",
