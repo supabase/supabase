@@ -1346,7 +1346,7 @@ commands:
   - id: supabase-orgs-list
     title: supabase orgs list
     summary: List all organizations
-    description: List all organizations the signed-in user belongs.
+    description: List all organizations the signed-in user belongs to.
     tags: []
     links: []
     usage: supabase orgs list

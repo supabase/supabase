@@ -130,7 +130,7 @@ meta="name=lib/supabase/proxy.ts"
 
 #### Sign-in and sign-up form
 
-To add sign-in/sign-up page for your application, create a new folder named `login`, containing a `page.tsx` file with the following code for a sign-in/signup form:
+To add sign-in/sign-up page for your application, create a new folder named `login`, containing a `page.tsx` file with the following code for a sign-in/sign-up form:
 
 <$CodeTabs>
 
@@ -145,10 +145,10 @@ meta="name=app/login/page.tsx"
 Create the sign-in/sign-up actions to hook up the form to the function which does the following:
 
 - Retrieve the user's information.
-- Send that information to Supabase as a signup request, which in turns sends a confirmation email. It uses [Magic Links](/docs/guides/auth/auth-email-passwordless#with-magic-link), so users can sign in with their email without using passwords.
+- Send that information to Supabase as a sign-up request, which in turns sends a confirmation email. It uses [Magic Links](/docs/guides/auth/auth-email-passwordless#with-magic-link), so users can sign in with their email without using passwords.
 - Handle any error that arises.
 
-Create the `action.ts` file in the `app/login` folder, which contains the sign-in and sign-up functions and the `error/page.tsx` file, which displays an error message if the sign-in or signup fails.
+Create the `actions.ts` file in the `app/login` folder, which contains the sign-in and sign-up functions and the `error/page.tsx` file, which displays an error message if the sign-in or sign-up fails.
 
 <$CodeTabs>
 
