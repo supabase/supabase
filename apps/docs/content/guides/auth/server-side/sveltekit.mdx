@@ -1,0 +1,222 @@
+---
+title: "SvelteKit OAuth Example"
+description: "How to use Supabase OAuth with SvelteKit"
+---
+
+# SvelteKit OAuth Example
+
+This guide shows how to use Supabase Auth with OAuth providers (Google, GitHub, etc.) inside a SvelteKit application.  
+You will learn how to configure OAuth in Supabase, handle redirects, manage sessions, and build a working login/logout flow.
+
+---
+
+## Prerequisites
+
+- A Supabase project  
+- An OAuth provider enabled (Google, GitHub, etc.)
+- Node.js 18+  
+- Basic understanding of SvelteKit
+
+---
+
+## 1. Create a SvelteKit Project
+
+```bash
+npm create svelte@latest supabase-oauth-example
+cd supabase-oauth-example
+npm install
+```
+
+---
+
+## 2. Install Supabase Client
+
+```bash
+npm install @supabase/supabase-js
+```
+
+---
+
+## 3. Add Environment Variables
+
+Create a `.env` file:
+
+```
+PUBLIC_SUPABASE_URL=your-project-url
+PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
+
+Retrieve these from:  
+**Supabase Dashboard → Project Settings → API**
+
+---
+
+## 4. Configure OAuth Provider
+
+Open:
+
+**Authentication → Providers**
+
+Enable Google/GitHub and set the redirect URL:
+
+```
+http://localhost:5173/auth/callback
+```
+
+---
+
+## 5. Create Supabase Client
+
+Create the file:
+
+```
+src/lib/supabaseClient.js
+```
+
+```js
+import { createClient } from '@supabase/supabase-js';
+
+export const supabase = createClient(
+  import.meta.env.PUBLIC_SUPABASE_URL,
+  import.meta.env.PUBLIC_SUPABASE_ANON_KEY
+);
+```
+
+---
+
+## 6. Login Page
+
+Create:
+
+```
+src/routes/login/+page.svelte
+```
+
+```svelte
+<script>
+  import { supabase } from '$lib/supabaseClient';
+
+  async function loginWithGoogle() {
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: 'http://localhost:5173/auth/callback' }
+    });
+  }
+</script>
+
+<button on:click={loginWithGoogle}>Login with Google</button>
+```
+
+---
+
+## 7. OAuth Callback Route
+
+Create:
+
+```
+src/routes/auth/callback/+page.server.js
+```
+
+```js
+import { supabase } from '$lib/supabaseClient';
+
+export async function load({ url }) {
+  const code = url.searchParams.get('code');
+
+  if (code) {
+    await supabase.auth.exchangeCodeForSession(code);
+  }
+
+  return { success: true };
+}
+```
+
+---
+
+## 8. Display Session
+
+Create:
+
+```
+src/routes/+layout.svelte
+```
+
+```svelte
+<script>
+  import { supabase } from '$lib/supabaseClient';
+  import { onMount } from 'svelte';
+  let user = null;
+
+  onMount(async () => {
+    const { data } = await supabase.auth.getUser();
+    user = data?.user || null;
+  });
+
+  async function logout() {
+    await supabase.auth.signOut();
+    user = null;
+  }
+</script>
+
+{#if user}
+  <p>Logged in as {user.email}</p>
+  <button on:click={logout}>Logout</button>
+{/if}
+
+<slot />
+```
+
+---
+
+## 9. Route Protection (Optional)
+
+```
+src/hooks.server.js
+```
+
+```js
+import { supabase } from '$lib/supabaseClient';
+
+export async function handle({ event, resolve }) {
+  const { data } = await supabase.auth.getUser();
+
+  if (!data?.user && event.url.pathname.startsWith('/dashboard')) {
+    return Response.redirect('/', 303);
+  }
+
+  return resolve(event);
+}
+```
+
+---
+
+## 10. Run the Example
+
+```bash
+npm run dev
+```
+
+Visit:
+
+```
+http://localhost:5173
+```
+
+You can now test OAuth login, callback redirects, and session handling.
+
+---
+
+## Summary
+
+This example covered:
+
+- SvelteKit setup  
+- Supabase client configuration  
+- OAuth provider setup  
+- Login flow  
+- Redirect callback  
+- Session management  
+- Logout  
+- Optional route protection  
+
+You now have a complete OAuth flow working in SvelteKit using Supabase Auth.
