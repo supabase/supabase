@@ -296,7 +296,7 @@ You are affected only if you call pgcrypto PGP functions with `cipher-algo=bf`, 
 
 </Admonition>
 
-This release fixes [CVE-2026-14663](https://www.postgresql.org/support/security/CVE-2026-14663/): when a requested PGP cipher is disabled in the server's OpenSSL build, pgcrypto silently stored data effectively unencrypted, and decryption succeeds even with the wrong key. After upgrading, decrypting such messages fails by default, and encrypting with those ciphers returns an error instead of storing unprotected data.
+This release fixes [CVE-2026-14663](https://www.postgresql.org/support/security/CVE-2026-14663/): when a requested PGP cipher is disabled in the server's OpenSSL build, pgcrypto silently stored data without effective encryption, and decryption succeeds even with the wrong key. After upgrading, decrypting such messages fails by default, and encrypting with those ciphers returns an error instead of storing unprotected data.
 
 To check whether stored data is affected, decrypt one value with a deliberately wrong passphrase:
 
