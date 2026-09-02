@@ -161,6 +161,6 @@ If you need more control over the sending process, instead of using a SMTP serve
 
 **Increase the duration of user sessions.**
 
-Having short-lived [user sessions](/docs/guides/auth/sessions) can be problematic for email sending, as it forces active users to sign in frequently, increasing the number of messages needed to be sent. Consider increasing the maximum duration of user sessions. If you do see an unnecessary increase in logins without a clear cause, check your frontend application for bugs.
+Having short-lived [user sessions](/docs/guides/auth/sessions) can be problematic for email sending, as it forces active users to sign in frequently, increasing the number of messages needed to be sent. Consider increasing the maximum duration of user sessions. If you do see an unnecessary increase in sign-ins without a clear cause, check your frontend application for bugs.
 
 If you are using a [SSR](/docs/guides/auth/server-side) framework on the frontend and are seeing an increased number of user sign-ins without a clear cause, check your set up. Make sure to keep the `@supabase/ssr` package up to date and closely follow the guides we publish. Make sure that the middleware components of your SSR frontend works as intended and matches the guides we've published. Sometimes a misplaced `return` or conditional can cause early session termination.
