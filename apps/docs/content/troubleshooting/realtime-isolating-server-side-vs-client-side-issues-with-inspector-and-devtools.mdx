@@ -56,9 +56,9 @@ If the configuration and package versions are correct but events still do not ar
 
 Use the captured messages to determine what happened, then act accordingly:
 
-- Channel joined, but the server never sent the event - the subscription doesn't match what was tested in Step 1. Recheck it against Step 2.
-- Server sent the event, but the application didn't process it - the issue is in the client-side handler, not the subscription config. Check for a thrown error or rejected promise inside the callback that could be silently swallowing it.
-- WebSocket connection didn't complete at all - continue to Step 4.
+- Channel joined, but the server never sent the event — the subscription doesn't match what was tested in Step 1. Recheck it against Step 2.
+- Server sent the event, but the application didn't process it — the issue is in the client-side handler, not the subscription config. Check for a thrown error or rejected promise inside the callback that could be silently swallowing it.
+- WebSocket connection didn't complete at all — continue to Step 4.
 
 #### Step 4: Check the network path
 
