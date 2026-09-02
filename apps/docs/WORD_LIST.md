@@ -471,13 +471,22 @@ Use _use_ or a more specific verb. The linter warns about _leverage_.
 
 Write _lifecycle_, not _life cycle_ or _life-cycle_.
 
-### login and log in
+### sign in, sign-in, sign out, and sign-up
 
-Use _login_ as a noun or adjective and _log in_ as a verb. Follow the terminology
-in the product UI when it uses _sign in_.
+Use _sign in_, _sign out_, and _sign up_ as verbs. Use _sign-in_, _sign-out_, and
+_sign-up_ as nouns or adjectives, including in hyphenated compounds such as
+_sign-in page_ or _sign-up flow_.
 
-- Recommended: Open the login page, and then log in.
+Match Supabase product UI labels, which use **Sign in**, **Sign out**, and
+**Sign up** in buttons and menus.
+
+- Recommended: Open the sign-in page, and then sign in.
+- Recommended: Select **Sign out** from the account menu.
 - Not recommended: Login to the Dashboard.
+- Not recommended: Log in to your project.
+
+Keep _login_ and _log in_ only when quoting third-party UI, CLI commands such as
+`supabase login`, or code identifiers.
 
 ## M
 
