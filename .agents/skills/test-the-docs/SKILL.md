@@ -88,4 +88,3 @@ Write a Verification table per [reference/verification-report.md](reference/veri
 - [`write-the-docs`](../write-the-docs/SKILL.md) — Draft; hands off here before PR
 - [`review-the-docs`](../review-the-docs/SKILL.md) — lint/build/classify; consumes Verification table
 - [`pm-the-docs`](../pm-the-docs/SKILL.md) — Frame/Shape; universe for cross-repo product lookup
-- [`proof-it-works`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/proof-it-works/SKILL.md) — optional evidence capture after a successful run
