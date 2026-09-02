@@ -31,8 +31,13 @@ vi.mock('@/hooks/misc/useCheckPermissions', () => ({
   useAsyncCheckPermissions: () => ({ can: true, isSuccess: true }),
 }))
 
+const mockFeatureFlags = vi.hoisted(() => ({
+  organizationMembersCreate: true,
+}))
 vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
-  useIsFeatureEnabled: () => ({ organizationMembersCreate: true }),
+  useIsFeatureEnabled: () => ({
+    organizationMembersCreate: mockFeatureFlags.organizationMembersCreate,
+  }),
 }))
 
 vi.mock('@/data/organizations/organization-members-query', () => ({
@@ -76,9 +81,12 @@ vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
   useCheckEntitlements: () => ({ hasAccess: false }),
 }))
 
+const mockRolesManagementPermissions = vi.hoisted(() => ({
+  rolesAddable: [1, 2, 3, 4] as number[],
+}))
 vi.mock('@/components/interfaces/Organization/TeamSettings/TeamSettings.utils', () => ({
   useGetRolesManagementPermissions: () => ({
-    rolesAddable: [1, 2, 3, 4],
+    rolesAddable: mockRolesManagementPermissions.rolesAddable,
     rolesRemovable: [1, 2, 3, 4],
   }),
 }))
@@ -120,11 +128,51 @@ describe('InviteMemberButton', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockInvite.mockResolvedValue({ succeeded: [], failed: [] })
+    mockRolesManagementPermissions.rolesAddable = [1, 2, 3, 4]
+    mockFeatureFlags.organizationMembersCreate = true
   })
 
   it('renders an enabled Invite members button', () => {
     customRender(<InviteMemberButton />)
     expect(screen.getByRole('button', { name: /invite members/i })).toBeEnabled()
+  })
+
+  it('shows the keyboard shortcut tooltip when inviting members is allowed', async () => {
+    customRender(<InviteMemberButton />)
+
+    await userEvent.hover(screen.getByRole('button', { name: /invite members/i }))
+
+    const shortcutTooltip = await screen.findByRole('tooltip')
+    expect(shortcutTooltip).toHaveTextContent('Invite members')
+    expect(shortcutTooltip).toHaveTextContent('⇧')
+  })
+
+  it('only shows the permission tooltip when inviting members is not allowed', async () => {
+    mockRolesManagementPermissions.rolesAddable = []
+    customRender(<InviteMemberButton />)
+
+    const inviteButton = screen.getByRole('button', { name: /invite members/i })
+    expect(inviteButton).toBeDisabled()
+
+    await userEvent.hover(inviteButton)
+
+    const permissionTooltip = await screen.findByRole('tooltip')
+    expect(permissionTooltip).toHaveTextContent(
+      'You need additional permissions to invite members to this organization'
+    )
+    expect(permissionTooltip).not.toHaveTextContent('⇧')
+    expect(screen.getAllByText('Invite members')).toHaveLength(1)
+  })
+
+  it('only shows the disabled tooltip when member invitations are turned off', async () => {
+    mockFeatureFlags.organizationMembersCreate = false
+    customRender(<InviteMemberButton />)
+
+    await userEvent.hover(screen.getByRole('button', { name: /invite members/i }))
+
+    const disabledTooltip = await screen.findByRole('tooltip')
+    expect(disabledTooltip).toHaveTextContent('Inviting members is currently disabled')
+    expect(disabledTooltip).not.toHaveTextContent('⇧')
   })
 
   it('opens the invite dialog when the button is clicked', async () => {

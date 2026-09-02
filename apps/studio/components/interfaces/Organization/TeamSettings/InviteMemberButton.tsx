@@ -50,6 +50,7 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useOrganizationCreateInvitationMutation } from '@/data/organization-members/organization-invitation-create-mutation'
 import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
@@ -65,6 +66,7 @@ import { DOCS_URL } from '@/lib/constants'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { useProfile } from '@/lib/profile'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const InviteMemberButton = () => {
   const { slug } = useParams()
@@ -122,6 +124,18 @@ export const InviteMemberButton = () => {
         organization?.slug
       )
     )
+
+  let inviteButtonTooltipText: string | undefined
+  if (!organizationMembersCreationEnabled) {
+    inviteButtonTooltipText = 'Inviting members is currently disabled'
+  } else if (!canInviteMembers) {
+    inviteButtonTooltipText =
+      'You need additional permissions to invite members to this organization'
+  }
+
+  useShortcut(SHORTCUT_IDS.ORG_TEAM_INVITE, () => setIsOpen(true), {
+    enabled: canInviteMembers,
+  })
 
   const { mutateAsync: inviteMemberAsync, isPending: isInviting } =
     useOrganizationCreateInvitationMutation()
@@ -251,37 +265,36 @@ export const InviteMemberButton = () => {
     onClose: closeInviteSheet,
   })
 
+  const inviteMembersButton = (
+    <ButtonTooltip
+      variant="primary"
+      disabled={!canInviteMembers}
+      icon={<UserPlus size={14} />}
+      className="pointer-events-auto grow md:grow-0"
+      onClick={() => setIsOpen(true)}
+      tooltip={{
+        content: {
+          side: 'bottom',
+          text: inviteButtonTooltipText,
+        },
+      }}
+    >
+      Invite members
+    </ButtonTooltip>
+  )
+
+  const shouldShowShortcutTooltip = !isOpen && inviteButtonTooltipText === undefined
+
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
-        <Shortcut
-          id={SHORTCUT_IDS.ORG_TEAM_INVITE}
-          onTrigger={() => {
-            if (canInviteMembers) setIsOpen(true)
-          }}
-          side="bottom"
-          tooltipOpen={isOpen ? false : undefined}
-        >
-          <ButtonTooltip
-            variant="primary"
-            disabled={!canInviteMembers}
-            icon={<UserPlus size={14} />}
-            className="pointer-events-auto grow md:grow-0"
-            onClick={() => setIsOpen(true)}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text: !organizationMembersCreationEnabled
-                  ? 'Inviting members is currently disabled'
-                  : !canInviteMembers
-                    ? 'You need additional permissions to invite members to this organization'
-                    : undefined,
-              },
-            }}
-          >
-            Invite members
-          </ButtonTooltip>
-        </Shortcut>
+        {shouldShowShortcutTooltip ? (
+          <ShortcutTooltip shortcutId={SHORTCUT_IDS.ORG_TEAM_INVITE} side="bottom">
+            {inviteMembersButton}
+          </ShortcutTooltip>
+        ) : (
+          inviteMembersButton
+        )}
       </SheetTrigger>
       <SheetContent size="lg" className="flex flex-col gap-0">
         <SheetHeader>
