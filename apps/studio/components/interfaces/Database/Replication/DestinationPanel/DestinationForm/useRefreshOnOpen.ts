@@ -26,9 +26,12 @@ interface UseRefreshOnOpenProps {
 }
 
 export const useRefreshOnOpen = ({ isEnabled = true, refetch }: UseRefreshOnOpenProps) => {
-  const handleOpenChange = useCallback((isOpen: boolean) => {
-    if (isOpen && isEnabled) void refetch()
-  }, [isEnabled, refetch])
+  const handleOpenChange = useCallback(
+    (isOpen: boolean) => {
+      if (isOpen && isEnabled) void refetch()
+    },
+    [isEnabled, refetch]
+  )
 
   return { handleOpenChange }
 }
