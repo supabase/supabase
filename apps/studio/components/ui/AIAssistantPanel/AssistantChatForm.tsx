@@ -46,9 +46,9 @@ export interface FormProps {
   /* If currently editing an existing message */
   isEditing?: boolean
   /* The currently selected AI model */
-  selectedModel: AssistantModelId
+  selectedModel?: AssistantModelId
   /* Callback when a model is chosen */
-  onSelectModel: (model: AssistantModelId) => void
+  onSelectModel?: (model: AssistantModelId) => void
 }
 
 const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
@@ -99,6 +99,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
     }
 
     const canSubmit = !disabled && !loading && !!value
+    const showModelSelector = selectedModel !== undefined && onSelectModel !== undefined
 
     return (
       <div className="w-full">
@@ -131,10 +132,17 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
             onChange={(event) => onValueChange(event)}
             onKeyDown={handleKeyDown}
           />
-          <div className="absolute inset-x-1.5 bottom-1.5 flex items-center justify-between pointer-events-none">
-            <div className="pointer-events-auto">
-              <ModelSelector selectedModel={selectedModel} onSelectModel={onSelectModel} />
-            </div>
+          <div
+            className={cn(
+              'absolute inset-x-1.5 bottom-1.5 flex items-center pointer-events-none',
+              showModelSelector ? 'justify-between' : 'justify-end'
+            )}
+          >
+            {showModelSelector && (
+              <div className="pointer-events-auto">
+                <ModelSelector selectedModel={selectedModel} onSelectModel={onSelectModel} />
+              </div>
+            )}
 
             <div className="flex gap-3 items-center pointer-events-auto">
               {loading ? (
