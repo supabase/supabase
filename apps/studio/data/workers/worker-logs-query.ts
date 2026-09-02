@@ -1,5 +1,4 @@
 import { queryOptions } from '@tanstack/react-query'
-import dayjs from 'dayjs'
 import { z } from 'zod'
 
 import { workersKeys } from './keys'
@@ -29,7 +28,6 @@ export const WORKER_LOG_STREAM_LABEL: Record<WorkerLogStream, string> = {
 const WORKER_NAME_KEY = 'worker'
 const STREAM_KEY = 'source'
 
-const LOOKBACK_HOURS = 24
 const LOG_LIMIT = 100
 
 const workerLogRowSchema = z.object({
@@ -43,10 +41,22 @@ export type WorkerLogsVariables = {
   projectRef?: string
   name?: string
   stream: WorkerLogStream
+  iso_timestamp_start: string
+  iso_timestamp_end: string
+  message?: string
 }
 
-export const workerLogsSql = (name: string, stream: WorkerLogStream) =>
-  safeSql`select id, timestamp, severity_text as severity, event_message as message from logs where log_attributes[${analyticsLiteral(WORKER_NAME_KEY)}] = ${analyticsLiteral(name)} and log_attributes[${analyticsLiteral(STREAM_KEY)}] = ${analyticsLiteral(WORKER_LOG_SOURCES[stream])} order by timestamp desc limit ${analyticsLiteral(LOG_LIMIT)}`
+export const workerLogsSql = (
+  name: string,
+  stream: WorkerLogStream,
+  { message }: Pick<WorkerLogsVariables, 'message'> = {}
+) => {
+  const messageFilter = message
+    ? safeSql` and event_message ilike ${analyticsLiteral(`%${message}%`)}`
+    : safeSql``
+
+  return safeSql`select id, timestamp, severity_text as severity, event_message as message from logs where log_attributes[${analyticsLiteral(WORKER_NAME_KEY)}] = ${analyticsLiteral(name)} and log_attributes[${analyticsLiteral(STREAM_KEY)}] = ${analyticsLiteral(WORKER_LOG_SOURCES[stream])}${messageFilter} order by timestamp desc limit ${analyticsLiteral(LOG_LIMIT)}`
+}
 
 export const parseWorkerLogRows = (result: unknown): LogData[] =>
   z
@@ -60,30 +70,46 @@ export const parseWorkerLogRows = (result: unknown): LogData[] =>
     }))
 
 async function getWorkerLogs(
-  { projectRef, name, stream }: WorkerLogsVariables,
+  {
+    projectRef,
+    name,
+    stream,
+    iso_timestamp_start,
+    iso_timestamp_end,
+    message,
+  }: WorkerLogsVariables,
   signal?: AbortSignal
 ): Promise<LogData[]> {
   if (!projectRef) throw new Error('projectRef is required')
   if (!name) throw new Error('name is required')
 
-  const end = dayjs()
-  const start = end.subtract(LOOKBACK_HOURS, 'hour')
-
   const data = await executeAnalyticsSql({
     projectRef,
     endpoint: logsAllEndpointUrl(true),
-    sql: workerLogsSql(name, stream),
-    iso_timestamp_start: start.toISOString(),
-    iso_timestamp_end: end.toISOString(),
+    sql: workerLogsSql(name, stream, { message }),
+    iso_timestamp_start,
+    iso_timestamp_end,
     signal,
   })
 
   return parseWorkerLogRows(data?.result)
 }
 
-export const workerLogsQueryOptions = ({ projectRef, name, stream }: WorkerLogsVariables) =>
-  queryOptions({
-    queryKey: workersKeys.logs(projectRef, name, stream),
-    queryFn: ({ signal }) => getWorkerLogs({ projectRef, name, stream }, signal),
+export const workerLogsQueryOptions = (variables: WorkerLogsVariables) => {
+  const { projectRef, name, stream, iso_timestamp_start, iso_timestamp_end } = variables
+  const message = variables.message?.trim() || undefined
+
+  return queryOptions({
+    queryKey: workersKeys.logs(projectRef, name, stream, {
+      iso_timestamp_start,
+      iso_timestamp_end,
+      message,
+    }),
+    queryFn: ({ signal }) =>
+      getWorkerLogs(
+        { projectRef, name, stream, iso_timestamp_start, iso_timestamp_end, message },
+        signal
+      ),
     enabled: IS_PLATFORM && typeof projectRef !== 'undefined' && typeof name !== 'undefined',
   })
+}
