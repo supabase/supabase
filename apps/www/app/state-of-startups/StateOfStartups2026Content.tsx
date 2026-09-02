@@ -98,8 +98,7 @@ function FloatingTableOfContents({
                       onClick={() => setIsTocOpen(false)}
                       className={cn(
                         'block px-6 py-2 text-xs transition-colors font-mono uppercase tracking-wider text-center text-foreground-light hover:text-brand hover:bg-brand-300/25',
-                        chapterIndex + 1 === activeChapter &&
-                          'bg-brand-300/40 text-brand'
+                        chapterIndex + 1 === activeChapter && 'bg-brand-300/40 text-brand'
                       )}
                     >
                       {chapter.shortTitle}

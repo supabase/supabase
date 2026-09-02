@@ -478,7 +478,9 @@ function RealtimeSkeleton() {
                     key={msg.id}
                     className={cn(
                       'transition-colors duration-500',
-                      tableFlashId === msg.id ? 'bg-brand-default/15 dark:bg-brand-default/5' : 'bg-surface-75'
+                      tableFlashId === msg.id
+                        ? 'bg-brand-default/15 dark:bg-brand-default/5'
+                        : 'bg-surface-75'
                     )}
                   >
                     <td className="border-b border-r border-default px-3 py-1.5 text-foreground-muted text-xs truncate max-w-0">

@@ -166,9 +166,7 @@ const ContentLink = React.memo(function ContentLink(props: any) {
         href={props.url}
         className={[
           'cursor-pointer transition text-sm',
-          props.url === pathname
-            ? 'text-brand'
-            : 'hover:text-foreground text-foreground-lighter',
+          props.url === pathname ? 'text-brand' : 'hover:text-foreground text-foreground-lighter',
         ].join(' ')}
       >
         {props.icon && (

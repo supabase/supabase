@@ -148,7 +148,9 @@ export const UtilityActions = ({
                   size={14}
                   strokeWidth={2}
                   className={
-                    isFavorite ? 'fill-brand-default stroke-none' : 'fill-none stroke-foreground-light'
+                    isFavorite
+                      ? 'fill-brand-default stroke-none'
+                      : 'fill-none stroke-foreground-light'
                   }
                 />
                 {isFavorite ? 'Remove from' : 'Add to'} favorites
