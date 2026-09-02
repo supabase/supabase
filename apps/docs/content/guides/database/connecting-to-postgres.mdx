@@ -8,6 +8,7 @@ Learn how to pick a connection method and where to find the connection string fo
 
 - [Which connection method do you use?](#choose-a-connection-method) picks a method based on where your code runs.
 - [Get your connection string](#get-your-connection-string) shows where each string comes from.
+- [Configure your client](#configure-your-client) sets pool size, prepared statements, and SSL.
 - [Quickstarts](#quickstarts) connect a specific ORM or database GUI.
 
 For how pooling works and the limits that apply to your connections, see [Connection pooling and limits](/docs/guides/database/connecting-to-postgres/pooling-and-limits).
@@ -22,6 +23,7 @@ How you connect to your database depends on where your code runs. Find your case
 | A serverless or edge function                             | [Shared pooler, transaction mode](#pooler-transaction-mode) | These environments open many short-lived connections.                                         |
 | A persistent backend on IPv6, or with the IPv4 add-on     | [Direct connection](#direct-connection)                     | No pooler in the path.                                                                        |
 | A persistent backend on an IPv4-only network              | [Shared pooler, session mode](#pooler-session-mode)         | The shared pooler is IPv4-only on every plan.                                                 |
+| A third-party tool, such as a BI client or database GUI   | [Shared pooler, session mode](#pooler-session-mode)         | Reachable over IPv4 from networks you don't control, and it supports prepared statements.     |
 | A high-performance application on a paid plan             | [Dedicated pooler](#dedicated-pooler)                       | Runs on the same machine as your database, so lower latency than the shared pooler.           |
 | Migrations, `pg_dump`, backup and restore, or replication | [Direct connection](#direct-connection)                     | These are single sessions and Postgres native commands.                                       |
 
@@ -44,7 +46,7 @@ For every Postgres connection mode, the string comes from the same place:
 3. Choose the connection method you picked above.
 4. Copy the string and replace `[YOUR-PASSWORD]` with your database password. [Percent-encode](https://en.wikipedia.org/wiki/Percent-encoding) any reserved characters it contains, such as `&`, `#`, `?`, or a space.
 
-The sections below show what each string looks like and when to use it.
+The sections below show what each string looks like and when to use it. Take the host, port, and username from the string you copied rather than typing the bracketed placeholders literally. The pooler host in particular can't be composed from your region, and pooled connections use a different username from direct connections. Both are covered under [Endpoints and IP versions](#endpoints-and-ip-versions).
 
 ### Direct connection [#direct-connection]
 
@@ -78,7 +80,7 @@ The transaction mode connection string connects to your Postgres instance throug
 
 <Admonition type="caution">
 
-Transaction mode does not support [prepared statements](https://postgresql.org/docs/current/sql-prepare.html). To avoid errors, [turn off prepared statements](https://github.com/orgs/supabase/discussions/28239) for your connection library.
+Transaction mode does not support [prepared statements](https://postgresql.org/docs/current/sql-prepare.html). To avoid errors, turn them off in your connection library. See [Transaction mode limitations](#transaction-mode-limitations) for the setting your driver uses and for the other session-state features this affects.
 
 </Admonition>
 
@@ -98,31 +100,6 @@ postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:6543/postgres
 
 Get this string from the Supabase Dashboard by clicking [Connect](/dashboard/project/_?showConnect=true&method=transaction).
 
-### Configure your client
-
-Your connection library keeps its own pool of connections, separate from the poolers Supabase runs. Configure it for the environment your code runs in.
-
-In a serverless function:
-
-1. Create the client once at module scope, not per request.
-2. Set the pool to 1 connection. The client is shared by every invocation on that warm instance, so this caps the instance, not the request.
-3. Turn off prepared statements, which [transaction mode](#pooler-transaction-mode) doesn't support.
-
-```ts lib/db.ts
-import postgres from 'postgres'
-
-export const sql = postgres(process.env.DATABASE_URL, {
-  max: 1,
-  prepare: false,
-})
-```
-
-Library defaults assume a persistent backend, so they are too high for serverless. [Postgres.js](https://github.com/porsager/postgres) defaults to 10 connections. That is 10 connections for every warm instance of your function, and the number of warm instances isn't something you control. A few dozen instances is enough to exhaust the pool.
-
-Raise the pool above 1 only when you have evidence that concurrent invocations on one instance are queuing for the connection.
-
-For more on sizing an application-side pool, see the [Supavisor FAQ](/docs/guides/troubleshooting/supavisor-faq-YyP5tI). If you use Prisma, [Prisma troubleshooting](/docs/guides/database/prisma/prisma-troubleshooting) covers the equivalent `connection_limit` setting.
-
 ### Data APIs and client libraries [#data-apis-and-client-libraries]
 
 The Data APIs let you interact with your database using REST or GraphQL requests. You can use these APIs to fetch and insert data from the frontend, as long as your tables have [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS) enabled and policies that allow the access. RLS with no policies denies every request.
@@ -139,14 +116,6 @@ For convenience, you can also use the [Supabase client libraries](/docs/referenc
 - [C#](/docs/reference/csharp/introduction)
 - [Kotlin](/docs/reference/kotlin/introduction)
 
-### Connect with SSL [#connecting-with-ssl]
-
-Connect to your database using SSL wherever possible, to prevent snooping and man-in-the-middle attacks.
-
-Download your server root certificate from [Database settings](/dashboard/project/_/database/settings) in the Supabase Dashboard. The same section has a toggle that rejects non-SSL connections to your database.
-
-![The SSL Configuration section of Database settings, with a toggle to enforce SSL on incoming connections and a Download Certificate button.](/docs/img/database/database-settings-ssl.png)
-
 ### Endpoints and IP versions [#endpoints-and-ip-versions]
 
 Each mode has its own host, port, and IP version support. IP version support depends on your plan and on whether the project has the [IPv4 add-on](/docs/guides/platform/ipv4-address).
@@ -158,9 +127,79 @@ Each mode has its own host, port, and IP version support. IP version support dep
 | Shared pooler, transaction mode    | `aws-[INDEX]-[REGION].pooler.supabase.com:6543` | IPv4 | IPv4 | IPv4               |
 | Dedicated pooler, transaction mode | `db.[PROJECT-REF].supabase.co:6543`             | -    | IPv6 | IPv4               |
 
+`[INDEX]` in the shared pooler host is a pooler cluster index, not part of the region name. A region can have more than one, so you can't work out your host from your region. Copy the host from the Connect dialog.
+
+The username differs by connection type. Direct connections and the dedicated pooler use `postgres`. Shared pooler connections use `postgres.[PROJECT-REF]`. If you connect as a custom role through the shared pooler, the username is `[ROLE].[PROJECT-REF]`.
+
 The port routes the connection to the right pooler and mode. Port `5432` reaches Postgres for a direct connection and Supavisor for session mode. Port `6543` reaches PgBouncer for the dedicated pooler and Supavisor for shared transaction mode.
 
 To connect over IPv4, you have two options. The shared pooler is IPv4-only on every plan, in both session and transaction mode. Alternatively, add the [IPv4 add-on](/docs/guides/platform/ipv4-address) to your project, which makes the direct connection and the dedicated pooler reachable over IPv4 instead of IPv6.
+
+## Configure your client
+
+A connection string on its own isn't enough. Your connection library keeps its own pool of connections, separate from the poolers Supabase runs, and its defaults assume a persistent backend.
+
+In a serverless function:
+
+1. Create the client once at module scope, not per request.
+2. Set the pool to 1 connection. The client is shared by every invocation on that warm instance, so this caps the instance, not the request.
+3. Turn off prepared statements, which [transaction mode](#pooler-transaction-mode) doesn't support.
+4. Set SSL to `require`, so the driver refuses to connect without encryption.
+
+```ts lib/db.ts
+import postgres from 'postgres'
+
+export const sql = postgres(process.env.DATABASE_URL, {
+  max: 1,
+  prepare: false,
+  ssl: 'require',
+})
+```
+
+The rest of this section explains each setting, and what changes for a driver other than Postgres.js.
+
+### Application-side pool size
+
+Library defaults are too high for serverless. [Postgres.js](https://github.com/porsager/postgres) defaults to 10 connections. That is 10 connections for every warm instance of your function, and the number of warm instances isn't something you control. A few dozen instances is enough to exhaust the pool.
+
+Raise the pool above 1 only when you have evidence that concurrent invocations on one instance are queuing for the connection.
+
+For more on sizing an application-side pool, see the [Supavisor FAQ](/docs/guides/troubleshooting/supavisor-faq-YyP5tI). If you use Prisma, [Prisma troubleshooting](/docs/guides/database/prisma/prisma-troubleshooting) covers the equivalent `connection_limit` setting.
+
+### Transaction mode limitations
+
+[Transaction mode](#pooler-transaction-mode) returns your connection to the pool after each transaction, so anything that depends on session state doesn't survive between transactions. Three things are affected.
+
+**Prepared statements** aren't supported, so turn them off. Each driver does this differently:
+
+| Driver               | Setting                                   |
+| -------------------- | ----------------------------------------- |
+| Postgres.js, Drizzle | `prepare: false`                          |
+| Prisma               | `pgbouncer=true` on the connection string |
+| asyncpg              | `statement_cache_size=0`                  |
+| JDBC                 | `prepareThreshold=0`                      |
+
+For node-postgres, Psycopg, and Rust drivers, see [Disabling prepared statements](/docs/guides/troubleshooting/disabling-prepared-statements-qL8lEL).
+
+**Cursors** work inside a single transaction only. A `with hold` cursor is meant to outlive its transaction, and it doesn't survive the connection returning to the pool.
+
+**Session-level state** is lost between transactions. This covers `set` and `reset`, session-level advisory locks, `listen` and `notify`, and temporary tables. Run them inside the transaction that needs them, or use session mode or a direct connection instead.
+
+Direct connections and session mode support all three, so none of this applies to either.
+
+### SSL [#connecting-with-ssl]
+
+Connect using SSL wherever possible, to prevent snooping and man-in-the-middle attacks.
+
+Set SSL to `require` so the driver refuses to connect without encryption. Most drivers default to `prefer`, which falls back to sending your data in plaintext if the encrypted attempt fails. On a connection string, this is `sslmode=require`.
+
+`require` encrypts the connection but doesn't verify the server, so it doesn't stop a man-in-the-middle attack. To verify as well as encrypt, download your server root certificate from [Database settings](/dashboard/project/_/database/settings) in the Supabase Dashboard and point your driver at it. Downloading the certificate on its own changes nothing: the driver has to be told to use it, with `sslmode=verify-full` and `sslrootcert` on a connection string, or the equivalent option in your library. The same section has a toggle that rejects non-SSL connections to your database.
+
+![The SSL Configuration section of Database settings, with a toggle to enforce SSL on incoming connections and a Download Certificate button.](/docs/img/database/database-settings-ssl.png)
+
+### Stale connections
+
+Serverless runtimes freeze a function between requests, which can leave a pooled TCP socket stale. If you see `CONNECT_TIMEOUT` errors or queries that hang until the execution limit, see [Troubleshooting `CONNECT_TIMEOUT` or hanging queries in Serverless Functions](/docs/guides/troubleshooting/troubleshooting-connect_timeout-or-hanging-queries-in-vercel-serverless-functions-775f92).
 
 ## Quickstarts [#quickstarts]
 
