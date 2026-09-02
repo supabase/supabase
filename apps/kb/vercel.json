@@ -1,4 +1,8 @@
 {
   "buildCommand": "pnpm build",
-  "redirects": [{ "source": "/", "destination": "/kb", "permanent": false }]
+  "redirects": [{ "source": "/", "destination": "/kb", "permanent": false }],
+  "rewrites": [
+    { "source": "/kb", "destination": "/index.html" },
+    { "source": "/kb/:path*", "destination": "/:path*" }
+  ]
 }
