@@ -1,6 +1,6 @@
 # Sandbox setup
 
-Docker-isolated local execution for `/test-the-docs`. Patterns adapted from the contained E2E runner in [docs-agent-skills#16](https://github.com/supabase/docs-agent-skills/pull/16) (daemon check, non-root, temp workspace, fail closed). This skill uses Docker as the **local Supabase data plane** (`supabase start`), not as an act/GHA runner.
+Docker-isolated local execution for `/test-the-docs`. Requires Docker daemon up, non-root execution, a temp workspace, and fail-closed behavior when the daemon is down. This skill uses Docker as the **local Supabase data plane** (`supabase start`), not as an act/GHA runner.
 
 ## Prerequisites (fail closed)
 
