@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
+import { RefreshCw } from 'lucide-react'
 import { useState } from 'react'
+import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -38,6 +40,8 @@ const WorkersPage: NextPageWithLayout = () => {
     isPending,
     isError,
     isSuccess,
+    isFetching,
+    refetch,
   } = useQuery(workersQueryOptions({ projectRef: ref }))
 
   const isNotEnrolled = isError && isWorkersUnavailable(error)
@@ -74,7 +78,22 @@ const WorkersPage: NextPageWithLayout = () => {
               />
             )}
             {isMissingPermission && <NoPermission resourceText="view this project's workers" />}
-            {isUnexpectedError && <AlertError error={error} subject="Failed to retrieve workers" />}
+            {isUnexpectedError && (
+              <AlertError
+                error={error}
+                subject="Failed to retrieve workers"
+                additionalActions={
+                  <Button
+                    variant="default"
+                    icon={<RefreshCw />}
+                    loading={isFetching}
+                    onClick={() => refetch()}
+                  >
+                    Refresh
+                  </Button>
+                }
+              />
+            )}
             {isSuccess && workers.length === 0 && (
               <WorkersEmptyState onDeploy={() => setIsDeployInstructionsOpen(true)} />
             )}
@@ -83,6 +102,8 @@ const WorkersPage: NextPageWithLayout = () => {
                 projectRef={ref}
                 workers={workers}
                 onDeploy={() => setIsDeployInstructionsOpen(true)}
+                onRefresh={() => refetch()}
+                isRefreshing={isFetching}
               />
             )}
           </PageSectionContent>
