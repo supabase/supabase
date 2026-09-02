@@ -49,7 +49,10 @@ const agentDatabaseCell = (database_identifier?: string): AgentCell => ({
 })
 
 const chartDatabaseCell = (id: string, ySeries: string[]): CellWire => ({
-  ...wireDatabaseCell(id),
+  _tag: 'database_cell',
+  _id: id,
+  sql: 'select 1',
+  row_limit: 100,
   view: 'chart',
   chart: {
     type: 'bar',
@@ -61,8 +64,11 @@ const chartDatabaseCell = (id: string, ySeries: string[]): CellWire => ({
   },
 })
 
-const agentChartDatabaseCell = (ySeries: string[]): AgentCell => ({
-  ...agentDatabaseCell(),
+const agentChartDatabaseCell = (ySeries: string[], database_identifier?: string): AgentCell => ({
+  _tag: 'database_cell',
+  sql: 'select 1',
+  row_limit: 100,
+  database_identifier,
   view: 'chart',
   chart: {
     type: 'bar',
@@ -402,7 +408,7 @@ describe('getEntryMetadata', () => {
         {
           _tag: 'replaced',
           before: chartDatabaseCell('cell-1', ['signups']),
-          after: { ...agentChartDatabaseCell(['signups']), database_identifier: 'replica-3' },
+          after: agentChartDatabaseCell(['signups'], 'replica-3'),
           operationIndex: 0,
         },
         successfulDatabaseContext([{ identifier: 'replica-3', region: 'us-east-1' }])
