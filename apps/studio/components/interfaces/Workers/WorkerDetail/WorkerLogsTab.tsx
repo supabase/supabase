@@ -1,8 +1,18 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { RefreshCw } from 'lucide-react'
+import { RefreshCw, Search } from 'lucide-react'
 import { useState } from 'react'
-import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'ui'
+import {
+  Button,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { WorkerCommandLine } from '../WorkerCommandLine'
@@ -77,13 +87,14 @@ export const WorkerLogsTab = ({ workerName, stream }: WorkerLogsTabProps) => {
             value={dateRange}
             onSubmit={setDateRange}
             helpers={EXPLORER_DATEPICKER_HELPERS}
+            align="start"
           />
           {stream === 'requests' && (
             <Select
               value={method}
               onValueChange={(value) => setMethod(value === 'all' ? undefined : value)}
             >
-              <SelectTrigger className="w-32">
+              <SelectTrigger size="tiny" className="w-32">
                 <SelectValue placeholder="All methods" />
               </SelectTrigger>
               <SelectContent>
@@ -96,12 +107,17 @@ export const WorkerLogsTab = ({ workerName, stream }: WorkerLogsTabProps) => {
               </SelectContent>
             </Select>
           )}
-          <Input
-            className="w-56"
-            placeholder="Filter by event message"
-            value={message}
-            onChange={(event) => setMessage(event.target.value)}
-          />
+          <InputGroup className="w-60">
+            <InputGroupInput
+              size="tiny"
+              placeholder="Filter by event message"
+              value={message}
+              onChange={(event) => setMessage(event.target.value)}
+            />
+            <InputGroupAddon>
+              <Search />
+            </InputGroupAddon>
+          </InputGroup>
         </div>
         <Button
           variant="default"
