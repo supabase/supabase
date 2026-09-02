@@ -37,7 +37,7 @@ export function BlockInstallPromptButton({
 
   return (
     <Button_Shadcn_
-      variant="secondary"
+      variant="default"
       size="sm"
       className="h-7 gap-1 rounded-lg px-3 text-xs shadow-none"
       onClick={() => {
