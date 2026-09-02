@@ -355,7 +355,7 @@ export const Destinations = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead key="type" className="w-[20px]" />
+                    <TableHead key="type" className="w-[40px]" />
                     <TableHead key="name" className="w-[250px]" aria-sort={getAriaSort('name')}>
                       <TableHeadSort
                         column="name"

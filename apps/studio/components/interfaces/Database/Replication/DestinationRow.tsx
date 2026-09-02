@@ -7,7 +7,7 @@ import { TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger, WarningIc
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DeleteDestination } from './DeleteDestination'
-import { DestinationIcon } from './DestinationIcon'
+import { DestinationLogo } from './DestinationLogo'
 import { PipelineStatus } from './PipelineStatus'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import { getFormattedLagValue } from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
@@ -15,12 +15,12 @@ import { RowMenu } from './RowMenu'
 import { UpdateVersionModal } from './UpdateVersionModal'
 import { useDestinationInformation } from './useDestinationInformation'
 import { AlertError } from '@/components/ui/AlertError'
-import { createNavigationHandler } from '@/lib/navigation'
 import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
 import { useReplicationPipelineReplicationStatusQuery } from '@/data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelineVersionQuery } from '@/data/replication/pipeline-version-query'
 import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
+import { createNavigationHandler } from '@/lib/navigation'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -154,11 +154,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
           onKeyDown={handleNavigation}
           tabIndex={0}
         >
-          <TableCell>
-            {type ? (
-              <DestinationIcon type={type} size={18} className="text-foreground-light" />
-            ) : null}
-          </TableCell>
+          <TableCell>{type ? <DestinationLogo type={type} /> : null}</TableCell>
 
           <TableCell className="max-w-[180px]">
             {isPipelineLoading ? (
