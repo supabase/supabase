@@ -63,8 +63,12 @@ export function CommandCopyButton({ command }: { command: string }) {
           },
         })
       }}
+      aria-label="Copy install command"
     >
       {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+      <span className="sr-only" role="status">
+        {copied ? 'Install command copied' : ''}
+      </span>
     </Button_Shadcn_>
   )
 }

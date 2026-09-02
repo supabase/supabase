@@ -42,3 +42,33 @@ export function getInstallCommands(
     bun: `bunx --bun ${cli} add ${specifier}`,
   }
 }
+
+export function getPageBaseUrl(env = process.env.NEXT_PUBLIC_VERCEL_TARGET_ENV): string {
+  if (env === 'production') {
+    return 'https://supabase.com'
+  }
+  return getRegistryBaseUrl(env)
+}
+
+export function getPageUrl(pathname: string): string {
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+  const currentPath = pathname.startsWith(basePath) ? pathname : `${basePath}${pathname}`
+  return `${getPageBaseUrl()}${currentPath}`
+}
+
+export function getMarkdownPageUrl(pathname: string): string {
+  const url = getPageUrl(pathname)
+  return url.endsWith('.md') ? url : `${url}.md`
+}
+
+export function buildBlockInstallPrompt({
+  pageUrl,
+  name,
+  installCommand,
+}: {
+  pageUrl: string
+  name: string
+  installCommand: string
+}): string {
+  return `Help me install the ${name} block. Do the following: 1. Fetch ${pageUrl}. 2. Add the block with \`${installCommand}\`. If the CLI reports file conflicts, keep the existing files and merge the skipped files after install. 3. Follow any post-install instructions the CLI prints, then complete the remaining setup from the page.`
+}
