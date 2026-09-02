@@ -1,5 +1,6 @@
 import { useParams } from 'common'
-import { ArrowUpCircle, Edit, MoreVertical, Pause, Play, RotateCcw, Trash } from 'lucide-react'
+import { ArrowUpCircle, Edit, Eye, MoreVertical, Pause, Play, RotateCcw, Trash } from 'lucide-react'
+import Link from 'next/link'
 import { parseAsInteger, useQueryState } from 'nuqs'
 import { toast } from 'sonner'
 import {
@@ -166,6 +167,13 @@ export const RowMenu = ({
         </DropdownMenuTrigger>
 
         <DropdownMenuContent side="bottom" align="end" className="w-52">
+          <DropdownMenuItem className="space-x-2" asChild disabled={!pipeline}>
+            <Link href={`/project/${projectRef}/database/replication/${pipeline?.id}`}>
+              <Eye size={14} />
+              <p>View details</p>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           {hasUpdate && (
             <>
               <DropdownMenuItem className="space-x-2" onClick={() => onUpdateClick?.()}>
