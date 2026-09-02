@@ -3,7 +3,7 @@ import { useChat } from '@ai-sdk/react'
 import { lastAssistantMessageIsCompleteWithApprovalResponses } from 'ai'
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useParams, useSearchParamsShallow } from 'common/hooks'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { Eraser, Pencil, X } from 'lucide-react'
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Button, cn, KeyboardShortcut } from 'ui'
@@ -78,6 +78,7 @@ interface AssistantChatProps {
   onBranchChat: (messageId: string) => void
   composerContext?: AssistantChatComposerContext
   renderHeader?: (props: AssistantChatHeaderProps) => ReactNode
+  onInputChange?: (value: string) => void
 }
 
 export const AssistantChat = ({
@@ -89,6 +90,7 @@ export const AssistantChat = ({
   onBranchChat,
   composerContext,
   renderHeader,
+  onInputChange,
 }: AssistantChatProps) => {
   const { id: entityId } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -98,6 +100,7 @@ export const AssistantChat = ({
     useSelectedOrganizationQuery()
 
   const disablePrompts = useFlag('disableAssistantPrompts')
+  const shouldReduceMotion = useReducedMotion()
   const snap = useAiAssistantStateSnapshot()
   const state = useAiAssistantState()
   const currentChat = snap.chats[chatId]
@@ -194,7 +197,7 @@ export const AssistantChat = ({
     addToolApprovalResponse,
     stop,
     regenerate,
-  } = useChat({
+  } = useChat<MessageType>({
     id: chatId,
     ...(chatInstance ? { chat: chatInstance } : {}),
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,
@@ -459,6 +462,19 @@ export const AssistantChat = ({
     }
   }, [composerContext?.initialInput])
 
+  let placeholder: string
+  if (hasMessages && isSupportChat) {
+    placeholder = 'Share details so the assistant can help with your support request...'
+  } else if (hasMessages) {
+    placeholder = 'Ask a follow up question...'
+  } else if ((composerContext?.sqlSnippets ?? []).length > 0) {
+    placeholder = 'Ask a question or make a change...'
+  } else if (isSupportChat) {
+    placeholder = 'Describe your support issue...'
+  } else {
+    placeholder = 'Chat to Postgres...'
+  }
+
   return (
     <ErrorBoundary
       message="Something went wrong with the AI Assistant"
@@ -488,10 +504,10 @@ export const AssistantChat = ({
         })}
         {hasMessages ? (
           <Conversation className={cn('flex-1')}>
-            <ConversationContent className="w-full px-7 py-8 mb-10 max-w-3xl mx-auto">
+            <ConversationContent className="w-full px-7 py-8 mb-10">
               {renderedMessages}
-              {error && (
-                <>
+              <div className="w-full max-w-3xl mx-auto">
+                {error && (
                   <AlertError
                     error={
                       isContextExceededError
@@ -537,19 +553,23 @@ export const AssistantChat = ({
                       </div>
                     }
                   />
-                </>
-              )}
-              {isChatLoading && (
-                <motion.span
-                  animate={{ opacity: [1, 0] }}
-                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                  className="inline-block w-1.5 h-4 bg-foreground-lighter mt-4"
-                />
-              )}
+                )}
+                {isChatLoading && (
+                  <motion.span
+                    animate={shouldReduceMotion ? { opacity: 1 } : { opacity: [1, 0] }}
+                    transition={
+                      shouldReduceMotion
+                        ? { duration: 0 }
+                        : { duration: 1, repeat: Infinity, ease: 'linear' }
+                    }
+                    className="inline-block w-1.5 h-4 bg-foreground-lighter mt-4"
+                  />
+                )}
 
-              <p className="text-center text-xs text-foreground-muted mt-6">
-                The Assistant can make mistakes. Double check responses.
-              </p>
+                <p className="text-center text-xs text-foreground-muted mt-6">
+                  The Assistant can make mistakes. Double check responses.
+                </p>
+              </div>
             </ConversationContent>
             <ConversationScrollButton />
           </Conversation>
@@ -607,99 +627,89 @@ export const AssistantChat = ({
           )}
         </AnimatePresence>
 
-        <div className="px-3 pb-3 z-20 relative w-full max-w-3xl mx-auto flex flex-col gap-y-3">
-          {isSupportChat && !isSupportChatClosed && (
-            <div>
-              <div className="mb-3 border-t" />
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="tiny"
-                  disabled={!supportConversationId}
-                  onClick={() => state.setSupportLifecycleStatus(chatId, 'escalated')}
-                >
-                  Escalate to human
-                </Button>
-                <Button
-                  variant="outline"
-                  size="tiny"
-                  disabled={!supportConversationId}
-                  onClick={() => state.setSupportLifecycleStatus(chatId, 'user_resolved')}
-                >
-                  Resolve
-                </Button>
+        <div className="relative z-20 w-full px-7 pb-3">
+          <div className="mx-auto flex w-full max-w-3xl flex-col gap-y-3">
+            {isSupportChat && !isSupportChatClosed && (
+              <div>
+                <div className="mb-3 border-t" />
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="tiny"
+                    disabled={!supportConversationId}
+                    onClick={() => state.setSupportLifecycleStatus(chatId, 'escalated')}
+                  >
+                    Escalate to human
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="tiny"
+                    disabled={!supportConversationId}
+                    onClick={() => state.setSupportLifecycleStatus(chatId, 'user_resolved')}
+                  >
+                    Resolve
+                  </Button>
+                </div>
               </div>
-            </div>
-          )}
-
-          {disablePrompts && (
-            <Admonition
-              showIcon={false}
-              type="default"
-              title="Assistant has been temporarily disabled"
-              description="We're currently looking into getting it back online"
-            />
-          )}
-
-          {isSuccess && !isApiKeySet && (
-            <Admonition
-              type="default"
-              title="OpenAI API key not set"
-              description={
-                <Markdown
-                  content={
-                    'Add your `OPENAI_API_KEY` to your environment variables to use the AI Assistant.'
-                  }
-                />
-              }
-            />
-          )}
-
-          <AssistantChatForm
-            textAreaRef={inputRef}
-            className={cn(
-              'z-20',
-              '[&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border',
-              '[&>form>textarea]:rounded-md [&>form>textarea]:outline-hidden!',
-              '[&>form>textarea]:ring-offset-0! [&>form>textarea]:ring-0!'
             )}
-            loading={isChatLoading}
-            isEditing={!!editingMessageId}
-            disabled={isChatInputDisabled}
-            placeholder={
-              hasMessages
-                ? isSupportChat
-                  ? 'Share details so the assistant can help with your support request...'
-                  : 'Ask a follow up question...'
-                : (composerContext?.sqlSnippets ?? []).length > 0
-                  ? 'Ask a question or make a change...'
-                  : isSupportChat
-                    ? 'Describe your support issue...'
-                    : 'Chat to Postgres...'
-            }
-            value={value}
-            onValueChange={(e) => setValue(e.target.value)}
-            onSubmit={(finalMessage) => {
-              sendMessageToAssistant(finalMessage)
-            }}
-            onStop={() => {
-              stop()
-              // to save partial responses from the AI
-              const lastMessage = chatMessages[chatMessages.length - 1]
-              if (lastMessage && lastMessage.role === 'assistant') {
-                state.updateMessage(lastMessage, chatId)
-              }
-            }}
-            sqlSnippets={composerContext?.sqlSnippets}
-            onRemoveSnippet={(index) => {
-              const newSnippets = [...(composerContext?.sqlSnippets ?? [])]
-              newSnippets.splice(index, 1)
-              composerContext?.onSetSqlSnippets?.(newSnippets)
-            }}
-            includeSnippetsInMessage={includeSnippetsInMessage}
-            selectedModel={selectedModel}
-            onSelectModel={(model) => snap.setModel(model)}
-          />
+
+            {disablePrompts && (
+              <Admonition
+                showIcon={false}
+                type="default"
+                title="Assistant has been temporarily disabled"
+                description="We're currently looking into getting it back online"
+              />
+            )}
+
+            {isSuccess && !isApiKeySet && (
+              <Admonition
+                type="default"
+                title="OpenAI API key not set"
+                description={
+                  <Markdown
+                    content={
+                      'Add your `OPENAI_API_KEY` to your environment variables to use the AI Assistant.'
+                    }
+                  />
+                }
+              />
+            )}
+
+            <AssistantChatForm
+              textAreaRef={inputRef}
+              className="z-20"
+              loading={isChatLoading}
+              isEditing={!!editingMessageId}
+              disabled={isChatInputDisabled}
+              placeholder={placeholder}
+              value={value}
+              onValueChange={(e) => {
+                setValue(e.target.value)
+                onInputChange?.(e.target.value)
+              }}
+              onSubmit={(finalMessage) => {
+                sendMessageToAssistant(finalMessage)
+              }}
+              onStop={() => {
+                stop()
+                // to save partial responses from the AI
+                const lastMessage = chatMessages[chatMessages.length - 1]
+                if (lastMessage && lastMessage.role === 'assistant') {
+                  state.updateMessage(lastMessage, chatId)
+                }
+              }}
+              sqlSnippets={composerContext?.sqlSnippets}
+              onRemoveSnippet={(index) => {
+                const newSnippets = [...(composerContext?.sqlSnippets ?? [])]
+                newSnippets.splice(index, 1)
+                composerContext?.onSetSqlSnippets?.(newSnippets)
+              }}
+              includeSnippetsInMessage={includeSnippetsInMessage}
+              selectedModel={selectedModel}
+              onSelectModel={(model) => snap.setModel(model)}
+            />
+          </div>
         </div>
       </div>
     </ErrorBoundary>

@@ -41,7 +41,7 @@ pnpm api:codegen             # platform Management API types → packages/api-ty
 
 Every PR must pass typecheck + lint (one workflow), Prettier, and a typos check. Other checks are path-filtered: Studio unit tests/build and the lint ratchet (ESLint warning count must not increase) run on `apps/studio/**` changes; app-specific test suites run on their own paths.
 
-Never hand-edit generated files: `packages/api-types/types/**`, `**/routeTree.gen.ts`, `**/__generated__/**`, `apps/docs/features/docs/generated/**`, `apps/www/.generated/**`, `supabase/functions/common/database-types.ts`.
+Never hand-edit generated files: `packages/api-types/types/**`, `**/routeTree.gen.ts`, `**/__generated__/**`, `apps/docs/features/docs/generated/**`, `apps/www/.generated/**`, `supabase/functions/common/database-types.ts`, `apps/docs/content/_partials/access-control/scoped_pat_*.mdx` (run `make -C apps/docs/spec generate.partials.access-control`).
 
 ## Conventions
 
@@ -52,6 +52,8 @@ Never hand-edit generated files: `packages/api-types/types/**`, `**/routeTree.ge
 **Exports** — named exports only; default exports are allowed only where a framework requires them (`pages/**`, `app/**`, config files — the eslint preset has the exact carve-out list). Lint-enforced across all apps via `eslint-config-supabase` (severity `warn` everywhere; hard-enforced in Studio by the lint ratchet).
 
 **Language** — Use U.S. English everywhere.
+
+**Public surfaces** — this repo is public: PR descriptions, issues, and code comments are world-readable. Keep internal content out of them: absolute production metrics (event counts, user counts, revenue figures: state percentages, ratios, or relative change instead), internal decision detail (vendor, legal, pricing, or strategy discussions), and competitor names (protocol identifiers such as user-agent strings are fine). Put that context in the Linear issue and link it.
 
 ## Skills
 

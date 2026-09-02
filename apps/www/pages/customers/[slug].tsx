@@ -16,6 +16,7 @@ import Link from 'next/link'
 import { Button } from 'ui'
 
 import SectionContainer from '@/components/Layouts/SectionContainer'
+import { MarkdownActions } from '@/components/MarkdownActions'
 
 // table of contents extractor
 const toc = require('markdown-toc')
@@ -208,6 +209,12 @@ function CaseStudyPage(props: any) {
                             </div>
                           )
                         })}
+
+                        <MarkdownActions
+                          pagePath={`/customers/${slug}`}
+                          pageType="customers"
+                          className="not-prose"
+                        />
 
                         <div>
                           <p>Ready to get started?</p>

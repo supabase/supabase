@@ -12,7 +12,8 @@
  *   URL                 -> rich_text  (event URL)
  *   Book Meeting Link   -> url
  *   Location            -> rich_text
- *   Category            -> multi_select
+ *   Type                -> multi_select  (drives the site's category filter)
+ *   Category            -> multi_select  (audience taxonomy)
  *   Are you speaking at this event? -> multi_select
  *   Participation       -> multi_select
  */
@@ -25,6 +26,19 @@ import { EventHost, SUPABASE_HOST, SupabaseEvent } from './eventsTypes'
 
 // The actual DB ID (child database inside the page)
 const NOTION_EVENTS_DB_ID_FALLBACK = '21b5004b775f8058872fe8fa81e2c7ac'
+
+// Maps Notion "Type" options to the app's category vocabulary (the values in
+// CATEGORIES_FILTERS). Keys are lowercased for case-insensitive matching.
+// "Supabase Event", "Party" and "Sales Event" have no filter bucket and fall
+// through to DEFAULT_NOTION_CATEGORY.
+const NOTION_TYPE_CATEGORY_MAP: Record<string, string> = {
+  conference: 'conference',
+  hackathon: 'hackathon',
+  meetup: 'meetup',
+  'meetup - third party': 'meetup',
+}
+
+const DEFAULT_NOTION_CATEGORY = 'conference'
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -73,6 +87,27 @@ function getMultiSelect(page: any, name: string): string[] {
   return prop.multi_select.map((s: any) => s.name)
 }
 
+/**
+ * Derive the site's category values for a Notion event.
+ *
+ * "Type" is the primary signal. "Category" is an audience taxonomy (AI / ML,
+ * Postgres / Databases, …) that also carries a "Hackathon" option, so it's read
+ * as a secondary signal for events typed as something else — e.g. a third-party
+ * meetup that is really a hackathon.
+ */
+function getNotionCategories(page: any): string[] {
+  const mapped = getMultiSelect(page, 'Type')
+    .map((type) => NOTION_TYPE_CATEGORY_MAP[type.trim().toLowerCase()])
+    .filter(Boolean)
+
+  const isHackathonCategory = getMultiSelect(page, 'Category').some(
+    (category) => category.trim().toLowerCase() === 'hackathon'
+  )
+  if (isHackathonCategory) mapped.push('hackathon')
+
+  return mapped.length > 0 ? Array.from(new Set(mapped)) : [DEFAULT_NOTION_CATEGORY]
+}
+
 function getFormulaString(page: any, name: string): string {
   const prop = page.properties[name]
   if (!prop || prop.type !== 'formula' || prop.formula?.type !== 'string') return ''
@@ -116,7 +151,7 @@ export const getNotionEvents = async (): Promise<SupabaseEvent[]> => {
         const rawMeetingLink = getUrl(page, 'Book Meeting Link')
         const meetingLink = isSafeHttpUrl(rawMeetingLink) ? rawMeetingLink : ''
         const location = getRichText(page, 'Location')
-        const categories = ['conference']
+        const categories = getNotionCategories(page)
         const speakingAnswers = getMultiSelect(page, 'Are you speaking at this event?')
         const isSpeaking = speakingAnswers.includes('Yes')
 

@@ -1,4 +1,4 @@
-import { getAnchor } from '@ui/components/CustomHTMLElements/CustomHTMLElements.utils'
+import { getAnchor } from 'ui'
 
 import { EdgeFunction } from '@/data/edge-functions/edge-function-query'
 import { DOCS_URL } from '@/lib/constants'

@@ -22,7 +22,6 @@
     "codegen:references:new": "pnpm run codegen:references:new:ensure && tsx scripts/build-reference-content.ts",
     "codegen:references:legacy": "tsx features/docs/Reference.generated.script.ts",
     "codegen:references": "pnpm codegen:references:legacy && pnpm codegen:references:new",
-    "codemod:frontmatter": "node ./scripts/codemod/mdx-meta.mjs && prettier --cache --write \"content/**/*.mdx\"",
     "dev": "run-p --race dev:next dev:watch:troubleshooting",
     "dev:next": "next dev --port 3001",
     "dev:secrets:pull": "AWS_PROFILE=supa-dev node ../../scripts/getSecrets.js -n local/docs",

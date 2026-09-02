@@ -209,8 +209,18 @@ Choose the appropriate `type` for your admonition:
 - `caution`: Warn about behavior that could cause bugs, failed operations, unexpected results, or serious inconvenience but doesn't rise to the severity of `danger`.
 - `note`: Highlight an important prerequisite, constraint, clarification, or optional shortcut that doesn't represent a risk. If the information is essential to completing a step, include it in the procedure instead.
 
-```
-<Admonition type="note" title="Optional title">
+Structure an admonition with these props and content:
+
+- `title` (optional): Add a short callout title. Don't put Markdown or HTML headings inside an admonition. If the content needs a heading to structure the page, move the heading and its section outside the admonition.
+- `children`: Add rich body content such as paragraphs, lists, links, and code.
+- `actions` (optional): Add standalone calls to action so they remain separate from the body content. Keep contextual links and interactive examples in the body when they are part of the explanation.
+
+```mdx
+<Admonition
+  type="note"
+  title="Optional title"
+  actions={<Button>Continue</Button>}
+>
 
 Your content here
 
