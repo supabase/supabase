@@ -93,27 +93,14 @@ import Stripe from 'npm:stripe'
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!)
 
-// Deno has no synchronous Node crypto, so signature verification must go through
-// Stripe's SubtleCryptoProvider. The synchronous `constructEvent()` throws
-// "SubtleCryptoProvider cannot be used in a synchronous context" on this runtime.
-const cryptoProvider = Stripe.createSubtleCryptoProvider()
-
 export default {
   fetch: withSupabase({ auth: 'none' }, async (req, ctx) => {
     const signature = req.headers.get('stripe-signature') ?? ''
     const body = await req.text()
 
     try {
-      await stripe.webhooks.constructEventAsync(
-        body,
-        signature,
-        Deno.env.get('STRIPE_WEBHOOK_SECRET')!,
-        undefined,
-        cryptoProvider
-      )
-    } catch (err) {
-      // Log the reason so a configuration error isn't mistaken for a forged payload.
-      console.error('Stripe signature verification failed:', err)
+      stripe.webhooks.constructEvent(body, signature, Deno.env.get('STRIPE_WEBHOOK_SECRET')!)
+    } catch {
       return new Response('bad signature', { status: 400 })
     }
 
