@@ -1790,7 +1790,7 @@ commands:
     subcommands: []
     flags: []
   - id: supabase-login
-    title: supabase sign-in
+    title: supabase login
     summary: Authenticate using an access token
     description: |2
 
@@ -1798,21 +1798,21 @@ commands:
 
       Your access token is stored securely in [native credentials storage](https://github.com/zalando/go-keyring#dependencies). If native credentials storage is unavailable, it will be written to a plain text file at `~/.supabase/access-token`.
 
-      > If this behavior is not desired, such as in a CI environment, you may skip sign-in by specifying the `SUPABASE_ACCESS_TOKEN` environment variable in other commands.
+      > If this behavior is not desired, such as in a CI environment, you may skip login by specifying the `SUPABASE_ACCESS_TOKEN` environment variable in other commands.
 
       The Supabase CLI uses the stored token to access Management APIs for projects, functions, secrets, etc.
     examples:
       - id: basic-usage
         name: Basic usage
-        code: supabase sign-in
+        code: supabase login
         response: |
           You can generate an access token from https://supabase.com/dashboard/account/tokens
           Enter your access token: sbp_****************************************
-          Finished supabase sign-in.
+          Finished supabase login.
     tags:
       - local-dev
     links: []
-    usage: supabase sign-in [flags]
+    usage: supabase login [flags]
     subcommands: []
     flags:
       - id: name
@@ -1825,7 +1825,7 @@ commands:
         default_value: 'false'
       - id: token
         name: --token <string>
-        description: Use provided token instead of automatic sign-in flow
+        description: Use provided token instead of automatic login flow
         default_value: ''
   - id: supabase-link
     title: supabase link

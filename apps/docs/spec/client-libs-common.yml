@@ -5,7 +5,7 @@ commands:
     product: 'general'
 
   - id: supabase-login
-    title: supabase sign-in
+    title: supabase login
     product: 'general'
 
   - id: supabase-link

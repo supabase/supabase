@@ -179,7 +179,7 @@ To fine-tune what object events PGAudit will record, you must create a custom da
 create role "some_audit_role" noinherit;
 ```
 
-No other Postgres user can assume or sign in via this role. It solely exists to securely define what PGAudit will record.
+No other Postgres user can assume or login via this role. It solely exists to securely define what PGAudit will record.
 
 Once the role is created, you can direct PGAudit to log by assigning it to the `pgaudit.role` variable:
 
@@ -242,7 +242,7 @@ create table account (
 );
 ```
 
-Generates the following sign in the [Dashboard's Postgres Logs](/dashboard/project/_/logs/postgres-logs):
+Generates the following log in the [Dashboard's Postgres Logs](/dashboard/project/_/logs/postgres-logs):
 
 ```
  AUDIT: SESSION,1,1,DDL,CREATE TABLE,TABLE,public.account,create table account(

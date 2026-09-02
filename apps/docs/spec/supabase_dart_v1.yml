@@ -179,7 +179,7 @@ functions:
   - id: sign-in-with-apple
     title: 'signInWithApple()'
     description: |
-      Signs in a user using native Apple sign-in.
+      Signs in a user using native Apple login.
     notes: |
       - You need to [register your bundle ID](https://developer.apple.com/help/account/manage-identifiers/register-an-app-id/) and add it to Supabase dashboard.
       - This method is only available in iOS and macOS
