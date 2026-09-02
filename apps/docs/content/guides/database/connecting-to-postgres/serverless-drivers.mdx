@@ -9,7 +9,7 @@ Learn how to connect to your Postgres database from a serverless environment. Th
 
 [supabase-js](/docs/reference/javascript/introduction) is an isomorphic JavaScript client that uses the [auto-generated REST API](/docs/guides/api), so it works in any environment that supports HTTPS connections. This API has a built-in [connection pooler](/docs/guides/database/connecting-to-postgres/pooling-and-limits#how-connection-pooling-works) and can serve thousands of simultaneous requests, which suits serverless workloads.
 
-If you connect with a Postgres client instead, use the [shared pooler in transaction mode](/docs/guides/database/connecting-to-postgres#pooler-transaction-mode). Transaction mode doesn't support [prepared statements](https://postgresql.org/docs/current/sql-prepare.html), so [turn them off](https://github.com/orgs/supabase/discussions/28239) in your connection library.
+If you connect with a Postgres client instead, use the [shared pooler in transaction mode](/docs/guides/database/connecting-to-postgres#pooler-transaction-mode), then [configure your client](/docs/guides/database/connecting-to-postgres#configure-your-client) for pool size, prepared statements, and SSL. Those three settings are what most serverless connection problems come down to.
 
 ## Vercel Edge Functions
 
