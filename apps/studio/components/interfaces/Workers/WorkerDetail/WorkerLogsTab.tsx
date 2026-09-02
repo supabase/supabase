@@ -2,17 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { RefreshCw, Search } from 'lucide-react'
 import { useState } from 'react'
-import {
-  Button,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from 'ui'
+import { Button, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { WorkerCommandLine } from '../WorkerCommandLine'
@@ -54,7 +44,6 @@ export const WorkerLogsTab = ({ workerName, stream }: WorkerLogsTabProps) => {
   const [selectedLog, setSelectedLog] = useState<LogData | null>(null)
   const [dateRange, setDateRange] = useState<DatePickerValue>(defaultDateRange)
   const [message, setMessage] = useState('')
-  const [method, setMethod] = useState<string>()
   const debouncedMessage = useDebouncedValue(message, 300)
 
   const {
@@ -72,7 +61,6 @@ export const WorkerLogsTab = ({ workerName, stream }: WorkerLogsTabProps) => {
       iso_timestamp_start: dateRange.from,
       iso_timestamp_end: dateRange.to,
       message: debouncedMessage,
-      method,
     })
   )
 
@@ -89,24 +77,6 @@ export const WorkerLogsTab = ({ workerName, stream }: WorkerLogsTabProps) => {
             helpers={EXPLORER_DATEPICKER_HELPERS}
             align="start"
           />
-          {stream === 'requests' && (
-            <Select
-              value={method}
-              onValueChange={(value) => setMethod(value === 'all' ? undefined : value)}
-            >
-              <SelectTrigger size="tiny" className="w-32">
-                <SelectValue placeholder="All methods" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All methods</SelectItem>
-                {['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'].map((value) => (
-                  <SelectItem key={value} value={value}>
-                    {value}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
           <InputGroup className="w-60">
             <InputGroupInput
               size="tiny"

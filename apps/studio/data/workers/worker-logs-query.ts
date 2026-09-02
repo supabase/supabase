@@ -44,22 +44,18 @@ export type WorkerLogsVariables = {
   iso_timestamp_start: string
   iso_timestamp_end: string
   message?: string
-  method?: string
 }
 
 export const workerLogsSql = (
   name: string,
   stream: WorkerLogStream,
-  { message, method }: Pick<WorkerLogsVariables, 'message' | 'method'> = {}
+  { message }: Pick<WorkerLogsVariables, 'message'> = {}
 ) => {
   const messageFilter = message
     ? safeSql` and event_message ilike ${analyticsLiteral(`%${message}%`)}`
     : safeSql``
-  const methodFilter = method
-    ? safeSql` and log_attributes[${analyticsLiteral('request.method')}] = ${analyticsLiteral(method)}`
-    : safeSql``
 
-  return safeSql`select id, timestamp, severity_text as severity, event_message as message from logs where log_attributes[${analyticsLiteral(WORKER_NAME_KEY)}] = ${analyticsLiteral(name)} and log_attributes[${analyticsLiteral(STREAM_KEY)}] = ${analyticsLiteral(WORKER_LOG_SOURCES[stream])}${messageFilter}${methodFilter} order by timestamp desc limit ${analyticsLiteral(LOG_LIMIT)}`
+  return safeSql`select id, timestamp, severity_text as severity, event_message as message from logs where log_attributes[${analyticsLiteral(WORKER_NAME_KEY)}] = ${analyticsLiteral(name)} and log_attributes[${analyticsLiteral(STREAM_KEY)}] = ${analyticsLiteral(WORKER_LOG_SOURCES[stream])}${messageFilter} order by timestamp desc limit ${analyticsLiteral(LOG_LIMIT)}`
 }
 
 export const parseWorkerLogRows = (result: unknown): LogData[] =>
@@ -81,7 +77,6 @@ async function getWorkerLogs(
     iso_timestamp_start,
     iso_timestamp_end,
     message,
-    method,
   }: WorkerLogsVariables,
   signal?: AbortSignal
 ): Promise<LogData[]> {
@@ -91,7 +86,7 @@ async function getWorkerLogs(
   const data = await executeAnalyticsSql({
     projectRef,
     endpoint: logsAllEndpointUrl(true),
-    sql: workerLogsSql(name, stream, { message, method }),
+    sql: workerLogsSql(name, stream, { message }),
     iso_timestamp_start,
     iso_timestamp_end,
     signal,
@@ -103,18 +98,16 @@ async function getWorkerLogs(
 export const workerLogsQueryOptions = (variables: WorkerLogsVariables) => {
   const { projectRef, name, stream, iso_timestamp_start, iso_timestamp_end } = variables
   const message = variables.message?.trim() || undefined
-  const method = variables.method?.trim() || undefined
 
   return queryOptions({
     queryKey: workersKeys.logs(projectRef, name, stream, {
       iso_timestamp_start,
       iso_timestamp_end,
       message,
-      method,
     }),
     queryFn: ({ signal }) =>
       getWorkerLogs(
-        { projectRef, name, stream, iso_timestamp_start, iso_timestamp_end, message, method },
+        { projectRef, name, stream, iso_timestamp_start, iso_timestamp_end, message },
         signal
       ),
     enabled: IS_PLATFORM && typeof projectRef !== 'undefined' && typeof name !== 'undefined',

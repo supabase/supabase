@@ -10,7 +10,6 @@ export const workersKeys = {
       iso_timestamp_start?: string
       iso_timestamp_end?: string
       message?: string
-      method?: string
     }
   ) => ['projects', projectRef, 'worker', name, 'logs', stream, filters] as const,
 }

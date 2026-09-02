@@ -10,9 +10,9 @@ describe('workerLogsSql', () => {
     )
   })
 
-  it('filters by event message and request method before applying the limit', () => {
-    expect(workerLogsSql('embed', 'requests', { message: 'timeout', method: 'POST' })).toBe(
-      "select id, timestamp, severity_text as severity, event_message as message from logs where log_attributes['worker'] = 'embed' and log_attributes['source'] = 'worker_ingress_logs' and event_message ilike '%timeout%' and log_attributes['request.method'] = 'POST' order by timestamp desc limit 100"
+  it('filters by event message before applying the limit', () => {
+    expect(workerLogsSql('embed', 'requests', { message: 'timeout' })).toBe(
+      "select id, timestamp, severity_text as severity, event_message as message from logs where log_attributes['worker'] = 'embed' and log_attributes['source'] = 'worker_ingress_logs' and event_message ilike '%timeout%' order by timestamp desc limit 100"
     )
   })
 
@@ -28,13 +28,8 @@ describe('workerLogsSql', () => {
   })
 
   it('escapes filter values rather than interpolating them raw', () => {
-    expect(
-      workerLogsSql('embed', 'requests', {
-        message: "can't connect",
-        method: "POST' OR '1'='1",
-      })
-    ).toContain(
-      "event_message ilike '%can''t connect%' and log_attributes['request.method'] = 'POST'' OR ''1''=''1'"
+    expect(workerLogsSql('embed', 'requests', { message: "can't connect" })).toContain(
+      "event_message ilike '%can''t connect%'"
     )
   })
 })
@@ -46,7 +41,6 @@ describe('workersKeys.logs', () => {
         iso_timestamp_start: '2026-09-01T12:00:00.000Z',
         iso_timestamp_end: '2026-09-02T12:00:00.000Z',
         message: 'timeout',
-        method: 'POST',
       })
     ).toEqual([
       'projects',
@@ -59,7 +53,6 @@ describe('workersKeys.logs', () => {
         iso_timestamp_start: '2026-09-01T12:00:00.000Z',
         iso_timestamp_end: '2026-09-02T12:00:00.000Z',
         message: 'timeout',
-        method: 'POST',
       },
     ])
   })

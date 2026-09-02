@@ -27,18 +27,11 @@ vi.mock('@/components/interfaces/Settings/Logs/LogTable', () => ({
   LogTable: () => <div />,
 }))
 
-const renderTab = (stream: 'requests' | 'output') =>
-  customRender(<WorkerLogsTab workerName="embed" stream={stream} />)
+const renderTab = () => customRender(<WorkerLogsTab workerName="embed" stream="requests" />)
 
 describe('WorkerLogsTab', () => {
-  it('shows the method filter for invocation logs', () => {
-    renderTab('requests')
-
-    expect(screen.getByText('All methods')).toBeVisible()
-  })
-
-  it('hides the method filter for non-request logs', () => {
-    renderTab('output')
+  it('does not render a method filter', () => {
+    renderTab()
 
     expect(screen.queryByText('All methods')).not.toBeInTheDocument()
   })
