@@ -1,4 +1,11 @@
 import {
+  fromApiProjectConfig,
+  fromConfigDocument,
+  type EffectiveConfig,
+  type ProjectConfig,
+} from '@supabase/config'
+
+import {
   CONFIG_SECTIONS,
   getConfigValue,
   getFieldDefinition,
@@ -6,9 +13,14 @@ import {
   isSecretConfigField,
   type ConfigSection,
 } from './github-config-field-registry'
-import { gitHubConfigTomlSchema, type GitHubConfigToml } from './github-config.types'
 
-// This file should be temporary and will be removed once we publish a "@supabase/config" package.
+/**
+ * The parsed-config.toml side additionally carries `config_source` -- the GitHub connections API's
+ * own "is this config.toml owned by the repo" annotation, alongside the config.toml sections
+ * themselves. It has no config.toml or @supabase/config counterpart, so it's threaded through
+ * separately rather than folded into `ProjectConfig`.
+ */
+export type GitHubProjectConfig = ProjectConfig & { config_source?: string }
 
 type GitHubConfigFieldStatus = 'unmanaged' | 'managed' | 'drifted'
 
@@ -39,14 +51,55 @@ interface GitHubConfigDriftSummary {
   unmanagedFields: UnmanagedConfigField[]
 }
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function isEffectiveConfigLike(value: unknown): value is EffectiveConfig {
+  return isPlainObject(value)
+}
+
+/**
+ * Converts a v2 project-config API response's `attributes` into the hosted-section shape both
+ * sides of a drift comparison are normalized to. Returns `undefined` (rather than throwing) when
+ * `attributes` isn't loaded yet or the API returned something @supabase/config can't map.
+ */
+export function toDashboardProjectConfig(attributes: unknown): ProjectConfig | undefined {
+  if (attributes === undefined) return undefined
+  try {
+    return fromApiProjectConfig(attributes)
+  } catch {
+    return undefined
+  }
+}
+
+/**
+ * Converts a parsed config.toml document into the same hosted-section shape, preserving
+ * `config_source` (see {@link GitHubProjectConfig}) since @supabase/config's projection drops it.
+ */
+export function toGithubProjectConfig(document: unknown): GitHubProjectConfig | undefined {
+  const configSource =
+    isPlainObject(document) && typeof document.config_source === 'string'
+      ? document.config_source
+      : undefined
+
+  if (!isEffectiveConfigLike(document)) return undefined
+
+  try {
+    return { ...fromConfigDocument(document), config_source: configSource }
+  } catch {
+    return undefined
+  }
+}
+
 function getConfigFieldState({
   configPath,
   dashboardConfig,
   githubConfig,
 }: {
   configPath: string
-  dashboardConfig: GitHubConfigToml
-  githubConfig?: GitHubConfigToml
+  dashboardConfig: ProjectConfig
+  githubConfig?: GitHubProjectConfig
 }): GitHubConfigFieldState {
   const definition = getFieldDefinition(configPath)
   if (!definition || !githubConfig || isSecretConfigField(definition.configPath)) {
@@ -57,7 +110,7 @@ function getConfigFieldState({
 
   let githubValue = getConfigValue(githubConfig, definition.configPath)
   if (githubValue === undefined) {
-    const isCodeOwned = getConfigValue(githubConfig, 'config_source') === 'code'
+    const isCodeOwned = githubConfig.config_source === 'code'
     if (!isCodeOwned || definition.hostedDefault === undefined) return { status: 'unmanaged' }
 
     const normalizedDefaultValue =
@@ -82,37 +135,25 @@ export function getConfigDriftSummary({
   dashboardConfig,
   githubConfig,
 }: {
-  dashboardConfig?: GitHubConfigToml
-  githubConfig?: GitHubConfigToml
+  dashboardConfig?: ProjectConfig
+  githubConfig?: GitHubProjectConfig
 }): GitHubConfigDriftSummary {
   if (!dashboardConfig || !githubConfig) {
     return { managedCount: 0, driftedFields: [], unmanagedFields: [] }
   }
-
-  const githubConfigResult = gitHubConfigTomlSchema.safeParse(githubConfig)
-  const dashboardConfigResult = gitHubConfigTomlSchema.safeParse(dashboardConfig)
-  if (!githubConfigResult.success || !dashboardConfigResult.success) {
-    return { managedCount: 0, driftedFields: [], unmanagedFields: [] }
-  }
-  const cleanedGithubConfig = githubConfigResult.data
-  const cleanedDashboardConfig = dashboardConfigResult.data
 
   let managedCount = 0
   const driftedFields: GitHubConfigDriftField[] = []
   const unmanagedFields: UnmanagedConfigField[] = []
 
   for (const section of CONFIG_SECTIONS) {
-    const sectionConfig = cleanedDashboardConfig[section]
+    const sectionConfig = dashboardConfig[section]
     if (!sectionConfig) continue
 
     for (const { configPath, rawValue } of getSectionFieldEntries(section, sectionConfig)) {
       if (isSecretConfigField(configPath)) continue
 
-      const state = getConfigFieldState({
-        configPath,
-        dashboardConfig: cleanedDashboardConfig,
-        githubConfig: cleanedGithubConfig,
-      })
+      const state = getConfigFieldState({ configPath, dashboardConfig, githubConfig })
 
       if (state.status === 'managed') {
         managedCount += 1
