@@ -51,6 +51,7 @@
   --animate-chevron-up: chevron-up 2s ease-in-out infinite;
   --animate-sway: sway 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-marketplace-featured-progress: marketplace-featured-progress linear forwards;
+  --animate-ha-primary-fail-flash: ha-primary-fail-flash 0.7s ease-in-out both;
 
   /* font sizing and weights optimized for Inter */
   --text-sm: 0.8125rem;
@@ -105,6 +106,26 @@
   }
   50% {
     opacity: 0.8;
+  }
+}
+
+@keyframes ha-primary-fail-flash {
+  0%,
+  28% {
+    background-color: var(--background-surface-100);
+    border-color: var(--border-color-default);
+    box-shadow: 0 0 0 0 transparent;
+  }
+  14%,
+  42% {
+    background-color: var(--color-destructive-200);
+    border-color: var(--color-destructive-400);
+    box-shadow: 0 0 0 3px hsl(var(--destructive-600) / 0.4);
+  }
+  100% {
+    background-color: var(--color-destructive-200);
+    border-color: var(--color-destructive-400);
+    box-shadow: 0 0 0 0 transparent;
   }
 }
 

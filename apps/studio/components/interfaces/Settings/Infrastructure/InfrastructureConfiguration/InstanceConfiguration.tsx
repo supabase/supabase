@@ -11,6 +11,7 @@ import { HaInstanceConfiguration } from './HaInstanceConfiguration'
 import { addRegionNodes, generateNodes } from './InstanceConfiguration.utils'
 import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
+import type { FailoverSimulationPhase } from '@/components/interfaces/ProjectHome/simulateFailover.utils'
 import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'
 import { AlertError } from '@/components/ui/AlertError'
 import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
@@ -218,8 +219,15 @@ const InstanceConfigurationUI = () => {
   )
 }
 
-export const InstanceConfiguration = () => {
-  const { isHighAvailability, isPending } = useHighAvailability()
+export const InstanceConfiguration = ({
+  simulateHighAvailability = false,
+  failoverPhase = 'off',
+}: {
+  simulateHighAvailability?: boolean
+  failoverPhase?: FailoverSimulationPhase
+}) => {
+  const { isHighAvailability: isProjectHighAvailability, isPending } = useHighAvailability()
+  const isHighAvailability = isProjectHighAvailability || simulateHighAvailability
 
   // Wait for the project record so an HA project never briefly mounts the
   // standard diagram (and fires its queries) before swapping.
@@ -234,7 +242,14 @@ export const InstanceConfiguration = () => {
 
   return (
     <ReactFlowProvider>
-      {isHighAvailability ? <HaInstanceConfiguration /> : <InstanceConfigurationUI />}
+      {isHighAvailability ? (
+        <HaInstanceConfiguration
+          simulateHighAvailability={simulateHighAvailability}
+          failoverPhase={failoverPhase}
+        />
+      ) : (
+        <InstanceConfigurationUI />
+      )}
     </ReactFlowProvider>
   )
 }

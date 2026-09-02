@@ -1,7 +1,7 @@
 import { Edge, Node } from '@xyflow/react'
 import { groupBy } from 'lodash'
 
-import { getPoolerKey, hasPoolerIdentity, HaTopology } from './HaTopology.utils'
+import { getPoolerKey, HaPoolerStatus, hasPoolerIdentity, HaTopology } from './HaTopology.utils'
 import {
   NODE_CARD_WIDTH,
   SHARD_HEADER_HEIGHT,
@@ -20,21 +20,55 @@ export type HaPoolerNodeData = {
   shardName: string
   // Only set on primary nodes; hides the unused top handle when no gateway exists.
   hasGateway?: boolean
+  promotion?: 'promoting' | 'promoted'
+  statusOverride?: HaPoolerStatus
 }
 
 export type HaShardNodeData = {
   name: string
 }
 
+const REPLICATION_EDGE_STYLE = { strokeDasharray: '3 5' } as const
+
 // Records without a complete identity fall back to a positional id so two of
 // them never collide on the same React Flow node id (which would drop a card).
 const getPoolerNodeId = (pooler: Parameters<typeof getPoolerKey>[0], fallbackId: string) =>
   hasPoolerIdentity(pooler) ? `pooler-${getPoolerKey(pooler)}` : `pooler-${fallbackId}`
 
-export const generateHaNodesAndEdges = (topology: HaTopology): { nodes: Node[]; edges: Edge[] } => {
+const createSmoothstepEdge = ({
+  source,
+  target,
+  animated = false,
+  dashed = false,
+}: {
+  source: string
+  target: string
+  animated?: boolean
+  dashed?: boolean
+}): Edge => ({
+  id: `${source}-${target}`,
+  source,
+  target,
+  type: 'smoothstep',
+  animated,
+  className: 'cursor-default!',
+  ...(dashed ? { style: REPLICATION_EDGE_STYLE } : {}),
+})
+
+export const generateHaNodesAndEdges = (
+  topology: HaTopology,
+  {
+    isSimulated = false,
+    failoverPhase,
+  }: { isSimulated?: boolean; failoverPhase?: 'promoting' | 'failover' } = {}
+): { nodes: Node[]; edges: Edge[]; layoutEdges: Edge[] } => {
+  const isPromoting = failoverPhase === 'promoting'
+  const isFailover = failoverPhase === 'failover'
+  const isPrimaryFailed = isPromoting || isFailover
   const position = { x: 0, y: 0 }
   const nodes: Node[] = []
   const edges: Edge[] = []
+  const layoutEdges: Edge[] = []
 
   // The alpha runs one multigateway per cell; the diagram collapses them into a
   // single gateway node with a count rather than rendering one card per cell.
@@ -50,9 +84,13 @@ export const generateHaNodesAndEdges = (topology: HaTopology): { nodes: Node[]; 
 
   topology.shards.forEach((shard) => {
     let primaryId: string | undefined
+    const replicaIds: string[] = []
 
     if (shard.primary !== undefined) {
       primaryId = getPoolerNodeId(shard.primary, `${shard.id}-primary`)
+      let statusOverride: HaPoolerStatus | undefined
+      if (isPrimaryFailed) statusOverride = 'unhealthy'
+      else if (isSimulated) statusOverride = 'healthy'
       nodes.push({
         position,
         id: primaryId,
@@ -63,22 +101,18 @@ export const generateHaNodesAndEdges = (topology: HaTopology): { nodes: Node[]; 
           shardId: shard.id,
           shardName: shard.name,
           hasGateway,
+          statusOverride,
         } satisfies HaPoolerNodeData,
       })
-
-      if (hasGateway) {
-        edges.push({
-          id: `multigateway-${primaryId}`,
-          source: 'multigateway',
-          target: primaryId,
-          type: 'smoothstep',
-          className: 'cursor-default!',
-        })
-      }
     }
 
     shard.replicas.forEach((replica, replicaIndex) => {
       const replicaId = getPoolerNodeId(replica, `${shard.id}-replica-${replicaIndex}`)
+      let promotion: HaPoolerNodeData['promotion']
+      if (replicaIndex === 0 && isFailover) promotion = 'promoted'
+      if (replicaIndex === 0 && isPromoting) promotion = 'promoting'
+      replicaIds.push(replicaId)
+
       nodes.push({
         position,
         id: replicaId,
@@ -88,23 +122,61 @@ export const generateHaNodesAndEdges = (topology: HaTopology): { nodes: Node[]; 
           name: replica.id?.name,
           shardId: shard.id,
           shardName: shard.name,
+          promotion,
+          statusOverride: isSimulated || promotion !== undefined ? 'healthy' : undefined,
         } satisfies HaPoolerNodeData,
       })
+    })
 
-      if (primaryId !== undefined) {
-        edges.push({
-          id: `${primaryId}-${replicaId}`,
+    const promotedId = isFailover ? replicaIds[0] : undefined
+
+    // Healthy and promoting keep the original fan-out so the replica can later
+    // animate onto the primary row. Failover makes the promoted replica the
+    // parent of remaining replicas (same smoothstep geometry as primary → replica).
+    if (promotedId !== undefined) {
+      replicaIds.slice(1).forEach((replicaId) => {
+        const replicationEdge = createSmoothstepEdge({
+          source: promotedId,
+          target: replicaId,
+          animated: true,
+          dashed: true,
+        })
+        edges.push(replicationEdge)
+        layoutEdges.push(replicationEdge)
+      })
+    } else if (primaryId !== undefined) {
+      replicaIds.forEach((replicaId) => {
+        const replicationEdge = createSmoothstepEdge({
           source: primaryId,
           target: replicaId,
-          type: 'smoothstep',
           animated: true,
-          className: 'cursor-default!',
+        })
+        edges.push(replicationEdge)
+        layoutEdges.push(replicationEdge)
+      })
+    }
+
+    if (hasGateway) {
+      const gatewayTargetId = promotedId ?? primaryId
+      if (gatewayTargetId !== undefined) {
+        edges.push({
+          ...createSmoothstepEdge({ source: 'multigateway', target: gatewayTargetId }),
+          type: isFailover ? 'failover' : 'smoothstep',
         })
       }
-    })
+
+      // Keep the failed primary on the gateway row so it stays beside the
+      // promoted replica instead of dropping into the replica rank.
+      if (primaryId !== undefined) {
+        layoutEdges.push(createSmoothstepEdge({ source: 'multigateway', target: primaryId }))
+      }
+      if (promotedId !== undefined) {
+        layoutEdges.push(createSmoothstepEdge({ source: 'multigateway', target: promotedId }))
+      }
+    }
   })
 
-  return { nodes, edges }
+  return { nodes, edges, layoutEdges }
 }
 
 const getNodeWidth = (node: Node) => node.measured?.width ?? NODE_CARD_WIDTH

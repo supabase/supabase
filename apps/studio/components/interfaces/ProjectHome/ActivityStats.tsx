@@ -7,6 +7,7 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { HighAvailabilityBadge } from './HighAvailabilityBadge'
 import { ServiceStatus } from './ServiceStatus'
+import type { FailoverSimulationPhase } from './simulateFailover.utils'
 import { ComputeBadgeWrapper } from '@/components/ui/ComputeBadgeWrapper'
 import { DisableInteraction } from '@/components/ui/DisableInteraction'
 import { SingleStat } from '@/components/ui/SingleStat'
@@ -74,10 +75,17 @@ export const BranchStatValue = ({
   return <p className="text-foreground-lighter">Unknown</p>
 }
 
-export const ActivityStats = () => {
+export const ActivityStats = ({
+  isHighAvailabilityOverride,
+  failoverPhase = 'off',
+}: {
+  isHighAvailabilityOverride?: boolean
+  failoverPhase?: FailoverSimulationPhase
+}) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { isHighAvailability } = useHighAvailability()
+  const { isHighAvailability: isProjectHighAvailability } = useHighAvailability()
+  const isHighAvailability = isHighAvailabilityOverride ?? isProjectHighAvailability
   const { data: organization } = useSelectedOrganizationQuery()
   const { data: resourceWarnings } = useResourceWarningsQuery({ slug: organization?.slug })
   const projectResourceWarnings = resourceWarnings?.find((warning) => warning.project === ref)
@@ -154,7 +162,7 @@ export const ActivityStats = () => {
   return (
     <div className="@container">
       <div className="grid grid-cols-1 @md:grid-cols-2 gap-2 @md:gap-6 flex-wrap">
-        <ServiceStatus />
+        <ServiceStatus isHighAvailabilityOverride={isHighAvailability} failoverPhase={failoverPhase} />
 
         <SingleStat
           icon={<Cpu size={18} strokeWidth={1.5} className="text-foreground" />}
@@ -172,7 +180,7 @@ export const ActivityStats = () => {
               ) : (
                 <p className="text-foreground-lighter">Unknown</p>
               )}
-              {project?.high_availability && <HighAvailabilityBadge />}
+              {isHighAvailability && <HighAvailabilityBadge />}
             </div>
           }
         />

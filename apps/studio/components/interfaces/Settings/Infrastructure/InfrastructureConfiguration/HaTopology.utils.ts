@@ -154,11 +154,14 @@ export const buildHaTopology = ({
           best === undefined || compareRoutingRules(candidate, best) > 0 ? candidate : best,
         undefined
       )
+
+      const orderedReplicas = [...primaries.filter((pooler) => pooler !== primary), ...replicas]
+
       return {
         id,
         name: `Shard ${index + 1}`,
         primary,
-        replicas: [...primaries.filter((pooler) => pooler !== primary), ...replicas],
+        replicas: orderedReplicas,
       }
     })
 

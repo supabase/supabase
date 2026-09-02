@@ -6,6 +6,10 @@ import { cn, HoverCard, HoverCardContent, HoverCardTrigger, InfoIcon } from 'ui'
 
 import { useUnifiedLogsPreview } from '../App/FeaturePreview/FeaturePreviewContext'
 import { resolveRealtimeServiceStatus, type ProjectServiceStatus } from './ServiceStatus.utils'
+import {
+  getFailoverSimulationStatusLabel,
+  type FailoverSimulationPhase,
+} from './simulateFailover.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { SingleStat } from '@/components/ui/SingleStat'
 import { useBranchesQuery } from '@/data/branches/branches-query'
@@ -101,10 +105,17 @@ const extractDbSchema = (response: ServiceHealthResponse | undefined) => {
  * minutes of when it was created). Might be related to decoupling "ready" state vs "health checks"
  */
 
-export const ServiceStatus = () => {
+export const ServiceStatus = ({
+  isHighAvailabilityOverride,
+  failoverPhase = 'off',
+}: {
+  isHighAvailabilityOverride?: boolean
+  failoverPhase?: FailoverSimulationPhase
+}) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { isHighAvailability } = useHighAvailability()
+  const { isHighAvailability: isProjectHighAvailability } = useHighAvailability()
+  const isHighAvailability = isHighAvailabilityOverride ?? isProjectHighAvailability
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const {
@@ -310,7 +321,7 @@ export const ServiceStatus = () => {
     return 'Healthy'
   }
 
-  const overallStatusLabel = getOverallStatusLabel()
+  const overallStatusLabel = getFailoverSimulationStatusLabel(failoverPhase) ?? getOverallStatusLabel()
 
   return (
     <HoverCard openDelay={200} closeDelay={100}>

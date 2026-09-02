@@ -1,5 +1,6 @@
 import { Handle, Node, NodeProps, Position } from '@xyflow/react'
 import { Database, DatabaseBackup, HelpCircle, Layers, Loader2, Network } from 'lucide-react'
+import { type ReactNode } from 'react'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { ComputeMetricsFooter } from './ComputeMetricsFooter'
@@ -11,17 +12,49 @@ import {
 import { HA_POOLER_STATUS_LABELS, HaPoolerStatus } from './HaTopology.utils'
 import { NODE_CARD_WIDTH } from './InstanceConfiguration.constants'
 import { useHaPoolerCard } from './useHaPooler'
-import { BASE_PATH } from '@/lib/constants'
+import { RegionFlag } from '@/components/ui/RegionFlag'
 
-const STATUS_BADGE_VARIANTS: Record<HaPoolerStatus, 'success' | 'warning' | 'default'> = {
+const STATUS_BADGE_VARIANTS: Record<
+  HaPoolerStatus,
+  'success' | 'warning' | 'destructive' | 'default'
+> = {
   healthy: 'success',
   coming_up: 'default',
   going_down: 'default',
-  unhealthy: 'warning',
+  unhealthy: 'destructive',
 }
 
 const PoolerStatusBadge = ({ status }: { status: HaPoolerStatus }) => (
   <Badge variant={STATUS_BADGE_VARIANTS[status]}>{HA_POOLER_STATUS_LABELS[status]}</Badge>
+)
+
+const PromotionBadge = ({ state }: { state: NonNullable<HaPoolerNodeData['promotion']> }) => (
+  <span
+    className={cn(
+      'relative inline-flex items-center justify-center overflow-hidden rounded-md text-center font-mono uppercase',
+      'whitespace-nowrap font-medium tracking-[0.06em] text-[11px] leading-[1.1] px-[5.5px] py-[3px]',
+      'border border-purple-700 bg-purple-400 text-purple-1100',
+      'dark:border-purple-600/50 dark:bg-purple-100'
+    )}
+  >
+    {state === 'promoting' ? 'Promoting' : 'Promoted'}
+    <span className="animate-badge-shimmer pointer-events-none absolute inset-0 bg-gradient-to-br from-transparent via-white/35 to-transparent blur-md" />
+  </span>
+)
+
+const PoolerCardTitleRow = ({
+  title,
+  children,
+}: {
+  title: string
+  children?: ReactNode
+}) => (
+  <div className="flex items-center justify-between gap-x-2">
+    <p className="text-sm">{title}</p>
+    {children !== undefined && (
+      <div className="inline-flex shrink-0 items-center gap-x-2">{children}</div>
+    )}
+  </div>
 )
 
 const PoolerCardSubtitle = ({
@@ -73,8 +106,12 @@ export const MultigatewayNode = ({ data }: NodeProps<Node<MultigatewayNodeData>>
 
 export const HaPrimaryNode = ({ data }: NodeProps<Node<HaPoolerNodeData>>) => {
   // [Joshen] Just FYI Handles cannot be conditionally rendered
-  const { cell, name, hasGateway } = data
-  const { status, availabilityZone, computeSize, primaryRegion } = useHaPoolerCard({ cell, name })
+  const { cell, name, hasGateway, statusOverride } = data
+  const { status, availabilityZone, computeSize, primaryRegion } = useHaPoolerCard({
+    cell,
+    name,
+    statusOverride,
+  })
 
   return (
     <>
@@ -84,35 +121,32 @@ export const HaPrimaryNode = ({ data }: NodeProps<Node<HaPoolerNodeData>>) => {
         className={!hasGateway ? 'opacity-0' : ''}
         style={{ background: 'transparent' }}
       />
-      <div className="flex flex-col rounded-sm bg-surface-100 border border-default">
-        <div className="flex items-start justify-between p-3" style={{ width: NODE_CARD_WIDTH }}>
-          <div className="flex gap-x-3">
-            <div className="w-8 h-8 bg-brand-500 border border-brand-600 rounded-md flex items-center justify-center">
-              <Database aria-hidden="true" size={16} />
-            </div>
-            <div className="flex flex-col gap-y-0.5">
-              <div className="flex items-center gap-x-2">
-                <p className="text-sm">Primary Database</p>
-                {/* Stable live region so polled status changes are announced */}
-                <span role="status">
-                  {status !== undefined && <PoolerStatusBadge status={status} />}
-                </span>
-              </div>
-              {primaryRegion !== undefined && (
-                <p className="text-sm text-foreground-light">{primaryRegion.name}</p>
-              )}
-              <PoolerCardSubtitle availabilityZone={availabilityZone} computeSize={computeSize} />
-            </div>
+      <div
+        className={cn(
+          'flex flex-col rounded-sm bg-surface-100 border border-default',
+          status === 'unhealthy' &&
+            'bg-destructive-200 border-destructive-400 motion-safe:animate-ha-primary-fail-flash'
+        )}
+      >
+        <div className="flex gap-x-3 p-3" style={{ width: NODE_CARD_WIDTH }}>
+          <div className="w-8 h-8 shrink-0 bg-brand-500 border border-brand-600 rounded-md flex items-center justify-center">
+            <Database aria-hidden="true" size={16} />
           </div>
-          {primaryRegion !== undefined && (
-            // Decorative — the visible text next to it already names the region
-            <img
-              alt=""
-              aria-hidden="true"
-              className="w-8 rounded-xs mt-0.5"
-              src={`${BASE_PATH}/img/regions/${primaryRegion.region}.svg`}
-            />
-          )}
+          <div className="flex min-w-0 flex-1 flex-col gap-y-0.5">
+            <PoolerCardTitleRow title="Primary Database">
+              {/* Stable live region so polled status changes are announced */}
+              <span role="status" className="inline-flex items-center">
+                {status !== undefined && <PoolerStatusBadge status={status} />}
+              </span>
+            </PoolerCardTitleRow>
+            {primaryRegion !== undefined && (
+              <p className="flex items-center gap-x-1.5 text-sm text-foreground-light">
+                <RegionFlag className="w-4 shrink-0" region={primaryRegion.region} />
+                <span>{primaryRegion.name}</span>
+              </p>
+            )}
+            <PoolerCardSubtitle availabilityZone={availabilityZone} computeSize={computeSize} />
+          </div>
         </div>
         {/* Whether connection metrics are meaningful through the multigateway
             is unconfirmed, so they're left off for HA projects. */}
@@ -124,43 +158,47 @@ export const HaPrimaryNode = ({ data }: NodeProps<Node<HaPoolerNodeData>>) => {
 }
 
 export const HaReplicaNode = ({ data }: NodeProps<Node<HaPoolerNodeData>>) => {
-  const { cell, name } = data
-  const { status, availabilityZone, computeSize } = useHaPoolerCard({ cell, name })
+  const { cell, name, promotion, statusOverride } = data
+  const { status, availabilityZone, computeSize } = useHaPoolerCard({
+    cell,
+    name,
+    statusOverride,
+  })
+  const isPromoting = promotion === 'promoting'
 
   return (
     <>
       <Handle type="target" position={Position.Top} style={{ background: 'transparent' }} />
       <div
-        className="flex items-start rounded-sm bg-surface-100 border border-default p-3"
+        className="flex gap-x-3 rounded-sm bg-surface-100 border border-default p-3"
         style={{ width: NODE_CARD_WIDTH }}
       >
-        <div className="flex gap-x-3">
-          <div
-            className={cn(
-              'w-8 h-8 border rounded-md flex items-center justify-center',
-              status === 'healthy'
-                ? 'bg-brand-400 border-brand-500'
-                : 'bg-surface-100 border-foreground/20'
-            )}
-          >
-            {status === 'coming_up' ? (
+        <div
+          className={cn(
+            'w-8 h-8 shrink-0 border rounded-md flex items-center justify-center',
+            status === 'healthy'
+              ? 'bg-brand-400 border-brand-500'
+              : 'bg-surface-100 border-foreground/20'
+          )}
+        >
+            {status === 'coming_up' || isPromoting ? (
               <Loader2 aria-hidden="true" className="motion-safe:animate-spin" size={16} />
             ) : (
               <DatabaseBackup aria-hidden="true" size={16} />
             )}
-          </div>
-          <div className="flex flex-col gap-y-0.5">
-            <div className="flex items-center gap-x-2">
-              <p className="text-sm">Read Replica</p>
-              {/* Stable live region so polled status changes are announced */}
-              <span role="status">
-                {status !== undefined && <PoolerStatusBadge status={status} />}
-              </span>
-            </div>
-            <PoolerCardSubtitle availabilityZone={availabilityZone} computeSize={computeSize} />
-          </div>
+        </div>
+        <div className="flex min-w-0 flex-1 flex-col gap-y-0.5">
+          <PoolerCardTitleRow title="Read Replica">
+            {promotion !== undefined && <PromotionBadge state={promotion} />}
+            {/* Stable live region so polled status changes are announced */}
+            <span role="status" className="inline-flex items-center">
+              {status !== undefined && <PoolerStatusBadge status={status} />}
+            </span>
+          </PoolerCardTitleRow>
+          <PoolerCardSubtitle availabilityZone={availabilityZone} computeSize={computeSize} />
         </div>
       </div>
+      <Handle type="source" position={Position.Bottom} style={{ background: 'transparent' }} />
     </>
   )
 }
