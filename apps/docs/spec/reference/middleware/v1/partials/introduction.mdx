@@ -23,4 +23,4 @@ Ordering is your permission boundary. A middleware can only read context values 
 
 ### Environment access
 
-Middleware read configuration through `getEnv` instead of `process.env`. On Node, Deno, and Bun, `getEnv` reads the process environment. Cloudflare Workers pass env bindings per request instead of exposing a global environment; the pipeline seeds each request's bindings, and `getEnv` reads the ones for the current request.
+Middleware reads configuration through `getEnv` instead of `process.env`. On Node, Deno, and Bun, `getEnv` reads the process environment. Cloudflare Workers pass env bindings per request instead of exposing a global environment; the pipeline seeds each request's bindings, and `getEnv` reads the ones for the current request.
