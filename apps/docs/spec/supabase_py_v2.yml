@@ -52,11 +52,11 @@ functions:
           - name: persist_session
             isOptional: true
             type: bool
-            description: Whether to persist a logged in session to storage.
+            description: Whether to persist a signed in session to storage.
           - name: storage
             isOptional: true
             type: SyncSupportedStorage
-            description: A storage provider. Used to store the logged in session.
+            description: A storage provider. Used to store the signed in session.
           - name: realtime
             isOptional: true
             type: string
@@ -157,7 +157,7 @@ functions:
                   The channel to use for sending messages.
                   Only for phone signups.
     notes: |
-      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
+      - By default, the user needs to verify their email address before signing in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, a `user` is returned but `session` is null.
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
@@ -457,7 +457,7 @@ functions:
                 isOptional: true
                 type: string
     notes: |
-      Log in an existing user with an email and password or phone and password.
+      Sign in an existing user with an email and password or phone and password.
       - Requires either an email and password or a phone number and password.
     examples:
       - id: sign-in-with-email-and-password
@@ -1235,7 +1235,7 @@ functions:
       - The User model includes the following fields (since v2.28.0): `is_sso_user` (bool, defaults to `False`), `deleted_at` (optional string), and `banned_until` (optional string) in addition to the existing fields.
     examples:
       - id: get-the-logged-in-user-with-the-current-existing-session
-        name: Get the logged in user with the current existing session
+        name: Get the signed in user with the current existing session
         isSpotlight: true
         code: |
           ```
@@ -1275,7 +1275,7 @@ functions:
           }
           ```
       - id: get-the-logged-in-user-with-a-custom-access-token-jwt
-        name: Get the logged in user with a custom access token jwt
+        name: Get the signed in user with a custom access token jwt
         isSpotlight: false
         code: |
           ```
@@ -1861,7 +1861,7 @@ functions:
         isOptional: false
         type: string
     notes: |
-      Log in an existing user by exchanging an Auth Code issued during the PKCE flow.
+      Sign in an existing user by exchanging an Auth Code issued during the PKCE flow.
 
       - Used when `flow_type` is set to `pkce` in client options.
     examples:
@@ -3088,7 +3088,7 @@ functions:
             type: string
             description: Verification token received when the user completes the captcha on the site.
     notes: |
-      - The password reset flow consist of 2 broad steps: (i) Allow the user to login via the password reset link; (ii) Update the user's password.
+      - The password reset flow consist of 2 broad steps: (i) Allow the user to sign in via the password reset link; (ii) Update the user's password.
       - The `reset_password_for_email()` only sends a password reset link to the user's email.
       To update the user's password, see [`update_user()`](/docs/reference/python/auth-updateuser).
       - When the user clicks the reset link in the email they are redirected back to your application.

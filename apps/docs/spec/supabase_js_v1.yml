@@ -82,7 +82,7 @@ functions:
     title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
     notes: |
-      - By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [supabase.com/dashboard](https://supabase.com/dashboard)
+      - By default, the user will need to verify their email address before signing in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [supabase.com/dashboard](https://supabase.com/dashboard)
       - If "Email Confirmations" is turned on, a `user` is returned but `session` will be null
       - If "Email Confirmations" is turned off, both a `user` and a `session` will be returned
       - When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [supabase.com/dashboard](https://supabase.com/dashboard)
@@ -148,7 +148,7 @@ functions:
       - A user can sign up either via email or OAuth.
       - If you provide `email` without a `password`, the user will be sent a magic link.
       - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [supabase.com/dashboard](https://supabase.com/dashboard)
-      - Specifying a `provider` will open the browser to the relevant login page.
+      - Specifying a `provider` will open the browser to the relevant sign-in page.
     examples:
       - id: sign-in-with-email-and-password
         name: Sign in with email and password
@@ -192,10 +192,10 @@ functions:
       - id: sign-in-using-a-third-party-provider-with-redirect
         name: Sign in using a third-party provider with redirect
         description: |
-          Note that the `redirectTo` param is only relevant for OAuth logins, where the login flow is managed by
+          Note that the `redirectTo` param is only relevant for OAuth logins, where the sign-in flow is managed by
           the Auth server. If you are using email/phone logins you should set up your own redirects (within the email/sms template).
 
-          Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for
+          Sometimes you want to control where the user is redirected to after they are signed in. Supabase supports this for
           any URL path on your website (the URL must either be on the same domain as your [Site URL](https://supabase.com/dashboard/project/_/auth/url-configuration) or match one of the Redirect URLs).
 
           See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
@@ -224,7 +224,7 @@ functions:
       - id: sign-in-with-refresh-token
         name: Sign in using a refresh token (e.g. in React Native).
         description: |
-          If you are completing a sign up or login in a React Native app you can pass the refresh token obtained from the provider to obtain a session.
+          If you are completing a sign up or sign-in in a React Native app you can pass the refresh token obtained from the provider to obtain a session.
         code: |
           ```js
           // An example using Expo's `AuthSession`
@@ -273,7 +273,7 @@ functions:
       This method gets the user object from memory.
     examples:
       - id:
-        name: Get the logged in user
+        name: Get the signed in user
         isSpotlight: true
         code: |
           ```js
@@ -288,7 +288,7 @@ functions:
       To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://supabase.com/dashboard/project/_/auth/providers).
 
       User metadata: It's generally better to store user data in a table within your public schema (i.e., `public.users`).
-      Use the `update()` method if you have data which rarely changes or is specific only to the logged in user.
+      Use the `update()` method if you have data which rarely changes or is specific only to the signed in user.
     examples:
       - id: update-the-email-for-an-authenticated-user
         name: Update the email for an authenticated user

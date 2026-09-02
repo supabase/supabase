@@ -272,8 +272,8 @@ commands:
         -h, --help              help for list
         -p, --password string   Password to your remote Postgres database.
       ```
-  - id: supabase-login
-    title: supabase login
+  - id: supabase-sign-in
+    title: supabase sign-in
     summary: Authenticate using an access token
     tags:
       - local-dev
