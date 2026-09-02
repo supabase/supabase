@@ -12,6 +12,13 @@ import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
  */
 const WAREHOUSE_TLD = IS_STAGING_OR_LOCAL ? 'red' : 'io'
 
+/**
+ * Name of the singleton replication publication (and destination) the platform manages for
+ * Warehouse — `SUPABASE_MANAGED_WAREHOUSE_RESOURCE_NAME` in the platform repo. Its table list is
+ * the source of truth for what's currently replicated.
+ */
+export const WAREHOUSE_PUBLICATION_NAME = 'supabase_warehouse'
+
 export function getWarehouseFlightSqlEndpoint(projectRef: string): string {
   return `${projectRef}.warehouse.supabase.${WAREHOUSE_TLD}`
 }

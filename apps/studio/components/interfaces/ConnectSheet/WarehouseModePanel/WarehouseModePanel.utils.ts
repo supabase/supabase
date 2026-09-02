@@ -1,5 +1,7 @@
 import type { components } from 'api-types'
 
+import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
+
 export type WarehouseSetupBody = components['schemas']['WarehouseSetupBody']
 export type WarehouseSetupTarget = WarehouseSetupBody['targets'][number]
 
@@ -12,13 +14,56 @@ export function getSchemaTableKey(schema: string, table: string): string {
   return `${schema}.${table}`
 }
 
+/**
+ * Internal schemas that still hold product data users legitimately want in their warehouse.
+ * Everything else in `INTERNAL_SCHEMAS` is Supabase infrastructure — `vault` (secrets),
+ * `pgsodium`, `cron`/`pgmq` bookkeeping, migration history — which should never be offered as a
+ * replication target.
+ */
+const REPLICABLE_INTERNAL_SCHEMAS = ['auth', 'storage']
+
+const NON_SELECTABLE_SCHEMAS = new Set(
+  INTERNAL_SCHEMAS.filter((schema) => !REPLICABLE_INTERNAL_SCHEMAS.includes(schema))
+)
+
 /** Postgres schemas Warehouse setup shouldn't offer for replication. */
 export function isSelectableWarehouseSchema(schemaName: string): boolean {
-  return schemaName !== 'information_schema' && !schemaName.startsWith('pg_')
+  return !schemaName.startsWith('pg_') && !NON_SELECTABLE_SCHEMAS.has(schemaName)
 }
 
 export function getSelectedTableCount(selection: SchemaTableSelection): number {
   return Object.values(selection).filter(Boolean).length
+}
+
+/**
+ * Seeds the picker's selection from the tables already in the `supabase_warehouse` publication, so
+ * editing an existing setup starts from what's actually replicated instead of an empty selection.
+ * Schema-level checkboxes derive from these per-table entries, so a schema whose every table is in
+ * the publication ends up fully checked on its own.
+ */
+export function buildSelectionFromPublicationTables(
+  publicationTables: { schema: string; name: string }[]
+): SchemaTableSelection {
+  return publicationTables.reduce<SchemaTableSelection>((selection, table) => {
+    selection[getSchemaTableKey(table.schema, table.name)] = true
+    return selection
+  }, {})
+}
+
+/**
+ * Tri-state value for a schema's checkbox. Kept here (rather than inlined as nested ternaries in
+ * the picker) so the three cases stay explicit and testable.
+ */
+export function getSchemaCheckedState({
+  selectedCount,
+  totalCount,
+}: {
+  selectedCount: number
+  totalCount: number
+}): boolean | 'indeterminate' {
+  if (totalCount > 0 && selectedCount === totalCount) return true
+  if (selectedCount > 0) return 'indeterminate'
+  return false
 }
 
 /**
@@ -71,9 +116,7 @@ const SECRET_CATALOG_FIELDS: (keyof WarehouseCatalogCredentials)[] = [
   's3_secret_access_key',
 ]
 
-export function isSecretWarehouseCatalogField(
-  field: keyof WarehouseCatalogCredentials
-): boolean {
+export function isSecretWarehouseCatalogField(field: keyof WarehouseCatalogCredentials): boolean {
   return SECRET_CATALOG_FIELDS.includes(field)
 }
 

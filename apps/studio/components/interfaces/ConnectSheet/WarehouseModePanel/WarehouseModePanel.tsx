@@ -3,20 +3,25 @@ import { useState } from 'react'
 import { Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { AlertError } from '@/components/ui/AlertError'
-import { useWarehouseSetupMutation } from '@/data/warehouse/warehouse-setup-mutation'
-import { useWarehouseSetupStatusQuery } from '@/data/warehouse/warehouse-setup-status-query'
 import { WarehouseConnectionDetails } from './WarehouseConnectionDetails'
 import { WarehouseEnablingProgress } from './WarehouseEnablingProgress'
 import { WarehouseSchemaTablePicker } from './WarehouseSchemaTablePicker'
+import { AlertError } from '@/components/ui/AlertError'
+import { useWarehouseSetupMutation } from '@/data/warehouse/warehouse-setup-mutation'
+import {
+  useWarehouseSetupStatusQuery,
+  type WarehouseSetupStatusResponse,
+} from '@/data/warehouse/warehouse-setup-status-query'
 
 type PickerOverride = 'auto' | 'picker'
+type WarehouseSetupStatus = WarehouseSetupStatusResponse['setup_status']
 
 const POLLING_SETUP_STATUSES = new Set(['setting_up', 'copying'])
 
 export const WarehouseModePanel = () => {
   const { ref: projectRef } = useParams()
   const [override, setOverride] = useState<PickerOverride>('auto')
+  const [previousStatus, setPreviousStatus] = useState<WarehouseSetupStatus | undefined>(undefined)
 
   const { data, isPending, isError, error } = useWarehouseSetupStatusQuery(
     { projectRef },
@@ -28,21 +33,29 @@ export const WarehouseModePanel = () => {
     }
   )
 
+  // Drop the manual "show me the picker" override once the server reports setup running again,
+  // otherwise re-enabling from the picker lands back on the picker when it completes. Detected on
+  // status transition rather than from a mutation callback: the picker unmounts the moment the
+  // status query invalidates, and callbacks passed to `mutate()` are dropped on unmount.
+  const currentStatus = data?.setup_status
+  if (currentStatus !== previousStatus) {
+    setPreviousStatus(currentStatus)
+    if (currentStatus !== undefined && currentStatus !== 'complete') setOverride('auto')
+  }
+
   const setupMutation = useWarehouseSetupMutation()
 
+  // Re-submit the same tables that were already targeted -- the setup-status response tracks them
+  // individually (with state), so we don't need to send the user back through the picker.
+  const retryTargets = (data?.tables ?? []).map((table) => ({
+    type: 'table' as const,
+    schema: table.schema,
+    name: table.name,
+  }))
+
   const handleRetrySetup = () => {
-    if (!projectRef || !data) return
-
-    // Re-submit the same tables that were already targeted -- the setup-status response tracks
-    // them individually (with state), so we don't need to send the user back through the picker.
-    const targets = data.tables.map((table) => ({
-      type: 'table' as const,
-      schema: table.schema,
-      name: table.name,
-    }))
-    if (targets.length === 0) return
-
-    setupMutation.mutate({ projectRef, body: { targets } })
+    if (!projectRef || retryTargets.length === 0) return
+    setupMutation.mutate({ projectRef, body: { targets: retryTargets } })
   }
 
   if (isPending) return <GenericSkeletonLoader />
@@ -51,7 +64,7 @@ export const WarehouseModePanel = () => {
 
   const status = data.setup_status
 
-  if (status === undefined || status === 'not_started') {
+  if (status === 'not_started') {
     return <WarehouseSchemaTablePicker />
   }
 
@@ -65,13 +78,14 @@ export const WarehouseModePanel = () => {
       <AlertError
         subject="Warehouse setup failed"
         error={{
-          message:
-            failingStep?.message ?? 'An unknown error occurred while setting up Warehouse.',
+          message: failingStep?.message ?? 'An unknown error occurred while setting up Warehouse.',
         }}
         additionalActions={
-          <Button variant="default" loading={setupMutation.isPending} onClick={handleRetrySetup}>
-            Retry
-          </Button>
+          retryTargets.length > 0 ? (
+            <Button variant="default" loading={setupMutation.isPending} onClick={handleRetrySetup}>
+              Retry
+            </Button>
+          ) : undefined
         }
       />
     )
@@ -79,7 +93,7 @@ export const WarehouseModePanel = () => {
 
   // status === 'complete'
   if (override === 'picker') {
-    return <WarehouseSchemaTablePicker />
+    return <WarehouseSchemaTablePicker onBack={() => setOverride('auto')} />
   }
 
   return <WarehouseConnectionDetails onEditTables={() => setOverride('picker')} />

@@ -5,6 +5,12 @@ import { Badge, Button, cn } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import {
+  isSecretWarehouseCatalogField,
+  maskSecretValue,
+  type WarehouseCatalogCredentials,
+} from './WarehouseModePanel.utils'
+import { AlertError } from '@/components/ui/AlertError'
 import CopyButton from '@/components/ui/CopyButton'
 import { useUpdateWarehouseCatalogMutation } from '@/data/warehouse/warehouse-catalog-mutation'
 import { useWarehouseCatalogQuery } from '@/data/warehouse/warehouse-catalog-query'
@@ -12,12 +18,8 @@ import {
   getDuckLakeAttachSnippet,
   getWarehouseFlightSqlConnectionString,
   getWarehouseFlightSqlEndpoint,
+  getWarehouseUsqlCommand,
 } from '@/lib/warehouse'
-import {
-  isSecretWarehouseCatalogField,
-  maskSecretValue,
-  type WarehouseCatalogCredentials,
-} from './WarehouseModePanel.utils'
 
 export interface WarehouseConnectionDetailsProps {
   onEditTables: () => void
@@ -33,14 +35,14 @@ const CATALOG_FIELD_LABELS: Record<keyof WarehouseCatalogCredentials, string> = 
   metadata_schema: 'Metadata schema',
 }
 
-// Only these credential fields are surfaced individually; data_path and metadata_schema are
-// already embedded in the ATTACH snippet above them.
+// Only the S3 credentials are surfaced individually — DuckDB needs them to read the data files.
+// catalog_url, data_path and metadata_schema are already embedded in the ATTACH snippet above, so
+// repeating catalog_url as a masked row would be pure theater: the snippet shows it in full.
 const CATALOG_FIELDS_TO_DISPLAY: (keyof WarehouseCatalogCredentials)[] = [
   's3_endpoint',
   's3_region',
   's3_access_key_id',
   's3_secret_access_key',
-  'catalog_url',
 ]
 
 function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
@@ -61,7 +63,13 @@ function CopyValueRow({ value, mono = true }: { value: string; mono?: boolean })
       >
         {value}
       </span>
-      <CopyButton variant="default" size="tiny" iconOnly text={value} aria-label={`Copy ${value}`} />
+      <CopyButton
+        variant="default"
+        size="tiny"
+        iconOnly
+        text={value}
+        aria-label={`Copy ${value}`}
+      />
     </div>
   )
 }
@@ -86,13 +94,19 @@ function MaskedCopyValueRow({ value }: { value: string }) {
 export const WarehouseConnectionDetails = ({ onEditTables }: WarehouseConnectionDetailsProps) => {
   const { ref: projectRef } = useParams()
 
-  const { data: catalog, isPending: isCatalogPending } = useWarehouseCatalogQuery({ projectRef })
+  const {
+    data: catalog,
+    isPending: isCatalogPending,
+    isError: isCatalogError,
+    error: catalogError,
+  } = useWarehouseCatalogQuery({ projectRef })
   const catalogMutation = useUpdateWarehouseCatalogMutation()
 
   if (!projectRef) return null
 
   const endpoint = getWarehouseFlightSqlEndpoint(projectRef)
   const connectionString = getWarehouseFlightSqlConnectionString(projectRef)
+  const usqlCommand = getWarehouseUsqlCommand(projectRef)
 
   return (
     <div>
@@ -138,13 +152,32 @@ export const WarehouseConnectionDetails = ({ onEditTables }: WarehouseConnection
 
       <div className="h-px bg-border my-6" />
 
+      <p className="text-sm font-medium text-foreground mb-1">Connect with FlightSQL</p>
+      <p className="text-sm text-foreground-light max-w-xl mb-3">
+        Warehouse speaks the Arrow FlightSQL protocol. Any FlightSQL-compatible client can connect —
+        for example, using the <span className="font-mono">usql</span> CLI:
+      </p>
+      <CodeBlock language="bash" hideLineNumbers value={usqlCommand}>
+        {usqlCommand}
+      </CodeBlock>
+
+      <div className="h-px bg-border my-6" />
+
       <p className="text-sm font-medium text-foreground mb-1">
         Connect with DuckDB (DuckLake catalog)
       </p>
 
       {isCatalogPending && <GenericSkeletonLoader />}
 
-      {!isCatalogPending && !catalog?.enabled && (
+      {isCatalogError && (
+        <AlertError
+          className="mt-2"
+          subject="Failed to load DuckLake catalog access"
+          error={catalogError}
+        />
+      )}
+
+      {!isCatalogPending && !isCatalogError && !catalog?.enabled && (
         <div className="flex items-center gap-3 mt-2">
           <p className="text-sm text-foreground-light max-w-lg">
             Enable catalog access to attach this project's Warehouse directly from DuckDB.
@@ -160,7 +193,7 @@ export const WarehouseConnectionDetails = ({ onEditTables }: WarehouseConnection
         </div>
       )}
 
-      {!isCatalogPending && catalog?.enabled && catalog.credentials && (
+      {!isCatalogPending && !isCatalogError && catalog?.enabled && catalog.credentials && (
         <div className="flex flex-col gap-3 mt-2">
           <p className="text-sm text-foreground-light max-w-lg mb-1">
             Attach this project's Warehouse directly from DuckDB using the DuckLake catalog:

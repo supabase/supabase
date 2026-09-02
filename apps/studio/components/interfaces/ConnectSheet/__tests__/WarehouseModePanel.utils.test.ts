@@ -1,13 +1,15 @@
 import { describe, expect, test } from 'vitest'
 
 import {
+  buildSelectionFromPublicationTables,
   buildWarehouseSetupTargets,
+  getSchemaCheckedState,
   getSchemaTableKey,
   getSelectedTableCount,
   isSecretWarehouseCatalogField,
   isSelectableWarehouseSchema,
-  maskSecretValue,
   MASKED_SECRET_PLACEHOLDER,
+  maskSecretValue,
   type SchemaTableSelection,
   type SchemaWithTables,
 } from '../WarehouseModePanel/WarehouseModePanel.utils'
@@ -22,10 +24,92 @@ describe('WarehouseModePanel.utils:isSelectableWarehouseSchema', () => {
     expect(isSelectableWarehouseSchema('pg_toast')).toBe(false)
   })
 
+  test('excludes Supabase infrastructure schemas', () => {
+    // Replicating secrets or internal bookkeeping into a warehouse is never intended
+    expect(isSelectableWarehouseSchema('vault')).toBe(false)
+    expect(isSelectableWarehouseSchema('pgsodium')).toBe(false)
+    expect(isSelectableWarehouseSchema('realtime')).toBe(false)
+    expect(isSelectableWarehouseSchema('_realtime')).toBe(false)
+    expect(isSelectableWarehouseSchema('cron')).toBe(false)
+    expect(isSelectableWarehouseSchema('supabase_migrations')).toBe(false)
+    expect(isSelectableWarehouseSchema('extensions')).toBe(false)
+  })
+
   test('includes public and other user schemas', () => {
     expect(isSelectableWarehouseSchema('public')).toBe(true)
+    expect(isSelectableWarehouseSchema('analytics')).toBe(true)
+  })
+
+  test('includes auth and storage, which hold product data users replicate', () => {
     expect(isSelectableWarehouseSchema('auth')).toBe(true)
     expect(isSelectableWarehouseSchema('storage')).toBe(true)
+  })
+})
+
+describe('WarehouseModePanel.utils:buildSelectionFromPublicationTables', () => {
+  test('returns an empty selection when the publication has no tables', () => {
+    expect(buildSelectionFromPublicationTables([])).toEqual({})
+  })
+
+  test('marks every publication table as selected', () => {
+    expect(
+      buildSelectionFromPublicationTables([
+        { schema: 'public', name: 'orders' },
+        { schema: 'auth', name: 'users' },
+      ])
+    ).toEqual({ 'public.orders': true, 'auth.users': true })
+  })
+
+  test('produces a fully checked schema when every table of that schema is published', () => {
+    const schemaTables = ['orders', 'customers']
+    const selection = buildSelectionFromPublicationTables(
+      schemaTables.map((name) => ({ schema: 'public', name }))
+    )
+    const selectedCount = schemaTables.filter(
+      (name) => selection[getSchemaTableKey('public', name)]
+    ).length
+
+    expect(getSchemaCheckedState({ selectedCount, totalCount: schemaTables.length })).toBe(true)
+  })
+
+  test('produces an indeterminate schema when only some of its tables are published', () => {
+    const selection = buildSelectionFromPublicationTables([{ schema: 'public', name: 'orders' }])
+    const selectedCount = ['orders', 'customers'].filter(
+      (name) => selection[getSchemaTableKey('public', name)]
+    ).length
+
+    expect(getSchemaCheckedState({ selectedCount, totalCount: 2 })).toBe('indeterminate')
+  })
+
+  test('round-trips through buildWarehouseSetupTargets as a schema target when fully published', () => {
+    const schemas: SchemaWithTables[] = [{ schema: 'public', tables: ['orders', 'customers'] }]
+    const selection = buildSelectionFromPublicationTables([
+      { schema: 'public', name: 'orders' },
+      { schema: 'public', name: 'customers' },
+    ])
+
+    expect(buildWarehouseSetupTargets(selection, schemas)).toEqual([
+      { type: 'schema', schema: 'public' },
+    ])
+  })
+})
+
+describe('WarehouseModePanel.utils:getSchemaCheckedState', () => {
+  test('is unchecked when nothing is selected', () => {
+    expect(getSchemaCheckedState({ selectedCount: 0, totalCount: 3 })).toBe(false)
+  })
+
+  test('is indeterminate when only some tables are selected', () => {
+    expect(getSchemaCheckedState({ selectedCount: 1, totalCount: 3 })).toBe('indeterminate')
+    expect(getSchemaCheckedState({ selectedCount: 2, totalCount: 3 })).toBe('indeterminate')
+  })
+
+  test('is checked when every table is selected', () => {
+    expect(getSchemaCheckedState({ selectedCount: 3, totalCount: 3 })).toBe(true)
+  })
+
+  test('is unchecked for an empty schema rather than checked', () => {
+    expect(getSchemaCheckedState({ selectedCount: 0, totalCount: 0 })).toBe(false)
   })
 })
 
