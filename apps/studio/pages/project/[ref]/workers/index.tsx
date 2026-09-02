@@ -1,10 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
+import { RefreshCw } from 'lucide-react'
 import { useState } from 'react'
+import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
+  PageHeaderAside,
   PageHeaderDescription,
   PageHeaderMeta,
   PageHeaderSummary,
@@ -38,6 +41,8 @@ const WorkersPage: NextPageWithLayout = () => {
     isPending,
     isError,
     isSuccess,
+    isFetching,
+    refetch,
   } = useQuery(workersQueryOptions({ projectRef: ref }))
 
   const isNotEnrolled = isError && isWorkersUnavailable(error)
@@ -55,6 +60,16 @@ const WorkersPage: NextPageWithLayout = () => {
             </PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>
+        <PageHeaderAside>
+          <Button
+            variant="default"
+            icon={<RefreshCw />}
+            loading={isFetching}
+            onClick={() => refetch()}
+          >
+            Refresh
+          </Button>
+        </PageHeaderAside>
       </PageHeader>
 
       <PageContainer size="large">

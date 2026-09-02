@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
-import { screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import type { components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it } from 'vitest'
@@ -88,6 +88,23 @@ describe('/project/[ref]/workers', () => {
 
     expect(screen.getByText('Deploy your first worker')).toBeVisible()
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
+  })
+
+  it('refreshes the workers list on request', async () => {
+    const responses = [[], [workerDatum('embed')]]
+    let requestCount = 0
+    addAPIMock({
+      method: 'get',
+      path: '/v2/projects/:ref/workers',
+      response: () => HttpResponse.json({ data: responses[requestCount++] }),
+    })
+
+    await renderWorkersPage()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh' }))
+
+    await waitFor(() => expect(requestCount).toBe(2))
+    expect(await screen.findByRole('link', { name: 'embed' })).toBeVisible()
   })
 
   it('explains that a project outside the alpha is not enrolled', async () => {
