@@ -317,17 +317,29 @@ where <your_encrypted_column> is not null
   and pg_temp.affected_by_cve_2026_14663(<your_encrypted_column>);
 ```
 
-Any rows returned hold affected values: re-encrypt them with a modern cipher before you upgrade (or after upgrading by adding `ignore-cipher-failure=1` to the decrypt options):
+Any rows returned hold affected values. The scan covers symmetric (`pgp_sym_*`) messages; the wrong-key probe does not apply to public-key (`pgp_pub_*`) messages. If you call `pgp_pub_encrypt` with one of the affected `cipher-algo` options, treat those values as affected and re-encrypt them the same way using `pgp_pub_decrypt` and `pgp_pub_encrypt` with your key pair.
+
+Re-encrypt affected values with a modern cipher. Before you upgrade, the current version still decrypts them normally:
 
 ```sql
 update <your_table>
 set <col> = pgp_sym_encrypt(
               pgp_sym_decrypt(<col>, '<your-key>'),
               '<your-key>', 'cipher-algo=aes256')
-where ...;
+where <id_column> in (/* rows found by the scan above */);
 ```
 
-Because affected values were not protected as intended, consider rotating any secrets stored this way.
+After you upgrade, decrypting affected values fails by default — add `ignore-cipher-failure=1` to read them:
+
+```sql
+update <your_table>
+set <col> = pgp_sym_encrypt(
+              pgp_sym_decrypt(<col>, '<your-key>', 'ignore-cipher-failure=1'),
+              '<your-key>', 'cipher-algo=aes256')
+where <id_column> in (/* rows found by the scan above */);
+```
+
+Spot-check that a recovered value decrypts to the expected plaintext before running the update across all rows. Because affected values were not protected as intended, consider rotating any secrets stored this way.
 
 ### Btree_gist indexes on float columns require reindexing after upgrade
 
