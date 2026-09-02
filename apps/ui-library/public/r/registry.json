@@ -1764,11 +1764,6 @@
           "target": "supabase/functions/mcp-server/deno.json"
         },
         {
-          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/deno.lock",
-          "type": "registry:file",
-          "target": "supabase/functions/mcp-server/deno.lock"
-        },
-        {
           "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/.env.example",
           "type": "registry:file",
           "target": "supabase/functions/mcp-server/.env.example"
