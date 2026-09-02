@@ -157,7 +157,7 @@ export const RowMenu = ({
             <Button
               variant="default"
               className="px-1.5 hit-area-2"
-              aria-label="Destination options"
+              aria-label="Pipeline options"
               icon={<MoreVertical />}
             />
             {hasUpdate && (
@@ -208,11 +208,11 @@ export const RowMenu = ({
 
           <DropdownMenuItem className="space-x-2" onClick={() => setEdit(destinationId)}>
             <Edit size={14} />
-            <p>Edit destination</p>
+            <p>Edit pipeline</p>
           </DropdownMenuItem>
           <DropdownMenuItem className="space-x-2" onClick={onDeleteClick}>
             <Trash size={14} />
-            <p>Delete destination</p>
+            <p>Delete pipeline</p>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

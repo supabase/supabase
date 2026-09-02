@@ -180,7 +180,7 @@ describe('DestinationRow', () => {
     customRender(<DestinationRow destinationId={DESTINATION_ID} />)
 
     await screen.findByText('supabase_realtime')
-    await userEvent.click(screen.getByRole('button', { name: 'Destination options' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
 
     expect(routerMock.asPath).toBe('/project/default/database/replication')
   })

@@ -168,7 +168,7 @@ describe('ReplicationPipelineLayout', () => {
     expect(screen.getByText('Primary database')).toBeVisible()
   })
 
-  test('offers the destination actions the primary button does not', async () => {
+  test('offers the pipeline actions the primary button does not', async () => {
     mockStatus('started')
     renderLayout()
 
@@ -178,8 +178,8 @@ describe('ReplicationPipelineLayout', () => {
     // Primary button is Stop while running, so the menu carries Restart instead
     expect(await screen.findByRole('menuitem', { name: 'Restart pipeline' })).toBeVisible()
     expect(screen.queryByRole('menuitem', { name: 'Stop pipeline' })).not.toBeInTheDocument()
-    expect(screen.getByRole('menuitem', { name: 'Edit destination' })).toBeVisible()
-    expect(screen.getByRole('menuitem', { name: 'Delete destination' })).toBeVisible()
+    expect(screen.getByRole('menuitem', { name: 'Edit pipeline' })).toBeVisible()
+    expect(screen.getByRole('menuitem', { name: 'Delete pipeline' })).toBeVisible()
   })
 
   test('offers Stop from the menu when the primary button is Restart', async () => {

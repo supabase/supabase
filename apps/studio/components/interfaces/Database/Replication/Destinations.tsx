@@ -233,7 +233,7 @@ export const Destinations = () => {
       searchInputRef.current?.focus()
       searchInputRef.current?.select()
     },
-    { label: 'Search destinations' }
+    { label: 'Search pipelines' }
   )
 
   useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setFilterString(''))
@@ -265,7 +265,7 @@ export const Destinations = () => {
         <div className="flex items-center">
           <Input
             ref={searchInputRef}
-            placeholder="Search destinations"
+            placeholder="Search pipelines"
             size="tiny"
             icon={<Search />}
             value={filterString}
@@ -312,7 +312,7 @@ export const Destinations = () => {
                   tooltip={{
                     content: {
                       side: 'left',
-                      text: 'Remove all existing destinations before disabling Pipelines',
+                      text: 'Delete all pipelines before disabling Pipelines',
                     },
                   }}
                   onClick={() => setShowDisablePipelinesDialog(true)}
@@ -325,7 +325,7 @@ export const Destinations = () => {
 
           <Shortcut
             id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
-            label="Add destination"
+            label="Add pipeline"
             onTrigger={openDestinationPanel}
             options={{ enabled: !!newDestinationDefaultType }}
             side="bottom"
@@ -336,7 +336,7 @@ export const Destinations = () => {
               disabled={!newDestinationDefaultType}
               onClick={openDestinationPanel}
             >
-              Add destination
+              Add pipeline
             </Button>
           </Shortcut>
         </div>
@@ -344,7 +344,7 @@ export const Destinations = () => {
 
       <div className="w-full overflow-hidden overflow-x-auto flex flex-col gap-y-4">
         {hasErrorsFetchingData && (
-          <AlertError error={destinationsError} subject="Failed to retrieve destinations" />
+          <AlertError error={destinationsError} subject="Failed to retrieve pipelines" />
         )}
 
         {isLoading ? (
@@ -405,8 +405,8 @@ export const Destinations = () => {
           !hasErrorsFetchingData && (
             <EmptyStatePresentational
               icon={Workflow}
-              title="Add a destination"
-              description="Connect an external destination for analytics workloads."
+              title="Add a pipeline"
+              description="Send tables to an external destination for analytics workloads."
             >
               <Button
                 variant="default"
@@ -414,7 +414,7 @@ export const Destinations = () => {
                 disabled={!newDestinationDefaultType}
                 onClick={openDestinationPanel}
               >
-                Add destination
+                Add pipeline
               </Button>
             </EmptyStatePresentational>
           )

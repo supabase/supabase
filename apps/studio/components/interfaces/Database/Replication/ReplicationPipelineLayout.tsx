@@ -195,10 +195,10 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
         pipelineId: pipeline.id,
       })
       setShowDeleteDestination(false)
-      toast.success(`Deleted destination "${pipeline.destination_name}"`)
+      toast.success(`Deleted pipeline "${pipeline.destination_name}"`)
       router.push(`/project/${projectRef}/database/replication`)
     } catch (error) {
-      toast.error(`Failed to delete destination: ${(error as ResponseError).message}`)
+      toast.error(`Failed to delete pipeline: ${(error as ResponseError).message}`)
     } finally {
       setIsDeleting(false)
     }
@@ -342,7 +342,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                       }}
                     >
                       <Edit size={14} />
-                      <span>Edit destination</span>
+                      <span>Edit pipeline</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       className="gap-x-2"
@@ -350,7 +350,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                       onClick={() => setShowDeleteDestination(true)}
                     >
                       <Trash size={14} />
-                      <span>Delete destination</span>
+                      <span>Delete pipeline</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

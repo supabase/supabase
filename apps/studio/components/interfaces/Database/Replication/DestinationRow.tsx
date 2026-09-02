@@ -124,9 +124,9 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
       })
       // Close dialog after successful deletion
       setShowDeleteDestinationForm(false)
-      toast.success(`Deleted destination "${destinationName}"`)
+      toast.success(`Deleted pipeline "${destinationName}"`)
     } catch (error) {
-      toast.error(`Failed to delete destination: ${(error as ResponseError).message}`)
+      toast.error(`Failed to delete pipeline: ${(error as ResponseError).message}`)
     } finally {
       setIsDeleting(false)
     }
