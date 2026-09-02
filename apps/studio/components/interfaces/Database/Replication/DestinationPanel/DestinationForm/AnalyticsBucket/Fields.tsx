@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 import {
@@ -13,11 +13,11 @@ import {
   SelectItem,
   SelectSeparator,
   SelectTrigger,
-  WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { SelectionListState } from 'ui-patterns/SelectionListState'
 
 import {
   CREATE_NEW_KEY,
@@ -25,6 +25,11 @@ import {
   STORED_SECRET_PLACEHOLDER,
 } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
+import {
+  isMetadataListErrorVisible,
+  isMetadataListLoading,
+  useRefreshOnOpen,
+} from '../useRefreshOnOpen'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useAnalyticsBucketsQuery } from '@/data/storage/analytics-buckets-query'
 import { useIcebergNamespacesQuery } from '@/data/storage/iceberg-namespaces-query'
@@ -52,6 +57,19 @@ const getS3AccessKeyTriggerLabel = ({
   return value
 }
 
+const getNamespaceTriggerLabel = ({
+  canSelectNamespace,
+  value,
+}: {
+  canSelectNamespace: boolean
+  value: string | undefined
+}) => {
+  if (!canSelectNamespace) return 'Select a bucket first'
+  if (value === CREATE_NEW_NAMESPACE) return 'Create a new namespace'
+
+  return value || 'Select a namespace'
+}
+
 export const AnalyticsBucketFields = ({
   form,
   editMode,
@@ -73,10 +91,14 @@ export const AnalyticsBucketFields = ({
   const {
     data: keysData,
     isSuccess: isSuccessKeys,
-    isPending: isLoadingKeys,
+    isPending: isPendingKeys,
+    isFetching: isFetchingKeys,
     isError: isErrorKeys,
+    refetch: refetchKeys,
   } = useStorageCredentialsQuery({ projectRef })
   const s3Keys = keysData?.data ?? []
+  const isLoadingKeys = isMetadataListLoading(isPendingKeys || isFetchingKeys, s3Keys.length)
+  const isKeysErrorVisible = isMetadataListErrorVisible(isErrorKeys, s3Keys.length)
   const keyNoLongerExists =
     (s3AccessKeyId ?? '').length > 0 &&
     s3AccessKeyId !== CREATE_NEW_KEY &&
@@ -84,20 +106,44 @@ export const AnalyticsBucketFields = ({
 
   const {
     data: analyticsBuckets = [],
-    isPending: isLoadingBuckets,
+    isPending: isPendingBuckets,
+    isFetching: isFetchingBuckets,
     isError: isErrorBuckets,
+    refetch: refetchBuckets,
   } = useAnalyticsBucketsQuery({ projectRef })
+  const isLoadingBuckets = isMetadataListLoading(
+    isPendingBuckets || isFetchingBuckets,
+    analyticsBuckets.length
+  )
+  const isBucketsErrorVisible = isMetadataListErrorVisible(isErrorBuckets, analyticsBuckets.length)
 
   const canSelectNamespace = !!warehouseName
 
   const {
     data: namespaces = [],
-    isPending: isLoadingNamespaces,
+    isPending: isPendingNamespaces,
+    isFetching: isFetchingNamespaces,
     isError: isErrorNamespaces,
+    refetch: refetchNamespaces,
   } = useIcebergNamespacesQuery(
     { projectRef, warehouse: warehouseName },
     { enabled: !!warehouseName }
   )
+  const isLoadingNamespaces = isMetadataListLoading(
+    isPendingNamespaces || isFetchingNamespaces,
+    namespaces.length
+  )
+  const isNamespacesErrorVisible = isMetadataListErrorVisible(isErrorNamespaces, namespaces.length)
+  const { handleOpenChange: handleRefreshBucketsOnOpen } = useRefreshOnOpen({
+    refetch: refetchBuckets,
+  })
+  const { handleOpenChange: handleRefreshNamespacesOnOpen } = useRefreshOnOpen({
+    isEnabled: canSelectNamespace,
+    refetch: refetchNamespaces,
+  })
+  const { handleOpenChange: handleRefreshKeysOnOpen } = useRefreshOnOpen({
+    refetch: refetchKeys,
+  })
 
   return (
     <div className="flex flex-col gap-y-6 p-5">
@@ -113,61 +159,45 @@ export const AnalyticsBucketFields = ({
               layout="horizontal"
               description="The Analytics Bucket where data will be stored"
             >
-              {isLoadingBuckets ? (
-                <Button
-                  disabled
-                  variant="default"
-                  className="w-full justify-between"
-                  size="small"
-                  iconRight={<Loader2 className="animate-spin" />}
+              <FormControl>
+                <Select
+                  value={field.value}
+                  onOpenChange={handleRefreshBucketsOnOpen}
+                  onValueChange={(value) => {
+                    if (value === 'new-bucket') {
+                      onSelectNewBucket()
+                    } else {
+                      field.onChange(value)
+                      // [Joshen] Ideally should select the first namespace of the selected bucket
+                      form.setValue('namespace', '')
+                    }
+                  }}
                 >
-                  Retrieving buckets
-                </Button>
-              ) : isErrorBuckets ? (
-                <Button
-                  disabled
-                  variant="default"
-                  className="w-full justify-start"
-                  size="small"
-                  icon={<WarningIcon />}
-                >
-                  Failed to retrieve buckets
-                </Button>
-              ) : (
-                <FormControl>
-                  <Select
-                    value={field.value}
-                    onValueChange={(value) => {
-                      if (value === 'new-bucket') {
-                        onSelectNewBucket()
-                      } else {
-                        field.onChange(value)
-                        // [Joshen] Ideally should select the first namespace of the selected bucket
-                        form.setValue('namespace', '')
-                      }
-                    }}
-                  >
-                    <SelectTrigger>{field.value || 'Select a bucket'}</SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {analyticsBuckets.length === 0 ? (
-                          <SelectItem value="__no_buckets__" disabled>
-                            No buckets available
-                          </SelectItem>
-                        ) : (
-                          analyticsBuckets.map((bucket) => (
-                            <SelectItem key={bucket.name} value={bucket.name}>
-                              {bucket.name}
-                            </SelectItem>
-                          ))
-                        )}
-                        <SelectSeparator />
-                        <SelectItem value="new-bucket">Create a new bucket</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-              )}
+                  <SelectTrigger>{field.value || 'Select a bucket'}</SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectionListState
+                        isLoading={isLoadingBuckets}
+                        isError={isBucketsErrorVisible}
+                        isEmpty={
+                          !isLoadingBuckets &&
+                          !isBucketsErrorVisible &&
+                          analyticsBuckets.length === 0
+                        }
+                        emptyLabel="No buckets available"
+                        errorLabel="Unable to load buckets"
+                      />
+                      {analyticsBuckets.map((bucket) => (
+                        <SelectItem key={bucket.name} value={bucket.name}>
+                          {bucket.name}
+                        </SelectItem>
+                      ))}
+                      <SelectSeparator />
+                      <SelectItem value="new-bucket">Create a new bucket</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormControl>
             </FormItemLayout>
           )}
         />
@@ -181,62 +211,42 @@ export const AnalyticsBucketFields = ({
               layout="horizontal"
               description="The namespace within the bucket where tables will be organized"
             >
-              {isLoadingNamespaces && canSelectNamespace ? (
-                <Button
-                  disabled
-                  variant="default"
-                  className="w-full justify-between"
-                  size="small"
-                  iconRight={<Loader2 className="animate-spin" />}
+              <FormControl>
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  disabled={!canSelectNamespace}
+                  onOpenChange={handleRefreshNamespacesOnOpen}
                 >
-                  Retrieving namespaces
-                </Button>
-              ) : isErrorNamespaces ? (
-                <Button
-                  disabled
-                  variant="default"
-                  className="w-full justify-start"
-                  size="small"
-                  icon={<WarningIcon />}
-                >
-                  Failed to retrieve namespaces
-                </Button>
-              ) : (
-                <FormControl>
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    disabled={!canSelectNamespace}
-                  >
-                    <SelectTrigger>
-                      {!canSelectNamespace
-                        ? 'Select a warehouse first'
-                        : field.value === CREATE_NEW_NAMESPACE
-                          ? 'Create a new namespace'
-                          : field.value || 'Select a namespace'}
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {namespaces.length === 0 ? (
-                          <SelectItem value="__no_namespaces__" disabled>
-                            No namespaces available
-                          </SelectItem>
-                        ) : (
-                          namespaces.map((namespace) => (
-                            <SelectItem key={namespace} value={namespace}>
-                              {namespace}
-                            </SelectItem>
-                          ))
-                        )}
-                        <SelectSeparator />
-                        <SelectItem key={CREATE_NEW_NAMESPACE} value={CREATE_NEW_NAMESPACE}>
-                          Create a new namespace
+                  <SelectTrigger>
+                    {getNamespaceTriggerLabel({ canSelectNamespace, value: field.value })}
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectionListState
+                        isLoading={isLoadingNamespaces}
+                        isError={isNamespacesErrorVisible}
+                        isEmpty={
+                          !isLoadingNamespaces &&
+                          !isNamespacesErrorVisible &&
+                          namespaces.length === 0
+                        }
+                        emptyLabel="No namespaces available"
+                        errorLabel="Unable to load namespaces"
+                      />
+                      {namespaces.map((namespace) => (
+                        <SelectItem key={namespace} value={namespace}>
+                          {namespace}
                         </SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-              )}
+                      ))}
+                      <SelectSeparator />
+                      <SelectItem key={CREATE_NEW_NAMESPACE} value={CREATE_NEW_NAMESPACE}>
+                        Create a new namespace
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormControl>
             </FormItemLayout>
           )}
         />
@@ -341,49 +351,38 @@ export const AnalyticsBucketFields = ({
                 </div>
               }
             >
-              {isLoadingKeys ? (
-                <Button
-                  disabled
-                  variant="default"
-                  className="w-full justify-between"
-                  size="small"
-                  iconRight={<Loader2 className="animate-spin" />}
+              <FormControl>
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  onOpenChange={handleRefreshKeysOnOpen}
                 >
-                  Retrieving keys
-                </Button>
-              ) : isErrorKeys ? (
-                <Button
-                  disabled
-                  variant="default"
-                  className="w-full justify-start"
-                  size="small"
-                  icon={<WarningIcon />}
-                >
-                  Failed to retrieve keys
-                </Button>
-              ) : (
-                <FormControl>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      {getS3AccessKeyTriggerLabel({ value: field.value, editMode })}
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {s3Keys.map((key) => (
-                          <SelectItem key={key.id} value={key.access_key}>
-                            {key.access_key}
-                            <p className="text-foreground-lighter">{key.description}</p>
-                          </SelectItem>
-                        ))}
-                        <SelectSeparator />
-                        <SelectItem key={CREATE_NEW_KEY} value={CREATE_NEW_KEY}>
-                          Create a new key
+                  <SelectTrigger>
+                    {getS3AccessKeyTriggerLabel({ value: field.value, editMode })}
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectionListState
+                        isLoading={isLoadingKeys}
+                        isError={isKeysErrorVisible}
+                        isEmpty={!isLoadingKeys && !isKeysErrorVisible && s3Keys.length === 0}
+                        emptyLabel="No access keys available"
+                        errorLabel="Unable to load access keys"
+                      />
+                      {s3Keys.map((key) => (
+                        <SelectItem key={key.id} value={key.access_key}>
+                          {key.access_key}
+                          <p className="text-foreground-lighter">{key.description}</p>
                         </SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-              )}
+                      ))}
+                      <SelectSeparator />
+                      <SelectItem key={CREATE_NEW_KEY} value={CREATE_NEW_KEY}>
+                        Create a new key
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormControl>
             </FormItemLayout>
           )}
         />
