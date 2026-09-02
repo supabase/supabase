@@ -2,7 +2,7 @@
 
 Patterns to watch for when drafting docs, based on review feedback. These are guidelines, not absolute rules — use judgment based on context.
 
-## 1. Internal business context in open-source docs
+## 1. Internal planning context in open-source docs
 
 **Principle:** Supabase docs are open source. Internal planning context, unshipped features, and business intent shouldn't be visible in the public repo.
 
@@ -11,12 +11,13 @@ Patterns to watch for when drafting docs, based on review feedback. These are gu
 - HTML comments referencing PRDs, roadmaps, or internal ticket discussions
 - "Gap-fill" notes about what's planned but not shipped
 - Internal product strategy or positioning discussions
+- References to any project-management or ticketing system (internal or a contributor's own tools)
 
 **Where to put internal context instead:**
 
 - PR description (for review-time context)
-- Linear ticket (for product/PM handoff)
-- Internal Notion/docs (for roadmap tracking)
+- The team's project-management tool (for product/PM handoff)
+- Internal docs (for roadmap tracking)
 
 ## 2. Timeless documentation
 
@@ -48,17 +49,18 @@ Patterns to watch for when drafting docs, based on review feedback. These are gu
 
 **Valid exceptions:** Navigation structure needs, federated docs where the placeholder provides context and links out, cross-references where the page existing (even minimal) provides value.
 
-## 4. Redundancy
+## 4. Redundancy and over-explanation
 
-**Principle:** Avoid restating the same point in multiple ways.
+**Principle:** Avoid restating the same point in multiple ways. Prefer brevity — sometimes broad strokes help more than mechanical detail.
 
 **Common patterns:**
 
 - Multiple ways of saying the same thing: "It's free" + "You won't be billed" + "No charge"
 - Admonition stating a risk, then body text restating it verbatim
 - Adjacent sentences that rephrase each other
+- Over-explaining mechanical steps or implementation detail that doesn't help the reader complete the task
 
-**How to catch it:** If you can remove a sentence without losing information, it's probably redundant.
+**How to catch it:** If you can remove a sentence without losing information, it's probably redundant. If a procedure works with less setup explanation, prefer the shorter path.
 
 ## 5. Single-item lists
 
@@ -81,7 +83,7 @@ Before submitting a draft, check:
 - [ ] No HTML comments with internal PRD/roadmap/ticket context in MDX
 - [ ] Future promises minimized where appropriate (timeless documentation)
 - [ ] Placeholder pages avoided where possible
-- [ ] No unnecessary redundancy
+- [ ] No unnecessary redundancy or mechanical over-explanation
 - [ ] Single-item lists avoided unless there's a reason
 - [ ] Admonitions and body text cover distinct points
 
@@ -89,4 +91,4 @@ Before submitting a draft, check:
 
 ## Style guide consolidation
 
-This content is style guidance, not skill-specific process. It belongs in a shared, human-and-agent-readable style guide rather than only inside this skill. When [DOCS-1177](https://linear.app/supabase/issue/DOCS-1177/create-a-standalone-public-docs-style-guide)'s dedicated style guide lands, fold this content into it and replace this file with a pointer, the same pattern [reference/style-fallback.md](style-fallback.md) already uses for CONTRIBUTING.md/WORD_LIST.md.
+This content is style guidance, not skill-specific process. It belongs in a shared, human-and-agent-readable style guide rather than only inside this skill. When a dedicated style guide exists in the repo, fold this content into it and replace this file with a pointer, the same pattern [reference/style-fallback.md](style-fallback.md) already uses for CONTRIBUTING.md/WORD_LIST.md.
