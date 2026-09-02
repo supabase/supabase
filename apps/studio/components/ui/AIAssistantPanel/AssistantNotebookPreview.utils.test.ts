@@ -48,6 +48,32 @@ const agentDatabaseCell = (database_identifier?: string): AgentCell => ({
   database_identifier,
 })
 
+const chartDatabaseCell = (id: string, ySeries: string[]): CellWire => ({
+  ...wireDatabaseCell(id),
+  view: 'chart',
+  chart: {
+    type: 'bar',
+    x_column: 'day',
+    y_series: ySeries,
+    cumulative: false,
+    scale: 'linear',
+    show_labels: false,
+  },
+})
+
+const agentChartDatabaseCell = (ySeries: string[]): AgentCell => ({
+  ...agentDatabaseCell(),
+  view: 'chart',
+  chart: {
+    type: 'bar',
+    x_column: 'day',
+    y_series: ySeries,
+    cumulative: false,
+    scale: 'linear',
+    show_labels: false,
+  },
+})
+
 const successfulDatabaseContext = (
   databases: Array<{ identifier: string; region: string }> = []
 ): NotebookDatabaseContext => ({
@@ -217,10 +243,11 @@ describe('getCellMetadata', () => {
     })
   })
 
-  it('labels an implicit primary database', () => {
+  it('labels an implicit primary database and table view', () => {
     expect(getCellMetadata(wireDatabaseCell('cell-1'), successfulDatabaseContext())).toEqual({
       status: 'ready',
-      text: 'Database: Primary',
+      source: 'Database: Primary',
+      view: 'Table',
     })
   })
 
@@ -232,7 +259,8 @@ describe('getCellMetadata', () => {
       )
     ).toEqual({
       status: 'ready',
-      text: 'Database: Replica',
+      source: 'Database: Replica',
+      view: 'Table',
     })
   })
 
@@ -251,13 +279,24 @@ describe('getCellMetadata', () => {
         wireDatabaseCell('cell-1', 'Signups', 'missing-database'),
         successfulDatabaseContext()
       )
-    ).toEqual({ status: 'ready', text: 'Database: Unknown' })
+    ).toEqual({ status: 'ready', source: 'Database: Unknown', view: 'Table' })
   })
 
   it('labels a log cell with its formatted time range', () => {
     expect(getCellMetadata(wireLogCell('cell-1'), successfulDatabaseContext())).toEqual({
       status: 'ready',
-      text: 'Time range: Last 7 days',
+      source: 'Time range: Last 7 days',
+      view: 'Table',
+    })
+  })
+
+  it('reports the chart summary as the view field for a chart-view database cell', () => {
+    expect(
+      getCellMetadata(chartDatabaseCell('cell-1', ['signups']), successfulDatabaseContext())
+    ).toEqual({
+      status: 'ready',
+      source: 'Database: Primary',
+      view: 'Chart (bar, x: day, y: signups)',
     })
   })
 })
@@ -309,7 +348,7 @@ describe('getEntryMetadata', () => {
     ).toEqual({ status: 'loading' })
   })
 
-  it('returns a single line when replacement metadata is unchanged', () => {
+  it('hides metadata entirely when a replacement changes neither the database nor the view', () => {
     expect(
       getEntryMetadata(
         {
@@ -320,7 +359,58 @@ describe('getEntryMetadata', () => {
         },
         successfulDatabaseContext()
       )
-    ).toEqual({ status: 'ready', text: 'Database: Primary' })
+    ).toEqual({ status: 'hidden' })
+  })
+
+  it('surfaces only the view change from table to chart, omitting the unchanged database', () => {
+    expect(
+      getEntryMetadata(
+        {
+          _tag: 'replaced',
+          before: wireDatabaseCell('cell-1'),
+          after: agentChartDatabaseCell(['signups']),
+          operationIndex: 0,
+        },
+        successfulDatabaseContext()
+      )
+    ).toEqual({
+      status: 'ready',
+      text: 'Table → Chart (bar, x: day, y: signups)',
+    })
+  })
+
+  it('surfaces only a chart parameter change, omitting the unchanged database', () => {
+    expect(
+      getEntryMetadata(
+        {
+          _tag: 'replaced',
+          before: chartDatabaseCell('cell-1', ['signups']),
+          after: agentChartDatabaseCell(['active_users']),
+          operationIndex: 0,
+        },
+        successfulDatabaseContext()
+      )
+    ).toEqual({
+      status: 'ready',
+      text: 'Chart (bar, x: day, y: signups) → Chart (bar, x: day, y: active_users)',
+    })
+  })
+
+  it('surfaces only a database change, omitting the unchanged view', () => {
+    expect(
+      getEntryMetadata(
+        {
+          _tag: 'replaced',
+          before: chartDatabaseCell('cell-1', ['signups']),
+          after: { ...agentChartDatabaseCell(['signups']), database_identifier: 'replica-3' },
+          operationIndex: 0,
+        },
+        successfulDatabaseContext([{ identifier: 'replica-3', region: 'us-east-1' }])
+      )
+    ).toEqual({
+      status: 'ready',
+      text: 'Database: Primary → Database: Replica',
+    })
   })
 })
 
