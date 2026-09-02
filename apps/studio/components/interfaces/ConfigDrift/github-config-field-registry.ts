@@ -1,41 +1,23 @@
-import { type GitHubConfigToml } from './github-config.types'
-import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
-import { convertToBytes } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
+import type { ProjectConfig } from '@supabase/config'
 
-// This file should be temporary and will be removed once we publish a "@supabase/config" package.
+// This file's secret-filtering, field-lookup, and settingHref registry are still hand-rolled.
+// @supabase/config's `fromApiProjectConfig`/`fromConfigDocument` (called from github-config-drift.ts)
+// now own the section/field mapping and secret omission that this file used to duplicate for the
+// dashboard side; what's left here has no package equivalent (`settingHref` is a Studio-only
+// concept) or is kept as a defense-in-depth layer even though the package's own output should
+// never need it (the secret-field guard below, still exercised by github-config-drift.test.ts).
 
-// Every top-level config.toml section, excluding `project_id` which is a scalar, not a section.
+// Every hosted-project section `ProjectConfig` can carry (`HostedSectionKey` in @supabase/config).
 export const CONFIG_SECTIONS = [
   'api',
   'auth',
   'db',
-  'storage',
   'realtime',
-  'studio',
-  'inbucket',
-  'functions',
-  'edge_runtime',
-  'analytics',
-  'remotes',
+  'storage',
+  'workers',
   'experimental',
-] as const satisfies readonly Exclude<keyof GitHubConfigToml, 'project_id'>[]
+] as const satisfies readonly Exclude<keyof ProjectConfig, '_apiResponse'>[]
 export type ConfigSection = (typeof CONFIG_SECTIONS)[number]
-
-// The v2 project config API's own top-level section names — distinct from `CONFIG_SECTIONS`,
-// which mirrors config.toml's naming (e.g. `pooler` here nests under config.toml's `db.pooler`).
-const DASHBOARD_CONFIG_SECTIONS = [
-  'api',
-  'auth',
-  'database',
-  'pooler',
-  'realtime',
-  'storage',
-] as const
-type DashboardConfigSection = (typeof DASHBOARD_CONFIG_SECTIONS)[number]
-
-export type ConfigDriftDashboardConfig = Partial<
-  Record<DashboardConfigSection, Record<string, unknown>>
->
 
 interface ConfigFieldDefinition {
   settingHref: (projectRef: string) => string
@@ -173,8 +155,9 @@ const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
     settingHref: toApiSettingsHref,
   },
   'storage.file_size_limit': {
+    // Both sides now report this as a canonical string (e.g. "50MiB") via @supabase/config's
+    // `fromApiProjectConfig`/`fromConfigDocument`, so no normalization is needed here anymore.
     settingHref: toStorageSettingsHref,
-    normalizeGithubValue: parseFileSizeToBytes,
   },
   'api.enabled': {
     settingHref: toProjectHref,
@@ -517,37 +500,6 @@ export function normalizeRedirectUrls(value: unknown): string[] {
   )
     .filter(Boolean)
     .sort()
-}
-
-const FILE_SIZE_PATTERN = /^(\d+(?:\.\d+)?)\s*(B|KB|KIB|MB|MIB|GB|GIB)?$/i
-const FILE_SIZE_UNIT_ALIASES: Record<string, StorageSizeUnits> = {
-  B: StorageSizeUnits.BYTES,
-  KB: StorageSizeUnits.KB,
-  KIB: StorageSizeUnits.KB,
-  MB: StorageSizeUnits.MB,
-  MIB: StorageSizeUnits.MB,
-  GB: StorageSizeUnits.GB,
-  GIB: StorageSizeUnits.GB,
-}
-
-/**
- * config.toml declares storage.file_size_limit as a human string (e.g. "50MiB"); the v2 project
- * config returns the same setting in bytes. Parse the former so both sides compare as bytes.
- */
-function parseFileSizeToBytes(value: unknown): unknown {
-  if (typeof value === 'number') return value
-  if (typeof value !== 'string') return value
-
-  const match = FILE_SIZE_PATTERN.exec(value.trim())
-  if (!match) return value
-
-  const [, amount, unitSuffix] = match
-  const unit = unitSuffix
-    ? FILE_SIZE_UNIT_ALIASES[unitSuffix.toUpperCase()]
-    : StorageSizeUnits.BYTES
-  if (!unit) return value
-
-  return convertToBytes(Number(amount), unit)
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

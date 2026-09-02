@@ -1,8 +1,7 @@
+import type { EffectiveConfig } from '@supabase/config'
 import { useQuery } from '@tanstack/react-query'
 import type { components } from 'api-types'
-import { z } from 'zod'
 
-import { gitHubConfigTomlSchema } from '@/components/interfaces/ConfigDrift/github-config.types'
 import { get, handleError } from '@/data/fetchers'
 import type { UseCustomQueryOptions } from '@/types'
 
@@ -11,8 +10,16 @@ export type GitHubConfigVariables = {
   branch?: string
 }
 
+// The GitHub connections API additionally returns `config_source` alongside the config.toml
+// sections themselves -- see the same field's use in github-config-drift.ts.
+type ParsedGitHubConfig = EffectiveConfig & { config_source?: string }
+
 type GithubConfigQueryResponse = components['schemas']['GetGitHubConnectionConfigResponse'] & {
-  config: z.infer<typeof gitHubConfigTomlSchema>
+  config: ParsedGitHubConfig
+}
+
+function isPlainObject(value: unknown): value is ParsedGitHubConfig {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
 export const githubConfigKeys = {
@@ -39,16 +46,13 @@ export async function getGitHubConfig(
   )
 
   if (error) return handleError(error)
-  const parsed = gitHubConfigTomlSchema.safeParse(data.config)
-  if (parsed.error) {
-    return handleError(
-      new Error(`Invalid response from Github config API: ${parsed.error.message}`)
-    )
+  if (!isPlainObject(data.config)) {
+    return handleError(new Error('Invalid response from Github config API: expected an object'))
   }
 
   return {
     ...data,
-    config: parsed.data,
+    config: data.config,
   }
 }
 

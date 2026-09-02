@@ -143,14 +143,9 @@ const CONFIG_SECTION_LABELS: Record<ConfigSection, string> = {
   api: 'API',
   auth: 'Auth',
   db: 'Database',
-  storage: 'Storage',
   realtime: 'Realtime',
-  studio: 'Studio',
-  inbucket: 'Inbucket',
-  functions: 'Edge Functions',
-  edge_runtime: 'Edge Runtime',
-  analytics: 'Analytics',
-  remotes: 'Remotes',
+  storage: 'Storage',
+  workers: 'Workers',
   experimental: 'Experimental',
 }
 
