@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import type { components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it } from 'vitest'
@@ -91,19 +91,13 @@ describe('/project/[ref]/workers', () => {
   })
 
   it('refreshes the workers list on request', async () => {
-    const responses = [[workerDatum('existing')], [workerDatum('embed')]]
-    let requestCount = 0
-    addAPIMock({
-      method: 'get',
-      path: '/v2/projects/:ref/workers',
-      response: () => HttpResponse.json({ data: responses[requestCount++] }),
-    })
+    mockWorkersList([workerDatum('existing')])
 
     await renderWorkersPage()
 
+    mockWorkersList([workerDatum('embed')])
     fireEvent.click(screen.getByRole('button', { name: 'Refresh' }))
 
-    await waitFor(() => expect(requestCount).toBe(2))
     expect(await screen.findByRole('link', { name: 'embed' })).toBeVisible()
   })
 
@@ -132,10 +126,13 @@ describe('/project/[ref]/workers', () => {
     addAPIMock({
       method: 'get',
       path: '/v2/projects/:ref/workers',
-      response: () =>
-        requestCount++ === 0
-          ? HttpResponse.json<APIErrorBody>({ message: 'Unavailable' }, { status: 500 })
-          : HttpResponse.json({ data: [workerDatum('embed')] }),
+      response: (): HttpResponse<APIErrorBody> | HttpResponse<ListWorkersResponse> => {
+        if (requestCount++ === 0) {
+          return HttpResponse.json<APIErrorBody>({ message: 'Unavailable' }, { status: 500 })
+        }
+
+        return HttpResponse.json<ListWorkersResponse>({ data: [workerDatum('embed')] })
+      },
     })
 
     await renderWorkersPage()
