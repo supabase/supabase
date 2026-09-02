@@ -16,6 +16,8 @@ import type { Permission } from '@/types'
 type AccessControlPermission = components['schemas']['AccessControlPermission']
 type OrganizationResponse = components['schemas']['OrganizationResponse']
 type ProjectsResponse = components['schemas']['ListProjectsPaginatedResponse']
+type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse']
+type OrganizationProject = OrganizationProjectsResponse['projects'][number]
 
 /** Satisfies both Studio's `Permission` type and the API's `AccessControlPermission` row shape. */
 export type PermissionRowFixture = Permission & {
@@ -73,7 +75,27 @@ export const ownerRows = (slug: string, refs: string[] = []) => [
 ]
 
 export const MOCK_ORG = { slug: 'acme-prod', name: 'Acme Production' }
+export const MOCK_ORG_2 = { slug: 'acme-staging', name: 'Acme Staging' }
 export const MOCK_PROJECT = { ref: 'project-1', name: 'Project 1' }
+export const MOCK_PROJECT_2 = { ref: 'project-2', name: 'Project 2' }
+
+const toOrganizationProject = (project: { ref: string; name: string }): OrganizationProject => ({
+  cloud_provider: 'AWS',
+  databases: [],
+  inserted_at: new Date().toISOString(),
+  integration_source: null,
+  is_branch: false,
+  name: project.name,
+  ref: project.ref,
+  region: 'us-east-1',
+  status: 'ACTIVE_HEALTHY',
+})
+
+/** Per-org project lists backing the `/platform/organizations/{slug}/projects` mock below. */
+const PROJECTS_BY_ORG: Record<string, { ref: string; name: string }[]> = {
+  [MOCK_ORG.slug]: [MOCK_PROJECT],
+  [MOCK_ORG_2.slug]: [MOCK_PROJECT_2],
+}
 
 /**
  * Registers the GET mocks every scoped-token surface fires on mount: one organization
@@ -102,6 +124,18 @@ export const mockScopedTokenEnvironment = () => {
           },
         ],
       }),
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/organizations/:slug/projects',
+    response: ({ params }) => {
+      const slug = (params as { slug: string }).slug
+      const projects = (PROJECTS_BY_ORG[slug] ?? []).map(toOrganizationProject)
+      return HttpResponse.json<OrganizationProjectsResponse>({
+        projects,
+        pagination: { count: projects.length, limit: 100, offset: 0 },
+      })
+    },
   })
   addAPIMock({
     method: 'get',
