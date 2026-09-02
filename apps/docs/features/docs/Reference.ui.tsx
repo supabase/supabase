@@ -474,7 +474,9 @@ export function ApiSchemaParamSubdetails({
   if (
     !('enum' in schema) &&
     'type' in schema &&
-    (['boolean', 'number', 'integer'].includes(schema.type) ||
+    (schema.type === 'boolean' ||
+      ((schema.type === 'number' || schema.type === 'integer') &&
+        !('minimum' in schema || 'maximum' in schema)) ||
       (schema.type === 'string' &&
         !('minLength' in schema || 'maxLength' in schema || 'pattern' in schema)) ||
       (schema.type === 'array' &&
@@ -501,7 +503,15 @@ export function ApiSchemaParamSubdetails({
                     constraint: key,
                     value: schema[key],
                   }))
-              : []
+              : 'type' in schema && (schema.type === 'number' || schema.type === 'integer')
+                ? ['minimum', 'maximum']
+                    .filter((key) => key in schema)
+                    .map((key) => ({
+                      constraint: key,
+                      value: schema[key],
+                    }))
+                : []
+
   const subContent = asSchemaArray(rawSubContent)
 
   return (
@@ -575,7 +585,10 @@ export function ApiSchemaParamSubdetails({
                   <span className="font-mono text-sm font-medium text-foreground">
                     {String(detail)}
                   </span>
-                ) : 'type' in schema && schema.type === 'string' ? (
+                ) : 'type' in schema &&
+                  (schema.type === 'string' ||
+                    schema.type === 'number' ||
+                    schema.type === 'integer') ? (
                   <span className="text-sm text-foreground flex items-baseline gap-2">
                     <span className="font-mono text-sm font-medium text-foreground">
                       {detail.constraint}
