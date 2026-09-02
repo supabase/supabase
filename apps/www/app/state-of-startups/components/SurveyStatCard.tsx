@@ -27,7 +27,7 @@ export function SurveyStatCard({ label, query, value, cohortFilter }: SurveyStat
   const cardRef = useRef<HTMLDivElement>(null)
   const { year } = useYear()
 
-  const accentBg = 'bg-brand'
+  const accentBg = 'bg-brand-default'
   const accentText = 'text-brand'
 
   // A static `value` wins; otherwise resolve from the embedded dataset for the

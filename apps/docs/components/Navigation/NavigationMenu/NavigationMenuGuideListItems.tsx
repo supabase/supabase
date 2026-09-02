@@ -20,7 +20,7 @@ const HeaderLink = React.memo(function HeaderLink(props: {
       className={[
         ' ',
         !props.title && 'capitalize',
-        props.url === pathname ? 'text-brand-link' : 'hover:text-brand-link text-foreground',
+        props.url === pathname ? 'text-brand' : 'hover:text-brand text-foreground',
       ].join(' ')}
     >
       {props.title ?? props.id}
@@ -84,7 +84,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
                 'flex items-center gap-2 w-full',
                 'cursor-pointer transition text-sm',
                 activeItem
-                  ? 'text-brand-link font-medium'
+                  ? 'text-brand font-medium'
                   : 'hover:text-foreground text-foreground-lighter',
               ].join(' ')}
             >
@@ -114,8 +114,8 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
                         className={[
                           'cursor-pointer transition text-sm',
                           subSubItem.url === pathname
-                            ? 'text-brand-link'
-                            : 'hover:text-brand-link text-foreground-lighter',
+                            ? 'text-brand'
+                            : 'hover:text-brand text-foreground-lighter',
                         ].join(' ')}
                       >
                         {subSubItem.name}
@@ -134,7 +134,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
               'flex items-center gap-2',
               'cursor-pointer transition text-sm',
               activeItem
-                ? 'text-brand-link font-medium'
+                ? 'text-brand font-medium'
                 : 'hover:text-foreground text-foreground-lighter',
             ].join(' ')}
             parent={props.subItem.parent}
@@ -167,7 +167,7 @@ const ContentLink = React.memo(function ContentLink(props: any) {
         className={[
           'cursor-pointer transition text-sm',
           props.url === pathname
-            ? 'text-brand-link'
+            ? 'text-brand'
             : 'hover:text-foreground text-foreground-lighter',
         ].join(' ')}
       >
@@ -190,7 +190,7 @@ const Content = (props) => {
   return (
     <ul className={['relative w-full flex flex-col gap-0 pb-5'].join(' ')}>
       <Link href={menu.url ?? ''}>
-        <div className="flex items-center gap-3 my-3 text-brand-link">
+        <div className="flex items-center gap-3 my-3 text-brand">
           <MenuIconPicker icon={menu.icon} />
           <HeaderLink title={menu.title} url={menu.url} id={id} />
         </div>

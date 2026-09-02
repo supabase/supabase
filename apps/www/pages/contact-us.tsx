@@ -22,7 +22,7 @@ const ContactSection = ({
     </h2>
     <a
       href={`mailto:${email}`}
-      className="inline-block mt-2 lg:mt-3 font-mono text-base lg:text-lg text-brand-link hover:underline"
+      className="inline-block mt-2 lg:mt-3 font-mono text-base lg:text-lg text-brand hover:underline"
     >
       {email}
     </a>
@@ -87,7 +87,7 @@ const ContactUs = ({}: Props) => {
                 description={
                   <>
                     To report suspected violations of our{' '}
-                    <Link href="/aup" className="text-brand-link hover:underline">
+                    <Link href="/aup" className="text-brand hover:underline">
                       Acceptable Use Policy
                     </Link>
                     , including spam, phishing, malware, or unlawful activity involving Supabase
@@ -116,7 +116,7 @@ const ContactUs = ({}: Props) => {
                 <div className="mt-2 lg:mt-3">
                   <a
                     href="mailto:legal@supabase.com"
-                    className="inline-block font-mono text-base lg:text-lg text-brand-link hover:underline"
+                    className="inline-block font-mono text-base lg:text-lg text-brand hover:underline"
                   >
                     legal@supabase.com
                   </a>

@@ -193,7 +193,7 @@ function PreviousResultsCta() {
         <div className="w-fit bg-brand-300 px-5 py-3 text-[1.75rem] leading-8 tracking-tight text-brand md:text-[2.25rem] md:leading-10">
           of
         </div>
-        <div className="w-fit bg-brand px-5 py-3 text-[1.75rem] leading-8 tracking-tight text-background dark:text-brand-200 md:text-[2.25rem] md:leading-10">
+        <div className="w-fit bg-brand-default px-5 py-3 text-[1.75rem] leading-8 tracking-tight text-background dark:text-brand-200 md:text-[2.25rem] md:leading-10">
           Startups
         </div>
         <div className="w-fit bg-brand-500 px-5 py-3 text-[1.75rem] leading-8 tracking-tight text-brand-300 md:text-[2.25rem] md:leading-10">

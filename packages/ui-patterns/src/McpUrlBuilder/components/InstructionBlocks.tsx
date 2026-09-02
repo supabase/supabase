@@ -61,7 +61,7 @@ function reactRenderers(onCopy: (type?: McpOnCopyCallback) => void): Renderers {
         href={node.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-brand-link hover:underline"
+        className="text-brand hover:underline"
       >
         {children}
       </a>

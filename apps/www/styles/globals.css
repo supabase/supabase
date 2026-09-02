@@ -261,7 +261,7 @@ h6:not(.overwrite) {
 }
 
 .heading-gradient-brand {
-  @apply text-[#3ECF8E00] bg-clip-text bg-linear-to-b from-brand to-brand/80;
+  @apply text-[#3ECF8E00] bg-clip-text bg-linear-to-b from-brand-default to-brand-default/80;
 }
 
 .toc-animate {

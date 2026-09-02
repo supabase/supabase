@@ -49,7 +49,7 @@ export function SurveyChapterSection({ section }: { section: SurveySection }) {
     return { [cohortToggle.key]: option.filter }
   }, [cohortToggle, cohortLabel])
 
-  const eyebrowColor = 'text-brand-link dark:text-brand'
+  const eyebrowColor = 'text-brand'
 
   // A section can be compared across years only if it has any 2025 data. New-in-
   // 2026 questions (share of codebase, auth, agents, MCP, the AI-codebase

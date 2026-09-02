@@ -427,7 +427,7 @@ export const SQLEditorTreeViewItem = ({
                   <Heart
                     size={14}
                     className={cn(
-                      isFavorite ? 'fill-brand stroke-none' : 'fill-none stroke-foreground-light'
+                      isFavorite ? 'fill-brand-default stroke-none' : 'fill-none stroke-foreground-light'
                     )}
                   />
                   {isFavorite ? 'Remove from' : 'Add to'} favorites

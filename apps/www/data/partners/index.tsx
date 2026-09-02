@@ -15,7 +15,7 @@ export default {
     image: (
       <div className="relative z-10 flex items-center justify-center mb-4">
         <div
-          className="w-12 h-12 rounded-xl bg-brand border border-brand-900 flex items-center justify-center"
+          className="w-12 h-12 rounded-xl bg-brand-default border border-brand-900 flex items-center justify-center"
           style={{
             boxShadow: '0 0 20px hsl(var(--brand-300)), 0 0 30px hsl(var(--brand-200))',
           }}

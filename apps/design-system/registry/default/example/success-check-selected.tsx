@@ -23,7 +23,7 @@ export default function SuccessCheckSelected() {
             className={cn(
               'relative flex w-full items-center rounded-md border px-4 py-3 text-left text-sm transition-colors',
               isSelected
-                ? 'border-brand bg-brand-200/20 pr-10 dark:bg-brand-300'
+                ? 'border-brand-default bg-brand-200/20 pr-10 dark:bg-brand-300'
                 : 'hover:border-default hover:bg-surface-200'
             )}
           >

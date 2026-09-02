@@ -87,7 +87,7 @@ export const ReplicationNode = ({ id }: { id: string }) => {
                   <div
                     className={cn(
                       'w-2 h-2 rounded-full',
-                      statusName === 'started' ? 'bg-brand' : 'bg-destructive'
+                      statusName === 'started' ? 'bg-brand-default' : 'bg-destructive'
                     )}
                   />
                 </div>

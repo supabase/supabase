@@ -29,10 +29,10 @@ const buttonVariants = cva(
       variant: {
         primary: `
           bg-brand-400 dark:bg-brand-500
-          hover:bg-brand/80 dark:hover:bg-brand/50
+          hover:bg-brand-default/80 dark:hover:bg-brand-default/50
           text-foreground
-          border-brand-500/75 dark:border-brand/30
-          hover:border-brand-600 dark:hover:border-brand
+          border-brand-500/75 dark:border-brand-default/30
+          hover:border-brand-600 dark:hover:border-brand-default
           data-[state=open]:bg-brand-400/80 dark:data-[state=open]:bg-brand-500/80
           `,
         default: `

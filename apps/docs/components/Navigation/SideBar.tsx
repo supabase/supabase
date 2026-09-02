@@ -80,7 +80,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                   'py-1.5 px-5 rounded-sm text-sm transition',
                   `${
                     item.url === pathname
-                      ? 'bg-background text-brand-link'
+                      ? 'bg-background text-brand'
                       : 'text-foreground-light hover:text-foreground'
                   }`,
                 ].join(' ')}
@@ -105,7 +105,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                   size={14}
                   strokeWidth={2}
                 />
-                <span className="text-foreground text-sm group-hover:text-brand-link transition">
+                <span className="text-foreground text-sm group-hover:text-brand transition">
                   {group.label}
                 </span>
               </Accordion.Trigger>
@@ -119,7 +119,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                             'py-1.5 px-5 rounded-sm text-sm transition',
                             `${
                               section.url === pathname
-                                ? 'bg-background text-brand-link'
+                                ? 'bg-background text-brand'
                                 : 'text-foreground-light hover:text-foreground'
                             }`,
                           ].join(' ')}
@@ -144,7 +144,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                               size={14}
                               strokeWidth={2}
                             />
-                            <span className="text-foreground text-sm group-hover:text-brand-link transition">
+                            <span className="text-foreground text-sm group-hover:text-brand transition">
                               {section.name}
                             </span>
                           </Accordion.Trigger>
@@ -157,7 +157,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                                     'py-1.5 ml-4 px-5 rounded-sm text-sm transition',
                                     `${
                                       item.url === pathname
-                                        ? 'bg-background text-brand-link'
+                                        ? 'bg-background text-brand'
                                         : 'text-foreground-light hover:text-foreground'
                                     }`,
                                   ].join(' ')}

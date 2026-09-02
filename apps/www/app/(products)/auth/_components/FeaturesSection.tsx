@@ -193,7 +193,7 @@ function IntegratedSkeleton() {
           <div className="rounded-xl border border-border bg-surface-100 p-4">
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-2.5">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand/15 text-[10px] font-medium text-brand">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-default/15 text-[10px] font-medium text-brand">
                   CW
                 </div>
                 <div className="flex flex-col">
@@ -244,7 +244,7 @@ function IntegratedSkeleton() {
           {/* Verify email card */}
           <div className="rounded-xl border border-border bg-surface-100 p-4">
             <div className="flex flex-col items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand/10">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-default/10">
                 <svg
                   width="14"
                   height="14"
@@ -395,7 +395,7 @@ function IntegratedSkeleton() {
                   <span className="text-[10px] text-foreground">Authenticator app</span>
                   <span className="text-[9px] text-foreground-muted">TOTP via auth app</span>
                 </div>
-                <div className="rounded bg-brand/15 px-1.5 py-0.5 text-[8px] font-medium text-brand">
+                <div className="rounded bg-brand-default/15 px-1.5 py-0.5 text-[8px] font-medium text-brand">
                   On
                 </div>
               </div>

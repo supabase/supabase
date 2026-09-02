@@ -18,7 +18,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
             href="https://claude.com/plugins/supabase"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-brand-link hover:underline"
+            className="text-brand hover:underline"
           >
             official Anthropic marketplace
           </a>
@@ -53,7 +53,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
               href="https://developers.openai.com/codex/plugins#plugin-directory-in-the-codex-app"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-brand-link hover:underline"
+              className="text-brand hover:underline"
             >
               Codex desktop app plugin directory
             </a>
@@ -83,7 +83,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
             href="https://cursor.com/marketplace/supabase"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-brand-link hover:underline"
+            className="text-brand hover:underline"
           >
             Supabase
           </a>{' '}
@@ -118,7 +118,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
             href="https://geminicli.com/extensions/?name=supabase-communitysupabase-plugin"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-brand-link hover:underline"
+            className="text-brand hover:underline"
           >
             Gemini CLI extensions directory
           </a>
@@ -190,7 +190,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
             href="https://github.com/vercel-labs/open-plugin-spec"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-brand-link hover:underline"
+            className="text-brand hover:underline"
           >
             Open Plugin
           </a>{' '}
@@ -211,7 +211,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
               href="https://github.com/supabase-community/supabase-plugin"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-brand-link hover:underline"
+              className="text-brand hover:underline"
             >
               GitHub repository
             </a>
@@ -258,7 +258,7 @@ export function AgentPluginsPanel() {
               href={selectedClient.docsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-brand-link hover:underline inline-flex items-center"
+              className="text-brand hover:underline inline-flex items-center"
             >
               {selectedClient.docsLinkText ?? `View ${selectedClient.label} extensions docs`}
               <ExternalLink className="h-3 w-3 ml-1" />
@@ -270,7 +270,7 @@ export function AgentPluginsPanel() {
             href={selectedClient.repoUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-brand-link hover:underline inline-flex items-center"
+            className="text-brand hover:underline inline-flex items-center"
           >
             Give feedback
             <ExternalLink className="h-3 w-3 ml-1" />

@@ -128,7 +128,7 @@ const BUILD_STATE_META: Record<WorkerBuildState, WorkerStateMeta> = {
     dotClassName: 'bg-warning',
     textClassName: 'text-foreground-light',
   },
-  active: { label: 'Active', dotClassName: 'bg-brand', textClassName: 'text-foreground-light' },
+  active: { label: 'Active', dotClassName: 'bg-brand-default', textClassName: 'text-foreground-light' },
   failed: {
     label: 'Failed',
     dotClassName: 'bg-destructive',

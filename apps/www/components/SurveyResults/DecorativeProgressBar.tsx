@@ -9,7 +9,7 @@ interface ProgressBarProps {
 export function ProgressBar({
   className = 'h-4',
   backgroundClassName = 'bg-foreground-muted/80',
-  foregroundClassName = 'bg-brand',
+  foregroundClassName = 'bg-brand-default',
   animationDelay,
   reverse = false,
 }: ProgressBarProps) {
@@ -59,7 +59,7 @@ export function DecorativeProgressBar({
     {
       height: 'h-4',
       bgColor: 'bg-foreground-muted/80',
-      fgColor: 'bg-brand',
+      fgColor: 'bg-brand-default',
       animationDelay: '0s',
     },
     {
