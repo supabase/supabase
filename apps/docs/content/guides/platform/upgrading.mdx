@@ -339,7 +339,7 @@ set <col> = pgp_sym_encrypt(
 where <id_column> in (/* rows found by the scan above */);
 ```
 
-Spot-check that a recovered value decrypts to the expected plaintext before running the update across all rows. Because affected values were not protected as intended, consider rotating any secrets stored this way.
+If the plaintext is binary (encrypted with `pgp_sym_encrypt_bytea`), use `pgp_sym_decrypt_bytea` and `pgp_sym_encrypt_bytea` in the same way — the text functions reject binary plaintext. Spot-check that a recovered value decrypts to the expected plaintext before running the update across all rows. Because affected values were not protected as intended, consider rotating any secrets stored this way.
 
 ### Btree_gist indexes on float columns require reindexing after upgrade
 
