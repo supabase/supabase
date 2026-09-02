@@ -2709,6 +2709,29 @@ functions:
           }
           ```
         hideCodeBlock: true
+  - id: dry-run
+    title: dryRun()
+    description: |
+      Limit the query result by count.
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.limit'
+    params:
+      - name: count
+        isOptional: false
+        type: Long
+        description: The number of rows to limit the result to.
+      - name: referencedTable
+        isOptional: true
+        type: String
+        description: The foreign table to limit by.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```kotlin
+          supabase.from("characters").select {
+              limit(count = 1)
+          }
+          ```
   - id: range
     title: range()
     description: |
@@ -3246,8 +3269,8 @@ functions:
   - id: sign-in-with-passkey
     title: 'signInWithPasskey()'
     notes: |
-      supabase-kt currently does not provide a built-in way to sign in via passkeys, 
-      until then you can use the API methods the library provides to manage the flow yourself.
+      supabase-kt currently does not provide a built-in way to sign in via passkeys.
+      Until then you can use the API methods the library provides to manage the flow yourself.
     examples:
       - id: start-passkey-flow
         name: Start passkey authentication
@@ -3265,7 +3288,7 @@ functions:
   - id: register-passkey
     title: 'registerPasskey()'
     notes: |
-      supabase-kt currently does not provide a built-in way to register passkeys via an built-in flow, until then you can use the API methods
+      supabase-kt currently does not provide a built-in way to register passkeys via an built-in flow. Until then you can use the API methods
       the library provides to register a new passkey (WebAuthn credential) for the signed-in user.
     examples:
       - id: register-passkey
@@ -3273,10 +3296,10 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-        val response = supabase.auth.passkeys.startRegistration()
-        response.options // raw options for the passkey provider
-        // insert the credential received from the provider
-        val verifyResponse = supabase.auth.passkeys.verifyRegistration(response.challengeId, credential)
+          val response = supabase.auth.passkeys.startRegistration()
+          response.options // raw options for the passkey provider
+          // insert the credential received from the provider
+          val verifyResponse = supabase.auth.passkeys.verifyRegistration(response.challengeId, credential)
           ```
   - id: sign-in-with-otp
     title: 'signInWith(OTP)'
@@ -4288,6 +4311,94 @@ functions:
           ```kotlin
           val response = supabase.auth.getClaims(jwt = "your-jwt-token")
           ```
+  - id: oauth-server-api
+    title: OAuth Server Api
+    notes: |
+      asdasd
+  - id: auth-js-authoauthserverapi-getauthorizationdetails
+    notes: |
+      Retrieves details about an OAuth authorization request. Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+      Returns OAuthAuthorizationDetails including client info, scopes, and user information. If the response includes only a redirect_url field, 
+      it means consent was already given - the caller should handle the redirect manually if needed, so a OAuthRedirect will be returned.
+    examples:
+      - id: get-authorizationdetails
+        name: Get authorization details
+        code: |
+          ```kotlin
+          val details = supabase.auth.oauth.getAuthorizationDetails(authorizationId)
+          when(details) {
+              is OAuthAuthorizationDetails -> {
+                  println(details.user)
+                  println(details.redirectUri)
+              }
+              is OAuthRedirect -> println(details.redirectUrl)
+          }
+          ```
+    params:
+      - name: authorizationId
+        isOptional: false
+        type: String
+        description: The authorization you want to get details for
+  - id: auth-js-authoauthserverapi-approveauthorization
+    notes: |
+      Approves an OAuth authorization request. Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+    examples:
+      - id: approve-authorization
+        name: Approve authorization
+        code: |
+          ```kotlin
+          val redirect = supabase.auth.oauth.approveAuthorization(authorizationId)
+          println(redirect.redirectUrl)
+          ```
+    params:
+      - name: authorizationId
+        isOptional: false
+        type: String
+        description: The authorization you want to approve
+  - id: auth-js-authoauthserverapi-denyauthorization
+    notes: |
+      Denies an OAuth authorization request. Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+    examples:
+      - id: deny-authorization
+        name: Deny authorization
+        code: |
+          ```kotlin
+          val redirect = supabase.auth.oauth.denyAuthorization(authorizationId)
+          println(redirect.redirectUrl)
+          ```
+    params:
+      - name: authorizationId
+        isOptional: false
+        type: String
+        description: The authorization you want to deny
+  - id: auth-js-authoauthserverapi-listgrants
+    notes: |
+      Lists all OAuth grants that the authenticated user has authorized. Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+    examples:
+      - id: list-grants
+        name: List OAuth grants
+        code: |
+          ```kotlin
+          val grants = supabase.auth.oauth.listAuthorizationGrants()
+          for (grant in grants) {
+            println(grant.scopes)
+          }
+          ```
+  - id: auth-js-authoauthserverapi-revokegrant
+    notes: |
+      Revokes a user's OAuth grant for a specific client. Only relevant when the OAuth 2.1 server is enabled in Supabase Auth
+    examples:
+      - id: revoke-grant
+        name: Revoke OAuth grant
+        code: |
+          ```kotlin
+          supabase.auth.oauth.revokeGrant(grantId)
+          ```
+    params:
+      - name: grantId
+        isOptional: false
+        type: String
+        description: The grant you want to revoke
   - id: admin-api
     title: 'Overview'
     notes: |
