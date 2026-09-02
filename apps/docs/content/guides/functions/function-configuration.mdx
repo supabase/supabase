@@ -28,7 +28,7 @@ import_map = './functions/image-processor/import_map.json'
 
 # Custom entrypoint for legacy function using JavaScript
 [functions.legacy-processor]
-entrypoint = './functions/legacy-processor/index.js'
+entrypoint = './functions/legacy-processor/index.js
 ```
 
 This configuration tell Supabase that the `stripe-webhook` function doesn't require a valid JWT, the `image-processor` function uses a custom import map, and `legacy-processor` uses a custom entrypoint.
@@ -80,7 +80,7 @@ Save your Function as a JavaScript file (e.g. `index.js`) update the `supabase/c
 
 ```toml
 [functions.hello-world]
-entrypoint = './functions/hello-world/index.js' # path must be relative to config.toml
+entrypoint = './index.js' # path must be relative to config.toml
 ```
 
 You can use any `.ts`, `.js`, `.tsx`, `.jsx` or `.mjs` file as the entrypoint for a Function.

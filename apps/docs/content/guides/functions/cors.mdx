@@ -49,8 +49,7 @@ export default {
       const { name } = await req.json()
       return Response.json({ message: `Hello ${name}!` }, { headers: corsHeaders })
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error)
-      return Response.json({ error: message }, { status: 400, headers: corsHeaders })
+      return Response.json({ error: error.message }, { status: 400, headers: corsHeaders })
     }
   },
 }
@@ -84,7 +83,6 @@ export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers':
     'authorization, x-client-info, apikey, content-type, x-retry-count, traceparent, tracestate, baggage',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
 }
 ```
 
