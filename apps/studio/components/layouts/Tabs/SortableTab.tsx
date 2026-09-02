@@ -65,6 +65,7 @@ export const SortableTab = ({
   const isActive = tabs.activeTab === tab.id
 
   const closeTabFromKeyboard = (event: KeyboardEvent) => {
+    if (tab.closable === false) return
     if (event.key !== 'Delete' && event.key !== 'Backspace') return
     event.preventDefault()
     event.stopPropagation()
@@ -85,7 +86,7 @@ export const SortableTab = ({
           value={tab.id}
           onAuxClick={(e) => {
             // Middle click closes tab
-            if (e.button === 1) {
+            if (e.button === 1 && tab.closable !== false) {
               e.preventDefault()
               onClose(tab.id)
             }
@@ -137,33 +138,35 @@ export const SortableTab = ({
         {/* Sibling of TabsTrigger — not nested inside the tab button.
             Only the active tab's close is in the tab order (roving tabs). Delete/Backspace
             on the focused tab also closes. */}
-        <button
-          type="button"
-          tabIndex={isActive ? 0 : -1}
-          aria-label="Close tab"
-          onClick={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-            onClose(tab.id)
-          }}
-          onMouseDown={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-          }}
-          onPointerDown={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-          }}
-          className={cn(
-            'absolute top-1/2 right-2.5 z-10 -translate-y-1/2',
-            'flex size-5 items-center justify-center rounded-xs',
-            'opacity-0 group-hover/tab:opacity-100 group-focus-within/tab:opacity-100 focus-visible:opacity-100',
-            'hover:bg-200 focus-ring',
-            'cursor-pointer'
-          )}
-        >
-          <X size={12} className="text-foreground-light" />
-        </button>
+        {tab.closable !== false && (
+          <button
+            type="button"
+            tabIndex={isActive ? 0 : -1}
+            aria-label="Close tab"
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              onClose(tab.id)
+            }}
+            onMouseDown={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+            }}
+            onPointerDown={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+            }}
+            className={cn(
+              'absolute top-1/2 right-2.5 z-10 -translate-y-1/2',
+              'flex size-5 items-center justify-center rounded-xs',
+              'opacity-0 group-hover/tab:opacity-100 group-focus-within/tab:opacity-100 focus-visible:opacity-100',
+              'hover:bg-200 focus-ring',
+              'cursor-pointer'
+            )}
+          >
+            <X size={12} className="text-foreground-light" />
+          </button>
+        )}
       </div>
       {index < openTabs.length && (
         <div role="separator" className="h-full w-px bg-border" key={`separator-${tab.id}`} />

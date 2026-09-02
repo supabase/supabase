@@ -15,7 +15,6 @@ import {
 } from 'react'
 
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
-import { type QuerySource } from './querySource'
 import type { UtilityTab } from './SQLEditor.types'
 import { useSQLEditorContext } from './SQLEditorContext'
 import { useAddDefinitions } from './useAddDefinitions'
@@ -34,6 +33,7 @@ import {
   type SafeLogSqlFragment,
   type UntrustedLogSqlFragment,
 } from '@/data/logs/safe-analytics-sql'
+import { type QuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
@@ -81,7 +81,7 @@ type RunContextValue = {
   potentialIssues: SqlEditorExecution['potentialIssues']
   resetPotentialIssues: () => void
   prettifyQuery: () => void
-  runSource: QuerySource
+  runSource: QuerySourceBinding
   executeLogsQuery: (sql: SafeLogSqlFragment) => void
   readEditorLogsSql: () => UntrustedLogSqlFragment | undefined
 }
@@ -144,7 +144,7 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
 
   const runSource = useRunSource(id)
 
-  useAddDefinitions(id, monacoRef.current, { enabled: runSource.type !== 'logs' })
+  useAddDefinitions(id, monacoRef.current, { enabled: runSource._tag !== 'logs' })
 
   const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery(
     {
@@ -191,7 +191,7 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
 
   const isExecuting = isExecutingDb || isExecutingLogs
 
-  const ai = useSqlEditorAi({ id, editorMountCount, diff, prompt, sqlSource: runSource.type })
+  const ai = useSqlEditorAi({ id, editorMountCount, diff, prompt, sqlSource: runSource._tag })
   const { acceptAiHandler, discardAiHandler } = ai
 
   useSqlEditorShortcuts({

@@ -11,39 +11,35 @@ database_id = "188986c9-019d-4f26-baaf-6f58cec8fa7a"
 
 ## Navigating the API logs:
 
-The Database API is powered by a [ PostgREST web-server](https://postgrest.org/en/v12/), recording every request to the API Edge Network logs. To precisely navigate them, use the [Log Explorer](/dashboard/project/_/logs/explorer). These logs are managed through [Logflare](/blog/supabase-logs-self-hosted) and can be queried with a subset of BigQuery SQL syntax.
+The Database API is powered by a [ PostgREST web-server](https://postgrest.org/en/v12/), recording every request to the API Edge Network logs. To precisely navigate them, use the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs) with the query source set to **Logs**. These logs run on ClickHouse. Every log line is a row in a single `logs` table, tagged by a `source` column.
 
-The log table that contains API requests is `edge_logs`.
+API requests are the rows where `source = 'edge_logs'`.
 
 Notably, it contains:
 | field | description |
 --------|-------------|
 | event_message | the log's message |
 | timestamp | time event was recorded |
-| request metadata | metadata about the REST request |
-| response metadata | metadata about the REST response |
+| log_attributes | structured request and response fields, keyed by dotted path |
 
-The request and response columns are arrays in the metadata field and must be unnested. This is done with a `cross join`.
+Request and response details live in the `log_attributes` map. Read a field with bracket access, keeping the full dotted key. There are no unnesting joins.
 
-**Unnesting example**
+**Field access example**
 
 ```sql
 select
-  -- the event message does not require unnesting
+  -- event_message is a column, so it needs no lookup
   event_message,
-  -- unnested status_code column from metadata.response field
-  status_code
-from
-  edge_logs
-  -- Unpack data stored in the 'metadata' field
-  cross join unnest(metadata) as metadata
-  -- After unpacking the 'metadata' field, extract the 'response' field from it
-  cross join unnest(response) as response;
+  -- response.status_code is a log_attributes key
+  log_attributes['response.status_code'] as status_code
+from logs
+where source = 'edge_logs'
+limit 100;
 ```
 
 The most useful fields for debugging are:
 
-> NOTE: not every field is included below. For a full list, check the API Edge field reference in the [Log Explorer](/dashboard/project/_/logs/explorer)
+> NOTE: not every field is included below. For a full list, check the API Edge [field reference](/docs/guides/monitoring-and-debugging/logs#logs-field-reference)
 
 ### Request object
 
@@ -68,15 +64,10 @@ The most useful fields for debugging are:
 
 ```sql
 select
-  city
-from
-  edge_logs
--- Unpack 'metadata' field
-cross join unnest(metadata) AS metadata
--- unpack 'request' from 'metadata'
-cross join unnest(request) AS request;
--- unpack 'cf' from 'request'
-cross join unnest(cf) AS cf;
+  log_attributes['request.cf.city'] as city
+from logs
+where source = 'edge_logs'
+limit 100;
 ```
 
 #### IP and browser/environment data:
@@ -96,15 +87,10 @@ cross join unnest(cf) AS cf;
 
 ```sql
 select
-  cf_connecting_ip
-from
-  edge_logs
--- Unpack 'metadata' field
-cross join unnest(metadata) AS metadata
--- unpack 'request' from 'metadata'
-cross join unnest(request) AS request;
--- unpack 'headers' from 'request'
-cross join unnest(headers) AS headers;
+  log_attributes['request.headers.cf_connecting_ip'] as cf_connecting_ip
+from logs
+where source = 'edge_logs'
+limit 100;
 ```
 
 #### Query type and formatting data:
@@ -114,27 +100,22 @@ cross join unnest(headers) AS headers;
 - identify problematic queries
 - identify unusual behavior by authenticated users
 
-| Column                | Description                                               | Sample value                                                                                                              |
-| --------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| request.method        | Request Method (PATCH, GET, PUT...)                       | GET                                                                                                                       |
-| request.url           | Request URL, which contains the PostgREST formatted query | https://yuhplfrsdxxxtldakizi.supabase.co/rest/v1/users?select=username&id=eq.63b6190e-214f-4b8a-b72d-3af6e1921411&limit=1 |
-| request.sb.auth_users | authenticated user's ID                                   | 63b6190e-214f-4b8a-b72d-3af6e1921411                                                                                      |
+| Column                                       | Description                                               | Sample value                                                                                                              |
+| -------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| request.method                               | Request Method (PATCH, GET, PUT...)                       | GET                                                                                                                       |
+| request.url                                  | Request URL, which contains the PostgREST formatted query | https://yuhplfrsdxxxtldakizi.supabase.co/rest/v1/users?select=username&id=eq.63b6190e-214f-4b8a-b72d-3af6e1921411&limit=1 |
+| request.sb.jwt.authorization.payload.subject | authenticated user's ID                                   | 63b6190e-214f-4b8a-b72d-3af6e1921411                                                                                      |
 
 **Unnesting example:**
 
 ```sql
 select
-  method,
-  url,
-  auth_users
-from
-  edge_logs
--- Unpack 'metadata' field
-cross join unnest(metadata) AS metadata
--- unpack 'request' from 'metadata'
-cross join unnest(request) AS request;
--- unpack 'sb' from 'request'
-cross join unnest(sb) AS sb;
+  log_attributes['request.method'] as method,
+  log_attributes['request.url'] as url,
+  log_attributes['request.sb.jwt.authorization.payload.subject'] as auth_user
+from logs
+where source = 'edge_logs'
+limit 100;
 ```
 
 ### Response object
@@ -153,13 +134,10 @@ cross join unnest(sb) AS sb;
 
 ```sql
 select
-  status_code
-from
-  edge_logs
-  -- Unpack 'metadata' field
-  cross join unnest(metadata) as metadata
-  -- unpack 'response' from 'metadata'
-  cross join unnest(response) as response;
+  log_attributes['response.status_code'] as status_code
+from logs
+where source = 'edge_logs'
+limit 100;
 ```
 
 ## Finding errors
@@ -191,24 +169,20 @@ Example:
 
 ```sql
 select
-  cast(timestamp as datetime) as timestamp,
-  status_code,
-  url,
+  timestamp,
+  log_attributes['response.status_code'] as status_code,
+  log_attributes['request.url'] as url,
   event_message
-from edge_logs
-cross join unnest(metadata) as metadata
-cross join unnest(response) AS request;
-cross join unnest(response) AS response;
+from logs
 where
+  source = 'edge_logs'
   -- find all errors
-  status_code >= 400
-    and
-  -- find queries featuring the a specific <table_name> and <column_name>
-  (
-    regexp_contains(url, '<table_name>')
-    and
-    regexp_contains(event_message, '<column_name1>|<column_name2>')
-  )
+  and toInt32OrZero(log_attributes['response.status_code']) >= 400
+  -- find queries featuring a specific <table_name> and <column_name>
+  and match(log_attributes['request.url'], '<table_name>')
+  and match(event_message, '<column_name1>|<column_name2>')
+order by timestamp desc
+limit 100;
 ```
 
 PostgREST has an [error reference table](https://postgrest.org/en/v12/references/errors.html) that you can use to interpret status codes.
@@ -219,30 +193,25 @@ However, some errors that are reported through the Database API occur at the Pos
 
 ```sql
 select
-  cast(postgres_logs.timestamp as datetime) as timestamp,
-  error_severity,
-  user_name,
-  query,
-  detail,
-  sql_state_code,
+  timestamp,
+  log_attributes['parsed.error_severity'] as error_severity,
+  log_attributes['parsed.user_name'] as user_name,
+  log_attributes['parsed.query'] as query,
+  log_attributes['parsed.detail'] as detail,
+  log_attributes['parsed.sql_state_code'] as sql_state_code,
   event_message
-from postgres_logs
-  cross join unnest(metadata) as metadata
-  cross join unnest(metadata.parsed) as parsed
+from logs
 where
+  source = 'postgres_logs'
   -- filter only for error events
-  regexp_contains(parsed.error_severity, 'ERROR|FATAL|PANIC')
-    and
+  and log_attributes['parsed.error_severity'] in ('ERROR', 'FATAL', 'PANIC')
   -- All DB API requests are registered as the authenticator role
-  parsed.user_name = 'authenticator'
-    and
+  and log_attributes['parsed.user_name'] = 'authenticator'
   -- find failed queries featuring the function <function_name>
-  regexp_contains(parsed.query, '<function_name>')
-    and
+  and match(log_attributes['parsed.query'], '<function_name>')
   -- limit the time of the search to be around the time of the failed API request
-postgres_logs.timestamp between '2024-04-15 10:50:00' AND '2024-04-15 10:50:27'
-order by
- timestamp desc
+  and timestamp between '2024-04-15 10:50:00' and '2024-04-15 10:50:27'
+order by timestamp desc
 limit 100;
 ```
 
@@ -258,77 +227,69 @@ In some cases, errors may emerge because of Cloudflare or PostgREST server error
 
 ```sql
 select
-  cast(timestamp as datetime) as timestamp,
-  status_code,
+  timestamp,
+  log_attributes['response.status_code'] as status_code,
   event_message,
-  path
-from
-  edge_logs
-  cross join unnest(metadata) as metadata
-  cross join unnest(response) as response
-  cross join unnest(request) as request
+  log_attributes['request.path'] as path
+from logs
 where
+  source = 'edge_logs'
   -- find all errors
-  status_code >= 400
-  and regexp_contains(path, '^/rest/v1/');
--- only look at DB API
+  and toInt32OrZero(log_attributes['response.status_code']) >= 400
+  -- only look at DB API
+  and match(log_attributes['request.path'], '^/rest/v1/')
+order by timestamp desc
+limit 100;
 ```
 
 **Group errors by path and code:**
 
 ```sql
 select
-  status_code,
-  path,
-  count(path) as reoccurrence_per_path
-from
-  edge_logs
-  cross join unnest(metadata) as metadata
-  cross join unnest(response) as response
-  cross join unnest(request) as request
+  log_attributes['response.status_code'] as status_code,
+  log_attributes['request.path'] as path,
+  count() as reoccurrence_per_path
+from logs
 where
+  source = 'edge_logs'
   -- find all errors
-  status_code >= 400
-  and regexp_contains(path, '^/rest/v1/') -- only look at DB API
+  and toInt32OrZero(log_attributes['response.status_code']) >= 400
+  and match(log_attributes['request.path'], '^/rest/v1/') -- only look at DB API
 group by path, status_code
-order by reoccurrence_per_path;
+order by reoccurrence_per_path desc
+limit 100;
 ```
 
 **Find requests by region:**
 
 ```sql
 select
-  path,
-  region,
-  count(region) as region_count
-from
-  edge_logs
-  cross join unnest(metadata) as metadata
-  cross join unnest(request) as request
-  cross join unnest(cf) as cf
+  log_attributes['request.path'] as path,
+  log_attributes['request.cf.region'] as region,
+  count() as region_count
+from logs
 where
+  source = 'edge_logs'
   -- only look at DB API
-  regexp_contains(path, '^/rest/v1/')
+  and match(log_attributes['request.path'], '^/rest/v1/')
 group by region, path
-order by requester_region_count;
+order by region_count desc
+limit 100;
 ```
 
 **Find total requests by IP:**
 
 ```sql
 select
-  cf_connecting_ip as ip,
-  count(cf_connecting_ip) as ip_count
-from
-  edge_logs
-  cross join unnest(metadata) as metadata
-  cross join unnest(request) as request
-  cross join unnest(headers) as headers
-  cross join unnest(cf) as cf
-  cross join unnest(response) as response
-where regexp_contains(path, '^/auth/v1/')
+  log_attributes['request.headers.cf_connecting_ip'] as ip,
+  count() as ip_count
+from logs
+where
+  source = 'edge_logs'
+  and match(log_attributes['request.path'], '^/auth/v1/')
 group by ip
-order by ip_count;
+order by ip_count desc
+limit 100;
 ```
 
 **Search frequented query paths by authenticated user:**
@@ -336,16 +297,15 @@ order by ip_count;
 ```sql
 select
   -- only available for front-end clients
-  auth_users,
-  path,
-  count(auth_users) as ip_count
-from
-  edge_logs
-  cross join unnest(metadata) as metadata
-  cross join unnest(request) as request
-  cross join unnest(sb) as sb
+  log_attributes['request.sb.jwt.authorization.payload.subject'] as auth_user,
+  log_attributes['request.path'] as path,
+  count() as request_count
+from logs
 where
+  source = 'edge_logs'
   -- only look at DB API
-  regexp_contains(path, '^/rest/v1/')
-group by auth_users, path;
+  and match(log_attributes['request.path'], '^/rest/v1/')
+group by auth_user, path
+order by request_count desc
+limit 100;
 ```

@@ -89,6 +89,7 @@ describe('ai/tools getTools', () => {
 
     expect(tools).not.toHaveProperty('list_notebooks')
     expect(tools).not.toHaveProperty('get_notebook')
+    expect(tools).not.toHaveProperty('run_notebook')
   })
 
   it('includes notebook tools only when isExplorerEnabled is true', async () => {
@@ -96,5 +97,6 @@ describe('ai/tools getTools', () => {
 
     expect(tools).toHaveProperty('list_notebooks')
     expect(tools).toHaveProperty('get_notebook')
+    expect(tools).toHaveProperty('run_notebook')
   })
 })

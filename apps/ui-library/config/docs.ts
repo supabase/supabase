@@ -36,6 +36,33 @@ export const platformBlocks: SidebarNavGroup = {
   ],
 }
 
+export const oauthBlocks: SidebarNavGroup = {
+  title: 'OAuth',
+  items: [
+    {
+      title: 'OAuth Consent',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/oauth-consent',
+      items: [],
+      new: true,
+      commandItemLabel: 'OAuth Consent',
+    },
+  ],
+}
+
+export const mcpBlocks: SidebarNavGroup = {
+  title: 'MCP',
+  items: [
+    {
+      title: 'MCP Server',
+      href: '/docs/headless/mcp-server',
+      items: [],
+      new: true,
+      commandItemLabel: 'MCP Server',
+    },
+  ],
+}
+
 // Component definitions with supported frameworks
 export const componentPages: SidebarNavGroup = {
   title: 'Components',
@@ -130,6 +157,14 @@ export const COMMAND_ITEMS = [
     href: item.href,
   })),
   ...componentPages.items.map((item) => ({
+    label: item.commandItemLabel,
+    href: item.href,
+  })),
+  ...oauthBlocks.items.map((item) => ({
+    label: item.commandItemLabel,
+    href: item.href,
+  })),
+  ...mcpBlocks.items.map((item) => ({
     label: item.commandItemLabel,
     href: item.href,
   })),

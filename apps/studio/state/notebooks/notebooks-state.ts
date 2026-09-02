@@ -1,20 +1,37 @@
+import { type UniqueIdentifier } from '@dnd-kit/core'
+import { arrayMove } from '@dnd-kit/sortable'
+import { useParams } from 'common'
 import { useMemo } from 'react'
-import { proxy, snapshot, useSnapshot } from 'valtio'
+import { proxy, snapshot, useSnapshot, type Snapshot } from 'valtio'
 import { proxyMap } from 'valtio/utils'
 
 import type { Notebook, StateNotebook } from './types'
+import { isQueryCell } from '@/data/content/notebooks/notebook-schema'
 import type { SnippetStatus } from '@/data/content/snippet-status'
 import type { Notebooks } from '@/types'
 
-// [Joshen] Deliberately copied from sql-editor-lifecycle cause we might deprecate
-// that in favor of notebooks in the long run
 function statusOnEdit(status: SnippetStatus): SnippetStatus {
   return status === 'saved' ? 'unsaved' : status
+}
+
+type NotebookCellLocalState = {
+  showQuery?: boolean
 }
 
 export const notebooksState = proxy({
   notebooks: {} as Record<string, StateNotebook>,
   needsSaving: proxyMap<string, boolean>([]),
+  /** Session-only UI state keyed by cell ID; never persisted with notebook content. */
+  cellLocalState: proxyMap<string, NotebookCellLocalState>([]),
+  /** Session-only conflicts where an assistant changed the server while local edits remain. */
+  serverDivergedWhileDirty: proxyMap<string, 'updated' | 'deleted'>([]),
+  /**
+   * Id of the notebook the tab should scroll to the bottom of once rendered —
+   * set by a surface that adds a cell to a notebook it's about to navigate to
+   * (e.g. "Add to existing notebook" from a query tab), so the newly added
+   * cell lands in view.
+   */
+  pendingScrollToBottom: undefined as string | undefined,
 
   /**
    * Load notebook into the Valtio store. No-ops if already present.
@@ -45,6 +62,25 @@ export const notebooksState = proxy({
   },
 
   /**
+   * Marks a notebook as persisted after its first successful save. Every
+   * later save cycle is covered by `updateCells`'s `statusOnEdit` ('saved' ->
+   * 'unsaved' -> ...), but the one-time 'new' -> 'saved' transition has no
+   * other trigger — the resource query that would otherwise pick it up is
+   * disabled while the notebook is still 'new'.
+   */
+  markSaved: ({ id }: { id: string }) => {
+    const stateNotebook = notebooksState.notebooks[id]
+    if (stateNotebook) stateNotebook.status = 'saved'
+    notebooksState.clearServerDivergence({ id })
+  },
+
+  markServerDivergence: ({ id, type }: { id: string; type: 'updated' | 'deleted' }) =>
+    notebooksState.serverDivergedWhileDirty.set(id, type),
+
+  clearServerDivergence: ({ id }: { id: string }) =>
+    notebooksState.serverDivergedWhileDirty.delete(id),
+
+  /**
    * Rename follows its own async save directly at the call site rather than going
    * through needsSaving/the debounced scheduler.
    */
@@ -57,15 +93,16 @@ export const notebooksState = proxy({
 
   /**
    * Remove notebook from the store, and optionally remove it from the sync
-   * saving queue. Also clears any cached query-cell results for this notebook
-   * from the ephemeral session store.
+   * saving queue. Also clears its session-only query-cell UI state.
    */
   removeNotebook: ({ id, skipSave = false }: { id: string; skipSave?: boolean }) => {
     const { [id]: notebook, ...otherNotebooks } = notebooksState.notebooks
+    notebook?.notebook.content?.cells.forEach((cell) =>
+      notebooksState.cellLocalState.delete(cell._id)
+    )
     notebooksState.notebooks = otherNotebooks
     if (!skipSave) notebooksState.needsSaving.delete(id)
-
-    // TODO: clear notebookSessionState once it exists
+    notebooksState.clearServerDivergence({ id })
   },
 
   /**
@@ -81,17 +118,145 @@ export const notebooksState = proxy({
     skipSave,
   }: {
     id: string
-    cells: Notebooks.Cell[]
+    cells: Snapshot<Notebooks.Cell>[]
     skipSave?: boolean
   }) => {
     const stateNotebook = notebooksState.notebooks[id]
     if (!stateNotebook?.notebook.content) return
-    stateNotebook.notebook.content.cells = cells
+    stateNotebook.notebook.content.cells = cells as Notebooks.Cell[]
     stateNotebook.status = statusOnEdit(stateNotebook.status)
     if (!skipSave) notebooksState.needsSaving.set(id, false)
   },
 
+  /**
+   * Insert a cell right after `cellId` in a notebook's cell array — or at the
+   * end, if `cellId` is omitted or isn't found (e.g. an empty notebook has no
+   * cell to insert after). The caller builds the cell to insert (e.g. via
+   * `createMarkdownCellSkeleton`/`createQueryCellSkeleton`) since deciding
+   * what kind of cell to create is a UI concern, not a state one.
+   */
+  insertCellAfter: ({
+    id,
+    cellId,
+    cell,
+  }: {
+    id: string
+    cellId?: string
+    cell: Notebooks.Cell
+  }) => {
+    const stateNotebook = notebooksState.notebooks[id]
+    if (!stateNotebook?.notebook.content) return
+
+    const cells = stateNotebook.notebook.content.cells
+    const insertAt = cellId ? cells.findIndex((c) => c._id === cellId) : -1
+    const nextCells = [...cells]
+    nextCells.splice(insertAt === -1 ? cells.length : insertAt + 1, 0, cell)
+    if (isQueryCell(cell)) notebooksState.cellLocalState.set(cell._id, { showQuery: true })
+
+    notebooksState.updateCells({ id, cells: nextCells })
+  },
+
+  /**
+   * Update a single cell in a notebook's cell array via an updater callback.
+   * The caller decides how the cell's content should change (e.g. field
+   * defaults, tag conversion) since that's a UI concern, not a state one —
+   * this only finds the cell by id and re-saves the array.
+   */
+  updateCell: ({
+    id,
+    cellId,
+    updater,
+  }: {
+    id: string
+    cellId: string
+    updater: (cell: Notebooks.Cell) => Notebooks.Cell
+  }) => {
+    const stateNotebook = notebooksState.notebooks[id]
+    if (!stateNotebook?.notebook.content) return
+
+    const nextCells = stateNotebook.notebook.content.cells.map((cell) =>
+      cell._id === cellId ? updater(cell) : cell
+    )
+    notebooksState.updateCells({ id, cells: nextCells })
+  },
+
+  setQueryVisibility: ({ cellId, showQuery }: { cellId: string; showQuery: boolean }) =>
+    notebooksState.cellLocalState.set(cellId, {
+      ...notebooksState.cellLocalState.get(cellId),
+      showQuery,
+    }),
+
+  /**
+   * Remove a single cell from a notebook's cell array.
+   */
+  removeCell: ({ id, cellId }: { id: string; cellId: string }) => {
+    const stateNotebook = notebooksState.notebooks[id]
+    if (!stateNotebook?.notebook.content) return
+
+    const nextCells = stateNotebook.notebook.content.cells.filter((c) => c._id !== cellId)
+    notebooksState.cellLocalState.delete(cellId)
+    notebooksState.updateCells({ id, cells: nextCells })
+  },
+
+  /**
+   * Shift a cell one position up or down in a notebook's cell array. No-ops if
+   * the cell is already at that boundary (or isn't found).
+   */
+  moveCell: ({
+    id,
+    cellId,
+    direction,
+  }: {
+    id: string
+    cellId: string
+    direction: 'up' | 'down'
+  }) => {
+    const stateNotebook = notebooksState.notebooks[id]
+    if (!stateNotebook?.notebook.content) return
+
+    const cells = stateNotebook.notebook.content.cells
+    const currentIndex = cells.findIndex((c) => c._id === cellId)
+    if (currentIndex === -1) return
+
+    const nextIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
+    if (nextIndex < 0 || nextIndex >= cells.length) return
+
+    notebooksState.updateCells({ id, cells: arrayMove([...cells], currentIndex, nextIndex) })
+  },
+
+  /**
+   * Reorder a notebook's cell array by moving the cell at `activeCellId` to
+   * where `overCellId` currently sits (dnd-kit's drag-end positions).
+   */
+  reorderCells: ({
+    id,
+    activeCellId,
+    overCellId,
+  }: {
+    id: string
+    activeCellId: UniqueIdentifier
+    overCellId: UniqueIdentifier
+  }) => {
+    const stateNotebook = notebooksState.notebooks[id]
+    if (!stateNotebook?.notebook.content) return
+
+    const cells = stateNotebook.notebook.content.cells
+    const oldIndex = cells.findIndex((c) => c._id === activeCellId)
+    const newIndex = cells.findIndex((c) => c._id === overCellId)
+    if (oldIndex === -1 || newIndex === -1) return
+
+    notebooksState.updateCells({ id, cells: arrayMove([...cells], oldIndex, newIndex) })
+  },
+
   addNeedsSaving: (id: string) => notebooksState.needsSaving.set(id, true),
+
+  requestScrollToBottom: (id: string) => {
+    notebooksState.pendingScrollToBottom = id
+  },
+
+  clearPendingScrollToBottom: () => {
+    notebooksState.pendingScrollToBottom = undefined
+  },
 })
 
 export const getNotebooksStateSnapshot = () => snapshot(notebooksState)
@@ -108,4 +273,14 @@ export const useNotebooks = (projectRef: string) => {
         .map((x) => x.notebook),
     [projectRef, snapshot.notebooks]
   )
+}
+
+export const useCurrentNotebook = () => {
+  const { id, ref } = useParams()
+  const snapshot = useNotebooksStateSnapshot()
+  const currentNotebook = id ? snapshot.notebooks[id] : undefined
+
+  if (!currentNotebook || currentNotebook.projectRef !== ref) return undefined
+
+  return currentNotebook
 }

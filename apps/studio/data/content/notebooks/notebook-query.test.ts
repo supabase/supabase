@@ -7,9 +7,7 @@ import { addAPIMock } from '@/tests/lib/msw'
 
 const NOTEBOOK_ID = 'd3aadd77-7c3c-4de7-aa5c-5aa8ac270b44'
 
-// `type: 'notebook'` isn't in the generated GetUserContentByIdResponse['type'] enum yet (same
-// gap tracked by the ContentBase TODO in content-query.ts), so the mock body needs a cast.
-const NOTEBOOK_ROW = {
+const NOTEBOOK_ROW: components['schemas']['GetUserContentByIdResponse'] = {
   id: NOTEBOOK_ID,
   type: 'notebook',
   name: 'Signup funnel',
@@ -33,9 +31,7 @@ describe('getNotebook', () => {
       method: 'get',
       path: '/platform/projects/:ref/content/item/:id',
       response: () =>
-        HttpResponse.json<components['schemas']['GetUserContentByIdResponse']>(
-          NOTEBOOK_ROW as unknown as components['schemas']['GetUserContentByIdResponse']
-        ),
+        HttpResponse.json<components['schemas']['GetUserContentByIdResponse']>(NOTEBOOK_ROW),
     })
 
     const result = await getNotebook({ projectRef: 'default', id: NOTEBOOK_ID })

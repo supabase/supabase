@@ -78,25 +78,11 @@ describe('formatLogTick', () => {
 
 describe('getCumulativeResults', () => {
   it('returns empty array when results are empty', () => {
-    expect(
-      getCumulativeResults(
-        { rows: [] },
-        { type: 'bar', xKey: 'x', yKey: 'y', cumulative: false, showLabels: false, showGrid: false }
-      )
-    ).toEqual([])
+    expect(getCumulativeResults({ rows: [] }, { yKey: 'y' })).toEqual([])
   })
 
   it('returns empty array when results are undefined', () => {
-    expect(
-      getCumulativeResults(undefined as any, {
-        type: 'bar',
-        xKey: 'x',
-        yKey: 'y',
-        cumulative: false,
-        showLabels: false,
-        showGrid: false,
-      })
-    ).toEqual([])
+    expect(getCumulativeResults(undefined as any, { yKey: 'y' })).toEqual([])
   })
 
   it('accumulates yKey values across rows', () => {
@@ -120,6 +106,22 @@ describe('getCumulativeResults', () => {
       { x: 'a', y: 10 },
       { x: 'b', y: 30 },
       { x: 'c', y: 35 },
+    ])
+  })
+
+  it('accumulates each key independently when yKey is an array', () => {
+    const results = {
+      rows: [
+        { x: 'a', y1: 10, y2: 1 },
+        { x: 'b', y1: 20, y2: 2 },
+        { x: 'c', y1: 5, y2: 3 },
+      ],
+    }
+    const output = getCumulativeResults(results, { yKey: ['y1', 'y2'] })
+    expect(output).toEqual([
+      { x: 'a', y1: 10, y2: 1 },
+      { x: 'b', y1: 30, y2: 3 },
+      { x: 'c', y1: 35, y2: 6 },
     ])
   })
 

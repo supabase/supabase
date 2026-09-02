@@ -66,6 +66,19 @@ describe('matchRedirect query/hash preservation', () => {
     })
   })
 
+  it('redirects legacy replication replica detail to infrastructure', () => {
+    expect(
+      matchRedirect({
+        pathname: '/project/abc/database/replication/replica/replica-1',
+        search: {},
+        isPlatform: true,
+      })
+    ).toEqual({
+      destination: '/project/abc/settings/infrastructure/replica/replica-1',
+      permanent: true,
+    })
+  })
+
   it('redirects the legacy compute billing panel to the CPU section', () => {
     expect(
       matchRedirect({
@@ -142,5 +155,64 @@ describe('matchRedirect query/hash preservation', () => {
     expect(
       matchRedirect({ pathname: '/project/abc/editor', search: { a: '1' }, isPlatform: true })
     ).toBeNull()
+  })
+})
+
+describe('matchRedirect maintenance mode', () => {
+  it('sends every other path to /maintenance when enabled', () => {
+    expect(
+      matchRedirect({
+        pathname: '/project/abc/editor',
+        search: {},
+        isPlatform: true,
+        maintenanceMode: true,
+      })
+    ).toEqual({ destination: '/maintenance', permanent: false })
+  })
+
+  it('carries query and hash onto /maintenance', () => {
+    expect(
+      matchRedirect({
+        pathname: '/project/abc/editor',
+        search: { a: '1' },
+        isPlatform: true,
+        maintenanceMode: true,
+        hash: 'section',
+      })
+    ).toEqual({ destination: '/maintenance?a=1#section', permanent: false })
+  })
+
+  it('leaves /maintenance and /img reachable when enabled', () => {
+    expect(
+      matchRedirect({
+        pathname: '/maintenance',
+        search: {},
+        isPlatform: true,
+        maintenanceMode: true,
+      })
+    ).toBeNull()
+    expect(
+      matchRedirect({
+        pathname: '/img/supabase-logo.svg',
+        search: {},
+        isPlatform: true,
+        maintenanceMode: true,
+      })
+    ).toBeNull()
+  })
+
+  it('bounces /maintenance back to / when disabled', () => {
+    expect(matchRedirect({ pathname: '/maintenance', search: {}, isPlatform: true })).toEqual({
+      destination: '/',
+      permanent: false,
+    })
+    expect(
+      matchRedirect({
+        pathname: '/maintenance',
+        search: {},
+        isPlatform: true,
+        maintenanceMode: false,
+      })
+    ).toEqual({ destination: '/', permanent: false })
   })
 })
