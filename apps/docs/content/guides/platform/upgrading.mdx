@@ -292,20 +292,32 @@ _Applies when upgrading to Postgres 15.19 or 17.11._
 
 <Admonition type="caution">
 
-You are affected only if you call pgcrypto PGP functions with `cipher-algo=bf`, `cipher-algo=blowfish`, or `cipher-algo=cast5`. The default cipher (AES) and `3des` are not affected.
+On Supabase-managed instances, you are affected only if you call pgcrypto PGP functions with `cipher-algo=bf`, `cipher-algo=blowfish`, or `cipher-algo=cast5`. The default cipher (AES) and `3des` are not affected. On other deployments the affected set depends on that server's OpenSSL build — see the CVE for details.
 
 </Admonition>
 
 This release fixes [CVE-2026-14663](https://www.postgresql.org/support/security/CVE-2026-14663/): previously, when a requested PGP cipher was unavailable in the server's OpenSSL build, pgcrypto did not apply it, so affected values were not protected as intended and can be decrypted even with the wrong key. After upgrading, decrypting such messages fails by default, and encrypting with those ciphers returns an error.
 
-To check whether stored data is affected, decrypt one value with a deliberately wrong passphrase:
+To find affected rows, scan each stored value with a deliberately wrong passphrase: properly encrypted values raise an error, while affected values decrypt successfully even with the wrong key. Run the helper and the scan in the same session (`pg_temp` functions are session-scoped):
 
 ```sql
-select pgp_sym_decrypt(<your_encrypted_column>, 'deliberately-wrong-key')
-from <your_table> limit 1;
+create function pg_temp.affected_by_cve_2026_14663(msg bytea)
+returns boolean
+language plpgsql as $$
+begin
+  perform pgp_sym_decrypt_bytea(msg, 'deliberately-wrong-key');
+  return true;
+exception when others then
+  return false;
+end $$;
+
+select <id_column>
+from <your_table>
+where <your_encrypted_column> is not null
+  and pg_temp.affected_by_cve_2026_14663(<your_encrypted_column>);
 ```
 
-An error ("Wrong key or corrupt data") means the value is properly encrypted. If your data is returned, that value is affected: re-encrypt it with a modern cipher before you upgrade (or after upgrading by adding `ignore-cipher-failure=1` to the decrypt options):
+Any rows returned hold affected values: re-encrypt them with a modern cipher before you upgrade (or after upgrading by adding `ignore-cipher-failure=1` to the decrypt options):
 
 ```sql
 update <your_table>
