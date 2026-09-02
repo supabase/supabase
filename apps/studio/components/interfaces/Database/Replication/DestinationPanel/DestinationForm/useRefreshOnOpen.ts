@@ -1,6 +1,4 @@
-import { useCallback, useMemo } from 'react'
-
-import { useLatest } from '../../../../../../hooks/misc/useLatest'
+import { useMemo } from 'react'
 
 // Replication metadata (publication names, publication tables, source tables,
 // columns) and similar destination-form option lists follow one rule:
