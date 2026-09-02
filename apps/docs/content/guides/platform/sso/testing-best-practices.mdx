@@ -10,7 +10,7 @@ After configuring your SSO provider, thorough testing is essential before rollin
 Before you begin testing, verify:
 
 - Organization has Team or Enterprise plan
-- Sign-in flow type decided (IdP-initiated, SP-initiated, or both) - see [Choosing a Sign-in Flow](/docs/guides/platform/sso/choosing-sign-in-flow)
+- Sign-in flow type decided (IdP-initiated, SP-initiated, or both) - see [Choosing a Sign-in Flow](/docs/guides/platform/sso/choosing-login-flow)
 - Email domains identified (only required if using SP-initiated)
 - Auto-join settings and default role are decided
 - **At least one non-SSO owner account exists** (critical safety requirement)
@@ -18,7 +18,7 @@ Before you begin testing, verify:
 
 ## Testing sign-in flows
 
-Before testing auto-join and other features, verify which sign-in flows work for your SSO configuration. See [Understanding SSO Sign-in Flows](/docs/guides/platform/sso/sign-in-flows) for technical details.
+Before testing auto-join and other features, verify which sign-in flows work for your SSO configuration. See [Understanding SSO Sign-in Flows](/docs/guides/platform/sso/login-flows) for technical details.
 
 ### Testing IdP-initiated sign-in
 
@@ -281,7 +281,7 @@ Test with 2-3 additional users to verify:
    - Create a new invitation
    - Select **"Non-SSO"** option
    - Send invitation
-   - Recipient can use password or social sign-in to accept
+   - Recipient can use password or social login to accept
 
 3. **Test SSO mismatch scenario**:
    - Create an SSO-required invitation
@@ -388,7 +388,7 @@ Based on customer pain points that previously required support intervention:
 **Solution:**
 
 - Auto-join now applies on **every sign-in**, not only on first signup
-- To test: Enable auto-join, sign out completely, log back in via SSO
+- To test: Enable auto-join, sign out completely, sign in again via SSO
 - If still not working, verify domain configuration matches user email exactly
 
 #### "Can't invite users with the right authentication type"
@@ -490,7 +490,7 @@ This behavior prevents "orphaned" SSO accounts that can no longer authenticate.
 **Setup:**
 
 1. **Add non-SSO owner:**
-   - Create or invite a non-SSO user (password or social sign-in)
+   - Create or invite a non-SSO user (password or social login)
    - Promote to owner role
    - **Critical:** Verify non-SSO owner can sign in BEFORE deletion
    - Store credentials securely
@@ -714,7 +714,7 @@ Common causes:
 
 1. Create or verify non-SSO owner account exists
 2. Configure SSO provider with auto-join **DISABLED**
-3. Test SSO sign in with your own account
+3. Test SSO sign-in with your own account
 4. Verify attribute mappings are correct
 5. Test with 2-3 additional users
 6. Enable auto-join if desired

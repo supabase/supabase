@@ -2447,7 +2447,7 @@ functions:
       - Should be used only when you require the most current user data. For faster results, `getCurrentSessionOrNull()?.user` is recommended.
     examples:
       - id: get-the-logged-in-user-with-the-current-existing-session
-        name: Get the signed in user with the current session
+        name: Get the signed-in user with the current session
         isSpotlight: true
         code: |
           ```kotlin
@@ -2570,7 +2570,7 @@ functions:
     title: 'Send a password reset request'
     notes: |
       Sends a password reset request to the given email address.
-      - The password reset flow consist of 2 broad steps: (i) Allow the user to sign in via the password reset link; (ii) Update the user's password.
+      - The password reset flow consists of 2 broad steps: (i) Allow the user to sign in via the password reset link; (ii) Update the user's password.
       - The `sendRecoveryEmail()` only sends a password reset link to the user's email.
       To update the user's password, see [`modifyUser()`](/docs/reference/kotlin/auth-updateuser).
       - The user gets redirected back to your app, assuming you setup [OTP handling](/docs/reference/kotlin/initializing)

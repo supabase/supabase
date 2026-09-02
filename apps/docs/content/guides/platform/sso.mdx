@@ -9,7 +9,7 @@ Looking for docs on how to add Single Sign-On support in your Supabase project? 
 
 </Admonition>
 
-Supabase offers single sign-on (SSO) as a sign-in option to provide additional account security for your team. This allows company administrators to enforce the use of an identity provider when logging into Supabase. SSO improves the onboarding and offboarding experience of the company as the employee only needs a single set of credentials to access third-party applications or tools which can also be revoked by an administrator.
+Supabase offers single sign-on (SSO) as a sign-in option to provide additional account security for your team. This allows company administrators to enforce the use of an identity provider when signing in to Supabase. SSO improves the onboarding and offboarding experience of the company as the employee only needs a single set of credentials to access third-party applications or tools which can also be revoked by an administrator.
 
 <Admonition type="note">
 
@@ -67,14 +67,14 @@ Users start their sign-in at supabase.com by entering their email address, then 
 ### Need help choosing?
 
 - **Quick decision:** Start with IdP-initiated only (the default). It works for 90% of use cases.
-- **Detailed guidance:** See [Choosing the Right Sign-in Flow](/docs/guides/platform/sso/choosing-sign-in-flow) for scenario-based recommendations.
-- **Technical details:** Read [Understanding SSO Sign-in Flows](/docs/guides/platform/sso/sign-in-flows) for in-depth explanations.
+- **Detailed guidance:** See [Choosing the Right Sign-in Flow](/docs/guides/platform/sso/choosing-login-flow) for scenario-based recommendations.
+- **Technical details:** Read [Understanding SSO Sign-in Flows](/docs/guides/platform/sso/login-flows) for in-depth explanations.
 
 ## Key configuration options
 
-- **Sign-in flows** - Choose between IdP-initiated (users start from identity provider), SP-initiated (users start at supabase.com), or both. IdP-initiated is recommended for most organizations and requires no domain configuration. See [Choosing the Right Sign-in Flow](/docs/guides/platform/sso/choosing-sign-in-flow) for guidance.
+- **Sign-in flows** - Choose between IdP-initiated (users start from identity provider), SP-initiated (users start at supabase.com), or both. IdP-initiated is recommended for most organizations and requires no domain configuration. See [Choosing the Right Sign-in Flow](/docs/guides/platform/sso/choosing-login-flow) for guidance.
 - **Email domains** - Required only if you enable SP-initiated sign-in. You can associate one or more email domains with your SSO provider. Users with matching email addresses can sign in via SSO at supabase.com. Not required for IdP-initiated flow.
-- **Auto-join** - Optionally allow users with a matching domain to join your organization automatically when they sign in via SSO. This applies on every sign-in, not only on first signup.
+- **Auto-join** - Optionally allow users with a matching domain to join your organization automatically when they sign in via SSO. This applies on every sign-in, not only on first sign-up.
 - **Default role for auto-joined users** - Choose the role (e.g., `Read-only`, `Developer`, `Administrator`, `Owner`) that automatically joined users receive. We recommend using `Developer` as the default (principle of least privilege) and promoting users individually as needed. Refer to [access control](/docs/guides/platform/access-control) for more information about roles.
 - **Invitation types** - When inviting users to your organization, you can explicitly choose whether the invitation requires SSO authentication or allows non-SSO sign-in (password/social). This enables mixed authentication organizations with both SSO and non-SSO users.
 
@@ -95,7 +95,7 @@ When SSO is enabled for an organization:
 1. Create or verify at least one non-SSO owner account exists (required for safety)
 2. Configure your SSO provider following one of our [provider-specific guides](#supported-providers)
 3. Start with auto-join **disabled** to test the configuration
-4. Test SSO sign in with your own account
+4. Test SSO sign-in with your own account
 5. Once confirmed working, enable auto-join if desired
 6. Thoroughly test using our [SSO Testing and Best Practices](/docs/guides/platform/sso/testing-best-practices) guide
 7. Invite users to the organization or let them auto-join on sign-in
@@ -108,7 +108,7 @@ If a user is already a member of the organization under a non-SSO account, they 
 
 <Admonition type="note" title="No identity linking">
 
-Each user account verified using an SSO identity provider will not be legible for [identity linking](/docs/guides/auth/auth-identity-linking) to existing user accounts in the system. That is, if a user `valid.email@supabase.io` had signed up with a password, and then uses their company SSO sign in with your project, there will be two `valid.email@supabase.io` user accounts in the system.
+Each user account verified using an SSO identity provider will not be eligible for [identity linking](/docs/guides/auth/auth-identity-linking) to existing user accounts in the system. That is, if a user `valid.email@supabase.io` had signed up with a password, and then uses their company SSO sign-in with your project, there will be two `valid.email@supabase.io` user accounts in the system.
 
 Users will need to ensure they are signed in with the correct account when accessing organizations/projects.
 

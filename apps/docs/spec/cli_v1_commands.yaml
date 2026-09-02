@@ -1085,7 +1085,7 @@ commands:
   - id: supabase-projects-list
     title: supabase projects list
     summary: List all Supabase projects
-    description: List all Supabase projects the logged-in user can access.
+    description: List all Supabase projects the signed-in user can access.
     tags: []
     links: []
     usage: supabase projects list
@@ -1346,7 +1346,7 @@ commands:
   - id: supabase-orgs-list
     title: supabase orgs list
     summary: List all organizations
-    description: List all organizations the logged-in user belongs.
+    description: List all organizations the signed-in user belongs.
     tags: []
     links: []
     usage: supabase orgs list
@@ -1355,7 +1355,7 @@ commands:
   - id: supabase-orgs-create
     title: supabase orgs create
     summary: Create an organization
-    description: Create an organization for the logged-in user.
+    description: Create an organization for the signed-in user.
     tags: []
     links: []
     usage: supabase orgs create
@@ -1789,7 +1789,7 @@ commands:
     usage: supabase sign-out
     subcommands: []
     flags: []
-  - id: supabase-sign-in
+  - id: supabase-login
     title: supabase sign-in
     summary: Authenticate using an access token
     description: |2

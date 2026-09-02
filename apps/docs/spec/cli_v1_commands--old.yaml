@@ -172,7 +172,7 @@ commands:
   - id: supabase-projects-list
     title: supabase projects list
     summary: List all Supabase projects
-    description: List all Supabase projects the logged-in user can access.
+    description: List all Supabase projects the signed-in user can access.
     tags: []
     links: []
     usage: |-
@@ -218,7 +218,7 @@ commands:
   - id: supabase-orgs-list
     title: supabase orgs list
     summary: List all organizations
-    description: List all organizations the logged-in user belongs.
+    description: List all organizations the signed-in user belongs.
     tags: []
     links: []
     usage: |-
@@ -272,8 +272,8 @@ commands:
         -h, --help              help for list
         -p, --password string   Password to your remote Postgres database.
       ```
-  - id: supabase-sign-in
-    title: supabase sign-in
+  - id: supabase-login
+    title: supabase login
     summary: Authenticate using an access token
     tags:
       - local-dev

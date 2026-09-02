@@ -47,7 +47,7 @@ Within your client-side code, an Edge Function can throw three types of errors:
 - **`FunctionsFetchError`**: Function couldn't be reached at all
 
 ```jsx
-import { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from '@supabase/supabase-js'
+import { FunctionsFetchError, FunctionsHttpError, FunctionsRelayError } from '@supabase/supabase-js'
 
 const { data, error } = await supabase.functions.invoke('hello', {
   headers: { 'my-custom-header': 'my-custom-header-value' },

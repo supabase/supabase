@@ -8,7 +8,7 @@ To enable Facebook Auth for your project, you need to set up a Facebook OAuth ap
 
 ## Overview
 
-Setting up Facebook logins for your application consists of 4 parts:
+Setting up Facebook sign-in for your application consists of 4 parts:
 
 - Create and configure a Facebook Application on the [Facebook Developers Site](https://developers.facebook.com)
 - **Configure email permissions** in your Facebook app (required for Supabase Auth)
@@ -36,9 +36,9 @@ Setting up Facebook logins for your application consists of 4 parts:
 
 From the `Add Products to your App` screen:
 
-- Click **Setup** under **Facebook Sign-in**
-- Skip the Quickstart screen. Instead, in the left sidebar, click **Settings** under **Facebook Sign-in**
-- Enter your callback URI under **Valid OAuth Redirect URIs** on the **Facebook Sign-in Settings** page
+- Click **Setup** under **Facebook Login**
+- Skip the Quickstart screen. Instead, in the left sidebar, click **Settings** under **Facebook Login**
+- Enter your callback URI under **Valid OAuth Redirect URIs** on the **Facebook Login Settings** page
 - Click **Save Changes** at the bottom right
 
 <Admonition type="note">
@@ -393,14 +393,14 @@ Before your app can be used by the general public, you need to complete Facebook
 
 3. **Submit for Review**: Click **Submit for Review** and provide:
    - Detailed instructions for how Facebook reviewers should test your sign-in flow
-   - A screencast video demonstrating the Facebook Sign-in feature
+   - A screencast video demonstrating the Facebook Login feature
    - Explanation of how user data will be used
 
 4. **Wait for Approval**: Facebook typically reviews apps within 1-5 business days
 
 <Admonition type="note">
 
-If you only need basic authentication (name and profile picture), you may not need full App Review. Apps requesting only `public_profile` and `email` with the "Authenticate and request data from users with Facebook Sign-in" use case can often go live without a detailed review.
+If you only need basic authentication (name and profile picture), you may not need full App Review. Apps requesting only `public_profile` and `email` with the "Authenticate and request data from users with Facebook Login" use case can often go live without a detailed review.
 
 </Admonition>
 

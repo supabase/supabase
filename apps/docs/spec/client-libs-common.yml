@@ -4,7 +4,7 @@ commands:
     title: supabase test
     product: 'general'
 
-  - id: supabase-sign-in
+  - id: supabase-login
     title: supabase sign-in
     product: 'general'
 

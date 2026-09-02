@@ -28,8 +28,8 @@ Depending on your evaluation, you may choose to go with one of the following str
 
 | Strategy | Advantages                                                                                     | Disadvantages                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | -------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Rolling  | <ul><li>0 downtime</li><li>Users may need to sign in again</li></ul>                            | <ul><li>Need to maintain 2 different Auth services, which may be more costly in the short-term</li><li>Need to maintain separate codepaths for the period of the migration</li><li>Some existing users may be inactive and have not signed in with the new provider. This means that you eventually need to backfill these users. However, this is a much smaller-scale one-off migration with lower risks since these users are inactive.</li></ul> |
-| One-off  | <ul><li>No need to maintain 2 different auth services for an extended period of time</li></ul> | <ul><li>Some downtime</li><li>Users will need to sign in again. Risky for active users.</li></ul>                                                                                                                                                                                                                                                                                                                                                     |
+| Rolling  | <ul><li>0 downtime</li><li>Users may need to sign in again</li></ul>                           | <ul><li>Need to maintain 2 different Auth services, which may be more costly in the short-term</li><li>Need to maintain separate codepaths for the period of the migration</li><li>Some existing users may be inactive and have not signed in with the new provider. This means that you eventually need to backfill these users. However, this is a much smaller-scale one-off migration with lower risks since these users are inactive.</li></ul> |
+| One-off  | <ul><li>No need to maintain 2 different auth services for an extended period of time</li></ul> | <ul><li>Some downtime</li><li>Users will need to sign in again. Risky for active users.</li></ul>                                                                                                                                                                                                                                                                                                                                                    |
 
 ## Migration steps
 
@@ -140,7 +140,7 @@ Once you have imported your users, you can sign them in using the [`signInWithOt
 
 #### OAuth
 
-Configure your OAuth providers in Supabase by following the [Social sign-in guides](/docs/guides/auth/social-sign-in).
+Configure your OAuth providers in Supabase by following the [Social login guides](/docs/guides/auth/social-login).
 
 For both new and existing users, sign in the user using the [`signInWithOAuth`](/docs/reference/javascript/auth-signinwithoauth) method. This works without pre-migrating existing users, since the user always needs to sign in through the OAuth provider before being redirected to your service.
 
@@ -254,7 +254,7 @@ header="How do I migrate existing SAML Single Sign-On (SSO) connections?"
 id="saml"
 >
 
-Customers may need to link their identity provider with Supabase Auth separately, but their users should still be able to sign-in as per-normal after authenticating with their identity provider. For more information about SSO with SAML 2.0, you can check out [this guide](/docs/guides/auth/enterprise-sso/auth-sso-saml). If you want to migrate your existing SAML SSO connections from Auth0 to Supabase Auth, reach out to us via support.
+Customers may need to link their identity provider with Supabase Auth separately, but their users should still be able to sign in as per normal after authenticating with their identity provider. For more information about SSO with SAML 2.0, you can check out [this guide](/docs/guides/auth/enterprise-sso/auth-sso-saml). If you want to migrate your existing SAML SSO connections from Auth0 to Supabase Auth, reach out to us via support.
 
 </AccordionItem>
 

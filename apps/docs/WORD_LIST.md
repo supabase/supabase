@@ -486,7 +486,11 @@ Match Supabase product UI labels, which use **Sign in**, **Sign out**, and
 - Not recommended: Log in to your project.
 
 Keep _login_ and _log in_ only when quoting third-party UI, CLI commands such as
-`supabase login`, or code identifiers.
+`supabase login`, code identifiers, or established feature names such as
+_social login_ and URL slugs such as `/social-login` and `/phone-login`.
+
+Keep _logout_, _log out_, and `logOut` when they appear in implementation names,
+routes, CLI commands, or quoted third-party UI.
 
 ## M
 

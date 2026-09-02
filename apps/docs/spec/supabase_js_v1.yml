@@ -192,8 +192,8 @@ functions:
       - id: sign-in-using-a-third-party-provider-with-redirect
         name: Sign in using a third-party provider with redirect
         description: |
-          Note that the `redirectTo` param is only relevant for OAuth logins, where the sign-in flow is managed by
-          the Auth server. If you are using email/phone logins you should set up your own redirects (within the email/sms template).
+          Note that the `redirectTo` param is only relevant for OAuth sign-ins, where the sign-in flow is managed by
+          the Auth server. If you are using email/phone sign-ins you should set up your own redirects (within the email/sms template).
 
           Sometimes you want to control where the user is redirected to after they are signed in. Supabase supports this for
           any URL path on your website (the URL must either be on the same domain as your [Site URL](https://supabase.com/dashboard/project/_/auth/url-configuration) or match one of the Redirect URLs).
@@ -273,7 +273,7 @@ functions:
       This method gets the user object from memory.
     examples:
       - id:
-        name: Get the signed in user
+        name: Get the signed-in user
         isSpotlight: true
         code: |
           ```js
@@ -288,7 +288,7 @@ functions:
       To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://supabase.com/dashboard/project/_/auth/providers).
 
       User metadata: It's generally better to store user data in a table within your public schema (i.e., `public.users`).
-      Use the `update()` method if you have data which rarely changes or is specific only to the signed in user.
+      Use the `update()` method if you have data which rarely changes or is specific only to the signed-in user.
     examples:
       - id: update-the-email-for-an-authenticated-user
         name: Update the email for an authenticated user
@@ -737,7 +737,7 @@ functions:
       - id: passing-custom-headers
         name: Passing custom headers.
         description: |
-          You can pass custom headers to your Edge Function. Note: supabase-js automatically passes the `Authorization` header with the signed in user's JWT.
+          You can pass custom headers to your Edge Function. Note: supabase-js automatically passes the `Authorization` header with the signed-in user's JWT.
         isSpotlight: true
         code: |
           ```js

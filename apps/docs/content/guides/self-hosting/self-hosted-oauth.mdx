@@ -1,10 +1,10 @@
 ---
-title: 'Configure social sign-in (OAuth) Providers'
-description: 'Set up social sign-in (OAuth/OIDC) providers for self-hosted Supabase with Docker.'
-subtitle: 'Set up social sign-in (OAuth/OIDC) providers for self-hosted Supabase with Docker.'
+title: 'Configure social login (OAuth) providers'
+description: 'Set up social login (OAuth/OIDC) providers for self-hosted Supabase with Docker.'
+subtitle: 'Set up social login (OAuth/OIDC) providers for self-hosted Supabase with Docker.'
 ---
 
-This guide covers the **server-side configuration** required to enable social sign-in providers on a self-hosted Supabase instance running with Docker Compose. This applies to all OAuth and OIDC-based providers, including third-party identity providers like Keycloak.
+This guide covers the **server-side configuration** required to enable social login providers on a self-hosted Supabase instance running with Docker Compose. This applies to all OAuth and OIDC-based providers, including third-party identity providers like Keycloak.
 
 ## Before you begin
 
@@ -298,28 +298,28 @@ auth:
 
 Supabase Auth supports the following OAuth providers:
 
-| Provider          | Env prefix       | Additional variables            | Docs                                                                  |
-| ----------------- | ---------------- | ------------------------------- | --------------------------------------------------------------------- |
-| Apple             | `APPLE_`         | -                               | [Sign in with Apple](/docs/guides/auth/social-sign-in/auth-apple)         |
-| Azure (Microsoft) | `AZURE_`         | `URL` (tenant URL)              | [Sign in with Azure](/docs/guides/auth/social-sign-in/auth-azure)         |
-| Bitbucket         | `BITBUCKET_`     | -                               | [Sign in with Bitbucket](/docs/guides/auth/social-sign-in/auth-bitbucket) |
-| Discord           | `DISCORD_`       | -                               | [Sign in with Discord](/docs/guides/auth/social-sign-in/auth-discord)     |
-| Facebook          | `FACEBOOK_`      | -                               | [Sign in with Facebook](/docs/guides/auth/social-sign-in/auth-facebook)   |
-| Figma             | `FIGMA_`         | -                               | [Sign in with Figma](/docs/guides/auth/social-sign-in/auth-figma)         |
-| GitHub            | `GITHUB_`        | `URL` (for GitHub Enterprise)   | [Sign in with GitHub](/docs/guides/auth/social-sign-in/auth-github)       |
-| GitLab            | `GITLAB_`        | `URL` (for self-hosted GitLab)  | [Sign in with GitLab](/docs/guides/auth/social-sign-in/auth-gitlab)       |
-| Google            | `GOOGLE_`        | -                               | [Sign in with Google](/docs/guides/auth/social-sign-in/auth-google)       |
-| Kakao             | `KAKAO_`         | -                               | [Sign in with Kakao](/docs/guides/auth/social-sign-in/auth-kakao)         |
-| Keycloak (OIDC)   | `KEYCLOAK_`      | `URL` (realm URL, **required**) | [Sign in with Keycloak](/docs/guides/auth/social-sign-in/auth-keycloak)   |
-| LinkedIn (OIDC)   | `LINKEDIN_OIDC_` | -                               | [Sign in with LinkedIn](/docs/guides/auth/social-sign-in/auth-linkedin)   |
-| Notion            | `NOTION_`        | -                               | [Sign in with Notion](/docs/guides/auth/social-sign-in/auth-notion)       |
-| Slack (OIDC)      | `SLACK_OIDC_`    | -                               | [Sign in with Slack](/docs/guides/auth/social-sign-in/auth-slack)         |
-| Snapchat          | `SNAPCHAT_`      | -                               | -                                                                     |
-| Spotify           | `SPOTIFY_`       | -                               | [Sign in with Spotify](/docs/guides/auth/social-sign-in/auth-spotify)     |
-| Twitch            | `TWITCH_`        | -                               | [Sign in with Twitch](/docs/guides/auth/social-sign-in/auth-twitch)       |
-| Twitter           | `TWITTER_`       | -                               | [Sign in with Twitter](/docs/guides/auth/social-sign-in/auth-twitter)     |
-| WorkOS            | `WORKOS_`        | -                               | [Sign in with WorkOS](/docs/guides/auth/social-sign-in/auth-workos)       |
-| Zoom              | `ZOOM_`          | -                               | [Sign in with Zoom](/docs/guides/auth/social-sign-in/auth-zoom)           |
+| Provider          | Env prefix       | Additional variables            | Docs                                                                    |
+| ----------------- | ---------------- | ------------------------------- | ----------------------------------------------------------------------- |
+| Apple             | `APPLE_`         | -                               | [Sign in with Apple](/docs/guides/auth/social-login/auth-apple)         |
+| Azure (Microsoft) | `AZURE_`         | `URL` (tenant URL)              | [Sign in with Azure](/docs/guides/auth/social-login/auth-azure)         |
+| Bitbucket         | `BITBUCKET_`     | -                               | [Sign in with Bitbucket](/docs/guides/auth/social-login/auth-bitbucket) |
+| Discord           | `DISCORD_`       | -                               | [Sign in with Discord](/docs/guides/auth/social-login/auth-discord)     |
+| Facebook          | `FACEBOOK_`      | -                               | [Sign in with Facebook](/docs/guides/auth/social-login/auth-facebook)   |
+| Figma             | `FIGMA_`         | -                               | [Sign in with Figma](/docs/guides/auth/social-login/auth-figma)         |
+| GitHub            | `GITHUB_`        | `URL` (for GitHub Enterprise)   | [Sign in with GitHub](/docs/guides/auth/social-login/auth-github)       |
+| GitLab            | `GITLAB_`        | `URL` (for self-hosted GitLab)  | [Sign in with GitLab](/docs/guides/auth/social-login/auth-gitlab)       |
+| Google            | `GOOGLE_`        | -                               | [Sign in with Google](/docs/guides/auth/social-login/auth-google)       |
+| Kakao             | `KAKAO_`         | -                               | [Sign in with Kakao](/docs/guides/auth/social-login/auth-kakao)         |
+| Keycloak (OIDC)   | `KEYCLOAK_`      | `URL` (realm URL, **required**) | [Sign in with Keycloak](/docs/guides/auth/social-login/auth-keycloak)   |
+| LinkedIn (OIDC)   | `LINKEDIN_OIDC_` | -                               | [Sign in with LinkedIn](/docs/guides/auth/social-login/auth-linkedin)   |
+| Notion            | `NOTION_`        | -                               | [Sign in with Notion](/docs/guides/auth/social-login/auth-notion)       |
+| Slack (OIDC)      | `SLACK_OIDC_`    | -                               | [Sign in with Slack](/docs/guides/auth/social-login/auth-slack)         |
+| Snapchat          | `SNAPCHAT_`      | -                               | -                                                                       |
+| Spotify           | `SPOTIFY_`       | -                               | [Sign in with Spotify](/docs/guides/auth/social-login/auth-spotify)     |
+| Twitch            | `TWITCH_`        | -                               | [Sign in with Twitch](/docs/guides/auth/social-login/auth-twitch)       |
+| Twitter           | `TWITTER_`       | -                               | [Sign in with Twitter](/docs/guides/auth/social-login/auth-twitter)     |
+| WorkOS            | `WORKOS_`        | -                               | [Sign in with WorkOS](/docs/guides/auth/social-login/auth-workos)       |
+| Zoom              | `ZOOM_`          | -                               | [Sign in with Zoom](/docs/guides/auth/social-login/auth-zoom)           |
 
 For each provider, you need at minimum `ENABLED`, `CLIENT_ID`, `SECRET`, and `REDIRECT_URI` in `.env` and `docker-compose.yml`.
 
@@ -378,7 +378,7 @@ You can test OAuth with the following minimal HTML page:
 </html>
 ```
 
-For detailed client-side integration, see [social sign-in](/docs/guides/auth/social-sign-in).
+For detailed client-side integration, see [social login](/docs/guides/auth/social-login).
 
 ## Troubleshooting
 

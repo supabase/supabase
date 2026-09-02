@@ -8,7 +8,7 @@ To enable Spotify Auth for your project, you need to set up a Spotify OAuth appl
 
 ## Overview
 
-Setting up Spotify logins for your application consists of 3 parts:
+Setting up Spotify sign-in for your application consists of 3 parts:
 
 - Create and configure a Spotify Project and App on the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/).
 - Add your Spotify `API Key` and `API Secret Key` to your [Supabase Project](/dashboard).
@@ -70,7 +70,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
 
 The following outlines the steps to sign in using Spotify with Supabase Auth.
 
-1. Call the signin method from the client library.
+1. Call the sign-in method from the client library.
 1. The user is redirected to the Spotify sign-in page.
 1. After completing the sign-in process, the user will be redirected to your app with an error that says the email address needs to be confirmed. Simultaneously the user receives a confirmation email from Supabase Auth.
 1. The user clicks the confirmation link in the email.

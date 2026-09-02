@@ -212,7 +212,7 @@ functions:
   - id: sign-out
     title: 'SignOut()'
     description: |
-      Signs out the current user, if there is a signed in user.
+      Signs out the current user, if there is a signed-in user.
     notes: |
       - In order to use the `SignOut()` method, the user needs to be signed in first.
     examples:
@@ -259,9 +259,9 @@ functions:
   - id: get-user
     title: 'CurrentUser'
     description: |
-      Returns the user data, if there is a signed in user.
+      Returns the user data, if there is a signed-in user.
     examples:
-      - name: Get the signed in user
+      - name: Get the signed-in user
         isSpotlight: true
         code: |
           ```c#
@@ -270,7 +270,7 @@ functions:
   - id: update-user
     title: 'UpdateUser()'
     description: |
-      Updates user data, if there is a signed in user.
+      Updates user data, if there is a signed-in user.
     notes: |
       - In order to use the `UpdateUser()` method, the user needs to be signed in first.
       - By Default, email updates sends a confirmation link to both the user's current and new email.
@@ -618,7 +618,7 @@ functions:
     description: |
       Returns the Authenticator Assurance Level (AAL) for the active session.
     notes: |
-      - `aal1` (or `null`) means the user signed in with a single factor (password, OTP, magic link, or social sign-in).
+      - `aal1` (or `null`) means the user signed in with a single factor (password, OTP, magic link, or social login).
       - `aal2` means the user also verified an MFA factor.
       - Use this to decide whether to prompt the user to complete an MFA challenge.
     examples:
@@ -1558,7 +1558,7 @@ functions:
 
   - id: from-create-signed-upload-url
     description: |
-      Creates a signed URL that can be used to upload a file without requiring a logged-in user. This is useful for handing off uploads to an untrusted client.
+      Creates a signed URL that can be used to upload a file without requiring a signed-in user. This is useful for handing off uploads to an untrusted client.
     title: 'From().CreateUploadSignedUrl()'
     notes: |
       - Policy permissions required:

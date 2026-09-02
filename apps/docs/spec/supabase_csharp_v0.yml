@@ -215,7 +215,7 @@ functions:
   - id: sign-out
     title: 'SignOut()'
     description: |
-      Signs out the current user, if there is a signed in user.
+      Signs out the current user, if there is a signed-in user.
     notes: |
       - In order to use the `SignOut()` method, the user needs to be signed in first.
     examples:
@@ -254,9 +254,9 @@ functions:
   - id: get-user
     title: 'CurrentUser'
     description: |
-      Returns the user data, if there is a signed in user.
+      Returns the user data, if there is a signed-in user.
     examples:
-      - name: Get the signed in user
+      - name: Get the signed-in user
         isSpotlight: true
         code: |
           ```c#
@@ -265,7 +265,7 @@ functions:
   - id: update-user
     title: 'UpdateUser()'
     description: |
-      Updates user data, if there is a signed in user.
+      Updates user data, if there is a signed-in user.
     notes: |
       - In order to use the `UpdateUser()` method, the user needs to be signed in first.
       - By Default, email updates sends a confirmation link to both the user's current and new email.

@@ -68,7 +68,7 @@ Below is information about your project's SAML 2.0 configuration which you can s
 | SLO URL                     | `https://<project>.supabase.co/auth/v1/sso/slo`                         |
 | `NameID`                    | Required `emailAddress` or `persistent`                                 |
 
-Note that SLO (Single Sign-out) is not supported at this time with Supabase Auth as it is a rarely supported feature by identity providers. However, the URL is registered and advertised for when this does become available. SLO is a best-effort service, so we recommend considering [Session Timebox or Session Inactivity Timeout](/docs/guides/auth/sessions#limiting-session-lifetime-and-number-of-allowed-sessions-per-user) instead to force your end-users to authenticate regularly.
+Note that SLO (Single Logout) is not supported at this time with Supabase Auth as it is a rarely supported feature by identity providers. However, the URL is registered and advertised for when this does become available. SLO is a best-effort service, so we recommend considering [Session Timebox or Session Inactivity Timeout](/docs/guides/auth/sessions#limiting-session-lifetime-and-number-of-allowed-sessions-per-user) instead to force your end-users to authenticate regularly.
 
 Append `?download=true` to the Metadata URL to download the Metadata XML file. This is useful in cases where the identity provider requires a file.
 
@@ -76,10 +76,10 @@ Alternatively, you can use the `supabase sso info --project-ref <your-project>` 
 
 ### User accounts and identities
 
-User accounts and identities created via SSO differ from regular (email, phone, password, social sign-in...) accounts in these ways:
+User accounts and identities created via SSO differ from regular (email, phone, password, social login...) accounts in these ways:
 
 - **No identity linking.**
-  Each user account verified using an SSO identity provider are not legible for [identity linking](/docs/guides/auth/auth-identity-linking) to existing user accounts for security reasons. That is, if a user `valid.email@supabase.io` had signed up with a password, and then uses their company SSO sign in with your project, there will be two `valid.email@supabase.io` user accounts in the system.
+  Each user account verified using an SSO identity provider are not eligible for [identity linking](/docs/guides/auth/auth-identity-linking) to existing user accounts for security reasons. That is, if a user `valid.email@supabase.io` had signed up with a password, and then uses their company SSO sign-in with your project, there will be two `valid.email@supabase.io` user accounts in the system.
 - **Emails are not necessarily unique.**
   Given the behavior with no identity linking, email addresses are no longer a unique identifier for a user account. Always use the user's UUID to correctly reference user accounts.
 - **Sessions may have a maximum duration.**
@@ -94,7 +94,7 @@ Here are some commonly used statements to extract SSO related information from t
 - `auth.jwt()#>>'{amr,0,method}'`
   Returns the name of the last method used to verify the identity of this user. With SAML SSO this is `sso/saml`.
 - `auth.jwt()#>>'{amr,0,provider}'`
-  Returns the UUID of the SSO identity provider used by the user to sign-in.
+  Returns the UUID of the SSO identity provider used by the user to sign in.
 - `auth.jwt()#>>'{user_metadata,iss}'`
   Returns the identity provider's SAML 2.0 `EntityID`
 
