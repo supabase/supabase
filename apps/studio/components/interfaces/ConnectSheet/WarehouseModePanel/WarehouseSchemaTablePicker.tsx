@@ -18,7 +18,7 @@ import {
 import { AlertError } from '@/components/ui/AlertError'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
-import { useReplicationSourceId } from '@/data/replication/sources-query'
+import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
 import { useUpdateWarehouseCatalogMutation } from '@/data/warehouse/warehouse-catalog-mutation'
 import { useWarehouseSetupMutation } from '@/data/warehouse/warehouse-setup-mutation'
@@ -58,13 +58,25 @@ export const WarehouseSchemaTablePicker = ({ onBack }: WarehouseSchemaTablePicke
   } = useTablesQuery({ projectRef, connectionString: project?.connectionString })
 
   // The `supabase_warehouse` publication is the source of truth for what's currently replicated.
-  const sourceId = useReplicationSourceId({ projectRef })
+  // Reading the sources query directly (rather than via useReplicationSourceId) to get its
+  // loading state: the publications query stays disabled until a source id exists, so without it
+  // the list would render un-checked and then flash back to a loader once publications kick in.
+  const { data: sourcesData, isLoading: isSourcesLoading } = useReplicationSourcesQuery({
+    projectRef,
+  })
+  const sourceId = sourcesData?.sources.find((source) => source.name === projectRef)?.id
+
   const {
     data: publications,
-    isLoading: isPublicationsLoading,
     isError: isPublicationsError,
     error: publicationsError,
   } = useReplicationPublicationsQuery({ projectRef, sourceId })
+
+  // Derived from data presence rather than fetch status, so there's no render gap between the
+  // publications query becoming enabled and it actually starting to fetch.
+  const isSelectionPending =
+    isSourcesLoading ||
+    (sourceId !== undefined && publications === undefined && !isPublicationsError)
 
   const initialSelection = useMemo(() => {
     const warehousePublication = publications?.find(
@@ -145,9 +157,9 @@ export const WarehouseSchemaTablePicker = ({ onBack }: WarehouseSchemaTablePicke
     )
   }
 
-  // Waiting on publications too, so the pre-checked selection is in place before the user can
+  // Waiting on the publication too, so the pre-checked selection is in place before the user can
   // start toggling (an early toggle would otherwise pin an override that omits existing tables).
-  if (isSchemasPending || isTablesPending || isPublicationsLoading) return <GenericSkeletonLoader />
+  if (isSchemasPending || isTablesPending || isSelectionPending) return <GenericSkeletonLoader />
   if (isSchemasError) return <AlertError subject="Failed to load schemas" error={schemasError} />
   if (isTablesError) return <AlertError subject="Failed to load tables" error={tablesError} />
   // Only blocking when editing: a first-time setup starts from an empty selection anyway, so a

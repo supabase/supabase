@@ -47,18 +47,21 @@ const CATALOG_FIELDS_TO_DISPLAY: (keyof WarehouseCatalogCredentials)[] = [
 
 function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="grid grid-cols-[180px_1fr] gap-4 items-center">
+    // `minmax(0,1fr)` rather than `1fr`: a 1fr track keeps `min-width: auto`, so a long
+    // single-line value (the FlightSQL connection string) stretches the track past the panel
+    // instead of truncating inside it.
+    <div className="grid grid-cols-[180px_minmax(0,1fr)] gap-4 items-center">
       <span className="text-sm text-foreground-light">{label}</span>
-      <div>{children}</div>
+      <div className="min-w-0">{children}</div>
     </div>
   )
 }
 
 function CopyValueRow({ value, mono = true }: { value: string; mono?: boolean }) {
   return (
-    <div className="flex items-center gap-2 h-9 px-3 rounded-md border bg-control">
+    <div className="flex min-w-0 items-center gap-2 h-9 px-3 rounded-md border bg-control">
       <span
-        className={cn('flex-1 truncate text-sm text-foreground', mono && 'font-mono')}
+        className={cn('min-w-0 flex-1 truncate text-sm text-foreground', mono && 'font-mono')}
         title={value}
       >
         {value}
@@ -69,6 +72,7 @@ function CopyValueRow({ value, mono = true }: { value: string; mono?: boolean })
         iconOnly
         text={value}
         aria-label={`Copy ${value}`}
+        className="shrink-0"
       />
     </div>
   )
@@ -76,8 +80,8 @@ function CopyValueRow({ value, mono = true }: { value: string; mono?: boolean })
 
 function MaskedCopyValueRow({ value }: { value: string }) {
   return (
-    <div className="flex items-center gap-2 h-9 px-3 rounded-md border bg-control">
-      <span className="flex-1 truncate text-sm font-mono text-foreground-lighter">
+    <div className="flex min-w-0 items-center gap-2 h-9 px-3 rounded-md border bg-control">
+      <span className="min-w-0 flex-1 truncate text-sm font-mono text-foreground-lighter">
         {maskSecretValue(value)}
       </span>
       <CopyButton
@@ -86,6 +90,7 @@ function MaskedCopyValueRow({ value }: { value: string }) {
         iconOnly
         asyncText={() => value}
         aria-label="Copy secret value"
+        className="shrink-0"
       />
     </div>
   )
