@@ -15,7 +15,7 @@ If you get stuck while working through this guide, you can find the [full exampl
 
 ## About Refine
 
-[Refine](https://github.com/refinedev/refine) is a React-based framework used to rapidly build data-heavy applications like admin panels, dashboards, storefronts and any type of CRUD apps. It separates app concerns into individual layers, each backed by a React context and respective provider object. For example, the auth layer represents a context served by a specific set of [`authProvider`](https://refine.dev/docs/tutorial/understanding-authprovider/index/) methods that carry out authentication and authorization actions such as logging in, logging out, getting roles data, etc. Similarly, the data layer offers another level of abstraction equipped with [`dataProvider`](https://refine.dev/docs/tutorial/understanding-dataprovider/index/) methods to handle CRUD operations at appropriate backend API endpoints.
+[Refine](https://github.com/refinedev/refine) is a React-based framework used to rapidly build data-heavy applications like admin panels, dashboards, storefronts and any type of CRUD apps. It separates app concerns into individual layers, each backed by a React context and respective provider object. For example, the auth layer represents a context served by a specific set of [`authProvider`](https://refine.dev/docs/tutorial/understanding-authprovider/index/) methods that carry out authentication and authorization actions such as signing in, logging out, getting roles data, etc. Similarly, the data layer offers another level of abstraction equipped with [`dataProvider`](https://refine.dev/docs/tutorial/understanding-dataprovider/index/) methods to handle CRUD operations at appropriate backend API endpoints.
 
 Refine provides hassle-free integration with a Supabase backend with its supplementary [`@refinedev/supabase`](https://github.com/refinedev/refine/tree/main/packages/supabase) package. It generates `authProvider` and `dataProvider` methods at project initialization, so you don't need to spend much effort defining them yourself, choose Supabase as the backend service while creating the app with `create refine-app`.
 
@@ -72,7 +72,7 @@ You can find the full contents of this file [in the example repository](https://
 
 ### The `<Refine />` component
 
-In order to add login and user profile pages in this App, tweak the `<Refine />` component inside `App.tsx`.
+In order to add sign-in and user profile pages in this App, tweak the `<Refine />` component inside `App.tsx`.
 
 The `App.tsx` file initially looks like this:
 
@@ -161,7 +161,7 @@ lines={[[1, -1]]}
 meta="name=src/authProvider.ts"
 />
 
-### Set up a login component
+### Set up a sign-in component
 
 As the app uses the headless Refine core package that comes with no supported UI framework set up a plain React component to manage logins and sign ups.
 

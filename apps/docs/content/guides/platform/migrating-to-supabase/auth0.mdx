@@ -28,8 +28,8 @@ Depending on your evaluation, you may choose to go with one of the following str
 
 | Strategy | Advantages                                                                                     | Disadvantages                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | -------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Rolling  | <ul><li>0 downtime</li><li>Users may need to log in again</li></ul>                            | <ul><li>Need to maintain 2 different Auth services, which may be more costly in the short-term</li><li>Need to maintain separate codepaths for the period of the migration</li><li>Some existing users may be inactive and have not signed in with the new provider. This means that you eventually need to backfill these users. However, this is a much smaller-scale one-off migration with lower risks since these users are inactive.</li></ul> |
-| One-off  | <ul><li>No need to maintain 2 different auth services for an extended period of time</li></ul> | <ul><li>Some downtime</li><li>Users will need to log in again. Risky for active users.</li></ul>                                                                                                                                                                                                                                                                                                                                                     |
+| Rolling  | <ul><li>0 downtime</li><li>Users may need to sign in again</li></ul>                            | <ul><li>Need to maintain 2 different Auth services, which may be more costly in the short-term</li><li>Need to maintain separate codepaths for the period of the migration</li><li>Some existing users may be inactive and have not signed in with the new provider. This means that you eventually need to backfill these users. However, this is a much smaller-scale one-off migration with lower risks since these users are inactive.</li></ul> |
+| One-off  | <ul><li>No need to maintain 2 different auth services for an extended period of time</li></ul> | <ul><li>Some downtime</li><li>Users will need to sign in again. Risky for active users.</li></ul>                                                                                                                                                                                                                                                                                                                                                     |
 
 ## Migration steps
 
@@ -49,12 +49,12 @@ To export password hashes and MFA factors, contact Auth0 support.
 
 ### Step 2: Import your users into Supabase Auth
 
-The steps for importing your users depends on the login methods that you support.
+The steps for importing your users depends on the sign-in methods that you support.
 
 See the following sections for how to import users with:
 
-- [Password-based login](#password-based-methods)
-- [Passwordless login](#passwordless-methods)
+- [Password-based sign-in](#password-based-methods)
+- [Passwordless sign-in](#passwordless-methods)
 - [OAuth](#oauth)
 
 #### Password-based methods
@@ -73,7 +73,7 @@ Sign up new users using Supabase Auth's [signin methods](/docs/guides/auth/passw
 Migrate existing users to Supabase Auth. This requires two main steps: first, check which users need to be migrated, then create their accounts using the Supabase admin endpoints.
 
 1.  Get your Auth 0 user export and password hash export lists.
-1.  Filter for users who use password login.
+1.  Filter for users who use password sign-in.
     - Under the `identities` field in the user object, these users will have `auth0` as a provider. In the same identity object, you can find their Auth0 `user_id`.
     - Check that the user has a corresponding password hash by comparing their Auth0 `user_id` to the `oid` field in the password hash export.
 1.  Use Supabase Auth's [admin create user](/docs/reference/javascript/auth-admin-createuser) method to recreate the user in Supabase Auth. If the user has a confirmed email address or phone number, set `email_confirm` or `phone_confirm` to `true`.
@@ -140,7 +140,7 @@ Once you have imported your users, you can sign them in using the [`signInWithOt
 
 #### OAuth
 
-Configure your OAuth providers in Supabase by following the [Social login guides](/docs/guides/auth/social-login).
+Configure your OAuth providers in Supabase by following the [Social sign-in guides](/docs/guides/auth/social-sign-in).
 
 For both new and existing users, sign in the user using the [`signInWithOAuth`](/docs/reference/javascript/auth-signinwithoauth) method. This works without pre-migrating existing users, since the user always needs to sign in through the OAuth provider before being redirected to your service.
 

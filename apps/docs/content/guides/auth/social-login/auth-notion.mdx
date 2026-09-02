@@ -1,6 +1,6 @@
 ---
 id: 'auth-notion'
-title: 'Login with Notion'
+title: 'Sign in with Notion'
 description: 'Add Notion OAuth to your Supabase project'
 ---
 
@@ -12,16 +12,16 @@ Setting up Notion logins for your application consists of 3 parts:
 
 - Create and configure a Notion Application [Notion Developer Portal](https://www.notion.so/my-integrations)
 - Retrieve your OAuth client ID and OAuth client secret and add them to your [Supabase Project](/dashboard)
-- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+- Add the sign-in code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
 
 ## Create your notion integration
 
 - Go to [developers.notion.com](https://developers.notion.com/).
   {/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
-- Click "View my integrations" and login.
+- Click "View my integrations" and sign-in.
   ![notion.so](/docs/img/guides/auth-notion/notion.png)
 
-- Once logged in, go to [notion.so/my-integrations](https://notion.so/my-integrations) and create a new integration.
+- Once signed in, go to [notion.so/my-integrations](https://notion.so/my-integrations) and create a new integration.
 - When creating your integration, ensure that you select "Public integration" under "Integration type" and "Read user information including email addresses" under "Capabilities".
 - You will need to add a redirect URI, see [Add the redirect URI](#add-the-redirect-uri)
 - Once you've filled in the necessary fields, click "Submit" to finish creating the integration.
@@ -44,7 +44,7 @@ Setting up Notion logins for your application consists of 3 parts:
 
 <$Partial path="social_provider_settings_supabase.mdx" variables={{ "provider": "Notion" }} />
 
-## Add login code to your client app
+## Add sign-in code to your client app
 
 <Tabs
   scrollable

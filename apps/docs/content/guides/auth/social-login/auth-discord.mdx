@@ -1,6 +1,6 @@
 ---
 id: 'auth-discord'
-title: 'Login with Discord'
+title: 'Sign in with Discord'
 description: 'Add Discord OAuth to your Supabase project'
 ---
 
@@ -12,16 +12,16 @@ Setting up Discord logins for your application consists of 3 parts:
 
 - Create and configure a Discord Application [Discord Developer Portal](https://discord.com/developers)
 - Add your Discord OAuth Consumer keys to your [Supabase Project](/dashboard)
-- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+- Add the sign-in code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
 
 ## Access your Discord account
 
 - Go to [discord.com](https://discord.com/).
-- Click on `Login` at the top right to log in.
+- Click on `Login` at the top right to sign in.
 
 ![Discord Portal.](/docs/img/guides/auth-discord/discord-portal.png)
 
-- Once logged in, go to [discord.com/developers](https://discord.com/developers).
+- Once signed in, go to [discord.com/developers](https://discord.com/developers).
 
 ![Discord Portal.](/docs/img/guides/auth-discord/discord-developer-portal.png)
 
@@ -61,7 +61,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
   }'
 ```
 
-## Add login code to your client app
+## Add sign-in code to your client app
 
 <Tabs
   scrollable

@@ -8,10 +8,10 @@ Multi-factor authentication (MFA), sometimes called two-factor authentication (2
 
 It is considered a best practice to use MFA for your applications.
 
-Users with weak passwords or compromised social login accounts are prone to malicious account takeovers. These can be prevented with MFA because they require the user to provide proof of both of these:
+Users with weak passwords or compromised social sign-in accounts are prone to malicious account takeovers. These can be prevented with MFA because they require the user to provide proof of both of these:
 
 - Something they know.
-  Password, or access to a social-login account.
+  Password, or access to a social-sign-in account.
 - Something they have.
   Access to an authenticator app (a.k.a. TOTP) or a mobile phone.
 
@@ -24,7 +24,7 @@ Applications using MFA require two important flows:
 1. **Enrollment flow.**
    This lets users set up and control MFA in your app.
 2. **Authentication flow.**
-   This lets users sign in using any factors after the conventional login step.
+   This lets users sign in using any factors after the conventional sign-in step.
 
 Supabase Auth provides:
 
@@ -41,9 +41,9 @@ Once users have enrolled or signed-in with a factor, Supabase Auth adds addition
 This information is represented by an [Authenticator Assurance Level](https://pages.nist.gov/800-63-3-Implementation-Resources/63B/AAL/), a standard measure about the assurance of the user's identity Supabase Auth has for that particular session. There are two levels recognized today:
 
 1. **Assurance Level 1: `aal1`**
-   Means that the user's identity was verified using a conventional login method
+   Means that the user's identity was verified using a conventional sign-in method
    such as email+password, magic link, one-time password, phone auth or social
-   login.
+   sign-in.
 2. **Assurance Level 2: `aal2`**
    Means that the user's identity was additionally verified using at least one
    second factor, such as a TOTP code or One-Time Password code.
@@ -61,12 +61,12 @@ Adding MFA to your app involves these four steps:
 2. **Add unenroll flow.**
    You need to support a UI through which users can see existing devices and unenroll
    devices which are no longer relevant.
-3. **Add challenge step to login.**
-   If a user has set-up MFA, your app's login flow needs to present a challenge
+3. **Add challenge step to sign in.**
+   If a user has set-up MFA, your app's sign-in flow needs to present a challenge
    screen to the user asking them to prove they have access to the additional
    factor.
 4. **Enforce rules for MFA logins.**
-   Once your users have a way to enroll and log in with MFA, you need to enforce
+   Once your users have a way to enroll and sign in with MFA, you need to enforce
    authorization rules across your app: on the frontend, backend, API servers or
    Row-Level Security policies.
 
@@ -291,7 +291,7 @@ If your application uses the Supabase Database, Storage or Edge Functions, Row L
 2. **Retrieve the `aal` claim from the JWT and compare its value according to
    your needs.**
    If you've encountered an AAL level that can be increased, ask the user to
-   continue the login process instead of logging them out.
+   continue the sign-in process instead of logging them out.
 3. **Use the `https://<project-ref>.supabase.co/rest/v1/auth/factors` REST
    endpoint to identify if the user has enrolled any MFA factors.**
    Only `verified` factors should be acted upon.
@@ -349,7 +349,7 @@ Once you have extracted the most recent entry in the array, you can compare the 
 
 Currently recognized authentication methods are:
 
-- `oauth` - any OAuth based sign in (social login).
+- `oauth` - any OAuth based sign in (social sign-in).
 - `password` - any password based sign in.
 - `otp` - any one-time password based sign in (email code, SMS code, magic
   link).
@@ -361,8 +361,8 @@ The following additional claims are available when using PKCE flow:
 
 - `invite` - any sign in via an invitation.
 - `magiclink` - any sign in via magic link. Excludes logins resulting from invocation of `signUp`.
-- `email/signup` - any login resulting from an email signup.
-- `email_change` - any login resulting from a change in email.
+- `email/signup` - any sign-in resulting from an email signup.
+- `email_change` - any sign-in resulting from a change in email.
 
 More authentication methods will be added over time as we increase the number of authentication methods supported by Supabase.
 

@@ -32,7 +32,7 @@ SAML SSO is configured in two layers:
 1. **Global SAML enable (environment variables)** - a small set of env vars that enable the SAML engine and provide a signing key. These go in `.env` and `docker-compose.yml`.
 2. **Per-IdP configuration (admin API)** - individual Identity Providers are registered, updated, and deleted at runtime via the Auth admin API. No restart is needed when adding or removing providers.
 
-The login flow works as follows:
+The sign-in flow works as follows:
 
 1. Your app calls `POST /auth/v1/sso` with a domain or provider_id
 2. Auth generates a SAML `AuthnRequest` and returns a redirect URL to the IdP
@@ -508,13 +508,13 @@ Both return `{ "url": "https://idp.example.com/sso?SAMLRequest=..." }`.
 
 | Method       | Use case                                                                                                                                |
 | ------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `domain`     | Extract the domain from the user's email and let Auth find the right IdP. Best for login forms where the user enters their email first. |
+| `domain`     | Extract the domain from the user's email and let Auth find the right IdP. Best for sign-in forms where the user enters their email first. |
 | `providerId` | Use when you know the exact provider - for example, a dedicated "Sign in with Okta" button.                                             |
 
-## Test the login flow
+## Test the sign-in flow
 
-1. Open your application and trigger SSO login (or use the curl command above)
-2. You should be redirected to your IdP's login page
+1. Open your application and trigger SSO sign-in (or use the curl command above)
+2. You should be redirected to your IdP's sign-in page
 3. After authenticating, the IdP posts back to the ACS endpoint
 4. Auth processes the assertion and redirects you back to your `SITE_URL` (or `redirect_to` URL) with session tokens
 

@@ -34,7 +34,7 @@ flowchart TD
 
 In the **setup flow**, a session already at AAL1 calls the Enroll API, which returns a QR code for the user to scan with their authenticator app. The user enters the generated code, the Challenge and Verify APIs check it, and on success the session is upgraded to AAL2. If the code is incorrect, the user is prompted to enter it again.
 
-In the **login flow**, the user signs in (upgrading the session to AAL1) and the List Factors API is called. If the user has one or more factors, they open their authenticator and enter a code, which follows the same Challenge and Verify path to reach AAL2. If they have no factors enrolled, they are sent through the setup flow first.
+In the **sign-in flow**, the user signs in (upgrading the session to AAL1) and the List Factors API is called. If the user has one or more factors, they open their authenticator and enter a code, which follows the same Challenge and Verify path to reach AAL2. If they have no factors enrolled, they are sent through the setup flow first.
 
 <Admonition type="note">
 
@@ -46,8 +46,8 @@ In the **login flow**, the user signs in (upgrading the session to AAL1) and the
 
 An enrollment flow provides a UI for users to set up additional authentication factors. Most applications add the enrollment flow in two places within their app:
 
-1. Right after login or sign up.
-   This lets users set up MFA immediately after they log in or create an
+1. Right after sign-in or sign up.
+   This lets users set up MFA immediately after they sign in or create an
    account. We recommend encouraging all users to set up MFA if that makes sense
    for your application. Many applications offer this as an opt-in step in an
    effort to reduce onboarding friction.
@@ -169,9 +169,9 @@ export function EnrollMFA({
 }
 ```
 
-### Add a challenge step to login
+### Add a challenge step to sign in
 
-Once a user has logged in via their first factor (email+password, magic link, one time password, social login etc.) you need to perform a check if any additional factors need to be verified.
+Once a user has signed in via their first factor (email+password, magic link, one time password, social sign-in etc.) you need to perform a check if any additional factors need to be verified.
 
 This can be done by using the `supabase.auth.mfa.getAuthenticatorAssuranceLevel()` API. When the user signs in and is redirected back to your app, you should call this method to extract the user's current and next authenticator assurance level (AAL).
 
@@ -188,7 +188,7 @@ Below is a table that explains the combined meaning.
 
 #### Example: React
 
-Adding the challenge step to login depends heavily on the architecture of your app. However, a fairly common way to structure React apps is to have a large component (often named `App`) which contains most of the authenticated application logic.
+Adding the challenge step to sign in depends heavily on the architecture of your app. However, a fairly common way to structure React apps is to have a large component (often named `App`) which contains most of the authenticated application logic.
 
 This example will wrap this component with logic that will show an MFA challenge screen if necessary, before showing the full application. This is illustrated in the `AppWithMFA` example below.
 

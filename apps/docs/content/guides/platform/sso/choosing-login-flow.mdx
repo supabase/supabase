@@ -1,9 +1,9 @@
 ---
-title: 'Choosing the Right SSO Login Flow'
-description: 'Quick reference guide to help you choose between IdP-initiated, SP-initiated, or both login flows based on your use case.'
+title: 'Choosing the Right SSO Sign-in Flow'
+description: 'Quick reference guide to help you choose between IdP-initiated, SP-initiated, or both sign-in flows based on your use case.'
 ---
 
-Not sure which single sign-on (SSO) login flow to enable? This guide maps common enterprise scenarios to the recommended configuration.
+Not sure which single sign-on (SSO) sign-in flow to enable? This guide maps common enterprise scenarios to the recommended configuration.
 
 <Admonition type="note">
 
@@ -60,7 +60,7 @@ Do users need to start login at supabase.com?
    - "Supabase Production" → Points to prod org ACS URL
 2. In each Supabase organization:
    - Enable SSO
-   - Leave "Enable SP-initiated login" **OFF**
+   - Leave "Enable SP-initiated sign-in" **OFF**
    - Configure metadata from corresponding IdP app
 3. Users access each environment via IdP tiles
 
@@ -88,11 +88,11 @@ Do users need to start login at supabase.com?
 **How to configure:**
 
 1. Enable SSO in your Supabase organization
-2. Leave "Enable SP-initiated login" **OFF**
+2. Leave "Enable SP-initiated sign-in" **OFF**
 3. Configure identity provider metadata
 4. Create Supabase app tile in your IdP
 
-**Result:** One-click SSO login for all users.
+**Result:** One-click SSO sign-in for all users.
 
 ---
 
@@ -101,7 +101,7 @@ Do users need to start login at supabase.com?
 **Your situation:**
 
 - Users frequently bookmark supabase.com directly
-- You want to support starting login from Supabase
+- You want to support starting sign-in from Supabase
 - Single domain, single organization
 
 **Recommended configuration:** Enable both flows ✅
@@ -115,12 +115,12 @@ Do users need to start login at supabase.com?
 **How to configure:**
 
 1. Enable SSO in your Supabase organization
-2. Toggle "Enable SP-initiated login" **ON**
+2. Toggle "Enable SP-initiated sign-in" **ON**
 3. Add your email domain(s) (e.g., `company.com`)
 4. Configure identity provider metadata
 5. Create Supabase app tile in your IdP (optional but recommended)
 
-**Result:** Users can start login from either Supabase or IdP.
+**Result:** Users can start sign-in from either Supabase or IdP.
 
 ---
 
@@ -128,7 +128,7 @@ Do users need to start login at supabase.com?
 
 **Your situation:**
 
-- Currently using password-based login
+- Currently using password-based sign-in
 - Transitioning to SSO
 - Users are used to starting at supabase.com
 
@@ -136,14 +136,14 @@ Do users need to start login at supabase.com?
 
 **Why:**
 
-- Familiar login starting point for existing users
+- Familiar sign-in starting point for existing users
 - Gradual transition to IdP-based access
 - Can promote IdP tiles after users adapt
 
 **How to configure:**
 
 1. Ensure at least one non-SSO owner account exists
-2. Enable SSO and toggle "Enable SP-initiated login" **ON**
+2. Enable SSO and toggle "Enable SP-initiated sign-in" **ON**
 3. Add email domain(s)
 4. Start with auto-join **disabled**
 5. Test with small group
@@ -178,7 +178,7 @@ Do users need to start login at supabase.com?
 **How to configure:**
 
 1. Enable SSO in your Supabase organization
-2. Toggle "Enable SP-initiated login" **ON**
+2. Toggle "Enable SP-initiated sign-in" **ON**
 3. Add all domains: `parent.com`, `sub1.com`, `sub2.com`
 4. Configure identity provider to accept all domains
 5. Create Supabase app tiles in IdP (IdP-initiated also works)
@@ -229,7 +229,7 @@ Do users need to start login at supabase.com?
 **Why:**
 
 - SSO users can use either flow
-- Non-SSO users use password/social login
+- Non-SSO users use password/social sign-in
 - Separate invitation types for each group
 
 **How to configure:**
@@ -267,7 +267,7 @@ Communicate clearly which authentication method each user should use.
 
 ## Testing your configuration
 
-After choosing your login flow, thoroughly test:
+After choosing your sign-in flow, thoroughly test:
 
 1. **IdP-initiated:** Click app tile in IdP → Verify redirect to Supabase
 2. **SP-initiated:** Go to supabase.com/sign-in-sso → Enter email → Verify IdP redirect
@@ -278,18 +278,18 @@ See our comprehensive [SSO Testing and Best Practices guide](/docs/guides/platfo
 
 ## When to change configuration
 
-You can safely change login flow configuration at any time:
+You can safely change sign-in flow configuration at any time:
 
 ### Adding SP-initiated to IdP-only
 
-- Toggle "Enable SP-initiated login" ON
+- Toggle "Enable SP-initiated sign-in" ON
 - Add required domains
 - Test with existing users
 - No disruption to IdP-initiated flow
 
 ### Removing SP-initiated
 
-- Toggle "Enable SP-initiated login" OFF
+- Toggle "Enable SP-initiated sign-in" OFF
 - Domains are preserved (can re-enable later)
 - IdP-initiated continues working
 - Users who bookmarked supabase.com need to use IdP tiles instead
@@ -314,7 +314,7 @@ If you need help choosing the right configuration for your organization, contact
 
 ## Next steps
 
-- **Understand the technical details:** Read [Understanding SSO Login Flows](/docs/guides/platform/sso/login-flows)
+- **Understand the technical details:** Read [Understanding SSO Sign-in Flows](/docs/guides/platform/sso/sign-in-flows)
 - **Configure your provider:** Follow our [provider-specific guides](/docs/guides/platform/sso#supported-providers)
 - **Test your setup:** Review [SSO Testing and Best Practices](/docs/guides/platform/sso/testing-best-practices)
 - **Enable auto-join:** Configure [auto-join settings](/docs/guides/platform/sso#key-configuration-options)

@@ -20,7 +20,7 @@ Users that signed up with [SAML SSO](/docs/guides/auth/enterprise-sso/auth-sso-s
 
 ### Automatic linking
 
-Supabase Auth automatically links identities with the same email address to a single user. This helps to improve the user experience when multiple OAuth login options are presented since the user does not need to remember which OAuth account they used to sign up with. When a new user signs in with OAuth, Supabase Auth will attempt to look for an existing user that uses the same email address. If a match is found, the new identity is linked to the user.
+Supabase Auth automatically links identities with the same email address to a single user. This helps to improve the user experience when multiple OAuth sign-in options are presented since the user does not need to remember which OAuth account they used to sign up with. When a new user signs in with OAuth, Supabase Auth will attempt to look for an existing user that uses the same email address. If a match is found, the new identity is linked to the user.
 
 In order for automatic linking to correctly identify the user for linking, Supabase Auth needs to ensure that all user emails are unique. It would also be an insecure practice to automatically link an identity to a user with an unverified email address since that could lead to pre-account takeover attacks. To prevent this from happening, when a new identity can be linked to an existing user, Supabase Auth will remove any other unconfirmed identities linked to an existing user.
 
@@ -35,7 +35,7 @@ In order for automatic linking to correctly identify the user for linking, Supab
 >
 <TabPanel id="js" label="JavaScript">
 
-Supabase Auth allows a user to initiate identity linking with a different email address when they are logged in. To link an OAuth identity to the user, call [`linkIdentity()`](/docs/reference/javascript/auth-linkidentity):
+Supabase Auth allows a user to initiate identity linking with a different email address when they are signed in. To link an OAuth identity to the user, call [`linkIdentity()`](/docs/reference/javascript/auth-linkidentity):
 
 ```js
 import { createClient } from '@supabase/supabase-js'
@@ -50,7 +50,7 @@ const { data, error } = await supabase.auth.linkIdentity({ provider: 'google' })
 <$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
-Supabase Auth allows a user to initiate identity linking with a different email address when they are logged in. To link an OAuth identity to the user, call [`linkIdentity()`](/docs/reference/dart/auth-linkidentity):
+Supabase Auth allows a user to initiate identity linking with a different email address when they are signed in. To link an OAuth identity to the user, call [`linkIdentity()`](/docs/reference/dart/auth-linkidentity):
 
 ```dart
 await supabase.auth.linkIdentity(OAuthProvider.google);
@@ -61,7 +61,7 @@ await supabase.auth.linkIdentity(OAuthProvider.google);
 <$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
-Supabase Auth allows a user to initiate identity linking with a different email address when they are logged in. To link an OAuth identity to the user, call [`linkIdentity()`](/docs/reference/swift/auth-linkidentity):
+Supabase Auth allows a user to initiate identity linking with a different email address when they are signed in. To link an OAuth identity to the user, call [`linkIdentity()`](/docs/reference/swift/auth-linkidentity):
 
 ```swift
 try await supabase.auth.linkIdentity(provider: .google)
@@ -72,7 +72,7 @@ try await supabase.auth.linkIdentity(provider: .google)
 <$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
-Supabase Auth allows a user to initiate identity linking with a different email address when they are logged in. To link an OAuth identity to the user, call [`linkIdentity()`](/docs/reference/kotlin/auth-linkidentity):
+Supabase Auth allows a user to initiate identity linking with a different email address when they are signed in. To link an OAuth identity to the user, call [`linkIdentity()`](/docs/reference/kotlin/auth-linkidentity):
 
 ```kotlin
 supabase.auth.linkIdentity(Google)
@@ -83,7 +83,7 @@ supabase.auth.linkIdentity(Google)
 <$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
-Supabase Auth allows a user to initiate identity linking with a different email address when they are logged in. To link an OAuth identity to the user, call [`link_identity()`](/docs/reference/python/auth-linkidentity):
+Supabase Auth allows a user to initiate identity linking with a different email address when they are signed in. To link an OAuth identity to the user, call [`link_identity()`](/docs/reference/python/auth-linkidentity):
 
 ```python
 response = supabase.auth.link_identity({'provider': 'google'})
@@ -94,7 +94,7 @@ response = supabase.auth.link_identity({'provider': 'google'})
 <$Show if="sdk:csharp">
 <TabPanel id="csharp" label="C#">
 
-Supabase Auth allows a user to initiate identity linking with a different email address when they are logged in. To link an OAuth identity to the user, call [`LinkIdentity()`](/docs/reference/csharp/link-identity):
+Supabase Auth allows a user to initiate identity linking with a different email address when they are signed in. To link an OAuth identity to the user, call [`LinkIdentity()`](/docs/reference/csharp/link-identity):
 
 ```c#
 var state = await supabase.Auth.LinkIdentity(Provider.Google, new SignInOptions { FlowType = OAuthFlowType.PKCE });
@@ -175,7 +175,7 @@ This method supports the same OAuth providers as `signInWithIdToken()`: Google, 
 >
 <TabPanel id="js" label="JavaScript">
 
-You can use [`getUserIdentities()`](/docs/reference/javascript/auth-getuseridentities) to fetch all the identities linked to a user. Then, call [`unlinkIdentity()`](/docs/reference/javascript/auth-unlinkidentity) to unlink the identity. The user needs to be logged in and have at least 2 linked identities in order to unlink an existing identity.
+You can use [`getUserIdentities()`](/docs/reference/javascript/auth-getuseridentities) to fetch all the identities linked to a user. Then, call [`unlinkIdentity()`](/docs/reference/javascript/auth-unlinkidentity) to unlink the identity. The user needs to be signed in and have at least 2 linked identities in order to unlink an existing identity.
 
 ```js
 import { createClient } from '@supabase/supabase-js'
@@ -201,7 +201,7 @@ if (!identitiesError) {
 <$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
-You can use [`getUserIdentities()`](/docs/reference/dart/auth-getuseridentities) to fetch all the identities linked to a user. Then, call [`unlinkIdentity()`](/docs/reference/dart/auth-unlinkidentity) to unlink the identity. The user needs to be logged in and have at least 2 linked identities in order to unlink an existing identity.
+You can use [`getUserIdentities()`](/docs/reference/dart/auth-getuseridentities) to fetch all the identities linked to a user. Then, call [`unlinkIdentity()`](/docs/reference/dart/auth-unlinkidentity) to unlink the identity. The user needs to be signed in and have at least 2 linked identities in order to unlink an existing identity.
 
 ```dart
 // retrieve all identities linked to a user
@@ -220,7 +220,7 @@ await supabase.auth.unlinkIdentity(googleIdentity);
 <$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
-You can use [`getUserIdentities()`](/docs/reference/swift/auth-getuseridentities) to fetch all the identities linked to a user. Then, call [`unlinkIdentity()`](/docs/reference/swift/auth-unlinkidentity) to unlink the identity. The user needs to be logged in and have at least 2 linked identities in order to unlink an existing identity.
+You can use [`getUserIdentities()`](/docs/reference/swift/auth-getuseridentities) to fetch all the identities linked to a user. Then, call [`unlinkIdentity()`](/docs/reference/swift/auth-unlinkidentity) to unlink the identity. The user needs to be signed in and have at least 2 linked identities in order to unlink an existing identity.
 
 ```swift
 // retrieve all identities linked to a user
@@ -238,7 +238,7 @@ try await supabase.auth.unlinkIdentity(googleIdentity)
 <$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
-You can use [`currentIdentitiesOrNull()`](/docs/reference/kotlin/auth-getuseridentities) to get all the identities linked to a user. Then, call [`unlinkIdentity()`](/docs/reference/kotlin/auth-unlinkidentity) to unlink the identity. The user needs to be logged in and have at least 2 linked identities in order to unlink an existing identity.
+You can use [`currentIdentitiesOrNull()`](/docs/reference/kotlin/auth-getuseridentities) to get all the identities linked to a user. Then, call [`unlinkIdentity()`](/docs/reference/kotlin/auth-unlinkidentity) to unlink the identity. The user needs to be signed in and have at least 2 linked identities in order to unlink an existing identity.
 
 ```kotlin
 //get all identities linked to a user
@@ -256,7 +256,7 @@ supabase.auth.unlinkIdentity(googleIdentity.identityId!!)
 <$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
-You can use [`get_user_identities()`](/docs/reference/python/auth-getuseridentities) to fetch all the identities linked to a user. Then, call [`unlink_identity()`](/docs/reference/python/auth-unlinkidentity) to unlink the identity. The user needs to be logged in and have at least 2 linked identities in order to unlink an existing identity.
+You can use [`get_user_identities()`](/docs/reference/python/auth-getuseridentities) to fetch all the identities linked to a user. Then, call [`unlink_identity()`](/docs/reference/python/auth-unlinkidentity) to unlink the identity. The user needs to be signed in and have at least 2 linked identities in order to unlink an existing identity.
 
 ```python
 # retrieve all identities linked to a user
@@ -275,7 +275,7 @@ if google_identity:
 <$Show if="sdk:csharp">
 <TabPanel id="csharp" label="C#">
 
-Use `CurrentUser.Identities` to get all the identities linked to a user. Then, call [`UnlinkIdentity()`](/docs/reference/csharp/unlink-identity) to unlink the identity. The user needs to be logged in and have at least 2 linked identities in order to unlink an existing identity.
+Use `CurrentUser.Identities` to get all the identities linked to a user. Then, call [`UnlinkIdentity()`](/docs/reference/csharp/unlink-identity) to unlink the identity. The user needs to be signed in and have at least 2 linked identities in order to unlink an existing identity.
 
 ```c#
 // get all identities linked to the user
@@ -294,7 +294,7 @@ await supabase.Auth.UnlinkIdentity(googleIdentity);
 
 ## Frequently asked questions
 
-### How to add email/password login to an OAuth account?
+### How to add email/password sign in to an OAuth account?
 
 Call the `updateUser({ password: 'validpassword'})` to add email with password authentication to an account created with an OAuth provider (Google, GitHub, etc.).
 

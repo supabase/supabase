@@ -1,6 +1,6 @@
 ---
 id: 'auth-gitlab'
-title: 'Login with GitLab'
+title: 'Sign in with GitLab'
 description: 'Add GitLab OAuth to your Supabase project'
 ---
 
@@ -12,12 +12,12 @@ Setting up GitLab logins for your application consists of 3 parts:
 
 - Create and configure a GitLab Application on [GitLab](https://gitlab.com)
 - Add your GitLab Application keys to your [Supabase Project](/dashboard)
-- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+- Add the sign-in code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
 
 ## Access your GitLab account
 
 - Go to [gitlab.com](https://gitlab.com).
-- Click on `Login` at the top right to log in.
+- Click on `Login` at the top right to sign in.
 
 ![GitLab Developer Portal.](/docs/img/guides/auth-gitlab/gitlab-portal.png)
 
@@ -41,7 +41,7 @@ Setting up GitLab logins for your application consists of 3 parts:
 
 <$Partial path="social_provider_settings_supabase.mdx" variables={{ "provider": "GitLab" }} />
 
-## Add login code to your client app
+## Add sign-in code to your client app
 
 <Tabs
   scrollable
