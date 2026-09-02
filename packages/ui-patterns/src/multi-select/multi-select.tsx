@@ -21,13 +21,15 @@ import {
   SIZE_VARIANTS_DEFAULT,
 } from 'ui'
 
+import { SelectionListState } from '../SelectionListState'
+
 interface MultiSelectContextProps {
   id: string
   values: string[]
   onValuesChange: (value: string[]) => void
   toggleValue: (values: string) => void
   open: boolean
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setOpen: (open: boolean) => void
   inputValue: string
   setInputValue: React.Dispatch<React.SetStateAction<string>>
   activeIndex: number
@@ -41,6 +43,7 @@ const MultiSelectContext = React.createContext<MultiSelectContextProps | null>(n
 
 const DROPDOWN_MAX_HEIGHT = 300
 const DROPDOWN_GAP = 8
+const DROPDOWN_BORDER_HEIGHT = 2
 
 const commandItemClass = cn(
   'relative text-foreground-light text-left px-2 py-1.5 rounded-xs',
@@ -73,6 +76,7 @@ type MultiSelectorProps = {
   mode?: MultiSelectorMode
   values: string[]
   onValuesChange: (value: string[]) => void
+  onOpenChange?: (open: boolean) => void
   disabled?: boolean
 } & React.ComponentPropsWithoutRef<typeof Command> &
   VariantProps<typeof MultiSelectorVariants>
@@ -80,6 +84,7 @@ type MultiSelectorProps = {
 function MultiSelector({
   values = [],
   onValuesChange,
+  onOpenChange,
   disabled,
   dir,
   size,
@@ -89,12 +94,23 @@ function MultiSelector({
   ...props
 }: MultiSelectorProps) {
   const ref = React.useRef(null)
-  const [open, setOpen] = React.useState<boolean>(false)
+  const [open, setOpenState] = React.useState<boolean>(false)
   const [inputValue, setInputValue] = React.useState<string>('')
   const [activeIndex, setActiveIndex] = React.useState<number>(-1)
   const [dropdownMaxHeight, setDropdownMaxHeight] = React.useState<number>(DROPDOWN_MAX_HEIGHT)
+  const openRef = React.useRef(false)
   const generatedId = React.useId()
   const id = idProp ?? generatedId
+
+  const handleOpenChange = React.useCallback(
+    (nextOpen: boolean) => {
+      if (openRef.current === nextOpen) return
+      openRef.current = nextOpen
+      setOpenState(nextOpen)
+      onOpenChange?.(nextOpen)
+    },
+    [onOpenChange]
+  )
 
   const toggleValue = React.useCallback(
     (toggledValue: string) => {
@@ -104,7 +120,7 @@ function MultiSelector({
         onValuesChange([...values, toggledValue])
       }
     },
-    [values]
+    [onValuesChange, values]
   )
 
   useEffect(() => {
@@ -154,18 +170,18 @@ function MultiSelector({
           }
           break
         case 'Escape':
-          activeIndex !== -1 ? setActiveIndex(-1) : setOpen(false)
+          activeIndex !== -1 ? setActiveIndex(-1) : handleOpenChange(false)
           if (ref.current) {
             const button = (ref.current as HTMLDivElement).querySelector('button[role="combobox"]')
             button && (button as HTMLButtonElement).focus()
           }
           break
         case 'Enter':
-          setOpen(true)
+          handleOpenChange(true)
           break
       }
     },
-    [values, inputValue, activeIndex]
+    [values, inputValue, activeIndex, handleOpenChange]
   )
 
   return (
@@ -176,7 +192,7 @@ function MultiSelector({
         toggleValue,
         onValuesChange,
         open,
-        setOpen,
+        setOpen: handleOpenChange,
         inputValue,
         setInputValue,
         activeIndex,
@@ -186,7 +202,7 @@ function MultiSelector({
         dropdownMaxHeight,
       }}
     >
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover open={open} onOpenChange={handleOpenChange}>
         <Command
           id={id}
           ref={ref}
@@ -274,7 +290,8 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
       }
     }, [values, badgeLimit])
 
-    const badgeClasses = 'rounded-sm shrink-0 px-1.5 bg-surface-75 dark:bg-white/5'
+    const badgeClasses =
+      'rounded-sm shrink-0 px-1.5 bg-surface-75 dark:bg-white/5 normal-case tracking-normal text-xs'
 
     const handleTriggerClick: React.MouseEventHandler<HTMLButtonElement> = React.useCallback(
       (event) => {
@@ -374,7 +391,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
                 ref={inlineInputRef}
                 showSearchIcon={false}
                 onValueChange={activeIndex === -1 ? setInputValue : undefined}
-                placeholder={label}
+                placeholder={values.length === 0 ? label : undefined}
                 autoFocus={false}
                 wrapperClassName={cn(
                   'px-0 flex-1 border-none truncate',
@@ -497,7 +514,9 @@ const MultiSelectorContent = React.forwardRef<HTMLDivElement, PopoverContentProp
     return (
       <PopoverContent
         align="start"
+        collisionPadding={DROPDOWN_GAP}
         ref={ref}
+        sideOffset={DROPDOWN_GAP}
         className={cn(
           'bg-overlay shadow-md z-50 border rounded-md p-0',
           'w-(--radix-popper-anchor-width)',
@@ -525,53 +544,85 @@ const MultiSelectorList = React.forwardRef<
   React.ElementRef<typeof CommandList>,
   React.ComponentPropsWithoutRef<typeof CommandList> & {
     creatable?: boolean
+    emptyLabel?: string
+    error?: boolean
+    errorLabel?: string
+    loading?: boolean
   }
->(({ className, children, creatable = false, ...props }, ref) => {
-  const { open, inputValue, setInputValue, toggleValue, dropdownMaxHeight } = useMultiSelect()
+>(
+  (
+    {
+      className,
+      children,
+      creatable = false,
+      emptyLabel = 'No results found',
+      error = false,
+      errorLabel,
+      loading = false,
+      ...props
+    },
+    ref
+  ) => {
+    const { open, inputValue, setInputValue, toggleValue, dropdownMaxHeight } = useMultiSelect()
 
-  const options = Children.toArray(children)
-  const availableOptions = options
-    .filter((x: any) => !!x.props.value)
-    .map((x: any) => x.props.value.toLowerCase())
-  const isOptionExists = availableOptions.some((x: string) => x === inputValue.toLowerCase())
+    const options = Children.toArray(children)
+    const availableOptions = options
+      .filter((x: any) => !!x.props.value)
+      .map((x: any) => x.props.value.toLowerCase())
+    const isOptionExists = availableOptions.some((x: string) => x === inputValue.toLowerCase())
 
-  return (
-    <CommandList
-      ref={ref}
-      className={cn(
-        'p-1 flex flex-col scrollbar-thin scrollbar-track-transparent transition-colors',
-        'scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted',
-        'scrollbar-thumb-rounded-lg w-full overflow-y-auto',
-        className
-      )}
-      style={{ maxHeight: dropdownMaxHeight }}
-      onWheel={(e) => e.stopPropagation()}
-      {...props}
-    >
-      {children}
-      {creatable && inputValue.length > 0 && !isOptionExists ? (
-        <CommandItem
-          role="option"
-          onSelect={() => {
-            open && toggleValue(inputValue)
-            setInputValue('')
-          }}
-          className={commandItemClass}
-        >
-          Create "{inputValue}"
-        </CommandItem>
-      ) : creatable && options.length === 0 ? (
-        <div className="p-2 py-1.5 text-xs text-foreground-lighter font-italic">
-          Type to add a value
-        </div>
-      ) : (
-        <CommandEmpty>
-          <span className="text-foreground-muted">No results found</span>
-        </CommandEmpty>
-      )}
-    </CommandList>
-  )
-})
+    return (
+      <CommandList
+        ref={ref}
+        className={cn(
+          'p-1 flex flex-col scrollbar-thin scrollbar-track-transparent transition-colors',
+          'scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted',
+          'scrollbar-thumb-rounded-lg w-full overflow-y-auto',
+          className
+        )}
+        style={{
+          maxHeight: `min(${dropdownMaxHeight}px, calc(var(--radix-popover-content-available-height) - ${DROPDOWN_BORDER_HEIGHT}px))`,
+        }}
+        onWheel={(e) => e.stopPropagation()}
+        {...props}
+      >
+        <SelectionListState
+          isLoading={loading}
+          isError={error}
+          isEmpty={!loading && !error && options.length === 0 && !creatable}
+          emptyLabel={emptyLabel}
+          errorLabel={errorLabel}
+          skeletonVariant="multi-select"
+        />
+        {!loading && !error && (options.length > 0 || creatable) && (
+          <>
+            {children}
+            {creatable && inputValue.length > 0 && !isOptionExists ? (
+              <CommandItem
+                role="option"
+                onSelect={() => {
+                  open && toggleValue(inputValue)
+                  setInputValue('')
+                }}
+                className={commandItemClass}
+              >
+                Create "{inputValue}"
+              </CommandItem>
+            ) : creatable && options.length === 0 ? (
+              <div className="p-2 py-1.5 text-xs text-foreground-lighter font-italic">
+                Type to add a value
+              </div>
+            ) : (
+              <CommandEmpty>
+                <span className="text-foreground-muted">{emptyLabel}</span>
+              </CommandEmpty>
+            )}
+          </>
+        )}
+      </CommandList>
+    )
+  }
+)
 
 MultiSelectorList.displayName = 'MultiSelectorList'
 MultiSelector.List = MultiSelectorList
