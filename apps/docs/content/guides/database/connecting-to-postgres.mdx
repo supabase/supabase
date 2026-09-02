@@ -16,12 +16,12 @@ How you connect to your database depends on where your code runs:
 
 The following table summarizes each mode, its host and port, the IP version it supports on each plan, and what it's best used for:
 
-| Mode                               | Host:Port                               | Free | Paid | Paid + IPv4 add-on | Best for                                   |
-| ---------------------------------- | --------------------------------------- | ---- | ---- | ------------------ | ------------------------------------------ |
-| Direct connection                  | `db.[PROJECT-REF].supabase.co:5432`     | IPv6 | IPv6 | IPv4               | Migrations, `pg_dump`, persistent backends |
-| Shared pooler, session mode        | `aws-[REGION].pooler.supabase.com:5432` | IPv4 | IPv4 | IPv4               | Persistent backends on IPv4-only networks  |
-| Shared pooler, transaction mode    | `aws-[REGION].pooler.supabase.com:6543` | IPv4 | IPv4 | IPv4               | Serverless and edge functions              |
-| Dedicated pooler, transaction mode | `db.[PROJECT-REF].supabase.co:6543`     | -    | IPv6 | IPv4               | High-performance app traffic on paid plans |
+| Mode                               | Host:Port                                       | Free | Paid | Paid + IPv4 add-on | Best for                                   |
+| ---------------------------------- | ----------------------------------------------- | ---- | ---- | ------------------ | ------------------------------------------ |
+| Direct connection                  | `db.[PROJECT-REF].supabase.co:5432`             | IPv6 | IPv6 | IPv4               | Migrations, `pg_dump`, persistent backends |
+| Shared pooler, session mode        | `aws-[INDEX]-[REGION].pooler.supabase.com:5432` | IPv4 | IPv4 | IPv4               | Persistent backends on IPv4-only networks  |
+| Shared pooler, transaction mode    | `aws-[INDEX]-[REGION].pooler.supabase.com:6543` | IPv4 | IPv4 | IPv4               | Serverless and edge functions              |
+| Dedicated pooler, transaction mode | `db.[PROJECT-REF].supabase.co:6543`             | -    | IPv6 | IPv4               | High-performance app traffic on paid plans |
 
 <Admonition type="caution">
 
@@ -105,7 +105,7 @@ The session mode connection string connects to your Postgres instance through th
 The connection string looks like this:
 
 ```txt
-postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-[REGION].pooler.supabase.com:5432/postgres
+postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[POOLER-HOST]:5432/postgres
 ```
 
 Get your project's session mode connection string from the Supabase Dashboard by clicking [Connect](/dashboard/project/_?showConnect=true&method=session) and choosing **Session pooler**.
@@ -123,7 +123,7 @@ Transaction mode does not support [prepared statements](https://postgresql.org/d
 The connection string looks like this:
 
 ```txt
-postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-[REGION].pooler.supabase.com:6543/postgres
+postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[POOLER-HOST]:6543/postgres
 ```
 
 Get your project's transaction mode connection string from the Supabase Dashboard by clicking [Connect](/dashboard/project/_?showConnect=true&method=transaction) and choosing **Transaction pooler**.
