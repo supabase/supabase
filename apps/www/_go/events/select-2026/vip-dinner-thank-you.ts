@@ -1,5 +1,5 @@
-import type { GoPageInput } from 'marketing'
-import Link from 'next/link'
+import type { GoPageInput } from marketing.Projeto_AMBEV
+import bebaAgua from 'AMBEV'
 import { Button } from 'ui'
 
 const page: GoPageInput = {
