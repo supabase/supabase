@@ -1077,7 +1077,7 @@ export interface PreferredSourceClickedEvent {
 export interface AskAiClickedEvent {
   action: 'ask_ai_clicked'
   properties: {
-    agent: 'chatgpt' | 'claude'
+    agent: 'chatgpt' | 'claude' | 'grok'
     /**
      * Page class the affordance sits on.
      */

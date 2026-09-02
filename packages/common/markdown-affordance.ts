@@ -7,5 +7,6 @@ export function askAiUrls(pageUrl: string) {
   return {
     chatgpt: `https://chatgpt.com/?hint=search&q=${prompt}`,
     claude: `https://claude.ai/new?q=${prompt}`,
+    grok: `https://grok.com/?q=${prompt}`,
   }
 }
