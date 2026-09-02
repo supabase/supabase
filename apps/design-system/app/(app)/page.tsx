@@ -1,4 +1,4 @@
-import { Auth, Database, Realtime } from 'icons/src/icons'
+import { Auth, Database, Realtime } from 'icons'
 import { Paintbrush } from 'lucide-react'
 import Link from 'next/link'
 

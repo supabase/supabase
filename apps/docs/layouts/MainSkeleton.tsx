@@ -324,11 +324,11 @@ const NavContainer = memo(function NavContainer({ children }: PropsWithChildren)
     >
       <div
         className={cn(
-          'top-0 lg:top-(--header-height)',
+          'top-0',
           'h-full',
-          'relative lg:sticky',
+          'relative',
           'w-full lg:w-auto',
-          'h-fit lg:h-screen overflow-y-scroll lg:overflow-auto',
+          'h-fit lg:h-full overflow-y-scroll lg:overflow-auto',
           'overscroll-contain',
           'backdrop-blur-sm backdrop-filter bg-background',
           'flex flex-col grow'

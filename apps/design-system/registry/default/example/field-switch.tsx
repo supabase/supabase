@@ -1,10 +1,4 @@
-import { Switch } from 'ui'
-import {
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldLabel,
-} from 'ui/src/components/shadcn/ui/field'
+import { Field, FieldContent, FieldDescription, FieldLabel, Switch } from 'ui'
 
 export default function FieldSwitch() {
   return (

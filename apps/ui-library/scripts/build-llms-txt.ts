@@ -81,14 +81,14 @@ let content = `# Supabase Library
 Last updated: ${new Date().toISOString()}
 
 ## Overview
-Library of components for your project. The components integrate with Supabase and are shadcn compatible.
+Library of components for your project. The components integrate with Supabase and are shadcn compatible. Each docs page is also available as markdown for agents (append .md to the URL).
 
 ## Docs
 `
 
 // Add documentation links
 for (const doc of docs) {
-  const url = `${BASE_URL}/${doc.path}`
+  const url = `${BASE_URL}/${doc.path}.md`
   content += `- [${doc.title}](${url})`
   if (doc.description) {
     content += `\n    - ${doc.description}`

@@ -84,6 +84,11 @@ const rewrites = [
     destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/.well-known/security.txt`,
   },
   {
+    // legacy AI Catalog path; /.well-known/ard.json is the canonical source
+    source: '/.well-known/ai-catalog.json',
+    destination: '/.well-known/ard.json',
+  },
+  {
     source: '/openapi.json',
     destination: 'https://api.supabase.com/api/v1-json',
   },

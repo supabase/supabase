@@ -1,8 +1,7 @@
-import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import type { Control, FieldPath, FieldValues } from 'react-hook-form'
-import { cn, FormControl, FormField, Input, Textarea } from 'ui'
+import { cn, FormControl, FormField, Input, InputVariants, Textarea } from 'ui'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
