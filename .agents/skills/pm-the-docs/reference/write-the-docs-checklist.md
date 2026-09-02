@@ -10,7 +10,7 @@ A practical six-stage checklist and quality standard for planning, drafting, and
 
 Six short stages. Keep it lightweight; the point is to make good docs the default, not to add ceremony.
 
-_Self-serve first ([agent skills](../../../apps/docs/CONTRIBUTING.md#ai-agent-skills-for-docs-authoring)), ask your docs team's PM as needed._
+_Self-serve first ([agent skills](../../../../apps/docs/CONTRIBUTING.md#ai-agent-skills-for-docs-authoring)), ask your docs team's PM as needed._
 
 ## What good looks like
 
@@ -79,4 +79,4 @@ _Skill:_ `/review-the-docs` to triage, classify, verify the build, and report.
 
 ## Resources
 
-Skills for this checklist: [AI agent skills for docs authoring](../../../apps/docs/CONTRIBUTING.md#ai-agent-skills-for-docs-authoring) (`/pm-the-docs`, `/ask-the-docs`, `/write-the-docs`, `/test-the-docs`, `/review-the-docs`).
+Skills for this checklist: [AI agent skills for docs authoring](../../../../apps/docs/CONTRIBUTING.md#ai-agent-skills-for-docs-authoring) (`/pm-the-docs`, `/ask-the-docs`, `/write-the-docs`, `/test-the-docs`, `/review-the-docs`).

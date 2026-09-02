@@ -2,6 +2,17 @@
 
 Docker-isolated local execution for `/test-the-docs`. Requires Docker daemon up, non-root execution, a temp workspace, and fail-closed behavior when the daemon is down. This skill uses Docker as the **local Supabase data plane** (`supabase start`), not as an act/GHA runner.
 
+## Threat model and guardrails
+
+`mktemp` isolates the **project directory** only. Snippet commands still run on the host with the agent's environment and Docker access. That is intentional for a docs verification skill that needs `supabase start` on the host Docker daemon. Do not treat this as a disposable VM without host mounts.
+
+Guardrails:
+
+- **Local only.** Use `127.0.0.1` / `localhost` stack URLs. Reject snippets that target hosted or production Supabase projects.
+- **No secrets in notes.** Never paste `JWT_SECRET`, `ANON_KEY`, `SERVICE_ROLE_KEY`, or other keys into the Verification table, PR body, or chat logs.
+- **Prefer page commands.** Run documented steps from the MDX under test; do not run unrelated host-destructive commands.
+- **Fail closed** when Docker/CLI prerequisites for that artifact class are missing (see skill Phase 4).
+
 ## Prerequisites (fail closed)
 
 ```bash
@@ -16,7 +27,7 @@ docker info >/dev/null 2>&1 || { echo "error: Docker is not running — start Do
 command -v supabase >/dev/null || { echo "error: supabase CLI not found" >&2; exit 1; }
 ```
 
-If any check fails during a docs review, mark affected snippets `deferred` with the failure reason. Do not pretend they passed.
+Require Docker + `supabase` CLI only for artifacts that need the local stack (`runnable-local` / `runnable-with-setup` with DB/API). `example-app` builds need Node/npm only. If a required check fails, mark **that** artifact `deferred` with the reason. Do not pretend it passed.
 
 ## Temp project + local stack
 
@@ -33,11 +44,14 @@ trap cleanup EXIT
 cd "$TMP"
 supabase init
 supabase start
-# Connection details:
-supabase status -o env
+
+# Capture URLs only — never log JWT_SECRET / ANON_KEY / SERVICE_ROLE_KEY
+eval "$(supabase status -o env | grep -E '^(API_URL|DB_URL|DATABASE_URL)=' )"
+# Or redact before any capture:
+# supabase status -o env | sed -E 's/((JWT_SECRET|ANON_KEY|SERVICE_ROLE_KEY)=).*/\1[REDACTED]/'
 ```
 
-Apply SQL or migrations from the doc in order. Use the local DB URL from `supabase status` for `psql` / client snippets.
+Apply SQL or migrations from the doc in order. Use the local DB/API URL from the filtered status output for `psql` / client snippets.
 
 ## CLI-only (no database)
 
@@ -47,7 +61,7 @@ When blocks are help text, flag checks, or non-DB shell:
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 cd "$TMP"
-# run commands here
+# run commands here (still subject to local-only + no-secrets guardrails)
 ```
 
 Do not start the stack unless the snippet needs it.

@@ -18,6 +18,8 @@ Paste into the PR body or self-review note under a **Verification** heading.
 **Environment:** Docker Desktop <version if known>; supabase CLI <version>; non-root user
 ```
 
+Do **not** put secrets (`JWT_SECRET`, `ANON_KEY`, `SERVICE_ROLE_KEY`, access tokens) in Notes or Environment.
+
 ## Results
 
 | Result | Meaning |

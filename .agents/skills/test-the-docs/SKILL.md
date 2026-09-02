@@ -66,18 +66,21 @@ Assign each artifact a class per [reference/snippet-classes.md](reference/snippe
 Follow [reference/sandbox-setup.md](reference/sandbox-setup.md):
 
 1. Refuse if running as root.
-2. Require `docker` + `docker info` and the `supabase` CLI.
-3. `TMP=$(mktemp -d)` → `supabase init` → `supabase start` when DB/API behavior is involved.
-4. CLI-only blocks with no DB: separate `mktemp -d` without starting the stack.
-5. Always `supabase stop` and remove the temp dir (cleanup trap).
+2. Gate prerequisites **per artifact class**:
+   - `runnable-local` / `runnable-with-setup` that need DB/API: require `docker` + `docker info` and the `supabase` CLI, then `TMP=$(mktemp -d)` → `supabase init` → `supabase start`.
+   - CLI-only blocks with no DB: separate `mktemp -d` without starting the stack (still local-only).
+   - `example-app`: require Node/npm only; do **not** defer solely because Docker or the CLI is missing.
+3. Always `supabase stop` and remove the temp dir when a stack was started (cleanup trap).
+4. Capture connection **URLs only**; never paste `JWT_SECRET`, `ANON_KEY`, or `SERVICE_ROLE_KEY` into notes or logs.
 
-If Docker or the CLI is unavailable, mark in-scope snippets `deferred` with that reason — never silent skip.
+If a **required** prerequisite for that artifact is unavailable, mark that artifact `deferred` with the specific reason — never silent skip, and do not defer unrelated classes.
 
 ### 5. Execute
 
 - **Tier A:** one copy-pasteable end-to-end path from the page.
-- **Tier B:** each new/changed block classified `runnable-*`.
-- Capture exit code, stdout/stderr, and observed vs expected behavior.
+- **Tier B:** each new/changed block classified `runnable-*` **or** `example-app` (build and record the result).
+- Bound every artifact: default **60s** for shell/SQL/JS; allow longer for `example-app` install/build (e.g. **5m**). On timeout, kill the process **group**, then record `fail` or `deferred` with reason.
+- Capture exit code, stdout/stderr (redact secrets), and observed vs expected behavior.
 
 ### 6. Report
 
