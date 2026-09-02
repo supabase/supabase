@@ -1155,6 +1155,52 @@ const EXTERNAL_PROVIDER_KAKAO = {
   },
 }
 
+const EXTERNAL_PROVIDER_LINE = {
+  $schema: JSON_SCHEMA_VERSION,
+  type: 'object',
+  title: 'LINE',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-line`,
+  properties: {
+    EXTERNAL_LINE_ENABLED: {
+      title: 'LINE enabled',
+      type: 'boolean',
+    },
+    EXTERNAL_LINE_CLIENT_ID: {
+      title: 'Channel ID',
+      type: 'string',
+    },
+    EXTERNAL_LINE_SECRET: {
+      title: 'Channel secret',
+      type: 'string',
+      isSecret: true,
+    },
+    EXTERNAL_LINE_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
+  },
+  validationSchema: z.discriminatedUnion('EXTERNAL_LINE_ENABLED', [
+    z.object({
+      EXTERNAL_LINE_ENABLED: z.literal(false),
+      EXTERNAL_LINE_CLIENT_ID: z.string().optional(),
+      EXTERNAL_LINE_SECRET: z.string().optional(),
+      EXTERNAL_LINE_EMAIL_OPTIONAL: z.boolean().optional(),
+    }),
+    z.object({
+      EXTERNAL_LINE_ENABLED: z.literal(true),
+      EXTERNAL_LINE_CLIENT_ID: z.string().min(1, 'Channel ID is required'),
+      EXTERNAL_LINE_SECRET: z.string().min(1, 'Channel secret is required'),
+      EXTERNAL_LINE_EMAIL_OPTIONAL: z.boolean().optional(),
+    }),
+  ]),
+  misc: {
+    iconKey: 'line-icon',
+    requiresRedirect: true,
+  },
+}
+
 // [TODO]: clarify the EXTERNAL_KEYCLOAK_URL property
 const EXTERNAL_PROVIDER_KEYCLOAK = {
   $schema: JSON_SCHEMA_VERSION,
@@ -1767,6 +1813,7 @@ export const PROVIDERS_SCHEMAS = [
   EXTERNAL_PROVIDER_GOOGLE,
   EXTERNAL_PROVIDER_KAKAO,
   EXTERNAL_PROVIDER_KEYCLOAK,
+  EXTERNAL_PROVIDER_LINE,
   EXTERNAL_PROVIDER_LINKEDIN_OIDC,
   EXTERNAL_PROVIDER_NOTION,
   EXTERNAL_PROVIDER_TWITCH,
