@@ -140,6 +140,7 @@ type QueryEditorProps = {
   onRowLimitChange?: (val: number) => void
   onDisplayChange?: (display: QueryDisplay) => void
   onRun?: () => void
+  onDebug?: (prompt: string) => void
 }
 
 /**
@@ -170,6 +171,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     onRowLimitChange,
     onDisplayChange,
     onRun,
+    onDebug,
   }: QueryEditorProps,
   ref
 ) {
@@ -609,6 +611,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
             chart={display?.chart}
             sql={result?.sql}
             source={result?.source}
+            onDebug={onDebug}
           />
         </ExplorerQueryResults>
 
