@@ -1,4 +1,5 @@
 import { screen, within } from '@testing-library/react'
+import { ReactFlowProvider } from '@xyflow/react'
 import { platformComponents as components } from 'api-types'
 import { http, HttpResponse } from 'msw'
 import { describe, expect, test, vi } from 'vitest'
@@ -125,5 +126,72 @@ describe('HaInstanceConfiguration', () => {
     customRender(<HaInstanceConfiguration />, { profileContext: PROFILE_CONTEXT })
 
     expect(await screen.findByText('Cluster topology unavailable')).toBeInTheDocument()
+  })
+
+  test('uses mock topology data without calling HA admin when simulating High Availability', async () => {
+    mockProject('ACTIVE_HEALTHY')
+    let haAdminRequests = 0
+    mswServer.use(
+      http.get(`${API_URL}/platform/projects/:ref/ha-admin/v1/gateways`, () => {
+        haAdminRequests += 1
+        return HttpResponse.json<APIErrorBody>({ message: 'upstream unavailable' }, { status: 500 })
+      }),
+      http.get(`${API_URL}/platform/projects/:ref/ha-admin/v1/poolers`, () => {
+        haAdminRequests += 1
+        return HttpResponse.json<APIErrorBody>({ message: 'upstream unavailable' }, { status: 500 })
+      })
+    )
+
+    customRender(
+      <ReactFlowProvider>
+        <HaInstanceConfiguration simulateHighAvailability />
+      </ReactFlowProvider>,
+      { profileContext: PROFILE_CONTEXT }
+    )
+
+    expect(await screen.findByText('Primary Database')).toBeInTheDocument()
+    expect(screen.getAllByText('Read Replica')).toHaveLength(2)
+    expect(screen.queryByText('Failed to retrieve cluster topology')).not.toBeInTheDocument()
+    expect(haAdminRequests).toBe(0)
+  })
+
+  test('shows the primary as unhealthy and a replica as promoting during the promoting step', async () => {
+    mockProject('ACTIVE_HEALTHY')
+
+    customRender(
+      <ReactFlowProvider>
+        <HaInstanceConfiguration simulateHighAvailability failoverPhase="promoting" />
+      </ReactFlowProvider>,
+      { profileContext: PROFILE_CONTEXT }
+    )
+
+    expect(await screen.findByText('Primary Database')).toBeInTheDocument()
+    expect(screen.getByText('Promoting')).toBeInTheDocument()
+    expect(screen.queryByText('Promoted')).not.toBeInTheDocument()
+    expect(
+      within(screen.getByText('Primary Database').parentElement!).getByText('Unhealthy')
+    ).toBeInTheDocument()
+  })
+
+  test('shows the primary as unhealthy and a replica as promoted and healthy during simulated failover', async () => {
+    mockProject('ACTIVE_HEALTHY')
+
+    customRender(
+      <ReactFlowProvider>
+        <HaInstanceConfiguration simulateHighAvailability failoverPhase="failover" />
+      </ReactFlowProvider>,
+      { profileContext: PROFILE_CONTEXT }
+    )
+
+    expect(await screen.findByText('Primary Database')).toBeInTheDocument()
+    expect(screen.getAllByText('Read Replica')).toHaveLength(2)
+    expect(screen.getAllByText('Healthy')).toHaveLength(2)
+    expect(screen.getByText('Unhealthy')).toBeInTheDocument()
+    expect(
+      within(screen.getByText('Primary Database').parentElement!).getByText('Unhealthy')
+    ).toBeInTheDocument()
+    expect(
+      within(screen.getByText('Promoted').parentElement!).getByText('Healthy')
+    ).toBeInTheDocument()
   })
 })

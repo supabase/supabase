@@ -1,20 +1,29 @@
 import Link from 'next/link'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { InstanceConfiguration } from '../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
 import { ActivityStats } from '@/components/interfaces/ProjectHome/ActivityStats'
 import { ProjectConnectionPopover } from '@/components/interfaces/ProjectHome/ProjectConnectionPopover'
+import { useSimulatedFailover } from '@/components/interfaces/ProjectHome/useSimulatedFailover'
 import { ProjectPausedState } from '@/components/layouts/ProjectLayout/PausedState/ProjectPausedState'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { ProjectUpgradeFailedBanner } from '@/components/ui/ProjectUpgradeFailedBanner'
 import { useBranchesQuery } from '@/data/branches/branches-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL, IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
 
 export const TopSection = () => {
   const isOrioleDb = useIsOrioleDb()
+  const { isHighAvailability: isProjectHighAvailability } = useHighAvailability()
+  const [simulateHighAvailability] = useQueryState(
+    'simulateHighAvailability',
+    parseAsBoolean.withDefault(false)
+  )
+  const [simulateFailover] = useQueryState('simulateFailover', parseAsBoolean.withDefault(false))
   const { data: project, isLoading } = useSelectedProjectQuery()
   const { data: parentProject } = useProjectDetailQuery({ ref: project?.parent_project_ref })
 
@@ -27,6 +36,8 @@ export const TopSection = () => {
   const isMainBranch = currentBranch?.name === mainBranch?.name
 
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
+  const isHighAvailability = isProjectHighAvailability || simulateHighAvailability
+  const failoverPhase = useSimulatedFailover(isHighAvailability && simulateFailover)
   const projectName =
     currentBranch && !isMainBranch
       ? currentBranch.name
@@ -84,7 +95,10 @@ export const TopSection = () => {
           </div>
           {IS_PLATFORM && (
             <div className="mt-8">
-              <ActivityStats />
+              <ActivityStats
+                isHighAvailabilityOverride={isHighAvailability}
+                failoverPhase={failoverPhase}
+              />
             </div>
           )}
         </div>
@@ -95,7 +109,10 @@ export const TopSection = () => {
                 'w-full h-[400px] md:h-[500px] border border-muted rounded-md overflow-hidden flex flex-col relative'
               )}
             >
-              <InstanceConfiguration />
+              <InstanceConfiguration
+                simulateHighAvailability={simulateHighAvailability}
+                failoverPhase={failoverPhase}
+              />
             </div>
           </div>
         )}

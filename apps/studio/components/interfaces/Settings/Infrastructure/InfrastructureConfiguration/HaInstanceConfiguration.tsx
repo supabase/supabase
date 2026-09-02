@@ -6,13 +6,19 @@ import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { DiagramFlow } from './DiagramFlow'
 import { addShardNodes, generateHaNodesAndEdges } from './HaInstanceConfiguration.utils'
+import { HaFailoverEdge } from './HaInstanceEdge'
 import { HaPrimaryNode, HaReplicaNode, HaShardNode, MultigatewayNode } from './HaInstanceNode'
 import { buildHaTopology, selectTopologyPoolers } from './HaTopology.utils'
 import { HA_RANKSEP } from './InstanceConfiguration.constants'
+import type { FailoverSimulationPhase } from '@/components/interfaces/ProjectHome/simulateFailover.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { HighAvailabilityDisabledEmptyState } from '@/components/ui/HighAvailability/HighAvailabilityDisabledEmptyState'
 import { haClusterGatewaysQueryOptions } from '@/data/ha-admin/ha-cluster-gateways-query'
-import { haClusterPoolersQueryOptions } from '@/data/ha-admin/ha-cluster-poolers-query'
+import type { Multigateway } from '@/data/ha-admin/ha-cluster-gateways-query'
+import {
+  haClusterPoolersQueryOptions,
+  type Multipooler,
+} from '@/data/ha-admin/ha-cluster-poolers-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 
@@ -23,8 +29,8 @@ const nodeTypes = {
   HA_SHARD: HaShardNode,
 }
 
-// The gateway and replication edges both use React Flow's built-in smoothstep.
-const edgeTypes = {}
+const edgeTypes = { failover: HaFailoverEdge }
+const fitViewPadding = { top: '48px', right: '16px', bottom: '16px', left: '16px' } as const
 
 const POOLER_STATUS_REFRESH_MS = 30_000
 
@@ -33,48 +39,99 @@ const POOLER_STATUS_REFRESH_MS = 30_000
  * gateway tier → shard group → primary + read replicas, driven by the
  * read-only multiadmin `/ha-admin` passthrough.
  */
-export const HaInstanceConfiguration = () => {
+export const HaInstanceConfiguration = ({
+  simulateHighAvailability = false,
+  failoverPhase = 'off',
+}: {
+  simulateHighAvailability?: boolean
+  failoverPhase?: FailoverSimulationPhase
+}) => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
   const isProjectBuilding =
     project?.status === PROJECT_STATUS.COMING_UP || project?.status === PROJECT_STATUS.UNKNOWN
 
+  const simulatedTopology = useMemo(() => {
+    const region = project?.region ?? 'us-east-1'
+    const shardKey = { database: 'postgres', tableGroup: 'default', shard: '0-inf' }
+
+    return {
+      gateways: [
+        { id: { cell: `${region}a`, name: 'simulated-gateway' } },
+      ] satisfies Multigateway[],
+      poolers: [
+        {
+          id: { cell: `${region}a`, name: 'simulated-primary' },
+          shardKey,
+          routingState: { role: 'ROUTING_ROLE_PRIMARY' },
+          type: 'PRIMARY',
+        },
+        {
+          id: { cell: `${region}b`, name: 'simulated-replica' },
+          shardKey,
+          routingState: { role: 'ROUTING_ROLE_REPLICA' },
+          type: 'REPLICA',
+        },
+        {
+          id: { cell: `${region}c`, name: 'simulated-replica-2' },
+          shardKey,
+          routingState: { role: 'ROUTING_ROLE_REPLICA' },
+          type: 'REPLICA',
+        },
+      ] satisfies Multipooler[],
+    }
+  }, [project?.region])
+
+  const gatewaysQueryOptions = haClusterGatewaysQueryOptions({ projectRef })
+  const poolersQueryOptions = haClusterPoolersQueryOptions({ projectRef })
+
   // Gateways poll on the same interval as poolers so the gateway count and
   // gateway→primary edge track cluster changes while the page stays open.
   const {
-    data: gatewaysData,
+    data: queriedGatewaysData,
     error: gatewaysError,
     isPending: isPendingGateways,
     isError: isErrorGateways,
   } = useQuery({
-    ...haClusterGatewaysQueryOptions({ projectRef }),
+    ...gatewaysQueryOptions,
+    enabled: !simulateHighAvailability && gatewaysQueryOptions.enabled,
     refetchInterval: POOLER_STATUS_REFRESH_MS,
   })
 
   const {
-    data: poolers,
+    data: queriedPoolers,
     error: poolersError,
     isPending: isPendingPoolers,
     isError: isErrorPoolers,
   } = useQuery({
-    ...haClusterPoolersQueryOptions({ projectRef }),
+    ...poolersQueryOptions,
+    enabled: !simulateHighAvailability && poolersQueryOptions.enabled,
     refetchInterval: POOLER_STATUS_REFRESH_MS,
     select: selectTopologyPoolers,
   })
 
-  const gateways = gatewaysData?.gateways
+  const gateways = simulateHighAvailability
+    ? simulatedTopology.gateways
+    : queriedGatewaysData?.gateways
+  const poolers = simulateHighAvailability ? simulatedTopology.poolers : queriedPoolers
+  const failoverLayoutPhase =
+    failoverPhase === 'promoting' || failoverPhase === 'failover' ? failoverPhase : undefined
 
-  const { nodes, edges } = useMemo(
+  const { nodes, edges, layoutEdges } = useMemo(
     () =>
       generateHaNodesAndEdges(
-        buildHaTopology({ gateways: gateways ?? [], poolers: poolers ?? [] })
+        buildHaTopology({
+          gateways: gateways ?? [],
+          poolers: poolers ?? [],
+        }),
+        { isSimulated: simulateHighAvailability, failoverPhase: failoverLayoutPhase }
       ),
-    [gateways, poolers]
+    [failoverLayoutPhase, gateways, poolers, simulateHighAvailability]
   )
 
-  const isPending = isPendingGateways || isPendingPoolers
-  const isError = isErrorGateways || isErrorPoolers
+  const isPending = !simulateHighAvailability && (isPendingGateways || isPendingPoolers)
+  const isError = !simulateHighAvailability && (isErrorGateways || isErrorPoolers)
   const error = gatewaysError ?? poolersError
 
   // While the project is provisioning, the /ha-admin endpoints fail or return an
@@ -139,10 +196,12 @@ export const HaInstanceConfiguration = () => {
       <DiagramFlow
         nodes={nodes}
         edges={edges}
+        layoutEdges={layoutEdges}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         addGroupNodes={addShardNodes}
         ranksep={HA_RANKSEP}
+        fitViewPadding={fitViewPadding}
       />
     </div>
   )
