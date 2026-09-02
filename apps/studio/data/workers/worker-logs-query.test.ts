@@ -1,11 +1,18 @@
 import { describe, expect, it } from 'vitest'
 
+import { workersKeys } from './keys'
 import { parseWorkerLogRows, workerLogsSql } from './worker-logs-query'
 
 describe('workerLogsSql', () => {
   it('reads one worker stream, newest first', () => {
     expect(workerLogsSql('embed', 'output')).toBe(
       "select id, timestamp, severity_text as severity, event_message as message from logs where log_attributes['worker'] = 'embed' and log_attributes['source'] = 'worker_guest_logs' order by timestamp desc limit 100"
+    )
+  })
+
+  it('filters by event message and request method before applying the limit', () => {
+    expect(workerLogsSql('embed', 'requests', { message: 'timeout', method: 'POST' })).toBe(
+      "select id, timestamp, severity_text as severity, event_message as message from logs where log_attributes['worker'] = 'embed' and log_attributes['source'] = 'worker_ingress_logs' and event_message ilike '%timeout%' and log_attributes['request.method'] = 'POST' order by timestamp desc limit 100"
     )
   })
 
@@ -18,6 +25,43 @@ describe('workerLogsSql', () => {
     expect(workerLogsSql("embed' or '1'='1", 'output')).toContain(
       "log_attributes['worker'] = 'embed'' or ''1''=''1'"
     )
+  })
+
+  it('escapes filter values rather than interpolating them raw', () => {
+    expect(
+      workerLogsSql('embed', 'requests', {
+        message: "can't connect",
+        method: "POST' OR '1'='1",
+      })
+    ).toContain(
+      "event_message ilike '%can''t connect%' and log_attributes['request.method'] = 'POST'' OR ''1''=''1'"
+    )
+  })
+})
+
+describe('workersKeys.logs', () => {
+  it('includes the selected time range and filters', () => {
+    expect(
+      workersKeys.logs('project-ref', 'embed', 'requests', {
+        iso_timestamp_start: '2026-09-01T12:00:00.000Z',
+        iso_timestamp_end: '2026-09-02T12:00:00.000Z',
+        message: 'timeout',
+        method: 'POST',
+      })
+    ).toEqual([
+      'projects',
+      'project-ref',
+      'worker',
+      'embed',
+      'logs',
+      'requests',
+      {
+        iso_timestamp_start: '2026-09-01T12:00:00.000Z',
+        iso_timestamp_end: '2026-09-02T12:00:00.000Z',
+        message: 'timeout',
+        method: 'POST',
+      },
+    ])
   })
 })
 
