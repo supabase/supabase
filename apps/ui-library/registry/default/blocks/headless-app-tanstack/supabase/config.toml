@@ -1,0 +1,61 @@
+# Supabase configuration for a headless app: password auth for the product
+# session, an OAuth 2.1 server for external agents, and the MCP server that both
+# call. Values below are for local development — run `supabase config push` to
+# apply the same settings to a linked project.
+
+project_id = "headless-app"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+# Used to diff ./schemas into a migration.
+shadow_port = 54320
+major_version = 17
+
+# One directory per schema, then one file per object, in dependency order.
+[db.migrations]
+schema_paths = [
+    "./schemas/*/tables/*.sql",
+    "./schemas/*/views/*.sql",
+    "./schemas/*/functions/*.sql",
+]
+
+[studio]
+enabled = true
+port = 54323
+
+[inbucket]
+enabled = true
+port = 54324
+
+[auth]
+enabled = true
+# Origin that serves this app, including /oauth/consent. Use HTTPS in production.
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/**"]
+jwt_expiry = 3600
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+# Confirmations are off so local sign-ups can reach the app immediately.
+enable_confirmations = false
+
+# External MCP clients authorize here. Auth sends the user to
+# authorization_url_path, which the OAuth Consent block serves.
+[auth.oauth_server]
+enabled = true
+authorization_url_path = "/oauth/consent"
+# Lets any compatible client register itself. Set to false to register clients
+# yourself.
+allow_dynamic_registration = true
+
+# The MCP server verifies user access tokens itself, so skip the gateway check.
+[functions.mcp-server]
+verify_jwt = false

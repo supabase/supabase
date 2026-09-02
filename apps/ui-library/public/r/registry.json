@@ -1791,6 +1791,60 @@
       ]
     },
     {
+      "name": "headless-app-tanstack",
+      "type": "registry:block",
+      "title": "Headless App for TanStack Start",
+      "description": "Give your agents a backend: sign-in, OAuth consent, an MCP server, and a page to connect and revoke agents.",
+      "docs": "Set `site_url` in `supabase/config.toml` to the origin serving your app, and `PRODUCT_NAME` in `routes/_protected/agents.tsx`. Change the database by editing `supabase/schemas/public/tables/tasks.sql` and running `supabase db diff -f <name>`; add tools in `supabase/functions/mcp-server/tools/`. Deploy with `supabase db push`, `supabase config push`, and `supabase functions deploy mcp-server`, then sign in and open `/agents` to connect an agent.\n\nYou'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
+      "registryDependencies": [
+        "button",
+        "https://supabase.com/library/r/password-based-auth-tanstack.json",
+        "https://supabase.com/library/r/oauth-consent-tanstack.json",
+        "https://supabase.com/library/r/mcp-server.json"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/headless-app-tanstack/routes/_protected/agents.tsx",
+          "type": "registry:file",
+          "target": "routes/_protected/agents.tsx"
+        },
+        {
+          "path": "registry/default/blocks/headless-app-tanstack/components/connected-agents.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/headless-app-tanstack/hooks/use-oauth-grants.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/headless-app-tanstack/supabase/config.toml",
+          "type": "registry:file",
+          "target": "supabase/config.toml"
+        },
+        {
+          "path": "registry/default/blocks/headless-app-tanstack/supabase/schemas/public/tables/tasks.sql",
+          "type": "registry:file",
+          "target": "supabase/schemas/public/tables/tasks.sql"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
+      }
+    },
+    {
       "name": "oauth-consent-nextjs",
       "type": "registry:block",
       "title": "OAuth Consent for Next.js",

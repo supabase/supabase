@@ -1,0 +1,114 @@
+---
+title: Headless App
+description: Give your agents a backend
+---
+
+A headless app has no interface of its own. Users sign in once, connect their
+agent, and everything after that happens through MCP tool calls from whatever
+harness they use, like Claude Code, Codex, or ChatGPT. This block is the whole
+app: sign-in, the consent screen agents are sent to, the MCP server they call,
+and a page to connect and revoke them.
+
+Postgres carries the rules. Write them once as RLS policies, triggers, and
+constraints, and every agent call inherits them. The MCP server passes the
+user's own access token through to the database, so an agent acts as that user
+and cannot reach past what they are allowed to see.
+
+<BlockPreview name="headless-app" />
+
+## Installation
+
+<BlockItem name="headless-app-tanstack" showOpenInV0={false} />
+
+It installs the [Password-Based Auth](/library/docs/tanstack/password-based-auth),
+[OAuth Consent](/library/docs/tanstack/oauth-consent), and
+[MCP Server](/library/docs/headless/mcp-server) blocks, along with a complete
+`supabase/config.toml`.
+
+## Folder structure
+
+<RegistryBlock itemName="headless-app-tanstack" />
+
+## Set up
+
+1. Add your project's URL and key to `.env.local`:
+
+   ```env
+   VITE_SUPABASE_URL=
+   VITE_SUPABASE_PUBLISHABLE_KEY=
+   ```
+
+   Find them in the [Connect modal](https://supabase.com/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=react&using=vite&with=supabasejs),
+   or run `supabase status` against a local stack.
+
+2. Name your product. Set `PRODUCT_NAME` in `routes/_protected/agents.tsx` and
+   the `productName` prop in `routes/oauth/consent.tsx`.
+
+3. Set `site_url` in `supabase/config.toml` to the origin serving your app. Auth
+   sends users there to approve an agent, so it has to match.
+
+4. Start everything:
+
+   ```bash
+   supabase start
+   supabase functions serve mcp-server --env-file supabase/functions/.env
+   npm run dev
+   ```
+
+5. Sign up, open `/agents`, and paste the prompt into an agent. It registers
+   itself, sends you to `/oauth/consent`, and appears in the list once approved.
+
+## Shape the backend
+
+`supabase/schemas/` holds the database as declarative SQL. Edit these files to
+define whatever you want agents working within: tables, policies, triggers,
+functions. Then generate and apply the migration.
+
+```bash
+supabase db diff -f add_task_due_date
+supabase db reset
+```
+
+The included `public/tables/tasks.sql` declares a `tasks` table with Row Level
+Security, so each user reaches only their own rows. Add new objects beside it,
+one file per object. Make every change here rather than in Studio or the SQL
+editor, since the diff reads these files and not the live database.
+
+## Add tools
+
+Out of the box the server exposes one tool, `whoami`. Add the rest in
+`supabase/functions/mcp-server/tools/`. Each tool runs as the signed-in user, so
+the policies in your schema decide what an agent can reach. See the
+[MCP Server block](/library/docs/headless/mcp-server) for the tool template.
+
+## Deploy
+
+There are two things to deploy. First the Supabase project:
+
+```bash
+supabase link
+supabase db push
+supabase config push
+supabase functions deploy mcp-server
+```
+
+Then the app. Push it to Git and import the repository into
+[Vercel](https://vercel.com/new), which detects TanStack Start without extra
+build configuration, and add `VITE_SUPABASE_URL` and
+`VITE_SUPABASE_PUBLISHABLE_KEY` as environment variables. See
+[Vercel's TanStack Start guide](https://vercel.com/docs/frameworks/full-stack/tanstack-start)
+for the Nitro plugin your `vite.config.ts` needs.
+
+Finish by setting the Auth **Site URL** to your deployed domain, so agents land
+on the deployed consent screen.
+
+Your project must sign JWTs with an asymmetric key. On the legacy HS256 secret,
+clients that request the `openid` scope fail. Switch to ES256 or RS256 in
+[JWT Keys](https://supabase.com/dashboard/project/_/settings/jwt).
+
+## Further reading
+
+- [MCP Server block](/library/docs/headless/mcp-server)
+- [OAuth Consent block](/library/docs/tanstack/oauth-consent)
+- [MCP authentication](https://supabase.com/docs/guides/auth/oauth-server/mcp-authentication)
+- [Token security and RLS](https://supabase.com/docs/guides/auth/oauth-server/token-security)
