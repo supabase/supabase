@@ -2,7 +2,7 @@
 
 Cross-repo product search for Frame/Shape when a feature may span services. Use during `/pm-the-docs`, not `/ask-the-docs` (`ask-the-docs` stays on `apps/docs` architecture).
 
-**Cross-repo confirmation is required for everyone.** [`supabase/universe`](https://github.com/supabase/universe) is an optional accelerator for people who can access that private meta-repo (typically Supabase org members with a local clone). Open-source contributors without access use the OSS path below — that is a successful outcome, not a failure.
+**Cross-repo confirmation is required for everyone.** [`supabase/universe`](https://github.com/supabase/universe) is an optional accelerator when you have Supabase org access to that private meta-repo (and ideally a local clone). Contributors without that access use the OSS path below — that is a successful outcome, not a failure.
 
 ## Capability gate
 
@@ -18,7 +18,7 @@ flowchart TD
   start --> clone
   clone -->|yes| useUniverse
   clone -->|no| ghApi
-  ghApi -->|yes org access| useUniverse
+  ghApi -->|yes Supabase org access| useUniverse
   ghApi -->|no 404/403| ossPath
 ```
 
