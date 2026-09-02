@@ -3,7 +3,7 @@
 import { Check, Copy } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { Button_Shadcn_ } from 'ui'
+import { Button } from 'ui'
 
 import {
   buildBlockInstallPrompt,
@@ -36,20 +36,19 @@ export function BlockInstallPromptButton({
   }, [copied])
 
   return (
-    <Button_Shadcn_
-      variant="default"
-      size="sm"
-      className="h-7 gap-1 rounded-lg px-3 text-xs shadow-none"
+    <Button
+      variant="primary"
+      size="tiny"
+      icon={copied ? <Check /> : <Copy />}
       onClick={() => {
         navigator.clipboard.writeText(prompt)
         setCopied(true)
       }}
     >
-      {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
       {copied ? 'Copied prompt' : 'Copy prompt'}
       <span className="sr-only" role="status">
         {copied ? 'Agent install prompt copied' : ''}
       </span>
-    </Button_Shadcn_>
+    </Button>
   )
 }
