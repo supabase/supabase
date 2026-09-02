@@ -10,68 +10,81 @@ Mandatory Instructions for Supabase Declarative Schema Management
 
 ## 1. **Exclusive Use of Declarative Schema**
 
--**All database schema modifications must be defined within `.sql` files located in the `supabase/schemas/` directory. -**Do not\*\* create or modify files directly in the `supabase/migrations/` directory unless the modification is about the known caveats below. Migration files are to be generated automatically through the CLI.
+- **All database schema modifications must be defined within `.sql` files located in the `supabase/schemas/` directory**
+- **Do not** create or modify files directly in the `supabase/migrations/` directory unless the change falls under the known caveats below. Generate migration files through the CLI instead
+- **Do not** modify the database directly through Studio, the SQL editor, or `psql`. The schema files are the source of truth. Direct database changes are invisible to the diff and are silently dropped
 
-## 2. **Schema Declaration**
+## 2. **Prerequisites**
 
--For each database entity (e.g., tables, views, functions), create or update a corresponding `.sql` file in the `supabase/schemas/` directory
--Ensure that each `.sql` file accurately represents the desired final state of the entity
-
-## 3. **Migration Generation**
-
-- Before generating migrations, **stop the local Supabase development environment**
-  ```bash
-  supabase stop
+- The declarative workflow requires the `pg-delta` diff engine. Ensure `supabase/config.toml` contains:
+  ```toml
+  [experimental.pgdelta]
+  enabled = true
   ```
-- Generate migration files by diffing the declared schema against the current database state
+- Projects created with a recent `supabase init` have this enabled by default. On older projects, add the section above before generating migrations. Alternatively, pass the `--experimental` flag for a single command run
+
+## 3. **Schema Declaration**
+
+- For each database entity (e.g., tables, views, functions), create or update a corresponding `.sql` file in the `supabase/schemas/` directory
+- Ensure that each `.sql` file accurately represents the desired final state of the entity
+
+## 4. **Migration Generation**
+
+- After editing files in `supabase/schemas/`, generate and apply a migration in one step:
   ```bash
-  supabase db diff -f <migration_name>
+  supabase db schema declarative sync -f <migration_name>
   ```
   Replace `<migration_name>` with a descriptive name for the migration
+- The command offers to apply the generated migration to the local database. Pass `--no-apply` to only generate the file, or `--apply` (or the global `--yes`) to apply it without prompting
+- **Do not** run `supabase stop` first. The local stack can stay running because `sync` compares your schema files against your migration history, not the live database
+- **Do not** use `supabase db diff` to generate migrations from schema files. It diffs a live database against your migrations and never uses `supabase/schemas/` as its baseline
+- Review every generated migration file before committing it
 
-## 4. **Schema File Organization**
+## 5. **Schema File Organization**
 
-- Schema files are executed in lexicographic order. To manage dependencies (e.g., foreign keys), name files to ensure correct execution order
+- File names and directory layout are for readability only. The engine analyzes dependencies between statements (foreign keys, views over tables, functions used by triggers) and orders them automatically. Do not rely on lexicographic file ordering to manage dependencies
 - When adding new columns, append them to the end of the table definition to prevent unnecessary diffs
+- Reserve the `supabase/schemas/_custom/` directory for hand-authored SQL covering object kinds the engine does not track (see known caveats). Create the directory yourself. The CLI never creates, overwrites, or prunes it
 
-## 5. **Rollback Procedures**
+## 6. **Rollback Procedures**
 
-- To revert changes
-  - Manually update the relevant `.sql` files in `supabase/schemas/` to reflect the desired state
-  - Generate a new migration file capturing the rollback
-    ```bash
-    supabase db diff -f <rollback_migration_name>
-    ```
-  - Review the generated migration file carefully to avoid unintentional data loss
+- To revert a change that has **not** been deployed, reset the local database to a previous migration version, then edit the schema files and regenerate a single migration:
+  ```bash
+  supabase db reset --version <timestamp>
+  supabase db schema declarative sync -f <migration_name>
+  ```
+- To revert a change that **has** been deployed, first update the relevant `.sql` files in `supabase/schemas/` to reflect the desired state, then generate a new forward migration:
+  ```bash
+  supabase db schema declarative sync -f <rollback_migration_name>
+  ```
+- Review the generated migration file carefully to avoid unintentional data loss. Down migrations are usually destructive
 
-## 6. **Known caveats**
+## 7. **Known caveats**
 
-The migra diff tool used for generating schema diff is capable of tracking most database changes. However, there are edge cases where it can fail.
-
-If you need to use any of the entities below, remember to add them through versioned migrations instead.
+Schema diffs are generated by the `pg-delta` engine, which models most database entities, including tables, views, materialized views, functions, triggers, RLS policies, grants, comments, domains, partitions, and publications. The cases below are not captured.
 
 ### Data manipulation language
 
-- DML statements such as insert, update, delete, etc., are not captured by schema diff
+- DML statements such as `insert`, `update`, and `delete` are never captured by a schema diff. This includes storage buckets, which are rows in `storage.buckets`, not schema objects
+- A DML statement inside a declarative schema file is an error. Keep data changes in seed files or hand-written versioned migrations
 
-### View ownership
+### Untracked object kinds
 
-- view owner and grants
-- security invoker on views
-- materialized views
-- doesn’t recreate views when altering column type
+- The engine does not track: casts, operators, operator classes and families, text search configurations, dictionaries, parsers, and templates, statistics objects, languages, transforms, and parameter ACLs. The engine reports them as warnings instead of silently dropping them
+- To use these objects, put their SQL in the reserved `supabase/schemas/_custom/` directory so dependent objects still resolve, and deliver the change itself through a versioned migration. That migration must sort before the generated migration that depends on the object, or `db reset` and later `sync` runs fail
+- Exception: manage parameter ACLs through versioned migrations only. Do not put them in `_custom/`
 
-### RLS policies
+### Supabase-managed schemas
 
-- alter policy statements
-- column privileges
-- Other entities#
-- schema privileges are not tracked because each schema is diffed separately
-- comments are not tracked
-- partitions are not tracked
-- alter publication ... add table ...
-- create domain statements are ignored
-- grant statements are duplicated from default privileges
+- Platform objects in Supabase-managed schemas (such as `auth` and `storage`) are excluded from diffs, but your own customizations on top of them are captured, such as triggers on managed tables and RLS policies on `storage.objects`, `storage.buckets`, and `realtime.messages`. Other objects you create inside these schemas, such as your own functions or indexes, are not diffed. Manage those through versioned migrations
+
+### Extension-managed objects
+
+- Objects that extensions create and manage, such as partitions maintained by `pg_partman` and queue tables created by `pgmq`, are never emitted as raw `create table` or `drop table` statements. Changes to them appear as calls to the extension's own API (for example `select pgmq.drop_queue('q');`), and the CLI flags those as destructive. Create and change these objects through the extension's own functions and review any generated API calls
+
+### Legacy `migra` engine
+
+- If `[experimental.pgdelta]` is not enabled, the project falls back to the legacy `migra`-based workflow (`supabase stop`, then `supabase db diff -f <migration_name>`), which has additional limitations around view owners and grants, security invoker on views, `alter policy`, column privileges, comments, publication membership, roles, and domains. Enable `pg-delta` instead of following that flow
 
 ---
 

@@ -200,6 +200,16 @@ You should now see the `employees` table, along with your seed data in the Dashb
 
 This workflow is great if you know SQL and are comfortable creating tables and columns. If not, you can still use the Dashboard to create tables and columns, and then use the CLI to diff your changes and create migrations.
 
+The SQL that `db diff` generates depends on your project's diff engine.
+
+<$Partial path="diff_engine_check.mdx" />
+
+<Admonition type="note">
+
+If you'd rather declare the state you want your database to be in and have migrations generated for you, manage your schema declaratively instead. Edit files in `supabase/schemas/` and generate migrations with `supabase db schema declarative sync`. Don't use `db diff` to generate migrations from declarative files, because it never uses `supabase/schemas/` as its baseline. See [Declarative database schemas](/docs/guides/local-development/declarative-database-schemas).
+
+</Admonition>
+
 <Admonition type="caution">
 
 Only use the Dashboard to make schema changes on your **local** database, then capture them with `supabase db diff`. Making schema changes directly on your **remote** database (via the SQL editor or Table Editor) bypasses the migration history and will cause `db push` to fail with sync errors. Once you're using migrations, all schema changes to your remote database should go through migration files only.
@@ -472,6 +482,19 @@ supabase db pull
 ```
 
 This creates a new migration file capturing the current remote schema. Commit it to git, then follow the standard workflow going forward.
+
+What `db pull` captures in managed schemas depends on your project's diff engine.
+
+<$Partial path="diff_engine_check.mdx" />
+
+On `pg-delta`, a plain `supabase db pull` captures your customizations automatically, such as triggers on `auth.users` or RLS policies on `storage.objects`. On the legacy `migra` engine, a plain `db pull` also diffs trigger and RLS policy changes in those schemas. Recent CLI versions include them in the initial `pg_dump` baseline as well. Older CLI versions excluded `auth` and `storage` from the baseline and printed a message saying so. If you see that message, capture existing customizations once with explicit pulls:
+
+```bash name=Terminal
+supabase db pull --schema auth
+supabase db pull --schema storage
+```
+
+See [Diff engines](/docs/guides/local-development/diff-engines) for what each engine captures in managed schemas.
 
 ### Step 3: If the migration history table is wrong
 
