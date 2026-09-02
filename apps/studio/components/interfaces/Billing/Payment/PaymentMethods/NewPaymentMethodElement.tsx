@@ -75,6 +75,7 @@ export type PaymentMethodElementRef = {
         address: CustomerAddress | null
         customerName: string | null
         taxId: CustomerTaxId | null
+        isNewPaymentMethod: boolean
       }
     | undefined
   >
@@ -207,6 +208,7 @@ export const NewPaymentMethodElement = forwardRef(
         },
         customerName: addressElement.value.name,
         taxId: getConfiguredTaxId(),
+        isNewPaymentMethod: true,
       }
     }
 
