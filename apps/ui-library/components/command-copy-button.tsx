@@ -6,13 +6,7 @@ import { Button_Shadcn_ } from 'ui'
 
 import { useSendTelemetryEvent } from '@/lib/telemetry'
 
-export function CommandCopyButton({
-  command,
-  telemetryCommand = command,
-}: {
-  command: string
-  telemetryCommand?: string
-}) {
+export function CommandCopyButton({ command }: { command: string }) {
   const [copied, setCopied] = useState(false)
   const sendTelemetryEvent = useSendTelemetryEvent()
 
@@ -57,7 +51,7 @@ export function CommandCopyButton({
         setCopied(true)
 
         // Parse command and send telemetry event
-        const { framework, packageManager, title } = parseCommandForTelemetry(telemetryCommand)
+        const { framework, packageManager, title } = parseCommandForTelemetry(command)
 
         sendTelemetryEvent({
           action: 'supabase_ui_command_copy_button_clicked',
@@ -69,8 +63,12 @@ export function CommandCopyButton({
           },
         })
       }}
+      aria-label="Copy install command"
     >
       {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+      <span className="sr-only" role="status">
+        {copied ? 'Install command copied' : ''}
+      </span>
     </Button_Shadcn_>
   )
 }

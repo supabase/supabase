@@ -1,17 +1,11 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { usePathname } from 'next/navigation'
-import { cn, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 
 import { CommandCopyButton } from './command-copy-button'
 import { useLocalStorage } from './use-local-storage'
-import {
-  buildBlockInstallPrompt,
-  getInstallCommands,
-  getMarkdownPageUrl,
-  type PackageManager,
-} from '@/lib/install-command'
+import { getInstallCommands, type PackageManager } from '@/lib/install-command'
 
 interface CommandCopyProps {
   name: string
@@ -20,30 +14,15 @@ interface CommandCopyProps {
   framework?: 'react' | 'vue'
 }
 
-type InstallationTab = 'prompt' | PackageManager
-
-const LOCAL_STORAGE_KEY = 'installation-command-tab'
-const PACKAGE_MANAGERS: PackageManager[] = ['npm', 'pnpm', 'yarn', 'bun']
+const LOCAL_STORAGE_KEY = 'package-manager-copy-command'
 
 export function Command({ name, highlight, framework = 'react' }: CommandCopyProps) {
-  const pathname = usePathname()
-  const [value, setValue] = useLocalStorage<InstallationTab>(LOCAL_STORAGE_KEY, 'prompt')
+  const [value, setValue] = useLocalStorage(LOCAL_STORAGE_KEY, 'npm')
 
   const commands = getInstallCommands(name, { framework })
-  const prompt = buildBlockInstallPrompt({
-    pageUrl: getMarkdownPageUrl(pathname ?? ''),
-    name,
-    installCommand: commands.npm,
-  })
-  const tabs: InstallationTab[] = ['prompt', ...PACKAGE_MANAGERS]
-  const activeTab = tabs.includes(value) ? value : 'prompt'
 
   return (
-    <Tabs
-      value={activeTab}
-      onValueChange={(tab) => setValue(tab as InstallationTab)}
-      className="w-full"
-    >
+    <Tabs value={value} onValueChange={setValue} className="w-full">
       <div className="w-full group relative rounded-lg bg-surface-200 dark:bg-surface-100 px-4 py-2 overflow-hidden">
         {highlight && (
           <motion.div
@@ -61,39 +40,26 @@ export function Command({ name, highlight, framework = 'react' }: CommandCopyPro
 
         <div className="flex flex-col">
           <TabsList className="gap-2 relative mb-2 z-10">
-            {tabs.map((tab) => (
-              <TabsTrigger key={tab} value={tab} className="text-xs">
-                {tab}
+            {(Object.keys(commands) as PackageManager[]).map((manager) => (
+              <TabsTrigger key={manager} value={manager} className="text-xs">
+                {manager}
               </TabsTrigger>
             ))}
           </TabsList>
 
-          {tabs.map((tab) => {
-            const isPrompt = tab === 'prompt'
-            const content = isPrompt ? prompt : commands[tab]
-
-            return (
-              <TabsContent key={tab} value={tab} className="m-0">
-                <div className={cn('flex gap-2', isPrompt ? 'items-start' : 'items-center')}>
-                  <div
-                    className={cn(
-                      'min-w-0 flex-1 text-sm text-foreground relative z-10',
-                      isPrompt ? 'leading-6' : 'font-mono'
-                    )}
-                  >
-                    {!isPrompt && <span className="mr-2 text-[#888] select-none">$</span>}
-                    {content}
-                  </div>
-                  <div className="relative z-10 shrink-0">
-                    <CommandCopyButton
-                      command={content}
-                      telemetryCommand={isPrompt ? commands.npm : content}
-                    />
-                  </div>
+          {(Object.keys(commands) as PackageManager[]).map((manager) => (
+            <TabsContent key={manager} value={manager} className="m-0">
+              <div className="flex items-center">
+                <div className="flex-1 font-mono text-sm text-foreground relative z-10">
+                  <span className="mr-2 text-[#888] select-none">$</span>
+                  {commands[manager]}
                 </div>
-              </TabsContent>
-            )
-          })}
+                <div className="relative z-10">
+                  <CommandCopyButton command={commands[manager]} />
+                </div>
+              </div>
+            </TabsContent>
+          ))}
         </div>
       </div>
     </Tabs>
