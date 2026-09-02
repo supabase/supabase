@@ -33,7 +33,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListLogDrainsResponse"
+                  "$ref": "#/components/schemas/ListLogDrainsResponse_Output"
                 }
               }
             }
@@ -92,7 +92,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_config_read"]],
         "x-oauth-scope": "analytics_config:read"
       },
@@ -129,7 +129,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LogDrainResponse"
+                  "$ref": "#/components/schemas/LogDrainResponse_Output"
                 }
               }
             }
@@ -203,7 +203,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_config_write"]],
         "x-oauth-scope": "analytics_config:write"
       }
@@ -253,7 +253,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LogDrainResponse"
+                  "$ref": "#/components/schemas/LogDrainResponse_Output"
                 }
               }
             }
@@ -312,7 +312,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_config_write"]],
         "x-oauth-scope": "analytics_config:write"
       },
@@ -402,9 +402,90 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_config_write"]],
         "x-oauth-scope": "analytics_config:write"
+      }
+    },
+    "/v2/projects/{ref}/advisors/run": {
+      "post": {
+        "operationId": "v2-run-project-advisors",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/V2RunProjectAdvisorsBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V2ProjectAdvisorsResponse_Output"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseBody"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Runs the project advisors with the given names",
+        "tags": ["Advisors"],
+        "x-endpoint-owners": ["control-plane"],
+        "x-fga-permissions": [["advisors_read"]]
       }
     },
     "/v2/projects/{ref}/config": {
@@ -432,7 +513,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V2ProjectConfigResponse"
+                  "$ref": "#/components/schemas/V2ProjectConfigResponse_Output"
                 }
               }
             }
@@ -524,7 +605,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V2PreviewProjectTransferResponse"
+                  "$ref": "#/components/schemas/V2PreviewProjectTransferResponse_Output"
                 }
               }
             }
@@ -669,7 +750,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V2ListPrivateLinkAssociationsResponse"
+                  "$ref": "#/components/schemas/V2ListPrivateLinkAssociationsResponse_Output"
                 }
               }
             }
@@ -759,7 +840,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V2PrivateLinkAssociationResponse"
+                  "$ref": "#/components/schemas/V2PrivateLinkAssociationResponse_Output"
                 }
               }
             }
@@ -1035,7 +1116,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V2ListWorkersResponse"
+                  "$ref": "#/components/schemas/V2ListWorkersResponse_Output"
                 }
               }
             }
@@ -1124,7 +1205,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V2WorkerResponse"
+                  "$ref": "#/components/schemas/V2WorkerResponse_Output"
                 }
               }
             }
@@ -1293,7 +1374,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V2WorkerUploadResponse"
+                  "$ref": "#/components/schemas/V2WorkerUploadResponse_Output"
                 }
               }
             }
@@ -1392,7 +1473,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V2WorkerResponse"
+                  "$ref": "#/components/schemas/V2WorkerResponse_Output"
                 }
               }
             }
@@ -1514,7 +1595,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V2ListMembersResponse"
+                  "$ref": "#/components/schemas/V2ListMembersResponse_Output"
                 }
               }
             }
@@ -1611,7 +1692,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrganizationMemberRoleResponse"
+                  "$ref": "#/components/schemas/OrganizationMemberRoleResponse_Output"
                 }
               }
             }
@@ -1708,7 +1789,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V2ListRolesResponse"
+                  "$ref": "#/components/schemas/V2ListRolesResponse_Output"
                 }
               }
             }
@@ -1795,7 +1876,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V2CreateInvitationsResponse"
+                  "$ref": "#/components/schemas/V2CreateInvitationsResponse_Output"
                 }
               }
             }
@@ -1895,7 +1976,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V2DeleteInvitationsResponse"
+                  "$ref": "#/components/schemas/V2DeleteInvitationsResponse_Output"
                 }
               }
             }
@@ -2032,7 +2113,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V2ListProjectsResponse"
+                  "$ref": "#/components/schemas/V2ListProjectsResponse_Output"
                 }
               }
             }
@@ -2160,7 +2241,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V2ListGitHubConnectionsResponse"
+                  "$ref": "#/components/schemas/V2ListGitHubConnectionsResponse_Output"
                 }
               }
             }
@@ -10665,7 +10746,6 @@
                                     }
                                   },
                                   "required": ["organization_slug", "project_ref"],
-                                  "additionalProperties": {},
                                   "description": "Final data sent to the consumer."
                                 },
                                 "timestamp": {
@@ -20853,7 +20933,6 @@
                                     }
                                   },
                                   "required": ["organization_slug", "project_ref"],
-                                  "additionalProperties": {},
                                   "description": "Final data sent to the consumer."
                                 },
                                 "timestamp": {
@@ -22616,7 +22695,7 @@
       }
     },
     "schemas": {
-      "ListLogDrainsResponse": {
+      "ListLogDrainsResponse_Output": {
         "type": "object",
         "properties": {
           "data": {
@@ -22647,35 +22726,6 @@
                           "type": "object",
                           "properties": {
                             "url": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "schema": {
-                              "type": "string"
-                            },
-                            "username": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "password": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "port": {
-                              "type": "number",
-                              "nullable": true
-                            },
-                            "hostname": {
-                              "type": "string"
-                            }
-                          },
-                          "additionalProperties": false,
-                          "title": "postgres"
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "url": {
                               "type": "string"
                             },
                             "http": {
@@ -22692,21 +22742,7 @@
                               }
                             }
                           },
-                          "additionalProperties": false,
                           "title": "webhook"
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "project_id": {
-                              "type": "string"
-                            },
-                            "dataset_id": {
-                              "type": "string"
-                            }
-                          },
-                          "additionalProperties": false,
-                          "title": "bigquery"
                         },
                         {
                           "type": "object",
@@ -22718,7 +22754,6 @@
                               "type": "string"
                             }
                           },
-                          "additionalProperties": false,
                           "title": "datadog"
                         },
                         {
@@ -22742,7 +22777,6 @@
                               }
                             }
                           },
-                          "additionalProperties": false,
                           "title": "loki"
                         },
                         {
@@ -22752,7 +22786,6 @@
                               "type": "string"
                             }
                           },
-                          "additionalProperties": false,
                           "title": "sentry"
                         },
                         {
@@ -22768,7 +22801,6 @@
                               "type": "string"
                             }
                           },
-                          "additionalProperties": false,
                           "title": "axiom"
                         },
                         {
@@ -22802,8 +22834,69 @@
                               "type": "string"
                             }
                           },
-                          "additionalProperties": false,
                           "title": "syslog"
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "s3_bucket": {
+                              "type": "string"
+                            },
+                            "storage_region": {
+                              "type": "string"
+                            },
+                            "access_key_id": {
+                              "type": "string"
+                            },
+                            "secret_access_key": {
+                              "type": "string"
+                            },
+                            "batch_timeout": {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            }
+                          },
+                          "title": "s3"
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "region": {
+                              "type": "string"
+                            },
+                            "username": {
+                              "type": "string"
+                            },
+                            "password": {
+                              "type": "string"
+                            }
+                          },
+                          "title": "last9"
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "endpoint": {
+                              "type": "string"
+                            },
+                            "protocol": {
+                              "default": "http/protobuf",
+                              "type": "string"
+                            },
+                            "gzip": {
+                              "default": true,
+                              "type": "boolean"
+                            },
+                            "headers": {
+                              "default": {},
+                              "type": "object",
+                              "additionalProperties": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "title": "otlp"
                         }
                       ]
                     },
@@ -22926,35 +23019,6 @@
                         "type": "object",
                         "properties": {
                           "url": {
-                            "type": "string",
-                            "nullable": true
-                          },
-                          "schema": {
-                            "type": "string"
-                          },
-                          "username": {
-                            "type": "string",
-                            "nullable": true
-                          },
-                          "password": {
-                            "type": "string",
-                            "nullable": true
-                          },
-                          "port": {
-                            "type": "number",
-                            "nullable": true
-                          },
-                          "hostname": {
-                            "type": "string"
-                          }
-                        },
-                        "additionalProperties": false,
-                        "title": "postgres"
-                      },
-                      {
-                        "type": "object",
-                        "properties": {
-                          "url": {
                             "type": "string"
                           },
                           "http": {
@@ -22973,19 +23037,6 @@
                         },
                         "additionalProperties": false,
                         "title": "webhook"
-                      },
-                      {
-                        "type": "object",
-                        "properties": {
-                          "project_id": {
-                            "type": "string"
-                          },
-                          "dataset_id": {
-                            "type": "string"
-                          }
-                        },
-                        "additionalProperties": false,
-                        "title": "bigquery"
                       },
                       {
                         "type": "object",
@@ -23083,6 +23134,71 @@
                         },
                         "additionalProperties": false,
                         "title": "syslog"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "s3_bucket": {
+                            "type": "string"
+                          },
+                          "storage_region": {
+                            "type": "string"
+                          },
+                          "access_key_id": {
+                            "type": "string"
+                          },
+                          "secret_access_key": {
+                            "type": "string"
+                          },
+                          "batch_timeout": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          }
+                        },
+                        "additionalProperties": false,
+                        "title": "s3"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "region": {
+                            "type": "string"
+                          },
+                          "username": {
+                            "type": "string"
+                          },
+                          "password": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false,
+                        "title": "last9"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "endpoint": {
+                            "type": "string"
+                          },
+                          "protocol": {
+                            "default": "http/protobuf",
+                            "type": "string"
+                          },
+                          "gzip": {
+                            "default": true,
+                            "type": "boolean"
+                          },
+                          "headers": {
+                            "default": {},
+                            "type": "object",
+                            "additionalProperties": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "additionalProperties": false,
+                        "title": "otlp"
                       }
                     ]
                   },
@@ -23104,7 +23220,8 @@
                     ]
                   }
                 },
-                "required": ["name", "config", "backend_type"]
+                "required": ["name", "config", "backend_type"],
+                "additionalProperties": {}
               }
             },
             "required": ["type", "attributes"]
@@ -23112,7 +23229,7 @@
         },
         "required": ["data"]
       },
-      "LogDrainResponse": {
+      "LogDrainResponse_Output": {
         "type": "object",
         "properties": {
           "data": {
@@ -23141,35 +23258,6 @@
                         "type": "object",
                         "properties": {
                           "url": {
-                            "type": "string",
-                            "nullable": true
-                          },
-                          "schema": {
-                            "type": "string"
-                          },
-                          "username": {
-                            "type": "string",
-                            "nullable": true
-                          },
-                          "password": {
-                            "type": "string",
-                            "nullable": true
-                          },
-                          "port": {
-                            "type": "number",
-                            "nullable": true
-                          },
-                          "hostname": {
-                            "type": "string"
-                          }
-                        },
-                        "additionalProperties": false,
-                        "title": "postgres"
-                      },
-                      {
-                        "type": "object",
-                        "properties": {
-                          "url": {
                             "type": "string"
                           },
                           "http": {
@@ -23186,21 +23274,7 @@
                             }
                           }
                         },
-                        "additionalProperties": false,
                         "title": "webhook"
-                      },
-                      {
-                        "type": "object",
-                        "properties": {
-                          "project_id": {
-                            "type": "string"
-                          },
-                          "dataset_id": {
-                            "type": "string"
-                          }
-                        },
-                        "additionalProperties": false,
-                        "title": "bigquery"
                       },
                       {
                         "type": "object",
@@ -23212,7 +23286,6 @@
                             "type": "string"
                           }
                         },
-                        "additionalProperties": false,
                         "title": "datadog"
                       },
                       {
@@ -23236,7 +23309,6 @@
                             }
                           }
                         },
-                        "additionalProperties": false,
                         "title": "loki"
                       },
                       {
@@ -23246,7 +23318,6 @@
                             "type": "string"
                           }
                         },
-                        "additionalProperties": false,
                         "title": "sentry"
                       },
                       {
@@ -23262,7 +23333,6 @@
                             "type": "string"
                           }
                         },
-                        "additionalProperties": false,
                         "title": "axiom"
                       },
                       {
@@ -23296,8 +23366,69 @@
                             "type": "string"
                           }
                         },
-                        "additionalProperties": false,
                         "title": "syslog"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "s3_bucket": {
+                            "type": "string"
+                          },
+                          "storage_region": {
+                            "type": "string"
+                          },
+                          "access_key_id": {
+                            "type": "string"
+                          },
+                          "secret_access_key": {
+                            "type": "string"
+                          },
+                          "batch_timeout": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          }
+                        },
+                        "title": "s3"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "region": {
+                            "type": "string"
+                          },
+                          "username": {
+                            "type": "string"
+                          },
+                          "password": {
+                            "type": "string"
+                          }
+                        },
+                        "title": "last9"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "endpoint": {
+                            "type": "string"
+                          },
+                          "protocol": {
+                            "default": "http/protobuf",
+                            "type": "string"
+                          },
+                          "gzip": {
+                            "default": true,
+                            "type": "boolean"
+                          },
+                          "headers": {
+                            "default": {},
+                            "type": "object",
+                            "additionalProperties": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "title": "otlp"
                       }
                     ]
                   },
@@ -23353,35 +23484,6 @@
                         "type": "object",
                         "properties": {
                           "url": {
-                            "type": "string",
-                            "nullable": true
-                          },
-                          "schema": {
-                            "type": "string"
-                          },
-                          "username": {
-                            "type": "string",
-                            "nullable": true
-                          },
-                          "password": {
-                            "type": "string",
-                            "nullable": true
-                          },
-                          "port": {
-                            "type": "number",
-                            "nullable": true
-                          },
-                          "hostname": {
-                            "type": "string"
-                          }
-                        },
-                        "additionalProperties": false,
-                        "title": "postgres"
-                      },
-                      {
-                        "type": "object",
-                        "properties": {
-                          "url": {
                             "type": "string"
                           },
                           "http": {
@@ -23400,19 +23502,6 @@
                         },
                         "additionalProperties": false,
                         "title": "webhook"
-                      },
-                      {
-                        "type": "object",
-                        "properties": {
-                          "project_id": {
-                            "type": "string"
-                          },
-                          "dataset_id": {
-                            "type": "string"
-                          }
-                        },
-                        "additionalProperties": false,
-                        "title": "bigquery"
                       },
                       {
                         "type": "object",
@@ -23510,6 +23599,71 @@
                         },
                         "additionalProperties": false,
                         "title": "syslog"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "s3_bucket": {
+                            "type": "string"
+                          },
+                          "storage_region": {
+                            "type": "string"
+                          },
+                          "access_key_id": {
+                            "type": "string"
+                          },
+                          "secret_access_key": {
+                            "type": "string"
+                          },
+                          "batch_timeout": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          }
+                        },
+                        "additionalProperties": false,
+                        "title": "s3"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "region": {
+                            "type": "string"
+                          },
+                          "username": {
+                            "type": "string"
+                          },
+                          "password": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false,
+                        "title": "last9"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "endpoint": {
+                            "type": "string"
+                          },
+                          "protocol": {
+                            "default": "http/protobuf",
+                            "type": "string"
+                          },
+                          "gzip": {
+                            "default": true,
+                            "type": "boolean"
+                          },
+                          "headers": {
+                            "default": {},
+                            "type": "object",
+                            "additionalProperties": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "additionalProperties": false,
+                        "title": "otlp"
                       }
                     ]
                   },
@@ -23531,7 +23685,8 @@
                     ]
                   }
                 },
-                "required": ["backend_type"]
+                "required": ["backend_type"],
+                "additionalProperties": {}
               }
             },
             "required": ["type", "attributes"]
@@ -23539,7 +23694,246 @@
         },
         "required": ["data"]
       },
-      "V2ProjectConfigResponse": {
+      "V2RunProjectAdvisorsBody": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Resource type.",
+                "enum": ["project_advisors"]
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "lints": {
+                    "minItems": 1,
+                    "maxItems": 10,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "enum": [
+                            "unindexed_foreign_keys",
+                            "auth_users_exposed",
+                            "auth_rls_initplan",
+                            "no_primary_key",
+                            "unused_index",
+                            "multiple_permissive_policies",
+                            "policy_exists_rls_disabled",
+                            "rls_enabled_no_policy",
+                            "duplicate_index",
+                            "security_definer_view",
+                            "function_search_path_mutable",
+                            "rls_disabled_in_public",
+                            "extension_in_public",
+                            "rls_references_user_metadata",
+                            "materialized_view_in_api",
+                            "foreign_table_in_api",
+                            "unsupported_reg_types",
+                            "auth_otp_long_expiry",
+                            "auth_otp_short_length",
+                            "ssl_not_enforced",
+                            "log_connections_not_enabled",
+                            "network_restrictions_not_set",
+                            "password_requirements_min_length",
+                            "pitr_not_enabled",
+                            "auth_leaked_password_protection",
+                            "auth_insufficient_mfa_options",
+                            "auth_password_policy_missing",
+                            "leaked_service_key",
+                            "no_backup_admin",
+                            "vulnerable_postgres_version",
+                            "db_not_reachable",
+                            "db_connection_failing",
+                            "db_connection_limit_reached",
+                            "instance_telemetry_lost",
+                            "instance_db_down",
+                            "instance_alert_firing",
+                            "log_service_error_rate_high"
+                          ]
+                        }
+                      },
+                      "required": ["name"],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": ["lints"],
+                "additionalProperties": false
+              }
+            },
+            "required": ["type", "attributes"],
+            "additionalProperties": {}
+          }
+        },
+        "required": ["data"]
+      },
+      "V2ProjectAdvisorsResponse_Output": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Resource type.",
+                "enum": ["project_advisors"]
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "lints": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "enum": [
+                            "unindexed_foreign_keys",
+                            "auth_users_exposed",
+                            "auth_rls_initplan",
+                            "no_primary_key",
+                            "unused_index",
+                            "multiple_permissive_policies",
+                            "policy_exists_rls_disabled",
+                            "rls_enabled_no_policy",
+                            "duplicate_index",
+                            "security_definer_view",
+                            "function_search_path_mutable",
+                            "rls_disabled_in_public",
+                            "extension_in_public",
+                            "rls_references_user_metadata",
+                            "materialized_view_in_api",
+                            "foreign_table_in_api",
+                            "unsupported_reg_types",
+                            "auth_otp_long_expiry",
+                            "auth_otp_short_length",
+                            "ssl_not_enforced",
+                            "log_connections_not_enabled",
+                            "network_restrictions_not_set",
+                            "password_requirements_min_length",
+                            "pitr_not_enabled",
+                            "auth_leaked_password_protection",
+                            "auth_insufficient_mfa_options",
+                            "auth_password_policy_missing",
+                            "leaked_service_key",
+                            "no_backup_admin",
+                            "vulnerable_postgres_version",
+                            "db_not_reachable",
+                            "db_connection_failing",
+                            "db_connection_limit_reached",
+                            "instance_telemetry_lost",
+                            "instance_db_down",
+                            "instance_alert_firing",
+                            "log_service_error_rate_high",
+                            "project_not_active",
+                            "advisor_check_unavailable"
+                          ],
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "level": {
+                          "type": "string",
+                          "enum": ["ERROR", "WARN", "INFO"]
+                        },
+                        "facing": {
+                          "type": "string",
+                          "enum": ["EXTERNAL"]
+                        },
+                        "categories": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": ["PERFORMANCE", "SECURITY", "HEALTH"]
+                          },
+                          "x-ignore-array-items-must-be-objects": true
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "detail": {
+                          "type": "string"
+                        },
+                        "remediation": {
+                          "type": "string"
+                        },
+                        "metadata": {
+                          "type": "object",
+                          "properties": {
+                            "schema": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "entity": {
+                              "type": "string"
+                            },
+                            "type": {
+                              "enum": [
+                                "table",
+                                "view",
+                                "materialized view",
+                                "foreign table",
+                                "auth",
+                                "function",
+                                "extension",
+                                "compliance",
+                                "health"
+                              ],
+                              "type": "string"
+                            },
+                            "fkey_name": {
+                              "type": "string"
+                            },
+                            "fkey_columns": {
+                              "x-ignore-array-items-must-be-objects": true,
+                              "type": "array",
+                              "items": {
+                                "type": "number"
+                              }
+                            }
+                          }
+                        },
+                        "cache_key": {
+                          "type": "string"
+                        },
+                        "observed_at": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "title",
+                        "level",
+                        "facing",
+                        "categories",
+                        "description",
+                        "detail",
+                        "remediation",
+                        "cache_key"
+                      ]
+                    }
+                  }
+                },
+                "required": ["lints"]
+              }
+            },
+            "required": ["type", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "V2ProjectConfigResponse_Output": {
         "type": "object",
         "properties": {
           "data": {
@@ -24096,7 +24490,7 @@
         },
         "required": ["data"]
       },
-      "V2PreviewProjectTransferResponse": {
+      "V2PreviewProjectTransferResponse_Output": {
         "type": "object",
         "properties": {
           "data": {
@@ -24167,7 +24561,7 @@
         },
         "required": ["data"]
       },
-      "V2ListPrivateLinkAssociationsResponse": {
+      "V2ListPrivateLinkAssociationsResponse_Output": {
         "type": "object",
         "properties": {
           "data": {
@@ -24292,7 +24686,7 @@
         },
         "required": ["data"]
       },
-      "V2PrivateLinkAssociationResponse": {
+      "V2PrivateLinkAssociationResponse_Output": {
         "type": "object",
         "properties": {
           "data": {
@@ -24375,7 +24769,7 @@
         },
         "required": ["data"]
       },
-      "V2ListWorkersResponse": {
+      "V2ListWorkersResponse_Output": {
         "type": "object",
         "properties": {
           "data": {
@@ -24475,7 +24869,7 @@
         },
         "required": ["data"]
       },
-      "V2WorkerResponse": {
+      "V2WorkerResponse_Output": {
         "type": "object",
         "properties": {
           "data": {
@@ -24572,7 +24966,7 @@
         },
         "required": ["data"]
       },
-      "V2WorkerUploadResponse": {
+      "V2WorkerUploadResponse_Output": {
         "type": "object",
         "properties": {
           "data": {
@@ -24663,7 +25057,7 @@
         },
         "required": ["data"]
       },
-      "V2ListMembersResponse": {
+      "V2ListMembersResponse_Output": {
         "type": "object",
         "properties": {
           "data": {
@@ -24835,7 +25229,7 @@
         },
         "required": ["data"]
       },
-      "OrganizationMemberRoleResponse": {
+      "OrganizationMemberRoleResponse_Output": {
         "type": "object",
         "properties": {
           "data": {
@@ -24884,7 +25278,7 @@
         },
         "required": ["data"]
       },
-      "V2ListRolesResponse": {
+      "V2ListRolesResponse_Output": {
         "type": "object",
         "properties": {
           "data": {
@@ -24980,7 +25374,7 @@
         },
         "required": ["data"]
       },
-      "V2CreateInvitationsResponse": {
+      "V2CreateInvitationsResponse_Output": {
         "type": "object",
         "properties": {
           "error": {
@@ -25160,7 +25554,7 @@
         },
         "required": ["data"]
       },
-      "V2DeleteInvitationsResponse": {
+      "V2DeleteInvitationsResponse_Output": {
         "type": "object",
         "properties": {
           "data": {
@@ -25193,7 +25587,7 @@
         },
         "required": ["data"]
       },
-      "V2ListProjectsResponse": {
+      "V2ListProjectsResponse_Output": {
         "type": "object",
         "properties": {
           "data": {
@@ -25380,7 +25774,7 @@
         },
         "required": ["data", "links"]
       },
-      "V2ListGitHubConnectionsResponse": {
+      "V2ListGitHubConnectionsResponse_Output": {
         "type": "object",
         "properties": {
           "data": {

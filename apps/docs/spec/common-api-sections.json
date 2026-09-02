@@ -21,6 +21,12 @@
         "title": "Get security advisors",
         "slug": "v1-get-security-advisors",
         "type": "operation"
+      },
+      {
+        "id": "v2-run-project-advisors",
+        "title": "Run project advisors",
+        "slug": "v2-run-project-advisors",
+        "type": "operation"
       }
     ]
   },

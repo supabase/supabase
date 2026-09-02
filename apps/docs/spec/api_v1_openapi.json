@@ -4667,7 +4667,7 @@
         "summary": "Gets project's logs",
         "tags": ["Analytics"],
         "x-badges": [{ "name": "OAuth scope: analytics:read", "position": "after" }],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_logs_read"]],
         "x-oauth-scope": "analytics:read"
       }
@@ -4740,7 +4740,7 @@
         "summary": "Gets all project's logs in a single log stream",
         "tags": ["Analytics"],
         "x-badges": [{ "name": "OAuth scope: analytics:read", "position": "after" }],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_logs_read"]],
         "x-oauth-scope": "analytics:read"
       }
@@ -4790,7 +4790,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Gets project's usage api counts",
         "tags": ["Analytics"],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_usage_read"]]
       }
     },
@@ -4829,7 +4829,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Gets project's usage api requests count",
         "tags": ["Analytics"],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_usage_read"]]
       }
     },
@@ -4882,7 +4882,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Gets a project's function combined statistics",
         "tags": ["Analytics"],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_usage_read"]]
       }
     },
@@ -4925,7 +4925,7 @@
         "summary": "Scrape a project's metrics",
         "tags": ["Analytics"],
         "x-badges": [{ "name": "OAuth scope: analytics:read", "position": "after" }],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_logs_read"]],
         "x-oauth-scope": "analytics:read"
       }
@@ -7899,7 +7899,7 @@
       "description": "Visit [https://supabase.github.io/storage/](https://supabase.github.io/storage/) for complete documentation."
     }
   ],
-  "servers": [],
+  "servers": [{ "url": "https://api.supabase.com" }],
   "components": {
     "securitySchemes": { "bearer": { "scheme": "bearer", "bearerFormat": "JWT", "type": "http" } },
     "schemas": {
@@ -11488,6 +11488,7 @@
                     "auth_otp_long_expiry",
                     "auth_otp_short_length",
                     "ssl_not_enforced",
+                    "log_connections_not_enabled",
                     "network_restrictions_not_set",
                     "password_requirements_min_length",
                     "pitr_not_enabled",
@@ -11496,7 +11497,16 @@
                     "auth_password_policy_missing",
                     "leaked_service_key",
                     "no_backup_admin",
-                    "vulnerable_postgres_version"
+                    "vulnerable_postgres_version",
+                    "db_not_reachable",
+                    "db_connection_failing",
+                    "db_connection_limit_reached",
+                    "instance_telemetry_lost",
+                    "instance_db_down",
+                    "instance_alert_firing",
+                    "log_service_error_rate_high",
+                    "project_not_active",
+                    "advisor_check_unavailable"
                   ],
                   "type": "string"
                 },
@@ -11505,7 +11515,8 @@
                 "facing": { "type": "string", "enum": ["EXTERNAL"] },
                 "categories": {
                   "type": "array",
-                  "items": { "type": "string", "enum": ["PERFORMANCE", "SECURITY"] }
+                  "items": { "type": "string", "enum": ["PERFORMANCE", "SECURITY", "HEALTH"] },
+                  "x-ignore-array-items-must-be-objects": true
                 },
                 "description": { "type": "string" },
                 "detail": { "type": "string" },
@@ -11517,14 +11528,34 @@
                     "name": { "type": "string" },
                     "entity": { "type": "string" },
                     "type": {
-                      "type": "string",
-                      "enum": ["table", "view", "auth", "function", "extension", "compliance"]
+                      "enum": [
+                        "table",
+                        "view",
+                        "materialized view",
+                        "foreign table",
+                        "auth",
+                        "function",
+                        "extension",
+                        "compliance",
+                        "health"
+                      ],
+                      "type": "string"
                     },
                     "fkey_name": { "type": "string" },
-                    "fkey_columns": { "type": "array", "items": { "type": "number" } }
-                  }
+                    "fkey_columns": {
+                      "x-ignore-array-items-must-be-objects": true,
+                      "type": "array",
+                      "items": { "type": "number" }
+                    }
+                  },
+                  "additionalProperties": {}
                 },
-                "cache_key": { "type": "string" }
+                "cache_key": { "type": "string" },
+                "observed_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                }
               },
               "required": [
                 "name",
@@ -11536,7 +11567,8 @@
                 "detail",
                 "remediation",
                 "cache_key"
-              ]
+              ],
+              "additionalProperties": {}
             }
           }
         },
