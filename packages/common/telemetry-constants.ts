@@ -1569,6 +1569,32 @@ export interface ExplorerBannerCtaButtonClickedEvent {
 }
 
 /**
+ * User clicked the button in the Explorer sidebar title bar to temporarily switch to the SQL
+ * Editor for snippet access.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/explorer
+ */
+export interface ExplorerTempAccessSqlEditorClickedEvent {
+  action: 'explorer_temp_access_sql_editor_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the "Back to Explorer" button in the SQL Editor title bar, shown only when the
+ * visit originated from the Explorer's temporary switch button.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/sql
+ */
+export interface SqlEditorBackExplorerClickedEvent {
+  action: 'sql_editor_back_explorer_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked a metric card PID in the Overview panel of the Database Connections observability page, selecting it in the activity table below.
  *
  * @group Events
@@ -3871,6 +3897,8 @@ export type TelemetryEvent =
   | ExplorerBannerExposedEvent
   | ExplorerBannerDismissButtonClickedEvent
   | ExplorerBannerCtaButtonClickedEvent
+  | ExplorerTempAccessSqlEditorClickedEvent
+  | SqlEditorBackExplorerClickedEvent
   | SessionTerminateButtonClickedEvent
   | SessionTerminateSubmittedEvent
   | QueryCancelButtonClickedEvent
