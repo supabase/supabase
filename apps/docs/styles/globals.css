@@ -160,11 +160,16 @@ h6:not(.font-mono),
   @apply font-heading font-semibold;
 }
 
+/* Alert set its own type scale to prevent drift in docs */
 .prose
   :where(p, li, a, figcaption):not(:where([class~='not-prose'], [class~='not-prose'] *)):not(
     :where(h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6) *
-  ) {
+  ):not(:where([data-slot='alert'] *)) {
   @apply text-base leading-7;
+}
+
+.prose :where([data-slot='alert'] ol > li)::before {
+  top: 0;
 }
 
 .prose :where(h1, .h1):not(:where([class~='not-prose'], [class~='not-prose'] *)) {

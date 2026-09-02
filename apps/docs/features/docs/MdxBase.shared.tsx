@@ -43,8 +43,8 @@ import { AiPrompt } from '../ui/AiPrompt'
 import { ErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
 
-// Wrap Admonition for Docs-specific styling (within MDX prose, requires a margin-bottom)
-const AdmonitionWithMargin = (props: AdmonitionProps) => {
+// Admonition as it appears in docs pages: sits in MDX prose, so it needs a margin-bottom.
+const DocsAdmonition = (props: AdmonitionProps) => {
   return <Admonition {...props} className="mb-8" />
 }
 
@@ -67,7 +67,7 @@ const Pre = (props: any) => {
 const components = {
   Accordion,
   AccordionItem,
-  Admonition: AdmonitionWithMargin,
+  Admonition: DocsAdmonition,
   AgentPluginsPanel,
   AiPrompt,
   AiPromptsIndex,
