@@ -11,16 +11,21 @@ const input = (overrides: Partial<Parameters<typeof buildWorkerSnippets>[0]> = {
 
 describe('buildWorkerSnippets', () => {
   it('points the invoke examples at the worker URL', () => {
-    const { javascript, python } = buildWorkerSnippets(input({ name: 'embed' }))
+    const { curl, javascript, python } = buildWorkerSnippets(input({ name: 'embed' }))
     const url = 'https://abcdefgh.supabase.co/workers/v1/embed'
 
+    expect(curl).toContain(`'${url}'`)
     expect(javascript).toContain(`'${url}'`)
     expect(python).toContain(`"${url}"`)
   })
 
   it('leaves a placeholder invoke URL until the project settings resolve', () => {
-    const { javascript } = buildWorkerSnippets(input({ endpoint: undefined }))
-    expect(javascript).toContain('[YOUR WORKER URL]')
+    const { curl } = buildWorkerSnippets(input({ endpoint: undefined }))
+    expect(curl).toContain('[YOUR WORKER URL]')
+  })
+
+  it('does not require authorization for the CLI invoke example', () => {
+    expect(buildWorkerSnippets(input()).curl).not.toContain('Authorization')
   })
 
   it('asks for the anon key to invoke a public worker and the service role key for a private one', () => {

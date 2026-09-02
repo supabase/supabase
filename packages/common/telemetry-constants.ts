@@ -46,14 +46,16 @@ export interface SignUpEvent {
 }
 
 /**
- * Triggered when a user signs in with GitHub, Email and Password or SSO.
+ * Triggered when a user signs in with an OAuth provider, Email and Password, or SSO.
  *
  * Some unintuitive behavior:
  *   - If signing up with GitHub the SignInEvent gets triggered first before the SignUpEvent.
+ *   - Captured server-side; the distinct_id often resolves to the anonymous cookie because
+ *     the event races identify, so don't use it as a funnel join key across the auth boundary.
  *
  * @group Events
  * @source studio
- * @page /sign-in-mfa
+ * @page /sign-in, /sign-in-mfa
  */
 export interface SignInEvent {
   action: 'sign_in'
@@ -1532,6 +1534,19 @@ export interface DatabaseConnectionsBannerCtaButtonClickedEvent {
 }
 
 /**
+ * The Explorer feature preview banner was rendered in studio project pages, fired at most once
+ * per page load. Acts as the denominator for the banner's dismiss and CTA rates; dedupe per
+ * session or per user at query time.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ExplorerBannerExposedEvent {
+  action: 'explorer_banner_exposed'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the dismiss button on the Explorer feature preview banner in studio project pages.
  *
  * @group Events
@@ -2946,7 +2961,7 @@ export interface AdvisorDetailOpenedEvent {
      */
     advisorSource: 'lint' | 'notification' | 'signal'
     /**
-     * Category of the advisor (SECURITY or PERFORMANCE)
+     * Category of the advisor
      */
     advisorCategory?: AdvisorCategory
     /**
@@ -2977,7 +2992,7 @@ export interface AdvisorAssistantButtonClickedEvent {
      */
     origin: 'homepage' | 'lint_detail'
     /**
-     * Category of the advisor (SECURITY or PERFORMANCE)
+     * Category of the advisor
      */
     advisorCategory?: AdvisorCategory
     /**
@@ -3504,6 +3519,25 @@ export interface UpgradeCtaClickedEvent {
 }
 
 /**
+ * User was exposed to the plan-change panel presentation experiment.
+ * Fires once per session per enrolled user in any variant (including control), so the
+ * conversion analysis has a baseline cohort. Conversion itself is tracked server-side.
+ * GROWTH experiment: `pricingPanelPlanPresentation`.
+ *
+ * @group Events
+ * @page /org/[slug]/billing (plan-change side panel)
+ * @source studio
+ */
+export interface PricingPanelPlanPresentationExperimentExposedEvent {
+  action: 'pricing_panel_plan_presentation_experiment_exposed'
+  properties: {
+    /** The experiment variant the user is enrolled in */
+    variant: 'control' | 'parity' | 'gaps'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * User clicked the primary CTA on a resource exhaustion warning banner.
  *
  * @group Events
@@ -3834,6 +3868,7 @@ export type TelemetryEvent =
   | DatabaseConnectionsBlockerViewClickedEvent
   | DatabaseConnectionsBannerDismissButtonClickedEvent
   | DatabaseConnectionsBannerCtaButtonClickedEvent
+  | ExplorerBannerExposedEvent
   | ExplorerBannerDismissButtonClickedEvent
   | ExplorerBannerCtaButtonClickedEvent
   | SessionTerminateButtonClickedEvent
@@ -3923,6 +3958,7 @@ export type TelemetryEvent =
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
   | UpgradeCtaClickedEvent
+  | PricingPanelPlanPresentationExperimentExposedEvent
   | AccessTokenCreatedEvent
   | AccessTokenRemovedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent

@@ -41,10 +41,17 @@ export async function generateMetadata(props: DocPageProps): Promise<Metadata> {
     return {}
   }
 
+  const markdownPath = `${process.env.NEXT_PUBLIC_BASE_PATH ?? '/library'}/docs/${doc.slugAsParams}.md`
+
   const metadata: Metadata = {
     ...mainMetadata,
     title: doc.title,
     description: doc.description,
+    alternates: {
+      types: {
+        'text/markdown': `https://supabase.com${markdownPath}`,
+      },
+    },
     openGraph: {
       ...mainMetadata.openGraph,
       title: doc.title,

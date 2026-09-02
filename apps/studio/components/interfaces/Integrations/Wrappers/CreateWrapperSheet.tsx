@@ -282,7 +282,6 @@ export const CreateWrapperSheet = ({
                       <FormItemLayout
                         layout="vertical"
                         label="Wrapper Name"
-                        name="wrapper_name"
                         description={
                           wrapper_name.length > 0 ? (
                             <>
@@ -295,7 +294,7 @@ export const CreateWrapperSheet = ({
                         }
                       >
                         <FormControl>
-                          <Input id="wrapper_name" {...field} />
+                          <Input {...field} />
                         </FormControl>
                       </FormItemLayout>
                     )}

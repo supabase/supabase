@@ -164,31 +164,36 @@ const MessagesTable = ({
           )}
         >
           <div className="flex grow flex-col lg:w-1/2">
-            {enabled && (
-              <div className="w-full h-9 px-4 bg-surface-100 items-center inline-flex justify-between text-foreground-light">
-                <div className="inline-flex gap-2.5 text-xs">
-                  <Loader2 size="16" className="animate-spin" />
-                  <div>Listening</div>
-                  <div>•</div>
-                  <div>
-                    {data.length > 0
-                      ? data.length >= 100
-                        ? `Found a large number of messages, showing only the latest 100...`
-                        : `Found ${data.length} messages...`
-                      : `No message found yet...`}
+            {/* Persistent role="status" live region so screen readers announce when
+            listening starts — a live region only announces updates to content it
+            already contains. */}
+            <div role="status">
+              {enabled && (
+                <div className="w-full h-9 px-4 bg-surface-100 items-center inline-flex justify-between text-foreground-light">
+                  <div className="inline-flex gap-2.5 text-xs">
+                    <Loader2 size="16" aria-hidden="true" className="animate-spin" />
+                    <div>Listening</div>
+                    <div aria-hidden="true">•</div>
+                    <div>
+                      {data.length > 0
+                        ? data.length >= 100
+                          ? `Found a large number of messages, showing only the latest 100...`
+                          : `Found ${data.length} messages...`
+                        : `No message found yet...`}
+                    </div>
                   </div>
+                  <ShortcutTooltip shortcutId={SHORTCUT_IDS.INSPECTOR_BROADCAST} side="bottom">
+                    <Button
+                      variant="default"
+                      onClick={showSendMessage}
+                      icon={<Megaphone strokeWidth={1.5} />}
+                    >
+                      <span>Broadcast a message</span>
+                    </Button>
+                  </ShortcutTooltip>
                 </div>
-                <ShortcutTooltip shortcutId={SHORTCUT_IDS.INSPECTOR_BROADCAST} side="bottom">
-                  <Button
-                    variant="default"
-                    onClick={showSendMessage}
-                    icon={<Megaphone strokeWidth={1.5} />}
-                  >
-                    <span>Broadcast a message</span>
-                  </Button>
-                </ShortcutTooltip>
-              </div>
-            )}
+              )}
+            </div>
 
             <DataGrid
               className="data-grid--simple-logs h-full border-t-0! border-b-0!"

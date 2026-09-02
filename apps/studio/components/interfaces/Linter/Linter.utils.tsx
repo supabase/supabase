@@ -258,6 +258,16 @@ export const lintInfoMap: LintInfo[] = [
     category: 'security',
   },
   {
+    name: 'pitr_archiving_stale',
+    title: 'PITR archiving may be broken',
+    icon: <Ruler className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/database/backups/pitr`,
+    linkText: 'View settings',
+    // anchor explains what PITR is, not how to fix a stale archive; PITR-archiving-specific docs tracked in TODO: INDATA-1149
+    docsLink: `${DOCS_URL}/guides/platform/backups#point-in-time-recovery`,
+    category: 'security',
+  },
+  {
     name: 'auth_leaked_password_protection',
     title: 'Leaked Password Protection Disabled',
     icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,

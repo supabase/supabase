@@ -89,6 +89,7 @@ Deji I
 Dennis Senn
 Dimitrios Liappis
 Div Arora
+Dion Zeneli
 Divit D
 Divya Sharma
 Donna Alexandra
@@ -273,6 +274,7 @@ Sana Cordeaux
 Sasi Kanumuri
 Sara Read
 Satya Rohith Gannamanedi
+Sean Geoghegan
 Sean Oliver
 Sean Romberg
 Sean Thompson
@@ -317,6 +319,7 @@ Tyler Shukert
 TzeYiing L
 Utkarash Singh
 Victor Farazdagi
+Warda Bibi
 Warwick Mitchell
 Wen Bo Xie
 Wendie Cheung

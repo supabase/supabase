@@ -582,6 +582,14 @@
       "import": "./src/Row/index.tsx",
       "types": "./src/Row/index.tsx"
     },
+    "./SelectionListState/SelectionListState": {
+      "import": "./src/SelectionListState/SelectionListState.tsx",
+      "types": "./src/SelectionListState/SelectionListState.tsx"
+    },
+    "./SelectionListState": {
+      "import": "./src/SelectionListState/index.ts",
+      "types": "./src/SelectionListState/index.ts"
+    },
     "./ShimmeringLoader/index.css": {
       "import": "./src/ShimmeringLoader/index.css",
       "types": "./src/ShimmeringLoader/index.css"

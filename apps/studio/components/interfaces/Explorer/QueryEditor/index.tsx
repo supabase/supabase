@@ -12,7 +12,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import { Button, cn } from 'ui'
+import { Button, cn, KeyboardShortcut } from 'ui'
 
 import { resolveLogTimeRange } from '../../QuerySources/LogTimeRange.utils'
 import {
@@ -113,6 +113,8 @@ export type QueryEditorHandle = {
   run: (force?: boolean) => Promise<void>
   /** The editor's live text buffer, ahead of any blur-triggered commit to the store. */
   getSql: () => string
+  /** Formats the editor's SQL in place and commits the result, same as the SQL Editor's Prettify SQL action. */
+  prettify: () => Promise<void>
 }
 
 type QueryEditorProps = {
@@ -225,13 +227,11 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   )
 
   const { mutateAsync: executeSql, isPending: isExecutingSql } = useExecuteSqlMutation({
-    onSuccess: (data) => onResultChange({ rows: data.result }),
-    onError: (error) => onResultChange({ error }),
+    onError: () => {},
   })
 
   const { mutateAsync: executeLogsSql, isPending: isExecutingLogs } = useExecuteLogsSqlMutation({
-    onSuccess: (data) => onResultChange({ rows: data.rows as readonly Record<string, unknown>[] }),
-    onError: (error) => onResultChange({ error }),
+    onError: () => {},
   })
 
   const isResolvingDatabase =
@@ -257,6 +257,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     }
 
     onRun?.()
+    const querySnapshot = { sql: rawSql, source: query._tag }
     // [Joshen] This is deliberate to commit the sql, rather than the passed rawSql
     // As we want to save the cell's content into the store, rather than what's getting run
     onSqlCommit?.(sql)
@@ -265,6 +266,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       if (!isOtelLogsEnabled) {
         onResultChange({
           error: { message: "Querying logs isn't available for this project yet." },
+          ...querySnapshot,
         })
         return
       }
@@ -274,7 +276,14 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
         sql: acceptUntrustedLogsSql(untrustedLogSql(rawSql)),
         range: resolveLogTimeRange(query.time_range),
         endpoint: QUERY_SOURCE_REGISTRY.logs.endpoint,
-      }).catch(() => {})
+      }).then(
+        (data) =>
+          onResultChange({
+            rows: data.rows as readonly Record<string, unknown>[],
+            ...querySnapshot,
+          }),
+        (error) => onResultChange({ error, ...querySnapshot })
+      )
       return
     }
 
@@ -282,7 +291,10 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     const limitedSql = applyAutoLimit(safeSql, rowLimit)
 
     if (!isValidConnString(connectionString)) {
-      onResultChange({ error: { message: 'Unable to run query: Connection string is missing' } })
+      onResultChange({
+        error: { message: 'Unable to run query: Connection string is missing' },
+        ...querySnapshot,
+      })
       return
     }
 
@@ -294,7 +306,10 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       contextualInvalidation: true,
       isStatementTimeoutDisabled: true,
       isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
-    }).catch(() => {})
+    }).then(
+      (data) => onResultChange({ rows: data.result, ...querySnapshot }),
+      (error) => onResultChange({ error, ...querySnapshot })
+    )
   }
 
   const handleConfirmPendingRun = () => {
@@ -350,9 +365,19 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
 
   const Shell = variant === 'viewport' ? ExplorerQueryViewport : ExplorerQuery
 
+  const handlePrettify = async () => {
+    if (pendingProposalRef.current) return
+
+    const editor = editorInstanceRef.current
+    if (!editor) return
+    await editor.getAction('editor.action.formatDocument')?.run()
+    onSqlCommitRef.current?.(editor.getValue())
+  }
+
   useImperativeHandle(ref, () => ({
     run: (force = false) => handleRunQuery({ shouldForce: force }),
     getSql: () => sqlRef.current,
+    prettify: handlePrettify,
   }))
 
   useEffect(() => {
@@ -368,9 +393,15 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       <Shell className={cn(variant === 'embedded' && 'mx-auto max-w-6xl', className)}>
         <ExplorerToolbar className={cn(variant === 'viewport' && 'px-4')}>
           <ExplorerToolbarIcon>
-            <CodeSquare size={14} />
+            <CodeSquare size={16} strokeWidth={2} />
           </ExplorerToolbarIcon>
-          <ExplorerToolbarTitle onSaveTitle={onTitleChange}>{title}</ExplorerToolbarTitle>
+          {variant === 'viewport' ? (
+            <ExplorerToolbarTitle className="text-muted text-xs italic">
+              Run SQL
+            </ExplorerToolbarTitle>
+          ) : (
+            <ExplorerToolbarTitle onSaveTitle={onTitleChange}>{title}</ExplorerToolbarTitle>
+          )}
           <ExplorerToolbarActions>
             {onSourceChange && (
               <QuerySourceMenu
@@ -396,7 +427,9 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
               />
             )}
             <ExplorerToolbarAction
-              icon={showQuery ? <EyeOff /> : <Eye />}
+              icon={
+                showQuery ? <EyeOff size={16} strokeWidth={2} /> : <Eye size={16} strokeWidth={2} />
+              }
               disabled={pendingProposal !== null}
               tooltip={showQuery ? 'Hide query' : 'Show query'}
               onClick={() => onShowQueryChange(!showQuery)}
@@ -405,9 +438,14 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
             {toolbarActions}
 
             <ExplorerToolbarAction
-              icon={<Play />}
+              icon={<Play size={16} strokeWidth={2} />}
               loading={isExecuting}
-              tooltip={hasSelection ? 'Run selected query' : 'Run query'}
+              tooltip={
+                <div className="flex items-center gap-2.5">
+                  <span>{hasSelection ? 'Run selected query' : 'Run query'}</span>
+                  <KeyboardShortcut keys={['Meta', 'Enter']} />
+                </div>
+              }
               disabled={
                 isBusy || pendingProposal !== null || isRunDisabled || sql.trim().length === 0
               }
@@ -492,6 +530,16 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
                       if (selectionParts) setPromptState({ isOpen: true, ...selectionParts })
                     },
                   })
+
+                  editor.addAction({
+                    id: 'prettify-query',
+                    label: 'Prettify SQL',
+                    keybindings: [monaco.KeyMod.Alt | monaco.KeyMod.Shift | monaco.KeyCode.KeyF],
+                    contextMenuGroupId: 'operation',
+                    run: () => {
+                      handlePrettify()
+                    },
+                  })
                 }}
               />
 
@@ -555,7 +603,13 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
               : 'overflow-x-auto'
           )}
         >
-          <QueryResultRenderer view={view} result={result} chart={display?.chart} />
+          <QueryResultRenderer
+            view={view}
+            result={result}
+            chart={display?.chart}
+            sql={result?.sql}
+            source={result?.source}
+          />
         </ExplorerQueryResults>
 
         <ExplorerQueryFooter className="flex items-center gap-x-2">

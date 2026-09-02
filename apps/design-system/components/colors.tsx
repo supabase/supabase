@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { cn } from 'ui'
-import color from 'ui/src/lib/tailwind-demo-classes'
+import { cn, colors } from 'ui'
 
 import { Grid, GridItem } from './grid'
+
+const color = colors['default']
 
 const Colors = ({
   definition,

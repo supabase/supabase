@@ -34,16 +34,12 @@ Schema migrations are SQL statements written in Data Definition Language. They a
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```sql name=supabase/schemas/employees.sql
 create table "employees" (
   "id" integer not null,
   "name" text
 );
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -59,13 +55,9 @@ create table "employees" (
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase db schema declarative sync -f create_employees_table
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -81,14 +73,10 @@ supabase db schema declarative sync -f create_employees_table
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase start
 supabase migration up
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -114,8 +102,6 @@ Don't use `supabase db diff` here: it diffs a live database against your migrati
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```sql name=supabase/schemas/employees.sql
 create table "employees" (
   "id" integer not null,
@@ -123,8 +109,6 @@ create table "employees" (
   "age" smallint not null
 );
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -146,13 +130,9 @@ Some entities like views and enums expect columns to be declared in a specific o
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase db schema declarative sync -f add_age
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -168,13 +148,9 @@ supabase db schema declarative sync -f add_age
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```sql name=supabase/migrations/<timestamp>_add_age.sql
 alter table "public"."employees" add column "age" smallint not null;
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -189,13 +165,9 @@ alter table "public"."employees" add column "age" smallint not null;
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase migration up
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -213,13 +185,9 @@ supabase migration up
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase login
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -232,13 +200,9 @@ supabase login
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase link
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -251,13 +215,9 @@ supabase link
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase db push
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -267,8 +227,6 @@ supabase db push
 ### Managing dependencies
 
 As your database schema evolves, you will probably start using more advanced entities like views and functions. These entities are notoriously verbose to manage using plain migrations because the entire body must be recreated whenever there is a change. Using declarative schema, you can now edit them in-place so it’s much easier to review.
-
-<$CodeTabs>
 
 ```sql name=supabase/schemas/employees.sql
 create table "employees" (
@@ -288,8 +246,6 @@ AS $$
   where id = employee_id;
 $$;
 ```
-
-</$CodeTabs>
 
 You don't need to order your schema files manually. When generating a migration, the engine analyzes the dependencies between your statements, such as foreign keys, views over tables, and functions used by triggers, and orders them automatically - file names and directory layout are purely for readability. If your statements contain a genuine dependency cycle, the command reports it as a diagnostic instead of producing a broken migration.
 
@@ -319,13 +275,9 @@ The `[db.migrations].schema_paths` setting from earlier CLI versions no longer c
 
 To set up declarative schemas on an existing project, export your production schema into declarative files:
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase db schema declarative generate --linked
 ```
-
-</$CodeTabs>
 
 This writes per-object SQL files under `supabase/schemas/`, organized by database schema. In scripts, pass the target explicitly (`--local`, `--linked`, or `--db-url`) and add `--overwrite` to replace an existing tree without prompting. To later refresh the declarative tree from the remote database (for example, after a change was deployed outside your local workflow), run `supabase db pull --declarative` - it replaces the schema files without creating a migration or touching migration history.
 
@@ -333,13 +285,9 @@ This writes per-object SQL files under `supabase/schemas/`, organized by databas
 
 During development, you may want to rollback a migration to keep your new schema changes in a single migration file. This can be done by resetting your local database to a previous version.
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase db reset --version 20241005112233
 ```
-
-</$CodeTabs>
 
 After a reset, you can [edit the schema](#updating-your-schema) and regenerate a new migration file. Note that you should not reset a version that's already deployed to production.
 
