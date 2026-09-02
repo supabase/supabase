@@ -9,7 +9,7 @@ Learn how Edge Functions manage CPU resources and what happens when limits are r
 
 ## How isolates work
 
-An isolate is like a worker that can handle multiple requests for a function. It works until a time limit of 400 seconds is reached. Edge Functions use isolates with soft and hard CPU limits.
+An isolate is like a worker that can handle multiple requests for a function. It works until it reaches the wall clock time limit. Edge Functions use isolates with soft and hard CPU limits.
 
 ## Soft limit
 
@@ -17,7 +17,7 @@ When the isolate hits the soft limit, it **retires**. This means:
 
 - It won't take on any new requests
 - It will finish processing requests it's already working on
-- It keeps going until it hits the hard limit for CPU time or reaches the 400-second time limit, whichever comes first
+- It keeps going until it hits the hard limit for CPU time or reaches the wall clock time limit, whichever comes first
 
 ## Hard limit
 
