@@ -18,7 +18,6 @@ import { generateAssistantResponse } from '@/lib/ai/generate-assistant-response'
 import { isExplorerEnabled } from '@/lib/ai/is-explorer-enabled'
 import { getModel } from '@/lib/ai/model'
 import {
-  DEFAULT_ASSISTANT_ADVANCE_MODEL_ID,
   DEFAULT_ASSISTANT_BASE_MODEL_ID,
   getAssistantModelEntry,
   isAssistantBaseModelId,
@@ -157,7 +156,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
   const envThrottled = process.env.IS_THROTTLED !== 'false'
 
-  let effectiveModel: AssistantModelId = requestedModel ?? DEFAULT_ASSISTANT_ADVANCE_MODEL_ID
+  let effectiveModel: AssistantModelId = requestedModel ?? DEFAULT_ASSISTANT_BASE_MODEL_ID
   if (!hasAccessToAdvanceModel || (envThrottled && !isAssistantBaseModelId(effectiveModel))) {
     effectiveModel = DEFAULT_ASSISTANT_BASE_MODEL_ID
   }
