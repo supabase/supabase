@@ -37,6 +37,7 @@ const ssrLodashEs = {
 // https://astro.build/config
 export default defineConfig({
   base: '/kb',
+  trailingSlash: 'ignore',
   integrations: [react()],
   vite: {
     ssr: {
