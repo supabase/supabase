@@ -2709,29 +2709,6 @@ functions:
           }
           ```
         hideCodeBlock: true
-  - id: dry-run
-    title: dryRun()
-    description: |
-      Limit the query result by count.
-    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.limit'
-    params:
-      - name: count
-        isOptional: false
-        type: Long
-        description: The number of rows to limit the result to.
-      - name: referencedTable
-        isOptional: true
-        type: String
-        description: The foreign table to limit by.
-    examples:
-      - id: with-select
-        name: With `select()`
-        code: |
-          ```kotlin
-          supabase.from("characters").select {
-              limit(count = 1)
-          }
-          ```
   - id: range
     title: range()
     description: |
@@ -4314,7 +4291,9 @@ functions:
   - id: oauth-server-api
     title: OAuth Server Api
     notes: |
-      asdasd
+      Methods under the `supabase.auth.oauth` namespace are used when your Supabase project acts as an OAuth 2.1 server. 
+      They drive the user-facing consent flow, let users manage the grants they have issued to third-party clients, and require a signed-in user. 
+      The OAuth 2.1 server feature must be enabled in your Supabase Auth configuration.
   - id: auth-js-authoauthserverapi-getauthorizationdetails
     notes: |
       Retrieves details about an OAuth authorization request. Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
