@@ -2314,7 +2314,7 @@ functions:
             //the url was opened automatically, if you don't want that, provide a custom redirect url
           ```
   - id: sign-out
-    title: 'sign-out()'
+    title: 'logout()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signOut'
     notes: |
       Logs out the current user.

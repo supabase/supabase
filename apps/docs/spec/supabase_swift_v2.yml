@@ -4741,7 +4741,7 @@ functions:
       - id: passing-custom-headers
         name: Passing custom headers
         description: |
-          You can pass custom headers to your function. Note: supabase-js automatically passes the `Authorization` header with the signed-in user's JWT.
+          You can pass custom headers to your function. Note: supabase-swift automatically passes the `Authorization` header with the signed-in user's JWT.
         isSpotlight: true
         code: |
           ```swift

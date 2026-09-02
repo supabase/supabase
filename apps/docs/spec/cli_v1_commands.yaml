@@ -1780,13 +1780,13 @@ commands:
         name: --local
         description: Resets applied migrations on the local database.
         default_value: 'true'
-  - id: supabase-sign-out
-    title: supabase sign-out
-    summary: Sign out and delete access tokens locally
+  - id: supabase-logout
+    title: supabase logout
+    summary: Log out and delete access tokens locally
     tags:
       - local-dev
     links: []
-    usage: supabase sign-out
+    usage: supabase logout
     subcommands: []
     flags: []
   - id: supabase-login
