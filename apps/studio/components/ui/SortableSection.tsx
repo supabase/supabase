@@ -29,6 +29,7 @@ export const SortableSection = ({
     onDragStart: (event) => {
       if (event.active.id === id) {
         isDraggingRef.current = true
+        clearTimeout(openTimeoutRef.current)
         setMenuOpen(false)
       }
     },
