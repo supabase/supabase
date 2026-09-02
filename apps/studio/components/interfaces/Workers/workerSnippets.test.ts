@@ -61,9 +61,18 @@ describe('buildWorkerSnippets', () => {
     expect(configToml).toContain('[workers.embed]')
     expect(configToml).toContain('runtime   = "python"')
     expect(configToml).toContain('size      = "4gb-2vcpu"    # 4 GB · 2 vCPU')
-    expect(configToml).toContain('access    = "private"')
+    expect(configToml).toContain('exposure  = "private"')
     expect(configToml).toContain('instances = 3')
     expect(configToml).toContain(WORKERS_REGION)
+  })
+
+  it('configures private workers for CLI deployment', () => {
+    const { aiPrompt, cli } = buildWorkerSnippets(input({ access: 'private' }))
+
+    expect(cli).toContain('--exposure private')
+    expect(aiPrompt).toContain('push my-worker --exposure private')
+    expect(cli).not.toContain('only deploy public workers')
+    expect(aiPrompt).not.toContain('only deploy public workers')
   })
 })
 
