@@ -17,7 +17,7 @@ _Self-serve first ([agent skills](../../../../apps/docs/CONTRIBUTING.md#ai-agent
 - The **why** is explicit: a reader learns what problem this solves and when to reach for it, not only the steps.
 - The content **type is deliberate** and consistent within the page.
 - **Audience and prerequisites** are stated up front.
-- **Examples are runnable and have been run** (commands, code, expected result) — verify with `/test-the-docs` against a Docker-isolated local stack, not production.
+- **Examples are runnable and have been tested** (commands, code, expected result) — verify with `/test-the-docs` against a Docker-isolated local stack, not production.
 - **Correct stage** like GA is stated; limitations are named honestly.
 - The page **lives in the right place** in the IA and links to and from related pages.
 - Terminology and formatting match existing docs (and style guide once it lands).
@@ -48,9 +48,11 @@ _Skill:_ `/write-the-docs` to draft net-new content grounded in Linear and the c
 - [ ] E: Contribute technical depth and verify accuracy (APIs, limits, edge cases)
 - [ ] P: Call out the current stage inline and any known limitations
 
+When the work is improving an existing page (restructure, reorder, connective text, brevity) rather than authoring net-new content, use `/edit-the-docs` instead of `/write-the-docs`.
+
 ### 4. Self-review against the bar
 
-_Skills:_ `/test-the-docs` to run snippets and produce a Verification table; `/review-the-docs` for local self-review (lint/build/classify) before opening the PR.
+_Skills:_ `/review-the-docs` for local self-review (lint/build/classify) before opening the PR; `/test-the-docs` to run snippets and produce a Verification table.
 
 - [ ] P/E: Check the draft against "What good looks like" above before opening the PR
 - [ ] P/E: `/test-the-docs` run; Verification table ready for the PR body
@@ -71,7 +73,7 @@ _Skill:_ `/review-the-docs` to triage, classify, verify the build, and report.
 
 **Self-serve when:** the checklist above is clear, standards exist, and you know the product stage and audience.
 
-**Ask when:** scope or stage is unclear, you need a review path, the bar is ambiguous, or the launch docs touch cross-cutting surfaces (quickstarts, API keys, tutorials, onboarding, platform concepts).
+**Ask when:** scope or stage is unclear, you need a review path, the bar is ambiguous, or the launch docs touch cross-cutting surfaces (quick starts, API keys, tutorials, onboarding, platform concepts).
 
 **What to expect:** the docs PM is the point of contact for questions, skills enablement, and review against the bar.
 
@@ -79,4 +81,4 @@ _Skill:_ `/review-the-docs` to triage, classify, verify the build, and report.
 
 ## Resources
 
-Skills for this checklist: [AI agent skills for docs authoring](../../../../apps/docs/CONTRIBUTING.md#ai-agent-skills-for-docs-authoring) (`/pm-the-docs`, `/ask-the-docs`, `/write-the-docs`, `/test-the-docs`, `/review-the-docs`).
+Skills for this checklist: [AI agent skills for docs authoring](../../../../apps/docs/CONTRIBUTING.md#ai-agent-skills-for-docs-authoring) (`/pm-the-docs`, `/ask-the-docs`, `/write-the-docs`, `/edit-the-docs`, `/test-the-docs`, `/review-the-docs`).
