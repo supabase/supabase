@@ -87,8 +87,8 @@ describe('getConfigDriftSummary', () => {
 
     it('counts a list that differs only in order as managed', () => {
       const summary = getConfigDriftSummary({
-        // `convertProjectConfigToGitHubConfig` sorts the dashboard list and `normalizeGithubValue`
-        // sorts the config.toml one, so ordering can never register as drift.
+        // `fromApiProjectConfig` sorts the dashboard list and `normalizeGithubValue` sorts the
+        // config.toml one, so ordering can never register as drift.
         dashboardConfig: { auth: { additional_redirect_urls: ['https://a.com', 'https://b.com'] } },
         githubConfig: { auth: { additional_redirect_urls: ['https://b.com', 'https://a.com'] } },
       })
