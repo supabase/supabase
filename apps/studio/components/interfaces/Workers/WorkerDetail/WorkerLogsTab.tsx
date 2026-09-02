@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import dayjs from 'dayjs'
 import { RefreshCw } from 'lucide-react'
 import { useState } from 'react'
 import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'ui'
@@ -8,6 +7,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { WorkerCommandLine } from '../WorkerCommandLine'
 import { WorkersLogsColumnRender } from '@/components/interfaces/Settings/Logs/LogColumnRenderers/WorkersLogsColumnRender'
+import { EXPLORER_DATEPICKER_HELPERS } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import {
   LogsDatePicker,
   type DatePickerValue,
@@ -28,35 +28,16 @@ interface WorkerLogsTabProps {
   stream: WorkerLogStream
 }
 
-const WORKER_LOG_DATE_HELPERS = [
-  {
-    text: 'Last 1 hour',
-    calcFrom: () => dayjs().subtract(1, 'hour').toISOString(),
-    calcTo: () => dayjs().toISOString(),
-  },
-  {
-    text: 'Last 6 hours',
-    calcFrom: () => dayjs().subtract(6, 'hour').toISOString(),
-    calcTo: () => dayjs().toISOString(),
-  },
-  {
-    text: 'Last 24 hours',
-    calcFrom: () => dayjs().subtract(1, 'day').toISOString(),
-    calcTo: () => dayjs().toISOString(),
-  },
-  {
-    text: 'Last 7 days',
-    calcFrom: () => dayjs().subtract(7, 'day').toISOString(),
-    calcTo: () => dayjs().toISOString(),
-  },
-]
+const defaultDateRange = (): DatePickerValue => {
+  const helper = EXPLORER_DATEPICKER_HELPERS.find((helper) => helper.text === 'Last 24 hours')!
 
-const defaultDateRange = (): DatePickerValue => ({
-  from: WORKER_LOG_DATE_HELPERS[2].calcFrom(),
-  to: WORKER_LOG_DATE_HELPERS[2].calcTo(),
-  isHelper: true,
-  text: WORKER_LOG_DATE_HELPERS[2].text,
-})
+  return {
+    from: helper.calcFrom(),
+    to: helper.calcTo(),
+    isHelper: true,
+    text: helper.text,
+  }
+}
 
 export const WorkerLogsTab = ({ workerName, stream }: WorkerLogsTabProps) => {
   const { ref: projectRef } = useParams()
@@ -95,7 +76,7 @@ export const WorkerLogsTab = ({ workerName, stream }: WorkerLogsTabProps) => {
             hideWarnings
             value={dateRange}
             onSubmit={setDateRange}
-            helpers={WORKER_LOG_DATE_HELPERS}
+            helpers={EXPLORER_DATEPICKER_HELPERS}
           />
           {stream === 'requests' && (
             <Select
