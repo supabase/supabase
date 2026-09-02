@@ -29,37 +29,33 @@ export const ErrorDetailsDialog = ({
 }: ErrorDetailsDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size="xlarge" aria-describedby={undefined}>
+      <DialogContent size="small">
         <DialogHeader>
-          <DialogTitle>
-            Replication error on <code className="text-code-inline">{tableName}</code>
-          </DialogTitle>
+          <DialogTitle>Replication error</DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
-        <DialogSection className="p-0!">
-          <div className="px-4 py-3">
-            <p className="text-sm text-foreground-light">
-              The following error occurred during replication:
-            </p>
+        <DialogSection className="flex flex-col gap-y-4">
+          <div className="flex flex-col gap-y-2">
+            <p className="text-sm text-foreground-light">{tableName} stopped replicating:</p>
+            {/*
+              No `language`: this is an error message reported by the destination, not code, so
+              syntax highlighting would colour it at random. The code block is still the right
+              frame, since it marks the text as machine output and carries a copy button for
+              pasting into a support request.
+            */}
+            <CodeBlock
+              hideLineNumbers
+              wrapLines
+              wrapLongLines
+              value={reason}
+              wrapperClassName={cn('[&_pre]:px-3 [&_pre]:py-3')}
+              className="[&_code]:text-xs [&_code]:text-foreground [&_span]:text-foreground!"
+            />
           </div>
-          <CodeBlock
-            hideLineNumbers
-            wrapLines={false}
-            wrapperClassName={cn(
-              '[&_pre]:px-4 [&_pre]:py-3 [&>pre]:border-x-0 [&>pre]:rounded-none'
-            )}
-            language="bash"
-            value={reason}
-            className="[&_code]:text-xs [&_code]:text-foreground [&_span]:text-foreground!"
-          />
-          {solution && (
-            <div className="px-4 py-3">
-              <p className="text-sm">{solution}</p>
-            </div>
-          )}
+          {solution && <p className="text-sm text-foreground-light">{solution}</p>}
         </DialogSection>
         <DialogFooter>
-          <DialogClose>
+          <DialogClose asChild>
             <Button variant="default">Close</Button>
           </DialogClose>
         </DialogFooter>

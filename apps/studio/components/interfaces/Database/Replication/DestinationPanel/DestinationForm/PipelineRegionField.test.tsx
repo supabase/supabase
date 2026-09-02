@@ -1,11 +1,8 @@
 import { screen } from '@testing-library/react'
 import { describe, expect, test } from 'vitest'
 
-import {
-  getPipelineRegionDescription,
-  PIPELINE_REGION,
-  PipelineRegionField,
-} from './PipelineRegionField'
+import { PIPELINE_REGION } from '../../Replication.constants'
+import { getPipelineRegionDescription, PipelineRegionField } from './PipelineRegionField'
 import { customRender } from '@/tests/lib/custom-render'
 
 describe('getPipelineRegionDescription', () => {

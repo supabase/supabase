@@ -17,3 +17,15 @@ export const getReplicationDestinationType = (
   return undefined
 }
 
+/**
+ * The specific place inside a destination that a pipeline writes to — a BigQuery dataset, a
+ * ClickHouse or Snowflake database, an Iceberg warehouse. Returns undefined when the destination
+ * has no single meaningful target (DuckLake writes to a data path).
+ */
+export const getReplicationDestinationTarget = (
+  config?: Record<string, unknown>
+): string | undefined =>
+  (config?.big_query as { dataset_id?: string })?.dataset_id ??
+  (config?.clickhouse as { database?: string })?.database ??
+  (config?.snowflake as { database?: string })?.database ??
+  (config?.iceberg as { warehouse_name?: string })?.warehouse_name

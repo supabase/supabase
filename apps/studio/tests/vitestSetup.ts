@@ -2,6 +2,7 @@ import '@testing-library/jest-dom/vitest'
 
 import { cleanup } from '@testing-library/react'
 import dayjs from 'dayjs'
+import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
@@ -14,6 +15,7 @@ import { routerMock } from './lib/route-mock'
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
+dayjs.extend(duration)
 
 // Uncomment this if HTML in errors are being annoying.
 //
