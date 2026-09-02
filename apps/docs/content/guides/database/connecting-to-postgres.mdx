@@ -176,9 +176,9 @@ Server-side poolers maintain hot connections with the database and share them wi
 
 Connect to your database using SSL wherever possible, to prevent snooping and man-in-the-middle attacks.
 
-Get your connection info and server root certificate from [Database settings](/dashboard/project/_/database/settings) in the Supabase Dashboard:
+Download your server root certificate from [Database settings](/dashboard/project/_/database/settings) in the Supabase Dashboard. The same section has a toggle that rejects non-SSL connections to your database.
 
-![Connection info and server root certificate.](/docs/img/database/database-settings-ssl.png)
+![The SSL Configuration section of Database settings, with a toggle to enforce SSL on incoming connections and a Download Certificate button.](/docs/img/database/database-settings-ssl.png)
 
 ## Resources
 
@@ -190,11 +190,11 @@ Get your connection info and server root certificate from [Database settings](/d
 
 The following answers cover common connection problems and questions.
 
-### What is a "connection refused" error?
+### What is a `connection refused` error?
 
-A "connection refused" error means your database isn't reachable. Check that your Supabase project is running, confirm your database's connection string, check your firewall settings, and validate your network permissions.
+A `connection refused` error means your database isn't reachable. Check that your Supabase project is running, confirm your database's connection string, check your firewall settings, and validate your network permissions.
 
-### What is the "FATAL: Password authentication failed" error?
+### What is the `FATAL: Password authentication failed` error?
 
 This error means your credentials are incorrect. Check your username and password in the Supabase Dashboard. If the problem persists, reset your database password in the project settings.
 
@@ -212,11 +212,22 @@ You can use both, but don't do it unless you're trying to increase the total num
 
 ### How does the default pool size work?
 
-Supavisor and PgBouncer work independently, but both reference the same pool size setting. For example, if you set the pool size to 30, Supavisor can open up to 30 server-side connections to Postgres. These connections are shared between the session mode port, `5432`, and the transaction mode port, `6543`. Each mode can use up to 30 connections independently, or split them between both modes, but the total across both modes cannot exceed 30. PgBouncer can also open up to 30 connections under the same limit. If both poolers reach their limits at the same time, you could have as many as 60 backend connections hitting your database, in addition to any direct connections. You can adjust the pool size in [Database settings](/dashboard/project/_/database/settings) in the Supabase Dashboard.
+Supavisor and PgBouncer work independently, but both reference the same pool size setting. You can adjust it in [Database settings](/dashboard/project/_/database/settings) in the Supabase Dashboard.
+
+Say you set the pool size to 30. Supavisor can then open up to 30 server-side connections to Postgres. Those 30 are shared between the session mode port, `5432`, and the transaction mode port, `6543`. Each mode can use all 30 on its own, or the two can split them, but the total across both modes cannot exceed 30.
+
+PgBouncer can open up to 30 connections under the same limit. If both poolers reach their limits at the same time, you could have as many as 60 backend connections hitting your database, in addition to any direct connections.
 
 ### What is the difference between client connections and backend connections?
 
-There are two limits to understand when working with poolers. The first is client connections, which is how many clients can connect to a pooler at the same time. This number is capped by your [compute size's max pooler clients limit](/docs/guides/platform/compute-and-disk#postgres-replication-slots-wal-senders-and-connections), and it applies independently to Supavisor and PgBouncer. The second is backend connections, which is the number of active connections a pooler opens to Postgres. This number is set by the pool size for that pooler.
+There are two limits to understand when working with poolers.
+
+| Limit               | What it counts                                            | What sets it                                                                                                                                  |
+| ------------------- | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Client connections  | How many clients can connect to a pooler at the same time | Your [compute size's max pooler clients limit](/docs/guides/platform/compute-and-disk#postgres-replication-slots-wal-senders-and-connections) |
+| Backend connections | How many active connections a pooler opens to Postgres    | The pool size for that pooler                                                                                                                 |
+
+Both limits apply independently to Supavisor and PgBouncer.
 
 ```txt
 Total backend load on Postgres =
