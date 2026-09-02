@@ -3123,28 +3123,28 @@ export const self_hosting: NavMenuConstant = {
       name: 'Add Reverse Proxy with HTTPS',
       url: '/guides/self-hosting/self-hosted-proxy-https',
     },
+    { name: 'Upgrade to Postgres 17', url: '/guides/self-hosting/postgres-upgrade-17' },
+    { name: 'Remove superuser access', url: '/guides/self-hosting/remove-superuser-access' },
     { name: 'Update your deployment', url: '/guides/self-hosting/updating' },
     {
       name: 'How-to Guides',
       items: [
-        { name: 'Upgrade to Postgres 17', url: '/guides/self-hosting/postgres-upgrade-17' },
-        { name: 'Remove superuser access', url: '/guides/self-hosting/remove-superuser-access' },
         { name: 'Run Self-Hosted Functions', url: '/guides/self-hosting/self-hosted-functions' },
         { name: 'Configure S3 Storage', url: '/guides/self-hosting/self-hosted-s3' },
-        { name: 'Add Custom Email Templates', url: '/guides/self-hosting/custom-email-templates' },
+        { name: 'Enable MCP server', url: '/guides/self-hosting/enable-mcp' },
         { name: 'Configure Social Login (OAuth)', url: '/guides/self-hosting/self-hosted-oauth' },
         { name: 'Configure Phone Login & MFA', url: '/guides/self-hosting/self-hosted-phone-mfa' },
+        { name: 'Add Custom Email Templates', url: '/guides/self-hosting/custom-email-templates' },
         { name: 'Configure SAML 2.0 SSO', url: '/guides/self-hosting/self-hosted-saml-sso' },
-        { name: 'Enable MCP server', url: '/guides/self-hosting/enable-mcp' },
-        {
-          name: 'Build Custom Extensions',
-          url: '/guides/self-hosting/custom-postgres-extensions',
-        },
         {
           name: 'Restore Project from Platform',
           url: '/guides/self-hosting/restore-from-platform',
         },
         { name: 'Copy Storage from Platform', url: '/guides/self-hosting/copy-from-platform-s3' },
+        {
+          name: 'Build Custom Extensions',
+          url: '/guides/self-hosting/custom-postgres-extensions',
+        },
       ],
     },
     {
