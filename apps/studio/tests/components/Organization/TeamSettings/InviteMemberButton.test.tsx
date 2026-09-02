@@ -168,11 +168,17 @@ describe('InviteMemberButton', () => {
     mockFeatureFlags.organizationMembersCreate = false
     customRender(<InviteMemberButton />)
 
-    await userEvent.hover(screen.getByRole('button', { name: /invite members/i }))
+    const inviteButton = screen.getByRole('button', { name: /invite members/i })
+    expect(inviteButton).toBeDisabled()
+
+    await userEvent.hover(inviteButton)
 
     const disabledTooltip = await screen.findByRole('tooltip')
     expect(disabledTooltip).toHaveTextContent('Inviting members is currently disabled')
     expect(disabledTooltip).not.toHaveTextContent('⇧')
+
+    await userEvent.keyboard('{Shift>}N{/Shift}')
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
   it('opens the invite dialog when the button is clicked', async () => {
