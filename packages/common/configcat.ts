@@ -56,6 +56,27 @@ async function getClient() {
   }
 }
 
+/**
+ * Reads a ConfigCat string-array-style flag, targeted by `targetingKey` rather than user email.
+ * Mirrors the platform API's `getStringArrayValue` helper (`packages/flags/src/base-flags.ts`) so a
+ * flag like `warehouse` (a comma-separated allow-list of org slugs, or the `'none'` sentinel for an
+ * empty list) evaluates identically on the client and the server for the same targeting key.
+ */
+export async function getStringArrayFlag(flagKey: string, targetingKey: string): Promise<string[]> {
+  const client = await getClient()
+  if (!client) return []
+
+  await client.waitForReady()
+
+  const rawValue = await client.getValueAsync(flagKey, '', new configcat.User(targetingKey))
+  if (!rawValue || rawValue === 'none') return []
+
+  return rawValue
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean)
+}
+
 export async function getFlags(userEmail: string = '', customAttributes?: Record<string, string>) {
   const client = await getClient()
   const _customAttributes = {

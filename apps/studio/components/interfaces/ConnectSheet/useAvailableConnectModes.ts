@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 
 import type { ConnectMode } from './Connect.types'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useIsWarehouseEnabled } from '@/hooks/misc/useIsWarehouseEnabled'
 
 export function useAvailableConnectModes(): ConnectMode[] {
   const {
@@ -13,6 +14,7 @@ export function useAvailableConnectModes(): ConnectMode[] {
     'project_connection:show_mobile_frameworks',
     'project_connection:show_orms',
   ])
+  const isWarehouseEnabled = useIsWarehouseEnabled()
 
   return useMemo(() => {
     const allModes: { id: ConnectMode; enabled: boolean }[] = [
@@ -21,7 +23,8 @@ export function useAvailableConnectModes(): ConnectMode[] {
       { id: 'direct', enabled: true },
       { id: 'orm', enabled: showOrms },
       { id: 'mcp', enabled: true },
+      { id: 'warehouse', enabled: isWarehouseEnabled },
     ]
     return allModes.filter((m) => m.enabled).map((m) => m.id)
-  }, [showAppFrameworks, showMobileFrameworks, showOrms])
+  }, [showAppFrameworks, showMobileFrameworks, showOrms, isWarehouseEnabled])
 }
