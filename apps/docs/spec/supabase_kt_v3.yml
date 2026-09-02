@@ -63,7 +63,7 @@ functions:
              scheme = "deeplink scheme"
 
              // On Android only, you can set OAuth and SSO logins to open in a custom tab, rather than an external browser:
-             defaultExternalAuthAction = ExternalAuthAction.CustomTabs() //defaults to ExternalAuthAction.ExternalBrowser
+             defaultExternalAuthAction = ExternalAuthAction.CustomTabs() // defaults to ExternalAuthAction.ExternalBrowser
           }
           ```
       4. **Call platform specific function on startup** \
@@ -136,7 +136,7 @@ functions:
           ) {
               install(Auth)
               install(Postgrest)
-              //install other modules
+              // install other modules
           }
           ```
       - id: configure-auth
@@ -150,7 +150,7 @@ functions:
               install(Auth) {
                   alwaysAutoRefresh = false // default: true
                   autoLoadFromStorage = false // default: true
-                  //and more...
+                  // and more...
               }
           }
           ```
@@ -285,7 +285,7 @@ functions:
               supabaseKey = "your-publishable-key"
           ) {
               install(Functions) {
-                  //no custom settings
+                  // no custom settings
               }
           }
           ```
@@ -303,7 +303,7 @@ functions:
           ) {
               install(GraphQL) {
                   apolloConfiguration {
-                    //custom configuration
+                    // custom configuration
                   }
               }
           }
@@ -499,13 +499,13 @@ functions:
           supabase.from("characters").update(
               {
                  Country::name setTo "Han Solo"
-                 //or
+                 // or
                  set("name", "Han Solo")
               }
           ) {
               filter {
                   Character::id eq 1
-                  //or
+                  // or
                   eq("id", 1)
               }
           }
@@ -517,14 +517,14 @@ functions:
           val newCharacter = supabase.from("characters").update(
               {
                  Character::name setTo "Han Solo"
-                 //or
+                 // or
                  set("name", "Han Solo")
               }
           ) {
               select()
               filter {
                   Character::id eq 1
-                  //or
+                  // or
                   eq("id", 1)
               }
           }.decodeSingle<Character>()
@@ -678,7 +678,7 @@ functions:
           supabase.from("cities").delete {
               filter {
                   City::id eq 666
-                  //or
+                  // or
                   eq("id", 666)
               }
           }
@@ -691,7 +691,7 @@ functions:
               select()
               filter {
                   City::id eq 666
-                  //or
+                  // or
                   eq("id", 666)
               }
           }.decodeSingle<City>()
@@ -776,7 +776,7 @@ functions:
           supabase.from("cities").select(columns = Columns.list("name", "country_id")) {
               filter {
                   City::name eq "The Shire"
-                  //or
+                  // or
                   eq("name", "The Shire")
               }
           }
@@ -790,11 +790,11 @@ functions:
           ```kotlin
           supabase.from("cities").select(columns = Columns.list("name, country_id")) {
               filter {
-                  and { //when both are true
+                  and { // when both are true
                      City::population gt 40000
                      City::population lt 700000
                   }
-                  or { //when either one of the filters are true
+                  or { // when either one of the filters are true
                      City::name eq "Hobbiton"
                      City::name eq "Edoras"
                   }
@@ -927,7 +927,7 @@ functions:
                   or {
                       Country::id eq 2
                       Country::name eq "Mordor"
-                      //or
+                      // or
                       eq("id", 2)
                       eq("name", "Mordor")
                   }
@@ -1005,7 +1005,7 @@ functions:
           supabase.from("cities").select(columns = Columns.list("name", "country_id")) {
               filter {
                   City::name eq "The Shire"
-                  //or
+                  // or
                   eq("name", "The Shire")
               }
           }
@@ -1018,7 +1018,7 @@ functions:
           supabase.from("cities").update(toUpdate) {
               filter {
                   City::name eq "Hobbiton"
-                  //or
+                  // or
                   eq("name", "Hobbiton")
               }
           }
@@ -1030,7 +1030,7 @@ functions:
           supabase.from("cities").delete {
               filter {
                   City::name eq "Mordor"
-                  //or
+                  // or
                   eq("name", "Mordor")
               }
           }
@@ -1042,7 +1042,7 @@ functions:
           supabase.postgrest.rpc("function") {
               filter {
                   City::name eq "Mordor"
-                  //or
+                  // or
                   eq("name", "Mordor")
               }
           }
@@ -1070,7 +1070,7 @@ functions:
           supabase.from("cities").select(columns = Columns.list("name", "country_id")) {
               filter {
                   City::name neq "The Shire"
-                  //or
+                  // or
                   neq("name", "The Shire")
               }
           }
@@ -1083,7 +1083,7 @@ functions:
           supabase.from("cities").update(toUpdate) {
               filter {
                   City::name neq "The Shire"
-                  //or
+                  // or
                   neq("name", "The Shire")
               }
           }
@@ -1095,7 +1095,7 @@ functions:
           supabase.from("cities").delete {
               filter {
                   City::name neq "The Shire"
-                  //or
+                  // or
                   neq("name", "The Shire")
               }
           }
@@ -1133,7 +1133,7 @@ functions:
           supabase.from("cities").select(columns = Columns.list("name")) {
               filter {
                  City::countryId gt 300
-                 //or
+                 // or
                  gt("country_id", 300)
               }
           }
@@ -1146,7 +1146,7 @@ functions:
           supabase.from("cities").update(toUpdate) {
               filter {
                  City::countryId gt 300
-                 //or
+                 // or
                  gt("country_id", 300)
               }
           }
@@ -1158,7 +1158,7 @@ functions:
           supabase.from("cities").delete {
               filter {
                  City::countryId gt 300
-                 //or
+                 // or
                  gt("country_id", 300)
               }
           }
@@ -1170,7 +1170,7 @@ functions:
           supabase.postgrest.rpc("echo_all_cities") {
               filter {
                  City::countryId gt 300
-                 //or
+                 // or
                  gt("country_id", 300)
               }
           }
@@ -1198,7 +1198,7 @@ functions:
           supabase.from("cities").select(columns = Columns.list("name")) {
               filter {
                  City::countryId gte 300
-                 //or
+                 // or
                  gte("country_id", 300)
               }
           }
@@ -1211,7 +1211,7 @@ functions:
           supabase.from("cities").update(toUpdate) {
               filter {
                  City::countryId gte 300
-                 //or
+                 // or
                  gte("country_id", 300)
               }
           }
@@ -1223,7 +1223,7 @@ functions:
           supabase.from("cities").delete {
               filter {
                  City::countryId gte 300
-                 //or
+                 // or
                  gte("country_id", 300)
               }
           }
@@ -1235,7 +1235,7 @@ functions:
           supabase.postgrest.rpc("echo_all_cities") {
               filter {
                  City::countryId gte 300
-                 //or
+                 // or
                  gte("country_id", 300)
               }
           }
@@ -1263,7 +1263,7 @@ functions:
           supabase.from("cities").select(columns = Columns.list("name")) {
               filter {
                  City::countryId lt 300
-                 //or
+                 // or
                  lt("country_id", 300)
               }
           }
@@ -1276,7 +1276,7 @@ functions:
           supabase.from("cities").update(toUpdate) {
               filter {
                  City::countryId lt 300
-                 //or
+                 // or
                  lt("country_id", 300)
               }
           }
@@ -1288,7 +1288,7 @@ functions:
           supabase.from("cities").delete {
               filter {
                  City::countryId lt 300
-                 //or
+                 // or
                  lt("country_id", 300)
               }
           }
@@ -1300,7 +1300,7 @@ functions:
           supabase.postgrest.rpc("echo_all_cities") {
               filter {
                  City::countryId lt 300
-                 //or
+                 // or
                  lt("country_id", 300)
               }
           }
@@ -1328,7 +1328,7 @@ functions:
           supabase.from("cities").select(columns = Columns.list("name")) {
               filter {
                  City::countryId lte 300
-                 //or
+                 // or
                  lte("country_id", 300)
               }
           }
@@ -1341,7 +1341,7 @@ functions:
           supabase.from("cities").update(toUpdate) {
               filter {
                  City::countryId lte 300
-                 //or
+                 // or
                  lte("country_id", 300)
               }
           }
@@ -1353,7 +1353,7 @@ functions:
           supabase.from("cities").delete {
               filter {
                  City::countryId lte 300
-                 //or
+                 // or
                  lte("country_id", 300)
               }
           }
@@ -1365,7 +1365,7 @@ functions:
           supabase.postgrest.rpc("echo_all_cities") {
               filter {
                  City::countryId lte 300
-                 //or
+                 // or
                  lte("country_id", 300)
               }
           }
@@ -1393,7 +1393,7 @@ functions:
           supabase.from("cities").select(columns = Columns.list("name")) {
               filter {
                  City::name like "%la%"
-                 //or
+                 // or
                  like("name", "%la%")
               }
           }
@@ -1406,7 +1406,7 @@ functions:
           supabase.from("cities").update(toUpdate) {
               filter {
                  City::name like "%la%"
-                 //or
+                 // or
                  like("name", "%la%")
               }
           }
@@ -1418,7 +1418,7 @@ functions:
           supabase.from("cities").delete {
               filter {
                  City::name like "%la%"
-                 //or
+                 // or
                  like("name", "%la%")
               }
           }
@@ -1430,7 +1430,7 @@ functions:
           supabase.postgrest.rpc("echo_all_cities") {
               filter {
                  City::name like "%la%"
-                 //or
+                 // or
                  like("name", "%la%")
               }
           }
@@ -1458,7 +1458,7 @@ functions:
           supabase.from("cities").select(columns = Columns.list("name")) {
               filter {
                  City::name ilike "%la%"
-                 //or
+                 // or
                  ilike("name", "%la%")
               }
           }
@@ -1471,7 +1471,7 @@ functions:
           supabase.from("cities").update(toUpdate) {
               filter {
                  City::name ilike "%la%"
-                 //or
+                 // or
                  ilike("name", "%la%")
               }
           }
@@ -1483,7 +1483,7 @@ functions:
           supabase.from("cities").delete {
               filter {
                  City::name ilike "%la%"
-                 //or
+                 // or
                  ilike("name", "%la%")
               }
           }
@@ -1495,7 +1495,7 @@ functions:
           supabase.postgrest.rpc("echo_all_cities") {
               filter {
                  City::name ilike "%la%"
-                 //or
+                 // or
                  ilike("name", "%la%")
               }
           }
@@ -1525,7 +1525,7 @@ functions:
           supabase.from("cities").select(columns = Columns.list("name")) {
               filter {
                  City::name isExact null
-                 //or
+                 // or
                  exact("name", null)
               }
           }
@@ -1538,7 +1538,7 @@ functions:
           supabase.from("cities").update(toUpdate) {
               filter {
                  City::name isExact null
-                 //or
+                 // or
                  exact("name", null)
               }
           }
@@ -1550,7 +1550,7 @@ functions:
           supabase.from("cities").delete {
               filter {
                  City::name isExact null
-                 //or
+                 // or
                  exact("name", null)
               }
           }
@@ -1562,7 +1562,7 @@ functions:
           supabase.postgrest.rpc("echo_all_cities") {
               filter {
                  City::name isExact null
-                 //or
+                 // or
                  exact("name", null)
               }
           }
@@ -1590,7 +1590,7 @@ functions:
           supabase.from("cities").select(columns = Columns.list("name")) {
               filter {
                  City::name isIn listOf("Hobbiton", "Edoras")
-                 //or
+                 // or
                  isIn("name", listOf("Hobbiton", "Edoras"))
               }
           }
@@ -1603,7 +1603,7 @@ functions:
           supabase.from("cities").update(toUpdate) {
               filter {
                  City::name isIn listOf("Hobbiton", "Edoras")
-                 //or
+                 // or
                  isIn("name", listOf("Hobbiton", "Edoras"))
               }
           }
@@ -1615,7 +1615,7 @@ functions:
           supabase.from("cities").delete {
               filter {
                  City::name isIn listOf("Hobbiton", "Edoras")
-                 //or
+                 // or
                  isIn("name", listOf("Hobbiton", "Edoras"))
               }
           }
@@ -1627,7 +1627,7 @@ functions:
           supabase.postgrest.rpc("echo_all_cities") {
               filter {
                  City::name isIn listOf("Hobbiton", "Edoras")
-                 //or
+                 // or
                  isIn("name", listOf("Hobbiton", "Edoras"))
               }
           }
@@ -1655,7 +1655,7 @@ functions:
           supabase.from("cities").select(columns = Columns.list("name")) {
               filter {
                  City::name notIn listOf("Hobbiton", "Edoras")
-                 //or
+                 // or
                  notIn("name", listOf("Hobbiton", "Edoras"))
               }
           }
@@ -1683,7 +1683,7 @@ functions:
           supabase.from("cities").select(columns = Columns.list("name")) {
               filter {
                  City::mainExports contains listOf("oil")
-                 //or
+                 // or
                  contains("main_exports", listOf("oil"))
               }
           }
@@ -1696,7 +1696,7 @@ functions:
           supabase.from("cities").update(toUpdate) {
               filter {
                  City::mainExports contains listOf("oil")
-                 //or
+                 // or
                  contains("main_exports", listOf("oil"))
               }
           }
@@ -1708,7 +1708,7 @@ functions:
           supabase.from("cities").delete {
               filter {
                  City::mainExports contains listOf("oil")
-                 //or
+                 // or
                  contains("main_exports", listOf("oil"))
               }
           }
@@ -1720,7 +1720,7 @@ functions:
           supabase.postgrest.rpc("echo_all_cities") {
               filter {
                  City::mainExports contains listOf("oil")
-                 //or
+                 // or
                  contains("main_exports", listOf("oil"))
               }
           }
@@ -1748,7 +1748,7 @@ functions:
             supabase.from("reservations").select {
                 filter {
                    Reservation::during rangeLt ("2000-01-02 08:30" to "2000-01-02 09:30")
-                   //or
+                   // or
                    rangeLt("during", "2000-01-02 08:30" to "2000-01-02 09:30")
                 }
             }
@@ -1812,7 +1812,7 @@ functions:
             supabase.from("reservations").select {
                 filter {
                    Reservation::during rangeGt ("2000-01-02 08:30" to "2000-01-02 09:30")
-                   //or
+                   // or
                    rangeGt("during", "2000-01-02 08:30" to "2000-01-02 09:30")
                 }
             }
@@ -1876,7 +1876,7 @@ functions:
             supabase.from("reservations").select {
                 filter {
                    Reservation::during rangeGte ("2000-01-02 08:30" to "2000-01-02 09:30")
-                   //or
+                   // or
                    rangeGte("during", "2000-01-02 08:30" to "2000-01-02 09:30")
                 }
             }
@@ -1941,7 +1941,7 @@ functions:
             supabase.from("reservations").select {
                 filter {
                    Reservation::during rangeLte ("2000-01-02 08:30" to "2000-01-02 09:30")
-                   //or
+                   // or
                    rangeLte("during", "2000-01-02 08:30" to "2000-01-02 09:30")
                 }
             }
@@ -2005,7 +2005,7 @@ functions:
             supabase.from("reservations").select {
                 filter {
                    Reservation::during adjacent ("2000-01-02 08:30" to "2000-01-02 09:30")
-                   //or
+                   // or
                    adjacent("during", "2000-01-02 08:30" to "2000-01-02 09:30")
                 }
             }
@@ -2065,7 +2065,7 @@ functions:
           supabase.from("issues").select(columns = Columns.list("title")) {
               filter {
                  Issue::tags overlaps listOf("is:closed", "severity:high")
-                 //or
+                 // or
                  overlaps("tags", listOf("is:closed", "severity:high"))
               }
           }
@@ -2107,7 +2107,7 @@ functions:
           supabase.from("issues").select(columns = Columns.list("title")) {
               filter {
                  Issue::during overlaps listOf("2000-01-01 12:45", "2000-01-01 13:15")
-                 //or
+                 // or
                  overlaps("during", listOf("2000-01-01 12:45", "2000-01-01 13:15"))
               }
           }
@@ -3238,8 +3238,8 @@ functions:
           ```kotlin
           supabase.auth.signInWith(IDToken) {
               idToken = "token"
-              provider = Google //Also supported: Apple, Azure and Facebook
-              //optional:
+              provider = Google // Also supported: Apple, Azure and Facebook
+              // optional:
               nonce = "nonce"
           }
           ```
@@ -3265,8 +3265,8 @@ functions:
   - id: register-passkey
     title: 'registerPasskey()'
     notes: |
-      supabase-kt currently does not provide a built-in way to register passkeys via an built-in flow. Until then you can use the API methods
-      the library provides to register a new passkey (WebAuthn credential) for the signed-in user.
+      supabase-kt does not yet offer a built-in flow for passkey registration. 
+      In the meantime, you can use the library's lower-level API methods to register a new passkey (WebAuthn credential) for the signed-in user.
     examples:
       - id: register-passkey
         name: Register a passkey for the current user
@@ -3471,7 +3471,7 @@ functions:
                 domain = "company.com"
             }
 
-            //the url was opened automatically, if you don't want that, provide a custom redirect url
+            // the url was opened automatically, if you don't want that, provide a custom redirect url
           ```
       - id: sign-in-with-provider-uuid
         name: Sign in with provider UUID
@@ -3485,7 +3485,7 @@ functions:
                 providerId = "21648a9d-8d5a-4555-a9d1-d6375dc14e92"
             }
 
-            //the url was opened automatically, if you don't want that, provide a custom redirect url
+            // the url was opened automatically, if you don't want that, provide a custom redirect url
           ```
   - id: sign-out
     title: 'signOut()'
@@ -3765,9 +3765,9 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          //get the identities from the current user
+          // get the identities from the current user
           val identities = supabase.auth.currentIdentitiesOrNull()
-          //Or retrieve them
+          // Or retrieve them
           val identities = supabase.auth.retrieveUserForCurrentSession().identities
           ```
   - id: link-identity
@@ -3808,7 +3808,7 @@ functions:
           ```kotlin
           supabase.auth.linkIdentity(OAuthProvider)
 
-          //Example:
+          // Example:
           supabase.auth.linkIdentity(Google)
           ```
       - id: link-identity-idtoken
@@ -3842,13 +3842,13 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          //get all identities linked to a user
+          // get all identities linked to a user
           val identities = supabase.auth.currentIdentitiesOrNull() ?: emptyList()
 
-          //find the google identity linked to the user
+          // find the google identity linked to the user
           val googleIdentity = identities.first { it.provider == "google" }
 
-          //unlink the google identity from the user
+          // unlink the google identity from the user
           supabase.auth.unlinkIdentity(googleIdentity.identityId!!)
           ```
   - id: set-session
@@ -3917,7 +3917,7 @@ functions:
               when(it) {
                   is SessionStatus.Authenticated -> {
                       println("Received new authenticated session.")
-                      when(it.source) { //Check the source of the session
+                      when(it.source) { // Check the source of the session
                           SessionSource.External -> TODO()
                           is SessionSource.Refresh -> TODO()
                           is SessionSource.SignIn -> TODO()
@@ -4063,7 +4063,7 @@ functions:
           // Use the id to create a challenge.
           // The challenge can be verified by entering the code generated from the authenticator app.
           // The code will be generated upon scanning the qr_code or entering the secret into the authenticator app.
-          val (id, type, qrCode) = factor.data //qrCode is a svg as a string
+          val (id, type, qrCode) = factor.data // qrCode is a svg as a string
           val (factorId, factorType, _) = factor
           val challenge = supabase.auth.mfa.createChallenge(factor.id)
           ```
@@ -4228,7 +4228,7 @@ functions:
         code: |
           ```kotlin
           val (enabled, _) = supabase.auth.mfa.status
-          //flow variant, automatically emitting new values on session changes
+          // flow variant, automatically emitting new values on session changes
           val statusFlow = supabase.auth.mfa.statusFlow
           ```
       - id: aal-enabled-for-current-session
@@ -4237,7 +4237,7 @@ functions:
         code: |
           ```kotlin
           val (_, active) = supabase.auth.mfa.status
-          //flow variant, automatically emitting new values on session changes
+          // flow variant, automatically emitting new values on session changes
           val statusFlow = supabase.auth.mfa.statusFlow
           ```
   - id: get-claims
@@ -4394,7 +4394,7 @@ functions:
               supabaseKey = "supabaseKey"
           ) {
               install(Auth) {
-                  minimalConfig() //disables session saving and auto-refreshing
+                  minimalConfig() // disables session saving and auto-refreshing
               }
               // install other plugins (these will use the secret key)
           }
@@ -4582,7 +4582,7 @@ functions:
           ```kotlin
           supabase.auth.admin.inviteUserByEmail(
               email = "example@email.com",
-              //optional:
+              // optional:
               redirectTo = "https://example.com/redirect",
               data = buildJsonObject {
                   put("custom", "value")
@@ -5006,18 +5006,18 @@ functions:
             function = "function",
             headers = Headers.build {
                 /*Default headers*/
-                //when you are sending a body you may want to add this header:
+                // when you are sending a body you may want to add this header:
                 append(HttpHeaders.ContentType, "application/json")
               }
             )
-          //invoke it:
+          // invoke it:
           function()
-          //invoke it with a body:
+          // invoke it with a body:
           function(body)
-          //invoke it with custom request options:
+          // invoke it with custom request options:
           function(body) {
               header("Header", "Value")
-              parameter("Key", "Value") //url parameter
+              parameter("Key", "Value") // url parameter
           }
           ```
   - id: stream
@@ -5078,9 +5078,9 @@ functions:
         code: |
           ```kotlin
           val flow: Flow<Country> = supabase.from("countries").selectSingleValueAsFlow(Country::id) {
-              //You can use the same filter methods as in the `select` method, but the result is limited to a single row
+              // You can use the same filter methods as in the `select` method, but the result is limited to a single row
               Country::id eq 1
-              //or
+              // or
               eq("id", 1)
           }
           flow.collect {
@@ -5127,13 +5127,13 @@ functions:
           data class PresenceState(val username: String)
 
           val channel = supabase.channel("channelId") {
-              //optional config
+              // optional config
           }
 
-          //if you want more control and want to receive the raw data, use the `presenceChangeFlow` method
+          // if you want more control and want to receive the raw data, use the `presenceChangeFlow` method
           val presenceFlow = channel.presenceDataFlow<PresenceState>()
 
-          //Collect the flow
+          // Collect the flow
           presenceFlow.onEach {
               for (presence in it) {
                   println(presence.username)
@@ -5141,7 +5141,7 @@ functions:
           }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
 
           channel.subscribe(blockUntilSubscribed = true)
-          //send your own state
+          // send your own state
           channel.track(PresenceState(username = "John"))
         description: |
           You have two methods you can use to listen for presence updates:
@@ -5152,7 +5152,7 @@ functions:
         code: |
           ```kotlin
           val channel = supabase.channel("channelId") {
-              //optional config
+              // optional config
               broadcast {
                   replicationReady = true // send a system message when the client can expect postgres changes
               }
@@ -5160,7 +5160,7 @@ functions:
 
           val systemFlow = channel.systemFlow()
 
-          //Collect the flow
+          // Collect the flow
           systemFlow.onEach {
               println(it.status)
           }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
@@ -5171,11 +5171,11 @@ functions:
         code: |
           ```kotlin
           val channel = supabase.channel("channelId") {
-              //optional config
+              // optional config
           }
           val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema = "public")
 
-          //Collect the flow
+          // Collect the flow
           changeFlow.onEach {
               when(it) {
                   is PostgresAction.Delete -> println("Deleted: ${it.oldRecord}")
@@ -5192,17 +5192,17 @@ functions:
         code: |
           ```kotlin
           val channel = supabase.channel("channelId") {
-              //optional config
+              // optional config
           }
 
-          //This flow will automatically emit the initial data of all messages (which can be restricted by specifying a filter) and then listens for updates.
-          //The data is cached automatically by the primary key you specify
+          // This flow will automatically emit the initial data of all messages (which can be restricted by specifying a filter) and then listens for updates.
+          // The data is cached automatically by the primary key you specify
           val users: Flow<List<User>> = channel.postgresListDataFlow(schema = "public", table = "users", primaryKey = User::id) {
              // optional filter
              eq("id", 256)
           }
 
-          //If you want more control and want to receive the raw data use the `postgresChangeFlow` method:
+          // If you want more control and want to receive the raw data use the `postgresChangeFlow` method:
           val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema = "public") {
               table = "users"
               // optional filter
@@ -5211,7 +5211,7 @@ functions:
               }
           }
 
-          //Collect the flow
+          // Collect the flow
           changeFlow.onEach {
               when(it) {
                   is PostgresAction.Delete -> println("Deleted: ${it.oldRecord}")
@@ -5232,13 +5232,13 @@ functions:
         code: |
           ```kotlin
           val channel = supabase.channel("channelId") {
-              //optional config
+              // optional config
           }
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Insert>(schema = "public") {
               table = "users"
           }
 
-          //Collect the flow
+          // Collect the flow
           changeFlow.onEach {
               println(it.record)
           }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
@@ -5257,14 +5257,14 @@ functions:
         code: |
           ```kotlin
           val channel = supabase.channel("channelId") {
-              //optional config
+              // optional config
           }
 
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
               table = "users"
           }
 
-          //Collect the flow
+          // Collect the flow
           changeFlow.onEach {
               println(it.record)
               println(it.oldRecord)
@@ -5284,14 +5284,14 @@ functions:
         code: |
           ```kotlin
           val channel = supabase.channel("channelId") {
-              //optional config
+              // optional config
           }
 
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Delete>(schema = "public") {
               table = "users"
           }
 
-          //Collect the flow
+          // Collect the flow
           changeFlow.onEach {
               println(it.oldRecord)
           }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
@@ -5303,22 +5303,22 @@ functions:
         code: |
           ```kotlin
           val channel = supabase.channel("channelId") {
-             //optional config
+             // optional config
           }
 
-          //This flow will automatically emit the user's initial data and then emits new values on update. The flow ends on deletion
+          // This flow will automatically emit the user's initial data and then emits new values on update. The flow ends on deletion
           val user: Flow<User> = channel.postgresSingleDataFlow(schema = "public", table = "users", primaryKey = User::id) {
-              //This is the same filter as used in postgrest, so you could use complex queries, but only one entry is fetched
+              // This is the same filter as used in postgrest, so you could use complex queries, but only one entry is fetched
               eq("id", 1)
           }
 
-          //If you want more control, use the `postgresChangeFlow` method which works the same as the other examples
+          // If you want more control, use the `postgresChangeFlow` method which works the same as the other examples
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Delete>(schema = "public") {
               table = "users"
               filter("id", FilterOperator.EQ, 1)
           }
 
-          //Collect the flow
+          // Collect the flow
           changeFlow.onEach {
               println(it.oldRecord)
           }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
@@ -5379,9 +5379,9 @@ functions:
         code: |
           ```kotlin
           val channel = supabase.channel("channelId") {
-              //optional config
+              // optional config
           }
-          //...
+          // ...
           supabase.realtime.removeChannel(channel)
           ```
       - id: unsubscribe-channel
@@ -5390,9 +5390,9 @@ functions:
         code: |
           ```kotlin
           val channel = supabase.channel("channelId") {
-              //optional config
+              // optional config
           }
-          //...
+          // ...
           channel.unsubscribe()
           ```
   - id: remove-all-channels
@@ -6209,7 +6209,7 @@ functions:
           bucket.upload("myIcon.png", byteArray) {
               upsert = false
           }
-          //on JVM you can use java.io.File
+          // on JVM you can use java.io.File
           bucket.upload("myIcon.png", file) {
               upsert = false
           }
@@ -6233,11 +6233,11 @@ functions:
         code: |
           ```kotlin
           val bucket = supabase.storage.from("avatars")
-          //JVM/Android:
+          // JVM/Android:
           val upload = bucket.resumable.createOrContinueUpload("icon.png", File("icon.png"))
-          //Other platforms:
+          // Other platforms:
           val upload = bucket.resumable.createOrContinueUpload(data = byteArray, source = "this is for continuing previous uploads later", path = "icon.png")
-          val upload = bucket.resumable.createOrContinueUpload( //Probably better to write an extension function
+          val upload = bucket.resumable.createOrContinueUpload( // Probably better to write an extension function
               channel = { offset -> /* create ByteReadChannel and seek to offset */ },
               source = "this is for continuing previous uploads later",
               size = dataSize,
@@ -6282,18 +6282,18 @@ functions:
           ```kotlin
           val bucket = supabase.storage.from("avatars")
 
-          //only on JVM/Android:
+          // only on JVM/Android:
           bucket.resumable.continuePreviousFileUploads()
-              .map { it.await() } //await all uploads. This just makes sure the uploads have an update-to-date url. You can also do this in parallel
+              .map { it.await() } // await all uploads. This just makes sure the uploads have an update-to-date url. You can also do this in parallel
               .forEach { upload ->
                   upload.startOrResumeUploading()
               }
 
-          //on other platforms you may have to continue uploads from the source (Probably better to write an extension function):
+          // on other platforms you may have to continue uploads from the source (Probably better to write an extension function):
           bucket.resumable.continuePreviousUploads { source, offset ->
-              //create ByteReadChannel from source and seek to offset
+              // create ByteReadChannel from source and seek to offset
           }
-              .map { it.await() } //await all uploads. This just makes sure the uploads have an update-to-date url. You can also do this in parallel
+              .map { it.await() } // await all uploads. This just makes sure the uploads have an update-to-date url. You can also do this in parallel
               .forEach { upload ->
                   upload.startOrResumeUploading()
               }
@@ -6339,7 +6339,7 @@ functions:
           bucket.update("myIcon.png", byteArray) {
               upsert = false
           }
-          //on JVM you can use java.io.File
+          // on JVM you can use java.io.File
           bucket.update("myIcon.png", file) {
               upsert = false
           }
@@ -6556,7 +6556,7 @@ functions:
         code: |
           ```kotlin
           supabase.storage.from("avatars").uploadToSignedUrl(path = "avatar.jpg", token = "token-from-createSignedUploadUrl", data = bytes)
-          //or on JVM:
+          // or on JVM:
           supabase.storage.from("avatars").uploadToSignedUrl(path = "avatar.jpg", token = "token-from-createSignedUploadUrl", file = File("avatar.jpg"))
           ```
   - id: from-get-public-url
@@ -6621,7 +6621,7 @@ functions:
           ```kotlin
           val bucket = supabase.storage.from("avatars")
           val bytes = bucket.downloadAuthenticated("test.png")
-          //or on JVM:
+          // or on JVM:
           bucket.downloadAuthenticatedTo("test.png", File("test.png"))
           ```
       - id: download-file-public
@@ -6631,7 +6631,7 @@ functions:
           ```kotlin
           val bucket = supabase.storage.from("avatars")
           val bytes = bucket.downloadPublic("test.png")
-          //or on JVM:
+          // or on JVM:
           bucket.downloadPublicTo("test.png", File("test.png"))
           ```
       - id: download-with-transformation
@@ -6646,7 +6646,7 @@ functions:
                   quality = 100
               }
           }
-          //or on JVM:
+          // or on JVM:
           bucket.downloadPublicTo("test.png", File("test.png")) {
               transform {
                   size(100, 100)
@@ -6667,12 +6667,12 @@ functions:
                   DownloadStatus.Success -> println("Downloaded successfully")
               }
           }
-          //or on JVM:
+          // or on JVM:
           bucket.downloadAuthenticatedToAsFlow("icon.png", File("icon.png")).collect {
               when(it) {
                   is DownloadStatus.Progress -> println("Downloaded ${it.totalBytesReceived.toFloat() / it.contentLength * 100}%")
                   DownloadStatus.Success -> println("Downloaded successfully")
-                  else -> {} //The ByteData status will never occur as we are writing directly to a file
+                  else -> {} // The ByteData status will never occur as we are writing directly to a file
               }
           }
           ```
