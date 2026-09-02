@@ -175,7 +175,7 @@ const page: GoPageInput = {
             'By submitting this form, I confirm that I have read and understood the Privacy Policy.',
         },
         notion: {
-          database_id: '37d5004b775f809e8cc4e29fdec302aa',
+          database_id: '37d5004b775f80c585c7fc15377098dc',
           columnMap: {
             first_name: 'First Name',
             last_name: 'Last Name',
