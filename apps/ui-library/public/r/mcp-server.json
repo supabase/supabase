@@ -1,0 +1,52 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "mcp-server",
+  "type": "registry:item",
+  "title": "MCP Server",
+  "description": "Add a user-scoped MCP server to your product.",
+  "files": [
+    {
+      "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/index.ts",
+      "content": "import 'jsr:@supabase/functions-js@2.108.2/edge-runtime.d.ts'\n\nimport { createMcpHandler, McpServer } from 'npm:@modelcontextprotocol/server@2.0.0'\nimport {\n  withOAuthProtectedResource,\n  withSupabase,\n  type SupabaseContext,\n} from 'npm:@supabase/server@1.5.1'\n\nimport { registerTools, type ToolContext } from './tools/index.ts'\n\n// An MCP server as a single Supabase Edge Function. withSupabase accepts any\n// verified user access token and builds an RLS-scoped client, so both embedded\n// product agents and external OAuth clients can act as the signed-in user.\n//\n// withOAuthProtectedResource adds OAuth discovery for external MCP clients and\n// points authentication failures at it. Tools are composed in ./tools/index.ts.\n\nfunction readTextEnv(name: string, fallback: string): string {\n  return Deno.env.get(name)?.trim() || fallback\n}\n\nconst SERVER_NAME = readTextEnv('MCP_SERVER_NAME', 'supabase-mcp')\nconst SERVER_DESCRIPTION = readTextEnv(\n  'MCP_SERVER_DESCRIPTION',\n  'MCP access to this Supabase project for the signed-in user.'\n)\n\nconst SERVER_INSTRUCTIONS =\n  `${SERVER_DESCRIPTION} ` +\n  'Every tool runs as the signed-in Supabase user, so role grants and Row Level Security apply. ' +\n  \"Call tools/list to discover what this project exposes, and read a tool's description and \" +\n  'annotations before calling it — some tools have side effects.'\n\nconst CORS_HEADERS: Record<string, string> = {\n  'Access-Control-Allow-Origin': '*',\n  'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',\n  'Access-Control-Allow-Headers':\n    'Authorization, Content-Type, Accept, Mcp-Protocol-Version, Mcp-Session-Id, Mcp-Method, Mcp-Name',\n  'Access-Control-Expose-Headers': 'WWW-Authenticate, Mcp-Session-Id',\n}\n\nfunction createServer(context: ToolContext): McpServer {\n  const server = new McpServer(\n    { name: SERVER_NAME, version: '1.0.0' },\n    { instructions: SERVER_INSTRUCTIONS }\n  )\n\n  registerTools(server, context)\n  return server\n}\n\nasync function handleMcp(request: Request, ctx: SupabaseContext): Promise<Response> {\n  // The server and its tools are bound to this caller for exactly one request.\n  const handler = createMcpHandler(\n    () =>\n      createServer({\n        supabase: ctx.supabase,\n        // auth: 'user' guarantees both claim shapes before this handler runs.\n        userClaims: ctx.userClaims!,\n        jwtClaims: ctx.jwtClaims!,\n      }),\n    { onerror: (error) => console.error('MCP request failed', error) }\n  )\n\n  return handler.fetch(request)\n}\n\nDeno.serve(\n  withOAuthProtectedResource(\n    withSupabase({ auth: 'user', cors: { headers: CORS_HEADERS } }, handleMcp)\n  )\n)\n",
+      "type": "registry:file",
+      "target": "supabase/functions/mcp-server/index.ts"
+    },
+    {
+      "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/deno.json",
+      "content": "{\n  \"nodeModulesDir\": \"none\",\n  \"compilerOptions\": {\n    \"strict\": true\n  },\n  \"tasks\": {\n    \"check\": \"deno check index.ts\"\n  }\n}\n",
+      "type": "registry:file",
+      "target": "supabase/functions/mcp-server/deno.json"
+    },
+    {
+      "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/.env.example",
+      "content": "# Copy this file to supabase/functions/.env before serving locally:\n#   cp supabase/functions/mcp-server/.env.example supabase/functions/.env\n#   supabase functions serve mcp-server --env-file supabase/functions/.env\n\n# Keep the protocol-level server name short and project-specific.\nMCP_SERVER_NAME=supabase-mcp\nMCP_SERVER_DESCRIPTION=\"MCP access to this Supabase project for the signed-in user.\"\n",
+      "type": "registry:file",
+      "target": "supabase/functions/mcp-server/.env.example"
+    },
+    {
+      "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/tools/types.ts",
+      "content": "import type { SupabaseContext } from 'npm:@supabase/server@1.5.1'\nimport type { SupabaseClient } from 'npm:@supabase/supabase-js@2.108.2'\n\n// Only expose the user-scoped client and verified identity to tools. Keeping\n// supabaseAdmin out of this type makes bypassing RLS an explicit design choice.\nexport type ToolContext = {\n  supabase: SupabaseClient\n  userClaims: NonNullable<SupabaseContext['userClaims']>\n  jwtClaims: NonNullable<SupabaseContext['jwtClaims']>\n}\n",
+      "type": "registry:file",
+      "target": "supabase/functions/mcp-server/tools/types.ts"
+    },
+    {
+      "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/tools/result.ts",
+      "content": "import type { CallToolResult } from 'npm:@modelcontextprotocol/server@2.0.0'\n\n// Shared helpers for building MCP tool results, so every tool returns the same\n// shape and signals failure the same way.\n\n/**\n * A successful structured result with a JSON text fallback for older clients.\n */\nexport function jsonResult(value: unknown): CallToolResult {\n  return {\n    content: [{ type: 'text', text: JSON.stringify(value) ?? 'null' }],\n    structuredContent: value ?? null,\n  }\n}\n\n/**\n * A failed result. The message goes back to the model so it can correct itself,\n * so keep it actionable — and free of credentials, claims, and stack traces.\n */\nexport function errorResult(message: string): CallToolResult {\n  return {\n    isError: true,\n    content: [{ type: 'text', text: message }],\n  }\n}\n\nfunction readString(value: unknown, key: string): string | null {\n  if (!value || typeof value !== 'object' || !(key in value)) return null\n  const property = (value as Record<string, unknown>)[key]\n  return typeof property === 'string' && property ? property : null\n}\n\n/**\n * Turn an unknown thrown value into a safe MCP error. Supabase API errors often\n * carry a `code` and `hint`, both of which help a model fix its next call.\n */\nexport function runtimeErrorResult(error: unknown): CallToolResult {\n  const message = error instanceof Error ? error.message : String(error)\n  const code = readString(error, 'code')\n  const hint = readString(error, 'hint')\n\n  return errorResult(\n    [code ? `[${code}]` : null, message, hint ? `Hint: ${hint}` : null].filter(Boolean).join(' ')\n  )\n}\n",
+      "type": "registry:file",
+      "target": "supabase/functions/mcp-server/tools/result.ts"
+    },
+    {
+      "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/tools/whoami.ts",
+      "content": "import type { McpServer } from 'npm:@modelcontextprotocol/server@2.0.0'\n\nimport { jsonResult } from './result.ts'\nimport type { ToolContext } from './types.ts'\n\n// Answers from verified claims, demonstrating that every tool runs as the\n// signed-in user. client_id is present for OAuth tokens and null for ordinary\n// product sessions.\nexport function registerWhoamiTool(\n  server: McpServer,\n  { userClaims, jwtClaims }: ToolContext\n): void {\n  const clientId =\n    typeof jwtClaims?.client_id === 'string' && jwtClaims.client_id ? jwtClaims.client_id : null\n\n  server.registerTool(\n    'whoami',\n    {\n      description: \"Return the signed-in user's identity and OAuth client id, when present.\",\n      annotations: {\n        readOnlyHint: true,\n        destructiveHint: false,\n        openWorldHint: false,\n      },\n    },\n    () =>\n      jsonResult({\n        id: userClaims.id,\n        email: userClaims.email ?? null,\n        role: userClaims.role ?? null,\n        client_id: clientId,\n      })\n  )\n}\n",
+      "type": "registry:file",
+      "target": "supabase/functions/mcp-server/tools/whoami.ts"
+    },
+    {
+      "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/tools/index.ts",
+      "content": "import type { McpServer } from 'npm:@modelcontextprotocol/server@2.0.0'\n\nimport type { ToolContext } from './types.ts'\nimport { registerWhoamiTool } from './whoami.ts'\n\nexport type { ToolContext } from './types.ts'\n\n// The one composition point for this server. Add one registration call for\n// each tool module; the MCP SDK rejects duplicate protocol tool names.\nexport function registerTools(server: McpServer, context: ToolContext): void {\n  registerWhoamiTool(server, context)\n}\n",
+      "type": "registry:file",
+      "target": "supabase/functions/mcp-server/tools/index.ts"
+    }
+  ],
+  "docs": "Disable gateway JWT verification, then deploy the Edge Function. A trusted product backend can call it with the signed-in user's access token. For external clients, install the [OAuth Consent block](https://supabase.com/library/docs/nextjs/oauth-consent), enable OAuth and dynamic registration, and set the Auth Site URL to the consent app. Every call runs through the user's RLS-scoped client. OAuth tokens include `client_id`; product sessions do not, so define policies for both paths. See [MCP authentication](https://supabase.com/docs/guides/auth/oauth-server/mcp-authentication) and [token security](https://supabase.com/docs/guides/auth/oauth-server/token-security)."
+}

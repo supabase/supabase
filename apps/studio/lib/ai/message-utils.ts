@@ -8,6 +8,15 @@ import {
 
 type UIPart = UIMessagePart<UIDataTypes, UITools>
 
+/** Strips `update_notebook`'s `previous_content` snapshot — display-only, never re-uploaded. */
+function stripNotebookSnapshot(part: UIPart): UIPart {
+  if (!isToolUIPart(part) || part.type !== 'tool-update_notebook') return part
+  if (!part.output || typeof part.output !== 'object') return part
+
+  const { previous_content, ...sanitizedOutput } = part.output as Record<string, unknown>
+  return { ...part, output: sanitizedOutput } as UIPart
+}
+
 /**
  * Prepares messages for API transmission by cleaning and limiting history
  */
@@ -25,6 +34,11 @@ export function prepareMessagesForAPI(messages: UIMessage[]): UIMessage[] {
     const cleanedMessage = { ...message } as UIMessage & { results?: unknown }
     if (message.role === 'assistant' && message.results) {
       delete cleanedMessage.results
+    }
+    // Map into a new array rather than mutating in place — `parts` is shared by reference
+    // with the locally persisted message the assistant panel reads from.
+    if (cleanedMessage.parts) {
+      cleanedMessage.parts = cleanedMessage.parts.map(stripNotebookSnapshot)
     }
     return cleanedMessage as UIMessage
   })

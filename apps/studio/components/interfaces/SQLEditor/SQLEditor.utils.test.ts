@@ -185,6 +185,22 @@ describe('SQLEditor.utils.ts:deriveSnippetIdentity', () => {
     })
     expect(result).toEqual({ id: 'existing-id', isLoading: false })
   })
+  test('is loading when the snippets map itself is missing', () => {
+    const result = deriveSnippetIdentity({
+      urlId: 'existing-id',
+      generatedId: 'generated-id',
+      snippets: undefined as unknown as Record<string, { snippet: { content?: unknown } }>,
+    })
+    expect(result).toEqual({ id: 'existing-id', isLoading: true })
+  })
+  test('is loading when the snippets entry has no snippet on it', () => {
+    const result = deriveSnippetIdentity({
+      urlId: 'existing-id',
+      generatedId: 'generated-id',
+      snippets: { 'existing-id': {} as { snippet: { content?: unknown } } },
+    })
+    expect(result).toEqual({ id: 'existing-id', isLoading: true })
+  })
 })
 
 const buildDebugSnippet = (uncheckedSql: string) => ({

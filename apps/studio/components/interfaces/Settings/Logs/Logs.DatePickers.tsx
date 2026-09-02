@@ -1,5 +1,3 @@
-import { Label } from '@ui/components/shadcn/ui/label'
-import { RadioGroup, RadioGroupItem } from '@ui/components/shadcn/ui/radio-group'
 import dayjs from 'dayjs'
 import { Clock, HistoryIcon, Lock } from 'lucide-react'
 import type { PropsWithChildren } from 'react'
@@ -11,9 +9,12 @@ import {
   cn,
   copyToClipboard,
   Input,
+  Label,
   Popover,
   PopoverContent,
   PopoverTrigger,
+  RadioGroup,
+  RadioGroupItem,
 } from 'ui'
 
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from './Logs.constants'

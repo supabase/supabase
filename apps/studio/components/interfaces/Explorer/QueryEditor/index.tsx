@@ -2,7 +2,7 @@ import { useMonaco } from '@monaco-editor/react'
 import { acceptUntrustedSql, untrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { useFlag } from 'common'
 import { CodeSquare, Eye, EyeOff, Play } from 'lucide-react'
-import type { editor as monacoEditor } from 'monaco-editor'
+import type { editor as monacoEditor, Selection } from 'monaco-editor'
 import {
   forwardRef,
   useEffect,
@@ -12,7 +12,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import { Button, cn } from 'ui'
+import { Button, cn, KeyboardShortcut } from 'ui'
 
 import { resolveLogTimeRange } from '../../QuerySources/LogTimeRange.utils'
 import {
@@ -35,15 +35,24 @@ import { QueryResultRenderer } from './QueryResultRenderer'
 import { QuerySourceMenu } from './QuerySourceMenu'
 import { useQueryEditorAi } from './useQueryEditorAi'
 import { LegacyLogsRewriteBanner } from '@/components/interfaces/Settings/Logs/LegacyLogsRewriteBanner'
+import { RunQueryWarningModal } from '@/components/interfaces/SQLEditor/RunQueryWarningModal'
+import type { PotentialIssues } from '@/components/interfaces/SQLEditor/SQLEditor.types'
+import {
+  analyzeQueryIssues,
+  appendEnableRLSStatements,
+  hasBlockingIssues,
+} from '@/components/interfaces/SQLEditor/SQLEditor.utils'
 import { useAddDefinitions } from '@/components/interfaces/SQLEditor/useAddDefinitions'
 import { ResizableAIWidget } from '@/components/ui/AIEditor/ResizableAIWidget'
 import { getEditorSelectionParts, type EditorSelection } from '@/components/ui/AIEditor/utils'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+import { getEditorValueOrSelection } from '@/components/ui/CodeEditor/CodeEditor.utils'
 import { DiffEditor } from '@/components/ui/DiffEditor'
 import {
   type DatabaseSourceParameters,
   type LogsSourceParameters,
 } from '@/data/content/notebooks/notebook-schema'
+import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
 import { isValidConnString } from '@/data/fetchers'
 import { useExecuteLogsSqlMutation } from '@/data/logs/execute-logs-sql-mutation'
 import {
@@ -96,7 +105,16 @@ export type ExplorerQueryModel =
     } & LogsSourceParameters)
 
 export type QueryEditorHandle = {
-  run: () => Promise<void>
+  /**
+   * `force` skips this query's own blocking-issue check (destructive op, unwhered
+   * update/delete, missing RLS, …) — for a caller that already gathered its own consent
+   * for this run, e.g. the notebook-wide mutation confirmation.
+   */
+  run: (force?: boolean) => Promise<void>
+  /** The editor's live text buffer, ahead of any blur-triggered commit to the store. */
+  getSql: () => string
+  /** Formats the editor's SQL in place and commits the result, same as the SQL Editor's Prettify SQL action. */
+  prettify: () => Promise<void>
 }
 
 type QueryEditorProps = {
@@ -168,7 +186,11 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   const rowLimit = query._tag === 'database' ? query.rowLimit : undefined
   const databaseIdentifier = query._tag === 'database' ? query.database_identifier : undefined
 
+  const { x_column, y_series } = display?.chart ?? {}
+  const hasConfig = !!x_column && (y_series ?? []).length > 0
+
   const [promptInput, setPromptInput] = useState('')
+  const [pendingRun, setPendingRun] = useState<{ sql: string; issues: PotentialIssues }>()
   const [pendingProposal, setPendingProposal] = useState<PendingProposal | null>(null)
   const pendingProposalRef = useLatest(pendingProposal)
 
@@ -176,6 +198,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   const [promptState, setPromptState] = useState<(EditorSelection & { isOpen: boolean }) | null>(
     null
   )
+  const [hasSelection, setHasSelection] = useState(false)
 
   const dialect = query._tag === 'logs' ? 'clickhouse' : 'postgres'
   const { requestCompletion, isCompletionLoading } = useQueryEditorAi({ dialect })
@@ -193,14 +216,22 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     }
   )
 
+  const connectionString =
+    databaseIdentifier === undefined || databaseIdentifier === project?.ref
+      ? project?.connectionString
+      : databases?.find((database) => database.identifier === databaseIdentifier)?.connectionString
+
+  const { data: eventTriggers } = useDatabaseEventTriggersQuery(
+    { projectRef: project?.ref, connectionString },
+    { enabled: query._tag === 'database' && isValidConnString(connectionString) }
+  )
+
   const { mutateAsync: executeSql, isPending: isExecutingSql } = useExecuteSqlMutation({
-    onSuccess: (data) => onResultChange({ rows: data.result }),
-    onError: (error) => onResultChange({ error }),
+    onError: () => {},
   })
 
   const { mutateAsync: executeLogsSql, isPending: isExecutingLogs } = useExecuteLogsSqlMutation({
-    onSuccess: (data) => onResultChange({ rows: data.rows as readonly Record<string, unknown>[] }),
-    onError: (error) => onResultChange({ error }),
+    onError: () => {},
   })
 
   const isResolvingDatabase =
@@ -208,23 +239,34 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   const isExecuting = isExecutingSql || isExecutingLogs
   const isBusy = isLoadingProject || isResolvingDatabase || isExecuting
 
-  /**
-   * The user's run gesture, and therefore the promotion point for this query's SQL. The
-   * raw text comes straight off the editor, so it is (re)branded untrusted here — the
-   * editor boundary — and promoted in the same handler. Which pair of helpers applies is
-   * decided by `query._tag`, the same discriminant that picks the execution endpoint, so
-   * Postgres SQL cannot reach the analytics wire or vice versa.
-   */
-  const handleRunQuery = async (rawSql: string = sql) => {
+  const handleRunQuery = async ({
+    rawSql = sql,
+    shouldForce = false,
+  }: {
+    rawSql?: string
+    shouldForce?: boolean
+  } = {}) => {
     if (!project || isBusy || pendingProposal || isRunDisabled || rawSql.trim().length === 0) return
 
+    if (query._tag === 'database') {
+      const issues = analyzeQueryIssues(rawSql, eventTriggers)
+      if (hasBlockingIssues(issues, shouldForce)) {
+        setPendingRun({ sql: rawSql, issues })
+        return
+      }
+    }
+
     onRun?.()
-    onSqlCommit?.(rawSql)
+    const querySnapshot = { sql: rawSql, source: query._tag }
+    // [Joshen] This is deliberate to commit the sql, rather than the passed rawSql
+    // As we want to save the cell's content into the store, rather than what's getting run
+    onSqlCommit?.(sql)
 
     if (query._tag === 'logs') {
       if (!isOtelLogsEnabled) {
         onResultChange({
           error: { message: "Querying logs isn't available for this project yet." },
+          ...querySnapshot,
         })
         return
       }
@@ -234,20 +276,25 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
         sql: acceptUntrustedLogsSql(untrustedLogSql(rawSql)),
         range: resolveLogTimeRange(query.time_range),
         endpoint: QUERY_SOURCE_REGISTRY.logs.endpoint,
-      }).catch(() => {})
+      }).then(
+        (data) =>
+          onResultChange({
+            rows: data.rows as readonly Record<string, unknown>[],
+            ...querySnapshot,
+          }),
+        (error) => onResultChange({ error, ...querySnapshot })
+      )
       return
     }
 
     const safeSql = acceptUntrustedSql(untrustedSql(rawSql))
     const limitedSql = applyAutoLimit(safeSql, rowLimit)
-    const connectionString =
-      databaseIdentifier === undefined || databaseIdentifier === project.ref
-        ? project.connectionString
-        : databases?.find((database) => database.identifier === databaseIdentifier)
-            ?.connectionString
 
     if (!isValidConnString(connectionString)) {
-      onResultChange({ error: { message: 'Unable to run query: Connection string is missing' } })
+      onResultChange({
+        error: { message: 'Unable to run query: Connection string is missing' },
+        ...querySnapshot,
+      })
       return
     }
 
@@ -259,7 +306,26 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       contextualInvalidation: true,
       isStatementTimeoutDisabled: true,
       isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
-    }).catch(() => {})
+    }).then(
+      (data) => onResultChange({ rows: data.result, ...querySnapshot }),
+      (error) => onResultChange({ error, ...querySnapshot })
+    )
+  }
+
+  const handleConfirmPendingRun = () => {
+    if (!pendingRun) return
+    const runSql = pendingRun.sql
+    setPendingRun(undefined)
+    handleRunQuery({ rawSql: runSql, shouldForce: true })
+  }
+
+  const handleConfirmPendingRunWithRLS = () => {
+    if (!pendingRun) return
+    const tables = pendingRun.issues.createTablesMissingRLS ?? []
+    if (tables.length === 0) return
+    const rewrittenSql = appendEnableRLSStatements(pendingRun.sql, tables)
+    setPendingRun(undefined)
+    handleRunQuery({ rawSql: rewrittenSql, shouldForce: true })
   }
 
   const acceptSqlProposal = () => {
@@ -270,8 +336,6 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     }
     setPendingProposal(null)
   }
-
-  const discardSqlProposal = () => setPendingProposal(null)
 
   const closePrompt = () => {
     setPromptState(null)
@@ -301,7 +365,20 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
 
   const Shell = variant === 'viewport' ? ExplorerQueryViewport : ExplorerQuery
 
-  useImperativeHandle(ref, () => ({ run: () => handleRunQuery() }))
+  const handlePrettify = async () => {
+    if (pendingProposalRef.current) return
+
+    const editor = editorInstanceRef.current
+    if (!editor) return
+    await editor.getAction('editor.action.formatDocument')?.run()
+    onSqlCommitRef.current?.(editor.getValue())
+  }
+
+  useImperativeHandle(ref, () => ({
+    run: (force = false) => handleRunQuery({ shouldForce: force }),
+    getSql: () => sqlRef.current,
+    prettify: handlePrettify,
+  }))
 
   useEffect(() => {
     if (!promptState?.isOpen) return
@@ -312,172 +389,253 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   }, [promptState?.isOpen])
 
   return (
-    <Shell className={cn(variant === 'embedded' && 'mx-auto max-w-6xl', className)}>
-      <ExplorerToolbar>
-        <ExplorerToolbarIcon>
-          <CodeSquare size={14} />
-        </ExplorerToolbarIcon>
-        <ExplorerToolbarTitle onSaveTitle={onTitleChange}>{title}</ExplorerToolbarTitle>
-        <ExplorerToolbarActions>
-          {toolbarActions}
-          {onSourceChange && (
-            <QuerySourceMenu
-              disabled={pendingProposal !== null}
-              source={toQuerySourceBinding(query)}
-              onSourceChange={(source) => {
-                setPendingProposal(null)
-                onSourceChange(source)
-              }}
-              rowLimit={rowLimit}
-              onRowLimitChange={onRowLimitChange}
-              roleImpersonationState={roleImpersonationState}
-            />
+    <>
+      <Shell className={cn(variant === 'embedded' && 'mx-auto max-w-6xl', className)}>
+        <ExplorerToolbar className={cn(variant === 'viewport' && 'px-4')}>
+          <ExplorerToolbarIcon>
+            <CodeSquare size={16} strokeWidth={2} />
+          </ExplorerToolbarIcon>
+          {variant === 'viewport' ? (
+            <ExplorerToolbarTitle className="text-muted text-xs italic">
+              Run SQL
+            </ExplorerToolbarTitle>
+          ) : (
+            <ExplorerToolbarTitle onSaveTitle={onTitleChange}>{title}</ExplorerToolbarTitle>
           )}
-          {display && onDisplayChange && (
-            <DisplaySettingsButton
-              result={result}
-              display={display}
-              columns={columns}
-              disabled={(result?.rows ?? []).length === 0}
-              onChange={onDisplayChange}
-            />
-          )}
-          <ExplorerToolbarAction
-            icon={showQuery ? <EyeOff /> : <Eye />}
-            disabled={pendingProposal !== null}
-            tooltip={showQuery ? 'Hide query' : 'Show query'}
-            onClick={() => onShowQueryChange(!showQuery)}
-          />
-          <ExplorerToolbarAction
-            loading={isExecuting}
-            icon={<Play />}
-            tooltip="Run query"
-            disabled={
-              isBusy || pendingProposal !== null || isRunDisabled || sql.trim().length === 0
-            }
-            onClick={() => handleRunQuery()}
-          >
-            Run
-          </ExplorerToolbarAction>
-        </ExplorerToolbarActions>
-      </ExplorerToolbar>
-
-      {showQuery && (
-        <>
-          <LegacyLogsRewriteBanner
-            isLogsSource={query._tag === 'logs'}
-            sql={sql}
-            readSql={() => sqlRef.current}
-            onProposal={({ original, modified }) =>
-              setPendingProposal({
-                original,
-                modified,
-                label: 'Review the ClickHouse SQL rewrite before accepting it',
-              })
-            }
-            hidden={pendingProposal !== null}
-          />
-          <ExplorerQueryEditor
-            className={cn('relative', variant === 'viewport' ? 'h-[45%] min-h-48' : undefined)}
-          >
-            <CodeEditor
-              id={`explorer-query-${id}`}
-              language="pgsql"
-              isReadOnly={isReadOnly}
-              value={sql}
-              placeholder={!promptState?.isOpen ? generatePlaceholder(os) : ''}
-              placeholderClassName="top-[13px]"
-              className={variant === 'embedded' ? 'h-44' : undefined}
-              actions={{
-                runQuery: { enabled: !isRunDisabled, callback: handleRunQuery },
-              }}
-              options={{
-                minimap: { enabled: false },
-                padding: { top: 8 },
-              }}
-              onInputChange={(value) => onSqlChange(value ?? '')}
-              onMount={(editor, monaco) => {
-                editor.onDidBlurEditorWidget(() => onSqlCommitRef.current?.(sqlRef.current))
-                editorInstanceRef.current = editor
-
-                editor.addAction({
-                  id: 'generate-sql',
-                  label: 'Generate SQL',
-                  keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyK],
-                  run: () => {
-                    if (pendingProposalRef.current) return
-                    const selectionParts = getEditorSelectionParts(editor)
-                    if (selectionParts) setPromptState({ isOpen: true, ...selectionParts })
-                  },
-                })
-              }}
-            />
-
-            {promptState?.isOpen && editorInstanceRef.current && !pendingProposal && (
-              <ResizableAIWidget
-                editor={editorInstanceRef.current}
-                id={`explorer-ask-ai-${id}`}
-                value={promptInput}
-                onChange={setPromptInput}
-                onSubmit={handleGenerateSql}
-                onCancel={closePrompt}
-                isDiffVisible={false}
-                isLoading={isCompletionLoading}
-                startLineNumber={Math.max(0, promptState.startLineNumber)}
-                endLineNumber={promptState.endLineNumber}
+          <ExplorerToolbarActions>
+            {onSourceChange && (
+              <QuerySourceMenu
+                disabled={pendingProposal !== null}
+                source={toQuerySourceBinding(query)}
+                onSourceChange={(source) => {
+                  setPendingProposal(null)
+                  onSourceChange(source)
+                }}
+                rowLimit={rowLimit}
+                onRowLimitChange={onRowLimitChange}
+                roleImpersonationState={roleImpersonationState}
               />
             )}
 
-            {pendingProposal && (
-              <div className="absolute inset-0 z-10 flex flex-col bg-studio">
-                <div className="flex items-center justify-between gap-2 border-b bg-surface-100 px-3 py-2">
-                  <div>
-                    <p className="text-xs text-foreground-light">{pendingProposal.label}</p>
-                    {pendingProposal.prompt && (
-                      <p className="text-xs text-foreground-lighter">
-                        Prompt: {pendingProposal.prompt}
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button variant="default" size="tiny" onClick={discardSqlProposal}>
-                      Discard
-                    </Button>
-                    <Button variant="primary" size="tiny" onClick={acceptSqlProposal}>
-                      Accept
-                    </Button>
-                  </div>
-                </div>
-                <div className="min-h-0 flex-1">
-                  <DiffEditor
-                    language="pgsql"
-                    original={pendingProposal.original}
-                    modified={pendingProposal.modified}
-                  />
-                </div>
-              </div>
+            {display && onDisplayChange && (
+              <DisplaySettingsButton
+                result={result}
+                display={display}
+                columns={columns}
+                disabled={(result?.rows ?? []).length === 0}
+                onChange={onDisplayChange}
+              />
             )}
-          </ExplorerQueryEditor>
-        </>
-      )}
+            <ExplorerToolbarAction
+              icon={
+                showQuery ? <EyeOff size={16} strokeWidth={2} /> : <Eye size={16} strokeWidth={2} />
+              }
+              disabled={pendingProposal !== null}
+              tooltip={showQuery ? 'Hide query' : 'Show query'}
+              onClick={() => onShowQueryChange(!showQuery)}
+            />
 
-      <ExplorerQueryResults
-        className={cn(
-          (result?.rows ?? []).length === 0 ? 'items-center justify-center' : 'overflow-x-auto'
-        )}
-      >
-        <QueryResultRenderer view={view} result={result} chart={display?.chart} />
-      </ExplorerQueryResults>
+            {toolbarActions}
 
-      <ExplorerQueryFooter className="flex items-center gap-x-2">
-        <p>{(result?.rows ?? []).length.toLocaleString()} rows</p>
-        {rowLimit && (
+            <ExplorerToolbarAction
+              icon={<Play size={16} strokeWidth={2} />}
+              loading={isExecuting}
+              tooltip={
+                <div className="flex items-center gap-2.5">
+                  <span>{hasSelection ? 'Run selected query' : 'Run query'}</span>
+                  <KeyboardShortcut keys={['Meta', 'Enter']} />
+                </div>
+              }
+              disabled={
+                isBusy || pendingProposal !== null || isRunDisabled || sql.trim().length === 0
+              }
+              onClick={() => {
+                const editorInstance = editorInstanceRef.current
+                const rawSql = editorInstance ? getEditorValueOrSelection(editorInstance) : sql
+                handleRunQuery({ rawSql })
+              }}
+            >
+              {hasSelection ? 'Run selected' : 'Run'}
+            </ExplorerToolbarAction>
+          </ExplorerToolbarActions>
+        </ExplorerToolbar>
+
+        {showQuery && (
           <>
-            <p>·</p>
-            <p>{rowLimit < 0 ? 'No row limit' : `Limit ${rowLimit} rows`}</p>
+            <LegacyLogsRewriteBanner
+              isLogsSource={query._tag === 'logs'}
+              sql={sql}
+              readSql={() => sqlRef.current}
+              onProposal={({ original, modified }) =>
+                setPendingProposal({
+                  original,
+                  modified,
+                  label: 'Review the ClickHouse SQL rewrite before accepting it',
+                })
+              }
+              hidden={pendingProposal !== null}
+            />
+            <ExplorerQueryEditor
+              className={cn('relative', variant === 'viewport' ? 'h-[45%] min-h-48' : undefined)}
+            >
+              <CodeEditor
+                id={`explorer-query-${id}`}
+                language="pgsql"
+                isReadOnly={isReadOnly}
+                value={sql}
+                placeholder={!promptState?.isOpen ? generatePlaceholder(os) : ''}
+                placeholderClassName="top-[13px]"
+                className={variant === 'embedded' ? 'h-44' : undefined}
+                actions={{
+                  runQuery: {
+                    enabled: !isRunDisabled,
+                    callback: (rawSql: string) => handleRunQuery({ rawSql }),
+                  },
+                }}
+                options={{
+                  minimap: { enabled: false },
+                  padding: { top: 8 },
+                }}
+                onInputChange={(value) => onSqlChange(value ?? '')}
+                onMount={(editor, monaco) => {
+                  editor.onDidBlurEditorWidget(() => onSqlCommitRef.current?.(sqlRef.current))
+                  editorInstanceRef.current = editor
+
+                  const updateHasSelection = (selection: Selection | null | undefined) => {
+                    const noSelection =
+                      !selection ||
+                      (selection.startLineNumber === selection.endLineNumber &&
+                        selection.startColumn === selection.endColumn)
+                    setHasSelection(!noSelection)
+                  }
+
+                  // A remount (e.g. toggling "Show query" off then on) creates a fresh
+                  // editor with no listener history, so `hasSelection` must be read from
+                  // this instance directly rather than left at whatever the previous
+                  // editor instance last reported.
+                  updateHasSelection(editor.getSelection())
+                  editor.onDidChangeCursorSelection(({ selection }) =>
+                    updateHasSelection(selection)
+                  )
+
+                  editor.addAction({
+                    id: 'generate-sql',
+                    label: 'Generate SQL',
+                    keybindings: [
+                      monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyK,
+                    ],
+                    run: () => {
+                      if (pendingProposalRef.current) return
+                      const selectionParts = getEditorSelectionParts(editor)
+                      if (selectionParts) setPromptState({ isOpen: true, ...selectionParts })
+                    },
+                  })
+
+                  editor.addAction({
+                    id: 'prettify-query',
+                    label: 'Prettify SQL',
+                    keybindings: [monaco.KeyMod.Alt | monaco.KeyMod.Shift | monaco.KeyCode.KeyF],
+                    contextMenuGroupId: 'operation',
+                    run: () => {
+                      handlePrettify()
+                    },
+                  })
+                }}
+              />
+
+              {promptState?.isOpen && editorInstanceRef.current && !pendingProposal && (
+                <ResizableAIWidget
+                  editor={editorInstanceRef.current}
+                  id={`explorer-ask-ai-${id}`}
+                  value={promptInput}
+                  onChange={setPromptInput}
+                  onSubmit={handleGenerateSql}
+                  onCancel={closePrompt}
+                  isDiffVisible={false}
+                  isLoading={isCompletionLoading}
+                  startLineNumber={Math.max(0, promptState.startLineNumber)}
+                  endLineNumber={promptState.endLineNumber}
+                />
+              )}
+
+              {pendingProposal && (
+                <div className="absolute inset-0 z-10 flex flex-col bg-studio">
+                  <div className="flex items-center justify-between gap-2 border-b bg-surface-100 px-3 py-2">
+                    <div>
+                      <p className="text-xs text-foreground-light">{pendingProposal.label}</p>
+                      {pendingProposal.prompt && (
+                        <p className="text-xs text-foreground-lighter">
+                          Prompt: {pendingProposal.prompt}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="default"
+                        size="tiny"
+                        onClick={() => setPendingProposal(null)}
+                      >
+                        Discard
+                      </Button>
+                      <Button variant="primary" size="tiny" onClick={acceptSqlProposal}>
+                        Accept
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="min-h-0 flex-1">
+                    <DiffEditor
+                      language="pgsql"
+                      original={pendingProposal.original}
+                      modified={pendingProposal.modified}
+                    />
+                  </div>
+                </div>
+              )}
+            </ExplorerQueryEditor>
           </>
         )}
-      </ExplorerQueryFooter>
-    </Shell>
+
+        <ExplorerQueryResults
+          className={cn(
+            variant === 'embedded' ? 'max-h-80' : '',
+            (result?.rows ?? []).length === 0 || (view === 'chart' && !hasConfig)
+              ? 'items-center justify-center'
+              : 'overflow-x-auto'
+          )}
+        >
+          <QueryResultRenderer
+            view={view}
+            result={result}
+            chart={display?.chart}
+            sql={result?.sql}
+            source={result?.source}
+          />
+        </ExplorerQueryResults>
+
+        <ExplorerQueryFooter className="flex items-center gap-x-2">
+          <p>{(result?.rows ?? []).length.toLocaleString()} rows</p>
+          {rowLimit && (
+            <>
+              <p>·</p>
+              <p>{rowLimit < 0 ? 'No row limit' : `Limit ${rowLimit} rows`}</p>
+            </>
+          )}
+        </ExplorerQueryFooter>
+      </Shell>
+
+      {query._tag === 'database' && (
+        <RunQueryWarningModal
+          visible={!!pendingRun}
+          potentialIssues={pendingRun?.issues}
+          onCancel={() => setPendingRun(undefined)}
+          onConfirm={handleConfirmPendingRun}
+          onConfirmWithRLS={
+            (pendingRun?.issues.createTablesMissingRLS?.length ?? 0) > 0
+              ? handleConfirmPendingRunWithRLS
+              : undefined
+          }
+        />
+      )}
+    </>
   )
 })

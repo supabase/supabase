@@ -91,7 +91,7 @@ FormItem.displayName = 'FormItem'
 const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & { enableSelection?: boolean }
->(({ className, enableSelection = false, ...props }, ref) => {
+>(({ className, enableSelection = false, htmlFor, ...props }, ref) => {
   const { error, formItemId } = useFormField()
 
   const Comp = enableSelection ? 'label' : Label
@@ -106,7 +106,7 @@ const FormLabel = React.forwardRef<
         className,
         'leading-normal'
       )}
-      htmlFor={formItemId}
+      htmlFor={htmlFor ?? formItemId}
       {...props}
     />
   )

@@ -9,16 +9,19 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
-import { Button, buttonVariants, cn } from 'ui'
-import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
 import {
+  Button,
+  buttonVariants,
+  cn,
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from 'ui/src/components/shadcn/ui/navigation-menu'
+} from 'ui'
+import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
+import { AnnouncementBanner } from 'ui-patterns/Banners/AnnouncementBanner'
 
 import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
@@ -78,6 +81,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
 
   return (
     <>
+      <AnnouncementBanner />
       <div
         className={cn(
           'sticky top-0 z-40 transform',

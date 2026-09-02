@@ -1,7 +1,8 @@
 import { Expand } from 'lucide-react'
-import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { formatCellValue, isLargeValue } from './DataGridResults.utils'
+import { NullValue } from '@/components/grid/components/common/NullValue'
 
 interface ResultCellProps {
   column: string
@@ -15,16 +16,13 @@ export const ResultCell = ({ column, value, onContextMenu, onExpand }: ResultCel
 
   return (
     <div
-      className={cn(
-        'group/cell relative flex items-center h-full font-mono text-xs w-full whitespace-pre',
-        value === null && 'text-foreground-lighter'
-      )}
+      className="group/cell relative flex h-full w-full items-center overflow-hidden text-ellipsis text-grid text-foreground"
       onContextMenu={(e) => {
         e.preventDefault()
         onContextMenu(e, column, value)
       }}
     >
-      {formatCellValue(value)}
+      {value === null ? <NullValue /> : formatCellValue(value)}
       {showExpand && (
         <Tooltip>
           <TooltipTrigger asChild>

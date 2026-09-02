@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { type PropsWithChildren, type ReactNode } from 'react'
+import { useEffect, useEffectEvent, type PropsWithChildren, type ReactNode } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
@@ -11,10 +11,13 @@ import { Confirm } from './Confirm'
 import { type ConfirmFooterApprovalState } from './Confirm.utils'
 import {
   createNotebookInputSchema,
+  deleteNotebookInputSchema,
   notebookToolOutputSchema,
   updateNotebookInputSchema,
+  updateNotebookToolOutputSchema,
 } from './Message.utils'
 import { AlertError } from '@/components/ui/AlertError'
+import { hasDiscardableChanges } from '@/data/content/notebooks/notebook-cache'
 import {
   deriveNotebookDiff,
   describeNotebookOperationError,
@@ -22,8 +25,9 @@ import {
 } from '@/data/content/notebooks/notebook-operations'
 import { useNotebookQuery } from '@/data/content/notebooks/notebook-query'
 import { toWireNotebook } from '@/data/content/notebooks/notebook-schema'
+import { useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 
-export type NotebookProposalMode = 'create' | 'update'
+export type NotebookProposalMode = 'create' | 'update' | 'delete'
 
 export type NotebookProposalState =
   | 'input-available'
@@ -42,6 +46,9 @@ export interface NotebookProposalRendererProps {
   confirmState?: ConfirmFooterApprovalState
   onApprove?: () => void
   onDeny?: () => void
+  /** Denies with a specific reason instead of a generic "user skipped" — used to auto-deny
+   *  an update that can't be applied as written so the model sees why and can retry. */
+  denyWithReason?: (reason: string) => void
 }
 
 type NotebookProposalStepProps = Omit<
@@ -49,6 +56,12 @@ type NotebookProposalStepProps = Omit<
   'mode' | 'output' | 'state'
 > & {
   footerAction?: ReactNode
+}
+
+/** For steps (update, delete) that branch on the tool's live state/output, unlike create. */
+type NotebookProposalStepPropsWithOutput = NotebookProposalStepProps & {
+  state: NotebookProposalState
+  output: unknown
 }
 
 const MODE_COPY = {
@@ -64,7 +77,19 @@ const MODE_COPY = {
     confirmLabelLoading: 'Applying changes...',
     outputLabel: 'Notebook updated',
   },
+  delete: {
+    confirmMessage: 'Assistant wants to delete this notebook',
+    confirmLabel: 'Delete',
+    confirmLabelLoading: 'Deleting...',
+    outputLabel: 'Notebook deleted',
+  },
 } as const
+
+const NOTEBOOK_ACTION_NOUN: Record<NotebookProposalMode, string> = {
+  create: 'creation',
+  update: 'update',
+  delete: 'deletion',
+}
 
 /**
  * Renders the create/update notebook tool across all approval states. Owns input parsing
@@ -74,10 +99,20 @@ const MODE_COPY = {
  */
 export const NotebookProposalRenderer = (props: NotebookProposalRendererProps) => {
   const { ref } = useParams()
-  const { mode, state, input, output, confirmState, onApprove, onDeny } = props
+  const { mode, state, input, output, confirmState, onApprove, onDeny, denyWithReason } = props
+
+  if (
+    mode === 'update' &&
+    (state === 'output-available' || state === 'output-error' || state === 'output-denied')
+  ) {
+    return <UpdateNotebookTerminalSummary state={state} output={output} />
+  }
+
   const parsedOutput = notebookToolOutputSchema.safeParse(output)
+  // A deleted notebook no longer exists to open, so this action only applies to create/update.
+  const canOpenNotebook = mode !== 'delete' && state === 'output-available'
   const footerAction =
-    state === 'output-available' && parsedOutput.success && ref ? (
+    canOpenNotebook && parsedOutput.success && ref ? (
       <Button asChild variant="default" size="tiny">
         <Link href={`/project/${ref}/explorer/notebook/${parsedOutput.data.id}`}>
           Open notebook
@@ -85,20 +120,32 @@ export const NotebookProposalRenderer = (props: NotebookProposalRendererProps) =
       </Button>
     ) : undefined
 
-  const proposal =
-    mode === 'create' ? (
-      <CreateNotebookProposal
+  const proposal = (mode === 'create' && (
+    <CreateNotebookProposal
+      input={input}
+      confirmState={confirmState}
+      footerAction={confirmState === undefined ? undefined : footerAction}
+      onApprove={onApprove}
+      onDeny={onDeny}
+    />
+  )) ||
+    (mode === 'update' && (
+      <UpdateNotebookProposal
         input={input}
+        state={state}
+        output={output}
         confirmState={confirmState}
         footerAction={confirmState === undefined ? undefined : footerAction}
         onApprove={onApprove}
         onDeny={onDeny}
+        denyWithReason={denyWithReason}
       />
-    ) : (
-      <UpdateNotebookProposal
+    )) || (
+      <DeleteNotebookProposal
         input={input}
+        state={state}
+        output={output}
         confirmState={confirmState}
-        footerAction={confirmState === undefined ? undefined : footerAction}
         onApprove={onApprove}
         onDeny={onDeny}
       />
@@ -109,6 +156,35 @@ export const NotebookProposalRenderer = (props: NotebookProposalRendererProps) =
       {proposal}
       {confirmState === undefined && footerAction}
     </>
+  )
+}
+
+function UpdateNotebookTerminalSummary({
+  state,
+  output,
+}: Pick<NotebookProposalRendererProps, 'state' | 'output'>) {
+  const { ref } = useParams()
+  const parsedOutput = notebookToolOutputSchema.safeParse(output)
+  const label =
+    state === 'output-available'
+      ? parsedOutput.success
+        ? `Notebook updated: ${parsedOutput.data.name}`
+        : 'Notebook updated'
+      : state === 'output-error'
+        ? 'Failed to update notebook'
+        : 'Skipped notebook update'
+
+  return (
+    <div className="flex items-center justify-between gap-2 my-2 mx-4 px-3 py-1.5 text-sm border rounded-md bg-surface-75">
+      <span className="text-foreground-light truncate">{label}</span>
+      {state === 'output-available' && parsedOutput.success && ref && (
+        <Button asChild variant="default" size="tiny">
+          <Link href={`/project/${ref}/explorer/notebook/${parsedOutput.data.id}`}>
+            Open notebook
+          </Link>
+        </Button>
+      )}
+    </div>
   )
 }
 
@@ -151,7 +227,7 @@ function NotebookConfirm({
       confirmLabelLoading={confirmLabelLoading ?? copy.confirmLabelLoading}
       successMessage={copy.outputLabel}
       errorMessage={`Failed to ${mode} notebook`}
-      deniedMessage={`Skipped notebook ${mode === 'create' ? 'creation' : 'update'}`}
+      deniedMessage={`Skipped notebook ${NOTEBOOK_ACTION_NOUN[mode]}`}
       footerAction={footerAction}
       extraLoading={extraLoading}
       denyOnly={denyOnly}
@@ -230,15 +306,92 @@ function CreateNotebookProposal({
   )
 }
 
+const TERMINAL_CONFIRM_STATES: ConfirmFooterApprovalState[] = ['success', 'error', 'denied']
+
+/**
+ * An update whose operations don't apply to the notebook as currently loaded
+ * (e.g. an operation targets a cell id that no longer exists). There's nothing
+ * for the user to decide here, so instead of asking them to Skip, deny
+ * automatically with the specific reason — same text `update_notebook`'s
+ * server-side execute() would throw for the same failure — so the model sees
+ * why and can retry (e.g. re-fetch and reissue) without the user's involvement.
+ *
+ * For a terminal `confirmState` (the decision already happened), re-deriving
+ * against live content is just for display, and "can't be applied as written"
+ * is inaccurate — nothing is being applied anymore. Instead, state that the
+ * notebook has changed since, so the preview can't be reconstructed.
+ */
+function UnapplyableNotebookUpdateNotice({
+  notebookName,
+  reason,
+  confirmState,
+  footerAction,
+  onDeny,
+  denyWithReason,
+}: {
+  notebookName: string
+  reason: string
+  confirmState?: ConfirmFooterApprovalState
+  footerAction?: ReactNode
+  onDeny?: () => void
+  denyWithReason?: (reason: string) => void
+}) {
+  const onUnapplyable = useEffectEvent(() => {
+    denyWithReason?.(reason)
+  })
+
+  useEffect(() => {
+    if (confirmState === 'approval-requested') onUnapplyable()
+  }, [confirmState])
+
+  const isTerminal = confirmState !== undefined && TERMINAL_CONFIRM_STATES.includes(confirmState)
+
+  return (
+    <NotebookConfirm
+      mode="update"
+      confirmState={confirmState}
+      footerAction={footerAction}
+      message={`Assistant wants to update "${notebookName}"`}
+      denyOnly
+      onDeny={() => (denyWithReason ? denyWithReason(reason) : onDeny?.())}
+    >
+      <div className="p-3">
+        {isTerminal ? (
+          <Admonition
+            type="warning"
+            title="Preview unavailable"
+            description="This notebook has changed since, so the preview can't be reconstructed."
+          />
+        ) : (
+          <Admonition
+            type="warning"
+            title="This update can't be applied as written"
+            description={reason}
+          />
+        )}
+      </div>
+    </NotebookConfirm>
+  )
+}
+
 function UpdateNotebookProposal({
   input,
+  state,
+  output,
   confirmState,
   footerAction,
   onApprove,
   onDeny,
-}: NotebookProposalStepProps) {
+  denyWithReason,
+}: NotebookProposalStepPropsWithOutput) {
   const { ref } = useParams()
+  const notebooksSnap = useNotebooksStateSnapshot()
   const parsedInput = updateNotebookInputSchema.safeParse(input)
+  const isCompleted = state === 'output-available'
+  const hasUnsavedLocalChanges =
+    confirmState === 'approval-requested' &&
+    parsedInput.success &&
+    hasDiscardableChanges(notebooksSnap.notebooks[parsedInput.data.id])
 
   const {
     data: notebook,
@@ -247,7 +400,7 @@ function UpdateNotebookProposal({
     error,
   } = useNotebookQuery(
     { projectRef: ref, id: parsedInput.success ? parsedInput.data.id : undefined },
-    { enabled: parsedInput.success }
+    { enabled: parsedInput.success && !isCompleted }
   )
 
   if (!parsedInput.success) {
@@ -258,6 +411,48 @@ function UpdateNotebookProposal({
         input={input}
         onDeny={onDeny}
       />
+    )
+  }
+
+  if (isCompleted) {
+    const parsedOutput = updateNotebookToolOutputSchema.safeParse(output)
+    const notebookName = parsedOutput.success ? parsedOutput.data.name : undefined
+    const isOutputForRequestedNotebook =
+      parsedOutput.success && parsedOutput.data.id === parsedInput.data.id
+    const previousContent = isOutputForRequestedNotebook
+      ? parsedOutput.data.previous_content
+      : undefined
+    const diff = previousContent
+      ? deriveNotebookDiff(previousContent, parsedInput.data.operations)
+      : undefined
+
+    if (diff?.success) {
+      return (
+        <NotebookConfirm
+          mode="update"
+          confirmState={confirmState}
+          footerAction={footerAction}
+          message={`Assistant wants to update "${notebookName}"`}
+          onApprove={onApprove}
+          onDeny={onDeny}
+        >
+          <AssistantNotebookPreview entries={diff.entries} mode="update" title={notebookName} />
+        </NotebookConfirm>
+      )
+    }
+
+    return (
+      <NotebookConfirm
+        mode="update"
+        confirmState={confirmState}
+        footerAction={footerAction}
+        onApprove={onApprove}
+        onDeny={onDeny}
+      >
+        <div className="p-3 text-sm text-foreground-light truncate">
+          {notebookName ? `Notebook updated: ${notebookName}` : MODE_COPY.update.outputLabel}
+        </div>
+      </NotebookConfirm>
     )
   }
 
@@ -293,21 +488,14 @@ function UpdateNotebookProposal({
 
   if (!diff.success) {
     return (
-      <NotebookConfirm
-        mode="update"
+      <UnapplyableNotebookUpdateNotice
+        notebookName={notebook.name}
+        reason={describeNotebookOperationError(diff.error)}
         confirmState={confirmState}
-        message={`Assistant wants to update "${notebook.name}"`}
-        denyOnly
+        footerAction={footerAction}
         onDeny={onDeny}
-      >
-        <div className="p-3">
-          <Admonition
-            type="warning"
-            title="This update can't be applied as written"
-            description={describeNotebookOperationError(diff.error)}
-          />
-        </div>
-      </NotebookConfirm>
+        denyWithReason={denyWithReason}
+      />
     )
   }
 
@@ -320,7 +508,128 @@ function UpdateNotebookProposal({
       onApprove={onApprove}
       onDeny={onDeny}
     >
+      {hasUnsavedLocalChanges && <UnsavedLocalChangesWarning mode="update" />}
       <AssistantNotebookPreview entries={diff.entries} mode="update" title={notebook.name} />
     </NotebookConfirm>
+  )
+}
+
+function DeleteNotebookProposal({
+  input,
+  state,
+  output,
+  confirmState,
+  onApprove,
+  onDeny,
+}: NotebookProposalStepPropsWithOutput) {
+  const { ref } = useParams()
+  const notebooksSnap = useNotebooksStateSnapshot()
+  const parsedInput = deleteNotebookInputSchema.safeParse(input)
+  const isCompleted = state === 'output-available'
+  const hasUnsavedLocalChanges =
+    confirmState === 'approval-requested' &&
+    parsedInput.success &&
+    hasDiscardableChanges(notebooksSnap.notebooks[parsedInput.data.id])
+
+  const {
+    data: notebook,
+    isLoading,
+    isError,
+    error,
+  } = useNotebookQuery(
+    { projectRef: ref, id: parsedInput.success ? parsedInput.data.id : undefined },
+    { enabled: parsedInput.success && !isCompleted }
+  )
+
+  if (!parsedInput.success) {
+    return (
+      <NotebookParseFailure
+        mode="delete"
+        confirmState={confirmState}
+        input={input}
+        onDeny={onDeny}
+      />
+    )
+  }
+
+  if (isCompleted) {
+    const parsedOutput = notebookToolOutputSchema.safeParse(output)
+    const notebookName = parsedOutput.success ? parsedOutput.data.name : undefined
+
+    return (
+      <NotebookConfirm
+        mode="delete"
+        confirmState={confirmState}
+        onApprove={onApprove}
+        onDeny={onDeny}
+      >
+        <div className="p-3 text-sm text-foreground-light truncate">
+          {notebookName ? `Notebook deleted: ${notebookName}` : MODE_COPY.delete.outputLabel}
+        </div>
+      </NotebookConfirm>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <div className="my-4 mx-4 rounded-lg border bg-surface-75 heading-meta h-9 px-3 text-foreground-light flex items-center gap-2">
+        <Loader2 className="w-4 h-4 animate-spin" />
+        Loading notebook...
+      </div>
+    )
+  }
+
+  if (isError || !notebook) {
+    return (
+      <div className="w-auto overflow-x-hidden my-4 flex flex-col gap-2">
+        <AlertError error={error} subject="Failed to load notebook" />
+        {confirmState !== undefined && (
+          <Button
+            variant="outline"
+            size="tiny"
+            className="w-fit"
+            disabled={confirmState !== 'approval-requested'}
+            onClick={onDeny}
+          >
+            Skip
+          </Button>
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <NotebookConfirm
+      mode="delete"
+      confirmState={confirmState}
+      message={`Assistant wants to delete "${notebook.name}"`}
+      onApprove={onApprove}
+      onDeny={onDeny}
+    >
+      {hasUnsavedLocalChanges && <UnsavedLocalChangesWarning mode="delete" />}
+      <div className="p-3">
+        <Admonition
+          type="destructive"
+          title={`Delete "${notebook.name}"?`}
+          description="This notebook and all of its cells will be permanently deleted. This cannot be undone."
+        />
+      </div>
+    </NotebookConfirm>
+  )
+}
+
+function UnsavedLocalChangesWarning({ mode }: { mode: 'update' | 'delete' }) {
+  return (
+    <div className="px-2 pt-2">
+      <Admonition
+        type="warning"
+        title="Unsaved local changes"
+        description={
+          mode === 'update'
+            ? "This notebook has unsaved local changes that aren't reflected in this preview. Approving will overwrite them on save."
+            : "This notebook has unsaved local changes that aren't reflected in this preview. Approving will permanently delete them."
+        }
+      />
+    </div>
   )
 }

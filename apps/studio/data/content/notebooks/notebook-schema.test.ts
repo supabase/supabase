@@ -136,6 +136,27 @@ describe('notebookSchema', () => {
     expect(result.success).toBe(true)
   })
 
+  it('normalizes an empty-string database_identifier to absent — a model asked to omit it often writes "" instead', () => {
+    const result = notebookSchema.safeParse({
+      schema_version: 1,
+      cells: [
+        {
+          _tag: 'database_cell',
+          _id: '1',
+          sql: 'select 1',
+          row_limit: 100,
+          database_identifier: '',
+        },
+      ],
+    })
+
+    expect(result.success).toBe(true)
+    if (!result.success) return
+    const [cell] = result.data.cells
+    expect(cell._tag).toBe('database_cell')
+    expect(cell._tag === 'database_cell' ? cell.database_identifier : undefined).toBeUndefined()
+  })
+
   it('rejects a cell with no _id — the backend always assigns one on save', () => {
     const result = notebookSchema.safeParse({
       schema_version: 1,
@@ -256,26 +277,6 @@ describe('agentNotebookSchema', () => {
     const result = agentNotebookSchema.safeParse({
       schema_version: 1,
       cells: [{ _tag: 'markdown_cell', id: 'should-not-be-here', text: 'hello' }],
-    })
-
-    expect(result.success).toBe(false)
-  })
-
-  it('rejects a database_cell that carries a database_identifier', () => {
-    // Agents have no way to discover a project's real read-replica identifiers, so an
-    // invented one silently breaks the cell (its connection string never resolves) — the
-    // field is stripped from the agent-facing schema entirely rather than left for a model
-    // to guess at.
-    const result = agentNotebookSchema.safeParse({
-      schema_version: 1,
-      cells: [
-        {
-          _tag: 'database_cell',
-          sql: 'select 1',
-          row_limit: 100,
-          database_identifier: 'replica-1',
-        },
-      ],
     })
 
     expect(result.success).toBe(false)

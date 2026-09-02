@@ -15,6 +15,7 @@ import { ExperimentalTokenDropdown } from '../Classic/ExperimentalTokenDropdown'
 import { NewScopedTokenForm } from './Form/NewScopedTokenForm'
 import { getExpiryDate, type TokenFormValues } from './Form/NewScopedTokenForm.utils'
 import { NewScopedTokenSuccess } from './Form/NewScopedTokenSuccess'
+import { TokenDocsButtons } from './TokenDocsButtons'
 import {
   useAccessTokenCreateMutation,
   type NewAccessToken,
@@ -63,6 +64,7 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
             track('access_token_created', {
               tokenType: 'classic',
               expiryPreset: values.expiresAt,
+              resourceAccess: 'account',
             })
             showCreatedToken(data)
           },
@@ -123,11 +125,12 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
         size="default"
         className="flex h-full flex-col gap-0 sm:w-[656px] lg:w-[800px]"
       >
-        <SheetHeader>
+        <SheetHeader className="flex flex-col md:flex-row justify-between gap-4 items-start md:items-center">
           <SheetTitle>{step === 'success' ? 'Token created' : 'Generate token'}</SheetTitle>
           <SheetDescription className="sr-only">
             Configure and create a new access token.
           </SheetDescription>
+          {step !== 'success' && <TokenDocsButtons />}
         </SheetHeader>
         {step === 'success' && createdToken ? (
           <NewScopedTokenSuccess

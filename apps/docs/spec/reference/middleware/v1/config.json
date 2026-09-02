@@ -1,0 +1,5 @@
+{
+  "categoryOrder": ["Composition", "Middleware", "Environment", "Types"],
+  "partialsOrder": ["introduction", "installing"],
+  "navigationPrefixes": {}
+}
