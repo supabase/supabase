@@ -8,7 +8,8 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DeleteDestination } from './DeleteDestination'
 import { DestinationLogo } from './DestinationLogo'
-import { PipelineStatus } from './PipelineStatus'
+import { DetailSubtext } from './DetailSubtext'
+import { PipelineStatePill } from './PipelineStatePill'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import { getFormattedLagValue } from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
 import { RowMenu } from './RowMenu'
@@ -164,11 +165,11 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
                 <p className="text-sm font-medium text-foreground truncate">
                   {destinationName || type}
                 </p>
-                <div className="flex items-center gap-x-1.5 text-xs text-foreground-lighter">
+                <DetailSubtext className="flex items-center gap-x-1.5">
                   <span className="font-mono">#{pipeline?.id}</span>
                   <span aria-hidden>&middot;</span>
                   <span>{type}</span>
-                </div>
+                </DetailSubtext>
               </div>
             )}
           </TableCell>
@@ -177,13 +178,14 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
             {isPipelineLoading || !pipeline ? (
               <ShimmeringLoader />
             ) : (
-              <PipelineStatus
+              <PipelineStatePill
                 pipelineStatus={pipelineStatus?.status}
                 error={pipelineStatusError}
                 isLoading={isPipelineStatusLoading}
                 isError={isPipelineStatusError}
                 isSuccess={isPipelineStatusSuccess}
                 requestStatus={requestStatus}
+                projectRef={projectRef}
                 pipelineId={pipeline?.id}
               />
             )}

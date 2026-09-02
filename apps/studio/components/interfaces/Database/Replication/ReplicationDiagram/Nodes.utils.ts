@@ -16,3 +16,4 @@ export const getReplicationDestinationType = (
   if ('clickhouse' in config) return 'ClickHouse'
   return undefined
 }
+
