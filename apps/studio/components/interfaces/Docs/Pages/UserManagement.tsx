@@ -42,8 +42,8 @@ export const UserManagement = ({ selectedLang, showApiKey }: UserManagementProps
               the user using a <code>user_id</code> field.
             </p>
             <p>
-              Supabase already has built in the routes to sign up, login, and log out for managing
-              users in your apps and websites.
+              Supabase already has built in the routes to sign up, sign in, and sign out for
+              managing users in your apps and websites.
             </p>
           </>
         }
@@ -69,12 +69,12 @@ export const UserManagement = ({ selectedLang, showApiKey }: UserManagementProps
       />
 
       <DocSection
-        title="Log in with Email/Password"
+        title="Sign in with email/password"
         content={
           <>
-            <p>If an account is created, users can login to your app.</p>
+            <p>If an account is created, users can sign in to your app.</p>
             <p>
-              After they have logged in, all interactions using the Supabase JS client will be
+              After they have signed in, all interactions using the Supabase JS client will be
               performed as "that user".
             </p>
           </>
@@ -133,7 +133,7 @@ export const UserManagement = ({ selectedLang, showApiKey }: UserManagementProps
       />
 
       <DocSection
-        title="Login via SMS OTP"
+        title="Sign in via SMS OTP"
         content={
           <>
             <p>
@@ -142,7 +142,7 @@ export const UserManagement = ({ selectedLang, showApiKey }: UserManagementProps
             </p>
             <p>
               You must enter your own twilio credentials on the auth settings page to enable
-              SMS-based Logins.
+              SMS-based sign-in.
             </p>
           </>
         }
@@ -178,12 +178,12 @@ export const UserManagement = ({ selectedLang, showApiKey }: UserManagementProps
 
       {authenticationSignInProviders && (
         <DocSection
-          title="Log in with Third Party OAuth"
+          title="Sign in with third-party OAuth"
           content={
             <>
               <p>
-                Users can log in with Third Party OAuth like Google, Facebook, GitHub, and more. You
-                must first enable each of these in the Auth Providers settings{' '}
+                Users can sign in with third-party OAuth like Google, Facebook, GitHub, and more.
+                You must first enable each of these in the Auth Providers settings{' '}
                 <span className="text-green-500">
                   <InlineLink key={'AUTH'} href={`/project/${projectRef}/auth/providers`}>
                     here
@@ -198,7 +198,7 @@ export const UserManagement = ({ selectedLang, showApiKey }: UserManagementProps
                 </InlineLink>
               </p>
               <p>
-                After they have logged in, all interactions using the Supabase JS client will be
+                After they have signed in, all interactions using the Supabase JS client will be
                 performed as "that user".
               </p>
               <p>
@@ -229,7 +229,7 @@ export const UserManagement = ({ selectedLang, showApiKey }: UserManagementProps
 
       <DocSection
         title="User"
-        content={<p>Get the JSON object for the logged in user.</p>}
+        content={<p>Get the JSON object for the signed-in user.</p>}
         snippets={
           <CodeSnippet
             selectedLang={selectedLang}
@@ -242,7 +242,7 @@ export const UserManagement = ({ selectedLang, showApiKey }: UserManagementProps
         title="Forgotten Password Email"
         content={
           <p>
-            Sends the user a log in link via email. Once logged in you should direct the user to a
+            Sends the user a sign-in link via email. Once signed in you should direct the user to a
             new password form. And use "Update User" below to save the new password.
           </p>
         }
@@ -271,7 +271,7 @@ export const UserManagement = ({ selectedLang, showApiKey }: UserManagementProps
       />
 
       <DocSection
-        title="Log out"
+        title="Sign out"
         content={
           <p>
             After calling log out, all interactions using the Supabase JS client will be
@@ -290,7 +290,7 @@ export const UserManagement = ({ selectedLang, showApiKey }: UserManagementProps
         title="Send a User an Invite over Email"
         content={
           <>
-            <p>Send a user a passwordless link which they can use to sign up and log in.</p>
+            <p>Send a user a passwordless link which they can use to sign up and sign in.</p>
             <p>
               After they have clicked the link, all interactions using the Supabase JS client will
               be performed as "that user".
