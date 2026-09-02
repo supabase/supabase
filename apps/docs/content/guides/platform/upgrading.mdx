@@ -286,6 +286,37 @@ Reindex each index it returns, using the schema-qualified name. `REINDEX INDEX C
 REINDEX INDEX CONCURRENTLY <schema_name>.<index_name>;
 ```
 
+### Pgcrypto legacy PGP ciphers
+
+_Applies when upgrading to Postgres 15.19 or 17.11._
+
+<Admonition type="caution">
+
+You are affected only if you call pgcrypto PGP functions with `cipher-algo=bf`, `cipher-algo=blowfish`, or `cipher-algo=cast5`. The default cipher (AES) and `3des` are not affected.
+
+</Admonition>
+
+This release fixes [CVE-2026-14663](https://www.postgresql.org/support/security/CVE-2026-14663/): when a requested PGP cipher is disabled in the server's OpenSSL build, pgcrypto silently stored data effectively unencrypted, and decryption succeeds even with the wrong key. After upgrading, decrypting such messages fails by default, and encrypting with those ciphers returns an error instead of storing unprotected data.
+
+To check whether stored data is affected, decrypt one value with a deliberately wrong passphrase:
+
+```sql
+select pgp_sym_decrypt(<your_encrypted_column>, 'deliberately-wrong-key')
+from <your_table> limit 1;
+```
+
+An error ("Wrong key or corrupt data") means the value is properly encrypted. If your data is returned, that value is affected: re-encrypt it with a modern cipher before you upgrade (or after upgrading by adding `ignore-cipher-failure=1` to the decrypt options):
+
+```sql
+update <your_table>
+set <col> = pgp_sym_encrypt(
+              pgp_sym_decrypt(<col>, '<your-key>'),
+              '<your-key>', 'cipher-algo=aes256')
+where ...;
+```
+
+Because affected data was not effectively encrypted at rest, consider rotating any secrets stored this way.
+
 ### Btree_gist indexes on float columns require reindexing after upgrade
 
 _Applies when upgrading to Postgres 15.19 or 17.11._
