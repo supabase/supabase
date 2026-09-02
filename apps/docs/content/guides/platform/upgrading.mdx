@@ -292,7 +292,7 @@ _Applies when upgrading to Postgres 15.19 or 17.11._
 
 <Admonition type="caution">
 
-On Supabase-managed instances, you are affected only if you call pgcrypto PGP functions with `cipher-algo=bf`, `cipher-algo=blowfish`, or `cipher-algo=cast5`. The default cipher (AES) and `3des` are not affected. On other deployments the affected set depends on that server's OpenSSL build — see the CVE for details.
+You are affected only if you call pgcrypto PGP functions with a `cipher-algo` that is unavailable in your server's OpenSSL build. On Supabase-managed instances that means `cipher-algo=bf`, `cipher-algo=blowfish`, or `cipher-algo=cast5`; the default cipher (AES) and `3des` are not affected.
 
 </Admonition>
 
