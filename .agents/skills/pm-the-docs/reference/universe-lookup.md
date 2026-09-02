@@ -1,39 +1,75 @@
-# Universe lookup (employees)
+# Cross-repo product lookup
 
-Cross-repo product search for Frame/Shape when a feature may span services. Use this during `/pm-the-docs`, not `/ask-the-docs` (`ask-the-docs` stays on `apps/docs` architecture).
+Cross-repo product search for Frame/Shape when a feature may span services. Use during `/pm-the-docs`, not `/ask-the-docs` (`ask-the-docs` stays on `apps/docs` architecture).
 
-[`supabase/universe`](https://github.com/supabase/universe) aggregates core platform repos as git submodules under `repos/` so you can search the whole product surface from one workspace.
+**Cross-repo confirmation is required for everyone.** [`supabase/universe`](https://github.com/supabase/universe) is an optional accelerator for people who can access that private meta-repo (typically Supabase org members with a local clone). Open-source contributors without access use the OSS path below — that is a successful outcome, not a failure.
 
-## Availability
+## Capability gate
 
-Resolve the universe root in order:
+Run this gate before any universe clone or submodule command.
+
+```mermaid
+flowchart TD
+  start[Cross-repo grounding needed]
+  clone{"Local universe root exists?"}
+  ghApi{"gh api repos/supabase/universe succeeds?"}
+  useUniverse[Use universe clone + rg in repos/]
+  ossPath[OSS path: public gh search + linked product repos]
+  start --> clone
+  clone -->|yes| useUniverse
+  clone -->|no| ghApi
+  ghApi -->|yes org access| useUniverse
+  ghApi -->|no 404/403| ossPath
+```
+
+### 1. Local clone?
+
+Resolve the universe root in order (do not hardcode machine-specific absolute paths in committed files):
 
 1. `$SUPABASE_UNIVERSE_ROOT` (if set)
 2. `$HOME/GitHub/supabase/universe`
 
 ```bash
 UNIVERSE_ROOT="${SUPABASE_UNIVERSE_ROOT:-$HOME/GitHub/supabase/universe}"
+[[ -d "$UNIVERSE_ROOT/.git" || -f "$UNIVERSE_ROOT/.git" ]] && echo "local universe ok"
 ```
 
-If that directory does not exist, **do not assume access**. Fall back to:
+If that checkout exists → **accelerator path** (skip the `gh api` probe).
 
-- `gh search code --owner supabase '<query>'` (and other orgs named in the ticket)
-- Any product repo already linked from Linear / the PR
+### 2. Else probe org access (read-only, no clone)
 
-Do not hardcode machine-specific absolute paths (for example a single laptop home directory) in committed skill files.
+```bash
+gh api repos/supabase/universe -q .full_name
+```
 
-## Initialize submodules
+| Result | Next step |
+| ------ | --------- |
+| Success (`supabase/universe`) | Accelerator path: you **may** clone with `--recurse-submodules` (or ask the user to), then search |
+| 404, 403, or other failure | **OSS path only** — do **not** run `git clone` or `git submodule update` against universe |
 
-If `repos/` is empty or missing expected checkouts:
+## OSS path (always valid)
+
+When the gate says universe is unavailable:
+
+- Search public code: `gh search code --owner supabase '<query>'` (plus other public owners named in the ticket)
+- Read any product repo already checked out or linked from Linear / the PR
+- Prefer `supabase/supabase` in-tree sources when that is enough
+- In the Frame/Shape summary, record `universe: unavailable (OSS)` and list the public sources used
+
+Never treat missing universe access as a blocker or an incomplete Frame/Shape.
+
+## Accelerator: universe (when accessible)
+
+Prefer an existing local clone. Only init or update submodules after the gate succeeds:
 
 ```bash
 cd "$UNIVERSE_ROOT"
 git submodule update --init --recursive
 ```
 
-Private submodules (`platform`, `branching`) may need a PAT; public submodules are enough for most docs grounding. If init fails for a private repo, note that and search the public ones plus `gh search`.
+Private submodules (`platform`, `branching`) may need a PAT. If those fail, note the gap and continue with public submodules plus the OSS search path.
 
-## Where to look
+### Where to look
 
 Start from the universe README "Finding your way around" table, then `rg` inside the relevant submodule:
 
@@ -52,8 +88,9 @@ When scope is unknown, search initialized `repos/**` with a tight pattern rather
 ## How to use in Frame / Shape
 
 1. Name the product surfaces the launch might touch (CLI, Auth, migrations, Dashboard, …).
-2. Resolve those to submodule paths above.
-3. Confirm with a short search whether behavior lives in one repo or several.
-4. Record in the Frame/Shape summary: repos consulted, confirmed cross-cutting vs single-repo, and any gaps.
+2. Run the **capability gate**.
+3. Resolve surfaces to repos (universe submodules **or** public search / linked checkouts).
+4. Confirm with a short search whether behavior lives in one repo or several.
+5. Record in the Frame/Shape summary: gate result (`universe: available` or `universe: unavailable (OSS)`), repos consulted, cross-cutting vs single-repo, and any gaps.
 
-If universe is unavailable, say so and use the fallback search — still distinguish confirmed fact from inference.
+Always distinguish confirmed fact from inference.

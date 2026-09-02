@@ -24,7 +24,7 @@ _Self-serve first ([agent skills](../../../apps/docs/CONTRIBUTING.md#ai-agent-sk
 
 ### 1. Frame
 
-_Skills:_ `/ask-the-docs` for how the docs surface works today; `/pm-the-docs` for audience, stage, and cross-cutting scope (employees: universe for cross-repo span — see [universe-lookup.md](universe-lookup.md)).
+_Skills:_ `/ask-the-docs` for how the docs surface works today; `/pm-the-docs` for audience, stage, and cross-cutting scope (cross-repo span via universe when accessible — see [universe-lookup.md](universe-lookup.md)).
 
 - [ ] P: State the product stage (private/public alpha, beta, GA)
 - [ ] P: Name the audience and the job they are trying to do
@@ -40,11 +40,11 @@ _Skill:_ `/ask-the-docs` for IA placement, architecture, and where content lives
 
 ### 3. Draft
 
-_Skill:_ `/write-the-docs` to draft net-new content grounded in Linear and the code (`/pm-the-docs` → universe for cross-repo behavior when needed).
+_Skill:_ `/write-the-docs` to draft net-new content grounded in Linear and the code (`/pm-the-docs` → universe when accessible, else public search / named product repos).
 
 - [ ] P: Lead with the why and the outcome, then the how/what (product story first)
 - [ ] P: Include at least one runnable, copy-pasteable example that you have actually run (or will run in Self-review via `/test-the-docs`)
-- [ ] P/E: Cross-repo behavior confirmed via `supabase/universe` (employees) or named product repos when the feature is not confined to `supabase/supabase` (lookup via `/pm-the-docs`, not `/ask-the-docs`)
+- [ ] P/E: Cross-repo behavior confirmed via universe when accessible, else public `gh search` / named product repos when the feature is not confined to `supabase/supabase` (lookup via `/pm-the-docs`, not `/ask-the-docs`)
 - [ ] E: Contribute technical depth and verify accuracy (APIs, limits, edge cases)
 - [ ] P: Call out the current stage inline and any known limitations
 

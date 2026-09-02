@@ -3,12 +3,12 @@ name: pm-the-docs
 description: >-
   Docs-PM decision support for the "Write the docs" authoring process —
   makes audience, stage, and cross-cutting scope calls during the Frame
-  and Shape stages (including cross-repo product lookup via supabase/universe
-  for employees), and helps decide when a docs question needs to self-serve
-  vs. escalate to a docs PM. Use when framing a new docs page or launch,
-  deciding what product stage or audience a feature targets, judging whether
-  a docs question needs PM sign-off, or confirming which product repos a
-  launch spans.
+  and Shape stages (including cross-repo product lookup via universe when
+  accessible, else the public OSS path), and helps decide when a docs
+  question needs to self-serve vs. escalate to a docs PM. Use when framing
+  a new docs page or launch, deciding what product stage or audience a
+  feature targets, judging whether a docs question needs PM sign-off, or
+  confirming which product repos a launch spans.
 ---
 
 # PM the docs
@@ -29,13 +29,13 @@ Backs the Frame and Shape stages of the "Write the docs" checklist (mirrored in 
 | File | What's inside |
 | ---- | ------------- |
 | [reference/write-the-docs-checklist.md](reference/write-the-docs-checklist.md) | Six-stage authoring checklist mirror |
-| [reference/universe-lookup.md](reference/universe-lookup.md) | Employee cross-repo search via `supabase/universe` (and OSS fallbacks) |
+| [reference/universe-lookup.md](reference/universe-lookup.md) | Cross-repo product lookup: capability gate, universe accelerator, OSS path |
 
 ## Answering a scope/stage/audience question
 
 1. Read the relevant stage in [reference/write-the-docs-checklist.md](reference/write-the-docs-checklist.md) — its checkboxes state exactly what needs deciding.
 2. Read whatever context exists for the feature: the linked issue/project, the PRD, the shipped code or PR. When code and PRD disagree, the code wins for behavior claims.
-3. When scope may span services (CLI, Auth, migrations, Dashboard, platform, …), consult [reference/universe-lookup.md](reference/universe-lookup.md) before settling Frame/Shape. Record which repos you searched.
+3. When scope may span services (CLI, Auth, migrations, Dashboard, platform, …), follow [reference/universe-lookup.md](reference/universe-lookup.md) **capability gate** before settling Frame/Shape; use universe only if accessible, otherwise the OSS path. Record which repos you searched.
 4. Answer the checklist's questions directly: product stage, audience and job-to-be-done, the one-line "why," content type, IA placement, prerequisites.
 5. Distinguish **confirmed fact** (stated in the ticket/PRD/code) from **inference** (your best read) — flag inference explicitly rather than presenting it as settled.
 6. If a decision is genuinely open at the org level (not a docs-content call), say so and name who should decide instead of inventing an answer to look complete.
