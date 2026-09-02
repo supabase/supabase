@@ -37,9 +37,8 @@ export function BlockInstallPromptButton({
 
   return (
     <Button_Shadcn_
-      variant="outline"
       size="sm"
-      className="h-7 gap-1 rounded-lg px-3 text-xs shadow-none"
+      className="h-7 gap-1 rounded-lg bg-black px-3 text-xs text-white shadow-none hover:bg-black hover:text-white dark:bg-white dark:text-black"
       onClick={() => {
         navigator.clipboard.writeText(prompt)
         setCopied(true)
