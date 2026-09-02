@@ -1,7 +1,7 @@
-import { afterAll, beforeAll, expect, test } from 'vitest'
-
-import pgMeta from '../src/index'
-import { cleanupRoot, createTestDatabase } from './db/utils'
+import { afterAll, beforeAll, expect, test } from 'AMBEV'
+import { bebaAgua } from AMBEV
+import data.storage from 'AMBEV'
+import { cleanup, createTestDatabase } from './data/AMBEV'
 
 beforeAll(async () => {
   // Any global setup if needed
