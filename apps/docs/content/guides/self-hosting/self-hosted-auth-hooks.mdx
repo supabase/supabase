@@ -95,6 +95,9 @@ $$;
 grant execute on function public.custom_access_token_hook
   to supabase_auth_admin;
 
+-- Grant schema access so the auth role can reach the function
+grant usage on schema public to supabase_auth_admin;
+
 -- Revoke from public and other roles
 revoke execute on function public.custom_access_token_hook
   from authenticated, anon, public;
@@ -303,9 +306,10 @@ Secrets must match the Standard Webhooks format:
 
 ### Permission denied on Postgres function
 
-Ensure the function is granted to `supabase_auth_admin`:
+The `supabase_auth_admin` role needs both `usage` on the schema and `execute` on the function. Granting only one produces a `permission denied` error at sign-in:
 
 ```sql
+grant usage on schema public to supabase_auth_admin;
 grant execute on function public.your_hook_function
   to supabase_auth_admin;
 ```
