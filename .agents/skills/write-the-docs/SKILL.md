@@ -60,12 +60,14 @@ Before handing off, confirm:
 - [ ] Content type confirmed as Guide/Troubleshooting (not something that belongs in generated Reference instead)
 - [ ] Nav placement and nav enablement both wired, not just the placement
 - [ ] Internal links resolve; first-use of new terms/acronyms is defined
+- [ ] If the draft has procedural snippets (CLI, SQL, client code), **offered** to run [`test-the-docs`](../test-the-docs/SKILL.md) (optional; needs Docker + local CLI)
 
 ## Phase 3 — Handoff
 
 This skill stops at a reviewable draft. It does not open worktrees or PRs itself:
 
-- Before opening the PR, run [`test-the-docs`](../test-the-docs/SKILL.md) on procedural snippets and attach the Verification table to the PR body / self-review note. Then run [`review-the-docs`](../review-the-docs/SKILL.md) local self-review (lint/build/classify).
+- **Offer** [`test-the-docs`](../test-the-docs/SKILL.md) when the draft includes runnable procedural snippets. Ask before starting the Docker sandbox; if declined or Docker is unavailable, record `deferred` and continue. When accepted, attach the Verification table to the PR body / self-review note.
+- Then run [`review-the-docs`](../review-the-docs/SKILL.md) local self-review (lint/build/classify).
 - Hand off to [`create-pull-request`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/create-pull-request/SKILL.md) (and [`work-linear-issue`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/work-linear-issue/SKILL.md) if the ticket needs a full worktree+PR flow) for the actual PR mechanics. Carry the Phase 1/2 flagged-assumptions list forward explicitly into that handoff — it belongs in the PR description (e.g. a "needs review" section) so a reviewer sees it, not just as an inline comment buried in the draft.
 - If the feature is UI-driven and the PR will need screenshots/GIFs, flag [`proof-it-works`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/proof-it-works/SKILL.md) as the next step rather than capturing evidence here.
 
