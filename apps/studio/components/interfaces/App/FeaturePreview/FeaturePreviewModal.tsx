@@ -20,16 +20,14 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   ScrollArea,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-} from 'ui/src/components/shadcn/ui/select'
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
 import { AdvisorRulesPreview } from './AdvisorRulesPreview'
 import { CLSPreview } from './CLSPreview'

@@ -239,7 +239,7 @@ export const EnableExtensionModal = ({
                       name="name"
                       control={form.control}
                       render={({ field }) => (
-                        <FormItemLayout name="name" label="Schema name">
+                        <FormItemLayout label="Schema name">
                           <FormControl>
                             <Input {...field} />
                           </FormControl>

@@ -11,9 +11,8 @@ import { useSendTelemetryEvent } from '~/lib/telemetry'
 import Link from 'next/link'
 import { useCallback, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Badge } from 'ui'
+import { Badge, Heading } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
-import { Heading } from 'ui/src/components/CustomHTMLElements'
 
 import { resolveContentListingIcon } from './iconChip'
 
