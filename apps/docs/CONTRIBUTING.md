@@ -21,9 +21,9 @@ To make docs as clear as possible:
 
 ## AI agent skills for docs authoring
 
-If you're using Claude Code or Cursor, this repo ships skills that back the [Write the docs](../../.agents/skills/pm-the-docs/reference/write-the-docs-checklist.md) authoring checklist.
+If you're using an AI coding agent (Claude Code, Codex, or anything else that reads `.agents/skills/`), this repo ships skills that back the [Write the docs](../../.agents/skills/pm-the-docs/reference/write-the-docs-checklist.md) authoring checklist.
 
-Invoke a skill by name: `/write-the-docs`, `/edit-the-docs`, `/ask-the-docs`, `/pm-the-docs`, `/review-the-docs`.
+Ask your agent for a skill by name (`write-the-docs`, `edit-the-docs`, `ask-the-docs`, `pm-the-docs`, `review-the-docs`); in Claude Code these are also available as `/name` slash commands.
 
 | Skill | Checklist stage | Use for |
 | --- | --- | --- |
@@ -33,7 +33,7 @@ Invoke a skill by name: `/write-the-docs`, `/edit-the-docs`, `/ask-the-docs`, `/
 | [`edit-the-docs`](../../.agents/skills/edit-the-docs/SKILL.md) | Edit | Restructure and improve existing pages |
 | [`review-the-docs`](../../.agents/skills/review-the-docs/SKILL.md) | Self-review / PR review | Checking a draft and PR triage/verification |
 
-The canonical files live in `.agents/skills/`, with Git symlinks in `.claude/skills/` and `.cursor/skills/`.
+The canonical files live in `.agents/skills/`; `.claude/skills` is a Git symlink to that directory so Claude Code discovers them too.
 
 ## Document types
 
