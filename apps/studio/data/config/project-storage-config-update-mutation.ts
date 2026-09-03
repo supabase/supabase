@@ -51,7 +51,10 @@ export const useProjectStorageConfigUpdateUpdateMutation = ({
     mutationFn: (vars) => updateProjectStorageConfigUpdate(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries({ queryKey: configKeys.storage(projectRef) })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: configKeys.storage(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: configKeys.projectConfig(projectRef) }),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

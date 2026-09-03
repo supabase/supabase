@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { configKeys } from '../config/keys'
 import { authKeys } from './keys'
 import type { components } from '@/data/api'
 import { handleError, patch } from '@/data/fetchers'
@@ -37,7 +38,10 @@ export const useAuthHooksUpdateMutation = ({
     mutationFn: (vars) => updateAuthHooks(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries({ queryKey: authKeys.authConfig(projectRef) })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: authKeys.authConfig(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: configKeys.projectConfig(projectRef) }),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
