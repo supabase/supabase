@@ -40,9 +40,6 @@ const toAuthTemplatesHref = (projectRef: string) => `/project/${projectRef}/auth
  */
 // Entries with no dedicated Studio settings page fall back to `toProjectHref`.
 export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
-  'analytics.backend': { settingHref: toProjectHref, label: 'Analytics backend' },
-  'analytics.enabled': { settingHref: toProjectHref, label: 'Analytics enabled' },
-  'analytics.port': { settingHref: toProjectHref, label: 'Analytics port' },
   'api.enabled': { settingHref: toDataApiSettingsHref, label: 'API enabled' },
   'api.extra_search_path': { settingHref: toDataApiSettingsHref, label: 'Extra search path' },
   'api.max_rows': { settingHref: toDataApiSettingsHref, label: 'Max rows' },
@@ -669,23 +666,13 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
   'db.seed.sql_paths': { settingHref: toProjectHref, label: 'Seed file paths' },
   'db.shadow_port': { settingHref: toProjectHref, label: 'Shadow database port' },
   'db.ssl_enforcement.enabled': { settingHref: toProjectHref, label: 'SSL enforcement enabled' },
-  'edge_runtime.deno_version': { settingHref: toProjectHref, label: 'Deno version' },
-  'edge_runtime.enabled': { settingHref: toProjectHref, label: 'Edge runtime enabled' },
-  'edge_runtime.inspector_port': {
-    settingHref: toProjectHref,
-    label: 'Edge runtime inspector port',
-  },
-  'edge_runtime.policy': { settingHref: toProjectHref, label: 'Edge runtime policy' },
   'experimental.inspect.rules': { settingHref: toProjectHref, label: 'Inspect rules' },
-  'experimental.orioledb_version': { settingHref: toProjectHref, label: 'OrioleDB version' },
   'experimental.pgdelta.enabled': { settingHref: toProjectHref, label: 'pgdelta enabled' },
   'experimental.s3_access_key': { settingHref: toProjectHref, label: 'S3 access key' },
   'experimental.s3_host': { settingHref: toProjectHref, label: 'S3 host' },
   'experimental.s3_region': { settingHref: toProjectHref, label: 'S3 region' },
   'experimental.s3_secret_key': { settingHref: toProjectHref, label: 'S3 secret key' },
   'experimental.webhooks.enabled': { settingHref: toProjectHref, label: 'Webhooks enabled' },
-  'inbucket.enabled': { settingHref: toProjectHref, label: 'Inbucket enabled' },
-  'inbucket.port': { settingHref: toProjectHref, label: 'Inbucket port' },
   'realtime.enabled': { settingHref: toProjectHref, label: 'Realtime enabled' },
   'realtime.ip_version': { settingHref: toProjectHref, label: 'IP version' },
   'realtime.max_header_length': { settingHref: toProjectHref, label: 'Max header length' },
@@ -708,9 +695,6 @@ export const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
   'storage.vector.enabled': { settingHref: toProjectHref, label: 'Storage vector enabled' },
   'storage.vector.max_buckets': { settingHref: toProjectHref, label: 'Max vector buckets' },
   'storage.vector.max_indexes': { settingHref: toProjectHref, label: 'Max vector indexes' },
-  'studio.api_url': { settingHref: toProjectHref, label: 'Studio API URL' },
-  'studio.enabled': { settingHref: toProjectHref, label: 'Studio enabled' },
-  'studio.port': { settingHref: toProjectHref, label: 'Studio port' },
 }
 
 export function getFieldDefinition(configPath: string): ResolvedConfigFieldDefinition | undefined {
