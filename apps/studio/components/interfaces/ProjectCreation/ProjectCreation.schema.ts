@@ -18,7 +18,11 @@ export const FormSchema = z
       required_error: 'Please enter a Postgres version.',
     }),
     instanceType: z.string().optional(),
-    kubernetesClusterId: z.string().optional(),
+    kubernetesClusterId: z
+      .string()
+      .trim()
+      .transform((value) => (value === '' ? undefined : value))
+      .optional(),
     kubernetesClusterForce: z.boolean().optional(),
     dbRegion: z.string({
       required_error: 'Please select a region.',
