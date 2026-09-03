@@ -571,6 +571,15 @@ Issue Details: ${issue}
 Description: ${description}`
 }
 
+const LINTER_LEVEL_VALUES = Object.values(LINTER_LEVELS)
+
+/**
+ * The `preset` query param is user controlled, so match it against the known levels
+ * instead of trusting it to be one.
+ */
+export const parseLinterLevel = (value?: string) =>
+  LINTER_LEVEL_VALUES.find((level) => level === value)
+
 export const getLintEntityString = (metadata: Lint['metadata']) => {
   if (!metadata) {
     return undefined
