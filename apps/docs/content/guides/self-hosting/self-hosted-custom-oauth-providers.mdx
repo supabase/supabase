@@ -1,7 +1,7 @@
 ---
-title: "Custom OAuth/OIDC Providers"
-description: "Configure any OAuth2 or OIDC-compatible identity provider for self-hosted Supabase"
-subtitle: "Configure any OAuth2 or OIDC-compatible identity provider for self-hosted Supabase"
+title: 'Custom OAuth/OIDC Providers'
+description: 'Configure any OAuth2 or OIDC-compatible identity provider for self-hosted Supabase'
+subtitle: 'Configure any OAuth2 or OIDC-compatible identity provider for self-hosted Supabase'
 ---
 
 ## Overview
@@ -40,7 +40,7 @@ services:
   auth:
     environment:
       # ... existing variables ...
-      GOTRUE_CUSTOM_OAUTH_ENABLED: "true"
+      GOTRUE_CUSTOM_OAUTH_ENABLED: 'true'
       GOTRUE_CUSTOM_OAUTH_MAX_PROVIDERS: 0 # optional - Default is 0 (unlimited)
 ```
 
@@ -77,16 +77,16 @@ Use an OAuth2 provider when your identity provider does not support OpenID Conne
 
 ```js
 const { data, error } = await supabase.auth.admin.customProviders.createProvider({
-  provider_type: "oauth2",
-  identifier: "custom:my-oauth-provider",
-  name: "My OAuth Provider",
-  client_id: "your-client-id",
-  client_secret: "your-client-secret",
-  authorization_url: "https://provider.example.com/oauth/authorize",
-  token_url: "https://provider.example.com/oauth/token",
-  userinfo_url: "https://provider.example.com/oauth/userinfo",
-  scopes: ["profile", "email"],
-});
+  provider_type: 'oauth2',
+  identifier: 'custom:my-oauth-provider',
+  name: 'My OAuth Provider',
+  client_id: 'your-client-id',
+  client_secret: 'your-client-secret',
+  authorization_url: 'https://provider.example.com/oauth/authorize',
+  token_url: 'https://provider.example.com/oauth/token',
+  userinfo_url: 'https://provider.example.com/oauth/userinfo',
+  scopes: ['profile', 'email'],
+})
 ```
 
 </TabPanel>
@@ -129,14 +129,14 @@ Use an OIDC provider when your identity provider supports OpenID Connect. Supply
 
 ```js
 const { data, error } = await supabase.auth.admin.customProviders.createProvider({
-  provider_type: "oidc",
-  identifier: "custom:my-oidc-provider",
-  name: "My OIDC Provider",
-  client_id: "your-client-id",
-  client_secret: "your-client-secret",
-  issuer: "https://auth.example.com",
-  scopes: ["openid", "profile", "email"],
-});
+  provider_type: 'oidc',
+  identifier: 'custom:my-oidc-provider',
+  name: 'My OIDC Provider',
+  client_id: 'your-client-id',
+  client_secret: 'your-client-secret',
+  issuer: 'https://auth.example.com',
+  scopes: ['openid', 'profile', 'email'],
+})
 ```
 
 </TabPanel>
@@ -207,15 +207,15 @@ Copy the Client ID and Client Secret from the **Login Widget** screen, then use 
 
 ```js
 const { data, error } = await supabase.auth.admin.customProviders.createProvider({
-  provider_type: "oidc",
-  identifier: "custom:telegram",
-  name: "Telegram",
-  client_id: "your-client-id",
-  client_secret: "your-client-secret",
-  issuer: "https://oauth.telegram.org",
-  scopes: ["openid", "profile"],
+  provider_type: 'oidc',
+  identifier: 'custom:telegram',
+  name: 'Telegram',
+  client_id: 'your-client-id',
+  client_secret: 'your-client-secret',
+  issuer: 'https://oauth.telegram.org',
+  scopes: ['openid', 'profile'],
   email_optional: true,
-});
+})
 ```
 
 </TabPanel>
@@ -256,8 +256,8 @@ At this point, you should be able to sign in with Telegram from your client app.
 
 ```js
 const { data, error } = await supabase.auth.signInWithOAuth({
-  provider: "custom:telegram",
-});
+  provider: 'custom:telegram',
+})
 ```
 
 ## Managing Providers
@@ -275,12 +275,12 @@ const { data, error } = await supabase.auth.signInWithOAuth({
 
 ```js
 // List all custom providers
-const { data, error } = await supabase.auth.admin.customProviders.listProviders();
+const { data, error } = await supabase.auth.admin.customProviders.listProviders()
 
 // Filter by provider type
 const { data, error } = await supabase.auth.admin.customProviders.listProviders({
-  type: "oidc",
-});
+  type: 'oidc',
+})
 ```
 
 </TabPanel>
@@ -318,12 +318,12 @@ queryGroup="provider-management">
 
 ```js
 const { data, error } = await supabase.auth.admin.customProviders.updateProvider(
-  "custom:my-provider",
+  'custom:my-provider',
   {
-    name: "Updated Provider Name",
-    scopes: ["openid", "profile", "email"],
-  },
-);
+    name: 'Updated Provider Name',
+    scopes: ['openid', 'profile', 'email'],
+  }
+)
 ```
 
 </TabPanel>
@@ -356,7 +356,7 @@ queryGroup="provider-management">
 
 ```js
 const { data, error } =
-  await supabase.auth.admin.customProviders.deleteProvider("custom:my-provider");
+  await supabase.auth.admin.customProviders.deleteProvider('custom:my-provider')
 ```
 
 </TabPanel>
