@@ -33,7 +33,7 @@ and clarity. Distinct from [`write-the-docs`](../write-the-docs/SKILL.md)
 
 ## Phase 2 — Restructure
 
-Apply [reference/structure-and-flow.md](reference/structure-and-flow.md):
+Apply the **Mixed information types**, **Navigation**, and **Cross-references and glue** guidance in [`apps/docs/CONTRIBUTING.md`](../../../apps/docs/CONTRIBUTING.md) (Guides section), summarized here:
 
 1. Classify substantial sections as contextual, procedural, or reference content. In a mixed page, group sections by information type so that context doesn't interrupt the procedural path.
 2. For a long or mixed page, add a short introduction that links to its major section groups and tells readers when to use each one. Skip this navigation when a short page is already easy to scan.
@@ -66,7 +66,7 @@ Then run [`review-the-docs`](../review-the-docs/SKILL.md) local self-review (`pn
 ## Additional resources
 
 - Structure SoT: [`apps/docs/CONTRIBUTING.md`](../../../apps/docs/CONTRIBUTING.md) (mixed types, navigation, glue)
-- Structure ops: [reference/structure-and-flow.md](reference/structure-and-flow.md)
+- Structure ops: [`apps/docs/CONTRIBUTING.md`](../../../apps/docs/CONTRIBUTING.md) — Guides: Mixed information types, Navigation, Cross-references and glue
 - Pitfalls: [`write-the-docs/reference/common-pitfalls.md`](../write-the-docs/reference/common-pitfalls.md)
 - Mechanics: [`write-the-docs/reference/drafting-mechanics.md`](../write-the-docs/reference/drafting-mechanics.md)
 - Architecture/IA: [`ask-the-docs`](../ask-the-docs/SKILL.md)

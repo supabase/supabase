@@ -49,28 +49,28 @@ flowchart TB
 
 ## Top-level directory layout
 
-| Path                                   | Purpose                                                                            | Notes                                                                      |
-| -------------------------------------- | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| `app/`                                 | Next.js App Router — thin route files that delegate to feature modules             | Slug-based catch-alls per section, e.g. `guides/auth/[[...slug]]/page.tsx` |
-| `apps/docs/content/guides/`            | Source MDX for `/docs/guides/...` pages                                            | One file per page; `_partials/` for shared blocks                          |
-| `apps/docs/content/_partials/`         | Reusable MDX snippets included via `<$Partial path="..." />`                       | Recursion supported                                                        |
-| `apps/docs/content/troubleshooting/`   | Troubleshooting articles                                                           | Some synced from GitHub issues via `Troubleshooting.script.mjs`            |
-| `apps/docs/components/`                | React components used inside MDX                                                   | One folder per component or component family                               |
-| `apps/docs/data/`                      | Typed data modules consumed by components                                          | `.data.ts` suffix; lookup helpers live in `.utils.ts`, not here            |
-| `apps/docs/lib/`                       | Pure library code shared across pipelines                                          | Schemas (zod), helpers (`.utils.ts`), tests                                |
-| `apps/docs/features/docs/`             | Page-level skeletons and the MDX renderer (`MdxBase`)                              | Shared `<Heading>` lives in `MdxBase.shared.tsx`                           |
-| `apps/docs/features/`                  | Domain logic — docs rendering, auth, search/command menu, telemetry, app providers | `app.providers.tsx` wires React Query, theme, dev toolbar, command menu    |
-| `apps/docs/spec/`                      | Source-of-truth specs for reference generation                                     | OpenAPI, SDK YAML, CLI config                                              |
-| `apps/docs/generator/`                 | Codegen templates for reference docs                                               |                                                                            |
-| `apps/docs/resources/`                 | Data loaders (guide, reference, search, errors)                                    |                                                                            |
-| `apps/docs/internals/`                 | Build-time markdown generation                                                     | **Do not import from runtime/client code**                                 |
-| `apps/docs/internals/markdown-schema/` | Per-component handlers: JSX → markdown string                                      | File name matches the component name                                       |
+| Path                                   | Purpose                                                                                | Notes                                                                                        |
+| -------------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `app/`                                 | Next.js App Router — thin route files that delegate to feature modules                 | Slug-based catch-alls per section, e.g. `guides/auth/[[...slug]]/page.tsx`                   |
+| `apps/docs/content/guides/`            | Source MDX for `/docs/guides/...` pages                                                | One file per page; `_partials/` for shared blocks                                            |
+| `apps/docs/content/_partials/`         | Reusable MDX snippets included via `<$Partial path="..." />`                           | Recursion supported                                                                          |
+| `apps/docs/content/troubleshooting/`   | Troubleshooting articles                                                               | Some synced from GitHub issues via `Troubleshooting.script.mjs`                              |
+| `apps/docs/components/`                | React components used inside MDX                                                       | One folder per component or component family                                                 |
+| `apps/docs/data/`                      | Typed data modules consumed by components                                              | `.data.ts` suffix; lookup helpers live in `.utils.ts`, not here                              |
+| `apps/docs/lib/`                       | Pure library code shared across pipelines                                              | Schemas (zod), helpers (`.utils.ts`), tests                                                  |
+| `apps/docs/features/docs/`             | Page-level skeletons and the MDX renderer (`MdxBase`)                                  | Shared `<Heading>` lives in `MdxBase.shared.tsx`                                             |
+| `apps/docs/features/`                  | Domain logic — docs rendering, auth, search/command menu, telemetry, app providers     | `app.providers.tsx` wires React Query, theme, dev toolbar, command menu                      |
+| `apps/docs/spec/`                      | Source-of-truth specs for reference generation                                         | OpenAPI, SDK YAML, CLI config                                                                |
+| `apps/docs/generator/`                 | Codegen templates for reference docs                                                   |                                                                                              |
+| `apps/docs/resources/`                 | GraphQL endpoint (`/api/graphql`): per-query schema, model, resolver                   | See [`graphql-endpoint.md`](./graphql-endpoint.md)                                           |
+| `apps/docs/internals/`                 | Build-time markdown generation                                                         | **Do not import from runtime/client code**                                                   |
+| `apps/docs/internals/markdown-schema/` | Per-component handlers: JSX → markdown string                                          | File name matches the component name                                                         |
 | `apps/docs/public/markdown/guides/`    | Generated `.md` output; served via `/docs/guides/<path>.md` or `Accept: text/markdown` | Built by `generate-guides-markdown.ts`; see [`llm-agent-surface.md`](./llm-agent-surface.md) |
-| `apps/docs/public/markdown/reference/` | Generated reference `.md` files                                                    | Built by `generate-reference-markdown.ts`                                  |
-| `apps/docs/middleware.ts`              | Content negotiation for guides; bot rewrite for reference deep links               | Uses `packages/common/markdown-negotiation.ts`                             |
-| `apps/docs/app/api/guides-md/`         | Serves pre-generated guide markdown to agents                                      | Rewritten from `/docs/guides/<path>.md`                                    |
-| `apps/docs/examples/`                  | Copied from repo root `examples/` at build time                                    | `codegen:examples`                                                         |
-| `apps/docs/scripts/`                   | Build-time scripts (sitemap, markdown export, embeddings)                          |                                                                            |
+| `apps/docs/public/markdown/reference/` | Generated reference `.md` files                                                        | Built by `generate-reference-markdown.ts`                                                    |
+| `apps/docs/middleware.ts`              | Content negotiation for guides; bot rewrite for reference deep links                   | Uses `packages/common/markdown-negotiation.ts`                                               |
+| `apps/docs/app/api/guides-md/`         | Serves pre-generated guide markdown to agents                                          | Rewritten from `/docs/guides/<path>.md`                                                      |
+| `apps/docs/examples/`                  | Copied from repo root `examples/` at build time                                        | `codegen:examples`                                                                           |
+| `apps/docs/scripts/`                   | Build-time scripts (sitemap, markdown export, embeddings)                              |                                                                                              |
 
 Published guide sections: `ai`, `api`, `auth`, `cron`, `database`, `deployment`,
 `functions`, `getting-started`, `integrations`, `local-development`, `platform`,
@@ -79,12 +79,12 @@ Published guide sections: `ai`, `api`, `auth`, `cron`, `database`, `deployment`,
 
 ## Content types
 
-| Type                   | Location                                              | Notes                                                                                                                                                                       |
-| ---------------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Guides / tutorials** | `content/guides/`                                     | Hand-written MDX; goal-oriented                                                                                                                                             |
-| **Troubleshooting**    | `content/troubleshooting/`                            | Partly synced from GitHub issues                                                                                                                                            |
+| Type                   | Location                                              | Notes                                                                                                                                                                                                                                                                    |
+| ---------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Guides / tutorials** | `content/guides/`                                     | Hand-written MDX; goal-oriented                                                                                                                                                                                                                                          |
+| **Troubleshooting**    | `content/troubleshooting/`                            | Partly synced from GitHub issues                                                                                                                                                                                                                                         |
 | **Reference**          | Generated from `spec/` → `features/docs/generated/**` | Spec-driven (OpenAPI, SDKSpec, ConfigSpec, CLISpec). Reference pages do **not** use the standard MDX path — see [`docs-app-direction.md`](./docs-app-direction.md) for why. Management API OpenAPI path: [`management-api-reference.md`](./management-api-reference.md). |
-| **Federated**          | External repos at build time                          | Pulled via GitHub App. See [`federated-docs.md`](./federated-docs.md)                                                                                                       |
+| **Federated**          | External repos at build time                          | Pulled via GitHub App. See [`federated-docs.md`](./federated-docs.md)                                                                                                                                                                                                    |
 
 ## Routing model
 
@@ -128,12 +128,12 @@ outputs in sync without a parallel data shape.
 **Reference implementation: `ContentListings`** — the ID-keyed two-pipeline
 pattern in production:
 
-| Layer | Path |
-| ----- | ---- |
-| Data registry | `apps/docs/data/content-listings/` (`.data.ts` per topic + `index.ts`) |
-| Runtime component | `apps/docs/components/ContentListings/` |
-| Markdown handler | `apps/docs/internals/markdown-schema/ContentListings.ts` |
-| MDX registration | `apps/docs/features/docs/MdxBase.shared.tsx` |
+| Layer             | Path                                                                   |
+| ----------------- | ---------------------------------------------------------------------- |
+| Data registry     | `apps/docs/data/content-listings/` (`.data.ts` per topic + `index.ts`) |
+| Runtime component | `apps/docs/components/ContentListings/`                                |
+| Markdown handler  | `apps/docs/internals/markdown-schema/ContentListings.ts`               |
+| MDX registration  | `apps/docs/features/docs/MdxBase.shared.tsx`                           |
 
 MDX usage: `<ContentListings id="storage-get-started" />`. For batch
 overview-page migration, see the `audit-content-listings` skill in
@@ -194,14 +194,14 @@ markdown string to substitute.
 See [`ci-and-lint.md`](./ci-and-lint.md) for the full CI surface. Local
 commands:
 
-| Tool                                        | Where       | What it catches                                           |
-| ------------------------------------------- | ----------- | --------------------------------------------------------- |
-| `pnpm test:local <path>` (from `apps/docs`) | per-test    | Vitest suite for `lib/` and `data/` schemas               |
-| `pnpm format`                               | repo root   | Prettier — run before opening a PR                        |
-| `pnpm lint --filter=docs`                   | repo root   | ESLint over `apps/docs`                                   |
-| `pnpm typecheck`                            | repo root   | TS across packages                                        |
-| `pnpm build --filter=docs`                  | repo root   | Includes markdown generation; failures here block release |
-| `pnpm run supa-mdx-lint`                    | `apps/docs` | MDX content lint                                          |
+| Tool                                                | Where       | What it catches                                                                                                |
+| --------------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------- |
+| `pnpm test:local:unwatch <path>` (from `apps/docs`) | per-test    | Vitest suite for `lib/` and `data/` schemas; needs local Supabase + DB reset first — see `apps/docs/AGENTS.md` |
+| `pnpm format`                                       | repo root   | Prettier — run before opening a PR                                                                             |
+| `pnpm lint --filter=docs`                           | repo root   | ESLint over `apps/docs`                                                                                        |
+| `pnpm typecheck`                                    | repo root   | TS across packages                                                                                             |
+| `pnpm build --filter=docs`                          | repo root   | Includes markdown generation; failures here block release                                                      |
+| `pnpm lint:mdx`                                     | `apps/docs` | MDX content lint (whole `content/` tree)                                                                       |
 
 Before adding a custom lint job, check whether the existing one can absorb
 the check (see [`adding-features.md`](./adding-features.md) "Reuse
