@@ -1,30 +1,20 @@
 import {
   CliConfigSchema,
   fromApiProjectConfig,
-  fromConfigDocument,
   type CliConfig,
   type EffectiveConfig,
   type ProjectConfig,
 } from '@supabase/config'
+import { diffProjectConfig, type ConfigChange } from '@supabase/config/internal'
 import { Schema } from 'effect'
+import { isPlainObject } from 'lodash'
 
 import {
   CONFIG_SECTIONS,
-  getConfigValue,
   getFieldDefinition,
   getSectionFieldEntries,
-  isSecretConfigField,
   type ConfigSection,
-} from './github-config-field-registry'
-
-type GitHubConfigFieldStatus = 'unmanaged' | 'managed' | 'drifted'
-
-interface GitHubConfigFieldState {
-  status: GitHubConfigFieldStatus
-  configPath?: string
-  settingHref?: (projectRef: string) => string
-  githubValue?: unknown
-}
+} from './ConfigurationDriftPage.constants'
 
 export interface GitHubConfigDriftField {
   section: ConfigSection
@@ -40,18 +30,16 @@ export interface UnmanagedConfigField {
   dashboardValue: unknown
 }
 
+export interface MatchedConfigField {
+  section: ConfigSection
+  configPath: string
+  value: unknown
+}
+
 interface GitHubConfigDriftSummary {
-  managedCount: number
   driftedFields: GitHubConfigDriftField[]
+  matchedFields: MatchedConfigField[]
   unmanagedFields: UnmanagedConfigField[]
-}
-
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
-}
-
-function isEffectiveConfigLike(value: unknown): value is EffectiveConfig {
-  return isPlainObject(value)
 }
 
 /**
@@ -59,7 +47,7 @@ function isEffectiveConfigLike(value: unknown): value is EffectiveConfig {
  * sides of a drift comparison are normalized to. Returns `undefined` (rather than throwing) when
  * `attributes` isn't loaded yet or the API returned something @supabase/config can't map.
  */
-export function toDashboardProjectConfig(attributes: unknown): ProjectConfig | undefined {
+export function fromDashboardProjectConfig(attributes: unknown): ProjectConfig | undefined {
   if (attributes === undefined) return undefined
   try {
     return fromApiProjectConfig(attributes)
@@ -69,43 +57,26 @@ export function toDashboardProjectConfig(attributes: unknown): ProjectConfig | u
 }
 
 /**
- * Converts a parsed config.toml document into the same hosted-section shape as the dashboard side.
+ * Decodes a parsed config.toml document into the `{ config, document }` pair `diffProjectConfig`
+ * takes as its local operand. Keeping the raw `document` alongside the decoded `config` is what
+ * unlocks raw-presence masking (distinguishing "the file wrote this value" from "the file inherited
+ * a schema default") — see `DiffProjectConfigOptions.local`'s own docstring. Returns `undefined`
+ * (rather than throwing) when `document` isn't loaded yet or fails to decode against the schema.
  */
-export function toGithubProjectConfig(document: unknown): ProjectConfig | undefined {
-  if (!isEffectiveConfigLike(document)) return undefined
-
+export function decodeGithubConfigDocument(
+  document: unknown
+): { config: CliConfig; document: Record<string, unknown> } | undefined {
+  if (!isRecord(document)) return undefined
   try {
-    const githubCompleteConfig: CliConfig = Schema.decodeUnknownSync(CliConfigSchema)(document)
-    const githubProjectConfig = fromConfigDocument(githubCompleteConfig)
-    return githubProjectConfig
+    const config = Schema.decodeUnknownSync(CliConfigSchema)(document)
+    return { config, document }
   } catch {
     return undefined
   }
 }
 
-function getConfigFieldState({
-  configPath,
-  dashboardConfig,
-  githubConfig,
-}: {
-  configPath: string
-  dashboardConfig: ProjectConfig
-  githubConfig?: ProjectConfig
-}): GitHubConfigFieldState {
-  const definition = getFieldDefinition(configPath)
-  if (!definition || !githubConfig || isSecretConfigField(definition.configPath)) {
-    return { status: 'unmanaged' }
-  }
-
-  const dashboardValue = getConfigValue(dashboardConfig, definition.configPath)
-  const githubValue = getConfigValue(githubConfig, definition.configPath)
-
-  return {
-    status: valuesMatch(dashboardValue, githubValue) ? 'managed' : 'drifted',
-    configPath: definition.configPath,
-    settingHref: definition.settingHref,
-    githubValue,
-  }
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return isPlainObject(value)
 }
 
 export function getConfigDriftSummary({
@@ -113,14 +84,30 @@ export function getConfigDriftSummary({
   githubConfig,
 }: {
   dashboardConfig?: ProjectConfig
-  githubConfig?: ProjectConfig
+  githubConfig?: EffectiveConfig
 }): GitHubConfigDriftSummary {
   if (!dashboardConfig || !githubConfig) {
-    return { managedCount: 0, driftedFields: [], unmanagedFields: [] }
+    return { driftedFields: [], matchedFields: [], unmanagedFields: [] }
   }
 
-  let managedCount = 0
+  const decodedGithubConfig = decodeGithubConfigDocument(githubConfig)
+  if (!decodedGithubConfig) {
+    return { driftedFields: [], matchedFields: [], unmanagedFields: [] }
+  }
+
+  const changeSet = diffProjectConfig({
+    local: decodedGithubConfig,
+    remote: dashboardConfig,
+  })
+
+  const changesByPath = new Map<string, ConfigChange>(
+    changeSet.changes.map((change) => [change.path.join('.'), change])
+  )
+  const maskedPaths = new Set(changeSet.masked.map((path) => path.join('.')))
+  const unmanagedByPushPaths = new Set(changeSet.unmanaged.map((path) => path.join('.')))
+
   const driftedFields: GitHubConfigDriftField[] = []
+  const matchedFields: MatchedConfigField[] = []
   const unmanagedFields: UnmanagedConfigField[] = []
 
   for (const section of CONFIG_SECTIONS) {
@@ -128,32 +115,34 @@ export function getConfigDriftSummary({
     if (!sectionConfig) continue
 
     for (const { configPath, rawValue } of getSectionFieldEntries(section, sectionConfig)) {
-      if (isSecretConfigField(configPath)) continue
+      if (maskedPaths.has(configPath)) continue
 
-      const state = getConfigFieldState({ configPath, dashboardConfig, githubConfig })
+      const change = changesByPath.get(configPath)
+      if (change) {
+        const definition = getFieldDefinition(configPath)
+        if (!definition) {
+          unmanagedFields.push({ section, configPath, dashboardValue: rawValue })
+          continue
+        }
 
-      if (state.status === 'managed') {
-        managedCount += 1
+        driftedFields.push({
+          section,
+          configPath,
+          settingHref: definition.settingHref,
+          dashboardValue: change.remote,
+          githubValue: change.local,
+        })
         continue
       }
-      if (state.status === 'unmanaged' || !state.configPath || !state.settingHref) {
+
+      if (unmanagedByPushPaths.has(configPath)) {
         unmanagedFields.push({ section, configPath, dashboardValue: rawValue })
         continue
       }
 
-      driftedFields.push({
-        section,
-        configPath: state.configPath,
-        settingHref: state.settingHref,
-        dashboardValue: rawValue,
-        githubValue: state.githubValue,
-      })
+      matchedFields.push({ section, configPath, value: rawValue })
     }
   }
 
-  return { managedCount, driftedFields, unmanagedFields }
-}
-
-function valuesMatch(left: unknown, right: unknown): boolean {
-  return JSON.stringify(left) === JSON.stringify(right)
+  return { driftedFields, matchedFields, unmanagedFields }
 }
