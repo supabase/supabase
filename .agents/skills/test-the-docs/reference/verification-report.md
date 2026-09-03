@@ -7,27 +7,27 @@ Paste into the PR body or self-review note under a **Verification** heading.
 ```markdown
 ## Verification (`/test-the-docs`)
 
-| Snippet / step | Class | Sandbox | Result | Notes |
-| -------------- | ----- | ------- | ------ | ----- |
-| e.g. `create type …` SQL | runnable-local | temp dir + `supabase start` | pass | |
-| e.g. `supabase db diff` | runnable-local | temp dir + local stack | fail | product bug → link issue |
-| e.g. paid Dashboard-only step | deferred | — | deferred | needs hosted project |
+| Snippet / step                | Class          | Sandbox                           | Result   | Notes                    |
+| ----------------------------- | -------------- | --------------------------------- | -------- | ------------------------ |
+| e.g. `create type …` SQL      | runnable-local | Compose runner + `supabase start` | pass     |                          |
+| e.g. `supabase db diff`       | runnable-local | Compose runner + local stack      | fail     | product bug → link issue |
+| e.g. paid Dashboard-only step | deferred       | —                                 | deferred | needs hosted project     |
 
 **Tier A path:** <one-line description of the end-to-end path run>
 
-**Environment:** Docker Desktop <version if known>; supabase CLI <version>; non-root user
+**Environment:** Docker Desktop <version if known>; compose sandbox (`sandbox/run.sh`); fences in-container only
 ```
 
 Do **not** put secrets (`JWT_SECRET`, `ANON_KEY`, `SERVICE_ROLE_KEY`, access tokens) in Notes or Environment.
 
 ## Results
 
-| Result | Meaning |
-| ------ | ------- |
-| `pass` | Command exited 0 and matched expected behavior |
-| `fail` | Ran but wrong output / non-zero exit — docs wrong **or** product bug |
-| `deferred` | Not run; reason required in Notes |
-| `skipped` | Out of scope (`illustrative-only`) |
+| Result     | Meaning                                                              |
+| ---------- | -------------------------------------------------------------------- |
+| `pass`     | Command exited 0 and matched expected behavior                       |
+| `fail`     | Ran but wrong output / non-zero exit — docs wrong **or** product bug |
+| `deferred` | Not run; reason required in Notes                                    |
+| `skipped`  | Out of scope (`illustrative-only`)                                   |
 
 ## Product bugs
 
