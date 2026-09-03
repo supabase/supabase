@@ -1,0 +1,377 @@
+---
+title: "Custom OAuth/OIDC Providers"
+description: "Configure any OAuth2 or OIDC-compatible identity provider for self-hosted Supabase"
+subtitle: "Configure any OAuth2 or OIDC-compatible identity provider for self-hosted Supabase"
+---
+
+## Overview
+
+Custom OAuth/OIDC providers let you integrate any standards-compliant identity provider with Supabase Auth, beyond the ones Supabase supports out of the box.
+
+Each custom provider uses a `custom:` prefix in its identifier. This prefix distinguishes custom providers from built-in providers.
+
+There are two provider types:
+
+- **OAuth2**: for generic OAuth2 providers where you supply the authorization, token, and userinfo endpoints manually.
+- **OIDC**: for providers that support [OpenID Connect](https://openid.net/connect/) discovery. You supply only the issuer URL and endpoints are resolved automatically.
+
+## Provider identifiers
+
+Every custom provider identifier must start with the `custom:` prefix. Identifiers are 2ΓÇô50 characters, lowercase alphanumeric with hyphens and colons allowed. Examples:
+
+- `custom:my-provider`
+- `custom:github-enterprise`
+
+## Enable Custom OAuth
+
+Custom OAuth/OIDC providers must first be enabled in your self-hosted Supabase instance. The following env variables can be used to configure custom OAuth:
+
+| Env Variable                        | Description                                                                                       |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `GOTRUE_CUSTOM_OAUTH_ENABLED`       | Enables custom OAuth/OIDC providers. Set to `"true"` to enable the feature.                       |
+| `GOTRUE_CUSTOM_OAUTH_MAX_PROVIDERS` | **Optional.** Maximum number of custom OAuth/OIDC providers allowed. Defaults to `0` (unlimited). |
+
+### Configure Auth service
+
+Add the following environment variables to the auth service in your `docker-compose.yml`:
+
+```yml
+services:
+  auth:
+    environment:
+      # ... existing variables ...
+      GOTRUE_CUSTOM_OAUTH_ENABLED: "true"
+      GOTRUE_CUSTOM_OAUTH_MAX_PROVIDERS: 0 # optional - Default is 0 (unlimited)
+```
+
+### Relaunch the Auth service
+
+After updating the environment variables, relaunch the auth service for the changes to take effect:
+
+```sh
+sh run.sh recreate auth
+```
+
+## Creating a Provider
+
+### OAuth provider
+
+Use an OAuth2 provider when your identity provider does not support OpenID Connect discovery. You must supply the authorization, token, and userinfo endpoint URLs explicitly.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="create-provider"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase.auth.admin.customProviders.createProvider({
+  provider_type: "oauth2",
+  identifier: "custom:my-oauth-provider",
+  name: "My OAuth Provider",
+  client_id: "your-client-id",
+  client_secret: "your-client-secret",
+  authorization_url: "https://provider.example.com/oauth/authorize",
+  token_url: "https://provider.example.com/oauth/token",
+  userinfo_url: "https://provider.example.com/oauth/userinfo",
+  scopes: ["profile", "email"],
+});
+```
+
+</TabPanel>
+
+<TabPanel id="curl" label="cURL">
+
+```sh
+curl -X POST "http://<your-domain>/auth/v1/admin/custom-providers" \
+  -H "apikey: your-supabase-secret-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "provider_type": "oauth2",
+    "identifier": "custom:my-oauth-provider",
+    "name": "My OAuth Provider",
+    "client_id": "your-client-id",
+    "client_secret": "your-client-secret",
+    "authorization_url": "https://provider.example.com/oauth/authorize",
+    "token_url": "https://provider.example.com/oauth/token",
+    "userinfo_url": "https://provider.example.com/oauth/userinfo",
+    "scopes": ["profile", "email"]
+  }'
+```
+
+</TabPanel>
+
+</Tabs>
+
+### OIDC provider
+
+Use an OIDC provider when your identity provider supports OpenID Connect. Supply the `issuer` URL and the discovery document, JWKS, and endpoints are resolved automatically.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="create-provider"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase.auth.admin.customProviders.createProvider({
+  provider_type: "oidc",
+  identifier: "custom:my-oidc-provider",
+  name: "My OIDC Provider",
+  client_id: "your-client-id",
+  client_secret: "your-client-secret",
+  issuer: "https://auth.example.com",
+  scopes: ["openid", "profile", "email"],
+});
+```
+
+</TabPanel>
+
+<TabPanel id="curl" label="cURL">
+
+```sh
+curl -X POST "http://<your-domain>/auth/v1/admin/custom-providers" \
+  -H "apikey: your-supabase-secret-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "provider_type": "oidc",
+    "identifier": "custom:my-oidc-provider",
+    "name": "My OIDC Provider",
+    "client_id": "your-client-id",
+    "client_secret": "your-client-secret",
+    "issuer": "https://auth.example.com",
+    "scopes": ["openid", "profile", "email"]
+  }'
+```
+
+</TabPanel>
+
+</Tabs>
+
+OIDC providers have the following automatic behavior:
+
+- The discovery document is fetched from `{issuer}/.well-known/openid-configuration` (or from `discovery_url` if set).
+- The `openid` scope is always included. It is automatically added if missing from the `scopes` array.
+- ID tokens are verified against the provider's JWKS (fetched from the discovery document's `jwks_uri`).
+
+## Callback URL
+
+When registering your application with an external identity provider, make sure to configure the Supabase Auth callback URL. Copy the URL below and add it as the redirect/callback URI in your identity provider's settings.
+
+```
+https://<your-domain>/auth/v1/callback
+```
+
+## Example: Telegram
+
+Below is a step-by-step guide to setup Telegram OIDC with Supabase Auth. Make sure you've enabled Custom OAuth in your self-hosted Supabase instance.
+
+<Admonition type="note">
+
+You need to make sure that Supabase Auth version is >= v2.196.0 because of this [issue](https://github.com/supabase/auth/issues/2534) which was fixed in v2.196.0
+
+</Admonition>
+
+### Step 1: Create a Telegram Bot
+
+Open [@BotFather](https://t.me/BotFather) on Telegram and send the command `/newbot`. Follow the prompts to choose a name and username for your bot.
+
+### Step 2: Register Redirect URL
+
+Open [@BotFather mini app](https://t.me/botfather?startapp) on Telegram and select the bot you created in the last step. Choose `Login Widget` and this should open a page where you can configure Redirect URLs. Click on `Add a Redirect URI` and enter your self-hosted Supabase url:
+
+```
+https://<your-domain>/auth/v1/callback
+```
+
+After entering the url, don't exit as we need to get more info from this page.
+
+### Step 3: Create Telegram Provider
+
+On the `Login Widget` screen from Step 2, you'll also find your Client ID and Client Secret. Copy these values and add them below to create a custom Telegram OAuth provider:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="create-provider"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase.auth.admin.customProviders.createProvider({
+  provider_type: "oidc",
+  identifier: "custom:telegram",
+  name: "Telegram",
+  client_id: "your-client-id",
+  client_secret: "your-client-secret",
+  issuer: "https://oauth.telegram.org",
+  scopes: ["openid", "profile"],
+  email_optional: true,
+});
+```
+
+</TabPanel>
+
+<TabPanel id="curl" label="cURL">
+
+```sh
+curl -X POST "http://<your-domain>/auth/v1/admin/custom-providers" \
+  -H "apikey: your-supabase-secret-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "provider_type": "oidc",
+    "identifier": "custom:telegram",
+    "name": "Telegram",
+    "client_id": "your-client-id",
+    "client_secret": "your-client-secret",
+    "issuer": "https://oauth.telegram.org",
+    "scopes": ['openid', 'profile'],
+    "email_optional": true
+  }'
+```
+
+</TabPanel>
+
+</Tabs>
+
+In the above request:
+
+- `identifier` can be any value you want as long as its prefixed with `custom:`.
+- 'name' can be any value you want.
+- `email_optional` has to be set to `true` as Telegram doesn't return email field.
+
+Refer to official [Telegram Docs](https://core.telegram.org/bots/telegram-login#available-scopes) to get a list of available scopes.
+
+### Step 4: Sign in with Telegram
+
+At this point, you should be able to sign in with Telegram from your client app.
+
+```js
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider: "custom:telegram",
+});
+```
+
+## Managing Providers
+
+### List providers
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="provider-management"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+// List all custom providers
+const { data, error } = await supabase.auth.admin.customProviders.listProviders();
+
+// Filter by provider type
+const { data, error } = await supabase.auth.admin.customProviders.listProviders({
+  type: "oidc",
+});
+```
+
+</TabPanel>
+
+<TabPanel id="curl" label="cURL">
+
+```sh
+# List all custom providers
+
+curl "<your-domain>/auth/v1/admin/custom-providers" \
+ -H "apikey: your-supabase-secret-key"
+
+# Filter by provider type
+
+curl "<your-domain>/auth/v1/admin/custom-providers?type=oidc" \
+ -H "apikey: your-supabase-secret-key"
+
+```
+
+</TabPanel>
+
+</Tabs>
+
+### Update a provider
+
+Update any provider fields except `provider_type` and `identifier`. Only provided fields are changed (partial update). To rotate a client secret, update only the `client_secret` field.
+
+<Tabs
+scrollable
+size="small"
+type="underlined"
+defaultActiveId="js"
+queryGroup="provider-management">
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase.auth.admin.customProviders.updateProvider(
+  "custom:my-provider",
+  {
+    name: "Updated Provider Name",
+    scopes: ["openid", "profile", "email"],
+  },
+);
+```
+
+</TabPanel>
+
+<TabPanel id="curl" label="cURL">
+
+```sh
+curl -X PUT "http://<your-domain>/auth/v1/admin/custom-providers/custom:my-provider" \
+  -H "apikey: your-supabase-secret-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Updated Provider Name",
+    "scopes": ["openid", "profile", "email"]
+  }'
+```
+
+</TabPanel>
+</Tabs>
+
+### Delete a provider
+
+<Tabs
+scrollable
+size="small"
+type="underlined"
+defaultActiveId="js"
+queryGroup="provider-management">
+
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } =
+  await supabase.auth.admin.customProviders.deleteProvider("custom:my-provider");
+```
+
+</TabPanel>
+
+<TabPanel id="curl" label="cURL">
+
+```sh
+curl -X DELETE "http://<your-domain>/auth/v1/admin/custom-providers/custom:my-provider" \
+  -H "apikey: your-supabase-secret-key"
+```
+
+</TabPanel>
+
+</Tabs>
+
+## Additional Resources
+
+- [Custom OAuth/OIDC Providers](/docs/guides/auth/custom-oauth-providers)
