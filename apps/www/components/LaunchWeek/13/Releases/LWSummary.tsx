@@ -9,7 +9,7 @@ const LW13Summary = () => {
     <div className="w-full border bg-alternative-200 flex flex-col rounded-lg text-foreground-lighter mt-12">
       <div className="w-full p-4 flex justify-between items-center">
         <Link
-          href="/launch-week/13"
+          href="/launch-week"
           className="flex items-center text-foreground font-medium gap-1.5 leading-none uppercase text-xs opacity-80 transition-opacity hover:opacity-100"
         >
           Launch Week
@@ -22,14 +22,14 @@ const LW13Summary = () => {
           {days.map(
             (day, i: number) =>
               day.shipped && (
-                <ol key={day.id}>
+                <li key={day.id}>
                   <Link href={day.blog} className="group flex py-1 gap-2 hover:text-foreground">
                     <span className="shrink-0 text-sm font-mono uppercase leading-6">
                       Day {i + 1} -
                     </span>
                     <span className="leading-6">{day.title}</span>
                   </Link>
-                </ol>
+                </li>
               )
           )}
         </ul>
@@ -43,7 +43,7 @@ const LW13Summary = () => {
             {buildDays.map(
               (day, i: number) =>
                 day.is_shipped && (
-                  <ol key={day.id}>
+                  <li key={day.id}>
                     <Link
                       href={day.links[0].url}
                       className="relative flex items-center justify-between group w-full py-1 hover:text-foreground"
@@ -56,17 +56,17 @@ const LW13Summary = () => {
                         {day.title}
                       </span>
                     </Link>
-                  </ol>
+                  </li>
                 )
             )}
-            <ol className="border-t pt-4 mt-2">
+            <li className="border-t pt-4 mt-2">
               <Link
                 href="/events?category=meetup"
                 className="relative flex items-center justify-between group w-full py-1 hover:text-foreground"
               >
                 Community Meetups
               </Link>
-            </ol>
+            </li>
           </ul>
         </div>
       </div>

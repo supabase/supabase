@@ -1,6 +1,6 @@
 import { ChevronRight, CircleX, Minus, MoreVertical, StopCircle } from 'lucide-react'
-import { parseAsInteger, parseAsString, useQueryState } from 'nuqs'
-import { Fragment, useState } from 'react'
+import { parseAsString, useQueryState } from 'nuqs'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   AlertDialog,
@@ -42,6 +42,7 @@ import {
   getBlockingChain,
   getDuration,
 } from './DatabaseConnections.utils'
+import { useSelectActivityPid } from './useSelectActivityPid'
 import { formatDuration } from '@/components/interfaces/QueryPerformance/QueryPerformance.utils'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
@@ -110,7 +111,8 @@ export const ActivityRow = ({
   const track = useTrack()
   const { data: project } = useSelectedProjectQuery()
   const [showTerminateConfirmDialog, setShowTerminateConfirmDialog] = useState(false)
-  const [selectedPid, setSelectedPid] = useQueryState('pid', parseAsInteger)
+  const { selectedPid, selectPid } = useSelectActivityPid()
+  const rowRef = useRef<HTMLTableRowElement>(null)
 
   const { data } = useDatabaseActivityQuery({
     projectRef: project?.ref,
@@ -147,11 +149,12 @@ export const ActivityRow = ({
         activity.state === 'idle in transaction (aborted)') &&
         durationSeconds >= WARN_DURATION_IDLE_TXN))
 
-  const onCancelQuery = async () => {
+  const onCancelQuery = async (origin: 'dropdown_menu' | 'terminate_dialog') => {
     const isBlocking = (data ?? []).some((x) => x.blocked_by.includes(activity.pid))
     track('query_cancel_button_clicked', {
       activityState: activity.state,
       isBlocking,
+      origin,
     })
 
     const toastId = toast.loading(`Cancelling query (ID: ${activity.pid})`)
@@ -191,9 +194,16 @@ export const ActivityRow = ({
     } catch (error) {}
   }
 
+  useEffect(() => {
+    if (selectedPid === activity.pid) {
+      rowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [selectedPid, activity.pid])
+
   return (
     <>
       <TableRow
+        ref={rowRef}
         id={activity.pid.toString()}
         key={activity.pid}
         className={cn('[&>td]:py-3', nested && 'bg-alternative')}
@@ -338,7 +348,7 @@ export const ActivityRow = ({
                   <HoverCard openDelay={150} closeDelay={100}>
                     <HoverCardTrigger
                       className={cn(InlineLinkClassName, 'cursor-pointer')}
-                      onClick={() => setSelectedPid(pid)}
+                      onClick={() => selectPid(pid)}
                     >
                       {pid}
                     </HoverCardTrigger>
@@ -378,7 +388,7 @@ export const ActivityRow = ({
                                     role="button"
                                     tabIndex={0}
                                     className="cursor-pointer hover:underline"
-                                    onClick={() => setSelectedPid(chainPid)}
+                                    onClick={() => selectPid(chainPid)}
                                   >
                                     PID: {chainPid}
                                   </span>
@@ -436,7 +446,7 @@ export const ActivityRow = ({
                 disabled={
                   activity.state !== 'active' || superuserRoles?.includes(activity.role_name)
                 }
-                onClick={onCancelQuery}
+                onClick={() => onCancelQuery('dropdown_menu')}
                 tooltip={{
                   content: {
                     side: 'left',
@@ -494,7 +504,10 @@ export const ActivityRow = ({
             <AlertDialogCancel>Back</AlertDialogCancel>
             <div className="flex items-center gap-x-2">
               {activity.state === 'active' && (
-                <AlertDialogAction variant="default" onClick={onCancelQuery}>
+                <AlertDialogAction
+                  variant="default"
+                  onClick={() => onCancelQuery('terminate_dialog')}
+                >
                   Cancel query
                 </AlertDialogAction>
               )}

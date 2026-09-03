@@ -28,6 +28,7 @@ Angelico de los Reyes
 Anna Baker
 Ant Evans
 Ant Wilson
+Anthony Lio
 Ariuna K
 Arshdeep Singh
 Artur Zakirov
@@ -37,6 +38,7 @@ Barco Fourie
 Barry Roodt
 Beng Eu
 Benjamin Coenen
+Beth Long
 Bo Lu
 Bobbie Soedirgo
 Brad Gyger
@@ -88,8 +90,10 @@ Deji I
 Dennis Senn
 Dimitrios Liappis
 Div Arora
+Dion Zeneli
 Divit D
 Divya Sharma
+Donna Alexandra
 Douglas Hunley
 Eduardo Gurgel
 Eleftheria Trivyzaki
@@ -98,6 +102,7 @@ Emmett Folger
 Erfi Anugrah
 Eric Kharitonashvili
 Etienne Stalmans
+Evan Cummack
 Eyal Ehrlich
 Fabrizio Fenoglio
 Fady A
@@ -130,6 +135,7 @@ Hunter Luckow
 Ignacio Dobronich
 Illia Basalaiev
 Inian P
+Iryna Deans
 Ivan Vasilov
 Jamie Boyd
 Jared Patterson
@@ -241,6 +247,8 @@ Peter Lyn
 Peter Soderberg
 Pierre Ducroquet
 Pierre Frances
+Ping-Min Lin
+Prashansa Kulshrestha
 Qiao Han
 Quintin Willison
 Rafael Chacón
@@ -259,6 +267,7 @@ Ryan Goulet
 Ryan Senior
 Ruan Maia
 Saba Pochkhua
+Safa Orhan
 Sagar Shedge
 Sam Meech-Ward
 Sam Rome
@@ -267,6 +276,8 @@ Samir Ketema
 Sana Cordeaux
 Sasi Kanumuri
 Sara Read
+Satya Rohith Gannamanedi
+Sean Geoghegan
 Sean Oliver
 Sean Romberg
 Sean Thompson
@@ -277,6 +288,7 @@ Shane E
 Shaun Newman
 Shardul Borhade
 Shreekar Shetty
+Simon Tomlinson
 Sreyas Udayavarman
 Stephanie Jackson (stejacks)
 Stephen Morgan
@@ -303,12 +315,15 @@ Tobias Pfeiffer
 Tom Ashley
 Tom G
 Tomás Pozo
+Tomás Torgal
+Tomohiro Mitani
 Tyler Hillery
 Tyler Fontaine
 Tyler Shukert
 TzeYiing L
 Utkarash Singh
 Victor Farazdagi
+Warda Bibi
 Warwick Mitchell
 Wen Bo Xie
 Wendie Cheung

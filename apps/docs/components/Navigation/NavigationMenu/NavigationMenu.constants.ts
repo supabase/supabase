@@ -286,6 +286,13 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             new: true,
           },
           {
+            label: 'Middleware SDK',
+            icon: 'reference-javascript',
+            href: '/reference/middleware' as `/${string}`,
+            level: 'reference_middleware',
+            new: true,
+          },
+          {
             label: 'CLI Commands',
             icon: 'reference-cli',
             href: '/reference/cli/introduction' as `/${string}`,
@@ -1118,6 +1125,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/postgres/row-level-security' as `/${string}`,
         },
         {
+          name: 'Row Level Security Performance',
+          url: '/guides/database/postgres/row-level-security-performance' as `/${string}`,
+        },
+        {
           name: 'Column Level Security',
           url: '/guides/database/postgres/column-level-security' as `/${string}`,
         },
@@ -1203,6 +1214,18 @@ export const database: NavMenuConstant = {
             {
               name: 'BigQuery',
               url: '/guides/database/replication/bigquery' as `/${string}`,
+            },
+            {
+              name: 'ClickHouse',
+              url: '/guides/database/replication/clickhouse' as `/${string}`,
+            },
+            {
+              name: 'DuckLake',
+              url: '/guides/database/replication/ducklake' as `/${string}`,
+            },
+            {
+              name: 'Snowflake',
+              url: '/guides/database/replication/snowflake' as `/${string}`,
             },
             {
               name: 'Monitoring',
@@ -2713,6 +2736,11 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/access-control' as `/${string}`,
         },
         {
+          name: 'Personal Access Tokens',
+          url: '/guides/platform/personal-access-tokens' as `/${string}`,
+          enabled: fullPlatformEnabled,
+        },
+        {
           name: 'Multi-factor Authentication',
           url: '/guides/platform/multi-factor-authentication',
           enabled: fullPlatformEnabled,
@@ -2771,6 +2799,10 @@ export const platform: NavMenuConstant = {
             {
               name: 'Testing and Best Practices',
               url: '/guides/platform/sso/testing-best-practices' as `/${string}`,
+            },
+            {
+              name: 'Enterprise-Managed Authentication for MCP',
+              url: '/guides/platform/sso/enterprise-mcp-authentication' as `/${string}`,
             },
           ],
         },
@@ -3084,34 +3116,37 @@ export const self_hosting: NavMenuConstant = {
   items: [
     { name: 'Overview', url: '/guides/self-hosting' },
     { name: 'Deploy with Docker', url: '/guides/self-hosting/docker' },
+    { name: 'Accessing Postgres', url: '/guides/self-hosting/accessing-postgres' },
     { name: 'Configure new API keys', url: '/guides/self-hosting/self-hosted-auth-keys' },
     { name: 'Learn about API Gateway', url: '/guides/self-hosting/self-hosted-envoy' },
     {
       name: 'Add Reverse Proxy with HTTPS',
       url: '/guides/self-hosting/self-hosted-proxy-https',
     },
+    { name: 'Upgrade to Postgres 17', url: '/guides/self-hosting/postgres-upgrade-17' },
+    { name: 'Remove superuser access', url: '/guides/self-hosting/remove-superuser-access' },
     { name: 'Update your deployment', url: '/guides/self-hosting/updating' },
     {
       name: 'How-to Guides',
       items: [
-        { name: 'Upgrade to Postgres 17', url: '/guides/self-hosting/postgres-upgrade-17' },
-        { name: 'Remove superuser access', url: '/guides/self-hosting/remove-superuser-access' },
         { name: 'Run Self-Hosted Functions', url: '/guides/self-hosting/self-hosted-functions' },
         { name: 'Configure S3 Storage', url: '/guides/self-hosting/self-hosted-s3' },
-        { name: 'Add Custom Email Templates', url: '/guides/self-hosting/custom-email-templates' },
+        { name: 'Enable MCP server', url: '/guides/self-hosting/enable-mcp' },
         { name: 'Configure Social Login (OAuth)', url: '/guides/self-hosting/self-hosted-oauth' },
         { name: 'Configure Phone Login & MFA', url: '/guides/self-hosting/self-hosted-phone-mfa' },
+        { name: 'Add Custom Email Templates', url: '/guides/self-hosting/custom-email-templates' },
+        { name: 'Configure Auth Hooks', url: '/guides/self-hosting/self-hosted-auth-hooks' },
+        { name: 'Configure Passkeys', url: '/guides/self-hosting/self-hosted-passkeys' },
         { name: 'Configure SAML 2.0 SSO', url: '/guides/self-hosting/self-hosted-saml-sso' },
-        { name: 'Enable MCP server', url: '/guides/self-hosting/enable-mcp' },
-        {
-          name: 'Build Custom Extensions',
-          url: '/guides/self-hosting/custom-postgres-extensions',
-        },
         {
           name: 'Restore Project from Platform',
           url: '/guides/self-hosting/restore-from-platform',
         },
         { name: 'Copy Storage from Platform', url: '/guides/self-hosting/copy-from-platform-s3' },
+        {
+          name: 'Build Custom Extensions',
+          url: '/guides/self-hosting/custom-postgres-extensions',
+        },
       ],
     },
     {
@@ -3269,6 +3304,10 @@ export const integrations: NavMenuConstant = {
       url: '/guides/integrations/vercel-marketplace',
     },
     {
+      name: 'Stripe Projects',
+      url: '/guides/integrations/stripe-projects',
+    },
+    {
       name: 'Build Your Own',
       items: [
         {
@@ -3361,7 +3400,7 @@ export const reference = {
         },
         {
           name: 'Management API',
-          url: '/reference/javascript',
+          url: '/reference/api/introduction',
           icon: '/img/icons/menu/reference-api' as `/${string}`,
         },
       ],
@@ -3399,6 +3438,17 @@ export const reference_server_v1 = {
   pkg: {
     name: '@supabase/server',
     repo: 'https://github.com/supabase/server',
+  },
+}
+
+export const reference_middleware_v1 = {
+  icon: 'reference-javascript',
+  title: 'Middleware',
+  url: '/reference/middleware',
+  parent: '/reference',
+  pkg: {
+    name: '@supabase/middleware',
+    repo: 'https://github.com/supabase/middleware',
   },
 }
 
