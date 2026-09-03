@@ -30,7 +30,7 @@ interface PopUpProps extends PropsWithChildren {
 }
 
 const buttonClassName = cn(
-  'relative px-1 py-0 -my-px',
+  'leading-4.5 align-baseline text-left relative px-1 py-0 -my-px',
   'rounded-sm bg-surface-200 border border-dashed',
   'transition-colors hover:border-strong group/inline-popup'
 )
@@ -43,6 +43,7 @@ const InfoTooltip = ({
 }: PopUpProps) => {
   const id = useId().replaceAll(':', '')
   const timeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const triggerRef = useRef<HTMLButtonElement | null>(null)
 
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false)
   const [tooltipOpen, _setTooltipOpen] = useState(false)
@@ -70,14 +71,24 @@ const InfoTooltip = ({
     }
   }, [])
 
+  const handleTriggerClick = () => setMobileSheetOpen(true)
+
+  const handleCloseClick = () => setMobileSheetOpen(false)
+
+  const handleSheetCloseAutoFocus = (event: Event) => {
+    event.preventDefault()
+    triggerRef.current?.focus()
+  }
+
   return (
     <>
       <Tooltip open={tooltipOpen} onOpenChange={(open) => !isMobile && setTooltipOpen(open)}>
         <TooltipTrigger asChild>
-          <span
-            role="button"
+          <button
+            ref={triggerRef}
+            type="button"
             tabIndex={0}
-            onClick={() => setMobileSheetOpen(true)}
+            onClick={handleTriggerClick}
             className={cn(buttonClassName, className)}
           >
             {children}
@@ -85,7 +96,7 @@ const InfoTooltip = ({
               aria-hidden={true}
               className="absolute p-px bg-background rounded-full -left-1.5 -top-1.5 w-3 h-3 text-foreground-lighter group-hover/inline-popup:text-foreground-light transition-colors"
             />
-          </span>
+          </button>
         </TooltipTrigger>
         <TooltipContent id={`tooltip-content-${id}`} className={contentContainerClassName}>
           {tooltipContent}
@@ -94,6 +105,7 @@ const InfoTooltip = ({
       {isMobile && (
         <Sheet open={mobileSheetOpen} onOpenChange={setMobileSheetOpen}>
           <SheetContent
+            onCloseAutoFocus={handleSheetCloseAutoFocus}
             id={`mobile-sheet-content-${id}`}
             showClose={false}
             size="full"
@@ -111,7 +123,12 @@ const InfoTooltip = ({
                   <InfoIcon className="p-px min-w-4 min-h-4 text-foreground-lighter" />
                   <p className="italic text-foreground-light truncate">{children}</p>
                 </div>
-                <Button variant="text" onClick={() => setMobileSheetOpen(false)} className="px-1">
+                <Button
+                  variant="text"
+                  onClick={handleCloseClick}
+                  className="px-1"
+                  aria-label="Close"
+                >
                   <XIcon className="w-4 h-4 text-foreground-lighter" />
                 </Button>
               </SheetHeader>
