@@ -54,25 +54,13 @@ describe('getConfigDriftSummary', () => {
     })
   })
 
-  it('falls back to the hosted default when config.toml is code-owned and silent on the field', () => {
-    const atDefault = getConfigDriftSummary({
-      dashboardConfig: { auth: { site_url: 'http://localhost:3000' } },
-      githubConfig: { auth: {}, config_source: 'code' },
-    })
-    expect(atDefault).toEqual({
-      managedCount: 0,
-      driftedFields: [],
-      unmanagedFields: [
-        { section: 'auth', configPath: 'auth.site_url', dashboardValue: 'http://localhost:3000' },
-      ],
-    })
-
+  it('reports a field missing from config.toml as drifted against the hosted value', () => {
     const drifted = getConfigDriftSummary({
       dashboardConfig: { auth: { site_url: 'https://example.com' } },
-      githubConfig: { auth: {}, config_source: 'code' },
+      githubConfig: { auth: {} },
     })
     expect(drifted.driftedFields).toHaveLength(1)
-    expect(drifted.driftedFields[0].githubValue).toBe('http://localhost:3000')
+    expect(drifted.driftedFields[0].githubValue).toBeUndefined()
   })
 
   describe('auth.additional_redirect_urls', () => {
@@ -125,20 +113,13 @@ describe('getConfigDriftSummary', () => {
       ])
     })
 
-    it('compares against the empty hosted default when code-owned config.toml is silent', () => {
-      const atDefault = getConfigDriftSummary({
-        dashboardConfig: { auth: { additional_redirect_urls: [] } },
-        githubConfig: { auth: {}, config_source: 'code' },
-      })
-      expect(atDefault.managedCount).toBe(0)
-      expect(atDefault.driftedFields).toEqual([])
-
+    it('reports a list missing from config.toml as drifted', () => {
       const drifted = getConfigDriftSummary({
         dashboardConfig: { auth: { additional_redirect_urls: ['https://a.com'] } },
-        githubConfig: { auth: {}, config_source: 'code' },
+        githubConfig: { auth: {} },
       })
       expect(drifted.driftedFields).toHaveLength(1)
-      expect(drifted.driftedFields[0].githubValue).toEqual([])
+      expect(drifted.driftedFields[0].githubValue).toBeUndefined()
     })
   })
 })
