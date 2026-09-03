@@ -205,6 +205,7 @@ export const WarehouseSchemaTablePicker = ({ onBack }: WarehouseSchemaTablePicke
               <div className="flex items-center gap-2 px-3 py-2 bg-surface-75">
                 <button
                   type="button"
+                  tabIndex={0}
                   aria-label={isOpen ? `Collapse ${schema.schema}` : `Expand ${schema.schema}`}
                   onClick={() => toggleExpanded(schema.schema, isOpen)}
                   className="text-foreground-lighter"

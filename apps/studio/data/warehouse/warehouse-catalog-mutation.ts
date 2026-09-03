@@ -34,7 +34,11 @@ export const useUpdateWarehouseCatalogMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<UpdateWarehouseCatalogData, ResponseError, UpdateWarehouseCatalogVariables>,
+  UseCustomMutationOptions<
+    UpdateWarehouseCatalogData,
+    ResponseError,
+    UpdateWarehouseCatalogVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

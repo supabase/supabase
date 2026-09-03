@@ -22,7 +22,9 @@ export const WarehouseEnablingProgress = ({ status }: WarehouseEnablingProgressP
     <div>
       <Admonition
         type="default"
-        icon={<Loader2 size={16} strokeWidth={1.5} className="animate-spin text-foreground-light" />}
+        icon={
+          <Loader2 size={16} strokeWidth={1.5} className="animate-spin text-foreground-light" />
+        }
         description="Setting up your Warehouse — this can take a few minutes while we backfill selected tables."
         className="mb-5"
       />

@@ -152,6 +152,7 @@ export const WarehouseConnectionDetails = ({ onEditTables }: WarehouseConnection
         <Badge variant="success">Warehouse enabled</Badge>
         <button
           type="button"
+          tabIndex={0}
           onClick={onEditTables}
           className="text-sm text-foreground-light underline underline-offset-2 ml-auto"
         >

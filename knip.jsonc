@@ -73,6 +73,11 @@
         // this file so `enumMembers` keeps working everywhere else.
         "data/database/constraints-query.ts": ["enumMembers"],
         "hooks/misc/useTrackExperimentExposure.ts": ["files"],
+        // Staging-only pinned Postgres image + FDW request payload for creating
+        // Warehouse test projects by hand. Nothing imports it yet — it's kept
+        // alongside the rest of the Warehouse work so the values stay in one
+        // place until the project-creation surface that consumes them lands.
+        "components/interfaces/ProjectCreation/WarehouseFdwCustomImage.constants.ts": ["files"],
       },
       // `vercel` is a globally installed CLI used by the `deploy:staging` script
       "ignoreBinaries": ["vercel"],
