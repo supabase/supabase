@@ -1,0 +1,53 @@
+---
+id: 'multigres'
+title: 'Multigres'
+subtitle: 'Multi-node high availability for your Postgres database'
+description: 'Run your Supabase project across multiple Postgres nodes with automatic failover, using the Multigres integration.'
+---
+
+<Admonition type="caution">
+
+Multigres is in [Public Alpha](/docs/guides/getting-started/features#feature-status). It's free during the Alpha for organizations on a paid plan, for up to two projects, but pricing may change once it leaves Alpha. It isn't covered by the [uptime SLA](/sla), and Supabase isn't targeting production or mission-critical workloads with it during this stage.
+
+</Admonition>
+
+Multigres runs your Postgres database across multiple nodes instead of one, so your project keeps serving reads and writes if a node fails. It's Supabase's integration of [Multigres](https://multigres.com), an open-source project that brings the same distributed-systems approach the Vitess project brought to MySQL to Postgres instead.
+
+<ContentListings id="database-multigres-what-you-get" />
+
+## Eligibility
+
+During the Public Alpha:
+
+- Multigres is available to organizations on a paid plan. It isn't available on the Free plan.
+- Availability is being rolled out gradually, so the option to enable it may not yet appear for every eligible organization.
+- Up to two projects per eligible organization can use Multigres for free during the Alpha.
+
+## Enabling Multigres
+
+For eligible organizations, an administrator can turn on Multigres when creating a new project.
+
+## What's not included in the alpha
+
+Some Supabase features and project operations aren't yet available on Multigres-backed projects:
+
+- **Realtime.** Multigres doesn't yet support the logical replication that Realtime depends on, so Realtime is unavailable.
+- **Point-in-Time Recovery.** Only the standard daily backups are available.
+- **Cross-region read replicas.** Multigres projects run in a single region during the Alpha.
+- **OrioleDB.** A project can use Multigres or [OrioleDB](/docs/guides/database/orioledb), not both.
+- **Resizing after creation.** Compute size, disk, and the number of replicas can't be changed after a Multigres project is created.
+- **Sharding and custom durability policies.** These are on the longer-term roadmap but aren't part of the Alpha.
+
+<Admonition type="caution">
+
+Enabling Multigres migrates your project's database to run on Multigres. There's currently no managed path to move it back to a standard Postgres project.
+
+</Admonition>
+
+## Compatibility
+
+Multigres aims for full compatibility with standard Postgres, but there are some differences to be aware of. See [Multigres compatibility](/docs/guides/database/multigres/compatibility) for details.
+
+## Resources
+
+[Multigres documentation](https://multigres.com/docs) — architecture, self-hosted deployment, and other technical depth that goes beyond the hosted Supabase integration covered on this page.

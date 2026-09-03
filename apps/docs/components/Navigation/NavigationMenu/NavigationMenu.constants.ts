@@ -1117,6 +1117,20 @@ export const database: NavMenuConstant = {
       ],
     },
     {
+      name: 'Multigres',
+      url: undefined,
+      items: [
+        {
+          name: 'Overview',
+          url: '/guides/database/multigres' as `/${string}`,
+        },
+        {
+          name: 'Compatibility',
+          url: '/guides/database/multigres/compatibility' as `/${string}`,
+        },
+      ],
+    },
+    {
       name: 'Access and security',
       url: undefined,
       items: [

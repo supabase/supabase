@@ -22,7 +22,7 @@ export const contentListingIconSchema = z.union([z.string().min(1), contentListi
 
 export const contentListingItemSchema = z.object({
   title: z.string().min(1),
-  href: z.string().min(1),
+  href: z.string().min(1).optional(),
   description: z.string().min(1),
   icon: contentListingIconSchema.optional(),
   hasLightIcon: z.boolean().optional(),

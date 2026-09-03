@@ -2,7 +2,7 @@ import type { ContentListingGroup } from '~/lib/content-listings.schema'
 
 import { aiToolsBuildingIntoApp, aiToolsSupportedAgents } from './ai-tools.data'
 import { authGetStarted, authNextSteps, authPricing } from './auth.data'
-import { databaseGetStarted, databaseNextSteps } from './database.data'
+import { databaseGetStarted, databaseMultigresWhatYouGet, databaseNextSteps } from './database.data'
 import {
   functionsExamplesAiMedia,
   functionsExamplesMessaging,
@@ -36,6 +36,7 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   authPricing,
   authNextSteps,
   databaseGetStarted,
+  databaseMultigresWhatYouGet,
   databaseNextSteps,
   functionsGetStarted,
   functionsExamplesSupabase,
