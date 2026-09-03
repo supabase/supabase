@@ -6,8 +6,6 @@ subtitle: 'Set up auth hooks for self-hosted Supabase with Docker.'
 
 This guide covers the **server-side configuration** required to enable auth hooks on a self-hosted Supabase instance running with Docker Compose. Auth hooks let you run custom logic at specific points in the authentication flow - for example, adding claims to JWTs, sending SMS through a custom provider, or restricting signups.
 
-For hook implementation details (input/output schemas, SQL and HTTP examples), see [Auth Hooks](/docs/guides/auth/auth-hooks).
-
 ## Before you begin
 
 You need:
@@ -17,6 +15,8 @@ You need:
 - For HTTP endpoint hooks: a reachable HTTPS endpoint or a local Edge Function.
 
 ## How hooks work
+
+For hook implementation details (input/output schemas, SQL and HTTP examples), see [Auth Hooks](/docs/guides/auth/auth-hooks).
 
 Supabase Auth can call a **hook** at specific lifecycle events during the auth flow. Each hook can be configured with the following environment variables:
 
@@ -44,7 +44,7 @@ Hooks support two URI schemes:
 
 <Admonition type="note">
 
-Postgres function hooks run inside your database - no network overhead, no secrets required.
+Postgres function hooks run inside your database, so there is no network overhead and no need to manage secrets.
 
 </Admonition>
 
