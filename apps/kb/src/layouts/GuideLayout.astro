@@ -1,0 +1,39 @@
+---
+import { Github } from 'lucide-react'
+import { Badge } from 'ui'
+
+import Layout from './Layout.astro'
+
+interface Props {
+	title: string
+	description?: string
+	topics?: string[]
+	github_url?: string
+}
+
+const { title, description, topics = [], github_url } = Astro.props
+---
+
+<Layout title={title} description={description}>
+	<article class="prose max-w-3xl mx-auto px-6 py-16">
+		<h1>{title}</h1>
+		{description && <p class="lead">{description}</p>}
+		{
+			topics.length > 0 && (
+				<div class="flex flex-wrap gap-2">
+					{topics.map((topic) => <Badge>{topic}</Badge>)}
+				</div>
+			)
+		}
+		<slot />
+		{
+			github_url && (
+				<p>
+					<a href={github_url} target="_blank" rel="noreferrer" class="inline-flex items-center gap-1.5">
+						<Github size={16} /> Go to the GitHub discussion
+					</a>
+				</p>
+			)
+		}
+	</article>
+</Layout>

@@ -1,7 +1,7 @@
 ---
 name: review-the-docs
 description: >-
-  Review Supabase docs changes locally in ~/GitHub/supabase/supabase —
+  Review Supabase docs changes locally in your `supabase/supabase` checkout —
   either an open PR (triage, classify, verify) or your own branch before
   opening a PR (local self-review). Covers markdown pipeline, MDX content,
   tutorials, examples, Studio links, and docs tooling. Use when asked to
@@ -31,24 +31,24 @@ For **implementing** docs fixes (Linear tickets, worktrees, platform E2E), use [
 
 ## Repository layout
 
-| Path                                   | Purpose                                                   |
-| -------------------------------------- | --------------------------------------------------------- |
-| `~/GitHub/supabase/supabase`           | Main clone for review checkouts                           |
-| `apps/docs/content/guides/`            | Source MDX                                                |
-| `apps/docs/internals/`                 | Markdown pipeline (`generate-guides-markdown.ts`, etc.)   |
-| `apps/docs/internals/markdown-schema/` | Component handlers → plain markdown strings               |
-| `apps/docs/public/markdown/guides/`    | Generated output (produced by build)                      |
-| `apps/docs/components/`                | React MDX components                                      |
-| `examples/`                            | Tutorial/quickstart apps referenced via `$CodeSample`     |
-| `apps/studio/`                         | Dashboard UI; may link to hosted docs                     |
-| `.agents/skills/`                      | In-repo agent skills (symlinked from `.claude`/`.cursor`) |
+| Path                                    | Purpose                                                          |
+| --------------------------------------- | ---------------------------------------------------------------- |
+| your local `supabase/supabase` checkout | Main clone for review checkouts                                  |
+| `apps/docs/content/guides/`             | Source MDX                                                       |
+| `apps/docs/internals/`                  | Markdown pipeline (`generate-guides-markdown.ts`, etc.)          |
+| `apps/docs/internals/markdown-schema/`  | Component handlers → plain markdown strings                      |
+| `apps/docs/public/markdown/guides/`     | Generated output (produced by build)                             |
+| `apps/docs/components/`                 | React MDX components                                             |
+| `examples/`                             | Tutorial/quickstart apps referenced via `$CodeSample`            |
+| `apps/studio/`                          | Dashboard UI; may link to hosted docs                            |
+| `.agents/skills/`                       | In-repo agent skills (canonical; `.claude/skills` symlinks here) |
 
 ## Local self-review (no open PR)
 
 Use this on your own branch **before** opening a PR (checklist Stage 4). No `gh pr` required.
 
 ```bash
-cd ~/GitHub/supabase/supabase
+cd <your supabase/supabase checkout>
 # Ensure you're on the feature branch, not master
 git branch --show-current
 git diff --name-only master...HEAD
@@ -59,8 +59,8 @@ git diff --name-only master...HEAD
 3. **Run type-specific checks** from the matching sections below on the current branch (no checkout step). Typical commands:
 
 ```bash
-# Content / tutorial MDX
-cd apps/docs && pnpm lint:mdx -- <changed-paths>
+# Content / tutorial MDX (lints the whole content/ tree; no per-file scoping)
+cd apps/docs && pnpm lint:mdx
 
 # Pipeline / schema handler
 cd apps/docs && pnpm build:guides-markdown
@@ -109,17 +109,17 @@ Inspect changed files from `gh pr view` or:
 gh pr diff <number> --repo supabase/supabase --name-only
 ```
 
-| PR type                     | Path signals                                                                                                    | Primary skill section                                          |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| **Markdown-schema handler** | `apps/docs/internals/markdown-schema/`, `generate-guides-markdown.ts`                                           | [Schema handler review](#schema-handler-review)                |
-| **Pipeline / internals**    | `apps/docs/internals/` (not just one new handler)                                                               | [Pipeline review](#pipeline-review)                            |
-| **Content-only MDX**        | `apps/docs/content/**` only                                                                                     | [Content review](#content-review)                              |
-| **Tutorial / quickstart**   | `apps/docs/content/guides/**/tutorials/`, `quickstarts/`, plus `examples/`                                      | [Tutorial review](#tutorial-review) → also `work-linear-issue` |
-| **Example app only**        | `examples/**` without matching MDX                                                                              | [Example review](#example-review)                              |
-| **Studio ↔ docs links**     | `apps/studio/**`                                                                                                | [Studio review](#studio-review)                                |
-| **Docs UI / components**    | `apps/docs/components/`, `apps/docs/features/` (no pipeline)                                                    | [Component review](#component-review)                          |
-| **Docs tooling**            | `.agents/skills/`, `.claude/skills/`, `.cursor/skills/`, `apps/docs/CONTRIBUTING.md`, `apps/docs/DEVELOPERS.md` | [Docs tooling review](#docs-tooling-review)                    |
-| **Mixed**                   | Multiple path groups above                                                                                      | Run each applicable section; note overlap                      |
+| PR type                     | Path signals                                                                                     | Primary skill section                                          |
+| --------------------------- | ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------- |
+| **Markdown-schema handler** | `apps/docs/internals/markdown-schema/`, `generate-guides-markdown.ts`                            | [Schema handler review](#schema-handler-review)                |
+| **Pipeline / internals**    | `apps/docs/internals/` (not just one new handler)                                                | [Pipeline review](#pipeline-review)                            |
+| **Content-only MDX**        | `apps/docs/content/**` only                                                                      | [Content review](#content-review)                              |
+| **Tutorial / quickstart**   | `apps/docs/content/guides/**/tutorials/`, `quickstarts/`, plus `examples/`                       | [Tutorial review](#tutorial-review) → also `work-linear-issue` |
+| **Example app only**        | `examples/**` without matching MDX                                                               | [Example review](#example-review)                              |
+| **Studio ↔ docs links**     | `apps/studio/**`                                                                                 | [Studio review](#studio-review)                                |
+| **Docs UI / components**    | `apps/docs/components/`, `apps/docs/features/` (no pipeline)                                     | [Component review](#component-review)                          |
+| **Docs tooling**            | `.agents/skills/`, `apps/docs/AGENTS.md`, `apps/docs/CONTRIBUTING.md`, `apps/docs/DEVELOPERS.md` | [Docs tooling review](#docs-tooling-review)                    |
+| **Mixed**                   | Multiple path groups above                                                                       | Run each applicable section; note overlap                      |
 
 When a PR spans types (e.g. schema handler + component refactor), run **all** matching sections.
 
@@ -132,7 +132,7 @@ Repeat for **each PR** (bottom of stack first).
 **Checkout and install:**
 
 ```bash
-cd ~/GitHub/supabase/supabase
+cd <your supabase/supabase checkout>
 gh pr checkout <number> --repo supabase/supabase
 pnpm install --filter docs...   # when node_modules missing or deps changed
 ```
@@ -175,7 +175,7 @@ Find usages: `rg '<ComponentName' apps/docs/content/`
 
 ```bash
 cd apps/docs && pnpm build:guides-markdown
-# Expect: Generated 546 markdown files under public/markdown/guides/
+# Expect: "Generated N markdown files" where N roughly matches the .mdx count under content/guides/
 ```
 
 Inspect `public/markdown/guides/` for affected pages:
@@ -194,7 +194,7 @@ For AST refactors, link rewriting, reference markdown generation, etc.
 cd apps/docs
 pnpm build:guides-markdown
 pnpm build:reference-markdown   # when reference pipeline changed
-pnpm test internals/internal-links.test.ts   # when link handling changed
+pnpm test:local:unwatch internals/internal-links.test.ts   # when link handling changed (needs local Supabase — see apps/docs/AGENTS.md)
 ```
 
 Verify both guides and reference output when `generate-reference-markdown.ts` or `internal-links.ts` changed.
@@ -207,7 +207,7 @@ MDX prose, partials, navigation — no pipeline or example changes.
 
 ```bash
 cd apps/docs
-pnpm lint:mdx -- <changed-paths>    # or monorepo equivalent on changed files
+pnpm lint:mdx    # lints the whole content/ tree; filter the output to your changed paths
 ```
 
 Checklist:
@@ -229,7 +229,7 @@ Tutorial MDX plus matching example app. **Read [`work-linear-issue`](https://git
 
 ```bash
 # MDX lint
-cd apps/docs && pnpm lint:mdx -- content/guides/getting-started/tutorials/<path>
+cd apps/docs && pnpm lint:mdx    # then check output for content/guides/getting-started/tutorials/<path>
 
 # Example build (from work-linear-issue)
 cd examples/<example-dir>
@@ -294,7 +294,8 @@ Agent skills, contributor docs, or skill symlink wiring — no MDX/pipeline chan
 
 Checklist:
 
-- [ ] Symlinks under `.claude/skills/` and `.cursor/skills/` resolve to `.agents/skills/...` (same pattern as `vitest`)
+- [ ] `.agents/skills/` is the canonical location — no skill content added anywhere else
+- [ ] `.claude/skills` is still a single Git symlink to `../.agents/skills` — no per-skill symlinks or copies under `.claude/`
 - [ ] Cross-skill links resolve: relative for in-repo skills; absolute `docs-agent-skills` URLs only for skills that remain in that private repo
 - [ ] No personal vault paths, Obsidian references, or private-process-only instructions
 - [ ] `apps/docs/CONTRIBUTING.md` / `DEVELOPERS.md` pointers match skill names and checklist stages
@@ -302,7 +303,7 @@ Checklist:
 
 ```bash
 # Symlink smoke check
-ls -la .claude/skills/<skill-name> .cursor/skills/<skill-name>
+test "$(readlink .claude/skills)" = "../.agents/skills"
 test -f .claude/skills/<skill-name>/SKILL.md
 
 # Leftover internal refs
@@ -320,7 +321,7 @@ One consolidated report after all PRs are reviewed.
 ```markdown
 # PR review report — <author, label, or topic>
 
-Reviewed locally at `~/GitHub/supabase/supabase`.
+Reviewed locally in a `supabase/supabase` checkout.
 
 **Stack order:** master → #NNN → … (if applicable)
 

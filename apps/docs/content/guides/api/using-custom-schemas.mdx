@@ -56,6 +56,12 @@ const { data: todos, error } = await supabase.from('todos').select('*')
 const { data: todos, error } = await supabase.schema('myschema').from('todos').select('*')
 ```
 
+<Admonition type="note">
+
+With generated `Database` types that include `public`, `createClient<Database>(...)` type-checks `db.schema` against `public` only, unless the schema name is also passed as the second generic: `createClient<Database, 'myschema'>(...)`. `supabase.schema('myschema').from(...)` infers its schema per call and needs no second generic. In both cases `myschema` has to be present in the generated `Database` type.
+
+</Admonition>
+
 </TabPanel>
 <$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
