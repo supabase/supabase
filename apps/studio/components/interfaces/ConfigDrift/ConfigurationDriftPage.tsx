@@ -2,6 +2,7 @@ import { useParams } from 'common'
 import { ArrowRight, CheckCircle2, FileWarning, Github, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Card, Skeleton } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CollapsibleCardSection } from 'ui-patterns/CollapsibleCardSection'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
@@ -267,6 +268,19 @@ export function ConfigurationDriftPage() {
 
   return (
     <main className="space-y-6">
+      <Admonition
+        type="warning"
+        title="Config.toml will overwrite these settings on the next deploy"
+        description={
+          <>
+            This project is connected to GitHub, so the next commit will redeploy config.toml and
+            overwrite any settings changed here. To persist these changes instead, run{' '}
+            <code className="text-code-inline text-xs">supabase config pull</code> to pull them into
+            config.toml.
+          </>
+        }
+      />
+
       {comparableSettingCount === 0 ? (
         <Card className="flex min-h-44 items-center justify-center px-6 text-center">
           <div className="max-w-lg">
