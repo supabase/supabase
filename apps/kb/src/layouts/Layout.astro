@@ -1,6 +1,13 @@
 ---
 import { Header } from '../components/Header'
 import '../styles/globals.css'
+
+interface Props {
+	title: string
+	description?: string
+}
+
+const { title, description } = Astro.props
 ---
 
 <!doctype html>
@@ -9,6 +16,7 @@ import '../styles/globals.css'
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="robots" content="noindex, nofollow" />
+		{description && <meta name="description" content={description} />}
 		<script is:inline>
 			// Set data-theme on <html> before first paint, so the page doesn't flash
 			// the wrong theme while this loads. Defaults to dark (no system-preference
@@ -50,7 +58,7 @@ import '../styles/globals.css'
 			rel="stylesheet"
 			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
 		/>
-		<title>Supabase Knowledge Base</title>
+		<title>{title} | Supabase Knowledge Base</title>
 	</head>
 	<body>
 		<Header client:load />

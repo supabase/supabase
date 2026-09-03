@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Gauge, Inbox, Shield } from 'lucide-react'
+import { Activity, Gauge, Inbox, Shield } from 'lucide-react'
 import type { ElementType } from 'react'
 
 import type { AdvisorItem, AdvisorLintItem, AdvisorNotificationItem } from './AdvisorPanel.types'
@@ -50,7 +50,9 @@ export const createAdvisorLintItems = (lintData?: Lint[]): AdvisorLintItem[] => 
         ? ('security' as const)
         : categories.includes('PERFORMANCE')
           ? ('performance' as const)
-          : undefined
+          : categories.includes('HEALTH')
+            ? ('health' as const)
+            : undefined
 
       if (!tab) return null
 
@@ -153,6 +155,7 @@ export const getAdvisorItemSecondaryText = (
 export const tabIconMap: Record<Exclude<AdvisorTab, 'all'>, ElementType> = {
   security: Shield,
   performance: Gauge,
+  health: Activity,
   messages: Inbox,
 }
 

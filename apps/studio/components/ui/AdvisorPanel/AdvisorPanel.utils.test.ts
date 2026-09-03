@@ -72,6 +72,19 @@ describe('AdvisorPanel.utils', () => {
     expect(getAdvisorItemSecondaryText(bannedIpSignal)).toBe('Database · 203.0.113.10')
   })
 
+  it('files a health lint under the health tab', () => {
+    const [item] = createAdvisorLintItems([
+      createLint({
+        cache_key: 'instance_db_down',
+        name: 'instance_db_down',
+        categories: ['HEALTH'],
+        metadata: { type: 'health', entity: 'Database' },
+      }),
+    ])
+
+    expect(item?.tab).toBe('health')
+  })
+
   describe('notification secondary text', () => {
     const [notificationWithProject] = createAdvisorNotificationItems([
       createNotification({

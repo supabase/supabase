@@ -14,7 +14,7 @@ type AdvisorBaseItem = {
   title: string
   severity: AdvisorSeverity
   createdAt?: number
-  tab: 'security' | 'performance' | 'messages'
+  tab: 'security' | 'performance' | 'health' | 'messages'
   source: AdvisorItemSource
 }
 
