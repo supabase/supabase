@@ -14,12 +14,21 @@ import MenuIconPicker from './MenuIconPicker'
 
 type NavAccordionItem = {
   url?: string
+  enabled?: boolean
   items?: NavAccordionItem[]
 }
 
 function hasActiveDescendant(item: NavAccordionItem, pathname: string): boolean {
+  if (item.enabled === false) return false
   if (item.url === pathname) return true
   return item.items?.some((child) => hasActiveDescendant(child, pathname)) ?? false
+}
+
+function isRenderable(item: NavAccordionItem): boolean {
+  if (item.enabled === false) return false
+  if (item.url) return true
+
+  return item.items?.some(isRenderable) ?? false
 }
 
 const HeaderLink = React.memo(function HeaderLink(props: {
@@ -48,12 +57,14 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
   const activeItem = props.subItem.url === pathname
   const activeItemRef = useRef<HTMLLIElement>(null)
   const childItems = props.subItem.items ?? []
-  const hasChildren = childItems.length > 0
-  const enabledChildren = childItems.filter((child) => child.enabled !== false)
+  const enabledChildren = childItems.filter(isRenderable)
+  const hasChildren = enabledChildren.length > 0
 
-  const isChildActive = childItems.some((child: NavAccordionItem) =>
+  const isChildActive = enabledChildren.some((child: NavAccordionItem) =>
     hasActiveDescendant(child, pathname)
   )
+
+  const accordionValue = props.subItem.url || props.subItem.name
 
   const LinkContainer = (props) => {
     const isExternal = props.url.startsWith('https://')
@@ -79,6 +90,9 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
       }, 0)
     }
   })
+
+  if (!hasChildren && !props.subItem.url) return null
+
   return (
     <li ref={!hasChildren && activeItem ? activeItemRef : null}>
       {hasChildren ? (
@@ -86,9 +100,9 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
           collapsible
           type="single"
           className="space-y-0.5"
-          defaultValue={isChildActive ? props.subItem.url : undefined}
+          defaultValue={isChildActive ? accordionValue : undefined}
         >
-          <Accordion.Item key={props.subItem.url || props.subItem.name} value={props.subItem.url}>
+          <Accordion.Item key={accordionValue} value={accordionValue}>
             <Accordion.Trigger
               className={[
                 'flex items-center gap-2 w-full',
@@ -221,7 +235,7 @@ const Content = (props) => {
           if (entry.enabled === false) return null
 
           if (entry.items && entry.items.length > 0) {
-            const enabledItems = entry.items.filter((item) => item.enabled !== false)
+            const enabledItems = entry.items.filter(isRenderable)
             if (enabledItems.length === 0) return null
 
             return (
