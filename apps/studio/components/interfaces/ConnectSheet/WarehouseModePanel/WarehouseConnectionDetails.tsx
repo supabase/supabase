@@ -114,9 +114,17 @@ function DuckLakeSetup({ credentials }: { credentials: WarehouseCatalogCredentia
       >
         <MaskedCopyValueRow value={connection.password} />
       </FieldRow>
-      <CodeBlock language="sql" hideLineNumbers value={setupScript}>
-        {setupScript}
-      </CodeBlock>
+      {/*
+        `className` is what switches CodeBlock from its plain <code> fallback to the syntax
+        highlighter — without it the SQL renders unhighlighted and the blank lines between steps
+        collapse.
+      */}
+      <CodeBlock
+        className="[&_code]:text-foreground"
+        language="sql"
+        hideLineNumbers
+        value={setupScript}
+      />
     </div>
   )
 }
@@ -187,9 +195,13 @@ export const WarehouseConnectionDetails = ({ onEditTables }: WarehouseConnection
         Warehouse speaks the Arrow FlightSQL protocol. Any FlightSQL-compatible client can connect —
         for example, using the <span className="font-mono">usql</span> CLI:
       </p>
-      <CodeBlock language="bash" hideLineNumbers value={usqlCommand}>
-        {usqlCommand}
-      </CodeBlock>
+      <CodeBlock
+        className="[&_code]:text-foreground"
+        language="bash"
+        hideLineNumbers
+        wrapLongLines
+        value={usqlCommand}
+      />
 
       <div className="h-px bg-border my-6" />
 
