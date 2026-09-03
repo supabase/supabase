@@ -18,6 +18,8 @@ export const FormSchema = z
       required_error: 'Please enter a Postgres version.',
     }),
     instanceType: z.string().optional(),
+    kubernetesClusterId: z.string().optional(),
+    kubernetesClusterForce: z.boolean().optional(),
     dbRegion: z.string({
       required_error: 'Please select a region.',
     }),
@@ -46,7 +48,15 @@ export const FormSchema = z
   })
   .superRefine(
     (
-      { dbPassStrength, dbPassStrengthWarning, highAvailability, cloudProvider, useOrioleDb },
+      {
+        dbPassStrength,
+        dbPassStrengthWarning,
+        highAvailability,
+        cloudProvider,
+        useOrioleDb,
+        kubernetesClusterId,
+        kubernetesClusterForce,
+      },
       ctx
     ) => {
       if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
@@ -74,6 +84,23 @@ export const FormSchema = z
           code: z.ZodIssueCode.custom,
           path: ['useOrioleDb'],
           message: 'High availability is not supported with OrioleDB images',
+        })
+      }
+
+      if (kubernetesClusterId && cloudProvider !== 'AWS_K8S' && cloudProvider !== 'AWS_NIMBUS') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['kubernetesClusterId'],
+          message:
+            'Kubernetes cluster ID is only supported for Kubernetes-architecture cloud providers',
+        })
+      }
+
+      if (kubernetesClusterForce && !kubernetesClusterId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['kubernetesClusterForce'],
+          message: 'Force-deploy has no effect without a Kubernetes cluster ID',
         })
       }
     }
