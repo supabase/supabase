@@ -62,6 +62,19 @@ This example enables the **Custom Access Token** hook using a Postgres function 
 
 You can execute the following SQL from the Supabase Dashboard SQL Editor, or by connecting to your database using a Postgres client such as psql.
 
+This example reads roles from a `user_roles` table, so create that table first. If the table is missing, the hook errors and every sign-in fails.
+
+```sql name=user_roles.sql
+create table if not exists public.user_roles (
+  user_id uuid not null references auth.users
+    on delete cascade,
+  role text not null,
+  primary key (user_id)
+);
+```
+
+Then create the hook function:
+
 ```sql name=custom_access_token_hook.sql
 create or replace function public.custom_access_token_hook(event jsonb)
 returns jsonb
@@ -95,7 +108,7 @@ $$;
 grant execute on function public.custom_access_token_hook
   to supabase_auth_admin;
 
--- Grant schema access so the auth role can reach the function
+-- Grant schema access to supabase_auth_admin (usually already granted by default)
 grant usage on schema public to supabase_auth_admin;
 
 -- Revoke from public and other roles
@@ -116,15 +129,22 @@ services:
       GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_URI: 'pg-functions://postgres/public/custom_access_token_hook'
 ```
 
-### Step 3: Restart the auth service
+### Step 3: Relaunch the auth service
 
 ```sh
-docker compose up -d --force-recreate --no-deps auth
+sh run.sh recreate auth
 ```
 
-### Step 4: Verify
+### Step 4: Verify the custom claim
 
-Sign in and decode the JWT. If the hook ran successfully, your custom claim should be present. If something doesn't work, check the auth logs:
+Give a user a role so the hook has something to add. Replace the UUID with a real user ID from `auth.users`:
+
+```sql
+insert into public.user_roles (user_id, role)
+values ('00000000-0000-0000-0000-000000000000', 'admin');
+```
+
+Sign in as that user and decode the JWT. If the hook ran successfully, the `user_role` claim is present. A user with no matching row in `user_roles` still signs in, but without the claim. If something doesn't work, check the auth logs:
 
 ```sh
 docker compose logs auth --tail 20
@@ -133,6 +153,12 @@ docker compose logs auth --tail 20
 ## Step-by-step: HTTP endpoint hook
 
 This example enables the **Send SMS** hook using an Edge Function.
+
+<Admonition type="note">
+
+The Send SMS hook only fires when Auth sends an OTP. Make sure phone auth is enabled (`GOTRUE_EXTERNAL_PHONE_ENABLED=true`) and automatic phone confirmation is off (`GOTRUE_SMS_AUTOCONFIRM=false`). When `GOTRUE_SMS_AUTOCONFIRM` is on, signups are confirmed without an OTP, so the hook never runs.
+
+</Admonition>
 
 ### Step 1: Create the Edge Function
 
@@ -210,13 +236,13 @@ services:
       SEND_SMS_HOOK_SECRET: ${SEND_SMS_HOOK_SECRET}
 ```
 
-### Step 5: Restart auth and functions services
+### Step 5: Relaunch auth and functions services
 
 ```sh
-docker compose up -d --force-recreate --no-deps auth functions
+sh run.sh recreate auth functions
 ```
 
-### Step 6: Verify
+### Step 6: Verify the hook fires
 
 Trigger an SMS authentication event and confirm that the hook executes successfully.
 
@@ -272,7 +298,7 @@ Postgres function hooks (`pg-functions://` URIs) do not require secrets - they r
 ### Hook not firing
 
 - Check that `GOTRUE_HOOK_{HOOK_NAME}_ENABLED` is set to `"true"` (as a string) in `docker-compose.yml`
-- Verify the variable reaches the container: `docker compose exec auth env | grep GOTRUE_HOOK`
+- Verify the variable reaches the container: `sh run.sh printenv auth | grep GOTRUE_HOOK`
 - Remember: `.env` variables do not reach the container unless passed through in `docker-compose.yml`
 
 ### `pg-functions://` URI errors
@@ -306,12 +332,17 @@ Secrets must match the Standard Webhooks format:
 
 ### Permission denied on Postgres function
 
-The `supabase_auth_admin` role needs both `usage` on the schema and `execute` on the function. Granting only one produces a `permission denied` error at sign-in:
+The `supabase_auth_admin` role needs `execute` on the function. By default every role inherits `execute` from the `public` role, but the setup in Step 1 revokes it from `public`, so you must grant it back to `supabase_auth_admin` explicitly. Otherwise sign-in fails with `500: Error running hook URI`, and the auth logs show a permission-denied error:
+
+```sql
+grant execute on function public.your_hook_function
+  to supabase_auth_admin;
+```
+
+The role also needs `usage` on the schema. On a default install it already has this through the built-in grant on the `public` schema, but grant it explicitly if your database has revoked usage from `public`:
 
 ```sql
 grant usage on schema public to supabase_auth_admin;
-grant execute on function public.your_hook_function
-  to supabase_auth_admin;
 ```
 
 ### SMS OTP expiry is too short
