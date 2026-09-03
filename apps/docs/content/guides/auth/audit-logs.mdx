@@ -34,20 +34,51 @@ You can enable or disable Postgres database storage to optimize your costs.
 
 ## Log format
 
-Audit logs contain detailed information about each authentication event:
+The two storage options record slightly different information, so the shape of an event depends on where you read it from.
+
+### In Postgres
+
+Each event is one row in `auth.audit_log_entries`, with the event details in the `payload` JSON column:
+
+| Column       | Description                                              |
+| ------------ | -------------------------------------------------------- |
+| `id`         | Unique ID of the audit log entry                         |
+| `payload`    | Event details (see below)                                |
+| `ip_address` | IP address the request came from, or `''` if unavailable |
+| `created_at` | When the event was recorded                              |
 
 ```json
 {
-  "timestamp": "2025-08-01T10:30:00Z",
-  "user_id": "uuid",
+  "actor_id": "8a3f1a2e-1c4b-4f0e-9a3d-6b2c5d7e8f90",
+  "actor_username": "user@example.com",
+  "actor_via_sso": false,
   "action": "user_signedup",
-  "ip_address": "192.168.1.1",
-  "user_agent": "Mozilla/5.0...",
-  "metadata": {
+  "log_type": "team",
+  "traits": {
     "provider": "email"
   }
 }
 ```
+
+`actor_name` is included when the user has a `full_name` in their user metadata, and `traits` is included when the event carries extra context such as the provider used.
+
+<Admonition type="note">
+
+`ip_address` is a column on `auth.audit_log_entries`, not a field inside `payload`. The user agent is not stored in Postgres — if you need to associate a device with a user, `auth.sessions` has both `ip` and `user_agent`.
+
+</Admonition>
+
+### In dashboard logs
+
+Events sent to external log storage carry the same fields as `payload`, plus:
+
+| Field          | Description                                  |
+| -------------- | -------------------------------------------- |
+| `audit_log_id` | Matches `auth.audit_log_entries.id`          |
+| `created_at`   | When the event was recorded                  |
+| `ip_address`   | IP address the request came from             |
+| `user_agent`   | User agent of the request, when one was sent |
+| `request_id`   | ID of the request that produced the event    |
 
 ### Log actions reference
 
@@ -67,16 +98,16 @@ Audit logs contain detailed information about each authentication event:
 | `user_updated_password`         | Password change completed               |
 | `token_revoked`                 | Refresh token revoked                   |
 | `token_refreshed`               | Refresh token used to obtain new tokens |
-| `generate_recovery_codes`       | MFA recovery codes generated            |
 | `factor_in_progress`            | MFA factor enrollment started           |
 | `factor_unenrolled`             | MFA factor removed                      |
 | `challenge_created`             | MFA challenge initiated                 |
 | `verification_attempted`        | MFA verification attempt                |
 | `factor_deleted`                | MFA factor deleted                      |
-| `recovery_codes_deleted`        | MFA recovery codes deleted              |
 | `factor_updated`                | MFA factor settings updated             |
-| `mfa_code_login`                | Login with MFA code                     |
 | `identity_unlinked`             | An identity unlinked from account       |
+| `passkey_created`               | Passkey registered                      |
+| `passkey_updated`               | Passkey updated                         |
+| `passkey_deleted`               | Passkey removed                         |
 
 ## Limitations
 
