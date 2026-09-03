@@ -9,15 +9,16 @@ const Command = dynamic(() => import('./command').then((mod) => mod.Command), { 
 
 interface BlockItemProps {
   name: string
+  showOpenInV0?: boolean
 }
 
-export const BlockItem = ({ name }: BlockItemProps) => {
+export const BlockItem = ({ name, showOpenInV0 = true }: BlockItemProps) => {
   const framework = name.includes('vue') || name.includes('nuxtjs') ? 'vue' : 'react'
 
   return (
     <div className="mt-4">
       <Command name={name} highlight framework={framework} />
-      <OpenInV0Button name={name} className="w-fit shrink-0 mt-4" />
+      {showOpenInV0 && <OpenInV0Button name={name} className="w-fit shrink-0 mt-4" />}
     </div>
   )
 }

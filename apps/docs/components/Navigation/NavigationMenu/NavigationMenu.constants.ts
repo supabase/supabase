@@ -286,6 +286,13 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             new: true,
           },
           {
+            label: 'Middleware SDK',
+            icon: 'reference-javascript',
+            href: '/reference/middleware' as `/${string}`,
+            level: 'reference_middleware',
+            new: true,
+          },
+          {
             label: 'CLI Commands',
             icon: 'reference-cli',
             href: '/reference/cli/introduction' as `/${string}`,
@@ -3429,6 +3436,17 @@ export const reference_server_v1 = {
   pkg: {
     name: '@supabase/server',
     repo: 'https://github.com/supabase/server',
+  },
+}
+
+export const reference_middleware_v1 = {
+  icon: 'reference-javascript',
+  title: 'Middleware',
+  url: '/reference/middleware',
+  parent: '/reference',
+  pkg: {
+    name: '@supabase/middleware',
+    repo: 'https://github.com/supabase/middleware',
   },
 }
 

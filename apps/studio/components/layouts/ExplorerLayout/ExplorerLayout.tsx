@@ -27,6 +27,7 @@ import {
   useCreateQuery,
 } from '@/components/interfaces/Explorer/hooks'
 import { useIsTemporarySqlEditorVisit } from '@/hooks/misc/useIsTemporarySqlEditorVisit'
+import { useTrack } from '@/lib/telemetry/track'
 import {
   editorEntityTypes,
   EXPLORER_HOME_TAB,
@@ -102,6 +103,7 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
 
 const BackToSqlEditorButton = () => {
   const { ref } = useParams()
+  const track = useTrack()
   const { setIsTemporary } = useIsTemporarySqlEditorVisit(ref)
 
   if (!ref) return null
@@ -114,7 +116,10 @@ const BackToSqlEditorButton = () => {
       <Link
         href={`/project/${ref}/sql`}
         aria-label="Switch to SQL Editor"
-        onClick={() => setIsTemporary(true)}
+        onClick={() => {
+          setIsTemporary(true)
+          track('explorer_temp_access_sql_editor_clicked')
+        }}
       />
     </EditorNavigationButton>
   )
