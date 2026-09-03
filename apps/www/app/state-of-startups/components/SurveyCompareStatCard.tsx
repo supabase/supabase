@@ -10,7 +10,7 @@ function CompareValue({ caption, query }: { caption: string; query: Distribution
       <span className="text-foreground-light text-xs font-mono uppercase tracking-widest">
         {caption}
       </span>
-      <span className="text-brand-display text-4xl md:text-6xl font-mono tracking-tight tabular-nums">
+      <span className="text-brand text-4xl md:text-6xl font-mono tracking-tight tabular-nums">
         {percent === null ? '—' : `${percent}%`}
       </span>
     </div>

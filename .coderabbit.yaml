@@ -117,9 +117,9 @@ reviews:
           "read more", or "learn more" when it does not describe the
           destination. Skip if aria-label or wrapping context already names
           where the link goes.
-        - Color contrast: flag informative text below 4.5:1, or below 3:1 when at
-          least 24px regular or 18.5px bold. Skip logotypes and decorative text. For
-          expressive hero text at 40px or larger, report the contrast as advisory when
+        - Color contrast: flag non-large informative text below 4.5:1 and large informative
+          text (at least 24px regular or 18.5px bold) below 3:1. Skip logotypes and
+          decorative text. Treat expressive hero text at 40px or larger as advisory when
           nearby compliant text conveys the same information.
 
 # Applies our internal engineering skills (.claude/skills/) as CodeRabbit review
