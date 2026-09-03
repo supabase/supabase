@@ -153,11 +153,16 @@ export function useSqlEditorAi({
     try {
       setIsAcceptDiffLoading(true)
 
-      // TODO: show error if undefined
-      if (!sourceSqlDiff || !editor.isReady() || !diffController.isMounted()) return
+      if (!sourceSqlDiff || !editor.isReady() || !diffController.isMounted()) {
+        toast.error('Unable to apply the AI SQL diff right now. Please try again.')
+        return
+      }
 
       const sql = diffController.getModifiedValue()
-      if (sql === undefined) return
+      if (sql === undefined) {
+        toast.error('Unable to apply the AI edit because the diff editor returned no SQL.')
+        return
+      }
 
       if (selectedDiffType === DiffType.NewSnippet) {
         const { title } = await generateSqlTitle({ sql })
