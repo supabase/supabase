@@ -14,31 +14,27 @@ export interface ResourceAccessPillItem {
 export const OrganizationAccessPill = ({
   slug,
   organization,
-  isInaccessible = false,
 }: {
   slug: string
   organization: OrganizationsData[number] | undefined
-  isInaccessible?: boolean
-}) => (
-  <div
-    className={cn(
-      'flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border bg-surface-75 text-foreground-light px-3 py-1 text-xs',
-      isInaccessible ? 'border-destructive-500 text-destructive' : 'border-strong text-foreground'
-    )}
-  >
-    <Boxes size={14} strokeWidth={1.5} className="shrink-0 text-foreground-lighter" />
-    {organization?.name ?? slug}
-  </div>
-)
-
-export const ProjectAccessPill = ({
-  projectRef,
-  isInaccessible = false,
-}: {
-  projectRef: string
-  isInaccessible?: boolean
 }) => {
+  const isInaccessible = organization == null
+  return (
+    <div
+      className={cn(
+        'flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border bg-surface-75 text-foreground-light px-3 py-1 text-xs',
+        isInaccessible ? 'border-destructive-500 text-destructive' : 'border-strong text-foreground'
+      )}
+    >
+      <Boxes size={14} strokeWidth={1.5} className="shrink-0 text-foreground-lighter" />
+      {organization?.name ?? slug}
+    </div>
+  )
+}
+
+export const ProjectAccessPill = ({ projectRef }: { projectRef: string }) => {
   const { data } = useProjectDetailQuery({ ref: projectRef })
+  const isInaccessible = data == null
   return (
     <div
       className={cn(
