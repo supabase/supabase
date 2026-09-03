@@ -143,7 +143,27 @@ popover open/close with keyboard/mouse, multi-step form transitions.
 **Not valid:** testing a calculation or transformation that happens to live
 in a component — extract to `.utils.ts` and unit test instead.
 
-Conventions and the full template (`customRender`, `addAPIMock`, MSW setup) live in the `studio-mock-api-tests` skill — don't copy them here.
+Studio component test conventions:
+
+```tsx
+import { screen } from '@testing-library/react'
+import { HttpResponse } from 'msw'
+
+import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock } from '@/tests/lib/msw'
+
+addAPIMock({
+  method: 'get',
+  path: '/platform/organizations',
+  response: () => HttpResponse.json([]),
+})
+customRender(<MyComponent />)
+expect(await screen.findByText('No organizations')).toBeInTheDocument()
+```
+
+- Mock API requests at the network layer with `addAPIMock` (MSW) — unhandled requests fail the test. Don't `vi.mock('@/data/...')`.
+- `customRender` wraps the component in the providers Studio needs (React Query, router, etc.).
+- The full template, path-param syntax, and the jsdom/MSW gotchas are in the `studio-mock-api-tests` skill.
 
 ## 4. E2E Tests for Shared Features (HIGH)
 

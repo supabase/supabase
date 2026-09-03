@@ -412,6 +412,48 @@ The wire boundary is `executeAnalyticsSql` in
 `no-restricted-syntax` rule in `apps/studio/eslint.config.cjs` blocks direct
 `post()`/`get()` calls to the `logs.all` endpoints from any other file.
 
-For the helpers, wiring, and the review-gated escape hatches
-(`untrustedLogSql` / `acceptUntrustedLogsSql`), see the
-`clickhouse-logs-queries` skill (`references/codebase-integration.md`).
+Build fragments with the helpers in `safe-analytics-sql.ts`:
+
+- `safeSql` — template tag that only accepts `SafeLogSqlFragment`
+  interpolations; plain strings and Postgres `SafeSqlFragment`s are rejected at
+  compile time.
+- `analyticsLiteral(value)` — sanitizes string/number/boolean literals.
+- `quotedIdent(name)` — validates and backtick-quotes dotted identifiers.
+- `keyword(value, allowed)` — resolves a value against an allow-list of
+  fragments (e.g. `AND`/`OR`); never returns the raw input.
+- `joinSqlFragments(fragments, separator)` — composes already-branded
+  fragments.
+
+```ts
+import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
+import { analyticsLiteral, quotedIdent, safeSql } from '@/data/logs/safe-analytics-sql'
+
+// ✅ GOOD: every interpolation is sanitized.
+const sql = safeSql`
+  SELECT timestamp, event_message
+  FROM ${quotedIdent(table)}
+  WHERE id = ${analyticsLiteral(id)}
+`
+
+await executeAnalyticsSql({ projectRef, endpoint, sql, iso_timestamp_start, iso_timestamp_end })
+```
+
+```ts
+// 🛑 BAD: raw string interpolation. This fails to type-check at the
+// executeAnalyticsSql boundary because the result is `string`, not
+// `SafeLogSqlFragment`.
+const sql = `SELECT * FROM ${table} WHERE id = '${id}'`
+await executeAnalyticsSql({ projectRef, endpoint, sql, iso_timestamp_start, iso_timestamp_end })
+```
+
+The only path that runs SQL not built from these helpers is user-authored
+editor text: `untrustedLogSql(text)` marks it `UntrustedLogSqlFragment`
+(displayable and storable, never executable), and `acceptUntrustedLogsSql`
+promotes it to `SafeLogSqlFragment`. That promotion is a **security boundary**
+— call it only from an event handler tied to a deliberate run gesture (Run
+button click, Cmd+Enter), never from render, `useEffect`, or any path without
+a user gesture. The same rule as `acceptUntrustedSql` on the Postgres side.
+
+Endpoint selection, the OTEL query builders, and the rest of the Studio
+wiring live in the `clickhouse-logs-queries` skill
+(`references/codebase-integration.md`).
