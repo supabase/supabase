@@ -44,6 +44,8 @@ WebAuthn requires a secure context, so when setting `GOTRUE_WEBAUTHN_RP_ORIGINS`
 - Each origin's hostname must match or be a subdomain of `GOTRUE_WEBAUTHN_RP_ID`.
 - Android native apps can use an app origin of the form `android:apk-key-hash:<base64url SHA-256 of the signing certificate>`.
 
+For local testing, set `GOTRUE_WEBAUTHN_RP_ID` to `localhost` and use `http://localhost:3000` as the origin.
+
 <Admonition type="caution" title="Changing the Relying Party ID invalidates existing passkeys">
 
 Passkeys are cryptographically bound to the Relying Party (RP) ID they were registered against. Changing the RP ID makes every existing passkey unusable for sign-in, and users will need to register a new one. Pick the RP ID carefully before users start enrolling, and keep it stable once they do.
@@ -57,6 +59,17 @@ After updating the environment variables, relaunch the auth service for the chan
 ```bash
 sh run.sh recreate auth
 ```
+
+### Verify passkeys are enabled
+
+Request an authentication challenge to confirm the auth service picked up the configuration:
+
+```sh
+curl -X POST 'http://<your-domain>/auth/v1/passkeys/authentication/options' \
+  -H 'apikey: your-anon-key'
+```
+
+A `200` response containing a `challenge_id` confirms that passkey authentication is enabled. A `passkey_disabled` error means the auth service did not pick up the configuration.
 
 ## Manage a user's passkeys
 
