@@ -22,12 +22,12 @@ export const OrganizationAccessPill = ({
   return (
     <Badge
       variant={isInaccessible ? 'destructive' : 'default'}
-      className={cn('normal-case text-xs font-normal tracking-normal', {
+      className={cn('normal-case text-xs font-normal tracking-normal pr-2', {
         'border-destructive-500': isInaccessible,
         'text-foreground': !isInaccessible,
       })}
     >
-      <Box
+      <Boxes
         size={14}
         strokeWidth={1.5}
         className={cn('shrink-0', {
@@ -46,7 +46,7 @@ export const ProjectAccessPill = ({ projectRef }: { projectRef: string }) => {
   return (
     <Badge
       variant={isInaccessible ? 'destructive' : 'default'}
-      className={cn('normal-case text-xs font-normal tracking-normal', {
+      className={cn('normal-case text-xs font-normal tracking-normal pr-2', {
         'border-destructive-500': isInaccessible,
         'text-foreground': !isInaccessible,
       })}
