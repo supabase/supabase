@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { apiWrapper } from '@/lib/api/apiWrapper'
 
 export default function handleEndpoint(req: NextApiRequest, res: NextApiResponse) {
-  return apiWrapper(req, res, handler)
+  return apiWrapper(req, res, handler, { withAuth: true })
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {

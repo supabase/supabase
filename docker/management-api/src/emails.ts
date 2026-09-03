@@ -1,27 +1,59 @@
 import { spawn } from 'node:child_process'
+import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-export {
-  GOTRUE_TEMPLATE_PROPS,
-  type GoTrueTemplateProps,
-} from './render-email-worker.js'
+import { transform } from 'esbuild'
 
-const IS_TS_SOURCE = import.meta.url.endsWith('.ts')
-const WORKER_PATH = fileURLToPath(
-  new URL(IS_TS_SOURCE ? './render-email-worker.ts' : './render-email-worker.js', import.meta.url)
-)
-const WORKER_ARGV = IS_TS_SOURCE ? ['--import', 'tsx', WORKER_PATH] : [WORKER_PATH]
+export const GOTRUE_TEMPLATE_PROPS = {
+  confirmationURL: '{{ .ConfirmationURL }}',
+  token: '{{ .Token }}',
+  tokenHash: '{{ .TokenHash }}',
+  siteURL: '{{ .SiteURL }}',
+  email: '{{ .Email }}',
+  newEmail: '{{ .NewEmail }}',
+  redirectTo: '{{ .RedirectTo }}',
+  data: '{{ .Data }}',
+  oldEmail: '{{ .OldEmail }}',
+  phone: '{{ .Phone }}',
+  oldPhone: '{{ .OldPhone }}',
+  provider: '{{ .Provider }}',
+  factorType: '{{ .FactorType }}',
+} as const
+
+export type GoTrueTemplateProps = Record<keyof typeof GOTRUE_TEMPLATE_PROPS, string>
+
+const WORKER_PATH = fileURLToPath(new URL('./render-email-worker.js', import.meta.url))
+const PACKAGE_ROOT = dirname(dirname(WORKER_PATH))
+const WORKER_ARGV = [
+  '--permission',
+  `--allow-fs-read=${PACKAGE_ROOT}`,
+  '--disallow-code-generation-from-strings',
+  WORKER_PATH,
+]
 const RENDER_TIMEOUT_MS = 15_000
 const MAX_SOURCE_BYTES = 512 * 1024
 const MAX_OUTPUT_BYTES = 4 * 1024 * 1024
+
+async function compileReactEmail(source: string): Promise<string> {
+  const { code } = await transform(source, {
+    loader: 'tsx',
+    format: 'cjs',
+    jsx: 'automatic',
+    target: 'node20',
+  })
+  return code
+}
 
 export async function renderReactEmail(source: string): Promise<string> {
   if (Buffer.byteLength(source, 'utf8') > MAX_SOURCE_BYTES) {
     throw new Error('template source is too large')
   }
 
+  const code = await compileReactEmail(source)
+
   const child = spawn(process.execPath, WORKER_ARGV, {
-    env: { EMAIL_RENDER_WORKER: '1', ...(IS_TS_SOURCE ? { PATH: process.env.PATH ?? '' } : {}) },
+    cwd: PACKAGE_ROOT,
+    env: {},
     stdio: ['pipe', 'pipe', 'pipe'],
   })
 
@@ -54,7 +86,7 @@ export async function renderReactEmail(source: string): Promise<string> {
     })
   })
 
-  child.stdin.end(source, 'utf8')
+  child.stdin.end(JSON.stringify({ code, props: GOTRUE_TEMPLATE_PROPS }), 'utf8')
   await finished
 
   if (stdoutBytes > MAX_OUTPUT_BYTES) throw new Error('rendered template is too large')

@@ -55,7 +55,7 @@ export function decryptString(value: string, context = ''): string {
 }
 
 const SENSITIVE_KEY_RE =
-  /(SECRET|SECRETS|PASSWORD|PASS|TOKEN|ACCESS_KEY|API_KEY|APIKEY|PRIVATE_KEY|CREDENTIALS|ACCOUNT_SID|CLIENT_ID)$/
+  /(SECRET|SECRETS|PASSWORD|PASS|TOKEN|ACCESS_KEY|API_KEY|APIKEY|PRIVATE_KEY|CREDENTIALS|ACCOUNT_SID|CLIENT_ID|TEST_OTP)$/
 
 export function isSensitiveConfigKey(key: string): boolean {
   return SENSITIVE_KEY_RE.test(key)

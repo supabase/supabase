@@ -1,40 +1,36 @@
+import { AUTH_CONFIG_KEYS, type ConfigValueType } from './auth-config-keys.js'
 import type { ConfigValue } from './store.js'
 
-const BOOLEAN_KEYS = [
-  'DISABLE_SIGNUP',
-  'EXTERNAL_EMAIL_ENABLED',
-  'EXTERNAL_ANONYMOUS_USERS_ENABLED',
-  'EXTERNAL_PHONE_ENABLED',
-  'MAILER_AUTOCONFIRM',
-  'SMS_AUTOCONFIRM',
-]
+const BASELINE_ENV_PREFIX = 'AUTH_DEFAULT_'
 
-const NUMBER_KEYS = ['JWT_EXP']
+function parseBaselineValue(type: ConfigValueType, raw: string): ConfigValue | undefined {
+  switch (type) {
+    case 'boolean':
+      if (raw === 'true') return true
+      if (raw === 'false') return false
+      return undefined
+    case 'number': {
+      const parsed = Number(raw)
+      return raw.trim() !== '' && Number.isFinite(parsed) ? parsed : undefined
+    }
+    case 'string':
+      return raw
+  }
+}
 
-const STRING_KEYS = [
-  'SITE_URL',
-  'URI_ALLOW_LIST',
-  'SMTP_ADMIN_EMAIL',
-  'SMTP_HOST',
-  'SMTP_PORT',
-  'SMTP_USER',
-  'SMTP_PASS',
-  'SMTP_SENDER_NAME',
-]
-
-export function baselineConfig(): Record<string, ConfigValue> {
+export function baselineConfigFrom(
+  source: Record<string, string | undefined>
+): Record<string, ConfigValue> {
   const out: Record<string, ConfigValue> = {}
-  for (const key of STRING_KEYS) {
-    const value = process.env[`AUTH_DEFAULT_${key}`]
+  for (const [key, type] of Object.entries(AUTH_CONFIG_KEYS)) {
+    const raw = source[`${BASELINE_ENV_PREFIX}${key}`]
+    if (raw === undefined) continue
+    const value = parseBaselineValue(type, raw)
     if (value !== undefined) out[key] = value
   }
-  for (const key of BOOLEAN_KEYS) {
-    const value = process.env[`AUTH_DEFAULT_${key}`]
-    if (value !== undefined) out[key] = value === 'true'
-  }
-  for (const key of NUMBER_KEYS) {
-    const value = process.env[`AUTH_DEFAULT_${key}`]
-    if (value !== undefined && !Number.isNaN(Number(value))) out[key] = Number(value)
-  }
   return out
+}
+
+export function baselineConfig(): Record<string, ConfigValue> {
+  return baselineConfigFrom(process.env)
 }

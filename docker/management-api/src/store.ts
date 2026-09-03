@@ -7,6 +7,23 @@ export const pool = new pg.Pool({ connectionString: env.databaseUrl })
 
 export type ConfigValue = string | number | boolean | null
 
+export type Queryable = Pick<pg.Pool, 'query'>
+
+export async function withTransaction<T>(fn: (tx: Queryable) => Promise<T>): Promise<T> {
+  const client = await pool.connect()
+  try {
+    await client.query('begin')
+    const result = await fn(client)
+    await client.query('commit')
+    return result
+  } catch (err) {
+    await client.query('rollback')
+    throw err
+  } finally {
+    client.release()
+  }
+}
+
 export async function migrate(): Promise<void> {
   await pool.query(`
     create schema if not exists management;
@@ -38,8 +55,8 @@ function deserializeConfigValue(key: string, value: unknown): ConfigValue {
   return value as ConfigValue
 }
 
-export async function getAllConfig(): Promise<Record<string, ConfigValue>> {
-  const { rows } = await pool.query('select key, value from management.auth_config')
+export async function getAllConfig(db: Queryable = pool): Promise<Record<string, ConfigValue>> {
+  const { rows } = await db.query('select key, value from management.auth_config')
   const out: Record<string, ConfigValue> = {}
   for (const row of rows) {
     out[row.key] = deserializeConfigValue(row.key, row.value)
@@ -47,36 +64,33 @@ export async function getAllConfig(): Promise<Record<string, ConfigValue>> {
   return out
 }
 
-export async function upsertConfig(entries: Record<string, ConfigValue>): Promise<void> {
+export async function upsertConfig(
+  entries: Record<string, ConfigValue>,
+  db?: Queryable
+): Promise<void> {
   const keys = Object.keys(entries)
   if (keys.length === 0) return
-  const client = await pool.connect()
-  try {
-    await client.query('begin')
+  const run = async (tx: Queryable) => {
     for (const key of keys) {
       const value = entries[key]
       if (value === null) {
-        await client.query('delete from management.auth_config where key = $1', [key])
+        await tx.query('delete from management.auth_config where key = $1', [key])
       } else {
-        await client.query(
+        await tx.query(
           `insert into management.auth_config (key, value) values ($1, $2::jsonb)
            on conflict (key) do update set value = excluded.value, updated_at = now()`,
           [key, serializeConfigValue(key, value)]
         )
       }
     }
-    await client.query('commit')
-  } catch (err) {
-    await client.query('rollback')
-    throw err
-  } finally {
-    client.release()
   }
+  if (db) await run(db)
+  else await withTransaction(run)
 }
 
-export async function deleteConfig(keys: string[]): Promise<void> {
+export async function deleteConfig(keys: string[], db: Queryable = pool): Promise<void> {
   if (keys.length === 0) return
-  await pool.query('delete from management.auth_config where key = any($1)', [keys])
+  await db.query('delete from management.auth_config where key = any($1)', [keys])
 }
 
 export type EmailTemplate = {
@@ -86,23 +100,29 @@ export type EmailTemplate = {
   rendered_html: string
 }
 
-export async function getEmailTemplate(templateType: string): Promise<EmailTemplate | null> {
-  const { rows } = await pool.query(
+export async function getEmailTemplate(
+  templateType: string,
+  db: Queryable = pool
+): Promise<EmailTemplate | null> {
+  const { rows } = await db.query(
     'select template_type, source, source_format, rendered_html from management.email_templates where template_type = $1',
     [templateType]
   )
   return rows[0] ?? null
 }
 
-export async function getAllEmailTemplates(): Promise<EmailTemplate[]> {
-  const { rows } = await pool.query(
+export async function getAllEmailTemplates(db: Queryable = pool): Promise<EmailTemplate[]> {
+  const { rows } = await db.query(
     'select template_type, source, source_format, rendered_html from management.email_templates'
   )
   return rows
 }
 
-export async function upsertEmailTemplate(template: EmailTemplate): Promise<void> {
-  await pool.query(
+export async function upsertEmailTemplate(
+  template: EmailTemplate,
+  db: Queryable = pool
+): Promise<void> {
+  await db.query(
     `insert into management.email_templates (template_type, source, source_format, rendered_html)
      values ($1, $2, $3, $4)
      on conflict (template_type) do update
@@ -114,8 +134,11 @@ export async function upsertEmailTemplate(template: EmailTemplate): Promise<void
   )
 }
 
-export async function deleteEmailTemplate(templateType: string): Promise<void> {
-  await pool.query('delete from management.email_templates where template_type = $1', [
+export async function deleteEmailTemplate(
+  templateType: string,
+  db: Queryable = pool
+): Promise<void> {
+  await db.query('delete from management.email_templates where template_type = $1', [
     templateType,
   ])
 }

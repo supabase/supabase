@@ -66,10 +66,12 @@ describe('isSensitiveConfigKey', () => {
     assert.ok(isSensitiveConfigKey('SMS_TWILIO_AUTH_TOKEN'))
     assert.ok(isSensitiveConfigKey('SMS_VONAGE_API_KEY'))
     assert.ok(isSensitiveConfigKey('SECURITY_CAPTCHA_SECRET'))
+    assert.ok(isSensitiveConfigKey('SMS_TEST_OTP'))
   })
 
   it('leaves non-sensitive keys alone', () => {
     assert.ok(!isSensitiveConfigKey('SITE_URL'))
     assert.ok(!isSensitiveConfigKey('EXTERNAL_GITHUB_ENABLED'))
+    assert.ok(!isSensitiveConfigKey('SMS_TEST_OTP_VALID_UNTIL'))
   })
 })

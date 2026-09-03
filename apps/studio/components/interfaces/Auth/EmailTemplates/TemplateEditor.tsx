@@ -415,7 +415,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                 </div>
               </div>
               {activeView === 'source' && isReactFormat && (
-                <div className="overflow-hidden rounded-md border dark:border-control [&_.monaco-editor]:outline-0 [&_.monaco-editor-background]:bg-surface-200/30! [&_.monaco-editor_.margin]:bg-surface-200/30! dark:[&_.monaco-editor-background]:bg-surface-300! dark:[&_.monaco-editor_.margin]:bg-surface-300!">
+                <div className="overflow-hidden rounded-md border dark:border-control focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background [&_.monaco-editor]:outline-0 [&_.monaco-editor-background]:bg-surface-200/30! [&_.monaco-editor_.margin]:bg-surface-200/30! dark:[&_.monaco-editor-background]:bg-surface-300! dark:[&_.monaco-editor_.margin]:bg-surface-300!">
                   <CodeEditor
                     id="react-email-editor"
                     language="typescript"
@@ -440,7 +440,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
               )}
               {activeView === 'source' && !isReactFormat ? (
                 <>
-                  <div className="overflow-hidden rounded-md border dark:border-control overflow-hidden [&_.monaco-editor]:outline-0 [&_.monaco-editor-background]:bg-surface-200/30! [&_.monaco-editor_.margin]:bg-surface-200/30! dark:[&_.monaco-editor-background]:bg-surface-300! dark:[&_.monaco-editor_.margin]:bg-surface-300!">
+                  <div className="overflow-hidden rounded-md border dark:border-control focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background [&_.monaco-editor]:outline-0 [&_.monaco-editor-background]:bg-surface-200/30! [&_.monaco-editor_.margin]:bg-surface-200/30! dark:[&_.monaco-editor-background]:bg-surface-300! dark:[&_.monaco-editor_.margin]:bg-surface-300!">
                     <CodeEditor
                       id="code-id"
                       language="html"

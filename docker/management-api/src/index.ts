@@ -17,8 +17,10 @@ import {
   getAllConfig,
   getEmailTemplate,
   migrate,
+  type Queryable,
   upsertConfig,
   upsertEmailTemplate,
+  withTransaction,
 } from './store.js'
 
 const app = new Hono()
@@ -78,19 +80,22 @@ function validateConfigPayload(payload: Record<string, unknown>): {
   return { valid, errors }
 }
 
-async function storeHtmlTemplates(config: Record<string, ConfigValue>) {
+async function storeHtmlTemplates(config: Record<string, ConfigValue>, tx: Queryable) {
   for (const [key, value] of Object.entries(config)) {
     const templateType = templateTypeFromConfigKey(key)
     if (!templateType) continue
     if (value === null) {
-      await deleteEmailTemplate(templateType)
+      await deleteEmailTemplate(templateType, tx)
     } else if (typeof value === 'string') {
-      await upsertEmailTemplate({
-        template_type: templateType,
-        source: value,
-        source_format: 'html',
-        rendered_html: value,
-      })
+      await upsertEmailTemplate(
+        {
+          template_type: templateType,
+          source: value,
+          source_format: 'html',
+          rendered_html: value,
+        },
+        tx
+      )
     }
   }
 }
@@ -98,8 +103,10 @@ async function storeHtmlTemplates(config: Record<string, ConfigValue>) {
 async function applyConfigPatch(payload: Record<string, unknown>): Promise<string[]> {
   const { valid, errors } = validateConfigPayload(payload)
   if (errors.length > 0) return errors
-  await storeHtmlTemplates(valid)
-  await upsertConfig(valid)
+  await withTransaction(async (tx) => {
+    await storeHtmlTemplates(valid, tx)
+    await upsertConfig(valid, tx)
+  })
   await syncEnvFile()
   return []
 }
@@ -152,11 +159,16 @@ app.post('/platform/auth/:ref/templates/:template/reset', async (c) => {
   if (!isProjectRef(c.req.param('ref'))) return c.json({ message: 'project not found' }, 404)
   const template = templateParam(c)
   if (!template) return c.json({ message: 'unknown template type' }, 400)
-  await deleteEmailTemplate(template)
-  await deleteConfig([
-    `MAILER_TEMPLATES_${template.toUpperCase()}_CONTENT`,
-    `MAILER_SUBJECTS_${template.toUpperCase()}`,
-  ])
+  await withTransaction(async (tx) => {
+    await deleteEmailTemplate(template, tx)
+    await deleteConfig(
+      [
+        `MAILER_TEMPLATES_${template.toUpperCase()}_CONTENT`,
+        `MAILER_SUBJECTS_${template.toUpperCase()}`,
+      ],
+      tx
+    )
+  })
   await syncEnvFile()
   return c.json(await currentConfig())
 })
@@ -178,14 +190,22 @@ app.put('/platform/auth/:ref/templates/:template/react', async (c) => {
     return c.json({ message: `failed to render template: ${message}` }, 400)
   }
 
-  await upsertEmailTemplate({
-    template_type: template,
-    source,
-    source_format: 'react',
-    rendered_html: renderedHtml,
-  })
-  await upsertConfig({
-    [`MAILER_TEMPLATES_${template.toUpperCase()}_CONTENT`]: renderedHtml,
+  await withTransaction(async (tx) => {
+    await upsertEmailTemplate(
+      {
+        template_type: template,
+        source,
+        source_format: 'react',
+        rendered_html: renderedHtml,
+      },
+      tx
+    )
+    await upsertConfig(
+      {
+        [`MAILER_TEMPLATES_${template.toUpperCase()}_CONTENT`]: renderedHtml,
+      },
+      tx
+    )
   })
   await syncEnvFile()
   return c.json({ template_type: template, rendered_html: renderedHtml })

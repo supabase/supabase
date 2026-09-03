@@ -1,4 +1,5 @@
-import { mkdir, rename, writeFile } from 'node:fs/promises'
+import { randomUUID } from 'node:crypto'
+import { mkdir, rename, rm, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 
 import { AUTH_CONFIG_KEYS } from './auth-config-keys.js'
@@ -31,8 +32,12 @@ export function templateTypeFromConfigKey(key: string): string | null {
   return match ? match[1].toLowerCase() : null
 }
 
-function escapeEnvValue(value: string): string {
-  return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n')}"`
+export function escapeEnvValue(value: string): string {
+  return `"${value
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"')
+    .replace(/\$/g, '\\$')
+    .replace(/\n/g, '\\n')}"`
 }
 
 function serializeDuration(value: number, unit: 'hours' | 'seconds'): string | null {
@@ -104,7 +109,7 @@ function defaultEnvFileOptions(): EnvFileOptions {
   }
 }
 
-export async function syncEnvFile(): Promise<void> {
+async function writeEnvFile(): Promise<void> {
   const [config, templates] = await Promise.all([getAllConfig(), getAllEmailTemplates()])
   const content = renderEnvFile(
     config,
@@ -113,7 +118,20 @@ export async function syncEnvFile(): Promise<void> {
 
   const target = join(env.authConfigDir, MANAGED_ENV_FILE)
   await mkdir(dirname(target), { recursive: true })
-  const tmp = `${target}.tmp`
-  await writeFile(tmp, content, 'utf8')
-  await rename(tmp, target)
+  const tmp = `${target}.${randomUUID()}.tmp`
+  try {
+    await writeFile(tmp, content, 'utf8')
+    await rename(tmp, target)
+  } catch (err) {
+    await rm(tmp, { force: true })
+    throw err
+  }
+}
+
+let syncQueue: Promise<void> = Promise.resolve()
+
+export function syncEnvFile(): Promise<void> {
+  const run = syncQueue.then(writeEnvFile)
+  syncQueue = run.catch(() => undefined)
+  return run
 }
