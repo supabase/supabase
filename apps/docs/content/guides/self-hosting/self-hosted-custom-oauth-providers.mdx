@@ -17,7 +17,7 @@ There are two provider types:
 
 ## Provider identifiers
 
-Every custom provider identifier must start with the `custom:` prefix. Identifiers are 2ΓÇô50 characters, lowercase alphanumeric with hyphens and colons allowed. Examples:
+Every custom provider identifier must start with the `custom:` prefix. Identifiers are 2-50 characters, lowercase alphanumeric with hyphens and colons allowed. Examples:
 
 - `custom:my-provider`
 - `custom:github-enterprise`
@@ -53,6 +53,14 @@ sh run.sh recreate auth
 ```
 
 ## Creating a Provider
+
+## Callback URL
+
+When registering your application with an external identity provider, make sure to configure the Supabase Auth callback URL. Copy the URL below and add it as the redirect/callback URI in your identity provider's settings.
+
+```
+https://<your-domain>/auth/v1/callback
+```
 
 ### OAuth provider
 
@@ -160,17 +168,9 @@ OIDC providers have the following automatic behavior:
 - The `openid` scope is always included. It is automatically added if missing from the `scopes` array.
 - ID tokens are verified against the provider's JWKS (fetched from the discovery document's `jwks_uri`).
 
-## Callback URL
-
-When registering your application with an external identity provider, make sure to configure the Supabase Auth callback URL. Copy the URL below and add it as the redirect/callback URI in your identity provider's settings.
-
-```
-https://<your-domain>/auth/v1/callback
-```
-
 ## Example: Telegram
 
-Below is a step-by-step guide to setup Telegram OIDC with Supabase Auth. Make sure you've enabled Custom OAuth in your self-hosted Supabase instance.
+Below is a step-by-step guide to set up Telegram OAuth with Supabase Auth. Make sure you've enabled Custom OAuth in your self-hosted Supabase instance.
 
 <Admonition type="note">
 
@@ -233,7 +233,7 @@ curl -X POST "http://<your-domain>/auth/v1/admin/custom-providers" \
     "client_id": "your-client-id",
     "client_secret": "your-client-secret",
     "issuer": "https://oauth.telegram.org",
-    "scopes": ['openid', 'profile'],
+    "scopes": ["openid", "profile"],
     "email_optional": true
   }'
 ```
@@ -244,11 +244,11 @@ curl -X POST "http://<your-domain>/auth/v1/admin/custom-providers" \
 
 In the above request:
 
-- `identifier` can be any value you want as long as its prefixed with `custom:`.
+- `identifier` can be any value you want as long as it's prefixed with `custom:`.
 - 'name' can be any value you want.
-- `email_optional` has to be set to `true` as Telegram doesn't return email field.
+- `email_optional` has to be set to `true` as Telegram doesn't return an email field.
 
-Refer to official [Telegram Docs](https://core.telegram.org/bots/telegram-login#available-scopes) to get a list of available scopes.
+Refer to the official [Telegram Docs](https://core.telegram.org/bots/telegram-login#available-scopes) to get a list of available scopes.
 
 ### Step 4: Sign in with Telegram
 
