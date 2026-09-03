@@ -3,19 +3,13 @@ id: 'manage-usage-logs-ingest'
 title: 'Manage Logs Ingest usage'
 ---
 
-<Admonition type="caution" title="Coming soon">
-
-Logs pricing is being rolled out. Pricing details and included quotas on this page are subject to change. This page will be updated when billing enforcement goes live.
-
-</Admonition>
-
 ## What you are charged for
 
-You are charged for the total volume of log data that Supabase ingests across all your project's services (Postgres, API gateway, Auth, Storage, Realtime, Edge Functions, etc.) during the billing cycle, measured in GB.
+You are charged for the total volume of log data that Supabase ingests across all your project's services (Postgres, API gateway, Auth, Storage, Realtime, Edge Functions, and others) during the billing cycle.
 
 ## How charges are calculated
 
-Logs Ingest is charged per GB of log data ingested during the billing cycle.
+Logs Ingest is charged per byte of log data ingested during the billing cycle.
 
 ### Usage on your invoice
 
@@ -27,25 +21,71 @@ Usage is shown as "Logs Ingest" on your invoice.
 
 ## Billing examples
 
-Billing examples will be published here when pricing is finalized.
+Ingest is billed per byte (bytes ÷ 1,000,000,000 × $0.50), not rounded up to the next GB. These examples use fractional GB to show that precision.
+
+| Plan | Monthly ingest | Included | Billable overage | Cost                    |
+| ---- | -------------- | -------- | ---------------- | ----------------------- |
+| Free | 0.32 GB        | 1 GB     | —                | <Price price="0" />     |
+| Paid | 4.76 GB        | 5 GB     | —                | <Price price="0" />     |
+| Paid | 5.24 GB        | 5 GB     | 0.24 GB          | <Price price="0.12" />  |
+| Paid | 12.48 GB       | 5 GB     | 7.48 GB          | <Price price="3.74" />  |
+| Paid | 26.92 GB       | 5 GB     | 21.92 GB         | <Price price="10.96" /> |
+| Paid | 100.06 GB      | 5 GB     | 95.06 GB         | <Price price="47.53" /> |
 
 ## View usage
 
 You can view Logs Ingest usage on the [organization's usage page](/dashboard/org/_/usage) of the Dashboard. The page shows the usage of all projects by default. To view the usage for a specific project, select it from the dropdown. You can also select a different time period.
 
-{/* TODO: Add screenshots once Studio surfaces are live */}
-
 ## Optimize usage
 
-Every service in your Supabase project automatically generates logs — you don't write them directly. Log volume scales with your application's traffic and behavior. To reduce ingest volume:
+Every service in your Supabase project generates logs automatically — you don't write them directly. Log volume scales with your application's traffic and behavior. Your project's database (Postgres) can also be configured to record different kinds of activity, such as every query it runs, every time an app connects, and how long things take.
 
-- **Configure Postgres logging settings.** Postgres emits logs for connections, checkpoints, statements, and more — many of which can be tuned or disabled. Adjusting settings such as `log_connections`, `log_min_duration_statement`, and `log_statement` can significantly reduce Postgres log volume. See [Customizing Postgres configs](/docs/guides/database/custom-postgres-config) for the full list of configurable parameters.
-- **Reduce log-level verbosity** in your Edge Functions and server-side code (for example, `info` → `warn` in production).
-- **Audit verbose logging in your application code.** Application-level logs forwarded to Supabase services count toward ingest.
-- **Cap log payload size.** Large structured payloads can inflate GB-billed volume.
-- **Investigate spikes.** Use the [**Logs Explorer**](/dashboard/project/_/logs-explorer) in the Dashboard to find services or endpoints producing unusually high volume.
+Most projects don't need to log everything, all the time. However, turning off a log type means you won't have that information if something goes wrong later, for example a slow query, a security incident, or a connection storm. If your team relies on these logs for debugging, security audits, or compliance requirements, check with them before you change a setting. When in doubt, reduce the volume of a log type rather than turning it off completely — for example, raise a threshold rather than disabling logging outright.
 
-{/* TODO: add MCP/skill guidance link when available */}
+You change all of the Postgres settings below through [Custom Postgres Configuration](/docs/guides/database/custom-postgres-config), either from the SQL Editor or the Supabase CLI. Some changes take effect immediately; others require a database restart. The CLI has a `--no-restart` option if you want to batch several changes together before restarting.
+
+### Start with the two biggest levers
+
+Consider these options first. They are responsible for most log volume on most projects.
+
+- **`log_statement`** When set to `all`, Postgres writes out the actual text of every statement your application runs, including every `SELECT`. Set to `mod`, it only logs DDL and data-modifying statements (`INSERT`, `UPDATE`, `DELETE`, `TRUNCATE`), not reads. On an active project, `all` produces high log volume in a short time, since it logs once per statement rather than once per problem. Set it to `none` if you don't manually read through raw query logs to debug your application, for example if your team relies on an AI coding assistant, an APM tool, or the Query Performance dashboard instead. Keep `all` on if you routinely read query text in the Logs Explorer to debug issues, or you have a compliance requirement to retain a full statement audit trail; `mod` is a lighter-volume option if you only need a record of data changes.
+- **`log_min_duration_statement`** Logs the duration and SQL text of every statement that takes longer than a threshold you set, in milliseconds — unlike `log_duration`, which logs duration only, with no statement text. A threshold of `0` logs every statement's duration and text, and generates volume similar to `log_statement`. Raise the threshold (for example, from a few milliseconds to 1-2 seconds) if you only care about queries that are slow enough to notice. Keep it low only while you're actively in a performance-tuning phase, and raise it back up once that investigation is done.
+
+<Admonition type="danger" title="Statement logs can expose sensitive data">
+
+Enabling `log_statement=all`, or setting `log_min_duration_statement` to a low or `0` threshold, logs the full text of statements — including plaintext values such as passwords passed as query parameters. Before enabling either, check whether your queries carry sensitive data, and confirm who can access these logs and how long they're retained.
+
+</Admonition>
+
+### Check these often-overlooked settings
+
+- **`log_connections` and `log_disconnections`** Writes a log line every time a client connects to your database, and another when it disconnects. This is usually low-volume for an app with a handful of long-lived connections, but if your application opens and closes a new connection for every request instead of reusing a pooled connection, it can generate two log lines per request. Turn it off if you don't need a record of exactly when every connection opened and closed. Keep it on if you're troubleshooting connection exhaustion or connection spikes, or have a security requirement to log all connection activity. If this setting is generating a lot of volume, your app may not be using a connection pooler such as Supavisor, which Supabase provides by default. Connecting through the pooler reduces both log volume and the risk of running out of connections.
+- **`log_autovacuum_min_duration`.** Logs when Postgres's autovacuum maintenance process runs and how long it took. On a database with many frequently updated tables, a low threshold can produce a steady trickle of log lines over a month. Raise the threshold, or turn it off, if you're not actively diagnosing a table-maintenance problem. Keep it on with a reasonable threshold if you've had autovacuum-related performance issues before.
+- **`log_temp_files`** Logs when a query needs more working memory than it's been given and has to write temporary data to disk — usually a sign of a large sort or join. Turn it off if you're not actively tuning query performance around memory usage. Keep it on if you're investigating slow queries related to sorting or joining large amounts of data.
+- **`log_lock_waits`** Logs when a query waits an unusually long time to acquire a lock. This is normally low-volume unless your application has real lock contention. Turn it off if you're not seeing symptoms of queries hanging. Keep it on if multiple processes write to the same data concurrently and you've seen unexplained slowdowns before.
+
+### Check this if your logs seem unusually large for no clear reason
+
+**`log_min_messages`** controls the verbosity of Postgres's own internal logging, separate from query activity. If this was turned up to a debug level while troubleshooting a specific issue and never turned back down, it can produce a large, ongoing volume of internal messages that aren't useful for day-to-day monitoring. The default level is `WARNING`.
+
+- **`DEBUG5–DEBUG1`** — five tiers of increasingly detailed internal diagnostic output meant for Postgres developers, with DEBUG5 the most verbose and DEBUG1 the least.
+- **`INFO`** — information explicitly requested by a command the user ran, like the output of VACUUM VERBOSE.
+- **`NOTICE`** — informational messages that might be helpful to a user, such as a notice that a long identifier got truncated.
+- **`WARNING`** — a warning about a likely problem, such as running COMMIT outside a transaction block.
+- **`ERROR`** — reports an error that aborted the current command, but the session keeps running.
+- **`LOG`** — information of interest to administrators, such as checkpoint activity. It's ranked between `ERROR` and `FATAL` for `log_min_messages`, unlike its position for `client_min_messages`.
+- **`FATAL`** — reports an error serious enough to abort the entire session, not only the current command.
+- **`PANIC`** — reports an error serious enough to abort every session on the database, that is, a crash.
+
+Each level includes everything that comes after it in this list, so setting `log_min_messages` to `WARNING` also logs `ERROR`, `LOG`, `FATAL`, and `PANIC`, but not `NOTICE` or anything earlier in the list.
+
+### Settings you can generally leave alone
+
+`log_checkpoints`, `log_replication_commands`, `log_recovery_conflict_waits`, and `log_startup_progress_interval` are either low-volume by nature or only relevant if you use specific features such as replication. Unless you know you're using the related feature, these rarely contribute meaningfully to your total ingest.
+
+## Checking your new usage baseline
+
+After you change a setting, give it a day or two, then check your ingest usage trend in the Dashboard, or your log volume in the Logs Explorer, to confirm the change had the effect you expected. Volume can be uneven day-to-day depending on traffic, so look at the trend over several days before drawing conclusions. If you're not sure which setting is responsible for your current usage, check which kind of log entries make up most of your volume in the Logs Explorer before changing anything.
 
 ## Exceeding Quotas
 

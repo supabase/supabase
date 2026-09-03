@@ -1,1 +1,7 @@
-Pricing details and included quotas will be published here when billing enforcement goes live.
+Every organization gets a query allowance scaled to its log ingest usage, at a fixed ratio:
+
+```
+Query allowance = 100 × log ingest usage
+```
+
+The Free Plan includes 1 GB of ingest, so it also includes 100 GB of query allowance. Paid plans include 5 GB of ingest, so they start with 500 GB of query allowance. If you ingest more than your plan's included amount and pay for the overage, your allowance grows at the same 100x rate.
