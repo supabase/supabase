@@ -119,8 +119,8 @@ reviews:
           where the link goes.
         - Color contrast: flag non-large informative text below 4.5:1 and large informative
           text (at least 24px regular or 18.5px bold) below 3:1. Skip logotypes and
-          decorative text. Treat expressive hero text at 40px or larger as advisory when
-          nearby compliant text conveys the same information.
+          decorative text. Treat expressive text at 40px or larger as advisory rather
+          than blocking.
 
 # Applies our internal engineering skills (.claude/skills/) as CodeRabbit review
 # guidelines. The skills are the single source of truth — they are consumed

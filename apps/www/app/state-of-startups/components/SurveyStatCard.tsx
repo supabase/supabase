@@ -28,7 +28,7 @@ export function SurveyStatCard({ label, query, value, cohortFilter }: SurveyStat
   const { year } = useYear()
 
   const accentBg = 'bg-brand-default'
-  const accentText = 'text-brand'
+  const accentText = 'text-brand md:text-brand-display'
 
   // A static `value` wins; otherwise resolve from the embedded dataset for the
   // active year. Returns null when the option/column has no data that year
