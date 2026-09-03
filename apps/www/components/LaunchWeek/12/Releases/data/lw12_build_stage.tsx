@@ -1,7 +1,7 @@
 // see apps/www/components/LaunchWeek/X/Releases/data/lwx_advent_days.tsx for reference
 
-import { type ClassValue } from 'clsx'
 import { ReactNode } from 'react'
+import type { ClassValue } from 'ui'
 
 export interface AdventDay {
   icon?: ReactNode // use svg jsx with 34x34px viewport
