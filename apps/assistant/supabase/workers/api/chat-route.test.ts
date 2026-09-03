@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { z } from 'zod'
 
+import worker from './index.ts'
 import { chatBodySchema } from './src/http/chat-body.ts'
 import { jsonError } from './src/http/errors.ts'
-import worker from './index.ts'
 
 const { generateAssistantResponse, getTools, getModel } = vi.hoisted(() => ({
   generateAssistantResponse: vi.fn(),
@@ -115,7 +115,7 @@ describe('api worker router', () => {
   test('GET /health returns 200', async () => {
     const response = await worker.fetch(request('/health'))
     expect(response.status).toBe(200)
-    await expect(response.json()).resolves.toEqual({ ok: true })
+    await expect(response.json()).resolves.toEqual({ ok: true, build: 'dev' })
   })
 
   test('unknown path returns 404', async () => {

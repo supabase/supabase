@@ -14,6 +14,12 @@
         "DATABASE_URL",
         "SUPABASE_JWKS",
         "SUPABASE_JWKS_URL",
+        "ASSISTANT_SUPABASE_URL",
+        "ASSISTANT_PUBLISHABLE_KEY",
+        "ASSISTANT_SECRET_KEY",
+        "ASSISTANT_DB_URL",
+        "ASSISTANT_JWKS",
+        "ASSISTANT_JWKS_URL",
         "PLATFORM_JWKS_URL",
         "PLATFORM_JWT_ISSUER",
         "OAUTH_CLIENT_ID",
@@ -25,9 +31,10 @@
         "MCP_URL",
         "MANAGEMENT_API_URL",
         "ASSISTANT_PUBLIC_URL",
-        "PORT"
+        "ASSISTANT_BUILD_ID",
+        "PORT",
       ],
-      "outputs": ["supabase/workers/**/*.mjs", "supabase/workers/**/*.mjs.map"]
+      "outputs": ["supabase/workers/**/*.mjs", "supabase/workers/**/*.mjs.map"],
     },
     "lint": {
       "env": [
@@ -42,6 +49,12 @@
         "DATABASE_URL",
         "SUPABASE_JWKS",
         "SUPABASE_JWKS_URL",
+        "ASSISTANT_SUPABASE_URL",
+        "ASSISTANT_PUBLISHABLE_KEY",
+        "ASSISTANT_SECRET_KEY",
+        "ASSISTANT_DB_URL",
+        "ASSISTANT_JWKS",
+        "ASSISTANT_JWKS_URL",
         "PLATFORM_JWKS_URL",
         "PLATFORM_JWT_ISSUER",
         "OAUTH_CLIENT_ID",
@@ -51,8 +64,9 @@
         "OAUTH_PRESELECT_ORGANIZATION",
         "MANAGEMENT_API_URL",
         "ASSISTANT_PUBLIC_URL",
-        "PORT"
-      ]
-    }
-  }
+        "ASSISTANT_BUILD_ID",
+        "PORT",
+      ],
+    },
+  },
 }

@@ -158,7 +158,7 @@ export const routes: Route[] = [
     method: 'GET',
     pattern: '/health',
     auth: 'none',
-    handler: async () => Response.json({ ok: true }),
+    handler: async () => Response.json({ ok: true, build: env.buildId }),
   },
   {
     method: 'POST',

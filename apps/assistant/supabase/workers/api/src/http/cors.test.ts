@@ -10,6 +10,7 @@ describe('isAllowedOrigin', () => {
     'https://app.supabase.com',
     'https://supabase.green',
     'https://studio.supabase.green',
+    'https://studio-staging-git-poc-assistant-app-supabase.vercel.app',
   ])('allows %s', (origin) => {
     expect(isAllowedOrigin(origin)).toBe(true)
   })
@@ -20,6 +21,8 @@ describe('isAllowedOrigin', () => {
     'https://supabase.red',
     'https://supabase.com.evil.example',
     'https://notsupabase.green',
+    'https://random-app.vercel.app',
+    'https://studio-staging-git-poc-assistant-app-supabase.vercel.app.evil.example',
   ])('rejects %s', (origin) => {
     expect(isAllowedOrigin(origin)).toBe(false)
   })

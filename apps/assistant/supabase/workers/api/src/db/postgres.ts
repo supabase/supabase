@@ -1,12 +1,14 @@
 import { Pool, type QueryResultRow } from 'pg'
 
-import { env } from '../env.ts'
+import { describeDbHost, env } from '../env.ts'
 
 let pool: Pool | undefined
 
 function getAdminPool(): Pool {
   if (!pool) {
-    pool = new Pool({ connectionString: env.supabaseDbUrl, max: 4 })
+    const connectionString = env.supabaseDbUrl
+    console.log(`assistant db pool connecting to ${describeDbHost(connectionString)}`)
+    pool = new Pool({ connectionString, max: 4 })
   }
   return pool
 }

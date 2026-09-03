@@ -1,7 +1,7 @@
 import { withSupabase } from '@supabase/server'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
-import { env } from '../env'
+import { env, supabaseServerEnv } from '../env'
 import { corsForRequest } from './cors'
 import { HttpError } from './errors'
 
@@ -41,11 +41,6 @@ export function createPublishableClient(): SupabaseClient {
 
 export function resolveAdmin(ctx: HandlerContext): SupabaseClient {
   return ctx.supabaseAdmin ?? createAdminClient()
-}
-
-function supabaseServerEnv() {
-  const jwks = env.supabaseJwks
-  return jwks ? { jwks } : {}
 }
 
 export const withUser = (handler: AuthedHandler) => (request: Request) =>

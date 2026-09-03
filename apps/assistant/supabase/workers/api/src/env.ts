@@ -21,11 +21,10 @@ function first(...names: string[]): string | undefined {
   return undefined
 }
 
-function required(name: string, ...aliases: string[]): string {
-  const value = first(name, ...aliases)
+function required(...names: string[]): string {
+  const value = first(...names)
   if (!value) {
-    const listed = [name, ...aliases].join(' or ')
-    throw new Error(`Missing required environment variable ${listed}`)
+    throw new Error(`Missing required environment variable ${names.join(' or ')}`)
   }
   return value
 }
@@ -37,9 +36,100 @@ function stripTrailingSlash(url: string): string {
 type JsonWebKeySet = { keys: JsonWebKey[] }
 
 /**
- * `@supabase/server` `auth: 'user'` needs a JWKS. Platform auto-injects
- * `SUPABASE_JWKS`; local `tsx` does not. Prefer explicit env, otherwise the
- * assistant project's well-known endpoint.
+ * The assistant project's own connection details, in three shapes:
+ *
+ * 1. Platform default secrets (`SUPABASE_URL`, `SUPABASE_DB_URL`, and the JSON
+ *    dictionaries `SUPABASE_PUBLISHABLE_KEYS` / `SUPABASE_SECRET_KEYS`).
+ * 2. Local `.env`: singular `SUPABASE_PUBLISHABLE_KEY` / `SUPABASE_SECRET_KEY`.
+ * 3. `ASSISTANT_*` for a hosted worker — user secrets cannot start with
+ *    `SUPABASE_` ("Env name cannot start with SUPABASE_, skipping"). They mirror
+ *    Studio's `NEXT_PUBLIC_ASSISTANT_SUPABASE_URL` / `NEXT_PUBLIC_ASSISTANT_PUBLISHABLE_KEY`.
+ *
+ * `ASSISTANT_*` is listed first: an operator set it deliberately, and it must
+ * beat a platform default (e.g. a direct `db.<ref>` host that is IPv6-only and
+ * unreachable from the worker VM, where the session pooler is required).
+ */
+const SUPABASE_URL_NAMES = ['ASSISTANT_SUPABASE_URL', 'SUPABASE_URL']
+const PUBLISHABLE_KEY_NAMES = [
+  'ASSISTANT_PUBLISHABLE_KEY',
+  'SUPABASE_PUBLISHABLE_KEY',
+  'SUPABASE_ANON_KEY',
+]
+const PUBLISHABLE_KEYS_JSON_NAME = 'SUPABASE_PUBLISHABLE_KEYS'
+const SECRET_KEY_NAMES = [
+  'ASSISTANT_SECRET_KEY',
+  'SUPABASE_SECRET_KEY',
+  'SUPABASE_SERVICE_ROLE_KEY',
+]
+const SECRET_KEYS_JSON_NAME = 'SUPABASE_SECRET_KEYS'
+const DB_URL_NAMES = ['ASSISTANT_DB_URL', 'SUPABASE_DB_URL', 'DATABASE_URL']
+const JWKS_NAMES = ['ASSISTANT_JWKS', 'SUPABASE_JWKS']
+const JWKS_URL_NAMES = ['ASSISTANT_JWKS_URL', 'SUPABASE_JWKS_URL']
+
+/** Host and port of a connection string for logs; never the credentials. */
+export function describeDbHost(connectionString: string): string {
+  try {
+    const url = new URL(connectionString)
+    return url.port ? `${url.hostname}:${url.port}` : url.hostname
+  } catch {
+    return '<unparseable connection string>'
+  }
+}
+
+/**
+ * `SUPABASE_*_KEYS` is a JSON object of key name → API key. `@supabase/server`
+ * reads it natively; our own `createClient` calls need one string, so pick
+ * `default`, or the only entry when there is exactly one.
+ */
+export function parseApiKeysDictionary(
+  raw: string | undefined,
+  name: string
+): Record<string, string> | undefined {
+  if (!raw) return undefined
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(raw)
+  } catch {
+    throw new Error(`${name} must be a JSON object of key name to API key`)
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error(`${name} must be a JSON object of key name to API key`)
+  }
+  const entries = Object.entries(parsed).filter(
+    (entry): entry is [string, string] => typeof entry[1] === 'string' && entry[1] !== ''
+  )
+  return entries.length > 0 ? Object.fromEntries(entries) : undefined
+}
+
+function defaultApiKey(keys: Record<string, string> | undefined): string | undefined {
+  if (!keys) return undefined
+  if (keys.default) return keys.default
+  const values = Object.values(keys)
+  return values.length === 1 ? values[0] : undefined
+}
+
+function resolveApiKeys(
+  singularNames: string[],
+  dictionaryName: string
+): Record<string, string> | undefined {
+  const singular = first(...singularNames)
+  if (singular) return { default: singular }
+  return parseApiKeysDictionary(readEnv(dictionaryName), dictionaryName)
+}
+
+function requiredApiKey(singularNames: string[], dictionaryName: string): string {
+  const key = defaultApiKey(resolveApiKeys(singularNames, dictionaryName))
+  if (!key) {
+    throw new Error(
+      `Missing required environment variable ${singularNames.join(' or ')} (or a "default" entry in ${dictionaryName})`
+    )
+  }
+  return key
+}
+
+/**
+ * `@supabase/server` `auth: 'user'` needs a JWKS. Prefer explicit env,
+ * otherwise the assistant project's well-known endpoint.
  */
 export function resolveAssistantJwks({
   inlineJwks,
@@ -114,22 +204,22 @@ export function resolveMcpUrl({
  */
 export const env = {
   get supabaseUrl() {
-    return required('SUPABASE_URL')
+    return required(...SUPABASE_URL_NAMES)
   },
   get supabasePublishableKey() {
-    return required('SUPABASE_PUBLISHABLE_KEY', 'SUPABASE_ANON_KEY')
+    return requiredApiKey(PUBLISHABLE_KEY_NAMES, PUBLISHABLE_KEYS_JSON_NAME)
   },
   get supabaseSecretKey() {
-    return required('SUPABASE_SECRET_KEY', 'SUPABASE_SERVICE_ROLE_KEY')
+    return requiredApiKey(SECRET_KEY_NAMES, SECRET_KEYS_JSON_NAME)
   },
   get supabaseDbUrl() {
-    return required('SUPABASE_DB_URL', 'DATABASE_URL')
+    return required(...DB_URL_NAMES)
   },
   get supabaseJwks() {
     return resolveAssistantJwks({
-      inlineJwks: readEnv('SUPABASE_JWKS'),
-      jwksUrl: readEnv('SUPABASE_JWKS_URL'),
-      supabaseUrl: readEnv('SUPABASE_URL'),
+      inlineJwks: first(...JWKS_NAMES),
+      jwksUrl: first(...JWKS_URL_NAMES),
+      supabaseUrl: first(...SUPABASE_URL_NAMES),
     })
   },
   get platformJwksUrl() {
@@ -171,4 +261,39 @@ export const env = {
   get port() {
     return Number.parseInt(readEnv('PORT') ?? '8787', 10)
   },
+  /**
+   * Literal `process.env.ASSISTANT_BUILD_ID` is replaced at bundle time by
+   * esbuild `define` (not via `readEnv`, which indexes dynamically). `dev`
+   * (tsx) has no build step.
+   */
+  get buildId() {
+    return envValue(process.env.ASSISTANT_BUILD_ID) ?? 'dev'
+  },
+}
+
+/**
+ * `@supabase/server` only reads `SUPABASE_URL` / `SUPABASE_*_KEY` from
+ * `process.env`, which a hosted worker never has (see `SUPABASE_URL_NAMES`).
+ * Pass whatever we resolve so `withSupabase` sees the `ASSISTANT_*` values too;
+ * it still reports a clear `MISSING_*` error for anything left unset.
+ */
+export function supabaseServerEnv() {
+  const url = first(...SUPABASE_URL_NAMES)
+  const publishableKeys = resolveApiKeys(PUBLISHABLE_KEY_NAMES, PUBLISHABLE_KEYS_JSON_NAME)
+  const secretKeys = resolveApiKeys(SECRET_KEY_NAMES, SECRET_KEYS_JSON_NAME)
+  const jwks = env.supabaseJwks
+  return {
+    ...(url ? { url } : {}),
+    ...(publishableKeys ? { publishableKeys } : {}),
+    ...(secretKeys ? { secretKeys } : {}),
+    ...(jwks ? { jwks } : {}),
+  }
+}
+
+/** Names present in the environment (never values); logged once at boot. */
+export function describeEnvNames(): string {
+  return Object.keys(process.env)
+    .filter((name) => envValue(process.env[name]) !== undefined)
+    .sort()
+    .join(', ')
 }

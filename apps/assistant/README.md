@@ -75,9 +75,41 @@ Edit `supabase/schemas/**`, then generate a migration:
 npx --yes supabase@beta db schema declarative sync -f <name>
 ```
 
-Worker secrets cannot use the `SUPABASE_` prefix (reserved). Set OAuth app
-credentials as `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, and
-`OAUTH_REDIRECT_URI`.
+## Worker secrets
+
+Worker secrets cannot use the `SUPABASE_` prefix: `supabase secrets set` skips
+them ("Env name cannot start with SUPABASE\_"), and the Workers runtime does not
+inject `SUPABASE_URL` or keys either — a deployed worker only sees the secrets
+you set. Without them every route, including `/health`, fails with
+`MISSING_SUPABASE_URL` from `@supabase/server`.
+
+Set the assistant project's own connection details under `ASSISTANT_*`
+(`env.ts` reads them as fallbacks for the `SUPABASE_*` names the local `.env`
+uses):
+
+| Secret                      | Value                                                      |
+| --------------------------- | ---------------------------------------------------------- |
+| `ASSISTANT_SUPABASE_URL`    | `https://<assistant-ref>.supabase.co` (`.red` on staging)  |
+| `ASSISTANT_PUBLISHABLE_KEY` | the project's `sb_publishable_…` key                       |
+| `ASSISTANT_SECRET_KEY`      | the project's `sb_secret_…` key                            |
+| `ASSISTANT_DB_URL`          | direct Postgres URL (used for `private.read_oauth_tokens`) |
+| `ASSISTANT_JWKS_URL`        | optional; derived from `ASSISTANT_SUPABASE_URL` when unset |
+
+Plus `PLATFORM_JWKS_URL`, `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`,
+`OAUTH_REDIRECT_URI`, `OPENAI_API_KEY`, and `MANAGEMENT_API_URL` when Studio is
+not on production.
+
+`ASSISTANT_DB_URL` must be the **Session pooler** string
+(`postgres.<ref>@aws-0-<region>.pooler.…:5432`). The direct `db.<ref>.…` host
+only has an AAAA record and the worker VM resolves IPv4, so it fails with
+`getaddrinfo ENOTFOUND`. The transaction pooler would work today but breaks the
+moment a query needs session state.
+
+Secrets are applied when an instance starts (`workers launcher: applied config
+bundle (N vars)`), and the `pg` pool caches its connection string. After
+changing a secret, run `pnpm --filter assistant workers:push` to restart. The
+worker logs its env var names (never values) at boot, so the first log line
+after a deploy shows exactly which secrets the runtime applied.
 
 ## Workers
 
