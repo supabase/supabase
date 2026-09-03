@@ -33,8 +33,8 @@ export const OrganizationAccessPill = ({
 }
 
 export const ProjectAccessPill = ({ projectRef }: { projectRef: string }) => {
-  const { data } = useProjectDetailQuery({ ref: projectRef })
-  const isInaccessible = data == null
+  const { data, isPending } = useProjectDetailQuery({ ref: projectRef })
+  const isInaccessible = data == null && !isPending
   return (
     <div
       className={cn(
