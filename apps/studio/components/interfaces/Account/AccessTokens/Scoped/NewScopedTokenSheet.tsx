@@ -42,12 +42,15 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
 
   const [step, setStep] = useState<'form' | 'success'>('form')
   const [createdToken, setCreatedToken] = useState<
-    NewScopedAccessToken | NewAccessToken | undefined
+    { token: NewScopedAccessToken | NewAccessToken; tokenType: 'classic' | 'scoped' } | undefined
   >()
 
-  const showCreatedToken = (data: NewScopedAccessToken | NewAccessToken) => {
+  const showCreatedToken = (
+    data: NewScopedAccessToken | NewAccessToken,
+    tokenType: 'classic' | 'scoped'
+  ) => {
     toast.success('Access token created successfully')
-    setCreatedToken(data)
+    setCreatedToken({ token: data, tokenType })
     setStep('success')
   }
 
@@ -66,7 +69,7 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
               expiryPreset: values.expiresAt,
               resourceAccess: 'account',
             })
-            showCreatedToken(data)
+            showCreatedToken(data, 'classic')
           },
         }
       )
@@ -94,7 +97,7 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
           resourceAccess: values.resourceAccess,
           permissionCount: permissions.length,
         })
-        showCreatedToken(data)
+        showCreatedToken(data, 'scoped')
       },
     })
   }
@@ -134,8 +137,9 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
         </SheetHeader>
         {step === 'success' && createdToken ? (
           <NewScopedTokenSuccess
-            tokenName={createdToken.name}
-            tokenValue={createdToken.token}
+            tokenName={createdToken.token.name}
+            tokenValue={createdToken.token.token}
+            tokenType={createdToken.tokenType}
             onClose={() => handleOpenChange(false, true)}
           />
         ) : (
