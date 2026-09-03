@@ -69,24 +69,72 @@ reviews:
           for both runtimes until the final cleanup pass (tracked in FE-3106).
         Keep this a reminder to verify, not a hard blocker: if no mirror is required,
         say so briefly rather than forcing a change.
+    - path: '{apps,packages}/**/*.{tsx,jsx,css,mdx}'
+      instructions: |
+        When reviewing UI changes, flag these accessibility gaps. Comments are
+        advisory. One comment per gap. Skip test files (*.test.*, *.spec.*) and
+        generated files. Skip Radix/shadcn primitives imported from ui for all
+        checks below. Do not flag issues axe-core already catches mechanically,
+        such as a missing alt attribute, an empty button or link name, or
+        invalid ARIA.
+        - State changes: if sighted users can see a status change (toast,
+          loading/empty swap, copy confirmation, async result) and nothing
+          announces it, suggest aria-live="polite" or role="status". Reserve
+          role="alert" for urgent errors or warnings. Skip if a live region,
+          Radix Toast, or Sonner is already there, or if the change is
+          decoration only. If a live region is created in the same conditional
+          as its message, flag that: the region must already exist in the DOM,
+          then receive the update, or screen readers often announce nothing.
+        - Mouse interaction: flag pointer-only handlers on a non-interactive
+          element (div, span, or similar) with no keyboard equivalent. The
+          listed handlers are illustrative: onClick, onMouseEnter,
+          onDoubleClick, onContextMenu, onPointerDown, onPointerUp,
+          onTouchStart, onTouchEnd, and equivalents. Also flag hover-only UI
+          (content revealed with onMouseEnter or CSS :hover) that has no focus
+          or keyboard path.
+        - Animation: flag animate-*, keyframes, or JS motion with no
+          reduced-motion treatment. Prefer Tailwind motion-reduce: /
+          motion-safe:, or matchMedia('(prefers-reduced-motion: reduce)').
+          packages/config/css/utilities.css only zeroes out .shimmer under
+          reduced motion, not all animation.
+        - Alt text: flag generic values such as Image, Icon, Photo, Picture, or
+          the filename. Flag alt that starts with "image of" or "picture of".
+          If adjacent visible text already names the image (blog thumbnail next
+          to its title, icon next to its label), flag it as redundant and
+          recommend alt="" plus aria-hidden on the image. For a decorative SVG
+          next to visible text, recommend aria-hidden on the SVG. If alt is
+          longer than about two sentences, suggest moving the extra into a
+          caption, adjacent text, or aria-describedby. Do not treat a character
+          count as a hard fail.
+        - Focus visibility: flag outline-none, outline-hidden, outline: none,
+          outline: 0, or equivalent :focus resets that are not paired with a
+          focus-visible ring or outline, or with the focus-ring or focus-inset
+          utility.
+        - Color-only state: flag status, validation, or selection that is
+          conveyed only by color. Suggest a text label, icon, or sr-only text
+          in addition.
+        - Link purpose: flag an accessible name that is only "click here",
+          "read more", or "learn more" when it does not describe the
+          destination. Skip if aria-label or wrapping context already names
+          where the link goes.
 
-# Applies our internal engineering skills (.claude/skills/) as CodeRabbit review
+# Applies our internal engineering skills (.agents/skills/) as CodeRabbit review
 # guidelines. The skills are the single source of truth — they are consumed
 # directly, with no copy of their content elsewhere.
 #
 # `applyTo` decouples where a guideline file lives from the code it governs.
 # Without it, CodeRabbit scopes a guideline file to its own directory and below;
-# our skills live in .claude/skills/, which contains no code, so they would never
+# our skills live in .agents/skills/, which contains no code, so they would never
 # reach apps/studio. `applyTo` points them at the right paths instead.
 knowledge_base:
   code_guidelines:
     filePatterns:
       # Studio code conventions — React/TS, UI patterns, composition, data fetching, errors
-      - files: '.claude/skills/{studio-best-practices,studio-ui-patterns,vercel-composition-patterns,studio-queries,studio-error-handling,react-hook-form}/SKILL.md'
+      - files: '.agents/skills/{studio-ui-patterns,vercel-composition-patterns,studio-queries,studio-error-handling,react-hook-form}/SKILL.md'
         applyTo: 'apps/studio/**/*.{ts,tsx}'
       # Studio unit / component test conventions
-      - files: '.claude/skills/{studio-testing,studio-mock-api-tests}/SKILL.md'
+      - files: '.agents/skills/{studio-testing,studio-mock-api-tests}/SKILL.md'
         applyTo: 'apps/studio/**/*.test.{ts,tsx}'
       # Studio end-to-end (Playwright) test conventions
-      - files: '.claude/skills/studio-e2e-tests/SKILL.md'
+      - files: '.agents/skills/studio-e2e-tests/SKILL.md'
         applyTo: 'e2e/studio/**/*.spec.ts'

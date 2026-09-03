@@ -14,13 +14,16 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
 import { LastSignInWrapper } from './LastSignInWrapper'
+import { resolveCaptchaToken } from './SignIn.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { useAddLoginEvent } from '@/data/misc/audit-login-mutation'
 import { getMfaAuthenticatorAssuranceLevel } from '@/data/profile/mfa-authenticator-assurance-level-query'
 import { useLastSignIn } from '@/hooks/misc/useLastSignIn'
 import { captureCriticalError } from '@/lib/error-reporting'
 import { auth, buildPathWithParams, getReturnToPath } from '@/lib/gotrue'
+import { classifyApiError, classifyValidationError } from '@/lib/telemetry/funnel-errors'
 import { useTrack } from '@/lib/telemetry/track'
+import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Must be a valid email'),
@@ -51,6 +54,7 @@ export const SignInForm = () => {
   }, [])
 
   const track = useTrack()
+  const trackFunnelError = useTrackFunnelError()
   const { mutate: addLoginEvent } = useAddLoginEvent()
 
   let forgotPasswordUrl = `/forgot-password`
@@ -64,8 +68,13 @@ export const SignInForm = () => {
 
     let token = captchaToken
     if (!token) {
-      const captchaResponse = await captchaRef.current?.execute({ async: true })
-      token = captchaResponse?.response ?? null
+      const captcha = await resolveCaptchaToken(captchaRef, trackFunnelError, toastId)
+      if (!captcha.ok) {
+        setCaptchaToken(null)
+        captchaRef.current?.resetCaptcha()
+        return
+      }
+      token = captcha.token
     }
 
     const { error } = await auth.signInWithPassword({
@@ -81,7 +90,7 @@ export const SignInForm = () => {
         if (data) {
           if (data.currentLevel !== data.nextLevel) {
             toast.success(`You need to provide your second factor authentication`, { id: toastId })
-            const url = buildPathWithParams('/sign-in-mfa')
+            const url = buildPathWithParams('/sign-in-mfa?method=email')
             router.replace(url)
             return
           }
@@ -100,6 +109,7 @@ export const SignInForm = () => {
         router.push(redirectPath)
       } catch (error: any) {
         toast.error(`Failed to sign in: ${(error as AuthError).message}`, { id: toastId })
+        trackFunnelError('signin', classifyApiError('signin', error), 'toast', toastId)
         captureCriticalError(error, 'sign in via EP')
       }
     } else {
@@ -107,13 +117,16 @@ export const SignInForm = () => {
       captchaRef.current?.resetCaptcha()
 
       if (error.message.toLowerCase() === 'email not confirmed') {
-        return toast.error(
+        toast.error(
           'Your account has not been verified. Please check the verification link sent to your email. If you have not received the email or the link has expired, please sign up again to request a new verification link.',
           { id: toastId }
         )
+        trackFunnelError('signin', classifyApiError('signin', error), 'toast', toastId)
+        return
       }
 
       toast.error(error.message, { id: toastId })
+      trackFunnelError('signin', classifyApiError('signin', error), 'toast', toastId)
     }
   }
 
@@ -125,7 +138,12 @@ export const SignInForm = () => {
         id={formId}
         method="POST"
         className="flex flex-col gap-4"
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={(e) => {
+          track('sign_in_submitted', { category: 'account', method: 'email' })
+          return form.handleSubmit(onSubmit, (errors) =>
+            trackFunnelError('signin', classifyValidationError('signin', errors), 'form')
+          )(e)
+        }}
       >
         {authError && <AlertError error={authError} subject="Error while signing in" />}
         <FormField
@@ -133,10 +151,9 @@ export const SignInForm = () => {
           name="email"
           control={form.control}
           render={({ field }) => (
-            <FormItemLayout name="email" label="Email">
+            <FormItemLayout label="Email">
               <FormControl>
                 <Input
-                  id="email"
                   type="email"
                   autoComplete="email"
                   {...field}
@@ -154,11 +171,10 @@ export const SignInForm = () => {
             name="password"
             control={form.control}
             render={({ field }) => (
-              <FormItemLayout name="password" label="Password">
-                <FormControl>
-                  <div className="relative">
+              <FormItemLayout label="Password">
+                <div className="relative">
+                  <FormControl>
                     <Input
-                      id="password"
                       type={passwordHidden ? 'password' : 'text'}
                       autoComplete="current-password"
                       {...field}
@@ -166,17 +182,17 @@ export const SignInForm = () => {
                       disabled={isSubmitting}
                       className="pr-10"
                     />
-                    <Button
-                      variant="default"
-                      title={passwordHidden ? `Show password` : `Hide password`}
-                      aria-label={passwordHidden ? `Show password` : `Hide password`}
-                      className="absolute right-1 top-1 px-1.5"
-                      icon={passwordHidden ? <Eye /> : <EyeOff />}
-                      disabled={isSubmitting}
-                      onClick={() => setPasswordHidden((prev) => !prev)}
-                    />
-                  </div>
-                </FormControl>
+                  </FormControl>
+                  <Button
+                    variant="default"
+                    title={passwordHidden ? `Show password` : `Hide password`}
+                    aria-label={passwordHidden ? `Show password` : `Hide password`}
+                    className="absolute right-1 top-1 px-1.5"
+                    icon={passwordHidden ? <Eye /> : <EyeOff />}
+                    disabled={isSubmitting}
+                    onClick={() => setPasswordHidden((prev) => !prev)}
+                  />
+                </div>
               </FormItemLayout>
             )}
           />

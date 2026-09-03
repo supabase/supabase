@@ -48,6 +48,21 @@ const frameworks = [
     href: '/guides/getting-started/quickstarts/sveltekit',
   },
   {
+    name: 'SolidJS',
+    icon: '/docs/img/icons/solidjs-icon',
+    href: '/guides/getting-started/quickstarts/solidjs',
+  },
+  {
+    name: 'RedwoodJS',
+    icon: '/docs/img/icons/redwood-icon',
+    href: '/guides/getting-started/quickstarts/redwoodjs',
+  },
+  {
+    name: 'Refine',
+    icon: '/docs/img/icons/refine-icon',
+    href: '/guides/getting-started/quickstarts/refine',
+  },
+  {
     name: 'Hono',
     icon: '/docs/img/icons/hono-icon',
     href: '/guides/getting-started/quickstarts/hono',
@@ -80,6 +95,16 @@ const frameworks = [
     name: 'Python',
     icon: '/docs/img/icons/python-icon',
     href: '/guides/getting-started/quickstarts/flask',
+  },
+  {
+    name: 'Laravel',
+    icon: '/docs/img/icons/laravel-icon',
+    href: '/guides/getting-started/quickstarts/laravel',
+  },
+  {
+    name: 'Ruby on Rails',
+    icon: '/docs/img/icons/rails-icon',
+    href: '/guides/getting-started/quickstarts/ruby-on-rails',
   },
 ]
 

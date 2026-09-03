@@ -6,7 +6,11 @@ import { RefObject, useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
-import { alignEditor, BASE_MONACO_EDITOR_OPTIONS } from './CodeEditor.utils'
+import {
+  alignEditor,
+  BASE_MONACO_EDITOR_OPTIONS,
+  getEditorValueOrSelection,
+} from './CodeEditor.utils'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -42,6 +46,7 @@ interface CodeEditorProps {
   hideLineNumbers?: boolean
   className?: string
   wrapperClassName?: string
+  placeholderClassName?: string
   loading?: boolean
   options?: EditorProps['options']
   value?: string
@@ -71,6 +76,7 @@ export const CodeEditor = ({
   hideLineNumbers = false,
   className,
   wrapperClassName,
+  placeholderClassName,
   loading,
   options,
   value,
@@ -160,13 +166,8 @@ export const CodeEditor = ({
         contextMenuGroupId: 'operation',
         contextMenuOrder: 0,
         run: () => {
-          const selection = editorRef?.current?.getSelection()
-          if (!selection) return
-
-          const selectedValue = editorRef?.current?.getModel()?.getValueInRange(selection)
-          const editorValue = editorRef?.current?.getValue()
-
-          runQueryCallbackRef.current(selectedValue || editorValue)
+          if (!editorRef.current) return
+          runQueryCallbackRef.current(getEditorValueOrSelection(editorRef.current))
         },
       })
     }
@@ -273,9 +274,10 @@ export const CodeEditor = ({
       {placeholder !== undefined && (
         <div
           className={cn(
-            'monaco-placeholder absolute top-[3px] left-[57px] text-sm pointer-events-none font-mono',
+            'monaco-placeholder absolute top-[5px] left-[57px] text-sm pointer-events-none font-mono',
             '[&>div>p]:text-foreground-lighter [&>div>p]:m-0! tracking-tighter',
-            showPlaceholder ? 'block' : 'hidden'
+            showPlaceholder ? 'block' : 'hidden',
+            placeholderClassName
           )}
         >
           <Markdown content={placeholder} />

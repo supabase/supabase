@@ -30,6 +30,9 @@ import {
   SheetFooter,
   SheetSection,
   Switch,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
@@ -536,12 +539,20 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
               />
 
               {!readonly && (
-                <Button
-                  variant="default"
-                  icon={<Trash size={12} />}
-                  onClick={() => remove(index)}
-                  className="h-[34px] w-[34px]"
-                />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="default"
+                      icon={<Trash size={12} />}
+                      onClick={() => remove(index)}
+                      className="h-[34px] w-[34px]"
+                      aria-label="Remove argument"
+                      // Tooltip repeats the label; the description would read the name twice
+                      aria-describedby={undefined}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Remove </TooltipContent>
+                </Tooltip>
               )}
             </div>
           )
