@@ -1,9 +1,12 @@
 import {
+  CliConfigSchema,
   fromApiProjectConfig,
   fromConfigDocument,
+  type CliConfig,
   type EffectiveConfig,
   type ProjectConfig,
 } from '@supabase/config'
+import { Schema } from 'effect'
 
 import {
   CONFIG_SECTIONS,
@@ -13,14 +16,6 @@ import {
   isSecretConfigField,
   type ConfigSection,
 } from './github-config-field-registry'
-
-/**
- * The parsed-config.toml side additionally carries `config_source` -- the GitHub connections API's
- * own "is this config.toml owned by the repo" annotation, alongside the config.toml sections
- * themselves. It has no config.toml or @supabase/config counterpart, so it's threaded through
- * separately rather than folded into `ProjectConfig`.
- */
-export type GitHubProjectConfig = ProjectConfig & { config_source?: string }
 
 type GitHubConfigFieldStatus = 'unmanaged' | 'managed' | 'drifted'
 
@@ -74,19 +69,15 @@ export function toDashboardProjectConfig(attributes: unknown): ProjectConfig | u
 }
 
 /**
- * Converts a parsed config.toml document into the same hosted-section shape, preserving
- * `config_source` (see {@link GitHubProjectConfig}) since @supabase/config's projection drops it.
+ * Converts a parsed config.toml document into the same hosted-section shape as the dashboard side.
  */
-export function toGithubProjectConfig(document: unknown): GitHubProjectConfig | undefined {
-  const configSource =
-    isPlainObject(document) && typeof document.config_source === 'string'
-      ? document.config_source
-      : undefined
-
+export function toGithubProjectConfig(document: unknown): ProjectConfig | undefined {
   if (!isEffectiveConfigLike(document)) return undefined
 
   try {
-    return { ...fromConfigDocument(document), config_source: configSource }
+    const githubCompleteConfig: CliConfig = Schema.decodeUnknownSync(CliConfigSchema)(document)
+    const githubProjectConfig = fromConfigDocument(githubCompleteConfig)
+    return githubProjectConfig
   } catch {
     return undefined
   }
@@ -99,32 +90,18 @@ function getConfigFieldState({
 }: {
   configPath: string
   dashboardConfig: ProjectConfig
-  githubConfig?: GitHubProjectConfig
+  githubConfig?: ProjectConfig
 }): GitHubConfigFieldState {
   const definition = getFieldDefinition(configPath)
   if (!definition || !githubConfig || isSecretConfigField(definition.configPath)) {
     return { status: 'unmanaged' }
   }
 
-  const normalizedDashboardValue = getConfigValue(dashboardConfig, definition.configPath)
+  const dashboardValue = getConfigValue(dashboardConfig, definition.configPath)
+  const githubValue = getConfigValue(githubConfig, definition.configPath)
 
-  let githubValue = getConfigValue(githubConfig, definition.configPath)
-  if (githubValue === undefined) {
-    const isCodeOwned = githubConfig.config_source === 'code'
-    if (!isCodeOwned || definition.hostedDefault === undefined) return { status: 'unmanaged' }
-
-    const normalizedDefaultValue =
-      definition.normalizeGithubValue?.(definition.hostedDefault) ?? definition.hostedDefault
-    if (valuesMatch(normalizedDashboardValue, normalizedDefaultValue)) {
-      return { status: 'unmanaged' }
-    }
-
-    githubValue = definition.hostedDefault
-  }
-
-  const normalizedGithubValue = definition.normalizeGithubValue?.(githubValue) ?? githubValue
   return {
-    status: valuesMatch(normalizedDashboardValue, normalizedGithubValue) ? 'managed' : 'drifted',
+    status: valuesMatch(dashboardValue, githubValue) ? 'managed' : 'drifted',
     configPath: definition.configPath,
     settingHref: definition.settingHref,
     githubValue,
@@ -136,7 +113,7 @@ export function getConfigDriftSummary({
   githubConfig,
 }: {
   dashboardConfig?: ProjectConfig
-  githubConfig?: GitHubProjectConfig
+  githubConfig?: ProjectConfig
 }): GitHubConfigDriftSummary {
   if (!dashboardConfig || !githubConfig) {
     return { managedCount: 0, driftedFields: [], unmanagedFields: [] }

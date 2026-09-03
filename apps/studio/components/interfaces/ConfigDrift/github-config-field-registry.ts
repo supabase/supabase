@@ -1,4 +1,4 @@
-import type { ProjectConfig } from '@supabase/config'
+import { fromConfigDocument, getDefaultCliConfig, type ProjectConfig } from '@supabase/config'
 
 // This file's secret-filtering, field-lookup, and settingHref registry are still hand-rolled.
 // @supabase/config's `fromApiProjectConfig`/`fromConfigDocument` (called from github-config-drift.ts)
@@ -7,23 +7,16 @@ import type { ProjectConfig } from '@supabase/config'
 // concept) or is kept as a defense-in-depth layer even though the package's own output should
 // never need it (the secret-field guard below, still exercised by github-config-drift.test.ts).
 
-// Every hosted-project section `ProjectConfig` can carry (`HostedSectionKey` in @supabase/config).
-export const CONFIG_SECTIONS = [
-  'api',
-  'auth',
-  'db',
-  'realtime',
-  'storage',
-  'workers',
-  'experimental',
-] as const satisfies readonly Exclude<keyof ProjectConfig, '_apiResponse'>[]
+const DEFAULT_PROJECT_CONFIG = fromConfigDocument(getDefaultCliConfig())
+
+export const CONFIG_SECTIONS = Object.keys(DEFAULT_PROJECT_CONFIG) as Exclude<
+  keyof ProjectConfig,
+  '_apiResponse'
+>[]
 export type ConfigSection = (typeof CONFIG_SECTIONS)[number]
 
 interface ConfigFieldDefinition {
   settingHref: (projectRef: string) => string
-  /** Value to compare against when the field is absent from a code-owned config.toml. */
-  hostedDefault?: unknown
-  normalizeGithubValue?: (value: unknown) => unknown
 }
 
 export type ResolvedConfigFieldDefinition = ConfigFieldDefinition & { configPath: string }
@@ -81,12 +74,9 @@ const CONFIG_FIELD_REGISTRY: Record<string, ConfigFieldDefinition> = {
   },
   'auth.site_url': {
     settingHref: toAuthUrlConfigHref,
-    hostedDefault: 'http://localhost:3000',
   },
   'auth.additional_redirect_urls': {
     settingHref: toAuthUrlConfigHref,
-    hostedDefault: [],
-    normalizeGithubValue: normalizeRedirectUrls,
   },
   'auth.email.enable_signup': {
     settingHref: toAuthProvidersHref,

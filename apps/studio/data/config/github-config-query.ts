@@ -10,15 +10,11 @@ export type GitHubConfigVariables = {
   branch?: string
 }
 
-// The GitHub connections API additionally returns `config_source` alongside the config.toml
-// sections themselves -- see the same field's use in github-config-drift.ts.
-type ParsedGitHubConfig = EffectiveConfig & { config_source?: string }
-
 type GithubConfigQueryResponse = components['schemas']['GetGitHubConnectionConfigResponse'] & {
-  config: ParsedGitHubConfig
+  config: EffectiveConfig
 }
 
-function isPlainObject(value: unknown): value is ParsedGitHubConfig {
+function isPlainObject(value: unknown): value is EffectiveConfig {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
