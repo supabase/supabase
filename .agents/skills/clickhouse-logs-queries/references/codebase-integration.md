@@ -39,7 +39,7 @@ deliberate user run gesture (Run button click, Cmd+Enter), never from render,
 `useEffect`, or any path without a user gesture.
 
 ```ts
-import { analyticsLiteral, safeSql } from 'data/logs/safe-analytics-sql'
+import { analyticsLiteral, safeSql } from '@/data/logs/safe-analytics-sql'
 
 const source = 'edge_logs'
 const sql = safeSql`
@@ -71,7 +71,35 @@ const endpoint = logsAllEndpointUrl(useOtel)
 ```
 
 Run the fragment through `executeAnalyticsSql` (`apps/studio/data/logs/execute-analytics-sql.ts`)
-against that endpoint.
+against that endpoint:
+
+```ts
+import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
+import { analyticsLiteral, quotedIdent, safeSql } from '@/data/logs/safe-analytics-sql'
+
+// ✅ GOOD: every interpolation is sanitized.
+const sql = safeSql`
+  SELECT timestamp, event_message
+  FROM ${quotedIdent(table)}
+  WHERE id = ${analyticsLiteral(id)}
+`
+
+await executeAnalyticsSql({
+  projectRef,
+  endpoint,
+  sql,
+  iso_timestamp_start,
+  iso_timestamp_end,
+})
+```
+
+```ts
+// 🛑 BAD: raw string interpolation. This fails to type-check at the
+// executeAnalyticsSql boundary because the result is `string`, not
+// `SafeLogSqlFragment`.
+const sql = `SELECT * FROM ${table} WHERE id = '${id}'`
+await executeAnalyticsSql({ projectRef, endpoint, sql, iso_timestamp_start, iso_timestamp_end })
+```
 
 ## Follow the existing OTEL builders
 
