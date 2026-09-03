@@ -1,6 +1,6 @@
 import type { Lint } from '@/data/lint/lint-query'
 import type { Notification } from '@/data/notifications/notifications-v2-query'
-import type { AdvisorItemSource, AdvisorSeverity } from '@/state/advisor-state'
+import type { AdvisorCategory, AdvisorItemSource, AdvisorSeverity } from '@/state/advisor-state'
 
 export type AdvisorSignalType = 'banned-ip'
 
@@ -14,7 +14,7 @@ type AdvisorBaseItem = {
   title: string
   severity: AdvisorSeverity
   createdAt?: number
-  tab: 'security' | 'performance' | 'health' | 'messages'
+  category: AdvisorCategory
   source: AdvisorItemSource
 }
 
