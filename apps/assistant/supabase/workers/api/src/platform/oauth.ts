@@ -29,8 +29,8 @@ export function generateOAuthState(): string {
 /**
  * Platform OAuth `organization_slug` must be a cloud org the signed-in
  * supabase.com user belongs to. Local Studio slugs are not that — skip
- * preselect (`SUPABASE_OAUTH_PRESELECT_ORGANIZATION=false`) or override
- * (`SUPABASE_OAUTH_ORGANIZATION_SLUG`).
+ * preselect (`OAUTH_PRESELECT_ORGANIZATION=false`) or override
+ * (`OAUTH_ORGANIZATION_SLUG`).
  */
 export function resolveAuthorizeOrganizationSlug({
   studioOrgSlug,

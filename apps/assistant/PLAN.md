@@ -373,7 +373,7 @@ try to bend `withSupabase` into doing these.
 Environment variables the worker needs (set in the Workers config, read via `process.env`):
 `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY` (auto-resolved by
 `@supabase/server` when running inside Supabase — **VERIFY** for Workers), `PLATFORM_JWKS_URL`,
-`SUPABASE_OAUTH_CLIENT_ID`, `SUPABASE_OAUTH_CLIENT_SECRET`, `SUPABASE_OAUTH_REDIRECT_URI`,
+`OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, `OAUTH_REDIRECT_URI`,
 `OPENAI_API_KEY`, `ANTHROPIC_API_KEY` (sandbox only), `GITHUB_APP_ID`, `GITHUB_APP_PRIVATE_KEY`,
 `BRAINTRUST_*` (optional), `IS_THROTTLED`, `SANDBOX_PROVIDER=lambda|local`.
 

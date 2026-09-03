@@ -75,6 +75,10 @@ Edit `supabase/schemas/**`, then generate a migration:
 npx --yes supabase@beta db schema declarative sync -f <name>
 ```
 
+Worker secrets cannot use the `SUPABASE_` prefix (reserved). Set OAuth app
+credentials as `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, and
+`OAUTH_REDIRECT_URI`.
+
 ## Workers
 
 Workers are experimental. Always use the beta CLI:

@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { resolveAssistantJwks, resolveMcpUrl } from './env'
+import { env, resolveAssistantJwks, resolveMcpUrl } from './env'
 
 describe('resolveMcpUrl', () => {
   it('prefers an explicit MCP_URL', () => {
@@ -60,5 +60,24 @@ describe('resolveAssistantJwks', () => {
 
   it('returns undefined when nothing is configured', () => {
     expect(resolveAssistantJwks({})).toBeUndefined()
+  })
+})
+
+describe('OAuth env names', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs()
+  })
+
+  it('reads OAUTH_REDIRECT_URI', () => {
+    vi.stubEnv('OAUTH_REDIRECT_URI', 'https://example.supabase.red/workers/v1/api/oauth/callback')
+    expect(env.supabaseOauthRedirectUri).toBe(
+      'https://example.supabase.red/workers/v1/api/oauth/callback'
+    )
+  })
+
+  it('reads lowercase dashboard secret names', () => {
+    vi.stubEnv('OAUTH_CLIENT_ID', '')
+    vi.stubEnv('oauth_client_id', 'client-from-dashboard')
+    expect(env.supabaseOauthClientId).toBe('client-from-dashboard')
   })
 })

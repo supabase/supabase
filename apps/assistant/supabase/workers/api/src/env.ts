@@ -1,6 +1,16 @@
-function readEnv(name: string): string | undefined {
-  const value = process.env[name]
+function envValue(value: string | undefined): string | undefined {
   return value === undefined || value === '' ? undefined : value
+}
+
+/**
+ * Workers secrets cannot be named `SUPABASE_*` (reserved). Dashboard names are
+ * often lowercase (`oauth_redirect_uri`); local `.env` stays UPPER_SNAKE.
+ */
+function readEnv(name: string): string | undefined {
+  const exact = envValue(process.env[name])
+  if (exact !== undefined) return exact
+  if (name !== name.toLowerCase()) return envValue(process.env[name.toLowerCase()])
+  return undefined
 }
 
 function first(...names: string[]): string | undefined {
@@ -129,19 +139,19 @@ export const env = {
     return readEnv('PLATFORM_JWT_ISSUER')
   },
   get supabaseOauthClientId() {
-    return required('SUPABASE_OAUTH_CLIENT_ID')
+    return required('OAUTH_CLIENT_ID')
   },
   get supabaseOauthClientSecret() {
-    return required('SUPABASE_OAUTH_CLIENT_SECRET')
+    return required('OAUTH_CLIENT_SECRET')
   },
   get supabaseOauthRedirectUri() {
-    return required('SUPABASE_OAUTH_REDIRECT_URI')
+    return required('OAUTH_REDIRECT_URI')
   },
   get oauthOrganizationSlug() {
-    return readEnv('SUPABASE_OAUTH_ORGANIZATION_SLUG')
+    return readEnv('OAUTH_ORGANIZATION_SLUG')
   },
   get oauthPreselectOrganization() {
-    return readEnv('SUPABASE_OAUTH_PRESELECT_ORGANIZATION') !== 'false'
+    return readEnv('OAUTH_PRESELECT_ORGANIZATION') !== 'false'
   },
   get openaiApiKey() {
     return readEnv('OPENAI_API_KEY')
