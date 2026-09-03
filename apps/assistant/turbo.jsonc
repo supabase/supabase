@@ -1,0 +1,58 @@
+{
+  "$schema": "./../../node_modules/turbo/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "env": [
+        "SUPABASE_URL",
+        "SUPABASE_PUBLISHABLE_KEY",
+        "SUPABASE_ANON_KEY",
+        "SUPABASE_SECRET_KEY",
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "SUPABASE_DB_URL",
+        "DATABASE_URL",
+        "SUPABASE_JWKS",
+        "SUPABASE_JWKS_URL",
+        "PLATFORM_JWKS_URL",
+        "PLATFORM_JWT_ISSUER",
+        "SUPABASE_OAUTH_CLIENT_ID",
+        "SUPABASE_OAUTH_CLIENT_SECRET",
+        "SUPABASE_OAUTH_REDIRECT_URI",
+        "SUPABASE_OAUTH_ORGANIZATION_SLUG",
+        "SUPABASE_OAUTH_PRESELECT_ORGANIZATION",
+        "OPENAI_API_KEY",
+        "MCP_URL",
+        "MANAGEMENT_API_URL",
+        "ASSISTANT_PUBLIC_URL",
+        "PORT"
+      ],
+      "outputs": ["supabase/workers/**/*.mjs", "supabase/workers/**/*.mjs.map"]
+    },
+    "lint": {
+      "env": [
+        "OPENAI_API_KEY",
+        "MCP_URL",
+        "SUPABASE_URL",
+        "SUPABASE_PUBLISHABLE_KEY",
+        "SUPABASE_ANON_KEY",
+        "SUPABASE_SECRET_KEY",
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "SUPABASE_DB_URL",
+        "DATABASE_URL",
+        "SUPABASE_JWKS",
+        "SUPABASE_JWKS_URL",
+        "PLATFORM_JWKS_URL",
+        "PLATFORM_JWT_ISSUER",
+        "SUPABASE_OAUTH_CLIENT_ID",
+        "SUPABASE_OAUTH_CLIENT_SECRET",
+        "SUPABASE_OAUTH_REDIRECT_URI",
+        "SUPABASE_OAUTH_ORGANIZATION_SLUG",
+        "SUPABASE_OAUTH_PRESELECT_ORGANIZATION",
+        "MANAGEMENT_API_URL",
+        "ASSISTANT_PUBLIC_URL",
+        "PORT"
+      ]
+    }
+  }
+}

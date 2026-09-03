@@ -2,6 +2,12 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL
   ? new URL(process.env.NEXT_PUBLIC_API_URL).origin
   : ''
 const SUPABASE_URL = process.env.SUPABASE_URL ? new URL(process.env.SUPABASE_URL).origin : ''
+const ASSISTANT_API_URL = process.env.NEXT_PUBLIC_ASSISTANT_API_URL
+  ? new URL(process.env.NEXT_PUBLIC_ASSISTANT_API_URL).origin
+  : ''
+const ASSISTANT_SUPABASE_URL = process.env.NEXT_PUBLIC_ASSISTANT_SUPABASE_URL
+  ? new URL(process.env.NEXT_PUBLIC_ASSISTANT_SUPABASE_URL).origin
+  : ''
 const GOTRUE_URL = process.env.NEXT_PUBLIC_GOTRUE_URL
   ? new URL(process.env.NEXT_PUBLIC_GOTRUE_URL).origin
   : ''
@@ -18,6 +24,13 @@ if (SUPABASE_URL) {
   const url = new URL(SUPABASE_URL)
   const wsUrl = `${url.hostname}:${url.port}`
   SUPABASE_LOCAL_PROJECTS_URL_WS = `ws://${wsUrl} wss://${wsUrl}`
+}
+
+let ASSISTANT_SUPABASE_URL_WS = ''
+if (ASSISTANT_SUPABASE_URL) {
+  const url = new URL(ASSISTANT_SUPABASE_URL)
+  const wsUrl = url.port ? `${url.hostname}:${url.port}` : url.hostname
+  ASSISTANT_SUPABASE_URL_WS = `ws://${wsUrl} wss://${wsUrl}`
 }
 
 // Needed to test docs search in local dev
@@ -89,6 +102,9 @@ export function getCSP() {
   const DEFAULT_SRC_URLS = [
     API_URL,
     SUPABASE_URL,
+    ASSISTANT_API_URL,
+    ASSISTANT_SUPABASE_URL,
+    ASSISTANT_SUPABASE_URL_WS,
     GOTRUE_URL,
     MARKETPLACE_API_URL,
     SUPABASE_LOCAL_PROJECTS_URL_WS,

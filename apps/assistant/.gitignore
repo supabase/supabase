@@ -1,0 +1,5 @@
+supabase/.temp/
+supabase/.branches/
+supabase/workers/**/*.mjs
+supabase/workers/**/*.mjs.map
+*.tsbuildinfo

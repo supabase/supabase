@@ -6,6 +6,7 @@ import { useParams, useSearchParamsShallow } from 'common/hooks'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { Eraser, Pencil, X } from 'lucide-react'
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { toast } from 'sonner'
 import { Button, cn, KeyboardShortcut } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
@@ -29,6 +30,7 @@ import {
 } from './elements/Conversation'
 import { Message } from './Message'
 import { Markdown } from '@/components/interfaces/Markdown'
+import { useMessageFeedbackMutation } from '@/data/ai-assistant/message-feedback-mutation'
 import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
 import { useRateMessageMutation } from '@/data/ai/rate-message-mutation'
 import { useTablesQuery } from '@/data/tables/tables-query'
@@ -36,6 +38,12 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useAssistantSupabaseBackend } from '@/lib/ai/assistant-backend'
+import { startAssistantOAuth } from '@/lib/ai/assistant-client'
+import {
+  assistantApiOrigin,
+  readAssistantOAuthCompleteMessage,
+} from '@/lib/ai/assistant-oauth'
 import type { AssistantMessageMetadata } from '@/lib/ai/assistant-message-metadata'
 import { getParallelApprovalIdsToReject } from '@/lib/ai/message-utils'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -93,6 +101,7 @@ export const AssistantChat = ({
     useSelectedOrganizationQuery()
 
   const disablePrompts = useFlag('disableAssistantPrompts')
+  const useAssistantBackend = useAssistantSupabaseBackend()
   const shouldReduceMotion = useReducedMotion()
   const snap = useAiAssistantStateSnapshot()
   const state = useAiAssistantState()
@@ -131,6 +140,11 @@ export const AssistantChat = ({
   const isApiKeySet = !!check?.hasKey
 
   const { mutateAsync: rateMessage } = useRateMessageMutation()
+  const { mutateAsync: submitAssistantFeedback } = useMessageFeedbackMutation({
+    onError: (feedbackError) => {
+      console.error('Failed to rate message:', feedbackError)
+    },
+  })
 
   const { data: tables } = useTablesQuery(
     {
@@ -249,22 +263,32 @@ export const AssistantChat = ({
       setMessageRatings((prev) => ({ ...prev, [messageId]: rating }))
 
       try {
-        const result = await rateMessage({
-          rating,
-          messages: chatMessages,
-          messageId,
-          projectRef: project.ref,
-          orgSlug: selectedOrganization.slug,
-          reason,
-          spanId: state.messageSpanIds[messageId],
-        })
+        if (useAssistantBackend) {
+          await submitAssistantFeedback({ conversationId: chatId, messageId, rating, reason })
+          track('assistant_message_rating_submitted', {
+            rating,
+            category: 'other',
+            ...(reason && { reason }),
+            chatId,
+          })
+        } else {
+          const result = await rateMessage({
+            rating,
+            messages: chatMessages,
+            messageId,
+            projectRef: project.ref,
+            orgSlug: selectedOrganization.slug,
+            reason,
+            spanId: state.messageSpanIds[messageId],
+          })
 
-        track('assistant_message_rating_submitted', {
-          rating,
-          category: result.category,
-          ...(reason && { reason }),
-          chatId,
-        })
+          track('assistant_message_rating_submitted', {
+            rating,
+            category: result.category,
+            ...(reason && { reason }),
+            chatId,
+          })
+        }
       } catch (error) {
         console.error('Failed to rate message:', error)
         // Rollback on error
@@ -274,13 +298,61 @@ export const AssistantChat = ({
         })
       }
     },
-    [chatMessages, project?.ref, selectedOrganization?.slug, rateMessage, track, state, chatId]
+    [
+      chatMessages,
+      project?.ref,
+      selectedOrganization?.slug,
+      rateMessage,
+      submitAssistantFeedback,
+      useAssistantBackend,
+      track,
+      state,
+      chatId,
+    ]
   )
 
   const isContextExceededError =
     error &&
     (error.message?.includes('context_length_exceeded') ||
       error.message?.includes('exceeds the context window'))
+
+  const isOAuthRequired =
+    !!snap.oauthRequiredOrgSlug || (!!error?.message && error.message.includes('oauth_required'))
+
+  useEffect(() => {
+    if (!useAssistantBackend) return
+
+    const expectedOrigin = assistantApiOrigin()
+    const onMessage = (event: MessageEvent) => {
+      const payload = readAssistantOAuthCompleteMessage(event, expectedOrigin)
+      if (!payload) return
+      const requiredOrg = state.oauthRequiredOrgSlug ?? state.context.orgSlug
+      if (requiredOrg && payload.org_slug !== requiredOrg) return
+      state.oauthRequiredOrgSlug = undefined
+      chatInstance?.clearError()
+    }
+
+    window.addEventListener('message', onMessage)
+    return () => window.removeEventListener('message', onMessage)
+  }, [useAssistantBackend, state, chatInstance])
+
+  const handleConnectOrganization = async () => {
+    const orgSlug = snap.oauthRequiredOrgSlug ?? snap.context.orgSlug
+    if (!orgSlug) return
+    try {
+      const url = await startAssistantOAuth(orgSlug, window.location.href)
+      const popup = window.open(url, 'Connect organization', 'popup,width=600,height=800')
+      if (!popup) {
+        toast.error("Couldn't open the connection window. Allow popups and try again.")
+      }
+    } catch (connectError) {
+      toast.error(
+        connectError instanceof Error
+          ? connectError.message
+          : "Couldn't start the connection. Try again."
+      )
+    }
+  }
 
   const renderedMessages = useMemo(
     () =>
@@ -644,6 +716,18 @@ export const AssistantChat = ({
                       'Add your `OPENAI_API_KEY` to your environment variables to use the AI Assistant.'
                     }
                   />
+                }
+              />
+            )}
+
+            {isOAuthRequired && (
+              <Admonition
+                type="caution"
+                title="Connect this organization so the assistant can query the project."
+                actions={
+                  <Button size="tiny" onClick={handleConnectOrganization}>
+                    Connect organization
+                  </Button>
                 }
               />
             )}

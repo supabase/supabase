@@ -95,5 +95,13 @@
         "@babel/core",
       ],
     },
+    "apps/assistant": {
+      "entry": [
+        "supabase/workers/api/index.ts",
+        "supabase/workers/api/local.ts",
+        "esbuild.config.mjs",
+      ],
+      "ignore": ["supabase/workers/**/*.mjs"],
+    },
   },
 }

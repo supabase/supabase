@@ -1,0 +1,46 @@
+# Assistant is a Supabase project: config.toml, workers, and declarative schemas.
+# Workers: `npx --yes supabase@beta experimental workers new|push`
+# Schema: edit supabase/schemas/**, then
+#   `npx --yes supabase@beta db schema declarative sync -f <name>`
+project_id = "assistant"
+
+[api]
+port = 55321
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 55322
+major_version = 17
+
+[studio]
+port = 55323
+
+[inbucket]
+port = 55324
+
+[auth]
+site_url = "http://localhost:8082"
+additional_redirect_urls = [
+  "http://localhost:8082",
+  "http://localhost:8787",
+  "http://127.0.0.1:8787",
+]
+jwt_expiry = 3600
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+enable_confirmations = false
+
+[realtime]
+enabled = true
+
+[workers.api]
+runtime = "node"
+size = "2gb"
+
+[experimental.pgdelta]
+enabled = true
+declarative_schema_path = "./schemas"

@@ -1,0 +1,43 @@
+{
+  "name": "assistant",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node esbuild.config.mjs",
+    "dev": "tsx watch supabase/workers/api/local.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest --run",
+    "test:watch": "vitest watch",
+    "workers:new": "npx --yes supabase@beta experimental workers new",
+    "workers:push": "node esbuild.config.mjs && npx --yes supabase@beta experimental workers push",
+    "workers:list": "npx --yes supabase@beta experimental workers list",
+    "workers:status": "npx --yes supabase@beta experimental workers status"
+  },
+  "dependencies": {
+    "@ai-sdk/mcp": "2.0.31",
+    "@ai-sdk/openai": "4.0.41",
+    "@supabase/mcp-server-supabase": "^0.11.0",
+    "@supabase/pg-meta": "workspace:*",
+    "@supabase/server": "^1.5.1",
+    "@supabase/supabase-js": "catalog:",
+    "ai": "7.0.59",
+    "common-tags": "^1.8.2",
+    "jose": "^6.0.11",
+    "pg": "^8.16.3",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/common-tags": "^1.8.4",
+    "@types/node": "catalog:",
+    "@types/pg": "^8.11.11",
+    "esbuild": "^0.25.9",
+    "eslint": "^9.0.0",
+    "eslint-config-supabase": "workspace:*",
+    "tsconfig": "workspace:*",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

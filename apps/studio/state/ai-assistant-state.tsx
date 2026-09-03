@@ -15,10 +15,26 @@ import { v4 as uuidv4 } from 'uuid'
 import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 
 import type { SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
+import {
+  createConversation,
+  useConversationCreateMutation,
+} from '@/data/ai-assistant/conversation-create-mutation'
+import {
+  deleteConversation,
+  useConversationDeleteMutation,
+} from '@/data/ai-assistant/conversation-delete-mutation'
+import { conversationDetailQueryOptions } from '@/data/ai-assistant/conversation-detail-query'
+import {
+  updateConversation,
+  useConversationUpdateMutation,
+} from '@/data/ai-assistant/conversation-update-mutation'
+import { conversationsQueryOptions } from '@/data/ai-assistant/conversations-query'
 import type { AiSupportStatus } from '@/data/feedback/ai-chat-front-sync'
 import { constructHeaders } from '@/data/fetchers'
 import { getQueryClient } from '@/data/query-client'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { getAssistantApiUrl, useAssistantSupabaseBackend } from '@/lib/ai/assistant-backend'
+import { getAssistantAccessToken } from '@/lib/ai/assistant-client'
 import { prepareMessagesForAPI } from '@/lib/ai/message-utils'
 import { isKnownAssistantModelId } from '@/lib/ai/model.utils'
 import type { AssistantModelId } from '@/lib/ai/model.utils'
@@ -278,9 +294,75 @@ function ensureActiveChatOrInitialize(state: AiAssistantState) {
   }
 }
 
+const assistantConversationApi = {
+  create: createConversation,
+  update: updateConversation,
+  delete: deleteConversation,
+}
+
+const pendingConversationCreates = new Map<string, Promise<void>>()
+
+function persistConversationIfEnabled(state: AiAssistantState, chat: ChatSession): Promise<void> {
+  if (!state.useAssistantBackend) return Promise.resolve()
+
+  const projectRef = state.context.projectRef
+  const orgSlug = state.context.orgSlug
+  if (!projectRef || !orgSlug) return Promise.resolve()
+
+  const pending = assistantConversationApi
+    .create({
+      projectRef,
+      payload: {
+        id: chat.id,
+        name: chat.name,
+        org_slug: orgSlug,
+        model: state.model,
+        ...(chat.branchedFrom
+          ? {
+              branched_from: {
+                chat_id: chat.branchedFrom.chatId,
+                message_id: chat.branchedFrom.messageId,
+              },
+            }
+          : {}),
+      },
+    })
+    .then(() => undefined)
+    .catch((error) => {
+      console.error('Failed to create assistant conversation:', error)
+    })
+    .finally(() => {
+      pendingConversationCreates.delete(chat.id)
+    })
+
+  pendingConversationCreates.set(chat.id, pending)
+  return pending
+}
+
+async function loadConversationsFromBackend(
+  projectRef: string
+): Promise<Record<string, ChatSession>> {
+  const queryClient = getQueryClient()
+  const conversations = await queryClient.fetchQuery(conversationsQueryOptions({ projectRef }))
+
+  const chatsWithMessages = await Promise.all(
+    conversations.map(async (chat) => {
+      if (chat.messages.length > 0) return chat
+      try {
+        return await queryClient.fetchQuery(conversationDetailQueryOptions({ id: chat.id }))
+      } catch (error) {
+        console.error('Failed to load assistant conversation detail:', error)
+        return chat
+      }
+    })
+  )
+
+  return Object.fromEntries(chatsWithMessages.map((chat) => [chat.id, chat]))
+}
+
 function createChatInstance(
   state: AiAssistantState,
-  options: { id: string; initialMessages: MessageType[] }
+  options: { id: string; initialMessages: MessageType[]; useAssistantBackend: boolean }
 ) {
   // Seeded so effects already reflected in persisted history aren't replayed on the first
   // onFinish after a reload.
@@ -295,29 +377,67 @@ function createChatInstance(
   // can switch projects while the request is still in flight.
   let requestProjectRef: string | undefined
 
+  const useAssistantBackend = options.useAssistantBackend
+  const assistantApiUrl = getAssistantApiUrl()
+  const api =
+    useAssistantBackend && assistantApiUrl
+      ? `${assistantApiUrl}/v1/conversations/${options.id}/chat`
+      : `${BASE_PATH}/api/ai/sql/generate-v4`
+
   return new Chat<MessageType>({
     id: options.id,
     messages: options.initialMessages.map((message) => sanitizeForCloning(message)),
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,
     transport: new DefaultChatTransport({
-      api: `${BASE_PATH}/api/ai/sql/generate-v4`,
+      api,
       fetch: async (url, init) => {
         const response = await globalThis.fetch(url as RequestInfo, init)
         const spanId = response.headers.get('x-braintrust-span-id')
         if (spanId) {
           state.pendingSpanIds[options.id] = spanId
         }
+
+        if (useAssistantBackend && response.status === 409) {
+          try {
+            const body = await response.clone().json()
+            if (body?.code === 'oauth_required') {
+              state.oauthRequiredOrgSlug = body.org_slug ?? state.context.orgSlug
+            }
+          } catch {
+            // Return the original response so useChat can surface the error
+          }
+        } else if (useAssistantBackend && response.ok) {
+          state.oauthRequiredOrgSlug = undefined
+        }
+
         return response
       },
       async prepareSendMessagesRequest({ messages, ...opts }) {
         const cleanedMessages = prepareMessagesForAPI(messages)
+        const chat = state.chats[options.id]
+        requestProjectRef = state.context.projectRef
+
+        if (useAssistantBackend) {
+          await pendingConversationCreates.get(options.id)
+          const assistantToken = await getAssistantAccessToken()
+          return {
+            ...opts,
+            body: {
+              messages: cleanedMessages,
+              projectRef: state.context.projectRef,
+              chatId: options.id,
+              chatName: chat?.name,
+              supportMode: chat?.supportMetadata?.isSupportChat ?? false,
+              orgSlug: state.context.orgSlug,
+              model: state.model,
+              ...opts.body,
+            },
+            headers: { Authorization: `Bearer ${assistantToken}` },
+          }
+        }
+
         const headerData = await constructHeaders()
         const authorizationHeader = headerData.get('Authorization')
-
-        // Get the chat specific to this request to ensure we have the correct name
-        const chat = state.chats[options.id]
-
-        requestProjectRef = state.context.projectRef
 
         return {
           ...opts,
@@ -412,6 +532,8 @@ export const createAiAssistantState = (): AiAssistantState => {
     pendingSpanIds: {},
     messageSpanIds: {},
     isInitialized: false,
+    useAssistantBackend: false,
+    oauthRequiredOrgSlug: undefined,
 
     setContext: (context: Partial<AiAssistantContext>) => {
       state.context = { ...state.context, ...context }
@@ -420,6 +542,7 @@ export const createAiAssistantState = (): AiAssistantState => {
     resetAiAssistantPanel: () => {
       Object.assign(state, createInitialAiAssistantData())
       state.isInitialized = false
+      state.oauthRequiredOrgSlug = undefined
     },
 
     setModel: (model: AssistantModel) => {
@@ -446,13 +569,21 @@ export const createAiAssistantState = (): AiAssistantState => {
         [chatId]: newChat,
       }
 
-      const chatInstance = createChatInstance(state, { id: chatId, initialMessages: [] })
+      const chatInstance = createChatInstance(state, {
+        id: chatId,
+        initialMessages: [],
+        useAssistantBackend: state.useAssistantBackend,
+      })
       state.chatInstances[chatId] = ref(chatInstance)
+      persistConversationIfEnabled(state, newChat)
 
       if (options?.initialMessage) {
-        chatInstance.sendMessage({
-          text: options.initialMessage,
-        })
+        const send = () => {
+          chatInstance.sendMessage({ text: options.initialMessage! })
+        }
+        const pending = pendingConversationCreates.get(chatId)
+        if (pending) void pending.then(send)
+        else send()
       }
 
       return chatId
@@ -498,8 +629,13 @@ export const createAiAssistantState = (): AiAssistantState => {
       }
 
       state.chatInstances[chatId] = ref(
-        createChatInstance(state, { id: chatId, initialMessages: branchedMessages })
+        createChatInstance(state, {
+          id: chatId,
+          initialMessages: branchedMessages,
+          useAssistantBackend: state.useAssistantBackend,
+        })
       )
+      persistConversationIfEnabled(state, newChat)
 
       return chatId
     },
@@ -547,7 +683,11 @@ export const createAiAssistantState = (): AiAssistantState => {
       const chat = state.chats[id]
       if (chat && !state.chatInstances[id]) {
         state.chatInstances[id] = ref(
-          createChatInstance(state, { id, initialMessages: chat.messages })
+          createChatInstance(state, {
+            id,
+            initialMessages: chat.messages,
+            useAssistantBackend: state.useAssistantBackend,
+          })
         )
       }
     },
@@ -564,6 +704,14 @@ export const createAiAssistantState = (): AiAssistantState => {
       state.chats = remainingChats
       delete state.chatInstances[id]
 
+      if (state.useAssistantBackend) {
+        void assistantConversationApi
+          .delete({ id, projectRef: state.context.projectRef })
+          .catch((error) => {
+            console.error('Failed to delete assistant conversation:', error)
+          })
+      }
+
       if (id === state.activeChatId) {
         const remainingChatIds = Object.keys(remainingChats)
         state.activeChatId = remainingChatIds.length > 0 ? remainingChatIds[0] : undefined
@@ -579,6 +727,17 @@ export const createAiAssistantState = (): AiAssistantState => {
       if (chat && chat.name !== name) {
         chat.name = name
         chat.updatedAt = new Date()
+        if (state.useAssistantBackend) {
+          void assistantConversationApi
+            .update({
+              id,
+              projectRef: state.context.projectRef,
+              payload: { name },
+            })
+            .catch((error) => {
+              console.error('Failed to rename assistant conversation:', error)
+            })
+        }
       }
     },
 
@@ -714,6 +873,8 @@ export type AiAssistantState = AiAssistantData & {
   pendingSpanIds: Record<string, string>
   messageSpanIds: Record<string, string>
   isInitialized: boolean
+  useAssistantBackend: boolean
+  oauthRequiredOrgSlug?: string
   setContext: (context: Partial<AiAssistantContext>) => void
   setModel: (model: AssistantModel) => void
   createChat: (options?: CreateChatOptions) => string
@@ -738,8 +899,39 @@ export const AiAssistantStateContext = createContext<AiAssistantState>(createAiA
 
 export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren) => {
   const { data: project } = useSelectedProjectQuery()
+  const useAssistantBackend = useAssistantSupabaseBackend()
+  const { mutateAsync: createConversationMutate } = useConversationCreateMutation({
+    onError: (error) => {
+      console.error('Failed to create assistant conversation:', error)
+    },
+  })
+  const { mutateAsync: updateConversationMutate } = useConversationUpdateMutation({
+    onError: (error) => {
+      console.error('Failed to rename assistant conversation:', error)
+    },
+  })
+  const { mutateAsync: deleteConversationMutate } = useConversationDeleteMutation({
+    onError: (error) => {
+      console.error('Failed to delete assistant conversation:', error)
+    },
+  })
   // Initialize state. createAiAssistantState now just sets defaults.
   const [state] = useState(() => createAiAssistantState())
+
+  useEffect(() => {
+    assistantConversationApi.create = (variables) => createConversationMutate(variables)
+    assistantConversationApi.update = (variables) => updateConversationMutate(variables)
+    assistantConversationApi.delete = (variables) => deleteConversationMutate(variables)
+    return () => {
+      assistantConversationApi.create = createConversation
+      assistantConversationApi.update = updateConversation
+      assistantConversationApi.delete = deleteConversation
+    }
+  }, [createConversationMutate, updateConversationMutate, deleteConversationMutate])
+
+  useEffect(() => {
+    state.useAssistantBackend = useAssistantBackend
+  }, [state, useAssistantBackend])
 
   // Effect to load state from IndexedDB on mount or projectRef change
   useEffect(() => {
@@ -747,11 +939,33 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
     state.isInitialized = false
 
     async function loadAndInitializeState() {
+      state.useAssistantBackend = useAssistantBackend
+
       if (!project?.ref || typeof window === 'undefined') {
         if (project?.ref === undefined) {
           state.resetAiAssistantPanel()
         }
         return // Don't load if no projectRef or not in browser
+      }
+
+      if (useAssistantBackend) {
+        try {
+          const chats = await loadConversationsFromBackend(project.ref)
+          if (!isMounted) return
+          state.chatInstances = {}
+          state.loadPersistedState({
+            projectRef: project.ref,
+            chats,
+            model: state.model,
+          })
+        } catch (error) {
+          console.error('Failed to load assistant conversations:', error)
+          if (!isMounted) return
+        }
+
+        ensureActiveChatOrInitialize(state)
+        state.isInitialized = true
+        return
       }
 
       let loadedState: StoredAiAssistantState | null = null
@@ -781,10 +995,12 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
     return () => {
       isMounted = false
     }
-  }, [project?.ref, state])
+  }, [project?.ref, state, useAssistantBackend])
 
   // Effect to save state to IndexedDB on changes
   useEffect(() => {
+    if (useAssistantBackend) return undefined
+
     if (typeof window !== 'undefined' && project?.ref) {
       // Create a debounced version of saveAiState
       const debouncedSaveAiState = debounce(saveAiState, 500)
@@ -821,7 +1037,7 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
       }
     }
     return undefined
-  }, [state, project?.ref])
+  }, [state, project?.ref, useAssistantBackend])
 
   return (
     <AiAssistantStateContext.Provider value={state}>{children}</AiAssistantStateContext.Provider>

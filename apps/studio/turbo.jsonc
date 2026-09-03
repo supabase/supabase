@@ -44,6 +44,10 @@
         "NEXT_PUBLIC_VERCEL_ENV",
         "NEXT_PUBLIC_USERCENTRICS_RULESET_ID",
         "NEXT_PUBLIC_MCP_URL",
+        "NEXT_PUBLIC_ASSISTANT_BACKEND",
+        "NEXT_PUBLIC_ASSISTANT_SUPABASE_URL",
+        "NEXT_PUBLIC_ASSISTANT_PUBLISHABLE_KEY",
+        "NEXT_PUBLIC_ASSISTANT_API_URL",
         "NEXT_PUBLIC_IS_NIMBUS",
         "NEXT_PUBLIC_ONGOING_INCIDENT",
         // These envs are technically passthrough env vars because they're only used on the server side of Nextjs
