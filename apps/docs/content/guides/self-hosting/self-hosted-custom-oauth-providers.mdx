@@ -242,17 +242,17 @@ curl -X POST "http://<your-domain>/auth/v1/admin/custom-providers" \
 
 </Tabs>
 
-In the above request:
+A few notes on the fields above:
 
-- `identifier` can be any value you want as long as it's prefixed with `custom:`.
-- 'name' can be any value you want.
-- `email_optional` has to be set to `true` as Telegram doesn't return an email field.
+- `identifier`: must be prefixed with `custom:` and follow the [identifier rules](#provider-identifiers) - 2-50 characters, lowercase alphanumeric with hyphens and colons.
+- `name`: can be any value you want.
+- `email_optional`: must be set to `true`, since Telegram doesn't return an email field.
 
-Refer to the official [Telegram Docs](https://core.telegram.org/bots/telegram-login#available-scopes) to get a list of available scopes.
+For the full list of available scopes, refer to the official [Telegram docs](https://core.telegram.org/bots/telegram-login#available-scopes).
 
 ### Step 4: Sign in with Telegram
 
-At this point, you should be able to sign in with Telegram from your client app.
+With the provider configured, you can now sign in with Telegram from your app:
 
 ```js
 const { data, error } = await supabase.auth.signInWithOAuth({
