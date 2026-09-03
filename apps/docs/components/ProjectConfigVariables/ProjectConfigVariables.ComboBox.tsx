@@ -86,6 +86,7 @@ export function ComboBox<Opt extends ComboBoxOption>({
           role="combobox"
           disabled={disabled}
           aria-expanded={open}
+          aria-label={`Select a ${name}`}
           className={cn(
             'overflow-hidden',
             'h-auto min-h-10',
