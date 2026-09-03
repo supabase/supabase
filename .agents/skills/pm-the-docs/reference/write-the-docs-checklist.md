@@ -52,10 +52,10 @@ When the work is improving an existing page (restructure, reorder, connective te
 
 ### 4. Self-review against the bar
 
-_Skills:_ `/review-the-docs` for [local self-review](../../review-the-docs/SKILL.md#local-self-review-no-open-pr) before opening the PR; `/test-the-docs` to run snippets and produce a Verification table.
+_Skills:_ `/review-the-docs` for [local self-review](../../review-the-docs/SKILL.md#local-self-review-no-open-pr) before opening the PR; `/test-the-docs` to run snippets and produce a verification report.
 
 - [ ] P/E: Check the draft against "What good looks like" above before opening the PR
-- [ ] P/E: `/test-the-docs` run; Verification table ready for the PR body
+- [ ] P/E: `/test-the-docs` run; verification report ready for the PR body
 - [ ] P/E: Follow Authoring Experience standards and tooling when available
 
 ### 5. PR review

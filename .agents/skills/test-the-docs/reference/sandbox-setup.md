@@ -19,7 +19,7 @@ Guardrails:
 
 - **Fences in-container only.** Never run MDX fences on the host shell. Use `./sandbox/run.sh exec` or `exec-timeout`.
 - **Local stack only.** Reject snippets that target hosted or production Supabase projects.
-- **No secrets in notes.** Never paste `PUBLISHABLE_KEY`, `SECRET_KEY`, `JWT_SECRET`, `ANON_KEY`, `SERVICE_ROLE_KEY`, `S3_PROTOCOL_ACCESS_KEY_ID`, `S3_PROTOCOL_ACCESS_KEY_SECRET`, or other keys into the Verification table, PR body, or chat logs. Capture **URLs only** from `supabase status -o env`.
+- **No secrets in notes.** Never paste `PUBLISHABLE_KEY`, `SECRET_KEY`, `JWT_SECRET`, `ANON_KEY`, `SERVICE_ROLE_KEY`, `S3_PROTOCOL_ACCESS_KEY_ID`, `S3_PROTOCOL_ACCESS_KEY_SECRET`, or other keys into the verification report, PR body, or chat logs. Capture **URLs only** from `supabase status -o env`.
 - **`curl` / `wget`.** Only to URLs from the filtered status capture (`API_URL`, `DB_URL`, `DATABASE_URL`), or to local endpoints the page under test documents. Mark other targets `deferred`.
 - **`npm` / `npx` / `node`.** Only for `example-app` artifacts. Mount the app read-only at `/examples`, copy into `/work/example`, then `npm install && npm run build` (or the page’s documented build). Arbitrary `node -e`, remote `npx`, or Node from unrelated bash fences → `deferred`.
 - **Prefer page commands.** Run documented steps from the MDX under test.

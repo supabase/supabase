@@ -4,13 +4,13 @@ description: >-
   Execute runnable docs snippets and examples inside a disposable Docker Compose
   sandbox (runner container + local Supabase stack via `supabase start`). Use
   after Draft or during Self-review when asked to test the docs, fact-check
-  CLI/SQL/code samples, or produce a Verification table for a docs PR.
+  CLI/SQL/code samples, or produce a verification report for a docs PR.
   Complements review-the-docs lint/build checks; does not replace them.
 ---
 
 # Test the docs
 
-Runs procedural docs content **inside disposable containers**, not on the host shell and not against production. Produces a Verification table for the PR body / self-review note.
+Runs procedural docs content **inside disposable containers**, not on the host shell and not against production. Produces a verification report for the PR body / self-review note.
 
 For lint, markdown rebuilds, example-app triage, and PR review, use [`review-the-docs`](../review-the-docs/SKILL.md). For Frame/Shape and cross-repo product lookup, use [`pm-the-docs`](../pm-the-docs/SKILL.md).
 
@@ -87,10 +87,10 @@ If a **required** prerequisite for that artifact is unavailable, mark that artif
 
 ### 6. Report
 
-Write a Verification table per [reference/verification-report.md](reference/verification-report.md) for the PR body / self-review note.
+Write a verification report per [reference/verification-report.md](reference/verification-report.md) for the PR body / self-review note.
 
 ## Related skills
 
 - [`write-the-docs`](../write-the-docs/SKILL.md) — Draft; hands off here before PR
-- [`review-the-docs`](../review-the-docs/SKILL.md) — lint/build/classify; consumes Verification table
+- [`review-the-docs`](../review-the-docs/SKILL.md) — lint/build/classify; consumes verification report
 - [`pm-the-docs`](../pm-the-docs/SKILL.md) — Frame/Shape; universe for cross-repo product lookup

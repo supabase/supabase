@@ -50,6 +50,6 @@ Escalate to your docs team's PM when scope or stage is unclear, you need a revie
 
 - [`ask-the-docs`](../ask-the-docs/SKILL.md) — IA placement and docs-app architecture (Shape stage). Cross-repo **product** lookup lives here in `universe-lookup.md`, not in `ask-the-docs`.
 - [`write-the-docs`](../write-the-docs/SKILL.md) — drafting once Frame/Shape are settled
-- [`test-the-docs`](../test-the-docs/SKILL.md) — run snippets against a Docker-isolated local stack; Verification table
+- [`test-the-docs`](../test-the-docs/SKILL.md) — run snippets against a Docker-isolated local stack; verification report
 - [`edit-the-docs`](../edit-the-docs/SKILL.md) — restructure and improve existing pages
 - [`review-the-docs`](../review-the-docs/SKILL.md) — self-review and PR review stages

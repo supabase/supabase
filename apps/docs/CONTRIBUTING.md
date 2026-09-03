@@ -31,7 +31,7 @@ Ask your agent for a skill by name (`pm-the-docs`, `ask-the-docs`, `write-the-do
 | [`ask-the-docs`](../../.agents/skills/ask-the-docs/SKILL.md) | Frame / Shape | `apps/docs` architecture, IA placement, and where content lives |
 | [`write-the-docs`](../../.agents/skills/write-the-docs/SKILL.md) | Draft | Drafting net-new content grounded in the code |
 | [`edit-the-docs`](../../.agents/skills/edit-the-docs/SKILL.md) | Edit | Restructure and improve existing pages |
-| [`test-the-docs`](../../.agents/skills/test-the-docs/SKILL.md) | Draft / Self-review | Execute docs snippets in a Docker-isolated local stack; Verification table |
+| [`test-the-docs`](../../.agents/skills/test-the-docs/SKILL.md) | Draft / Self-review | Execute docs snippets in a Docker-isolated local stack; verification report |
 | [`review-the-docs`](../../.agents/skills/review-the-docs/SKILL.md) | Self-review / PR review | Checking a draft and PR triage/verification |
 
 The canonical files live in `.agents/skills/`; `.claude/skills` is a Git symlink to that directory so Claude Code discovers them too.
