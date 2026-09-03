@@ -1,6 +1,6 @@
 import { Box, Boxes } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { cn } from 'ui'
+import { Badge, cn } from 'ui'
 
 import { OrganizationsData } from '@/data/organizations/organizations-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
@@ -20,33 +20,47 @@ export const OrganizationAccessPill = ({
 }) => {
   const isInaccessible = organization == null
   return (
-    <div
-      className={cn(
-        'flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border bg-surface-75 text-foreground-light px-3 py-1 text-xs',
-        isInaccessible ? 'border-destructive-500 text-destructive' : 'border-strong text-foreground'
-      )}
+    <Badge
+      variant={isInaccessible ? 'destructive' : 'default'}
+      className={cn('normal-case text-xs font-normal tracking-normal', {
+        'border-destructive-500': isInaccessible,
+        'text-foreground': !isInaccessible,
+      })}
     >
-      <Boxes size={14} strokeWidth={1.5} className="shrink-0 text-foreground-lighter" />
-      {organization?.name ?? slug}{' '}
-      {isInaccessible ? <span className="sr-only">(innaccessible)</span> : null}
-    </div>
+      <Box
+        size={14}
+        strokeWidth={1.5}
+        className={cn('shrink-0', {
+          'text-foreground-lighter': !isInaccessible,
+        })}
+      />
+      {organization?.name ?? slug}
+      {isInaccessible ? <span> - revoked</span> : null}
+    </Badge>
   )
 }
 
 export const ProjectAccessPill = ({ projectRef }: { projectRef: string }) => {
-  const { data, isPending } = useProjectDetailQuery({ ref: projectRef })
-  const isInaccessible = data == null && !isPending
+  const { data: project, isPending } = useProjectDetailQuery({ ref: projectRef })
+  const isInaccessible = project == null && !isPending
   return (
-    <div
-      className={cn(
-        'flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border bg-surface-75 text-foreground-light px-3 py-1 text-xs',
-        isInaccessible ? 'border-destructive-500 text-destructive' : 'border-strong text-foreground'
-      )}
+    <Badge
+      variant={isInaccessible ? 'destructive' : 'default'}
+      className={cn('normal-case text-xs font-normal tracking-normal', {
+        'border-destructive-500': isInaccessible,
+        'text-foreground': !isInaccessible,
+      })}
     >
-      <Box size={14} strokeWidth={1.5} className="shrink-0 text-foreground-lighter" />
-      {data?.name ?? projectRef}{' '}
-      {isInaccessible ? <span className="sr-only">(innaccessible)</span> : null}
-    </div>
+      <Box
+        size={14}
+        strokeWidth={1.5}
+        className={cn('shrink-0', {
+          'text-foreground-lighter': !isInaccessible,
+        })}
+      />
+      {project?.name ?? projectRef}
+      {isInaccessible ? <span> - revoked</span> : null}
+    </Badge>
   )
 }
 
