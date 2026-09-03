@@ -106,20 +106,6 @@ export type WarehouseCatalogCredentials = NonNullable<
 
 export const MASKED_SECRET_PLACEHOLDER = '••••••••'
 
-/**
- * Catalog credential fields that should never be shown in plaintext by default:
- * `catalog_url` embeds the DuckLake catalog's Postgres password, and `s3_secret_access_key`
- * is a raw secret key.
- */
-const SECRET_CATALOG_FIELDS: (keyof WarehouseCatalogCredentials)[] = [
-  'catalog_url',
-  's3_secret_access_key',
-]
-
-export function isSecretWarehouseCatalogField(field: keyof WarehouseCatalogCredentials): boolean {
-  return SECRET_CATALOG_FIELDS.includes(field)
-}
-
 export function maskSecretValue(value: string | undefined | null): string {
   if (!value) return ''
   return MASKED_SECRET_PLACEHOLDER

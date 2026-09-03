@@ -6,7 +6,6 @@ import {
   getSchemaCheckedState,
   getSchemaTableKey,
   getSelectedTableCount,
-  isSecretWarehouseCatalogField,
   isSelectableWarehouseSchema,
   MASKED_SECRET_PLACEHOLDER,
   maskSecretValue,
@@ -204,33 +203,6 @@ describe('WarehouseModePanel.utils:buildWarehouseSetupTargets', () => {
       { type: 'schema', schema: 'public' },
       { type: 'table', schema: 'auth', name: 'users' },
     ])
-  })
-})
-
-describe('WarehouseModePanel.utils:isSecretWarehouseCatalogField', () => {
-  test('treats catalog_url as secret', () => {
-    expect(isSecretWarehouseCatalogField('catalog_url')).toBe(true)
-  })
-
-  test('treats s3_secret_access_key as secret', () => {
-    expect(isSecretWarehouseCatalogField('s3_secret_access_key')).toBe(true)
-  })
-
-  test('does not treat s3_endpoint as secret', () => {
-    expect(isSecretWarehouseCatalogField('s3_endpoint')).toBe(false)
-  })
-
-  test('does not treat s3_region as secret', () => {
-    expect(isSecretWarehouseCatalogField('s3_region')).toBe(false)
-  })
-
-  test('does not treat s3_access_key_id as secret', () => {
-    expect(isSecretWarehouseCatalogField('s3_access_key_id')).toBe(false)
-  })
-
-  test('does not treat metadata_schema or data_path as secret', () => {
-    expect(isSecretWarehouseCatalogField('metadata_schema')).toBe(false)
-    expect(isSecretWarehouseCatalogField('data_path')).toBe(false)
   })
 })
 

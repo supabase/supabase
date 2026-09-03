@@ -2,50 +2,30 @@ import { useParams } from 'common'
 import { KeyRound } from 'lucide-react'
 import Link from 'next/link'
 import { Badge, Button, cn } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import {
-  isSecretWarehouseCatalogField,
-  maskSecretValue,
-  type WarehouseCatalogCredentials,
-} from './WarehouseModePanel.utils'
+import { maskSecretValue, type WarehouseCatalogCredentials } from './WarehouseModePanel.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import CopyButton from '@/components/ui/CopyButton'
 import { useUpdateWarehouseCatalogMutation } from '@/data/warehouse/warehouse-catalog-mutation'
 import { useWarehouseCatalogQuery } from '@/data/warehouse/warehouse-catalog-query'
 import {
-  getDuckLakeAttachSnippet,
+  DUCKLAKE_METADATA_PASSWORD_ENV_VAR,
+  DUCKLAKE_S3_SECRET_ENV_VAR,
+  getDuckLakeSetupScript,
   getWarehouseFlightSqlConnectionString,
   getWarehouseFlightSqlEndpoint,
   getWarehouseUsqlCommand,
+  parseWarehouseCatalogUrl,
 } from '@/lib/warehouse'
 
 export interface WarehouseConnectionDetailsProps {
   onEditTables: () => void
 }
 
-const CATALOG_FIELD_LABELS: Record<keyof WarehouseCatalogCredentials, string> = {
-  s3_endpoint: 'S3 endpoint',
-  s3_region: 'S3 region',
-  s3_access_key_id: 'S3 access key ID',
-  s3_secret_access_key: 'S3 secret access key',
-  catalog_url: 'Catalog URL',
-  data_path: 'Data path',
-  metadata_schema: 'Metadata schema',
-}
-
-// Only the S3 credentials are surfaced individually — DuckDB needs them to read the data files.
-// catalog_url, data_path and metadata_schema are already embedded in the ATTACH snippet above, so
-// repeating catalog_url as a masked row would be pure theater: the snippet shows it in full.
-const CATALOG_FIELDS_TO_DISPLAY: (keyof WarehouseCatalogCredentials)[] = [
-  's3_endpoint',
-  's3_region',
-  's3_access_key_id',
-  's3_secret_access_key',
-]
-
-function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
+function FieldRow({ label, children }: { label: React.ReactNode; children: React.ReactNode }) {
   return (
     // `minmax(0,1fr)` rather than `1fr`: a 1fr track keeps `min-width: auto`, so a long
     // single-line value (the FlightSQL connection string) stretches the track past the panel
@@ -92,6 +72,51 @@ function MaskedCopyValueRow({ value }: { value: string }) {
         aria-label="Copy secret value"
         className="shrink-0"
       />
+    </div>
+  )
+}
+
+/**
+ * The DuckDB setup script inlines everything except the two passwords, which it reads via
+ * `getenv()` — so those are the only credential values surfaced as their own rows here.
+ */
+function DuckLakeSetup({ credentials }: { credentials: WarehouseCatalogCredentials }) {
+  const connection = parseWarehouseCatalogUrl(credentials.catalog_url)
+
+  if (connection === null) {
+    return (
+      <div className="flex flex-col gap-3 mt-2">
+        <Admonition
+          type="warning"
+          title="Could not read the catalog connection details"
+          description="Copy the catalog URL and configure the DuckLake secrets manually."
+        />
+        <FieldRow label="Catalog URL">
+          <MaskedCopyValueRow value={credentials.catalog_url} />
+        </FieldRow>
+      </div>
+    )
+  }
+
+  const setupScript = getDuckLakeSetupScript({ credentials, connection })
+
+  return (
+    <div className="flex flex-col gap-3 mt-2">
+      <p className="text-sm text-foreground-light max-w-xl mb-1">
+        Attach this project's Warehouse directly from DuckDB. The script reads both passwords from
+        environment variables — set these before running it:
+      </p>
+      <FieldRow label={<span className="font-mono text-xs">{DUCKLAKE_S3_SECRET_ENV_VAR}</span>}>
+        <MaskedCopyValueRow value={credentials.s3_secret_access_key} />
+      </FieldRow>
+      <FieldRow
+        label={<span className="font-mono text-xs">{DUCKLAKE_METADATA_PASSWORD_ENV_VAR}</span>}
+      >
+        <MaskedCopyValueRow value={connection.password} />
+      </FieldRow>
+      <CodeBlock language="sql" hideLineNumbers value={setupScript}>
+        {setupScript}
+      </CodeBlock>
     </div>
   )
 }
@@ -199,30 +224,7 @@ export const WarehouseConnectionDetails = ({ onEditTables }: WarehouseConnection
       )}
 
       {!isCatalogPending && !isCatalogError && catalog?.enabled && catalog.credentials && (
-        <div className="flex flex-col gap-3 mt-2">
-          <p className="text-sm text-foreground-light max-w-lg mb-1">
-            Attach this project's Warehouse directly from DuckDB using the DuckLake catalog:
-          </p>
-          <CodeBlock
-            language="sql"
-            hideLineNumbers
-            value={getDuckLakeAttachSnippet(catalog.credentials)}
-          >
-            {getDuckLakeAttachSnippet(catalog.credentials)}
-          </CodeBlock>
-          {CATALOG_FIELDS_TO_DISPLAY.map((field) => {
-            const value = catalog.credentials![field]
-            return (
-              <FieldRow key={field} label={CATALOG_FIELD_LABELS[field]}>
-                {isSecretWarehouseCatalogField(field) ? (
-                  <MaskedCopyValueRow value={value} />
-                ) : (
-                  <CopyValueRow value={value} />
-                )}
-              </FieldRow>
-            )
-          })}
-        </div>
+        <DuckLakeSetup credentials={catalog.credentials} />
       )}
     </div>
   )
