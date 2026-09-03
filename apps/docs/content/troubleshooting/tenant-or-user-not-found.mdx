@@ -1,0 +1,34 @@
+---
+title = "Tenant or user not found when connecting through the shared pooler"
+date_created = "2026-09-02T00:00:00+00:00"
+topics = [ "database", "supavisor" ]
+keywords = [ "pooler", "supavisor", "tenant", "hostname", "username" ]
+[[errors]]
+message = "Tenant or user not found"
+[[errors]]
+message = "FATAL: (ENOTFOUND) tenant/user postgres.<project-ref> not found"
+---
+
+A `Tenant or user not found` error means the shared pooler couldn't match your host and username to a project. Some drivers report it as `FATAL: (ENOTFOUND) tenant/user postgres.<project-ref> not found`.
+
+The error reads like a credentials problem, so it often sends people to reset a password that was never wrong. The cause is almost always the host or the username, not the password.
+
+## The host was typed instead of copied
+
+Shared pooler hosts look like `aws-1-us-east-2.pooler.supabase.com`. The number is a pooler cluster index, not part of the region name, and a region can have more than one. `aws-0` is not a safe default, and you can't work the host out from your region.
+
+Copy the host from the [Connect](/dashboard/project/_?showConnect=true) dialog rather than composing it.
+
+## The username is missing the project ref
+
+Shared pooler connections use `postgres.[PROJECT-REF]`, not `postgres`. Direct connections and the dedicated pooler use `postgres`.
+
+If you connect as a custom role through the shared pooler, the username is `[ROLE].[PROJECT-REF]`. Supplying only the role name makes the pooler read it as part of the hostname, which surfaces as a DNS error.
+
+## How to fix it
+
+1. Open the [Connect](/dashboard/project/_?showConnect=true) dialog in the Supabase Dashboard.
+2. Choose **Session pooler** or **Transaction pooler**.
+3. Copy the whole string, and replace only the password placeholder.
+
+For the full set of hosts, ports, and usernames, see [Connect to your database](/docs/guides/database/connecting-to-postgres).
