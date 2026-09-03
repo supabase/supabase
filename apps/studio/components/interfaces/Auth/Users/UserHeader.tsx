@@ -16,26 +16,28 @@ export const UserHeader = ({ user }: { user: User }) => {
   return (
     <div className={cn(PANEL_PADDING)}>
       {isPhoneAuth ? (
-        <div className="flex items-center gap-x-1">
-          <p>{user.phone}</p>
+        <div className="flex min-w-0 items-start gap-x-1">
+          <p className="min-w-0 [overflow-wrap:anywhere]">{user.phone}</p>
           <CopyButton
             iconOnly
             variant="text"
             icon={<Copy />}
-            className="px-1"
+            className="shrink-0 px-1"
             text={user?.phone ?? ''}
           />
         </div>
       ) : isAnonUser ? (
         <>
           <p>Anonymous user</p>
-          <div className="flex items-center gap-x-1">
-            <p className="text-foreground-light text-sm">{user.id}</p>
+          <div className="flex min-w-0 items-start gap-x-1">
+            <p className="text-foreground-light min-w-0 text-sm [overflow-wrap:anywhere]">
+              {user.id}
+            </p>
             <CopyButton
               iconOnly
               variant="text"
               icon={<Copy />}
-              className="px-1"
+              className="shrink-0 px-1"
               text={user?.id ?? ''}
             />
           </div>
@@ -43,15 +45,20 @@ export const UserHeader = ({ user }: { user: User }) => {
       ) : (
         <>
           {hasDisplayName && <p>{displayName}</p>}
-          <div className="flex items-center gap-x-1">
-            <p className={cn(hasDisplayName ? 'text-foreground-light text-sm' : 'text-foreground')}>
+          <div className="flex min-w-0 items-start gap-x-1">
+            <p
+              className={cn(
+                'min-w-0 [overflow-wrap:anywhere]',
+                hasDisplayName ? 'text-foreground-light text-sm' : 'text-foreground'
+              )}
+            >
               {user.email}
             </p>
             <CopyButton
               iconOnly
               variant="text"
               icon={<Copy />}
-              className="px-1"
+              className="shrink-0 px-1"
               text={user?.email ?? ''}
             />
           </div>
