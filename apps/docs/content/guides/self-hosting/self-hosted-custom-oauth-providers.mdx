@@ -96,6 +96,7 @@ const { data, error } = await supabase.auth.admin.customProviders.createProvider
 ```sh
 curl -X POST "http://<your-domain>/auth/v1/admin/custom-providers" \
   -H "apikey: your-supabase-secret-key" \
+  -H "Authorization: Bearer your-supabase-secret-key" \
   -H "Content-Type: application/json" \
   -d '{
     "provider_type": "oauth2",
@@ -146,6 +147,7 @@ const { data, error } = await supabase.auth.admin.customProviders.createProvider
 ```sh
 curl -X POST "http://<your-domain>/auth/v1/admin/custom-providers" \
   -H "apikey: your-supabase-secret-key" \
+  -H "Authorization: Bearer your-supabase-secret-key" \
   -H "Content-Type: application/json" \
   -d '{
     "provider_type": "oidc",
@@ -190,7 +192,7 @@ Open the [@BotFather mini app](https://t.me/botfather?startapp) on Telegram and 
 https://<your-domain>/auth/v1/callback
 ```
 
-Keep this page open - you'll need your Client ID and Client Secret from it in the next step.
+This screen also shows your Client ID and Client Secret, which will be used to create the provider in the next step.
 
 ### Step 3: Create Telegram Provider
 
@@ -210,8 +212,8 @@ const { data, error } = await supabase.auth.admin.customProviders.createProvider
   provider_type: 'oidc',
   identifier: 'custom:telegram',
   name: 'Telegram',
-  client_id: 'your-client-id',
-  client_secret: 'your-client-secret',
+  client_id: '<YOUR-CLIENT-ID>',
+  client_secret: '<YOUR-CLIENT-SECRET>',
   issuer: 'https://oauth.telegram.org',
   scopes: ['openid', 'profile'],
   email_optional: true,
@@ -225,6 +227,7 @@ const { data, error } = await supabase.auth.admin.customProviders.createProvider
 ```sh
 curl -X POST "http://<your-domain>/auth/v1/admin/custom-providers" \
   -H "apikey: your-supabase-secret-key" \
+  -H "Authorization: Bearer your-supabase-secret-key" \
   -H "Content-Type: application/json" \
   -d '{
     "provider_type": "oidc",
@@ -291,12 +294,14 @@ const { data, error } = await supabase.auth.admin.customProviders.listProviders(
 # List all custom providers
 
 curl "http://<your-domain>/auth/v1/admin/custom-providers" \
- -H "apikey: your-supabase-secret-key"
+ -H "apikey: your-supabase-secret-key" \
+ -H "Authorization: Bearer your-supabase-secret-key"
 
 # Filter by provider type
 
 curl "http://<your-domain>/auth/v1/admin/custom-providers?type=oidc" \
- -H "apikey: your-supabase-secret-key"
+ -H "apikey: your-supabase-secret-key" \
+ -H "Authorization: Bearer your-supabase-secret-key"
 
 ```
 
@@ -333,6 +338,7 @@ const { data, error } = await supabase.auth.admin.customProviders.updateProvider
 ```sh
 curl -X PUT "http://<your-domain>/auth/v1/admin/custom-providers/custom:my-provider" \
   -H "apikey: your-supabase-secret-key" \
+  -H "Authorization: Bearer your-supabase-secret-key" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Updated Provider Name",
@@ -365,7 +371,8 @@ const { data, error } =
 
 ```sh
 curl -X DELETE "http://<your-domain>/auth/v1/admin/custom-providers/custom:my-provider" \
-  -H "apikey: your-supabase-secret-key"
+  -H "apikey: your-supabase-secret-key" \
+  -H "Authorization: Bearer your-supabase-secret-key"
 ```
 
 </TabPanel>
