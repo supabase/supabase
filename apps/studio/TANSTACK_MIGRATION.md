@@ -290,6 +290,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### Project shell — `/advisors/*`
 
+- [x] A `routes/project/$ref/advisors/health.tsx` ← `pages/project/[ref]/advisors/health.tsx`
 - [x] A `routes/project/$ref/advisors/performance.tsx` ← `pages/project/[ref]/advisors/performance.tsx`
 - [x] A `routes/project/$ref/advisors/security.tsx` ← `pages/project/[ref]/advisors/security.tsx`
 - [x] A `routes/project/$ref/advisors/rules/performance.tsx` ← `pages/project/[ref]/advisors/rules/performance.tsx`
