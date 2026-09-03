@@ -66,12 +66,6 @@ export interface ChartBarProps {
   showGrid?: boolean
   showYAxis?: boolean
   showXAxis?: boolean
-  XAxisProps?: {
-    tick?: boolean
-    tickFormatter?: (value: any) => string
-    height?: number
-    [key: string]: any
-  }
   YAxisProps?: {
     tick?: boolean
     tickFormatter?: (value: any) => string
@@ -102,7 +96,6 @@ export const ChartBar = ({
   showGrid = false,
   showYAxis = false,
   showXAxis = false,
-  XAxisProps,
   YAxisProps,
 }: ChartBarProps) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
@@ -139,11 +132,8 @@ export const ChartBar = ({
       : false,
     hide: !showXAxis,
     interval: 'preserveStartEnd' as const,
-    tickMargin: showXAxis ? (XAxisProps?.tickMargin ?? 4) : 0,
-    height: showXAxis ? (XAxisProps?.height ?? 24) : 0,
     axisLine: { stroke: CHART_COLORS.AXIS },
     tickLine: { stroke: CHART_COLORS.AXIS },
-    ...XAxisProps,
   }
 
   const yAxisConfig = {

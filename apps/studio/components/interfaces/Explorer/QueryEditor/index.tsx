@@ -1,7 +1,7 @@
 import { useMonaco } from '@monaco-editor/react'
 import { acceptUntrustedSql, untrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { useFlag } from 'common'
-import { CodeSquare, Eye, EyeOff } from 'lucide-react'
+import { CodeSquare, Eye, EyeOff, Play } from 'lucide-react'
 import type { editor as monacoEditor, Selection } from 'monaco-editor'
 import {
   forwardRef,
@@ -12,7 +12,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import { Button, cn } from 'ui'
+import { Button, cn, KeyboardShortcut } from 'ui'
 
 import { resolveLogTimeRange } from '../../QuerySources/LogTimeRange.utils'
 import {
@@ -32,7 +32,6 @@ import {
 import { type QueryDisplay, type QueryResult } from '../types'
 import { DisplaySettingsButton } from './DisplaySettingsButton'
 import { QueryResultRenderer } from './QueryResultRenderer'
-import { QueryRunButton } from './QueryRunButton'
 import { QuerySourceMenu } from './QuerySourceMenu'
 import { useQueryEditorAi } from './useQueryEditorAi'
 import { LegacyLogsRewriteBanner } from '@/components/interfaces/Settings/Logs/LegacyLogsRewriteBanner'
@@ -438,19 +437,26 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
 
             {toolbarActions}
 
-            <QueryRunButton
-              isExecuting={isExecuting}
+            <ExplorerToolbarAction
+              icon={<Play size={16} strokeWidth={2} />}
+              loading={isExecuting}
+              tooltip={
+                <div className="flex items-center gap-2.5">
+                  <span>{hasSelection ? 'Run selected query' : 'Run query'}</span>
+                  <KeyboardShortcut keys={['Meta', 'Enter']} />
+                </div>
+              }
               disabled={
                 isBusy || pendingProposal !== null || isRunDisabled || sql.trim().length === 0
               }
-              hasSelection={showQuery && hasSelection}
-              onRun={() => handleRunQuery({ rawSql: sql })}
-              onRunSelected={() => {
+              onClick={() => {
                 const editorInstance = editorInstanceRef.current
                 const rawSql = editorInstance ? getEditorValueOrSelection(editorInstance) : sql
                 handleRunQuery({ rawSql })
               }}
-            />
+            >
+              {hasSelection ? 'Run selected' : 'Run'}
+            </ExplorerToolbarAction>
           </ExplorerToolbarActions>
         </ExplorerToolbar>
 

@@ -4,17 +4,17 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { AdvisorItem } from './AdvisorPanel.types'
 import {
-  advisorCategoryIcons,
   formatItemDate,
   getAdvisorItemSecondaryText,
   getAdvisorPanelItemDisplayTitle,
   severityBadgeVariants,
   severityColorClasses,
   severityLabels,
+  tabIconMap,
 } from './AdvisorPanel.utils'
 import { EmptyAdvisor } from './EmptyAdvisor'
 import type { Notification } from '@/data/notifications/notifications-v2-query'
-import type { AdvisorCategory, AdvisorSeverity } from '@/state/advisor-state'
+import type { AdvisorSeverity, AdvisorTab } from '@/state/advisor-state'
 
 const NoProjectNotice = () => {
   return (
@@ -23,7 +23,7 @@ const NoProjectNotice = () => {
       <div className="text-center">
         <p className="heading-default">Project required</p>
         <p className="text-foreground-light text-sm">
-          Select a project to view its security, performance and health advisories
+          Select a project to view security and performance advisories
         </p>
       </div>
     </div>
@@ -34,11 +34,10 @@ interface AdvisorPanelBodyProps {
   isLoading: boolean
   isError: boolean
   filteredItems: AdvisorItem[]
-  categoryFilters: AdvisorCategory[]
+  activeTab: AdvisorTab
   severityFilters: AdvisorSeverity[]
   onItemClick: (item: AdvisorItem) => void
   onClearFilters: () => void
-  onShowHiddenItems: () => void
   hiddenItemsCount: number
   hasAnyFilters: boolean
   hasProjectRef?: boolean
@@ -49,21 +48,17 @@ export const AdvisorPanelBody = ({
   isLoading,
   isError,
   filteredItems,
-  categoryFilters,
+  activeTab,
   severityFilters,
   onItemClick,
   onClearFilters,
-  onShowHiddenItems,
   hiddenItemsCount,
   hasAnyFilters,
   hasProjectRef = true,
   projectNameByRef,
 }: AdvisorPanelBodyProps) => {
-  // Notifications are the only items that exist without a project, so the notice replaces
-  // the list whenever the user has narrowed to categories that need one.
-  const needsProject =
-    categoryFilters.length > 0 && categoryFilters.every((category) => category !== 'messages')
-  if (!hasProjectRef && needsProject) {
+  // Show notice if no project ref and trying to view project-specific tabs
+  if (!hasProjectRef && activeTab !== 'messages' && activeTab !== 'all') {
     return <NoProjectNotice />
   }
 
@@ -90,7 +85,7 @@ export const AdvisorPanelBody = ({
   if (filteredItems.length === 0) {
     return (
       <EmptyAdvisor
-        categoryFilters={categoryFilters}
+        activeTab={activeTab}
         hasFilters={hasAnyFilters}
         onClearFilters={onClearFilters}
       />
@@ -101,7 +96,7 @@ export const AdvisorPanelBody = ({
     <>
       <div className="flex flex-col">
         {filteredItems.map((item) => {
-          const CategoryIcon = advisorCategoryIcons[item.category]
+          const SeverityIcon = tabIconMap[item.tab as Exclude<AdvisorTab, 'all'>]
           const severityClass = severityColorClasses[item.severity]
           const isNotification = item.source === 'notification'
           const notification = isNotification ? (item.original as Notification) : null
@@ -127,7 +122,7 @@ export const AdvisorPanelBody = ({
               >
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-3 overflow-hidden">
-                    <CategoryIcon
+                    <SeverityIcon
                       size={16}
                       strokeWidth={1.5}
                       className={cn('shrink-0', severityClass)}
@@ -165,7 +160,7 @@ export const AdvisorPanelBody = ({
       </div>
       {severityFilters.length > 0 && hiddenItemsCount > 0 && (
         <div className="px-4 py-3">
-          <Button variant="text" className="w-full" onClick={onShowHiddenItems}>
+          <Button variant="text" className="w-full" onClick={onClearFilters}>
             Show {hiddenItemsCount} more issue{hiddenItemsCount !== 1 ? 's' : ''}
           </Button>
         </div>

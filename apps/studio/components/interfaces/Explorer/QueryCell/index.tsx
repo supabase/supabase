@@ -136,7 +136,7 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
         onDisplayChange={handleDisplayChange}
         toolbarActions={
           <ExplorerToolbarAction
-            icon={<AlignLeft size={16} strokeWidth={2} />}
+            icon={<AlignLeft />}
             tooltip={
               <div className="flex items-center gap-2.5">
                 <span>Prettify SQL</span>

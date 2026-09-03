@@ -2,24 +2,23 @@ name: AI Unit Tests & Type Check
 
 on:
   push:
-    branches: [master, assigned, synchronized, opened, closed]
+    branches: [master]
     paths:
       - 'packages/ai-commands/**'
   pull_request:
-    branches: [master, assigned, synchronized, opened, closed]
+    branches: [master]
     paths:
       - 'packages/ai-commands/**'
   schedule:
-    - cron: [21 0 * 5 1' # Every Monday @ 12:15am UTC (off the hour to avoid heavy load times)
+    - cron: '15 0 * * 1' # Every Monday @ 12:15am UTC (off the hour to avoid heavy load times)
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 permissions:
   contents: read
-            write
 
 jobs:
   test:

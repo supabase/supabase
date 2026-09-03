@@ -44,7 +44,7 @@ const useDropdownMenu = (user: User | null) => {
     ],
     [
       {
-        label: 'Sign out',
+        label: 'Logout',
         type: 'button',
         icon: LogOut,
         onClick: async () => {

@@ -30,7 +30,7 @@ const menus = [
 ]
 
 const triggerClass =
-  'h-(--header-height) p-2 bg-transparent border-transparent font-normal rounded-none text-foreground-light hover:text-foreground data-open:text-foreground! border-0 focus-ring focus-visible:text-foreground h-full focus-visible:rounded-sm shadow-none!'
+  'h-(--header-height) p-2 border-transparent font-normal rounded-none text-foreground-light hover:text-foreground data-open:text-foreground! border-0 focus-ring focus-visible:text-foreground h-full focus-visible:rounded-sm shadow-none!'
 // docs gates this at `md:absolute` (its own base component class) because its
 // nav is hidden entirely below `lg` in favor of a separate mobile menu. kb
 // doesn't have that split — the nav is always visible — so `absolute` is

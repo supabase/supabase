@@ -1,16 +1,11 @@
 import {
-  Activity,
-  AlertTriangle,
   Box,
   Clock,
-  Database,
   Eye,
-  Gauge,
   Lock,
   LockIcon,
   Ruler,
   Scaling,
-  Server,
   Table2,
   TextSearch,
   Unlock,
@@ -398,80 +393,6 @@ export const lintInfoMap: LintInfo[] = [
     docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable`,
     category: 'security',
   },
-  // Health lints report on the running project rather than on schema, so they link to the
-  // page that shows what is happening rather than to an object to edit.
-  {
-    name: 'instance_db_down',
-    title: 'Database process is down',
-    icon: <Database className="text-foreground-muted" size={15} strokeWidth={1.5} />,
-    link: ({ projectRef }) => `/project/${projectRef}/logs/postgres-logs`,
-    linkText: 'View database logs',
-    docsLink: `${DOCS_URL}/guides/platform/troubleshooting`,
-    category: 'health',
-  },
-  {
-    name: 'db_not_reachable',
-    title: 'Database not usable',
-    icon: <Server className="text-foreground-muted" size={15} strokeWidth={1.5} />,
-    link: ({ projectRef }) => `/project/${projectRef}/database/settings`,
-    linkText: 'View connection settings',
-    docsLink: `${DOCS_URL}/guides/database/connecting-to-postgres`,
-    category: 'health',
-  },
-  {
-    name: 'db_connection_limit_reached',
-    title: 'Database connection limit reached',
-    icon: <Gauge className="text-foreground-muted" size={15} strokeWidth={1.5} />,
-    link: ({ projectRef }) => `/project/${projectRef}/observability/connections`,
-    linkText: 'View connections',
-    docsLink: `${DOCS_URL}/guides/database/connection-management`,
-    category: 'health',
-  },
-  {
-    name: 'log_data_api_error_rate_high',
-    title: 'Data API error rate is persistently high',
-    icon: <Activity className="text-foreground-muted" size={15} strokeWidth={1.5} />,
-    link: ({ projectRef }) => `/project/${projectRef}/logs/edge-logs`,
-    linkText: 'View logs',
-    docsLink: `${DOCS_URL}/guides/platform/troubleshooting`,
-    category: 'health',
-  },
-  {
-    name: 'log_auth_error_rate_high',
-    title: 'Auth error rate is persistently high',
-    icon: <Activity className="text-foreground-muted" size={15} strokeWidth={1.5} />,
-    link: ({ projectRef }) => `/project/${projectRef}/logs/edge-logs`,
-    linkText: 'View logs',
-    docsLink: `${DOCS_URL}/guides/platform/troubleshooting`,
-    category: 'health',
-  },
-  {
-    name: 'log_storage_error_rate_high',
-    title: 'Storage error rate is persistently high',
-    icon: <Activity className="text-foreground-muted" size={15} strokeWidth={1.5} />,
-    link: ({ projectRef }) => `/project/${projectRef}/logs/edge-logs`,
-    linkText: 'View logs',
-    docsLink: `${DOCS_URL}/guides/platform/troubleshooting`,
-    category: 'health',
-  },
-  {
-    name: 'log_edge_function_error_rate_high',
-    title: 'Edge Function error rate is persistently high',
-    icon: <Activity className="text-foreground-muted" size={15} strokeWidth={1.5} />,
-    link: ({ projectRef }) => `/project/${projectRef}/logs/edge-logs`,
-    linkText: 'View logs',
-    docsLink: `${DOCS_URL}/guides/platform/troubleshooting`,
-    category: 'health',
-  },
-  {
-    name: 'instance_alert_firing',
-    title: 'Infrastructure alerts firing',
-    icon: <AlertTriangle className="text-foreground-muted" size={15} strokeWidth={1.5} />,
-    link: ({ projectRef }) => `/project/${projectRef}/settings/infrastructure`,
-    linkText: 'View infrastructure',
-    docsLink: `${DOCS_URL}/guides/platform/troubleshooting`,
-    category: 'health',
-  },
 ]
 
 export const LintCTA = ({
@@ -523,8 +444,6 @@ export const EntityTypeIcon = ({ type }: { type: string | undefined }) => {
       return <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />
     case 'auth':
       return <Lock className="text-foreground-muted" size={15} strokeWidth={1.5} />
-    case 'health':
-      return <Activity className="text-foreground-muted" size={15} strokeWidth={1.5} />
     default:
       return <Box className="text-foreground-muted" size={15} strokeWidth={1.5} />
   }

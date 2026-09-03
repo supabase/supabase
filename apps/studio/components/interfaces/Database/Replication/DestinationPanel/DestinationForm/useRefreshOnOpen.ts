@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useCallback } from 'react'
 
 // Replication metadata (publication names, publication tables, source tables,
 // columns) and similar destination-form option lists follow one rule:
@@ -26,11 +26,12 @@ interface UseRefreshOnOpenProps {
 }
 
 export const useRefreshOnOpen = ({ isEnabled = true, refetch }: UseRefreshOnOpenProps) => {
-  return useMemo(() => {
-    const handleOpenChange = (isOpen: boolean) => {
+  const handleOpenChange = useCallback(
+    (isOpen: boolean) => {
       if (isOpen && isEnabled) void refetch()
-    }
+    },
+    [isEnabled, refetch]
+  )
 
-    return { handleOpenChange }
-  }, [isEnabled, refetch])
+  return { handleOpenChange }
 }

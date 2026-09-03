@@ -39,8 +39,6 @@ _Skill:_ `/write-the-docs` to draft net-new content grounded in Linear and the c
 - [ ] E: Contribute technical depth and verify accuracy (APIs, limits, edge cases)
 - [ ] P: Call out the current stage inline and any known limitations
 
-When the work is improving an existing page (restructure, reorder, connective text, brevity) rather than authoring net-new content, use `/edit-the-docs` instead of `/write-the-docs`.
-
 ## 4. Self-review against the bar
 
 _Skill:_ `/review-the-docs` — [Local self-review](../review-the-docs/SKILL.md#local-self-review-no-open-pr) on your own branch before opening the PR.

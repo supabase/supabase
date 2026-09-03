@@ -5,7 +5,6 @@ import {
   createAdvisorLintItems,
   createAdvisorNotificationItems,
   getAdvisorItemSecondaryText,
-  getAdvisorItemTelemetryCategory,
   sortAdvisorItems,
 } from './AdvisorPanel.utils'
 import type { Lint } from '@/data/lint/lint-query'
@@ -42,7 +41,7 @@ const createBannedIPSignalItem = (ip: string): AdvisorSignalItem => ({
   source: 'signal',
   type: 'banned-ip',
   severity: 'warning',
-  category: 'security',
+  tab: 'security',
   title: 'Banned IP address',
   summary: `The IP address \`${ip}\` is temporarily blocked.`,
   docsUrl: 'https://supabase.com/docs/reference/cli/supabase-network-bans',
@@ -71,37 +70,6 @@ describe('AdvisorPanel.utils', () => {
   it('uses database surface-area metadata and the IP address for banned IP signals', () => {
     const bannedIpSignal = createBannedIPSignalItem('203.0.113.10')
     expect(getAdvisorItemSecondaryText(bannedIpSignal)).toBe('Database · 203.0.113.10')
-  })
-
-  describe('lint categories', () => {
-    it('files a health lint under the health category', () => {
-      const [item] = createAdvisorLintItems([
-        createLint({
-          cache_key: 'instance_db_down',
-          name: 'instance_db_down',
-          categories: ['HEALTH'],
-          metadata: { type: 'health', entity: 'Database' },
-        }),
-      ])
-
-      expect(item?.category).toBe('health')
-      expect(getAdvisorItemTelemetryCategory(item!)).toBe('HEALTH')
-    })
-
-    it('keeps security ahead of health when a lint carries both categories', () => {
-      const [item] = createAdvisorLintItems([
-        createLint({ cache_key: 'both', categories: ['HEALTH', 'SECURITY'] }),
-      ])
-
-      expect(item?.category).toBe('security')
-      expect(getAdvisorItemTelemetryCategory(item!)).toBe('SECURITY')
-    })
-
-    it('drops lints with no recognised category', () => {
-      expect(
-        createAdvisorLintItems([createLint({ categories: [] as Lint['categories'] })])
-      ).toEqual([])
-    })
   })
 
   describe('notification secondary text', () => {

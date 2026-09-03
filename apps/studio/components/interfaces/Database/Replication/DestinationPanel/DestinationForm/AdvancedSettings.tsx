@@ -5,6 +5,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
+  Badge,
   FormControl,
   FormField,
   FormInputGroupInput,
@@ -41,8 +42,8 @@ export const AdvancedSettings = ({
 }) => {
   const handleNumberChange =
     (field: { onChange: (value?: number) => void }) => (e: ChangeEvent<HTMLInputElement>) => {
-      const parsed = e.target.valueAsNumber
-      field.onChange(e.target.value === '' || Number.isNaN(parsed) ? undefined : parsed)
+      const val = e.target.value
+      field.onChange(val === '' ? undefined : Number(val))
     }
 
   return (
@@ -58,6 +59,7 @@ export const AdvancedSettings = ({
             </div>
           </AccordionTrigger>
           <AccordionContent className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4">
+            {/* Batch wait time - applies to all destinations */}
             <FormField
               control={form.control}
               name="maxFillMs"
@@ -159,7 +161,7 @@ export const AdvancedSettings = ({
                       <SelectTrigger>
                         {INVALIDATED_SLOT_BEHAVIOR_LABELS[field.value ?? 'error']}
                       </SelectTrigger>
-                      <SelectContent side="bottom" collisionPadding={16}>
+                      <SelectContent>
                         <SelectItem value="error" className="[&>span]:top-2.5">
                           <p>Block startup</p>
                           <p className="text-foreground-lighter">
@@ -186,7 +188,12 @@ export const AdvancedSettings = ({
                   name="connectionPoolSize"
                   render={({ field }) => (
                     <FormItemLayout
-                      label="Connection pool size"
+                      label={
+                        <div className="flex flex-col gap-y-2">
+                          <span>Connection pool size</span>
+                          <Badge className="w-min">BigQuery only</Badge>
+                        </div>
+                      }
                       layout="horizontal"
                       description="Number of BigQuery connections used for destination writes."
                     >
@@ -215,7 +222,12 @@ export const AdvancedSettings = ({
                   name="maxStalenessMins"
                   render={({ field }) => (
                     <FormItemLayout
-                      label="Maximum staleness"
+                      label={
+                        <div className="flex flex-col gap-y-2">
+                          <span>Maximum staleness</span>
+                          <Badge className="w-min">BigQuery only</Badge>
+                        </div>
+                      }
                       layout="horizontal"
                       description="Set the maximum age of query results while BigQuery applies ongoing changes, or leave blank for the freshest results."
                     >
