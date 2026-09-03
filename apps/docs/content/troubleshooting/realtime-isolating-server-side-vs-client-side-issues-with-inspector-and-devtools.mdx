@@ -23,12 +23,12 @@ For `broadcast`, you can trigger the message directly from Inspector. For `prese
 
 **If the test fails as `postgres`:**
 
-- For `postgres_changes`, see [Realtime: Postgres Changes Troubleshooting](https://supabase.com/docs/guides/troubleshooting/realtime-postgres-changes-troubleshooting). It covers publication membership and other server-side configuration.
+- For `postgres_changes`, see [Realtime: Postgres Changes Troubleshooting](https://supabase.com/docs/guides/troubleshooting/realtime-postgres-changes-troubleshooting#step-1-is-the-table-in-the-realtime-publication). It covers publication membership and other server-side configuration.
 - For `broadcast` or `presence`, the failure occurs before authorization. Verify that the trigger or send call is firing.
 
 **If the test succeeds as `postgres` but fails as the authenticated user:**
 
-- For `postgres_changes`, the issue is likely related to RLS. See [Realtime: Postgres Changes Troubleshooting](https://supabase.com/docs/guides/troubleshooting/realtime-postgres-changes-troubleshooting) for guidance on testing and fixing policies.
+- For `postgres_changes`, the issue is likely related to RLS. See [Realtime: Postgres Changes Troubleshooting](https://supabase.com/docs/guides/troubleshooting/realtime-postgres-changes-troubleshooting#step-2-is-rls-quietly-blocking-the-row) for guidance on testing and fixing policies.
 - For `broadcast` or `presence`, the issue is likely related to channel authorization on `realtime.messages` for that role. Review the [policy examples in the Realtime Authorization docs](https://supabase.com/docs/guides/realtime/authorization?queryGroups=language&language=js#examples). Also check whether a complex policy is causing authorization checks to run slowly or time out.
 
 **If both tests succeed:** The Realtime server and Postgres are working as expected. The issue is likely in the client or network path. Continue to Step 2.
@@ -37,7 +37,7 @@ For `broadcast`, you can trigger the message directly from Inspector. For `prese
 
 Check for these common configuration issues:
 
-- **`postgres_changes`:** Confirm that the filter, schema, table, and event type match. See the "Check the subscription code itself" section of [Realtime: Postgres Changes Troubleshooting](https://supabase.com/docs/guides/troubleshooting/realtime-postgres-changes-troubleshooting) for common mismatches.
+- **`postgres_changes`:** Confirm that the filter, schema, table, and event type match. See the "Check the subscription code itself" section of [Realtime: Postgres Changes Troubleshooting](https://supabase.com/docs/guides/troubleshooting/realtime-postgres-changes-troubleshooting#step-4-check-the-subscription-code-itself) for common mismatches.
 - **`broadcast`:** Confirm that the sender and receiver use the same topic and event name.
 - **`presence`:** Confirm that `track()` is called after the channel reaches `SUBSCRIBED` and that all clients use the same channel name.
 
@@ -68,4 +68,4 @@ If it does not, or if the console reports a TLS or certificate error, a firewall
 
 Try the same app on a different network to confirm.
 
-If you still need help, contact Support and include the relevant results of these tests along with the troubleshooting steps you've already tried. This information will help narrow down the cause.
+If you still need help, [contact Support](https://supabase.com/support) and include a description of the issue, relevant results of these tests, and the troubleshooting steps you've already tried. This information will help narrow down the cause.
