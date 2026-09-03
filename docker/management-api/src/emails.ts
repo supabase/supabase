@@ -80,6 +80,11 @@ export async function renderReactEmail(source: string): Promise<string> {
       clearTimeout(timer)
       reject(err)
     })
+    child.stdin.on('error', (err) => {
+      clearTimeout(timer)
+      child.kill('SIGKILL')
+      reject(new Error(`failed to send the template to the renderer: ${err.message}`))
+    })
     child.on('close', () => {
       clearTimeout(timer)
       resolve()

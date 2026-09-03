@@ -22,6 +22,7 @@ import {
   upsertEmailTemplate,
   withTransaction,
 } from './store.js'
+import { isRedactedWriteOnlyValue, redactWriteOnlyKeys } from './write-only.js'
 
 const app = new Hono()
 
@@ -68,6 +69,7 @@ function validateConfigPayload(payload: Record<string, unknown>): {
       valid[key] = null
       continue
     }
+    if (isRedactedWriteOnlyValue(key, value)) continue
     const isExpectedType =
       typeof value === expected &&
       (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean')
@@ -120,9 +122,7 @@ async function currentConfig() {
     else if (key.startsWith('MAILER_SUBJECTS_')) subjectsCustom[key] = true
   }
   return {
-    ...defaultAuthConfig(),
-    ...baselineConfig(),
-    ...stored,
+    ...redactWriteOnlyKeys({ ...defaultAuthConfig(), ...baselineConfig(), ...stored }),
     MAILER_TEMPLATES_CUSTOM_CONTENTS: templatesCustom,
     MAILER_SUBJECTS_CUSTOM_CONTENTS: subjectsCustom,
   }

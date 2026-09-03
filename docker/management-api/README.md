@@ -48,7 +48,7 @@ works unchanged against it:
 
 | Method | Path | Description |
 | --- | --- | --- |
-| `GET` | `/platform/auth/{ref}/config` | Current merged auth configuration |
+| `GET` | `/platform/auth/{ref}/config` | Current merged auth configuration (`SMTP_PASS` is returned as `********`) |
 | `PATCH` | `/platform/auth/{ref}/config` | Update any subset of config keys |
 | `PATCH` | `/platform/auth/{ref}/config/hooks` | Update auth hook config |
 | `POST` | `/platform/auth/{ref}/templates/{template}/reset` | Reset an email template to default |
