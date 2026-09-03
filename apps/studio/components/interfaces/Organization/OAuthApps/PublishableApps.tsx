@@ -35,7 +35,7 @@ import CopyButton from '@/components/ui/CopyButton'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { OAuthAppCreateResponse } from '@/data/oauth/oauth-app-create-mutation'
-import { useOAuthAppsQuery } from '@/data/oauth/oauth-apps-query'
+import { OAuthApp, useOAuthAppsQuery } from '@/data/oauth/oauth-apps-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
