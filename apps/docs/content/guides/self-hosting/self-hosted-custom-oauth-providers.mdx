@@ -54,7 +54,7 @@ sh run.sh recreate auth
 
 ## Creating a Provider
 
-## Callback URL
+### Callback URL
 
 When registering your application with an external identity provider, make sure to configure the Supabase Auth callback URL. Copy the URL below and add it as the redirect/callback URI in your identity provider's settings.
 
@@ -170,11 +170,11 @@ OIDC providers have the following automatic behavior:
 
 ## Example: Telegram
 
-Below is a step-by-step guide to set up Telegram OAuth with Supabase Auth. Make sure you've enabled Custom OAuth in your self-hosted Supabase instance.
+The following steps walk through setting up Telegram OAuth with Supabase Auth. Before you begin, make sure you've enabled Custom OAuth in your self-hosted Supabase instance.
 
 <Admonition type="note">
 
-You need to make sure that Supabase Auth version is >= v2.196.0 because of this [issue](https://github.com/supabase/auth/issues/2534) which was fixed in v2.196.0
+Telegram OAuth requires Supabase Auth version >= `v2.196.0`. Earlier versions are affected by [this issue](https://github.com/supabase/auth/issues/2534), which was fixed in v2.196.0.
 
 </Admonition>
 
@@ -184,17 +184,17 @@ Open [@BotFather](https://t.me/BotFather) on Telegram and send the command `/new
 
 ### Step 2: Register Redirect URL
 
-Open [@BotFather mini app](https://t.me/botfather?startapp) on Telegram and select the bot you created in the last step. Choose `Login Widget` and this should open a page where you can configure Redirect URLs. Click on `Add a Redirect URI` and enter your self-hosted Supabase url:
+Open the [@BotFather mini app](https://t.me/botfather?startapp) on Telegram and select the bot you created in the previous step. Choose **Login Widget** to open the page where you configure redirect URIs. Click **Add a Redirect URI** and enter your self-hosted Supabase URL:
 
 ```
 https://<your-domain>/auth/v1/callback
 ```
 
-After entering the url, don't exit as we need to get more info from this page.
+Keep this page open - you'll need your Client ID and Client Secret from it in the next step.
 
 ### Step 3: Create Telegram Provider
 
-On the `Login Widget` screen from Step 2, you'll also find your Client ID and Client Secret. Copy these values and add them below to create a custom Telegram OAuth provider:
+Copy the Client ID and Client Secret from the **Login Widget** screen, then use them to create a custom Telegram OAuth provider:
 
 <Tabs
   scrollable
