@@ -14,7 +14,6 @@
   "dependencies": {
     "@astrojs/react": "^6.0.4",
     "astro": "^7.2.6",
-    "lucide-react": "*",
     "react": "catalog:",
     "react-dom": "catalog:",
     "ui": "workspace:*"

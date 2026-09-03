@@ -122,7 +122,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
             ref={textAreaRef}
             disabled={disabled}
             className={cn(
-              'text-base md:text-sm pr-10 pb-9 max-h-64 rounded-lg',
+              'text-base md:text-sm pr-10 pb-9 max-h-64',
               sqlSnippets && sqlSnippets.length > 0 && 'pt-10'
             )}
             placeholder={placeholder}

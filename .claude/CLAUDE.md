@@ -60,7 +60,7 @@ Never hand-edit generated files: `packages/api-types/types/**`, `**/routeTree.ge
 The skills in `.claude/skills/` are the source of truth for conventions — load the relevant ones before working, don't guess:
 
 - `copywriting` — any user-facing text, anywhere in the monorepo
-- `pm-the-docs` / `write-the-docs` / `edit-the-docs` / `ask-the-docs` / `review-the-docs` — anything under `apps/docs` (see `apps/docs/CONTRIBUTING.md` for the authoring skill model)
+- `docs-content` — anything under `apps/docs`
 - `telemetry-standards` — PostHog events, `packages/common/telemetry-constants.ts`
 - `dev-toolbar-review` — `packages/dev-tools`, `packages/common/posthog-client.ts`, `packages/common/feature-flags.tsx`
 - `safe-sql-execution` — any code that builds or executes SQL against user databases

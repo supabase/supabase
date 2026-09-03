@@ -153,7 +153,7 @@ export const MultipleCodeBlock = ({
           key={file.name}
           value={file.name}
           forceMount
-          className="p-0 max-h-72 overflow-y-auto data-[state=inactive]:hidden"
+          className="p-0 max-h-72 overflow-scroll data-[state=inactive]:hidden"
           data-connect-tab-content
           data-tab-label={file.name}
         >

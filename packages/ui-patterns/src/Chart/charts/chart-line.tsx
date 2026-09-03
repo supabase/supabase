@@ -74,12 +74,6 @@ export interface ChartLineProps {
   showGrid?: boolean
   showXAxis?: boolean
   showYAxis?: boolean
-  XAxisProps?: {
-    tick?: boolean
-    tickFormatter?: (value: any) => string
-    height?: number
-    [key: string]: any
-  }
   YAxisProps?: {
     tick?: boolean
     tickFormatter?: (value: any) => string
@@ -112,7 +106,6 @@ export const ChartLine = ({
   showGrid = false,
   showXAxis = false,
   showYAxis = false,
-  XAxisProps,
   YAxisProps,
   strokeWidth = 1.5,
   referenceLines,
@@ -150,11 +143,8 @@ export const ChartLine = ({
       : false,
     hide: !showXAxis,
     interval: 'preserveStartEnd' as const,
-    tickMargin: showXAxis ? (XAxisProps?.tickMargin ?? 4) : 0,
-    height: showXAxis ? (XAxisProps?.height ?? 24) : 0,
     axisLine: { stroke: CHART_COLORS.AXIS },
     tickLine: { stroke: CHART_COLORS.AXIS },
-    ...XAxisProps,
   }
 
   const yAxisConfig = {

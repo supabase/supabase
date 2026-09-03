@@ -26,7 +26,7 @@ const createBannedIPSignalItems = ({
     source: 'signal' as const,
     type: 'banned-ip' as const,
     severity: 'warning' as const,
-    category: 'security' as const,
+    tab: 'security' as const,
     title: 'Banned IP address',
     summary: `The IP address \`${ip}\` is temporarily blocked because of suspicious traffic or repeated failed password attempts.`,
     description:

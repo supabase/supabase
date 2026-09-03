@@ -72,9 +72,3 @@ h6:not(.font-mono),
 ::file-selector-button {
   border-color: var(--border-default, currentColor);
 }
-
-/* TEMPORARY UNTIL WE IMPLEMENT OUR OWN CODE COMPONENT */
-.prose pre code {
-  padding: 1rem;
-  display: inline-block;
-}
