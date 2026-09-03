@@ -48,10 +48,10 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
   const activeItem = props.subItem.url === pathname
   const activeItemRef = useRef<HTMLLIElement>(null)
   const childItems = props.subItem.items ?? []
-  const hasChildren = childItems.length > 0
   const enabledChildren = childItems.filter((child) => child.enabled !== false)
+  const hasChildren = enabledChildren.length > 0
 
-  const isChildActive = childItems.some((child: NavAccordionItem) =>
+  const isChildActive = enabledChildren.some((child: NavAccordionItem) =>
     hasActiveDescendant(child, pathname)
   )
 
@@ -79,6 +79,9 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
       }, 0)
     }
   })
+
+  if (!hasChildren && !props.subItem.url) return null
+
   return (
     <li ref={!hasChildren && activeItem ? activeItemRef : null}>
       {hasChildren ? (
