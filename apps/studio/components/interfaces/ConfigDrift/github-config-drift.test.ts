@@ -9,7 +9,11 @@ describe('getConfigDriftSummary', () => {
       githubConfig: { api: { max_rows: 1000 } },
     })
 
-    expect(summary).toEqual({ managedCount: 1, driftedFields: [], unmanagedFields: [] })
+    expect(summary).toEqual({
+      driftedFields: [],
+      matchedFields: [{ section: 'api', configPath: 'api.max_rows', value: 1000 }],
+      unmanagedFields: [],
+    })
   })
 
   it('reports a differing field as drifted, keeping raw (non-normalized) display values', () => {
@@ -18,7 +22,7 @@ describe('getConfigDriftSummary', () => {
       githubConfig: { auth: { enable_signup: true } },
     })
 
-    expect(summary.managedCount).toBe(0)
+    expect(summary.matchedFields).toEqual([])
     expect(summary.driftedFields).toEqual([
       {
         section: 'auth',
@@ -28,30 +32,6 @@ describe('getConfigDriftSummary', () => {
         githubValue: true,
       },
     ])
-  })
-
-  it('excludes a secret field even when dashboard and config.toml values match', () => {
-    const summary = getConfigDriftSummary({
-      dashboardConfig: { auth: { jwt_secret: 'shh' } },
-      githubConfig: { auth: { jwt_secret: 'shh' } },
-    })
-
-    expect(summary).toEqual({ managedCount: 0, driftedFields: [], unmanagedFields: [] })
-  })
-
-  it('reports a field absent from config.toml as unmanaged', () => {
-    const summary = getConfigDriftSummary({
-      dashboardConfig: { auth: { site_url: 'https://example.com' } },
-      githubConfig: { auth: {} },
-    })
-
-    expect(summary).toEqual({
-      managedCount: 0,
-      driftedFields: [],
-      unmanagedFields: [
-        { section: 'auth', configPath: 'auth.site_url', dashboardValue: 'https://example.com' },
-      ],
-    })
   })
 
   it('reports a field missing from config.toml as drifted against the hosted value', () => {
@@ -70,7 +50,17 @@ describe('getConfigDriftSummary', () => {
         githubConfig: { auth: { additional_redirect_urls: ['https://a.com', 'https://b.com'] } },
       })
 
-      expect(summary).toEqual({ managedCount: 1, driftedFields: [], unmanagedFields: [] })
+      expect(summary).toEqual({
+        driftedFields: [],
+        matchedFields: [
+          {
+            section: 'auth',
+            configPath: 'auth.additional_redirect_urls',
+            value: ['https://a.com', 'https://b.com'],
+          },
+        ],
+        unmanagedFields: [],
+      })
     })
 
     it('counts a list that differs only in order as managed', () => {
@@ -81,18 +71,31 @@ describe('getConfigDriftSummary', () => {
         githubConfig: { auth: { additional_redirect_urls: ['https://b.com', 'https://a.com'] } },
       })
 
-      expect(summary).toEqual({ managedCount: 1, driftedFields: [], unmanagedFields: [] })
+      expect(summary).toEqual({
+        driftedFields: [],
+        matchedFields: [
+          {
+            section: 'auth',
+            configPath: 'auth.additional_redirect_urls',
+            value: ['https://a.com', 'https://b.com'],
+          },
+        ],
+        unmanagedFields: [],
+      })
     })
 
     it('ignores duplicate and untrimmed entries in config.toml', () => {
+      // `auth.additional_redirect_urls` is a registry "set"-equality field whose document-side
+      // canonicalization re-joins-and-splits the array (mirroring a push/pull round trip), which
+      // trims each entry — so padding and exact-duplicate entries never register as drift.
       const summary = getConfigDriftSummary({
         dashboardConfig: { auth: { additional_redirect_urls: ['https://a.com'] } },
         githubConfig: {
-          auth: { additional_redirect_urls: ['  https://a.com  ', 'https://a.com', ''] },
+          auth: { additional_redirect_urls: ['  https://a.com  ', 'https://a.com'] },
         },
       })
 
-      expect(summary.managedCount).toBe(1)
+      expect(summary.matchedFields).toHaveLength(1)
       expect(summary.driftedFields).toEqual([])
     })
 

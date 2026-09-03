@@ -2,9 +2,14 @@ import { describe, expect, it } from 'vitest'
 
 import {
   createConfigurationDriftRows,
+  groupMatchedConfigFields,
   groupUnmanagedConfigFields,
 } from './ConfigurationDriftPage.utils'
-import type { GitHubConfigDriftField, UnmanagedConfigField } from './github-config-drift'
+import type {
+  GitHubConfigDriftField,
+  MatchedConfigField,
+  UnmanagedConfigField,
+} from './github-config-drift'
 
 const PROJECT_REF = 'abcdefgh'
 
@@ -24,6 +29,15 @@ function unmanagedField(overrides: Partial<UnmanagedConfigField>): UnmanagedConf
     section: 'api',
     configPath: 'api.max_rows',
     dashboardValue: 1000,
+    ...overrides,
+  }
+}
+
+function matchedField(overrides: Partial<MatchedConfigField>): MatchedConfigField {
+  return {
+    section: 'api',
+    configPath: 'api.max_rows',
+    value: 1000,
     ...overrides,
   }
 }
@@ -179,5 +193,37 @@ describe('groupUnmanagedConfigFields', () => {
     ])
 
     expect(groups[0].rows[0].value).toBe('https://a.com\nhttps://b.com')
+  })
+})
+
+describe('groupMatchedConfigFields', () => {
+  it('returns an empty array when there are no matched fields', () => {
+    expect(groupMatchedConfigFields([])).toEqual([])
+  })
+
+  it('groups fields from the same section into a single group', () => {
+    const groups = groupMatchedConfigFields([
+      matchedField({ configPath: 'api.max_rows', value: 1000 }),
+      matchedField({ configPath: 'api.enabled', value: true }),
+    ])
+
+    expect(groups).toHaveLength(1)
+    expect(groups[0]).toEqual({
+      section: 'api',
+      sectionLabel: 'API',
+      rows: [
+        { configPath: 'api.max_rows', label: 'Max rows', value: '1000' },
+        { configPath: 'api.enabled', label: 'API enabled', value: 'Enabled' },
+      ],
+    })
+  })
+
+  it('orders groups by CONFIG_SECTIONS order, not by input order', () => {
+    const groups = groupMatchedConfigFields([
+      matchedField({ section: 'storage', configPath: 'storage.enabled', value: true }),
+      matchedField({ section: 'api', configPath: 'api.enabled', value: true }),
+    ])
+
+    expect(groups.map((group) => group.section)).toEqual(['api', 'storage'])
   })
 })

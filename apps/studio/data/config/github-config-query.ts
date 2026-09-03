@@ -1,4 +1,3 @@
-import type { EffectiveConfig } from '@supabase/config'
 import { useQuery } from '@tanstack/react-query'
 import type { components } from 'api-types'
 
@@ -10,13 +9,7 @@ export type GitHubConfigVariables = {
   branch?: string
 }
 
-type GithubConfigQueryResponse = components['schemas']['GetGitHubConnectionConfigResponse'] & {
-  config: EffectiveConfig
-}
-
-function isPlainObject(value: unknown): value is EffectiveConfig {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
-}
+type GithubConfigQueryResponse = components['schemas']['GetGitHubConnectionConfigResponse']
 
 export const githubConfigKeys = {
   all: ['github-config'] as const,
@@ -42,14 +35,7 @@ export async function getGitHubConfig(
   )
 
   if (error) return handleError(error)
-  if (!isPlainObject(data.config)) {
-    return handleError(new Error('Invalid response from Github config API: expected an object'))
-  }
-
-  return {
-    ...data,
-    config: data.config,
-  }
+  return data
 }
 
 export const useGitHubConfigQuery = <TData = GithubConfigQueryResponse>(

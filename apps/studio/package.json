@@ -71,7 +71,7 @@
     "@stripe/stripe-js": "9.1.0",
     "@stripe/sync-engine": "1.0.32",
     "@supabase/auth-js": "catalog:",
-    "@supabase/config": "^0.1.0",
+    "@supabase/config": "^0.2.0",
     "@supabase/mcp-server-supabase": "^0.11.0",
     "@supabase/pg-meta": "workspace:*",
     "@supabase/realtime-js": "catalog:",
