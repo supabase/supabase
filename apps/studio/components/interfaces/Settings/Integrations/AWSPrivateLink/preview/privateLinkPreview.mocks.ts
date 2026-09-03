@@ -17,13 +17,12 @@ export type PreviewAWSAccount = AWSAccount & {
 const VERCEL_IAM_ROLE_ARN = `arn:aws:iam::${VERCEL_PREVIEW_AWS_ACCOUNT_ID}:role/TenantConnector`
 
 function account(
-  overrides: Partial<PreviewAWSAccount> & Pick<PreviewAWSAccount, 'status'>
+  overrides: Partial<PreviewAWSAccount> & Pick<PreviewAWSAccount, 'status' | 'database_identifier'>
 ): PreviewAWSAccount {
   return {
     aws_account_id: AWS_DIRECT_PREVIEW_ACCOUNT_ID,
     account_name: 'Production VPC',
     database_type: 'PRIMARY',
-    database_identifier: undefined,
     resource_access_manager_resource_config_id: 'rcfg-0123456789abcdef0',
     resource_access_manager_resource_config_arn:
       'arn:aws:vpc-lattice:us-east-1:000000000000:resourceconfiguration/rcfg-0123456789abcdef0',
@@ -38,7 +37,7 @@ export function getPreviewAccounts(
   scenario: PrivateLinkPreviewScenario,
   projectRef?: string
 ): PreviewAWSAccount[] {
-  const primaryId = projectRef
+  const primaryId = projectRef ?? 'preview-primary'
 
   const awsConnected = account({
     status: 'ASSOCIATION_ACCEPTED',
