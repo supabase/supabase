@@ -21,6 +21,7 @@ interface ConfigFieldDefinition {
 
 export type ResolvedConfigFieldDefinition = ConfigFieldDefinition & { configPath: string }
 
+export const toProjectHomepageHref = (projectRef: string) => `/project/${projectRef}`
 const toAuthUrlConfigHref = (projectRef: string) => `/project/${projectRef}/auth/url-configuration`
 const toAuthProvidersHref = (projectRef: string) => `/project/${projectRef}/auth/providers`
 const toApiSettingsHref = (projectRef: string) => `/project/${projectRef}/settings/api`
