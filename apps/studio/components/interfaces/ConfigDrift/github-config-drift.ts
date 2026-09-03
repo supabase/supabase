@@ -13,6 +13,7 @@ import {
   CONFIG_SECTIONS,
   getFieldDefinition,
   getSectionFieldEntries,
+  toProjectHomepageHref,
   type ConfigSection,
 } from './ConfigurationDriftPage.constants'
 
@@ -120,15 +121,11 @@ export function getConfigDriftSummary({
       const change = changesByPath.get(configPath)
       if (change) {
         const definition = getFieldDefinition(configPath)
-        if (!definition) {
-          unmanagedFields.push({ section, configPath, dashboardValue: rawValue })
-          continue
-        }
 
         driftedFields.push({
           section,
           configPath,
-          settingHref: definition.settingHref,
+          settingHref: definition?.settingHref ?? toProjectHomepageHref,
           dashboardValue: change.remote,
           githubValue: change.local,
         })
