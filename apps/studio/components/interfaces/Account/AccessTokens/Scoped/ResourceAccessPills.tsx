@@ -27,7 +27,8 @@ export const OrganizationAccessPill = ({
       )}
     >
       <Boxes size={14} strokeWidth={1.5} className="shrink-0 text-foreground-lighter" />
-      {organization?.name ?? slug} <span className="sr-only">(innaccessible)</span>
+      {organization?.name ?? slug}{' '}
+      {isInaccessible ? <span className="sr-only">(innaccessible)</span> : null}
     </div>
   )
 }
@@ -43,7 +44,8 @@ export const ProjectAccessPill = ({ projectRef }: { projectRef: string }) => {
       )}
     >
       <Box size={14} strokeWidth={1.5} className="shrink-0 text-foreground-lighter" />
-      {data?.name ?? projectRef} <span className="sr-only">(innaccessible)</span>
+      {data?.name ?? projectRef}{' '}
+      {isInaccessible ? <span className="sr-only">(innaccessible)</span> : null}
     </div>
   )
 }
