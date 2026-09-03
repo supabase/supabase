@@ -161,7 +161,7 @@ describe('groupUnmanagedConfigFields', () => {
       sectionLabel: 'API',
       rows: [
         { configPath: 'api.max_rows', label: 'Max rows', value: '1000' },
-        { configPath: 'api.enabled', label: 'API enabled', value: 'Enabled' },
+        { configPath: 'api.enabled', label: 'API enabled', value: 'true' },
       ],
     })
   })
@@ -213,7 +213,7 @@ describe('groupMatchedConfigFields', () => {
       sectionLabel: 'API',
       rows: [
         { configPath: 'api.max_rows', label: 'Max rows', value: '1000' },
-        { configPath: 'api.enabled', label: 'API enabled', value: 'Enabled' },
+        { configPath: 'api.enabled', label: 'API enabled', value: 'true' },
       ],
     })
   })
