@@ -25,12 +25,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { pgmqArchiveTable, pgmqQueueTable } from '../Queues.utils'
 import { getQueueFunctionsMapping } from './Queue.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useQueuesExposePostgrestStatusQuery } from '@/data/database-queues/database-queues-expose-postgrest-status-query'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
@@ -214,7 +214,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
       toast.success('Successfully updated permissions')
       setOpen(false)
     } catch (error: unknown) {
-      toast.error(`Failed to update permissions: ${getErrorMessage(error)}`)
+      toast.error(`Failed to update permissions: ${getErrorMessage(error, 'unknown error')}`)
     } finally {
       setIsSaving(false)
     }
@@ -239,7 +239,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <ButtonTooltip
-          type="text"
+          variant="text"
           className="px-1.5"
           icon={<Settings />}
           title="Settings"
@@ -372,10 +372,10 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
           </Table>
         </SheetSection>
         <SheetFooter>
-          <Button type="default" disabled={isSaving} onClick={() => setOpen(false)}>
+          <Button variant="default" disabled={isSaving} onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button type="primary" loading={isSaving} onClick={onSaveConfiguration}>
+          <Button variant="primary" loading={isSaving} onClick={onSaveConfiguration}>
             Save changes
           </Button>
         </SheetFooter>

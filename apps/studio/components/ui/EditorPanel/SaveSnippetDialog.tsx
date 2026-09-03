@@ -77,7 +77,7 @@ export const SaveSnippetDialog = ({ open, sql, onOpenChange, onSave }: SaveSnipp
           </div>
           <div className="flex justify-end">
             <ButtonTooltip
-              type="default"
+              variant="default"
               size="tiny"
               disabled={isGenerating || !isApiKeySet || isHipaaProjectDisallowed || isAiOptedOut}
               onClick={() => generateTitle({ sql })}
@@ -105,7 +105,7 @@ export const SaveSnippetDialog = ({ open, sql, onOpenChange, onSave }: SaveSnipp
         </DialogSection>
         <DialogSectionSeparator />
         <DialogFooter className="px-5 py-4">
-          <Button type="default" onClick={() => onOpenChange(false)}>
+          <Button variant="default" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button disabled={!name.trim()} onClick={handleSave}>

@@ -37,7 +37,7 @@ export const CollapsibleCodeBlock = ({ onRemove, ...props }: CollapsibleCodeBloc
 
         {onRemove && (
           <Button
-            type="text"
+            variant="text"
             size="tiny"
             className="shrink-0 w-6 h-6"
             onClick={onRemove}

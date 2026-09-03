@@ -151,3 +151,47 @@ And then open the browser to [localhost:3000](http://localhost:3000) and you sho
 ![Supabase SolidJS](/docs/img/supabase-solidjs-demo.png)
 
 At this stage you have a fully functional application!
+
+## Add a server route (SolidStart)
+
+The example above is client-only. If you migrate the app to [SolidStart](https://start.solidjs.com/) for server-side rendering and API routes, you can add protected server endpoints with [`@supabase/server`](https://supabase.github.io/server/).
+
+`createSupabaseContext` validates the incoming request's JWT locally (using your project's asymmetric signing keys, no round-trip to the Auth server), scopes a Supabase client to the authenticated user via RLS, and exposes the user's claims, all from a single call inside your SolidStart API route handler.
+
+```bash
+npm install @supabase/server
+```
+
+<$CodeTabs>
+
+```typescript name=src/routes/api/profile.ts
+import type { APIEvent } from '@solidjs/start/server'
+import { createSupabaseContext } from '@supabase/server'
+
+export async function GET({ request }: APIEvent) {
+  const { data: ctx, error } = await createSupabaseContext(request, {
+    auth: 'user',
+  })
+
+  if (error) {
+    return Response.json({ message: error.message, code: error.code }, { status: error.status })
+  }
+
+  const { supabase, userClaims } = ctx
+  const { data, error: queryError } = await supabase
+    .from('profiles')
+    .select('username, website, avatar_url')
+    .eq('id', userClaims.id)
+    .single()
+
+  if (queryError) {
+    return Response.json({ message: queryError.message }, { status: 500 })
+  }
+
+  return Response.json(data)
+}
+```
+
+</$CodeTabs>
+
+To make a route public, swap `auth: 'user'` for `auth: 'none'`. For app-wide authentication via SolidStart middleware, or for the full `@supabase/server` API, see the [getting started guide](https://supabase.github.io/server/getting-started).

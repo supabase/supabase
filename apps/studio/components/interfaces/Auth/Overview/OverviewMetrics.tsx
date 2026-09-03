@@ -5,7 +5,6 @@ import { BarChart2, ChevronRight, ExternalLink, Telescope } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { AiIconAnimation, Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { StatusCode } from 'ui-patterns'
 import {
   Chart,
   ChartActions,
@@ -24,6 +23,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { StatusCode } from 'ui-patterns/StatusCode'
 
 import {
   AuthErrorCodeRow,
@@ -40,7 +40,7 @@ import {
   getMetricValues,
 } from './OverviewUsage.constants'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ErrorCodeTooltip } from '@/components/ui/ErrorCodeTooltip/ErrorCodeTooltip'
 import { Service } from '@/data/graphql/graphql'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -103,7 +103,7 @@ const LogsLink = ({ href }: { href: string }) => (
   <Tooltip>
     <TooltipTrigger asChild>
       <Button
-        type="text"
+        variant="text"
         size="tiny"
         className="p-1.5 text-foreground-lighter hover:text-foreground"
         asChild

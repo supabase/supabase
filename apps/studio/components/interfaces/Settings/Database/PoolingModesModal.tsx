@@ -19,6 +19,7 @@ import {
 import { Markdown } from '@/components/interfaces/Markdown'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
+import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { DOCS_URL } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import { useDatabaseSettingsStateSnapshot } from '@/state/database-settings'
@@ -27,14 +28,20 @@ export const PoolingModesModal = () => {
   const { ref: projectRef } = useParams()
   const snap = useDatabaseSettingsStateSnapshot()
   const state = useDatabaseSelectorStateSnapshot()
+  const { isHighAvailability, isPending: isHighAvailabilityPending } = useHighAvailability()
 
-  const { data } = useSupavisorConfigurationQuery({ projectRef: projectRef })
+  const { data } = useSupavisorConfigurationQuery(
+    { projectRef: projectRef },
+    { enabled: !isHighAvailability && !isHighAvailabilityPending }
+  )
   const primaryConfig = data?.find((x) => x.identifier === state.selectedDatabaseId)
 
   const navigateToPoolerSettings = () => {
     const el = document.getElementById('connection-pooler')
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
+
+  if (isHighAvailability) return null
 
   return (
     <Dialog open={snap.showPoolingModeHelper} onOpenChange={snap.setShowPoolingModeHelper}>
@@ -101,7 +108,7 @@ This mode is similar to connecting to your database directly. There is full supp
         )}
         <DialogFooter>
           <DialogClose onClick={() => snap.setShowPoolingModeHelper(false)}>
-            <Button type="default">Close</Button>
+            <Button variant="default">Close</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

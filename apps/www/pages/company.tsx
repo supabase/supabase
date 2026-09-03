@@ -67,12 +67,7 @@ export default Index
 const Header = () => {
   return (
     <>
-      <div
-        className="
-          sm:py-18
-          container relative mx-auto px-6 py-16 text-center md:py-24 lg:px-16 lg:py-24
-          xl:px-20"
-      >
+      <div className="section-container text-center py-16 sm:py-18 md:py-24">
         <h1 className="text-foreground text-5xl">
           Join one of the world's fastest growing open source communities.
         </h1>
@@ -96,9 +91,7 @@ const Team = () => {
           </div>
           <div className=" col-span-4 pt-8 md:mt-0 md:text-right">
             <a href="https://supabase.com/careers">
-              <Button size="medium" className="text-white">
-                Join the team
-              </Button>
+              <Button size="medium">Join the team</Button>
             </a>
           </div>
         </div>
@@ -119,8 +112,7 @@ const Community = () => {
               key={x.title}
               className={`
               space-y-4 text-center lg:text-left
-              ${i !== CommunityData.length - 1 ? 'border-default lg:border-r' : ''}
-              ${i === 1 ? 'border-default md:border-0 lg:border-r ' : ''}
+              ${i !== CommunityData.length - 1 ? 'border-default lg:border-r lg:pr-4' : ''}
           `}
             >
               <div
@@ -140,7 +132,7 @@ const Community = () => {
                 />
               </div>
               <div>
-                <h1 className="text-foreground mb-0 text-4xl">{x.stat}</h1>
+                <h1 className="text-foreground mb-0 text-3xl">{x.stat}</h1>
                 <p className="text-foreground-light text-sm">{x.statLabel}</p>
               </div>
             </div>
@@ -168,8 +160,7 @@ const Investors = () => {
           title="Our investors"
           paragraph={
             <>
-              We've raised over $116 million in funding, backed by some of the world's leading
-              investors.
+              We've raised $1 billion in funding, backed by some of the world's leading investors.
             </>
           }
         />
@@ -178,24 +169,18 @@ const Investors = () => {
       <div className="mx-auto mt-5 mb-16 grid max-w-lg gap-0.5 lg:max-w-none lg:grid-cols-4">
         {InvestorData.filter((x) => x.lead === true).map((x) => (
           <div key={x.name}>
-            <div
-              className="
-              bg-surface-100
-              col-span-1 flex h-32 content-end
-              items-center justify-center"
-            >
-              <div className="relative h-8 w-full overflow-auto">
+            <div className="bg-surface-100 col-span-1 flex h-32 content-end items-center justify-center">
+              <div
+                className="relative w-full overflow-hidden"
+                style={{ height: `${(x.scale ?? 1) * 2}rem` }}
+              >
                 <Image
                   layout="fill"
                   src={`${x.img}`}
                   alt={x.name}
                   objectFit="scale-down"
                   objectPosition="center"
-                  className="
-                    opacity-50
-                    contrast-0
-                    filter
-                  "
+                  className="opacity-50 contrast-0 filter"
                 />
               </div>
             </div>
@@ -229,13 +214,13 @@ const Press = () => {
       <div>
         <SectionHeader title={'Press'} />
       </div>
-      <div className="mx-auto mt-5 grid gap-5 lg:max-w-none lg:grid-cols-3">
+      <div className="mx-auto mt-5 grid gap-5 sm:grid-cols-2 lg:max-w-none lg:grid-cols-4">
         {PressData.filter((x) => x.type == 'article').map((x) => (
           <Link
             href={x.href}
             key={x.href}
             target="_blank"
-            className="flex flex-col justify-start items-stretch group cursor-pointer transition rounded-xl focus-visible:ring-2 focus-visible:ring-foreground-lighter outline-hidden outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-foreground-lighter"
+            className="flex flex-col justify-start items-stretch group cursor-pointer rounded-xl focus-ring"
           >
             <Panel
               hasActiveOnHover
@@ -262,7 +247,7 @@ const Press = () => {
             href={x.href}
             key={x.href}
             target="_blank"
-            className="flex flex-col justify-start items-stretch group cursor-pointer transition rounded-xl focus-visible:ring-2 focus-visible:ring-foreground-lighter outline-hidden outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-foreground-lighter"
+            className="flex flex-col justify-start items-stretch group cursor-pointer rounded-xl focus-ring"
           >
             <Panel
               hasActiveOnHover

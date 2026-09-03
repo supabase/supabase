@@ -80,7 +80,7 @@ export function AppsListTable({
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button type="default" icon={<MoreVertical size={14} />} className="w-7" />
+                      <Button variant="default" icon={<MoreVertical size={14} />} className="w-7" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" side="bottom" className="w-44">
                       <DropdownMenuItem className="gap-x-2" onClick={() => onViewApp(app)}>

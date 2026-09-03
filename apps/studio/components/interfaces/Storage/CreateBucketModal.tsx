@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -24,7 +24,7 @@ import {
   SelectValue,
   Switch,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
@@ -108,8 +108,8 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
     },
   })
   const { formatted_size_limit: formattedSizeLimitError } = form.formState.errors
-  const isPublicBucket = form.watch('public')
-  const hasFileSizeLimit = form.watch('has_file_size_limit')
+  const isPublicBucket = useWatch({ control: form.control, name: 'public' })
+  const hasFileSizeLimit = useWatch({ control: form.control, name: 'has_file_size_limit' })
 
   const onSubmit: SubmitHandler<CreateBucketForm> = async (values) => {
     if (!ref) return console.error('Project ref is required')
@@ -198,13 +198,11 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout
-                    name="name"
                     label="Bucket name"
                     labelOptional="Cannot be changed after creation"
                   >
                     <FormControl>
                       <Input
-                        id="name"
                         data-1p-ignore
                         data-lpignore="true"
                         data-form-type="other"
@@ -228,18 +226,12 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
                 render={({ field }) => (
                   <FormItemLayout
                     hideMessage
-                    name="public"
                     label="Public bucket"
                     description="Allow anyone to read objects without authorization"
                     layout="flex"
                   >
                     <FormControl>
-                      <Switch
-                        id="public"
-                        size="large"
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
+                      <Switch size="large" checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -262,18 +254,12 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout
-                    name="has_file_size_limit"
                     label="Restrict file size"
                     description="Prevent uploading of files larger than a specified limit"
                     layout="flex"
                   >
                     <FormControl>
-                      <Switch
-                        id="has_file_size_limit"
-                        size="large"
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
+                      <Switch size="large" checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -286,22 +272,11 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
                     name="formatted_size_limit"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout
-                        hideMessage
-                        name="formatted_size_limit"
-                        label="File size limit"
-                      >
+                      <FormItemLayout hideMessage label="File size limit">
                         <div className="grid grid-cols-12 gap-x-2">
                           <div className="col-span-8">
                             <FormControl>
-                              <Input
-                                id="formatted_size_limit"
-                                aria-label="File size limit"
-                                type="number"
-                                min={0}
-                                placeholder="0"
-                                {...field}
-                              />
+                              <Input type="number" min={0} placeholder="0" {...field} />
                             </FormControl>
                           </div>
                           <div className="col-span-4">
@@ -357,7 +332,7 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
 
             <DialogSection className="space-y-2">
               <FormItemLayout
-                name="has_allowed_mime_types"
+                id="has_allowed_mime_types"
                 label="Restrict MIME types"
                 description="Allow only certain types of files to be uploaded"
                 layout="flex"
@@ -378,14 +353,12 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
                   control={form.control}
                   render={({ field }) => (
                     <FormItemLayout
-                      name="allowed_mime_types"
                       label="Allowed MIME types"
                       labelOptional="Comma separated values"
                       description="Wildcards are allowed, e.g. image/*."
                     >
                       <FormControl>
                         <Input
-                          id="allowed_mime_types"
                           {...field}
                           placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
                         />
@@ -399,12 +372,12 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
         </Form>
 
         <DialogFooter>
-          <Button type="default" disabled={isCreatingBucket} onClick={() => onOpenChange(false)}>
+          <Button variant="default" disabled={isCreatingBucket} onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button
             form={formId}
-            htmlType="submit"
+            type="submit"
             loading={isCreatingBucket}
             disabled={isCreatingBucket}
           >

@@ -126,7 +126,7 @@ export const IndexSuggestionIcon = ({
         />
         <div className="p-3 flex gap-2 items-center border-t justify-end">
           <Button
-            type="text"
+            variant="text"
             onClick={(e) => {
               e.stopPropagation()
               if (onClickIcon && !isCreatingIndex) onClickIcon()

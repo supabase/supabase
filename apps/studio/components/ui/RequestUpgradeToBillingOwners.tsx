@@ -48,7 +48,7 @@ interface RequestUpgradeToBillingOwnersProps {
   /** Used in the default message template, e.g: "Upgrade to ..." */
   featureProposition?: string
   className?: string
-  type?: 'primary' | 'default'
+  variant?: 'primary' | 'default'
 }
 
 export const RequestUpgradeToBillingOwners = ({
@@ -58,7 +58,7 @@ export const RequestUpgradeToBillingOwners = ({
   featureProposition,
   children,
   className,
-  type = 'primary',
+  variant = 'primary',
 }: PropsWithChildren<RequestUpgradeToBillingOwnersProps>) => {
   const [open, setOpen] = useState(false)
   const track = useTrack()
@@ -162,7 +162,7 @@ export const RequestUpgradeToBillingOwners = ({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button block={block} type={type} className={className}>
+        <Button block={block} variant={variant} className={className}>
           {buttonText}
         </Button>
       </DialogTrigger>
@@ -236,10 +236,10 @@ export const RequestUpgradeToBillingOwners = ({
             </DialogSection>
 
             <DialogFooter>
-              <Button type="default" disabled={isSubmitting} onClick={() => setOpen(false)}>
+              <Button variant="default" disabled={isSubmitting} onClick={() => setOpen(false)}>
                 Cancel
               </Button>
-              <Button htmlType="submit" form={formId} loading={isSubmitting}>
+              <Button type="submit" form={formId} loading={isSubmitting}>
                 Submit request
               </Button>
             </DialogFooter>

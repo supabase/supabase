@@ -20,37 +20,31 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
 import { z } from 'zod'
 
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useCreatePublicationMutation } from '@/data/replication/publication-create-mutation'
+import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useReplicationTablesQuery } from '@/data/replication/tables-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 
 interface NewPublicationPanelProps {
   visible: boolean
-  sourceId?: number
-  onClose: () => void
+  onClose: (newPublication?: string) => void
 }
 
-export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicationPanelProps) => {
+export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelProps) => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const sourceId = useReplicationSourceId({ projectRef })
 
-  const { data: tables } = useReplicationTablesQuery({ projectRef, sourceId })
-
-  const { mutate: createPublication, isPending: creatingPublication } =
-    useCreatePublicationMutation({
-      onSuccess: () => {
-        toast.success('Successfully created publication')
-        form.reset(defaultValues)
-        onClose()
-      },
-    })
+  const { data: tables } = useReplicationTablesQuery({ projectRef, sourceId }, { enabled: visible })
 
   const formId = 'publication-editor'
   const FormSchema = z.object({
     name: z.string().min(1, 'Name is required'),
     tables: z.array(z.string()).min(1, 'At least one table is required'),
   })
-  const defaultValues = {
+  const defaultValues: z.infer<typeof FormSchema> = {
     name: '',
     tables: [],
   }
@@ -60,6 +54,28 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
     resolver: zodResolver(FormSchema),
     defaultValues,
   })
+
+  // Always destructure formState values otherwise they won't be updated
+  // See https://react-hook-form.com/docs/useform/formstate
+  const { isDirty } = form.formState
+
+  const closePanel = (newPublication?: string) => {
+    form.reset(defaultValues)
+    onClose(newPublication)
+  }
+
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
+    checkIsDirty: () => isDirty,
+    onClose: () => closePanel(),
+  })
+
+  const { mutate: createPublication, isPending: creatingPublication } =
+    useCreatePublicationMutation({
+      onSuccess: (_, vars) => {
+        toast.success('Successfully created publication')
+        closePanel(vars.name)
+      },
+    })
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
@@ -82,12 +98,12 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
 
   return (
     <>
-      <Sheet open={visible} onOpenChange={onClose}>
+      <Sheet open={visible} onOpenChange={handleOpenChange}>
         <SheetContent size="default">
           <div className="flex flex-col h-full">
             <SheetHeader>
-              <SheetTitle>Create a new Publication</SheetTitle>
-              <SheetDescription>Replicate table changes to destinations</SheetDescription>
+              <SheetTitle>Create a new publication</SheetTitle>
+              <SheetDescription>Choose which tables to replicate to destinations.</SheetDescription>
             </SheetHeader>
             <SheetSection className="grow overflow-auto">
               <Form {...form}>
@@ -113,7 +129,7 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
                     render={({ field }) => (
                       <FormItemLayout
                         label="Tables"
-                        description="Which tables to replicate to destinations"
+                        description="Select at least one table to include in the publication."
                       >
                         <FormControl>
                           <MultiSelector
@@ -147,16 +163,17 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
               </Form>
             </SheetSection>
             <SheetFooter>
-              <Button type="default" disabled={creatingPublication} onClick={onClose}>
+              <Button variant="default" disabled={creatingPublication} onClick={confirmOnClose}>
                 Cancel
               </Button>
-              <Button type="primary" disabled={creatingPublication} form={formId} htmlType="submit">
+              <Button variant="primary" loading={creatingPublication} form={formId} type="submit">
                 Create publication
               </Button>
             </SheetFooter>
           </div>
         </SheetContent>
       </Sheet>
+      <DiscardChangesConfirmationDialog {...modalProps} />
     </>
   )
 }

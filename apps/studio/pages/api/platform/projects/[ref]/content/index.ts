@@ -3,7 +3,7 @@ import { compact } from 'lodash'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
-import apiWrapper from '@/lib/api/apiWrapper'
+import { apiWrapper } from '@/lib/api/apiWrapper'
 import {
   deleteSnippet,
   getSnippets,
@@ -11,6 +11,17 @@ import {
   SnippetSchema,
   updateSnippet,
 } from '@/lib/api/snippets.utils'
+
+// Next.js defaults the API body parser to a 1mb limit, which rejects large SQL
+// snippets (e.g. multi-thousand-line RPCs) with a 413 before they can be saved.
+// Match the 5mb limit already used by the AI SQL endpoint.
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '5mb',
+    },
+  },
+}
 
 const wrappedHandler = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 

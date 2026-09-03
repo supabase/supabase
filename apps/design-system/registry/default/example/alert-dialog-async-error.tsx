@@ -12,7 +12,7 @@ import {
   AlertDialogTrigger,
   Button,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 const resetTemplate = async () => {
   await new Promise((resolve) => setTimeout(resolve, 1200))
@@ -36,7 +36,7 @@ export default function AlertDialogAsyncError() {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button type="outline">Show Alert Dialog</Button>
+        <Button variant="outline">Show Alert Dialog</Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

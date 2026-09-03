@@ -92,7 +92,7 @@ export const TimezoneSettings = () => {
                     aria-expanded={open}
                     aria-controls={listboxId}
                     className="w-full justify-between"
-                    type="default"
+                    variant="default"
                     size="small"
                     icon={<Globe />}
                     iconRight={<ChevronsUpDown size={14} strokeWidth={1.5} />}

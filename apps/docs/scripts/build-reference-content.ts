@@ -18,6 +18,10 @@ import matter from 'gray-matter'
 
 import {
   buildMap,
+  KIND_CLASS,
+  KIND_INTERFACE,
+  KIND_PROPERTY,
+  KIND_TYPE_ALIAS,
   KIND_VARIABLE,
   normalizeComment,
   parseSignature,
@@ -63,6 +67,8 @@ interface Declaration {
   parameters?: Param[]
   type?: unknown
   flags?: { isOptional?: boolean; isConst?: boolean }
+  // Non-TypeDoc field: pre-rendered legacy function content (see FunctionEntry.content).
+  content?: Record<string, unknown>
 }
 
 interface FunctionEntry {
@@ -70,6 +76,14 @@ interface FunctionEntry {
   category: string
   subcategory: string | null
   $ref: string
+  /**
+   * Optional pre-rendered content (description, notes, params, examples) carried
+   * directly on a declaration. TypeDoc never emits this; it exists so non-TypeDoc
+   * sources adapted "as a pre-step" (e.g. the Dart YAML converter) can ship the
+   * legacy function shape straight onto the functions.json entry without a
+   * typeSpec round-trip. Absent for real TypeDoc dumps, so JS output is unchanged.
+   */
+  content?: Record<string, unknown>
 }
 
 interface FunctionsEntry {
@@ -355,6 +369,52 @@ function collectFunctions(
         isConst: node.flags?.isConst ?? false,
       }
       out.typeSpec.variables[ref] = variableEntry
+    } else if (node.kind === KIND_TYPE_ALIAS && node.type) {
+      // Type alias — store description and underlying type definition
+      const variableEntry: VariableTypes = {
+        name: ref,
+        type: parseType(node.type, idMap),
+        comment: node.comment ? normalizeComment(node.comment as any) : undefined,
+        isConst: false,
+      }
+      out.typeSpec.variables[ref] = variableEntry
+    } else if (node.kind === KIND_INTERFACE && node.children) {
+      // Interface — store as a method-like entry so the renderer shows properties as a param table
+      const params = (node.children as any[])
+        .filter((child: any) => child.kind === KIND_PROPERTY)
+        .map((prop: any) => ({
+          name: prop.name,
+          comment: prop.comment ? normalizeComment(prop.comment as any) : undefined,
+          isOptional: prop.flags?.isOptional ?? false,
+          type: prop.type ? parseType(prop.type, idMap) : undefined,
+        }))
+      const methodEntry: MethodTypes = {
+        name: ref,
+        params,
+        ret: undefined,
+        comment: node.comment ? normalizeComment(node.comment as any) : undefined,
+      }
+      out.typeSpec.methods[ref] = methodEntry
+    } else if (node.kind === KIND_CLASS && node.children) {
+      // Class — store as a method-like entry so the renderer shows the class
+      // description plus its public properties as a param table. Without this,
+      // classes fall through every branch and only their constructor child is
+      // stored, leaving the class ref (which functions.json points at) empty.
+      const params = (node.children as any[])
+        .filter((child: any) => child.kind === KIND_PROPERTY)
+        .map((prop: any) => ({
+          name: prop.name,
+          comment: prop.comment ? normalizeComment(prop.comment as any) : undefined,
+          isOptional: prop.flags?.isOptional ?? false,
+          type: prop.type ? parseType(prop.type, idMap) : undefined,
+        }))
+      const methodEntry: MethodTypes = {
+        name: ref,
+        params,
+        ret: undefined,
+        comment: node.comment ? normalizeComment(node.comment as any) : undefined,
+      }
+      out.typeSpec.methods[ref] = methodEntry
     }
   }
 
@@ -363,7 +423,7 @@ function collectFunctions(
     if (category) {
       const subcategory = readTagFromDeclOrSignature(node, '@subcategory')
       const $ref = normalizeRefPath([ctx.pkg, ...ctx.path, node.name].join('.'))
-      out.functions.push({ name: node.name, category, subcategory, $ref })
+      out.functions.push({ name: node.name, category, subcategory, $ref, content: node.content })
     }
   }
 
@@ -519,7 +579,9 @@ function buildBySlug(
     items.push(entry)
     // functions.json `id` must match the bySlug entry's `id` (not the slug) —
     // the renderer in Reference.sections.tsx does `fns.find(f => f.id === section.id)`.
-    functionsList.push({ id: entry.id, $ref: fn.$ref })
+    // `fn.content`, when present, carries the legacy function shape for non-TypeDoc
+    // sources; spread it so the renderer reads those fields without a typeSpec.
+    functionsList.push({ id: entry.id, $ref: fn.$ref, ...(fn.content ?? {}) })
   }
 
   // Sort items alphabetically (case-insensitive) within categories and within

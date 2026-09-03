@@ -51,14 +51,40 @@ export async function fetchJsLibReferenceSource() {
   })
 }
 
+export async function fetchServerLibReferenceSource() {
+  // Server SDK is driven by the new reference pipeline. Ingest search sources
+  // from the generated `content/reference/server/v1/` outputs so embeddings
+  // never drift from what the renderer shows.
+  return loadClientLibReferenceFromNewPipeline({
+    source: 'server-lib',
+    path: '/reference/server',
+    meta: { title: 'Server Reference', language: 'TypeScript' },
+    contentDir: 'content/reference/server/v1',
+  })
+}
+
+export async function fetchMiddlewareLibReferenceSource() {
+  // Middleware SDK is driven by the new reference pipeline. Ingest search
+  // sources from the generated `content/reference/middleware/v1/` outputs so
+  // embeddings never drift from what the renderer shows.
+  return loadClientLibReferenceFromNewPipeline({
+    source: 'middleware-lib',
+    path: '/reference/middleware',
+    meta: { title: 'Middleware Reference', language: 'TypeScript' },
+    contentDir: 'content/reference/middleware/v1',
+  })
+}
+
 export async function fetchDartLibReferenceSource() {
-  return new ClientLibReferenceLoader(
-    'dart-lib',
-    '/reference/dart',
-    { title: 'Dart Reference', language: 'Dart' },
-    'spec/supabase_dart_v2.yml',
-    'spec/common-client-libs-sections.json'
-  ).load()
+  // Dart v2 is driven by the new reference pipeline. Ingest search sources from
+  // the generated `content/reference/dart/v2/` outputs so embeddings never
+  // drift from what the renderer shows.
+  return loadClientLibReferenceFromNewPipeline({
+    source: 'dart-lib',
+    path: '/reference/dart',
+    meta: { title: 'Dart Reference', language: 'Dart' },
+    contentDir: 'content/reference/dart/v2',
+  })
 }
 
 export async function fetchPythonLibReferenceSource() {
@@ -130,6 +156,8 @@ export async function fetchAllSources(fullIndex: boolean) {
   const lintWarningsGuideSources = fetchLintWarningsGuideSources()
   const openApiReferenceSource = fetchOpenApiReferenceSource()
   const jsLibReferenceSource = fetchJsLibReferenceSource()
+  const serverLibReferenceSource = fullIndex ? fetchServerLibReferenceSource() : []
+  const middlewareLibReferenceSource = fullIndex ? fetchMiddlewareLibReferenceSource() : []
   const dartLibReferenceSource = fullIndex ? fetchDartLibReferenceSource() : []
   const pythonLibReferenceSource = fullIndex ? fetchPythonLibReferenceSource() : []
   const cSharpLibReferenceSource = fullIndex ? fetchCSharpLibReferenceSource() : []
@@ -163,6 +191,8 @@ export async function fetchAllSources(fullIndex: boolean) {
       lintWarningsGuideSources,
       openApiReferenceSource,
       jsLibReferenceSource,
+      serverLibReferenceSource,
+      middlewareLibReferenceSource,
       dartLibReferenceSource,
       pythonLibReferenceSource,
       cSharpLibReferenceSource,

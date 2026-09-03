@@ -3,8 +3,7 @@
 import { hasConsented, LOCAL_STORAGE_KEYS } from 'common'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Button } from 'ui/src/components/Button/Button'
-import { cn } from 'ui/src/lib/utils/cn'
+import { Button, cn } from 'ui'
 
 import announcement from '../Banners/data.json'
 
@@ -53,12 +52,12 @@ const PromoToast = () => {
       </div>
 
       <div className="relative z-10 flex items-center space-x-2">
-        <Button asChild type="secondary">
+        <Button asChild variant="secondary">
           <Link target="_blank" rel="noreferrer" href={`https://supabase.com${announcement.link}`}>
             Claim your ticket
           </Link>
         </Button>
-        <Button type="default" onClick={handleHide}>
+        <Button variant="default" onClick={handleHide}>
           Dismiss
         </Button>
       </div>

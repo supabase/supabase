@@ -8,7 +8,7 @@ API routes are automatically created when you create Postgres Tables, Views, or 
 
 ## Create a table
 
-Let's create our first API route by creating a table called `todos` to store tasks.
+Create your first API route by creating a table called `todos` to store tasks.
 This creates a corresponding route `todos` which can accept `GET`, `POST`, `PATCH`, & `DELETE` requests.
 
 <Tabs
@@ -68,7 +68,7 @@ To do this, you need to get the Project URL and key from [the project's **Connec
 
 <$Partial path="api_keys_deprecation.mdx" variables={{ "framework": "{{ .framework }}", "tab": "{{ .tab }}" }} />
 
-[Read the API keys docs](/docs/guides/getting-started/api-keys) for a full explanation of all key types and their uses.
+See [API keys](/docs/guides/getting-started/api-keys) for a full explanation of all key types and their uses.
 
 The REST API is accessible through the URL `https://<project_ref>.supabase.co/rest/v1`
 
@@ -78,7 +78,7 @@ Both of these routes require the key to be passed through an `apikey` header.
 
 You can interact with your API directly via HTTP requests, or you can use the client libraries which we provide.
 
-Let's see how to make a request to the `todos` table which we created in the first step,
+See how to make a request to the `todos` table which we created in the first step,
 using the API URL (`SUPABASE_URL`) and Key (`SUPABASE_PUBLISHABLE_KEY`) we provided:
 
 <Tabs
@@ -101,6 +101,20 @@ const { data: todos, error } = await supabase.from('todos').select('*')
 ```
 
 </TabPanel>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+// Initialize the client
+var supabase = new Supabase.Client(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+await supabase.InitializeAsync();
+
+// Make a request
+var todos = await supabase.From<Todo>().Get();
+```
+
+</TabPanel>
+</$Show>
 <TabPanel id="curl" label="cURL">
 
 ```bash

@@ -1,4 +1,5 @@
 import { CubeIcon } from '@heroicons/react/outline'
+import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
 import { useBreakpoint } from 'common'
 import {
   ArrowLeftRight,
@@ -134,7 +135,7 @@ const data: () => {
       ctas: [
         {
           label: 'Start Building',
-          href: 'https://supabase.com/dashboard',
+          href: DASHBOARD_SIGN_UP_URL,
           type: 'primary' as any,
           onClick: () =>
             sendTelemetryEvent({
@@ -276,7 +277,7 @@ const data: () => {
       customers: [
         {
           name: 'eXp Realty',
-          logo: '/images/customers/logos/exprealty.svg',
+          logo: '/images/customers/logos/on-light/exprealty.png',
           highlights: [
             'Saved $3M+ annually across multiple systems',
             '70+ vibe-coded applications in production',
@@ -290,7 +291,7 @@ const data: () => {
         },
         {
           name: 'Accenture Innovation Labs',
-          logo: '/images/customers/logos/accenture.svg',
+          logo: '/images/customers/logos/on-light/accenture.svg',
           highlights: [
             'Prototype-to-production in hours, not months',
             'Avoiding AWS complexity and auto-shutdown policies',
@@ -360,7 +361,7 @@ const data: () => {
                   absolute pointer-events-none
                   w-full h-full
                   inset-0 top-auto
-                  bg-[linear-gradient(to_bottom,transparent_0%,hsl(var(--background-default))_100%)]
+                  bg-[linear-gradient(to_bottom,transparent_0%,var(--background-default)_100%)]
                 "
               />
             </div>
@@ -426,7 +427,7 @@ const data: () => {
           ),
           className: 'border-l-0! sm:border-l!',
           image: (
-            <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]" />
+            <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,var(--background-default)_75%)]" />
           ),
         },
         {
@@ -621,7 +622,7 @@ const data: () => {
                   absolute pointer-events-none
                   w-full h-full
                   inset-0 top-auto
-                  bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]
+                  bg-[linear-gradient(to_top,transparent_0%,transparent_50%,var(--background-default)_75%)]
                 "
               />
               <Image
@@ -751,7 +752,7 @@ const data: () => {
           description: 'Start free with any AI builder + Supabase',
           cta: {
             label: 'Create Your First App in 5 Minutes',
-            href: 'https://supabase.com/dashboard',
+            href: DASHBOARD_SIGN_UP_URL,
           },
         },
         {

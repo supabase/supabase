@@ -9,6 +9,7 @@ import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
 import { BASE_PATH } from '~/lib/constants'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter, type GuideFrontmatter } from '~/lib/docs'
+import { mdAlternate } from '~/lib/md-alternates'
 import { GuideModelLoader } from '~/resources/guide/guideModelLoader'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { gfmFromMarkdown } from 'mdast-util-gfm'
@@ -30,9 +31,10 @@ const PUBLISHED_SECTIONS = [
   'deployment',
   'functions',
   'getting-started',
-  // 'graphql', -- technically published, but completely federated
+  'graphql',
   'integrations',
   'local-development',
+  'monitoring-and-debugging',
   'platform',
   'queues',
   'realtime',
@@ -40,7 +42,6 @@ const PUBLISHED_SECTIONS = [
   'security',
   'self-hosting',
   'storage',
-  'telemetry',
 ] as const
 
 const getGuidesMarkdownInternal = async (slug: string[]) => {
@@ -77,13 +78,14 @@ const getGuidesMarkdownInternal = async (slug: string[]) => {
       throw Error(`Type of frontmatter is not valid for path: ${fullPath}`)
     }
 
+    const { editLink: editLinkOverride, ...restMeta } = meta
     const editLink = newEditLink(
-      `supabase/supabase/blob/master/apps/docs/content/guides/${relPath}.mdx`
+      editLinkOverride ?? `supabase/supabase/blob/master/apps/docs/content/guides/${relPath}.mdx`
     )
 
     return {
       pathname: `/guides/${slug.join('/')}` satisfies `/${string}`,
-      meta,
+      meta: restMeta,
       content,
       editLink,
     }
@@ -181,7 +183,7 @@ const genGuideMeta =
         canonical: meta.canonical || `${BASE_PATH}${pathname}`,
         types: {
           ...(parentAlternates?.types ?? {}),
-          'text/markdown': `${BASE_PATH}${pathname}.md`,
+          ...mdAlternate(pathname.replace(/^\/guides\//, '')),
         },
       },
       openGraph: {

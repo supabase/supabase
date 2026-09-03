@@ -18,7 +18,7 @@ If you get stuck while working through this guide, you can find the [full exampl
 
 ## Building the app
 
-Let's start building the Vue 3 app from scratch.
+Build the Vue 3 app from scratch.
 
 ### Initialize a Nuxt 3 app
 
@@ -30,7 +30,7 @@ npx nuxi init nuxt-user-management
 cd nuxt-user-management
 ```
 
-Then let's install the only additional dependency: [Nuxt Supabase](https://supabase.nuxtjs.org/). We only need to import Nuxt Supabase as a dev dependency.
+Then install the only additional dependency: [Nuxt Supabase](https://supabase.nuxtjs.org/). We only need to import Nuxt Supabase as a dev dependency.
 
 ```bash
 npm install @nuxtjs/supabase --save-dev
@@ -73,7 +73,7 @@ export default defineNuxtConfig({
 
 ### Set up Auth component
 
-Let's set up a Vue component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
+Set up a Vue component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
 
 <$CodeTabs>
 
@@ -128,7 +128,7 @@ To access the user information, use the composable [`useSupabaseUser`](https://s
 ### Account component
 
 After a user is signed in we can allow them to edit their profile details and manage their account.
-Let's create a new component for that called `Account.vue`.
+Create a new component called `Account.vue`.
 
 <$CodeTabs>
 
@@ -360,3 +360,43 @@ And then open the browser to [localhost:3000](http://localhost:3000) and you sho
 ![Supabase Nuxt 3](/docs/img/supabase-vue-3-demo.png)
 
 At this stage you have a fully functional application!
+
+## Add a server route
+
+So far the app authenticates the user on the client. For protected API endpoints or server-rendered data, you need a server route that verifies the session.
+
+[`@supabase/server`](https://supabase.github.io/server/) handles the full flow through a single middleware: it validates the JWT locally (using your project's asymmetric signing keys, no round-trip to the Auth server), attaches an RLS-scoped Supabase client and the user's claims to the request, and rejects unauthenticated requests with a 401 before your handler runs.
+
+```bash
+npm install @supabase/server
+```
+
+<$CodeTabs>
+
+```typescript name=server/api/profile.get.ts
+import { withSupabase } from '@supabase/server/adapters/h3'
+import { defineHandler } from 'h3'
+
+export default defineHandler({
+  middleware: [withSupabase({ auth: 'user' })],
+  handler: async (event) => {
+    const { supabase, userClaims } = event.context.supabaseContext
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('username, website, avatar_url')
+      .eq('id', userClaims.id)
+      .single()
+
+    if (error) {
+      throw createError({ statusCode: 500, statusMessage: error.message })
+    }
+
+    return data
+  },
+})
+```
+
+</$CodeTabs>
+
+For an unauthenticated route, pass `auth: 'none'`. For app-wide auth, register `withSupabase({ auth: 'user' })` as a Nuxt server middleware at `server/middleware/supabase.ts` instead. See the [h3/Nuxt adapter docs](https://supabase.github.io/server/adapters/h3) for typing, route overrides, and the full API.

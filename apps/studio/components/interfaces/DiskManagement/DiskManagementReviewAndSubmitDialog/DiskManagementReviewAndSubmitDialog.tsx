@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ArrowRight } from 'lucide-react'
+import { AlertTriangle, ArrowRight } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
 import {
   Alert,
@@ -84,6 +84,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
     anyDiskAttributeChange,
     showThroughputRow,
     hasAnyBreakdownRows,
+    hasExtendedDowntimeRisk,
     oldComputeLabel,
     newComputeLabel,
   } = useDiskManagementReviewChanges(form, numReplicas)
@@ -93,8 +94,8 @@ export const DiskManagementReviewAndSubmitDialog = ({
       <DialogTrigger asChild>
         <ButtonTooltip
           size={buttonSize}
-          htmlType="submit"
-          type="primary"
+          type="submit"
+          variant="primary"
           onClick={async (e) => {
             e.preventDefault()
             const isValid = await form.trigger()
@@ -125,7 +126,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
         {(hasComputeChanges || anyBillableDiskChange) && (
           <>
             <div className="relative flex border-b">
-              <div className="flex-1 flex flex-col items-center gap-2 py-6 px-4 border-r bg-linear-to-t from-[hsl(var(--background-surface-100))] to-transparent">
+              <div className="flex-1 flex flex-col items-center gap-2 py-6 px-4 border-r bg-linear-to-t from-[var(--background-surface-100)] to-transparent">
                 <span className="text-xs uppercase tracking-widest font-mono text-foreground-lighter">
                   Before
                 </span>
@@ -143,7 +144,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 <ArrowRight size={16} className="text-brand-600 relative z-10" strokeWidth={2.5} />
               </div>
 
-              <div className="flex-1 flex flex-col items-center gap-2 py-6 px-4 bg-linear-to-t from-[hsl(var(--background-surface-100))] to-transparent">
+              <div className="flex-1 flex flex-col items-center gap-2 py-6 px-4 bg-linear-to-t from-[var(--background-surface-100)] to-transparent">
                 <span className="text-xs uppercase tracking-widest font-mono text-foreground-lighter">
                   After
                 </span>
@@ -187,7 +188,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 label="IOPS"
                 description={
                   anyDiskAttributeChange && !hasTotalSizeChanges && !hasStorageTypeChanges
-                    ? 'Disk attributes, including IOPS and disk size, may only be modified 4 times in any 24-hour window, starting from the first modification.'
+                    ? 'Disk attributes, including IOPS and disk size, may only be modified 4 times within a rolling 24-hour window. A new modification can be started as soon as the previous one completes.'
                     : undefined
                 }
               >
@@ -216,7 +217,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
             {(hasTotalSizeChanges || hasStorageTypeChanges) && (
               <BreakdownRow
                 label="Disk size"
-                description="For 4 hours after changes you will not be able to modify disk attributes."
+                description="You can modify disk attributes up to 4 times within a rolling 24-hour window."
               >
                 <div className="flex flex-col items-end gap-0.5">
                   <ValueChange
@@ -267,15 +268,29 @@ export const DiskManagementReviewAndSubmitDialog = ({
           </div>
         )}
 
+        {hasExtendedDowntimeRisk && (
+          <>
+            <DialogSectionSeparator />
+            <DialogSection>
+              <Alert variant="warning">
+                <AlertTriangle />
+                <AlertTitle>
+                  Resizes may require more downtime than normal on this project.
+                </AlertTitle>
+              </Alert>
+            </DialogSection>
+          </>
+        )}
+
         <DialogFooter className="px-5 py-4">
-          <Button block size="large" type="default" onClick={() => setIsDialogOpen(false)}>
+          <Button block size="large" variant="default" onClick={() => setIsDialogOpen(false)}>
             Cancel
           </Button>
           <Button
             block
-            type="primary"
+            variant="primary"
             size="large"
-            htmlType="submit"
+            type="submit"
             loading={loading}
             onClick={async () => {
               await onSubmit(form.getValues())

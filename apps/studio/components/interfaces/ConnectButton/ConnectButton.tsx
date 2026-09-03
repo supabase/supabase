@@ -12,13 +12,13 @@ import { useAppStateSnapshot } from '@/state/app-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface ConnectButtonProps {
-  buttonType?: ComponentProps<typeof Button>['type']
+  buttonVariant?: ComponentProps<typeof Button>['variant']
   className?: string
   iconOnly?: boolean
 }
 
 export const ConnectButton = ({
-  buttonType = 'default',
+  buttonVariant = 'default',
   className,
   iconOnly = false,
 }: ConnectButtonProps) => {
@@ -40,7 +40,7 @@ export const ConnectButton = ({
         open={showConnect ? false : undefined}
       >
         <Button
-          type={buttonType}
+          variant={buttonVariant}
           disabled={!isActiveHealthy}
           className={cn('rounded-full', className)}
           icon={<Plug className="rotate-90" />}
@@ -58,7 +58,7 @@ export const ConnectButton = ({
 
   return (
     <ButtonTooltip
-      type={buttonType}
+      variant={buttonVariant}
       disabled
       className={cn('rounded-full', className)}
       icon={<Plug className="rotate-90" />}

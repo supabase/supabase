@@ -111,7 +111,7 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
               <div className="flex items-center gap-2 justify-end">
                 {doc.links?.doc && (
                   <Button
-                    type="outline"
+                    variant="outline"
                     className="rounded-full"
                     icon={<ExternalLink className="text-foreground-muted" strokeWidth={1} />}
                   >
@@ -128,7 +128,7 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
                 )}
                 {doc.links?.api && (
                   <Button
-                    type="outline"
+                    variant="outline"
                     className="rounded-full"
                     icon={<ExternalLink className="text-foreground-muted" strokeWidth={1} />}
                   >
@@ -205,7 +205,7 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
                 <div className="flex items-center gap-2 justify-end">
                   {doc.links?.doc && (
                     <Button
-                      type="outline"
+                      variant="outline"
                       className="rounded-full"
                       icon={<ExternalLink className="text-foreground-muted" strokeWidth={1} />}
                     >
@@ -222,7 +222,7 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
                   )}
                   {doc.links?.api && (
                     <Button
-                      type="outline"
+                      variant="outline"
                       className="rounded-full"
                       icon={<ExternalLink className="text-foreground-muted" strokeWidth={1} />}
                     >
@@ -268,7 +268,7 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
                 <div className="flex items-center gap-2 justify-end">
                   {doc.links?.doc && (
                     <Button
-                      type="outline"
+                      variant="outline"
                       className="rounded-full"
                       icon={<ExternalLink className="text-foreground-muted" strokeWidth={1} />}
                     >
@@ -279,7 +279,7 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
                   )}
                   {doc.links?.api && (
                     <Button
-                      type="outline"
+                      variant="outline"
                       className="rounded-full"
                       icon={<ExternalLink className="text-foreground-muted" strokeWidth={1} />}
                     >

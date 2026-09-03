@@ -73,7 +73,7 @@ export default function ComboboxForm() {
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
-                      type="default"
+                      variant="default"
                       role="combobox"
                       className={cn(
                         'w-[200px] justify-between',
@@ -128,7 +128,7 @@ export default function ComboboxForm() {
             </FormItem>
           )}
         />
-        <Button htmlType="submit" type="secondary" size="small">
+        <Button type="submit" variant="secondary" size="small">
           Submit
         </Button>
       </form>

@@ -132,7 +132,7 @@ export const CreateAuth0IntegrationDialog = ({
                   <FormItemLayout label="Auth0 domain name">
                     <div className="flex flex-row">
                       <Button
-                        type="default"
+                        variant="default"
                         size="small"
                         className="px-2 text-foreground-light rounded-r-none"
                         onClick={() => form.setFocus('auth0DomainName')}
@@ -143,7 +143,7 @@ export const CreateAuth0IntegrationDialog = ({
                         <Input className="border-l-0 rounded-none border-r-0 z-50" {...field} />
                       </FormControl>
                       <Button
-                        type="default"
+                        variant="default"
                         size="small"
                         className="px-2 text-foreground-light rounded-l-none"
                         onClick={() => form.setFocus('auth0DomainName')}
@@ -160,16 +160,16 @@ export const CreateAuth0IntegrationDialog = ({
         <DialogFooter>
           {!isCreating && (
             <div className="flex-1">
-              <Button type="danger" onClick={() => onDelete()} icon={<Trash />}>
+              <Button variant="danger" onClick={() => onDelete()} icon={<Trash />}>
                 Remove connection
               </Button>
             </div>
           )}
 
-          <Button disabled={isPending} type="default" onClick={() => onClose()}>
+          <Button disabled={isPending} variant="default" onClick={() => onClose()}>
             Cancel
           </Button>
-          <Button form={FORM_ID} htmlType="submit" disabled={isPending} loading={isPending}>
+          <Button form={FORM_ID} type="submit" disabled={isPending} loading={isPending}>
             {isCreating ? 'Create connection' : 'Update connection'}
           </Button>
         </DialogFooter>

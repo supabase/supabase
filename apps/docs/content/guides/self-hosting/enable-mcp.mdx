@@ -29,19 +29,8 @@ When connecting via an SSH tunnel to the Studio Docker container, the source IP 
 scrollable
 size="small"
 type="underlined"
-defaultActiveId="kong"
+defaultActiveId="envoy"
 >
-
-<TabPanel id="kong" label="Kong">
-
-Determine the Docker bridge gateway IP on the host running your Supabase containers:
-
-```sh
-docker inspect supabase-kong \
-  --format '{{range .NetworkSettings.Networks}}{{println .Gateway}}{{end}}'
-```
-
-</TabPanel>
 
 <TabPanel id="envoy" label="Envoy">
 
@@ -49,6 +38,17 @@ Determine the Docker bridge gateway IP on the host running your Supabase contain
 
 ```sh
 docker inspect supabase-envoy \
+  --format '{{range .NetworkSettings.Networks}}{{println .Gateway}}{{end}}'
+```
+
+</TabPanel>
+
+<TabPanel id="kong" label="Kong">
+
+Determine the Docker bridge gateway IP on the host running your Supabase containers:
+
+```sh
+docker inspect supabase-kong \
   --format '{{range .NetworkSettings.Networks}}{{println .Gateway}}{{end}}'
 ```
 
@@ -64,52 +64,8 @@ This command will output an IP address, e.g., `172.18.0.1`.
 scrollable
 size="small"
 type="underlined"
-defaultActiveId="kong"
+defaultActiveId="envoy"
 >
-
-<TabPanel id="kong" label="Kong">
-
-Add the IP address you discovered to the Kong configuration by editing the following section in `./volumes/api/kong.yml`:
-
-1. Comment out the request-termination section
-2. Remove the # symbols from the entire section starting with `- name: cors`, including `deny: []`
-3. Add your local IP to the 'allow' list
-4. **Preserve the existing indentation** - YAML is whitespace-sensitive and the config will fail to load if it changes
-5. Your edited configuration should look like the example below:
-
-```yaml name=volumes/api/kong.yml
-## MCP endpoint - local access
-- name: mcp
-  _comment: 'MCP: /mcp -> http://studio:3000/api/mcp (local access)'
-  url: http://studio:3000/api/mcp
-  routes:
-    - name: mcp
-      strip_path: true
-      paths:
-        - /mcp
-  plugins:
-    # Block access to /mcp by default
-    #- name: request-termination
-    #  config:
-    #    status_code: 403
-    #    message: "Access is forbidden."
-    # Enable local access (danger zone!)
-    # 1. Comment out the 'request-termination' section above
-    # 2. Uncomment the entire section below, including 'deny'
-    # 3. Add your local IPs to the 'allow' list
-    - name: cors
-    - name: ip-restriction
-      config:
-        allow:
-          - 127.0.0.1
-          - ::1
-          # Add your Docker bridge gateway IP below
-          - 172.18.0.1
-        # Do not remove deny!
-        deny: []
-```
-
-</TabPanel>
 
 <TabPanel id="envoy" label="Envoy">
 
@@ -177,36 +133,59 @@ Add the IP address you discovered to the Envoy configuration by editing the `/mc
 
 </TabPanel>
 
+<TabPanel id="kong" label="Kong">
+
+Add the IP address you discovered to the Kong configuration by editing the following section in `./volumes/api/kong.yml`:
+
+1. Comment out the request-termination section
+2. Remove the # symbols from the entire section starting with `- name: cors`, including `deny: []`
+3. Add your local IP to the 'allow' list
+4. **Preserve the existing indentation** - YAML is whitespace-sensitive and the config will fail to load if it changes
+5. Your edited configuration should look like the example below:
+
+```yaml name=volumes/api/kong.yml
+## MCP endpoint - local access
+- name: mcp
+  _comment: 'MCP: /mcp -> http://studio:3000/api/mcp (local access)'
+  url: http://studio:3000/api/mcp
+  routes:
+    - name: mcp
+      strip_path: true
+      paths:
+        - /mcp
+  plugins:
+    # Block access to /mcp by default
+    #- name: request-termination
+    #  config:
+    #    status_code: 403
+    #    message: "Access is forbidden."
+    # Enable local access (danger zone!)
+    # 1. Comment out the 'request-termination' section above
+    # 2. Uncomment the entire section below, including 'deny'
+    # 3. Add your local IPs to the 'allow' list
+    - name: cors
+    - name: ip-restriction
+      config:
+        allow:
+          - 127.0.0.1
+          - ::1
+          # Add your Docker bridge gateway IP below
+          - 172.18.0.1
+        # Do not remove deny!
+        deny: []
+```
+
+</TabPanel>
+
 </Tabs>
 
 ### Step 3: Restart API gateway
 
 After you've added the local IP address as above, restart your gateway:
 
-<Tabs
-scrollable
-size="small"
-type="underlined"
-defaultActiveId="kong"
->
-
-<TabPanel id="kong" label="Kong">
-
 ```sh
-docker compose restart kong
+sh run.sh restart api-gw
 ```
-
-</TabPanel>
-
-<TabPanel id="envoy" label="Envoy">
-
-```sh
-docker compose -f docker-compose.yml -f docker-compose.envoy.yml restart api-gw
-```
-
-</TabPanel>
-
-</Tabs>
 
 ### Step 4: Create the SSH tunnel
 
@@ -266,7 +245,6 @@ Start your MCP client (Claude Code, Cursor, etc.) and verify access to the MCP t
 
 If you are unable to connect to the MCP server:
 
-1. Update Kong configuration file to the [latest version](https://github.com/supabase/supabase/blob/master/docker/volumes/api/kong.yml) and edit carefully
-2. Confirm the Docker bridge gateway IP is correctly added in `./volumes/api/kong.yml`
-3. Check Kong's logs for errors: `docker compose logs kong`
-4. Make sure your SSH tunnel is active
+1. Confirm the Docker bridge gateway IP is correctly added to the API gateway configuration
+2. Check the API gateway's logs for errors: `docker compose logs api-gw`
+3. Make sure your SSH tunnel is active

@@ -1,4 +1,4 @@
-import { ICommand } from 'ui-patterns'
+import { ICommand } from 'ui-patterns/CommandMenu'
 
 import { SHORTCUT_IDS } from './registry'
 

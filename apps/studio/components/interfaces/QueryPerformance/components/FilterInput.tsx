@@ -29,7 +29,7 @@ export const FilterInput = ({ value, onChange, placeholder, className }: FilterI
           <Button
             key="clear"
             size="tiny"
-            type="text"
+            variant="text"
             icon={<X />}
             onClick={() => onChange('')}
             className="p-0 h-5 w-5"

@@ -19,7 +19,7 @@ import {
   formatYAxisTick,
 } from '@/components/ui/QueryBlock/QueryBlock.utils'
 import { AnalyticsInterval } from '@/data/analytics/constants'
-import { mapMultiResponseToAnalyticsData } from '@/data/analytics/infra-monitoring-queries'
+import { mapResponseToAnalyticsData } from '@/data/analytics/infra-monitoring-queries'
 import {
   InfraMonitoringAttribute,
   useInfraMonitoringAttributesQuery,
@@ -119,7 +119,7 @@ export const ChartBlock = ({
 
   const infraMonitoringData = useMemo(() => {
     if (!infraMonitoringRawData) return undefined
-    const mapped = mapMultiResponseToAnalyticsData(infraMonitoringRawData, [
+    const mapped = mapResponseToAnalyticsData(infraMonitoringRawData, [
       attribute as InfraMonitoringAttribute,
     ])
     return mapped[attribute]
@@ -153,19 +153,19 @@ export const ChartBlock = ({
 
   const getCellColor = (attribute: string, value: number) => {
     const threshold = METRIC_THRESHOLDS[attribute as keyof typeof METRIC_THRESHOLDS]
-    if (!threshold) return 'hsl(var(--chart-1))'
+    if (!threshold) return 'var(--chart-1)'
     if (threshold.check === 'gt') {
       return value >= threshold.danger
-        ? 'hsl(var(--chart-destructive))'
+        ? 'var(--chart-destructive)'
         : value >= threshold.warning
-          ? 'hsl(var(--chart-warning))'
-          : 'hsl(var(--chart-1))'
+          ? 'var(--chart-warning)'
+          : 'var(--chart-1)'
     } else {
       return value <= threshold.danger
-        ? 'hsl(var(--chart-destructive))'
+        ? 'var(--chart-destructive)'
         : value <= threshold.warning
-          ? 'hsl(var(--chart-warning))'
-          : 'hsl(var(--chart-1))'
+          ? 'var(--chart-warning)'
+          : 'var(--chart-1)'
     }
   }
 
@@ -224,7 +224,7 @@ export const ChartBlock = ({
       actions={
         <>
           <ButtonTooltip
-            type="text"
+            variant="text"
             size="tiny"
             disabled={loading}
             className="w-7 h-7"
@@ -243,7 +243,7 @@ export const ChartBlock = ({
             }}
           />
           <ButtonTooltip
-            type={logScale ? 'default' : 'text'}
+            variant={logScale ? 'default' : 'text'}
             size="tiny"
             disabled={loading}
             className="h-7 px-1.5 font-mono text-[10px]"
@@ -362,7 +362,7 @@ export const ChartBlock = ({
                     />
                   }
                 />
-                <Line dataKey={metricLabel} stroke="hsl(var(--chart-1))" radius={4} />
+                <Line dataKey={metricLabel} stroke="var(--chart-1)" radius={4} />
               </LineChart>
             )}
           </ChartContainer>

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { Card, CardContent } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
 

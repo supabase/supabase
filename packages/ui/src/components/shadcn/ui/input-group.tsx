@@ -45,7 +45,7 @@ function InputGroup({
       role="group"
       className={cn(
         'group/input-group relative items-center outline-hidden transition-[color,box-shadow]',
-        'flex rounded-md border border-control bg-foreground/[.026] text-sm',
+        'flex rounded-md border border-control hover:border-control-hover bg-field text-sm transition-colors duration-200',
         'has-[>textarea]:h-auto',
 
         // Variants based on alignment.
@@ -55,12 +55,16 @@ function InputGroup({
         'has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col has-[>[data-align=block-start]]:[&>input]:pb-3',
         'has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-end]]:[&>input]:pt-3',
 
-        // Focus state.
-        'has-[[data-slot=input-group-control]:focus-visible]:outline-hidden has-[[data-slot=input-group-control]:focus-visible]:ring-2 has-[[data-slot=input-group-control]:focus-visible]:ring-background-control has-[[data-slot=input-group-control]:focus-visible]:ring-offset-2 has-[[data-slot=input-group-control]:focus-visible]:ring-offset-foreground-muted',
+        // Focus state. Parent listens via :has() — cannot use the focus-ring utility
+        // (that utility targets :focus-visible on the element itself).
+        'has-[[data-slot=input-group-control]:focus-visible]:outline-hidden has-[[data-slot=input-group-control]:focus-visible]:border-control-hover has-[[data-slot=input-group-control]:focus-visible]:ring-2 has-[[data-slot=input-group-control]:focus-visible]:ring-ring has-[[data-slot=input-group-control]:focus-visible]:ring-offset-2 has-[[data-slot=input-group-control]:focus-visible]:ring-offset-background',
+        'has-[[data-slot=input-group-control]:focus]:border-control-hover',
 
         // Error state.
         'has-[[data-slot][aria-invalid=true]]:bg-destructive-200 has-[[data-slot][aria-invalid=true]]:ring-destructive/20 has-[[data-slot][aria-invalid=true]]:border-destructive-400 dark:has-[[data-slot][aria-invalid=true]]:ring-destructive/40',
+        'has-[[data-slot][aria-invalid=true]]:hover:border-destructive',
         'has-[[data-slot][aria-invalid=true]]:has-[[data-slot=input-group-control]:focus-visible]:border-destructive',
+        'has-[[data-slot][aria-invalid=true]]:has-[[data-slot=input-group-control]:focus]:border-destructive',
 
         // Disabled state.
         'has-[[data-slot=input-group-control]:disabled]:cursor-not-allowed has-[[data-slot=input-group-control]:disabled]:text-foreground-muted',
@@ -130,10 +134,10 @@ const inputGroupButtonVariants = cva('', {
 const InputGroupButton = React.forwardRef<
   HTMLButtonElement,
   Omit<React.ComponentProps<typeof Button>, 'size'> & VariantProps<typeof inputGroupButtonVariants>
->(function InputGroupButton({ className, type = 'text', size = 'tiny', ...props }, ref) {
+>(function InputGroupButton({ className, variant = 'text', size = 'tiny', ...props }, ref) {
   return (
     <Button
-      type={type}
+      variant={variant}
       size={size}
       className={cn(inputGroupButtonVariants({ size }), className)}
       ref={ref}
@@ -164,10 +168,12 @@ const InputGroupInput = React.forwardRef<HTMLInputElement, InputProps>(
       data-slot="input-group-control"
       className={cn(
         'flex-1 block rounded-none border border-transparent -m-px bg-transparent shadow-none',
-        'focus:border-transparent focus-visible:border-transparent focus-visible:ring-0 focus-visible:ring-offset-0',
+        // Shell owns hover/focus chrome; kill Input's control-hover borders on the inner control.
+        'hover:border-transparent focus:border-transparent focus-visible:border-transparent',
+        'focus-visible:ring-0 focus-visible:ring-offset-0',
         'read-only:border-transparent',
         'aria-[invalid=true]:border-transparent aria-[invalid=true]:bg-transparent',
-        'aria-[invalid=true]:focus:border-transparent aria-[invalid=true]:focus-visible:border-transparent',
+        'aria-[invalid=true]:hover:border-transparent aria-[invalid=true]:focus:border-transparent aria-[invalid=true]:focus-visible:border-transparent',
         className
       )}
       {...props}
@@ -186,7 +192,10 @@ const InputGroupTextarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       data-slot="input-group-control"
       className={cn(
         'flex-1 resize-none rounded-none border border-transparent bg-transparent py-0 shadow-none',
-        'focus:border-transparent focus-visible:border-transparent focus-visible:ring-0 focus-visible:ring-offset-0',
+        'hover:border-transparent focus:border-transparent focus-visible:border-transparent',
+        'focus-visible:ring-0 focus-visible:ring-offset-0',
+        'aria-[invalid=true]:border-transparent aria-[invalid=true]:bg-transparent',
+        'aria-[invalid=true]:hover:border-transparent aria-[invalid=true]:focus:border-transparent aria-[invalid=true]:focus-visible:border-transparent',
         className
       )}
       {...props}

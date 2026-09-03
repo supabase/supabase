@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { Plus, X } from 'lucide-react'
-import { Fragment, useState } from 'react'
-import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
+import { useState } from 'react'
+import { Control, SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -43,6 +43,8 @@ import { useIcebergNamespacesQuery } from '@/data/storage/iceberg-namespaces-que
 const formId = 'create-namespace-table'
 const NEW_NAMESPACE_MARKER = 'new-namespace'
 
+type CreateTableFormValues = z.infer<ReturnType<typeof createFormSchema>>
+
 interface CreateTableSheetProps {
   open: boolean
   onOpenChange: (value: boolean) => void
@@ -53,18 +55,18 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
   const [isCreating, setIsCreating] = useState(false)
 
   const FormSchema = createFormSchema()
-  const defaultValues = {
+  const defaultValues: CreateTableFormValues = {
     namespace: '',
     newNamespace: undefined,
     name: '',
-    columns: [{ name: '', type: 'string' as any }],
+    columns: [{ name: '', type: 'string' }],
   }
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues,
     mode: 'onChange',
   })
-  const { namespace } = form.watch()
+  const namespace = useWatch({ control: form.control, name: 'namespace' })
   const {
     fields: columns,
     append: appendColumn,
@@ -191,7 +193,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                     name="newNamespace"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout name="newNamespace" label="Name of new namespace">
+                      <FormItemLayout label="Name of new namespace">
                         <FormControl>
                           <Input {...field} placeholder="Provide a name for your new namespace" />
                         </FormControl>
@@ -209,7 +211,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                     name="name"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout name="name" label="Name of table">
+                      <FormItemLayout label="Name of table">
                         <FormControl>
                           <Input {...field} placeholder="Provide a name for your new table" />
                         </FormControl>
@@ -221,7 +223,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                     <div className="flex items-center justify-between">
                       <p className="text-sm">Columns</p>
                       <Button
-                        type="default"
+                        variant="default"
                         icon={<Plus />}
                         onClick={() => appendColumn({ name: '', type: 'string' })}
                       >
@@ -238,102 +240,15 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                           <p className="text-xs text-foreground-lighter">Name</p>
                           <p className="text-xs text-foreground-lighter">Type</p>
                         </div>
-                        {columns.map((_, idx) => {
-                          const columnType = form.watch(`columns.${idx}.type`)
-                          const additionalFields =
-                            COLUMN_TYPE_FIELDS[columnType as keyof typeof COLUMN_TYPE_FIELDS] ?? []
-
-                          return (
-                            <Fragment key={`column-${idx}`}>
-                              <div className="grid grid-cols-[1fr_1fr_32px] gap-x-1">
-                                <FormField
-                                  control={form.control}
-                                  name={`columns.${idx}.name`}
-                                  render={({ field }) => (
-                                    <FormItemLayout>
-                                      <FormControl>
-                                        <Input
-                                          {...field}
-                                          placeholder="Provide a column name"
-                                          disabled={isCreating}
-                                          className="h-auto"
-                                        />
-                                      </FormControl>
-                                    </FormItemLayout>
-                                  )}
-                                />
-                                <FormField
-                                  control={form.control}
-                                  name={`columns.${idx}.type`}
-                                  render={({ field }) => (
-                                    <FormControl>
-                                      <Select value={field.value} onValueChange={field.onChange}>
-                                        <SelectTrigger className="h-auto">
-                                          <SelectValue placeholder="Select a type" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          {COLUMN_TYPES.map((x) => (
-                                            <SelectItem key={x} value={x}>
-                                              {x}
-                                            </SelectItem>
-                                          ))}
-                                        </SelectContent>
-                                      </Select>
-                                    </FormControl>
-                                  )}
-                                />
-                                <div className="flex items-center justify-center">
-                                  <Button
-                                    type="text"
-                                    size="tiny"
-                                    icon={<X strokeWidth={1.5} size={14} />}
-                                    className="w-6 h-6"
-                                    onClick={() => removeColumn(idx)}
-                                  />
-                                </div>
-
-                                {additionalFields.length > 0 && (
-                                  <div className="col-span-full flex items-center mt-2">
-                                    <div className="flex items-center justify-end gap-1 w-[85%] ">
-                                      {additionalFields.map((x) => (
-                                        <FormField
-                                          control={form.control}
-                                          key={`columns.${idx}.${x.name}`}
-                                          name={`columns.${idx}.${x.name}` as any}
-                                          render={({ field }) => (
-                                            <FormItemLayout>
-                                              <FormControl>
-                                                <InputGroup>
-                                                  <InputGroupAddon align="inline-start">
-                                                    {x.name}
-                                                  </InputGroupAddon>
-                                                  <FormInputGroupInput
-                                                    {...field}
-                                                    type={x.type === 'number' ? 'number' : 'text'}
-                                                    disabled={isCreating}
-                                                    className="h-[34px] rounded-l-none"
-                                                    onChange={(event) =>
-                                                      field.onChange(
-                                                        isNaN(event.target.valueAsNumber)
-                                                          ? null
-                                                          : event.target.valueAsNumber
-                                                      )
-                                                    }
-                                                  />
-                                                </InputGroup>
-                                              </FormControl>
-                                            </FormItemLayout>
-                                          )}
-                                        />
-                                      ))}
-                                    </div>
-                                    <div className="w-4 h-[1.6rem] border-r border-b rounded-br mr-3 border-control -translate-y-3" />
-                                  </div>
-                                )}
-                              </div>
-                            </Fragment>
-                          )
-                        })}
+                        {columns.map((column, idx) => (
+                          <ColumnRow
+                            key={column.id}
+                            control={form.control}
+                            idx={idx}
+                            isCreating={isCreating}
+                            onRemove={() => removeColumn(idx)}
+                          />
+                        ))}
                       </>
                     )}
                   </div>
@@ -344,7 +259,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
             <SheetFooter>
               <Button
                 disabled={isCreating}
-                type="default"
+                variant="default"
                 onClick={() => {
                   onOpenChange(false)
                   form.reset(defaultValues)
@@ -352,7 +267,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
               >
                 Cancel
               </Button>
-              <Button form={formId} htmlType="submit" loading={isCreating}>
+              <Button form={formId} type="submit" loading={isCreating}>
                 Create table
               </Button>
             </SheetFooter>
@@ -360,5 +275,103 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
         </form>
       </Form>
     </Sheet>
+  )
+}
+
+interface ColumnRowProps {
+  control: Control<CreateTableFormValues>
+  idx: number
+  isCreating: boolean
+  onRemove: () => void
+}
+
+const ColumnRow = ({ control, idx, isCreating, onRemove }: ColumnRowProps) => {
+  const columnType = useWatch({ control, name: `columns.${idx}.type` })
+  const additionalFields = COLUMN_TYPE_FIELDS[columnType] ?? []
+
+  return (
+    <div className="grid grid-cols-[1fr_1fr_32px] gap-x-1">
+      <FormField
+        control={control}
+        name={`columns.${idx}.name`}
+        render={({ field }) => (
+          <FormItemLayout>
+            <FormControl>
+              <Input
+                {...field}
+                placeholder="Provide a column name"
+                disabled={isCreating}
+                className="h-auto"
+              />
+            </FormControl>
+          </FormItemLayout>
+        )}
+      />
+      <FormField
+        control={control}
+        name={`columns.${idx}.type`}
+        render={({ field }) => (
+          <FormControl>
+            <Select value={field.value} onValueChange={field.onChange}>
+              <SelectTrigger className="h-auto">
+                <SelectValue placeholder="Select a type" />
+              </SelectTrigger>
+              <SelectContent>
+                {COLUMN_TYPES.map((x) => (
+                  <SelectItem key={x} value={x}>
+                    {x}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormControl>
+        )}
+      />
+      <div className="flex items-center justify-center">
+        <Button
+          aria-label="Remove"
+          variant="text"
+          size="tiny"
+          icon={<X strokeWidth={1.5} size={14} />}
+          className="w-6 h-6"
+          onClick={onRemove}
+        />
+      </div>
+
+      {additionalFields.length > 0 && (
+        <div className="col-span-full flex items-center mt-2">
+          <div className="flex items-center justify-end gap-1 w-[85%] ">
+            {additionalFields.map((x) => (
+              <FormField
+                control={control}
+                key={`columns.${idx}.${x.name}`}
+                name={`columns.${idx}.${x.name}`}
+                render={({ field }) => (
+                  <FormItemLayout>
+                    <FormControl>
+                      <InputGroup>
+                        <InputGroupAddon align="inline-start">{x.name}</InputGroupAddon>
+                        <FormInputGroupInput
+                          {...field}
+                          type={x.type === 'number' ? 'number' : 'text'}
+                          disabled={isCreating}
+                          className="h-[34px] rounded-l-none"
+                          onChange={(event) =>
+                            field.onChange(
+                              isNaN(event.target.valueAsNumber) ? null : event.target.valueAsNumber
+                            )
+                          }
+                        />
+                      </InputGroup>
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            ))}
+          </div>
+          <div className="w-4 h-[1.6rem] border-r border-b rounded-br mr-3 border-control -translate-y-3" />
+        </div>
+      )}
+    </div>
   )
 }

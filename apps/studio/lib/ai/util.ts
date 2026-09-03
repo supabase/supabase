@@ -32,7 +32,7 @@ export async function selectWeightedKey<T extends string>(
   const keys = Object.keys(weights) as T[]
   const encoder = new TextEncoder()
   const data = encoder.encode(input)
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data as BufferSource)
 
   // Use first 4 bytes (32 bit integer)
   const hashInt = new DataView(hashBuffer).getUint32(0)

@@ -6,6 +6,7 @@ import type { CSSProperties, PointerEvent } from 'react'
 import { Button, cn } from 'ui'
 
 import { useDevToolbar } from './DevToolbarContext'
+import { getEventCountBadge } from './utils'
 
 // Duplicated for tree-shaking — bundler must see literal process.env reference.
 // Keep in sync: index.ts, DevToolbarContext.tsx, DevToolbar.tsx, feature-flags.tsx
@@ -163,7 +164,7 @@ export function DevToolbarTrigger() {
 
   if (!IS_TOOLBAR_ENABLED || !isEnabled) return null
 
-  const eventCount = events.length
+  const eventCountBadge = getEventCountBadge(events.length)
   const isDragging = dragPos !== null
   const snapCoords = getSnapCoords(snapPosition, viewport.w, viewport.h)
   const FULL_TRANSITION = `${SNAP_TRANSITION}, opacity 200ms ease`
@@ -210,11 +211,10 @@ export function DevToolbarTrigger() {
   return (
     <div style={containerStyle}>
       <Button
-        type="text"
+        variant="default"
+        rounded
         className={cn(
-          'relative rounded-full h-10 w-10 p-0',
-          'bg-surface-100 border border-overlay shadow-md',
-          'text-foreground-light hover:text-foreground hover:bg-surface-200',
+          'relative h-10 w-10 p-0 shadow-md',
           'focus-visible:outline-0 focus-visible:outline-transparent focus-visible:outline-offset-0',
           'select-none touch-none',
           isDragging ? 'cursor-grabbing' : 'cursor-pointer'
@@ -239,17 +239,17 @@ export function DevToolbarTrigger() {
           aria-hidden="true"
           className="pointer-events-none"
         />
-        {eventCount > 0 && (
+        {eventCountBadge && (
           <span
             className={cn(
               'absolute -top-1 -right-1',
-              'h-4 min-w-4 px-0.5',
               'inline-flex items-center justify-center',
-              'rounded-full bg-destructive text-foreground',
-              'text-[10px] font-medium leading-none'
+              'rounded-full bg-brand text-black',
+              'text-[9px] font-medium leading-none tracking-tighter tabular-nums',
+              eventCountBadge.sizeClass
             )}
           >
-            {eventCount > 99 ? '99+' : eventCount}
+            {eventCountBadge.label}
           </span>
         )}
       </Button>

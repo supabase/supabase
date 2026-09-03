@@ -12,8 +12,12 @@ interface InterstitialLayoutProps {
   logo?: ReactNode
   title?: ReactNode
   description?: ReactNode
+  /** Optional content rendered beneath the card (e.g. a terms disclaimer), at the card's width. */
+  footer?: ReactNode
   containerClassName?: string
   cardClassName?: string
+  /** Shared max-width for the card and footer column. Defaults to `max-w-[400px]`. */
+  widthClassName?: string
   titleClassName?: string
   descriptionClassName?: string
 }
@@ -29,8 +33,10 @@ export const InterstitialLayout = ({
   logo,
   title,
   description,
+  footer,
   containerClassName,
   cardClassName,
+  widthClassName = 'max-w-[400px]',
   titleClassName,
   descriptionClassName,
   children,
@@ -60,6 +66,27 @@ export const InterstitialLayout = ({
     </DescriptionElement>
   ) : null
 
+  const card = (
+    <MotionCard
+      layout="size"
+      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+      className={cn('overflow-hidden w-full mx-auto', widthClassName, cardClassName)}
+    >
+      {(logo || title || description) && (
+        <CardHeader className="font-normal items-center gap-0 space-y-0 px-6 py-6 text-center [--card-padding-x:1.5rem] border-0">
+          {logo && <div className="mb-4 flex justify-center">{logo}</div>}
+          {(titleElement || descriptionElement) && (
+            <div className="flex flex-col items-center gap-1">
+              {titleElement}
+              {descriptionElement}
+            </div>
+          )}
+        </CardHeader>
+      )}
+      {children}
+    </MotionCard>
+  )
+
   return (
     <div
       className={cn(
@@ -67,24 +94,14 @@ export const InterstitialLayout = ({
         containerClassName
       )}
     >
-      <MotionCard
-        layout="size"
-        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-        className={cn('overflow-hidden max-w-[400px] w-full mx-auto', cardClassName)}
-      >
-        {(logo || title || description) && (
-          <CardHeader className="font-normal items-center gap-0 space-y-0 px-6 py-6 text-center [--card-padding-x:1.5rem] border-0">
-            {logo && <div className="mb-4 flex justify-center">{logo}</div>}
-            {(titleElement || descriptionElement) && (
-              <div className="flex flex-col items-center gap-1">
-                {titleElement}
-                {descriptionElement}
-              </div>
-            )}
-          </CardHeader>
-        )}
-        {children}
-      </MotionCard>
+      {footer ? (
+        <div className={cn('flex w-full flex-col items-center gap-4', widthClassName)}>
+          {card}
+          <div className="px-2 text-center text-balance">{footer}</div>
+        </div>
+      ) : (
+        card
+      )}
     </div>
   )
 }
@@ -114,16 +131,39 @@ export const LogoPair = ({ left, right }: { left: ReactNode; right: ReactNode })
   </div>
 )
 
-/** Partner logo rendered edge-to-edge inside a LogoBox. */
-export const PartnerLogo = ({ src, alt }: { src: string; alt: string }) => (
-  <LogoBox>
-    <img alt={alt} src={src} className="size-full object-cover" />
+/** Partner logo rendered edge-to-edge inside a LogoBox by default. */
+export const PartnerLogo = ({
+  src,
+  alt,
+  className,
+  imageClassName,
+}: {
+  src: string
+  alt: string
+  className?: string
+  imageClassName?: string
+}) => (
+  <LogoBox className={className}>
+    <img alt={alt} src={src} className={cn('size-full object-cover', imageClassName)} />
   </LogoBox>
 )
 
+/**
+ * Sign-in destination mark, inset to match {@link SupabaseLogo}. Falls back to the destination's
+ * initial when no icon is available.
+ */
+export const DestinationLogo = ({ icon, name }: { icon?: ReactNode; name: string }) => (
+  <LogoBox>
+    {icon ?? <span className="text-lg font-medium text-foreground-light">{name.slice(0, 1)}</span>}
+  </LogoBox>
+)
+
+/** Fixed light tile chrome for Connect pairs with unclassified (uploaded) marks. */
+export const CONNECT_LOGO_LIGHT_TILE_CLASSNAME = 'border-black/10 bg-white'
+
 /** Supabase symbol (not the wordmark) rendered inset inside a LogoBox. */
-export const SupabaseLogo = () => (
-  <LogoBox className="bg-surface-75">
+export const SupabaseLogo = ({ forceLight = false }: { forceLight?: boolean } = {}) => (
+  <LogoBox className={forceLight ? CONNECT_LOGO_LIGHT_TILE_CLASSNAME : 'bg-surface-75'}>
     <img alt="Supabase" src={`${BASE_PATH}/img/supabase-logo.svg`} className="size-7" />
   </LogoBox>
 )
@@ -133,11 +173,13 @@ export const InterstitialAccountRow = ({
   displayName,
   action,
   className,
+  detail,
 }: {
   avatarUrl?: string
   displayName?: string
   action?: ReactNode
   className?: string
+  detail?: string
 }) => (
   <Card className={cn('shadow-none', !action && 'border-muted bg-surface-200/50', className)}>
     <CardContent
@@ -156,8 +198,21 @@ export const InterstitialAccountRow = ({
         <p className="truncate text-sm text-foreground">
           {displayName || <span className="invisible">Loading account</span>}
         </p>
+        {detail && <p className="mt-1 truncate text-xs text-foreground-light">{detail}</p>}
       </div>
       {action}
     </CardContent>
   </Card>
 )
+
+export const InterstitialActionError = ({ error }: { error?: ReactNode }) => {
+  if (!error) return null
+
+  return (
+    <div className="mt-3 border-t border-muted pt-5">
+      <p role="alert" className="text-center text-xs text-destructive text-balance">
+        {error}
+      </p>
+    </div>
+  )
+}

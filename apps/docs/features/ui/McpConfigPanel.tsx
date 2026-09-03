@@ -2,6 +2,7 @@
 
 import { useDebounce } from '~/hooks/useDebounce'
 import { useIntersectionObserver } from '~/hooks/useIntersectionObserver'
+import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { useProjectsInfiniteQuery } from '~/lib/fetch/projects-infinite'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
@@ -22,13 +23,14 @@ import {
   PopoverTrigger,
   ScrollArea,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import {
   createMcpCopyHandler,
+  MCP_HOSTED_AUTH_NOTE,
   McpConfigPanel as McpConfigPanelBase,
   type McpClient,
 } from 'ui-patterns/McpUrlBuilder'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 type PlatformType = (typeof PLATFORMS)[number]['value']
 
@@ -104,7 +106,7 @@ function ProjectSelector({
         </span>
 
         {!isUserLoading && !isLoggedIn ? (
-          <Button size="small" type="default" className="gap-0 rounded-l-none" asChild>
+          <Button size="small" variant="default" className="gap-0 rounded-l-none" asChild>
             <Link href="https://supabase.com/dashboard" rel="noreferrer noopener" target="_blank">
               <div className="flex items-center gap-2">Log in to choose a project</div>
             </Link>
@@ -113,7 +115,7 @@ function ProjectSelector({
           <PopoverTrigger asChild disabled={isUserLoading || isLoading || isError}>
             <Button
               size="small"
-              type="default"
+              variant="default"
               className="gap-0 rounded-l-none"
               iconRight={
                 <ChevronDown
@@ -214,7 +216,7 @@ function PlatformSelector({
         <PopoverTrigger asChild>
           <Button
             size="small"
-            type="default"
+            variant="default"
             className="gap-0 rounded-l-none"
             iconRight={
               <ChevronDown
@@ -268,6 +270,7 @@ export function McpConfigPanel() {
   const [selectedClient, setSelectedClient] = useState<McpClient | null>(null)
   const { resolvedTheme } = useTheme()
   const sendTelemetryEvent = useSendTelemetryEvent()
+  const { mcpServers } = getCustomContent(['mcp:servers'])
 
   const isPlatform = selectedPlatform === 'hosted'
   const project = isPlatform ? selectedProject : null
@@ -326,23 +329,16 @@ export function McpConfigPanel() {
           projectRef={project?.ref}
           theme={resolvedTheme as 'light' | 'dark'}
           isPlatform={isPlatform}
+          platformUrl={mcpServers?.remote}
+          nonPlatformUrl={mcpServers?.local}
           onCopyCallback={handleCopy}
           onInstallCallback={handleInstall}
           onClientSelect={setSelectedClient}
         />
       </div>
       {isPlatform && (
-        <Admonition type="note" title="Authentication" className="mt-3">
-          <p>
-            {
-              "Some MCP clients will automatically prompt you to login during setup, while others may require manual authentication steps. Either authentication method will open a browser window where you can login to your Supabase account and grant organization access to the MCP client. In the future, we'll offer more fine grain control over these permissions."
-            }
-          </p>
-          <p>
-            {
-              'Previously Supabase MCP required you to generate a personal access token (PAT), but this is no longer required.'
-            }
-          </p>
+        <Admonition type="note" title={MCP_HOSTED_AUTH_NOTE.title} className="mt-3">
+          <p>{MCP_HOSTED_AUTH_NOTE.body}</p>
         </Admonition>
       )}
     </>

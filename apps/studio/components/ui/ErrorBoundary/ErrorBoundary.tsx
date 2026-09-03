@@ -28,11 +28,11 @@ const ErrorFallback = ({
         <AlertTitle>{message}</AlertTitle>
         <AlertDescription>We've been notified and will review and fix this issue.</AlertDescription>
         <div className="mt-4 flex gap-2">
-          <Button type="default" onClick={resetErrorBoundary} className="text-sm">
+          <Button variant="default" onClick={resetErrorBoundary} className="text-sm">
             Try again
           </Button>
           {actions?.map((action, index) => (
-            <Button key={index} type="default" onClick={action.onClick} className="text-sm">
+            <Button key={index} variant="default" onClick={action.onClick} className="text-sm">
               {action.label}
             </Button>
           ))}

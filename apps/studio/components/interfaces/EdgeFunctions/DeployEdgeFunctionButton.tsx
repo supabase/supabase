@@ -31,7 +31,7 @@ export const DeployEdgeFunctionButton = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild disabled={!isProjectActive}>
         <ButtonTooltip
-          type="primary"
+          variant="primary"
           disabled={!isProjectActive}
           iconRight={<ChevronDown className="w-4 h-4" strokeWidth={1.5} />}
           tooltip={{

@@ -158,7 +158,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
             <Button
               block
               size="small"
-              htmlType="submit"
+              type="submit"
               loading={isCreatingUser}
               disabled={!canCreateUsers || isCreatingUser}
             >

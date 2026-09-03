@@ -18,6 +18,7 @@ import {
   validateFields,
 } from './RowEditor.utils'
 import { TextEditor } from './TextEditor'
+import { getStableRowIdentifiers } from '@/components/grid/utils/queueOperationUtils'
 import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -64,8 +65,10 @@ export const RowEditor = ({
   const [loading, setLoading] = useState(false)
   const [createMore, setCreateMore] = useState(false)
 
+  // Generated columns are always computed by the database, so they are excluded from the form.
+  // They remain in rowFields as primary key identifiers may rely on them.
   const [requiredFields, optionalFields] = partition(
-    rowFields,
+    rowFields.filter((rowField) => !rowField.isGenerated),
     (rowField: any) => !rowField.isNullable
   )
 
@@ -144,7 +147,7 @@ export const RowEditor = ({
           identifiers[column.name] =
             column.format === 'bytea' ? convertByteaToHex(row![column.name]) : row![column.name]
         })
-        configuration.identifiers = identifiers
+        configuration.identifiers = getStableRowIdentifiers(row!, identifiers)
         configuration.rowIdx = row!.idx
       }
 

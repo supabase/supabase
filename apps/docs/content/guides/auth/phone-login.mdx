@@ -19,13 +19,13 @@ Phone OTP login can:
 - Increase security by reducing the risk of password-related security breaches
 - Reduce support burden of dealing with password resets and other password-related flows
 
-<CostWarning />
+<$Partial path="cost_warning.mdx" />
 
 ## Enabling phone login
 
 Enable phone authentication on the [Auth Providers page](/dashboard/project/_/auth/providers) for hosted Supabase projects.
 
-For self-hosted projects or local development, use the [configuration file](/docs/guides/cli/config#auth.sms.enable_signup). See the configuration variables namespaced under `auth.sms`.
+For self-hosted projects or local development, use the [configuration file](/docs/guides/local-development/cli/config#auth.sms.enable_signup). See the configuration variables namespaced under `auth.sms`.
 
 You also need to set up an SMS provider. Each provider has its own configuration. Supported providers include MessageBird, Twilio, Vonage, and TextLocal (community-supported).
 
@@ -96,6 +96,15 @@ supabase.auth.signInWith(OTP) {
 response = supabase.auth.sign_in_with_otp({
   'phone': '+13334445555',
 })
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+await supabase.Auth.SignIn(SignInType.Phone, "+13334445555");
 ```
 
 </TabPanel>
@@ -193,6 +202,17 @@ response = supabase.auth.verify_otp({
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `VerifyOTP`:
+
+```c#
+var session = await supabase.Auth.VerifyOTP("+13334445555", "123456", MobileOtpType.SMS);
+```
+
+</TabPanel>
+</$Show>
 <TabPanel id="http" label="HTTP">
 
 ```bash
@@ -278,6 +298,15 @@ supabase.auth.updateUser {
 response = supabase.auth.update_user({
   'phone': '123456789',
 })
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var response = await supabase.Auth.Update(new UserAttributes { Phone = "123456789" });
 ```
 
 </TabPanel>

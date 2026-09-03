@@ -77,7 +77,7 @@ function ReplyCard({ reply, thread }: { reply: Reply; thread?: ThreadRow }) {
             </span>
           )}
           {reply.external_activity_url && (
-            <Button asChild type="default" size="tiny">
+            <Button asChild variant="default" size="tiny">
               <a
                 href={reply.external_activity_url}
                 target="_blank"

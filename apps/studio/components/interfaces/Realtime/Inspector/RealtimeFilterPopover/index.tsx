@@ -89,7 +89,7 @@ export const RealtimeFilterPopover = ({
     <PopoverTrigger asChild>
       <Button
         icon={<PlusCircle size="16" />}
-        type={isFiltered ? 'primary' : 'dashed'}
+        variant={isFiltered ? 'primary' : 'dashed'}
         className={cn('rounded-full px-1 text-xs h-[26px]')}
         size="small"
       >
@@ -252,7 +252,7 @@ export const RealtimeFilterPopover = ({
             </>
           )}
           <div className="px-4 py-2 gap-2 flex justify-end">
-            <Button type="default" onClick={() => setOpen(false)}>
+            <Button variant="default" onClick={() => setOpen(false)}>
               Cancel
             </Button>
             <Button onClick={() => setApplyConfigOpen(true)}>Apply</Button>

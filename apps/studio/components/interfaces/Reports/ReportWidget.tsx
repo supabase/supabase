@@ -60,7 +60,7 @@ const ReportWidget = (props: ReportWidgetProps) => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  type="default"
+                  variant="default"
                   icon={<ExternalLink />}
                   className="px-1"
                   onClick={() => {

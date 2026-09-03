@@ -2,23 +2,22 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
-import { isArray } from 'lodash'
-import { Check, ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
-import { Button, cn, SidePanel } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { CancellationFlow } from './CancellationFlow'
-import { EnterpriseCard } from './EnterpriseCard'
+import {
+  isFullScreenPresentation,
+  isPlanChangeEligible,
+  usePlanPresentationExperiment,
+} from './plan-presentation'
+import { PlanCards } from './PlanCards'
+import { PlanUpdateFullScreenShell, PlanUpdateSheetShell } from './PlanUpdatePanelShell'
 import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import UpgradeSurveyModal from './UpgradeModal'
 import { STRIPE_PROJECTS_DOCS_URL } from '@/components/interfaces/Billing/Payment/PaymentMethods/StripePaymentConnection'
-import { getPlanChangeType } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
-import { RequestUpgradeToBillingOwners } from '@/components/ui/RequestUpgradeToBillingOwners'
 import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-utils'
 import { useOrganizationBillingSubscriptionPreview } from '@/data/organizations/organization-billing-subscription-preview'
 import { useOrganizationQuery } from '@/data/organizations/organization-query'
@@ -30,7 +29,6 @@ import type { OrgPlan } from '@/data/subscriptions/types'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
-import { formatCurrency } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
 import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 import { Organization } from '@/types/base'
@@ -48,6 +46,52 @@ const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
       organizationSlug: selectedOrganization?.slug,
     }
   }
+}
+
+const PartnerManagedPlanNotice = ({
+  organization,
+  isStripeManaged,
+  isPartnerBilled,
+  stripeProjectsUpgradeCommand,
+}: {
+  organization: Organization | undefined
+  isStripeManaged: boolean
+  isPartnerBilled: boolean
+  stripeProjectsUpgradeCommand: string
+}) => {
+  if (!organization) return null
+
+  if (isStripeManaged) {
+    return (
+      <PartnerManagedResource
+        managedBy={MANAGED_BY.STRIPE_PROJECTS}
+        resource="Organization plans"
+        title="Organization plans are managed through Stripe."
+        details={
+          <>
+            Run <code className="text-code-inline">{stripeProjectsUpgradeCommand}</code> in your
+            project directory.
+          </>
+        }
+        cta={{
+          overrideUrl: `${STRIPE_PROJECTS_DOCS_URL}#upgrade-a-service-tier`,
+          message: 'Stripe Projects docs',
+        }}
+      />
+    )
+  }
+
+  if (isPartnerBilled) {
+    return (
+      <PartnerManagedResource
+        managedBy={organization.managed_by}
+        resource="Organization plans"
+        cta={getPartnerManagedResourceCta(organization)}
+      />
+    )
+  }
+
+  return null
 }
 
 const getStripeProjectsUpgradeCommand = (planId: string | null | undefined) => {
@@ -98,7 +142,10 @@ export const PlanUpdateSidePanel = () => {
   )
 
   const snap = useOrgSettingsPageStateSnapshot()
-  const visible = snap.panelKey === 'subscriptionPlan'
+  const isOpenedViaUrl = router.query.panel === 'subscriptionPlan'
+  const visible = snap.panelKey === 'subscriptionPlan' || isOpenedViaUrl
+
+  const contentDelay = isOpenedViaUrl ? 0.4 : 0.15
 
   const { data: orgProjectsData } = useOrgProjectsInfiniteQuery({ slug }, { enabled: visible })
   const orgProjects =
@@ -134,6 +181,23 @@ export const PlanUpdateSidePanel = () => {
   })
 
   const availablePlans: OrgPlan[] = plans?.plans ?? []
+
+  // Only orgs that can actually act on the panel enter the experiment, and only once it is open
+  const isPlanPresentationEligible =
+    visible &&
+    isPlanChangeEligible({
+      managedBy: selectedOrganization?.managed_by,
+      billingPartner: selectedOrganization?.billing_partner,
+      currentPlanId: subscription?.plan?.id,
+      canUpdateSubscription,
+    })
+
+  const { variant: presentation, isResolved: isPresentationResolved } =
+    usePlanPresentationExperiment({ eligible: isPlanPresentationEligible })
+  const isFullScreen = isFullScreenPresentation(presentation)
+
+  // The fullscreen variant swaps the shell, so hold the panel closed until the variant is known
+  const isPanelOpen = visible && isPresentationResolved
 
   const onPanelOpened = useEffectEvent(
     (properties: StudioPricingSidePanelOpenedEvent['properties']) => {
@@ -182,194 +246,55 @@ export const PlanUpdateSidePanel = () => {
     selectedOrganization?.plan?.id ?? subscription?.plan?.id
   )
 
+  const notice = (
+    <PartnerManagedPlanNotice
+      organization={selectedOrganization}
+      isStripeManaged={isStripeManagedOrganization}
+      isPartnerBilled={isPartnerBilledOrganization}
+      stripeProjectsUpgradeCommand={stripeProjectsUpgradeCommand}
+    />
+  )
+
+  const planCards = (
+    <PlanCards
+      availablePlans={availablePlans}
+      isLoadingPlans={isLoadingPlans}
+      currentSubscriptionPlanId={subscription?.plan?.id}
+      currentSubscriptionPlanName={subscription?.plan?.name}
+      canUpdateSubscription={canUpdateSubscription}
+      isPartnerBilledOrganization={isPartnerBilledOrganization}
+      hasOrioleProjects={hasOrioleProjects}
+      selectedOrganization={selectedOrganization}
+      variant={presentation}
+      entryDelay={isFullScreen ? contentDelay : undefined}
+      onSelectTier={setSelectedTier}
+    />
+  )
+
   return (
     <>
-      <SidePanel
-        hideFooter
-        size="xxlarge"
-        visible={visible}
-        onCancel={() => onClose()}
-        header={
-          <div className="flex items-center justify-between w-full">
-            <h4>Change subscription plan for {selectedOrganization?.name}</h4>
-            <Button asChild type="default" icon={<ExternalLink />}>
-              <a href="https://supabase.com/pricing" target="_blank" rel="noreferrer">
-                Pricing
-              </a>
-            </Button>
-          </div>
-        }
-      >
-        {selectedOrganization &&
-          (isStripeManagedOrganization ? (
-            <PartnerManagedResource
-              managedBy={MANAGED_BY.STRIPE_PROJECTS}
-              resource="Organization plans"
-              title="Organization plans are managed through Stripe."
-              details={
-                <>
-                  Run <code className="text-code-inline">{stripeProjectsUpgradeCommand}</code> in
-                  your project directory.
-                </>
-              }
-              cta={{
-                overrideUrl: `${STRIPE_PROJECTS_DOCS_URL}#upgrade-a-service-tier`,
-                message: 'Stripe Projects docs',
-              }}
-            />
-          ) : isPartnerBilledOrganization ? (
-            <PartnerManagedResource
-              managedBy={selectedOrganization.managed_by}
-              resource="Organization plans"
-              cta={getPartnerManagedResourceCta(selectedOrganization)}
-            />
-          ) : null)}
-        <SidePanel.Content>
-          <div className="py-6 grid grid-cols-12 gap-3">
-            {subscriptionsPlans.map((plan) => {
-              const planMeta = availablePlans.find((p) => p.id === plan.id.split('tier_')[1])
-              const price = planMeta?.price ?? 0
-              const isDowngradeOption =
-                getPlanChangeType(subscription?.plan.id, plan?.planId) === 'downgrade'
-              const isCurrentPlan = planMeta?.id === subscription?.plan?.id
-              const features = plan.features
-              const footer = plan.footer
+      {isFullScreen && isPanelOpen && (
+        <PlanUpdateFullScreenShell
+          organizationName={selectedOrganization?.name}
+          notice={notice}
+          skipOverlayFade={isOpenedViaUrl}
+          contentDelay={contentDelay}
+          onClose={onClose}
+        >
+          {planCards}
+        </PlanUpdateFullScreenShell>
+      )}
 
-              const source = Array.isArray(router.query.source)
-                ? router.query.source[0]
-                : router.query.source
-              // TODO this panel should allow direct configuration of the highlighting rather than indirectly via the source param
-              const shouldHighlight = source === 'log-drains-empty-state' && plan.id === 'tier_pro'
-
-              if (plan.id === 'tier_enterprise') {
-                return <EnterpriseCard key={plan.id} plan={plan} isCurrentPlan={isCurrentPlan} />
-              }
-
-              return (
-                <div
-                  key={plan.id}
-                  className={cn(
-                    'px-4 py-4 flex flex-col items-start justify-between',
-                    'border rounded-md col-span-12 md:col-span-4 bg-surface-200',
-                    shouldHighlight &&
-                      'ring-4 ring-brand animate-[pulse_1.5s_ease-in-out_1] shadow-md shadow-brand/40'
-                  )}
-                >
-                  <div className="w-full">
-                    <div className="flex items-center space-x-2">
-                      <p className="text-brand-link text-sm uppercase">{plan.name}</p>
-                      {isCurrentPlan ? (
-                        <div className="text-xs bg-surface-300 text-foreground-light rounded-sm px-2 py-0.5">
-                          Current plan
-                        </div>
-                      ) : plan.nameBadge ? (
-                        <div className="text-xs bg-brand-300 dark:bg-brand-400 text-brand-600 rounded-sm px-2 py-0.5">
-                          {plan.nameBadge}
-                        </div>
-                      ) : null}
-                    </div>
-                    <div className="mt-4 flex items-center space-x-1 mb-4">
-                      {(price ?? 0) > 0 && <p className="text-foreground-light text-sm">From</p>}
-                      {isLoadingPlans ? (
-                        <div className="h-[28px] flex items-center justify-center">
-                          <ShimmeringLoader className="w-[30px] h-[24px]" />
-                        </div>
-                      ) : (
-                        <p className="text-foreground text-lg" translate="no">
-                          {formatCurrency(price)}
-                        </p>
-                      )}
-                      <p className="text-foreground-light text-sm">{plan.costUnit}</p>
-                    </div>
-                    {isCurrentPlan ? (
-                      <Button block disabled type="default">
-                        Current plan
-                      </Button>
-                    ) : !canUpdateSubscription && !isDowngradeOption ? (
-                      <RequestUpgradeToBillingOwners block plan={plan.name as 'Pro' | 'Team'} />
-                    ) : (
-                      <ButtonTooltip
-                        block
-                        type={isDowngradeOption ? 'default' : 'primary'}
-                        disabled={
-                          (!canUpdateSubscription && isDowngradeOption) ||
-                          subscription?.plan?.id === 'enterprise' ||
-                          subscription?.plan?.id === 'platform' ||
-                          // Downgrades to free are still allowed through the dashboard given we have much better control about showing customers the impact + any possible issues with downgrading to free
-                          (isPartnerBilledOrganization && plan.id !== 'tier_free') ||
-                          // Orgs managed by AWS marketplace are not allowed to change the plan
-                          selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE ||
-                          hasOrioleProjects
-                        }
-                        onClick={() => {
-                          setSelectedTier(plan.id as 'tier_free' | 'tier_pro' | 'tier_team')
-                          track('studio_pricing_plan_cta_clicked', {
-                            selectedPlan: plan.name,
-                            currentPlan: subscription?.plan?.name,
-                          })
-                        }}
-                        tooltip={{
-                          content: {
-                            side: 'bottom',
-                            className: hasOrioleProjects ? 'w-96 text-center' : '',
-                            text:
-                              !canUpdateSubscription && isDowngradeOption
-                                ? "You need additional permissions to change your organization's plan"
-                                : subscription?.plan?.id === 'enterprise' ||
-                                    subscription?.plan?.id === 'platform'
-                                  ? 'Reach out to us via support to update your plan'
-                                  : hasOrioleProjects
-                                    ? 'Your organization has projects that are using the OrioleDB extension which is only available on the Free plan. Remove all OrioleDB projects before changing your plan.'
-                                    : selectedOrganization?.managed_by ===
-                                        MANAGED_BY.AWS_MARKETPLACE
-                                      ? 'You cannot change the plan for an organization managed by AWS Marketplace'
-                                      : undefined,
-                          },
-                        }}
-                      >
-                        {isDowngradeOption ? 'Downgrade' : 'Upgrade'} to {plan.name}
-                      </ButtonTooltip>
-                    )}
-
-                    <div className="border-t my-4" />
-
-                    <ul role="list">
-                      {features.map((feature) => (
-                        <li
-                          key={typeof feature === 'string' ? feature : feature[0]}
-                          className="flex py-2"
-                        >
-                          <div className="w-[12px]">
-                            <Check
-                              className="h-3 w-3 text-brand translate-y-[2.5px]"
-                              aria-hidden="true"
-                              strokeWidth={3}
-                            />
-                          </div>
-                          <div>
-                            <p className="ml-3 text-xs text-foreground-light">
-                              {typeof feature === 'string' ? feature : feature[0]}
-                            </p>
-                            {isArray(feature) && (
-                              <p className="ml-3 text-xs text-foreground-lighter">{feature[1]}</p>
-                            )}
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {footer && (
-                    <div className="border-t pt-4 mt-4">
-                      <p className="text-foreground-light text-xs">{footer}</p>
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        </SidePanel.Content>
-      </SidePanel>
+      {!isFullScreen && (
+        <PlanUpdateSheetShell
+          visible={isPanelOpen}
+          organizationName={selectedOrganization?.name}
+          notice={notice}
+          onClose={onClose}
+        >
+          {planCards}
+        </PlanUpdateSheetShell>
+      )}
 
       <CancellationFlow
         visible={selectedTier === 'tier_free'}
@@ -380,6 +305,7 @@ export const PlanUpdateSidePanel = () => {
       <SubscriptionPlanUpdateDialog
         selectedTier={selectedTier}
         onClose={() => setSelectedTier(undefined)}
+        onSuccess={isFullScreen ? onClose : undefined}
         planMeta={planMeta}
         subscriptionPreviewQueryResult={subscriptionPreviewData}
         projects={orgProjects}

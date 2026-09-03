@@ -5,12 +5,12 @@ description: 'Monitor Edge Functions with the Sentry Deno SDK.'
 
 Add the [Sentry Deno SDK](https://docs.sentry.io/platforms/javascript/guides/deno/) to your Supabase Edge Functions to track exceptions and get notified of errors or performance issues.
 
-### Prerequisites
+## Prerequisites
 
 - [Create a Sentry account](https://sentry.io/signup/).
-- Make sure you have the latest version of the [Supabase CLI](/docs/guides/cli#installation) installed.
+- Make sure you have the latest version of the [Supabase CLI](/docs/guides/local-development/cli/getting-started#installing-the-supabase-cli) installed.
 
-### 1. Create Supabase function
+## 1. Create Supabase function
 
 Create a new function locally:
 
@@ -18,17 +18,17 @@ Create a new function locally:
 supabase functions new sentryfied
 ```
 
-### 2. Add the Sentry Deno SDK
+## 2. Add the Sentry Deno SDK
 
 Handle exceptions within your function and send them to Sentry.
 
 ```tsx
-import * as Sentry from 'https://deno.land/x/sentry/index.mjs'
+import * as Sentry from 'npm:@sentry/deno@^8'
 import { withSupabase } from 'npm:@supabase/server@^1'
 
 Sentry.init({
   // https://docs.sentry.io/product/sentry-basics/concepts/dsn-explainer/#where-to-find-your-dsn
-  dsn: SENTRY_DSN,
+  dsn: Deno.env.get('SENTRY_DSN'),
   defaultIntegrations: false,
   // Performance Monitoring
   tracesSampleRate: 1.0,
@@ -55,13 +55,13 @@ export default {
       Sentry.captureException(e)
       // Flush Sentry before the running process closes
       await Sentry.flush(2000)
-      return Response.json({ msg: 'error' }, { status: 500 })
+      return Response.json({ error: 'Internal Server Error' }, { status: 500 })
     }
   }),
 }
 ```
 
-### 3. Deploy and test
+## 3. Deploy and test
 
 Run function locally:
 
@@ -78,7 +78,7 @@ Deploy function to Supabase:
 supabase functions deploy sentryfied --no-verify-jwt
 ```
 
-### 4. Try it yourself
+## 4. Try it yourself
 
 Find the complete example on [GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/sentryfied/index.ts).
 

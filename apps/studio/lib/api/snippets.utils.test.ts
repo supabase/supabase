@@ -238,6 +238,23 @@ describe('snippets.utils', () => {
 
       await expect(getFilesystemEntries()).rejects.toThrow('Permission denied')
     })
+
+    it('should skip reading file content when includeContent is false', async () => {
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockResolvedValue([
+        { name: 'snippet1.sql', isDirectory: () => false, isFile: () => true },
+        { name: 'snippet2.sql', isDirectory: () => false, isFile: () => true },
+      ] as any)
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
+
+      const entries = await getFilesystemEntries({ includeContent: false })
+
+      const files = entries.filter((e) => e.type === 'file')
+      expect(files).toHaveLength(2)
+      expect(files.every((f) => f.content === undefined)).toBe(true)
+      // Listings should never touch file contents off disk.
+      expect(mockedFS.readFile).not.toHaveBeenCalled()
+    })
   })
 
   describe('getSnippet', () => {
@@ -657,6 +674,45 @@ describe('snippets.utils', () => {
       const result = await getSnippets({ limit: 1000 })
 
       expect(result.snippets).toHaveLength(1)
+    })
+
+    it('should omit content but keep metadata when includeContent is false', async () => {
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockResolvedValue([
+        { name: 'test-snippet.sql', isDirectory: () => false, isFile: () => true },
+      ] as any)
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01T10:00:00Z') } as any)
+
+      const result = await getSnippets({ includeContent: false })
+
+      expect(result.snippets).toHaveLength(1)
+      const snippet = result.snippets[0]
+
+      // Matches the Management API folder-listing contract: metadata, no SQL body.
+      expect(snippet).not.toHaveProperty('content')
+      expect(snippet).toMatchObject({
+        name: 'test-snippet',
+        type: 'sql',
+        visibility: 'user',
+        folder_id: null,
+      })
+      expect(snippet.id).toBeDefined()
+      // Listing must not read file contents off disk.
+      expect(mockedFS.readFile).not.toHaveBeenCalled()
+    })
+
+    it('searches by name without reading content when includeContent is false', async () => {
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockResolvedValue([
+        { name: 'user-query.sql', isDirectory: () => false, isFile: () => true },
+        { name: 'admin-report.sql', isDirectory: () => false, isFile: () => true },
+      ] as any)
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
+
+      const result = await getSnippets({ searchTerm: 'user', includeContent: false })
+
+      expect(result.snippets.map((s) => s.name)).toEqual(['user-query'])
+      expect(mockedFS.readFile).not.toHaveBeenCalled()
     })
   })
 

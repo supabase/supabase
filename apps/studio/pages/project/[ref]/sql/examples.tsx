@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
 import SQLExamples from '@/components/interfaces/SQLEditor/SQLTemplates/SQLExamples'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { EditorBaseLayout } from '@/components/layouts/editors/EditorBaseLayout'
 import SQLEditorLayout from '@/components/layouts/SQLEditorLayout/SQLEditorLayout'
 import { SQLEditorMenu } from '@/components/layouts/SQLEditorLayout/SQLEditorMenu'

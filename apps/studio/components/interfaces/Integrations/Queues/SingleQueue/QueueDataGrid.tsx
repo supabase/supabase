@@ -7,7 +7,7 @@ import { Badge, Button, cn, ResizableHandle, ResizablePanel, ResizablePanelGroup
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DATE_FORMAT, MessageDetailsPanel } from './MessageDetailsPanel'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { PostgresQueueMessage } from '@/data/database-queues/database-queue-messages-infinite-query'
 import type { ResponseError } from '@/types'
 

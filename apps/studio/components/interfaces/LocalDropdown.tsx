@@ -14,11 +14,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   singleThemes,
-  Theme,
 } from 'ui'
 
 import { ButtonTooltip } from '../ui/ButtonTooltip'
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
+import { DevToolbarMenuGroup } from './DevToolbarMenuGroup'
 import { ProfileImage } from '@/components/ui/ProfileImage'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
@@ -44,7 +44,7 @@ export const LocalDropdown = ({
     >
       <DropdownMenuTrigger className={cn('border shrink-0 px-3', triggerClassName)} asChild>
         <ButtonTooltip
-          type="default"
+          variant="default"
           className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
           tooltip={{ content: { text: 'Settings' } }}
         >
@@ -75,6 +75,7 @@ export const LocalDropdown = ({
           Feature previews
         </DropdownMenuItem>
         <DropdownMenuSeparator />
+        <DevToolbarMenuGroup />
         <DropdownMenuGroup>
           <DropdownMenuLabel>Theme</DropdownMenuLabel>
           <DropdownMenuRadioGroup
@@ -83,7 +84,7 @@ export const LocalDropdown = ({
               setTheme(value)
             }}
           >
-            {singleThemes.map((theme: Theme) => (
+            {singleThemes.map((theme) => (
               <DropdownMenuRadioItem
                 key={theme.value}
                 value={theme.value}

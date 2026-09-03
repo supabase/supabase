@@ -21,6 +21,7 @@ interface TabProps {
 
 const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }: TabProps) => (
   <button
+    tabIndex={0}
     onClick={onClick}
     className={`text-left text-lg flex flex-col group gap-1 transition-all ${
       isActive ? 'flex-2 text-foreground' : 'flex-1 text-foreground-light'
@@ -138,7 +139,7 @@ const TimedTabsSection = ({
           </h2>
           <p className="text-foreground-lighter mb-4 max-w-sm">{paragraph}</p>
           {cta && (
-            <Button asChild type="default" size="small" icon={<ArrowUpRight />}>
+            <Button asChild variant="default" size="small" icon={<ArrowUpRight />}>
               <Link href={cta.link}>{cta.label ?? 'Explore more'}</Link>
             </Button>
           )}

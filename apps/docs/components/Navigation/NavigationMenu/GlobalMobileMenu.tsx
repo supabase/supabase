@@ -29,7 +29,7 @@ const listItem = {
 }
 
 const itemClassName =
-  'block py-2 pl-2 pr-3.5 text-sm text-foreground-light hover:bg-surface-200 focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-foreground-lighter focus-visible:rounded-sm'
+  'block py-2 pl-2 pr-3.5 text-sm text-foreground-light hover:bg-surface-200 focus-ring rounded-sm'
 
 const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
   const activeLabel = useActiveMenuLabel(GLOBAL_MENU_ITEMS)
@@ -63,6 +63,7 @@ const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
                     href={item.href}
                     title={item.label}
                     community={item.community}
+                    new={item.new}
                     icon={item.icon}
                   />
                 )
@@ -141,9 +142,10 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
               <div className="flex gap-4 items-center">
                 <ThemeToggle contentClassName="bg-surface-200" />
                 <button
+                  tabIndex={0}
                   onClick={() => setOpen(false)}
                   type="button"
-                  className="inline-flex items-center justify-center focus:ring-brand bg-surface-100 hover:bg-surface-200 focus:outline-hidden focus:ring-2 focus:ring-inset border border-default bg-surface-100/75 text-foreground-light rounded-sm min-w-[30px] w-[30px] h-[30px]"
+                  className="inline-flex items-center justify-center bg-surface-100 hover:bg-surface-200 border border-default bg-surface-100/75 text-foreground-light rounded-sm min-w-[30px] w-[30px] h-[30px] focus-ring"
                 >
                   <span className="sr-only">Close menu</span>
                   <X />
@@ -162,11 +164,13 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
                     </Button>
                   ) : (
                     <>
-                      <Button block size="medium" type="default" asChild>
+                      <Button block size="medium" variant="default" asChild>
                         <Link href="https://supabase.com/dashboard/sign-in">Sign in</Link>
                       </Button>
                       <Button block size="medium" asChild>
-                        <Link href="https://supabase.com/dashboard/new">Start your project</Link>
+                        <Link href="https://supabase.com/dashboard/sign-up">
+                          Start your project
+                        </Link>
                       </Button>
                     </>
                   )}

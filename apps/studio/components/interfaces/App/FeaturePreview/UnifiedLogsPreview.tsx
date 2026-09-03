@@ -13,10 +13,6 @@ export const UnifiedLogsPreview = () => {
         Experience our enhanced Logs interface with improved filtering, real-time updates, and a
         unified view across all your services. Built for better performance and easier debugging.
       </p>
-      <p className="text-foreground-light text-sm mb-4">
-        This interface is only available for organizations on the Enterprise plan.
-      </p>
-
       <Image
         alt="new-logs-preview"
         src={`${BASE_PATH}/img/previews/new-logs-preview.png`}

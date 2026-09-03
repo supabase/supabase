@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { useIsPgDeltaDiffEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { ReviewWithAI } from '../BranchManagement/ReviewWithAI'
@@ -191,7 +191,7 @@ export const MergeActions = ({
                     : 'Unable to merge at this time',
             },
           }}
-          type="primary"
+          variant="primary"
           loading={isSubmitting}
           disabled={isMergeDisabled}
           onClick={onSelectMerge}
@@ -201,7 +201,7 @@ export const MergeActions = ({
         </ButtonTooltip>
       ) : (
         <Button
-          type="primary"
+          variant="primary"
           loading={isSubmitting}
           onClick={onSelectMerge}
           icon={<GitMerge size={16} strokeWidth={1.5} className="text-brand" />}
@@ -212,7 +212,12 @@ export const MergeActions = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="default" loading={isUpdating} className="px-1.5" icon={<MoreVertical />} />
+          <Button
+            variant="default"
+            loading={isUpdating}
+            className="px-1.5"
+            icon={<MoreVertical />}
+          />
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" align="end" className="w-52">
           <DropdownMenuItem

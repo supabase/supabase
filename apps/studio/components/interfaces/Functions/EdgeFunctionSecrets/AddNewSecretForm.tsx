@@ -241,7 +241,7 @@ export const AddNewSecretForm = () => {
                             />
                           </FormControl>
                           <Button
-                            type="default"
+                            variant="default"
                             className="w-[34px] h-[34px] shrink-0 p-0"
                             aria-label="Remove secret"
                             icon={<Trash size={12} />}
@@ -281,7 +281,7 @@ export const AddNewSecretForm = () => {
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
-                                  type="text"
+                                  variant="text"
                                   className="absolute right-3 top-2 px-1"
                                   aria-label={
                                     isSecretVisible(fieldItem.id)
@@ -310,10 +310,10 @@ export const AddNewSecretForm = () => {
               </p>
 
               <div className="flex items-center space-x-2">
-                <Button type="default" onClick={handleAddAnotherSecret}>
+                <Button variant="default" onClick={handleAddAnotherSecret}>
                   Add another
                 </Button>
-                <Button type="primary" htmlType="submit" disabled={isCreating} loading={isCreating}>
+                <Button variant="primary" type="submit" disabled={isCreating} loading={isCreating}>
                   {isCreating ? 'Saving...' : fields.length > 1 ? 'Bulk save' : 'Save'}
                 </Button>
               </div>

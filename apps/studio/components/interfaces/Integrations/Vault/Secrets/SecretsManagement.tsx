@@ -21,7 +21,7 @@ import { AddNewSecretModal } from './AddNewSecretModal'
 import { DeleteSecretModal } from './DeleteSecretModal'
 import { EditSecretModal } from './EditSecretModal'
 import { formatSecretColumns } from './Secrets.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useVaultSecretsQuery } from '@/data/vault/vault-secrets-query'
@@ -117,7 +117,7 @@ export const SecretsManagement = () => {
                     <Button
                       key="clear"
                       size="tiny"
-                      type="text"
+                      variant="text"
                       icon={<X />}
                       onClick={() => setSearchValue('')}
                       className="p-0 h-5 w-5"
@@ -145,7 +145,7 @@ export const SecretsManagement = () => {
 
             <div className="flex items-center gap-x-2">
               <Button
-                type="default"
+                variant="default"
                 icon={<RefreshCw />}
                 loading={isRefetching}
                 onClick={() => refetch()}
@@ -154,7 +154,7 @@ export const SecretsManagement = () => {
               </Button>
               <DocsButton href={`${DOCS_URL}/guides/database/vault`} />
               <ButtonTooltip
-                type="primary"
+                variant="primary"
                 disabled={!canManageSecrets}
                 onClick={() => setShowAddSecretModal(true)}
                 tooltip={{

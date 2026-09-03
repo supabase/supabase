@@ -174,7 +174,7 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
             </div>
 
             <ButtonTooltip
-              type="primary"
+              variant="primary"
               className="w-min mx-5"
               onClick={onSelectCreateAndExposeAPISchema}
               disabled={hasAPISchema && isAPISchemaExposed}
@@ -247,7 +247,7 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
                 and Extra search path in your API configuration.
               </p>
               <ButtonTooltip
-                type="primary"
+                variant="primary"
                 className="w-min"
                 disabled={!isPublicSchemaExposed}
                 loading={isUpdatingConfig}

@@ -12,7 +12,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { tryParseJson } from '@/lib/helpers'
 
 interface SendMessageModalProps {
@@ -76,7 +76,7 @@ export const SendMessageModal = ({
           </div>
         </DialogSection>
         <DialogFooter>
-          <Button onClick={onSelectCancel} type="default">
+          <Button onClick={onSelectCancel} variant="default">
             Cancel
           </Button>
           <Button
@@ -88,7 +88,7 @@ export const SendMessageModal = ({
                 onSelectConfirm({ ...values, payload })
               }
             }}
-            type="primary"
+            variant="primary"
           >
             Confirm
           </Button>

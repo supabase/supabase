@@ -32,7 +32,7 @@ const SpreadsheetImportConfiguration = ({
           <div className="py-1 flex items-center justify-between">
             <p className="text-sm">Configure import data</p>
             <Button
-              type="text"
+              variant="text"
               aria-label="Toggle import configuration"
               icon={
                 <ChevronDown
@@ -62,7 +62,7 @@ const SpreadsheetImportConfiguration = ({
                 return (
                   <Button
                     key={header}
-                    type={isSelected ? 'primary' : 'default'}
+                    variant={isSelected ? 'primary' : 'default'}
                     aria-label={`Toggle column ${header}`}
                     aria-pressed={isSelected}
                     className={cn('transition', isSelected ? 'opacity-100' : 'opacity-75')}

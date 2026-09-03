@@ -21,7 +21,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import { Content } from '@/data/content/content-query'
+import { ContentOfType } from '@/data/content/content-query'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 
 const formSchema = z.object({
@@ -32,7 +32,7 @@ const formSchema = z.object({
 type CustomReport = z.infer<typeof formSchema>
 
 export interface UpdateCustomReportProps {
-  selectedReport?: Content
+  selectedReport?: ContentOfType<'report'>
   initialValues: CustomReport
   onCancel: () => void
 }
@@ -103,9 +103,9 @@ export const UpdateCustomReportModal = ({
                 control={form.control}
                 name="name"
                 render={({ field }) => (
-                  <FormItemLayout name="name" layout="vertical" label="Name">
+                  <FormItemLayout layout="vertical" label="Name">
                     <FormControl>
-                      <Input {...field} id="name" />
+                      <Input {...field} />
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -116,11 +116,10 @@ export const UpdateCustomReportModal = ({
                 control={form.control}
                 name="description"
                 render={({ field }) => (
-                  <FormItemLayout name="description" layout="vertical" label="Description">
+                  <FormItemLayout layout="vertical" label="Description">
                     <FormControl>
                       <Textarea
                         {...field}
-                        id="description"
                         rows={4}
                         placeholder="Describe your custom report"
                         className="resize-none"
@@ -131,10 +130,10 @@ export const UpdateCustomReportModal = ({
               />
             </DialogSection>
             <DialogFooter>
-              <Button htmlType="reset" type="default" onClick={handleCancel} disabled={isUpdating}>
+              <Button type="reset" variant="default" onClick={handleCancel} disabled={isUpdating}>
                 Cancel
               </Button>
-              <Button htmlType="submit" loading={isUpdating} disabled={isUpdating || !isDirty}>
+              <Button type="submit" loading={isUpdating} disabled={isUpdating || !isDirty}>
                 Save custom report
               </Button>
             </DialogFooter>

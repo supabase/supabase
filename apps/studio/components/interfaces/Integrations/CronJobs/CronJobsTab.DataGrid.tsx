@@ -3,7 +3,7 @@ import DataGrid, { Row, type Column } from 'react-data-grid'
 import { cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import type { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
 import type { ResponseError } from '@/types'
 

@@ -7,13 +7,13 @@ import {
   CommandEmpty,
   CommandGroup,
   CommandInput,
-  CommandItem,
   CommandList,
   CommandSeparator,
   ScrollArea,
 } from 'ui'
 
 import { OrgCommandItem } from './OrgCommandItem'
+import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import type { Organization } from '@/types'
 
 export interface OrganizationDropdownCommandContentProps {
@@ -57,7 +57,7 @@ export function OrganizationDropdownCommandContent({
     return (
       <Command className={cn(className, 'flex flex-col flex-1 min-h-0 overflow-hidden')}>
         <div className="flex items-center gap-2 shrink-0 border-b p-2">
-          <Button type="text" block size="small" asChild>
+          <Button variant="text" block size="small" asChild>
             <Link
               href="/organizations"
               className="text-xs text-foreground-light hover:text-foreground"
@@ -68,7 +68,7 @@ export function OrganizationDropdownCommandContent({
           </Button>
           {organizationCreationEnabled && (
             <Button
-              type="default"
+              variant="default"
               block
               size="small"
               asChild
@@ -109,22 +109,26 @@ export function OrganizationDropdownCommandContent({
         </CommandGroup>
         <CommandSeparator />
         <CommandGroup>
-          <CommandItem className="cursor-pointer w-full" onSelect={() => onClose()}>
-            <Link href="/organizations" className="flex items-center gap-2 w-full">
-              All Organizations
-            </Link>
-          </CommandItem>
+          <CommandItemLink
+            href="/organizations"
+            className="cursor-pointer w-full gap-2"
+            onSelect={onClose}
+          >
+            All Organizations
+          </CommandItemLink>
         </CommandGroup>
         {organizationCreationEnabled && (
           <>
             <CommandSeparator />
             <CommandGroup>
-              <CommandItem className="cursor-pointer w-full" onSelect={() => onClose()}>
-                <Link href="/new" className="flex items-center gap-2 w-full">
-                  <Plus size={14} strokeWidth={1.5} />
-                  <p>New organization</p>
-                </Link>
-              </CommandItem>
+              <CommandItemLink
+                href="/new"
+                className="cursor-pointer w-full gap-2"
+                onSelect={onClose}
+              >
+                <Plus size={14} strokeWidth={1.5} />
+                <p>New organization</p>
+              </CommandItemLink>
             </CommandGroup>
           </>
         )}

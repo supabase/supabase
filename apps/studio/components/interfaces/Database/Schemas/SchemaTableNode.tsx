@@ -122,7 +122,7 @@ const TableNodeComponent = ({
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
-                          type="text"
+                          variant="text"
                           className="px-0 w-[16px] h-[16px] rounded-sm nodrag nopan"
                         >
                           <MoreVertical size={10} />
@@ -249,15 +249,7 @@ const TableNodeComponent = ({
                 )}
               >
                 {column.isPrimary && (
-                  <Key
-                    size={8}
-                    strokeWidth={1}
-                    className={cn(
-                      // 'sb-grid-column-header__inner__primary-key'
-                      'shrink-0',
-                      'text-light'
-                    )}
-                  />
+                  <Key size={8} strokeWidth={1} className={cn('shrink-0', 'text-light')} />
                 )}
                 {column.isNullable && (
                   <DiamondIcon size={8} strokeWidth={1} className="shrink-0 text-light" />
@@ -313,7 +305,7 @@ const TableNodeComponent = ({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    type="text"
+                    variant="text"
                     // Use opacity to hide the button so that it remains accessible (users can tab to it)
                     className="opacity-0 focus:opacity-100 group-hover:opacity-100 data-open:opacity-100 absolute right-0 top-1/2 -translate-y-1/2 px-0 mr-1 w-[16px] h-[16px] rounded-sm"
                   >

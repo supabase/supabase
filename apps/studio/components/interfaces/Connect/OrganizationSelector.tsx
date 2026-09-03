@@ -1,13 +1,12 @@
-import { LOCAL_STORAGE_KEYS } from 'common'
-import { Check, ChevronDown } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { useMemo, useState, type ReactNode } from 'react'
-import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
+import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger, SuccessCheck } from 'ui'
 
 import {
   CreateOrganizationCard,
   OrganizationCard,
 } from '@/components/interfaces/Organization/OrganizationCard'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import type { Organization } from '@/types'
 
 const VISIBLE_ORGANIZATIONS_LIMIT = 3
@@ -46,10 +45,7 @@ export const OrganizationSelector = ({
   unavailableReason?: ReactNode
 }) => {
   const [showMore, setShowMore] = useState(false)
-  const [lastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
 
   const { visibleOrganizations, overflowOrganizations } = useMemo(() => {
     const lastVisitedOrg = organizations.find(({ slug }) => slug === lastVisitedOrganization)
@@ -197,6 +193,7 @@ const ConnectOrganizationButton = ({
 }) => (
   <button
     type="button"
+    tabIndex={disabled ? -1 : 0}
     disabled={disabled}
     onClick={onClick}
     aria-pressed={selected}
@@ -217,9 +214,7 @@ const ConnectOrganizationButton = ({
       )}
     />
     {selected && (
-      <span className="pointer-events-none absolute right-3 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded-full bg-brand-500 dark:bg-brand-200 text-white dark:text-brand">
-        <Check className="size-3.5" strokeWidth={2} />
-      </span>
+      <SuccessCheck className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2" />
     )}
   </button>
 )

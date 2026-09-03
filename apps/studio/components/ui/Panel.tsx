@@ -103,9 +103,9 @@ const PanelNotice = forwardRef<
           className="absolute inset-0 mt-[-5px]"
           style={{
             backgroundImage: `
-                linear-gradient(to right, hsl(var(--background-200)/1) 0%, hsl(var(--background-200)/1) 30%, hsl(var(--background-200)/0) 100%),
-                linear-gradient(to right, hsl(var(--border-default)/0.33) 1px, transparent 1px),
-                linear-gradient(to bottom, hsl(var(--border-default)/0.33) 1px, transparent 1px)
+                linear-gradient(to right, oklch(from var(--background-200) l c h / 1) 0%, oklch(from var(--background-200) l c h / 1) 30%, oklch(from var(--background-200) l c h / 0) 100%),
+                linear-gradient(to right, oklch(from var(--border-default) l c h / 0.33) 1px, transparent 1px),
+                linear-gradient(to bottom, oklch(from var(--border-default) l c h / 0.33) 1px, transparent 1px)
               `,
             backgroundSize: '100% 100%, 15px 15px, 15px 15px',
             backgroundPosition: '0 0, 0 0, 0 0',
@@ -134,7 +134,7 @@ const PanelNotice = forwardRef<
           )}
         </div>
         {href && (
-          <Button size="tiny" type="default" className="text-xs" asChild>
+          <Button size="tiny" variant="default" className="text-xs" asChild>
             <a href={href} target="_blank" rel="noreferrer noopener">
               {buttonText ?? 'Read the accouncement'}
             </a>

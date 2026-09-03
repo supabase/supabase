@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
+import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
 import { ScaffoldSection } from '@/components/layouts/Scaffold'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
@@ -36,11 +37,11 @@ export const ExtensionNotInstalled = ({
             Learn more
           </InlineLink>
         </p>
-        <Button type="default" asChild className="mt-2">
+        <Button variant="default" asChild className="mt-2">
           <Link
             href={
               databaseNeedsUpgrading
-                ? `/project/${projectRef}/settings/infrastructure`
+                ? getServiceVersionsPath(projectRef)
                 : `/project/${projectRef}/database/extensions?filter=wrappers`
             }
           >
@@ -80,11 +81,11 @@ export const ExtensionNeedsUpgrade = ({
           Before reinstalling the wrapper extension, you must first remove all existing wrappers.
           Afterward, you can recreate the wrappers.
         </p>
-        <Button asChild type="default">
+        <Button asChild variant="default">
           <Link
             href={
               databaseNeedsUpgrading
-                ? `/project/${projectRef}/settings/infrastructure`
+                ? getServiceVersionsPath(projectRef)
                 : `/project/${projectRef}/database/extensions?filter=wrappers`
             }
           >
@@ -115,7 +116,7 @@ export const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
     <ScaffoldSection isFullWidth>
       <Admonition type="warning" title="Missing integration">
         <p>The S3 Vectors Wrapper integration is required in order to query vector tables.</p>
-        <Button type="default" loading={isCreatingS3VectorsWrapper} onClick={onSetupWrapper}>
+        <Button variant="default" loading={isCreatingS3VectorsWrapper} onClick={onSetupWrapper}>
           Install wrapper
         </Button>
       </Admonition>

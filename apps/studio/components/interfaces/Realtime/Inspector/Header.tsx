@@ -65,7 +65,7 @@ export const Header = ({
   const listeningButton = (
     <Button
       size="tiny"
-      type={config.enabled ? 'warning' : 'primary'}
+      variant={config.enabled ? 'warning' : 'primary'}
       className="rounded-l-none border-l-0"
       disabled={!canToggleListening}
       icon={config.enabled ? <StopCircle size="16" /> : <PlayCircle size="16" />}
@@ -92,7 +92,7 @@ export const Header = ({
         ) : (
           <ButtonTooltip
             size="tiny"
-            type={config.enabled ? 'warning' : 'primary'}
+            variant={config.enabled ? 'warning' : 'primary'}
             className="rounded-l-none border-l-0"
             disabled
             icon={config.enabled ? <StopCircle size="16" /> : <PlayCircle size="16" />}

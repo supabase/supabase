@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import type { editor } from 'monaco-editor'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 import {
@@ -19,10 +19,14 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
+import {
+  AUTH_EMAIL_TEMPLATES_DOCS_PATH,
+  AUTH_EMAIL_TEMPLATES_TERMINOLOGY_ANCHOR,
+} from './EmailTemplates.constants'
 import type { AuthTemplate } from './EmailTemplates.types'
 import { hasCustomEmailSender } from './EmailTemplates.utils'
 import { ResetTemplateDialog } from './ResetTemplateDialog'
@@ -195,7 +199,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
   }
 
   // Check if form values have changed
-  const formValues = form.watch()
+  const formValues = useWatch({ control: form.control })
   const baselineValues = INITIAL_VALUES
   const baselineBodyValue = (authConfig && authConfig[messageSlug]) ?? ''
   const hasCustomTemplate =
@@ -366,7 +370,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                       <p className="text-sm text-foreground-lighter">
                         Data placeholders that can be inserted into the subject or body.{' '}
                         <InlineLink
-                          href={`${DOCS_URL}/guides/local-development/customizing-email-templates#template-variables`}
+                          href={`${DOCS_URL}${AUTH_EMAIL_TEMPLATES_DOCS_PATH}#${AUTH_EMAIL_TEMPLATES_TERMINOLOGY_ANCHOR}`}
                         >
                           Learn more
                         </InlineLink>
@@ -377,7 +381,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                         <Tooltip key={variable.value}>
                           <TooltipTrigger asChild>
                             <Button
-                              type="outline"
+                              variant="outline"
                               size="tiny"
                               className="rounded-full"
                               onClick={() => insertTextAtCursor(variable.value)}
@@ -447,8 +451,8 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
               <div className="ml-auto flex flex-row gap-2">
                 {hasChanges && (
                   <Button
-                    type="default"
-                    htmlType="button"
+                    variant="default"
+                    type="button"
                     onClick={() => {
                       form.reset(INITIAL_VALUES)
                       setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
@@ -459,8 +463,8 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                   </Button>
                 )}
                 <ButtonTooltip
-                  type="primary"
-                  htmlType="submit"
+                  variant="primary"
+                  type="submit"
                   disabled={!canEdit || isSavingTemplate || !hasChanges}
                   loading={isSavingTemplate}
                   tooltip={{ content: { side: 'bottom', text: saveChangesTooltip } }}

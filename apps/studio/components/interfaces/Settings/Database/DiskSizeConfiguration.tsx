@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { ExternalLink, Info } from 'lucide-react'
 import Link from 'next/link'
-import { SetStateAction } from 'react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { toast } from 'sonner'
 import { Alert, AlertDescription, AlertTitle, Button, InfoIcon } from 'ui'
 import {
@@ -11,7 +11,7 @@ import {
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-} from 'ui-patterns'
+} from 'ui-patterns/PageSection'
 
 import { Markdown } from '@/components/interfaces/Markdown'
 import DiskSizeConfigurationModal from '@/components/interfaces/Settings/Database/DiskSizeConfigurationModal'
@@ -26,9 +26,9 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
   useIsAwsNimbusCloudProvider,
+  useIsHighAvailability,
   useSelectedProjectQuery,
 } from '@/hooks/misc/useSelectedProject'
-import { useUrlState } from '@/hooks/ui/useUrlState'
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
 
@@ -42,14 +42,13 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
   const { data: organization } = useSelectedOrganizationQuery()
 
   const isAwsNimbus = useIsAwsNimbusCloudProvider()
+  const isHighAvailability = useIsHighAvailability()
   const { reportsAll } = useIsFeatureEnabled(['reports:all'])
 
-  const [{ show_increase_disk_size_modal }, setUrlParams] = useUrlState()
-  const showIncreaseDiskSizeModal = show_increase_disk_size_modal === 'true'
-  const setShowIncreaseDiskSizeModal = (value: SetStateAction<boolean>) => {
-    const show = typeof value === 'function' ? value(showIncreaseDiskSizeModal) : value
-    setUrlParams({ show_increase_disk_size_modal: show ? 'true' : undefined })
-  }
+  const [showIncreaseDiskSizeModal, setShowIncreaseDiskSizeModal] = useQueryState(
+    'show_increase_disk_size_modal',
+    parseAsBoolean.withDefault(false)
+  )
 
   const { can: canUpdateDiskSizeConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
@@ -108,16 +107,18 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
                         </p>
                         {!isAwsNimbus && (
                           <ButtonTooltip
-                            type="default"
+                            variant="default"
                             className="w-min ml-auto"
-                            disabled={!canUpdateDiskSizeConfig || disabled}
+                            disabled={!canUpdateDiskSizeConfig || isHighAvailability || disabled}
                             onClick={() => setShowIncreaseDiskSizeModal(true)}
                             tooltip={{
                               content: {
                                 side: 'bottom',
                                 text: !canUpdateDiskSizeConfig
                                   ? 'You need additional permissions to increase the disk size'
-                                  : undefined,
+                                  : isHighAvailability
+                                    ? 'Disk size management is unavailable for High Availability projects'
+                                    : undefined,
                               },
                             }}
                           >
@@ -141,7 +142,11 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
 
                           {reportsAll && (
                             <div className="col-span-2 mt-4">
-                              <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
+                              <Button
+                                asChild
+                                variant="default"
+                                iconRight={<ExternalLink size={14} />}
+                              >
                                 <Link
                                   href={`/project/${projectRef}/reports/database#database-size-report`}
                                 >
@@ -160,7 +165,7 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
                               <Markdown
                                 className="max-w-full"
                                 content={`
-We auto-scale your disk as you need more storage, but can only do this once every 4 hours.
+We auto-scale your disk as you need more storage, up to 4 modifications within a rolling 24-hour window.
 If you upload more than 1.5x the current size of your storage, your database will go
 into read-only mode. If you know how big your database is going to be, you can
 manually increase the size here.
@@ -197,7 +202,7 @@ Read more about [disk management](${DOCS_URL}/guides/platform/database-size#disk
                     disable your spend cap.
                   </p>
                 )}
-                <Button asChild type="default" className="mt-3">
+                <Button asChild variant="default" className="mt-3">
                   <Link
                     href={`/org/${organization?.slug}/billing?panel=${
                       hasAccessToDiskSizeConfig === false ? 'subscriptionPlan' : 'costControl'
@@ -215,11 +220,13 @@ Read more about [disk management](${DOCS_URL}/guides/platform/database-size#disk
         </PageSectionContent>
       </PageSection>
 
-      <DiskSizeConfigurationModal
-        visible={showIncreaseDiskSizeModal}
-        loading={isUpdatingDiskSize}
-        hideModal={setShowIncreaseDiskSizeModal}
-      />
+      {!isHighAvailability && (
+        <DiskSizeConfigurationModal
+          visible={showIncreaseDiskSizeModal}
+          loading={isUpdatingDiskSize}
+          hideModal={setShowIncreaseDiskSizeModal}
+        />
+      )}
     </>
   )
 }

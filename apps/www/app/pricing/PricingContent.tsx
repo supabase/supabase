@@ -1,6 +1,7 @@
 import { ArrowDownIcon } from '@heroicons/react/outline'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
+import { MarkdownActions } from '~/components/MarkdownActions'
 import PricingAddons from '~/components/Pricing/PricingAddons'
 import PricingComputeSection from '~/components/Pricing/PricingComputeSection'
 import PricingDiskSection from '~/components/Pricing/PricingDiskSection'
@@ -27,6 +28,12 @@ export default function PricingContent() {
             <p className="p text-lg leading-5">
               Start building for free, collaborate with your team, then scale to millions of users
             </p>
+            <MarkdownActions
+              orientation="horizontal"
+              className="justify-center pt-4"
+              pagePath="/pricing"
+              pageType="pricing"
+            />
           </div>
         </div>
       </div>
@@ -36,11 +43,16 @@ export default function PricingContent() {
       <div className="text-center mt-10 xl:mt-16 mx-auto max-w-lg flex flex-col gap-8">
         <div className="flex justify-center gap-2">
           <a href="#compare-plans">
-            <Button size="tiny" type="secondary" iconRight={<ArrowDownIcon className="w-3" />}>
+            <Button size="tiny" variant="secondary" iconRight={<ArrowDownIcon className="w-3" />}>
               Compare Plans
             </Button>
           </a>
-          <Button size="tiny" type="default" asChild iconRight={<ArrowUpRight className="w-4" />}>
+          <Button
+            size="tiny"
+            variant="default"
+            asChild
+            iconRight={<ArrowUpRight className="w-4" />}
+          >
             <a
               href="/docs/guides/platform/billing-on-supabase#organization-based-billing"
               target="_blank"
@@ -65,7 +77,7 @@ export default function PricingContent() {
           <div className="flex items-center justify-center gap-1">
             <span className="py-1 px-3 bg-surface-100 flex items-center gap-1 border rounded-full text-xs text-foreground-lighter">
               What is &ldquo;compute&rdquo;?
-              <InfoTooltip side="bottom" className="max-w-[280px]">
+              <InfoTooltip side="bottom" className="max-w-[280px]" label="About compute">
                 Think of compute as the computer your database runs on. As your app grows, you scale
                 CPU and memory to handle more traffic and data.
               </InfoTooltip>

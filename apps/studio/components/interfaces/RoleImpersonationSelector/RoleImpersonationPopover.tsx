@@ -33,7 +33,7 @@ export const RoleImpersonationPopover = ({
       <PopoverTrigger asChild>
         <Button
           size="tiny"
-          type="default"
+          variant="default"
           className={cn(
             'h-[26px] pr-3 gap-0',
             variant === 'connected-on-right' && 'rounded-r-none border-r-0',

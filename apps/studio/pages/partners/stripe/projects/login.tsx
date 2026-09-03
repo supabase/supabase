@@ -5,10 +5,12 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { Button } from 'ui'
-import { Admonition, ShimmeringLoader } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
   InterstitialAccountRow,
+  InterstitialActionError,
   InterstitialLayout,
   LogoPair,
   PartnerLogo,
@@ -26,7 +28,7 @@ import type { NextPageWithLayout } from '@/types'
 
 const PAGE_TITLE = buildStudioPageTitle({ section: 'Authorize Stripe Projects', brand: 'Supabase' })
 
-const StripeProjectsLoginPage: NextPageWithLayout = () => {
+export const StripeProjectsLoginPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ar_id } = useParams()
   const signOut = useSignOut()
@@ -47,7 +49,12 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
     mutate: confirmAccountRequest,
     isPending: isConfirmationPending,
     isSuccess: isConfirmationSuccess,
+    error: confirmationMutationError,
+    reset: resetConfirmationError,
   } = useConfirmAccountRequestMutation()
+  const confirmationError = confirmationMutationError
+    ? `Failed to authorize Stripe Projects: ${confirmationMutationError.message}`
+    : undefined
 
   useEffect(() => {
     if (!router.isReady) return
@@ -59,6 +66,7 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
 
   const handleApprove = async () => {
     if (!ar_id || isConfirmationPending) return
+    resetConfirmationError()
     confirmAccountRequest({ arId: ar_id })
   }
 
@@ -130,7 +138,7 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
                   </>
                 }
               />
-              <Button type="default" block onClick={() => signOut()}>
+              <Button variant="default" block onClick={() => signOut()}>
                 Sign out
               </Button>
             </div>
@@ -139,7 +147,7 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
           {showAuthorizationState && emailMatches && linkedOrg && (
             <div className="flex flex-col gap-3">
               <Admonition
-                type="tip"
+                type="note"
                 description={
                   <>
                     <span className="font-medium text-foreground">{linkedOrg.name}</span> is already
@@ -148,12 +156,13 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
                 }
               />
               <div className="flex flex-col gap-2">
-                <Button type="primary" block loading={isConfirming} onClick={handleApprove}>
+                <Button variant="primary" block loading={isConfirming} onClick={handleApprove}>
                   Authorize Stripe Projects
                 </Button>
-                <Button type="text" block onClick={() => router.push('/')}>
+                <Button variant="text" block onClick={() => router.push('/')}>
                   Cancel
                 </Button>
+                <InterstitialActionError error={confirmationError} />
               </div>
             </div>
           )}
@@ -165,7 +174,7 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
                 displayName={displayName}
                 action={
                   <ButtonTooltip
-                    type="text"
+                    variant="text"
                     size="small"
                     className="h-8 w-8 px-0"
                     onClick={() => signOut()}
@@ -184,16 +193,17 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
 
               <div className="flex flex-col gap-2">
                 <Button
-                  type="primary"
+                  variant="primary"
                   loading={isConfirming}
                   disabled={isConfirming}
                   onClick={handleApprove}
                 >
                   Create organization
                 </Button>
-                <Button type="text" onClick={() => router.push('/')}>
+                <Button variant="text" onClick={() => router.push('/')}>
                   Cancel
                 </Button>
+                <InterstitialActionError error={confirmationError} />
               </div>
             </div>
           )}
@@ -205,7 +215,7 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
                 title="Unable to load authorization"
                 description={error?.message}
               />
-              <Button type="default" block onClick={() => signOut()}>
+              <Button variant="default" block onClick={() => signOut()}>
                 Sign out
               </Button>
             </div>

@@ -5,9 +5,8 @@ import { User } from 'lucide-react'
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { AiIconAnimation, Button, cn, CommandGroup, CommandItem, CommandList } from 'ui'
+import { AiIconAnimation, Button, cn, CommandGroup, CommandItem, CommandList, StatusIcon } from 'ui'
 import { markdownComponents } from 'ui-patterns/Markdown'
-import { StatusIcon } from 'ui/src/components/StatusIcon'
 
 import {
   Breadcrumb,
@@ -321,7 +320,7 @@ function ErrorState({ handleReset }: { handleReset: () => void }) {
         Sorry, looks like Supabase AI is having a hard time!
       </p>
       <p className="text-sm text-foreground-lighter text-center">Please try again in a bit.</p>
-      <Button size="tiny" type="default" onClick={handleReset}>
+      <Button size="tiny" variant="default" onClick={handleReset}>
         Try again?
       </Button>
     </div>

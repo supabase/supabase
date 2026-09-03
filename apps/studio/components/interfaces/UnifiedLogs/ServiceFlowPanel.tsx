@@ -7,10 +7,10 @@ import {
   ResizableHandle,
   ResizablePanel,
   Skeleton,
-  Tabs_Shadcn_ as Tabs,
-  TabsContent_Shadcn_ as TabsContent,
-  TabsList_Shadcn_ as TabsList,
-  TabsTrigger_Shadcn_ as TabsTrigger,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
@@ -80,6 +80,8 @@ export function ServiceFlowPanel({
 
   const { logsMetadata } = useIsFeatureEnabled(['logs:metadata'])
 
+  const timestampMs = getRowTimestampMs(selectedRow)
+
   // Query the logs API directly
   const {
     data: serviceFlowData,
@@ -91,13 +93,13 @@ export function ServiceFlowPanel({
       logId: selectedRow?.id,
       type: serviceFlowType,
       search: searchParameters,
+      logTimestampMs: timestampMs,
     },
     { enabled: Boolean(selectedRow?.id) && Boolean(serviceFlowType) }
   )
 
   if (!selectedRowKey || !selectedRow) return null
 
-  const timestampMs = getRowTimestampMs(selectedRow)
   const formattedTime = timestampMs ? new Date(timestampMs).toLocaleString() : null
 
   // Prepare JSON data for Raw JSON tab
@@ -238,7 +240,7 @@ export function ServiceFlowPanel({
               <div className="sticky top-2 z-10 flex justify-end px-2 -mb-9 pointer-events-none">
                 <Button
                   size="tiny"
-                  type="default"
+                  variant="default"
                   className="pointer-events-auto px-1.5"
                   icon={jsonCopied ? <Check size={12} /> : <Copy size={12} />}
                   onClick={() => {

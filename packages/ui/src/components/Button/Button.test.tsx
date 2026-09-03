@@ -74,6 +74,13 @@ describe('#Button', () => {
     expect(screen.queryByRole('button')).toHaveClass('w-full')
   })
 
+  it('should hide decorative icons from assistive technology', () => {
+    render(<Button icon={<svg data-testid="button-icon" />}>Save</Button>)
+
+    expect(screen.getByTestId('button-icon').parentElement).toHaveAttribute('aria-hidden', 'true')
+    expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
+  })
+
   it('should forward ref', () => {
     const ref: React.MutableRefObject<HTMLButtonElement | null> = {
       current: null,

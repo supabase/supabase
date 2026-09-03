@@ -50,7 +50,7 @@ const FeaturesSection = ({
               </h2>
               <p className="text-lighter mb-4">{paragraph}</p>
               {cta && (
-                <Button asChild type="default" size="small" icon={<ArrowUpRight />}>
+                <Button asChild variant="default" size="small" icon={<ArrowUpRight />}>
                   <Link href={cta.link}>{cta.label ?? 'Explore documentation'}</Link>
                 </Button>
               )}
@@ -102,7 +102,7 @@ const Feature = ({
             >
               <path
                 d={feature.icon}
-                stroke="hsl(var(--foreground-default))"
+                stroke="var(--foreground-default)"
                 strokeMiterlimit="10"
                 strokeLinejoin="round"
                 strokeLinecap="round"

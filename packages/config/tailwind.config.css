@@ -6,10 +6,13 @@
 @plugin "@tailwindcss/forms";
 @import 'tw-animate-css';
 
-/* Per-theme overrides for semantic --background-/--foreground-/--brand-*
- * tokens. Radix/scale/brand --color-* values are inlined directly in
- * colors.css below. */
+/* Define the semantic system first, then override its core inputs per theme.
+ * This order is significant because :root and a single class selector have
+ * equal specificity. Radix/scale/brand --color-* values are inlined directly
+ * in colors.css below. */
 @import '../ui/build/css/source/global.css';
+@import '../ui/build/css/source/semantic.css';
+@import '../ui/build/css/source/compat.css';
 @import '../ui/build/css/themes/dark.css';
 @import '../ui/build/css/themes/light.css';
 

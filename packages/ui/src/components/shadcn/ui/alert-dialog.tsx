@@ -5,6 +5,7 @@ import { AlertDialog as AlertDialogPrimitive } from 'radix-ui'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
+import { getExplicitTabIndex } from '../../../lib/utils/getExplicitTabIndex'
 import { Button, ButtonVariantProps, buttonVariants } from './../../Button'
 
 type AlertDialogContextValue = {
@@ -75,7 +76,22 @@ const AlertDialog = ({
 }
 AlertDialog.displayName = AlertDialogPrimitive.Root.displayName
 
-const AlertDialogTrigger = AlertDialogPrimitive.Trigger
+const AlertDialogTrigger = React.forwardRef<
+  React.ElementRef<typeof AlertDialogPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Trigger>
+>(({ disabled, tabIndex, ...props }, ref) => {
+  const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
+
+  return (
+    <AlertDialogPrimitive.Trigger
+      ref={ref}
+      {...props}
+      disabled={disabled}
+      tabIndex={computedTabIndex}
+    />
+  )
+})
+AlertDialogTrigger.displayName = AlertDialogPrimitive.Trigger.displayName
 
 const AlertDialogPortal = ({ children, ...props }: AlertDialogPrimitive.AlertDialogPortalProps) => (
   <AlertDialogPrimitive.Portal {...props}>
@@ -249,7 +265,7 @@ type AlertDialogActionProps = Omit<
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Action>,
   'onClick'
 > & {
-  variant?: NonNullable<ButtonVariantProps['type']>
+  variant?: NonNullable<ButtonVariantProps['variant']>
   loading?: boolean
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => unknown
 }
@@ -319,7 +335,7 @@ const AlertDialogAction = React.forwardRef<
         <AlertDialogPrimitive.Action
           ref={ref}
           asChild
-          className={cn(buttonVariants({ type: variant, size: 'tiny' }), className)}
+          className={cn(buttonVariants({ variant: variant, size: 'tiny' }), className)}
           disabled={isDisabled}
           onClick={handleClick}
           type={type}
@@ -336,9 +352,9 @@ const AlertDialogAction = React.forwardRef<
           ref={ref}
           className={className}
           disabled={isDisabled}
-          htmlType={type}
+          type={type}
           loading={loading}
-          type={variant}
+          variant={variant}
         >
           {children}
         </Button>
@@ -357,7 +373,11 @@ const AlertDialogCancel = React.forwardRef<
   return (
     <AlertDialogPrimitive.Cancel
       ref={ref}
-      className={cn(buttonVariants({ type: 'default', size: 'tiny' }), 'mt-2 sm:mt-0', className)}
+      className={cn(
+        buttonVariants({ variant: 'default', size: 'tiny' }),
+        'mt-2 sm:mt-0',
+        className
+      )}
       disabled={disabled || alertDialogContext?.loading}
       {...props}
     />

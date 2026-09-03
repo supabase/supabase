@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -11,7 +11,7 @@ import { useOrganizationMemberDeleteMutation } from '@/data/organizations/organi
 import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useProfile } from '@/lib/profile'
 
@@ -20,6 +20,7 @@ export const LeaveTeamButton = () => {
   const { slug } = useParams()
   const { profile } = useProfile()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { setLastVisitedOrganization } = useLastVisitedOrganization()
 
   // if organizationMembersDeletionEnabled is false, you also can't delete yourself
   const { organizationMembersDelete: organizationMembersDeletionEnabled } = useIsFeatureEnabled([
@@ -28,10 +29,6 @@ export const LeaveTeamButton = () => {
 
   const [isLeaving, setIsLeaving] = useState(false)
   const [isLeaveTeamModalOpen, setIsLeaveTeamModalOpen] = useState(false)
-  const [_, setLastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
 
   const { refetch: refetchOrganizations } = useOrganizationsQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
@@ -74,7 +71,7 @@ export const LeaveTeamButton = () => {
   return (
     <>
       <ButtonTooltip
-        type="default"
+        variant="default"
         disabled={!canLeave || !organizationMembersDeletionEnabled || isLeaving}
         onClick={() => setIsLeaveTeamModalOpen(true)}
         tooltip={{

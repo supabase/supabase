@@ -49,7 +49,7 @@ Create a new Edge Function for your MCP server:
 supabase functions new mcp
 ```
 
-<Admonition type="tip">
+<Admonition type="note">
 
 This tutorial uses the [official MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk) with the `WebStandardStreamableHTTPServerTransport`, but you can use any MCP framework that's compatible with the [Edge Runtime](/docs/guides/functions), such as [mcp-lite](https://github.com/fiberplane/mcp-lite) or [mcp-handler](https://github.com/vercel/mcp-handler).
 
@@ -75,7 +75,7 @@ const server = new McpServer({
   version: '0.1.0',
 })
 
-// Register a simple addition tool
+// Register an addition tool
 server.registerTool(
   'add',
   {
@@ -218,7 +218,9 @@ After this step, you have a fully deployed MCP server accessible from anywhere. 
 
 You can find ready-to-use MCP server implementations here:
 
-- [Simple MCP server](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/mcp/simple-mcp-server) - Basic unauthenticated example
+{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
+
+- [Simple MCP server](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/mcp/simple-mcp-server) - Unauthenticated example
 
 ## Resources
 

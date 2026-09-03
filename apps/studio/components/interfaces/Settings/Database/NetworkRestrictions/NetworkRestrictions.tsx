@@ -13,9 +13,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import {
   PageSection,
@@ -24,7 +21,7 @@ import {
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-} from 'ui-patterns'
+} from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import AddRestrictionModal from './AddRestrictionModal'
@@ -33,42 +30,51 @@ import DisallowAllModal from './DisallowAllModal'
 import RemoveRestrictionModal from './RemoveRestrictionModal'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { HighAvailabilityDisabledSectionNotice } from '@/components/ui/HighAvailability/HighAvailabilityDisabledSectionNotice'
 import { useNetworkRestrictionsQuery } from '@/data/network-restrictions/network-restrictions-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
+const HA_DISABLED_TITLE = 'Network restrictions unavailable on High Availability projects'
+const HA_DISABLED_DESCRIPTION =
+  "We're working to bring network restrictions to High Availability projects. Contact support if this is blocking your work."
+
 interface AccessButtonProps {
   disabled: boolean
+  disabledTooltip?: string
   onClick: (value: boolean) => void
 }
 
-const AllowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
-  <Tooltip>
-    <TooltipTrigger asChild>
-      <Button type="default" disabled={disabled} onClick={() => onClick(true)}>
-        Allow all access
-      </Button>
-    </TooltipTrigger>
-    {disabled && (
-      <TooltipContent side="bottom">
-        You need additional permissions to update network restrictions
-      </TooltipContent>
-    )}
-  </Tooltip>
-)
+const getDisabledTooltip = (disabled: boolean, disabledTooltip?: string) =>
+  disabled ? disabledTooltip : undefined
 
-const DisallowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
+const AllowAllAccessButton = ({ disabled, disabledTooltip, onClick }: AccessButtonProps) => (
   <ButtonTooltip
+    variant="default"
     disabled={disabled}
-    type="default"
     onClick={() => onClick(true)}
     tooltip={{
       content: {
         side: 'bottom',
-        text: disabled
-          ? 'You need additional permissions to update network restrictions'
-          : undefined,
+        text: getDisabledTooltip(disabled, disabledTooltip),
+      },
+    }}
+  >
+    Allow all access
+  </ButtonTooltip>
+)
+
+const DisallowAllAccessButton = ({ disabled, disabledTooltip, onClick }: AccessButtonProps) => (
+  <ButtonTooltip
+    disabled={disabled}
+    variant="default"
+    onClick={() => onClick(true)}
+    tooltip={{
+      content: {
+        side: 'bottom',
+        text: getDisabledTooltip(disabled, disabledTooltip),
       },
     }}
   >
@@ -79,6 +85,7 @@ const DisallowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
 export const NetworkRestrictions = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { isHighAvailability } = useHighAvailability()
   const [isAddingAddress, setIsAddingAddress] = useState<undefined | 'IPv4' | 'IPv6'>()
   const [isAllowingAll, setIsAllowingAll] = useState(false)
   const [isDisallowingAll, setIsDisallowingAll] = useState(false)
@@ -97,6 +104,11 @@ export const NetworkRestrictions = () => {
       },
     }
   )
+
+  const isSectionDisabled = isHighAvailability || !canUpdateNetworkRestrictions
+  const sectionDisabledReason = isHighAvailability
+    ? HA_DISABLED_TITLE
+    : 'You need additional permissions to update network restrictions'
 
   const hasAccessToRestrictions = data?.entitlement === 'allowed'
   const ipv4Restrictions = data?.config?.dbAllowedCidrs ?? []
@@ -121,14 +133,14 @@ export const NetworkRestrictions = () => {
           </PageSectionSummary>
           <PageSectionAside className="flex items-center gap-x-2">
             <DocsButton href={`${DOCS_URL}/guides/platform/network-restrictions`} />
-            {!canUpdateNetworkRestrictions ? (
+            {!canUpdateNetworkRestrictions || isHighAvailability ? (
               <ButtonTooltip
                 disabled
-                type="primary"
+                variant="primary"
                 tooltip={{
                   content: {
                     side: 'bottom',
-                    text: 'You need additional permissions to update network restrictions',
+                    text: sectionDisabledReason,
                   },
                 }}
               >
@@ -138,8 +150,8 @@ export const NetworkRestrictions = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    type="primary"
-                    disabled={!canUpdateNetworkRestrictions}
+                    variant="primary"
+                    disabled={isSectionDisabled}
                     iconRight={<ChevronDown size={14} />}
                   >
                     Add restriction
@@ -166,140 +178,171 @@ export const NetworkRestrictions = () => {
           </PageSectionAside>
         </PageSectionMeta>
         <PageSectionContent>
-          {isLoading ? (
-            <Card>
-              <CardContent>
-                <div className="space-y-2">
-                  <ShimmeringLoader />
-                  <ShimmeringLoader className="w-[70%]" />
-                  <ShimmeringLoader className="w-[50%]" />
-                </div>
-              </CardContent>
-            </Card>
-          ) : hasApplyError ? (
-            <Card>
-              <CardContent>
-                <div className="flex items-center justify-between">
+          {isHighAvailability && (
+            <div className="mb-4">
+              <HighAvailabilityDisabledSectionNotice
+                title={HA_DISABLED_TITLE}
+                description={HA_DISABLED_DESCRIPTION}
+              />
+            </div>
+          )}
+          {!isHighAvailability &&
+            (isLoading ? (
+              <Card>
+                <CardContent>
                   <div className="space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <AlertCircle size={20} strokeWidth={1.5} className="text-foreground-light" />
-                      <p className="text-sm">
-                        Your network restrictions were not applied correctly
-                      </p>
-                    </div>
-                    <p className="text-sm text-foreground-light">
-                      Please try to add your network restrictions again
-                    </p>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <AllowAllAccessButton
-                      disabled={!canUpdateNetworkRestrictions}
-                      onClick={setIsAllowingAll}
-                    />
-                    <DisallowAllAccessButton
-                      disabled={!canUpdateNetworkRestrictions}
-                      onClick={setIsDisallowingAll}
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card>
-              {isUninitialized || isAllowedAll ? (
-                <CardContent className="flex items-center justify-between">
-                  <div className="flex items-start space-x-4">
-                    <div className="space-y-0.5">
-                      <p className="text-foreground text-sm">
-                        Your database can be accessed by all IP addresses
-                      </p>
-                      <p className="text-foreground-light text-sm">
-                        You may start limiting access to your database by adding a network
-                        restriction.
-                      </p>
-                    </div>
-                  </div>
-                  <div>
-                    <DisallowAllAccessButton
-                      disabled={!canUpdateNetworkRestrictions}
-                      onClick={setIsDisallowingAll}
-                    />
+                    <ShimmeringLoader />
+                    <ShimmeringLoader className="w-[70%]" />
+                    <ShimmeringLoader className="w-[50%]" />
                   </div>
                 </CardContent>
-              ) : isDisallowedAll ? (
-                <CardContent className="flex items-center justify-between">
-                  <div className="flex items-start space-x-4">
-                    <Lock size={20} className="text-foreground-light" strokeWidth={1.5} />
-                    <div className="space-y-1">
-                      <p className="text-foreground-light text-sm">
-                        Your database <span className="text-amber-900 opacity-80">cannot</span> be
-                        accessed externally
-                      </p>
-                      <p className="text-foreground-light text-sm">
-                        All external IP addresses have been disallowed from accessing your project's
-                        database.
-                      </p>
-                      <p className="text-foreground-light text-sm">
-                        Note: Restrictions only apply to your database, and not to Supabase services
+              </Card>
+            ) : hasApplyError ? (
+              <Card>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <AlertCircle
+                          size={20}
+                          strokeWidth={1.5}
+                          className="text-foreground-light"
+                        />
+                        <p className="text-sm">
+                          Your network restrictions were not applied correctly
+                        </p>
+                      </div>
+                      <p className="text-sm text-foreground-light">
+                        Please try to add your network restrictions again
                       </p>
                     </div>
-                  </div>
-                  <div>
-                    <AllowAllAccessButton
-                      disabled={!canUpdateNetworkRestrictions}
-                      onClick={setIsAllowingAll}
-                    />
-                  </div>
-                </CardContent>
-              ) : (
-                <>
-                  <CardHeader className="md:flex-row md:items-center justify-between">
-                    <CardDescription className="text-foreground-light">
-                      <p>Only the following IP addresses have access to your database.</p>
-                      <p>
-                        You may remove all of them to allow all IP addresses to have access to your
-                        database.
-                      </p>
-                      <p>
-                        Note: Restrictions only apply to your database, and not to Supabase services
-                      </p>
-                    </CardDescription>
                     <div className="flex items-center space-x-2">
                       <AllowAllAccessButton
-                        disabled={!canUpdateNetworkRestrictions}
+                        disabled={isSectionDisabled}
+                        disabledTooltip={sectionDisabledReason}
                         onClick={setIsAllowingAll}
                       />
                       <DisallowAllAccessButton
-                        disabled={!canUpdateNetworkRestrictions}
+                        disabled={isSectionDisabled}
+                        disabledTooltip={sectionDisabledReason}
                         onClick={setIsDisallowingAll}
                       />
                     </div>
-                  </CardHeader>
-                  <CardContent className="py-0">
-                    <div className="divide-y">
-                      {restrictedIps.map((ip) => {
-                        return (
-                          <div key={ip} className="py-4 flex items-center justify-between">
-                            <div className="flex items-center space-x-5">
-                              <Globe size={16} className="text-foreground-lighter" />
-                              <Badge>{ipv4Restrictions.includes(ip) ? 'IPv4' : 'IPv6'}</Badge>
-                              <p className="text-sm font-mono">{ip}</p>
-                            </div>
-                            <Button
-                              type="default"
-                              onClick={() => setSelectedRestrictionToRemove(ip)}
-                            >
-                              Remove
-                            </Button>
-                          </div>
-                        )
-                      })}
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                {isUninitialized || isAllowedAll ? (
+                  <CardContent className="flex items-center justify-between">
+                    <div className="flex items-start space-x-4">
+                      <div className="space-y-0.5">
+                        <p className="text-foreground text-sm">
+                          Your database can be accessed by all IP addresses
+                        </p>
+                        <p className="text-foreground-light text-sm">
+                          You may start limiting access to your database by adding a network
+                          restriction.
+                        </p>
+                      </div>
+                    </div>
+                    <div>
+                      <DisallowAllAccessButton
+                        disabled={isSectionDisabled}
+                        disabledTooltip={sectionDisabledReason}
+                        onClick={setIsDisallowingAll}
+                      />
                     </div>
                   </CardContent>
-                </>
-              )}
-            </Card>
-          )}
+                ) : isDisallowedAll ? (
+                  <CardContent className="flex items-center justify-between">
+                    <div className="flex items-start space-x-4">
+                      <Lock size={20} className="text-foreground-light" strokeWidth={1.5} />
+                      <div className="space-y-1">
+                        <p className="text-foreground-light text-sm">
+                          Your database <span className="text-amber-900 opacity-80">cannot</span> be
+                          accessed externally
+                        </p>
+                        <p className="text-foreground-light text-sm">
+                          All external IP addresses have been disallowed from accessing your
+                          project's database.
+                        </p>
+                        <p className="text-foreground-light text-sm">
+                          Note: Restrictions only apply to your database, and not to Supabase
+                          services
+                        </p>
+                      </div>
+                    </div>
+                    <div>
+                      <AllowAllAccessButton
+                        disabled={isSectionDisabled}
+                        disabledTooltip={sectionDisabledReason}
+                        onClick={setIsAllowingAll}
+                      />
+                    </div>
+                  </CardContent>
+                ) : (
+                  <>
+                    <CardHeader className="md:flex-row md:items-center justify-between">
+                      <CardDescription className="text-foreground-light">
+                        <p>Only the following IP addresses have access to your database.</p>
+                        <p>
+                          You may remove all of them to allow all IP addresses to have access to
+                          your database.
+                        </p>
+                        <p>
+                          Note: Restrictions only apply to your database, and not to Supabase
+                          services
+                        </p>
+                      </CardDescription>
+                      <div className="flex items-center space-x-2">
+                        <AllowAllAccessButton
+                          disabled={isSectionDisabled}
+                          disabledTooltip={sectionDisabledReason}
+                          onClick={setIsAllowingAll}
+                        />
+                        <DisallowAllAccessButton
+                          disabled={isSectionDisabled}
+                          disabledTooltip={sectionDisabledReason}
+                          onClick={setIsDisallowingAll}
+                        />
+                      </div>
+                    </CardHeader>
+                    <CardContent className="py-0">
+                      <div className="divide-y">
+                        {restrictedIps.map((ip) => {
+                          return (
+                            <div key={ip} className="py-4 flex items-center justify-between">
+                              <div className="flex items-center space-x-5">
+                                <Globe size={16} className="text-foreground-lighter" />
+                                <Badge>{ipv4Restrictions.includes(ip) ? 'IPv4' : 'IPv6'}</Badge>
+                                <p className="text-sm font-mono">{ip}</p>
+                              </div>
+                              <ButtonTooltip
+                                variant="default"
+                                disabled={isSectionDisabled}
+                                onClick={() => setSelectedRestrictionToRemove(ip)}
+                                tooltip={{
+                                  content: {
+                                    side: 'bottom',
+                                    text: getDisabledTooltip(
+                                      isSectionDisabled,
+                                      sectionDisabledReason
+                                    ),
+                                  },
+                                }}
+                              >
+                                Remove
+                              </ButtonTooltip>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </CardContent>
+                  </>
+                )}
+              </Card>
+            ))}
         </PageSectionContent>
       </PageSection>
 

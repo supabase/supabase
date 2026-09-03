@@ -9,6 +9,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogSection,
+  DialogSectionSeparator,
   DialogTitle,
   DropdownMenu,
   DropdownMenuContent,
@@ -90,7 +91,7 @@ export const RestoreFailedState = () => {
             </div>
 
             <div className="border-t border-overlay flex items-center justify-end py-4 px-8 gap-x-2">
-              <Button asChild type="default">
+              <Button asChild variant="default">
                 <SupportLink
                   queryParams={{
                     category: SupportCategories.DATABASE_UNRESPONSIVE,
@@ -103,7 +104,7 @@ export const RestoreFailedState = () => {
               </Button>
 
               <ButtonTooltip
-                type="default"
+                variant="default"
                 icon={<Download />}
                 disabled={isLoadingBackups}
                 loading={isDownloading || isLoadingBackups}
@@ -119,8 +120,8 @@ export const RestoreFailedState = () => {
               </ButtonTooltip>
 
               <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <Button type="default" className="w-7" icon={<MoreVertical />} />
+                <DropdownMenuTrigger asChild>
+                  <Button variant="default" className="w-7" icon={<MoreVertical />} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-72" align="end">
                   <DropdownMenuItemTooltip
@@ -154,10 +155,13 @@ export const RestoreFailedState = () => {
       </div>
 
       <Dialog open={showCliBackup} onOpenChange={setShowCliBackup}>
-        <DialogContent size="medium">
+        <DialogContent size="medium" onOpenAutoFocus={(e) => e.preventDefault()}>
           <DialogHeader>
-            <DialogTitle>Back up your database</DialogTitle>
+            <DialogTitle>Back up your database with the Supabase CLI</DialogTitle>
           </DialogHeader>
+
+          <DialogSectionSeparator />
+
           <DialogSection>
             <LogicalBackupCliInstructions showResetPassword={false} />
           </DialogSection>

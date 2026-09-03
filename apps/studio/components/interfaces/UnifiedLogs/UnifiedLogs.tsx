@@ -29,7 +29,6 @@ import {
 
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
 import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Columns'
-import { ConnectionLogsToggle } from './components/ConnectionLogsToggle'
 import { DownloadLogsButton } from './components/DownloadLogsButton'
 import { LogsFilterBar } from './components/LogsFilterBar'
 import { LogsListPanel } from './components/LogsListPanel'
@@ -39,14 +38,19 @@ import { ServiceFlowPanel } from './ServiceFlowPanel'
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
 import {
+  buildDefaultColumnFilters,
   buildFilterSearchUpdate,
-  logsFiltersToColumnFilters,
   parseLogsFilterUrlParams,
 } from './UnifiedLogs.filters'
 import { useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
+import { isUserFilterUnreachable } from './UnifiedLogs.queries'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
-import { getFacetedUniqueValues, getLevelRowClassName } from './UnifiedLogs.utils'
+import {
+  gateMultigresLogType,
+  getFacetedUniqueValues,
+  getLevelRowClassName,
+} from './UnifiedLogs.utils'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
 import { arrSome, inDateRange } from '@/components/ui/DataTable/DataTable.utils'
@@ -63,6 +67,7 @@ import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -70,11 +75,11 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 export const CHART_CONFIG = {
   success: {
     label: <TooltipLabel level="success" />,
-    color: 'hsl(var(--foreground-muted))',
+    color: 'var(--chart-success)',
   },
   warning: {
     label: <TooltipLabel level="warning" />,
-    color: 'hsl(var(--warning-default))',
+    color: 'var(--chart-warning)',
   },
   error: {
     label: <TooltipLabel level="error" />,
@@ -91,7 +96,7 @@ export const UnifiedLogs = () => {
 
   const defaultColumnSorting = search.sort ? [search.sort] : []
   const defaultColumnVisibility = { uuid: false }
-  const defaultColumnFilters = logsFiltersToColumnFilters(parseLogsFilterUrlParams(search.filter))
+  const defaultColumnFilters = buildDefaultColumnFilters(search)
 
   const [topBarHeight, setTopBarHeight] = useState(0)
   const topBarRef = useRef<HTMLDivElement>(null)
@@ -106,6 +111,8 @@ export const UnifiedLogs = () => {
     observer.observe(topBar)
     return () => observer.unobserve(topBar)
   }, [])
+
+  const showMultigresLogs = useShowMultigresLogs()
 
   const [sorting, setSorting] = useState<SortingState>(defaultColumnSorting)
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(defaultColumnFilters)
@@ -267,7 +274,9 @@ export const UnifiedLogs = () => {
   // Will need to refactor this bit
   // - Each facet just handles its own state, rather than getting passed down like this
   const filterFields = useMemo(() => {
-    return defaultFilterFields.map((field) => {
+    const gatedFields = gateMultigresLogType(defaultFilterFields, showMultigresLogs)
+
+    return gatedFields.map((field) => {
       const facetsField = facets?.[field.value]
 
       // If no facets data available, use the predefined field
@@ -275,18 +284,25 @@ export const UnifiedLogs = () => {
 
       // For hardcoded enum fields, keep the predefined options (facets only used for counts)
       if (field.value === 'log_type' || field.value === 'method' || field.value === 'level') {
-        return field
+        const fieldWithCounts = {
+          ...field,
+          options: field.options.map((x) => {
+            return { ...x, count: facetsField.rows.find((y) => y.value === x.value)?.total ?? 0 }
+          }),
+        }
+        return fieldWithCounts
       }
 
       // For dynamic fields, use faceted options
-      const options: Option[] = facetsField.rows.map(({ value }) => ({
+      const options: Option[] = facetsField.rows.map(({ value, total }) => ({
         label: `${value}`,
         value,
+        count: total,
       }))
 
       return { ...field, options }
     })
-  }, [facets])
+  }, [facets, showMultigresLogs])
 
   const applyFilterSearch = () => {
     setSearch(buildFilterSearchUpdate(columnFilters, filterFields))
@@ -370,7 +386,6 @@ export const UnifiedLogs = () => {
             isFilterBarOpen={isFilterBarOpen}
             setIsFilterBarOpen={setIsFilterBarOpen}
             dateRangeDisabled={{ after: new Date() }}
-            afterFilters={<ConnectionLogsToggle />}
           />
           <ResizableHandle withHandle />
           <ResizablePanel
@@ -382,7 +397,7 @@ export const UnifiedLogs = () => {
                 <ShortcutTooltip shortcutId={SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS} side="bottom">
                   <Button
                     size="tiny"
-                    type="text"
+                    variant="text"
                     icon={isFilterBarOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
                     onClick={() => setIsFilterBarOpen((prev) => !prev)}
                     className="hidden w-[26px] sm:flex"
@@ -454,7 +469,7 @@ export const UnifiedLogs = () => {
                   className={cn(
                     'h-full [&>div]:h-full',
                     '[&_thead_th]:[border-top:none]! [&_thead_th]:[border-bottom:none]!',
-                    '[&_thead_th]:[box-shadow:inset_0_-1px_0_hsl(var(--border-default))]!',
+                    '[&_thead_th]:[box-shadow:inset_0_-1px_0_var(--border-default)]!',
                     '[&_thead_th]:text-foreground-lighter! [&_thead_tr:hover]:bg-surface-75',
                     '[&_thead_tr]:border-b-0! [&_tbody_tr]:border-b-0!'
                   )}
@@ -469,6 +484,16 @@ export const UnifiedLogs = () => {
                     setColumnOrder={setColumnOrder}
                     setColumnVisibility={setColumnVisibility}
                     searchParamsParser={SEARCH_PARAMS_PARSER}
+                    emptyStateMessage={
+                      isUserFilterUnreachable(search) ? (
+                        <div className="text-sm flex flex-col gap-y-1">
+                          <p className="text-foreground-light">No results found</p>
+                          <p className="text-foreground-lighter">
+                            Filtering by user is only supported for Auth and Postgres log types
+                          </p>
+                        </div>
+                      ) : undefined
+                    }
                   />
                 </div>
               </ResizablePanel>

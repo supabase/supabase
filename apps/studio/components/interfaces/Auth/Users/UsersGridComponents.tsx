@@ -76,7 +76,7 @@ export const HeaderCell = ({
         >
           <DropdownMenuTrigger asChild>
             <Button
-              type="text"
+              variant="text"
               icon={<ChevronDown />}
               className="p-0 h-5 w-5"
               onClick={() => setOpen(!open)}

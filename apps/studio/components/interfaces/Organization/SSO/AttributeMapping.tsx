@@ -112,7 +112,7 @@ export const AttributeMapping = ({
           <p>Map SSO attributes to user fields. Presets for supported identity providers:</p>
           <div className="flex flex-wrap items-center gap-2">
             {PROVIDER_PRESETS.map((preset) => (
-              <Button key={preset.name} type="outline" onClick={() => applyPreset(preset)}>
+              <Button key={preset.name} variant="outline" onClick={() => applyPreset(preset)}>
                 {preset.name}
               </Button>
             ))}

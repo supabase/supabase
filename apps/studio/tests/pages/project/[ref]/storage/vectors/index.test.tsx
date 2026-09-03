@@ -3,7 +3,6 @@ import { http, HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import type { ProjectStorageConfigData } from '@/data/config/project-storage-config-query'
-import type { ProjectDetail } from '@/data/projects/project-detail-query'
 import { API_URL } from '@/lib/constants'
 import StorageVectorsPage from '@/pages/project/[ref]/storage/vectors'
 import { customRender } from '@/tests/lib/custom-render'
@@ -39,16 +38,7 @@ vi.mock('@/lib/constants', async (importOriginal) => {
 })
 
 // Stub the heavy leaf children — each fires its own queries and renders a large
-// tree. We only assert which branch the page picks. Keep the real
-// `VECTOR_BUCKETS_AVAILABLE_REGIONS` so the region gate runs for real.
-vi.mock(
-  '@/components/interfaces/Storage/VectorBuckets/RegionLimitation',
-  async (importOriginal) => ({
-    ...(await importOriginal<Record<string, unknown>>()),
-    RegionLimitation: () => <div>region-limitation</div>,
-  })
-)
-
+// tree. We only assert which branch the page picks.
 vi.mock('@/components/interfaces/Storage/VectorBuckets', () => ({
   VectorsBuckets: () => <div>vectors-buckets</div>,
 }))
@@ -56,18 +46,6 @@ vi.mock('@/components/interfaces/Storage/VectorBuckets', () => ({
 vi.mock('@/components/interfaces/Storage/BucketsUpgradePlan', () => ({
   BucketsUpgradePlan: ({ type }: { type: string }) => <div>buckets-upgrade-plan-{type}</div>,
 }))
-
-const AVAILABLE_REGION = 'us-east-1'
-const UNAVAILABLE_REGION = 'ap-south-1'
-
-const mockProject = (region: string) => {
-  addAPIMock({
-    method: 'get',
-    path: '/platform/projects/:ref',
-    // The page only reads `region` off the project
-    response: () => HttpResponse.json<ProjectDetail>({ region } as unknown as ProjectDetail),
-  })
-}
 
 const mockStorageConfig = (vectorBucketsEnabled: boolean) => {
   addAPIMock({
@@ -99,20 +77,9 @@ const mockDeploymentMode = (isCli: boolean) => {
 describe('StorageVectorsPage', () => {
   beforeEach(() => {
     mockIsPlatform.value = true
-    mockProject(AVAILABLE_REGION)
   })
 
-  test('platform + region not supported: shows region limitation', async () => {
-    mockProject(UNAVAILABLE_REGION)
-    mockStorageConfig(true)
-
-    customRender(<StorageVectorsPage dehydratedState={undefined} />)
-
-    expect(await screen.findByText('region-limitation')).toBeInTheDocument()
-    expect(screen.queryByText('vectors-buckets')).not.toBeInTheDocument()
-  })
-
-  test('platform + supported region + not enabled: shows upgrade plan', async () => {
+  test('platform + not enabled: shows upgrade plan', async () => {
     mockStorageConfig(false)
 
     customRender(<StorageVectorsPage dehydratedState={undefined} />)
@@ -121,7 +88,7 @@ describe('StorageVectorsPage', () => {
     expect(screen.queryByText('vectors-buckets')).not.toBeInTheDocument()
   })
 
-  test('platform + supported region + enabled: shows vector buckets', async () => {
+  test('platform + enabled: shows vector buckets', async () => {
     mockStorageConfig(true)
 
     customRender(<StorageVectorsPage dehydratedState={undefined} />)
@@ -129,16 +96,13 @@ describe('StorageVectorsPage', () => {
     expect(await screen.findByText('vectors-buckets')).toBeInTheDocument()
   })
 
-  test('CLI (non-platform, enabled): shows vector buckets, skips region/upgrade gates', async () => {
+  test('CLI (non-platform, enabled): shows vector buckets, skips upgrade gate', async () => {
     mockIsPlatform.value = false
-    // Even an unsupported region shouldn't gate off-platform
-    mockProject(UNAVAILABLE_REGION)
     mockDeploymentMode(true)
 
     customRender(<StorageVectorsPage dehydratedState={undefined} />)
 
     expect(await screen.findByText('vectors-buckets')).toBeInTheDocument()
-    expect(screen.queryByText('region-limitation')).not.toBeInTheDocument()
   })
 
   test('self-hosted (non-platform): renders nothing', async () => {

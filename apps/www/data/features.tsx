@@ -642,38 +642,41 @@ Foreign Data Wrappers simplify data integration by bringing external data into y
     },
   },
   {
-    title: 'Supabase ETL',
-    subtitle: 'Real-time data replication to analytical destinations.',
-    description: `Supabase ETL is a change-data-capture pipeline built in Rust that replicates your Postgres tables to analytical destinations in near real-time. Reading directly from the Postgres Write Ahead Log, ETL ensures your analytics data stays synchronized with your production database.
+    title: 'Supabase Pipelines',
+    subtitle: 'Replicate Postgres data to analytical destinations.',
+    description: `Supabase Pipelines is a managed change data capture (CDC) product that uses Postgres logical replication to deliver published data to analytical destinations in near real time.
 
 ## Key benefits
-1. Real-time replication: Near real-time data synchronization using Postgres logical replication.
-2. Analytics Buckets support: Replicate to Iceberg format for large-scale analytics.
-3. BigQuery integration: Direct replication to Google's data warehouse.
-4. Complete change history: Captures INSERT, UPDATE, DELETE, and TRUNCATE operations.
-5. Optimized for analytics: Faster queries and lower storage costs through compression.
-6. Production isolation: Complete separation of analytics and production workloads.
+1. Initial sync: Copy existing rows from published tables.
+2. Ongoing replication: Capture and deliver subsequent INSERT, UPDATE, DELETE, and TRUNCATE operations selected by the publication.
+3. Managed operation: Monitor pipeline status, lag, table state, and errors in the Dashboard.
+4. Workload isolation: Keep analytical queries away from the primary database.
 
-## How it works
-ETL uses Postgres logical replication to capture changes. Each replicated table includes a \`cdc_operation\` column tracking the type of change. For Analytics Buckets, data is stored in append-only changelog format using Parquet files. For BigQuery, a view is created for each table backed by versioned tables.
+## Destinations
+BigQuery is currently available. ClickHouse, DuckLake, and Snowflake are in Early Access. [Request access](/go/supabase-pipelines-new-destinations) to these destinations.
 
-## Supabase ETL is valuable for:
-- Data warehousing and business intelligence
-- Historical analysis and audit trails
-- Large-scale analytics requiring separation from production
-- Compliance scenarios requiring complete data history
+## Setup
+Create a Postgres publication for the tables to replicate. In Database > Replication, add a Pipelines destination, configure its settings, and monitor the pipeline from the Dashboard.
+
+## Requirements
+Requirements depend on the destination. BigQuery and ClickHouse ReplacingMergeTree require source tables to have primary keys and require the publication to include those columns. ClickHouse updates require REPLICA IDENTITY FULL. ClickHouse deletes require primary-key or full identity. DuckLake updates and deletes require a primary-key identity, replica-identity index, or full identity. With a primary-key identity or replica-identity index, include every identity column in the publication. Snowflake updates require REPLICA IDENTITY FULL. Snowflake deletes require a published row identity.
+
+## Pipelines is valuable for:
+- Near real-time analytics data movement
+- Analytics separation from production
+- Managed replication to supported destination systems
 
 ## Limitations
-Tables require primary keys. DDL support (schema changes) is currently in development.
+Schema change support is destination-specific and limited. Destination-specific constraints apply.
 
-Supabase ETL provides a powerful alternative to Read Replicas for analytics workloads, optimizing performance while reducing costs.`,
+BigQuery and DuckLake keep current-state tables synchronized. ClickHouse supports current-state ReplacingMergeTree tables or append-only MergeTree CDC history. Snowflake stores append-only CDC history. Source \`TRUNCATE\` operations and table resets erase accumulated destination data. Schema changes can alter retained history in append-only ClickHouse and Snowflake tables.`,
     icon: CloudCog,
     products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: '',
-    docsUrl: 'https://supabase.github.io/etl/',
-    slug: 'supabase-etl',
+    heroImage: 'https://www.youtube-nocookie.com/embed/8o3duiYqppA',
+    docsUrl: 'https://supabase.com/docs/guides/database/replication/pipelines',
+    slug: 'supabase-pipelines',
     status: {
-      stage: PRODUCT_STAGES.PRIVATE_ALPHA,
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
       availableOnSelfHosted: false,
     },
   },
@@ -763,9 +766,10 @@ Supabase's Realtime Postgres Changes feature allows you to listen to database ch
 ## Key features
 1. Event-based listening: Subscribe to INSERT, UPDATE, DELETE, or all (*) events.
 2. Schema and table targeting: Listen to changes in specific schemas or tables.
-3. Granular filtering: Apply filters to receive only relevant changes.
+3. Granular filtering: Apply filters on one or more columns to receive only relevant changes.
 4. Multiple subscriptions: Listen to different combinations of events, schemas, and tables in a single channel.
 5. Row-level security integration: Respect database permissions when broadcasting changes.
+6. Column selection: Opt in to receive only the columns you choose in the event payload, with the primary key always included.
 
 ## Benefits:
 - Real-time updates: Receive instant notifications when data changes, enabling live-updating UIs.
@@ -779,8 +783,6 @@ Supabase's Realtime Postgres Changes feature allows you to listen to database ch
 - Real-time dashboards and analytics platforms
 - Live chat and messaging systems
 - Applications requiring instant updates based on database changes
-
-Supabase's Realtime Postgres Changes feature provides a powerful tool for creating responsive, real-time applications while leveraging the full capabilities of your Postgres database.
 `,
     icon: DatabaseZap,
     products: [PRODUCT_SHORTNAMES.REALTIME],
@@ -1609,7 +1611,7 @@ Supabase Storage simplifies adding robust file management to your applications, 
 2. Automatic compaction: S3 Tables merges small files automatically for optimal performance.
 3. Built-in time travel: Query historical data using snapshots.
 4. Schema evolution: Evolve schema over time without breaking queries.
-5. Integrated with ETL: Real-time replication from Postgres via Supabase ETL.
+5. Open ingestion: Populate buckets with your own Iceberg-compatible ingestion pipeline.
 6. Query from Postgres: Use Iceberg Foreign Data Wrapper to join with operational data.
 
 ## Query tools supported
@@ -2341,6 +2343,8 @@ The Logs & Analytics feature in Supabase provides users with comprehensive loggi
 
 OpenTelemetry integration allows you to export logs, metrics, and traces to any OTel-compatible tool—Datadog, Honeycomb, Grafana, or your preferred monitoring platform. The Metrics API exposes ~200 Prometheus-compatible Postgres metrics, including CPU, IO, WAL, connections, and query statistics.
 
+Trace propagation also works inbound. supabase-js, Swift, Flutter, and Python can propagate W3C Trace Context to Supabase, so a client-side trace and the corresponding Supabase logs share the same trace_id. It is opt-in and works with any W3C-compliant tracer, including OTLP, Sentry, Datadog, Honeycomb, and Grafana. See the [client-side tracing guide](https://supabase.com/docs/guides/monitoring-and-debugging/client-side-tracing) for the latest on supported SDKs and target platforms.
+
 ## Key benefits
 1. Real-Time Monitoring: Access live data on application performance and user interactions to make informed decisions.
 2. Comprehensive Log Management: Ingest and store logs from multiple sources, allowing for centralized management of application events.
@@ -2349,6 +2353,7 @@ OpenTelemetry integration allows you to export logs, metrics, and traces to any 
 5. Scalability: Handle large volumes of log data with a robust infrastructure designed for high availability and performance.
 6. OpenTelemetry Support: Export telemetry data to vendor-agnostic monitoring platforms for unified observability.
 7. Metrics API: Stream Postgres performance metrics for CPU, IO, WAL, connections, and query statistics.
+8. Client-Side Trace Propagation: correlate a trace from your client app — web, mobile, or server-side — with the matching API Gateway and Edge Function log under one shared 'trace_id'.
 
 This feature is particularly valuable for teams looking to enhance their application's reliability and performance by gaining deeper insights into usage patterns and potential issues.
 `,
@@ -2669,7 +2674,7 @@ $60 per drain per project, plus $0.20 per million events and $0.09 per GB egress
     icon: Activity,
     products: [ADDITIONAL_PRODUCTS.STUDIO],
     heroImage: 'https://www.youtube-nocookie.com/embed/A4GFmvgxS-E',
-    docsUrl: 'https://supabase.com/docs/guides/telemetry/log-drains',
+    docsUrl: 'https://supabase.com/docs/guides/monitoring-and-debugging/log-drains',
     slug: 'log-drains',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2830,48 +2835,6 @@ OrioleDB is a PostgreSQL storage extension built on its pluggable storage framew
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
       availableOnSelfHosted: true,
-    },
-  },
-  {
-    title: 'Replication',
-    subtitle: 'Replicate database changes to external destinations.',
-    description: `Replication uses Postgres logical replication to replicate database changes to external destinations like Analytics Buckets and BigQuery. Changes are captured from the Write Ahead Log and delivered in near real-time to analytical systems.
-
-## Key benefits
-1. Near real-time sync: Changes replicated as they occur using WAL reading.
-2. Analytics Buckets support: Append-only changelog format in Iceberg.
-3. BigQuery integration: Direct replication to Google's data warehouse.
-4. Complete change capture: INSERT, UPDATE, DELETE, and TRUNCATE operations.
-5. Managed pipeline: Monitor status, lag, and errors in dashboard.
-
-## Destinations
-Analytics Buckets create append-only changelog with \`cdc_operation\` column, preserving complete change history in Iceberg format. BigQuery creates views backed by versioned tables for efficient querying.
-
-## Setup
-Create Postgres publication for tables to replicate. Add destination in Replication section of dashboard. Configure destination-specific settings. Monitor pipeline in dashboard.
-
-## Requirements
-Tables must have primary keys. Logical replication must be enabled.
-
-## Replication is valuable for:
-- Real-time data warehousing
-- Analytics separation from production
-- Historical data archival
-- Multi-destination data sync
-- Compliance and audit trails
-
-## Limitations
-No DDL support yet (ALTER TABLE, ADD COLUMN). Destination-specific constraints may apply.
-
-Replication provides the real-time data pipeline required for modern analytics architectures.`,
-    icon: DatabaseZap,
-    products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/database/replication/external-replication-setup',
-    slug: 'replication',
-    status: {
-      stage: PRODUCT_STAGES.PRIVATE_ALPHA,
-      availableOnSelfHosted: false,
     },
   },
   {

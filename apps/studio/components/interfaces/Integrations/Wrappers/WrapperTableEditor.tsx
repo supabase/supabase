@@ -51,6 +51,7 @@ import type { AvailableColumn, Table, TableOption } from './Wrappers.types'
 import { getTableFormSchema } from './Wrappers.utils'
 import { ActionBar } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
 import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export type WrapperTableEditorProps = {
@@ -119,7 +120,7 @@ const WrapperTableEditor = ({
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <Button
-                  type="default"
+                  variant="default"
                   role="combobox"
                   aria-expanded={open}
                   aria-controls={listboxId}
@@ -191,7 +192,7 @@ const Option = ({ option, control }: { option: TableOption; control: Control<Fie
         name={option.name}
         defaultValue={option.defaultValue}
         render={({ field }) => (
-          <FormItemLayout layout="vertical" label={option.label} name={option.name}>
+          <FormItemLayout layout="vertical" label={option.label}>
             <FormControl>
               <Select value={field.value} onValueChange={field.onChange}>
                 <SelectTrigger>
@@ -219,9 +220,9 @@ const Option = ({ option, control }: { option: TableOption; control: Control<Fie
       name={option.name}
       defaultValue={option.defaultValue ?? ''}
       render={({ field }) => (
-        <FormItemLayout layout="vertical" label={option.label} name={option.name}>
+        <FormItemLayout layout="vertical" label={option.label}>
           <FormControl>
-            <Input {...field} id={option.name} placeholder={option.placeholder ?? ''} />
+            <Input {...field} placeholder={option.placeholder ?? ''} />
           </FormControl>
         </FormItemLayout>
       )}
@@ -239,10 +240,11 @@ const TableForm = ({
   initialData: any
 }) => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: schemas, isPending: isLoading } = useSchemasQuery({
+  const { data: allSchemas, isPending: isLoading } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const schemas = useSchemasFilteredForHighAvailability(allSchemas)
 
   const requiredOptions: TableOption[] = []
   const optionalOptions: TableOption[] = []
@@ -347,7 +349,6 @@ const TableForm = ({
             <FormItemLayout layout="vertical" label="Select a schema for the foreign table">
               <FormControl>
                 <Select
-                  name="schema"
                   value={field.value}
                   onValueChange={(schema) => {
                     field.onChange(schema)
@@ -378,9 +379,9 @@ const TableForm = ({
             control={form.control}
             name="schema_name"
             render={({ field }) => (
-              <FormItemLayout name="schema_name" layout="vertical" label="Schema name">
+              <FormItemLayout layout="vertical" label="Schema name">
                 <FormControl>
-                  <Input {...field} id="schema_name" />
+                  <Input {...field} />
                 </FormControl>
               </FormItemLayout>
             )}
@@ -393,12 +394,11 @@ const TableForm = ({
           render={({ field }) => (
             <FormItemLayout
               layout="vertical"
-              name="table_name"
               label="Table name"
               description="You can query from this table after the wrapper is enabled."
             >
               <FormControl>
-                <Input {...field} id="table_name" />
+                <Input {...field} />
               </FormControl>
             </FormItemLayout>
           )}
@@ -470,13 +470,9 @@ const TableForm = ({
                   control={form.control}
                   name={`columns.${columnIndex}.name`}
                   render={({ field }) => (
-                    <FormItemLayout
-                      layout="vertical"
-                      name={`columns.${columnIndex}.name`}
-                      label="Name"
-                    >
+                    <FormItemLayout layout="vertical" label="Name">
                       <FormControl>
-                        <Input {...field} id={`columns.${columnIndex}.name`} />
+                        <Input {...field} />
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -488,7 +484,7 @@ const TableForm = ({
                   enumTypes={[]}
                 />
                 <Button
-                  type="outline"
+                  variant="outline"
                   icon={<XIcon strokeWidth={1.5} />}
                   onClick={() => removeColumn(columnIndex)}
                   className="self-end -translate-y-1.5 px-1.5"
@@ -498,7 +494,7 @@ const TableForm = ({
               </div>
             ))}
             <Button
-              type="default"
+              variant="default"
               onClick={() => appendColumn({ name: '', type: 'text' })}
               className="self-start"
             >

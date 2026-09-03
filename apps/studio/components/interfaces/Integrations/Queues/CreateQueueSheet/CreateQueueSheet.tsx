@@ -109,7 +109,7 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
 
   return (
     <Sheet open={visible} onOpenChange={handleOpenChange}>
-      <SheetContent size="default" className="w-[35%]" tabIndex={undefined}>
+      <SheetContent size="default" className="w-[35%]">
         <div className="flex flex-col h-full" tabIndex={-1}>
           <SheetHeader>
             <SheetTitle>Create a new queue</SheetTitle>
@@ -135,8 +135,8 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
           <SheetFooter>
             <Button
               size="tiny"
-              type="default"
-              htmlType="button"
+              variant="default"
+              type="button"
               onClick={confirmOnClose}
               disabled={isPending}
             >
@@ -144,9 +144,9 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
             </Button>
             <Button
               size="tiny"
-              type="primary"
+              variant="primary"
               form={FORM_ID}
-              htmlType="submit"
+              type="submit"
               loading={isPending}
               disabled={!project?.ref}
             >

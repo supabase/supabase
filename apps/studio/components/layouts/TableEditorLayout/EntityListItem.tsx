@@ -184,6 +184,7 @@ export const EntityListItem = ({
       id={String(entity.id)}
       href={buildTableEditorUrl({ projectRef, tableId: entity.id, schema: entity.schema })}
       role="button"
+      tabIndex={0}
       aria-label={`View ${entity.name}`}
       className={cn(
         TreeViewItemVariant({
@@ -233,17 +234,23 @@ export const EntityListItem = ({
 
         {canEdit && (
           <DropdownMenu>
-            <DropdownMenuTrigger
-              asChild
-              className="text-foreground-lighter transition-all text-transparent group-hover:text-foreground data-open:text-foreground"
-            >
-              <Button
-                type="text"
-                className="w-6 h-6"
-                icon={<MoreVertical size={14} strokeWidth={2} />}
-                onClick={(e) => e.preventDefault()}
-              />
-            </DropdownMenuTrigger>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger
+                  asChild
+                  className="text-foreground-lighter transition-all text-transparent group-hover:text-foreground data-open:text-foreground"
+                >
+                  <Button
+                    variant="text"
+                    className="w-6 h-6"
+                    icon={<MoreVertical size={14} strokeWidth={2} />}
+                    onClick={(e) => e.preventDefault()}
+                    aria-label={`More options for ${entity.name}`}
+                  />
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">More options</TooltipContent>
+            </Tooltip>
             <DropdownMenuContent side="bottom" align="start" className="w-52">
               <DropdownMenuItem
                 key="copy-name"
@@ -365,7 +372,7 @@ export const EntityListItem = ({
                   <DropdownMenuItem key="view-policies" className="space-x-2" asChild>
                     <Link
                       key="view-policies"
-                      href={`/project/${projectRef}/auth/policies?schema=${encodeURIComponent(selectedSchema ?? '')}&search=${encodeURIComponent(String(entity.id))}`}
+                      href={`/project/${projectRef}/database/policies?schema=${encodeURIComponent(selectedSchema ?? '')}&search=${encodeURIComponent(String(entity.id))}`}
                     >
                       <Lock size={12} className="shrink-0" />
                       <span>View policies</span>

@@ -1,11 +1,13 @@
 import type { UIMessage as MessageType } from '@ai-sdk/react'
 import { ArrowUpRight } from 'lucide-react'
 import dynamic from 'next/dynamic'
+import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import type { JSX } from 'react'
 import type { StreamdownProps } from 'streamdown'
 import {
   AiIconAnimation,
+  Button,
   Card,
   CardContent,
   CardDescription,
@@ -15,12 +17,21 @@ import {
   Skeleton,
 } from 'ui'
 
-import { buildSupportAssistantPrompt } from '@/components/interfaces/Support/SupportAssistant.utils'
+import {
+  ASSISTANT_HANDOFF_QUERY_PARAM,
+  buildSupportAssistantPrompt,
+  storeAssistantHandoff,
+} from '@/components/interfaces/Support/SupportAssistant.utils'
 import type { SubmittedSupportRequest } from '@/components/interfaces/Support/SupportForm.state'
 import { NO_PROJECT_MARKER } from '@/components/interfaces/Support/SupportForm.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTrack } from '@/lib/telemetry/track'
-import { useAiAssistantStateSnapshot, type AiAssistantState } from '@/state/ai-assistant-state'
+import {
+  useAiAssistantState,
+  useAiAssistantStateSnapshot,
+  type AiAssistantState,
+} from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 type SupportAssistantPreviewChat = AiAssistantState['chatInstances'][string]
@@ -46,7 +57,13 @@ export function SupportAssistantSuccessCardContent({
   className,
 }: SupportAssistantSuccessCardContentProps) {
   const hasAssistantContext = hasProjectScopedAssistantContext(request.projectRef)
+  const { data: currentProject } = useSelectedProjectQuery()
+  // The ticket's resolved project isn't the one in the current URL — hand off to that
+  // project's own page instead of faking assistant context in place.
+  const isProjectHandoffRequired = hasAssistantContext && currentProject?.ref !== request.projectRef
+
   const aiAssistant = useAiAssistantStateSnapshot()
+  const aiAssistantState = useAiAssistantState()
   const { openSidebar } = useSidebarManagerSnapshot()
   const track = useTrack()
   const createdChatIdRef = useRef<string | null>(null)
@@ -55,8 +72,18 @@ export function SupportAssistantSuccessCardContent({
 
   const assistantPrompt = useMemo(() => buildSupportAssistantPrompt(request), [request])
 
+  // An opaque token for the handoff URL — the actual ticket content never touches the URL
+  // (browser history, referrer headers, a copy-pasted link); it's stashed in sessionStorage
+  // instead, scoped to this tab and consumed (removed) the moment the destination page reads it.
+  const [handoffToken] = useState(() => crypto.randomUUID())
+
   useEffect(() => {
-    if (!hasAssistantContext) return
+    if (!isProjectHandoffRequired) return
+    storeAssistantHandoff(handoffToken, request)
+  }, [isProjectHandoffRequired, handoffToken, request])
+
+  useEffect(() => {
+    if (!hasAssistantContext || isProjectHandoffRequired) return
     if (createdChatIdRef.current) return
 
     const newChatId = aiAssistant.newChat({
@@ -66,7 +93,7 @@ export function SupportAssistantSuccessCardContent({
 
     createdChatIdRef.current = newChatId
     setChatId(newChatId)
-  }, [aiAssistant, assistantPrompt, hasAssistantContext])
+  }, [aiAssistant, assistantPrompt, hasAssistantContext, isProjectHandoffRequired])
 
   const handleOpenAssistant = () => {
     track(
@@ -79,12 +106,82 @@ export function SupportAssistantSuccessCardContent({
     )
 
     if (chatId) {
-      aiAssistant.selectChat(chatId)
+      // Tag the chat as a support chat on first engagement so its messages and
+      // lifecycle sync to Front. Gated on the click (rather than on chat creation)
+      // so chats the user never opens don't create Front conversations.
+      const chat = aiAssistantState.chats[chatId]
+      if (chat && !chat.supportMetadata) {
+        chat.supportMetadata = {
+          subject: request.subject,
+          category: request.category,
+          severity: request.severity,
+          organizationSlug: request.organizationSlug,
+          projectRef: request.projectRef,
+          library: request.library,
+          affectedServices: request.affectedServices,
+          allowSupportAccess: request.allowSupportAccess,
+          // Reuse the Front conversation created at submit so AI messages thread into it.
+          frontConversationId: request.frontConversationId,
+          threadRef: request.threadRef,
+          isSupportChat: true,
+          lifecycleStatus: 'bot_active',
+          lastSyncedMessageCount: 0,
+          isSyncing: false,
+          isLifecycleSyncing: false,
+        }
+
+        // Flush any messages produced before the user engaged (the initial prompt
+        // and any assistant reply). Subsequent turns sync via the onFinish hook.
+        void import('@/state/ai-chat-front-sync')
+          .then(({ syncSupportChatToFront }) => syncSupportChatToFront(chatId, aiAssistantState))
+          .catch(() => {})
+      }
+
+      aiAssistantState.selectChat(chatId)
     }
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
   }
 
   if (!hasAssistantContext) return null
+
+  if (isProjectHandoffRequired) {
+    return (
+      <Card className={cn('bg-muted/50', className)}>
+        <CardHeader className="flex-row items-center justify-between gap-4 space-y-0">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border bg-background">
+              <AiIconAnimation size={14} />
+            </div>
+            <div className="min-w-0 space-y-1">
+              <CardTitle>While you wait</CardTitle>
+              <CardDescription>Continue with the Assistant in your project</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Button
+            asChild
+            variant="default"
+            size="tiny"
+            iconRight={<ArrowUpRight size={14} strokeWidth={1.5} />}
+          >
+            <Link
+              href={`/project/${request.projectRef}?sidebar=ai-assistant&${ASSISTANT_HANDOFF_QUERY_PARAM}=${handoffToken}`}
+              onClick={() =>
+                track(
+                  'support_assistant_follow_up_card_clicked',
+                  { ticketCategory: request.category },
+                  { project: request.projectRef, organization: request.organizationSlug }
+                )
+              }
+            >
+              Open Assistant in project
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <Card
@@ -99,7 +196,7 @@ export function SupportAssistantSuccessCardContent({
         }
       }}
       className={cn(
-        'group cursor-pointer bg-muted/50 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand',
+        'group cursor-pointer bg-muted/50 transition-colors hover:bg-muted/50 focus-ring',
         className
       )}
     >

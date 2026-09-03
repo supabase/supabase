@@ -13,7 +13,8 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { APIKeyRow } from './APIKeyRow'
 import { CreatePublishableAPIKeyDialog } from './CreatePublishableAPIKeyDialog'
@@ -130,7 +131,6 @@ export const PublishableAPIKeys = () => {
               )}
               {publishableApiKeys.map((apiKey) => (
                 <APIKeyRow
-                  showLastSeen={false}
                   key={apiKey.id}
                   apiKey={apiKey}
                   isDeleting={apiKeyToDelete?.id === apiKey.id && isDeletingAPIKey}

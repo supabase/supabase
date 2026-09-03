@@ -106,10 +106,10 @@ function FeedbackModal({ visible, page, onCancel, onSubmit }: FeedbackModalProps
         </Form>
         <DialogFooter>
           <div className="flex items-center justify-end gap-2">
-            <Button htmlType="reset" type="default" onClick={handleCancel} disabled={isSubmitting}>
+            <Button type="reset" variant="default" onClick={handleCancel} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button htmlType="submit" form={formId} loading={isSubmitting} disabled={isSubmitting}>
+            <Button type="submit" form={formId} loading={isSubmitting} disabled={isSubmitting}>
               Submit feedback
             </Button>
           </div>

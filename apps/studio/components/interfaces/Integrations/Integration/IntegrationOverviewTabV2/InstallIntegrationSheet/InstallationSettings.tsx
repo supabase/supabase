@@ -64,7 +64,7 @@ export const InstallationSettings = <
                         <Button
                           asChild
                           key={action.label}
-                          type="default"
+                          variant="default"
                           icon={isExternal ? <ExternalLink /> : undefined}
                         >
                           <Link

@@ -274,7 +274,7 @@ export function FilterCondition({
                 onChange={(e) => setPropertySearchText(e.target.value)}
                 onBlur={handlePropertyBlur}
                 onKeyDown={handlePropertyKeyDown}
-                className="h-full border-none bg-transparent py-0 pl-2 pr-1 text-xs focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground-light w-full absolute left-0 top-0"
+                className="h-full border-none bg-transparent py-0 pl-2 pr-1 text-xs hover:border-transparent focus:border-transparent focus-visible:border-transparent focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground-light w-full absolute left-0 top-0"
                 placeholder={property.label}
                 autoFocus
                 aria-label={`Change property from ${property.label}`}
@@ -332,7 +332,7 @@ export function FilterCondition({
               }}
               onBlur={handleOperatorBlur}
               onKeyDown={handleOperatorKeyDown}
-              className="h-full border-none bg-transparent py-0 px-1 text-center text-xs md:text-xs focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground w-full absolute left-0 top-0"
+              className="h-full border-none bg-transparent py-0 px-1 text-center text-xs md:text-xs hover:border-transparent focus:border-transparent focus-visible:border-transparent focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground w-full absolute left-0 top-0"
               aria-label={`Operator for ${property.label}`}
               data-testid={`filter-operator-${property.name}`}
               tabIndex={-1}
@@ -379,7 +379,7 @@ export function FilterCondition({
               onFocus={() => handleInputFocus(path)}
               onBlur={handleValueBlur}
               onKeyDown={handleValueKeyDown}
-              className="h-full border-none bg-transparent py-0 px-1 text-xs md:text-xs focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0"
+              className="h-full border-none bg-transparent py-0 px-1 text-xs md:text-xs hover:border-transparent focus:border-transparent focus-visible:border-transparent focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0"
               aria-label={`Value for ${property.label}`}
               data-testid={`filter-value-${property.name}`}
               tabIndex={-1}
@@ -432,7 +432,7 @@ export function FilterCondition({
         </PopoverContent>
       </Popover>
       <Button
-        type="text"
+        variant="text"
         size="tiny"
         icon={
           <X

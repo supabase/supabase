@@ -1,4 +1,4 @@
-import { acceptUntrustedSql } from '@supabase/pg-meta'
+import { acceptUntrustedSql, safeSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { X } from 'lucide-react'
@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { BURSTABLE_IO_METRIC_KEYS, DEPRECATED_REPORTS } from '../Reports.constants'
 import { ChartBlock } from './ChartBlock'
 import { DeprecatedChartBlock } from './DeprecatedChartBlock'
+import { LogsSnippetReportBlock } from './LogsSnippetReportBlock'
 import { UnavailableChartBlock } from './UnavailableChartBlock'
 import { hasBurstableIO } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
@@ -18,6 +19,7 @@ import { useContentIdQuery } from '@/data/content/content-id-query'
 import { usePrimaryDatabase } from '@/data/read-replicas/replicas-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { sqlKeys } from '@/data/sql/keys'
+import { applyAutoLimit } from '@/data/sql/utils'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import type { Dashboards, SqlSnippets } from '@/types'
@@ -78,7 +80,17 @@ export const ReportBlock = ({
     }
   )
 
-  const sql = isSnippet ? (data?.content as SqlSnippets.Content)?.unchecked_sql : undefined
+  const isLogsSnippet = data?.type === 'log_sql'
+
+  const autoLimit = 100
+  const sql =
+    isSnippet && !isLogsSnippet ? (data?.content as SqlSnippets.Content)?.unchecked_sql : undefined
+  // acceptUntrustedSql is usually not allowed outside a user-action event
+  // handler, but it's explicitly fine here: adding this block to a report is
+  // itself the user action that approves running its SQL.
+  const acceptedSql = sql !== undefined ? acceptUntrustedSql(sql) : safeSql``
+  const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(acceptedSql, autoLimit)
+
   const chartConfig = { ...DEFAULT_CHART_CONFIG, ...(item.chartConfig ?? {}) }
   const isDeprecatedChart = DEPRECATED_REPORTS.includes(item.attribute)
   const snippetMissing = contentError?.message.includes('Content not found')
@@ -93,11 +105,13 @@ export const ReportBlock = ({
     isPending: executeSqlLoading,
     refetch,
   } = useQuery({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- formattedSql/appendAutoLimit are fully derived from sql/autoLimit, both already in the key
     queryKey: sqlKeys.query(projectRef, [
       item.id,
       sql,
       readOnlyConnectionString,
       postgresConnectionString,
+      autoLimit,
     ]),
     queryFn: async () => {
       if (!projectRef || !sql) return null
@@ -112,13 +126,10 @@ export const ReportBlock = ({
       return executeSql({
         projectRef,
         connectionString,
-        // acceptUntrustedSql is usually not allowed in an auto-run position,
-        // but in this case we are explicitly allowing it because adding a block
-        // to a report is an explicit user action.
-        sql: acceptUntrustedSql(sql),
+        sql: formattedSql,
       })
     },
-    enabled: !isLoadingContent && contentError == null,
+    enabled: !isLoadingContent && contentError == null && !isLogsSnippet,
     refetchOnWindowFocus: false,
   })
 
@@ -144,6 +155,25 @@ export const ReportBlock = ({
     }
   }, [isRefreshing, refetch])
 
+  if (isLogsSnippet) {
+    return (
+      <LogsSnippetReportBlock
+        label={item.label}
+        actions={
+          !disableUpdate ? (
+            <ButtonTooltip
+              variant="text"
+              icon={<X />}
+              className="w-7 h-7"
+              onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
+              tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
+            />
+          ) : null
+        }
+      />
+    )
+  }
+
   return (
     <>
       {isSnippet ? (
@@ -167,7 +197,7 @@ export const ReportBlock = ({
           isWriteQuery={isWriteQuery}
           actions={
             <ButtonTooltip
-              type="text"
+              variant="text"
               icon={<X />}
               className="w-7 h-7"
               onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
@@ -180,6 +210,7 @@ export const ReportBlock = ({
           onUpdateChartConfig={onUpdateChart}
           onRemoveChart={() => onRemoveChart({ metric: { key: item.attribute } })}
           disabled={isLoadingContent || snippetMissing || !sql}
+          autoLimit={appendAutoLimit}
         />
       ) : isUnavailableBurstChart ? (
         <UnavailableChartBlock
@@ -187,7 +218,7 @@ export const ReportBlock = ({
           actions={
             !disableUpdate ? (
               <ButtonTooltip
-                type="text"
+                variant="text"
                 icon={<X />}
                 className="h-7 w-7"
                 onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
@@ -203,7 +234,7 @@ export const ReportBlock = ({
           actions={
             !disableUpdate ? (
               <ButtonTooltip
-                type="text"
+                variant="text"
                 icon={<X />}
                 className="w-7 h-7"
                 onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
@@ -226,7 +257,7 @@ export const ReportBlock = ({
           actions={
             !disableUpdate ? (
               <ButtonTooltip
-                type="text"
+                variant="text"
                 icon={<X />}
                 className="w-7 h-7"
                 onClick={() => onRemoveChart({ metric: { key: item.attribute } })}

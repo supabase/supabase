@@ -25,8 +25,10 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_PG_DELTA_DIFF: 'supabase-ui-pg-delta-diff',
   UI_PREVIEW_PLATFORM_WEBHOOKS: 'supabase-ui-platform-webhooks',
   UI_PREVIEW_JIT_DB_ACCESS: 'supabase-ui-jit-db-access',
-  UI_PREVIEW_RLS_TESTER: 'supabase-ui-rls-tester',
+  UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE: 'supabase-ui-sql-editor-manual-save',
   UI_PREVIEW_MARKETPLACE: 'supabase-ui-marketplace',
+  UI_PREVIEW_DATABASE_CONNECTIONS: 'preview-database-connections',
+  UI_PREVIEW_EXPLORER: 'preview-explorer',
 
   AI_ASSISTANT_MCP_OPT_IN: 'ai-assistant-mcp-opt-in',
 
@@ -48,6 +50,12 @@ export const LOCAL_STORAGE_KEYS = {
   SQL_EDITOR_SQL_BLOCK_ACKNOWLEDGED: (ref: string) => `sql-editor-sql-block-acknowledged-${ref}`,
   SQL_EDITOR_SECTION_STATE: (ref: string) => `sql-editor-section-state-${ref}`,
   SQL_EDITOR_SORT: (ref: string) => `sql-editor-sort-${ref}`,
+  SQL_EDITOR_MANUAL_SAVE_NOTICE_DISMISSED: 'sql-editor-manual-save-notice-dismissed',
+  // Set when a user follows the "temporarily switch to SQL Editor" link from Explorer;
+  // shows a way back and is cleared once they return to Explorer
+  SQL_EDITOR_TEMPORARY_FROM_EXPLORER: (ref: string) => `sql-editor-temporary-from-explorer-${ref}`,
+
+  EXPLORER_QUERY_DRAFTS: (ref: string) => `explorer-query-drafts-${ref}`,
 
   LOG_EXPLORER_SPLIT_SIZE: 'supabase_log-explorer-split-size',
   GRAPHQL_INTROSPECTION_NOTICE_COLLAPSED: (ref: string) =>
@@ -58,8 +66,6 @@ export const LOCAL_STORAGE_KEYS = {
   LINTER_SHOW_FOOTER: 'supabase-linter-show-footer',
   // Key to track account deletion requests
   ACCOUNT_DELETION_REQUEST: 'supabase-account-deletion-request',
-  // Used for storing a user id when sending reports to Sentry. The id is hashed for anonymity.
-  SENTRY_USER_ID: 'supabase-sentry-user-id',
   // Used for storing the last sign in method used by the user
   LAST_SIGN_IN_METHOD: 'supabase-last-sign-in-method',
   // Key to track the last selected schema. The project ref is intentionally put at the end for easier search in the browser console.
@@ -72,7 +78,7 @@ export const LOCAL_STORAGE_KEYS = {
   GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
   // Notice banner keys
   API_KEYS_FEEDBACK_DISMISSED: (ref: string) => `supabase-api-keys-feedback-dismissed-${ref}`,
-  TERMS_OF_SERVICE_UPDATE: 'terms-of-service-update-2026-06-06',
+  TERMS_OF_SERVICE_UPDATE: 'terms-of-service-update-2026-08-01',
   SUPAVISOR_MAINTENANCE: (ref: string) => `supavisor-maintenance-2026-06-09-${ref}`,
   REPORT_DATERANGE: 'supabase-report-daterange',
   PROJECT_PAUSING_STARTED_AT: (ref: string) => `supabase-project-pausing-started-at-${ref}`,
@@ -87,7 +93,7 @@ export const LOCAL_STORAGE_KEYS = {
   // Shortcut preferences
   SHORTCUT_STORAGE_KEY: 'supabase-shortcut-preferences',
 
-  LAST_VISITED_ORGANIZATION: 'last-visited-organization',
+  LAST_VISITED_ORGANIZATION: (uid?: number) => `last-visited-organization-${uid}`,
 
   // user impersonation selector previous searches
   USER_IMPERSONATION_SELECTOR_PREVIOUS_SEARCHES: (ref: string) =>
@@ -101,25 +107,32 @@ export const LOCAL_STORAGE_KEYS = {
   // RLS event trigger banner dismissed
   RLS_EVENT_TRIGGER_BANNER_DISMISSED: (ref: string) => `rls-event-trigger-banner-dismissed-${ref}`,
 
+  // Read replicas moved from Replication → Infrastructure
+  READ_REPLICAS_MOVED_CALLOUT_DISMISSED: (ref: string) =>
+    `read-replicas-moved-callout-dismissed-${ref}`,
+
   PROJECT_SECURITY_DISMISSED_AT: (ref: string) => `project-security-dismissed-at-${ref}`,
 
-  RLS_TESTER_BANNER_DISMISSED: (ref: string) => `rls-tester-banner-dismissed-${ref}`,
-
-  // Observability banner dismissed
-  OBSERVABILITY_BANNER_DISMISSED: (ref: string) => `observability-banner-dismissed-${ref}`,
+  DATABASE_CONNECTIONS_BANNER_DISMISSED: (ref: string) =>
+    `database-connections-banner-dismissed-${ref}`,
   ORGANIZATION_MARKETPLACE_BANNER_DISMISSED: (orgSlug: string, managedBy: string) =>
     `organization-marketplace-banner-dismissed-${orgSlug}-${managedBy}`,
   PROJECT_INTEGRATION_BANNER_DISMISSED: (ref: string, integrationSource: string) =>
     `project-integration-banner-dismissed-${ref}-${integrationSource}`,
+  EXPLORER_BANNER_DISMISSED: `explorer-banner-dismissed`,
 
   TABLE_EDITOR_QUEUE_OPERATIONS_BANNER_DISMISSED: (ref: string) =>
     `table-editor-queue-operations-banner-dismissed-${ref}`,
   FREE_MICRO_UPGRADE_BANNER_DISMISSED: (ref: string) =>
     `free-micro-upgrade-banner-dismissed-${ref}`,
-  UNIFIED_LOGS_BANNER_DISMISSED: 'unified-logs-banner-dismissed',
+  PROJECT_UPGRADE_FAILED_BANNER_DISMISSED_AT: (ref: string) =>
+    `project-upgrade-failed-banner-dismissed-at-${ref}`,
+  UNIFIED_LOGS_SIDEBAR_BANNER_DISMISSED: 'unified-logs-sidebar-banner-dismissed',
+  // Dated so the key retires with the banner; see BannerLogsAllDeprecation
+  LOGS_ALL_DEPRECATION_2026_09_23: 'logs-all-deprecation-2026-09-23-dismissed',
+  SCOPED_TOKENS_MIGRATION_ADMONITION_DISMISSED: 'scoped-tokens-migration-admonition-dismissed',
   STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED: (ref: string, bucketId: string) =>
     `storage-public-bucket-select-policy-warning-dismissed-${ref}-${bucketId}`,
-
   /**
    * COMMON
    */
@@ -156,6 +169,8 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE,
+  LOCAL_STORAGE_KEYS.SQL_EDITOR_MANUAL_SAVE_NOTICE_DISMISSED,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE,
   LOCAL_STORAGE_KEYS.LAST_SIGN_IN_METHOD,
   LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST,

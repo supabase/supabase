@@ -151,14 +151,14 @@ const OrganizationLayoutContent = ({
           </div>
           <div className="flex items-center gap-2">
             {selectedRedirectQuery?.data?.url && (
-              <Button asChild type="default" iconRight={<ExternalLink />}>
+              <Button asChild variant="default" iconRight={<ExternalLink />}>
                 <a href={selectedRedirectQuery.data.url} target="_blank" rel="noopener noreferrer">
                   Manage
                 </a>
               </Button>
             )}
             <ButtonTooltip
-              type="text"
+              variant="text"
               icon={<XIcon size={14} />}
               className="h-7 w-7 p-0"
               onClick={() => setIsBannerDismissed(true)}

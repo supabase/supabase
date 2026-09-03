@@ -1,5 +1,5 @@
 import pgMeta from '@supabase/pg-meta'
-import type { PGFunctionCreate } from '@supabase/pg-meta/src/pg-meta-functions'
+import type { PGFunctionUpdate } from '@supabase/pg-meta/src/pg-meta-functions'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -13,7 +13,7 @@ export type DatabaseFunctionUpdateVariables = {
   projectRef: string
   connectionString?: string | null
   func: SavedDatabaseFunction
-  payload: PGFunctionCreate
+  payload: PGFunctionUpdate
 }
 
 export async function updateDatabaseFunction({

@@ -12,7 +12,7 @@ import { filterByProjects, sortAuditLogs } from './AuditLogs.utils'
 import { LogDetailsPanel } from '@/components/interfaces/AuditLogs/LogDetailsPanel'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import Table from '@/components/to-be-cleaned/Table'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FilterPopover } from '@/components/ui/FilterPopover'
 import {
@@ -157,7 +157,7 @@ export const AuditLogs = () => {
                 )}
               </div>
               <Button
-                type="default"
+                variant="default"
                 disabled={isLoading || isRefetching}
                 icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
                 onClick={() => refetch()}
@@ -202,7 +202,7 @@ export const AuditLogs = () => {
                           <div className="flex items-center space-x-2">
                             <p>Date</p>
                             <ButtonTooltip
-                              type="text"
+                              variant="text"
                               className="px-1"
                               icon={
                                 dateSortDesc ? (
@@ -284,7 +284,7 @@ export const AuditLogs = () => {
                                 <TimestampInfo className="text-sm" utcTimestamp={isoTimestamp} />
                               </Table.td>
                               <Table.td align="right">
-                                <Button type="default">View details</Button>
+                                <Button variant="default">View details</Button>
                               </Table.td>
                             </Table.tr>
                           )

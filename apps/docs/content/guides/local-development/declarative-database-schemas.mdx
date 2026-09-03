@@ -11,6 +11,8 @@ Declarative schemas provide a developer-friendly way to maintain <InfoTooltip to
 
 [Migrations](/docs/guides/deployment/database-migrations) are traditionally managed imperatively (you provide the instructions on how exactly to change the database). This can lead to related information being scattered over multiple migration files. With declarative schemas, you instead declare the state you want your database to be in, and the instructions are generated for you.
 
+Because the schema files are the source of truth, make every change by editing them - not through Studio or the SQL editor. `supabase db diff` compares your schema files, not the live database, so changes made directly to the database are not picked up.
+
 ## Schema migrations
 
 Schema migrations are SQL statements written in Data Definition Language. They are versioned in your `supabase/migrations` directory to ensure schema consistency between local and remote environments.
@@ -26,16 +28,12 @@ Schema migrations are SQL statements written in Data Definition Language. They a
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```sql name=supabase/schemas/employees.sql
 create table "employees" (
   "id" integer not null,
   "name" text
 );
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -51,13 +49,9 @@ create table "employees" (
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase db diff -f create_employees_table
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -73,14 +67,10 @@ supabase db diff -f create_employees_table
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase start
 supabase migration up
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -88,6 +78,12 @@ supabase migration up
 </StepHikeCompact>
 
 ### Updating your schema
+
+<Admonition type="caution" label="Edit the schema files, not the database">
+
+With declarative schemas, the files in `supabase/schemas/` are the source of truth. `supabase db diff` compares **those files** against your migrations - it does **not** read the live database. Changes you make directly (Studio, the SQL editor, `psql`) are invisible to the diff: it reports "No schema changes found" and the change is silently dropped. Always edit the schema files, then run `db diff`.
+
+</Admonition>
 
 <StepHikeCompact>
 
@@ -98,8 +94,6 @@ supabase migration up
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```sql name=supabase/schemas/employees.sql
 create table "employees" (
   "id" integer not null,
@@ -108,14 +102,12 @@ create table "employees" (
 );
 ```
 
-</$CodeTabs>
-
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
 </StepHikeCompact>
 
-<Admonition type="tip">
+<Admonition type="note">
 
 Some entities like views and enums expect columns to be declared in a specific order. To avoid messy diffs, always append new columns to the end of the table.
 
@@ -130,13 +122,9 @@ Some entities like views and enums expect columns to be declared in a specific o
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase db diff -f add_age
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -152,13 +140,9 @@ supabase db diff -f add_age
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```sql name=supabase/migrations/<timestamp>_add_age.sql
 alter table "public"."employees" add column "age" smallint not null;
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -173,13 +157,9 @@ alter table "public"."employees" add column "age" smallint not null;
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase migration up
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -197,13 +177,9 @@ supabase migration up
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase login
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -216,13 +192,9 @@ supabase login
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase link
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -235,13 +207,9 @@ supabase link
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase db push
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -251,8 +219,6 @@ supabase db push
 ### Managing dependencies
 
 As your database schema evolves, you will probably start using more advanced entities like views and functions. These entities are notoriously verbose to manage using plain migrations because the entire body must be recreated whenever there is a change. Using declarative schema, you can now edit them in-place so it’s much easier to review.
-
-<$CodeTabs>
 
 ```sql name=supabase/schemas/employees.sql
 create table "employees" (
@@ -273,8 +239,6 @@ AS $$
 $$;
 ```
 
-</$CodeTabs>
-
 Your schema files are run in lexicographic order by default. The order is important when you have foreign keys between multiple tables as the parent table must be created first. For example, your `supabase` directory may end up with the following structure.
 
 ```bash
@@ -291,8 +255,6 @@ Your schema files are run in lexicographic order by default. The order is import
 
 For small projects with only a few tables, the default schema order may be sufficient. However, as your project grows, you might need more control over the order in which schemas are applied. To specify a custom order for applying the schemas, you can declare them explicitly in `config.toml`. Any glob patterns will evaluated, deduplicated, and sorted in lexicographic order. For example, the following pattern ensures `employees.sql` is always executed first.
 
-<$CodeTabs>
-
 ```toml name=supabase/config.toml
 [db.migrations]
 schema_paths = [
@@ -301,19 +263,13 @@ schema_paths = [
 ]
 ```
 
-</$CodeTabs>
-
 ### Pulling in your production schema
 
 To set up declarative schemas on a existing project, you can pull in your production schema by running:
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase db dump > supabase/schemas/prod.sql
 ```
-
-</$CodeTabs>
 
 From there, you can start breaking down your schema into smaller files and generate migrations. You can do this all at once, or incrementally as you make changes to your schema.
 
@@ -321,13 +277,9 @@ From there, you can start breaking down your schema into smaller files and gener
 
 During development, you may want to rollback a migration to keep your new schema changes in a single migration file. This can be done by resetting your local database to a previous version.
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase db reset --version 20241005112233
 ```
-
-</$CodeTabs>
 
 After a reset, you can [edit the schema](#updating-your-schema) and regenerate a new migration file. Note that you should not reset a version that's already deployed to production.
 
@@ -341,7 +293,7 @@ SQL statements generated in a down migration are usually destructive. You must r
 
 ## Known caveats
 
-The `migra` diff tool used for generating schema diff is capable of tracking most database changes. However, there are edge cases where it can fail.
+Schema diffs are generated by `pg-delta`, the default diff engine, which tracks most database changes. However, there are edge cases where schema diff can fail. The known cases below were documented against the legacy [`migra`](https://github.com/djrobstep/migra) engine (still available via `enabled = false` under `[experimental.pgdelta]` in `config.toml`, or `--use-migra`); some, such as duplicated grants from default privileges, also apply to `pg-delta`. Review every generated migration regardless of engine.
 
 If you need to use any of the entities below, remember to add them through [versioned migrations](/docs/guides/deployment/database-migrations) instead.
 

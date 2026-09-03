@@ -53,7 +53,7 @@ export const OperationQueueSidePanel = () => {
 
           <SheetFooter className="justify-between!">
             <Button
-              type="default"
+              variant="default"
               onClick={snap.closeSidePanel}
               iconRight={<KeyboardShortcut keys={['Meta', '.']} variant="inline" />}
             >
@@ -61,7 +61,7 @@ export const OperationQueueSidePanel = () => {
             </Button>
             <div className="flex space-x-3">
               <Button
-                type="default"
+                variant="default"
                 onClick={confirmOnClose}
                 disabled={isSaving || operations.length === 0}
               >

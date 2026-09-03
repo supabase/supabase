@@ -26,7 +26,7 @@ export function AdvisorsSidebarMenu({ page }: AdvisorsSidebarMenuProps) {
         description="Advisors are now available in the top toolbar for quicker access across the dashboard."
         illustration={<Badge variant="success">New</Badge>}
         actions={
-          <Button size="tiny" type="default" onClick={handleOpenAdvisor}>
+          <Button size="tiny" variant="default" onClick={handleOpenAdvisor}>
             Try it now
           </Button>
         }

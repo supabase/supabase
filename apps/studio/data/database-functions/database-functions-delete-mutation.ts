@@ -19,7 +19,7 @@ export async function deleteDatabaseFunction({
   connectionString,
   func,
 }: DatabaseFunctionDeleteVariables) {
-  const { sql, zod } = pgMeta.functions.remove(func)
+  const { sql, zod } = pgMeta.functions.remove(func, { type: func.type })
 
   const { result } = await executeSql({
     projectRef,

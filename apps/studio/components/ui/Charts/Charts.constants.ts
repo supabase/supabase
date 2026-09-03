@@ -3,14 +3,14 @@
 
 // For ChartHandler
 export const CHART_COLORS = {
-  TICK: 'hsl(var(--background-overlay-hover))',
-  AXIS: 'hsl(var(--background-overlay-hover))',
-  GREEN_1: 'hsl(var(--brand-default))', // #3ECF8E
+  TICK: 'var(--background-overlay-hover)',
+  AXIS: 'var(--background-overlay-hover)',
+  GREEN_1: 'hsl(var(--brand-default))',
   GREEN_2: 'hsl(var(--brand-500))',
   RED_1: 'hsl(var(--destructive-default))',
   RED_2: 'hsl(var(--destructive-500))',
-  REFERENCE_LINE: 'hsl(var(--foreground-muted))',
-  REFERENCE_LINE_TEXT: 'hsl(var(--foreground-muted))',
+  REFERENCE_LINE: 'var(--foreground-muted)',
+  REFERENCE_LINE_TEXT: 'var(--foreground-muted)',
 }
 
 const LIGHT_STACKED_CHART_COLORS = [
@@ -158,5 +158,4 @@ export const DEFAULT_STACK_COLORS: ValidStackColor[] = [
 export enum DateTimeFormats {
   FULL = 'MMM D, YYYY, hh:mma',
   FULL_SECONDS = 'MMM D, hh:mm:ssa',
-  DATE_ONLY = 'MMM D, YYYY',
 }

@@ -36,7 +36,7 @@ const ResourcesExceededErrorRenderer: React.FC<ErrorRendererProps> = ({ error, i
               <InputGroupAddon align="block-end">
                 <InputGroupButton
                   size="tiny"
-                  type="default"
+                  variant="default"
                   className="ml-auto"
                   onClick={() => {
                     copyToClipboard(errorAsJson)

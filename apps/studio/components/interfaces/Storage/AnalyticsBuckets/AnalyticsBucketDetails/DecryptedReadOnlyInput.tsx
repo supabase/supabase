@@ -84,7 +84,7 @@ export const DecryptedReadOnlyInput = ({
                 <div className="flex items-center justify-center">
                   <Button
                     disabled
-                    type="default"
+                    variant="default"
                     className="w-7"
                     icon={<Loader className="animate-spin" />}
                   />
@@ -92,7 +92,7 @@ export const DecryptedReadOnlyInput = ({
               ) : (
                 <div className="flex items-center justify-center">
                   <Button
-                    type="default"
+                    variant="default"
                     className="w-7"
                     loading={showHidden && isDecryptedValueLoading}
                     icon={showHidden ? <Eye /> : <EyeOff />}

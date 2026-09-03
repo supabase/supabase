@@ -11,10 +11,9 @@ import {
   StripeAddressElementOptions,
   type SetupIntent,
 } from '@stripe/stripe-js'
-import { Form } from '@ui/components/shadcn/ui/form'
 import { Check, ChevronsUpDown, HelpCircle } from 'lucide-react'
 import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -26,6 +25,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  Form,
   FormControl,
   FormField,
   FormItem,
@@ -51,7 +51,7 @@ import { getURL } from '@/lib/helpers'
 
 export const BillingCustomerDataSchema = z.object({
   tax_id_type: z.string(),
-  tax_id_value: z.string().min(2, {
+  tax_id_value: z.string().trim().min(2, {
     message: 'Tax ID needs to be set.',
   }),
   tax_id_name: z.string(),
@@ -140,7 +140,11 @@ export const NewPaymentMethodElement = forwardRef(
       form.setValue('tax_id_name', name)
     }
 
-    const { tax_id_name, tax_id_value } = form.watch()
+    const [tax_id_name, rawTaxIdValue] = useWatch({
+      control: form.control,
+      name: ['tax_id_name', 'tax_id_value'],
+    })
+    const taxIdValue = rawTaxIdValue?.trim() ?? ''
     const selectedTaxId = TAX_IDS.find((option) => option.name === tax_id_name)
 
     const [purchasingAsBusiness, setPurchasingAsBusiness] = useState(currentTaxId != null)
@@ -149,16 +153,16 @@ export const NewPaymentMethodElement = forwardRef(
     >(undefined)
     useEffect(() => {
       if (!onTaxIdChange) return
-      if (purchasingAsBusiness && selectedTaxId && tax_id_value) {
+      if (purchasingAsBusiness && selectedTaxId && taxIdValue) {
         onTaxIdChange({
           country: getEffectiveTaxCountry(selectedTaxId),
           type: selectedTaxId.type,
-          value: tax_id_value,
+          value: taxIdValue,
         })
       } else {
         onTaxIdChange(null)
       }
-    }, [purchasingAsBusiness, selectedTaxId, tax_id_value, onTaxIdChange])
+    }, [purchasingAsBusiness, selectedTaxId, taxIdValue, onTaxIdChange])
 
     const addressCountry = stripeAddress?.address.country
     const availableTaxIds = useMemo(() => {
@@ -212,7 +216,7 @@ export const NewPaymentMethodElement = forwardRef(
         ? {
             country: getEffectiveTaxCountry(selectedTaxId),
             type: selectedTaxId.type,
-            value: form.getValues('tax_id_value'),
+            value: form.getValues('tax_id_value').trim(),
           }
         : null
     }
@@ -395,7 +399,7 @@ export const NewPaymentMethodElement = forwardRef(
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
-                            type="default"
+                            variant="default"
                             role="combobox"
                             size="medium"
                             aria-expanded={showTaxIDsPopover}

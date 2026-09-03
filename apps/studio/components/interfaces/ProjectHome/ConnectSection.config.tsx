@@ -1,4 +1,4 @@
-import { Box, Cable, Database, KeyRound, Sparkles } from 'lucide-react'
+import { Box, Cable, Database, KeyRound, Server, Sparkles } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 import type { ConnectMode } from '../ConnectSheet/Connect.types'
@@ -20,6 +20,13 @@ export const CONNECT_ACTIONS: ConnectAction[] = [
     heading: 'Framework',
     subheading: 'Use a client library',
     icon: <Box size={16} strokeWidth={1.5} />,
+  },
+  {
+    id: 'server',
+    mode: 'server',
+    heading: 'Server',
+    subheading: 'Build APIs',
+    icon: <Server size={16} strokeWidth={1.5} />,
   },
   {
     id: 'direct',

@@ -72,18 +72,27 @@ export const ConnectSection = () => {
         </div>
 
         <CardContent className="relative z-10 p-0">
-          <div className="grid grid-cols-1 xl:grid-cols-5 divide-y xl:divide-y-0 xl:divide-x border-muted">
+          <div className="grid grid-cols-1 xl:grid-cols-6 divide-y xl:divide-y-0 xl:divide-x border-muted">
             {availableActions.map((action) => (
               <button
                 key={action.id}
                 type="button"
+                tabIndex={
+                  (action.requiresActiveProject ?? true)
+                    ? !isActiveHealthy
+                      ? -1
+                      : 0
+                    : !selectedProject?.ref
+                      ? -1
+                      : 0
+                }
                 disabled={
                   (action.requiresActiveProject ?? true) ? !isActiveHealthy : !selectedProject?.ref
                 }
                 onClick={() => handleActionClick(action)}
                 className={cn(
                   'group flex items-center gap-3 p-4 text-left transition-colors min-h-[72px] w-full',
-                  'hover:bg-surface-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand',
+                  'hover:bg-surface-100 focus-ring',
                   'xl:min-h-32 xl:flex-col xl:justify-center xl:p-6 xl:text-center',
                   ((action.requiresActiveProject ?? true)
                     ? !isActiveHealthy

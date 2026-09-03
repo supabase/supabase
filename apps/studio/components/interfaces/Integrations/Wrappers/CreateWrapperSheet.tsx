@@ -18,7 +18,7 @@ import {
   SheetTitle,
   WarningIcon,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -282,7 +282,6 @@ export const CreateWrapperSheet = ({
                       <FormItemLayout
                         layout="vertical"
                         label="Wrapper Name"
-                        name="wrapper_name"
                         description={
                           wrapper_name.length > 0 ? (
                             <>
@@ -295,7 +294,7 @@ export const CreateWrapperSheet = ({
                         }
                       >
                         <FormControl>
-                          <Input id="wrapper_name" {...field} />
+                          <Input {...field} />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -428,7 +427,7 @@ export const CreateWrapperSheet = ({
                             </div>
                             <div className="flex items-center space-x-2">
                               <Button
-                                type="default"
+                                variant="default"
                                 className="px-1"
                                 icon={<Edit />}
                                 onClick={() => {
@@ -436,7 +435,7 @@ export const CreateWrapperSheet = ({
                                 }}
                               />
                               <Button
-                                type="default"
+                                variant="default"
                                 className="px-1"
                                 icon={<Trash />}
                                 onClick={() => {
@@ -449,7 +448,7 @@ export const CreateWrapperSheet = ({
                       })}
 
                       <div className="flex justify-end">
-                        <Button type="default" onClick={() => setSelectedTableToEdit(NewTable)}>
+                        <Button variant="default" onClick={() => setSelectedTableToEdit(NewTable)}>
                           Add foreign table
                         </Button>
                       </div>
@@ -507,8 +506,8 @@ export const CreateWrapperSheet = ({
             <SheetFooter>
               <Button
                 size="tiny"
-                type="default"
-                htmlType="button"
+                variant="default"
+                type="button"
                 onClick={onCloseWithConfirmation}
                 disabled={isSubmitting}
               >
@@ -516,9 +515,9 @@ export const CreateWrapperSheet = ({
               </Button>
               <Button
                 size="tiny"
-                type="primary"
+                variant="primary"
                 form={FORM_ID}
-                htmlType="submit"
+                type="submit"
                 disabled={isSubmitting || isExtensionDataLoading}
                 loading={isSubmitting}
               >

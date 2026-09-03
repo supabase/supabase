@@ -11,12 +11,12 @@ import {
   SheetHeader,
   SheetSection,
   SheetTitle,
-  Tabs_Shadcn_ as Tabs,
-  TabsContent_Shadcn_ as TabsContent,
-  TabsList_Shadcn_ as TabsList,
-  TabsTrigger_Shadcn_ as TabsTrigger,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import type { WebhookDelivery } from './PlatformWebhooks.types'
 import { formatDeliveryStatus, statusBadgeVariant } from './PlatformWebhooksView.utils'
@@ -150,7 +150,7 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
                         label="Copy event payload"
                       >
                         <Button
-                          type="text"
+                          variant="text"
                           icon={<Copy size={14} />}
                           onClick={() => onCopy(deliveryEventPayload, 'event payload')}
                         >
@@ -193,7 +193,7 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
                         label="Copy response payload"
                       >
                         <Button
-                          type="text"
+                          variant="text"
                           icon={<Copy size={14} />}
                           onClick={() => onCopy(deliveryResponsePayload, 'response payload')}
                         >
@@ -220,7 +220,7 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
               onTrigger={() => onRetryDelivery(retryableDelivery.id)}
             >
               <Button
-                type="default"
+                variant="default"
                 icon={<RotateCcw />}
                 onClick={() => onRetryDelivery(retryableDelivery.id)}
               >

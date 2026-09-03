@@ -1,7 +1,6 @@
 import { cva } from 'class-variance-authority'
 import React from 'react'
-import { cn, FormDescription, FormLabel, FormMessage, Label } from 'ui'
-import { SIZE } from 'ui/src/lib/constants'
+import { cn, FormDescription, FormLabel, FormMessage, Label, SIZE } from 'ui'
 
 type Props = {
   align?: 'left' | 'right'
@@ -18,6 +17,14 @@ type Props = {
   isReactForm?: boolean
   hideMessage?: boolean
   name?: string
+  /**
+   * For layout="horizontal", switches the label/content split to react to the nearest
+   * `@container` ancestor's width instead of the viewport width. Use when the layout sits
+   * inside a narrower column (e.g. next to a sidebar) so it stacks to a single column as
+   * soon as that column gets tight, rather than waiting for a viewport breakpoint that may
+   * never reflect the column's actual available space.
+   */
+  isContainerResponsive?: boolean
 }
 
 const ContainerVariants = cva('relative grid gap-10', {
@@ -35,7 +42,7 @@ const ContainerVariants = cva('relative grid gap-10', {
       false: '',
     },
     layout: {
-      horizontal: 'flex flex-col gap-2 md:grid md:grid-cols-12',
+      horizontal: 'flex flex-col gap-2',
       vertical: 'flex flex-col gap-2',
       flex: 'flex flex-row gap-3',
       'flex-row-reverse':
@@ -57,8 +64,20 @@ const ContainerVariants = cva('relative grid gap-10', {
       align: 'right',
       className: 'justify-between',
     },
+    {
+      layout: 'horizontal',
+      responsive: false,
+      className: 'md:grid md:grid-cols-12',
+    },
+    {
+      layout: 'horizontal',
+      responsive: true,
+      className: '@xl:grid @xl:grid-cols-12',
+    },
   ],
-  defaultVariants: {},
+  defaultVariants: {
+    responsive: false,
+  },
 })
 
 const LabelContainerVariants = cva('transition-all duration-500 ease-in-out', {
@@ -287,6 +306,7 @@ export const FormLayout = React.forwardRef<
       hideMessage = false,
       isReactForm,
       error,
+      isContainerResponsive = false,
       ...props
     },
     ref
@@ -318,12 +338,14 @@ export const FormLayout = React.forwardRef<
           {description}
         </FormDescription>
       ) : description ? (
-        <p
-          className={cn(DescriptionVariants({ size, layout }), 'text-sm text-foreground-light')}
+        // Rendered as a div rather than a p as descriptions can be arbitrary JSX
+        // which may contain block-level elements (invalid HTML inside a p)
+        <div
+          className={cn(DescriptionVariants({ size, layout }))}
           data-formlayout-id={'description'}
         >
           {description}
-        </p>
+        </div>
       ) : null
 
     const LabelContents = () => (
@@ -354,7 +376,10 @@ export const FormLayout = React.forwardRef<
       <div
         ref={ref}
         {...props}
-        className={cn(ContainerVariants({ size, flex, align, layout }), className)}
+        className={cn(
+          ContainerVariants({ size, flex, align, layout, responsive: isContainerResponsive }),
+          className
+        )}
       >
         {flex && (
           <div className={cn(FlexContainer({ flex, align, layout }))}>
@@ -372,7 +397,7 @@ export const FormLayout = React.forwardRef<
                 <FormLabel
                   className="text-foreground flex gap-2 items-center wrap-break-word"
                   data-formlayout-id="formLabel"
-                  htmlFor={props.name || id}
+                  htmlFor={id}
                 >
                   <LabelContents />
                 </FormLabel>

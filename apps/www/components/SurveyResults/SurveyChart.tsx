@@ -314,7 +314,7 @@ export function SurveyChart({
       ref={chartRef}
       className="w-full bg-200 border-t border-muted"
       style={{
-        background: `radial-gradient(circle at center -150%, hsl(var(--brand-300)), transparent 80%), radial-gradient(ellipse at center 230%, hsl(var(--background-surface-200)), transparent 75%)`,
+        background: `radial-gradient(circle at center -150%, hsl(var(--brand-300)), transparent 80%), radial-gradient(ellipse at center 230%, var(--background-surface-200), transparent 75%)`,
       }}
     >
       <header className="px-8 py-8">
@@ -437,7 +437,7 @@ export function SurveyChart({
                     No responses match those filters. Maybe next year?
                   </p>
                   <Button
-                    type="primary"
+                    variant="primary"
                     size="tiny"
                     onClick={() =>
                       setActiveFilters(
@@ -476,7 +476,7 @@ export function SurveyChart({
             chartData.length > 3 && (
               <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center py-4 bg-linear-to-b from-transparent to-background">
                 <Button
-                  type="default"
+                  variant="default"
                   size="tiny"
                   onClick={() => setIsExpanded(true)}
                   className="shadow-xs"
@@ -529,7 +529,7 @@ function SurveyFilter({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          type="default"
+          variant="default"
           size="tiny"
           iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
         >

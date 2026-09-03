@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Download } from 'lucide-react'
 import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -42,7 +42,7 @@ export const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupI
       return (
         <div className="flex space-x-4">
           <ButtonTooltip
-            type="default"
+            variant="default"
             disabled={!isHealthy || !canTriggerScheduledBackups}
             onClick={onSelectBackup}
             tooltip={{
@@ -61,7 +61,7 @@ export const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupI
 
           {!backup.isPhysicalBackup && (
             <ButtonTooltip
-              type="default"
+              variant="default"
               icon={<Download />}
               loading={isDownloading}
               disabled={!canTriggerScheduledBackups || isDownloading}

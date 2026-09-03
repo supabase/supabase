@@ -91,7 +91,9 @@ export default function NavigationMenuDemo() {
             </NavigationMenuContent>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <NavigationMenuTrigger className={cn(buttonVariants({ type: 'text', size: 'small' }))}>
+            <NavigationMenuTrigger
+              className={cn(buttonVariants({ variant: 'text', size: 'small' }))}
+            >
               Components
             </NavigationMenuTrigger>
             <NavigationMenuContent>
@@ -105,7 +107,9 @@ export default function NavigationMenuDemo() {
             </NavigationMenuContent>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <NavigationMenuTrigger className={cn(buttonVariants({ type: 'text', size: 'small' }))}>
+            <NavigationMenuTrigger
+              className={cn(buttonVariants({ variant: 'text', size: 'small' }))}
+            >
               Components
             </NavigationMenuTrigger>
             <NavigationMenuContent>
@@ -119,7 +123,9 @@ export default function NavigationMenuDemo() {
             </NavigationMenuContent>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <NavigationMenuTrigger className={cn(buttonVariants({ type: 'text', size: 'small' }))}>
+            <NavigationMenuTrigger
+              className={cn(buttonVariants({ variant: 'text', size: 'small' }))}
+            >
               Components
             </NavigationMenuTrigger>
             <NavigationMenuContent>
@@ -133,7 +139,9 @@ export default function NavigationMenuDemo() {
             </NavigationMenuContent>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <NavigationMenuTrigger className={cn(buttonVariants({ type: 'text', size: 'small' }))}>
+            <NavigationMenuTrigger
+              className={cn(buttonVariants({ variant: 'text', size: 'small' }))}
+            >
               Components
             </NavigationMenuTrigger>
             <NavigationMenuContent>
@@ -149,7 +157,7 @@ export default function NavigationMenuDemo() {
           <NavigationMenuItem>
             <NavigationMenuLink
               href="/docs"
-              className={buttonVariants({ type: 'text', size: 'small' })}
+              className={buttonVariants({ variant: 'text', size: 'small' })}
             >
               Documentation
             </NavigationMenuLink>

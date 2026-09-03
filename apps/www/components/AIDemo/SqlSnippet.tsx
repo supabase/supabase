@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Code, Play, DatabaseIcon } from 'lucide-react'
-import { Button, cn, ChartContainer, ChartTooltip, ChartTooltipContent, SQL_ICON } from 'ui'
-import { BarChart, Bar, XAxis, CartesianGrid } from 'recharts'
+import { Code, DatabaseIcon, Play } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
+import { Button, ChartContainer, ChartTooltip, ChartTooltipContent, cn, SQL_ICON } from 'ui'
+
 import CodeBlock from '../CodeBlock/CodeBlock'
 
 interface SqlSnippetProps {
@@ -178,14 +179,14 @@ export const SqlSnippet = ({
           <h3 className="text-xs font-medium flex-1">{title}</h3>
           <div className="flex">
             <Button
-              type="text"
+              variant="text"
               size="tiny"
               className="w-7 h-7"
               icon={<Code size={14} />}
               onClick={() => setShowCode(!showCode)}
             />
             <Button
-              type="text"
+              variant="text"
               size="tiny"
               className="w-7 h-7"
               icon={<Play size={14} />}

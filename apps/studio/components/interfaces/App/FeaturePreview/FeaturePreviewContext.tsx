@@ -13,15 +13,19 @@ import {
 } from 'react'
 
 import { useFeaturePreviews } from './useFeaturePreviews'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { IS_PLATFORM } from '@/lib/constants'
 import { EMPTY_OBJ } from '@/lib/void'
 
 type FeaturePreviewContextType = {
   flags: { [key: string]: boolean }
+  isInitialized: boolean
   onUpdateFlag: (key: string, value: boolean) => void
 }
 
 const FeaturePreviewContext = createContext<FeaturePreviewContextType>({
   flags: EMPTY_OBJ,
+  isInitialized: false,
   onUpdateFlag: noop,
 })
 
@@ -34,10 +38,26 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) =
   const [flags, setFlags] = useState(() =>
     featurePreviews.reduce((a, b) => ({ ...a, [b.key]: false }), {})
   )
+  // Tracks whether `flags` reflects the loaded feature flags (vs. the pre-load
+  // defaults). Only set true once `initializeFlags` runs with `hasLoaded`.
+  const [isInitialized, setIsInitialized] = useState(false)
 
   const initializeFlags = useEffectEvent(() => {
     setFlags(
       featurePreviews.reduce((a, b) => {
+        // Platform-only previews can never be enabled outside the hosted platform
+        if (!IS_PLATFORM && b.isPlatformOnly) {
+          return { ...a, [b.key]: false }
+        }
+
+        // A forced preview has become the default behavior, so it's on whatever
+        // the user stored previously — including an explicit opt-out. Applied
+        // here rather than in the individual `useIsXEnabled` helpers so that the
+        // feature preview modal reflects it too.
+        if (b.isForced) {
+          return { ...a, [b.key]: true }
+        }
+
         const defaultOptIn = b.isDefaultOptIn
         const localStorageValue = safeLocalStorage.getItem(b.key)
         return {
@@ -51,12 +71,15 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) =
   useEffect(() => {
     if (typeof window !== 'undefined') {
       initializeFlags()
+      // Defer marking initialized until the underlying flags have loaded, so
+      // flag-derived defaults (e.g. default opt-in) are reflected in `flags`.
+      if (hasLoaded) setIsInitialized(true)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
   }, [hasLoaded])
 
   const value = {
     flags,
+    isInitialized,
     onUpdateFlag: (key: string, value: boolean) => {
       safeLocalStorage.setItem(key, value ? 'true' : 'false')
       const updatedFlags = { ...flags, [key]: value }
@@ -75,23 +98,23 @@ export const useIsColumnLevelPrivilegesEnabled = () => {
 }
 
 export const useUnifiedLogsPreview = () => {
-  const { flags, onUpdateFlag } = useFeaturePreviewContext()
-  const { hasLoaded: flagsHaveLoaded } = useContext(FeatureFlagContext)
-  const unifiedLogsEnabled = useFlag('unifiedLogs')
+  const { flags, isInitialized, onUpdateFlag } = useFeaturePreviewContext()
 
-  const isLoading = !flagsHaveLoaded
-  const isEnabled = unifiedLogsEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+  const isLoading = !isInitialized
+  const isEnabled = IS_PLATFORM && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+
+  const hasToggledPreview = !!safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS)
+  const isDefaultOptIn = IS_PLATFORM && !hasToggledPreview
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
 
-  return { isEnabled, isEligible: unifiedLogsEnabled, isLoading, enable, disable }
+  return { isEnabled, isLoading, isDefaultOptIn, enable, disable }
 }
 
 export const useIsPgDeltaDiffEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
-  return pgDeltaDiffEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF]
 }
 
 export const useIsAdvisorRulesEnabled = () => {
@@ -111,15 +134,41 @@ export const useIsJitDbAccessEnabled = () => {
   return jitDbAccessEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]
 }
 
-export const useIsRLSTesterEnabled = () => {
+/**
+ * Whether the SQL Editor saves snippets only on request. True when the user
+ * opted into the preview themselves *or* the `sqlEditorManualSaveForced` rollout
+ * has reached them — the preview's `isForced` flag folds the latter into `flags`.
+ */
+export const useIsSqlEditorManualSaveEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]
 }
 
 export const useIsMarketplaceEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
   return isMarketplaceEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]
+}
+
+export const useIsDatabaseConnectionsEnabled = () => {
+  const { flags, isInitialized } = useFeaturePreviewContext()
+  const [localStorageFlag] = useLocalStorageQuery<boolean | null>(
+    LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS,
+    null
+  )
+  const previouslyToggled = localStorageFlag !== null
+
+  return {
+    enabled: flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS],
+    isInitialized,
+    previouslyToggled,
+  }
+}
+
+export const useIsExplorerEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const isExplorerEnabled = useFlag('explorer')
+  return isExplorerEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER]
 }
 
 export const useFeaturePreviewModal = () => {

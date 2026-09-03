@@ -1,7 +1,7 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { SupportLink } from '../Support/SupportLink'
 import type { ResponseError } from '@/types'
@@ -29,7 +29,7 @@ const StorageBucketsError = ({ error }: StorageBucketsErrorProps) => {
             </>
           }
           actions={
-            <Button key="contact-support" asChild type="default" className="ml-4">
+            <Button key="contact-support" asChild variant="default" className="ml-4">
               <SupportLink
                 queryParams={{
                   projectRef: ref,

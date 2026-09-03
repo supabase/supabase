@@ -30,7 +30,7 @@ export const InsertDataDialog = ({ table, fdwTable }: InsertDataDialogProps) => 
   const sql = /* SQL */ `
 insert into ${fdwTable.schema}.${fdwTable.name} (
   -- specify columns
-) 
+)
 values (
   -- specify values for each column
 );
@@ -39,7 +39,7 @@ values (
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="default">Insert data</Button>
+        <Button variant="default">Insert data</Button>
       </DialogTrigger>
       <DialogContent aria-describedby={undefined}>
         <DialogHeader>
@@ -76,7 +76,7 @@ values (
           <DocsButton
             href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg#data-insertion`}
           />
-          <Button asChild type="default" icon={<SqlEditor />}>
+          <Button asChild variant="default" icon={<SqlEditor />}>
             <Link href={`/project/${ref}/sql/new?content=${encodeURIComponent(sql)}`}>
               Open in SQL Editor
             </Link>

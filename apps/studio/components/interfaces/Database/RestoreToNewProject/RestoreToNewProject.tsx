@@ -3,7 +3,7 @@ import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Alert, AlertDescription, AlertTitle, Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { PreviousRestoreItem } from './PreviousRestoreItem'
@@ -14,9 +14,10 @@ import { CreateNewProjectDialog } from '@/components/interfaces/Database/Backups
 import { projectSpecToMonthlyPrice } from '@/components/interfaces/Database/Backups/RestoreToNewProject/RestoreToNewProject.utils'
 import { DiskType } from '@/components/interfaces/DiskManagement/ui/DiskManagement.constants'
 import { Markdown } from '@/components/interfaces/Markdown'
-import AlertError from '@/components/ui/AlertError'
+import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import Panel from '@/components/ui/Panel'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
@@ -157,8 +158,8 @@ export const RestoreToNewProject = () => {
       >
         <Markdown
           className="max-w-full"
-          content={`Restore to new project is only available for Postgres 15 and above.  
-            Go to [infrastructure settings](/project/${project?.ref}/settings/infrastructure)
+          content={`Restore to new project is only available for Postgres 15 and above.
+            Go to [Service versions](${getServiceVersionsPath(project?.ref)})
             to upgrade your database version.
           `}
         />
@@ -265,7 +266,7 @@ export const RestoreToNewProject = () => {
               The new project {(restoringClone?.target_project as any)?.name || ''} is currently
               being created. You'll be able to restore again once the project is ready.
             </p>
-            <Button asChild type="default" className="mt-2">
+            <Button asChild variant="default" className="mt-2">
               <Link href={`/project/${restoringClone?.target_project?.ref ?? '_'}`}>
                 Go to new project
               </Link>

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
 
@@ -23,11 +23,12 @@ export function ApiAuthorizationInvalidScreen({
       <div className="flex flex-col gap-3 px-6 pb-6">
         <Admonition
           type="warning"
-          description={`Retry the authorization request from the requesting app. The URL is missing parameter${
+          title="Retry the authorization request from the requesting app. "
+          description={`The URL is missing parameter${
             isPlural ? 's' : ''
           }: ${missingParameters.join(', ')}.`}
         />
-        <Button type="default" block asChild>
+        <Button variant="default" block asChild>
           <Link href="/">Back to dashboard</Link>
         </Button>
       </div>

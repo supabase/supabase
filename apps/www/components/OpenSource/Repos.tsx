@@ -16,6 +16,7 @@ interface TabProps {
 
 const Tab = ({ isActive, label, icon, onClick }: TabProps) => (
   <button
+    tabIndex={0}
     onClick={onClick}
     className={`rounded-full px-4 md:px-3 py-2 md:py-1 nowrap flex group gap-1 transition-all ${
       isActive ? 'bg-surface-300' : 'text-foreground-lighter bg-surface-200 hover:bg-overlay-hover'

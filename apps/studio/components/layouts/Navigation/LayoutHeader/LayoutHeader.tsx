@@ -6,8 +6,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactNode, useMemo } from 'react'
 import { Badge, cn } from 'ui'
-import { CommandMenuTriggerInput } from 'ui-patterns'
+import { CommandMenuTriggerInput } from 'ui-patterns/CommandMenu'
 
+import { AdminStudioButton } from './AdminStudioButton'
 import { BreadcrumbsView } from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
 import { HomeIcon } from './HomeIcon'
@@ -93,7 +94,7 @@ export const LayoutHeader = ({
     selectedProject?.inserted_at !== undefined &&
     dayjs(selectedProject.inserted_at).isAfter(dayjs().subtract(5, 'day'))
 
-  const connectButtonType = isNewProject ? 'primary' : 'default'
+  const connectButtonVariant = isNewProject ? 'primary' : 'default'
 
   // show org selection if we are on a project page or on a explicit org route
   const showOrgSelection = slug || (selectedOrganization && projectRef)
@@ -216,7 +217,8 @@ export const LayoutHeader = ({
                   }}
                 >
                   {IS_PLATFORM && <MergeRequestButton />}
-                  <ConnectButton buttonType={connectButtonType} />
+                  <AdminStudioButton />
+                  <ConnectButton buttonVariant={connectButtonVariant} />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -233,7 +235,7 @@ export const LayoutHeader = ({
                     showShortcut={commandMenuEnabled}
                     placeholder="Search..."
                     className={cn(
-                      'hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent',
+                      'hidden md:flex md:min-w-32 xl:min-w-32 rounded-full',
                       '[&_.command-shortcut]:border-none',
                       '[&_.command-shortcut]:pr-2',
                       '[&_.command-shortcut]:bg-transparent',
@@ -260,13 +262,14 @@ export const LayoutHeader = ({
                 <div className="flex items-center gap-1 md:gap-2">
                   <CommandMenuTriggerInput
                     placeholder="Search..."
-                    className="hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent
-                        [&_.command-shortcut]:border-none
-                        [&_.command-shortcut]:pr-2
-                        [&_.command-shortcut]:bg-transparent
-                        [&_.command-shortcut]:text-foreground-lighter
-                        [&_.command-shortcut]:shadow-none
-                      "
+                    className={cn(
+                      'hidden md:flex md:min-w-32 xl:min-w-32 rounded-full',
+                      '[&_.command-shortcut]:border-none',
+                      '[&_.command-shortcut]:pr-2',
+                      '[&_.command-shortcut]:bg-transparent',
+                      '[&_.command-shortcut]:text-foreground-lighter',
+                      '[&_.command-shortcut]:shadow-none'
+                    )}
                   />
                   <HelpButton />
                   <AdvisorButton projectRef={projectRef} />

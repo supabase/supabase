@@ -112,7 +112,7 @@ const DatabaseSizeUsage = ({
                       <span className="text-foreground-light flex items-center gap-2">
                         {project.name}
                       </span>
-                      <Button asChild type="default" size={'tiny'}>
+                      <Button asChild variant="default" size={'tiny'}>
                         <Link
                           href={`/project/${project.ref}/observability/database#database-size-report`}
                         >

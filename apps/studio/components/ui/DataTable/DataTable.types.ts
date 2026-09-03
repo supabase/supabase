@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 export type Option = {
   label: string
   value: string
+  options?: Option[]
 }
 
 export type DatePreset = {

@@ -43,6 +43,8 @@ fi
 # Read keys from .env
 ANON_KEY=$(grep '^ANON_KEY=' .env | cut -d= -f2-)
 SERVICE_ROLE_KEY=$(grep '^SERVICE_ROLE_KEY=' .env | cut -d= -f2-)
+SUPABASE_PUBLISHABLE_KEY=$(grep '^SUPABASE_PUBLISHABLE_KEY=' .env | cut -d= -f2-)
+SUPABASE_SECRET_KEY=$(grep '^SUPABASE_SECRET_KEY=' .env | cut -d= -f2-)
 DASHBOARD_USERNAME=$(grep '^DASHBOARD_USERNAME=' .env | cut -d= -f2-)
 DASHBOARD_PASSWORD=$(grep '^DASHBOARD_PASSWORD=' .env | cut -d= -f2-)
 
@@ -73,6 +75,16 @@ http_body() {
     url="$1"
     shift
     curl -s "$@" "$url"
+}
+
+# Is a compose service running? Falls back to a label lookup so it works
+# regardless of which override files are loaded in this shell.
+service_running() {
+    svc="$1"
+    docker compose ps --services --status running 2>/dev/null | grep -qx "$svc" && return 0
+    docker ps --filter "label=com.docker.compose.project=${COMPOSE_PROJECT_NAME:-supabase}" \
+        --filter "label=com.docker.compose.service=$svc" \
+        --filter "status=running" --quiet | grep -q '.'
 }
 
 echo ""
@@ -167,7 +179,7 @@ else
     check "Create user (admin)" "true" "false"
 fi
 
-# Public signup (optional — depends on email autoconfirm setting)
+# Public signup (optional - depends on email autoconfirm setting)
 signup_email="smoke-signup-$$@example.com"
 signup_resp=$(http_body "$BASE_URL/auth/v1/signup" \
     -H "apikey: $ANON_KEY" \
@@ -197,22 +209,51 @@ fi
 
 echo ""
 echo "--- PostgREST ---"
-check "REST API query" "200" \
+check "REST API route with anon key" "403" \
     "$(http_status "$BASE_URL/rest/v1/" \
         -H "apikey: $ANON_KEY")"
+
+echo ""
+echo "--- PostgREST ---"
+check "REST API route with service role key" "200" \
+    "$(http_status "$BASE_URL/rest/v1/" \
+        -H "apikey: $SERVICE_ROLE_KEY")"
 
 # ---------------------------------------------
 # 5. GraphQL
 # ---------------------------------------------
 
 echo ""
-echo "--- GraphQL ---"
-gql_resp=$(http_body "$BASE_URL/graphql/v1" \
+echo "--- GraphQL (optional; off by default) ---"
+# pg_graphql is OFF by default since the PG17 image (the image drops the extension
+# on init, matching platform behavior for new projects), but users may enable it
+# (Studio extensions UI / CREATE EXTENSION pg_graphql). Both are valid states. A
+# healthy endpoint returns HTTP 200 either way:
+#   enabled  => {"data": ...}
+#   disabled => {"errors":[{"message":"pg_graphql extension is not enabled."}]}
+# Assert the status AND the response shape, so a non-200, non-JSON, or empty body
+# (a real gateway/runtime failure) is not silently classified as "disabled".
+gql_status=$(http_status "$BASE_URL/graphql/v1" \
     -H "apikey: $ANON_KEY" \
     -H "Content-Type: application/json" \
     -d '{"query":"{ __typename }"}')
-gql_has_data=$(echo "$gql_resp" | jq -r 'if .data then "true" else "false" end' 2>/dev/null)
-check "GraphQL introspection" "true" "$gql_has_data"
+gql_body=$(http_body "$BASE_URL/graphql/v1" \
+    -H "apikey: $ANON_KEY" \
+    -H "Content-Type: application/json" \
+    -d '{"query":"{ __typename }"}')
+if [ "$gql_status" = "200" ] && echo "$gql_body" | jq -e '.data' >/dev/null 2>&1; then
+    gql_state="enabled"
+elif [ "$gql_status" = "200" ] && echo "$gql_body" | jq -e '.errors' >/dev/null 2>&1; then
+    gql_state="disabled"
+else
+    gql_state="unhealthy (HTTP $gql_status)"
+fi
+case "$gql_state" in
+    enabled | disabled) gql_health="healthy" ;;
+    *) gql_health="unhealthy" ;;
+esac
+check "GraphQL endpoint healthy" "healthy" "$gql_health"
+echo "  (GraphQL is $gql_state)"
 
 # ---------------------------------------------
 # 6. Storage: create bucket, upload >6MB file, download, cleanup
@@ -279,7 +320,7 @@ if [ "$create_bucket_status" = "200" ]; then
 
         if [ -n "$signed_path" ]; then
             check "Create signed URL" "true" "true"
-            # Fetch signed URL without any auth headers (goes through Kong)
+            # Fetch signed URL without any auth headers (goes through the API gateway)
             signed_content=$(curl -s "$BASE_URL/storage/v1$signed_path")
             check "Fetch signed URL (no auth)" "signed url test content" "$signed_content"
         else
@@ -411,10 +452,10 @@ echo ""
 echo "--- Edge Functions ---"
 fn_resp=$(http_body "$BASE_URL/functions/v1/hello" \
     -X POST \
-    -H "Authorization: Bearer $ANON_KEY" \
+    -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
     -H "Content-Type: application/json" \
     -d '{}')
-check "Call hello function" '"Hello from Edge Functions!"' "$fn_resp"
+check "Call hello function" '{"message":"Hello from Edge Functions!"}' "$fn_resp"
 
 # ---------------------------------------------
 # 8. pg-meta (Studio backend)
@@ -455,6 +496,39 @@ check "Realtime /api/tenants blocked" "403" \
 check "Realtime /api/openapi blocked" "403" \
     "$(http_status "$BASE_URL/realtime/v1/api/openapi" \
         -H "apikey: $ANON_KEY")"
+
+# ---------------------------------------------
+# 10. Database pooler (transaction mode)
+# ---------------------------------------------
+
+echo ""
+echo "--- Database pooler (transaction mode) ---"
+if command -v docker >/dev/null 2>&1; then
+    pg_password=$(grep '^POSTGRES_PASSWORD=' .env | cut -d= -f2-)
+    pooler_tenant_id=$(grep '^POOLER_TENANT_ID=' .env | cut -d= -f2-)
+    # Connect as the postgres role through whichever transaction pooler is running:
+    #   Supavisor (default) -> service 'supavisor', port 6543, user 'postgres.<tenant>'
+    #   PgBouncer (override) -> service 'pgbouncer', port 6432 (published as 6543), user 'postgres'
+    # psql runs inside the db container (always has a client) and reaches the
+    # pooler over the compose network.
+    if service_running supavisor; then
+        pooler_user="postgres.$pooler_tenant_id"; pooler_host="supavisor"; pooler_port=6543
+    elif service_running pgbouncer; then
+        pooler_user="postgres"; pooler_host="pgbouncer"; pooler_port=6432
+    else
+        pooler_user=""
+    fi
+    if [ -n "$pooler_user" ]; then
+        pooler_result=$(docker exec -e PGPASSWORD="$pg_password" supabase-db \
+            psql "host=$pooler_host port=$pooler_port user=$pooler_user dbname=postgres sslmode=disable" \
+            -tAc "select 'pooler_ok';" 2>/dev/null | tr -d '[:space:]')
+        check "Pooler transaction-mode query (as postgres)" "pooler_ok" "$pooler_result"
+    else
+        check "Pooler running (supavisor or pgbouncer)" "true" "false"
+    fi
+else
+    echo "  SKIP: docker not available"
+fi
 
 # ---------------------------------------------
 # Summary

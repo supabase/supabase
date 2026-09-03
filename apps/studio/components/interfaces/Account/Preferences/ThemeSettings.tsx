@@ -15,7 +15,6 @@ import {
   SelectValue,
   Separator,
   singleThemes,
-  Theme,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
@@ -58,7 +57,7 @@ export const ThemeSettings = () => {
         value={theme}
         className="grid grid-cols-2 gap-4"
       >
-        {singleThemes.map((theme: Theme) => (
+        {singleThemes.map((theme) => (
           <RadioGroupLargeItem
             className="p-3 w-full"
             key={theme.value}

@@ -17,6 +17,9 @@ import {
   FormControl,
   FormField,
   Switch,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
@@ -114,6 +117,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
           <button
             id={`collapsible-trigger-${role.id}`}
             type="button"
+            tabIndex={0}
             className="group flex w-full items-center justify-between rounded-sm py-3 px-card text-foreground"
             onClick={(event) => {
               event.preventDefault()
@@ -154,14 +158,19 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
         </CollapsibleTrigger>
         {!disabled && (
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                type="default"
-                className="px-1"
-                icon={<MoreVertical />}
-                aria-label={`${role.name} actions`}
-              />
-            </DropdownMenuTrigger>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="default"
+                    className="px-1"
+                    icon={<MoreVertical />}
+                    aria-label={`${role.name} actions`}
+                  />
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">More options</TooltipContent>
+            </Tooltip>
             <DropdownMenuContent side="bottom" align="end" className="w-[120px]">
               <DropdownMenuItem
                 className="space-x-2"
@@ -214,12 +223,12 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
             </div>
             {!disabled && (
               <div className="py-4 flex items-center space-x-2 justify-end">
-                <Button type="default" disabled={!isDirty || isUpdating} onClick={() => reset()}>
+                <Button variant="default" disabled={!isDirty || isUpdating} onClick={() => reset()}>
                   Cancel
                 </Button>
                 <Button
-                  type="primary"
-                  htmlType="submit"
+                  variant="primary"
+                  type="submit"
                   disabled={!isDirty || isUpdating}
                   loading={isUpdating}
                 >

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { cn } from 'ui'
+
 import { AnimatedGridBackground } from '../AnimatedGridBackground'
 
 type Announcement = {
@@ -143,11 +144,11 @@ const months: Month[] = [
       },
       {
         title: 'Supabase UI Library now includes Infinite Query block',
-        url: 'https://supabase.com/ui/docs/infinite-query-hook',
+        url: 'https://supabase.com/library/docs/react/infinite-query',
       },
       {
         title: 'Supabase UI Library now includes Social Auth',
-        url: 'https://supabase.com/ui/docs/nextjs/social-auth',
+        url: 'https://supabase.com/library/docs/nextjs/social-auth',
       },
       {
         title: 'New SOC2 Report',
@@ -290,8 +291,8 @@ const months: Month[] = [
     isLaunchWeek: true,
     announcements: [
       {
-        title: 'Supabase ETL',
-        url: 'https://supabase.com/blog/introducing-supabase-etl',
+        title: 'Supabase Pipelines',
+        url: 'https://supabase.com/blog/introducing-supabase-pipelines',
       },
       {
         title: 'Analytics Buckets',

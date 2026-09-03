@@ -126,9 +126,9 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
                 control={form.control}
                 name="name"
                 render={({ field }) => (
-                  <FormItemLayout name="name" layout="vertical" label="Name">
+                  <FormItemLayout layout="vertical" label="Name">
                     <FormControl>
-                      <Input {...field} id="name" />
+                      <Input {...field} />
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -139,11 +139,10 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
                 control={form.control}
                 name="description"
                 render={({ field }) => (
-                  <FormItemLayout name="description" layout="vertical" label="Description">
+                  <FormItemLayout layout="vertical" label="Description">
                     <FormControl>
                       <Textarea
                         {...field}
-                        id="description"
                         rows={4}
                         placeholder="Describe your custom report"
                         className="resize-none"
@@ -154,10 +153,10 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
               />
             </DialogSection>
             <DialogFooter>
-              <Button htmlType="reset" type="default" onClick={handleCancel} disabled={isCreating}>
+              <Button type="reset" variant="default" onClick={handleCancel} disabled={isCreating}>
                 Cancel
               </Button>
-              <Button htmlType="submit" loading={isCreating} disabled={isCreating || !isDirty}>
+              <Button type="submit" loading={isCreating} disabled={isCreating || !isDirty}>
                 Create report
               </Button>
             </DialogFooter>
