@@ -39,6 +39,8 @@ docker compose version >/dev/null || { echo "error: docker compose not available
 
 The host does **not** need a global `supabase` CLI or Node for stack/example runs; those tools live in the runner image. If Docker/Compose is unavailable, mark artifacts that need the runner `deferred`.
 
+`run.sh` creates temp work/output dirs world-writable (`chmod 0777`) so the non-root runner (`uid 1001`) can write into the host bind mounts.
+
 ## Lifecycle (`run.sh`)
 
 From `.agents/skills/test-the-docs/sandbox/`:

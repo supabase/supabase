@@ -3,8 +3,8 @@
 # Starts a disposable compose project and execs fences inside the runner container.
 # Usage:
 #   eval "$(./run.sh env)"           # export TTD_* for the session
-#   ./run.sh up-stack                # build + start runner with docker.sock; init+start supabase in /work
-#   ./run.sh up-examples             # build + start runner without docker.sock
+#   ./run.sh up-stack                # DinD + runner; supabase init/start in /work
+#   ./run.sh up-examples             # runner only (no DinD); example-app builds in /work/example
 #   ./run.sh exec -- <cmd...>        # run a command in the active runner
 #   ./run.sh exec-timeout 60 -- <cmd...>
 #   ./run.sh down                    # compose down -v and remove work/output dirs created by this script
@@ -68,6 +68,8 @@ cmd_env() {
   project="ttd-${stamp}"
   work="$(mktemp -d "${TMPDIR:-/tmp}/ttd-work.XXXXXX")"
   output="$(mktemp -d "${TMPDIR:-/tmp}/ttd-out.XXXXXX")"
+  # World-writable so compose user 1001:1001 can write into host bind mounts
+  chmod 0777 "${work}" "${output}"
   cat <<EOF
 export TTD_PROJECT_NAME=$(printf '%q' "${project}")
 export TTD_WORK_DIR=$(printf '%q' "${work}")
@@ -85,6 +87,8 @@ prepare_exports() {
   export TTD_EXAMPLE_DIR="${TTD_EXAMPLE_DIR:-${SCRIPT_DIR}/.empty}"
   export TTD_NETWORK_NAME="${TTD_NETWORK_NAME:-${TTD_PROJECT_NAME}-net}"
   mkdir -p "${TTD_WORK_DIR}" "${TTD_OUTPUT_DIR}"
+  # Re-apply in case dirs were pre-created without cmd_env chmod
+  chmod 0777 "${TTD_WORK_DIR}" "${TTD_OUTPUT_DIR}"
 }
 
 cmd_up_stack() {
@@ -161,7 +165,7 @@ cmd_down() {
 }
 
 usage() {
-  sed -n '2,12p' "$0" | sed 's/^# //; s/^#//'
+  sed -n '2,10p' "$0" | sed 's/^# //; s/^#//'
 }
 
 main() {
