@@ -80,6 +80,26 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return isPlainObject(value)
 }
 
+/**
+ * Whether `configPath` (dotted, e.g. `api.max_rows`) is declared anywhere in the raw config.toml
+ * document — walking the parsed document itself rather than the decoded config, since decoding
+ * fills in schema defaults for every field the file never mentioned. This is the only reliable way
+ * to tell "config.toml set this" apart from "config.toml is silent and this happens to equal the
+ * default" — a distinction `diffProjectConfig`'s change classification collapses when the two
+ * sides' values coincide.
+ */
+function isPathDeclaredInDocument(
+  document: Record<string, unknown> | undefined,
+  configPath: string
+): boolean {
+  let current: unknown = document
+  for (const segment of configPath.split('.')) {
+    if (!isRecord(current) || !(segment in current)) return false
+    current = current[segment]
+  }
+  return true
+}
+
 export function getConfigDriftSummary({
   dashboardConfig,
   githubConfig,
@@ -132,7 +152,11 @@ export function getConfigDriftSummary({
         continue
       }
 
-      if (unmanagedByPushPaths.has(configPath)) {
+      const isTrackedInConfigToml = isPathDeclaredInDocument(
+        decodedGithubConfig.document,
+        configPath
+      )
+      if (unmanagedByPushPaths.has(configPath) || !isTrackedInConfigToml) {
         unmanagedFields.push({ section, configPath, dashboardValue: rawValue })
         continue
       }
