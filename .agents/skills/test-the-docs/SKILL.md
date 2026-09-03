@@ -53,13 +53,13 @@ List runnable artifacts from changed MDX:
 
 Assign each artifact a class per [reference/snippet-classes.md](reference/snippet-classes.md):
 
-| Class | Action |
-| ----- | ------ |
-| `runnable-local` | Run in temp stack / temp dir |
-| `runnable-with-setup` | Run after documented setup (migrations, seed) |
-| `example-app` | `npm install && npm run build` in `examples/…` |
-| `illustrative-only` | No run required |
-| `deferred` | Record reason; do not silently skip |
+| Class                 | Action                                         |
+| --------------------- | ---------------------------------------------- |
+| `runnable-local`      | Run in temp stack / temp dir                   |
+| `runnable-with-setup` | Run after documented setup (migrations, seed)  |
+| `example-app`         | `npm install && npm run build` in `examples/…` |
+| `illustrative-only`   | No run required                                |
+| `deferred`            | Record reason; do not silently skip            |
 
 ### 4. Sandbox setup
 
@@ -71,7 +71,7 @@ Follow [reference/sandbox-setup.md](reference/sandbox-setup.md):
    - CLI-only blocks with no DB: separate `mktemp -d` without starting the stack (still local-only).
    - `example-app`: require Node/npm only; do **not** defer solely because Docker or the CLI is missing.
 3. Always `supabase stop` and remove the temp dir when a stack was started (cleanup trap).
-4. Capture connection **URLs only**; never paste `JWT_SECRET`, `ANON_KEY`, or `SERVICE_ROLE_KEY` into notes or logs.
+4. Capture connection **URLs only**; never paste `PUBLISHABLE_KEY`, `SECRET_KEY`, `JWT_SECRET`, `ANON_KEY`, `SERVICE_ROLE_KEY`, `S3_PROTOCOL_ACCESS_KEY_ID`, `S3_PROTOCOL_ACCESS_KEY_SECRET`, or other credential fields into notes or logs.
 
 If a **required** prerequisite for that artifact is unavailable, mark that artifact `deferred` with the specific reason — never silent skip, and do not defer unrelated classes.
 
@@ -79,7 +79,7 @@ If a **required** prerequisite for that artifact is unavailable, mark that artif
 
 - **Tier A:** one copy-pasteable end-to-end path from the page.
 - **Tier B:** each new/changed block classified `runnable-*` **or** `example-app` (build and record the result).
-- Bound every artifact: default **60s** for shell/SQL/JS; allow longer for `example-app` install/build (e.g. **5m**). On timeout, kill the process **group**, then record `fail` or `deferred` with reason.
+- Bound every artifact: default **60s** for shell / SQL / JS / TypeScript / `tsx` / `jsx`; allow longer for `example-app` install/build (e.g. **5m**). On timeout, kill the process **group**, then record `fail` or `deferred` with reason.
 - Capture exit code, stdout/stderr (redact secrets), and observed vs expected behavior.
 
 ### 6. Report

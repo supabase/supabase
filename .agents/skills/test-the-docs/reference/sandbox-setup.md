@@ -6,10 +6,14 @@ Docker-isolated local execution for `/test-the-docs`. Requires Docker daemon up,
 
 `mktemp` isolates the **project directory** only. Snippet commands still run on the host with the agent's environment and Docker access. That is intentional for a docs verification skill that needs `supabase start` on the host Docker daemon. Do not treat this as a disposable VM without host mounts.
 
+This skill is for **docs authors and reviewers verifying intended content** (own draft, own PR, or a docs PR they chose to test). It is not an unattended CI runner over arbitrary untrusted PR input. Ordinary docs PRs still run; defer only out-of-policy fences.
+
 Guardrails:
 
 - **Local only.** Use `127.0.0.1` / `localhost` stack URLs. Reject snippets that target hosted or production Supabase projects.
-- **No secrets in notes.** Never paste `JWT_SECRET`, `ANON_KEY`, `SERVICE_ROLE_KEY`, or other keys into the Verification table, PR body, or chat logs.
+- **No secrets in notes.** Never paste `PUBLISHABLE_KEY`, `SECRET_KEY`, `JWT_SECRET`, `ANON_KEY`, `SERVICE_ROLE_KEY`, `S3_PROTOCOL_ACCESS_KEY_ID`, `S3_PROTOCOL_ACCESS_KEY_SECRET`, or other keys into the Verification table, PR body, or chat logs.
+- **Shell allowlist.** Before running a shell fence, require commands from: `supabase`, `psql`, `npm` / `npx` / `node` (example-app), and `curl` / `wget` only to `127.0.0.1` / `localhost`. Simple `&&` / `;` chains of allowlisted commands are OK.
+- **Reject out-of-policy fences.** Mark `deferred` (with reason) for: command substitution / backticks that reach the host, pipes into unknown tools, host-path reads outside `$TMP` / the example app under test, Docker CLI invoked by snippets, and non-loopback Supabase/API targets. Do not fail the whole skill for one bad fence.
 - **Prefer page commands.** Run documented steps from the MDX under test; do not run unrelated host-destructive commands.
 - **Fail closed** when Docker/CLI prerequisites for that artifact class are missing (see skill Phase 4).
 
@@ -45,10 +49,8 @@ cd "$TMP"
 supabase init
 supabase start
 
-# Capture URLs only — never log JWT_SECRET / ANON_KEY / SERVICE_ROLE_KEY
+# Capture URLs only — never log credential fields from `supabase status -o env`
 eval "$(supabase status -o env | grep -E '^(API_URL|DB_URL|DATABASE_URL)=' )"
-# Or redact before any capture:
-# supabase status -o env | sed -E 's/((JWT_SECRET|ANON_KEY|SERVICE_ROLE_KEY)=).*/\1[REDACTED]/'
 ```
 
 Apply SQL or migrations from the doc in order. Use the local DB/API URL from the filtered status output for `psql` / client snippets.
@@ -61,7 +63,7 @@ When blocks are help text, flag checks, or non-DB shell:
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 cd "$TMP"
-# run commands here (still subject to local-only + no-secrets guardrails)
+# run commands here (still subject to allowlist + local-only + no-secrets guardrails)
 ```
 
 Do not start the stack unless the snippet needs it.

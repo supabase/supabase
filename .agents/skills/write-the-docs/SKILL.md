@@ -67,7 +67,7 @@ Before handing off, confirm:
 - [ ] Content type confirmed as Guide/Troubleshooting (not something that belongs in generated Reference instead)
 - [ ] Nav placement and nav enablement both wired, not just the placement
 - [ ] Internal links resolve; first-use of new terms/acronyms is defined
-- [ ] If the draft has procedural snippets (CLI, SQL, client code), **offered** to run [`test-the-docs`](../test-the-docs/SKILL.md) (optional; needs Docker + local CLI)
+- [ ] If the draft has procedural snippets (CLI, SQL, client code, or example apps), **offered** to run [`test-the-docs`](../test-the-docs/SKILL.md) (optional; Docker + local CLI only for stack artifacts, Node/npm for `example-app`)
 - [ ] Future promises minimized where possible (timeless documentation principle)
 - [ ] No unnecessary redundancy (same point restated multiple ways)
 - [ ] Single-item lists avoided unless there's a specific reason
@@ -87,7 +87,7 @@ Re-read [`apps/docs/CONTRIBUTING.md`](../../../apps/docs/CONTRIBUTING.md) and [`
 
 This skill stops at a reviewable draft. It does not open worktrees or PRs itself:
 
-- **Offer** [`test-the-docs`](../test-the-docs/SKILL.md) when the draft includes runnable procedural snippets. Ask before starting the Docker sandbox; if declined or Docker is unavailable, record `deferred` and continue. When accepted, attach the Verification table to the PR body / self-review note.
+- **Offer** [`test-the-docs`](../test-the-docs/SKILL.md) when the draft includes runnable procedural snippets. Ask before starting verification. Gate prerequisites **per artifact class** (Docker + local CLI for stack/DB artifacts; Node/npm for `example-app`). If declined, or a required prerequisite for that class is missing, record `deferred` for those artifacts only and continue. When accepted, attach the Verification table to the PR body / self-review note.
 - Then run [`review-the-docs`](../review-the-docs/SKILL.md) local self-review (lint/build/classify).
 - Hand off to [`create-pull-request`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/create-pull-request/SKILL.md) (and [`work-linear-issue`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/work-linear-issue/SKILL.md) if the ticket needs a full worktree+PR flow) for the actual PR mechanics. Carry the Phase 1/2 flagged-assumptions list forward explicitly into that handoff — it belongs in the PR description (e.g. a "needs review" section) so a reviewer sees it, not just as an inline comment buried in the draft.
 - If the feature is UI-driven and the PR will need screenshots/GIFs, flag [`proof-it-works`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/proof-it-works/SKILL.md) as the next step rather than capturing evidence here.

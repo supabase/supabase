@@ -69,7 +69,7 @@ pnpm build:reference-markdown   # when reference pipeline changed
 ```
 
 4. Spot-check frontmatter, internal links, and nav wiring for content changes.
-5. **Offer runnable verification** — for content/tutorial PRs with new or changed procedural fenced blocks, ask whether to run [`test-the-docs`](../test-the-docs/SKILL.md) (Docker + local CLI). If accepted, include the Verification table; if declined or unavailable, record credible `deferred` reasons. Do not reimplement sandbox execution here.
+5. **Offer runnable verification** — for content/tutorial PRs with new or changed procedural fenced blocks, ask whether to run [`test-the-docs`](../test-the-docs/SKILL.md). Prerequisites are class-specific (Docker + local CLI for stack/DB artifacts; Node/npm for `example-app`). If accepted, include the Verification table; if declined or a required prerequisite for that class is missing, record credible `deferred` reasons for those artifacts only. Do not reimplement sandbox execution here.
 6. Write a short **self-review note** (blockers vs nits) suitable to paste into the future PR body under a "Self-review" heading.
 
 Then open the PR and continue with open-PR review if a second pass is needed.
