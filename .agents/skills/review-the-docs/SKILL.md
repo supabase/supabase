@@ -300,7 +300,7 @@ Checklist:
 
 ```bash
 # Symlink smoke check
-readlink .claude/skills   # → ../.agents/skills
+test "$(readlink .claude/skills)" = "../.agents/skills"
 test -f .claude/skills/<skill-name>/SKILL.md
 
 # Leftover internal refs

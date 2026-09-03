@@ -27,15 +27,17 @@ don't need MSW; render and assert directly.
 ## The template
 
 ```tsx
-import { fireEvent, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { screen } from '@testing-library/react'
+import { platformComponents as components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
-import { describe, expect, test, vi } from 'vitest'
+import { describe, expect, test } from 'vitest'
 
 import { MyComponent } from './MyComponent'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
+
+type OrganizationResponse = components['schemas']['OrganizationResponse']
 
 // Needed if the component renders inside a Sheet, Modal, Popover, or
 // anything else built on Radix that uses Web Animations.
@@ -61,7 +63,8 @@ describe('MyComponent', () => {
 })
 ```
 
-That's the whole pattern. Server lifecycle (`listen`/`resetHandlers`/
+That's the whole pattern (add `fireEvent`, `waitFor`, or `userEvent` as the
+interactions need them — see the gotchas below). Server lifecycle (`listen`/`resetHandlers`/
 `close`) is handled by `apps/studio/tests/vitestSetup.ts` — handlers
 registered via `addAPIMock` are scoped to the current test.
 

@@ -162,7 +162,13 @@ buttons.
   computing `defaultValues` from a query that may not have loaded freezes whatever
   happened to be in cache at mount. Add
   `resetOptions: { keepDirtyValues: true }` when a background refetch must not
-  clobber the user's in-progress edits. (Good examples:
+  clobber the user's in-progress edits. `keepDirtyValues` preserves whatever is
+  in `formState.dirtyFields`; typed edits and `setValue(…, { shouldDirty: true })`
+  populate it regardless of subscriptions, but `useFieldArray` operations
+  (append/remove/move) only mark fields dirty while `dirtyFields` or `isDirty`
+  is subscribed — so a form that combines `keepDirtyValues` with a field array
+  must read one of them in the owner, or the next refetch will discard array
+  edits. (Good examples:
   `components/interfaces/Settings/Database/ConnectionLogging.tsx`,
   `components/interfaces/Storage/EditBucketModal.tsx`.)
 - **After a successful mutation, re-baseline the form** in `onSuccess` so the

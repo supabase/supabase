@@ -98,11 +98,17 @@ A feature flag that gates behavior needs telemetry on both the flag state and ho
 
 `usePHFlag` returns `undefined` while the PostHog store is still loading. Read the raw flag via `usePHFlag('flagName')`, **not** through wrapper hooks that coerce `undefined` to `false`, and use a conditional spread so the property is omitted (not `false`) until the flag has resolved:
 
+As always, `track()` runs inside the user-action handler — never in the component body or an effect:
+
 ```typescript
+const track = useTrack()
 const flagValue = usePHFlag<boolean>('myBooleanFlag') // for boolean flags
-track('event_name', {
-  ...(flagValue !== undefined && { myFlagEnabled: flagValue }),
-})
+
+const handleSubmit = () => {
+  track('event_name', {
+    ...(flagValue !== undefined && { myFlagEnabled: flagValue }),
+  })
+}
 ```
 
 For string-valued flags (e.g. experiment variants), use `usePHFlag<string>('flagName')`; a flag that may be migrated from boolean to multivariate is typed `usePHFlag<boolean | string>`. `ProjectCreationForm.tsx` (`dataApiRevokeOnCreateDefault`) is the canonical example.

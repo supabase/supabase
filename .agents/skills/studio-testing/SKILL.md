@@ -147,21 +147,24 @@ Studio component test conventions:
 
 ```tsx
 import { screen } from '@testing-library/react'
+import { platformComponents as components } from 'api-types'
 import { HttpResponse } from 'msw'
 
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
+type OrganizationResponse = components['schemas']['OrganizationResponse']
+
 addAPIMock({
   method: 'get',
   path: '/platform/organizations',
-  response: () => HttpResponse.json([]),
+  response: () => HttpResponse.json<OrganizationResponse[]>([]),
 })
 customRender(<MyComponent />)
 expect(await screen.findByText('No organizations')).toBeInTheDocument()
 ```
 
-- Mock API requests at the network layer with `addAPIMock` (MSW) — unhandled requests fail the test. Don't `vi.mock('@/data/...')`.
+- Mock API requests at the network layer with `addAPIMock` (MSW) — unhandled requests fail the test. Don't `vi.mock('@/data/...')`. Always pass the OpenAPI body type to `HttpResponse.json<…>`.
 - `customRender` wraps the component in the providers Studio needs (React Query, router, etc.).
 - The full template, path-param syntax, and the jsdom/MSW gotchas are in the `studio-mock-api-tests` skill.
 

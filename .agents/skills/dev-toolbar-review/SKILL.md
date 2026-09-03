@@ -32,12 +32,12 @@ so PRs touching only those files won't auto-request review. Watch for these in t
 
 The toolbar uses two layers of protection:
 
-- **Build-time tree-shaking** in `index.ts`: `process.env.NODE_ENV !== 'development'` ternaries that replace components with noops/stubs so the implementation is eliminated from production bundles.
-- **Runtime guards** in components: `IS_LOCAL_DEV` checks — `DevToolbar` and `DevToolbarTrigger` return `null` to hide themselves, while `DevToolbarProvider` passes children through (`<>{children}</>`) to preserve the component tree.
+- **Build-time tree-shaking** in `index.ts`: the bundler inlines `process.env.NEXT_PUBLIC_ENVIRONMENT`, so `isToolbarEnabled = env === 'local' || env === 'staging'` makes the export ternaries static. Outside those two environments every export is a stub (`DevToolbar` and `DevToolbarTrigger` render `null`, `DevToolbarProvider` passes children through, `useDevToolbar` returns a no-op context) and the implementation modules are eliminated from the bundle. The same literal `process.env` check is duplicated in `DevToolbarContext.tsx`, `DevToolbar.tsx`, `DevToolbarTrigger.tsx`, and `feature-flags.tsx` because the bundler must see it directly — keep them in sync.
+- **Runtime guards** inside the implementation: `IS_LOCAL_DEV = env === 'local'` gates the local-only pieces — the SSE event stream in `DevToolbarContext.tsx` and local-only UI in `DevToolbar.tsx` — so staging gets the toolbar without them.
 
 **Check for:**
 
-- Guards being removed or broadened. The toolbar is expanding to staging and preview deploys but must remain invisible in production.
+- Guards being removed or broadened. The toolbar is enabled only for `local` and `staging`; preview and production builds must keep getting the stubs.
 - Tree-shaking ternaries in `index.ts` staying intact — these are the primary production safety mechanism.
 - New components or exports that bypass the existing guard pattern.
 

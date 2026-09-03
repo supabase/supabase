@@ -202,6 +202,7 @@ commands:
 | `pnpm typecheck`                                    | repo root   | TS across packages                                                                                             |
 | `pnpm build --filter=docs`                          | repo root   | Includes markdown generation; failures here block release                                                      |
 | `pnpm lint:mdx`                                     | `apps/docs` | MDX content lint (whole `content/` tree)                                                                       |
+| Typos check (`.github/workflows/avoid-typos.yml`)   | CI only     | `runner / misspell` job at error severity — no local command; fix flagged words before merge                   |
 
 Before adding a custom lint job, check whether the existing one can absorb
 the check (see [`adding-features.md`](./adding-features.md) "Reuse
