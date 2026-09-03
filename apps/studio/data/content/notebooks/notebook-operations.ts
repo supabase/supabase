@@ -110,9 +110,9 @@ function findAnchorIndex(entries: NotebookCellDiffEntry[], cellId: string): numb
     switch (entry._tag) {
       case 'unchanged':
       case 'moved':
-        return entry.cell.id === cellId
+        return entry.cell._id === cellId
       case 'replaced':
-        return entry.before.id === cellId
+        return entry.before._id === cellId
       case 'added':
       case 'removed':
         return false
@@ -127,7 +127,7 @@ function findTargetCell(
   for (let index = 0; index < entries.length; index++) {
     const entry = entries[index]
     if (entry._tag !== 'unchanged' && entry._tag !== 'moved') continue
-    if (entry.cell.id === cellId) return { index, cell: entry.cell }
+    if (entry.cell._id === cellId) return { index, cell: entry.cell }
   }
   return undefined
 }
@@ -139,11 +139,11 @@ function downgradeNoOpMoves(
   if (!entries.some((entry) => entry._tag === 'moved')) return entries
 
   const finalOrder = entries.flatMap((entry) =>
-    entry._tag === 'unchanged' || entry._tag === 'moved' ? [entry.cell.id] : []
+    entry._tag === 'unchanged' || entry._tag === 'moved' ? [entry.cell._id] : []
   )
   const survivingIds = new Set(finalOrder)
   const originalOrder = notebook.cells
-    .map((cell) => cell.id)
+    .map((cell) => cell._id)
     .filter((cellId) => survivingIds.has(cellId))
 
   const hasSamePredecessors = (cellId: string) => {
@@ -156,7 +156,7 @@ function downgradeNoOpMoves(
   }
 
   return entries.map((entry) =>
-    entry._tag === 'moved' && hasSamePredecessors(entry.cell.id)
+    entry._tag === 'moved' && hasSamePredecessors(entry.cell._id)
       ? { _tag: 'unchanged', cell: entry.cell }
       : entry
   )
@@ -177,7 +177,7 @@ export function deriveNotebookDiff(
     targetedIds.add(cellId)
   }
 
-  const originalIndexById = new Map(notebook.cells.map((cell, index) => [cell.id, index]))
+  const originalIndexById = new Map(notebook.cells.map((cell, index) => [cell._id, index]))
   const entries: NotebookCellDiffEntry[] = notebook.cells.map((cell) => ({
     _tag: 'unchanged',
     cell,
@@ -256,10 +256,13 @@ export function deriveNotebookDiff(
         }
 
         entries.splice(found.index, 1)
+        // Cells already inserted after this anchor stay behind at its old position, so a
+        // later insert anchored on it should start counting from its new position again.
+        insertedAfter.delete(operation.cell_id)
         const error = insertAfter(operation.after_cell_id, {
           _tag: 'moved',
           cell: found.cell,
-          fromIndex: originalIndexById.get(found.cell.id) ?? found.index,
+          fromIndex: originalIndexById.get(found.cell._id) ?? found.index,
           operationIndex,
         })
         if (error) return { success: false, error }

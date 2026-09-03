@@ -21,7 +21,7 @@ export type FeaturePreview = {
    */
   isForced?: boolean
   /** Optional category that the feature preview falls under, defaults to "Others" in the UI otherwise */
-  category?: 'observability' | 'database'
+  category?: 'observability' | 'database' | 'editors'
   /**
    * Where to send the user after enabling, to try the feature out. Omit if the
    * feature has no single destination (e.g. a global layout change).
@@ -35,12 +35,24 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
   const jitDbAccessEnabled = useFlag('jitDbAccess')
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
   const isDatabaseConnectionsEnabled = useFlag('topForPostgres')
+  const isExplorerEnabled = useFlag('explorer')
 
-  const unifiedLogsDefaultOptIn = useFlag('unifiedLogsDefaultOptIn')
   const isSqlEditorManualSaveForced = useFlag('sqlEditorManualSaveForced')
 
   return useMemo(() => {
     const previews: FeaturePreview[] = [
+      {
+        key: LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER,
+        name: 'Explorer & Notebooks',
+        category: 'editors',
+        // [Joshen TODO] Update with proper URL once discussion is up
+        discussionsUrl: undefined,
+        enabled: isExplorerEnabled,
+        isNew: true,
+        isPlatformOnly: true,
+        isDefaultOptIn: false,
+        getRoute: (ref?: string) => `/project/${ref}/explorer`,
+      },
       {
         key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
         name: 'Updated Logs interface',
@@ -49,7 +61,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
         enabled: true,
         isNew: true,
         isPlatformOnly: true,
-        isDefaultOptIn: unifiedLogsDefaultOptIn,
+        isDefaultOptIn: true,
         getRoute: (ref?: string) => `/project/${ref}/logs`,
       },
       {
@@ -115,6 +127,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       },
       {
         key: LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE,
+        category: 'editors',
         name: 'Disable snippet auto-saving',
         discussionsUrl: undefined,
         isNew: true,
@@ -142,11 +155,11 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
 
     return previews.sort((a, b) => Number(b.isNew) - Number(a.isNew))
   }, [
-    unifiedLogsDefaultOptIn,
     isSqlEditorManualSaveForced,
     isPlatformWebhooksEnabled,
     jitDbAccessEnabled,
     isMarketplaceEnabled,
     isDatabaseConnectionsEnabled,
+    isExplorerEnabled,
   ])
 }

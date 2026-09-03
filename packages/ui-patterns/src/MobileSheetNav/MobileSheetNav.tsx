@@ -4,8 +4,7 @@ import { useRouter } from 'next/router'
 import { ComponentProps, useEffect } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useWindowSize } from 'react-use'
-import { CommandEmpty, Sheet, SheetContent } from 'ui'
-import { cn } from 'ui/src/lib/utils'
+import { cn, CommandEmpty, Sheet, SheetContent } from 'ui'
 
 const MobileSheetNav: React.FC<{
   children: React.ReactNode

@@ -1,7 +1,6 @@
 import { cva } from 'class-variance-authority'
 import React from 'react'
-import { cn, FormDescription, FormLabel, FormMessage, Label } from 'ui'
-import { SIZE } from 'ui/src/lib/constants'
+import { cn, FormDescription, FormLabel, FormMessage, Label, SIZE } from 'ui'
 
 type Props = {
   align?: 'left' | 'right'
@@ -398,7 +397,7 @@ export const FormLayout = React.forwardRef<
                 <FormLabel
                   className="text-foreground flex gap-2 items-center wrap-break-word"
                   data-formlayout-id="formLabel"
-                  htmlFor={props.name || id}
+                  htmlFor={id}
                 >
                   <LabelContents />
                 </FormLabel>

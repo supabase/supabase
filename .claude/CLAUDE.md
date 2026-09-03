@@ -41,7 +41,7 @@ pnpm api:codegen             # platform Management API types → packages/api-ty
 
 Every PR must pass typecheck + lint (one workflow), Prettier, and a typos check. Other checks are path-filtered: Studio unit tests/build and the lint ratchet (ESLint warning count must not increase) run on `apps/studio/**` changes; app-specific test suites run on their own paths.
 
-Never hand-edit generated files: `packages/api-types/types/**`, `**/routeTree.gen.ts`, `**/__generated__/**`, `apps/docs/features/docs/generated/**`, `apps/www/.generated/**`, `supabase/functions/common/database-types.ts`.
+Never hand-edit generated files: `packages/api-types/types/**`, `**/routeTree.gen.ts`, `**/__generated__/**`, `apps/docs/features/docs/generated/**`, `apps/www/.generated/**`, `supabase/functions/common/database-types.ts`, `apps/docs/content/_partials/access-control/scoped_pat_*.mdx` (run `make -C apps/docs/spec generate.partials.access-control`).
 
 ## Conventions
 
@@ -53,12 +53,14 @@ Never hand-edit generated files: `packages/api-types/types/**`, `**/routeTree.ge
 
 **Language** — Use U.S. English everywhere.
 
+**Public surfaces** — this repo is public: PR descriptions, issues, and code comments are world-readable. Keep internal content out of them: absolute production metrics (event counts, user counts, revenue figures: state percentages, ratios, or relative change instead), internal decision detail (vendor, legal, pricing, or strategy discussions), and competitor names (protocol identifiers such as user-agent strings are fine). Put that context in the Linear issue and link it.
+
 ## Skills
 
 The skills in `.claude/skills/` are the source of truth for conventions — load the relevant ones before working, don't guess:
 
 - `copywriting` — any user-facing text, anywhere in the monorepo
-- `docs-content` — anything under `apps/docs`
+- `pm-the-docs` / `write-the-docs` / `edit-the-docs` / `ask-the-docs` / `review-the-docs` — anything under `apps/docs` (see `apps/docs/CONTRIBUTING.md` for the authoring skill model)
 - `telemetry-standards` — PostHog events, `packages/common/telemetry-constants.ts`
 - `dev-toolbar-review` — `packages/dev-tools`, `packages/common/posthog-client.ts`, `packages/common/feature-flags.tsx`
 - `safe-sql-execution` — any code that builds or executes SQL against user databases

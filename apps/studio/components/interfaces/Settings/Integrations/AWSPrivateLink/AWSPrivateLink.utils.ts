@@ -89,7 +89,7 @@ export function getConnectionsAttentionCopy(attention: ConnectionsAttention): {
     return {
       type: 'destructive',
       title: expiredCount === 1 ? 'A connection request expired' : 'Connection requests expired',
-      description: `AWS can no longer accept the expired share${expiredCount === 1 ? '' : 's'} below.`,
+      description: `AWS can no longer accept ${expiredCount === 1 ? 'this share' : 'these shares'}.`,
       shouldShowAcceptLink: false,
     }
   }

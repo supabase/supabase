@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import type { ComponentProps } from 'react'
 import { useState } from 'react'
-import { Button, CommandGroup, CommandItem } from 'ui'
+import { Button, CommandGroup } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AppLayoutDropdownTriggerButton } from './AppLayoutDropdown'
@@ -12,6 +12,7 @@ import { sanitizeRoute } from './ProjectDropdown.utils'
 import { ProjectRowLink } from './ProjectRowLink'
 import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
 import { usePreviewNavManagedBy } from '@/components/interfaces/Settings/Integrations/AWSPrivateLink/preview'
+import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import { getManagedByFromOrganizationPartner } from '@/data/organizations/managed-by-utils'
@@ -30,14 +31,12 @@ interface ProjectDropdownNewProjectActionsProps {
   organizationSlug: string | undefined
   embedded: boolean
   onClose: () => void
-  onNavigate: (href: string) => void
 }
 
 function ProjectDropdownNewProjectActions({
   organizationSlug,
   embedded,
   onClose,
-  onNavigate,
 }: ProjectDropdownNewProjectActionsProps) {
   const href = `/new/${organizationSlug}`
 
@@ -63,19 +62,10 @@ function ProjectDropdownNewProjectActions({
 
   return (
     <CommandGroup>
-      <CommandItem
-        className="cursor-pointer w-full"
-        onSelect={() => {
-          onClose()
-          onNavigate(href)
-        }}
-        onClick={onClose}
-      >
-        <Link href={href} onClick={onClose} className="w-full flex items-center gap-2">
-          <Plus size={14} strokeWidth={1.5} />
-          <p>New project</p>
-        </Link>
-      </CommandItem>
+      <CommandItemLink href={href} className="cursor-pointer w-full gap-2" onSelect={onClose}>
+        <Plus size={14} strokeWidth={1.5} />
+        <p>New project</p>
+      </CommandItemLink>
     </CommandGroup>
   )
 }
@@ -176,19 +166,12 @@ export const ProjectDropdown = ({
     open,
     setOpen: handleSetOpen,
     selectedRef: ref,
-    onSelect: (project: { ref: string }) => {
+    getItemHref: (project: { ref: string }) => {
       const sanitizedRoute = sanitizeRoute(router.route, router.query)
-      const href = sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
-      close()
-      router.push(href)
+      return sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
     },
     renderRow: (project: Pick<OrgProject, 'ref' | 'name' | 'status' | 'integration_source'>) => (
-      <ProjectRowLink
-        project={project}
-        selectedRef={ref}
-        route={router.route}
-        routerQueries={router.query}
-      />
+      <ProjectRowLink project={project} selectedRef={ref} />
     ),
     renderActions: (_setOpen: (value: boolean) => void, options?: { embedded?: boolean }) =>
       projectCreationEnabled ? (
@@ -196,7 +179,6 @@ export const ProjectDropdown = ({
           organizationSlug={selectedOrganization?.slug}
           embedded={options?.embedded ?? false}
           onClose={close}
-          onNavigate={(href) => router.push(href)}
         />
       ) : null,
   }

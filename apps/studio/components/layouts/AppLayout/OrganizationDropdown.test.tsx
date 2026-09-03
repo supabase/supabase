@@ -76,4 +76,16 @@ describe('OrganizationDropdown', () => {
     const selectedLink = screen.getByRole('link', { name: /org one/i })
     expect(within(selectedLink).queryByTestId('partner-icon')).toBeNull()
   })
+
+  it('renders organization command items as links', () => {
+    mockUseSelectedOrganizationQuery.mockReturnValue({
+      data: createMockOrganization({ slug: 'org-one', name: 'Org One' }),
+    })
+
+    render(<OrganizationDropdown embedded />)
+
+    const organizationLink = screen.getByRole('link', { name: /org two/i })
+    expect(within(organizationLink).getByRole('option')).toBeInTheDocument()
+    expect(organizationLink).toHaveAttribute('href', '/org/org-two')
+  })
 })

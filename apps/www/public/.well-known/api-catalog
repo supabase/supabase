@@ -1,6 +1,14 @@
 {
   "linkset": [
     {
+      "anchor": "https://supabase.com/.well-known/api-catalog",
+      "item": [
+        {
+          "href": "https://api.supabase.com/v1"
+        }
+      ]
+    },
+    {
       "anchor": "https://api.supabase.com/v1",
       "service-desc": [
         {
