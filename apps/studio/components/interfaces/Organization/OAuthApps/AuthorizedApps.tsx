@@ -49,6 +49,7 @@ export const AuthorizedApps = () => {
     isPending: isLoadingAuthorizedApps,
     isSuccess: isSuccessAuthorizedApps,
     isError: isErrorAuthorizedApps,
+    error: authorizedAppsError,
   } = useAuthorizedAppsQuery({ slug })
 
   const sortedAuthorizedApps = useMemo(() => {
@@ -96,7 +97,9 @@ export const AuthorizedApps = () => {
           <NoPermission resourceText="view authorized apps" />
         ) : null}
 
-        {isErrorAuthorizedApps && <AlertError subject="Failed to retrieve authorized apps" />}
+        {isErrorAuthorizedApps && (
+          <AlertError subject="Failed to retrieve authorized apps" error={authorizedAppsError} />
+        )}
 
         {isSuccessAuthorizedApps && (
           <Card>
