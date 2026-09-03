@@ -145,6 +145,8 @@ export const PublishableApps = () => {
 
         {createdApp !== undefined && (
           <div
+            role="status"
+            aria-live="polite"
             className={cn(
               'flex items-center justify-between p-4 px-6 border first:rounded-t last:rounded-b',
               'bg-background-alternative',
