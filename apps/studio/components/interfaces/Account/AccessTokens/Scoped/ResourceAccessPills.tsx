@@ -35,7 +35,7 @@ export const OrganizationAccessPill = ({
         })}
       />
       {organization?.name ?? slug}
-      {isInaccessible ? <span> - revoked</span> : null}
+      {isInaccessible ? <span role="status"> - revoked</span> : null}
     </Badge>
   )
 }
@@ -59,7 +59,7 @@ export const ProjectAccessPill = ({ projectRef }: { projectRef: string }) => {
         })}
       />
       {project?.name ?? projectRef}
-      {isInaccessible ? <span> - revoked</span> : null}
+      {isInaccessible ? <span role="status"> - revoked</span> : null}
     </Badge>
   )
 }
