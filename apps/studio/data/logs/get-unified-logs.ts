@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 
 import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
 import { getUnifiedLogsISOStartEnd } from './unified-logs-infinite-query'
+import { isUnifiedLogsQueryRow, mapUnifiedLogRow } from './unified-logs.utils'
 import { getUnifiedLogsQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getUnifiedLogsQuery as getUnifiedLogsQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
@@ -43,32 +44,7 @@ export async function retrieveUnifiedLogs({
 
   const resultData = data?.result ?? []
 
-  const result = resultData.map((row: any) => {
-    const ts = String(row.timestamp ?? '')
-    const looksLikeIso = /[T-]/.test(ts)
-    const date = looksLikeIso
-      ? new Date(/Z$|[+-]\d{2}:?\d{2}$/.test(ts) ? ts : `${ts}Z`)
-      : new Date(Number(ts) / 1000)
-    return {
-      id: row.id,
-      date,
-      timestamp: row.timestamp,
-      level: row.level,
-      status: row.status || 200,
-      method: row.method,
-      host: row.host,
-      pathname: (row.url || '').replace(/^https?:\/\/[^\/]+/, '') || row.pathname || '',
-      event_message: row.event_message || row.body || '',
-      headers:
-        typeof row.headers === 'string' ? JSON.parse(row.headers || '{}') : row.headers || {},
-      regions: row.region ? [row.region] : [],
-      log_type: row.log_type || '',
-      latency: row.latency || 0,
-      log_count: row.log_count || null,
-      logs: row.logs || [],
-      auth_user: row.auth_user || null,
-    }
-  })
+  const result = resultData.filter(isUnifiedLogsQueryRow).map(mapUnifiedLogRow)
 
   return result
 }

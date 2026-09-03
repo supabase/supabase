@@ -5,6 +5,7 @@ import {
   gateLogTypeFilters,
   gateLogTypeOptions,
   getEventMessageDisplay,
+  getRawLogData,
   parseMultigresEventMessage,
 } from './UnifiedLogs.utils'
 
@@ -92,6 +93,54 @@ describe('getEventMessageDisplay', () => {
       message: 'relation does not exist',
       capitalize: false,
     })
+  })
+})
+
+describe('getRawLogData', () => {
+  it('returns only the real Workers payload fields', () => {
+    const row = {
+      event_message: 'Error: Dynamic require of "path" is not supported',
+      id: '51a29911-9293-4616-8984-743cc548b629',
+      metadata: {
+        cw_event_id: '39883203917805946105278943454814281535421893832620638214',
+        launch_id: '1788424715503435269',
+        log_group: '/aws/lambda-microvms/workers/cxkpapyhaaywrtudnqpl/api',
+        log_stream: 'launch-1788424715503435269',
+        source: 'worker_guest_logs',
+        worker: 'api',
+      },
+      project: 'cxkpapyhaaywrtudnqpl',
+      timestamp: 1788424716876000,
+      log_type: 'workers' as const,
+      status: null,
+      level: null,
+      method: null,
+      pathname: null,
+      auth_user: null,
+      date: new Date(1788424716876),
+    }
+
+    expect(getRawLogData(row)).toEqual({
+      id: '51a29911-9293-4616-8984-743cc548b629',
+      timestamp: 1788424716876000,
+      event_message: 'Error: Dynamic require of "path" is not supported',
+      metadata: row.metadata,
+    })
+  })
+
+  it('returns non-Workers rows unchanged', () => {
+    const row = {
+      id: 'edge-log',
+      timestamp: 1788424716876000,
+      log_type: 'edge' as const,
+      status: 200,
+      method: 'GET' as const,
+      pathname: '/rest/v1',
+      level: 'success' as const,
+      date: new Date(1788424716876),
+    }
+
+    expect(getRawLogData(row)).toBe(row)
   })
 })
 

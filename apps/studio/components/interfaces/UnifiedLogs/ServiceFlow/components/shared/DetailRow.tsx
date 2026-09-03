@@ -52,7 +52,7 @@ export const DetailRow = ({
   const valueEl = isLoading ? (
     <Skeleton className="h-4 w-24" />
   ) : (
-    <FieldValue config={config} value={value} wrap={config.wrap} level={level} />
+    <FieldValue config={config} value={value} wrap={config.wrap} level={level ?? undefined} />
   )
 
   const rowClass = cn(

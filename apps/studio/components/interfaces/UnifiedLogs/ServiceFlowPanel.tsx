@@ -27,7 +27,7 @@ import { ServiceFlowPanelControls } from './ServiceFlow/components/ServiceFlowPa
 import { DetailSectionHeader } from './ServiceFlow/components/shared/DetailSection'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
-import { getRowTimestampMs } from './UnifiedLogs.utils'
+import { getRawLogData, getRowTimestampMs } from './UnifiedLogs.utils'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
 import {
   SERVICE_FLOW_TYPES,
@@ -105,14 +105,18 @@ export function ServiceFlowPanel({
   // Prepare JSON data for Raw JSON tab
   const jsonData =
     shouldShowServiceFlow && serviceFlowData?.result?.[0] ? serviceFlowData.result[0] : selectedRow
+  const rawLogData = getRawLogData(jsonData)
 
   const formattedJsonData =
-    !logsMetadata && 'raw_log_data' in jsonData && 'metadata' in jsonData.raw_log_data
+    !logsMetadata &&
+    'raw_log_data' in rawLogData &&
+    rawLogData.raw_log_data &&
+    'metadata' in rawLogData.raw_log_data
       ? {
-          ...jsonData,
-          raw_log_data: { ...jsonData.raw_log_data, metadata: undefined },
+          ...rawLogData,
+          raw_log_data: { ...rawLogData.raw_log_data, metadata: undefined },
         }
-      : jsonData
+      : rawLogData
 
   return (
     <>

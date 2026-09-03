@@ -3,9 +3,10 @@ import { cn } from 'ui'
 
 import { LOG_TYPES_LABELS } from './UnifiedLogs.constants'
 import { parseLogsFilterUrlParams } from './UnifiedLogs.filters'
-import { FacetMetadataSchema } from './UnifiedLogs.schema'
+import { ColumnSchema, FacetMetadataSchema } from './UnifiedLogs.schema'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
+import type { UnifiedLogInspectionEntry } from '@/data/logs/unified-log-inspection-query'
 
 export type UnifiedLogType = keyof typeof LOG_TYPES_LABELS
 
@@ -64,6 +65,21 @@ export function getRowTimestampMs(
   return null
 }
 
+type WorkersRawLogData = Pick<ColumnSchema, 'id' | 'timestamp' | 'event_message' | 'metadata'>
+
+export function getRawLogData(
+  row: ColumnSchema | UnifiedLogInspectionEntry
+): ColumnSchema | UnifiedLogInspectionEntry | WorkersRawLogData {
+  if (!('log_type' in row) || row.log_type !== 'workers') return row
+
+  return {
+    id: row.id,
+    timestamp: row.timestamp,
+    event_message: row.event_message,
+    metadata: row.metadata,
+  }
+}
+
 export const getLevelLabel = (value: (typeof LEVELS)[number]): string => {
   switch (value) {
     case 'success':
@@ -87,7 +103,7 @@ export const getStatusLevel = (status?: number | string): string => {
   return 'success'
 }
 
-export function getLevelRowClassName(value: (typeof LEVELS)[number]): string {
+export function getLevelRowClassName(value: (typeof LEVELS)[number] | null | undefined): string {
   switch (value) {
     case 'success':
       return ''

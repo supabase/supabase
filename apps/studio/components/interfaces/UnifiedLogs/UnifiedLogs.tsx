@@ -238,7 +238,7 @@ export const UnifiedLogs = () => {
   }, [search.filter])
 
   const getRowClassName = <
-    TData extends { date: Date; level: (typeof LEVELS)[number]; timestamp: number },
+    TData extends { date: Date; level: (typeof LEVELS)[number] | null; timestamp: number },
   >(
     row: Row<TData>
   ) => {

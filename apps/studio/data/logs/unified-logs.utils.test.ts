@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { extractLogMetadata } from './unified-logs.utils'
+import { extractLogMetadata, mapUnifiedLogRow } from './unified-logs.utils'
 
 describe('extractLogMetadata', () => {
   describe('non-auth logs', () => {
@@ -168,6 +168,80 @@ describe('extractLogMetadata', () => {
       }
 
       expect(extractLogMetadata(row).status).toBe(200)
+    })
+  })
+
+  describe('workers logs', () => {
+    it('does not synthesize unsupported request metadata', () => {
+      const row = {
+        event_message: 'Error: Dynamic require of "path" is not supported',
+        id: '51a29911-9293-4616-8984-743cc548b629',
+        log_type: 'workers',
+        metadata: {
+          cw_event_id: '39883203917805946105278943454814281535421893832620638214',
+          launch_id: '1788424715503435269',
+          log_group: '/aws/lambda-microvms/workers/cxkpapyhaaywrtudnqpl/api',
+          log_stream: 'launch-1788424715503435269',
+          source: 'worker_guest_logs',
+          worker: 'api',
+        },
+        project: 'cxkpapyhaaywrtudnqpl',
+        timestamp: 1788424716876000,
+      }
+
+      expect(extractLogMetadata(row)).toEqual({ status: null, method: null, pathname: null })
+    })
+
+    it('preserves only Workers metadata while keeping unsupported fields null', () => {
+      const metadata = {
+        cw_event_id: '39883203917805946105278943454814281535421893832620638214',
+        launch_id: '1788424715503435269',
+        log_group: '/aws/lambda-microvms/workers/cxkpapyhaaywrtudnqpl/api',
+        log_stream: 'launch-1788424715503435269',
+        source: 'worker_guest_logs',
+        worker: 'api',
+      }
+      const mapped = mapUnifiedLogRow({
+        event_message: 'Error: Dynamic require of "path" is not supported',
+        id: '51a29911-9293-4616-8984-743cc548b629',
+        log_type: 'workers',
+        metadata,
+        project: 'cxkpapyhaaywrtudnqpl',
+        timestamp: 1788424716876000,
+        status: 200,
+        level: 'success',
+        method: 'GET',
+        pathname: '/invented',
+        auth_user: 'invented-user',
+      })
+
+      expect(mapped).toMatchObject({
+        id: '51a29911-9293-4616-8984-743cc548b629',
+        timestamp: 1788424716876000,
+        event_message: 'Error: Dynamic require of "path" is not supported',
+        metadata,
+        status: null,
+        level: null,
+        method: null,
+        pathname: null,
+        auth_user: null,
+      })
+      expect(mapped).not.toHaveProperty('project')
+    })
+
+    it('does not add metadata to non-Workers rows', () => {
+      const mapped = mapUnifiedLogRow({
+        id: 'edge-log',
+        timestamp: 1788424716876000,
+        log_type: 'edge',
+        metadata: { request: 'existing metadata' },
+        status: 200,
+        level: 'success',
+        method: 'GET',
+        pathname: '/rest/v1',
+      })
+
+      expect(mapped).not.toHaveProperty('metadata')
     })
   })
 })

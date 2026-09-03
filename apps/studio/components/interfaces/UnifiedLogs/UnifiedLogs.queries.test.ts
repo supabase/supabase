@@ -70,6 +70,17 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       )
     })
 
+    it('projects only Workers fields that exist on worker logs', () => {
+      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:workers'))
+      const workerCondition =
+        "log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')"
+
+      expect(sql).toContain(`WHEN ${workerCondition} THEN null`)
+      expect(sql).toContain(`if(${workerCondition}, null, log_attributes['request.method'])`)
+      expect(sql).toContain(`if(${workerCondition}, null, log_attributes['request.path'])`)
+      expect(sql).toContain(`if(${workerCondition}, log_attributes, map()) AS metadata`)
+    })
+
     it('escapes single quotes in filter values to prevent SQL injection', () => {
       const sql = getUnifiedLogsQuery(
         withFilters(`method:eq:G'ET`, `pathname:eq:/customers'; DROP TABLE logs --`)
@@ -285,6 +296,15 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).toContain(
         `if(source = 'auth_logs', log_attributes['status'], log_attributes['response.status_code'])`
       )
+    })
+
+    it('does not classify Workers rows into a severity bucket', () => {
+      const sql = getLogsChartQuery(withFilters('log_type:eq:workers'))
+      const workerCondition =
+        "log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')"
+
+      expect(sql).toContain(`WHEN ${workerCondition} THEN null`)
+      expect(sql).not.toContain(`WHEN ${workerCondition} THEN 'success'`)
     })
   })
 
