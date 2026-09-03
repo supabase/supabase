@@ -12,5 +12,7 @@ ENV NODE_ENV=production
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 COPY --from=build /app/dist ./dist
+RUN mkdir -p /etc/auth && chown node:node /etc/auth
+USER node
 EXPOSE 8085
 CMD ["node", "dist/index.js"]

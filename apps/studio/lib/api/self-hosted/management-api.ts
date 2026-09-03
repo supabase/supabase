@@ -18,6 +18,7 @@ export async function proxyManagementApi(req: NextApiRequest, res: NextApiRespon
   const hasBody = req.method !== 'GET' && req.method !== 'HEAD'
   const response = await fetch(`${MANAGEMENT_API_URL}${path}`, {
     method: req.method,
+    redirect: 'error',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${MANAGEMENT_API_TOKEN}`,
