@@ -10,10 +10,11 @@ export default function handleEndpoint(req: NextApiRequest, res: NextApiResponse
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
   const { ref } = req.query
+  const path = `/platform/auth/${encodeURIComponent(String(ref))}/config/hooks`
 
   switch (method) {
     case 'PATCH':
-      return proxyManagementApi(req, res, `/platform/auth/${ref}/config/hooks`)
+      return proxyManagementApi(req, res, path)
     default:
       res.setHeader('Allow', ['PATCH'])
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })

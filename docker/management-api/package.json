@@ -4,6 +4,9 @@
   "private": true,
   "description": "Local management API for self-hosted Supabase: runtime Auth (GoTrue) configuration and email templates",
   "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.json",

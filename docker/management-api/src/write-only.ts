@@ -1,12 +1,8 @@
 import type { ConfigValue } from './store.js'
 
-const WRITE_ONLY_KEYS = new Set(['SMTP_PASS'])
+const WRITE_ONLY_KEYS = ['SMTP_PASS']
 
 export const REDACTED_VALUE = '********'
-
-export function isRedactedWriteOnlyValue(key: string, value: unknown): boolean {
-  return WRITE_ONLY_KEYS.has(key) && value === REDACTED_VALUE
-}
 
 export function redactWriteOnlyKeys(
   config: Record<string, ConfigValue>

@@ -1,5 +1,6 @@
 import { serve } from '@hono/node-server'
-import { type Env, type Handler, Hono } from 'hono'
+import { type Context, type Env, type Handler, Hono } from 'hono'
+import { bodyLimit } from 'hono/body-limit'
 import { logger } from 'hono/logger'
 import { timingSafeEqual } from 'node:crypto'
 
@@ -22,7 +23,7 @@ import {
   upsertEmailTemplate,
   withTransaction,
 } from './store.js'
-import { isRedactedWriteOnlyValue, redactWriteOnlyKeys } from './write-only.js'
+import { redactWriteOnlyKeys } from './write-only.js'
 
 const app = new Hono()
 
@@ -49,6 +50,26 @@ app.use('/platform/*', async (c, next) => {
   await next()
 })
 
+const MAX_BODY_BYTES = 4 * 1024 * 1024
+
+app.use(
+  '/platform/*',
+  bodyLimit({
+    maxSize: MAX_BODY_BYTES,
+    onError: (c) => c.json({ message: 'request body is too large' }, 413),
+  })
+)
+
+async function readJsonObject(c: Context): Promise<Record<string, unknown> | null> {
+  try {
+    const body: unknown = await c.req.json()
+    if (body === null || typeof body !== 'object' || Array.isArray(body)) return null
+    return body as Record<string, unknown>
+  } catch {
+    return null
+  }
+}
+
 function isProjectRef(ref: string): boolean {
   return ref === 'default'
 }
@@ -69,7 +90,6 @@ function validateConfigPayload(payload: Record<string, unknown>): {
       valid[key] = null
       continue
     }
-    if (isRedactedWriteOnlyValue(key, value)) continue
     const isExpectedType =
       typeof value === expected &&
       (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean')
@@ -135,7 +155,8 @@ app.get('/platform/auth/:ref/config', async (c) => {
 
 const handleConfigPatch: Handler<Env, '/platform/auth/:ref/config'> = async (c) => {
   if (!isProjectRef(c.req.param('ref'))) return c.json({ message: 'project not found' }, 404)
-  const payload = await c.req.json<Record<string, unknown>>()
+  const payload = await readJsonObject(c)
+  if (!payload) return c.json({ message: 'body must be a JSON object' }, 400)
   const errors = await applyConfigPatch(payload)
   if (errors.length > 0) return c.json({ message: errors.join('; ') }, 400)
   return c.json(await currentConfig())
@@ -177,7 +198,7 @@ app.put('/platform/auth/:ref/templates/:template/react', async (c) => {
   if (!isProjectRef(c.req.param('ref'))) return c.json({ message: 'project not found' }, 404)
   const template = templateParam(c)
   if (!template) return c.json({ message: 'unknown template type' }, 400)
-  const { source } = await c.req.json<{ source?: string }>()
+  const source = (await readJsonObject(c))?.source
   if (!source || typeof source !== 'string') {
     return c.json({ message: 'body must contain a `source` string' }, 400)
   }
