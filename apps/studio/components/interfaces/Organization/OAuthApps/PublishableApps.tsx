@@ -157,6 +157,7 @@ export const PublishableApps = () => {
                 icon={<X size={18} />}
                 className="px-1"
                 onClick={() => setCreatedApp(undefined)}
+                aria-label="Cancel"
               />
             </div>
             <div className="w-full space-y-4">
