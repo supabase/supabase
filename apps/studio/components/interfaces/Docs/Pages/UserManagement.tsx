@@ -107,7 +107,7 @@ export const UserManagement = ({ selectedLang, showApiKey }: UserManagementProps
       />
 
       <DocSection
-        title="Sign Up with Phone/Password"
+        title="Sign up with Phone/Password"
         content={
           <>
             <p>
@@ -274,7 +274,7 @@ export const UserManagement = ({ selectedLang, showApiKey }: UserManagementProps
         title="Sign out"
         content={
           <p>
-            After calling log out, all interactions using the Supabase JS client will be
+            After calling sign out, all interactions using the Supabase JS client will be
             "anonymous".
           </p>
         }
