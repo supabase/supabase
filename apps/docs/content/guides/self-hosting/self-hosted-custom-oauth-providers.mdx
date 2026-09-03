@@ -290,12 +290,12 @@ const { data, error } = await supabase.auth.admin.customProviders.listProviders(
 ```sh
 # List all custom providers
 
-curl "<your-domain>/auth/v1/admin/custom-providers" \
+curl "http://<your-domain>/auth/v1/admin/custom-providers" \
  -H "apikey: your-supabase-secret-key"
 
 # Filter by provider type
 
-curl "<your-domain>/auth/v1/admin/custom-providers?type=oidc" \
+curl "http://<your-domain>/auth/v1/admin/custom-providers?type=oidc" \
  -H "apikey: your-supabase-secret-key"
 
 ```
