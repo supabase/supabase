@@ -1,0 +1,43 @@
+---
+import { getCollection } from 'astro:content'
+
+import Layout from '../../layouts/Layout.astro'
+import { TOPICS, topicToSlug } from '../../lib/topics'
+
+export async function getStaticPaths() {
+	const guides = await getCollection('guides')
+
+	// One page per topic in TOPICS — not just topics a guide already uses —
+	// so every link on the "Topics" nav resolves instead of 404ing.
+	return TOPICS.map((topic) => ({
+		params: { topic: topicToSlug(topic.name) },
+		props: {
+			topic: topic.name,
+			description: topic.description,
+			guides: guides.filter((guide) => guide.data.topics?.includes(topic.name)),
+		},
+	}))
+}
+
+const { topic, description, guides } = Astro.props
+---
+
+<Layout title={topic} description={description}>
+	<article class="prose max-w-3xl mx-auto px-6 py-16">
+		<h1>{topic}</h1>
+		<p class="lead">{description}</p>
+		{
+			guides.length === 0 ? (
+				<p>No guides for this topic</p>
+			) : (
+				<ul>
+					{guides.map((guide) => (
+						<li>
+							<a href={`${import.meta.env.BASE_URL}/guides/${guide.id}`}>{guide.data.title}</a>
+						</li>
+					))}
+				</ul>
+			)
+		}
+	</article>
+</Layout>
