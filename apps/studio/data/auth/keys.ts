@@ -32,6 +32,8 @@ export const authKeys = {
   indexWorkerStatus: (projectRef: string | undefined) =>
     ['projects', projectRef, 'index-worker-status'] as const,
   authConfig: (projectRef: string | undefined) => ['projects', projectRef, 'auth-config'] as const,
+  reactTemplate: (projectRef: string | undefined, template: string | undefined) =>
+    ['projects', projectRef, 'auth-react-template', template] as const,
   accessToken: () => ['access-token'] as const,
   overviewMetrics: (projectRef: string | undefined) =>
     ['projects', projectRef, 'auth-overview-metrics'] as const,

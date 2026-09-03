@@ -39,6 +39,7 @@ import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-muta
 import { useAuthTemplateResetMutation } from '@/data/auth/auth-template-reset-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from '@/lib/constants'
 
 const smtpEnabledSchema = z.object({
   ENABLE_SMTP: z.literal(true),
@@ -303,7 +304,7 @@ export const SmtpForm = () => {
                           aria-label="Toggle SMTP"
                           checked={field.value}
                           onCheckedChange={field.onChange}
-                          disabled={!canUpdateConfig}
+                          disabled={!canUpdateConfig || (!IS_PLATFORM && field.value)}
                         />
                       </FormControl>
                     </FormItemLayout>

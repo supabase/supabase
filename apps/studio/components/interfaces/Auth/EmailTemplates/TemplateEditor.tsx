@@ -39,10 +39,12 @@ import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
 import type { AuthConfigResponse } from '@/data/auth/auth-config-query'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useAuthTemplateReactQuery } from '@/data/auth/auth-template-react-query'
+import { useAuthTemplateReactUpdateMutation } from '@/data/auth/auth-template-react-update-mutation'
 import { useValidateSpamMutation, ValidateSpamResponse } from '@/data/auth/validate-spam-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { usePreventNavigationOnUnsavedChanges } from '@/hooks/ui/usePreventNavigationOnUnsavedChanges'
-import { DOCS_URL } from '@/lib/constants'
+import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 
 interface TemplateEditorProps {
   template: AuthTemplate
@@ -106,9 +108,35 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
   const [, setHasUnsavedChanges] = useState(false)
   const [isSavingTemplate, setIsSavingTemplate] = useState(false)
   const [activeView, setActiveView] = useState<'source' | 'preview'>('source')
-  const previewSrcDoc = useMemo(() => getPreviewSrcDoc(bodyValue), [bodyValue])
+
+  const { data: reactTemplate } = useAuthTemplateReactQuery({
+    projectRef,
+    template: id.toLowerCase(),
+  })
+  const [editorFormatOverride, setEditorFormatOverride] = useState<'html' | 'react' | null>(null)
+  const [editedReactSource, setEditedReactSource] = useState<string | null>(null)
+  const savedReactSource = reactTemplate?.source ?? ''
+  const reactSource = editedReactSource ?? savedReactSource
+  const hasSavedReactTemplate = reactTemplate !== undefined && !reactTemplate.is_default
+  const editorFormat = IS_PLATFORM
+    ? 'html'
+    : (editorFormatOverride ?? (hasSavedReactTemplate ? 'react' : 'html'))
+  const isReactFormat = editorFormat === 'react'
+
+  const previewHtml =
+    isReactFormat && !hasSavedReactTemplate
+      ? (reactTemplate?.rendered_html ?? bodyValue)
+      : bodyValue
+  const previewSrcDoc = useMemo(() => getPreviewSrcDoc(previewHtml), [previewHtml])
 
   const { mutate: validateSpam } = useValidateSpamMutation()
+
+  const { mutate: updateReactTemplate } = useAuthTemplateReactUpdateMutation({
+    onError: (error) => {
+      setIsSavingTemplate(false)
+      toast.error(`Failed to save react email template: ${error.message}`)
+    },
+  })
 
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation({
     onError: (error) => {
@@ -151,6 +179,30 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
     if (!canEdit) return
 
     setIsSavingTemplate(true)
+
+    if (isReactFormat) {
+      updateReactTemplate(
+        { projectRef, template: id.toLowerCase(), source: reactSource },
+        {
+          onSuccess: () => {
+            const subjectPayload = { ...values }
+            delete subjectPayload[messageSlug]
+            updateAuthConfig(
+              { projectRef, config: subjectPayload },
+              {
+                onSuccess: () => {
+                  setIsSavingTemplate(false)
+                  setEditedReactSource(null)
+                  setHasUnsavedChanges(false)
+                  toast.success('Successfully updated email template')
+                },
+              }
+            )
+          },
+        }
+      )
+      return
+    }
 
     const payload = { ...values }
 
@@ -207,7 +259,10 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
     (subjectSlug !== undefined &&
       authConfig?.MAILER_SUBJECTS_CUSTOM_CONTENTS?.[subjectSlug] === true)
   const hasFormChanges = JSON.stringify(formValues) !== JSON.stringify(baselineValues)
-  const hasChanges = hasFormChanges || baselineBodyValue !== bodyValue
+  const hasBodyChanges = isReactFormat
+    ? editedReactSource !== null && editedReactSource !== savedReactSource
+    : baselineBodyValue !== bodyValue
+  const hasChanges = hasFormChanges || hasBodyChanges
   const saveChangesTooltip = !canUpdateConfig
     ? 'You need additional permissions to edit templates'
     : isReadOnly
@@ -329,24 +384,61 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
             <CardContent className="flex flex-col gap-4">
               <div className="flex items-center justify-between gap-2">
                 <Label>Body</Label>
-                <TwoOptionToggle
-                  width={60}
-                  options={['preview', 'source']}
-                  activeOption={activeView}
-                  onClickOption={(option) => {
-                    if (!canEdit && option === 'source') return
-                    setActiveView(option as 'source' | 'preview')
-                  }}
-                  borderOverride="border-muted"
-                  disabledOptions={!canEdit ? ['source'] : []}
-                  disabledOptionTooltip={
-                    !canUpdateConfig
-                      ? 'You need additional permissions to edit templates'
-                      : 'Set up custom SMTP to edit the source'
-                  }
-                />
+                <div className="flex items-center gap-2">
+                  {!IS_PLATFORM && reactTemplate !== undefined && (
+                    <TwoOptionToggle
+                      width={60}
+                      options={['react', 'html']}
+                      activeOption={editorFormat}
+                      onClickOption={(option) => {
+                        setEditorFormatOverride(option as 'html' | 'react')
+                      }}
+                      borderOverride="border-muted"
+                    />
+                  )}
+                  <TwoOptionToggle
+                    width={60}
+                    options={['preview', 'source']}
+                    activeOption={activeView}
+                    onClickOption={(option) => {
+                      if (!canEdit && option === 'source') return
+                      setActiveView(option as 'source' | 'preview')
+                    }}
+                    borderOverride="border-muted"
+                    disabledOptions={!canEdit ? ['source'] : []}
+                    disabledOptionTooltip={
+                      !canUpdateConfig
+                        ? 'You need additional permissions to edit templates'
+                        : 'Set up custom SMTP to edit the source'
+                    }
+                  />
+                </div>
               </div>
-              {activeView === 'source' ? (
+              {activeView === 'source' && isReactFormat && (
+                <div className="overflow-hidden rounded-md border dark:border-control [&_.monaco-editor]:outline-0 [&_.monaco-editor-background]:bg-surface-200/30! [&_.monaco-editor_.margin]:bg-surface-200/30! dark:[&_.monaco-editor-background]:bg-surface-300! dark:[&_.monaco-editor_.margin]:bg-surface-300!">
+                  <CodeEditor
+                    id="react-email-editor"
+                    language="typescript"
+                    isReadOnly={!canEdit}
+                    className="mb-0! relative h-96 outline-hidden outline-offset-0 outline-width-0 outline-0"
+                    onInputChange={(e: string | undefined) => {
+                      setEditedReactSource(e ?? '')
+                      if (reactSource !== e) setHasUnsavedChanges(true)
+                    }}
+                    options={{ wordWrap: 'on', contextmenu: false, padding: { top: 16 } }}
+                    value={reactSource}
+                    editorRef={editorRef}
+                  />
+                </div>
+              )}
+              {activeView === 'source' && isReactFormat && (
+                <Admonition
+                  type="default"
+                  title="React Email template"
+                  description="Export a React component as the default export. Template variables are passed as props (e.g. {props.confirmationURL}) and the email is rendered to HTML when saved."
+                />
+              )}
+              {activeView === 'source' && !isReactFormat ? (
                 <>
                   <div className="overflow-hidden rounded-md border dark:border-control overflow-hidden [&_.monaco-editor]:outline-0 [&_.monaco-editor-background]:bg-surface-200/30! [&_.monaco-editor_.margin]:bg-surface-200/30! dark:[&_.monaco-editor-background]:bg-surface-300! dark:[&_.monaco-editor_.margin]:bg-surface-300!">
                     <CodeEditor
@@ -416,7 +508,8 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                     </div>
                   </div>
                 </>
-              ) : (
+              ) : null}
+              {activeView === 'preview' && (
                 <>
                   <iframe
                     className="mb-0! mt-0 overflow-hidden h-96 w-full rounded-md border bg-white"
@@ -429,11 +522,18 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                     title="Email rendering may differ"
                     description="The preview shown here may differ slightly from how your email appears in the recipient’s email client."
                   />
+                  {isReactFormat && hasBodyChanges && (
+                    <Admonition
+                      type="note"
+                      title="Preview reflects the last saved version"
+                      description="React Email templates are rendered on the server. Save your changes to update the preview."
+                    />
+                  )}
                 </>
               )}
             </CardContent>
 
-            <SpamValidation spamRules={spamRules} />
+            {!isReactFormat && <SpamValidation spamRules={spamRules} />}
 
             <CardFooter className="flex flex-row justify-between gap-2">
               {hasCustomTemplate && (
@@ -443,6 +543,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                   onResetSuccess={(config: AuthConfigResponse) => {
                     form.reset(getFormValuesFromConfig(config))
                     setBodyValue((config && config[messageSlug]) ?? '')
+                    setEditedReactSource(null)
                     setValidationResult(undefined)
                     setHasUnsavedChanges(false)
                   }}
@@ -456,6 +557,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                     onClick={() => {
                       form.reset(INITIAL_VALUES)
                       setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
+                      setEditedReactSource(null)
                       setHasUnsavedChanges(false)
                     }}
                   >

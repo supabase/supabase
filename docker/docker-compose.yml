@@ -59,6 +59,9 @@ services:
       # See: docker-compose.logs.yml
       ENABLED_FEATURES_LOGS_ALL: "false"
 
+      MANAGEMENT_API_URL: http://management-api:8085
+      MANAGEMENT_API_TOKEN: ${MANAGEMENT_API_TOKEN:-${SERVICE_ROLE_KEY}}
+
       SNIPPETS_MANAGEMENT_FOLDER: /app/snippets
       EDGE_FUNCTIONS_MANAGEMENT_FOLDER: /app/edge-functions
     volumes:
@@ -110,6 +113,9 @@ services:
     container_name: supabase-auth
     image: supabase/gotrue:v2.189.0
     restart: unless-stopped
+    command: ["auth", "--config-dir", "/etc/auth"]
+    volumes:
+      - auth-runtime-config:/etc/auth:z
     healthcheck:
       test:
         [
@@ -245,6 +251,51 @@ services:
       # GOTRUE_HOOK_SEND_EMAIL_ENABLED: "false"
       # GOTRUE_HOOK_SEND_EMAIL_URI: "http://host.docker.internal:54321/functions/v1/email_sender"
       # GOTRUE_HOOK_SEND_EMAIL_SECRETS: "v1,whsec_VGhpcyBpcyBhbiBleGFtcGxlIG9mIGEgc2hvcnRlciBCYXNlNjQgc3RyaW5n"
+
+  # Runtime Auth configuration (providers, SMTP, email templates) for Studio, see ./management-api/README.md
+  management-api:
+    container_name: supabase-management-api
+    build: ./management-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        # Disable this if you are using an external Postgres database
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"fetch('http://localhost:8085/health').then((r) => {if (r.status !== 200) throw new Error(r.status)})\""
+        ]
+      timeout: 5s
+      interval: 5s
+      retries: 3
+    volumes:
+      - auth-runtime-config:/etc/auth:z
+    environment:
+      PORT: 8085
+      DATABASE_URL: postgres://supabase_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      MANAGEMENT_API_TOKEN: ${MANAGEMENT_API_TOKEN:-${SERVICE_ROLE_KEY}}
+      AUTH_CONFIG_DIR: /etc/auth
+      SELF_URL: http://management-api:8085
+      API_EXTERNAL_URL: ${API_EXTERNAL_URL}
+      VAULT_ENC_KEY: ${VAULT_ENC_KEY}
+
+      AUTH_DEFAULT_SITE_URL: ${SITE_URL}
+      AUTH_DEFAULT_URI_ALLOW_LIST: ${ADDITIONAL_REDIRECT_URLS}
+      AUTH_DEFAULT_DISABLE_SIGNUP: ${DISABLE_SIGNUP}
+      AUTH_DEFAULT_JWT_EXP: ${JWT_EXPIRY}
+      AUTH_DEFAULT_EXTERNAL_EMAIL_ENABLED: ${ENABLE_EMAIL_SIGNUP}
+      AUTH_DEFAULT_EXTERNAL_ANONYMOUS_USERS_ENABLED: ${ENABLE_ANONYMOUS_USERS}
+      AUTH_DEFAULT_MAILER_AUTOCONFIRM: ${ENABLE_EMAIL_AUTOCONFIRM}
+      AUTH_DEFAULT_EXTERNAL_PHONE_ENABLED: ${ENABLE_PHONE_SIGNUP}
+      AUTH_DEFAULT_SMS_AUTOCONFIRM: ${ENABLE_PHONE_AUTOCONFIRM}
+      AUTH_DEFAULT_SMTP_ADMIN_EMAIL: ${SMTP_ADMIN_EMAIL}
+      AUTH_DEFAULT_SMTP_HOST: ${SMTP_HOST}
+      AUTH_DEFAULT_SMTP_PORT: ${SMTP_PORT}
+      AUTH_DEFAULT_SMTP_USER: ${SMTP_USER}
+      AUTH_DEFAULT_SMTP_PASS: ${SMTP_PASS}
+      AUTH_DEFAULT_SMTP_SENDER_NAME: ${SMTP_SENDER_NAME}
 
   rest:
     container_name: supabase-rest
@@ -583,5 +634,6 @@ services:
       ]
 
 volumes:
+  auth-runtime-config:
   db-config:
   deno-cache:

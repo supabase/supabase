@@ -3,6 +3,7 @@ import { ArrowUpRight } from 'lucide-react'
 import { createElement } from 'react'
 
 import type { ProductMenuGroup } from '@/components/ui/ProductMenu/ProductMenu.types'
+import { useIsManagementApiEnabled } from '@/data/config/deployment-mode-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -12,6 +13,7 @@ const ExternalLinkIcon = createElement(ArrowUpRight, { strokeWidth: 1, className
 export interface GenerateAuthMenuOptions {
   ref?: string
   isPlatform: boolean
+  showAuthConfig: boolean
   showOverview: boolean
   features: {
     signInProviders: boolean
@@ -25,7 +27,7 @@ export interface GenerateAuthMenuOptions {
 }
 
 export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuGroup[] {
-  const { ref, isPlatform, showOverview, features } = options
+  const { ref, isPlatform, showAuthConfig, showOverview, features } = options
   const passkeysInMenu = Boolean(features.passkeys)
   const baseUrl = `/project/${ref}/auth`
 
@@ -64,7 +66,7 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
           : []),
       ],
     },
-    ...(features.emails && isPlatform
+    ...(features.emails && showAuthConfig
       ? [
           {
             title: 'Notifications',
@@ -96,20 +98,20 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
           items: [],
           // shortcutId: SHORTCUT_IDS.NAV_AUTH_POLICIES,
         },
+        ...(showAuthConfig && features.signInProviders
+          ? [
+              {
+                name: 'Sign In / Providers',
+                key: 'sign-in-up',
+                pages: ['providers', 'third-party'],
+                url: `${baseUrl}/providers`,
+                items: [],
+                shortcutId: SHORTCUT_IDS.NAV_AUTH_SIGN_IN,
+              },
+            ]
+          : []),
         ...(isPlatform
           ? [
-              ...(features.signInProviders
-                ? [
-                    {
-                      name: 'Sign In / Providers',
-                      key: 'sign-in-up',
-                      pages: ['providers', 'third-party'],
-                      url: `${baseUrl}/providers`,
-                      items: [],
-                      shortcutId: SHORTCUT_IDS.NAV_AUTH_SIGN_IN,
-                    },
-                  ]
-                : []),
               ...(passkeysInMenu
                 ? [
                     {
@@ -128,6 +130,10 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
                 label: 'Beta',
                 shortcutId: SHORTCUT_IDS.NAV_AUTH_OAUTH_SERVER,
               },
+            ]
+          : []),
+        ...(showAuthConfig
+          ? [
               {
                 name: 'Sessions',
                 key: 'sessions',
@@ -183,6 +189,10 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
                 label: 'Beta',
                 shortcutId: SHORTCUT_IDS.NAV_AUTH_HOOKS,
               },
+            ]
+          : []),
+        ...(isPlatform
+          ? [
               {
                 name: 'Audit Logs',
                 key: 'audit-logs',
@@ -210,6 +220,7 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
 
 export const useGenerateAuthMenu = (): ProductMenuGroup[] => {
   const { ref } = useParams()
+  const isManagementApiEnabled = useIsManagementApiEnabled()
   const showOverview = useFlag('authOverviewPage')
   const enablePasskeyAuth = useFlag('enablePasskeyAuth')
 
@@ -232,6 +243,7 @@ export const useGenerateAuthMenu = (): ProductMenuGroup[] => {
   return generateAuthMenu({
     ref,
     isPlatform: IS_PLATFORM,
+    showAuthConfig: IS_PLATFORM || isManagementApiEnabled,
     showOverview,
     features: {
       signInProviders: authenticationSignInProviders,
