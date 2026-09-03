@@ -6038,6 +6038,14 @@ export interface components {
             [key: string]: string
           }
         }
+        /**
+         * @description Bypasses the ACTIVE-status eligibility check for kubernetes_cluster_id (e.g. deliberately targeting a CORDONED cluster for testing). Has no effect without kubernetes_cluster_id also set.
+         */
+        kubernetes_cluster_force?: boolean
+        /**
+         * @description Override the Kubernetes cluster this project is created on, bypassing load-balancing, for this creation only. Only for internal use; rejected for user-facing requests in production.
+         */
+        kubernetes_cluster_id?: string
         warehouse_fdw?: {
           /** @description AWS ACM Private CA ARN used by the worker to issue per-project warehouse FDW client certificates. Defaults to the worker environment configuration when omitted. */
           client_certificate_authority_arn?: string
