@@ -41,7 +41,7 @@ pnpm api:codegen             # platform Management API types → packages/api-ty
 
 Every PR must pass typecheck + lint (one workflow), Prettier, and a typos check. Other checks are path-filtered: Studio unit tests/build and the lint ratchet (ESLint warning count must not increase) run on `apps/studio/**` changes; app-specific test suites run on their own paths.
 
-Never hand-edit generated files: `packages/api-types/types/**`, `**/routeTree.gen.ts`, `**/__generated__/**`, `apps/docs/features/docs/generated/**`, `apps/www/.generated/**`, `supabase/functions/common/database-types.ts`.
+Never hand-edit generated files: `packages/api-types/types/**`, `**/routeTree.gen.ts`, `**/__generated__/**`, `apps/docs/features/docs/generated/**`, `apps/www/.generated/**`, `supabase/functions/common/database-types.ts`, `apps/docs/content/_partials/access-control/scoped_pat_*.mdx` (run `make -C apps/docs/spec generate.partials.access-control`).
 
 ## Conventions
 
@@ -60,7 +60,7 @@ Never hand-edit generated files: `packages/api-types/types/**`, `**/routeTree.ge
 The skills in `.claude/skills/` are the source of truth for conventions — load the relevant ones before working, don't guess:
 
 - `copywriting` — any user-facing text, anywhere in the monorepo
-- `docs-content` — anything under `apps/docs`
+- `pm-the-docs` / `write-the-docs` / `edit-the-docs` / `ask-the-docs` / `review-the-docs` — anything under `apps/docs` (see `apps/docs/CONTRIBUTING.md` for the authoring skill model)
 - `telemetry-standards` — PostHog events, `packages/common/telemetry-constants.ts`
 - `dev-toolbar-review` — `packages/dev-tools`, `packages/common/posthog-client.ts`, `packages/common/feature-flags.tsx`
 - `safe-sql-execution` — any code that builds or executes SQL against user databases

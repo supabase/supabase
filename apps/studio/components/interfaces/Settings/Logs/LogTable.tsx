@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ContextMenuContent } from '@ui/components/shadcn/ui/context-menu'
 import { IS_PLATFORM, useParams } from 'common'
 import { Copy, Eye, EyeOff, Play } from 'lucide-react'
 import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -10,6 +9,7 @@ import {
   Checkbox,
   cn,
   ContextMenu,
+  ContextMenuContent,
   ContextMenuItem,
   ContextMenuTrigger,
   copyToClipboard,

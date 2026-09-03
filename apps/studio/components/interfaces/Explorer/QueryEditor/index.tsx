@@ -1,7 +1,7 @@
 import { useMonaco } from '@monaco-editor/react'
 import { acceptUntrustedSql, untrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { useFlag } from 'common'
-import { CodeSquare, Eye, EyeOff, Play } from 'lucide-react'
+import { CodeSquare, Eye, EyeOff } from 'lucide-react'
 import type { editor as monacoEditor, Selection } from 'monaco-editor'
 import {
   forwardRef,
@@ -12,7 +12,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import { Button, cn, KeyboardShortcut } from 'ui'
+import { Button, cn } from 'ui'
 
 import { resolveLogTimeRange } from '../../QuerySources/LogTimeRange.utils'
 import {
@@ -32,6 +32,7 @@ import {
 import { type QueryDisplay, type QueryResult } from '../types'
 import { DisplaySettingsButton } from './DisplaySettingsButton'
 import { QueryResultRenderer } from './QueryResultRenderer'
+import { QueryRunButton } from './QueryRunButton'
 import { QuerySourceMenu } from './QuerySourceMenu'
 import { useQueryEditorAi } from './useQueryEditorAi'
 import { LegacyLogsRewriteBanner } from '@/components/interfaces/Settings/Logs/LegacyLogsRewriteBanner'
@@ -227,13 +228,11 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   )
 
   const { mutateAsync: executeSql, isPending: isExecutingSql } = useExecuteSqlMutation({
-    onSuccess: (data) => onResultChange({ rows: data.result }),
-    onError: (error) => onResultChange({ error }),
+    onError: () => {},
   })
 
   const { mutateAsync: executeLogsSql, isPending: isExecutingLogs } = useExecuteLogsSqlMutation({
-    onSuccess: (data) => onResultChange({ rows: data.rows as readonly Record<string, unknown>[] }),
-    onError: (error) => onResultChange({ error }),
+    onError: () => {},
   })
 
   const isResolvingDatabase =
@@ -259,6 +258,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     }
 
     onRun?.()
+    const querySnapshot = { sql: rawSql, source: query._tag }
     // [Joshen] This is deliberate to commit the sql, rather than the passed rawSql
     // As we want to save the cell's content into the store, rather than what's getting run
     onSqlCommit?.(sql)
@@ -267,6 +267,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       if (!isOtelLogsEnabled) {
         onResultChange({
           error: { message: "Querying logs isn't available for this project yet." },
+          ...querySnapshot,
         })
         return
       }
@@ -276,7 +277,14 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
         sql: acceptUntrustedLogsSql(untrustedLogSql(rawSql)),
         range: resolveLogTimeRange(query.time_range),
         endpoint: QUERY_SOURCE_REGISTRY.logs.endpoint,
-      }).catch(() => {})
+      }).then(
+        (data) =>
+          onResultChange({
+            rows: data.rows as readonly Record<string, unknown>[],
+            ...querySnapshot,
+          }),
+        (error) => onResultChange({ error, ...querySnapshot })
+      )
       return
     }
 
@@ -284,7 +292,10 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     const limitedSql = applyAutoLimit(safeSql, rowLimit)
 
     if (!isValidConnString(connectionString)) {
-      onResultChange({ error: { message: 'Unable to run query: Connection string is missing' } })
+      onResultChange({
+        error: { message: 'Unable to run query: Connection string is missing' },
+        ...querySnapshot,
+      })
       return
     }
 
@@ -296,7 +307,10 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       contextualInvalidation: true,
       isStatementTimeoutDisabled: true,
       isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
-    }).catch(() => {})
+    }).then(
+      (data) => onResultChange({ rows: data.result, ...querySnapshot }),
+      (error) => onResultChange({ error, ...querySnapshot })
+    )
   }
 
   const handleConfirmPendingRun = () => {
@@ -382,7 +396,13 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
           <ExplorerToolbarIcon>
             <CodeSquare size={16} strokeWidth={2} />
           </ExplorerToolbarIcon>
-          <ExplorerToolbarTitle onSaveTitle={onTitleChange}>{title}</ExplorerToolbarTitle>
+          {variant === 'viewport' ? (
+            <ExplorerToolbarTitle className="text-muted text-xs italic">
+              Run SQL
+            </ExplorerToolbarTitle>
+          ) : (
+            <ExplorerToolbarTitle onSaveTitle={onTitleChange}>{title}</ExplorerToolbarTitle>
+          )}
           <ExplorerToolbarActions>
             {onSourceChange && (
               <QuerySourceMenu
@@ -418,26 +438,19 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
 
             {toolbarActions}
 
-            <ExplorerToolbarAction
-              icon={<Play size={16} strokeWidth={2} />}
-              loading={isExecuting}
-              tooltip={
-                <div className="flex items-center gap-2.5">
-                  <span>{hasSelection ? 'Run selected query' : 'Run query'}</span>
-                  <KeyboardShortcut keys={['Meta', 'Enter']} />
-                </div>
-              }
+            <QueryRunButton
+              isExecuting={isExecuting}
               disabled={
                 isBusy || pendingProposal !== null || isRunDisabled || sql.trim().length === 0
               }
-              onClick={() => {
+              hasSelection={showQuery && hasSelection}
+              onRun={() => handleRunQuery({ rawSql: sql })}
+              onRunSelected={() => {
                 const editorInstance = editorInstanceRef.current
                 const rawSql = editorInstance ? getEditorValueOrSelection(editorInstance) : sql
                 handleRunQuery({ rawSql })
               }}
-            >
-              {hasSelection ? 'Run selected' : 'Run'}
-            </ExplorerToolbarAction>
+            />
           </ExplorerToolbarActions>
         </ExplorerToolbar>
 
@@ -584,7 +597,13 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
               : 'overflow-x-auto'
           )}
         >
-          <QueryResultRenderer view={view} result={result} chart={display?.chart} />
+          <QueryResultRenderer
+            view={view}
+            result={result}
+            chart={display?.chart}
+            sql={result?.sql}
+            source={result?.source}
+          />
         </ExplorerQueryResults>
 
         <ExplorerQueryFooter className="flex items-center gap-x-2">

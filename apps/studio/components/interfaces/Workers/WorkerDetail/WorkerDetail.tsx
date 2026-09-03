@@ -118,7 +118,7 @@ export const WorkerDetail = () => {
               {worker.imageVersion !== undefined && (
                 <span className="flex items-center gap-2 text-foreground-light">
                   <Package size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                  Image {worker.imageVersion}
+                  Version {worker.imageVersion}
                 </span>
               )}
             </PageHeaderDescription>
