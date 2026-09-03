@@ -88,6 +88,9 @@ minimumReleaseAgeExclude:
   - '@typescript/*'
   # First-party, published from supabase-community/mdast-jsx.
   - mdast-jsx
+  # shadcn-ui/cn (replacement for clsx + tailwind-merge). First release was within the
+  # release-age window; remove this entry once it has aged out.
+  - cn
   # The following are excluded to fix vulnerablities.
   - react-use
   - '@astrojs/markdown-satteri@0.3.8'

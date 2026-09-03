@@ -9,7 +9,7 @@ import { render } from '@/tests/helpers'
  * win — otherwise the editor collapses to a single line.
  *
  * This regressed once already: #47339 appended the default as `cn(className, 'monaco-editor',
- * 'h-full')`, and tailwind-merge keeps the *last* conflicting height utility, so the trailing
+ * 'h-full')`, and `cn` keeps the *last* conflicting height utility, so the trailing
  * `h-full` clobbered caller heights. #47350 fixed it by passing `className` last. These tests
  * lock that ordering in.
  *
