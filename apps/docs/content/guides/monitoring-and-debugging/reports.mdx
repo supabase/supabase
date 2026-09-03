@@ -169,12 +169,12 @@ Why this matters for Postgres:
 
 Actions you can take:
 
-| Action                                                                                              | Description                                                                             |
-| --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| [Use connection pooling](/docs/guides/database/connecting-to-postgres#how-connection-pooling-works) | Route clients through Supavisor or PgBouncer to cap fork-driven commit pressure.        |
-| Lower `max_connections` or per-pool sizes                                                           | Reduce the upper bound on concurrent backends so spikes cannot exceed the Commit limit. |
-| [Tune `work_mem`](https://pgtune.leopard.in.ua)                                                     | Reduce per-operation memory allocations on workloads with many concurrent queries.      |
-| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size)                         | Raise both physical RAM and the Commit limit so the workload fits with headroom.        |
+| Action                                                                                                                 | Description                                                                             |
+| ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| [Use connection pooling](/docs/guides/database/connecting-to-postgres/pooling-and-limits#how-connection-pooling-works) | Route clients through Supavisor or PgBouncer to cap fork-driven commit pressure.        |
+| Lower `max_connections` or per-pool sizes                                                                              | Reduce the upper bound on concurrent backends so spikes cannot exceed the Commit limit. |
+| [Tune `work_mem`](https://pgtune.leopard.in.ua)                                                                        | Reduce per-operation memory allocations on workloads with many concurrent queries.      |
+| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size)                                            | Raise both physical RAM and the Commit limit so the workload fits with headroom.        |
 
 ### CPU usage
 
