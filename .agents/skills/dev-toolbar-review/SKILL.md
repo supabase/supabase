@@ -10,7 +10,7 @@ description: Safety rules for the dev toolbar, PostHog client, and feature flags
 
 Review checklist for PRs touching the dev toolbar (`packages/dev-tools/`) and its
 integration points in `packages/common/`. The toolbar surfaces telemetry events and
-allows feature flag overrides during local development (expanding to staging/preview).
+allows feature flag overrides in local and staging environments only.
 
 ## When This Applies
 

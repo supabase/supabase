@@ -34,10 +34,12 @@ Compose with `safeSql` plus these helpers. The only way to run SQL that was not
 built from them is the user-authored path: `untrustedLogSql(text)` marks editor
 text as `UntrustedLogSqlFragment` (displayable, storable, never executable), and
 `acceptUntrustedLogsSql(fragment)` promotes it to `SafeLogSqlFragment`. That
-promotion is a security boundary — call it only on a deliberate user action:
-a run gesture (Run button click, Cmd+Enter), an explicit save, or an
-approval-gated tool call (the AI notebook tools). Never from render,
-`useEffect`, or any automatic path.
+promotion is a security boundary — call it only from a run gesture (Run
+button click, Cmd+Enter) or an approval-gated tool call (the AI notebook
+tools). Never from render, `useEffect`, or any automatic path. The notebook
+persist path also promotes cells because the writable notebook type requires
+`SafeLogSqlFragment`; that is storage typing, not execution approval, and is
+not precedent for promoting anywhere else.
 
 ```ts
 import { analyticsLiteral, safeSql } from '@/data/logs/safe-analytics-sql'

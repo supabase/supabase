@@ -450,10 +450,12 @@ The only path that runs SQL not built from these helpers is user-authored
 editor text: `untrustedLogSql(text)` marks it `UntrustedLogSqlFragment`
 (displayable and storable, never executable), and `acceptUntrustedLogsSql`
 promotes it to `SafeLogSqlFragment`. That promotion is a **security boundary**
-— call it only on a deliberate user action: a run gesture (Run button click,
-Cmd+Enter), an explicit save, or an approval-gated tool call (the AI notebook
-tools). Never from render, `useEffect`, or any automatic path. The same rule as
-`acceptUntrustedSql` on the Postgres side.
+— call it only from a run gesture (Run button click, Cmd+Enter) or an
+approval-gated tool call (the AI notebook tools). Never from render,
+`useEffect`, or any automatic path. The notebook persist path also promotes
+cells because the writable notebook type requires the safe brand; that is
+storage typing, not execution approval, and is not precedent for promoting
+anywhere else. The same rule as `acceptUntrustedSql` on the Postgres side.
 
 Endpoint selection, the OTEL query builders, and the rest of the Studio
 wiring live in the `clickhouse-logs-queries` skill
