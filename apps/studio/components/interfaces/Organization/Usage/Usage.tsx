@@ -2,11 +2,9 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ChartArea, Check, ChevronDown } from 'lucide-react'
-import Link from 'next/link'
 import { useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { Button, cn, CommandGroup, CommandItem } from 'ui'
-import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { Restriction } from '../BillingSettings/Restriction'
@@ -18,6 +16,9 @@ import OrgLogUsage from './OrgLogUsage'
 import { Pipelines } from './Pipelines'
 import SizeAndCounts from './SizeAndCounts'
 import { TotalUsage } from './TotalUsage'
+import { getUsageBranchOptions, resolveUsageProjectRef } from './Usage.utils'
+import { UsageBranchFilter } from './UsageBranchFilter'
+import { UsageFilterNotice } from './UsageFilterNotice'
 import {
   ScaffoldContainer,
   ScaffoldHeader,
@@ -30,6 +31,7 @@ import { HighAvailabilityDisabledEmptyState } from '@/components/ui/HighAvailabi
 import { NoPermission } from '@/components/ui/NoPermission'
 import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
 import { useOrgDailyStatsQuery } from '@/data/analytics/org-daily-stats-query'
+import { useBranchesQuery } from '@/data/branches/branches-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -42,7 +44,19 @@ export const Usage = () => {
   const [dateRange, setDateRange] = useState<any>()
 
   const [selectedProjectRef, setSelectedProjectRef] = useQueryState('projectRef')
+  const [selectedBranchRef, setSelectedBranchRef] = useQueryState('branchRef')
   const [openProjectSelector, setOpenProjectSelector] = useState(false)
+
+  const { data: branches, isLoading: isLoadingBranches } = useBranchesQuery({
+    projectRef: selectedProjectRef ?? undefined,
+  })
+  const branchOptions = useMemo(() => getUsageBranchOptions(branches), [branches])
+  const usageProjectRef = resolveUsageProjectRef(
+    selectedProjectRef,
+    branchOptions,
+    selectedBranchRef
+  )
+  const selectedBranch = branchOptions.find((branch) => branch.project_ref === selectedBranchRef)
 
   const { data: selectedProject, isPending: isLoadingSelectedProject } = useProjectDetailQuery({
     ref: selectedProjectRef ?? undefined,
@@ -114,7 +128,7 @@ export const Usage = () => {
   } = useOrgDailyStatsQuery(
     {
       orgSlug: slug,
-      projectRef: selectedProjectRef ?? undefined,
+      projectRef: usageProjectRef ?? undefined,
       startDate,
       endDate,
     },
@@ -182,6 +196,7 @@ export const Usage = () => {
                     selectedRef={selectedProjectRef}
                     onSelect={(project) => {
                       setSelectedProjectRef(project.ref)
+                      setSelectedBranchRef(null)
                     }}
                     renderTrigger={({ listboxId, open }) => {
                       return (
@@ -217,10 +232,12 @@ export const Usage = () => {
                           onSelect={() => {
                             setOpenProjectSelector(false)
                             setSelectedProjectRef(null)
+                            setSelectedBranchRef(null)
                           }}
                           onClick={() => {
                             setOpenProjectSelector(false)
                             setSelectedProjectRef(null)
+                            setSelectedBranchRef(null)
                           }}
                         >
                           All projects
@@ -229,6 +246,17 @@ export const Usage = () => {
                       </CommandGroup>
                     )}
                   />
+
+                  {isLoadingBranches && <ShimmeringLoader className="w-[180px] py-3.5" />}
+
+                  {!isLoadingBranches && !!selectedProjectRef && (
+                    <UsageBranchFilter
+                      branchOptions={branchOptions}
+                      projectRef={selectedProjectRef}
+                      branchRef={selectedBranchRef}
+                      onSelectBranch={setSelectedBranchRef}
+                    />
+                  )}
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -274,29 +302,11 @@ export const Usage = () => {
       )}
 
       {selectedProject ? (
-        <ScaffoldContainer className="mt-5">
-          <Admonition
-            type="default"
-            title="Usage filtered by project"
-            description={
-              <div>
-                You are currently viewing usage for the{' '}
-                <span className="font-medium text-foreground">
-                  {selectedProject?.name || selectedProjectRef}
-                </span>{' '}
-                project. Supabase uses{' '}
-                <Link
-                  href="/docs/guides/platform/billing-on-supabase#organization-based-billing"
-                  target="_blank"
-                >
-                  organization-level billing
-                </Link>{' '}
-                and quotas. For billing purposes, we sum up usage from all your projects. To view
-                your usage quota, set the project filter above back to "All Projects".
-              </div>
-            }
-          />
-        </ScaffoldContainer>
+        <UsageFilterNotice
+          projectName={selectedProject.name || (selectedProjectRef ?? '')}
+          branchName={selectedBranch?.name}
+          hasBranches={branchOptions.length > 0}
+        />
       ) : (
         <ScaffoldContainer id="restriction" className="mt-5">
           <Restriction />
@@ -305,7 +315,7 @@ export const Usage = () => {
 
       <TotalUsage
         orgSlug={slug as string}
-        projectRef={selectedProjectRef}
+        projectRef={usageProjectRef}
         subscription={subscription}
         startDate={startDate}
         endDate={endDate}
@@ -325,7 +335,7 @@ export const Usage = () => {
 
       <Egress
         orgSlug={slug as string}
-        projectRef={selectedProjectRef}
+        projectRef={usageProjectRef}
         subscription={subscription}
         currentBillingCycleSelected={currentBillingCycleSelected}
         orgDailyStats={orgDailyStats}
@@ -336,7 +346,7 @@ export const Usage = () => {
 
       <SizeAndCounts
         orgSlug={slug as string}
-        projectRef={selectedProjectRef}
+        projectRef={usageProjectRef}
         subscription={subscription}
         currentBillingCycleSelected={currentBillingCycleSelected}
         orgDailyStats={orgDailyStats}
@@ -347,7 +357,7 @@ export const Usage = () => {
 
       <Activity
         orgSlug={slug as string}
-        projectRef={selectedProjectRef}
+        projectRef={usageProjectRef}
         subscription={subscription}
         startDate={startDate}
         endDate={endDate}
@@ -359,7 +369,7 @@ export const Usage = () => {
       {subscription?.plan.id === 'platform' && (
         <OrgLogUsage
           orgSlug={slug as string}
-          projectRef={selectedProjectRef}
+          projectRef={usageProjectRef}
           subscription={subscription}
           startDate={startDate}
           endDate={endDate}
@@ -371,7 +381,7 @@ export const Usage = () => {
 
       <Pipelines
         orgSlug={slug as string}
-        projectRef={selectedProjectRef}
+        projectRef={usageProjectRef}
         subscription={subscription}
         startDate={startDate}
         endDate={endDate}
