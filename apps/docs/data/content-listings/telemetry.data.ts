@@ -73,3 +73,68 @@ export const telemetryMonitoring: ContentListingGroup = {
     },
   ],
 }
+
+export const telemetryAccessWhat: ContentListingGroup = {
+  id: 'telemetry-access-what',
+  heading: 'What data you can observe',
+  headingLevel: 'h3',
+  type: 'grid',
+  columns: 2,
+  items: [
+    {
+      title: 'Logs',
+      href: '/guides/monitoring-and-debugging/advanced-log-filtering',
+      description:
+        'Query project logs and look up sources and fields. Record extra Postgres, API, and Realtime events.',
+    },
+    {
+      title: 'Metrics API',
+      href: '/guides/monitoring-and-debugging/metrics',
+      description: 'Scrape Prometheus-compatible database metrics for dashboards and alerting.',
+    },
+    {
+      title: 'Database',
+      href: '/guides/monitoring-and-debugging/inspect',
+      description:
+        'Inspect live Postgres stats such as bloat, cache hit rate, locks, and slow queries.',
+    },
+    {
+      title: 'Advisors',
+      href: '/guides/monitoring-and-debugging/advisors',
+      description:
+        'Pull deterministic security and performance findings as part of ongoing observability.',
+    },
+  ],
+}
+
+export const telemetryAccessWhere: ContentListingGroup = {
+  id: 'telemetry-access-where',
+  heading: 'Where you can observe it',
+  headingLevel: 'h3',
+  type: 'grid',
+  columns: 2,
+  items: [
+    {
+      title: 'MCP',
+      href: '/guides/monitoring-and-debugging/access-data#mcp',
+      description:
+        'Query logs, run read-only SQL, and fetch advisor findings from an agent harness.',
+    },
+    {
+      title: 'API',
+      href: '/guides/monitoring-and-debugging/access-data#api',
+      description: 'Read logs, advisors, and usage counts, or scrape the Metrics API.',
+    },
+    {
+      title: 'CLI',
+      href: '/guides/monitoring-and-debugging/access-data#cli',
+      description:
+        'Inspect the database and run security or performance advisors from the terminal.',
+    },
+    {
+      title: 'Studio',
+      href: '/guides/monitoring-and-debugging/access-data#studio',
+      description: 'Open Logs, Reports, and Advisors in the browser.',
+    },
+  ],
+}
