@@ -5,7 +5,7 @@ import { useCallback, useReducer, type Dispatch, type PropsWithChildren } from '
 import type { UseFormReturn } from 'react-hook-form'
 import SVG from 'react-inlinesvg'
 import { toast } from 'sonner'
-import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, Card, CardContent, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { AIAssistantOption } from './AIAssistantOption'
@@ -258,20 +258,22 @@ function SupportFormBody({
   const isSuccess = state.type === 'success'
 
   return (
-    <div
-      className={cn(
-        'min-w-full w-full space-y-12 rounded-sm border bg-panel-body-light shadow-md py-8',
-        'border-default'
-      )}
-    >
-      {isSuccess ? (
-        <Success
-          selectedProject={selectedProjectRef ?? undefined}
-          sentCategory={state.sentCategory}
-        />
-      ) : (
-        <SupportFormV2 form={form} initialError={initialError} state={state} dispatch={dispatch} />
-      )}
-    </div>
+    <Card className="min-w-full w-full">
+      <CardContent className="space-y-12 border-none py-8 px-0">
+        {isSuccess ? (
+          <Success
+            selectedProject={selectedProjectRef ?? undefined}
+            sentCategory={state.sentCategory}
+          />
+        ) : (
+          <SupportFormV2
+            form={form}
+            initialError={initialError}
+            state={state}
+            dispatch={dispatch}
+          />
+        )}
+      </CardContent>
+    </Card>
   )
 }
