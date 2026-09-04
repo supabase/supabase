@@ -289,6 +289,12 @@ export const connectSchema: ConnectSchema = {
       description: 'Connect your agent',
       fields: ['mcpClient', 'mcpReadonly', 'mcpFeatures'],
     },
+    {
+      id: 'warehouse',
+      label: 'Warehouse',
+      description: 'Connect to Warehouse',
+      fields: [],
+    },
   ],
 
   // -------------------------------------------------------------------------
@@ -467,6 +473,9 @@ export const connectSchema: ConnectSchema = {
         },
       },
       server: [serverInstallStep, serverEnvStep, serverSkillsInstallStep],
+      // Warehouse renders its own fully custom panel (WarehouseModePanel) instead of the
+      // generic field/step abstraction, so it has no steps of its own here.
+      warehouse: [],
       DEFAULT: [skillsInstallStep],
     },
   },
