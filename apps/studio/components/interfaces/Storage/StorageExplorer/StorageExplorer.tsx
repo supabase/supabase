@@ -41,6 +41,7 @@ export const StorageExplorer = () => {
     setSelectedFilePreview,
     setSelectedItemsToMove,
     setIsSearching,
+    setSearchString,
   } = useStorageExplorerStateSnapshot()
   const { view } = useStoragePreference(projectRef)
 
@@ -58,12 +59,14 @@ export const StorageExplorer = () => {
 
   const handleClearSearch = useCallback(() => {
     setIsSearching(false)
+    setSearchString('')
     setItemSearchString('')
-  }, [setIsSearching])
+  }, [setIsSearching, setSearchString])
 
   useStorageExplorerShortcuts({ onClearSearch: handleClearSearch })
 
   const fetchContents = useEffectEvent(async (bucket: Bucket) => {
+    setSearchString(debouncedSearchString)
     if (view === STORAGE_VIEWS.LIST) {
       const currentFolderIdx = openedFolders.length - 1
       const currentFolder = openedFolders[currentFolderIdx]
