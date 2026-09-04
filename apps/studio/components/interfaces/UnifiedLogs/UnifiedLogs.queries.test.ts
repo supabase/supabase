@@ -46,6 +46,41 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(where).not.toContain(`log_attributes['request.path'] LIKE '%/storage/%'`)
     })
 
+    it('routes the `workers` log type to every worker OTEL stream', () => {
+      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:workers'))
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(
+        `log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')`
+      )
+      expect(where).not.toContain(`source = 'workers'`)
+    })
+
+    it('classifies every worker OTEL stream as workers in the projected log type', () => {
+      const sql = getUnifiedLogsQuery(baseSearch)
+      expect(sql).toContain(
+        `WHEN log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs') THEN 'workers'`
+      )
+    })
+
+    it('excludes every worker OTEL stream when the workers log type is negated', () => {
+      const sql = getUnifiedLogsQuery(withFilters('log_type:neq:workers'))
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(
+        `NOT (log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs'))`
+      )
+    })
+
+    it('projects only Workers fields that exist on worker logs', () => {
+      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:workers'))
+      const workerCondition =
+        "log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')"
+
+      expect(sql).toContain(`WHEN ${workerCondition} THEN null`)
+      expect(sql).toContain(`if(${workerCondition}, null, log_attributes['request.method'])`)
+      expect(sql).toContain(`if(${workerCondition}, null, log_attributes['request.path'])`)
+      expect(sql).toContain(`if(${workerCondition}, log_attributes, map()) AS metadata`)
+    })
+
     it('escapes single quotes in filter values to prevent SQL injection', () => {
       const sql = getUnifiedLogsQuery(
         withFilters(`method:eq:G'ET`, `pathname:eq:/customers'; DROP TABLE logs --`)
@@ -261,6 +296,15 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).toContain(
         `if(source = 'auth_logs', log_attributes['status'], log_attributes['response.status_code'])`
       )
+    })
+
+    it('does not classify Workers rows into a severity bucket', () => {
+      const sql = getLogsChartQuery(withFilters('log_type:eq:workers'))
+      const workerCondition =
+        "log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')"
+
+      expect(sql).toContain(`WHEN ${workerCondition} THEN null`)
+      expect(sql).not.toContain(`WHEN ${workerCondition} THEN 'success'`)
     })
   })
 

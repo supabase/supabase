@@ -2,8 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import {
   buildUnifiedLogsUrl,
-  gateMultigresLogType,
+  gateLogTypeFilters,
+  gateLogTypeOptions,
   getEventMessageDisplay,
+  getRawLogData,
+  getWorkersLogsAvailability,
   parseMultigresEventMessage,
 } from './UnifiedLogs.utils'
 
@@ -94,7 +97,55 @@ describe('getEventMessageDisplay', () => {
   })
 })
 
-describe('gateMultigresLogType', () => {
+describe('getRawLogData', () => {
+  it('returns only the real Workers payload fields', () => {
+    const row = {
+      event_message: 'Error: Dynamic require of "path" is not supported',
+      id: '51a29911-9293-4616-8984-743cc548b629',
+      metadata: {
+        cw_event_id: '39883203917805946105278943454814281535421893832620638214',
+        launch_id: '1788424715503435269',
+        log_group: '/aws/lambda-microvms/workers/cxkpapyhaaywrtudnqpl/api',
+        log_stream: 'launch-1788424715503435269',
+        source: 'worker_guest_logs',
+        worker: 'api',
+      },
+      project: 'cxkpapyhaaywrtudnqpl',
+      timestamp: 1788424716876000,
+      log_type: 'workers' as const,
+      status: null,
+      level: null,
+      method: null,
+      pathname: null,
+      auth_user: null,
+      date: new Date(1788424716876),
+    }
+
+    expect(getRawLogData(row)).toEqual({
+      id: '51a29911-9293-4616-8984-743cc548b629',
+      timestamp: 1788424716876000,
+      event_message: 'Error: Dynamic require of "path" is not supported',
+      metadata: row.metadata,
+    })
+  })
+
+  it('returns non-Workers rows unchanged', () => {
+    const row = {
+      id: 'edge-log',
+      timestamp: 1788424716876000,
+      log_type: 'edge' as const,
+      status: 200,
+      method: 'GET' as const,
+      pathname: '/rest/v1',
+      level: 'success' as const,
+      date: new Date(1788424716876),
+    }
+
+    expect(getRawLogData(row)).toBe(row)
+  })
+})
+
+describe('gateLogTypeOptions', () => {
   const fields = [
     { value: 'date' },
     {
@@ -102,23 +153,110 @@ describe('gateMultigresLogType', () => {
       options: [
         { label: 'Postgres', value: 'postgres' },
         { label: 'Multigres', value: 'multigres' },
+        { label: 'Workers', value: 'workers' },
       ],
     },
   ]
 
-  it('drops the multigres log_type option when the flag is disabled', () => {
-    const gated = gateMultigresLogType(fields, false)
+  it('drops log_type options whose flags are disabled', () => {
+    const gated = gateLogTypeOptions(fields, { multigres: false, workers: false })
     const logType = gated.find((field) => field.value === 'log_type')
     expect(logType?.options?.map((option) => option.value)).toEqual(['postgres'])
   })
 
-  it('keeps the multigres option when the flag is enabled', () => {
-    const gated = gateMultigresLogType(fields, true)
+  it('keeps independently enabled log types', () => {
+    const gated = gateLogTypeOptions(fields, { multigres: false, workers: true })
+    const logType = gated.find((field) => field.value === 'log_type')
+    expect(logType?.options?.map((option) => option.value)).toEqual(['postgres', 'workers'])
+  })
+
+  it('returns the original fields when every gated log type is enabled', () => {
+    const gated = gateLogTypeOptions(fields, { multigres: true, workers: true })
     expect(gated).toBe(fields)
   })
 
   it('leaves non log_type fields untouched', () => {
-    const gated = gateMultigresLogType(fields, false)
+    const gated = gateLogTypeOptions(fields, { workers: false })
     expect(gated.find((field) => field.value === 'date')).toEqual({ value: 'date' })
+  })
+})
+
+describe('gateLogTypeFilters', () => {
+  it('removes disabled log types from equality and inequality filters', () => {
+    expect(
+      gateLogTypeFilters(
+        ['log_type:eq:workers', 'log_type:neq:multigres', 'log_type:eq:postgres', 'method:eq:GET'],
+        { workers: false, multigres: false }
+      )
+    ).toEqual(['log_type:eq:postgres', 'method:eq:GET'])
+  })
+
+  it('keeps enabled log types and unrelated filters unchanged', () => {
+    const filters = ['log_type:eq:workers', 'method:eq:GET']
+    expect(gateLogTypeFilters(filters, { workers: true })).toBe(filters)
+  })
+
+  it('preserves absent filter values', () => {
+    expect(gateLogTypeFilters(undefined, { workers: false })).toBeUndefined()
+    expect(gateLogTypeFilters(null, { workers: false })).toBeNull()
+  })
+})
+
+describe('getWorkersLogsAvailability', () => {
+  const workersFilter = ['log_type:eq:workers']
+
+  it('preserves an unresolved platform filter without allowing it into queries or sync', () => {
+    const availability = getWorkersLogsAvailability({
+      isPlatform: true,
+      flagsLoaded: false,
+      workersEnabled: false,
+    })
+
+    expect(gateLogTypeFilters(workersFilter, { workers: availability.preserveWorkersFilter })).toBe(
+      workersFilter
+    )
+    expect(gateLogTypeFilters(workersFilter, { workers: availability.canQueryWorkers })).toEqual([])
+    expect(availability.readyToSyncFilters).toBe(false)
+  })
+
+  it('allows Workers filters and queries when the platform flag is enabled', () => {
+    const availability = getWorkersLogsAvailability({
+      isPlatform: true,
+      flagsLoaded: true,
+      workersEnabled: true,
+    })
+
+    expect(availability).toEqual({
+      canQueryWorkers: true,
+      preserveWorkersFilter: true,
+      readyToSyncFilters: true,
+    })
+  })
+
+  it('removes Workers filters and queries when the platform flag is disabled', () => {
+    const availability = getWorkersLogsAvailability({
+      isPlatform: true,
+      flagsLoaded: true,
+      workersEnabled: false,
+    })
+
+    expect(availability).toEqual({
+      canQueryWorkers: false,
+      preserveWorkersFilter: false,
+      readyToSyncFilters: true,
+    })
+  })
+
+  it('syncs generic filters immediately while keeping Workers unavailable on self-hosted', () => {
+    const availability = getWorkersLogsAvailability({
+      isPlatform: false,
+      workersEnabled: false,
+    })
+
+    expect(availability).toEqual({
+      canQueryWorkers: false,
+      preserveWorkersFilter: false,
+      readyToSyncFilters: true,
+    })
   })
 })

@@ -2,11 +2,31 @@ import { type Table as TTable } from '@tanstack/react-table'
 import { cn } from 'ui'
 
 import { LOG_TYPES_LABELS } from './UnifiedLogs.constants'
-import { FacetMetadataSchema } from './UnifiedLogs.schema'
+import { parseLogsFilterUrlParams } from './UnifiedLogs.filters'
+import { ColumnSchema, FacetMetadataSchema } from './UnifiedLogs.schema'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
+import type { UnifiedLogInspectionEntry } from '@/data/logs/unified-log-inspection-query'
 
 export type UnifiedLogType = keyof typeof LOG_TYPES_LABELS
+
+export function getWorkersLogsAvailability({
+  isPlatform,
+  flagsLoaded,
+  workersEnabled,
+}: {
+  isPlatform: boolean
+  flagsLoaded?: boolean
+  workersEnabled: boolean
+}) {
+  const flagsReady = flagsLoaded === true
+
+  return {
+    canQueryWorkers: isPlatform && flagsReady && workersEnabled,
+    preserveWorkersFilter: isPlatform && (!flagsReady || workersEnabled),
+    readyToSyncFilters: !isPlatform || flagsReady,
+  }
+}
 
 export const buildUnifiedLogsUrl = ({
   projectRef,
@@ -63,6 +83,21 @@ export function getRowTimestampMs(
   return null
 }
 
+type WorkersRawLogData = Pick<ColumnSchema, 'id' | 'timestamp' | 'event_message' | 'metadata'>
+
+export function getRawLogData(
+  row: ColumnSchema | UnifiedLogInspectionEntry
+): ColumnSchema | UnifiedLogInspectionEntry | WorkersRawLogData {
+  if (!('log_type' in row) || row.log_type !== 'workers') return row
+
+  return {
+    id: row.id,
+    timestamp: row.timestamp,
+    event_message: row.event_message,
+    metadata: row.metadata,
+  }
+}
+
 export const getLevelLabel = (value: (typeof LEVELS)[number]): string => {
   switch (value) {
     case 'success':
@@ -86,7 +121,7 @@ export const getStatusLevel = (status?: number | string): string => {
   return 'success'
 }
 
-export function getLevelRowClassName(value: (typeof LEVELS)[number]): string {
+export function getLevelRowClassName(value: (typeof LEVELS)[number] | null | undefined): string {
   switch (value) {
     case 'success':
       return ''
@@ -205,19 +240,43 @@ export function getEventMessageDisplay(
   return { message: value, capitalize: false }
 }
 
-/**
- * Multigres logs are gated behind the `showMultigresLogs` flag, so the multigres
- * log_type option is removed from the filter fields when the flag is disabled.
- */
-export function gateMultigresLogType<T extends { value: string; options?: Option[] }>(
+export function gateLogTypeOptions<T extends { value: string; options?: Option[] }>(
   fields: T[],
-  showMultigresLogs: boolean
+  visibility: Partial<Record<UnifiedLogType, boolean>>
 ): T[] {
-  if (showMultigresLogs) return fields
-
-  return fields.map((field) =>
-    field.value === 'log_type' && field.options
-      ? ({ ...field, options: field.options.filter((option) => option.value !== 'multigres') } as T)
-      : field
+  const hiddenLogTypes = new Set(
+    Object.entries(visibility)
+      .filter(([, visible]) => !visible)
+      .map(([logType]) => logType)
   )
+
+  if (hiddenLogTypes.size === 0) return fields
+
+  return fields.map((field) => {
+    if (field.value !== 'log_type' || !field.options) return field
+    return {
+      ...field,
+      options: field.options.filter((option) => !hiddenLogTypes.has(option.value)),
+    }
+  })
+}
+
+export function gateLogTypeFilters(
+  filters: string[] | null | undefined,
+  visibility: Partial<Record<UnifiedLogType, boolean>>
+): string[] | null | undefined {
+  if (!filters) return filters
+
+  const hiddenLogTypes = new Set(
+    Object.entries(visibility)
+      .filter(([, visible]) => !visible)
+      .map(([logType]) => logType)
+  )
+
+  if (hiddenLogTypes.size === 0) return filters
+
+  return filters.filter((filter) => {
+    const parsed = parseLogsFilterUrlParams([filter])[0]
+    return parsed?.column !== 'log_type' || !hiddenLogTypes.has(parsed.value)
+  })
 }

@@ -1,4 +1,4 @@
-import { Auth, EdgeFunctions, Realtime, Storage } from 'icons'
+import { Auth, EdgeFunctions, Realtime, Storage, Workers } from 'icons'
 import { Box, Cable, Code2, Database, Network } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -11,11 +11,7 @@ interface LogTypeIconProps {
   className?: string
 }
 
-type IconComponent = React.ComponentType<{
-  size?: number
-  strokeWidth?: number
-  className?: string
-}>
+type IconComponent = typeof Box | typeof Auth
 
 // [Alaister]: commented out types coming in the future
 // edge: Globe,
@@ -29,6 +25,7 @@ const ICON_MAP: Partial<Record<(typeof LOG_TYPES)[number], IconComponent>> = {
   supavisor: Cable,
   pgbouncer: Cable,
   multigres: Network,
+  workers: Workers,
 }
 
 export const LogTypeIcon = ({
