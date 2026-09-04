@@ -1,0 +1,64 @@
+name: Verify production API types
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  verify-production-api-types:
+    runs-on: ubuntu-latest
+    steps:
+      - id: changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" --paginate --jq '.[].filename' | rg -q '^packages/api-types/types/'; then
+            echo "api_types_changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "api_types_changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check out trusted verifier
+        if: steps.changes.outputs.api_types_changed == 'true'
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.base.sha }}
+
+      - name: Download pull request API types
+        if: steps.changes.outputs.api_types_changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/api-types"
+          for name in api-v1 api-v2 platform; do
+            gh api -H 'Accept: application/vnd.github.raw+json' "repos/${{ github.repository }}/contents/packages/api-types/types/$name.d.ts?ref=${{ github.event.pull_request.head.sha }}" > "$RUNNER_TEMP/api-types/$name.d.ts"
+          done
+
+      - name: Install pnpm
+        if: steps.changes.outputs.api_types_changed == 'true'
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+        with:
+          run_install: false
+
+      - name: Set up Node.js
+        if: steps.changes.outputs.api_types_changed == 'true'
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version-file: '.nvmrc'
+          cache: pnpm
+
+      - name: Install API types dependencies
+        if: steps.changes.outputs.api_types_changed == 'true'
+        run: pnpm install --frozen-lockfile --filter=api-types...
+
+      - name: Verify production API types
+        if: steps.changes.outputs.api_types_changed == 'true'
+        env:
+          API_TYPES_DIRECTORY: ${{ runner.temp }}/api-types
+          PLATFORM_API_OPENAPI_TOKEN: ${{ secrets.PLATFORM_API_OPENAPI_TOKEN }}
+        run: pnpm --filter=api-types run verify-production-types
