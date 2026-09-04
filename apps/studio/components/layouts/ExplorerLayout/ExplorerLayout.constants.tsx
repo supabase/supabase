@@ -26,7 +26,7 @@ export const EXPLORER_SECTIONS: Array<{
 
 export const rowClassName = (isActive: boolean) =>
   cn(
-    'group relative flex h-7 w-full items-center gap-2 rounded-md pl-3 pr-2 text-sm',
+    'group relative flex h-7 w-full items-center gap-2 rounded-md px-2 text-sm',
     isActive
       ? 'bg-selection text-foreground'
       : 'text-foreground-light hover:bg-surface-200 hover:text-foreground'
@@ -61,7 +61,7 @@ export const ExplorerNavResourceWrapper = ({
       className={cn('absolute inset-0 flex flex-col', className)}
     >
       {header}
-      <div className="px-3 py-2">
+      <div className="px-4 py-2">
         <span id="explorer-sidebar-search-label" className="sr-only">
           {searchPlaceholder}
         </span>

@@ -139,8 +139,8 @@ const ExplorerSidebarHeader = (props: ExplorerSidebarHeaderProps) => {
   return (
     <div
       className={cn(
-        'shrink-0 items-center justify-between gap-2 pt-5',
-        section === undefined ? 'hidden px-6 md:flex' : 'flex px-3'
+        'shrink-0 items-center justify-between gap-2 px-4 pt-5',
+        section === undefined ? 'hidden md:flex' : 'flex'
       )}
     >
       {section !== undefined && (
@@ -153,7 +153,9 @@ const ExplorerSidebarHeader = (props: ExplorerSidebarHeaderProps) => {
           icon={<ChevronLeft />}
         />
       )}
-      <h4 className="min-w-0 flex-1 truncate text-lg">{title}</h4>
+      <h4 className={cn('min-w-0 flex-1 truncate text-lg', section === undefined && 'pl-2')}>
+        {title}
+      </h4>
       <div className="flex shrink-0 items-center gap-2">
         {section === undefined && <BackToSqlEditorButton />}
         {section !== undefined && (

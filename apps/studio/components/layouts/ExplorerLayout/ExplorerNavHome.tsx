@@ -53,7 +53,7 @@ export const ExplorerNavHome = ({
       className="absolute inset-0 flex flex-col"
     >
       {header}
-      <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-3">
+      <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-3">
         <nav className="flex flex-col gap-px">
           {EXPLORER_SECTIONS.map(({ type, label, icon: Icon }) => {
             return (
@@ -82,11 +82,11 @@ export const ExplorerNavHome = ({
         </nav>
 
         <section className="flex flex-col gap-px">
-          <h3 className="mb-2 px-3 font-mono text-sm font-normal uppercase text-foreground-lighter">
+          <h3 className="mb-2 px-2 font-mono text-sm font-normal uppercase text-foreground-lighter">
             Recently updated
           </h3>
           {recentItems.length === 0 ? (
-            <p className="px-3 text-xs text-foreground-lighter">Nothing edited yet</p>
+            <p className="px-2 text-xs text-foreground-lighter">Nothing edited yet</p>
           ) : (
             recentItems.map((item) => {
               const Icon = EXPLORER_SECTIONS.find((section) => section.type === item.type)?.icon
