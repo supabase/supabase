@@ -5,6 +5,18 @@ description: 'Creating and using Postgres tables.'
 video: 'https://www.youtube.com/v/TKwF3IGij5c'
 ---
 
+Learn what tables are and how to use them.
+
+This guide is organized into several groups:
+
+- [What is a table?](#what-is-a-table) explains the basics if you're new to relational databases.
+- [Creating tables](#creating-tables) and [loading data](#loading-data) take you from an empty database to a table with rows in it.
+- [Joining tables with foreign keys](#joining-tables-with-foreign-keys) and [schemas](#schemas) cover relating and organizing tables once you have more than one.
+- [Views](#views) cover saved queries that behave like tables, including materialized views.
+- [Reference](#reference) lists the column data types that Postgres supports.
+
+## What is a table?
+
 Tables are where you store your data.
 
 Tables are similar to Excel spreadsheets. They contain columns and rows.
@@ -22,13 +34,6 @@ For example, this table has 3 columns named `id`, `name`, and `description`, and
 {/* supa-mdx-lint-enable Rule003Spelling */}
 
 There are a few important differences from a spreadsheet, but it's a good starting point if you're new to relational databases.
-
-This guide is organized into four groups:
-
-- [Creating tables](#creating-tables) and [loading data](#loading-data) take you from an empty database to a table with rows in it.
-- [Joining tables with foreign keys](#joining-tables-with-foreign-keys) and [schemas](#schemas) cover relating and organizing tables once you have more than one.
-- [Views](#views) cover saved queries that behave like tables, including materialized views.
-- [Reference](#reference) lists the column data types that Postgres supports.
 
 ## Creating tables
 
