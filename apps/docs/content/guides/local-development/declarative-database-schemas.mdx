@@ -28,16 +28,12 @@ Schema migrations are SQL statements written in Data Definition Language. They a
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```sql name=supabase/schemas/employees.sql
 create table "employees" (
   "id" integer not null,
   "name" text
 );
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -53,13 +49,9 @@ create table "employees" (
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase db diff -f create_employees_table
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -75,14 +67,10 @@ supabase db diff -f create_employees_table
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase start
 supabase migration up
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -106,8 +94,6 @@ With declarative schemas, the files in `supabase/schemas/` are the source of tru
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```sql name=supabase/schemas/employees.sql
 create table "employees" (
   "id" integer not null,
@@ -115,8 +101,6 @@ create table "employees" (
   "age" smallint not null
 );
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -138,13 +122,9 @@ Some entities like views and enums expect columns to be declared in a specific o
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase db diff -f add_age
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -160,13 +140,9 @@ supabase db diff -f add_age
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```sql name=supabase/migrations/<timestamp>_add_age.sql
 alter table "public"."employees" add column "age" smallint not null;
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -181,13 +157,9 @@ alter table "public"."employees" add column "age" smallint not null;
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase migration up
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -199,19 +171,15 @@ supabase migration up
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Log in to the Supabase CLI">
-      [Log in](/docs/reference/cli/supabase-login) via the Supabase CLI.
+    <StepHikeCompact.Details title="Sign in to the Supabase CLI">
+      [Sign in](/docs/reference/cli/supabase-login) via the Supabase CLI.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase login
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -224,13 +192,9 @@ supabase login
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase link
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -243,13 +207,9 @@ supabase link
 
     <StepHikeCompact.Code>
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase db push
 ```
-
-</$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -259,8 +219,6 @@ supabase db push
 ### Managing dependencies
 
 As your database schema evolves, you will probably start using more advanced entities like views and functions. These entities are notoriously verbose to manage using plain migrations because the entire body must be recreated whenever there is a change. Using declarative schema, you can now edit them in-place so it’s much easier to review.
-
-<$CodeTabs>
 
 ```sql name=supabase/schemas/employees.sql
 create table "employees" (
@@ -281,8 +239,6 @@ AS $$
 $$;
 ```
 
-</$CodeTabs>
-
 Your schema files are run in lexicographic order by default. The order is important when you have foreign keys between multiple tables as the parent table must be created first. For example, your `supabase` directory may end up with the following structure.
 
 ```bash
@@ -299,8 +255,6 @@ Your schema files are run in lexicographic order by default. The order is import
 
 For small projects with only a few tables, the default schema order may be sufficient. However, as your project grows, you might need more control over the order in which schemas are applied. To specify a custom order for applying the schemas, you can declare them explicitly in `config.toml`. Any glob patterns will evaluated, deduplicated, and sorted in lexicographic order. For example, the following pattern ensures `employees.sql` is always executed first.
 
-<$CodeTabs>
-
 ```toml name=supabase/config.toml
 [db.migrations]
 schema_paths = [
@@ -309,19 +263,13 @@ schema_paths = [
 ]
 ```
 
-</$CodeTabs>
-
 ### Pulling in your production schema
 
 To set up declarative schemas on a existing project, you can pull in your production schema by running:
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase db dump > supabase/schemas/prod.sql
 ```
-
-</$CodeTabs>
 
 From there, you can start breaking down your schema into smaller files and generate migrations. You can do this all at once, or incrementally as you make changes to your schema.
 
@@ -329,13 +277,9 @@ From there, you can start breaking down your schema into smaller files and gener
 
 During development, you may want to rollback a migration to keep your new schema changes in a single migration file. This can be done by resetting your local database to a previous version.
 
-<$CodeTabs>
-
 ```bash name=Terminal
 supabase db reset --version 20241005112233
 ```
-
-</$CodeTabs>
 
 After a reset, you can [edit the schema](#updating-your-schema) and regenerate a new migration file. Note that you should not reset a version that's already deployed to production.
 

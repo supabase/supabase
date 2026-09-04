@@ -1,10 +1,15 @@
 import { useMemo } from 'react'
-import { type ChartConfig as ChartSeriesConfig } from 'ui'
+import { cn, type ChartConfig as ChartSeriesConfig } from 'ui'
 import { Chart, ChartBar, ChartCard, ChartContent, ChartLine } from 'ui-patterns/Chart'
 
 import { type QueryResult } from '../types'
 import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
-import { formatLogTick, getCumulativeResults } from '@/components/ui/QueryBlock/QueryBlock.utils'
+import {
+  computeYAxisWidth,
+  formatLogTick,
+  formatYAxisTick,
+  getCumulativeResults,
+} from '@/components/ui/QueryBlock/QueryBlock.utils'
 import { type ChartConfig } from '@/data/content/notebooks/notebook-schema'
 
 interface QueryResultChartProps {
@@ -58,10 +63,25 @@ export const QueryResultChart = ({ chart, result }: QueryResultChartProps) => {
   )
   const resultToRender = cumulative ? cumulativeResults : chartRows
 
+  const yAxisWidth = Math.max(
+    36,
+    ...y_series.map((key) =>
+      computeYAxisWidth(resultToRender, key, { isLogScale: effectiveScale === 'log' })
+    )
+  )
+
+  const yAxisProps = {
+    ...(show_labels ? { width: yAxisWidth } : {}),
+    scale: effectiveScale === 'log' ? 'log' : 'auto',
+    domain: effectiveScale === 'log' ? ([1, 'auto'] as const) : undefined,
+    tickFormatter: effectiveScale === 'log' ? formatLogTick : formatYAxisTick,
+  }
+
   if (!result || (result?.rows && result.rows.length === 0)) {
     return (
       <NoDataPlaceholder
-        className="bg border-0"
+        isFullHeight
+        className="border-0"
         size="normal"
         message="No results"
         description="Your query returned no rows"
@@ -72,7 +92,8 @@ export const QueryResultChart = ({ chart, result }: QueryResultChartProps) => {
   if (!hasConfig) {
     return (
       <NoDataPlaceholder
-        className="bg border-0"
+        isFullHeight
+        className="border-0"
         size="normal"
         message="Configure your chart"
         description="Select your X and Y axis in the display settings"
@@ -81,45 +102,35 @@ export const QueryResultChart = ({ chart, result }: QueryResultChartProps) => {
   }
 
   return (
-    <Chart>
-      <ChartCard className="rounded-none border-0">
-        <ChartContent>
-          <div className="h-40">
-            {type === 'bar' && (
-              <ChartBar
-                isFullHeight
-                xKey={x_column}
-                dataKey={y_series[0]}
-                dataKeys={y_series}
-                config={chartConfig}
-                showXAxis={show_labels}
-                showYAxis={show_labels}
-                data={resultToRender}
-                YAxisProps={{
-                  scale: effectiveScale === 'log' ? 'log' : 'auto',
-                  domain: effectiveScale === 'log' ? [1, 'auto'] : undefined,
-                  tickFormatter: effectiveScale === 'log' ? formatLogTick : undefined,
-                }}
-              />
-            )}
-            {type === 'line' && (
-              <ChartLine
-                isFullHeight
-                xKey={x_column}
-                dataKey={y_series[0]}
-                dataKeys={y_series}
-                config={chartConfig}
-                showXAxis={show_labels}
-                showYAxis={show_labels}
-                data={resultToRender}
-                YAxisProps={{
-                  scale: effectiveScale === 'log' ? 'log' : 'auto',
-                  domain: effectiveScale === 'log' ? [1, 'auto'] : undefined,
-                  tickFormatter: effectiveScale === 'log' ? formatLogTick : undefined,
-                }}
-              />
-            )}
-          </div>
+    <Chart className="flex flex-grow min-h-0">
+      <ChartCard className="flex flex-grow rounded-none border-0 min-h-0">
+        <ChartContent className={cn('min-h-0 h-full w-full', show_labels && 'pl-2 pb-2')}>
+          {type === 'bar' && (
+            <ChartBar
+              isFullHeight
+              xKey={x_column}
+              dataKey={y_series[0]}
+              dataKeys={y_series}
+              config={chartConfig}
+              showXAxis={show_labels}
+              showYAxis={show_labels}
+              data={resultToRender}
+              YAxisProps={yAxisProps}
+            />
+          )}
+          {type === 'line' && (
+            <ChartLine
+              isFullHeight
+              xKey={x_column}
+              dataKey={y_series[0]}
+              dataKeys={y_series}
+              config={chartConfig}
+              showXAxis={show_labels}
+              showYAxis={show_labels}
+              data={resultToRender}
+              YAxisProps={yAxisProps}
+            />
+          )}
         </ChartContent>
       </ChartCard>
     </Chart>

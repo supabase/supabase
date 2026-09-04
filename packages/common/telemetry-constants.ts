@@ -10,6 +10,7 @@
  *
  * @module telemetry-frontend
  */
+import type { components } from 'api-types'
 
 export type TelemetryGroups = {
   project: string
@@ -45,14 +46,15 @@ export interface SignUpEvent {
 }
 
 /**
- * Triggered when a user signs in with GitHub, Email and Password or SSO.
+ * Triggered when a user signs in with an OAuth provider, Email and Password, or SSO.
  *
  * Some unintuitive behavior:
  *   - If signing up with GitHub the SignInEvent gets triggered first before the SignUpEvent.
+ *   - distinct_id often resolves to the anonymous cookie (races identify); not a person-level join key.
  *
  * @group Events
  * @source studio
- * @page /sign-in-mfa
+ * @page /sign-in, /sign-in-mfa
  */
 export interface SignInEvent {
   action: 'sign_in'
@@ -60,6 +62,26 @@ export interface SignInEvent {
     category: 'account'
     /**
      * The method used to sign in, e.g. email, github, sso
+     */
+    method: string
+  }
+}
+
+/**
+ * Triggered when a user initiates a sign-in (form submit including client-side validation
+ * failures, OAuth or custom-provider click, partner token exchange), before auth resolves.
+ * Pre-auth, so distinct_id is the anonymous cookie: not a person-level join key.
+ *
+ * @group Events
+ * @source studio
+ * @page /sign-in, /sign-in-sso, /sign-in-partner
+ */
+export interface SignInSubmittedEvent {
+  action: 'sign_in_submitted'
+  properties: {
+    category: 'account'
+    /**
+     * Matches the sign_in event's method vocabulary, e.g. email (password path), github, sso
      */
     method: string
   }
@@ -1420,33 +1442,6 @@ export interface ReportsDatabaseGrafanaBannerClickedEvent {
 }
 
 /**
- * User clicks on the Unified Logs banner CTA button in studio project pages.
- *
- * @group Events
- * @source studio
- * @page /project/[ref]/*
- */
-export interface UnifiedLogsBannerCtaButtonClickedEvent {
-  action: 'unified_logs_banner_cta_button_clicked'
-  properties: {
-    is_enabled: boolean
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * User clicked the dismiss button on the Unified Logs banner in studio project pages.
- *
- * @group Events
- * @source studio
- * @page /project/[ref]/*
- */
-export interface UnifiedLogsBannerDismissButtonClickedEvent {
-  action: 'unified_logs_banner_dismiss_button_clicked'
-  groups: TelemetryGroups
-}
-
-/**
  * The logs.all deprecation banner was rendered, fired once per mount. Acts as the
  * denominator for the dismiss rate. Migration outcome itself is measured via decay in
  * `/v1/projects/:ref/analytics/endpoints/logs.all` traffic in the warehouse, not from this event.
@@ -1554,6 +1549,67 @@ export interface DatabaseConnectionsBannerCtaButtonClickedEvent {
   properties: {
     isEnabled: boolean
   }
+  groups: TelemetryGroups
+}
+
+/**
+ * The Explorer feature preview banner was rendered in studio project pages, fired at most once
+ * per page load. Acts as the denominator for the banner's dismiss and CTA rates; dedupe per
+ * session or per user at query time.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ExplorerBannerExposedEvent {
+  action: 'explorer_banner_exposed'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the dismiss button on the Explorer feature preview banner in studio project pages.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ExplorerBannerDismissButtonClickedEvent {
+  action: 'explorer_banner_dismiss_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the CTA button on the Explorer feature preview banner in studio project pages.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ExplorerBannerCtaButtonClickedEvent {
+  action: 'explorer_banner_cta_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the button in the Explorer sidebar title bar to temporarily switch to the SQL
+ * Editor for snippet access.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/explorer
+ */
+export interface ExplorerTempAccessSqlEditorClickedEvent {
+  action: 'explorer_temp_access_sql_editor_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the "Back to Explorer" button in the SQL Editor title bar, shown only when the
+ * visit originated from the Explorer's temporary switch button.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/sql
+ */
+export interface SqlEditorBackExplorerClickedEvent {
+  action: 'sql_editor_back_explorer_clicked'
   groups: TelemetryGroups
 }
 
@@ -2926,7 +2982,8 @@ export interface AuditLogDrainRemovedEvent {
   groups: Omit<TelemetryGroups, 'project'>
 }
 
-type AdvisorCategory = 'PERFORMANCE' | 'SECURITY'
+type AdvisorCategory =
+  components['schemas']['GetProjectLintsResponse'][number]['categories'][number]
 type AdvisorLevel = 'ERROR' | 'WARN' | 'INFO'
 
 /**
@@ -2949,7 +3006,7 @@ export interface AdvisorDetailOpenedEvent {
      */
     advisorSource: 'lint' | 'notification' | 'signal'
     /**
-     * Category of the advisor (SECURITY or PERFORMANCE)
+     * Category of the advisor
      */
     advisorCategory?: AdvisorCategory
     /**
@@ -2980,7 +3037,7 @@ export interface AdvisorAssistantButtonClickedEvent {
      */
     origin: 'homepage' | 'lint_detail'
     /**
-     * Category of the advisor (SECURITY or PERFORMANCE)
+     * Category of the advisor
      */
     advisorCategory?: AdvisorCategory
     /**
@@ -3164,7 +3221,7 @@ export interface DashboardErrorCreatedEvent {
     /**
      * Funnel the error occurred in (set only for instrumented funnel errors)
      */
-    origin?: 'signup' | 'project_creation' | 'org_creation'
+    origin?: 'signup' | 'signin' | 'project_creation' | 'org_creation'
     /**
      * Coarse classification of the funnel error
      */
@@ -3507,6 +3564,25 @@ export interface UpgradeCtaClickedEvent {
 }
 
 /**
+ * User was exposed to the plan-change panel presentation experiment.
+ * Fires once per session per enrolled user in any variant (including control), so the
+ * conversion analysis has a baseline cohort. Conversion itself is tracked server-side.
+ * GROWTH experiment: `pricingPanelPlanPresentation`.
+ *
+ * @group Events
+ * @page /org/[slug]/billing (plan-change side panel)
+ * @source studio
+ */
+export interface PricingPanelPlanPresentationExperimentExposedEvent {
+  action: 'pricing_panel_plan_presentation_experiment_exposed'
+  properties: {
+    /** The experiment variant the user is enrolled in */
+    variant: 'control' | 'parity' | 'gaps'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * User clicked the primary CTA on a resource exhaustion warning banner.
  *
  * @group Events
@@ -3741,6 +3817,7 @@ export interface HeaderLocalVersionPopoverOpenedEvent {
 export type TelemetryEvent =
   | SignUpEvent
   | SignInEvent
+  | SignInSubmittedEvent
   | ConnectionStringCopiedEvent
   | McpInstallButtonClickedEvent
   | ApiDocsOpenedEvent
@@ -3826,8 +3903,6 @@ export type TelemetryEvent =
   | StudioBillingCancelSubscriptionClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
-  | UnifiedLogsBannerCtaButtonClickedEvent
-  | UnifiedLogsBannerDismissButtonClickedEvent
   | LogsAllDeprecationBannerExposedEvent
   | LogsAllDeprecationBannerDismissButtonClickedEvent
   | IndexAdvisorEnableButtonClickedEvent
@@ -3839,6 +3914,11 @@ export type TelemetryEvent =
   | DatabaseConnectionsBlockerViewClickedEvent
   | DatabaseConnectionsBannerDismissButtonClickedEvent
   | DatabaseConnectionsBannerCtaButtonClickedEvent
+  | ExplorerBannerExposedEvent
+  | ExplorerBannerDismissButtonClickedEvent
+  | ExplorerBannerCtaButtonClickedEvent
+  | ExplorerTempAccessSqlEditorClickedEvent
+  | SqlEditorBackExplorerClickedEvent
   | SessionTerminateButtonClickedEvent
   | SessionTerminateSubmittedEvent
   | QueryCancelButtonClickedEvent
@@ -3926,6 +4006,7 @@ export type TelemetryEvent =
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
   | UpgradeCtaClickedEvent
+  | PricingPanelPlanPresentationExperimentExposedEvent
   | AccessTokenCreatedEvent
   | AccessTokenRemovedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent

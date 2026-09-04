@@ -1,15 +1,17 @@
-import { screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { HttpResponse } from 'msw'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ExplorerNotebookTab } from '../ExplorerNotebookTab'
+import { setCellSql } from '../QueryCell/QueryCell.utils'
 import { createMarkdownCellSkeleton, createQueryCellSkeleton } from '../utils'
+import { isQueryCell } from '@/data/content/notebooks/notebook-schema'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import { notebooksState } from '@/state/notebooks/notebooks-state'
 import type { Notebook } from '@/state/notebooks/types'
-import { createTabsState, TabsStateContext } from '@/state/tabs'
+import { createTabId, createTabsState, TabsStateContext } from '@/state/tabs'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { setupSqlEditorMocks } from '@/tests/lib/sql-editor-test-utils'
@@ -30,8 +32,18 @@ vi.mock('common', async (importOriginal) => {
 })
 
 vi.mock('@/components/ui/CodeEditor/CodeEditor', () => ({
-  CodeEditor: ({ value }: { value: string }) => (
-    <textarea aria-label="SQL editor" value={value} readOnly />
+  CodeEditor: ({
+    value,
+    onInputChange,
+  }: {
+    value: string
+    onInputChange?: (value: string | undefined) => void
+  }) => (
+    <textarea
+      aria-label="SQL editor"
+      value={value}
+      onChange={(e) => onInputChange?.(e.target.value)}
+    />
   ),
 }))
 
@@ -69,12 +81,39 @@ const seedNotebook = (cells: Notebooks.Cell[], status: 'new' | 'saved' = 'saved'
   else notebooksState.setNotebook({ projectRef: 'default', notebook })
 }
 
-const renderNotebookTab = () =>
+const renderNotebookTab = (tabsState = createTabsState('default')) =>
   customRender(
-    <TabsStateContext.Provider value={createTabsState('default')}>
+    <TabsStateContext.Provider value={tabsState}>
       <ExplorerNotebookTab />
     </TabsStateContext.Provider>
   )
+
+// `useAddDefinitions` fires its own background keywords/functions/schemas/table-columns
+// fetches, and `QueryEditor` fires a background database-event-triggers fetch (for the
+// run-time RLS/event-trigger warning check), against this same generic pg-meta query
+// endpoint (differentiated by the `key` search param) as soon as a database cell's editor
+// mounts — those are expected and unrelated to an actual cell run.
+const BACKGROUND_QUERY_KEYS = ['keywords', 'database-functions', 'schemas', 'table-columns']
+const isBackgroundQueryKey = (key: string) =>
+  BACKGROUND_QUERY_KEYS.includes(key) || key.endsWith('database-event-triggers')
+
+/** Mocks the database query endpoint and returns the SQL text of every non-background request. */
+const mockDatabaseQueryRequests = () => {
+  const queries: string[] = []
+  addAPIMock({
+    method: 'post',
+    path: '/platform/pg-meta/:ref/query',
+    response: async ({ request }) => {
+      const key = new URL(request.url).searchParams.get('key')
+      if (!key || !isBackgroundQueryKey(key)) {
+        const body = (await request.clone().json()) as { query?: string }
+        queries.push(body.query ?? '')
+      }
+      return HttpResponse.json([{ result: 1 }])
+    },
+  })
+  return queries
+}
 
 beforeEach(() => {
   setupSqlEditorMocks()
@@ -125,21 +164,7 @@ describe('ExplorerNotebookTab', () => {
   })
 
   it('runs every database and log cell, and skips markdown cells, on "Run notebook"', async () => {
-    // `useAddDefinitions` fires its own background keywords/functions/schemas/table-columns
-    // fetches against this same generic pg-meta query endpoint (differentiated by the `key`
-    // search param) as soon as a database cell's editor mounts — those are expected and
-    // unrelated to the actual cell run.
-    const INTELLISENSE_KEYS = ['keywords', 'database-functions', 'schemas', 'table-columns']
-    const dbRequests: Request[] = []
-    addAPIMock({
-      method: 'post',
-      path: '/platform/pg-meta/:ref/query',
-      response: ({ request }) => {
-        const key = new URL(request.url).searchParams.get('key')
-        if (!key || !INTELLISENSE_KEYS.includes(key)) dbRequests.push(request)
-        return HttpResponse.json([{ result: 1 }])
-      },
-    })
+    const dbRequests = mockDatabaseQueryRequests()
 
     const logRequests: Request[] = []
     addAPIMock({
@@ -160,6 +185,172 @@ describe('ExplorerNotebookTab', () => {
     await waitFor(() => expect(dbRequests).toHaveLength(1))
     await waitFor(() => expect(logRequests).toHaveLength(1))
     await waitFor(() => expect(runNotebookButton).toBeEnabled())
+  })
+
+  describe('mutation confirmation on "Run notebook"', () => {
+    const readOnlyCell = createQueryCellSkeleton({ title: 'Read-only query', sql: 'select 1' })
+    const mutatingCell = createQueryCellSkeleton({
+      title: 'Mutating query',
+      sql: 'delete from foo',
+    })
+
+    beforeEach(() => {
+      seedNotebook([readOnlyCell, mutatingCell])
+    })
+
+    it('opens a confirmation modal instead of running immediately when a cell mutates data', async () => {
+      const queries = mockDatabaseQueryRequests()
+
+      renderNotebookTab()
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Run notebook' }))
+
+      const dialog = await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
+      expect(within(dialog).getByText('Mutating query')).toBeInTheDocument()
+      expect(queries).toHaveLength(0)
+    })
+
+    it('runs no cells when the confirmation is cancelled', async () => {
+      const queries = mockDatabaseQueryRequests()
+
+      renderNotebookTab()
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Run notebook' }))
+      await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
+
+      await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+
+      await waitFor(() =>
+        expect(
+          screen.queryByRole('dialog', { name: 'Confirm to run notebook' })
+        ).not.toBeInTheDocument()
+      )
+      expect(queries).toHaveLength(0)
+    })
+
+    it('labels destructive queries and runs all cells after one confirmation', async () => {
+      const queries = mockDatabaseQueryRequests()
+
+      renderNotebookTab()
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Run notebook' }))
+      const dialog = await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
+      expect(within(dialog).getByText('Mutating query')).toBeInTheDocument()
+      expect(within(dialog).getByText('Destructive')).toBeInTheDocument()
+      expect(queries).toHaveLength(0)
+
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Run all cells' }))
+
+      await waitFor(() => expect(queries).toHaveLength(2))
+      expect(queries.some((query) => query.includes('select 1'))).toBe(true)
+      expect(queries.some((query) => query.includes('delete from foo'))).toBe(true)
+    })
+
+    it('runs no cells when the combined confirmation is cancelled', async () => {
+      const queries = mockDatabaseQueryRequests()
+
+      renderNotebookTab()
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Run notebook' }))
+      const dialog = await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }))
+
+      await waitFor(() =>
+        expect(
+          screen.queryByRole('dialog', { name: 'Confirm to run notebook' })
+        ).not.toBeInTheDocument()
+      )
+      expect(queries).toHaveLength(0)
+    })
+
+    it('does not label non-destructive mutations', async () => {
+      seedNotebook([
+        readOnlyCell,
+        createQueryCellSkeleton({
+          title: 'Add signup',
+          sql: "insert into signups values ('test')",
+        }),
+      ])
+      const queries = mockDatabaseQueryRequests()
+
+      renderNotebookTab()
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Run notebook' }))
+      const dialog = await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
+      expect(within(dialog).queryByText('Destructive')).not.toBeInTheDocument()
+
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Run all cells' }))
+
+      await waitFor(() => expect(queries).toHaveLength(2))
+    })
+
+    it('picks up a SQL commit that lands after this render but before the click handler runs', async () => {
+      seedNotebook([readOnlyCell])
+      const queries = mockDatabaseQueryRequests()
+
+      renderNotebookTab()
+
+      const runNotebookButton = await screen.findByRole('button', { name: 'Run notebook' })
+      await waitFor(() => expect(runNotebookButton).toBeEnabled())
+
+      // Simulates the store commit a Monaco blur performs synchronously right before the
+      // click (see QueryCell's onSqlCommit), without letting the resulting re-render reach
+      // this component first — the exact race "type mutating SQL, then immediately click
+      // Run notebook" hits in the browser.
+      notebooksState.updateCell({
+        id: NOTEBOOK_ID,
+        cellId: readOnlyCell._id,
+        updater: (cell) => (isQueryCell(cell) ? setCellSql(cell, 'delete from foo') : cell),
+      })
+      fireEvent.click(runNotebookButton)
+
+      const dialog = await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
+      expect(within(dialog).getByText('Read-only query')).toBeInTheDocument()
+      expect(queries).toHaveLength(0)
+    })
+
+    it('picks up SQL typed into the live editor buffer that has not yet been committed to the store', async () => {
+      seedNotebook([readOnlyCell], 'new')
+      const queries = mockDatabaseQueryRequests()
+
+      renderNotebookTab()
+
+      const sqlEditor = await screen.findByRole('textbox', { name: 'SQL editor' })
+      fireEvent.change(sqlEditor, { target: { value: 'delete from foo' } })
+
+      // No blur fired, so the store still has the original read-only SQL — the check must
+      // read the live buffer directly, not `notebooksState`, to catch this.
+      expect(
+        notebooksState.notebooks[NOTEBOOK_ID]?.notebook.content?.cells.find(
+          (cell) => cell._id === readOnlyCell._id
+        )
+      ).toMatchObject({ unchecked_sql: 'select 1' })
+
+      const runNotebookButton = screen.getByRole('button', { name: 'Run notebook' })
+      await userEvent.click(runNotebookButton)
+
+      const dialog = await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
+      expect(within(dialog).getByText('Read-only query')).toBeInTheDocument()
+      expect(queries).toHaveLength(0)
+
+      expect(within(dialog).getByText('Destructive')).toBeInTheDocument()
+    })
+
+    it('runs only the read-only cells when "Skip these queries" is checked', async () => {
+      const queries = mockDatabaseQueryRequests()
+
+      renderNotebookTab()
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Run notebook' }))
+      await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
+
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Skip these queries' }))
+      await userEvent.click(screen.getByRole('button', { name: 'Run read-only cells' }))
+
+      await waitFor(() => expect(queries).toHaveLength(1))
+      expect(queries[0]).toContain('select 1')
+      expect(queries.some((query) => query.includes('delete from foo'))).toBe(false)
+    })
   })
 
   it('disables "Run notebook" when the notebook has no database or log cells', async () => {
@@ -187,5 +378,57 @@ describe('ExplorerNotebookTab', () => {
     await userEvent.click(intellisenseItem)
 
     await waitFor(() => expect(readPersistedValue()).toBe(!initialValue))
+  })
+
+  it('persists the preview tab when saving the notebook', async () => {
+    addAPIMock({
+      method: 'put',
+      path: '/platform/projects/:ref/content',
+      response: () => HttpResponse.json({ id: NOTEBOOK_ID }),
+    })
+
+    const tabsState = createTabsState('default')
+    const tabId = createTabId('notebook', { id: NOTEBOOK_ID })
+    tabsState.addTab({ id: tabId, type: 'notebook', metadata: { notebookId: NOTEBOOK_ID } })
+    expect(tabsState.tabsMap[tabId]?.isPreview).toBe(true)
+
+    renderNotebookTab(tabsState)
+
+    const saveButton = await screen.findByRole('button', { name: 'Save changes' })
+    await userEvent.click(saveButton)
+
+    await waitFor(() => expect(tabsState.tabsMap[tabId]?.isPreview).toBe(false))
+  })
+
+  it('does not mark a newer edit as saved when an earlier save resolves after it', async () => {
+    let resolveSave: (() => void) | undefined
+    const savePromise = new Promise<void>((resolve) => {
+      resolveSave = resolve
+    })
+    addAPIMock({
+      method: 'put',
+      path: '/platform/projects/:ref/content',
+      response: async () => {
+        await savePromise
+        return HttpResponse.json({ id: NOTEBOOK_ID })
+      },
+    })
+
+    renderNotebookTab()
+
+    const saveButton = await screen.findByRole('button', { name: 'Save changes' })
+    await userEvent.click(saveButton)
+    await waitFor(() => expect(saveButton).toBeDisabled())
+
+    // Edit the notebook while the save request above is still in flight.
+    notebooksState.insertCellAfter({ id: NOTEBOOK_ID, cell: createMarkdownCellSkeleton() })
+    expect(notebooksState.notebooks[NOTEBOOK_ID]?.status).toBe('unsaved')
+
+    resolveSave?.()
+    await waitFor(() => expect(saveButton).toBeEnabled())
+
+    // The in-flight save only persisted the older content, so the notebook must still be
+    // considered unsaved rather than clobbered back to 'saved' by the stale response.
+    expect(notebooksState.notebooks[NOTEBOOK_ID]?.status).toBe('unsaved')
   })
 })

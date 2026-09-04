@@ -122,6 +122,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/_app/org/$slug/index.tsx` ← `pages/org/[slug]/index.tsx`
 - [x] A `routes/_app/org/$slug/apps.tsx` ← `pages/org/[slug]/apps.tsx`
 - [x] A `routes/_app/org/$slug/audit.tsx` ← `pages/org/[slug]/audit.tsx`
+- [x] A `routes/_app/org/$slug/audit-log-drains.tsx` ← `pages/org/[slug]/audit-log-drains.tsx` (wraps in OrganizationSettingsLayout inline)
 - [x] A `routes/_app/org/$slug/billing.tsx` ← `pages/org/[slug]/billing.tsx`
 - [x] A `routes/_app/org/$slug/documents.tsx` ← `pages/org/[slug]/documents.tsx`
 - [x] A `routes/_app/org/$slug/general.tsx` ← `pages/org/[slug]/general.tsx`
@@ -170,6 +171,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/database/functions.tsx` ← `pages/project/[ref]/database/functions.tsx`
 - [x] A `routes/project/$ref/database/indexes.tsx` ← `pages/project/[ref]/database/indexes.tsx`
 - [x] A `routes/project/$ref/database/migrations.tsx` ← `pages/project/[ref]/database/migrations.tsx`
+- [x] A `routes/project/$ref/database/policies.tsx` ← `pages/project/[ref]/database/policies.tsx`
 - [x] A `routes/project/$ref/database/roles.tsx` ← `pages/project/[ref]/database/roles.tsx`
 - [x] A `routes/project/$ref/database/settings.tsx` ← `pages/project/[ref]/database/settings.tsx`
 - [x] A `routes/project/$ref/database/types.tsx` ← `pages/project/[ref]/database/types.tsx`
@@ -192,7 +194,6 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 - [x] A `routes/project/$ref/auth/overview.tsx` ← `pages/project/[ref]/auth/overview.tsx`
 - [x] A `routes/project/$ref/auth/users.tsx` ← `pages/project/[ref]/auth/users.tsx`
-- [x] A `routes/project/$ref/auth/policies.tsx` ← `pages/project/[ref]/auth/policies.tsx`
 - [x] A `routes/project/$ref/auth/providers.tsx` ← `pages/project/[ref]/auth/providers.tsx` (sets `skipAuthLayout: true`, wraps in `AuthProvidersLayout` directly)
 - [x] A `routes/project/$ref/auth/mfa.tsx` ← `pages/project/[ref]/auth/mfa.tsx`
 - [x] A `routes/project/$ref/auth/hooks.tsx` ← `pages/project/[ref]/auth/hooks.tsx`
@@ -231,6 +232,8 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 ### Project shell — `/workers/*`
 
 - [x] A `routes/project/$ref/workers/index.tsx` ← `pages/project/[ref]/workers/index.tsx`
+- [x] A `routes/project/$ref/workers/$name.tsx` ← `pages/project/[ref]/workers/[name].tsx`
+- [x] A `routes/project/$ref/workers/secrets.tsx` ← `pages/project/[ref]/workers/secrets.tsx`
 
 ### Project shell — `/functions/*`
 
@@ -256,6 +259,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/logs/dedicated-pooler-logs.tsx` ← `pages/project/[ref]/logs/dedicated-pooler-logs.tsx`
 - [x] A `routes/project/$ref/logs/edge-functions-logs.tsx` ← `pages/project/[ref]/logs/edge-functions-logs.tsx`
 - [x] A `routes/project/$ref/logs/edge-logs.tsx` ← `pages/project/[ref]/logs/edge-logs.tsx`
+- [x] A `routes/project/$ref/logs/multigres-logs.tsx` ← `pages/project/[ref]/logs/multigres-logs.tsx`
 - [x] A `routes/project/$ref/logs/pg-upgrade-logs.tsx` ← `pages/project/[ref]/logs/pg-upgrade-logs.tsx`
 - [x] A `routes/project/$ref/logs/pgcron-logs.tsx` ← `pages/project/[ref]/logs/pgcron-logs.tsx`
 - [x] A `routes/project/$ref/logs/pooler-logs.tsx` ← `pages/project/[ref]/logs/pooler-logs.tsx`
@@ -276,6 +280,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/observability/auth.tsx` ← `pages/project/[ref]/observability/auth.tsx`
 - [x] A `routes/project/$ref/observability/database.tsx` ← `pages/project/[ref]/observability/database.tsx`
 - [x] A `routes/project/$ref/observability/api-overview.tsx` ← `pages/project/[ref]/observability/api-overview.tsx`
+- [x] A `routes/project/$ref/observability/connections.tsx` ← `pages/project/[ref]/observability/connections.tsx`
 - [x] A `routes/project/$ref/observability/edge-functions.tsx` ← `pages/project/[ref]/observability/edge-functions.tsx`
 - [x] A `routes/project/$ref/observability/postgrest.tsx` ← `pages/project/[ref]/observability/postgrest.tsx`
 - [x] A `routes/project/$ref/observability/query-insights.tsx` ← `pages/project/[ref]/observability/query-insights.tsx`
@@ -285,6 +290,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### Project shell — `/advisors/*`
 
+- [x] A `routes/project/$ref/advisors/health.tsx` ← `pages/project/[ref]/advisors/health.tsx`
 - [x] A `routes/project/$ref/advisors/performance.tsx` ← `pages/project/[ref]/advisors/performance.tsx`
 - [x] A `routes/project/$ref/advisors/security.tsx` ← `pages/project/[ref]/advisors/security.tsx`
 - [x] A `routes/project/$ref/advisors/rules/performance.tsx` ← `pages/project/[ref]/advisors/rules/performance.tsx`
@@ -296,6 +302,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/settings/addons.tsx` ← `pages/project/[ref]/settings/addons.tsx`
 - [x] A `routes/project/$ref/settings/api.tsx` ← `pages/project/[ref]/settings/api.tsx` (sets `skipSettingsLayout: true` — page is a useEffect redirect)
 - [x] A `routes/project/$ref/settings/dashboard.tsx` ← `pages/project/[ref]/settings/dashboard.tsx`
+- [x] A `routes/project/$ref/settings/code-configuration.tsx` ← `pages/project/[ref]/settings/code-configuration.tsx`
 - [x] A `routes/project/$ref/settings/infrastructure/index.tsx` ← `pages/project/[ref]/settings/infrastructure.tsx`
 - [x] A `routes/project/$ref/settings/infrastructure/replica/$replicaId.tsx` ← `pages/project/[ref]/settings/infrastructure/replica/[replicaId].tsx`
 - [x] A `routes/project/$ref/settings/integrations.tsx` ← `pages/project/[ref]/settings/integrations.tsx`
@@ -320,7 +327,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/sql/index.tsx` ← `pages/project/[ref]/sql/index.tsx`
 - [x] A `routes/project/$ref/sql/$id.tsx` ← `pages/project/[ref]/sql/[id].tsx`
 - [x] A `routes/project/$ref/sql/templates.tsx` ← `pages/project/[ref]/sql/templates.tsx`
-- [x] A `routes/project/$ref/sql/quickstarts.tsx` ← `pages/project/[ref]/sql/quickstarts.tsx`
+- [x] A `routes/project/$ref/sql/examples.tsx` ← `pages/project/[ref]/sql/examples.tsx`
 
 ### Project shell — `/editor/*`
 
@@ -333,6 +340,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/explorer/index.tsx` ← `pages/project/[ref]/explorer/index.tsx`
 - [x] A `routes/project/$ref/explorer/notebook/$id.tsx` ← `pages/project/[ref]/explorer/notebook/[id].tsx`
 - [x] A `routes/project/$ref/explorer/chat/$id.tsx` ← `pages/project/[ref]/explorer/chat/[id].tsx`
+- [x] A `routes/project/$ref/explorer/query/$id.tsx` ← `pages/project/[ref]/explorer/query/[id].tsx`
 
 ### Auth shell — `/sign-in`, `/sign-up`, etc.
 
@@ -354,6 +362,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/redeem.tsx` ← `pages/redeem.tsx` (RedeemCreditsLayout)
 - [x] A `routes/logout.tsx` ← `pages/logout.tsx`
 - [x] A `routes/maintenance.tsx` ← `pages/maintenance.tsx`
+- [x] A `routes/verify-email.tsx` ← `pages/verify-email.tsx`
 
 ### Error pages (handled at root)
 
@@ -611,5 +620,5 @@ for the Vite pipeline:
 - Delete `pages/_app.tsx`, `pages/_document.tsx`, `pages/_error.jsx`, `pages/500.tsx`, `pages/404.tsx` (Next-only catch-alls; TanStack equivalents on `__root.tsx`).
 - Drop the `dev:next` / `build:next` / `start:next` scripts from `apps/studio/package.json` once we're committed to TanStack.
 - Remove the `apps/studio/pages/**` `path_instructions` guardrail entry from `.coderabbit.yaml` (added in FE-3423; remove it as part of this FE-3106 cleanup) — it's only useful while both runtimes coexist.
-- Remove the "TanStack Start migration" section from `apps/studio/CLAUDE.md` — it only applies while both runtimes coexist.
+- Remove the "TanStack Start migration" section from `apps/studio/AGENTS.md` — it only applies while both runtimes coexist.
 - Delete this file.

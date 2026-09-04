@@ -1,6 +1,6 @@
 import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { Worker } from './Workers.types'
 import { WorkersList } from './WorkersList'
@@ -18,8 +18,16 @@ const worker = (name: string, overrides: Partial<Worker> = {}): Worker => ({
   ...overrides,
 })
 
-const renderList = (workers: Worker[]) =>
-  customRender(<WorkersList projectRef="default" workers={workers} />)
+const renderList = (workers: Worker[], onRefresh = vi.fn()) =>
+  customRender(
+    <WorkersList
+      projectRef="default"
+      workers={workers}
+      onDeploy={vi.fn()}
+      onRefresh={onRefresh}
+      isRefreshing={false}
+    />
+  )
 
 const rowNames = () =>
   screen
@@ -48,10 +56,17 @@ describe('WorkersList', () => {
 
     await userEvent.type(screen.getByPlaceholderText('Search by name'), 'resize')
     expect(rowNames()).toEqual(['resize-images'])
-    expect(screen.getByText('1 worker')).toBeVisible()
-
     await userEvent.type(screen.getByPlaceholderText('Search by name'), '-nope')
     expect(screen.getByText('No workers match your filters')).toBeVisible()
+  })
+
+  it('refreshes the workers list on request', async () => {
+    const onRefresh = vi.fn()
+    renderList([worker('embed')], onRefresh)
+
+    await userEvent.click(screen.getByRole('button', { name: 'Refresh' }))
+
+    expect(onRefresh).toHaveBeenCalledOnce()
   })
 
   it('pages through the workers ten at a time', async () => {

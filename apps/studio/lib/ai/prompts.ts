@@ -371,11 +371,11 @@ export const PG_BEST_PRACTICES = `
 - After creating a table, check and configure Data API access and RLS before use (see the "Exposing a Table to the Data API" section in RLS knowledge for the full workflow).
 - Define foreign key references within the \`CREATE TABLE\` statement.
 - Whenever a foreign key is included, generate a separate \`CREATE INDEX\` statement for the foreign key column(s) to improve join performance.
-- **Foreign Tables:** Place foreign tables in a schema named \`private\` (create the schema if needed). Explain the security risk (RLS bypass) and include a link: https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0017_foreign_table_in_api.
+- **Foreign Tables:** Place foreign tables in a schema named \`private\` (create the schema if needed). Explain the security risk (RLS bypass) and include a link: https://supabase.com/docs/guides/observability/advisors?queryGroups=lint&lint=0017_foreign_table_in_api.
 
 ### Views
 - Add \`with (security_invoker=on)\` immediately after \`CREATE VIEW view_name\`.
-- **Materialized Views:** Store materialized views in the \`private\` schema (create if needed). Explain the security risk (RLS bypass) and reference: https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0016_materialized_view_in_api.
+- **Materialized Views:** Store materialized views in the \`private\` schema (create if needed). Explain the security risk (RLS bypass) and reference: https://supabase.com/docs/guides/observability/advisors?queryGroups=lint&lint=0016_materialized_view_in_api.
 
 ### Extensions
 - Always install extensions in the \`extensions\` schema or a dedicated schema; never in \`public\`.
@@ -807,13 +807,17 @@ export const NOTEBOOKS_PROMPT = `
 ## Notebooks
 - Use \`create_notebook\` for a saved, shareable, multi-step investigation or dashboard the user will revisit — e.g. "build me a signup funnel notebook" or "create a notebook to track auth errors".
 - Use \`update_notebook\` to edit an existing notebook — insert, replace, delete, or move cells — instead of recreating it from scratch.
+- Use \`delete_notebook\` only when the user explicitly asks to delete a whole notebook — never to remove a cell from one still in use; that's \`update_notebook\` with a \`delete_cell\` operation. Deleting a notebook is irreversible — warn the user before calling it, the same way you would for any other irreversible operation.
+- When the user asks to read or analyze a notebook using its current results, call \`get_notebook\` and then \`run_notebook\`. The run tool presents all query cells for one user approval, executes them in notebook order, and returns only the results allowed by the organization's sharing level. Do not replace it with one \`execute_sql\` call per cell.
+- Questions only about a notebook's saved structure or query configuration do not require \`run_notebook\`.
 - Use \`execute_sql\` for a single ad-hoc question with no need to persist it.
-- When the request clearly calls for a notebook, call \`create_notebook\` or \`update_notebook\` directly; both tools handle user approval.
+- When the request clearly calls for a notebook, call \`create_notebook\`, \`update_notebook\`, or \`delete_notebook\` directly; all three tools handle user approval.
 - \`update_notebook\` requires \`expected_updated_at\`, the \`updated_at\` you got from \`get_notebook\`. If the notebook changed since, the call is rejected — call \`get_notebook\` again and reissue \`update_notebook\` against the current content.
 - Resolve a notebook referenced by name via \`list_notebooks\` yourself before calling \`get_notebook\`/\`update_notebook\` — never ask the user for a notebook id when a name is enough to look it up. Only ask the user to disambiguate if more than one notebook matches that name.
 - When describing an existing notebook, report each query cell's configuration that changes what it returns — a log cell's time range, a database cell's row limit — and don't count markdown cells as queries.
 - Before writing a \`database_cell\`'s SQL, call \`list_tables\` to confirm the referenced tables and columns actually exist. Never assume a table or column exists from the user's wording alone — if it isn't in the schema you fetched, say so instead of fabricating a query against it.
 - A \`database_cell\` or \`log_cell\` whose SQL performs an irreversible operation (DROP, TRUNCATE, DELETE without a WHERE clause, etc.) is still subject to the Destructive Operations rule below — warn explicitly before creating or updating a cell with such a query. Saving it for repeated future use does not make it safer.
+- There is no identifier for the primary database — not \`primary\`, not \`_primary\`, not an empty string, not the project ref, not any other placeholder spelling of "primary". \`database_identifier\` exists solely to name an explicitly requested read replica; the primary database is what you get by leaving the key out of the cell's JSON entirely, so when the user says "primary" or names no database, omit the key. Writing any string into this field — even one that merely gestures at "primary" — is rejected at save time and forces a retry, so get it right the first time. Before setting it for a replica, call \`list_databases\` and use one of the identifiers it returns; never invent one, because an unrecognized identifier is rejected the same way.
 - A cell that queries logs (edge_logs, postgres_logs, auth_logs, function_edge_logs, function_logs, storage_logs, realtime_logs, postgrest_logs, supavisor_logs, or pgbouncer_logs) must be a \`log_cell\`, never a \`database_cell\` — these are not Postgres tables, and a \`log_cell\`'s SQL runs on ClickHouse, not Postgres.
 ${CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS}
 ${buildClickhouseLogsSchemaSection()}

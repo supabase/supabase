@@ -4,9 +4,10 @@ import { proxy, ref, snapshot, useSnapshot } from 'valtio'
 import { z } from 'zod'
 
 import { DEFAULT_CELL_ROW_LIMIT } from '@/components/interfaces/Explorer/QueryCell/QueryCell.utils'
-import { type QueryResult } from '@/components/interfaces/Explorer/types'
+import { type QueryDisplay, type QueryResult } from '@/components/interfaces/Explorer/types'
 import { ROWS_PER_PAGE_OPTIONS } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
 import {
+  chartConfigSchema,
   type DatabaseSourceParameters,
   type LogsSourceParameters,
 } from '@/data/content/notebooks/notebook-schema'
@@ -24,6 +25,8 @@ type ExplorerQueryDraftBase = {
   projectRef: string
   name: string
   updatedAt: number
+  view: QueryDisplay['view']
+  chart?: QueryDisplay['chart']
 }
 
 /**
@@ -64,7 +67,7 @@ type PersistedExplorerQueryDraft = {
   updatedAt: number
   rowLimit?: number
   role?: ImpersonationRole
-}
+} & QueryDisplay
 
 type PersistedExplorerQueryDrafts = Record<string, PersistedExplorerQueryDraft>
 
@@ -81,9 +84,12 @@ const persistedDraftSchema = z.object({
   source: z.unknown().optional(),
   rowLimit: z.unknown().optional(),
   role: z.unknown().optional(),
+  view: z.unknown().optional(),
+  chart: z.unknown().optional(),
 })
 
 const VALID_ROW_LIMITS = ROWS_PER_PAGE_OPTIONS.map((option) => option.value)
+const queryViewSchema = z.enum(['table', 'chart'])
 
 /**
  * Falls back to the default whenever a persisted row limit isn't one of the values the row
@@ -111,7 +117,14 @@ const toDraft = ({
   projectRef: string
   persisted: PersistedExplorerQueryDraft
 }): ExplorerQueryDraft => {
-  const base = { id, projectRef, name: persisted.name, updatedAt: persisted.updatedAt }
+  const base = {
+    id,
+    projectRef,
+    name: persisted.name,
+    updatedAt: persisted.updatedAt,
+    view: persisted.view,
+    chart: persisted.chart,
+  }
 
   if (persisted.source._tag === 'logs') {
     return {
@@ -153,6 +166,10 @@ const readPersistedDrafts = (storage: StorageLike, projectRef: string) => {
         const parsedRole = impersonationRoleSchema.safeParse(draft.data.role)
         const role = parsedRole.success ? parsedRole.data : undefined
         const rowLimit = rowLimitSchema.parse(draft.data.rowLimit)
+        const parsedView = queryViewSchema.safeParse(draft.data.view)
+        const view = parsedView.success ? parsedView.data : 'table'
+        const parsedChart = chartConfigSchema.safeParse(draft.data.chart)
+        const chart = parsedChart.success ? parsedChart.data : undefined
 
         return [
           [
@@ -164,6 +181,8 @@ const readPersistedDrafts = (storage: StorageLike, projectRef: string) => {
               updatedAt: draft.data.updatedAt,
               role,
               rowLimit,
+              view,
+              chart,
             },
           ],
         ]
@@ -205,6 +224,8 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
       updatedAt: draft.updatedAt,
       rowLimit: draft._tag === 'database' ? draft.rowLimit : undefined,
       role: draft._tag === 'database' ? draft.role : undefined,
+      view: draft.view,
+      chart: draft.chart,
     }
     writePersistedDrafts(storage, draft.projectRef, persisted)
   }
@@ -216,7 +237,7 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
     createDraft: ({
       id,
       projectRef,
-      name = 'Untitled query',
+      name = 'Run SQL',
       sql = '',
       source = createDefaultSourceBinding('database'),
       rowLimit = DEFAULT_CELL_ROW_LIMIT,
@@ -237,6 +258,7 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
           sql,
           updatedAt: Date.now(),
           rowLimit,
+          view: 'table',
         },
       })
 
@@ -300,6 +322,8 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
           updatedAt: Date.now(),
           rowLimit: rowLimit ?? currentRowLimit,
           role: currentRole,
+          view: draft.view,
+          chart: draft.chart,
         },
       })
 
@@ -347,6 +371,21 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
 
     setResult: ({ id, result }: { id: string; result: ExplorerQueryResult }) => {
       state.results[id] = ref(result)
+    },
+
+    setDisplay: ({ id, display }: { id: string; display: QueryDisplay }) => {
+      const draft = state.drafts[id]
+      if (!draft) return
+
+      const parsedChart = chartConfigSchema.safeParse(display.chart)
+      const updatedDraft: ExplorerQueryDraft = {
+        ...draft,
+        view: queryViewSchema.parse(display.view),
+        chart: parsedChart.success ? parsedChart.data : undefined,
+        updatedAt: Date.now(),
+      }
+      state.drafts[id] = updatedDraft
+      persistDraft(updatedDraft)
     },
 
     /**

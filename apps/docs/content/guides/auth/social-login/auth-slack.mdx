@@ -1,6 +1,6 @@
 ---
 id: 'auth-slack'
-title: 'Login with Slack'
+title: 'Sign in with Slack'
 description: 'Add Slack OAuth to your Supabase project'
 ---
 
@@ -14,16 +14,16 @@ We will be replacing the existing Slack provider with a new Slack (OIDC) provide
 
 </Admonition>
 
-Setting up Slack logins for your application consists of 3 parts:
+Setting up Slack sign-in for your application consists of 3 parts:
 
 - Create and configure a Slack Project and App on the [Slack Developer Dashboard](https://api.slack.com/apps).
 - Add your Slack `API Key` and `API Secret Key` to your [Supabase Project](/dashboard).
-- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
+- Add the sign-in code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
 
 ## Access your Slack Developer account
 
 - Go to [api.slack.com](https://api.slack.com/apps).
-- Click on `Your Apps` at the top right to log in.
+- Click on `Your Apps` at the top right to sign in.
 
 ![Slack Developer Portal.](/docs/img/guides/auth-slack/slack-portal.png)
 
@@ -80,7 +80,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
   }'
 ```
 
-## Add login code to your client app
+## Add sign-in code to your client app
 
 <Tabs
   scrollable

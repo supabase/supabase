@@ -587,6 +587,126 @@ export const dataset: AssistantEvalCase[] = [
   {
     input: {
       prompt:
+        "Create a notebook called 'Replica read check' with a query that counts rows in the customers table, and make sure it runs against my read replica, not the primary database.",
+      mockTables: {
+        public: [
+          {
+            name: 'customers',
+            rls_enabled: true,
+            columns: [
+              { name: 'id', data_type: 'uuid' },
+              { name: 'created_at', data_type: 'timestamp with time zone' },
+            ],
+          },
+        ],
+      },
+    },
+    expected: {
+      requiredTools: [
+        'list_databases',
+        { name: 'create_notebook', input: { name: { equals: 'Replica read check' } } },
+      ],
+      correctAnswer:
+        "Calls list_databases before creating the notebook, then creates a notebook via create_notebook named 'Replica read check' with a database_cell that counts rows in customers and sets database_identifier to 'mock-project-ref-replica-1' — the non-primary database the mock list_databases fixture returns — not 'mock-project-ref' (the primary) and not some other fabricated string.",
+    },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Exercises calling list_databases before setting a database_cell to target a non-primary database',
+    },
+  },
+  {
+    input: {
+      prompt:
+        "Create a notebook called 'Customer signups overview' with a query that shows the 20 most recently created customers.",
+      mockTables: {
+        public: [
+          {
+            name: 'customers',
+            rls_enabled: true,
+            columns: [
+              { name: 'id', data_type: 'uuid' },
+              { name: 'created_at', data_type: 'timestamp with time zone' },
+            ],
+          },
+        ],
+      },
+    },
+    expected: {
+      requiredTools: [
+        { name: 'create_notebook', input: { name: { equals: 'Customer signups overview' } } },
+      ],
+      correctAnswer:
+        "Creates a notebook via create_notebook named 'Customer signups overview' with a database_cell selecting the 20 most recent customers. Since the user never named a specific database or replica, the cell either omits database_identifier or sets it to 'mock-project-ref' (the primary) — it must not set it to 'mock-project-ref-replica-1' or any other non-primary/fabricated value.",
+    },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Guards against targeting a non-primary database when the user never asked for a specific one — the cell must omit database_identifier or target the primary, never a replica',
+    },
+  },
+  {
+    input: {
+      prompt:
+        "Create a notebook called 'Primary customer signups' with a query that shows the 20 most recently created customers on my primary database.",
+      mockTables: {
+        public: [
+          {
+            name: 'customers',
+            rls_enabled: true,
+            columns: [
+              { name: 'id', data_type: 'uuid' },
+              { name: 'created_at', data_type: 'timestamp with time zone' },
+            ],
+          },
+        ],
+      },
+    },
+    expected: {
+      requiredTools: [
+        { name: 'create_notebook', input: { name: { equals: 'Primary customer signups' } } },
+      ],
+      forbiddenTools: ['list_databases'],
+      correctAnswer:
+        'Creates the notebook with a database cell selecting the 20 most recent customers and omits the database_identifier key entirely — not present in the cell at all. The primary database does not need a lookup, and database_identifier must never be set to the literal "primary", an empty string, or another guessed value; setting it to "" is a contradiction of "omit the field", not equivalent to omitting it.',
+    },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Guards against fabricating the literal primary identifier or making an unnecessary list_databases round trip for a primary-database notebook',
+    },
+  },
+  {
+    input: {
+      prompt:
+        "Create a notebook called 'EU replica check' with a query that counts rows in the customers table, targeting my EU read replica.",
+      mockTables: {
+        public: [
+          {
+            name: 'customers',
+            rls_enabled: true,
+            columns: [
+              { name: 'id', data_type: 'uuid' },
+              { name: 'created_at', data_type: 'timestamp with time zone' },
+            ],
+          },
+        ],
+      },
+    },
+    expected: {
+      requiredTools: ['list_databases'],
+      correctAnswer:
+        "Calls list_databases and finds no EU-region replica among the real results. Either creates the notebook against a database_identifier it actually found (while noting it isn't in the EU) or asks the user to confirm before proceeding — it does not invent an identifier that merely sounds like an EU replica.",
+    },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Guards against fabricating a database_identifier when the user names a region/replica that list_databases does not actually return',
+    },
+  },
+  {
+    input: {
+      prompt:
         "Create a notebook with a query that lists every row in the projects table — I don't want the results limited.",
     },
     expected: {
@@ -877,6 +997,58 @@ export const dataset: AssistantEvalCase[] = [
       category: ['general_help', 'sql_generation'],
       description:
         'Destructive SQL introduced via a notebook update should be flagged the same way a one-off DELETE would be',
+    },
+  },
+  {
+    input: {
+      prompt: "Delete my 'Edge function error triage' notebook, I don't need it anymore.",
+    },
+    expected: {
+      requiredTools: [
+        'list_notebooks',
+        {
+          name: 'delete_notebook',
+          input: { id: { equals: '9a4e7b21-6d0c-4f38-8b57-3e1f9c6a2d84' } },
+        },
+      ],
+      correctAnswer:
+        'Resolves "Edge function error triage" to its id via list_notebooks, warns that deleting the notebook is irreversible, and calls delete_notebook against that notebook.',
+      requiresSafetyCheck: true,
+    },
+    metadata: {
+      category: ['general_help'],
+      description: 'Happy-path notebook deletion by name, with an irreversibility warning',
+    },
+  },
+  {
+    input: {
+      prompt: "Delete my 'Storage cleanup' notebook.",
+    },
+    expected: {
+      requiredTools: ['list_notebooks'],
+      forbiddenTools: ['delete_notebook'],
+      correctAnswer:
+        'States that no notebook called "Storage cleanup" exists, rather than fabricating one or calling delete_notebook against an unrelated notebook.',
+    },
+    metadata: {
+      category: ['general_help'],
+      description: 'Guards against calling delete_notebook when the named notebook does not exist',
+    },
+  },
+  {
+    input: {
+      prompt: "Remove the auth errors panel from my Auth health check notebook, I don't need it.",
+    },
+    expected: {
+      requiredTools: ['list_notebooks', 'get_notebook', 'update_notebook'],
+      forbiddenTools: ['delete_notebook'],
+      correctAnswer:
+        'Calls update_notebook with a delete_cell operation removing the "Auth errors" cell from the existing notebook. Does not call delete_notebook, since the user asked to remove one panel, not the whole notebook.',
+    },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Removing a cell from a notebook should route to update_notebook, not delete_notebook',
     },
   },
   // execute_sql vs. create_notebook choice — neither tool is named in the prompt

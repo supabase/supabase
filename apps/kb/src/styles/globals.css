@@ -1,0 +1,80 @@
+@import 'config/tailwind.config.css';
+
+@source '../pages/**/*.astro';
+@source '../components/**/*.{astro,tsx}';
+@source '../layouts/**/*.astro';
+@source './../../../../packages/ui/src/**/*.{tsx,ts,js}';
+@source './../../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
+
+/* apps/docs loads Inter/Manrope via next/font, which injects these two
+ * variables as inline styles on <html>. kb loads the same fonts via the
+ * <link> tags in Layout.astro instead, so they're declared here as plain
+ * custom properties rather than next/font output. */
+:root {
+  --font-inter: 'Inter', system-ui, sans-serif;
+  --font-manrope: 'Manrope', system-ui, sans-serif;
+}
+
+/* Same @theme block as apps/docs/styles/globals.css. */
+@theme inline {
+  --font-sans:
+    var(--font-inter), Inter, Helvetica Neue, Helvetica, ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-manrope, var(--font-sans));
+  --font-mono: 'Source Code Pro', ui-monospace, Menlo, monospace;
+}
+
+/* Same type scale as apps/docs/styles/globals.css — without this, utilities
+ * like `text-sm` resolve to Tailwind's default 0.875rem instead of docs'
+ * 0.8125rem, so text using the same class names still renders at different
+ * sizes than docs. */
+@theme {
+  --text-sm: 0.8125rem;
+  --text-base: 0.9375rem;
+  --text-lg: 1rem;
+  --text-xl: 1.125rem;
+  --text-2xl: 1.375rem;
+  --text-3xl: 1.75rem;
+  --text-4xl: 2.125rem;
+  --text-5xl: 2.875rem;
+  --text-6xl: 3.625rem;
+  --text-7xl: 4.375rem;
+  --text-8xl: 5.875rem;
+  --text-9xl: 7.875rem;
+  --font-weight-normal: 450;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Same rule as apps/docs/styles/globals.css: headings use font-heading
+ * (Manrope) by default instead of the body's font-sans (Inter). */
+h1:not(.font-mono),
+h2:not(.font-mono),
+h3:not(.font-mono),
+h4:not(.font-mono),
+h5:not(.font-mono),
+h6:not(.font-mono),
+.h1:not(.font-mono),
+.h2:not(.font-mono),
+.h3:not(.font-mono),
+.h4:not(.font-mono),
+.h5:not(.font-mono),
+.h6:not(.font-mono) {
+  @apply font-heading font-semibold;
+}
+
+*,
+::after,
+::before,
+::backdrop,
+::file-selector-button {
+  border-color: var(--border-default, currentColor);
+}
+
+/* TEMPORARY UNTIL WE IMPLEMENT OUR OWN CODE COMPONENT */
+.prose pre code {
+  padding: 1rem;
+  display: inline-block;
+}
