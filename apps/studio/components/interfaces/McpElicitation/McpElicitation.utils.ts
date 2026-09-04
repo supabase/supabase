@@ -1,22 +1,29 @@
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import utc from 'dayjs/plugin/utc'
+
 import { UNKNOWN_CLIENT_LABEL } from './McpElicitation.constants'
 import type {
   ElicitationCopy,
   ElicitationOutcomeState,
   ElicitationProviderHint,
+  ElicitationRequest,
 } from './McpElicitation.types'
 
+dayjs.extend(relativeTime)
+dayjs.extend(utc)
+
 /**
- * Every user-visible mention of the client, key, project or provider resolves
- * through here so a request for any provider (or none we recognize) reads
- * correctly. Nothing below may hardcode a provider or key name.
+ * Every user-visible mention of the key, project or provider resolves through
+ * here so a request for any provider (or none we recognize) reads correctly.
+ * Nothing below may hardcode a provider or key name.
  */
 
-export function getClientLabel(client: string | null) {
-  return client ?? UNKNOWN_CLIENT_LABEL
-}
-
-const RETURN_TO_CLIENT_STEP = (client: string | null) =>
-  `Go back to ${getClientLabel(client)} and choose "I've completed it" to finish the tool call.`
+/**
+ * v1 is stateless, so the link never says which client sent the user here. The
+ * copy names the generic label instead of guessing.
+ */
+const RETURN_TO_CLIENT_STEP = `Go back to ${UNKNOWN_CLIENT_LABEL} and choose "I've completed it" to finish the tool call.`
 
 const CLOSE_TAB_FOOTER = 'You can close this tab.'
 
@@ -26,7 +33,7 @@ const UNVERIFIED_KEY_FOOTER =
 export function getElicitationCopy(state: ElicitationOutcomeState): ElicitationCopy {
   switch (state.status) {
     case 'stored': {
-      const { keyName, project, client } = state.request
+      const { keyName, project } = state.request
       const savedSentence = `${keyName} is saved for ${project}.`
 
       if (state.timedOut) {
@@ -44,7 +51,7 @@ export function getElicitationCopy(state: ElicitationOutcomeState): ElicitationC
         title: 'Key stored',
         subtitle: savedSentence,
         calloutTitle: 'Next step',
-        calloutBody: RETURN_TO_CLIENT_STEP(client),
+        calloutBody: RETURN_TO_CLIENT_STEP,
         footer: UNVERIFIED_KEY_FOOTER,
       }
     }
@@ -54,7 +61,7 @@ export function getElicitationCopy(state: ElicitationOutcomeState): ElicitationC
         title: 'This key is already stored',
         subtitle: `${state.request.keyName} was saved for ${state.request.project}. Nothing further to do here.`,
         calloutTitle: 'Next step',
-        calloutBody: RETURN_TO_CLIENT_STEP(state.request.client),
+        calloutBody: RETURN_TO_CLIENT_STEP,
         footer: CLOSE_TAB_FOOTER,
       }
 
@@ -84,11 +91,51 @@ export function getElicitationCopy(state: ElicitationOutcomeState): ElicitationC
         calloutBody: 'Try again later, or set the key in project settings instead.',
         footer: CLOSE_TAB_FOOTER,
       }
+
+    // Deliberately reason-free: the user can't act on a status code, and the
+    // only two ways in (lookup refused, write failed) have the same recovery.
+    case 'error':
+      return {
+        title: "Couldn't complete this request",
+        subtitle: 'Nothing was stored.',
+        calloutTitle: 'Next step',
+        calloutBody:
+          'Ask your agent to run the tool again, or set the key in project settings instead.',
+        footer: CLOSE_TAB_FOOTER,
+      }
   }
 }
 
 export function getSecretHelperText(project: string) {
   return `Stored encrypted for ${project}. Anyone with write access to this project can use it. Remove it any time from project settings.`
+}
+
+/**
+ * The one place the page admits it is about to destroy something. Storing stays
+ * enabled — replacing the key is usually exactly what the user came to do.
+ */
+export function getOverwriteWarning(request: ElicitationRequest) {
+  const { existingSecret, keyName } = request
+  if (existingSecret === undefined) return undefined
+
+  const updatedAt = existingSecret.updatedAt
+  const age = updatedAt === undefined ? undefined : formatSecretAge(updatedAt)
+
+  return age === undefined
+    ? `${keyName} already exists. Storing will replace it.`
+    : `${keyName} already exists — updated ${age} ago. Storing will replace it.`
+}
+
+/**
+ * The secrets endpoint returns either an ISO string or unix microseconds, so we
+ * normalize the same way `TimestampInfo` does. `fromNow(true)` drops the suffix
+ * because the caller owns the "ago".
+ */
+function formatSecretAge(updatedAt: string) {
+  const isUnixMicro = !Number.isNaN(Number(updatedAt)) && updatedAt.length === 16
+  const parsed = isUnixMicro ? dayjs.unix(Number(updatedAt) / 1000 / 1000) : dayjs.utc(updatedAt)
+
+  return parsed.isValid() ? parsed.fromNow(true) : undefined
 }
 
 /**
@@ -102,5 +149,5 @@ export function getSecretPrefixWarning(
   const prefix = providerHint?.prefix
   if (!prefix || value.length === 0 || value.startsWith(prefix)) return undefined
 
-  return `${providerHint.name} keys usually start with ${prefix}. You can still save this one.`
+  return `${providerHint.name} keys usually start with ${prefix}. You can still store this one.`
 }

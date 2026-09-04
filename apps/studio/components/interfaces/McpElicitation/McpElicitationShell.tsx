@@ -1,3 +1,4 @@
+import { ShieldAlert } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { cn } from 'ui'
 
@@ -41,5 +42,20 @@ export const McpElicitationFooter = ({
     )}
   >
     {children}
+  </p>
+)
+
+/**
+ * The v1 trust anchor. The link is forgeable — anyone can mint a `?ref=&name=`
+ * URL — so the page cannot claim a tool is waiting. It asks the user to confirm
+ * the intent instead, and sits above the details table where it is read before
+ * anything is typed.
+ *
+ * Warning-toned rather than destructive: nothing has gone wrong yet.
+ */
+export const McpElicitationTrustLine = ({ children }: { children: ReactNode }) => (
+  <p className="flex items-start gap-2.5 rounded-md border border-warning-400 bg-warning-200 px-3 py-2.5 text-xs text-foreground">
+    <ShieldAlert size={14} className="mt-px shrink-0 text-warning-600" aria-hidden />
+    <span className="text-balance">{children}</span>
   </p>
 )

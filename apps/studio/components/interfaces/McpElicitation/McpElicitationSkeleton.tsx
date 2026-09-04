@@ -4,8 +4,8 @@ import { McpElicitationDetailsSkeleton } from './McpElicitationDetails'
 import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
 
 /**
- * Reserves the header and details table at their resolved heights so the card
- * doesn't jump when the request arrives.
+ * Reserves the header, trust line and details table at their resolved heights
+ * so the card doesn't jump when the request arrives.
  */
 export const McpElicitationSkeleton = () => (
   <InterstitialLayout
@@ -19,6 +19,7 @@ export const McpElicitationSkeleton = () => (
     }
   >
     <div className="flex flex-col gap-6 px-6 pb-6">
+      <Skeleton className="h-[38px] w-full" />
       <McpElicitationDetailsSkeleton />
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">

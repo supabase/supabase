@@ -13,19 +13,24 @@ import {
   InputGroupInput,
   Separator,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
 import type { ElicitationRequest } from './McpElicitation.types'
-import { getSecretHelperText, getSecretPrefixWarning } from './McpElicitation.utils'
+import {
+  getOverwriteWarning,
+  getSecretHelperText,
+  getSecretPrefixWarning,
+} from './McpElicitation.utils'
 import { McpElicitationDetails } from './McpElicitationDetails'
-import { McpElicitationShell } from './McpElicitationShell'
+import { McpElicitationShell, McpElicitationTrustLine } from './McpElicitationShell'
 
 const FORM_ID = 'mcp-elicitation-form'
 const KEY_NAME_FIELD_ID = 'mcp-elicitation-key-name'
 
 const FormSchema = z.object({
-  secret: z.string().min(1, 'Enter the key value to save'),
+  secret: z.string().min(1, 'Enter the key value'),
 })
 
 type FormValues = z.infer<typeof FormSchema>
@@ -52,12 +57,17 @@ export const McpElicitationForm = ({
   // Stored exactly as typed. Any future paste cleanup has to be visible and
   // confirmed, so nothing here trims or rewrites the value.
   const prefixWarning = getSecretPrefixWarning(secret, providerHint)
+  const overwriteWarning = getOverwriteWarning(request)
 
   return (
     <McpElicitationShell
       title="Store an API key"
       subtitle="Supabase is asking for this key on behalf of a tool call. It never passes through your AI client."
     >
+      <McpElicitationTrustLine>
+        Only continue if you asked your AI client to store this secret.
+      </McpElicitationTrustLine>
+
       <McpElicitationDetails request={request} />
 
       <Form {...form}>
@@ -129,9 +139,14 @@ export const McpElicitationForm = ({
             {prefixWarning && <p className="text-xs text-warning-600">{prefixWarning}</p>}
           </div>
 
+          {/* Storing stays enabled: replacing the key is usually the point. */}
+          {overwriteWarning && (
+            <Admonition type="warning" description={overwriteWarning} className="mb-0" />
+          )}
+
           <div className="flex flex-col gap-2">
-            <Button block variant="primary" type="submit" loading={isSaving}>
-              Save
+            <Button block variant="primary" type="submit" loading={isSaving} disabled={isSaving}>
+              {isSaving ? 'Storing...' : 'Store'}
             </Button>
             <Button block variant="text" type="button" disabled={isSaving} onClick={onCancel}>
               Cancel
