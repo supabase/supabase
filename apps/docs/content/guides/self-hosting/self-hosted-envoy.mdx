@@ -80,15 +80,16 @@ Envoy cannot natively read environment variables inside its config. The entrypoi
 1. A SHA1+base64 hash of `DASHBOARD_PASSWORD` is computed and joined with `DASHBOARD_USERNAME` into a single `DASHBOARD_BASIC_AUTH` string in the `username:{SHA}<base64-encoded-sha1>` format that Envoy's `basic_auth` filter expects. Other hash formats are not supported.
 2. The following variables are then substituted into `lds.template.yaml` and the result is written to `lds.yaml`:
 
-| Variable                      | Used for                                                                  |
-| ----------------------------- | ------------------------------------------------------------------------- |
-| `ANON_KEY`                    | Legacy HS256 anon JWT (API key validation, RBAC)                          |
-| `SERVICE_ROLE_KEY`            | Legacy HS256 service_role JWT (API key validation, RBAC)                  |
-| `SUPABASE_PUBLISHABLE_KEY`    | Opaque `sb_publishable_*` key (translation source)                        |
-| `SUPABASE_SECRET_KEY`         | Opaque `sb_secret_*` key (translation source)                             |
-| `ANON_KEY_ASYMMETRIC`         | Pre-signed ES256 anon JWT (translation target; internal use only)         |
-| `SERVICE_ROLE_KEY_ASYMMETRIC` | Pre-signed ES256 service_role JWT (translation target; internal use only) |
-| `DASHBOARD_BASIC_AUTH`        | Dashboard basic auth credentials (computed in step 1)                     |
+| Variable                      | Used for                                                                             |
+| ----------------------------- | ------------------------------------------------------------------------------------ |
+| `ANON_KEY`                    | Legacy HS256 anon JWT (API key validation, RBAC)                                     |
+| `SERVICE_ROLE_KEY`            | Legacy HS256 service_role JWT (API key validation, RBAC)                             |
+| `SUPABASE_PUBLISHABLE_KEY`    | Opaque `sb_publishable_*` key (translation source)                                   |
+| `SUPABASE_SECRET_KEY`         | Opaque `sb_secret_*` key (translation source)                                        |
+| `ANON_KEY_ASYMMETRIC`         | Pre-signed ES256 anon JWT (translation target; internal use only)                    |
+| `SERVICE_ROLE_KEY_ASYMMETRIC` | Pre-signed ES256 service_role JWT (translation target; internal use only)            |
+| `DASHBOARD_BASIC_AUTH`        | Dashboard basic auth credentials (computed in step 1)                                |
+| `SUPABASE_PUBLIC_URL`         | Allowed CORS origin for the `/pg/` route (normalized before substitution, see below) |
 
 3. If all four of `SUPABASE_SECRET_KEY`, `SUPABASE_PUBLISHABLE_KEY`, `ANON_KEY_ASYMMETRIC`, and `SERVICE_ROLE_KEY_ASYMMETRIC` are set, opaque key translation is enabled. Otherwise, Envoy runs in legacy-only mode and only legacy HS256 keys are accepted. The entrypoint prints which mode is active to the container log at startup.
 
@@ -199,7 +200,7 @@ The gateway applies a permissive CORS policy at the virtual-host level:
 
 This matches both the current Supabase platform behavior and the previous Kong-based gateway. The auth boundary for Supabase APIs is the `apikey` header rather than the request origin.
 
-The `/pg/` route (direct Postgres introspection via `meta`, gated by the service role key) is the exception: it carries its own stricter per-route CORS override, restricted to `SUPABASE_PUBLIC_URL` and `localhost`/`127.0.0.1` origins, since there's no legitimate reason for this route to be called from an arbitrary third-party origin.
+The `/pg/` route is the exception. This route runs direct Postgres introspection through `meta` and requires the service role key. It uses a stricter per-route CORS override that allows only `SUPABASE_PUBLIC_URL`, `localhost`, and `127.0.0.1` origins. No third-party origin needs to call it.
 
 <Admonition type="note">
 
