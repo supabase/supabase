@@ -29,6 +29,8 @@ Never chain `gh pr create --base <previous-branch>`. That produces correct base 
 2. `gh stack view` confirms the structure and shows the mapped PR for each branch.
 3. `gh stack submit --auto` pushes and registers the stack on GitHub. Use `--auto` in a non-interactive session, where the editor can't open. New PRs are created as drafts unless you pass `--open`.
 
+**Check the titles after submitting.** `submit` can title a PR from its branch name rather than its commit subject. Fix any that came out wrong with `gh pr edit <pr> --title`.
+
 **Safe to re-run on PRs that already exist.** `submit` reports each one "up to date" and reuses it, so PR numbers, descriptions, draft state, and creation timestamps survive. Verify that by diffing the bodies afterward rather than assuming it.
 
 **Other commands.** `gh stack link <pr> <pr> <pr>` registers the GitHub stack without local tracking. `gh stack unstack` removes a stack. The extension is `github/gh-stack`.

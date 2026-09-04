@@ -95,6 +95,8 @@ When a claim does fail the test, verify before you change it, per Phase 1 of [`w
 
 Testing covers procedural content only. Claims that nothing executes, such as limits, defaults, and positioning, still need the code read above.
 
+**A branch above can change the answer.** The test is applied to the page as it stands, so a claim that passes inspection here can become wrong once an additions branch contradicts it. That correction belongs to the branch that creates the conflict, not back down here. Say so when you leave the claim, so the later change reads as intended rather than as a missed finding.
+
 **If every finding fails the test, PR 3 is empty.** Say what you checked and what you're deliberately leaving, then drop the branch. An empty PR 3 means verified and fine, not skipped. A technical concern raised later in the stack is then a new request, per the boundary rule in Phase 0.
 
 ## PR 4+: Additions, on request only
@@ -128,11 +130,13 @@ Run this before submitting each branch, not once at the end of the stack:
 - [ ] No invented behavior or positioning
 - [ ] Shared pitfalls checklist considered
 
-**Anchors.** Before renaming or rewording a heading, grep for `#<old-anchor-slug>` under `apps/docs/content` and update the matches. This is a PR 2 gate, since that's the branch where headings move.
+**Anchors.** Before renaming or rewording a heading, grep for `#<old-anchor-slug>` **across the repo, not just `apps/docs/content`.** Studio renders Docs buttons that deep-link into guide anchors, and `apps/www` links into them too. Those are the matches that break a button in the product rather than a link between two pages. Moving a section is safe; changing the heading text is what breaks the slug. This is a PR 2 gate, since that's the branch where headings move.
 
 **Frontmatter `title`.** It follows the same sentence-case rule as a heading. Renaming it moves a navigation label and a search entry, not just a line of prose, so it clears this same gate and lands in PR 2 rather than PR 1.
 
 **Lint and format.** Follow [`write-the-docs/reference/drafting-mechanics.md`](../write-the-docs/reference/drafting-mechanics.md). Then run the [`review-the-docs`](../review-the-docs/SKILL.md) local self-review: `pnpm lint:mdx`, plus `pnpm build:guides-markdown` when a guide, explainer, or tutorial changed.
+
+`build:guides-markdown` writes `apps/docs/public/markdown/manifest.json`, which the repo tracks and commits as `[]`. Discard that file before committing. It's a build artifact, not part of the edit.
 
 ## Additional resources
 
