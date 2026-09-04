@@ -1,11 +1,12 @@
 import {
   CliConfigSchema,
+  diffProjectConfig,
   fromApiProjectConfig,
   type CliConfig,
+  type ConfigChange,
   type EffectiveConfig,
   type ProjectConfig,
 } from '@supabase/config'
-import { diffProjectConfig, type ConfigChange } from '@supabase/config/internal'
 import { Schema } from 'effect'
 import { isPlainObject } from 'lodash'
 
