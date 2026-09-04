@@ -86,6 +86,10 @@ When a claim does fail the test, verify before you change it, per Phase 1 of [`w
 - Where code and product intent disagree, code wins for behavior claims. Flag the mismatch.
 - Flag anything you inferred in the PR description, not in the MDX.
 
+**Run the snippets when the page has them.** Offer [`test-the-docs`](../test-the-docs/SKILL.md) before you start, and don't run it unasked. A snippet that fails in the sandbox is the most direct evidence a claim fails the wrong-outcome test, because the reader hits the same error. Attach the verification report to the PR body. If the author declines, record the artifacts as deferred and carry on with the code read.
+
+Testing covers procedural content only. Claims that nothing executes, such as limits, defaults, and positioning, still need the code read above.
+
 **If every finding fails the test, PR 3 is empty.** Say what you checked and what you're deliberately leaving, then drop the branch. An empty PR 3 means verified and fine, not skipped. A technical concern raised later in the stack is then a new request, per the boundary rule in Phase 0.
 
 ## PR 4: Additions, on request only
@@ -134,5 +138,6 @@ Run this before submitting each branch, not once at the end of the stack:
 **Sibling skills:**
 
 - Pitfalls and drafting mechanics: [`common-pitfalls.md`](../write-the-docs/reference/common-pitfalls.md), [`drafting-mechanics.md`](../write-the-docs/reference/drafting-mechanics.md)
+- Runnable verification: [`test-the-docs`](../test-the-docs/SKILL.md)
 - Architecture and IA: [`ask-the-docs`](../ask-the-docs/SKILL.md)
 - Net-new drafts: [`write-the-docs`](../write-the-docs/SKILL.md)
