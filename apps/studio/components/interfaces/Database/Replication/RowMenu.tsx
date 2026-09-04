@@ -166,11 +166,14 @@ export const RowMenu = ({
             <Button
               variant="default"
               className="px-1.25 hit-area-2"
-              aria-label="Pipeline options"
+              aria-label={hasUpdate ? 'Pipeline options, update available' : 'Pipeline options'}
               icon={<MoreVertical />}
             />
             {hasUpdate && (
-              <span className="absolute -top-0.5 -right-0.5 h-2 w-2 bg-brand rounded-full" />
+              <span
+                className="absolute -top-0.5 -right-0.5 h-2 w-2 bg-brand rounded-full"
+                aria-hidden
+              />
             )}
           </div>
         </DropdownMenuTrigger>

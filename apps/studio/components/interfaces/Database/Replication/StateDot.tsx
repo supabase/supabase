@@ -36,7 +36,7 @@ export const StateDot = forwardRef<HTMLSpanElement, StateDotProps>(
         {isPulsing && (
           <span
             className={cn(
-              'absolute inline-flex h-full w-full animate-ping rounded-full opacity-75',
+              'absolute inline-flex h-full w-full animate-ping motion-reduce:animate-none rounded-full opacity-75',
               DOT_CLASS_NAME[variant]
             )}
             style={pulseDelayMs > 0 ? { animationDelay: `${pulseDelayMs}ms` } : undefined}

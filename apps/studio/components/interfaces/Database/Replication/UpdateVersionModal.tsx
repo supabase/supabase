@@ -49,7 +49,8 @@ export const UpdateVersionModal = ({
   const currentVersionName = versionData?.version?.name
   const newVersionName = versionData?.new_version?.name
 
-  const { mutateAsync: updatePipelineVersion } = useUpdatePipelineVersionMutation()
+  const { mutateAsync: updatePipelineVersion, isPending: isUpdating } =
+    useUpdatePipelineVersionMutation()
 
   const onConfirmUpdate = async () => {
     if (!projectRef || !pipeline?.id) return
@@ -84,6 +85,7 @@ export const UpdateVersionModal = ({
       title="Update available"
       confirmLabel={resolvedConfirmLabel}
       confirmLabelLoading={confirmLabelLoading}
+      loading={isUpdating}
       onCancel={onClose}
       onConfirm={onConfirmUpdate}
     >

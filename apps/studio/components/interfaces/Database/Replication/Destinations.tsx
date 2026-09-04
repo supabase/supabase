@@ -309,7 +309,10 @@ export const Destinations = () => {
                 <DropdownMenuItem
                   className="data-disabled:pointer-events-auto data-disabled:cursor-not-allowed"
                   disabled={!canDisablePipelines}
-                  onClick={() => setShowDisablePipelinesDialog(true)}
+                  onClick={() => {
+                    if (!canDisablePipelines) return
+                    setShowDisablePipelinesDialog(true)
+                  }}
                 >
                   <div className="flex flex-col gap-y-0.5">
                     <p>Disable Pipelines</p>

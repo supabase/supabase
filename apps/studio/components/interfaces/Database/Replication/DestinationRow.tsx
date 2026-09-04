@@ -108,10 +108,9 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
   })
   const hasUpdate = Boolean(versionData?.new_version)
 
-  const handleNavigation = createNavigationHandler(
-    `/project/${projectRef}/database/replication/${pipeline?.id}`,
-    router
-  )
+  const handleNavigation = pipeline
+    ? createNavigationHandler(`/project/${projectRef}/database/replication/${pipeline.id}`, router)
+    : undefined
 
   const onDeleteClick = async () => {
     if (!projectRef) {
@@ -154,7 +153,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
           </TableCell>
         </TableRow>
       )}
-      {isPipelineSuccess && (
+      {isPipelineSuccess && pipeline && (
         <TableRow
           className="relative cursor-pointer focus-inset"
           onClick={handleNavigation}
@@ -236,6 +235,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
             <div className="flex items-center justify-end gap-x-2">
               <div
                 onClick={(event) => event.stopPropagation()}
+                onAuxClick={(event) => event.stopPropagation()}
                 onKeyDown={(event) => event.stopPropagation()}
               >
                 <RowMenu

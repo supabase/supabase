@@ -53,6 +53,7 @@ import {
   type ReplicationPipelineTableStatus,
 } from '@/data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
+import { onSearchInputEscape } from '@/lib/keyboard'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -329,6 +330,7 @@ export const ReplicationPipelineStatus = () => {
                     value={searchString}
                     disabled={isPipelineError}
                     onChange={(e) => setSearchString(e.target.value)}
+                    onKeyDown={onSearchInputEscape(searchString, setSearchString)}
                     actions={
                       searchString.length > 0 && [
                         <X
@@ -417,6 +419,13 @@ export const ReplicationPipelineStatus = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
+                        <tr className="sr-only" aria-live="polite" role="status">
+                          <td colSpan={4}>
+                            {filteredTableStatuses.length === 0 && searchString.length > 0
+                              ? `No results found for "${searchString}"`
+                              : ''}
+                          </td>
+                        </tr>
                         {filteredTableStatuses.length === 0 && (
                           <TableRow className="[&>td]:hover:bg-inherit">
                             <TableCell colSpan={4}>
