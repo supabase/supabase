@@ -1,10 +1,4 @@
-import {
-  literal,
-  safeSql,
-  untrustedSql,
-  type SafeSqlFragment,
-  type UntrustedSqlFragment,
-} from '@supabase/pg-meta'
+import { untrustedSql, type SafeSqlFragment, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { TABLE_EVENT_ACTIONS } from 'common/telemetry-constants'
 
 import { isLogsSource, sqlSourceToFenceLanguage, type SqlSnippetSource } from './querySource'
@@ -26,6 +20,7 @@ import type { SnippetWithContent } from '@/data/content/sql-folders-query'
 import type { DatabaseEventTrigger } from '@/data/database-event-triggers/database-event-triggers-query'
 import { untrustedLogSql, type UntrustedLogSqlFragment } from '@/data/logs/safe-analytics-sql'
 import type { Database } from '@/data/read-replicas/replicas-query'
+import { applyAutoLimit } from '@/data/sql/utils'
 import { generateUuid } from '@/lib/api/snippets.browser'
 import { removeCommentsFromSql } from '@/lib/helpers'
 import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
@@ -333,7 +328,9 @@ export function deriveSnippetIdentity({
 }): { id: string; isLoading: boolean } {
   const id = !urlId || urlId === 'new' ? generatedId : urlId
 
-  const snippetIsLoading = !(id in snippets && snippets[id].snippet.content !== undefined)
+  // `snippets` is typed as always present, but has been seen arriving `undefined` at runtime, and
+  // an entry can be missing its `snippet`. Either case means the content isn't there yet.
+  const snippetIsLoading = snippets?.[id]?.snippet?.content === undefined
   const isLoading = urlId === 'new' ? false : snippetIsLoading
 
   return { id, isLoading }
@@ -382,66 +379,6 @@ export const compareAsNewSnippet = (sqlDiff: ContentDiff) => {
     original: '',
     modified: sqlDiff.modified,
   }
-}
-
-/**
- * Removes trailing `;` characters from a safe SQL fragment. Only ever removes
- * existing terminators — never adds text — so the result is exactly as safe
- * as the input; the brand carries over intentionally. This is the one place
- * in the file allowed to reassert `SafeSqlFragment` on a derived string —
- * every other function composes new fragments through `safeSql`/`literal`.
- */
-export function trimTrailingSemicolons(sql: SafeSqlFragment): SafeSqlFragment {
-  return sql.replace(/;+\s*$/, '') as SafeSqlFragment
-}
-
-// [Joshen] Just FYI as well the checks here on whether to append limit is quite restricted
-// This is to prevent dashboard from accidentally appending limit to the end of a query
-// thats not supposed to have any, since there's too many cases to cover.
-// We can however look into making this logic better in the future
-// i.e It's harder to append the limit param, than just leaving the query as it is
-// Otherwise we'd need a full on parser to do this properly
-//
-// Only accepts `SafeSqlFragment`: this decides whether to build (and builds)
-// a new SQL fragment that gets executed, so every caller — including ones
-// that only want the `appendAutoLimit` flag for a display hint — must already
-// hold safe SQL. Composes the ` limit N;` suffix through `safeSql`/`literal`
-// rather than gluing raw template-literal text onto the fragment and casting
-// the result, so the only new content this function ever stamps safe is an
-// internally-generated integer literal, never arbitrary concatenated text.
-export function applyAutoLimit(
-  sql: SafeSqlFragment,
-  limit: number = 0
-): { sql: SafeSqlFragment; appendAutoLimit: boolean } {
-  // Remove lines and whitespaces to use for checking
-  const cleanedSql = sql.trim().replaceAll('\n', ' ').replaceAll(/\s+/g, ' ')
-
-  // Check how many queries
-  const regMatch = cleanedSql.matchAll(/[a-zA-Z]*[0-9]*[;]+/g)
-  const queries = new Array(...regMatch)
-  const indexSemiColon = cleanedSql.lastIndexOf(';')
-  const hasComments = cleanedSql.includes('--')
-  const hasMultipleQueries =
-    queries.length > 1 || (indexSemiColon > 0 && indexSemiColon !== cleanedSql.length - 1)
-
-  // Check if need to auto limit rows
-  const appendAutoLimit =
-    limit > 0 &&
-    !hasComments &&
-    !hasMultipleQueries &&
-    cleanedSql.toLowerCase().startsWith('select') &&
-    !cleanedSql.toLowerCase().match(/fetch\s+first/i) &&
-    !cleanedSql.match(/limit$/i) &&
-    !cleanedSql.match(/limit;$/i) &&
-    !cleanedSql.match(/limit [0-9]* offset [0-9]*\s*[;]?$/i) &&
-    !cleanedSql.match(/limit [0-9]*\s*[;]?$/i)
-
-  if (!appendAutoLimit) return { sql, appendAutoLimit: false }
-
-  const core = cleanedSql.endsWith(';') ? trimTrailingSemicolons(sql) : sql
-  const suffixed = safeSql`${core} limit ${literal(limit)};`
-
-  return { sql: suffixed, appendAutoLimit: true }
 }
 
 /**

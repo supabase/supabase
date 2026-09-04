@@ -7,11 +7,11 @@ export const BigQueryFormSchema = z.object({
   connectionPoolSize: z
     .number()
     .int()
-    .min(1, 'Connection pool size must be greater than 0')
+    .min(1, 'Connection pool size must be greater than 0.')
     .optional(),
   maxStalenessMins: z
     .number()
-    .int('Maximum staleness must be a whole number of minutes')
-    .min(0, 'Maximum staleness must be 0 or greater')
+    .int('Maximum staleness must be a whole number of minutes.')
+    .min(0, 'Maximum staleness must be 0 or greater.')
     .optional(),
 })

@@ -1,7 +1,21 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getBlockChain, getBlockingChain, getConnectionMetrics } from './DatabaseConnections.utils'
+import {
+  filterActivities,
+  getBlockChain,
+  getBlockingChain,
+  getConnectionMetrics,
+  type ActivityFilters,
+} from './DatabaseConnections.utils'
 import { type DatabaseActivity } from '@/data/database/activity-query'
+
+const EMPTY_FILTERS: ActivityFilters = {
+  search: '',
+  states: [],
+  applications: [],
+  roles: [],
+  view: '',
+}
 
 const NOW = '2024-01-15T12:00:00Z'
 
@@ -31,6 +45,7 @@ const activity = (overrides: ActivityOverrides = {}): DatabaseActivity => ({
   application_name: 'test',
   blocked_by: [],
   query: 'select 1',
+  backend_start: NOW,
   query_start: null,
   transaction_start: null,
   state_change: null,
@@ -329,5 +344,88 @@ describe('getBlockingChain', () => {
     ]
 
     expect(getBlockingChain(1, activities)).toEqual([2])
+  })
+})
+
+describe('filterActivities', () => {
+  it('returns everything when no filters are applied', () => {
+    const activities = [activity({ pid: 1 }), activity({ pid: 2 })]
+
+    expect(filterActivities(activities, EMPTY_FILTERS)).toHaveLength(2)
+  })
+
+  it('filters by role', () => {
+    const activities = [
+      activity({ pid: 1, role_name: 'anon' }),
+      activity({ pid: 2, role_name: 'postgres' }),
+    ]
+
+    const result = filterActivities(activities, { ...EMPTY_FILTERS, roles: ['anon'] })
+
+    expect(result.map((x) => x.pid)).toEqual([1])
+  })
+
+  it('filters by state', () => {
+    const activities = [activity({ pid: 1, state: 'active' }), activity({ pid: 2, state: 'idle' })]
+
+    const result = filterActivities(activities, { ...EMPTY_FILTERS, states: ['idle'] })
+
+    expect(result.map((x) => x.pid)).toEqual([2])
+  })
+
+  it('filters by application', () => {
+    const activities = [
+      activity({ pid: 1, application_name: 'studio' }),
+      activity({ pid: 2, application_name: 'psql' }),
+    ]
+
+    const result = filterActivities(activities, { ...EMPTY_FILTERS, applications: ['psql'] })
+
+    expect(result.map((x) => x.pid)).toEqual([2])
+  })
+
+  it('filters by search matching the query text, case-insensitively', () => {
+    const activities = [
+      activity({ pid: 1, query: 'select * from users' }),
+      activity({ pid: 2, query: 'select * from orders' }),
+    ]
+
+    const result = filterActivities(activities, { ...EMPTY_FILTERS, search: 'USERS' })
+
+    expect(result.map((x) => x.pid)).toEqual([1])
+  })
+
+  it('excludes activities with a null query from a search filter', () => {
+    const activities = [activity({ pid: 1, query: null })]
+
+    expect(filterActivities(activities, { ...EMPTY_FILTERS, search: 'anything' })).toEqual([])
+  })
+
+  it('in blockers view, only keeps root blockers - excludes leaf/idle activities', () => {
+    const activities = [
+      activity({ pid: 1, blocked_by: [] }), // blocks pid 2, not itself blocked - root blocker
+      activity({ pid: 2, blocked_by: [1] }), // itself blocked - not a root blocker
+      activity({ pid: 3, blocked_by: [] }), // not blocked, and blocks nobody
+    ]
+
+    const result = filterActivities(activities, { ...EMPTY_FILTERS, view: 'blockers' })
+
+    expect(result.map((x) => x.pid)).toEqual([1])
+  })
+
+  it('combines multiple filters with AND semantics', () => {
+    const activities = [
+      activity({ pid: 1, role_name: 'anon', state: 'active' }),
+      activity({ pid: 2, role_name: 'anon', state: 'idle' }),
+      activity({ pid: 3, role_name: 'postgres', state: 'active' }),
+    ]
+
+    const result = filterActivities(activities, {
+      ...EMPTY_FILTERS,
+      roles: ['anon'],
+      states: ['active'],
+    })
+
+    expect(result.map((x) => x.pid)).toEqual([1])
   })
 })

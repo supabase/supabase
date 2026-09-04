@@ -24,9 +24,13 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface AIAssistantChatSelectorProps {
   disabled?: boolean
+  shortcutsEnabled?: boolean
 }
 
-export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSelectorProps) => {
+export const AIAssistantChatSelector = ({
+  disabled = false,
+  shortcutsEnabled = true,
+}: AIAssistantChatSelectorProps) => {
   const snap = useAiAssistantStateSnapshot()
 
   const [chatSelectorOpen, setChatSelectorOpen] = useState(false)
@@ -35,7 +39,13 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
 
   const chats = Object.entries(snap.chats)
 
-  useShortcut(SHORTCUT_IDS.AI_ASSISTANT_TOGGLE_HISTORY, () => setChatSelectorOpen((prev) => !prev))
+  useShortcut(
+    SHORTCUT_IDS.AI_ASSISTANT_TOGGLE_HISTORY,
+    () => setChatSelectorOpen((prev) => !prev),
+    {
+      enabled: shortcutsEnabled,
+    }
+  )
 
   const handleSelectChat = (id: string) => {
     snap.selectChat(id)

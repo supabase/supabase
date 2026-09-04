@@ -28,9 +28,9 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE: 'supabase-ui-sql-editor-manual-save',
   UI_PREVIEW_MARKETPLACE: 'supabase-ui-marketplace',
   UI_PREVIEW_DATABASE_CONNECTIONS: 'preview-database-connections',
+  UI_PREVIEW_EXPLORER: 'preview-explorer',
 
   AI_ASSISTANT_MCP_OPT_IN: 'ai-assistant-mcp-opt-in',
-  SIGN_IN_CHATGPT_ENABLED: 'siwc-enabled',
 
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
   STORAGE_PREFERENCE: (ref: string) => `storage-explorer-${ref}`,
@@ -51,6 +51,11 @@ export const LOCAL_STORAGE_KEYS = {
   SQL_EDITOR_SECTION_STATE: (ref: string) => `sql-editor-section-state-${ref}`,
   SQL_EDITOR_SORT: (ref: string) => `sql-editor-sort-${ref}`,
   SQL_EDITOR_MANUAL_SAVE_NOTICE_DISMISSED: 'sql-editor-manual-save-notice-dismissed',
+  // Set when a user follows the "temporarily switch to SQL Editor" link from Explorer;
+  // shows a way back and is cleared once they return to Explorer
+  SQL_EDITOR_TEMPORARY_FROM_EXPLORER: (ref: string) => `sql-editor-temporary-from-explorer-${ref}`,
+
+  EXPLORER_QUERY_DRAFTS: (ref: string) => `explorer-query-drafts-${ref}`,
 
   LOG_EXPLORER_SPLIT_SIZE: 'supabase_log-explorer-split-size',
   GRAPHQL_INTROSPECTION_NOTICE_COLLAPSED: (ref: string) =>
@@ -102,6 +107,10 @@ export const LOCAL_STORAGE_KEYS = {
   // RLS event trigger banner dismissed
   RLS_EVENT_TRIGGER_BANNER_DISMISSED: (ref: string) => `rls-event-trigger-banner-dismissed-${ref}`,
 
+  // Read replicas moved from Replication → Infrastructure
+  READ_REPLICAS_MOVED_CALLOUT_DISMISSED: (ref: string) =>
+    `read-replicas-moved-callout-dismissed-${ref}`,
+
   PROJECT_SECURITY_DISMISSED_AT: (ref: string) => `project-security-dismissed-at-${ref}`,
 
   DATABASE_CONNECTIONS_BANNER_DISMISSED: (ref: string) =>
@@ -110,6 +119,7 @@ export const LOCAL_STORAGE_KEYS = {
     `organization-marketplace-banner-dismissed-${orgSlug}-${managedBy}`,
   PROJECT_INTEGRATION_BANNER_DISMISSED: (ref: string, integrationSource: string) =>
     `project-integration-banner-dismissed-${ref}-${integrationSource}`,
+  EXPLORER_BANNER_DISMISSED: `explorer-banner-dismissed`,
 
   TABLE_EDITOR_QUEUE_OPERATIONS_BANNER_DISMISSED: (ref: string) =>
     `table-editor-queue-operations-banner-dismissed-${ref}`,
@@ -117,11 +127,12 @@ export const LOCAL_STORAGE_KEYS = {
     `free-micro-upgrade-banner-dismissed-${ref}`,
   PROJECT_UPGRADE_FAILED_BANNER_DISMISSED_AT: (ref: string) =>
     `project-upgrade-failed-banner-dismissed-at-${ref}`,
-  UNIFIED_LOGS_BANNER_DISMISSED: 'unified-logs-banner-dismissed',
   UNIFIED_LOGS_SIDEBAR_BANNER_DISMISSED: 'unified-logs-sidebar-banner-dismissed',
+  // Dated so the key retires with the banner; see BannerLogsAllDeprecation
+  LOGS_ALL_DEPRECATION_2026_09_23: 'logs-all-deprecation-2026-09-23-dismissed',
+  SCOPED_TOKENS_MIGRATION_ADMONITION_DISMISSED: 'scoped-tokens-migration-admonition-dismissed',
   STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED: (ref: string, bucketId: string) =>
     `storage-public-bucket-select-policy-warning-dismissed-${ref}-${bucketId}`,
-
   /**
    * COMMON
    */
@@ -165,7 +176,6 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST,
   LOCAL_STORAGE_KEYS.BLOG_VIEW,
   LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
-  LOCAL_STORAGE_KEYS.SIGN_IN_CHATGPT_ENABLED,
   LOCAL_STORAGE_KEYS.LINTER_SHOW_FOOTER,
   LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
   LOCAL_STORAGE_KEYS.UI_TIMEZONE,

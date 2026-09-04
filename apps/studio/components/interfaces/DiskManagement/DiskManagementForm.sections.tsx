@@ -29,6 +29,7 @@ import { DiskSpaceBar } from './ui/DiskSpaceBar'
 import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { HighAvailabilityDisabledSectionNotice } from '@/components/ui/HighAvailability/HighAvailabilityDisabledSectionNotice'
 import { RequestUpgradeToBillingOwners } from '@/components/ui/RequestUpgradeToBillingOwners'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -68,7 +69,15 @@ export function ComputeSection({
           <DocsButton href={`${DOCS_URL}/guides/platform/compute-and-disk`} />
         </PageSectionAside>
       </PageSectionMeta>
-      <PageSectionContent ref={settingsRef} className="scroll-mt-24">
+      <PageSectionContent
+        ref={settingsRef}
+        id="compute"
+        className="scroll-mt-24 flex flex-col gap-4"
+      >
+        <HighAvailabilityDisabledSectionNotice
+          title="Compute size can't be changed on High Availability projects"
+          description="High Availability projects run on a fixed compute size during Alpha. Contact support if this is blocking your work."
+        />
         <ComputeSizeField form={form} disabled={disabled} />
       </PageSectionContent>
     </PageSection>
@@ -141,6 +150,9 @@ export function DiskSection({
           <DocsButton href={`${DOCS_URL}/guides/platform/database-size`} />
         </PageSectionAside>
       </PageSectionMeta>
+
+      <HighAvailabilityDisabledSectionNotice title="Disk management is unavailable for High Availability projects" />
+
       <PageSectionContent ref={settingsRef} className="flex flex-col gap-4 scroll-mt-24">
         {isAws && <DiskSpaceBar form={form} />}
 
@@ -246,7 +258,7 @@ export function AdvancedSection({
       <PageSectionContent className="flex flex-col gap-4">
         <Card ref={autoscaleSettingsRef} className="scroll-mt-24">
           <CardContent className="flex flex-col gap-y-8">
-            <AutoScaleFields form={form} />
+            <AutoScaleFields form={form} disableInput={disableDiskInputs && disableDiskSizeInput} />
           </CardContent>
         </Card>
 

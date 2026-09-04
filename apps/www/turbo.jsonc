@@ -20,6 +20,9 @@
         "NEXT_PUBLIC_STUDIO_URL",
         "NEXT_PUBLIC_DOCS_URL",
         "NEXT_PUBLIC_REFERENCE_DOCS_URL",
+        "NEXT_PUBLIC_LIBRARY_URL",
+        "NEXT_PUBLIC_KB_URL",
+        // Temporary fallback during the production environment-variable migration.
         "NEXT_PUBLIC_UI_LIBRARY_URL",
         "NEXT_PUBLIC_SUPABASE_URL",
         "NEXT_PUBLIC_SUPABASE_ANON_KEY",
