@@ -115,14 +115,14 @@ Deno.serve(async (req: Request) => {
       const isValidJWT = await isValidHybridJWT(token);
 
       if (!isValidJWT) {
-        return new Response(JSON.stringify({ msg: 'Invalid JWT' }), {
+        return new Response(JSON.stringify({ error: 'Invalid JWT' }), {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
         })
       }
     } catch (e) {
       console.error(e)
-      return new Response(JSON.stringify({ msg: e.toString() }), {
+      return new Response(JSON.stringify({ error: e.toString() }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
       })
@@ -135,7 +135,7 @@ Deno.serve(async (req: Request) => {
   const service_name = path_parts[1]
 
   if (!service_name || service_name === '') {
-    const error = { msg: 'missing function name in request' }
+    const error = { error: 'missing function name in request' }
     return new Response(JSON.stringify(error), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
@@ -148,8 +148,13 @@ Deno.serve(async (req: Request) => {
   const memoryLimitMb = 150
   const workerTimeoutMs = 1 * 60 * 1000
   const noModuleCache = false
-  const importMapPath = null
-  const envVarsObj = Deno.env.toObject()
+  // Using a common Import Map for all functions 
+  // to use a scope 'deno.json' it must be dinamically resolved base on the 'service_name'
+  const importMapPath = `/home/deno/functions/deno.jsonc`
+  // SUPABASE_FUNCTION_SLUG is listed after the container env snapshot so
+  // nothing in it can shadow the value, and it is per-request because only this
+  // worker knows which function the request resolved to.
+  const envVarsObj = { ...Deno.env.toObject(), SUPABASE_FUNCTION_SLUG: service_name }
   const envVars = Object.keys(envVarsObj).map((k) => [k, envVarsObj[k]])
 
   try {
@@ -163,7 +168,7 @@ Deno.serve(async (req: Request) => {
     })
     return await worker.fetch(req)
   } catch (e) {
-    const error = { msg: e.toString() }
+    const error = { error: e.toString() }
     return new Response(JSON.stringify(error), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
