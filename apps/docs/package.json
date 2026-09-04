@@ -182,7 +182,6 @@
     "typescript": "catalog:",
     "unist-util-visit-parents": "5.1.3",
     "vite": "catalog:",
-    "vite-tsconfig-paths": "catalog:",
     "vitest": "catalog:"
   }
 }

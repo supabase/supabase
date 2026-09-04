@@ -49,7 +49,6 @@ catalog:
   typescript: ~6.0.2
   valtio: ^2.3.2
   vite: ^8.0.16
-  vite-tsconfig-paths: ^6.1.1
   vitest: ^5.0.0
   zod: 3.25.76
 
