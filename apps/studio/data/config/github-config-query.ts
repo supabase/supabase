@@ -1,8 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import type { components } from 'api-types'
-import { z } from 'zod'
 
-import { gitHubConfigTomlSchema } from '@/components/interfaces/ConfigDrift/github-config.types'
 import { get, handleError } from '@/data/fetchers'
 import type { UseCustomQueryOptions } from '@/types'
 
@@ -11,9 +9,7 @@ export type GitHubConfigVariables = {
   branch?: string
 }
 
-type GithubConfigQueryResponse = components['schemas']['GetGitHubConnectionConfigResponse'] & {
-  config: z.infer<typeof gitHubConfigTomlSchema>
-}
+type GithubConfigQueryResponse = components['schemas']['GetGitHubConnectionConfigResponse']
 
 export const githubConfigKeys = {
   all: ['github-config'] as const,
@@ -39,17 +35,7 @@ export async function getGitHubConfig(
   )
 
   if (error) return handleError(error)
-  const parsed = gitHubConfigTomlSchema.safeParse(data.config)
-  if (parsed.error) {
-    return handleError(
-      new Error(`Invalid response from Github config API: ${parsed.error.message}`)
-    )
-  }
-
-  return {
-    ...data,
-    config: parsed.data,
-  }
+  return data
 }
 
 export const useGitHubConfigQuery = <TData = GithubConfigQueryResponse>(
