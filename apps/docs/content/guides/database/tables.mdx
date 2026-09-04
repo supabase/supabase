@@ -1,6 +1,6 @@
 ---
 id: 'tables'
-title: 'Tables and Data'
+title: 'Tables and data'
 description: 'Creating and using Postgres tables.'
 video: 'https://www.youtube.com/v/TKwF3IGij5c'
 ---
@@ -22,6 +22,13 @@ For example, this table has 3 columns named `id`, `name`, and `description`, and
 {/* supa-mdx-lint-enable Rule003Spelling */}
 
 There are a few important differences from a spreadsheet, but it's a good starting point if you're new to relational databases.
+
+This guide is organized into four groups:
+
+- [Creating tables](#creating-tables) and [loading data](#loading-data) take you from an empty database to a table with rows in it.
+- [Joining tables with foreign keys](#joining-tables-with-foreign-keys) and [schemas](#schemas) cover relating and organizing tables once you have more than one.
+- [Views](#views) cover saved queries that behave like tables, including materialized views.
+- [Reference](#reference) lists the column data types that Postgres supports.
 
 ## Creating tables
 
@@ -86,68 +93,6 @@ When naming tables, use lowercase and underscores instead of spaces. For example
 
 </Admonition>
 
-## Columns
-
-You must define the data type when you create a column.
-
-### Data types
-
-Every column has a data type. Postgres provides many [default types](https://www.postgresql.org/docs/current/datatype.html), and you can design your own or use extensions if the default types don't fit your needs. You can use any data type that Postgres supports via the SQL editor. The Table Editor supports a subset of these, which keeps the experience focused for people with less database experience.
-
-<details>
-<summary>Show/Hide default data types</summary>
-
-| `Name`                            | `Aliases`     | `Description`                                                    |
-| --------------------------------- | ------------- | ---------------------------------------------------------------- |
-| `bigint`                          | `int8`        | signed eight-byte integer                                        |
-| `bigserial`                       | `serial8`     | autoincrementing eight-byte integer                              |
-| `bit`                             |               | fixed-length bit string                                          |
-| `bit varying`                     | `varbit`      | variable-length bit string                                       |
-| `boolean`                         | `bool`        | logical Boolean (true/false)                                     |
-| `box`                             |               | rectangular box on a plane                                       |
-| `bytea`                           |               | binary data (“byte array”)                                       |
-| `character`                       | `char`        | fixed-length character string                                    |
-| `character varying`               | `varchar`     | variable-length character string                                 |
-| `cidr`                            |               | IPv4 or IPv6 network address                                     |
-| `circle`                          |               | circle on a plane                                                |
-| `date`                            |               | calendar date (year, month, day)                                 |
-| `double precision`                | `float8`      | double precision floating-point number (8 bytes)                 |
-| `inet`                            |               | IPv4 or IPv6 host address                                        |
-| `integer`                         | `int`, `int4` | signed four-byte integer                                         |
-| `interval [ fields ]`             |               | time span                                                        |
-| `json`                            |               | textual JSON data                                                |
-| `jsonb`                           |               | binary JSON data, decomposed                                     |
-| `line`                            |               | infinite line on a plane                                         |
-| `lseg`                            |               | line segment on a plane                                          |
-| `macaddr`                         |               | MAC (Media Access Control) address                               |
-| `macaddr8`                        |               | MAC (Media Access Control) address (EUI-64 format)               |
-| `money`                           |               | currency amount                                                  |
-| `numeric`                         | `decimal`     | exact numeric of selectable precision                            |
-| `path`                            |               | geometric path on a plane                                        |
-| `pg_lsn`                          |               | Postgres Log Sequence Number                                     |
-| `pg_snapshot`                     |               | user-level transaction ID snapshot                               |
-| `point`                           |               | geometric point on a plane                                       |
-| `polygon`                         |               | closed geometric path on a plane                                 |
-| `real`                            | `float4`      | single precision floating-point number (4 bytes)                 |
-| `smallint`                        | `int2`        | signed two-byte integer                                          |
-| `smallserial`                     | `serial2`     | autoincrementing two-byte integer                                |
-| `serial`                          | `serial4`     | autoincrementing four-byte integer                               |
-| `text`                            |               | variable-length character string                                 |
-| `time [ without time zone ]`      |               | time of day (no time zone)                                       |
-| `time with time zone`             | `timetz`      | time of day, including time zone                                 |
-| `timestamp [ without time zone ]` |               | date and time (no time zone)                                     |
-| `timestamp with time zone`        | `timestamptz` | date and time, including time zone                               |
-| `tsquery`                         |               | text search query                                                |
-| `tsvector`                        |               | text search document                                             |
-| `txid_snapshot`                   |               | user-level transaction ID snapshot (deprecated; see pg_snapshot) |
-| `uuid`                            |               | universally unique identifier                                    |
-| `xml`                             |               | XML data                                                         |
-
-</details>
-
-You can cast columns from one type to another, but some types are incompatible.
-For example, if you cast a `timestamp` to a `date`, you lose all the time information that was previously saved.
-
 ### Primary keys
 
 A table can have a primary key, a unique identifier for every row of data. A few tips for primary keys:
@@ -177,10 +122,12 @@ create table movies (
 );
 ```
 
+You now have a table with its columns and primary key defined. To put rows in it, continue to [Loading data](#loading-data).
+
 ## Loading data
 
 There are several ways to load data in Supabase. You can load data directly into the database, or use the [Data API](/docs/guides/api).
-If you're loading large data sets, follow the bulk data loading instructions.
+If you're loading large data sets, follow the [bulk data loading](#bulk-data-loading) instructions.
 
 ### Basic data loading
 
@@ -412,27 +359,6 @@ For example, consider this situation:
 - A movie can have several `actors`.
 - An `actor` can perform in several movies.
 
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="dashboard"
-  queryGroup="database-method"
->
-<TabPanel id="dashboard" label="Dashboard">
-
-<div className="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/TKwF3IGij5c"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
-
-</TabPanel>
-<TabPanel id="sql" label="SQL">
-
 ```sql
 create table movies (
   id bigint generated by default as identity primary key,
@@ -451,9 +377,6 @@ create table performances (
   actor_id bigint not null references actors
 );
 ```
-
-</TabPanel>
-</Tabs>
 
 ## Schemas
 
@@ -495,6 +418,8 @@ A custom schema isn't reachable through the Supabase Data API until you expose i
 </Admonition>
 
 ## Views
+
+This section covers views, which sit on top of the tables above.
 
 A view is a convenient shortcut to a query. Creating a view doesn't involve new tables or data. When you run a view, Postgres executes the underlying query and returns its results.
 
@@ -667,6 +592,68 @@ How often you refresh a materialized view is up to you, and it probably differs 
 Materialized views are useful when execution times for queries or views are too slow. This happens in views or queries that involve multiple tables and billions of rows. Use a materialized view only when you can tolerate outdated data. Internal dashboards and analytics are common use cases.
 
 Creating a materialized view isn't a solution to inefficient queries. Always optimize a slow-running query, even when you implement a materialized view.
+
+## Reference
+
+Reference material for choosing a column type.
+
+### Data types
+
+Every column has a data type. Postgres provides many [default types](https://www.postgresql.org/docs/current/datatype.html), and you can design your own or use extensions if the default types don't fit your needs. You can use any data type that Postgres supports via the SQL editor. The Table Editor supports a subset of these, which keeps the experience focused for people with less database experience.
+
+<details>
+<summary>Show/Hide default data types</summary>
+
+| `Name`                            | `Aliases`     | `Description`                                                    |
+| --------------------------------- | ------------- | ---------------------------------------------------------------- |
+| `bigint`                          | `int8`        | signed eight-byte integer                                        |
+| `bigserial`                       | `serial8`     | autoincrementing eight-byte integer                              |
+| `bit`                             |               | fixed-length bit string                                          |
+| `bit varying`                     | `varbit`      | variable-length bit string                                       |
+| `boolean`                         | `bool`        | logical Boolean (true/false)                                     |
+| `box`                             |               | rectangular box on a plane                                       |
+| `bytea`                           |               | binary data (“byte array”)                                       |
+| `character`                       | `char`        | fixed-length character string                                    |
+| `character varying`               | `varchar`     | variable-length character string                                 |
+| `cidr`                            |               | IPv4 or IPv6 network address                                     |
+| `circle`                          |               | circle on a plane                                                |
+| `date`                            |               | calendar date (year, month, day)                                 |
+| `double precision`                | `float8`      | double precision floating-point number (8 bytes)                 |
+| `inet`                            |               | IPv4 or IPv6 host address                                        |
+| `integer`                         | `int`, `int4` | signed four-byte integer                                         |
+| `interval [ fields ]`             |               | time span                                                        |
+| `json`                            |               | textual JSON data                                                |
+| `jsonb`                           |               | binary JSON data, decomposed                                     |
+| `line`                            |               | infinite line on a plane                                         |
+| `lseg`                            |               | line segment on a plane                                          |
+| `macaddr`                         |               | MAC (Media Access Control) address                               |
+| `macaddr8`                        |               | MAC (Media Access Control) address (EUI-64 format)               |
+| `money`                           |               | currency amount                                                  |
+| `numeric`                         | `decimal`     | exact numeric of selectable precision                            |
+| `path`                            |               | geometric path on a plane                                        |
+| `pg_lsn`                          |               | Postgres Log Sequence Number                                     |
+| `pg_snapshot`                     |               | user-level transaction ID snapshot                               |
+| `point`                           |               | geometric point on a plane                                       |
+| `polygon`                         |               | closed geometric path on a plane                                 |
+| `real`                            | `float4`      | single precision floating-point number (4 bytes)                 |
+| `smallint`                        | `int2`        | signed two-byte integer                                          |
+| `smallserial`                     | `serial2`     | autoincrementing two-byte integer                                |
+| `serial`                          | `serial4`     | autoincrementing four-byte integer                               |
+| `text`                            |               | variable-length character string                                 |
+| `time [ without time zone ]`      |               | time of day (no time zone)                                       |
+| `time with time zone`             | `timetz`      | time of day, including time zone                                 |
+| `timestamp [ without time zone ]` |               | date and time (no time zone)                                     |
+| `timestamp with time zone`        | `timestamptz` | date and time, including time zone                               |
+| `tsquery`                         |               | text search query                                                |
+| `tsvector`                        |               | text search document                                             |
+| `txid_snapshot`                   |               | user-level transaction ID snapshot (deprecated; see pg_snapshot) |
+| `uuid`                            |               | universally unique identifier                                    |
+| `xml`                             |               | XML data                                                         |
+
+</details>
+
+You can cast columns from one type to another, but some types are incompatible.
+For example, if you cast a `timestamp` to a `date`, you lose all the time information that was previously saved.
 
 ## Resources
 
