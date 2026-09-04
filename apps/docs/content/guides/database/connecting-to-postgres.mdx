@@ -105,7 +105,7 @@ Your connection library keeps its own pool of connections, separate from the poo
 In a serverless function:
 
 1. Create the client once at module scope, not per request.
-2. Set the pool to 1 connection per invocation. Raise it only when you have evidence that you need more.
+2. Set the pool to 1 connection. The client is shared by every invocation on that warm instance, so this caps the instance, not the request.
 3. Turn off prepared statements, which [transaction mode](#pooler-transaction-mode) doesn't support.
 
 ```ts lib/db.ts
@@ -118,6 +118,8 @@ export const sql = postgres(process.env.DATABASE_URL, {
 ```
 
 Library defaults assume a persistent backend, so they are too high for serverless. [Postgres.js](https://github.com/porsager/postgres) defaults to 10 connections. That is 10 connections for every warm instance of your function, and the number of warm instances isn't something you control. A few dozen instances is enough to exhaust the pool.
+
+Raise the pool above 1 only when you have evidence that concurrent invocations on one instance are queuing for the connection.
 
 For more on sizing an application-side pool, see the [Supavisor FAQ](/docs/guides/troubleshooting/supavisor-faq-YyP5tI). If you use Prisma, [Prisma troubleshooting](/docs/guides/database/prisma/prisma-troubleshooting) covers the equivalent `connection_limit` setting.
 
