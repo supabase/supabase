@@ -416,6 +416,10 @@
       "type": "boolean",
       "description": "Enable the Dart/Flutter SDK"
     },
+    "sdk:elixir": {
+      "type": "boolean",
+      "description": "Enable the Elixir SDK"
+    },
     "sdk:kotlin": {
       "type": "boolean",
       "description": "Enable the Kotlin SDK"
@@ -536,6 +540,7 @@
     "sdk:auth",
     "sdk:csharp",
     "sdk:dart",
+    "sdk:elixir",
     "sdk:kotlin",
     "sdk:python",
     "sdk:swift",
