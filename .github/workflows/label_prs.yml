@@ -22,5 +22,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: 'The `api-deploy-required` label was auto-applied to this PR because it updates the API types. Ensure that the new or updated API, if any, is deployed on production before **removing the label** and merging this PR.',
+              body: 'The `api-deploy-required` label was auto-applied to this PR because it updates the API types. The required `Verify production API types` check confirms that these types match production before the PR can merge.',
             })

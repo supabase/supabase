@@ -1,0 +1,50 @@
+name: Verify production API types
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  verify-production-api-types:
+    runs-on: ubuntu-latest
+    steps:
+      - id: changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" --paginate --jq '.[].filename' | rg -q '^packages/api-types/types/'; then
+            echo "api_types_changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "api_types_changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check out pull request
+        if: steps.changes.outputs.api_types_changed == 'true'
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          persist-credentials: false
+
+      - name: Install pnpm
+        if: steps.changes.outputs.api_types_changed == 'true'
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+        with:
+          run_install: false
+
+      - name: Set up Node.js
+        if: steps.changes.outputs.api_types_changed == 'true'
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version-file: '.nvmrc'
+          cache: pnpm
+
+      - name: Install API types dependencies
+        if: steps.changes.outputs.api_types_changed == 'true'
+        run: pnpm install --frozen-lockfile --filter=api-types...
+
+      - name: Verify production API types
+        if: steps.changes.outputs.api_types_changed == 'true'
+        run: pnpm --filter=api-types run verify-production-types
